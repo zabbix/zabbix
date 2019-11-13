@@ -2328,8 +2328,7 @@ class testFormItem extends CLegacyWebTest {
 
 	public function testFormItem_HousekeeperUpdate() {
 		$this->zbxTestLogin('adm.gui.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
@@ -2345,8 +2344,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
 
 		$this->zbxTestOpen('adm.gui.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global');
 		$this->zbxTestInputType('hk_history', '99d');
@@ -2367,8 +2365,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('adm.gui.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestInputType('hk_history', 90);
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
