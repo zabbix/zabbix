@@ -51,7 +51,10 @@ jQuery('#timeperiod_type').change(function() {
 
 function submitMaintenancePeriod(selector) {
 	var $container = jQuery(selector),
-		elements = jQuery('input:visible,select:visible,input[type=hidden]', $container).serialize();
+		elements;
+
+	$container.trimValues(['#start_date']);
+	elements = jQuery('input:visible,select:visible,input[type=hidden]', $container).serialize();
 
 	sendAjaxData('zabbix.php', {
 		data: elements,
