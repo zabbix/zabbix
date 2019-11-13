@@ -51,16 +51,16 @@ class CControllerUsergroupList extends CController {
 	}
 
 	protected function doAction() {
-		$sort_field = getRequest('sort', CProfile::get('web.usergroup.sort', 'name'));
-		$sort_order = getRequest('sortorder', CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.usergroup.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP));
 
 		CProfile::update('web.usergroup.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.usergroup.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		// filter
 		if (hasRequest('filter_set')) {
-			CProfile::update('web.usergroup.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.usergroup.filter_user_status', getRequest('filter_user_status', -1),
+			CProfile::update('web.usergroup.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.usergroup.filter_user_status', $this->getInput('filter_user_status', -1),
 				PROFILE_TYPE_INT
 			);
 		}
