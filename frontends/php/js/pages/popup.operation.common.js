@@ -103,7 +103,7 @@ function validateOperationPopup() {
 	url.setArgument('validate', 1);
 
 	$submit_btn
-		.attr('disabled', true)
+		.prop('disabled', true)
 		.hide();
 
 	return jQuery
@@ -113,9 +113,9 @@ function validateOperationPopup() {
 			dataType: 'json',
 			method: 'POST'
 		})
-		.done(function (response) {
+		.done(function(response) {
 			$submit_btn
-				.attr('disabled', false)
+				.prop('disabled', false)
 				.show();
 
 			if (typeof response.errors !== 'undefined') {

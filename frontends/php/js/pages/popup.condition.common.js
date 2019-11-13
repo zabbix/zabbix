@@ -70,12 +70,12 @@ function submitConditionPopup(response) {
 function validateConditionPopup() {
 	var $form = jQuery(document.forms['popup.condition']),
 		url = new Curl($form.attr('action')),
-		$submit_btn = jQuery('.popup-submit-btn');
+		$submit_btn = jQuery('.popup-condition-submit-btn');
 
 	url.setArgument('validate', 1);
 
 	$submit_btn
-		.attr('disabled', true)
+		.prop('disabled', true)
 		.hide();
 
 	return jQuery
@@ -85,9 +85,9 @@ function validateConditionPopup() {
 			dataType: 'json',
 			method: 'POST'
 		})
-		.done(function (response) {
+		.done(function(response) {
 			$submit_btn
-				.attr('disabled', false)
+				.prop('disabled', false)
 				.show();
 
 			$form
