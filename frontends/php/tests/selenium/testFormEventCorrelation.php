@@ -86,12 +86,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Operations');
 
 		foreach($data['operation'] as $operation) {
-			if ($operation === 'Close old events') {
-				$operation_id = 'operation_0_type';
-			}
-			else {
-				$operation_id = 'operation_1_type';
-			}
+			$operation_id = ($operation === 'Close old event') ? 'operation_0_type' : 'operation_1_type';
 			$this->zbxTestCheckboxSelect($operation_id);
 		}
 
