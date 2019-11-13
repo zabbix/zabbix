@@ -145,6 +145,10 @@ class CRouter {
 		'widget.url.view'					=> ['CControllerWidgetUrlView',						'layout.widget',		'monitoring.widget.url.view'],
 		'widget.plaintext.view'				=> ['CControllerWidgetPlainTextView',				'layout.widget',		'monitoring.widget.plaintext.view'],
 		'widget.hostavail.view'				=> ['CControllerWidgetHostAvailView',				'layout.widget',		'monitoring.widget.hostavail.view'],
+		'popup.action.operation'			=> ['CControllerPopupActionOperation',				'layout.json',			'popup.operation.common'],
+		'popup.action.recovery'				=> ['CControllerPopupActionRecovery',				'layout.json',			'popup.operation.common'],
+		'popup.action.acknowledge'			=> ['CControllerPopupActionAcknowledge',			'layout.json',			'popup.operation.common'],
+		'popup.condition.operations'		=> ['CControllerPopupConditionOperations',			'layout.json',			'popup.condition.common'],
 		'popup.generic'						=> ['CControllerPopupGeneric',						'layout.json',			'popup.generic'],
 		'popup.httpstep'					=> ['CControllerPopupHttpStep',						'layout.json',			'popup.httpstep'],
 		'popup.media'						=> ['CControllerPopupMedia',						'layout.json',			'popup.media'],
@@ -157,10 +161,6 @@ class CRouter {
 		'popup.triggerwizard'				=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
 		'popup.mediatypetest.edit'			=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'			=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
-		'popup.operation.condition.edit'	=> ['CControllerPopupConditionActionOperations',	'layout.json',			'popup.condition.common'],
-		'popup.action.operation.edit'		=> ['CControllerPopupActionOperationEdit',			'layout.json',			'popup.operation.common'],
-		'popup.action.recovery.edit'		=> ['CControllerPopupActionRecoveryEdit',			'layout.json',			'popup.operation.common'],
-		'popup.action.acknowledge.edit'		=> ['CControllerPopupActionAcknowledgeEdit',		'layout.json',			'popup.operation.common'],
 		'search'							=> ['CControllerSearch',							'layout.htmlpage',		'search']
 	];
 

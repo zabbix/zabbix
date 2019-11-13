@@ -637,7 +637,7 @@ switch ($data['type']) {
 		$opcondition_type_combobox = new CComboBox(
 			'condition_type',
 			$condition_type,
-			"reloadPopup(this.form, 'popup.operation.condition.edit');",
+			"reloadPopup(this.form, 'popup.condition.operations');",
 			$combobox_options
 		);
 

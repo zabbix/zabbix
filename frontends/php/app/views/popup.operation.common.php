@@ -744,7 +744,7 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 
 	$opcondition_table->addRow([
 		(new CSimpleButton(_('Add')))
-			->onClick('return PopUp("popup.operation.condition.edit",'.CJs::encodeJson([
+			->onClick('return PopUp("popup.condition.operations",'.CJs::encodeJson([
 				'type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 				'source' => $data['source']
 			]).', null, this);')

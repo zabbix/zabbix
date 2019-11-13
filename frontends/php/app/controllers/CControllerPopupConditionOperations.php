@@ -22,7 +22,7 @@
 /**
  * Actions operation new condition popup.
  */
-class CControllerPopupConditionActionOperations extends CControllerPopupConditionCommon {
+class CControllerPopupConditionOperations extends CControllerPopupConditionCommon {
 
 	/**
 	 * @inheritDoc
@@ -31,12 +31,12 @@ class CControllerPopupConditionActionOperations extends CControllerPopupConditio
 	 */
 	protected function getCheckInputs() {
 		return [
-			'type' => 'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-			'source' => 'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL]),
-			'validate' => 'in 1',
-			'condition_type' => 'not_empty|in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-			'operator' => 'not_empty|in '.CONDITION_OPERATOR_EQUAL,
-			'value' => 'not_empty|in '.implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED])
+			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
+			'source' =>			'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL]),
+			'validate' =>		'in 1',
+			'condition_type' =>	'not_empty|in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+			'operator' =>		'not_empty|in '.CONDITION_OPERATOR_EQUAL,
+			'value' =>			'not_empty|in '.implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED])
 		];
 	}
 

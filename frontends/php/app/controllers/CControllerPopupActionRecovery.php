@@ -19,24 +19,24 @@
 **/
 
 
-class CControllerPopupActionAcknowledgeEdit extends CControllerPopupOperationCommon {
+class CControllerPopupActionRecovery extends CControllerPopupOperationCommon {
 
 	protected function getCheckInputs() {
 		return [
-			'type' => 'required|in '.ACTION_ACKNOWLEDGE_OPERATION,
-			'source' => 'required|in '.EVENT_SOURCE_TRIGGERS,
-			'operationtype' => 'in '.implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]),
-			'actionid' => 'string',
-			'update' => 'in 1',
-			'validate' => 'in 1',
-			'operation' => 'array'
+			'type' =>			'required|in '.ACTION_RECOVERY_OPERATION,
+			'source' =>			'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL]),
+			'operationtype' =>	'in '.implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_RECOVERY_MESSAGE]),
+			'actionid' =>		'string',
+			'update' =>			'in 1',
+			'validate' =>		'in 1',
+			'operation' =>		'array'
 		];
 	}
 
 	protected function getFormDetails() {
 		return [
-			'param' => 'add_ack_operation',
-			'input_name' => 'new_ack_operation'
+			'param' => 'add_recovery_operation',
+			'input_name' => 'new_recovery_operation'
 		];
 	}
 }

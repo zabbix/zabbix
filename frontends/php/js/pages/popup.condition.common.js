@@ -57,7 +57,7 @@ function submitConditionPopup(response) {
 	if (form_param === 'add_opcondition') {
 		overlayDialogueDestroy(cond_dialogueid);
 
-		PopUp('popup.action.operation.edit', jQuery(document.forms['popup.operation']).serialize(), opr_dialogueid);
+		PopUp('popup.action.operation', jQuery(document.forms['popup.operation']).serialize(), opr_dialogueid);
 	}
 	else {
 		submitFormWithParam(form_name, form_param, '1');
