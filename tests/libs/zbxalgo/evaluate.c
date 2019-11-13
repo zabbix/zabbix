@@ -66,7 +66,7 @@ void	zbx_mock_test_entry(void **state)
 		}
 		else if (SUCCEED != is_double(tmp, NULL))
 		{
-			fail_msg("func_pos parameter \"%s\" is not double.", tmp);
+			fail_msg("func_pos parameter \"%s\" is not double or is out of range.", tmp);
 		}
 
 		expected_value = str2double(tmp);
