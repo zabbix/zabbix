@@ -317,20 +317,18 @@
 		return jQuery('#ports').val(getDCheckDefaultPort(jQuery('#type').val()));
 	}
 
-	var submit_dcheck_lock = false;
-
 	/**
 	 * Sends discovery check form data to the server for validation before adding it to the main form.
 	 *
 	 * @param {string} form_name  Form name that is sent to the server for validation.
 	 */
 	function submitDCheck(form_name) {
-		if (submit_dcheck_lock) {
-			return false;
-		}
-		submit_dcheck_lock = true;
+		var $form = jQuery(document.forms['dcheck_form']),
+			$submit_btn = jQuery('.popup-dcheck-submit-btn');
 
-		var $form = jQuery(document.forms['dcheck_form']);
+		$submit_btn
+			.prop('disabled', true)
+			.hide();
 
 		$form.trimValues([
 			'#ports', '#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
@@ -345,7 +343,9 @@
 				.data('dialogueid');
 
 		if (!dialogueid) {
-			submit_dcheck_lock = false;
+			$submit_btn
+				.prop('disabled', false)
+				.show();
 
 			return false;
 		}
@@ -355,11 +355,16 @@
 			dataType: 'json',
 			method: 'POST',
 		}).done(function(response) {
-			$form.parent().find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+			$submit_btn
+				.prop('disabled', false)
+				.show();
+
+			$form
+				.parent()
+				.find('.<?= ZBX_STYLE_MSG_BAD ?>')
+				.remove();
 
 			if (typeof response.errors !== 'undefined') {
-				submit_dcheck_lock = false;
-
 				return jQuery(response.errors).insertBefore($form);
 			}
 			else {
@@ -377,7 +382,6 @@
 					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				if (hasDCheckDuplicates()) {
-					submit_dcheck_lock = false;
 					jQuery(makeMessageBox('bad', <?= CJs::encodeJson(_('Check already exists.')) ?>, null, true, false))
 						.insertBefore($form);
 
@@ -386,8 +390,6 @@
 
 				addPopupValues([dcheck]);
 				overlayDialogueDestroy(dialogueid);
-
-				submit_dcheck_lock = false;
 			}
 		});
 	}

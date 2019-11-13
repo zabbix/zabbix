@@ -122,6 +122,7 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['update'] ? _('Update') : _('Add'),
+			'class' => 'popup-dcheck-submit-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'submitDCheck();'
