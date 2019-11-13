@@ -160,22 +160,61 @@ class CRouter {
 		'search'						=> ['CControllerSearch',							'layout.htmlpage',		'search']
 	];
 
-	public function __construct($action) {
-		$this->action = $action;
-		$this->calculateRoute();
+	/**
+	 * Add new actions (potentially overwritting the existing ones).
+	 *
+	 * @param array  $actions                           List of actions.
+	 * @param string $actions['action_name']            Definition of the 'action_name' action.
+	 * @param string $actions['action_name']['class']   Controller class name of the 'action_name' action.
+	 * @param string $actions['action_name']['layout']  Optional layout of the 'action_name' action.
+	 * @param string $actions['action_name']['view']    Optional view of the 'action_name' action.
+	 *
+	 * @return bool  True on success, false on insufficient data.
+	 */
+
+	public function addActions(array $actions) {
+		$new_routes = [];
+
+		foreach ($actions as $action => $route) {
+			if (!is_array($route) || !array_key_exists('class', $route)) {
+				return false;
+			}
+
+			$new_routes[$action] = [
+				$route['class'],
+				array_key_exists('layout', $route) ? $route['layout'] : null,
+				array_key_exists('view', $route) ? $route['view'] : null
+			];
+		}
+
+		$this->routes = array_replace($this->routes, $new_routes);
+
+		return true;
 	}
 
 	/**
-	 * Locate and set controller, layout and view by action name.
+	 * Set controller, layout and view associated with the specified action.
 	 *
-	 * @return string
+	 * @param string $action
+	 *
+	 * @return bool  True if route was found, false otherwise.
 	 */
-	public function calculateRoute() {
-		if (array_key_exists($this->action, $this->routes)) {
-			$this->controller = $this->routes[$this->action][0];
-			$this->layout = $this->routes[$this->action][1];
-			$this->view = $this->routes[$this->action][2];
+	public function setAction($action) {
+		$this->action = $action;
+
+		if (array_key_exists($action, $this->routes)) {
+			$this->controller = $this->routes[$action][0];
+			$this->layout = $this->routes[$action][1];
+			$this->view = $this->routes[$action][2];
+
+			return true;
 		}
+
+		$this->controller = null;
+		$this->layout = null;
+		$this->view = null;
+
+		return false;
 	}
 
 	/**
