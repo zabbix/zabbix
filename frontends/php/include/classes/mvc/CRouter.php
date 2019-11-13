@@ -171,7 +171,6 @@ class CRouter {
 	 *
 	 * @return bool  True on success, false on insufficient data.
 	 */
-
 	public function addActions(array $actions) {
 		$new_routes = [];
 
