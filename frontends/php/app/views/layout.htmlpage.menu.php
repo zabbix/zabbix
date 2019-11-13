@@ -63,9 +63,13 @@ $user_navigation = (new CList())
 				->setTitle(_('Help'))
 			)
 			->addItem(
-				(new CLink(SPACE, $data['user']['is_guest'] ? 'javascript:;' : 'profile.php'))
-					->addClass($data['user']['is_guest'] ? ZBX_STYLE_TOP_NAV_GUEST : ZBX_STYLE_TOP_NAV_PROFILE)
-					->setTitle(getUserFullname($data['user']))
+				$data['user']['is_guest']
+					? (new CSpan(' '))
+						->addClass(ZBX_STYLE_TOP_NAV_GUEST)
+						->setTitle(getUserFullname($data['user']))
+					: (new CLink(' ', 'profile.php'))
+						->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
+						->setTitle(getUserFullname($data['user']))
 			)
 			->addItem(
 				(new CLink(SPACE, 'javascript:;'))
