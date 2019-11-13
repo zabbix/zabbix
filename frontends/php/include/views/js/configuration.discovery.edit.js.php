@@ -323,12 +323,7 @@
 	 * @param {string} form_name  Form name that is sent to the server for validation.
 	 */
 	function submitDCheck(form_name) {
-		var $form = jQuery(document.forms['dcheck_form']),
-			$submit_btn = jQuery('.popup-dcheck-submit-btn');
-
-		$submit_btn
-			.prop('disabled', true)
-			.hide();
+		var $form = jQuery(document.forms['dcheck_form']);
 
 		$form.trimValues([
 			'#ports', '#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
@@ -343,10 +338,6 @@
 				.data('dialogueid');
 
 		if (!dialogueid) {
-			$submit_btn
-				.prop('disabled', false)
-				.show();
-
 			return false;
 		}
 
@@ -355,10 +346,6 @@
 			dataType: 'json',
 			method: 'POST',
 		}).done(function(response) {
-			$submit_btn
-				.prop('disabled', false)
-				.show();
-
 			$form
 				.parent()
 				.find('.<?= ZBX_STYLE_MSG_BAD ?>')
