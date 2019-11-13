@@ -64,10 +64,10 @@ $user_navigation = (new CList())
 			)
 			->addItem(
 				$data['user']['is_guest']
-					? (new CSpan(' '))
+					? (new CSpan())
 						->addClass(ZBX_STYLE_TOP_NAV_GUEST)
 						->setTitle(getUserFullname($data['user']))
-					: (new CLink(' ', 'profile.php'))
+					: (new CLink(null, 'profile.php'))
 						->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
 						->setTitle(getUserFullname($data['user']))
 			)
