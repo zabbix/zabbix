@@ -24,11 +24,6 @@
  */
 class CControllerPopupConditionOperations extends CControllerPopupConditionCommon {
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getCheckInputs() {
 		return [
 			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
@@ -40,11 +35,6 @@ class CControllerPopupConditionOperations extends CControllerPopupConditionCommo
 		];
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return string
-	 */
 	protected function getConditionLastType() {
 		$last_type = CProfile::get('popup.condition.operations_last_type', CONDITION_TYPE_EVENT_ACKNOWLEDGED);
 
@@ -56,18 +46,10 @@ class CControllerPopupConditionOperations extends CControllerPopupConditionCommo
 		return $last_type;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	protected function validateFieldsManually() {
 		return true;
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getManuallyValidatedFields() {
 		return [
 			'form' => [
@@ -83,11 +65,6 @@ class CControllerPopupConditionOperations extends CControllerPopupConditionCommo
 		];
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getControllerResponseData() {
 		return [
 			'title' => _('New condition'),
