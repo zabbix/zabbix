@@ -1,0 +1,42 @@
+---
+test case: "k[aaaaabbbbbccccc]:18"
+in:
+  key: "k[aaaaabbbbbccccc]"
+  len: "18"
+out:
+  key: "k[aaaaabbbbbccccc]"
+---
+test case: "k[aaaaabbbbbccccc]:19"
+in:
+  key: "k[aaaaabbbbbccccc]"
+  len: "19"
+out:
+  key: "k[aaaaabbbbbccccc]"
+---
+test case: "k[aaaaabbbbbccccc]:17"
+in:
+  key: "k[aaaaabbbbbccccc]"
+  len: "17"
+out:
+  key: "k[aaaaabbbbbc...]"
+---
+test case: "aaaaabbbbbccccc:15"
+in:
+  key: "aaaaabbbbbccccc"
+  len: "15"
+out:
+  key: "aaaaabbbbbccccc"
+---
+test case: "aaaaabbbbbccccc:16"
+in:
+  key: "aaaaabbbbbccccc"
+  len: "16"
+out:
+  key: "aaaaabbbbbccccc"
+---
+test case: "aaaaabbbbbccccc:14"
+in:
+  key: "aaaaabbbbbccccc"
+  len: "14"
+out:
+  key: "aaaaabbbbbc..."
