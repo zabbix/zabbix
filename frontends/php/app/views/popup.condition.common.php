@@ -648,7 +648,10 @@ switch ($data['type']) {
 		break;
 }
 
-$form->addItem($form_list);
+$form->addItem([
+	$form_list,
+	(new CInput('submit', 'submit'))->addStyle('display: none;')
+]);
 
 $output = [
 	'header' => $data['title'],
@@ -657,7 +660,7 @@ $output = [
 	'buttons' => [
 		[
 			'title' => _('Add'),
-			'class' => '',
+			'class' => 'popup-submit-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'return validateConditionPopup();'
