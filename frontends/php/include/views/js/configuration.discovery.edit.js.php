@@ -254,7 +254,7 @@
 						index: $rows.length
 					};
 
-					PopUp('popup.discovery.check.edit', params, null, $btn);
+					PopUp('popup.discovery.check', params, null, $btn);
 					break;
 
 				case 'edit':
@@ -274,7 +274,7 @@
 						}
 					});
 
-					PopUp('popup.discovery.check.edit', params, null, $btn);
+					PopUp('popup.discovery.check', params, null, $btn);
 					break;
 			}
 		});

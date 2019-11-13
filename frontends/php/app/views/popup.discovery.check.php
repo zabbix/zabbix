@@ -25,7 +25,7 @@ order_result($discovery_ckeck_types);
 $form = (new CForm())
 	->cleanItems()
 	->setName('dcheck_form')
-	->addVar('action', 'popup.discovery.check.edit')
+	->addVar('action', 'popup.discovery.check')
 	->addVar('validate', 1)
 	->addVar('index', $data['index']);
 
@@ -117,7 +117,7 @@ $form->addItem([
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.discovery.check.edit.js.php',
+	'script_inline' => require 'app/views/popup.discovery.check.js.php',
 	'body' => $form->toString(),
 	'buttons' => [
 		[
