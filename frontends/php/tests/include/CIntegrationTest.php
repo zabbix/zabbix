@@ -814,27 +814,6 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
-	 * Get timestamp of log line.
-	 *
-	 * @param string  $line       line
-	 *
-	 * @return integer|false
-	 */
-	public static function getLineTimestamp($line) {
-		$matches = [];
-		$regex = '/\d+:(\d+:\d+.\d+)/';
-
-		if (preg_match($regex, $line, $matches, PREG_UNMATCHED_AS_NULL) === 1) {
-			if ($matches[1] != null) {
-				$ts = DateTime::createFromFormat('Ymd:Gis.u', $matches[1]);
-				return $ts->format('U');
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Check if line is present.
 	 *
 	 * @param string       $component     name of the component
@@ -848,25 +827,6 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
-	 * Check if line is present and return timestamp of that line.
-	 *
-	 * @param string  $path          log file path
-	 * @param string|array $lines    line(s) to look for
-	 * @param boolean $incremental   flag to be used to enable incremental read
-	 *
-	 * @return null|integer|false
-	 */
-	public static function isLogLinePresentTimestamp($component, $lines, $incremental = true) {
-		$res = CLogHelper::readLogUntil(self::getLogPath($component), $lines, $incremental, true);
-
-		if ($res !== null) {
-			return self::getLineTimestamp($res);
-		}
-
-		return $res;
-	}
-
-	/**
 	 * Wait until line is present in log.
 	 *
 	 * @param string       $component     name of the component
@@ -874,11 +834,10 @@ class CIntegrationTest extends CAPITest {
 	 * @param boolean      $incremental   flag to be used to enable incremental read
 	 * @param integer      $iterations    iteration count
 	 * @param integer      $delay         iteration delay
-	 * @param integer      $timestamp     timestamp
 	 *
-	 * @throws Exception    on failed wait operation or missing/invalid timestamp
+	 * @throws Exception    on failed wait operation
 	 */
-	protected function waitForLogLineToBePresent($component, $lines, $incremental = true, $iterations = null, $delay = null, &$timestamp = null) {
+	protected function waitForLogLineToBePresent($component, $lines, $incremental = true, $iterations = null, $delay = null) {
 		if ($iterations === null) {
 			$iterations = self::WAIT_ITERATIONS;
 		}
@@ -888,20 +847,8 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		for ($r = 0; $r < $iterations; $r++) {
-			if ($timestamp === true) {
-				$ts = $this->isLogLinePresentTimestamp($component, $lines, $incremental);
-				if ($ts !== null) {
-					if ($ts === false) {
-						throw new Exception('Failed to get timestamp of the log line');
-					}
-
-					$timestamp = $ts;
-					return;
-				}
-			} else {
-				if ($this->isLogLinePresent($component, $lines, $incremental)) {
-					return;
-				}
+			if ($this->isLogLinePresent($component, $lines, $incremental)) {
+				return;
 			}
 
 			sleep($delay);

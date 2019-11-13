@@ -20,11 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
-define('REF_ACT_CHKS_INTERVAL', 60);
-define('PROCESS_ACT_CHKS_DELAY', 60);
-define('PSV_FILE_NAME', '/tmp/some_temp_file_psv');
-define('ACT_FILE_NAME', '/tmp/some_temp_file_act');
-
 /**
  * Test suite for items state change verification.
  *
@@ -35,16 +30,22 @@ define('ACT_FILE_NAME', '/tmp/some_temp_file_act');
  */
 class testItemState extends CIntegrationTest {
 
+	const REFRESH_ACT_CHKS_INTERVAL	= 60;
+	const PROCESS_ACT_CHKS_DELAY	= 60;
+	const LOG_LINE_WAIT_TIME	= 30;
+	const PSV_FILE_NAME		= '/tmp/some_temp_file_psv';
+	const ACT_FILE_NAME		= '/tmp/some_temp_file_act';
+
 	private static $hostid;
 	private static $interfaceid;
 
 	private static $items = [
 		'zbx_psv_01' => [
-			'key' => 'vfs.file.contents['.PSV_FILE_NAME.']',
+			'key' => 'vfs.file.contents['.self::PSV_FILE_NAME.']',
 			'type' => ITEM_TYPE_ZABBIX
 		],
 		'zbx_act_01' => [
-			'key' => 'vfs.file.contents['.ACT_FILE_NAME.']',
+			'key' => 'vfs.file.contents['.self::ACT_FILE_NAME.']',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE
 		]
 	];
@@ -167,8 +168,8 @@ class testItemState extends CIntegrationTest {
 			$item['itemid'] = $itemids[$id++];
 		}
 
-		$this->assertTrue(@file_put_contents(PSV_FILE_NAME, '1') !== false);
-		$this->assertTrue(@file_put_contents(ACT_FILE_NAME, '1') !== false);
+		$this->assertTrue(@file_put_contents(self::PSV_FILE_NAME, '1') !== false);
+		$this->assertTrue(@file_put_contents(self::ACT_FILE_NAME, '1') !== false);
 
 		return true;
 	}
@@ -187,10 +188,78 @@ class testItemState extends CIntegrationTest {
 			self::COMPONENT_AGENT => [
 				'Hostname'  => 'test_host',
 				'ServerActive'  => '127.0.0.1',
-				'RefreshActiveChecks' => REF_ACT_CHKS_INTERVAL,
+				'RefreshActiveChecks' => self::REFRESH_ACT_CHKS_INTERVAL,
 				'BufferSend' => 1
 			]
 		];
+	}
+
+	/**
+	 * Get timestamp of log last line.
+	 *
+	 * @param string  $content       log content
+	 *
+	 * @return integer|false
+	 */
+	public function getTimestamp($line) {
+		$matches = [];
+		$regex = '/\d+:(\d+:\d+.\d+)/';
+
+		if (preg_match($regex, $line, $matches, PREG_UNMATCHED_AS_NULL) === 1) {
+			if ($matches[1] != null) {
+				$ts = DateTime::createFromFormat('Ymd:Gis.u', $matches[1]);
+				return $ts->format('U');
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Wait until line is present in log.
+	 *
+	 * @param string       $component     name of the component
+	 * @param string|array $lines         line(s) to look for
+	 * @param integer      $iterations    iteration count
+	 *
+	 * @return integer
+	 *
+	 * @throws Exception    on failed wait or if not able to retrieve timestamp
+	 */
+	public function getLogLineTimestamp($component, $lines, $iterations = null) {
+		if ($iterations === null) {
+			$iterations = self::LOG_LINE_WAIT_TIME;
+		}
+
+		for ($r = 0; $r < $iterations; $r++) {
+			$log_content = CLogHelper::readLogUntil(self::getLogPath($component), $lines);
+
+			if ($log_content !== null) {
+				$log_content = $this->getTimestamp(strrchr(rtrim($log_content, "\n"), "\n"));
+
+				if ($log_content === false) {
+					throw new Exception('Failed to get timestamp of the log line');
+				}
+
+				return $log_content;
+			}
+
+			sleep(1);
+		}
+
+		if (is_array($lines)) {
+			$quoted = [];
+			foreach ($lines as $line) {
+				$quoted[] = '"'.$line.'"';
+			}
+
+			$description = 'any of the lines ['.implode(', ', $quoted).']';
+		}
+		else {
+			$description = 'line "'.$lines.'"';
+		}
+
+		throw new Exception('Failed to wait for '.$description.' to be present in '.$component.' log file.');
 	}
 
 	/**
@@ -226,13 +295,12 @@ class testItemState extends CIntegrationTest {
 	 * Routine to check item state and intervals.
 	 */
 	public function checkItemStatePassive($scenario, $state) {
-		$delay = ($scenario['after_sync'] === true || $state === ITEM_STATE_NORMAL ? $scenario['delay_s'] : $delay = $scenario['refresh_unsupported']);
-		$wait = $delay + 60;
+		$delay = ($scenario['after_sync'] === true || $state === ITEM_STATE_NORMAL) ? $scenario['delay_s'] : $delay = $scenario['refresh_unsupported'];
+		$wait = $delay + self::LOG_LINE_WAIT_TIME;
 		$key = self::$items[$scenario['name']]['key'];
 
 		// Wait for item to be checked
-		$first_check = true;
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ["In get_value() key:'".$key."'"], true, $wait, 1, $first_check);
+		$first_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In get_value() key:'".$key."'"], $wait);
 
 		// Check item state
 		sleep(1);
@@ -245,12 +313,10 @@ class testItemState extends CIntegrationTest {
 		$this->assertEquals($state, $response['result'][0]['state'], 'Unexpected item state='.$response['result'][0]['state'].' (expected='.$state.')');
 
 		// Verify item checks intervals
-		$check = true;
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ["In get_value() key:'".$key."'"], true, $wait, 1, $check);
+		$check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In get_value() key:'".$key."'"], $wait);
 		$this->assertTrue($check <= $first_check + $delay + 1);
 
-		$next_check = true;
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ["In get_value() key:'".$key."'"], true, $wait, 1, $next_check);
+		$next_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In get_value() key:'".$key."'"], $wait);
 		$this->assertTrue($next_check <= $check + $delay + 1 && $next_check >= $check + $delay - 1);
 	}
 
@@ -258,16 +324,15 @@ class testItemState extends CIntegrationTest {
 	 * Routine to check item state and intervals (active agent items).
 	 */
 	public function checkItemStateActive($scenario, $state, &$refresh) {
-		$wait = max($scenario['delay_s'], $scenario['refresh_unsupported'], REF_ACT_CHKS_INTERVAL) + PROCESS_ACT_CHKS_DELAY + 60;
+		$wait = max($scenario['delay_s'], $scenario['refresh_unsupported'], self::REFRESH_ACT_CHKS_INTERVAL) + self::PROCESS_ACT_CHKS_DELAY + self::LOG_LINE_WAIT_TIME;
 		$key = self::$items[$scenario['name']]['key'];
 
 		// Wait for item to be checked
-		$check = true;
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [',"data":[{"host":"test_host","key":"'.$key.'","value":"'], true, $wait, 1, $check);
+		$check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, [',"data":[{"host":"test_host","key":"'.$key.'","value":"'], $wait);
 
 		// Update last refresh timestamp
-		while ($check > $refresh + REF_ACT_CHKS_INTERVAL) {
-			$refresh += REF_ACT_CHKS_INTERVAL;
+		while ($check > $refresh + self::REFRESH_ACT_CHKS_INTERVAL) {
+			$refresh += self::REFRESH_ACT_CHKS_INTERVAL;
 		}
 
 		// Check item state and read update interval
@@ -281,25 +346,24 @@ class testItemState extends CIntegrationTest {
 		$this->assertEquals($state, $response['result'][0]['state'], 'Unexpected item state='.$response['result'][0]['state'].' (expected='.$state.')');
 
 		// Verify item checks intervals
-		$next_check = true;
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [',"data":[{"host":"test_host","key":"'.$key.'","value":"'], true, $wait, 1, $next_check);
+		$next_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, [',"data":[{"host":"test_host","key":"'.$key.'","value":"'], $wait);
 
-		while ($next_check > $refresh + REF_ACT_CHKS_INTERVAL) {
-			$refresh += REF_ACT_CHKS_INTERVAL;
+		while ($next_check > $refresh + self::REFRESH_ACT_CHKS_INTERVAL) {
+			$refresh += self::REFRESH_ACT_CHKS_INTERVAL;
 		}
 
 		if ($state === ITEM_STATE_NOTSUPPORTED) {
 			$exp_nextcheck_item = $check + $scenario['refresh_unsupported'];
 			while ($refresh < $exp_nextcheck_item) {
-				$refresh += REF_ACT_CHKS_INTERVAL;
+				$refresh += self::REFRESH_ACT_CHKS_INTERVAL;
 			}
 
 			$exp_nextcheck_process = $check;
 			while ($exp_nextcheck_process < $refresh) {
-				$exp_nextcheck_process += PROCESS_ACT_CHKS_DELAY;
+				$exp_nextcheck_process += self::PROCESS_ACT_CHKS_DELAY;
 			}
 
-			if ($scenario['delay_s'] > PROCESS_ACT_CHKS_DELAY) {
+			if ($scenario['delay_s'] > self::PROCESS_ACT_CHKS_DELAY) {
 				$exp_nextcheck_item = $check;
 
 				while ($exp_nextcheck_item < $exp_nextcheck_process) {
@@ -361,7 +425,7 @@ class testItemState extends CIntegrationTest {
 	 */
 	public function testItemState_checkPassive($data) {
 		// Set refresh unsupported items interval
-		$this->assertTrue(DBexecute('UPDATE config SET refresh_unsupported='.zbx_dbstr($data['refresh_unsupported'].'s').' WHERE configid=1'), "Failed to set config.refresh_unsupported");
+		$this->assertTrue(DBexecute('UPDATE config SET refresh_unsupported='.zbx_dbstr($data['refresh_unsupported'].'s').' WHERE configid=1'));
 
 		// Prepare item
 		$this->prepareItem(self::$items[$data['name']]['itemid'], $data['delay_s'].'s');
@@ -371,16 +435,16 @@ class testItemState extends CIntegrationTest {
 
 		// Make item not supported
 		if ($data['after_sync'] === true) {
-			$this->assertTrue(@file_put_contents(PSV_FILE_NAME, 'text') !== false);
+			$this->assertTrue(@file_put_contents(self::PSV_FILE_NAME, 'text') !== false);
 		} else {
-			$this->assertTrue(@unlink(PSV_FILE_NAME) !== false);
+			$this->assertTrue(@unlink(self::PSV_FILE_NAME) !== false);
 		}
 
 		// Check item state and intervals
 		$this->checkItemStatePassive($data, ITEM_STATE_NOTSUPPORTED);
 
 		// Make item supported
-		$this->assertTrue(@file_put_contents(PSV_FILE_NAME, '1') !== false);
+		$this->assertTrue(@file_put_contents(self::PSV_FILE_NAME, '1') !== false);
 
 		// Check item state and intervals
 		$this->checkItemStatePassive($data, ITEM_STATE_NORMAL);
@@ -393,26 +457,27 @@ class testItemState extends CIntegrationTest {
 	 */
 	public function testItemState_checkActive($data) {
 		// Set refresh unsupported items interval
-		$this->assertTrue(DBexecute('UPDATE config SET refresh_unsupported='.zbx_dbstr($data['refresh_unsupported'].'s').' WHERE configid=1'), "Failed to set config.refresh_unsupported");
+		$this->assertTrue(DBexecute('UPDATE config SET refresh_unsupported='.zbx_dbstr($data['refresh_unsupported'].'s').' WHERE configid=1'));
 
 		// Prepare item
 		$this->prepareItem(self::$items[$data['name']]['itemid'], $data['delay_s'].'s');
 
 		// Wait for the refresh active checks
-		$refresh_active = true;
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['trapper got \'{"request":"active checks","host":"test_host"}\''], true, REF_ACT_CHKS_INTERVAL + 5, 1, $refresh_active);
+		$refresh_active = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ['trapper got \'{"request":"active checks","host":"test_host"}\''],
+				self::REFRESH_ACT_CHKS_INTERVAL + self::LOG_LINE_WAIT_TIME
+		);
 
 		// Check item state and intervals
 		$this->checkItemStateActive($data, ITEM_STATE_NORMAL, $refresh_active);
 
 		// Make item not supported
-		$this->assertTrue(@unlink(ACT_FILE_NAME) !== false);
+		$this->assertTrue(@unlink(self::ACT_FILE_NAME) !== false);
 
 		// Check item state and intervals
 		$this->checkItemStateActive($data, ITEM_STATE_NOTSUPPORTED, $refresh_active);
 
 		// Make item supported
-		$this->assertTrue(@file_put_contents(ACT_FILE_NAME, '1') !== false);
+		$this->assertTrue(@file_put_contents(self::ACT_FILE_NAME, '1') !== false);
 
 		// Check item state and intervals
 		$this->checkItemStateActive($data, ITEM_STATE_NORMAL, $refresh_active);

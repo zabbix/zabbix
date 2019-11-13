@@ -85,13 +85,12 @@ class CLogHelper {
 	 * @param string       $path          log file path
 	 * @param string|array $lines         line(s) to look for
 	 * @param boolean      $incremental   flag to be used to enable incremental read
-	 * @param boolean      $single        flag to be used to return single line
 	 *
 	 * @return string|null
 	 *
 	 * @throws Exception    on cases when log is not available
 	 */
-	public static function readLogUntil($path, $lines, $incremental = true, $single = false) {
+	public static function readLogUntil($path, $lines, $incremental = true) {
 		if (!is_array($lines)) {
 			$lines = [$lines];
 		}
@@ -112,10 +111,6 @@ class CLogHelper {
 
 		$position = strpos($content, "\n", $offset);
 		if ($position === false) {
-			if ($single == true) {
-				return substr($content, $offset);
-			}
-
 			return $content;
 		}
 
@@ -128,10 +123,6 @@ class CLogHelper {
 			}
 
 			self::$log_offsets[$path] -= $pos - $position;
-		}
-
-		if ($single == true) {
-			return substr($content, $offset, $position - $offset);
 		}
 
 		return substr($content, 0, $position);
