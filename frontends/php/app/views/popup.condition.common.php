@@ -673,7 +673,7 @@ $output = [
 	'buttons' => [
 		[
 			'title' => _('Add'),
-			'class' => '',
+			'class' => 'popup-submit-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'return validateConditionPopup();'

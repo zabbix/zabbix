@@ -769,7 +769,7 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['update'] ? _('Update') : _('Add'),
-			'class' => '',
+			'class' => 'popup-operation-submit-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'validateOperationPopup();'

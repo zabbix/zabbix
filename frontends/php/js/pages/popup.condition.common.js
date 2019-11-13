@@ -69,9 +69,14 @@ function submitConditionPopup(response) {
  */
 function validateConditionPopup() {
 	var $form = jQuery(document.forms['popup.condition']),
-		url = new Curl($form.attr('action'));
+		url = new Curl($form.attr('action')),
+		$submit_btn = jQuery('.popup-submit-btn');
 
 	url.setArgument('validate', 1);
+
+	$submit_btn
+		.attr('disabled', true)
+		.hide();
 
 	return jQuery
 		.ajax({
@@ -80,8 +85,15 @@ function validateConditionPopup() {
 			dataType: 'json',
 			method: 'POST'
 		})
-		.done(function(response) {
-			$form.parent().find('.msg-bad').remove();
+		.done(function (response) {
+			$submit_btn
+				.attr('disabled', false)
+				.show();
+
+			$form
+				.parent()
+				.find('.msg-bad')
+				.remove();
 
 			if (typeof response.errors !== 'undefined') {
 				return jQuery(response.errors).insertBefore($form);
