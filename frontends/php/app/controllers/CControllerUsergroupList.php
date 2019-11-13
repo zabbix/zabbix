@@ -58,13 +58,13 @@ class CControllerUsergroupList extends CController {
 		CProfile::update('web.usergroup.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		// filter
-		if (hasRequest('filter_set')) {
+		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.usergroup.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.usergroup.filter_user_status', $this->getInput('filter_user_status', -1),
 				PROFILE_TYPE_INT
 			);
 		}
-		elseif (hasRequest('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.usergroup.filter_name');
 			CProfile::delete('web.usergroup.filter_user_status');
 		}
@@ -88,7 +88,7 @@ class CControllerUsergroupList extends CController {
 				'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
 				'selectUsers' => ['userid', 'alias', 'name', 'surname', 'gui_access', 'users_status'],
 				'search' => ['name' => ($filter['name'] !== '') ? $filter['name'] : null],
-				'filter' => ['user_status' => ($filter['user_status'] != -1) ? $filter['user_status'] : null],
+				'filter' => ['users_status' => ($filter['user_status'] != -1) ? $filter['user_status'] : null],
 				'sortfield' => $sort_field,
 				'limit' => $config['search_limit'] + 1
 			])
