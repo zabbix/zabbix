@@ -1613,8 +1613,12 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 		if (NULL != zbx_hashset_search(&items_keys, &item->key))
 		{
+			char key_short[ITEMKEY_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
 			*error = zbx_strdcatf(*error, "Cannot %s item: item with the same key \"%s\" already exists.\n",
-						(0 != item->itemid ? "update" : "create"), item->key);
+						(0 != item->itemid ? "update" : "create"),
+						zbx_truncate_itemkey(item->key, ITEMKEY_ERRMSG_MAX,
+						sizeof(key_short), (char **)&key_short));
 
 			if (0 != item->itemid)
 			{
@@ -1704,9 +1708,13 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 				if (0 == strcmp(item->key, row[0]))
 				{
+					char key_short[ITEMKEY_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
 					*error = zbx_strdcatf(*error, "Cannot %s item:"
 							" item with the same key \"%s\" already exists.\n",
-							(0 != item->itemid ? "update" : "create"), item->key);
+							(0 != item->itemid ? "update" : "create"),
+							zbx_truncate_itemkey(item->key, ITEMKEY_ERRMSG_MAX,
+							sizeof(key_short), (char **)&key_short));
 
 					if (0 != item->itemid)
 					{

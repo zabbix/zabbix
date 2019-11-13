@@ -5358,3 +5358,50 @@ fail:
 	zbx_free(tmp);
 	return FAIL;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_truncate_itemkey                                             *
+ *                                                                            *
+ * Purpose: check the item key characters length and, if the length exceeds   *
+ *          max allowable characters length, truncate the item key, while     *
+ *          maintaining the right square bracket                              *
+ *                                                                            *
+ * Parameters: key      - [IN] item key for processing                        *
+ *             char_max - [IN] item key max characters length                 *
+ *             buf_len  - [IN] buffer size for short version of item key      *
+ *             buf      - [IN/OUT] buffer for short version of item key       *
+ *                                                                            *
+ * Return value: The item key that does not exceed passed length              *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const int buf_len, char **buf)
+{
+#	define SUFFIX	"..."
+
+	size_t	key_len;
+	int	is_backet = 0;
+
+	if (char_max >= zbx_strlen_utf8(key))
+		return key;
+
+	if (NULL !=  strchr(key, '['))
+		is_backet = 1;
+
+	if (buf_len - (ZBX_CONST_STRLEN(SUFFIX) + is_backet) <
+			(key_len = 1 + zbx_strlen_utf8_nchars(key, char_max - (ZBX_CONST_STRLEN(SUFFIX) + is_backet))))
+	{
+		key_len = buf_len - (ZBX_CONST_STRLEN(SUFFIX) + is_backet);
+	}
+
+	if (0 >= key_len)
+		return key;
+
+	key_len = zbx_strlcpy_utf8(*buf, key, key_len);
+	zbx_strlcpy_utf8(&(*buf)[key_len], SUFFIX, sizeof(SUFFIX));
+
+	if (0 != is_backet)
+		zbx_strlcpy_utf8(&(*buf)[key_len + ZBX_CONST_STRLEN(SUFFIX)], "]", sizeof("]"));
+
+	return *buf;
+}

@@ -1123,6 +1123,9 @@ void	zbx_backtrace(void);
 int	int_in_list(char *list, int value);
 int	ip_in_list(const char *list, const char *ip);
 
+#define ITEMKEY_ERRMSG_MAX	255
+const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const int buf_len, char **buf);
+
 /* IP range support */
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1
