@@ -97,14 +97,9 @@ function submitOperationPopup(response) {
  */
 function validateOperationPopup() {
 	var $form = jQuery(document.forms['popup.operation']),
-		url = new Curl($form.attr('action')),
-		$submit_btn = jQuery('.popup-operation-submit-btn');
+		url = new Curl($form.attr('action'));
 
 	url.setArgument('validate', 1);
-
-	$submit_btn
-		.prop('disabled', true)
-		.hide();
 
 	return jQuery
 		.ajax({
@@ -114,10 +109,6 @@ function validateOperationPopup() {
 			method: 'POST'
 		})
 		.done(function(response) {
-			$submit_btn
-				.prop('disabled', false)
-				.show();
-
 			if (typeof response.errors !== 'undefined') {
 				$form.parent().find('.msg-bad').remove();
 
