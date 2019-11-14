@@ -23,26 +23,43 @@ import (
 	"fmt"
 	"time"
 
-	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxcmd"
 )
 
+type Options struct {
+	Timeout              int `conf:"optional,range=1:30"`
+	Capacity             int `conf:"optional,range=1:100"`
+	LogRemoteCommands    int `conf:"optional,range=0:1,default=0"`
+	EnableRemoteCommands int `conf:"optional,range=0:1,default=0"`
+}
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	enableRemoteCommands int
+	options Options
 }
 
 var impl Plugin
 
-func (p *Plugin) Configure(options map[string]string) {
-	p.enableRemoteCommands = agent.Options.EnableRemoteCommands
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+	if err := conf.Unmarshal(options, &p.options); err != nil {
+		p.Warningf("cannot unmarshal configuration options: %s", err)
+	}
+	if p.options.Timeout == 0 {
+		p.options.Timeout = global.Timeout
+	}
+}
+
+func (p *Plugin) Validate(options interface{}) error {
+	var o Options
+	return conf.Unmarshal(options, &o)
 }
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if p.enableRemoteCommands != 1 {
+	if p.options.EnableRemoteCommands != 1 {
 		return nil, fmt.Errorf("Remote commands are not enabled.")
 	}
 
@@ -54,14 +71,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Invalid first parameter.")
 	}
 
-	if agent.Options.LogRemoteCommands == 1 {
+	if p.options.LogRemoteCommands == 1 {
 		p.Warningf("Executing command:'%s'", params[0])
 	} else {
 		p.Debugf("Executing command:'%s'", params[0])
 	}
 
 	if len(params) == 1 || params[1] == "" || params[1] == "wait" {
-		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(agent.Options.Timeout))
+		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(p.options.Timeout))
 		if err != nil {
 			return nil, err
 		}

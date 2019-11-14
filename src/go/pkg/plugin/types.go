@@ -36,23 +36,30 @@ type Collector interface {
 
 // Exporter - interface for exporting collected metrics
 type Exporter interface {
+	// Export method exports data based on the key 'key' and its parameters 'params'.
 	Export(key string, params []string, context ContextProvider) (interface{}, error)
 }
 
 // Runner - interface for managing background processes
 type Runner interface {
+	// Start method activates plugin.
 	Start()
+	// Stop method deactivates pluing.
 	Stop()
 }
 
 // Watcher - interface for fully custom monitoring
 type Watcher interface {
+	// Watch method instructs plugin to watch for events based on item configuration in 'requests'.
 	Watch(requests []*Request, context ContextProvider)
 }
 
 // Configurator - interface for plugin configuration in agent conf files
 type Configurator interface {
-	Configure(options map[string]string)
+	// Configure method passes global and private plugin configuration after it has been activated.
+	Configure(globalOptions *GlobalOptions, privateOptions interface{})
+	// Validate method validates private plugin configuration during agent startup.
+	Validate(privateOptions interface{}) error
 }
 
 type ResultWriter interface {
@@ -112,4 +119,12 @@ type Request struct {
 	Delay       string  `json:"delay"`
 	LastLogsize *uint64 `json:"lastlogsize"`
 	Mtime       *int    `json:"mtime"`
+}
+
+// GlobalOptions are global agent configuration parameters that can be accessed by plugins.
+// In most cases it's recommended to allow plugins overriding global configuration parameters
+// they are using with plugin specific parameters.
+type GlobalOptions struct {
+	Timeout  int
+	SourceIP string
 }

@@ -25,11 +25,11 @@ import (
 	"fmt"
 	"math"
 	"sort"
-	"strconv"
 	"time"
 
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/monitor"
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/log"
@@ -264,29 +264,32 @@ run:
 				}
 				cleaned = now
 			}
-		case v := <-m.input:
-			if v == nil {
+		case u := <-m.input:
+			if u == nil {
 				break run
 			}
-			switch v.(type) {
+			switch v := u.(type) {
 			case *updateRequest:
-				m.processUpdateRequest(v.(*updateRequest), time.Now())
+				m.processUpdateRequest(v, time.Now())
 				m.processQueue(time.Now())
 			case performer:
-				m.processFinishRequest(v.(performer))
+				m.processFinishRequest(v)
 				m.processQueue(time.Now())
 			case *queryRequest:
-				r := v.(*queryRequest)
-				if response, err := m.processQuery(r); err != nil {
-					r.sink <- "cannot process request: " + err.Error()
+				if response, err := m.processQuery(v); err != nil {
+					v.sink <- "cannot process request: " + err.Error()
 				} else {
-					r.sink <- response
+					v.sink <- response
 				}
 			}
 		}
 	}
 	log.Debugf("manager has been stopped")
 	monitor.Unregister()
+}
+
+type pluginCapacity struct {
+	Capacity int `conf:"optional"`
 }
 
 func (m *Manager) init() {
@@ -308,15 +311,20 @@ func (m *Manager) init() {
 	for _, metric := range metrics {
 		if metric.Plugin != pagent.impl {
 			capacity := metric.Plugin.Capacity()
-			if options, ok := agent.Options.Plugins[metric.Plugin.Name()]; ok {
-				if cap, ok := options["Capacity"]; ok {
-					var err error
-					if capacity, err = strconv.Atoi(cap); err != nil {
-						log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
-							metric.Plugin.Name(), cap, plugin.DefaultCapacity)
+			var opts pluginCapacity
+			optsRaw := agent.Options.Plugins[metric.Plugin.Name()]
+			if optsRaw != nil {
+				if err := conf.Unmarshal(optsRaw, &opts, false); err != nil {
+					log.Warningf("invalid plugin %s configuration: %s", metric.Plugin.Name(), err)
+					log.Warningf("using default plugin capacity settings: %d", plugin.DefaultCapacity)
+					capacity = plugin.DefaultCapacity
+				} else {
+					if opts.Capacity != 0 {
+						capacity = opts.Capacity
 					}
 				}
 			}
+
 			if capacity > metric.Plugin.Capacity() {
 				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
 					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
@@ -426,13 +434,26 @@ func (m *Manager) Query(command string) (status string) {
 	return <-request.sink
 }
 
-func (m *Manager) configure(options agent.AgentOptions) error {
+func (m *Manager) validatePlugins(options *agent.AgentOptions) (err error) {
+	for _, p := range plugin.Plugins {
+		if c, ok := p.(plugin.Configurator); ok {
+			if err = c.Validate(options.Plugins[p.Name()]); err != nil {
+				return fmt.Errorf("invalid plugin %s configuration: %s", p.Name(), err)
+			}
+		}
+	}
+	return
+}
+
+func (m *Manager) configure(options *agent.AgentOptions) error {
 	return m.loadAlias(options)
 }
 
-func NewManager(options agent.AgentOptions) (*Manager, error) {
+func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {
 	var m Manager
 	m.init()
-	err := m.configure(options)
-	return &m, err
+	if err = m.validatePlugins(options); err != nil {
+		return
+	}
+	return &m, m.configure(options)
 }
