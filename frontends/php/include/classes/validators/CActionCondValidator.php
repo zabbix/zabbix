@@ -61,7 +61,7 @@ class CActionCondValidator extends CValidator {
 			case CONDITION_TYPE_HOST:
 			case CONDITION_TYPE_DRULE:
 			case CONDITION_TYPE_PROXY:
-				if (zbx_empty($condition['value'])) {
+				if (zbx_empty($condition['value']) || $condition['value'] === '0') {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (is_array($condition['value'])) {
