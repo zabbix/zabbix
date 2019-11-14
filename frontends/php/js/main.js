@@ -439,6 +439,7 @@ var hintBox = {
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
 			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
+			content_box = jQuery('<div></div>').addClass('wordwrap'),
 			appendTo = appendTo || 'body';
 
 		if (styles) {
@@ -460,10 +461,10 @@ var hintBox = {
 		}
 
 		if (!empty(className)) {
-			box.append(jQuery('<div></div>').addClass(className).html(hintText));
+			content_box.append(jQuery('<div></div>').addClass(className).html(hintText));
 		}
 		else {
-			box.html(hintText);
+			content_box.html(hintText);
 		}
 
 		if (isStatic) {
@@ -482,7 +483,7 @@ var hintBox = {
 			box.prepend(close_link);
 		}
 
-		jQuery(appendTo).append(box);
+		jQuery(appendTo).append(jQuery(box).append(content_box));
 
 		var removeHandler = function() {
 			hintBox.deleteHint(target);
