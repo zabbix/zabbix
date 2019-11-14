@@ -184,6 +184,23 @@ class CWidgetConfig {
 	}
 
 	/**
+	 * Detect if widget dialogue should be sticked to top instead of being centered vertically.
+	 *
+	 * @param string $type  Widget type
+	 *
+	 * @return bool
+	 */
+	public static function getDialogueStickToTop($type) {
+		switch ($type) {
+			case WIDGET_SVG_GRAPH:
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
+	/**
 	 * Is it allowed for the widget to have scrollable content.
 	 *
 	 * @static
