@@ -119,6 +119,8 @@ class testGraphWidget extends CWebTest {
 
 		sleep(2);
 		$form->submit();
+		$form->parents('id:overlay_dialogue')->query('xpath:div[@class="overlay-dialogue-footer"]'.
+				'//button[@class="dialogue-widget-save"]')->one()->waitUntilClickable();
 
 		if (!is_array($data['error'])) {
 			$data['error'] = [$data['error']];

@@ -149,7 +149,7 @@ class CDashboardElement extends CElement {
 		$controls = $this->getControls();
 
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashbrd-save')->one()->click(true);
+			$controls->query('id:dashbrd-save')->one()->waitUntilClickable()->click(true);
 			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
 		}
 
