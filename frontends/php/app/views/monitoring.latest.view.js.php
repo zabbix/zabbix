@@ -76,10 +76,15 @@ jQuery(function($) {
 		},
 
 		onDataFail: function(jqXHR) {
+			this.clearLoading();
+
 			var messages = $(jqXHR.responseText).find('.msg-global');
 			if (messages.length) {
-				this.clearLoading();
 				this.getCurrentForm().html(messages);
+			}
+			else {
+				this.removeMessages();
+				this.addMessages(makeMessageBox('bad', t('Fatal error, please report to the Zabbix team')));
 			}
 		},
 
