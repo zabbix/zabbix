@@ -337,7 +337,7 @@ ul.top-nav-icons {
 		}
 	}
 
-	a {
+	a, span.top-nav-guest {
 		display: block;
 		width: 24px;
 		height: 45px;
@@ -365,6 +365,10 @@ ul.top-nav-icons {
 
 	.top-nav-profile {
 		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
+	}
+
+	.top-nav-guest {
+		background: url(../img/icon-sprite.svg) no-repeat -241px -104px;
 	}
 
 	.top-nav-signout {
