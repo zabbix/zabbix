@@ -3,19 +3,14 @@
 jQuery(function($) {
 
 	function LatestPage() {
+		this.refresh_url = '<?= $this->data['refresh_url']; ?>';
+		this.refresh_interval = <?= $this->data['refresh_interval'] ?>;
+
 		this.running = false;
 		this.timeout = null;
 	}
 
 	LatestPage.prototype = {
-
-		getRefreshUrl: function() {
-			return "<?= $this->data['refresh_url']; ?>";
-		},
-
-		getRefreshInterval: function() {
-			return "<?= $this->data['refresh_interval']; ?>";
-		},
 
 		getCurrentForm: function() {
 			return $('form[name=items]');
@@ -32,7 +27,7 @@ jQuery(function($) {
 		refresh: function() {
 			this.setLoading();
 
-			var deferred = $.getJSON(this.getRefreshUrl());
+			var deferred = $.getJSON(this.refresh_url);
 
 			return this.bindDataEvents(deferred);
 		},
@@ -76,20 +71,21 @@ jQuery(function($) {
 		},
 
 		onDataFail: function(jqXHR) {
-			this.clearLoading();
-
 			var messages = $(jqXHR.responseText).find('.msg-global');
 			if (messages.length) {
+				this.clearLoading();
 				this.getCurrentForm().html(messages);
 			}
-			else {
+			// Not showing errors if XHR failed due to page unload.
+			else if (jqXHR.status != 0) {
+				this.clearLoading();
 				this.removeMessages();
 				this.addMessages(makeMessageBox('bad', t('Fatal error, please report to the Zabbix team')));
 			}
 		},
 
 		onDataAlways: function() {
-			if (this.running) {
+			if (this.refresh_interval != 0 && this.running) {
 				this.scheduleRefresh();
 			}
 		},
@@ -99,7 +95,7 @@ jQuery(function($) {
 			this.timeout = setTimeout((function() {
 				this.timeout = null;
 				this.refresh();
-			}).bind(this), this.getRefreshInterval());
+			}).bind(this), this.refresh_interval);
 		},
 
 		unscheduleRefresh: function() {
