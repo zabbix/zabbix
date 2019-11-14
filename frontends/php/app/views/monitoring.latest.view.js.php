@@ -85,7 +85,7 @@ jQuery(function($) {
 		},
 
 		onDataAlways: function() {
-			if (this.refresh_interval != 0 && this.running) {
+			if (this.running) {
 				this.scheduleRefresh();
 			}
 		},
@@ -106,8 +106,10 @@ jQuery(function($) {
 		},
 
 		start: function() {
-			this.running = true;
-			this.scheduleRefresh();
+			if (this.refresh_interval != 0) {
+				this.running = true;
+				this.scheduleRefresh();
+			}
 		},
 
 		stop: function() {
