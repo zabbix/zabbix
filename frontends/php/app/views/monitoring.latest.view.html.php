@@ -299,7 +299,7 @@ foreach ($data['applications'] as $appid => $dbApp) {
 	}
 }
 
-//  Display OTHER ITEMS (which are not linked to application).
+// Display OTHER ITEMS (which are not linked to application).
 
 $tab_rows = [];
 foreach ($data['items'] as $item) {
