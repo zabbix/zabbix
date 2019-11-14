@@ -169,7 +169,7 @@ foreach ($data['items'] as $key => $item) {
 			&& (bcsub($last_history['value'], $prev_history['value'], $digits) != 0)) {
 
 		$change = '';
-		if (($last_history['value'] - $prev_history['value']) > 0) {
+		if ($last_history['value'] - $prev_history['value'] > 0) {
 			$change = '+';
 		}
 
@@ -248,13 +248,13 @@ foreach ($data['items'] as $key => $item) {
 	}
 
 	// Add the item row to each application tab.
-	foreach ($item['applications'] as $itemApplication) {
-		$applicationId = $itemApplication['applicationid'];
+	foreach ($item['applications'] as $item_application) {
+		$applicationid = $item_application['applicationid'];
 
-		if (isset($data['applications'][$applicationId])) {
-			$data['applications'][$applicationId]['item_cnt']++;
+		if (array_key_exists($applicationid, $data['applications'])) {
+			$data['applications'][$applicationid]['item_cnt']++;
 			// Objects may have different properties, so it's better to use a copy of it.
-			$tab_rows[$applicationId][] = clone $row;
+			$tab_rows[$applicationid][] = clone $row;
 		}
 	}
 
@@ -263,7 +263,7 @@ foreach ($data['items'] as $key => $item) {
 }
 
 foreach ($data['applications'] as $appid => $dbApp) {
-	if (!isset($tab_rows[$appid])) {
+	if (!array_key_exists($appid, $tab_rows)) {
 		continue;
 	}
 
@@ -325,12 +325,12 @@ foreach ($data['items'] as $item) {
 
 	// Column "change".
 	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT : 0;
-	if (isset($last_history['value']) && isset($prev_history['value'])
+	if ($last_history && $prev_history
 			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 			&& (bcsub($last_history['value'], $prev_history['value'], $digits) != 0)) {
 
 		$change = '';
-		if (($last_history['value'] - $prev_history['value']) > 0) {
+		if ($last_history['value'] - $prev_history['value'] > 0) {
 			$change = '+';
 		}
 
@@ -414,7 +414,7 @@ foreach ($data['items'] as $item) {
 }
 
 foreach ($data['hosts'] as $hostid => $db_host) {
-	if (!isset($tab_rows[$hostid])) {
+	if (!array_key_exists($hostid, $tab_rows)) {
 		continue;
 	}
 

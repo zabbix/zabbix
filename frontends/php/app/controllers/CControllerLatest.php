@@ -67,12 +67,15 @@ abstract class CControllerLatest extends CController {
 		}
 
 		// We'll only display the values if the filter is set.
-		$filter_set = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
+		$filter_set = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids']
+			|| $filter['hostids']);
 
 		if ($filter_set) {
 			$groupids = null;
+
 			if ($child_groups) {
 				$groups = $filter_groups;
+
 				foreach ($child_groups as $child_group) {
 					$child_groups = API::HostGroup()->get([
 						'output' => ['groupid'],
@@ -80,8 +83,10 @@ abstract class CControllerLatest extends CController {
 						'startSearch' => true,
 						'preservekeys' => true
 					]);
+
 					$groups = array_replace($groups, $child_groups);
 				}
+
 				$groupids = array_keys($groups);
 			}
 
