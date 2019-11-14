@@ -21,7 +21,7 @@
 
 $form = (new CForm())
 	->cleanItems()
-	->addVar('action', 'popup.preproctest.send')
+	->addVar('action', 'popup.itemtest.send')
 	->addVar('hostid', $data['hostid'])
 	->addVar('value_type', $data['value_type'])
 	->addVar('test_type', $data['test_type'])
@@ -191,7 +191,7 @@ $templates = [
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.preproctestedit.view.js.php',
+	'script_inline' => require 'app/views/popup.itemtestedit.view.js.php',
 	'body' => (new CDiv([$form, $templates]))->toString(),
 	'cancel_action' => 'return savePreprocessingTestInputs();',
 	'buttons' => [

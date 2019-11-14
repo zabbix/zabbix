@@ -22,7 +22,7 @@
 /**
  * Controller to build preprocessing test dialog.
  */
-class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
+class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 	protected function checkInput() {
 		$fields = [

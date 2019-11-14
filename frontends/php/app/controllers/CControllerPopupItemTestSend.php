@@ -22,7 +22,7 @@
 /**
  * Controller to perform preprocessing test send action.
  */
-class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
+class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 	/**
 	 * @var bool

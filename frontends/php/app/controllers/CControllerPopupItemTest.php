@@ -19,7 +19,7 @@
 **/
 
 
-abstract class CControllerPopupPreprocTest extends CController {
+abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Types of preprocessing tests, depending on type of item.
 	 */

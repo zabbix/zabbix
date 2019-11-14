@@ -148,9 +148,9 @@
 		function openPreprocessingTestDialog(step_nums, show_final_result, trigger_elmnt) {
 			var $step_obj = $(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot');
 
-			PopUp('popup.preproctest.edit', $.extend({
+			PopUp('popup.itemtest.edit', $.extend({
 				delay: $('#delay').val() || '',
-				value_type: $('#value_type').val() || <?= CControllerPopupPreprocTest::ZBX_DEFAULT_VALUE_TYPE ?>,
+				value_type: $('#value_type').val() || <?= CControllerPopupItemTest::ZBX_DEFAULT_VALUE_TYPE ?>,
 				steps: getPreprocessingSteps(step_nums),
 				hostid: <?= $data['hostid'] ?>,
 				test_type: <?= $data['preprocessing_test_type'] ?>,
