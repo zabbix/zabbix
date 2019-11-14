@@ -184,7 +184,7 @@ class ZBase {
 	 * Register autoloader.
 	 */
 	private function registerAutoloader() {
-		$autoloader = new CAutoloader($this->getIncludePaths());
+		$autoloader = new CAutoloader($this->getIncludePaths(), $this->rootDir);
 		$autoloader->register();
 	}
 

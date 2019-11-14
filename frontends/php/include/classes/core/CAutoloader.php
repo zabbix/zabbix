@@ -23,21 +23,23 @@
  * The Zabbix autoloader class.
  */
 class CAutoloader {
-
+	protected $root_dir;
 	/**
 	 * An array of directories, where the autoloader will look for the classes.
 	 *
 	 * @var array
 	 */
-	protected $includePaths = [];
+	protected $include_paths = [];
 
 	/**
 	 * Initializes object with array of include paths.
 	 *
-	 * @param array $includePaths absolute paths
+	 * @param array  $include_paths     absolute paths
+	 * @param string $root_dir          web root directory
 	 */
-	public function __construct(array $includePaths) {
-		$this->includePaths = $includePaths;
+	public function __construct(array $include_paths, $root_dir) {
+		$this->include_paths = $include_paths;
+		$this->root_dir = $root_dir;
 	}
 
 	/**
@@ -52,28 +54,56 @@ class CAutoloader {
 	/**
 	 * Attempts to find and load the given class.
 	 *
-	 * @param $className
+	 * @param string $class_name
 	 */
-	protected function loadClass($className) {
-		if ($classFile = $this->findClassFile($className)) {
-			require $classFile;
+	protected function loadClass($class_name) {
+		$class_path = $this->findClassFile($class_name);
+
+		if ($class_path === false) {
+			$class_path = $this->findNamespaceClassFile($class_name);
+		}
+
+		if ($class_path) {
+			require $class_path;
 		}
 	}
 
 	/**
 	 * Attempts to find corresponding file for given class name in the current include directories.
 	 *
-	 * @param string $className
+	 * @param string $class_name
 	 *
 	 * @return bool|string
 	 */
-	protected function findClassFile($className) {
-		foreach ($this->includePaths as $includePath) {
-			$filePath = $includePath.'/'.$className.'.php';
+	protected function findClassFile($class_name) {
+		foreach ($this->include_paths as $path) {
+			$file_path = $path.'/'.$class_name.'.php';
 
-			if (is_file($filePath)) {
-				return $filePath;
+			if (is_file($file_path)) {
+				return $file_path;
 			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get path to class with namespace. All namespace parts except class name will be lowercased.
+	 *
+	 * @param string $fqcn    Fully qualified class name.
+	 * @return bool|string
+	 */
+	protected function findNamespaceClassFile($fqcn) {
+		$path = explode('\\', $fqcn);
+
+		if (count($path) > 1) {
+			$name = array_pop($path);
+			$path = array_map('strtolower', $path);
+			array_unshift($path, $this->root_dir);
+			$path[] = $name.'.php';
+			$file_path = implode('/', $path);
+
+			return is_file($file_path) ? $file_path : false;
 		}
 
 		return false;
