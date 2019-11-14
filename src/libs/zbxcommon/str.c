@@ -2029,6 +2029,30 @@ size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_charcount_utf8_nbytes                                        *
+ *                                                                            *
+ * Purpose: calculates number of chars in utf8 text limited by maxlen bytes   *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen)
+{
+	size_t	n = 0;
+
+	maxlen = zbx_strlen_utf8_nbytes(text, maxlen);
+
+	while ('\0' != *text && maxlen > 0)
+	{
+		if (0x80 != (0xc0 & *text++))
+			n++;
+
+		maxlen--;
+	}
+
+	return n;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_is_utf8                                                      *
  *                                                                            *
  * Purpose: check UTF-8 sequences                                             *
@@ -5375,33 +5399,68 @@ fail:
  * Return value: The item key that does not exceed passed length              *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const int buf_len, char **buf)
+const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const size_t buf_len, char **buf)
 {
 #	define SUFFIX	"..."
+#	define KSUFFIX	"[...]"
 
-	size_t	key_len;
-	int	is_backet = 0;
+	size_t	key_byte_count, key_char_total;
+	int	is_bracket = 0;
+	char	*bracket_l;
 
-	if (char_max >= zbx_strlen_utf8(key))
+	if (char_max >= (key_char_total = zbx_strlen_utf8(key)))
 		return key;
 
-	if (NULL !=  strchr(key, '['))
-		is_backet = 1;
+	if (NULL != (bracket_l = strchr(key, '[')))
+		is_bracket = 1;
 
-	if (buf_len - (ZBX_CONST_STRLEN(SUFFIX) + is_backet) <
-			(key_len = 1 + zbx_strlen_utf8_nchars(key, char_max - (ZBX_CONST_STRLEN(SUFFIX) + is_backet))))
+	if (0 != is_bracket)
 	{
-		key_len = buf_len - (ZBX_CONST_STRLEN(SUFFIX) + is_backet);
+		size_t	key_char_count, param_char_count, param_byte_count;
+
+		key_char_count = zbx_charcount_utf8_nbytes(key, bracket_l - key);
+		param_char_count = key_char_total - key_char_count;
+
+		if (param_char_count <= ZBX_CONST_STRLEN(KSUFFIX))
+		{
+			key_byte_count = zbx_strlen_utf8_nchars(key, char_max - param_char_count -
+					ZBX_CONST_STRLEN(KSUFFIX));
+			param_byte_count = 1 + zbx_strlen_utf8_nchars(bracket_l, key_char_count);
+
+			if (buf_len < key_byte_count + param_byte_count)
+				return key;
+
+			zbx_strlcpy_utf8(*buf, key, key_byte_count);
+			zbx_strlcpy_utf8(&(*buf)[key_byte_count], &key[key_byte_count], param_byte_count);
+
+			return *buf;
+		}
+
+		if (key_char_count + ZBX_CONST_STRLEN(KSUFFIX) > char_max)
+		{
+			key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - ZBX_CONST_STRLEN(KSUFFIX) -
+					ZBX_CONST_STRLEN(KSUFFIX));
+
+			if (buf_len < key_byte_count + ZBX_CONST_STRLEN(KSUFFIX))
+				return key;
+
+			zbx_strlcpy_utf8(*buf, key, key_byte_count);
+			zbx_strlcpy_utf8(&(*buf)[key_byte_count], KSUFFIX, sizeof(KSUFFIX));
+
+			return *buf;
+		}
 	}
 
-	if (0 >= key_len)
+	key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - (ZBX_CONST_STRLEN(SUFFIX) + is_bracket));
+
+	if (buf_len < key_byte_count + ZBX_CONST_STRLEN(SUFFIX) + is_bracket)
 		return key;
 
-	key_len = zbx_strlcpy_utf8(*buf, key, key_len);
-	zbx_strlcpy_utf8(&(*buf)[key_len], SUFFIX, sizeof(SUFFIX));
+	key_byte_count = zbx_strlcpy_utf8(*buf, key, key_byte_count);
+	zbx_strlcpy_utf8(&(*buf)[key_byte_count], SUFFIX, sizeof(SUFFIX));
 
-	if (0 != is_backet)
-		zbx_strlcpy_utf8(&(*buf)[key_len + ZBX_CONST_STRLEN(SUFFIX)], "]", sizeof("]"));
+	if (0 != is_bracket)
+		zbx_strlcpy_utf8(&(*buf)[key_byte_count + ZBX_CONST_STRLEN(SUFFIX)], "]", sizeof("]"));
 
 	return *buf;
 }
