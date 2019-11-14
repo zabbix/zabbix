@@ -83,7 +83,10 @@ class CControllerDashboardWidgetEdit extends CController {
 				'type' => $type,
 				'name' => $this->getInput('name', ''),
 				'view_mode' => $this->getInput('view_mode', ZBX_WIDGET_VIEW_MODE_NORMAL),
-				'fields' => $form->getFields()
+				'fields' => $form->getFields(),
+				'options' => [
+					'stick_to_top' => CWidgetConfig::getDialogueStickToTop($type)
+				]
 			],
 			'known_widget_types' => $known_widget_types,
 			'captions' => $this->getCaptions($form)

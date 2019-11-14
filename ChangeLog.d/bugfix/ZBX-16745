@@ -1,0 +1,1 @@
+..F.....S. [ZBX-16745] implemeted webhook returned tags preview in media type test modal window, added server improvements in webhook processing, removed webhooks from watchdog media type lists (gcalenko, wiper)

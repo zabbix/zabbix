@@ -397,6 +397,12 @@ $icon-widget-btn: (
 			}
 		}
 	}
+
+	&.page-title-submenu::before {
+		background-color: $form-bg-color;
+		border-top: 1px solid $form-border-color;
+		border-left: 1px solid $form-border-color;
+	}
 }
 
 ul.top-nav-icons {

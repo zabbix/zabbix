@@ -591,7 +591,9 @@ $item_form_list->addRow(
 	(new CVisibilityBox('visible[description]', 'description', _('Original')))
 		->setLabel(_('Description'))
 		->setChecked(isset($data['visible']['description'])),
-	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextArea('description', $data['description']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setMaxlength(DB::getFieldLength('items' , 'description'))
 );
 
 $tabs = (new CTabView())

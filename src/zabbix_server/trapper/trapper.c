@@ -118,7 +118,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		ret = FAIL;
 	}
 
-	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
+	zbx_send_response_same(sock, ret, info, CONFIG_TIMEOUT);
 
 	zbx_free(info);
 
@@ -150,7 +150,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 		ret = FAIL;
 	}
 
-	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
+	zbx_send_response_same(sock, ret, info, CONFIG_TIMEOUT);
 
 	zbx_free(info);
 
@@ -569,7 +569,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 	if (NULL != value)
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESULT, value, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_DATA, value, ZBX_JSON_TYPE_STRING);
 
 	(void)zbx_tcp_send(sock, json.buffer);
 

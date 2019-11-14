@@ -1924,9 +1924,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 									*mtime_sent = *mtime;
 
 								(*s_count)--;
+								zbx_free(item_value);
 							}
+							else
+							{
+								zbx_free(item_value);
 
-							zbx_free(item_value);
+								/* Sending of buffer failed. */
+								/* Try to resend it in the next check. */
+								ret = SUCCEED;
+								goto out;
+							}
 						}
 					}
 					else	/* log.count[] or logrt.count[] */
@@ -2010,9 +2018,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 									*mtime_sent = *mtime;
 
 								(*s_count)--;
+								zbx_free(item_value);
 							}
+							else
+							{
+								zbx_free(item_value);
 
-							zbx_free(item_value);
+								/* Sending of buffer failed. */
+								/* Try to resend it in the next check. */
+								ret = SUCCEED;
+								goto out;
+							}
 						}
 					}
 					else	/* log.count[] or logrt.count[] */

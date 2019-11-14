@@ -23,18 +23,7 @@ $this->includeJSfile('app/views/administration.autoreg.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Auto registration'))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu((new CUrl('zabbix.php'))
-					->setArgument('action', 'autoreg.edit')
-					->getUrl()
-				))
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $autoreg_form = (new CForm())
 	->setId('autoreg-form')

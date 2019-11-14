@@ -122,6 +122,9 @@ class testDRule extends CAPITest {
 	}
 
 	/**
+	 * @on-before removeGuestFromDisabledGroup
+	 * @on-after addGuestToDisabledGroup
+	 *
 	 * @dataProvider getDRuleUserPermissionsData
 	 */
 	public function testDRule_Permissions($login, $drule, $expected_error) {
@@ -139,5 +142,16 @@ class testDRule extends CAPITest {
 		else {
 			$this->assertEquals($old_drule, CDBHelper::getHash($sql));
 		}
+	}
+
+	/**
+	 * Guest user needs to be out of "Disabled" group to have access to frontend.
+	 */
+	public static function removeGuestFromDisabledGroup() {
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }

@@ -15,7 +15,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq&#13;
 &#13;
-Template tooling version used: 0.32</description>
+Template tooling version used: 0.33</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -1241,7 +1241,7 @@ Template tooling version used: 0.32</description>
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq&#13;
 &#13;
-Template tooling version used: 0.32</description>
+Template tooling version used: 0.33</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
