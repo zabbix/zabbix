@@ -82,9 +82,11 @@ class testMultiselect extends CWebTest {
 		$form->invalidate();
 		$element = $form->getField('Items')->query('tag:input')->one();
 		$element->type('Zab');
-		$debug_button = $this->query('class:btn-debug')->one();
-		$zabbix_version = $this->query('xpath://footer[text()]')->one();
 		$this->query('class:multiselect-suggest')->waitUntilVisible();
-		$this->assertScreenshotExcept(null, [$element, $debug_button,$zabbix_version]);
+		$this->assertScreenshotExcept(null, [
+			$element,
+			['query' => 'class:btn-debug'],
+			['query' => 'xpath://footer[text()]']
+		]);
 	}
 }
