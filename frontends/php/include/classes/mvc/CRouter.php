@@ -168,52 +168,37 @@ class CRouter {
 	 * @param string $actions['action_name']['class']   Controller class name of the 'action_name' action.
 	 * @param string $actions['action_name']['layout']  Optional layout of the 'action_name' action.
 	 * @param string $actions['action_name']['view']    Optional view of the 'action_name' action.
-	 *
-	 * @return bool  True on success, false on insufficient data.
 	 */
 	public function addActions(array $actions) {
 		$new_routes = [];
 
 		foreach ($actions as $action => $route) {
-			if (!is_array($route) || !array_key_exists('class', $route)) {
-				return false;
+			if (is_array($route) && array_key_exists('class', $route)) {
+				$this->routes[$action] = [
+					$route['class'],
+					array_key_exists('layout', $route) ? $route['layout'] : null,
+					array_key_exists('view', $route) ? $route['view'] : null
+				];
 			}
-
-			$new_routes[$action] = [
-				$route['class'],
-				array_key_exists('layout', $route) ? $route['layout'] : null,
-				array_key_exists('view', $route) ? $route['view'] : null
-			];
 		}
-
-		$this->routes = array_replace($this->routes, $new_routes);
-
-		return true;
 	}
 
 	/**
 	 * Set controller, layout and view associated with the specified action.
 	 *
 	 * @param string $action
-	 *
-	 * @return bool  True if route was found, false otherwise.
 	 */
 	public function setAction($action) {
 		$this->action = $action;
 
 		if (array_key_exists($action, $this->routes)) {
-			$this->controller = $this->routes[$action][0];
-			$this->layout = $this->routes[$action][1];
-			$this->view = $this->routes[$action][2];
-
-			return true;
+			list($this->controller, $this->layout, $this->view) = $this->routes[$action];
 		}
-
-		$this->controller = null;
-		$this->layout = null;
-		$this->view = null;
-
-		return false;
+		else {
+			$this->controller = null;
+			$this->layout = null;
+			$this->view = null;
+		}
 	}
 
 	/**
