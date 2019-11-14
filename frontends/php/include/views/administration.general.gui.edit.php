@@ -27,7 +27,7 @@ $widget = (new CWidget())
 
 $guiTab = (new CFormList())
 	->addRow(_('Default theme'),
-		(new CComboBox('default_theme', $data['default_theme'], null, Z::getThemes()))
+		(new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes()))
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Dropdown first entry'), [

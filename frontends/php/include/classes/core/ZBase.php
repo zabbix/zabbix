@@ -54,7 +54,7 @@ class ZBase {
 	 */
 	public static function getInstance() {
 		if (self::$instance === null) {
-			self::$instance = new Z();
+			self::$instance = new APP();
 		}
 
 		return self::$instance;
@@ -151,7 +151,8 @@ class ZBase {
 
 		// new MVC processing, otherwise we continue execution old style
 		if (hasRequest('action')) {
-			$router = new CRouter(getRequest('action'));
+			$router = new CRouter;
+			$router->setAction(getRequest('action'));
 
 			if ($router->getController() !== null) {
 				CProfiler::getInstance()->start();

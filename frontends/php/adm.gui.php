@@ -26,7 +26,7 @@ $page['file'] = 'adm.gui.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$themes = array_keys(Z::getThemes());
+$themes = array_keys(APP::getThemes());
 
 $fields = [
 	'default_theme'				=> [T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({update})',
