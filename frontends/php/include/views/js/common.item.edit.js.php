@@ -220,6 +220,83 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 
 ?>
 <script type="text/javascript">
+	/**
+	 * Collect current preprocessing step properties.
+	 *
+	 * @param {array} step_nums  List of step numbers to collect.
+	 *
+	 * @return array
+	 */
+	function getPreprocessingSteps(step_nums) {
+		var $preprocessing = $('#preprocessing'),
+			steps = [];
+
+		step_nums.each(function(num) {
+			var type = jQuery('[name="preprocessing[' + num + '][type]"]', $preprocessing).val(),
+				error_handler = jQuery('[name="preprocessing[' + num + '][on_fail]"]').is(':checked')
+					? jQuery('[name="preprocessing[' + num + '][error_handler]"]:checked').val()
+					: <?= ZBX_PREPROC_FAIL_DEFAULT ?>,
+				params = [];
+
+			var on_fail = {
+				error_handler: error_handler,
+				error_handler_params: (error_handler == <?= ZBX_PREPROC_FAIL_SET_VALUE ?>
+						|| error_handler == <?= ZBX_PREPROC_FAIL_SET_ERROR ?>)
+					? jQuery('[name="preprocessing[' + num + '][error_handler_params]"]').val()
+					: ''
+			};
+
+			if (jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
+				params.push(jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
+			}
+			if (jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
+				params.push(jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
+			}
+			if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).length) {
+				// ZBX-16642
+				if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
+					if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
+						params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
+					}
+					else {
+						params.push(0);
+					}
+				}
+				else {
+					params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
+				}
+			}
+
+			steps.push(jQuery.extend({
+				type: type,
+				params: params.join("\n")
+			}, on_fail));
+		});
+
+		return steps;
+	}
+
+	/**
+	 * Creates preprocessing test modal window.
+	 *
+	 * @param {array}  step_nums          List of step numbers to collect.
+	 * @param {bool}   show_final_result  Either the final result should be displayed.
+	 * @param {object} trigger_elmnt      UI element triggered function.
+	 */
+	function openPreprocessingTestDialog(step_nums, show_final_result, trigger_elmnt) {
+		var $step_obj = jQuery(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot');
+
+		PopUp('popup.itemtest.edit', jQuery.extend({
+			delay: jQuery('#delay').val() || '',
+			value_type: jQuery('#value_type').val() || <?= CControllerPopupItemTest::ZBX_DEFAULT_VALUE_TYPE ?>,
+			steps: getPreprocessingSteps(step_nums),
+			hostid: <?= $data['hostid'] ?>,
+			test_type: <?= $data['preprocessing_test_type'] ?>,
+			step_obj: $step_obj.attr('data-step') || -1,
+			show_final_result: show_final_result ? 1 : 0
+		}, {'data': $step_obj.data('test-data') || []}), 'preprocessing-test', trigger_elmnt);
+	}
+
 	function setAuthTypeLabel() {
 		if (jQuery('#authtype').val() == <?php echo CJs::encodeJson(ITEM_AUTHTYPE_PUBLICKEY); ?>
 				&& jQuery('#type').val() == <?php echo CJs::encodeJson(ITEM_TYPE_SSH); ?>) {
@@ -263,12 +340,27 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
+				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>,
+					testable_item_types = <?= CJs::encodeJson(CControllerPopupItemTest::$testable_item_types) ?>,
+					type = parseInt($('#type').val());
+
+				$('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
+
 				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())]);
 
 				setAuthTypeLabel();
 			})
 			.trigger('change');
+
+		$('#test_item').on('click', function() {
+			var step_nums = [];
+			$('select[name^="preprocessing"][name$="[type]"]', $('#preprocessing')).each(function() {
+				var str = $(this).attr('name');
+				step_nums.push(str.substr(14, str.length - 21));
+			});
+
+			openPreprocessingTestDialog(step_nums, true, this);
+		});
 
 		$('#authtype').bind('change', function() {
 			setAuthTypeLabel();

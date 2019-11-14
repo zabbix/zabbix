@@ -780,6 +780,7 @@ if ($data['itemid'] != 0) {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
+			(new CSimpleButton(_('Test')))->setId('test_item'),
 			(new CButtonDelete(_('Delete item prototype?'),
 				url_params(['form', 'itemid', 'parent_discoveryid'])
 			))->setEnabled(!$readonly),
@@ -790,7 +791,7 @@ if ($data['itemid'] != 0) {
 else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_params(['parent_discoveryid']))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_params(['parent_discoveryid']))]
 	));
 }
 
