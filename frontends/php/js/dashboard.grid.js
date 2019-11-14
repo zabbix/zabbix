@@ -996,15 +996,6 @@
 				doWidgetResize($obj, $(event.target), data);
 			},
 			resize: function(event, ui) {
-				// Hack for Safari to manually accept parent container height in pixels on widget resize.
-				if (SF) {
-					$.each(data['widgets'], function() {
-						if (this.type === 'clock' || this.type === 'sysmap') {
-							this.content_body.find(':first').height(this.content_body.height());
-						}
-					});
-				}
-
 				var $div = $(event.target);
 
 				if (ui.position.left < 0) {
@@ -1036,15 +1027,6 @@
 				// Hide resize handles for situation when mouse button was released outside dashboard container area.
 				if (widget['div'].has(event.toElement).length == 0) {
 					widget['div'].find('.ui-resizable-handle').hide();
-				}
-
-				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
-				if (SF) {
-					$.each(data['widgets'], function() {
-						if (this.type === 'clock' || this.type === 'sysmap') {
-							this.content_body.find(':first').height(this.content_body.height());
-						}
-					});
 				}
 
 				// Invoke onResizeEnd on every affected widget.
@@ -1192,6 +1174,8 @@
 
 		startPreloader(widget);
 
+		$('#dashbrd-save').prop('disabled', true);
+
 		jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -1242,6 +1226,8 @@
 					widget['update_attempts'] = 0;
 					updateWidgetContent($obj, data, widget);
 				}
+				$('#dashbrd-save').prop('disabled', false);
+
 			}, function() {
 				// TODO: gentle message about failed update of widget content
 				widget['update_attempts'] = 0;
@@ -1337,6 +1323,8 @@
 				.appendTo($obj);
 		}
 
+		$('.dialogue-widget-save', data.dialogue.div).prop('disabled', true);
+
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -1347,6 +1335,7 @@
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
+					$('.dialogue-widget-save', data.dialogue.div).prop('disabled', false);
 				}
 				else {
 					// No errors, proceed with update.
@@ -2389,6 +2378,12 @@
 					data: ajax_data,
 					dataType: 'json',
 					beforeSend: function() {
+						/*
+						 * Clear the 'sticked-to-top' class before updating the body for it's mutation handler
+						 * to center the popup while the widget form is being loaded.
+						 */
+						jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
+
 						body.empty()
 							.append($('<div>')
 								// The smallest possible size of configuration dialog.
@@ -2403,6 +2398,14 @@
 								));
 					},
 					success: function(resp) {
+						/*
+						 * Set the 'sticked-to-top' class before updating the body for it's mutation handler
+						 * to have actual data for the popup positioning.
+						 */
+						if (resp.options.stick_to_top) {
+							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
+						}
+
 						body.empty();
 						body.append(resp.body);
 						if (typeof(resp.debug) !== 'undefined') {
@@ -2424,13 +2427,6 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
-						if (data.dialogue['widget_type'] === 'svggraph') {
-							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
-						}
-						else {
-							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
-						}
-
 						if (data.dialogue.widget === null
 								&& !findEmptyPosition($this, data, data.dialogue.widget_type)) {
 							showMessageExhausted(data);

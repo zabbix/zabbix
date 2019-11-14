@@ -779,7 +779,9 @@ class CScreenProblem extends CScreenBase {
 		$data = self::getData($this->data['filter'], $this->config);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
 
-		$paging = getPagingLine($data['problems'], ZBX_SORT_UP, clone $url);
+		if ($this->data['action'] === 'problem.view') {
+			$paging = getPagingLine($data['problems'], ZBX_SORT_UP, clone $url);
+		}
 
 		$data = self::makeData($data, $this->data['filter']);
 
@@ -1114,6 +1116,12 @@ class CScreenProblem extends CScreenBase {
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
 		else {
+			/*
+			 * Search limit performs +1 selection to know if limit was exceeded, this will assure that csv has
+			 * "search_limit" records at most.
+			 */
+			array_splice($data['problems'], $this->config['search_limit']);
+
 			$csv = [];
 
 			$csv[] = [

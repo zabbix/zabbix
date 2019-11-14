@@ -232,8 +232,10 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		zbx_json_type_t		type;
 
-		if (SUCCEED == (rc = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
+		if (SUCCEED == (rc = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc, &type)) &&
+				ZBX_JSON_TYPE_NULL != type)
 		{
 			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 			{
@@ -247,6 +249,8 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 					rc = FAIL;
 			}
 		}
+		else
+			rc = FAIL;
 
 		/* check if a new condition group has started */
 		if (NULL == lastmacro || 0 != strcmp(lastmacro, condition->macro))
@@ -299,8 +303,10 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		zbx_json_type_t		type;
 
-		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
+		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc, &type)) &&
+				ZBX_JSON_TYPE_NULL != type)
 		{
 			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 			{
@@ -314,6 +320,8 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
 					ret = FAIL;
 			}
 		}
+		else
+			ret = FAIL;
 
 		/* if any of conditions are false the evaluation returns false */
 		if (SUCCEED != ret)
@@ -353,8 +361,10 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		zbx_json_type_t		type;
 
-		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
+		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc, &type)) &&
+				ZBX_JSON_TYPE_NULL != type)
 		{
 			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 			{
@@ -368,6 +378,8 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 					ret = FAIL;
 			}
 		}
+		else
+			ret = FAIL;
 
 		/* if any of conditions are true the evaluation returns true */
 		if (SUCCEED == ret)
@@ -416,8 +428,10 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 		char			*value = NULL;
 		size_t			value_alloc = 0;
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		zbx_json_type_t		type;
 
-		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
+		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc, &type)) &&
+				ZBX_JSON_TYPE_NULL != type)
 		{
 			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 			{
@@ -431,6 +445,8 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 					ret = FAIL;
 			}
 		}
+		else
+			ret = FAIL;
 
 		zbx_free(value);
 

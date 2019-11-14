@@ -57,7 +57,7 @@ class CScreenPlainText extends CScreenBase {
 			'itemids' => $this->screenitem['resourceid'],
 			'output' => API_OUTPUT_EXTEND,
 			'sortorder' => ZBX_SORT_DOWN,
-			'sortfield' => ['itemid', 'clock'],
+			'sortfield' => 'clock',
 			'limit' => $this->screenitem['elements'],
 			'time_from' => $this->timeline['from_ts'],
 			'time_till' => $this->timeline['to_ts']

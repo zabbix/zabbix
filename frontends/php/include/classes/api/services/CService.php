@@ -547,11 +547,10 @@ class CService extends CApiService {
 
 			$problemServiceIds = [];
 			foreach ($services as &$service) {
-				$service['alarms'] = [];
-
 				// don't calculate SLA for services with disabled status calculation
 				if ($this->isStatusEnabled($service)) {
 					$usedSeviceIds[$service['serviceid']] = $service['serviceid'];
+					$service['alarms'] = [];
 
 					if ($service['status'] > 0) {
 						$problemServiceIds[] = $service['serviceid'];

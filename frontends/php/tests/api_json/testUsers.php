@@ -234,8 +234,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_create
-	*/
+	 * @dataProvider user_create
+	 */
 	public function testUsers_Create($user, $expected_error) {
 		$result = $this->call('user.create', $user, $expected_error);
 
@@ -277,8 +277,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* Create user with multiple email address
-	*/
+	 * Create user with multiple email address
+	 */
 	public function testUsers_CreateUserWithMultipleEmails() {
 		$user = [
 			'alias' => 'API user create with multiple emails',
@@ -555,8 +555,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_update
-	*/
+	 * @dataProvider user_update
+	 */
 	public function testUsers_Update($users, $expected_error) {
 		foreach ($users as $user) {
 			if (array_key_exists('userid', $user) && filter_var($user['userid'], FILTER_VALIDATE_INT)
@@ -1477,8 +1477,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_properties
-	*/
+	 * @dataProvider user_properties
+	 */
 	public function testUser_NotRequiredPropertiesAndMedias($user, $expected_error) {
 		$methods = ['user.create', 'user.update'];
 
@@ -1592,8 +1592,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_delete
-	*/
+	 * @dataProvider user_delete
+	 */
 	public function testUsers_Delete($user, $expected_error) {
 		$result = $this->call('user.delete', $user, $expected_error);
 
@@ -1664,8 +1664,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_permissions
-	*/
+	 * @dataProvider user_permissions
+	 */
 	public function testUsers_UserPermissions($method, $login, $user, $expected_error) {
 		$this->authorize($login['user'], $login['password']);
 		$this->call($method, $user, $expected_error);
@@ -1695,8 +1695,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider auth_data
-	*/
+	 * @dataProvider auth_data
+	 */
 	public function testUsers_Session($data) {
 		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
 	}
@@ -1828,8 +1828,11 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider login_data
-	*/
+	 * @on-before removeGuestFromDisabledGroup
+	 * @on-after addGuestToDisabledGroup
+	 *
+	 * @dataProvider login_data
+	 */
 	public function testUsers_Login($user, $expected_error) {
 		$this->disableAuthorization();
 		$this->call('user.login', $user, $expected_error);
@@ -1842,5 +1845,16 @@ class testUsers extends CAPITest {
 		}
 
 		$this->assertRegExp('/Account is blocked for (2[5-9]|30) seconds./', $result['error']['data']);
+	}
+
+	/**
+	 * Guest user needs to be out of "Disabled" group to have access to frontend.
+	 */
+	public static function removeGuestFromDisabledGroup() {
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }

@@ -1,0 +1,1 @@
+........S. [ZBX-9146] fixed json null value being treated as empty string for LLD filters (atumilovics)

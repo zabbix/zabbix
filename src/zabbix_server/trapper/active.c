@@ -480,7 +480,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	zbx_vector_ptr_create(&regexps);
 	zbx_vector_str_create(&names);
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", zbx_json_strerror());
 		goto error;
@@ -489,12 +489,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
 
 	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_HOST_METADATA,
-			&host_metadata, &host_metadata_alloc))
+			&host_metadata, &host_metadata_alloc, NULL))
 	{
 		*host_metadata = '\0';
 	}
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip), NULL))
 		strscpy(ip, sock->peer);
 
 	if (FAIL == is_ip(ip))	/* check even if 'ip' came from get_ip_by_socket() - it can return not a valid IP */
@@ -503,7 +503,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp), NULL))
 	{
 		port = ZBX_DEFAULT_AGENT_PORT;
 	}
