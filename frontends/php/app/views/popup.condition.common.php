@@ -199,7 +199,9 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Severity'), new CSeverity(['name' => 'value', 'value' => null]));
+					->addRow(_('Severity'), new CSeverity([
+						'name' => 'value', 'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+					]));
 				break;
 
 			// Host form elements.
