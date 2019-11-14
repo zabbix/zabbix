@@ -170,8 +170,6 @@ class CRouter {
 	 * @param string $actions['action_name']['view']    Optional view of the 'action_name' action.
 	 */
 	public function addActions(array $actions) {
-		$new_routes = [];
-
 		foreach ($actions as $action => $route) {
 			if (is_array($route) && array_key_exists('class', $route)) {
 				$this->routes[$action] = [
