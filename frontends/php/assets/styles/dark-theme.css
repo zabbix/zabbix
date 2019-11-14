@@ -7,6 +7,9 @@
 .top-nav-profile {
   background: url(../img/icon-sprite.svg) no-repeat -84px -104px !important; }
 
+.top-nav-guest {
+  background: url(../img/icon-sprite.svg) no-repeat -241px -140px !important; }
+
 .top-nav-signout {
   background: url(../img/icon-sprite.svg) no-repeat -84px -140px !important; }
 
@@ -275,7 +278,7 @@ ul.top-nav-icons {
         ul.top-nav-icons li .search-suggest li a {
           opacity: inherit;
           width: inherit; }
-  ul.top-nav-icons a {
+  ul.top-nav-icons a, ul.top-nav-icons span.top-nav-guest {
     display: block;
     width: 24px;
     height: 45px;
@@ -289,10 +292,10 @@ ul.top-nav-icons {
     -webkit-transition: opacity 0.2s ease-out;
     -moz-transition: opacity 0.2s ease-out;
     transition: opacity 0.2s ease-out; }
-    ul.top-nav-icons a:hover {
+    ul.top-nav-icons a:hover, ul.top-nav-icons span.top-nav-guest:hover {
       opacity: 1;
       filter: alpha(opacity=100); }
-    ul.top-nav-icons a:focus {
+    ul.top-nav-icons a:focus, ul.top-nav-icons span.top-nav-guest:focus {
       background-color: #383838 !important;
       opacity: 1;
       filter: alpha(opacity=100); }
@@ -300,6 +303,8 @@ ul.top-nav-icons {
     background: url(../img/icon-sprite.svg) no-repeat -6px -32px; }
   ul.top-nav-icons .top-nav-profile {
     background: url(../img/icon-sprite.svg) no-repeat -6px -104px; }
+  ul.top-nav-icons .top-nav-guest {
+    background: url(../img/icon-sprite.svg) no-repeat -241px -104px; }
   ul.top-nav-icons .top-nav-signout {
     background: url(../img/icon-sprite.svg) no-repeat -6px -140px; }
   ul.top-nav-icons .top-nav-zbbshare {
