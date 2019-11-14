@@ -87,6 +87,19 @@ if (!$events) {
 }
 $event = reset($events);
 
+$event['comments'] = ($trigger['comments'] !== '')
+	? CMacrosResolverHelper::resolveTriggerDescription(
+		[
+			'triggerid' => $trigger['triggerid'],
+			'expression' => $trigger['expression'],
+			'comments' => $trigger['comments'],
+			'clock' => $event['clock'],
+			'ns' => $event['ns']
+		],
+		['events' => true]
+	)
+	: '';
+
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
 		'output' => ['correlationid', 'userid'],
@@ -154,33 +167,35 @@ $mediatypes = API::Mediatype()->get([
 /*
  * Display
  */
-$eventTab = (new CTable())
-	->addRow([
-		new CDiv([
-			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))->setHeader(_('Trigger details')),
-			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
-				make_event_details($event,
-					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
-				)
-			))->setHeader(_('Event details'))
-		]),
-		new CDiv([
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONS,
-				makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
-			))
-				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state', true))
-				->setHeader(_('Actions'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state'),
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
-				make_small_eventlist($event,
-					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
-				)
-			))
-				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
-				->setHeader(_('Event list [previous 20]'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state')
-		])
-	]);
+$event_details_url = (new CUrl($page['file']))
+	->setArgument('triggerid', getRequest('triggerid'))
+	->setArgument('eventid', getRequest('eventid'))
+	->getUrl();
 
-$eventWidget = (new CWidget())
+$event_tab = (new CDiv([
+	new CDiv([
+		(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger, $event['eventid'])))
+			->setHeader(_('Trigger details')),
+		(new CUiWidget(WIDGET_HAT_EVENTDETAILS, make_event_details($event, $event_details_url)))
+			->setHeader(_('Event details'))
+	]),
+	new CDiv([
+		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONS,
+			makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
+		))
+			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state', true))
+			->setHeader(_('Actions'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state')
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID),
+		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST, make_small_eventlist($event, $event_details_url)))
+			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
+			->setHeader(_('Event list [previous 20]'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state')
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)
+	])
+]))
+	->addClass(ZBX_STYLE_COLUMNS)
+	->addClass(ZBX_STYLE_COLUMNS_2);
+
+(new CWidget())
 	->setTitle(_('Event details'))
 	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,
@@ -189,7 +204,7 @@ $eventWidget = (new CWidget())
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem($eventTab)
+	->addItem($event_tab)
 	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

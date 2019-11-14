@@ -23,15 +23,7 @@ require_once dirname(__FILE__).'/js/administration.general.gui.php';
 
 $widget = (new CWidget())
 	->setTitle(_('GUI'))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.gui.php'))
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $guiTab = (new CFormList())
 	->addRow(_('Default theme'),

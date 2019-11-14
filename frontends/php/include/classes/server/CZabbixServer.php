@@ -206,6 +206,7 @@ class CZabbixServer {
 	 * @param string $data['sendto']       Message destination.
 	 * @param string $data['subject']      Message subject.
 	 * @param string $data['message']      Message body.
+	 * @param string $data['params']       Custom parameters for media type webhook.
 	 * @param string $sid                  User session ID.
 	 *
 	 * @return bool|array
@@ -214,12 +215,7 @@ class CZabbixServer {
 		return $this->request([
 			'request' => 'alert.send',
 			'sid' => $sid,
-			'data' => [
-				'mediatypeid' => $data['mediatypeid'],
-				'sendto' => $data['sendto'],
-				'subject' => $data['subject'],
-				'message' => $data['message']
-			]
+			'data' => $data
 		]);
 	}
 

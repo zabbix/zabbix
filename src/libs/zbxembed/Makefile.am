@@ -3,7 +3,12 @@
 noinst_LIBRARIES = libzbxembed.a
 
 libzbxembed_a_SOURCES = \
+	duk_config.h \
+	duktape.c \
+	duktape.h \
 	embed.c \
-	duktape.c duktape.h \
-	duk_config.h
-
+	embed.h \
+	httprequest.c \
+	httprequest.h \
+	zabbix.c \
+	zabbix.h

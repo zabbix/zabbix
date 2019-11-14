@@ -570,7 +570,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * Get menu popup trigger section data.
  *
  * @param {string} options['triggerid']               Trigger ID.
- * @param {string} options['eventid']                 (optional) Required for Acknowledge and Description sections.
+ * @param {string} options['eventid']                 (optional) Required for Acknowledge section.
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
  * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
@@ -578,8 +578,6 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * @param {string} options['acknowledge']['backurl']  Return URL.
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
- * @param {bool}   options['show_description']        Show Description item in context menu. Default: true.
- * @param {bool}   options['description_enabled']     Show Description item enabled. Default: true.
  * @param {string} options['url']                     Trigger URL link (optional).
  * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
@@ -622,31 +620,6 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		};
 	}
 
-	// description
-	if (typeof options.show_description === 'undefined' || options.show_description !== false) {
-		var trigger_descr = {
-			label: t('Description')
-		};
-
-		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
-			trigger_descr.clickCallback = function() {
-				var	popup_options = {triggerid: options.triggerid};
-
-				if (typeof options.eventid !== 'undefined') {
-					popup_options.eventid = options.eventid;
-				}
-
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-				return PopUp('popup.trigdesc.view', popup_options, null, trigger_elmnt);
-			}
-		}
-		else {
-			trigger_descr.disabled = true;
-		}
-		items[items.length] = trigger_descr;
-	}
-
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration) {
 		var url = new Curl('triggers.php', false);
@@ -660,18 +633,18 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		};
 	}
 
-	// url
-	if (typeof options.url !== 'undefined' && options.url.length > 0) {
-		items[items.length] = {
-			label: t('URL'),
-			url: options.url
-		};
-	}
-
 	sections[sections.length] = {
 		label: t('S_TRIGGER'),
 		items: items
 	};
+
+	// urls
+	if ('urls' in options) {
+		sections[sections.length] = {
+			label: t('Links'),
+			items: options.urls
+		};
+	}
 
 	// items
 	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
@@ -816,6 +789,52 @@ function getMenuPopupItemPrototype(options) {
 }
 
 /**
+ * Get menu popup submenu section data.
+ *
+ * @param object options['submenu']                                    List of menu sections.
+ * @param object options['submenu'][section]                           An individual section definition.
+ * @param string options['submenu'][section]['label']                  Non-clickable section label.
+ * @param object options['submenu'][section]['items']                  List of menu items of the section.
+ * @param string options['submenu'][section]['items'][url]             Menu item label for the given url.
+ * @param object options['submenu'][section]['items'][key]             Menu item with a submenu.
+ * @param object options['submenu'][section]['items'][key]['label']    Non-clickable subsection label.
+ * @param object options['submenu'][section]['items'][key]['items']    List of menu items of the subsection.
+ * @param object options['submenu'][section]['items'][key]['items'][]  More levels of submenu.
+ *
+ * @returns array
+ */
+function getMenuPopupSubmenu(options) {
+	var transform = function(sections) {
+			var result = [];
+
+			for (var key in sections) {
+				if (typeof sections[key] === 'object') {
+					var item = {};
+					for (var item_key in sections[key]) {
+						if (item_key === 'items') {
+							item[item_key] = transform(sections[key][item_key]);
+						}
+						else {
+							item[item_key] = sections[key][item_key];
+						}
+					}
+					result.push(item);
+				}
+				else {
+					result.push({
+						'label': sections[key],
+						'url': key
+					});
+				}
+			}
+
+			return result;
+		};
+
+	return transform(options.submenu);
+}
+
+/**
  * Get data for the "Insert expression" menu in the trigger expression constructor.
  *
  * @return array
@@ -941,6 +960,9 @@ jQuery(function($) {
 	 * @param string sections[n]['label']  Section title (optional).
 	 * @param array  sections[n]['items']  Section menu data (see createMenuItem() for available options).
 	 * @param object event                 Menu popup call event.
+	 * @param object options               Menu popup options (optional).
+	 * @param object options['class']      Menu popup additional class name (optional).
+	 * @param object options['position']   Menu popup position object (optional).
 	 *
 	 * @see createMenuItem()
 	 */
@@ -954,155 +976,111 @@ jQuery(function($) {
 	};
 
 	var methods = {
-		init: function(sections, event) {
-			var opener = $(this),
-				id = opener.data('menu-popup-id'),
-				menuPopup = $('#' + id),
-				mapContainer = null,
-				position_target = event.target;
-
-			if (event.type === 'contextmenu' || (IE && opener.closest('svg').length > 0)
-					|| event.originalEvent.detail !== 0) {
-				position_target = event;
+		init: function(sections, event, options) {
+			// Don't display empty menu.
+			if (!sections.length || !sections[0]['items'].length) {
+				return;
 			}
 
-			opener.attr('data-expanded', 'true');
+			var $opener = $(this);
 
-			// Close other action menus.
-			$('.menu-popup-top').not('#' + id).menuPopup('close');
-
-			if (menuPopup.length > 0) {
-				var display = menuPopup.css('display');
-
-				// Hide current action menu sub-levels.
-				$('.menu-popup', menuPopup).css('display', 'none');
-
-				if (display === 'block') {
-					menuPopup.fadeOut(0);
-					$(opener).removeAttr('data-expanded');
-				}
-				else {
-					menuPopup.fadeIn(50);
-				}
-
-				menuPopup.position({
-					of: position_target,
+			options = $.extend({
+				position: {
+					of: event,
 					my: 'left top',
 					at: 'left bottom'
-				});
-			}
-			else {
-				id = new Date().getTime();
+				}
+			}, options || {});
 
-				menuPopup = $('<ul>', {
-					'id': id,
+			// Close other action menus and prevent focus jumping before opening a new popup.
+			$('.menu-popup-top').menuPopup('close', null, false);
+
+			$opener.attr('data-expanded', 'true');
+
+			var $menu_popup = $('<ul>', {
 					'role': 'menu',
 					'class': 'menu-popup menu-popup-top',
 					'tabindex': 0
 				});
 
-				// create sections
-				var sections_length = sections.length;
-				if (sections_length) {
-					$.each(sections, function(i, section) {
-						if ((typeof section.label !== 'undefined') && (section.label.length > 0)) {
-							var h3 = $('<h3>').text(section.label);
-							var sectionItem = $('<li>').append(h3);
-						}
-
-						// Add section delimited for all sections except first one.
-						if (i > 0) {
-							menuPopup.append($('<li>').append($('<div>')));
-						}
-						menuPopup.append(sectionItem);
-
-						$.each(section.items, function(i, item) {
-							if (sections_length > 1) {
-								item['ariaLabel'] = section.label + ', ' + item['label'];
-							}
-							menuPopup.append(createMenuItem(item));
-						});
-					});
-				}
-
-				if (sections_length == 1) {
-					menuPopup.attr({'aria-label': sections[0].label});
-				}
-
-				// Skip displaying empty menu sections.
-				if (menuPopup.children().length == 0) {
-					return;
-				}
-
-				// Set menu popup for map area.
-				if (opener.prop('tagName') === 'AREA') {
-					$('.menuPopupContainer').remove();
-
-					mapContainer = $('<div>', {
-						'class': 'menuPopupContainer',
-						'css': {
-							position: 'absolute',
-							top: event.pageY,
-							left: event.pageX
-						}
-					})
-					.append(menuPopup);
-
-					$('body').append(mapContainer);
-				}
-				// Set menu popup for common html elements.
-				else {
-					opener.data('menu-popup-id', id);
-
-					$('body').append(menuPopup);
-				}
-
-				// Hide current action menu sub-levels.
-				$('.menu-popup', menuPopup).css('display', 'none');
-
-				// display
-				menuPopup
-					.fadeIn(50)
-					.data('is-active', false)
-					.mouseenter(function() {
-						menuPopup.data('is-active', true);
-
-						clearTimeout(window.menuPopupTimeoutHandler);
-					})
-					.on('click', function(e) {
-						e.stopPropagation();
-					})
-					.position({
-						of: (opener.prop('tagName') === 'AREA') ? mapContainer : position_target,
-						my: 'left top',
-						at: 'left bottom'
-					});
+			// Add custom class, if specified.
+			if ('class' in options) {
+				$menu_popup.addClass(options.class);
 			}
+
+			// Create menu sections.
+			$.each(sections, function(i, section) {
+				// Add a separator between menu item sections.
+				if (i > 0) {
+					$menu_popup.append($('<li>').append($('<div>')));
+				}
+
+				var section_label = null;
+
+				if (typeof section.label === 'string' && section.label.length) {
+					section_label = section.label;
+				}
+
+				// Add menu item section label, if provided.
+				if (section_label !== null) {
+					$menu_popup.append($('<li>').append($('<h3>').text(section_label)));
+				}
+
+				// Add individual menu items of the section.
+				$.each(section.items, function(i, item) {
+					item = $.extend({}, item);
+					if (sections.length > 1 && section_label !== null) {
+						item.ariaLabel = section_label + ', ' + item['label'];
+					}
+					$menu_popup.append(createMenuItem(item));
+				});
+			});
+
+			if (sections.length == 1) {
+				if (typeof sections[0].label === 'string' && sections[0].label.length) {
+					$menu_popup.attr({'aria-label': sections[0].label});
+				}
+			}
+
+			$('body').append($menu_popup);
+
+			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
+			$menu_popup.add('.menu-popup', $menu_popup).css('display', 'none');
+
+			// Position and display the menu.
+			$menu_popup.position(options.position).fadeIn(50);
 
 			addToOverlaysStack('menu-popup', event.target, 'menu-popup');
 
 			$(document)
-				.on('click', {menu: menuPopup, opener: opener}, menuPopupDocumentCloseHandler)
-				.on('keydown', {menu: menuPopup}, menuPopupKeyDownHandler);
+				.on('click', {menu: $menu_popup, opener: $opener}, menuPopupDocumentCloseHandler)
+				.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
 
-			menuPopup.focus();
+			$menu_popup.focus();
 		},
-		close: function(trigger_elmnt, return_focus) {
-			var menuPopup = $(this);
-			if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
-				menuPopup.data('is-active', false);
-				$(trigger_elmnt).removeAttr('data-expanded');
-				menuPopup.fadeOut(0);
 
-				$('.highlighted', menuPopup).removeClass('highlighted');
-				$('[aria-expanded="true"]', menuPopup).attr({'aria-expanded': 'false'});
+		close: function(trigger_elmnt, return_focus) {
+			var menu_popup = $(this);
+
+			if (!menu_popup.is(trigger_elmnt) && menu_popup.has(trigger_elmnt).length === 0) {
+				$(trigger_elmnt).removeAttr('data-expanded');
+				menu_popup.fadeOut(0);
+
+				$('.highlighted', menu_popup).removeClass('highlighted');
+				$('[aria-expanded="true"]', menu_popup).attr({'aria-expanded': 'false'});
 
 				$(document)
 					.off('click', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
-				removeFromOverlaysStack('menu-popup', return_focus);
-				menuPopup.remove();
+				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
+
+				if (overlay !== null && typeof overlay['element'] !== undefined) {
+					// Remove expanded attribute of the original opener.
+					$(overlay['element']).removeAttr('data-expanded');
+				}
+
+				menu_popup.remove();
 			}
 		}
 	};
@@ -1320,6 +1298,10 @@ jQuery(function($) {
 
 			if (typeof options.url !== 'undefined') {
 				link.attr('href', options.url);
+
+				if ('target' in options) {
+					link.attr('target', options.target);
+				}
 			}
 
 			if (typeof options.clickCallback !== 'undefined') {

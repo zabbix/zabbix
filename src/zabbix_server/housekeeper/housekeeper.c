@@ -106,6 +106,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
 #define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
 #define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
+#define HK_UPDATE_CACHE_TREND_COUNT		2
 
 /* the oldest record timestamp cache for items in history tables */
 typedef struct
@@ -353,25 +354,35 @@ static void	hk_history_release(zbx_hk_history_rule_t *rule)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static void	hk_history_item_update(zbx_hk_history_rule_t *rule, int now, zbx_uint64_t itemid, int history)
+static void	hk_history_item_update(zbx_hk_history_rule_t *rules, zbx_hk_history_rule_t *rule_add, int count,
+		int now, zbx_uint64_t itemid, int history)
 {
-	zbx_hk_item_cache_t	*item_record;
+	zbx_hk_history_rule_t	*rule;
 
-	if (ZBX_HK_MODE_REGULAR != *rule->poption_mode)
-		return;
-
-	item_record = (zbx_hk_item_cache_t *)zbx_hashset_search(&rule->item_cache, &itemid);
-
-	if (NULL == item_record)
+	/* item can be cached in multiple rules when value type has been changed */
+	for (rule = rules; rule - rules < count; rule++)
 	{
-		zbx_hk_item_cache_t	item_data = {itemid, now};
+		zbx_hk_item_cache_t	*item_record;
 
-		item_record = (zbx_hk_item_cache_t *)zbx_hashset_insert(&rule->item_cache, &item_data, sizeof(zbx_hk_item_cache_t));
-		if (NULL == item_record)
-			return;
+		if (0 == rule->item_cache.num_slots)
+			continue;
+
+		if (NULL == (item_record = (zbx_hk_item_cache_t *)zbx_hashset_search(&rule->item_cache, &itemid)))
+		{
+			zbx_hk_item_cache_t	item_data = {itemid, now};
+
+			if (rule_add != rule)
+				continue;
+
+			if (NULL == (item_record = (zbx_hk_item_cache_t *)zbx_hashset_insert(&rule->item_cache,
+					&item_data, sizeof(zbx_hk_item_cache_t))))
+			{
+				continue;
+			}
+		}
+
+		hk_history_delete_queue_append(rule, now, item_record, history);
 	}
-
-	hk_history_delete_queue_append(rule, now, item_record, history);
 }
 
 /******************************************************************************
@@ -410,10 +421,9 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		value_type = atoi(row[1]);
 		ZBX_STR2UINT64(hostid, row[4]);
 
-		if (ITEM_VALUE_TYPE_MAX > value_type)
+		if (value_type < ITEM_VALUE_TYPE_MAX &&
+				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
 		{
-			rule = rules + value_type;
-
 			tmp = zbx_strdup(tmp, row[2]);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
 					MACRO_TYPE_COMMON, NULL, 0);
@@ -434,13 +444,16 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (0 != history && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
 				history = *rule->poption;
 
-			hk_history_item_update(rule, now, itemid, history);
+			hk_history_item_update(rules, rule, ITEM_VALUE_TYPE_MAX, now, itemid, history);
 		}
 
 		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
 		{
 			rule = rules + (value_type == ITEM_VALUE_TYPE_FLOAT ?
 					HK_UPDATE_CACHE_OFFSET_TREND_FLOAT : HK_UPDATE_CACHE_OFFSET_TREND_UINT);
+
+			if (ZBX_HK_MODE_REGULAR != *rule->poption_mode)
+				continue;
 
 			tmp = zbx_strdup(tmp, row[3]);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
@@ -461,7 +474,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (0 != trends && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
 				trends = *rule->poption;
 
-			hk_history_item_update(rule, now, itemid, trends);
+			hk_history_item_update(rules + HK_UPDATE_CACHE_OFFSET_TREND_FLOAT, rule,
+					HK_UPDATE_CACHE_TREND_COUNT, now, itemid, trends);
 		}
 	}
 	DBfree_result(result);

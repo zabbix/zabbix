@@ -1075,7 +1075,7 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 
 		zbx_vector_ptr_append(functions, function);
 	}
-	else
+	else if (NULL != function)
 	{
 		if (function->itemid != itemid)
 		{
@@ -1431,7 +1431,7 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 {
 	zbx_lld_trigger_t			*trigger, *dep_trigger;
 	const zbx_lld_trigger_prototype_t	*dep_trigger_prototype;
-	zbx_lld_dependency_t			*dependency;
+	zbx_lld_dependency_t			*dependency = NULL;
 	zbx_uint64_t				triggerid_up;
 	int					i, j, index;
 
@@ -1492,8 +1492,11 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 
 				zbx_vector_ptr_append(&dep_trigger->dependents, trigger);
 
-				dependency->trigger_up = dep_trigger;
-				dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED;
+				if (NULL != dependency)
+				{
+					dependency->trigger_up = dep_trigger;
+					dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED;
+				}
 			}
 			else
 			{
@@ -1527,7 +1530,8 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 				zbx_vector_ptr_append(&trigger->dependencies, dependency);
 			}
 
-			dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED;
+			if (NULL != dependency)
+				dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED;
 		}
 	}
 out:

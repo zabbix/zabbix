@@ -56,16 +56,16 @@ out:
     pattern: 1
     op: ==
 ---
-test case: 'cpu{decription="CPU \"Intel\""}'
+test case: 'cpu{description="CPU \"Intel\""}'
 in: 
-  filter: 'cpu{decription=~"CPU \"Intel\""}'
+  filter: 'cpu{description=~"CPU \"Intel\""}'
 out:
   return: SUCCEED
   metric:
     pattern: cpu
     op: =
   labels:
-    - key: decription
+    - key: description
       pattern: CPU "Intel"
       op: =~
 ---

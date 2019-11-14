@@ -28,7 +28,7 @@ class CWidgetFormProblemHosts extends CWidgetForm {
 		parent::__construct($data, WIDGET_PROBLEM_HOSTS);
 
 		// Host groups.
-		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
+		$field_groups = new CWidgetFieldMsGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $this->data)) {
 			$field_groups->setValue($this->data['groupids']);
@@ -37,7 +37,7 @@ class CWidgetFormProblemHosts extends CWidgetForm {
 		$this->fields[$field_groups->getName()] = $field_groups;
 
 		// Exclude host groups.
-		$field_exclude_groups = new CWidgetFieldGroup('exclude_groupids', _('Exclude host groups'));
+		$field_exclude_groups = new CWidgetFieldMsGroup('exclude_groupids', _('Exclude host groups'));
 
 		if (array_key_exists('exclude_groupids', $this->data)) {
 			$field_exclude_groups->setValue($this->data['exclude_groupids']);
@@ -46,7 +46,7 @@ class CWidgetFormProblemHosts extends CWidgetForm {
 		$this->fields[$field_exclude_groups->getName()] = $field_exclude_groups;
 
 		// Hosts field.
-		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'));
+		$field_hosts = new CWidgetFieldMsHost('hostids', _('Hosts'));
 
 		if (array_key_exists('hostids', $this->data)) {
 			$field_hosts->setValue($this->data['hostids']);

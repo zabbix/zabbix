@@ -456,9 +456,9 @@ typedef struct
 	zbx_vector_ptr_t	correlations;
 	zbx_hashset_t		conditions;
 
-	/* Configuration synchonization timestamp of the rules. */
-	/* Update the cache if this timesamp is less than the   */
-	/* current configuration synchonization timestamp.      */
+	/* Configuration synchronization timestamp of the rules. */
+	/* Update the cache if this timesamp is less than the    */
+	/* current configuration synchronization timestamp.      */
 	int			sync_ts;
 }
 zbx_correlation_rules_t;
@@ -647,6 +647,7 @@ void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_
 		size_t num);
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
+int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid);
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);

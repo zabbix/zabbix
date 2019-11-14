@@ -68,7 +68,7 @@ AC_HELP_STRING([--with-openipmi@<:@=DIR@:>@],[Include OPENIPMI support @<:@defau
 
                found_openipmi="yes"
                AC_DEFINE(HAVE_OPENIPMI,1,[Define to 1 if OPENIPMI should be enabled.])
-	       AC_DEFINE(OPENIPMI_DEPRECATED, 1, [Define to 1 if OPENIPMI depricated functions is used.])
+	       AC_DEFINE(OPENIPMI_DEPRECATED, 1, [Define to 1 if OPENIPMI deprecated functions is used.])
                AC_MSG_RESULT(yes)
 	fi
   fi

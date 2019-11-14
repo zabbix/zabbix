@@ -1660,7 +1660,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                     <preprocessing>
                         <step>
                             <type>5</type>
-                            <params>Time:\s(\d.\d+)\sms
+                            <params>Time:\s(\d+\.\d+)\sms
 \1</params>
                             <error_handler>0</error_handler>
                             <error_handler_params/>
@@ -4899,7 +4899,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <expression>{Template DB PostgreSQL:pgsql.dbstat.deadlocks.rate[&quot;{#DBNAME}&quot;].min(5m)} &gt; {$PG.DEADLOCKS.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
-                            <name>Database {#DBNAME}: Deadlock occured (over {$PG.DEADLOCKS.MAX.WARN:&quot;{#DBNAME}&quot;} in 5m)</name>
+                            <name>Database {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:&quot;{#DBNAME}&quot;} in 5m)</name>
                             <correlation_mode>0</correlation_mode>
                             <correlation_tag/>
                             <url/>
@@ -5548,7 +5548,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                     <screen_items>
                         <screen_item>
                             <resourcetype>20</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>0</x>
                             <y>0</y>
@@ -5570,7 +5570,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>20</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>1</x>
                             <y>0</y>
@@ -5592,7 +5592,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>20</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>0</x>
                             <y>1</y>
@@ -5614,7 +5614,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>20</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>1</x>
                             <y>1</y>
@@ -5636,7 +5636,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>20</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>0</x>
                             <y>2</y>
@@ -5658,7 +5658,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>20</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>1</x>
                             <y>2</y>
@@ -5680,7 +5680,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>20</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>0</x>
                             <y>3</y>
@@ -5702,7 +5702,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>20</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>1</x>
                             <y>3</y>
@@ -5731,7 +5731,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                     <screen_items>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>0</x>
                             <y>0</y>
@@ -5753,7 +5753,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>1</x>
                             <y>0</y>
@@ -5775,7 +5775,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>0</x>
                             <y>1</y>
@@ -5797,7 +5797,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>1</x>
                             <y>1</y>
@@ -5819,7 +5819,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>0</x>
                             <y>2</y>
@@ -5841,7 +5841,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>1</x>
                             <y>2</y>
@@ -5863,7 +5863,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>0</x>
                             <y>3</y>
@@ -5885,7 +5885,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>200</height>
                             <x>1</x>
                             <y>3</y>

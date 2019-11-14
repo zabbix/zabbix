@@ -160,7 +160,7 @@ $item_form_list
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					'&rArr;',
-					(new CTextBox('headers[value][#{index}]', '#{value}', false, 1000))
+					(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
@@ -604,7 +604,9 @@ $item_form_list
 		(new CVisibilityBox('visible[description]', 'description', _('Original')))
 			->setLabel(_('Description'))
 			->setChecked(array_key_exists('description', $data['visible'])),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('items' , 'description'))
 	);
 
 $tabs = (new CTabView())

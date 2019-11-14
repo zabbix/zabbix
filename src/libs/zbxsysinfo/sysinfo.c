@@ -352,6 +352,8 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue)
  *                                                                            *
  * Return value: request - structure filled with data from item key           *
  *                                                                            *
+ * Comments: thread-safe                                                      *
+ *                                                                            *
  ******************************************************************************/
 int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 {
@@ -467,7 +469,7 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 
 	for (c = suppressed_chars; '\0' != *c; c++)
 	{
-		if (NULL == strchr(param, *c))
+		if (NULL == param || NULL == strchr(param, *c))
 			continue;
 
 		buf = (char *)zbx_malloc(buf, buf_alloc);
@@ -1351,7 +1353,7 @@ out:
 }
 #else
 
-ZBX_THREAD_LOCAL static zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
+static ZBX_THREAD_LOCAL zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
 
 zbx_uint32_t get_thread_global_mutex_flag()
 {

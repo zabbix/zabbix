@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>3.4</version>
+   <version>4.4</version>
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
@@ -11,9 +11,23 @@
       <template>
          <template>Template Net Dell Force S-Series SNMPv2</template>
          <name>Template Net Dell Force S-Series SNMPv2</name>
-         <description>Template Dell Force S-Series version: 0.15&#13;
+         <description>Template Dell Force S-Series&#13;
+&#13;
 MIBs used:&#13;
-F10-S-SERIES-CHASSIS-MIB</description>
+F10-S-SERIES-CHASSIS-MIB&#13;
+&#13;
+Template tooling version used: 0.32</description>
+         <templates>
+            <template>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Interfaces SNMPv2</name>
+            </template>
+         </templates>
          <groups>
             <group>
                <name>Templates/Network devices</name>
@@ -39,187 +53,126 @@ F10-S-SERIES-CHASSIS-MIB</description>
                <name>Temperature</name>
             </application>
          </applications>
-         <items/>
          <discovery_rules>
             <discovery_rule>
+               <name>FAN Discovery</name>
+               <type>SNMPV2</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.4.1.1]</snmp_oid>
+               <key>fan.discovery</key>
+               <delay>1h</delay>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Fan {#SNMPVALUE}: Fan status</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.4.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
+The status of the fan tray {#SNMPVALUE}.</description>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus</name>
+                     </valuemap>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <name>Fan {#SNMPVALUE}: Fan is in critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the fan unit</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
+                           <name>Fan {#SNMPVALUE}: Fan is not in normal state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>INFO</priority>
+                           <description>Please check the fan unit</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Fan {#SNMPVALUE}: Fan is in critical state</name>
+                                 <expression>{Template Net Dell Force S-Series SNMPv2:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+            </discovery_rule>
+            <discovery_rule>
                <name>CPU and Memory and Flash Discovery</name>
-               <type>4</type>
+               <type>SNMPV2</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.9.1.1]</snmp_oid>
                <key>module.discovery</key>
                <delay>1h</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
-               <lifetime>30d</lifetime>
-               <description/>
                <item_prototypes>
                   <item_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.9.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>0</value_type>
-                     <allowed_hosts/>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
 CPU utilization in percentage for last 1 minute.</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>CPU</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
+                           <name>#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
+                           <opdata>Current utilization: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPINDEX}: Memory utilization</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.9.1.5.{#SNMPINDEX}</snmp_oid>
-                     <key>vm.memory.pused[chStackUnitMemUsageUtil.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>0</value_type>
-                     <allowed_hosts/>
+                     <key>vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
 Total memory usage in percentage.</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Memory</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
+                           <name>#{#SNMPINDEX}: High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>#{#SNMPINDEX}: High CPU utilization</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:vm.memory.pused[chStackUnitMemUsageUtil.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>#{#SNMPINDEX}: High memory utilization</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
-                     <width>900</width>
-                     <height>200</height>
-                     <yaxismin>0</yaxismin>
-                     <yaxismax>100</yaxismax>
-                     <show_work_period>1</show_work_period>
-                     <show_triggers>1</show_triggers>
-                     <type>0</type>
-                     <show_legend>1</show_legend>
-                     <show_3d>0</show_3d>
-                     <percent_left>0.0000</percent_left>
-                     <percent_right>0.0000</percent_right>
-                     <ymin_type_1>1</ymin_type_1>
-                     <ymax_type_1>1</ymax_type_1>
-                     <ymin_item_1>0</ymin_item_1>
-                     <ymax_item_1>0</ymax_item_1>
+                     <ymin_type_1>FIXED</ymin_type_1>
+                     <ymax_type_1>FIXED</ymax_type_1>
                      <graph_items>
                         <graph_item>
-                           <sortorder>0</sortorder>
-                           <drawtype>5</drawtype>
+                           <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template Net Dell Force S-Series SNMPv2</host>
                               <key>system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}]</key>
@@ -229,103 +182,41 @@ Total memory usage in percentage.</description>
                   </graph_prototype>
                   <graph_prototype>
                      <name>#{#SNMPINDEX}: Memory utilization</name>
-                     <width>900</width>
-                     <height>200</height>
-                     <yaxismin>0</yaxismin>
-                     <yaxismax>100</yaxismax>
-                     <show_work_period>1</show_work_period>
-                     <show_triggers>1</show_triggers>
-                     <type>0</type>
-                     <show_legend>1</show_legend>
-                     <show_3d>0</show_3d>
-                     <percent_left>0.0000</percent_left>
-                     <percent_right>0.0000</percent_right>
-                     <ymin_type_1>1</ymin_type_1>
-                     <ymax_type_1>1</ymax_type_1>
-                     <ymin_item_1>0</ymin_item_1>
-                     <ymax_item_1>0</ymax_item_1>
+                     <ymin_type_1>FIXED</ymin_type_1>
+                     <ymax_type_1>FIXED</ymax_type_1>
                      <graph_items>
                         <graph_item>
-                           <sortorder>0</sortorder>
-                           <drawtype>5</drawtype>
+                           <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template Net Dell Force S-Series SNMPv2</host>
-                              <key>vm.memory.pused[chStackUnitMemUsageUtil.{#SNMPINDEX}]</key>
+                              <key>vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
-               <host_prototypes/>
-               <jmx_endpoint/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
-               <type>4</type>
+               <type>SNMPV2</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.3.1.1]</snmp_oid>
                <key>psu.discovery</key>
                <delay>1h</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
-               <lifetime>30d</lifetime>
                <description>A list of power supply residents in the S-series chassis.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>PSU {#SNMPVALUE}: Power supply status</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.3.1.2.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>2w</history>
                      <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
 The status of the power supply {#SNMPVALUE}</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Power supply</name>
@@ -334,515 +225,213 @@ The status of the power supply {#SNMPVALUE}</description>
                      <valuemap>
                         <name>F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus</name>
                      </valuemap>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-               </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>PSU {#SNMPVALUE}: Power supply is in critical state</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Please check the power supply unit for errors</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>PSU {#SNMPVALUE}: Power supply is not in normal state</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Please check the power supply unit for errors</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies>
-                        <dependency>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                            <name>PSU {#SNMPVALUE}: Power supply is in critical state</name>
-                           <expression>{Template Net Dell Force S-Series SNMPv2:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
-                           <recovery_expression/>
-                        </dependency>
-                     </dependencies>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
-               <graph_prototypes/>
-               <host_prototypes/>
-               <jmx_endpoint/>
-            </discovery_rule>
-            <discovery_rule>
-               <name>FAN Discovery</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.4.1.1]</snmp_oid>
-               <key>fan.discovery</key>
-               <delay>1h</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
-               <lifetime>30d</lifetime>
-               <description/>
-               <item_prototypes>
-                  <item_prototype>
-                     <name>Fan {#SNMPVALUE}: Fan status</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.4.1.2.{#SNMPINDEX}</snmp_oid>
-                     <key>sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>2w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
-The status of the fan tray {#SNMPVALUE}.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Fans</name>
-                        </application>
-                     </applications>
-                     <valuemap>
-                        <name>F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus</name>
-                     </valuemap>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the power supply unit for errors</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
+                           <name>PSU {#SNMPVALUE}: Power supply is not in normal state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>INFO</priority>
+                           <description>Please check the power supply unit for errors</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>PSU {#SNMPVALUE}: Power supply is in critical state</name>
+                                 <expression>{Template Net Dell Force S-Series SNMPv2:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>Fan {#SNMPVALUE}: Fan is in critical state</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Please check the fan unit</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>Fan {#SNMPVALUE}: Fan is not in normal state</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Please check the fan unit</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies>
-                        <dependency>
-                           <name>Fan {#SNMPVALUE}: Fan is in critical state</name>
-                           <expression>{Template Net Dell Force S-Series SNMPv2:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
-                           <recovery_expression/>
-                        </dependency>
-                     </dependencies>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
-               <graph_prototypes/>
-               <host_prototypes/>
-               <jmx_endpoint/>
             </discovery_rule>
             <discovery_rule>
                <name>Stack Unit Discovery</name>
-               <type>4</type>
+               <type>SNMPV2</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.2.1.2]</snmp_oid>
                <key>stack.discovery</key>
                <delay>1h</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
-               <lifetime>30d</lifetime>
-               <description/>
                <item_prototypes>
                   <item_prototype>
                      <name>Device {#SNMPVALUE}: Temperature</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.2.1.14.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>0</value_type>
-                     <allowed_hosts/>
+                     <value_type>FLOAT</value_type>
                      <units>°C</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
 The temperature of the unit.</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Temperature</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                           <name>Device {#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Device {#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                                 <expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>Device {#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                           <name>Device {#SNMPVALUE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Hardware model name</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.2.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.model[chStackUnitModelID.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
                      <history>2w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>1</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
 The plugged-in model ID for this unit.</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Inventory</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Hardware serial number</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.2.1.12.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
                      <history>2w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>1</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
 The unit's serial number.</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Inventory</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <recovery_mode>NONE</recovery_mode>
+                           <name>#{#SNMPVALUE}: Device has been replaced (new serial number received)</name>
+                           <priority>INFO</priority>
+                           <description>Device serial number has changed. Ack to close</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Hardware version(revision)</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.2.1.21.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.version[chStackUnitProductRev.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
                      <history>2w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>1</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
 The unit manufacturer's product revision</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Inventory</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
                   </item_prototype>
                   <item_prototype>
                      <name>#{#SNMPVALUE}: Operating system</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.6027.3.10.1.2.2.1.10.{#SNMPINDEX}</snmp_oid>
                      <key>system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
                      <history>2w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>1</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
                      <description>MIB: F10-S-SERIES-CHASSIS-MIB&#13;
 Current code version of this unit.</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Inventory</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <recovery_mode>NONE</recovery_mode>
+                           <name>#{#SNMPVALUE}: Operating system description has changed</name>
+                           <priority>INFO</priority>
+                           <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
-                     <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
-                     <name>Device {#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies>
-                        <dependency>
-                           <name>Device {#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                        </dependency>
-                     </dependencies>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                     <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                     <name>Device {#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
-                     <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Dell Force S-Series SNMPv2:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
-                     <name>Device {#SNMPVALUE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Net Dell Force S-Series SNMPv2:system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}].diff()}=1 and {Template Net Dell Force S-Series SNMPv2:system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}].strlen()}&gt;0</expression>
-                     <recovery_mode>2</recovery_mode>
-                     <recovery_expression/>
-                     <name>#{#SNMPVALUE}: Device has been replaced (new serial number received)</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Device serial number has changed. Ack to close</description>
-                     <type>0</type>
-                     <manual_close>1</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
-               <graph_prototypes/>
-               <host_prototypes/>
-               <jmx_endpoint/>
             </discovery_rule>
          </discovery_rules>
-         <httptests/>
          <macros>
             <macro>
-               <macro>{$CPU_UTIL_MAX}</macro>
+               <macro>{$CPU.UTIL.CRIT}</macro>
                <value>90</value>
             </macro>
             <macro>
@@ -854,7 +443,7 @@ Device serial number has changed. Ack to close</description>
                <value>1</value>
             </macro>
             <macro>
-               <macro>{$MEMORY_UTIL_MAX}</macro>
+               <macro>{$MEMORY.UTIL.MAX}</macro>
                <value>90</value>
             </macro>
             <macro>
@@ -878,22 +467,8 @@ Device serial number has changed. Ack to close</description>
                <value>55</value>
             </macro>
          </macros>
-         <templates>
-            <template>
-               <name>Template Module EtherLike-MIB SNMPv2</name>
-            </template>
-            <template>
-               <name>Template Module Generic SNMPv2</name>
-            </template>
-            <template>
-               <name>Template Module Interfaces SNMPv2</name>
-            </template>
-         </templates>
-         <screens/>
       </template>
    </templates>
-   <graphs/>
-   <triggers/>
    <value_maps>
       <value_map>
          <name>F10-S-SERIES-CHASSIS-MIB::extremeFanOperational</name>

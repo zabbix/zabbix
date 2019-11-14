@@ -514,7 +514,9 @@ else {
 $triggersFormList
 	->addRow(_('URL'), (new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Description'),
-		(new CTextArea('comments', $data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('comments', $data['comments']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('triggers' , 'comments'))
 	)
 	->addRow(_('Create enabled'), (new CCheckBox('status'))->setChecked($status));
 

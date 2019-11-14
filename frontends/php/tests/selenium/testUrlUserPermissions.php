@@ -20,6 +20,10 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @on-before removeGuestFromDisabledGroup
+ * @on-after addGuestToDisabledGroup
+ */
 class testUrlUserPermissions extends CLegacyWebTest {
 
 	public static function data() {
@@ -48,7 +52,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'overview.php',
 				'title' =>	'Overview [refreshed every 30 sec.]',
-				'header' =>	'Overview',
+				'header' =>	'Trigger overview',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
@@ -58,7 +62,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'overview.php?form_refresh=1&groupid=0&type=0&view_style=0',
 				'title' =>	'Overview [refreshed every 30 sec.]',
-				'header' =>	'Overview',
+				'header' =>	'Trigger overview',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
@@ -446,7 +450,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Trigger actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -456,7 +460,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=0',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Trigger actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -466,7 +470,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=1',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Discovery actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -476,7 +480,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=2',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Auto registration actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -486,7 +490,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=3',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Internal actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -767,11 +771,10 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		}
 	}
 
-	public function testUrlUserPermissions_DisableGuest() {
-		DBexecute("INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)");
-	}
-
 	/**
+	 * @on-before addGuestToDisabledGroup
+	 * @on-after removeGuestFromDisabledGroup
+	 *
 	 * @dataProvider data
 	 */
 	public function testUrlUserPermissions_DisabledGuest($data) {
@@ -781,7 +784,14 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
 	}
 
-	public function testUrlUserPermissions_EnableGuest() {
-		DBexecute("DELETE FROM users_groups WHERE id=150");
+	/**
+	 * Guest user needs to be out of "Disabled" group to have access to frontend.
+	 */
+	public static function removeGuestFromDisabledGroup() {
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }

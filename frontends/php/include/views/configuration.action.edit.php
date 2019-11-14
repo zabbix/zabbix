@@ -505,12 +505,14 @@ if (!empty($data['new_operation'])) {
 			$mediaTypeComboBox = (new CComboBox('new_operation[opmessage][mediatypeid]', $data['new_operation']['opmessage']['mediatypeid']))
 				->addItem(0, '- '._('All').' -');
 
-			$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
+			$db_mediatypes = API::MediaType()->get([
+				'output' => ['name'],
+				'preservekeys' => true
+			]);
+			order_result($db_mediatypes, 'name');
 
-			order_result($dbMediaTypes, 'description');
-
-			foreach ($dbMediaTypes as $dbMediaType) {
-				$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['description']);
+			foreach ($db_mediatypes as $mediatypeid => $db_mediatype) {
+				$mediaTypeComboBox->addItem($mediatypeid, $db_mediatype['name']);
 			}
 
 			$new_operation_formlist
@@ -838,10 +840,6 @@ if (!empty($data['new_operation'])) {
 
 		$i = 0;
 
-		$operationConditionStringValues = actionOperationConditionValueToString(
-			$data['new_operation']['opconditions']
-		);
-
 		foreach (array_values($data['new_operation']['opconditions']) as $cIdx => $opcondition) {
 			if (!isset($opcondition['conditiontype'])) {
 				$opcondition['conditiontype'] = 0;
@@ -857,13 +855,16 @@ if (!empty($data['new_operation'])) {
 			}
 
 			$label = num2letter($i);
+			$cond_value = $opcondition['value'] ? _('Ack') : _('Not Ack');
 			$labelCol = (new CCol($label))
 				->addClass('label')
 				->setAttribute('data-conditiontype', $opcondition['conditiontype'])
 				->setAttribute('data-formulaid', $label);
 			$operationConditionsTable->addRow([
 					$labelCol,
-					$operationConditionStringValues[$cIdx],
+					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
+						$opcondition['value'], ''
+					),
 					(new CCol([
 						(new CButton('remove', _('Remove')))
 							->onClick('javascript: removeOperationCondition('.$i.');')
@@ -1191,12 +1192,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					$data['new_recovery_operation']['opmessage']['mediatypeid'])
 				)->addItem(0, '- '._('All').' -');
 
-				$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
+				$db_mediatypes = API::MediaType()->get([
+					'output' => ['name'],
+					'preservekeys' => true
+				]);
+				order_result($db_mediatypes, 'name');
 
-				order_result($dbMediaTypes, 'description');
-
-				foreach ($dbMediaTypes as $dbMediaType) {
-					$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['description']);
+				foreach ($db_mediatypes as $mediatypeid => $db_mediatype) {
+					$mediaTypeComboBox->addItem($mediatypeid, $db_mediatype['name']);
 				}
 
 				$new_operation_formlist
@@ -1960,7 +1963,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			)->addItem(0, '- '._('All').' -');
 
 			foreach ($data['available_mediatypes'] as $mediatype) {
-				$mediatype_cbox->addItem($mediatype['mediatypeid'], $mediatype['description']);
+				$mediatype_cbox->addItem($mediatype['mediatypeid'], $mediatype['name']);
 			}
 			$is_default_msg = (array_key_exists('default_msg', $data['new_ack_operation']['opmessage'])
 				&& $data['new_ack_operation']['opmessage']['default_msg'] == 1);

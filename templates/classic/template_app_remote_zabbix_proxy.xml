@@ -2250,7 +2250,7 @@
                     <screen_items>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>212</height>
                             <x>0</x>
                             <y>0</y>
@@ -2272,7 +2272,7 @@
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>100</height>
                             <x>1</x>
                             <y>0</y>
@@ -2294,7 +2294,7 @@
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>100</height>
                             <x>0</x>
                             <y>1</y>
@@ -2316,7 +2316,7 @@
                         </screen_item>
                         <screen_item>
                             <resourcetype>0</resourcetype>
-                            <width>500</width>
+                            <width>750</width>
                             <height>128</height>
                             <x>1</x>
                             <y>1</y>

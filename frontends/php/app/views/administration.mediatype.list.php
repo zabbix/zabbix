@@ -28,6 +28,7 @@ $widget = (new CWidget())
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
+			->addItem(new CRedirectButton(_('Import'), 'conf.import.php?rules_preset=mediatype'))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
@@ -61,7 +62,7 @@ $mediaTypeTable = (new CTableInfo())
 			(new CCheckBox('all_media_types'))
 				->onClick("checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
 		_('Status'),
 		_('Used in actions'),
@@ -84,14 +85,6 @@ foreach ($data['mediatypes'] as $mediaType) {
 
 		case MEDIA_TYPE_SMS:
 			$details = _('GSM modem').NAME_DELIMITER.'"'.$mediaType['gsm_modem'].'"';
-			break;
-
-		case MEDIA_TYPE_JABBER:
-			$details = _('Jabber identifier').NAME_DELIMITER.'"'.$mediaType['username'].'"';
-			break;
-
-		case MEDIA_TYPE_EZ_TEXTING:
-			$details = _('Username').NAME_DELIMITER.'"'.$mediaType['username'].'"';
 			break;
 
 		default:
@@ -138,7 +131,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 			'mediatypeid' => $mediaType['mediatypeid']
 		]).', "mediatypetest_edit", this);');
 
-	$name = new CLink($mediaType['description'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
+	$name = new CLink($mediaType['name'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
 
 	// append row
 	$mediaTypeTable->addRow([
@@ -159,6 +152,14 @@ $mediaTypeForm->addItem([
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?')],
 		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?')],
+		'mediatype.export' => ['name' => _('Export'), 'redirect' =>
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'export.mediatypes.xml')
+				->setArgument('backurl', (new CUrl('zabbix.php'))
+					->setArgument('action', 'mediatype.list')
+					->getUrl())
+				->getUrl()
+		],
 		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?')]
 	], 'mediatype')
 ]);

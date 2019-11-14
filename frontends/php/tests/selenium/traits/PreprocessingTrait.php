@@ -50,6 +50,12 @@ trait PreprocessingTrait {
 				'value'		=> ['getValue']
 			],
 			[
+				'name'		=> 'parameter_3',
+				'selector'	=> 'xpath:.//input[contains(@id, "_params_2")]',
+				'detect'	=> true,
+				'value'		=> ['getValue']
+			],
+			[
 				'name'		=> 'on_fail',
 				'selector'	=> 'xpath:.//input[contains(@id, "_on_fail")]',
 				'class'		=> 'CCheckboxElement',

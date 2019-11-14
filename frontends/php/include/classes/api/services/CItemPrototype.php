@@ -41,7 +41,7 @@ class CItemPrototype extends CItemGeneral {
 		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
 		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
 		ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON
 	];
 
 	public function __construct() {
@@ -747,7 +747,9 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['type', 'master_itemid']);
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['type', 'authtype',
+			'master_itemid'
+		]);
 
 		$this->validateDependentItems($items);
 
@@ -757,7 +759,7 @@ class CItemPrototype extends CItemGeneral {
 				'url' => '',
 				'query_fields' => '',
 				'timeout' => $defaults['timeout'],
-				'status_codes' => '',
+				'status_codes' => $defaults['status_codes'],
 				'follow_redirects' => $defaults['follow_redirects'],
 				'request_method' => $defaults['request_method'],
 				'allow_traps' => $defaults['allow_traps'],
@@ -771,9 +773,6 @@ class CItemPrototype extends CItemGeneral {
 				'verify_host' => $defaults['verify_host'],
 				'ssl_cert_file' => '',
 				'ssl_key_file' => '',
-				'authtype' => $defaults['authtype'],
-				'username' => '',
-				'password' => '',
 				'posts' => ''
 			]
 		];
@@ -802,9 +801,8 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				// Clean username and password on authtype change to HTTPTEST_AUTH_NONE.
-				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE
-						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
+				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
+				if ($item['authtype'] == HTTPTEST_AUTH_NONE) {
 					$item['username'] = '';
 					$item['password'] = '';
 				}

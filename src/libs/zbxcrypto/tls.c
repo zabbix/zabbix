@@ -45,8 +45,7 @@
 #	include <openssl/rand.h>
 #endif
 
-/* Currently use only TLS 1.2, which has number 3.3. In 2015 a new standard for TLS 1.3 is expected. */
-/* Then we might need to support both TLS 1.2 and 1.3 to work with older Zabbix agents. */
+/* use only TLS 1.2 (which has number 3.3) with PolarSSL */
 #if defined(HAVE_POLARSSL)
 #	define ZBX_TLS_MIN_MAJOR_VER	SSL_MAJOR_VERSION_3
 #	define ZBX_TLS_MIN_MINOR_VER	SSL_MINOR_VERSION_3
@@ -204,10 +203,10 @@ extern char				*CONFIG_TLS_KEY_FILE;
 extern char				*CONFIG_TLS_PSK_IDENTITY;
 extern char				*CONFIG_TLS_PSK_FILE;
 
-ZBX_THREAD_LOCAL static char		*my_psk_identity	= NULL;
-ZBX_THREAD_LOCAL static size_t		my_psk_identity_len	= 0;
-ZBX_THREAD_LOCAL static char		*my_psk			= NULL;
-ZBX_THREAD_LOCAL static size_t		my_psk_len		= 0;
+static ZBX_THREAD_LOCAL char		*my_psk_identity	= NULL;
+static ZBX_THREAD_LOCAL size_t		my_psk_identity_len	= 0;
+static ZBX_THREAD_LOCAL char		*my_psk			= NULL;
+static ZBX_THREAD_LOCAL size_t		my_psk_len		= 0;
 
 /* Pointer to DCget_psk_by_identity() initialized at runtime. This is a workaround for linking. */
 /* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where DCget_psk_by_identity() resides */
@@ -218,41 +217,41 @@ size_t	(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int
 static unsigned int	psk_usage;
 
 #if defined(HAVE_POLARSSL)
-ZBX_THREAD_LOCAL static x509_crt		*ca_cert		= NULL;
-ZBX_THREAD_LOCAL static x509_crl		*crl			= NULL;
-ZBX_THREAD_LOCAL static x509_crt		*my_cert		= NULL;
-ZBX_THREAD_LOCAL static pk_context		*my_priv_key		= NULL;
-ZBX_THREAD_LOCAL static entropy_context		*entropy		= NULL;
-ZBX_THREAD_LOCAL static ctr_drbg_context	*ctr_drbg		= NULL;
-ZBX_THREAD_LOCAL static char			*err_msg		= NULL;
-ZBX_THREAD_LOCAL static int			*ciphersuites_cert	= NULL;
-ZBX_THREAD_LOCAL static int			*ciphersuites_psk	= NULL;
-ZBX_THREAD_LOCAL static int			*ciphersuites_all	= NULL;
+static ZBX_THREAD_LOCAL x509_crt		*ca_cert		= NULL;
+static ZBX_THREAD_LOCAL x509_crl		*crl			= NULL;
+static ZBX_THREAD_LOCAL x509_crt		*my_cert		= NULL;
+static ZBX_THREAD_LOCAL pk_context		*my_priv_key		= NULL;
+static ZBX_THREAD_LOCAL entropy_context		*entropy		= NULL;
+static ZBX_THREAD_LOCAL ctr_drbg_context	*ctr_drbg		= NULL;
+static ZBX_THREAD_LOCAL char			*err_msg		= NULL;
+static ZBX_THREAD_LOCAL int			*ciphersuites_cert	= NULL;
+static ZBX_THREAD_LOCAL int			*ciphersuites_psk	= NULL;
+static ZBX_THREAD_LOCAL int			*ciphersuites_all	= NULL;
 #elif defined(HAVE_GNUTLS)
-ZBX_THREAD_LOCAL static gnutls_certificate_credentials_t	my_cert_creds		= NULL;
-ZBX_THREAD_LOCAL static gnutls_psk_client_credentials_t		my_psk_client_creds	= NULL;
-ZBX_THREAD_LOCAL static gnutls_psk_server_credentials_t		my_psk_server_creds	= NULL;
-ZBX_THREAD_LOCAL static gnutls_priority_t			ciphersuites_cert	= NULL;
-ZBX_THREAD_LOCAL static gnutls_priority_t			ciphersuites_psk	= NULL;
-ZBX_THREAD_LOCAL static gnutls_priority_t			ciphersuites_all	= NULL;
+static ZBX_THREAD_LOCAL gnutls_certificate_credentials_t	my_cert_creds		= NULL;
+static ZBX_THREAD_LOCAL gnutls_psk_client_credentials_t		my_psk_client_creds	= NULL;
+static ZBX_THREAD_LOCAL gnutls_psk_server_credentials_t		my_psk_server_creds	= NULL;
+static ZBX_THREAD_LOCAL gnutls_priority_t			ciphersuites_cert	= NULL;
+static ZBX_THREAD_LOCAL gnutls_priority_t			ciphersuites_psk	= NULL;
+static ZBX_THREAD_LOCAL gnutls_priority_t			ciphersuites_all	= NULL;
 static int							init_done 		= 0;
 #elif defined(HAVE_OPENSSL)
-ZBX_THREAD_LOCAL static const SSL_METHOD	*method			= NULL;
-ZBX_THREAD_LOCAL static SSL_CTX			*ctx_cert		= NULL;
+static ZBX_THREAD_LOCAL const SSL_METHOD	*method			= NULL;
+static ZBX_THREAD_LOCAL SSL_CTX			*ctx_cert		= NULL;
 #ifdef HAVE_OPENSSL_WITH_PSK
-ZBX_THREAD_LOCAL static SSL_CTX			*ctx_psk		= NULL;
-ZBX_THREAD_LOCAL static SSL_CTX			*ctx_all		= NULL;
+static ZBX_THREAD_LOCAL SSL_CTX			*ctx_psk		= NULL;
+static ZBX_THREAD_LOCAL SSL_CTX			*ctx_all		= NULL;
 /* variables for passing required PSK identity and PSK info to client callback function */
-ZBX_THREAD_LOCAL static const char		*psk_identity_for_cb	= NULL;
-ZBX_THREAD_LOCAL static size_t			psk_identity_len_for_cb	= 0;
-ZBX_THREAD_LOCAL static char			*psk_for_cb		= NULL;
-ZBX_THREAD_LOCAL static size_t			psk_len_for_cb		= 0;
+static ZBX_THREAD_LOCAL const char		*psk_identity_for_cb	= NULL;
+static ZBX_THREAD_LOCAL size_t			psk_identity_len_for_cb	= 0;
+static ZBX_THREAD_LOCAL char			*psk_for_cb		= NULL;
+static ZBX_THREAD_LOCAL size_t			psk_len_for_cb		= 0;
 #endif
 static int					init_done 		= 0;
 #ifdef HAVE_OPENSSL_WITH_PSK
 /* variables for capturing PSK identity from server callback function */
-ZBX_THREAD_LOCAL static int			incoming_connection_has_psk = 0;
-ZBX_THREAD_LOCAL static char			incoming_connection_psk_id[PSK_MAX_IDENTITY_LEN + 1];
+static ZBX_THREAD_LOCAL int			incoming_connection_has_psk = 0;
+static ZBX_THREAD_LOCAL char			incoming_connection_psk_id[PSK_MAX_IDENTITY_LEN + 1];
 #endif
 /* buffer for messages produced by zbx_openssl_info_cb() */
 ZBX_THREAD_LOCAL char				info_buf[256];
@@ -2535,8 +2534,12 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 	X509			*cert;
 #endif
 
-	if ((NULL == issuer || '\0' != *issuer) && (NULL == subject || '\0' != *subject))
+	if ((NULL == issuer || '\0' == *issuer) && (NULL == subject || '\0' == *subject))
 		return SUCCEED;
+
+	tls_issuer[0] = '\0';
+	tls_subject[0] = '\0';
+
 #if defined(HAVE_POLARSSL)
 	if (NULL == (cert = ssl_get_peer_cert(tls_ctx->ctx)))
 	{
@@ -4495,6 +4498,9 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __func__,
 			SSL_get_version(s->tls_ctx->ctx), SSL_get_cipher(s->tls_ctx->ctx));
+#ifdef HAVE_OPENSSL_WITH_PSK
+	psk_for_cb = NULL;
+#endif
 
 	return SUCCEED;
 
@@ -4506,6 +4512,10 @@ out:	/* an error occurred */
 out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
+#ifdef HAVE_OPENSSL_WITH_PSK
+	psk_for_cb = NULL;
+#endif
+
 	return ret;
 }
 #endif

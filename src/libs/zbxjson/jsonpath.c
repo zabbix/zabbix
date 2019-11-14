@@ -915,6 +915,9 @@ static int	jsonpath_parse_names(const char *list, zbx_jsonpath_t *jsonpath, cons
 			case '\t':
 				break;
 			case ',':
+				if (NULL != start)
+					break;
+
 				if (0 == parsed_name)
 				{
 					ret = zbx_jsonpath_error(end);
@@ -2095,8 +2098,8 @@ static int	jsonpath_extract_numeric_value(const char *ptr, double *value)
 {
 	char	buffer[MAX_STRING_LEN];
 
-	if (('-' != *ptr && 0 == isdigit((unsigned char)*ptr)) ||
-		NULL == zbx_json_decodevalue(ptr, buffer, sizeof(buffer), NULL))
+	if (NULL == zbx_json_decodevalue(ptr, buffer, sizeof(buffer), NULL) ||
+		SUCCEED != is_double(buffer))
 	{
 		zbx_set_json_strerror("array value is not a number starting with: %s", ptr);
 		return FAIL;
@@ -2213,6 +2216,11 @@ static int	jsonpath_apply_function(const zbx_vector_str_t *objects, zbx_jsonpath
 		result /= objects->values_num;
 
 	*output = zbx_dsprintf(NULL, ZBX_FS_DBL, result);
+	if (SUCCEED != is_double(*output))
+	{
+		zbx_set_json_strerror("invalid function result: %s", *output);
+		goto out;
+	}
 	del_zeros(*output);
 	ret = SUCCEED;
 out:
@@ -2352,6 +2360,9 @@ void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath)
 		jsonpath_segment_clear(&jsonpath->segments[i]);
 
 	zbx_free(jsonpath->segments);
+	jsonpath->segments_num = 0;
+	jsonpath->segments_alloc = 0;
+	jsonpath->definite = 0;
 }
 
 /******************************************************************************
@@ -2475,7 +2486,7 @@ int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char *
 	int			path_depth = 0, ret = SUCCEED;
 	zbx_vector_str_t	objects;
 
-	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
+	if (SUCCEED != zbx_jsonpath_compile(path, &jsonpath))
 		return FAIL;
 
 	zbx_vector_str_create(&objects);

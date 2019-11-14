@@ -16,12 +16,13 @@
 		$('#type').change(function() {
 			var media_type = $(this).val();
 
-			$('#eztext_link').hide();
-			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username,' +
-					'#eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security,' +
-					'#smtp_authentication, #exec_path, #exec_params_table, #content_type')
+			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #passwd, #smtp_verify_peer, ' +
+					'#smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_path, ' +
+					'#exec_params_table, #content_type')
 				.closest('li')
 				.hide();
+
+			$('li[id^="row_webhook_"]').hide();
 
 			switch (media_type) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
@@ -32,8 +33,6 @@
 					toggleSecurityOptions();
 					toggleAuthenticationOptions();
 					setMaxSessionsType(media_type);
-
-					$('#passwd').parent().prev().find('label').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 					break;
 
 				case '<?= MEDIA_TYPE_EXEC ?>':
@@ -46,19 +45,9 @@
 					setMaxSessionsType(media_type);
 					break;
 
-				case '<?= MEDIA_TYPE_JABBER ?>':
-					$('#jabber_username, #passwd').closest('li').show();
+				case '<?= MEDIA_TYPE_WEBHOOK ?>':
+					$('li[id^="row_webhook_"]').show();
 					setMaxSessionsType(media_type);
-
-					$('#passwd').parent().prev().find('label').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-					break;
-
-				case '<?= MEDIA_TYPE_EZ_TEXTING ?>':
-					$('#eztext_username, #eztext_limit, #passwd').closest('li').show();
-					$('#eztext_link').show();
-					setMaxSessionsType(media_type);
-
-					$('#passwd').parent().prev().find('label').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 					break;
 			}
 		});
@@ -70,7 +59,7 @@
 			$('#passwd').prop('disabled', false).show();
 			$('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
 			$('#update').val('mediatype.create').attr({id: 'add'});
-			$('#description').focus();
+			$('#name').focus();
 		});
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
@@ -91,8 +80,8 @@
 			}
 
 			$(this).trimValues([
-				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
-				'#jabber_username', '#eztext_username', '#smtp_username', '#maxsessions'
+				'#name', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
+				'#smtp_username', '#maxsessions'
 			]);
 		});
 
@@ -111,6 +100,12 @@
 		$('input[name=smtp_authentication]').change(function() {
 			toggleAuthenticationOptions();
 		});
+
+		$('#show_event_menu').change(function() {
+			$('#event_menu_url, #event_menu_name').prop('disabled', !$(this).is(':checked'));
+		});
+
+		$('#parameters_table').dynamicRows({ template: '#parameters_row' });
 
 		/**
 		 * Show or hide "SSL verify peer" and "SSL verify host" fields.

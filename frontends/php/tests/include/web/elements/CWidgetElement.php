@@ -54,16 +54,16 @@ class CWidgetElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[@class="dashbrd-grid-widget-content"]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-content")]')->one();
 	}
 
 	/**
-	 * Check if widget is editable (dashboard is set to edit mode).
+	 * Check if widget is editable (widget edit button is present).
 	 *
 	 * @return boolean
 	 */
 	public function isEditable() {
-		return $this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->isDisplayed();
+		return $this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->isPresent();
 	}
 
 	/**
@@ -72,7 +72,7 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->click();
+		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->click(true);
 		return $this->query('xpath://div[@data-dialogueid="widgetConfg"]//form')->waitUntilVisible()->asForm()->one();
 	}
 

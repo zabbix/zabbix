@@ -101,7 +101,7 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS, true);
+	setcookie($name, $value, isset($time) ? $time : 0, CSession::getDefaultCookiePath(), null, HTTPS, true);
 	$_COOKIE[$name] = $value;
 }
 
@@ -813,16 +813,21 @@ function convert_units($options = []) {
 /**
  * Convert time format with suffixes to seconds.
  * Examples:
- *		10m = 600
- *		3d = 10800
- *		-10m = -600
+ *        10m = 600
+ *        3d = 259200
+ *        -10m = -600
  *
  * @param string $time
+ * @param bool $with_year
  *
  * @return null|string
  */
-function timeUnitToSeconds($time) {
-	preg_match('/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
+function timeUnitToSeconds($time, $with_year = false) {
+	preg_match(
+		'/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.
+		($with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES).'])?$/',
+		$time, $matches
+	);
 
 	$is_negative = (array_key_exists('sign', $matches) && $matches['sign'] === '-');
 
@@ -848,6 +853,12 @@ function timeUnitToSeconds($time) {
 				break;
 			case 'w':
 				$sec = bcmul($time, SEC_PER_WEEK);
+				break;
+			case 'M':
+				$sec = bcmul($time, SEC_PER_MONTH);
+				break;
+			case 'y':
+				$sec = bcmul($time, SEC_PER_YEAR);
 				break;
 		}
 	}
@@ -1429,26 +1440,6 @@ function zbx_toCSV($values) {
 	}
 
 	return $csv;
-}
-
-function zbx_array_mintersect($keys, $array) {
-	$result = [];
-
-	foreach ($keys as $field) {
-		if (is_array($field)) {
-			foreach ($field as $sub_field) {
-				if (isset($array[$sub_field])) {
-					$result[$sub_field] = $array[$sub_field];
-					break;
-				}
-			}
-		}
-		elseif (isset($array[$field])) {
-			$result[$field] = $array[$field];
-		}
-	}
-
-	return $result;
 }
 
 function zbx_str2links($text) {

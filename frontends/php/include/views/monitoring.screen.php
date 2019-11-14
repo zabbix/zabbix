@@ -26,6 +26,14 @@ $widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	$widget
 		->setTitle(_('Screens'))
+		->setTitleSubmenu([
+			'main_section' => [
+				'items' => [
+					'screens.php' => _('Screens'),
+					'slides.php' => _('Slide shows')
+				]
+			]
+		])
 		->addItem((new CList())
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
@@ -43,13 +51,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		]));
 }
 
-$controls = (new CList())
-	->addItem(
-		(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
-			'screens.php' => _('Screens'),
-			'slides.php' => _('Slide shows')
-		]))->removeId()
-);
+$controls = new CList();
 
 if (check_dynamic_items($data['screen']['screenid'], 0)) {
 	$pageFilter = new CPageFilter([

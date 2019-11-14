@@ -25,6 +25,7 @@
 #define ZBX_PROTO_TAG_DATA			"data"
 #define ZBX_PROTO_TAG_REGEXP			"regexp"
 #define ZBX_PROTO_TAG_DELAY			"delay"
+#define ZBX_PROTO_TAG_REFRESH_UNSUPPORTED	"refresh_unsupported"
 #define ZBX_PROTO_TAG_DRULE			"drule"
 #define ZBX_PROTO_TAG_DCHECK			"dcheck"
 #define ZBX_PROTO_TAG_HOST			"host"
@@ -121,6 +122,7 @@
 #define ZBX_PROTO_TAG_SINGLE			"single"
 #define ZBX_PROTO_TAG_INTERFACE			"interface"
 #define ZBX_PROTO_TAG_FLAGS			"flags"
+#define ZBX_PROTO_TAG_PARAMETERS		"parameters"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -213,8 +215,10 @@ const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char 
 		size_t *string_alloc, zbx_json_type_t *type);
 const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, char *name, size_t len);
 const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name);
-int		zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len);
-int		zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc);
+int		zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len,
+		zbx_json_type_t *type);
+int		zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string,
+		size_t *string_alloc, zbx_json_type_t *type);
 int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *out);
 int		zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(const struct zbx_json_parse *jp);

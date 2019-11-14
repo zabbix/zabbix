@@ -236,7 +236,7 @@ $form_list
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					'&rArr;',
-					(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 1000))
+					(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
@@ -752,7 +752,9 @@ $form_list
 	->addRow(_('Application prototypes'), $application_prototype_listbox)
 	// Append description to form list.
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('items' , 'description'))
 	)
 	// Append status to form list.
 	->addRow(_('Create enabled'),

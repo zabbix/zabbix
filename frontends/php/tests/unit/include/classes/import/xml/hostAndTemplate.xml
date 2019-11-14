@@ -63,7 +63,7 @@
                     <name>Template App FTP Service</name>
                 </template>
                 <template>
-                    <name>Template OS Linux</name>
+                    <name>Template OS Linux by Zabbix agent</name>
                 </template>
             </templates>
             <groups>
@@ -1108,7 +1108,7 @@
                     <name>Template App FTP Service</name>
                 </template>
                 <template>
-                    <name>Template OS Linux</name>
+                    <name>Template OS Linux by Zabbix agent</name>
                 </template>
             </templates>
             <screens>

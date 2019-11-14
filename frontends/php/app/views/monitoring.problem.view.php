@@ -288,6 +288,14 @@ if ($data['action'] == 'problem.view') {
 				->setAttribute('placeholder', _('comma-separated list'))
 				->setEnabled((int) $data['filter']['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
 		)
+		->addRow(_('Show operational data'), [
+			(new CRadioButtonList('filter_show_opdata', (int) $data['filter']['show_opdata']))
+				->addValue(_('None'), OPERATIONAL_DATA_SHOW_NONE)
+				->addValue(_('Separately'), OPERATIONAL_DATA_SHOW_SEPARATELY)
+				->addValue(_('With problem name'), OPERATIONAL_DATA_SHOW_WITH_PROBLEM)
+				->setModern(true)
+				->setEnabled($data['filter']['compact_view'] == 0)
+		])
 		->addRow(_('Show suppressed problems'), [
 			(new CCheckBox('filter_show_suppressed'))
 				->setChecked($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE),
@@ -319,11 +327,6 @@ if ($data['action'] == 'problem.view') {
 			]))
 				->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
 				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
-		])
-		->addRow(_('Show operational data'), [
-			(new CCheckBox('filter_show_opdata'))
-				->setChecked($data['filter']['show_opdata'] == 1)
-				->setEnabled($data['filter']['compact_view'] == 0)
 		]);
 
 	$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'problem.view')))
@@ -380,7 +383,6 @@ if ($data['action'] == 'problem.view') {
 			'mainObject' => 1
 		];
 
-		$this->addPostJS('timeControl.useTimeRefresh('.zbx_jsvalue(CWebUser::getRefresh()).');');
 		$this->addPostJS('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($screen->timeline).', '.zbx_jsvalue($objData).');');
 		$this->addPostJS('timeControl.processObjects();');
 	}

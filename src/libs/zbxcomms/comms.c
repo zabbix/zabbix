@@ -188,7 +188,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  *                                                                            *
  * Function: zbx_getip_by_host                                                *
  *                                                                            *
- * Purpose: retrieve IP addres by host name                                   *
+ * Purpose: retrieve IP address by host name                                  *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
@@ -204,7 +204,7 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 	if (0 != getaddrinfo(host, NULL, &hints, &ai))
 	{
 		ip[0] = '\0';
-		return;
+		goto out;
 	}
 
 	switch(ai->ai_addr->sa_family) {
@@ -216,8 +216,11 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 			break;
 		default:
 			ip[0] = '\0';
-			return;
+			goto out;
 	}
+out:
+	if (NULL != ai)
+		freeaddrinfo(ai);
 }
 #else
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
@@ -1624,7 +1627,8 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 		}
 		else
 		{
-			if (0 != (left = MIN(ZBX_TCP_LINE_LEN - s->read_bytes, (size_t)(ptr - buffer))))
+			if (0 != (left = (NULL == ptr ? ZBX_TCP_LINE_LEN - s->read_bytes :
+					MIN(ZBX_TCP_LINE_LEN - s->read_bytes, (size_t)(ptr - buffer)))))
 			{
 				/* fill the string to the defined limit */
 				zbx_strncpy_alloc(&s->buffer, &alloc, &offset, buffer, left);

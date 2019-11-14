@@ -2,4 +2,6 @@
 
 noinst_LIBRARIES = libagentsysinfo.a
 
-libagentsysinfo_a_SOURCES = agent.c agent.h
+libagentsysinfo_a_SOURCES = \
+	agent.c \
+	agent.h

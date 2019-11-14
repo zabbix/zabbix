@@ -38,6 +38,7 @@ class CWidgetConfig {
 			WIDGET_FAV_MAPS				=> _('Favourite maps'),
 			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
 			WIDGET_GRAPH				=> _('Graph (classic)'),
+			WIDGET_GRAPH_PROTOTYPE		=> _('Graph prototype'),
 			WIDGET_HOST_AVAIL			=> _('Host availability'),
 			WIDGET_MAP					=> _('Map'),
 			WIDGET_NAV_TREE				=> _('Map navigation tree'),
@@ -62,31 +63,32 @@ class CWidgetConfig {
 	 */
 	private static function getDefaultDimensions() {
 		return [
-			WIDGET_ACTION_LOG			=> ['width' => 12, 'height' => 5],
-			WIDGET_CLOCK				=> ['width' => 4, 'height' => 3],
-			WIDGET_DATA_OVER			=> ['width' => 12, 'height' => 5],
-			WIDGET_DISCOVERY			=> ['width' => 6, 'height' => 3],
-			WIDGET_FAV_GRAPHS			=> ['width' => 4, 'height' => 3],
-			WIDGET_FAV_MAPS				=> ['width' => 4, 'height' => 3],
-			WIDGET_FAV_SCREENS			=> ['width' => 4, 'height' => 3],
-			WIDGET_GRAPH				=> ['width' => 12, 'height' => 5],
-			WIDGET_HOST_AVAIL			=> ['width' => 6, 'height' => 2],
-			WIDGET_MAP					=> ['width' => 18, 'height' => 5],
-			WIDGET_NAV_TREE				=> ['width' => 6, 'height' => 5],
-			WIDGET_PLAIN_TEXT			=> ['width' => 6, 'height' => 3],
-			WIDGET_PROBLEM_HOSTS		=> ['width' => 12, 'height' => 5],
-			WIDGET_PROBLEMS				=> ['width' => 12, 'height' => 5],
-			WIDGET_PROBLEMS_BY_SV		=> ['width' => 12, 'height' => 5],
-			WIDGET_SVG_GRAPH			=> ['width' => 12, 'height' => 5],
-			WIDGET_SYSTEM_INFO			=> ['width' => 12, 'height' => 5],
-			WIDGET_TRIG_OVER			=> ['width' => 12, 'height' => 5],
-			WIDGET_URL					=> ['width' => 12, 'height' => 5],
-			WIDGET_WEB					=> ['width' => 6, 'height' => 3]
+			WIDGET_ACTION_LOG			=> ['width' => 12,	'height' => 5],
+			WIDGET_CLOCK				=> ['width' => 4,	'height' => 3],
+			WIDGET_DATA_OVER			=> ['width' => 12,	'height' => 5],
+			WIDGET_DISCOVERY			=> ['width' => 6,	'height' => 3],
+			WIDGET_FAV_GRAPHS			=> ['width' => 4,	'height' => 3],
+			WIDGET_FAV_MAPS				=> ['width' => 4,	'height' => 3],
+			WIDGET_FAV_SCREENS			=> ['width' => 4,	'height' => 3],
+			WIDGET_GRAPH				=> ['width' => 12,	'height' => 5],
+			WIDGET_GRAPH_PROTOTYPE		=> ['width' => 16,	'height' => 5],
+			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 3],
+			WIDGET_MAP					=> ['width' => 18,	'height' => 5],
+			WIDGET_NAV_TREE				=> ['width' => 6,	'height' => 5],
+			WIDGET_PLAIN_TEXT			=> ['width' => 6,	'height' => 3],
+			WIDGET_PROBLEM_HOSTS		=> ['width' => 12,	'height' => 5],
+			WIDGET_PROBLEMS				=> ['width' => 12,	'height' => 5],
+			WIDGET_PROBLEMS_BY_SV		=> ['width' => 12,	'height' => 5],
+			WIDGET_SVG_GRAPH			=> ['width' => 12,	'height' => 5],
+			WIDGET_SYSTEM_INFO			=> ['width' => 12,	'height' => 5],
+			WIDGET_TRIG_OVER			=> ['width' => 12,	'height' => 5],
+			WIDGET_URL					=> ['width' => 12,	'height' => 5],
+			WIDGET_WEB					=> ['width' => 6,	'height' => 3]
 		];
 	}
 
 	/**
-	 * Return default values for new widgets.
+	 * Return default values for widgets.
 	 *
 	 * @static
 	 *
@@ -99,7 +101,8 @@ class CWidgetConfig {
 		foreach (self::getKnownWidgetTypes() as $type => $name) {
 			$ret[$type] = [
 				'header' => $name,
-				'size' => $dimensions[$type]
+				'size' => $dimensions[$type],
+				'iterator' => self::isIterator($type)
 			];
 		}
 
@@ -121,6 +124,7 @@ class CWidgetConfig {
 			case WIDGET_DATA_OVER:
 			case WIDGET_DISCOVERY:
 			case WIDGET_GRAPH:
+			case WIDGET_GRAPH_PROTOTYPE:
 			case WIDGET_PLAIN_TEXT:
 			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
@@ -176,6 +180,7 @@ class CWidgetConfig {
 	public static function usesTimeSelector(array $widget) {
 		switch ($widget['type']) {
 			case WIDGET_GRAPH:
+			case WIDGET_GRAPH_PROTOTYPE:
 				return true;
 
 			case WIDGET_SVG_GRAPH:
@@ -186,23 +191,30 @@ class CWidgetConfig {
 		}
 	}
 
+	public static function isIterator($type) {
+		switch ($type) {
+			case WIDGET_GRAPH_PROTOTYPE:
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
 	/**
-	 * Is it allowed for the widget to have scrollable content.
+	 * Detect if widget dialogue should be sticked to top instead of being centered vertically.
 	 *
-	 * @static
-	 *
-	 * @param string $type  Widget type - 'WIDGET_' constant.
+	 * @param string $type  Widget type
 	 *
 	 * @return bool
 	 */
-	private static function isScrollable($type) {
+	public static function getDialogueStickToTop($type) {
 		switch ($type) {
-			case WIDGET_GRAPH:
 			case WIDGET_SVG_GRAPH:
-				return false;
+				return true;
 
 			default:
-				return true;
+				return false;
 		}
 	}
 
@@ -217,8 +229,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	private static function hasPadding($type, $fields, $view_mode)
-	{
+	private static function hasPadding($type, $fields, $view_mode) {
 		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
 			switch ($type) {
 				case WIDGET_CLOCK:
@@ -234,11 +245,14 @@ class CWidgetConfig {
 		else {
 			switch ($type) {
 				case WIDGET_HOST_AVAIL:
-					return false;
+					return (count($fields['interface_type']) != 1);
 
 				case WIDGET_PROBLEMS_BY_SV:
-					return (!array_key_exists('show_type', $fields)
-						|| $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS);
+					return $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
+
+				case WIDGET_GRAPH_PROTOTYPE:
+				case WIDGET_URL:
+					return false;
 
 				default:
 					return true;
@@ -255,11 +269,9 @@ class CWidgetConfig {
 	 *
 	 * @return array
 	 */
-	public static function getConfiguration($type, $fields, $view_mode)
-	{
+	public static function getConfiguration($type, $fields, $view_mode) {
 		return [
-			'scrollable' => self::isScrollable($type),
-			'padding' => self::hasPadding($type, $fields, $view_mode),
+			'padding' => self::hasPadding($type, $fields, $view_mode)
 		];
 	}
 
@@ -286,6 +298,9 @@ class CWidgetConfig {
 
 			case WIDGET_GRAPH:
 				return new CWidgetFormGraph($data);
+
+			case WIDGET_GRAPH_PROTOTYPE:
+				return new CWidgetFormGraphPrototype($data);
 
 			case WIDGET_HOST_AVAIL:
 				return new CWidgetFormHostAvail($data);

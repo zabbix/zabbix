@@ -22,8 +22,109 @@ require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
  * @backup dashboard
+ * @backup profiles
  */
 class testPageDashboardWidgets extends CWebTest {
+
+	/**
+	 * Default selected widget type.
+	 * The widget type should not be changed in frontend and in DB.
+	 */
+	public function testPageDashboardWidgets_checkUnchangedWidgetType() {
+		// Opening widget configuration form for new widget first time.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
+		$dashboard = CDashboardElement::find()->one()->edit();
+		// Check that widget type isn't changed in frontend and in DB.
+		$this->checkLastSelectedWidgetType();
+
+		// Opening edit widget form.
+		$form = $dashboard->getWidget('System information')->edit();
+		$this->assertEquals('System information', $form->getField('Type')->getValue());
+		$form->submit();
+		$form->parents('xpath://div[contains(@class, "overlay-dialogue")]')->one()->waitUntilNotVisible();
+		// Check that widget type isn't changed in frontend and in DB.
+		$this->checkLastSelectedWidgetType();
+
+		// Making changes in widget form that are not "Widget type".
+		$form = $dashboard->getWidget('Problems')->edit();
+		$this->assertEquals('Problems', $form->getField('Type')->getValue());
+		$data =[
+			'Name' => 'check widget type',
+			'Refresh interval' => 'No refresh',
+			'Show' => 'Recent problems',
+			'Show tags' => 'None'
+		];
+		$form->fill($data);
+		$form->submit();
+		$form->parents('xpath://div[contains(@class, "overlay-dialogue")]')->one()->waitUntilNotVisible();
+		$this->checkLastSelectedWidgetType();
+
+		// Add widget with current default type "Action log".
+		$form = $dashboard->addWidget()->asForm();
+		$form->submit();
+		// Check if widget was added.
+		$dashboard->getWidget('Action log');
+		$this->checkLastSelectedWidgetType();
+
+		$dashboard->cancelEditing();
+	}
+
+	/**
+	 * Check last selected widget type in frontend and in DB.
+	 * By default is 'Action log' type and without record in DB.
+	 *
+	 * @param string $type			widget type name
+	 * @param string $db_type		widget type name stored in DB
+	 */
+	private function checkLastSelectedWidgetType($type = 'Action log', $db_type = null) {
+		$dashboard = CDashboardElement::find()->one();
+		$overlay = $dashboard->addWidget();
+		$form = $overlay->asForm();
+		$this->assertEquals($type, $form->getField('Type')->getValue());
+
+		if ($db_type) {
+			$this->assertEquals($db_type, CDBHelper::getValue("SELECT value_str FROM profiles".
+					" WHERE userid=1 AND idx='web.dashbrd.last_widget_type'"));
+		}
+		else {
+			$this->assertEquals(0, CDBHelper::getCount("SELECT * FROM profiles".
+					" WHERE userid=1 AND idx='web.dashbrd.last_widget_type'"));
+		}
+
+		$overlay->close();
+	}
+
+	/**
+	 * Widget type should be inherited from the one that was selected last time.
+	 */
+	public function testPageDashboardWidgets_checkWidgetTypeRemembering() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
+		$dashboard = CDashboardElement::find()->one()->edit();
+		// Opening widget configuration form for new Clock widget.
+		$overlay = $dashboard->addWidget();
+		$form = $overlay->asForm();
+		$form->fill(['Type' => 'Clock']);
+		$form->waitUntilReloaded();
+		$overlay->close();
+		// Check that widget type is remembered as Clock.
+		$this->checkLastSelectedWidgetType('Clock', 'clock');
+
+		// Save edit widget form without changing widget type.
+		$form = $dashboard->getWidget('System information')->edit();
+		$this->assertEquals('System information', $form->getField('Type')->getValue());
+		$form->submit();
+		// Check that widget type is still remembered as Clock.
+		$this->checkLastSelectedWidgetType('Clock', 'clock');
+
+		// Opening edit widget form and change widget type.
+		$form = $dashboard->getWidget('System information')->edit();
+		$form->fill(['Type' => 'Data overview']);
+		$overlay->close();
+		// Check that widget type inherited from previous widget.
+		$this->checkLastSelectedWidgetType('Data overview', 'dataover');
+
+		$dashboard->cancelEditing();
+	}
 
 	/**
 	 * Check "Problem Hosts" widget.
@@ -67,42 +168,6 @@ class testPageDashboardWidgets extends CWebTest {
 			// Check the value in table.
 			$this->assertEquals($problems, $row['Without problems']);
 			$this->assertEquals($problems, $row['Total']);
-		}
-	}
-
-	/**
-	 * Check "Problems by severity" widget.
-	 */
-	public function testPageDashboardWidgets_checkProblemsBySeverityWidget() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
-
-		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->getWidget('Problems by severity');
-		$table = $widget->getContent()->asTable();
-
-		$this->assertSame(['Host group', 'Disaster', 'High', 'Average', 'Warning', 'Information', 'Not classified'],
-				$table->getHeadersText()
-		);
-
-		// Expected table values.
-		$expected = [
-			'Host group for tag permissions' => [
-				'Not classified' => 2
-			],
-			'Zabbix servers' => [
-				'Average' => 1,
-				'Warning' => 5
-			]
-		];
-
-		$data = $table->index('Host group');
-
-		foreach ($expected as $group => $fields) {
-			$row = $data[$group];
-
-			foreach ($fields as $column => $value) {
-				$this->assertEquals($value, $row[$column]);
-			}
 		}
 	}
 
@@ -211,6 +276,8 @@ class testPageDashboardWidgets extends CWebTest {
 
 		// Change the name of widget.
 		$form->getField('Name')->clear()->type('New widget name');
+		// Change show option.
+		$form->getField('Show')->select('Host groups');
 		// Submit the form.
 		$form->submit();
 

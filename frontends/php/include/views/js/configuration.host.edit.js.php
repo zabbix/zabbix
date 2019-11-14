@@ -1,3 +1,25 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2019 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+?>
 <script type="text/x-jquery-tmpl" id="hostInterfaceRow">
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
 	<td class="interface-drag-control <?= ZBX_STYLE_TD_DRAG_ICON ?>">
@@ -460,13 +482,6 @@
 			}
 		});
 
-		/**
-		 * Mass update
-		 */
-		jQuery('#mass_replace_tpls').on('change', function() {
-			jQuery('#mass_clear_tpls').prop('disabled', !this.checked);
-		}).change();
-
 		// Refresh field visibility on document load.
 		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
 			jQuery('#tls_in_none').prop('checked', true);
@@ -481,7 +496,7 @@
 		jQuery('input[name=tls_connect]').trigger('change');
 
 		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
-		jQuery('#hostForm').submit(function() {
+		jQuery('#hostsForm').submit(function() {
 			var tls_accept = 0x00;
 
 			if (jQuery('#tls_in_none').is(':checked')) {

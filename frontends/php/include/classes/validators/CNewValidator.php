@@ -184,8 +184,9 @@ class CNewValidator {
 				 */
 				case 'array_db':
 					if (array_key_exists($field, $this->input)) {
-						if (!$this->is_array_db($this->input[$field], $params['table'], $params['field'], $flags)
-								|| !is_array($this->input[$field])) {
+						if (!is_array($this->input[$field])
+								|| !$this->is_array_db($this->input[$field], $params['table'], $params['field'], $flags)
+						) {
 							$this->addError($fatal,
 								is_scalar($this->input[$field])
 									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)

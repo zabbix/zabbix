@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 DIST_SUBDIRS = \
+	go \
 	libs \
 	zabbix_agent \
 	zabbix_get \
@@ -17,6 +18,10 @@ COMMON_SUBDIRS = libs
 else
 if PROXY
 COMMON_SUBDIRS = libs
+else
+if AGENT2
+COMMON_SUBDIRS = libs
+endif
 endif
 endif
 endif
@@ -26,6 +31,14 @@ AGENT_SUBDIRS = \
 	zabbix_agent \
 	zabbix_get \
 	zabbix_sender
+endif
+
+if AGENT2
+if !AGENT 
+AGENT_SUBDIRS = zabbix_agent
+endif
+AGENT2_SUBDIRS = \
+	go
 endif
 
 if SERVER
@@ -67,9 +80,11 @@ endif
 SUBDIRS = \
 	$(COMMON_SUBDIRS) \
 	$(AGENT_SUBDIRS) \
+	$(AGENT2_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(PROXY_SUBDIRS) \
 	$(JAVA_SUBDIRS)
+	
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
@@ -78,4 +93,3 @@ dist-hook:
 	cp $(srcdir)/modules/dummy/*.c $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/Makefile $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/README $(distdir)/modules/dummy/
-

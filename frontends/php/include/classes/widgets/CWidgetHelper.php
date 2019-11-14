@@ -65,6 +65,19 @@ class CWidgetHelper {
 	}
 
 	/**
+	* Add Columns and Rows fields to the form of iterator.
+	*
+	* @param CFormList $form_list
+	* @param CWidgetFieldIntegerBox $field_columns
+	* @param CWidgetFieldIntegerBox $field_rows
+	*/
+	public static function addIteratorFields($form_list, $field_columns, $field_rows) {
+		$form_list
+			->addRow(self::getLabel($field_columns), self::getIntegerBox($field_columns))
+			->addRow(self::getLabel($field_rows), self::getIntegerBox($field_rows));
+	}
+
+	/**
 	 * Creates label linked to the field.
 	 *
 	 * @param CWidgetField $field
@@ -74,25 +87,6 @@ class CWidgetHelper {
 	public static function getLabel($field) {
 		return (new CLabel($field->getLabel(), $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field));
-	}
-
-	/**
-	 * Creates label linked to the multiselect field.
-	 *
-	 * @param CMultiSelect $field
-	 *
-	 * @return CLabel
-	 */
-	public static function getMultiselectLabel($field) {
-		$field_name = $field->getName();
-
-		if ($field instanceof CWidgetFieldItem) {
-			$field_name .= ($field->isMultiple() ? '[]' : '');
-		} else {
-			$field_name .= '[]';
-		}
-
-		return (new CLabel($field->getLabel(), $field_name.'_ms'))->setAsteriskMark(self::isAriaRequired($field));
 	}
 
 	/**
@@ -188,99 +182,148 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldGroup $field
+	 * Creates label linked to the multiselect field.
+	 *
+	 * @param CWidgetFieldMs $field
+	 *
+	 * @return CLabel
+	 */
+	public static function getMultiselectLabel($field) {
+		$field_name = $field->getName();
+
+		if ($field instanceof CWidgetFieldMs) {
+			$field_name .= ($field->isMultiple() ? '[]' : '');
+		}
+		else {
+			$field_name .= '[]';
+		}
+
+		return (new CLabel($field->getLabel(), $field_name.'_ms'))
+			->setAsteriskMark(self::isAriaRequired($field));
+	}
+
+	/**
+	 * @param CWidgetFieldMs $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	private static function getMultiselectField($field, $captions, $form_name, $object_name, $popup_options) {
+		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
+
+		return (new CMultiSelect([
+			'name' => $field_name,
+			'object_name' => $object_name,
+			'multiple' => $field->isMultiple(),
+			'data' => $captions,
+			'popup' => [
+				'parameters' => [
+					'dstfrm' => $form_name,
+					'dstfld1' => zbx_formatDomId($field_name)
+				] + $popup_options
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(self::isAriaRequired($field));
+	}
+
+	/**
+	 * @param CWidgetFieldMsGroup $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
 	 * @return CMultiSelect
 	 */
 	public static function getGroup($field, $captions, $form_name) {
-		$field_name = $field->getName().'[]';
-
-		return (new CMultiSelect([
-			'name' => $field_name,
-			'object_name' => 'hostGroup',
-			'data' => $captions,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $form_name,
-					'dstfld1' => zbx_formatDomId($field_name),
-					'real_hosts' => true,
-					'enrich_parent_groups' => true
-				]
-			],
-			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(self::isAriaRequired($field));
+		return self::getMultiselectField($field, $captions, $form_name, 'hostGroup', [
+			'srctbl' => 'host_groups',
+			'srcfld1' => 'groupid',
+			'real_hosts' => true,
+			'enrich_parent_groups' => true
+		] + $field->getFilterParameters());
 	}
 
 	/**
-	 * @param CWidgetFieldHost $field
+	 * @param CWidgetFieldMsHost $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
 	 * @return CMultiSelect
 	 */
 	public static function getHost($field, $captions, $form_name) {
-		$field_name = $field->getName().'[]';
-
-		return (new CMultiSelect([
-			'name' => $field_name,
-			'object_name' => 'hosts',
-			'data' => $captions,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'hosts',
-					'srcfld1' => 'hostid',
-					'dstfrm' => $form_name,
-					'dstfld1' => zbx_formatDomId($field_name)
-				]
-			],
-			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(self::isAriaRequired($field));
+		return self::getMultiselectField($field, $captions, $form_name, 'hosts', [
+			'srctbl' => 'hosts',
+			'srcfld1' => 'hostid'
+		] + $field->getFilterParameters());
 	}
 
 	/**
-	 * @param CWidgetFieldItem $field
+	 * @param CWidgetFieldMsItem $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
 	 * @return CMultiSelect
 	 */
 	public static function getItem($field, $captions, $form_name) {
-		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
-
-		return (new CMultiSelect([
-			'name' => $field_name,
-			'object_name' => 'items',
-			'multiple' => $field->isMultiple(),
-			'data' => $captions,
-			'popup' => [
-				'parameters' => [
-						'srctbl' => 'items',
-						'srcfld1' => 'itemid',
-						'dstfrm' => $form_name,
-						'dstfld1' => zbx_formatDomId($field_name)
-					] + $field->getFilterParameters()
-			],
-			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(self::isAriaRequired($field));
+		return self::getMultiselectField($field, $captions, $form_name, 'items', [
+			'srctbl' => 'items',
+			'srcfld1' => 'itemid',
+			'real_hosts' => true,
+			'webitems' => true
+		] + $field->getFilterParameters());
 	}
 
 	/**
-	 * @param CWidgetFieldSelectResource $field
-	 * @param array $caption
+	 * @param CWidgetFieldMsGraph $field
+	 * @param array $captions
 	 * @param string $form_name
 	 *
-	 * @return array
+	 * @return CMultiSelect
 	 */
+	public static function getGraph($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'graphs', [
+			'srctbl' => 'graphs',
+			'srcfld1' => 'graphid',
+			'srcfld2' => 'name',
+			'real_hosts' => true,
+			'with_graphs' => true
+		] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMsItemPrototype $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getItemPrototype($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'item_prototypes', [
+			'srctbl' => 'item_prototypes',
+			'srcfld1' => 'itemid',
+			'real_hosts' => true
+		] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMsGraphPrototype $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getGraphPrototype($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'graph_prototypes', [
+			'srctbl' => 'graph_prototypes',
+			'srcfld1' => 'graphid',
+			'srcfld2' => 'name',
+			'real_hosts' => true,
+			'with_graph_prototypes' => true
+		] + $field->getFilterParameters());
+	}
+
 	public static function getSelectResource($field, $caption, $form_name) {
 		return [
 			(new CTextBox($field->getName().'_caption', $caption, true))
@@ -357,23 +400,39 @@ class CWidgetHelper {
 	 * @return CList
 	 */
 	public static function getSeverities($field, $config) {
-		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
-
-		if ($field->getOrientation() == CWidgetFieldSeverities::ORIENTATION_HORIZONTAL) {
-			$severities->addClass(ZBX_STYLE_HOR_LIST);
-		}
+		$severities = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severities->addItem(
-				(new CCheckBox($field->getName().'[]', $severity))
-					->setLabel(getSeverityName($severity, $config))
-					->setId($field->getName().'_'.$severity)
-					->setChecked(in_array($severity, $field->getValue()))
+			$severities[$severity] = getSeverityName($severity, $config);
+		}
+
+		return self::getCheckBoxList($field, $severities);
+	}
+
+	/**
+	 * @param CWidgetFieldCheckBoxList $field
+	 * @param array $config
+	 *
+	 * @return CList
+	 */
+	public static function getCheckBoxList($field, array $config) {
+		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+
+		if ($field->getOrientation() == CWidgetFieldCheckBoxList::ORIENTATION_HORIZONTAL) {
+			$checkbox_list->addClass(ZBX_STYLE_HOR_LIST);
+		}
+
+		foreach ($config as $key => $label) {
+			$checkbox_list->addItem(
+				(new CCheckBox($field->getName().'[]', $key))
+					->setLabel($label)
+					->setId($field->getName().'_'.$key)
+					->setChecked(in_array($key, $field->getValue()))
 					->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
 			);
 		}
 
-		return $severities;
+		return $checkbox_list;
 	}
 
 	/**
@@ -531,6 +590,7 @@ class CWidgetHelper {
 							'name' => $field->getName().'['.$row_num.'][hosts][]',
 							'object_name' => 'hosts',
 							'data' => $value['hosts'],
+							'placeholder' => _('host pattern'),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
@@ -542,7 +602,6 @@ class CWidgetHelper {
 							'add_post_js' => false
 						]))
 							->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-							->setAttribute('placeholder', _('host pattern'))
 							->setAriaRequired(self::isAriaRequired($field))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50),
@@ -551,6 +610,7 @@ class CWidgetHelper {
 							'name' => $field->getName().'['.$row_num.'][items][]',
 							'object_name' => 'items',
 							'data' => $value['items'],
+							'placeholder' => _('item pattern'),
 							'multiple' => true,
 							'popup' => [
 								'parameters' => [
@@ -567,7 +627,6 @@ class CWidgetHelper {
 							'add_post_js' => false
 						]))
 							->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-							->setAttribute('placeholder', _('host pattern'))
 							->setAriaRequired(self::isAriaRequired($field))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50)
@@ -889,6 +948,7 @@ class CWidgetHelper {
 							'name' => $field_name.'['.$row_num.'][hosts][]',
 							'object_name' => 'hosts',
 							'data' => $value['hosts'],
+							'placeholder' => _('host pattern'),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
@@ -905,6 +965,7 @@ class CWidgetHelper {
 							'name' => $field_name.'['.$row_num.'][items][]',
 							'object_name' => 'items',
 							'data' => $value['items'],
+							'placeholder' => _('item pattern'),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'items',
@@ -1016,6 +1077,43 @@ class CWidgetHelper {
 									->setAttribute('placeholder', _('none'))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
+							->addRow(_('Aggregation function'),
+								(new CComboBox(
+									$field_name.'['.$row_num.'][aggregate_function]',
+									(int) $value['aggregate_function'], null,
+									[
+										GRAPH_AGGREGATE_NONE => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_NONE),
+										GRAPH_AGGREGATE_MIN => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MIN),
+										GRAPH_AGGREGATE_MAX => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MAX),
+										GRAPH_AGGREGATE_AVG => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_AVG),
+										GRAPH_AGGREGATE_COUNT => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_COUNT),
+										GRAPH_AGGREGATE_SUM => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_SUM),
+										GRAPH_AGGREGATE_FIRST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_FIRST),
+										GRAPH_AGGREGATE_LAST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_LAST)
+									]
+								))
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+									->onChange('changeDataSetAggregateFunction(this);')
+							)
+							->addRow(_('Aggregation interval'),
+								(new CTextBox(
+									$field_name.'['.$row_num.'][aggregate_interval]',
+									$value['aggregate_interval']
+								))
+									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
+									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+							->addRow(_('Aggregate'),
+								(new CRadioButtonList(
+									$field_name.'['.$row_num.'][aggregate_grouping]',
+									(int) $value['aggregate_grouping'])
+								)
+									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
+									->addValue(_('Data set'), GRAPH_AGGREGATE_BY_DATASET)
+									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
+									->setModern(true)
+							)
 					))
 						->addClass(ZBX_STYLE_COLUMN_50),
 				]))
@@ -1056,18 +1154,11 @@ class CWidgetHelper {
 		$values = $field->getValue();
 
 		if (!$values) {
-			$values[] = [];
+			$values[] = CWidgetFieldGraphDataSet::getDefaults();
 		}
 
-		$i = 0;
-
-		foreach ($values as $value) {
-			// Take default values for missing fields. This can happen if particular field is disabled.
-			$value += CWidgetFieldGraphDataSet::getDefaults();
-
+		foreach ($values as $i => $value) {
 			$list->addItem(self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i == 0));
-
-			$i++;
 		}
 
 		// Add 'Add' button under accordion.
@@ -1121,6 +1212,14 @@ class CWidgetHelper {
 						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
 						'break;'.
 				'}'.
+			'};',
+
+			'function changeDataSetAggregateFunction(obj) {'.
+				'var row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");'.
+				'var no_aggregation = (jQuery(obj).val() == '.GRAPH_AGGREGATE_NONE.');'.
+				'jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);'.
+				'jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);'.
+				'jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);'.
 			'};',
 
 			// Initialize dynamic rows.

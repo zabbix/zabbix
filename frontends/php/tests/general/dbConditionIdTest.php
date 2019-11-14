@@ -29,27 +29,33 @@ class dbConditionIdTest extends CTest {
 		return [
 			[
 				['field', [0]],
+				"field IS NULL",
 				"field IS NULL"
 			],
 			[
 				['field', [0, 1]],
+				"(field=1 OR field IS NULL)",
 				"(field=1 OR field IS NULL)"
 			],
 			[
 				['field', [1, 0]],
+				"(field=1 OR field IS NULL)",
 				"(field=1 OR field IS NULL)"
 			],
 			[
 				['field', [0, 1, 2, 3]],
+				"(field IN (1,2,3) OR field IS NULL)",
 				"(field IN (1,2,3) OR field IS NULL)"
 			],
 			[
 				['field', [0, 1, 2, 3, 5, 6, 7, 8, 9, 10]],
-				"(field IN (1,2,3,5,6,7,8,9,10) OR field IS NULL)"
+				"(field IN (1,2,3,5,6,7,8,9,10) OR field IS NULL)",
+				"(field BETWEEN 5 AND 10 OR field IN (1,2,3) OR field IS NULL)"
 			],
 			[
 				['field', [0, 1, 2, 3, 5, 6, 7, 8, 9, 10], true],
-				"field NOT IN (1,2,3,5,6,7,8,9,10) AND field IS NOT NULL"
+				"field NOT IN (1,2,3,5,6,7,8,9,10) AND field IS NOT NULL",
+				"NOT field BETWEEN 5 AND 10 AND field NOT IN (1,2,3) AND field IS NOT NULL"
 			]
 		];
 	}
@@ -57,9 +63,11 @@ class dbConditionIdTest extends CTest {
 	/**
 	 * @dataProvider provider
 	 */
-	public function test($params, $expectedResult) {
+	public function test($params, $expected_non_oracle, $expected_oracle) {
+		global $DB;
+
 		$result = call_user_func_array('dbConditionId', $params);
 
-		$this->assertSame($expectedResult, $result);
+		$this->assertSame($DB['TYPE'] == ZBX_DB_ORACLE ? $expected_oracle : $expected_non_oracle, $result);
 	}
 }

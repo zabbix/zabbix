@@ -581,11 +581,13 @@ function closeDialogHandler(event) {
 	}
 }
 
-/*
+/**
  * Removed overlay from overlays stack and sets focus to source element.
  *
  * @param {string} dialogueid		Id of dialogue, that is being closed.
  * @param {boolean} return_focus	If not FALSE, the element stored in overlay.element will be focused.
+ *
+ * @return {object|undefined|null}  Overlay object, if found.
  */
 function removeFromOverlaysStack(dialogueid, return_focus) {
 	var overlay = null,
@@ -603,6 +605,8 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
 		}
 	});
 
+	var result = null;
+
 	if (overlay) {
 		// Focus UI element that was clicked to open an overlay.
 		if (return_focus) {
@@ -610,13 +614,16 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
 		}
 
 		// Remove dialogue from the stack.
-		overlays_stack.splice(index, 1);
+		result = overlays_stack.splice(index, 1)[0];
 	}
 
 	// Remove event listener.
 	if (overlays_stack.length == 0) {
 		jQuery(document).off('keydown', closeDialogHandler);
 	}
+
+	// Return the removed layer.
+	return result;
 }
 
 /**

@@ -62,6 +62,7 @@ $filter_column1 = (new CFormList())
 		(new CCheckBoxList('filter_priority'))
 			->setOptions($data['config_priorities'])
 			->setChecked($data['filter_priority'])
+			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
 	)
 	->addRow(_('State'),
