@@ -72,9 +72,9 @@ class CControllerLatestView extends CControllerLatest {
 		// Filter.
 		if ($this->hasInput('filter_set')) {
 			CProfile::updateArray('web.latest.filter.groupids', $this->getInput('filter_groupids', []),
-				PROFILE_TYPE_STR
+				PROFILE_TYPE_ID
 			);
-			CProfile::updateArray('web.latest.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_STR);
+			CProfile::updateArray('web.latest.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
 			CProfile::update('web.latest.filter.application', $this->getInput('filter_application', ''),
 				PROFILE_TYPE_STR
 			);
