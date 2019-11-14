@@ -47,13 +47,16 @@ if ($data['filter']['show_details']) {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 13%'),
-		make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 21%'),
+		make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url)
+			->addStyle('width: 13%'),
+		make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url)
+			->addStyle('width: 21%'),
 		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
 		(new CColHeader(_('History')))->addStyle('width: 5%'),
 		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
 		(new CColHeader(_('Type')))->addStyle('width: 8%'),
-		make_sorting_header(_('Last check'), 'lastclock', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 14%'),
+		make_sorting_header(_('Last check'), 'lastclock', $data['sort_field'], $data['sort_order'], $view_url)
+			->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%'),
@@ -64,9 +67,12 @@ else {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 17%'),
-		make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 40%'),
-		make_sorting_header(_('Last check'), 'lastclock', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 14%'),
+		make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url)
+			->addStyle('width: 17%'),
+		make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url)
+			->addStyle('width: 40%'),
+		make_sorting_header(_('Last check'), 'lastclock', $data['sort_field'], $data['sort_order'], $view_url)
+			->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%')
@@ -136,8 +142,8 @@ foreach ($data['items'] as $key => $item) {
 		continue;
 	}
 
-	$lastHistory = isset($data['history'][$item['itemid']][0]) ? $data['history'][$item['itemid']][0] : null;
-	$prevHistory = isset($data['history'][$item['itemid']][1]) ? $data['history'][$item['itemid']][1] : null;
+	$last_history = isset($data['history'][$item['itemid']][0]) ? $data['history'][$item['itemid']][0] : null;
+	$prev_history = isset($data['history'][$item['itemid']][1]) ? $data['history'][$item['itemid']][1] : null;
 
 	if (strpos($item['units'], ',') !== false) {
 		list($item['units'], $item['unitsLong']) = explode(',', $item['units']);
@@ -146,30 +152,30 @@ foreach ($data['items'] as $key => $item) {
 		$item['unitsLong'] = '';
 	}
 
-	// last check time and last value
-	if ($lastHistory) {
-		$lastClock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $lastHistory['clock']);
-		$lastValue = formatHistoryValue($lastHistory['value'], $item, false);
+	// Last check time and last value.
+	if ($last_history) {
+		$last_clock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']);
+		$last_value = formatHistoryValue($last_history['value'], $item, false);
 	}
 	else {
-		$lastClock = UNKNOWN_VALUE;
-		$lastValue = UNKNOWN_VALUE;
+		$last_clock = UNKNOWN_VALUE;
+		$last_value = UNKNOWN_VALUE;
 	}
 
-	// change
+	// Change.
 	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT : 0;
-	if ($lastHistory && $prevHistory
+	if ($last_history && $prev_history
 			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& (bcsub($lastHistory['value'], $prevHistory['value'], $digits) != 0)) {
+			&& (bcsub($last_history['value'], $prev_history['value'], $digits) != 0)) {
 
 		$change = '';
-		if (($lastHistory['value'] - $prevHistory['value']) > 0) {
+		if (($last_history['value'] - $prev_history['value']) > 0) {
 			$change = '+';
 		}
 
-		// for 'unixtime' change should be calculated as uptime
+		// For 'unixtime' change should be calculated as uptime.
 		$change .= convert_units([
-			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
+			'value' => bcsub($last_history['value'], $prev_history['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
 	}
@@ -177,7 +183,7 @@ foreach ($data['items'] as $key => $item) {
 		$change = UNKNOWN_VALUE;
 	}
 
-	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
+	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']);
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $item['show_link']
@@ -200,8 +206,8 @@ foreach ($data['items'] as $key => $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	if ($data['filter']['show_details']) {
-		// item key
-		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
+		// Item key.
+		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
 			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
 				->addClass(ZBX_STYLE_LINK_ALT)
@@ -216,13 +222,13 @@ foreach ($data['items'] as $key => $item) {
 			'',
 			$checkbox,
 			'',
-			(new CCol([$item_name, $itemKey]))->addClass($state_css),
+			(new CCol([$item_name, $item_key]))->addClass($state_css),
 			(new CCol($item['delay']))->addClass($state_css),
 			(new CCol($item['history']))->addClass($state_css),
 			(new CCol($item['trends']))->addClass($state_css),
 			(new CCol(item_type2str($item['type'])))->addClass($state_css),
-			(new CCol($lastClock))->addClass($state_css),
-			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($last_clock))->addClass($state_css),
+			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
 			$actions,
 			makeInformationList($info_icons)
@@ -234,25 +240,25 @@ foreach ($data['items'] as $key => $item) {
 			$checkbox,
 			'',
 			(new CCol($item_name))->addClass($state_css),
-			(new CCol($lastClock))->addClass($state_css),
-			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($last_clock))->addClass($state_css),
+			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
 			$actions
 		]);
 	}
 
-	// add the item row to each application tab
+	// Add the item row to each application tab.
 	foreach ($item['applications'] as $itemApplication) {
 		$applicationId = $itemApplication['applicationid'];
 
 		if (isset($data['applications'][$applicationId])) {
 			$data['applications'][$applicationId]['item_cnt']++;
-			// objects may have different properties, so it's better to use a copy of it
+			// Objects may have different properties, so it's better to use a copy of it.
 			$tab_rows[$applicationId][] = clone $row;
 		}
 	}
 
-	// remove items with applications from the collection
+	// Remove items with applications from the collection.
 	unset($data['items'][$key]);
 }
 
@@ -263,16 +269,16 @@ foreach ($data['applications'] as $appid => $dbApp) {
 
 	$host = $data['hosts'][$dbApp['hostid']];
 
-	$appRows = $tab_rows[$appid];
+	$app_rows = $tab_rows[$appid];
 
 	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$hostName = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($dbApp['hostid']));
+	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($dbApp['hostid']));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
-		$hostName->addClass(ZBX_STYLE_RED);
+		$host_name->addClass(ZBX_STYLE_RED);
 	}
 
-	// add toggle row
+	// Add toggle row.
 	$table->addRow([
 		(new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
@@ -281,25 +287,24 @@ foreach ($data['applications'] as $appid => $dbApp) {
 			->setAttribute('data-open-state', $open_state)
 			->addItem(new CSpan()),
 		'',
-		$hostName,
+		$host_name,
 		(new CCol([bold($dbApp['name']), ' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')']))
 			->setColSpan($data['filter']['show_details'] ? 10 : 5)
 	]);
 
-	// add toggle sub rows
-	foreach ($appRows as $row) {
+	// Add toggle sub rows.
+	foreach ($app_rows as $row) {
 		$row->setAttribute('parent_app_id', $dbApp['applicationid']);
 		$table->addRow($row);
 	}
 }
 
-/**
- * Display OTHER ITEMS (which are not linked to application)
- */
+//  Display OTHER ITEMS (which are not linked to application).
+
 $tab_rows = [];
 foreach ($data['items'] as $item) {
-	$lastHistory = isset($data['history'][$item['itemid']][0]) ? $data['history'][$item['itemid']][0] : null;
-	$prevHistory = isset($data['history'][$item['itemid']][1]) ? $data['history'][$item['itemid']][1] : null;
+	$last_history = isset($data['history'][$item['itemid']][0]) ? $data['history'][$item['itemid']][0] : null;
+	$prev_history = isset($data['history'][$item['itemid']][1]) ? $data['history'][$item['itemid']][1] : null;
 
 	if (strpos($item['units'], ',') !== false) {
 		list($item['units'], $item['unitsLong']) = explode(',', $item['units']);
@@ -308,30 +313,30 @@ foreach ($data['items'] as $item) {
 		$item['unitsLong'] = '';
 	}
 
-	// last check time and last value
-	if ($lastHistory) {
-		$lastClock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $lastHistory['clock']);
-		$lastValue = formatHistoryValue($lastHistory['value'], $item, false);
+	// Last check time and last value.
+	if ($last_history) {
+		$last_clock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']);
+		$last_value = formatHistoryValue($last_history['value'], $item, false);
 	}
 	else {
-		$lastClock = UNKNOWN_VALUE;
-		$lastValue = UNKNOWN_VALUE;
+		$last_clock = UNKNOWN_VALUE;
+		$last_value = UNKNOWN_VALUE;
 	}
 
-	// column "change"
+	// Column "change".
 	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT : 0;
-	if (isset($lastHistory['value']) && isset($prevHistory['value'])
+	if (isset($last_history['value']) && isset($prev_history['value'])
 			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& (bcsub($lastHistory['value'], $prevHistory['value'], $digits) != 0)) {
+			&& (bcsub($last_history['value'], $prev_history['value'], $digits) != 0)) {
 
 		$change = '';
-		if (($lastHistory['value'] - $prevHistory['value']) > 0) {
+		if (($last_history['value'] - $prev_history['value']) > 0) {
 			$change = '+';
 		}
 
-		// for 'unixtime' change should be calculated as uptime
+		// For 'unixtime' change should be calculated as uptime.
 		$change .= convert_units([
-			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
+			'value' => bcsub($last_history['value'], $prev_history['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
 	}
@@ -363,8 +368,8 @@ foreach ($data['items'] as $item) {
 
 	$host = $data['hosts'][$item['hostid']];
 	if ($data['filter']['show_details']) {
-		// item key
-		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
+		// Item key.
+		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
 			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
 				->addClass(ZBX_STYLE_LINK_ALT)
@@ -379,13 +384,13 @@ foreach ($data['items'] as $item) {
 			'',
 			$checkbox,
 			'',
-			(new CCol([$item_name, $itemKey]))->addClass($state_css),
+			(new CCol([$item_name, $item_key]))->addClass($state_css),
 			(new CCol($item['delay']))->addClass($state_css),
 			(new CCol($item['history']))->addClass($state_css),
 			(new CCol($item['trends']))->addClass($state_css),
 			(new CCol(item_type2str($item['type'])))->addClass($state_css),
-			(new CCol($lastClock))->addClass($state_css),
-			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($last_clock))->addClass($state_css),
+			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
 			$actions,
 			makeInformationList($info_icons)
@@ -397,8 +402,8 @@ foreach ($data['items'] as $item) {
 			$checkbox,
 			'',
 			(new CCol($item_name))->addClass($state_css),
-			(new CCol($lastClock))->addClass($state_css),
-			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($last_clock))->addClass($state_css),
+			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
 			$actions
 		]);
@@ -408,23 +413,23 @@ foreach ($data['items'] as $item) {
 	$tab_rows[$item['hostid']][] = $row;
 }
 
-foreach ($data['hosts'] as $hostId => $dbHost) {
-	if (!isset($tab_rows[$hostId])) {
+foreach ($data['hosts'] as $hostid => $db_host) {
+	if (!isset($tab_rows[$hostid])) {
 		continue;
 	}
 
-	$host = $data['hosts'][$dbHost['hostid']];
+	$host = $data['hosts'][$db_host['hostid']];
 
-	$appRows = $tab_rows[$hostId];
+	$app_rows = $tab_rows[$hostid];
 
 	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$hostName = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostId));
+	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
-		$hostName->addClass(ZBX_STYLE_RED);
+		$host_name->addClass(ZBX_STYLE_RED);
 	}
 
-	// add toggle row
+	// Add toggle row.
 	$table->addRow([
 		(new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
@@ -433,13 +438,13 @@ foreach ($data['hosts'] as $hostId => $dbHost) {
 			->setAttribute('data-open-state', $open_state)
 			->addItem(new CSpan()),
 		'',
-		$hostName,
-		(new CCol([bold('- '.('other').' -'), ' ('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')']))
+		$host_name,
+		(new CCol([bold('- '.('other').' -'), ' ('._n('%1$s Item', '%1$s Items', $db_host['item_cnt']).')']))
 			->setColSpan($data['filter']['show_details'] ? 10 : 5)
 	]);
 
-	// add toggle sub rows
-	foreach($appRows as $row) {
+	// Add toggle sub rows.
+	foreach($app_rows as $row) {
 		$row->setAttribute('parent_host_id', $host['hostid']);
 		$table->addRow($row);
 	}

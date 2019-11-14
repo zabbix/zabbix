@@ -1,8 +1,6 @@
 <script type="text/javascript">
-
 jQuery(function($) {
-
-	function LatestPage() {
+	function latestPage() {
 		this.refresh_url = '<?= $this->data['refresh_url']; ?>';
 		this.refresh_interval = <?= $this->data['refresh_interval'] ?>;
 
@@ -10,20 +8,16 @@ jQuery(function($) {
 		this.timeout = null;
 	}
 
-	LatestPage.prototype = {
-
+	latestPage.prototype = {
 		getCurrentForm: function() {
 			return $('form[name=items]');
 		},
-
 		addMessages: function(messages) {
 			$('main').prepend(messages);
 		},
-
 		removeMessages: function() {
 			$('main .msg-bad').remove();
 		},
-
 		refresh: function() {
 			this.setLoading();
 
@@ -31,21 +25,17 @@ jQuery(function($) {
 
 			return this.bindDataEvents(deferred);
 		},
-
 		setLoading: function() {
 			this.getCurrentForm().addClass('in-progress delayed-15s');
 		},
-
 		clearLoading: function() {
 			this.getCurrentForm().removeClass('in-progress delayed-15s');
 		},
-
 		doRefresh: function(body) {
 			this.getCurrentForm().replaceWith(body);
 			this.hydrate();
 			chkbxRange.init();
 		},
-
 		bindDataEvents: function(deferred) {
 			var that = this;
 
@@ -60,7 +50,6 @@ jQuery(function($) {
 
 			return deferred;
 		},
-
 		onDataDone: function(response) {
 			this.clearLoading();
 			this.removeMessages();
@@ -69,7 +58,6 @@ jQuery(function($) {
 				this.addMessages(response.messages);
 			}
 		},
-
 		onDataFail: function(jqXHR) {
 			var messages = $(jqXHR.responseText).find('.msg-global');
 			if (messages.length) {
@@ -83,13 +71,11 @@ jQuery(function($) {
 				this.addMessages(makeMessageBox('bad', t('Fatal error, please report to the Zabbix team')));
 			}
 		},
-
 		onDataAlways: function() {
 			if (this.running) {
 				this.scheduleRefresh();
 			}
 		},
-
 		scheduleRefresh: function() {
 			this.unscheduleRefresh();
 			this.timeout = setTimeout((function() {
@@ -97,26 +83,22 @@ jQuery(function($) {
 				this.refresh();
 			}).bind(this), this.refresh_interval);
 		},
-
 		unscheduleRefresh: function() {
 			if (this.timeout !== null) {
 				clearTimeout(this.timeout);
 				this.timeout = null;
 			}
 		},
-
 		start: function() {
 			if (this.refresh_interval != 0) {
 				this.running = true;
 				this.scheduleRefresh();
 			}
 		},
-
 		stop: function() {
 			this.running = false;
 			this.unscheduleRefresh();
 		},
-
 		hydrate: function() {
 			var open_state_all = '0';
 
@@ -124,9 +106,9 @@ jQuery(function($) {
 				var open_state = $(this).data('open-state');
 
 				$('span', this)
-					.addClass(open_state == '0' ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
+					.addClass(open_state === '0' ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
 
-				if (open_state == '0') {
+				if (open_state === '0') {
 					var	hostid = $(this).attr('data-host-id');
 					if (hostid) {
 						$('tr[parent_host_id=' + hostid + ']').hide();
@@ -142,20 +124,20 @@ jQuery(function($) {
 
 			$('.app-list-toggle-all').data('open-state', open_state_all);
 			$('.app-list-toggle-all span')
-				.addClass(open_state_all == '0' ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
+				.addClass(open_state_all === '0' ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
 
-			// click event for main toggle (+-) button
+			// Click event for main toggle (+-) button.
 			$('.app-list-toggle-all').click(function() {
-				// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
+				// This is for Opera browser with large tables, which renders table layout while showing/hiding rows.
 				$(this).closest('table').fadeTo(0, 0);
 
-				var open_state = ($(this).data('open-state') == '0') ? '1' : '0',
-					del_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>',
-					add_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>',
+				var open_state = ($(this).data('open-state') === '0') ? '1' : '0',
+					del_class = (open_state === '0') ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>',
+					add_class = (open_state === '0') ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>',
 					applicationids = [],
 					hostids = [];
 
-				// change and store new state
+				// Change and store new state.
 				$(this).data('open-state', open_state);
 
 				$('span', this)
@@ -163,7 +145,7 @@ jQuery(function($) {
 					.addClass(add_class);
 
 				$('.app-list-toggle').each(function() {
-					if ($(this).data('open-state') != open_state) {
+					if ($(this).data('open-state') !== open_state) {
 						$(this).data('open-state', open_state);
 						$('span', this)
 							.removeClass(del_class)
@@ -171,18 +153,18 @@ jQuery(function($) {
 
 						var hostid = $(this).attr('data-host-id');
 						if (hostid) {
-							$('tr[parent_host_id=' + hostid + ']').toggle(open_state == '1');
+							$('tr[parent_host_id=' + hostid + ']').toggle(open_state === '1');
 							hostids.push(hostid);
 						}
 						else {
 							var applicationid = $(this).attr('data-app-id');
-							$('tr[parent_app_id=' + applicationid + ']').toggle(open_state == '1');
+							$('tr[parent_app_id=' + applicationid + ']').toggle(open_state === '1');
 							applicationids.push(applicationid);
 						}
 					}
 				});
 
-				// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
+				// This is for Opera browser with large tables, which renders table layout while showing/hiding rows.
 				$(this).closest('table').fadeTo(0, 1);
 
 				if (!empty(hostids)) {
@@ -193,23 +175,23 @@ jQuery(function($) {
 				}
 			});
 
-			// click event for every toggle (+-) button
+			// Click event for every toggle (+-) button.
 			$('.app-list-toggle').click(function() {
-				var open_state = ($(this).data('open-state') == '0') ? '1' : '0',
-					del_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>',
-					add_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>',
+				var open_state = ($(this).data('open-state') === '0') ? '1' : '0',
+					del_class = (open_state === '0') ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>',
+					add_class = (open_state === '0') ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>',
 					open_state_all = '0';
 
-				// change and store new state
+				// Change and store new state.
 				$(this).data('open-state', open_state);
 
 				$('span', this)
 					.removeClass(del_class)
 					.addClass(add_class);
 
-				if (open_state == '0') {
+				if (open_state === '0') {
 					$('.app-list-toggle').each(function() {
-						if ($(this).data('open-state') != '0') {
+						if ($(this).data('open-state') !== '0') {
 							open_state_all = '1';
 						}
 					});
@@ -218,7 +200,7 @@ jQuery(function($) {
 					open_state_all = '1';
 				}
 
-				if ($('.app-list-toggle-all').data('open-state') != open_state_all) {
+				if ($('.app-list-toggle-all').data('open-state') !== open_state_all) {
 					$('.app-list-toggle-all').data('open-state', open_state_all);
 					$('.app-list-toggle-all span')
 						.removeClass(del_class)
@@ -227,21 +209,20 @@ jQuery(function($) {
 
 				var hostid = $(this).attr('data-host-id');
 				if (hostid) {
-					$('tr[parent_host_id=' + hostid + ']').toggle(open_state == '1');
+					$('tr[parent_host_id=' + hostid + ']').toggle(open_state === '1');
 					updateUserProfile('web.latest.toggle_other', open_state, [hostid]);
 				}
 				else {
 					var applicationid = $(this).attr('data-app-id');
-					$('tr[parent_app_id=' + applicationid + ']').toggle(open_state == '1');
+					$('tr[parent_app_id=' + applicationid + ']').toggle(open_state === '1');
 					updateUserProfile('web.latest.toggle', open_state, [applicationid]);
 				}
 			});
 		}
 	};
 
-	window.latest_page = new LatestPage(true);
+	window.latest_page = new latestPage(true);
 	window.latest_page.hydrate();
 	window.latest_page.start();
 });
-
 </script>

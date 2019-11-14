@@ -29,10 +29,8 @@ $web_layout_mode = CView::getLayoutMode();
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(get_icon('fullscreen'))
-		))
+	->setControls(
+		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen'))))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -76,7 +74,8 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 				->addRow(_('Application'), [
-					(new CTextBox('filter_application', $data['filter']['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+					(new CTextBox('filter_application', $data['filter']['application']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('application_name', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
@@ -92,11 +91,15 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 						)
 				]),
 			(new CFormList())
-				->addRow(_('Name'), (new CTextBox('filter_select', $data['filter']['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
+				->addRow(_('Name'), (new CTextBox('filter_select', $data['filter']['select']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
 				->addRow(_('Show items without data'),
 					(new CCheckBox('filter_show_without_data'))->setChecked($data['filter']['show_without_data'] == 1)
 				)
-				->addRow(_('Show details'), (new CCheckBox('filter_show_details'))->setChecked($data['filter']['show_details'] == 1))
+				->addRow(_('Show details'),
+					(new CCheckBox('filter_show_details'))->setChecked($data['filter']['show_details'] == 1)
+				)
 		])
 	);
 }

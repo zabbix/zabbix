@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Controller for the "Latest data" page.
+ */
 class CControllerLatestView extends CControllerLatest {
 
 	protected function init() {
@@ -66,16 +69,22 @@ class CControllerLatestView extends CControllerLatest {
 	}
 
 	protected function doAction() {
-		/*
-		 * Filter
-		 */
+		// Filter.
 		if ($this->hasInput('filter_set')) {
-			CProfile::updateArray('web.latest.filter.groupids', $this->getInput('filter_groupids', []), PROFILE_TYPE_STR);
+			CProfile::updateArray('web.latest.filter.groupids', $this->getInput('filter_groupids', []),
+				PROFILE_TYPE_STR
+			);
 			CProfile::updateArray('web.latest.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_STR);
-			CProfile::update('web.latest.filter.application', $this->getInput('filter_application', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.latest.filter.application', $this->getInput('filter_application', ''),
+				PROFILE_TYPE_STR
+			);
 			CProfile::update('web.latest.filter.select', $this->getInput('filter_select', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.latest.filter.show_without_data', $this->getInput('filter_show_without_data', 0), PROFILE_TYPE_INT);
-			CProfile::update('web.latest.filter.show_details', $this->getInput('filter_show_details', 0), PROFILE_TYPE_INT);
+			CProfile::update('web.latest.filter.show_without_data', $this->getInput('filter_show_without_data', 0),
+				PROFILE_TYPE_INT
+			);
+			CProfile::update('web.latest.filter.show_details', $this->getInput('filter_show_details', 0),
+				PROFILE_TYPE_INT
+			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.latest.filter.groupids');
@@ -119,9 +128,7 @@ class CControllerLatestView extends CControllerLatest {
 			->setArgument('page', $this->getInput('page', 1))
 			->removeArgument('filter_set');
 
-		/*
-		 * Display
-		 */
+		// Display.
 		$data = [
 			'filter' => $filter,
 			'sort_field' => $sort_field,
@@ -130,7 +137,7 @@ class CControllerLatestView extends CControllerLatest {
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'active_tab' => CProfile::get('web.latest.filter.active', 1)
-		] + parent::prepareData($filter, $sort_field, $sort_order);
+		] + $this->prepareData($filter, $sort_field, $sort_order);
 
 		CView::$has_web_layout_mode = true;
 

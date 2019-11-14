@@ -19,14 +19,30 @@
 **/
 
 
+/**
+ * Base controller for the "Latest data" page and the "Latest data" asynchronous refresh page.
+ */
 abstract class CControllerLatest extends CController {
 
+	/**
+	 * Prepares the latest data based on the given filter and sorting options.
+	 *
+	 * @param array  $filter                      Item filter options.
+	 * @param array  $filter['groupids']          Filter items by host groups.
+	 * @param array  $filter['hostids']           Filter items by hosts.
+	 * @param array  $filter['application']       Filter items by application.
+	 * @param array  $filter['select']            Filter items by name.
+	 * @param array  $filter['show_without_data'] Include items with empty history.
+	 * @param string $sort_field                  Sorting field.
+	 * @param string $sort_order                  Sorting order.
+	 */
 	protected function prepareData($filter, $sort_field, $sort_order) {
 		$applications = [];
 		$items = [];
 		$child_groups = [];
+		$history = null;
 
-		// multiselect host groups
+		// Multiselect host groups.
 		$multiselect_hostgroup_data = [];
 		if ($filter['groupids']) {
 			$filter_groups = API::HostGroup()->get([
@@ -50,7 +66,7 @@ abstract class CControllerLatest extends CController {
 			}
 		}
 
-		// we'll only display the values if the filter is set
+		// We'll only display the values if the filter is set.
 		$filter_set = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
 
 		if ($filter_set) {
@@ -92,10 +108,10 @@ abstract class CControllerLatest extends CController {
 
 			$applications = null;
 
-			// if an application filter is set, fetch the applications and then use them to filter items
+			// If an application filter is set, fetch the applications and then use them to filter items.
 			if ($filter['application'] !== '') {
 				$applications = API::Application()->get([
-					'output' => API_OUTPUT_EXTEND,
+					'output' => ['applicationid', 'hostid', 'name'],
 					'hostids' => array_keys($hosts),
 					'search' => ['name' => $filter['application']],
 					'preservekeys' => true
@@ -117,11 +133,13 @@ abstract class CControllerLatest extends CController {
 				'preservekeys' => true
 			]);
 
-			// if the applications haven't been loaded when filtering, load them based on the retrieved items to avoid
-			// fetching applications from hosts that may not be displayed
+			/*
+			 * If the applications haven't been loaded when filtering, load them based on the retrieved items to avoid
+			 * fetching applications from hosts that may not be displayed.
+			 */
 			if ($applications === null) {
 				$applications = API::Application()->get([
-					'output' => API_OUTPUT_EXTEND,
+					'output' => ['applicationid', 'hostid', 'name'],
 					'hostids' => array_keys(array_flip(zbx_objectValues($items, 'hostid'))),
 					'search' => ['name' => $filter['application']],
 					'preservekeys' => true
@@ -130,14 +148,14 @@ abstract class CControllerLatest extends CController {
 		}
 
 		if ($items) {
-			// macros
+			// Macros.
 			$items = CMacrosResolverHelper::resolveItemKeys($items);
 			$items = CMacrosResolverHelper::resolveItemNames($items);
 			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
-			// filter items by name
+			// Filter items by name.
 			foreach ($items as $key => $item) {
-				if (($filter['select'] !== '')) {
+				if ($filter['select'] !== '') {
 					$haystack = mb_strtolower($item['name_expanded']);
 					$needle = mb_strtolower($filter['select']);
 
@@ -148,13 +166,13 @@ abstract class CControllerLatest extends CController {
 			}
 
 			if ($items) {
-				// get history
+				// Get history.
 				$history = Manager::History()->getLastValues($items, 2, ZBX_HISTORY_PERIOD);
 
-				// filter items without history
+				// Filter items without history.
 				if (!$filter['show_without_data']) {
 					foreach ($items as $key => $item) {
-						if (!isset($history[$item['itemid']])) {
+						if (!array_key_exists($item['itemid'], $history)) {
 							unset($items[$key]);
 						}
 					}
@@ -162,15 +180,15 @@ abstract class CControllerLatest extends CController {
 			}
 
 			if ($items) {
-				// add item last update date for sorting
+				// Add item last update date for sorting.
 				foreach ($items as &$item) {
-					if (isset($history[$item['itemid']])) {
+					if (array_key_exists($item['itemid'], $history)) {
 						$item['lastclock'] = $history[$item['itemid']][0]['clock'];
 					}
 				}
 				unset($item);
 
-				// sort
+				// Sort.
 				if ($sort_field === 'name') {
 					$sort_fields = [['field' => 'name_expanded', 'order' => $sort_order], 'itemid'];
 				}
@@ -189,7 +207,7 @@ abstract class CControllerLatest extends CController {
 					}
 					unset($application);
 
-					// by default order by application name and application id
+					// By default order by application name and application id
 					$sort_fields = ($sort_field === 'host') ? [['field' => 'hostname', 'order' => $sort_order]] : [];
 					array_push($sort_fields, 'name', 'applicationid');
 					CArrayHelper::sort($applications, $sort_fields);
@@ -197,7 +215,7 @@ abstract class CControllerLatest extends CController {
 			}
 		}
 
-		// multiselect hosts
+		// Multiselect hosts.
 		$multiselect_host_data = [];
 		if ($filter['hostids']) {
 			$filter_hosts = API::Host()->get([
@@ -217,10 +235,10 @@ abstract class CControllerLatest extends CController {
 			'hosts' => $hosts,
 			'items' => $items,
 			'applications' => $applications,
-			'history' => isset($history) ? $history : null,
+			'history' => $history,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
 			'multiselect_host_data' => $multiselect_host_data,
-			'filter_set' => $filter_set,
+			'filter_set' => $filter_set
 		];
 	}
 }

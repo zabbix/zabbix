@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Controller for the "Latest data" asynchronous refresh page.
+ */
 class CControllerLatestViewRefresh extends CControllerLatest {
 
 	protected function init() {
@@ -64,9 +67,7 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 	}
 
 	protected function doAction() {
-		/*
-		 * Filter
-		 */
+		// Filter.
 		$filter = [
 			'groupids' => $this->hasInput('filter_groupids') ? $this->getInput('filter_groupids') : null,
 			'hostids' => $this->hasInput('filter_hostids') ? $this->getInput('filter_hostids') : null,
@@ -91,15 +92,13 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 			->setArgument('sort', $sort_field)
 			->setArgument('sortorder', $sort_order);
 
-		/*
-		 * Display
-		 */
+		// Display.
 		$data = [
 			'filter' => $filter,
 			'sort_field' => $sort_field,
 			'sort_order' => $sort_order,
 			'view_curl' => $view_curl
-		] + parent::prepareData($filter, $sort_field, $sort_order);
+		] + $this->prepareData($filter, $sort_field, $sort_order);
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
