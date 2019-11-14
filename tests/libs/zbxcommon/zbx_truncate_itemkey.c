@@ -23,21 +23,21 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	size_t		len;
+	size_t		key_len, buf_len;
 	char		*buf;
 	const char	*key, *exp_result, *act_result;
 
 	ZBX_UNUSED(state);
 
 	key = zbx_mock_get_parameter_string("in.key");
+	key_len = zbx_mock_get_parameter_uint64("in.key_len");
+	buf_len = zbx_mock_get_parameter_uint64("in.buf_len");
 
-	len = zbx_mock_get_parameter_uint64("in.len");
-
-	buf = (char *)zbx_malloc(NULL, len * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1);
+	buf = (char *)zbx_malloc(NULL, buf_len);
 
 	exp_result = zbx_mock_get_parameter_string("out.key");
 
-	act_result = zbx_truncate_itemkey(key, len, len * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1, &buf);
+	act_result = zbx_truncate_itemkey(key, key_len, buf_len, &buf);
 
 	zbx_mock_assert_str_eq("return value", exp_result, act_result);
 
