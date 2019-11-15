@@ -178,7 +178,6 @@ foreach ($data['items'] as $key => $item) {
 	if ($last_history && $prev_history
 			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 			&& (bcsub($last_history['value'], $prev_history['value'], $digits) != 0)) {
-
 		$change = '';
 		if ($last_history['value'] - $prev_history['value'] > 0) {
 			$change = '+';
@@ -187,7 +186,7 @@ foreach ($data['items'] as $key => $item) {
 		// The change must be calculated as uptime for the 'unixtime'.
 		$change .= convert_units([
 			'value' => bcsub($last_history['value'], $prev_history['value'], $digits),
-			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
+			'units' => ($item['units'] === 'unixtime') ? 'uptime' : $item['units']
 		]);
 	}
 	else {
@@ -358,7 +357,7 @@ foreach ($data['items'] as $item) {
 		// The change must be calculated as uptime for the 'unixtime'.
 		$change .= convert_units([
 			'value' => bcsub($last_history['value'], $prev_history['value'], $digits),
-			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
+			'units' => ($item['units'] === 'unixtime') ? 'uptime' : $item['units']
 		]);
 	}
 	else {
