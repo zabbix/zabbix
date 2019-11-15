@@ -601,14 +601,12 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							break;
 					}
 				}
-				if ($action === 'Add') {
-					$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="Add"]');
-				}
-				elseif ($action === 'Edit') {
-					$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="Update"]');
-				}
-				if (!array_key_exists('error_in_checks', $data) && $action !== 'Remove') {
-					$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+				if ($action === 'Add' || $action === 'Edit') {
+					$button = ($action === 'Add') ? 'Add' : 'Update';
+					$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="'.$button.'"]');
+					if (!array_key_exists('error_in_checks', $data)) {
+						$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+					}
 				}
 			}
 		}
