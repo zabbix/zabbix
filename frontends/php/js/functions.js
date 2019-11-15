@@ -1069,7 +1069,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 				.attr('title', t('Close'))
 				.click(function() {
 					jQuery(this)
-						.closest('.' + classes[index])
+						.closest('.' + msg_class)
 						.remove();
 				});
 		$msg_box.append($button);
