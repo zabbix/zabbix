@@ -383,15 +383,15 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 			goto out;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_KEY, &name, &name_alloc) ||
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_KEY, &name, &name_alloc, NULL) ||
 				'\0' == *name)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_KEY);
 			continue;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_KEY_ORIG, &key_orig, &key_orig_alloc)
-				|| '\0' == *key_orig)
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_KEY_ORIG, &key_orig, &key_orig_alloc,
+				NULL) || '\0' == *key_orig)
 		{
 			size_t offset = 0;
 			zbx_strcpy_alloc(&key_orig, &key_orig_alloc, &offset, name);
@@ -478,7 +478,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 				goto out;
 			}
 
-			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, "name", &name, &name_alloc))
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, "name", &name, &name_alloc, NULL))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", "name");
 				continue;
