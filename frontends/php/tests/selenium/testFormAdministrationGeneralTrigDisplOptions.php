@@ -75,7 +75,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
 		$this->zbxTestCheckHeader('Trigger displaying options');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger displaying options');
 		$this->zbxTestTextPresent(['Trigger displaying options', 'blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged RESOLVED events', 'Acknowledged RESOLVED events', 'Display OK triggers for', 'On status change triggers blink for']);
 
 		// hash calculation for not-changed DB fields
@@ -293,7 +293,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
 		$this->zbxTestCheckHeader('Trigger displaying options');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger displaying options');
 
 		// hash calculation for the DB fields that should be changed in this report
 		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['custom_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';

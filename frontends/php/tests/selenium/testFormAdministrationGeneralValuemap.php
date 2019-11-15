@@ -26,8 +26,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 	public function testFormAdministrationGeneralValuemap_Layout() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Value mapping');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Value mapping');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestAssertElementPresentId('form');

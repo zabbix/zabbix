@@ -19,22 +19,34 @@
 **/
 
 
+$submenu_source = [
+	EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
+	EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
+	EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration actions'),
+	EVENT_SOURCE_INTERNAL => _('Internal actions')
+];
+
+$submenu = [];
+foreach ($submenu_source as $value => $label) {
+	$url = (new CUrl('actionconf.php'))
+		->setArgument('eventsource', $value)
+		->getUrl();
+
+	$submenu[$url] = $label;
+}
+
 $widget = (new CWidget())
-	->setTitle(_('Actions'))
+	->setTitle(array_key_exists($data['eventsource'], $submenu_source) ? $submenu_source[$data['eventsource']] : null)
+	->setTitleSubmenu([
+		'main_section' => [
+			'items' => $submenu
+		]
+	])
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
+			->addItem(new CInput('hidden', 'eventsource', $data['eventsource']))
 			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Event source'), 'eventsource'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('eventsource', $data['eventsource'], 'submit()', [
-						EVENT_SOURCE_TRIGGERS => _('Triggers'),
-						EVENT_SOURCE_DISCOVERY => _('Discovery'),
-						EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
-						EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
-					])
-				])
 				->addItem(new CSubmit('form', _('Create action')))
 			)
 		))

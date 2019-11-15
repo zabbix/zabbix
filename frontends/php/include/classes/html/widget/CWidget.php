@@ -22,6 +22,7 @@
 class CWidget {
 
 	private $title = null;
+	private $title_submenu = null;
 	private $controls = null;
 
 	/**
@@ -40,6 +41,12 @@ class CWidget {
 
 	public function setTitle($title) {
 		$this->title = $title;
+
+		return $this;
+	}
+
+	public function setTitleSubmenu($title_submenu) {
+		$this->title_submenu = $title_submenu;
 
 		return $this;
 	}
@@ -90,13 +97,14 @@ class CWidget {
 		$widget = [];
 
 		if ($this->web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-			$this
-				->addItem(get_icon('fullscreen')
-				->setAttribute('aria-label', _('Content controls')));
-		} elseif ($this->title !== null || $this->controls !== null) {
+			$this->addItem(get_icon('fullscreen')->setAttribute('aria-label', _('Content controls')));
+		}
+		elseif ($this->title !== null || $this->controls !== null) {
 			$widget[] = $this->createTopHeader();
 		}
+
 		$tab = [$widget, $this->body];
+
 		return unpack_object($tab);
 	}
 
@@ -104,18 +112,29 @@ class CWidget {
 		$divs = [];
 
 		if ($this->title !== null) {
-			$divs[] = (new CDiv((new CTag('h1', true, $this->title))->setId(ZBX_STYLE_PAGE_TITLE)))
-				->addClass(ZBX_STYLE_CELL);
+			$title_tag = (new CTag('h1', true, $this->title))->setId(ZBX_STYLE_PAGE_TITLE);
+
+			if ($this->title_submenu) {
+				$title_tag = (new CLinkAction($title_tag))
+					->setMenuPopup([
+						'type' => 'submenu',
+						'data' => [
+							'submenu' => $this->title_submenu
+						],
+						'options' => [
+							'class' => ZBX_STYLE_PAGE_TITLE_SUBMENU
+						]
+					])
+					->setAttribute('aria-label', _('Content controls: header'));
+			}
+
+			$divs[] = new CDiv($title_tag);
 		}
 
 		if ($this->controls !== null) {
-			$divs[] = (new CDiv($this->controls))
-				->addClass(ZBX_STYLE_CELL)
-				->addClass(ZBX_STYLE_NOWRAP);
+			$divs[] = (new CDiv($this->controls))->addClass(ZBX_STYLE_NOWRAP);
 		}
 
-		return (new CDiv($divs))
-			->addClass(ZBX_STYLE_HEADER_TITLE)
-			->addClass(ZBX_STYLE_TABLE);
+		return (new CDiv($divs))->addClass(ZBX_STYLE_HEADER_TITLE);
 	}
 }

@@ -91,13 +91,13 @@ static void	process_configuration_sync(size_t *data_size)
 
 	/* if the answer is short then most likely it is a negative answer "response":"failed" */
 	if (128 > *data_size &&
-			SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)) &&
+			SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value), NULL) &&
 			0 == strcmp(value, ZBX_PROTO_VALUE_FAILED))
 	{
 		char	*info = NULL;
 		size_t	info_alloc = 0;
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc, NULL))
 			info = zbx_dsprintf(info, "negative response \"%s\"", value);
 
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",

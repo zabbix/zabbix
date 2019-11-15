@@ -316,6 +316,9 @@ $icon-widget-btn: (
 .top-nav-profile {
 	background: url(../img/icon-sprite.svg) no-repeat -84px -104px !important;
 }
+.top-nav-guest {
+	background: url(../img/icon-sprite.svg) no-repeat -241px -140px !important;
+}
 .top-nav-signout {
 	background: url(../img/icon-sprite.svg) no-repeat -84px -140px !important;
 }
@@ -396,6 +399,12 @@ $icon-widget-btn: (
 				background: url(../img/icon-sprite.svg) no-repeat -317px -835px;
 			}
 		}
+	}
+
+	&.page-title-submenu::before {
+		background-color: $form-bg-color;
+		border-top: 1px solid $form-border-color;
+		border-left: 1px solid $form-border-color;
 	}
 }
 

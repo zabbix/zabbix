@@ -24,7 +24,7 @@ class testPageAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	public function testPageAdministrationGeneralIconMapping_CheckLayout(){
 		$this->zbxTestLogin('adm.gui.php');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Icon mapping');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
 		$strings = [];
 

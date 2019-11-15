@@ -1,6 +1,8 @@
 Changes for 5.0.0alpha1
 
 New features:
+..F....... [ZBX-16776] reworked custom item select to multiselect (rlataria)
+...G...PS. [ZBXNEXT-5543] added compression support for Zabbix agent 2 (MVekslers)
 ....I..... [ZBXNEXT-5532] disabled guest user by default (talbergs)
 ..F....... [ZBXNEXT-5500] added scrollbars for item and problem descriptions (ashubin)
 .........T [ZBXNEXT-5493] updated "Template OS Windows SNMP template","Template Module Interfaces Windows SNMPv2" (mchudinov)
@@ -10,6 +12,17 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
+.......PS. [ZBX-16883] fixed possible out of bounds access in csv to json preprocessing (asestakovs)
+..F....... [ZBX-16787] fixed wrong placeholder in graph widget form (rlataria)
+.......PS. [ZBX-16835] fixed throttled LLD items being shown in queue when monitored through Zabbix proxy (vso)
+A......... [ZBX-16679] fixed username and password fields resetting and saving for item, item prototype and LLD rule on type change (Ivo)
+........S. [ZBX-16785] improved performance of timer process when reading from "problem_tag" table (vso)
+..F....... [ZBX-16696] fixed multiselect suggest box clipping when overflowing not allowed in parent containers (averza)
+..F....... [ZBX-16809] fixed undefined offset error in action operation condition form (miks)
+...G...... [ZBX-16595] optimized active logs checks monitoring when buffer flushing fails (arimdjonoks)
+..F....... [ZBX-16682] fixed wrong element label update in map constructor (rlataria)
+...G...... [ZBX-16769] fixed Zabbix agent 2 compilation on i386, arm, ppc64le and s390x architectures (viktors)
+........S. [ZBX-16843] fixed {TRIGGER.ID} to be supported on trigger level in addition to host level and template level tags (vso)
 ..F....... [ZBX-16812] fixed problems by severity widget problem duplication (talbergs)
 ..F....... [ZBX-16815] fixed widget form positioing when changing widget type from Graph to any other type (averza)
 ..F....... [ZBX-16706] fixed unneeded padding for dashboard URL widget (averza)
@@ -79,6 +92,8 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 Changes for 4.4.2rc1
 
 New features:
+..F....... [ZBX-16776] reworked custom item select to multiselect (rlataria)
+...G...PS. [ZBXNEXT-5543] added compression support for Zabbix agent 2 (MVekslers)
 ....I..... [ZBXNEXT-5532] disabled guest user by default (talbergs)
 ..F....... [ZBXNEXT-5500] added scrollbars for item and problem descriptions (ashubin)
 .........T [ZBXNEXT-5493] updated "Template OS Windows SNMP template","Template Module Interfaces Windows SNMPv2" (mchudinov)
@@ -86,6 +101,17 @@ New features:
 ..F....... [ZBXNEXT-4825] implemented in Monitoring -> Problems the button "Export to CSV" to export all pages (talbergs)
 
 Bug fixes:
+.......PS. [ZBX-16883] fixed possible out of bounds access in csv to json preprocessing (asestakovs)
+..F....... [ZBX-16787] fixed wrong placeholder in graph widget form (rlataria)
+.......PS. [ZBX-16835] fixed throttled LLD items being shown in queue when monitored through Zabbix proxy (vso)
+A......... [ZBX-16679] fixed username and password fields resetting and saving for item, item prototype and LLD rule on type change (Ivo)
+........S. [ZBX-16785] improved performance of timer process when reading from "problem_tag" table (vso)
+..F....... [ZBX-16696] fixed multiselect suggest box clipping when overflowing not allowed in parent containers (averza)
+..F....... [ZBX-16809] fixed undefined offset error in action operation condition form (miks)
+...G...... [ZBX-16595] optimized active logs checks monitoring when buffer flushing fails (arimdjonoks)
+..F....... [ZBX-16682] fixed wrong element label update in map constructor (rlataria)
+...G...... [ZBX-16769] fixed Zabbix agent 2 compilation on i386, arm, ppc64le and s390x architectures (viktors)
+........S. [ZBX-16843] fixed {TRIGGER.ID} to be supported on trigger level in addition to host level and template level tags (vso)
 ..F....... [ZBX-16812] fixed problems by severity widget problem duplication (talbergs)
 ..F....... [ZBX-16815] fixed widget form positioing when changing widget type from Graph to any other type (averza)
 ..F....... [ZBX-16706] fixed unneeded padding for dashboard URL widget (averza)
@@ -950,12 +976,19 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.15rc1
 
 New features:
+..F....... [ZBX-16776] reworked custom item select to multiselect (rlataria)
 ....I..... [ZBXNEXT-5532] disabled guest user by default (talbergs)
 .........T [ZBXNEXT-5493] updated "Template OS Windows SNMP template","Template Module Interfaces Windows SNMPv2" (mchudinov)
 .........T [ZBX-16540] fixed "Template Module HOST-RESOURCES-MIB SNMPv2","Template Net Arista SNMPv2" (mchudinov)
 ..F....... [ZBXNEXT-4825] implemented in Monitoring -> Problems the button "Export to CSV" to export all pages (talbergs)
 
 Bug fixes:
+A......... [ZBX-16679] fixed username and password fields resetting and saving for item, item prototype and LLD rule on type change (Ivo)
+........S. [ZBX-16785] improved performance of timer process when reading from "problem_tag" table (vso)
+..F....... [ZBX-16696] fixed multiselect suggest box clipping when overflowing not allowed in parent containers (averza)
+..F....... [ZBX-16809] fixed undefined offset error in action operation condition form (miks)
+...G...... [ZBX-16595] optimized active logs checks monitoring when buffer flushing fails (arimdjonoks)
+..F....... [ZBX-16682] fixed wrong element label update in map constructor (rlataria)
 ..F....... [ZBX-16815] fixed widget form positioing when changing widget type from Graph to any other type (averza)
 ..F....... [ZBX-16706] fixed unneeded padding for dashboard URL widget (averza)
 ..F....... [ZBX-16784] fixed Oracle performance by using "between" operator in SQL queries (averza)

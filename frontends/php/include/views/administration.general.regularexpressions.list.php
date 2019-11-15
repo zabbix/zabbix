@@ -21,11 +21,11 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.regexps.php'))
 				->addItem(new CSubmit('form', _('New regular expression')))
 			)
 		))
