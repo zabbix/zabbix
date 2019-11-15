@@ -47,8 +47,9 @@ class testGraphWidget extends CWebTest {
 	 * Set "Graph" as default widget type.
 	 */
 	public function setDefaultWidgetType() {
-		DBexecute("INSERT INTO profiles (profileid, userid, idx, value_str, type) "
-				. "VALUES (999, 1, 'web.dashbrd.last_widget_type', 'svggraph', 3)");
+		DBexecute('DELETE FROM profiles WHERE idx=\'web.dashbrd.last_widget_type\' AND userid=\'1\'');
+		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, type)'.
+				' VALUES (999,1,\'web.dashbrd.last_widget_type\',\'svggraph\',3)');
 	}
 
 	/**

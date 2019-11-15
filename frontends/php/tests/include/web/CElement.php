@@ -347,6 +347,21 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Hover over an element.
+	 *
+	 * @return $this
+	 */
+	public function hover() {
+		$rect = $this->getRect();
+
+		CElementQuery::getDriver()->getMouse()->mouseMove($this->getCoordinates(), floor($rect['width'] / 2),
+				floor($rect['height'] / 2)
+		);
+
+		return $this;
+	}
+
+	/**
 	 * Check if element is clickable.
 	 *
 	 * @return boolean
