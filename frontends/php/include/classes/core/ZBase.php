@@ -68,6 +68,7 @@ class ZBase {
 		$autoloader = new CAutoloader($this->rootDir);
 		$autoloader->addNamespace('', $this->getIncludePaths());
 		$autoloader->register();
+		APP::Component()->autoloader = $autoloader;
 
 		// initialize API classes
 		$apiServiceFactory = new CApiServiceFactory();
