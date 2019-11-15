@@ -55,15 +55,7 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 	}
 
 	protected function checkPermissions() {
-		if ($this->hasInput('filter_groupids') && !isReadableHostGroups($this->getInput('filter_groupids'))) {
-			return false;
-		}
-
-		if ($this->hasInput('filter_hostids') && !isReadableHosts($this->getInput('filter_hostids'))) {
-			return false;
-		}
-
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
