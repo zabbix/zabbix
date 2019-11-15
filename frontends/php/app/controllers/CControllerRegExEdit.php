@@ -103,7 +103,13 @@ class CControllerRegExEdit extends CController {
 			}
 		}
 		else {
-			$data['expressions'] = $this->getInput('expressions', []);
+			$data['expressions'] = $this->getInput('expressions', [[
+				'expression' => '',
+				'expression_type' => EXPRESSION_TYPE_INCLUDED,
+				'exp_delimiter' => ',',
+				'case_sensitive' => 0
+			]]);
+
 			foreach ($data['expressions'] as &$expression) {
 				if (!array_key_exists('case_sensitive', $expression)) {
 					$expression['case_sensitive'] = 0;
