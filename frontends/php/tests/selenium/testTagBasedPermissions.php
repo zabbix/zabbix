@@ -31,7 +31,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 	 */
 	public function setTagFilter($user_groups) {
 		foreach ($user_groups as $group_name => $hostgroups) {
-			$this->zbxTestLogin('usergrps.php');
+			$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 
 			if (empty($hostgroups)) {
 				break;
@@ -56,15 +56,15 @@ class testTagBasedPermissions extends CLegacyWebTest {
 					}
 
 					foreach ($values as $value) {
-						$this->zbxTestClickButtonMultiselect('tag_filter_groupids_');
+						$this->zbxTestClickButtonMultiselect('new_tag_filter_groupids_');
 						$this->zbxTestLaunchOverlayDialog('Host groups');
 						$this->zbxTestClickLinkTextWait($hostgroup);
 
 						if ($tag !== '') {
-							$this->zbxTestInputType('tag', $tag);
+							$this->zbxTestInputType('new_tag_filter_tag', $tag);
 						}
 						if ($value !== '') {
-							$this->zbxTestInputType('value', $value);
+							$this->zbxTestInputType('new_tag_filter_value', $value);
 						}
 
 						$this->zbxTestClickXpath("//ul[@id='tagFilterFormList']//button[text()='Add']");
