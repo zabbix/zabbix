@@ -223,7 +223,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 							->setChecked($i == 0)
 							->onClick('check_target(this, '.TRIGGER_EXPRESSION.');')
 						: null,
-					$e['list'],
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$data['limited']
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
