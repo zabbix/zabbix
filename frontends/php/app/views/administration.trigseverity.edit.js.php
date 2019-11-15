@@ -68,5 +68,12 @@ $schema = DB::getSchema('config');
 				]
 			}, this);
 		});
+
+		var $form = jQuery('form');
+		$form.on('submit', function() {
+			$form.trimValues(['#severity_name_0', '#severity_name_1', '#severity_name_2', '#severity_name_3',
+				'#severity_name_4', '#severity_name_5'
+			]);
+		});
 	});
 </script>
