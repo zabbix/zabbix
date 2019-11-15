@@ -301,7 +301,6 @@ zbx_user_macro_parse_LDFLAGS = @SERVER_LDFLAGS@
 zbx_user_macro_parse_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
-<<<<<<< HEAD
 zbx_str_extract_SOURCES = \
 	zbx_str_extract.c \
 	$(COMMON_SRC_FILES)
