@@ -71,8 +71,7 @@ jQuery(function($) {
 				this.getCurrentForm().html(messages);
 			}
 			else {
-				this.removeMessages();
-				this.addMessages(makeMessageBox('bad', t('Fatal error, please report to the Zabbix team')));
+				this.getCurrentForm().html(jqXHR.responseText);
 			}
 		},
 		onDataAlways: function() {
