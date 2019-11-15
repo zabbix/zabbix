@@ -227,6 +227,5 @@ jQuery(function($) {
 
 	window.latest_page = new latestPage(true);
 	window.latest_page.hydrate();
-	window.latest_page.start();
 });
 </script>

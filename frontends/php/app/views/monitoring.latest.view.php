@@ -109,3 +109,12 @@ $widget->addItem((new CView('monitoring.latest.view.html', array_intersect_key($
 ]))))->getOutput());
 
 $widget->show();
+
+// Initialize page refresh only if the filter is sufficient for data selection.
+if ($data['filter_set']) {
+	$this->addPostJS(
+		'jQuery(function($) {'.
+			'latest_page.start();'.
+		'});'
+	);
+}
