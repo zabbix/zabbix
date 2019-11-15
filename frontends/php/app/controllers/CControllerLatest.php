@@ -30,19 +30,19 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $filter                      Item filter options.
 	 * @param array  $filter['groupids']          Filter items by host groups.
 	 * @param array  $filter['hostids']           Filter items by hosts.
-	 * @param array  $filter['application']       Filter items by application.
-	 * @param array  $filter['select']            Filter items by name.
-	 * @param array  $filter['show_without_data'] Include items with empty history.
+	 * @param string $filter['application']       Filter items by application.
+	 * @param string $filter['select']            Filter items by name.
+	 * @param int    $filter['show_without_data'] Include items with empty history.
 	 * @param string $sort_field                  Sorting field.
 	 * @param string $sort_order                  Sorting order.
 	 */
-	protected function prepareData($filter, $sort_field, $sort_order) {
+	protected function prepareData(array $filter, $sort_field, $sort_order) {
 		$applications = [];
 		$items = [];
 		$child_groups = [];
 		$history = null;
 
-		// Multiselect host groups.
+		// multiselect host groups
 		$multiselect_hostgroup_data = [];
 		if ($filter['groupids']) {
 			$filter_groups = API::HostGroup()->get([
@@ -66,9 +66,9 @@ abstract class CControllerLatest extends CController {
 			}
 		}
 
-		// We'll only display the values if the filter is set.
-		$filter_set = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids']
-			|| $filter['hostids']);
+		// Only display the values if the filter is set.
+		$filter_set = $filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids']
+			|| $filter['hostids'];
 
 		if ($filter_set) {
 			$groupids = null;
@@ -153,7 +153,7 @@ abstract class CControllerLatest extends CController {
 		}
 
 		if ($items) {
-			// Macros.
+			// macros
 			$items = CMacrosResolverHelper::resolveItemKeys($items);
 			$items = CMacrosResolverHelper::resolveItemNames($items);
 			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
@@ -193,7 +193,7 @@ abstract class CControllerLatest extends CController {
 				}
 				unset($item);
 
-				// Sort.
+				// sort
 				if ($sort_field === 'name') {
 					$sort_fields = [['field' => 'name_expanded', 'order' => $sort_order], 'itemid'];
 				}
@@ -212,7 +212,7 @@ abstract class CControllerLatest extends CController {
 					}
 					unset($application);
 
-					// By default order by application name and application id
+					// Order by application name and applicationid by default.
 					$sort_fields = ($sort_field === 'host') ? [['field' => 'hostname', 'order' => $sort_order]] : [];
 					array_push($sort_fields, 'name', 'applicationid');
 					CArrayHelper::sort($applications, $sort_fields);
@@ -220,7 +220,7 @@ abstract class CControllerLatest extends CController {
 			}
 		}
 
-		// Multiselect hosts.
+		// multiselect hosts
 		$multiselect_host_data = [];
 		if ($filter['hostids']) {
 			$filter_hosts = API::Host()->get([

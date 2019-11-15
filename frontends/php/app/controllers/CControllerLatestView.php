@@ -32,7 +32,7 @@ class CControllerLatestView extends CControllerLatest {
 		$fields = [
 			'page' =>						'ge 1',
 
-			// Filter inputs.
+			// filter inputs
 			'filter_groupids' =>			'array_id',
 			'filter_hostids' =>				'array_id',
 			'filter_application' =>			'string',
@@ -42,7 +42,7 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_set' =>					'in 1',
 			'filter_rst' =>					'in 1',
 
-			// Table sorting inputs.
+			// table sorting inputs
 			'sort' =>						'in host,name,lastclock',
 			'sortorder' =>					'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
 		];
@@ -61,7 +61,7 @@ class CControllerLatestView extends CControllerLatest {
 	}
 
 	protected function doAction() {
-		// Filter.
+		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::updateArray('web.latest.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
@@ -120,7 +120,7 @@ class CControllerLatestView extends CControllerLatest {
 			->setArgument('page', $this->getInput('page', 1))
 			->removeArgument('filter_set');
 
-		// Display.
+		// display
 		$data = [
 			'filter' => $filter,
 			'sort_field' => $sort_field,

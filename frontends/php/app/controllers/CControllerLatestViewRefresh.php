@@ -32,7 +32,7 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 		$fields = [
 			'page' =>						'ge 1',
 
-			// Filter inputs.
+			// filter inputs
 			'filter_groupids' =>			'array_id',
 			'filter_hostids' =>				'array_id',
 			'filter_application' =>			'string',
@@ -40,7 +40,7 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 			'filter_show_without_data' =>	'in 1',
 			'filter_show_details' =>		'in 1',
 
-			// Table sorting inputs.
+			// table sorting inputs
 			'sort' =>						'in host,name,lastclock',
 			'sortorder' =>					'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
 		];
@@ -59,7 +59,7 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 	}
 
 	protected function doAction() {
-		// Filter.
+		// filter
 		$filter = [
 			'groupids' => $this->hasInput('filter_groupids') ? $this->getInput('filter_groupids') : null,
 			'hostids' => $this->hasInput('filter_hostids') ? $this->getInput('filter_hostids') : null,
@@ -84,7 +84,7 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 			->setArgument('sort', $sort_field)
 			->setArgument('sortorder', $sort_order);
 
-		// Display.
+		// display
 		$data = [
 			'filter' => $filter,
 			'sort_field' => $sort_field,

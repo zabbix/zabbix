@@ -142,8 +142,19 @@ foreach ($data['items'] as $key => $item) {
 		continue;
 	}
 
-	$last_history = isset($data['history'][$item['itemid']][0]) ? $data['history'][$item['itemid']][0] : null;
-	$prev_history = isset($data['history'][$item['itemid']][1]) ? $data['history'][$item['itemid']][1] : null;
+	if ($data['history'] !== null && array_key_exists($item['itemid'], $data['history'])) {
+		$last_history = (count($data['history'][$item['itemid']]) > 0) ? $data['history'][$item['itemid']][0] : null;
+	}
+	else {
+		$last_history = null;
+	}
+
+	if ($data['history'] !== null && array_key_exists($item['itemid'], $data['history'])) {
+		$prev_history = (count($data['history'][$item['itemid']]) > 1) ? $data['history'][$item['itemid']][1] : null;
+	}
+	else {
+		$prev_history = null;
+	}
 
 	if (strpos($item['units'], ',') !== false) {
 		list($item['units'], $item['unitsLong']) = explode(',', $item['units']);
@@ -152,7 +163,7 @@ foreach ($data['items'] as $key => $item) {
 		$item['unitsLong'] = '';
 	}
 
-	// Last check time and last value.
+	// last check time and last value
 	if ($last_history) {
 		$last_clock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']);
 		$last_value = formatHistoryValue($last_history['value'], $item, false);
@@ -162,7 +173,7 @@ foreach ($data['items'] as $key => $item) {
 		$last_value = UNKNOWN_VALUE;
 	}
 
-	// Change.
+	// change
 	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT : 0;
 	if ($last_history && $prev_history
 			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
@@ -173,7 +184,7 @@ foreach ($data['items'] as $key => $item) {
 			$change = '+';
 		}
 
-		// For 'unixtime' change should be calculated as uptime.
+		// The change must be calculated as uptime for the 'unixtime'.
 		$change .= convert_units([
 			'value' => bcsub($last_history['value'], $prev_history['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
@@ -206,7 +217,7 @@ foreach ($data['items'] as $key => $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	if ($data['filter']['show_details']) {
-		// Item key.
+		// item key
 		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
 			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
@@ -262,18 +273,18 @@ foreach ($data['items'] as $key => $item) {
 	unset($data['items'][$key]);
 }
 
-foreach ($data['applications'] as $appid => $dbApp) {
+foreach ($data['applications'] as $appid => $db_app) {
 	if (!array_key_exists($appid, $tab_rows)) {
 		continue;
 	}
 
-	$host = $data['hosts'][$dbApp['hostid']];
+	$host = $data['hosts'][$db_app['hostid']];
 
 	$app_rows = $tab_rows[$appid];
 
-	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
+	$open_state = CProfile::get('web.latest.toggle', null, $db_app['applicationid']);
 
-	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($dbApp['hostid']));
+	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($db_app['hostid']));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$host_name->addClass(ZBX_STYLE_RED);
 	}
@@ -283,18 +294,18 @@ foreach ($data['applications'] as $appid => $dbApp) {
 		(new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
 			->addClass('app-list-toggle')
-			->setAttribute('data-app-id', $dbApp['applicationid'])
+			->setAttribute('data-app-id', $db_app['applicationid'])
 			->setAttribute('data-open-state', $open_state)
 			->addItem(new CSpan()),
 		'',
 		$host_name,
-		(new CCol([bold($dbApp['name']), ' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')']))
+		(new CCol([bold($db_app['name']), ' ('._n('%1$s Item', '%1$s Items', $db_app['item_cnt']).')']))
 			->setColSpan($data['filter']['show_details'] ? 10 : 5)
 	]);
 
 	// Add toggle sub rows.
 	foreach ($app_rows as $row) {
-		$row->setAttribute('parent_app_id', $dbApp['applicationid']);
+		$row->setAttribute('parent_app_id', $db_app['applicationid']);
 		$table->addRow($row);
 	}
 }
@@ -303,8 +314,19 @@ foreach ($data['applications'] as $appid => $dbApp) {
 
 $tab_rows = [];
 foreach ($data['items'] as $item) {
-	$last_history = isset($data['history'][$item['itemid']][0]) ? $data['history'][$item['itemid']][0] : null;
-	$prev_history = isset($data['history'][$item['itemid']][1]) ? $data['history'][$item['itemid']][1] : null;
+	if ($data['history'] !== null && array_key_exists($item['itemid'], $data['history'])) {
+		$last_history = (count($data['history'][$item['itemid']]) > 0) ? $data['history'][$item['itemid']][0] : null;
+	}
+	else {
+		$last_history = null;
+	}
+
+	if ($data['history'] !== null && array_key_exists($item['itemid'], $data['history'])) {
+		$prev_history = (count($data['history'][$item['itemid']]) > 1) ? $data['history'][$item['itemid']][1] : null;
+	}
+	else {
+		$prev_history = null;
+	}
 
 	if (strpos($item['units'], ',') !== false) {
 		list($item['units'], $item['unitsLong']) = explode(',', $item['units']);
@@ -313,7 +335,7 @@ foreach ($data['items'] as $item) {
 		$item['unitsLong'] = '';
 	}
 
-	// Last check time and last value.
+	// last check time and last value
 	if ($last_history) {
 		$last_clock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']);
 		$last_value = formatHistoryValue($last_history['value'], $item, false);
@@ -323,7 +345,7 @@ foreach ($data['items'] as $item) {
 		$last_value = UNKNOWN_VALUE;
 	}
 
-	// Column "change".
+	// change
 	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT : 0;
 	if ($last_history && $prev_history
 			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
@@ -334,7 +356,7 @@ foreach ($data['items'] as $item) {
 			$change = '+';
 		}
 
-		// For 'unixtime' change should be calculated as uptime.
+		// The change must be calculated as uptime for the 'unixtime'.
 		$change .= convert_units([
 			'value' => bcsub($last_history['value'], $prev_history['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
@@ -344,7 +366,7 @@ foreach ($data['items'] as $item) {
 		$change = UNKNOWN_VALUE;
 	}
 
-	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
+	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']);
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $item['show_link']
@@ -368,7 +390,7 @@ foreach ($data['items'] as $item) {
 
 	$host = $data['hosts'][$item['hostid']];
 	if ($data['filter']['show_details']) {
-		// Item key.
+		// item key
 		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
 			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
