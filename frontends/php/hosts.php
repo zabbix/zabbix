@@ -89,8 +89,11 @@ $fields = [
 	'flags' =>					[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]), null
 								],
-	'mass_replace_tpls' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
 	'mass_clear_tpls' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
+	'mass_action_tpls' =>		[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
+									null
+								],
 	'inventory_mode' =>			[T_ZBX_INT, O_OPT, null,
 									IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC),
 									null
@@ -352,7 +355,8 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			$options['selectGroups'] = ['groupid'];
 		}
 
-		if (array_key_exists('templates', $visible) && !hasRequest('mass_replace_tpls')) {
+		if (array_key_exists('templates', $visible)
+				&& !(getRequest('mass_action_tpls') == ZBX_ACTION_REPLACE && !hasRequest('mass_clear_tpls'))) {
 			$options['selectParentTemplates'] = ['templateid'];
 		}
 
@@ -424,27 +428,6 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			$new_values['status'] = getRequest('status', HOST_STATUS_NOT_MONITORED);
 		}
 
-		$templateids = [];
-		if (array_key_exists('templates', $visible)) {
-			$templateids = $_REQUEST['templates'];
-
-			if (hasRequest('mass_replace_tpls')) {
-				if (hasRequest('mass_clear_tpls')) {
-					$host_templates = API::Template()->get([
-						'output' => ['templateid'],
-						'hostids' => $hostids
-					]);
-
-					$host_templateids = zbx_objectValues($host_templates, 'templateid');
-					$templates_to_delete = array_diff($host_templateids, $templateids);
-
-					$new_values['templates_clear'] = zbx_toObject($templates_to_delete, 'templateid');
-				}
-
-				$new_values['templates'] = $templateids;
-			}
-		}
-
 		$host_inventory = array_intersect_key(getRequest('host_inventory', []), $visible);
 
 		if (array_key_exists('inventory_mode', $visible)) {
@@ -489,10 +472,32 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 				}
 			}
 
-			if ($templateids && array_key_exists('parentTemplates', $host)) {
-				$host['templates'] = array_unique(
-					array_merge($templateids, zbx_objectValues($host['parentTemplates'], 'templateid'))
-				);
+			if (array_key_exists('templates', $visible)) {
+				$host_templateids = array_key_exists('parentTemplates', $host)
+					? zbx_objectValues($host['parentTemplates'], 'templateid')
+					: [];
+
+				switch (getRequest('mass_action_tpls')) {
+					case ZBX_ACTION_ADD:
+						$host['templates'] = array_unique(array_merge($host_templateids, getRequest('templates', [])));
+						break;
+
+					case ZBX_ACTION_REPLACE:
+						$host['templates'] = getRequest('templates', []);
+						if (getRequest('mass_clear_tpls')) {
+							$host['templates_clear'] = array_unique(
+								array_diff($host_templateids, getRequest('templates', []))
+							);
+						}
+						break;
+
+					case ZBX_ACTION_REMOVE:
+						$host['templates'] = array_unique(array_diff($host_templateids, getRequest('templates', [])));
+						if (getRequest('mass_clear_tpls')) {
+							$host['templates_clear'] = array_unique(getRequest('templates', []));
+						}
+						break;
+				}
 			}
 
 			if (array_key_exists('inventory_mode', $new_values)) {
@@ -905,7 +910,7 @@ if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || ha
 	$data = [
 		'hosts' => getRequest('hosts'),
 		'visible' => getRequest('visible', []),
-		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
+		'mass_action_tpls' => getRequest('mass_action_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
 		'tags' => $tags,

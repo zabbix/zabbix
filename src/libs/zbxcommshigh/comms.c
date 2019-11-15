@@ -138,7 +138,7 @@ int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error)
 		goto out;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
+	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value), NULL))
 	{
 		*error = zbx_strdup(*error, "no \"" ZBX_PROTO_TAG_RESPONSE "\" tag");
 		goto out;
@@ -149,7 +149,7 @@ int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error)
 		char	*info = NULL;
 		size_t	info_alloc = 0;
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc, NULL))
 			*error = zbx_strdup(*error, info);
 		else
 			*error = zbx_dsprintf(*error, "negative response \"%s\"", value);

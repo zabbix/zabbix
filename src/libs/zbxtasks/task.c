@@ -664,57 +664,57 @@ static zbx_tm_remote_command_t	*tm_json_deserialize_remote_command(const struct 
 				command_alloc = 0;
 	zbx_tm_remote_command_t	*data = NULL;
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_COMMANDTYPE, value, sizeof(value)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_COMMANDTYPE, value, sizeof(value), NULL))
 		goto out;
 
 	commandtype = atoi(value);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_EXECUTE_ON, value, sizeof(value)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_EXECUTE_ON, value, sizeof(value), NULL))
 		goto out;
 
 	execute_on = atoi(value);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PORT, value, sizeof(value)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PORT, value, sizeof(value), NULL))
 		goto out;
 
 	port = atoi(value);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_AUTHTYPE, value, sizeof(value)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_AUTHTYPE, value, sizeof(value), NULL))
 		goto out;
 
 	authtype = atoi(value);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_ALERTID, value, sizeof(value)) ||
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_ALERTID, value, sizeof(value), NULL) ||
 			SUCCEED != is_uint64(value, &alertid))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value)) ||
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value), NULL) ||
 			SUCCEED != is_uint64(value, &parent_taskid))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, value, sizeof(value)) ||
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, value, sizeof(value), NULL) ||
 			SUCCEED != is_uint64(value, &hostid))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_USERNAME, &username, &username_alloc))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_USERNAME, &username, &username_alloc, NULL))
 		goto out;
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_PASSWORD, &password, &password_alloc))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_PASSWORD, &password, &password_alloc, NULL))
 		goto out;
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_PUBLICKEY, &publickey, &publickey_alloc))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_PUBLICKEY, &publickey, &publickey_alloc, NULL))
 		goto out;
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_PRIVATEKEY, &privatekey, &privatekey_alloc))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_PRIVATEKEY, &privatekey, &privatekey_alloc, NULL))
 		goto out;
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_COMMAND, &command, &command_alloc))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_COMMAND, &command, &command_alloc, NULL))
 		goto out;
 
 	data = zbx_tm_remote_command_create(commandtype, command, execute_on, port, authtype, username, password,
@@ -750,18 +750,18 @@ static zbx_tm_remote_command_result_t	*tm_json_deserialize_remote_command_result
 	size_t				info_alloc = 0;
 	zbx_tm_remote_command_result_t	*data = NULL;
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_STATUS, value, sizeof(value)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_STATUS, value, sizeof(value), NULL))
 		goto out;
 
 	status = atoi(value);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value)) ||
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value), NULL) ||
 			SUCCEED != is_uint64(value, &parent_taskid))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc, NULL))
 		goto out;
 
 	data = zbx_tm_remote_command_result_create(parent_taskid, status, info);
@@ -788,7 +788,7 @@ static zbx_tm_check_now_t	*tm_json_deserialize_check_now(const struct zbx_json_p
 	char		value[MAX_ID_LEN + 1];
 	zbx_uint64_t	itemid;
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_ITEMID, value, sizeof(value)) ||
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_ITEMID, value, sizeof(value), NULL) ||
 			SUCCEED != is_uint64(value, &itemid))
 	{
 		return NULL;
@@ -813,17 +813,17 @@ static zbx_tm_task_t	*tm_json_deserialize_task(const struct zbx_json_parse *jp)
 	char	value[MAX_STRING_LEN];
 	int	type, clock, ttl;
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, value, sizeof(value)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, value, sizeof(value), NULL))
 		return NULL;
 
 	ZBX_STR2UCHAR(type, value);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, value, sizeof(value)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, value, sizeof(value), NULL))
 		return NULL;
 
 	clock = atoi(value);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TTL, value, sizeof(value)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TTL, value, sizeof(value), NULL))
 		return NULL;
 
 	ttl = atoi(value);

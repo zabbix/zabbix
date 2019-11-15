@@ -28,7 +28,7 @@ class testPageOverview extends CLegacyWebTest {
 	public function testPageOverview_NoHostNames() {
 		$this->zbxTestLogin('overview.php');
 		$this->zbxTestCheckTitle('Overview [refreshed every 30 sec.]');
-		$this->zbxTestCheckHeader('Overview');
+		$this->zbxTestCheckHeader('Trigger overview');
 		$this->zbxTestCheckNoRealHostnames();
 	}
 
@@ -37,9 +37,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Overview check with type 'Triggers'.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
 						'groupid' => 'all',
-						'type' => 'Triggers',
 						'view_style' => 'Left'
 					],
 					'result_hosts' => [
@@ -55,9 +55,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
 						'groupid' => 'Another group to check Overview',
-						'type' => 'Triggers'
 					],
 					'result_hosts' => [
 						'4_Host_to_check_Monitoring_Overview'
@@ -69,9 +69,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
 						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers',
 						'view_style' => 'Top'
 					],
 					'result_hosts' => [
@@ -86,9 +86,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Severity option in filter.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
 						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers',
 						'view_style' => 'Left'
 					],
 					'show_severity' => 'Information',
@@ -103,9 +103,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
 						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers',
 						'view_style' => 'Top'
 					],
 					'show_severity' => 'Warning',
@@ -120,9 +120,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'show_severity' => 'Average',
 					'result_hosts' => [
@@ -135,9 +135,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'show_severity' => 'High',
 					'result_hosts' => [
@@ -150,9 +150,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'show_severity' => 'Disaster',
 					'result_hosts' => [
@@ -166,9 +166,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Application option in filter.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'applications' => [
 						'app_group' => 'Group to check Overview',
@@ -186,9 +186,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'applications' => [
 						'application' => '2 application'
@@ -204,9 +204,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Name option in filter.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'name' => 'Warning',
 					'result_hosts' => [
@@ -219,9 +219,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'name' => '2_',
 					'result_hosts' => [
@@ -234,9 +234,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'name' => 'Trigger-map-test-zbx6840'
 				]
@@ -244,9 +244,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Show unacknowledged only option in filter.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'ack_status' => true,
 					'result_hosts' => [
@@ -261,9 +261,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Host inventory option in filter.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'inventories' => [
 						'inventory_field' => 'Notes',
@@ -280,9 +280,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Age less than option in filter.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'age' => '1'
 				]
@@ -290,9 +290,9 @@ class testPageOverview extends CLegacyWebTest {
 			// All filter options.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'show_severity' => 'Average',
 					'triggers_status' => 'Any',
@@ -317,9 +317,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Make trigger in problem state.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'triggers_status' => 'Recent problems',
 					'problem' => ['3_trigger_Disaster' => TRIGGER_VALUE_TRUE],
@@ -335,9 +335,9 @@ class testPageOverview extends CLegacyWebTest {
 			// This test case depends from previous case, trigger should be in problem state.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'triggers_status' => 'Problems',
 					'result_hosts' => [
@@ -352,9 +352,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Make trigger in resolved state.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'triggers_status' => 'Problems',
 					'problem' => ['3_trigger_Disaster' => TRIGGER_VALUE_FALSE],
@@ -370,9 +370,9 @@ class testPageOverview extends CLegacyWebTest {
 			// This test case depends from previous case, trigger should be resolved.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
+						'groupid' => 'Group to check Overview'
 					],
 					'triggers_status' => 'Recent problems',
 					'result_hosts' => [
@@ -387,9 +387,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Overview check with type 'Data'.
 			[
 				[
+					'general_filter' => 'Data overview',
 					'main_filter' => [
 						'groupid' => 'Another group to check Overview',
-						'type' => 'Data',
 						'view_style' => 'Top'
 					],
 					'result_hosts' => [
@@ -402,9 +402,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Data overview',
 					'main_filter' => [
 						'groupid' => 'Group to check Overview',
-						'type' => 'Data',
 						'view_style' => 'Left'
 					],
 					'result_hosts' => [
@@ -417,9 +417,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Data overview',
 					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Data'
+						'groupid' => 'Group to check Overview'
 					],
 					'applications' => [
 						'application' => '1 application'
@@ -434,9 +434,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Data overview',
 					'main_filter' => [
-						'groupid' => 'all',
-						'type' => 'Data'
+						'groupid' => 'all'
 					],
 					'applications' => [
 						'app_group' => 'Group to check Overview',
@@ -454,9 +454,9 @@ class testPageOverview extends CLegacyWebTest {
 			// Show suppressed problems with type Triggers.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Host group for suppression',
-						'type' => 'Triggers'
+						'groupid' => 'Host group for suppression'
 					],
 					'result_hosts' => [
 						'Host for suppression'
@@ -470,18 +470,18 @@ class testPageOverview extends CLegacyWebTest {
 			// Do not show suppressed problems with type Triggers.
 			[
 				[
+					'general_filter' => 'Trigger overview',
 					'main_filter' => [
-						'groupid' => 'Host group for suppression',
-						'type' => 'Triggers'
+						'groupid' => 'Host group for suppression'
 					]
 				]
 			],
 			// Check suppressed problems with type Data.
 			[
 				[
+					'general_filter' => 'Data overview',
 					'main_filter' => [
-						'groupid' => 'Host group for suppression',
-						'type' => 'Data'
+						'groupid' => 'Host group for suppression'
 					],
 					'result_hosts' => [
 						'Host for suppression'
@@ -494,9 +494,9 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
+					'general_filter' => 'Data overview',
 					'main_filter' => [
-						'groupid' => 'Host group for suppression',
-						'type' => 'Data'
+						'groupid' => 'Host group for suppression'
 					],
 					'result_hosts' => [
 						'Host for suppression'
@@ -518,9 +518,10 @@ class testPageOverview extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		// Main filter options.
-		$fields = ['groupid', 'type', 'view_style'];
+		$fields = ['groupid', 'view_style'];
 		foreach ($fields as $field) {
 			if (array_key_exists($field, $data['main_filter'])) {
+				$this->query('id:page-title-general')->asPopupButton()->one()->select($data['general_filter']);
 				$main_filter = $data['main_filter'];
 				$this->zbxTestDropdownSelectWait($field, $main_filter[$field]);
 				$this->zbxTestWaitForPageToLoad();
@@ -608,13 +609,14 @@ class testPageOverview extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//table[@class="list-table"][not(@id="'.$tabel_id.'")]'));
 
 		// Check  the result in frontend.
-		$this->zbxTestDropdownAssertSelected('type', $main_filter['type']);
+		$this->zbxTestCheckHeader($data['general_filter']);
+		$this->zbxTestDropdownAssertSelected('groupid', $main_filter['groupid']);
 		$this->zbxTestDropdownAssertSelected('view_style', $main_filter['view_style']);
 		if (!array_key_exists('result_hosts', $data)) {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//tr[@class="nothing-to-show"]'));
 			$this->zbxTestAssertElementPresentXpath('//tr[@class="nothing-to-show"]/td[text()="No data found."]');
 		}
-		elseif ($main_filter['type'] === 'Triggers') {
+		elseif ($data['general_filter'] === 'Trigger overview') {
 			// Check output for host location as 'Top'.
 			if ($main_filter['view_style'] === 'Top') {
 				$this->zbxTestAssertElementPresentXpath('//th[text()="Triggers"]');
@@ -626,7 +628,7 @@ class testPageOverview extends CLegacyWebTest {
 				$this->checkResultsInTable($main_filter['view_style'], $data['result_triggers'], $data['result_hosts']);
 			}
 		}
-		elseif ($main_filter['type'] === 'Data') {
+		elseif ($data['general_filter'] === 'Data') {
 			if ($main_filter['view_style'] === 'Top') {
 				$this->zbxTestAssertElementPresentXpath('//th[text()="Items"]');
 				$this->checkResultsInTable($main_filter['view_style'], $data['result_hosts'], $data['result_items']);
@@ -667,7 +669,7 @@ class testPageOverview extends CLegacyWebTest {
 		return [
 			[
 				[
-					'type' => 'Triggers',
+					'type' => 'Trigger overview',
 					'links' => [
 						'zabbix.php?action=problem.view&filter_triggerids',
 						'action=acknowledge.edit&eventids',
@@ -679,7 +681,7 @@ class testPageOverview extends CLegacyWebTest {
 			],
 			[
 				[
-					'type' => 'Data',
+					'type' => 'Data overview',
 					'links' => [
 						'action=showgraph&to=now&from=now-1h',
 						'action=showgraph&to=now&from=now-7d',
@@ -696,14 +698,15 @@ class testPageOverview extends CLegacyWebTest {
 	 * @dataProvider getMenuPopup
 	 */
 	public function testPageOverview_MenuPopupLinks($data) {
-		$this->zbxTestLogin('overview.php');
-		$this->zbxTestCheckHeader('Overview');
+		$this->zbxTestLogin('overview.php?type=0');
+		$this->zbxTestCheckHeader('Trigger overview');
 		$this->zbxTestClickButtonText('Reset');
-
 		// Select group and type, then open context menu.
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestDropdownSelectWait('type', $data['type']);
+
+		$this->query('id:page-title-general')->asPopupButton()->one()->select($data['type']);
 		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestCheckHeader($data['type']);
 		$this->zbxTestClickXpathWait('//tbody//td[contains(@class, "cursor-pointer")]');
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//ul[contains(@class, "menu-popup")]//a'));
 
@@ -727,17 +730,17 @@ class testPageOverview extends CLegacyWebTest {
 
 	public function testPageOverview_FullScreenKioskMode() {
 		try {
-			$this->zbxTestLogin('overview.php');
-			$this->zbxTestCheckHeader('Overview');
+			$this->zbxTestLogin('overview.php?type=0');
+			$this->zbxTestCheckHeader('Trigger overview');
 			$this->zbxTestAssertElementPresentXpath("//header");
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 
 			$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-max')]");
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
-			$this->zbxTestCheckHeader('Overview');
+			$this->zbxTestCheckHeader('Trigger overview');
 			$this->zbxTestAssertElementNotPresentXpath("//header");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
 			$this->zbxTestAssertElementNotPresentXpath('//div[@id="mmenu"][@class="top-nav-container"]');
 			$this->zbxTestAssertElementNotPresentXpath('//nav[@class="top-subnav-container"]');
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
@@ -746,7 +749,7 @@ class testPageOverview extends CLegacyWebTest {
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
 			$this->zbxTestAssertElementNotPresentXpath("//header");
-			$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
+			$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title']");
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
 
 			$this->webDriver->executeScript('arguments[0].click();', [$this->webDriver->findElement(WebDriverBy::className('btn-min'))]);
@@ -754,12 +757,12 @@ class testPageOverview extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-max')]"));
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 			$this->zbxTestAssertElementPresentXpath("//header");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
 		}
 		catch (Exception $e) {
 			// Reset fullscreen/kiosk mode.
 			$this->zbxTestLogin('overview.php?fullscreen=0');
-			$this->zbxTestCheckHeader('Overview');
+			$this->zbxTestCheckHeader('Trigger overview');
 			throw $e;
 		}
 	}

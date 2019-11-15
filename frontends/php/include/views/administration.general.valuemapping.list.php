@@ -21,11 +21,11 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Value mapping'))
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
 				->addItem(new CSubmit('form', _('Create value map')))
 				->addItem((new CButton('form', _('Import')))
 					->onClick('redirect("conf.import.php?rules_preset=valuemap")')

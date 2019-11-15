@@ -147,6 +147,15 @@ class CControllerPopupMediatypeTestSend extends CController {
 			$output['messages'] = $messages->toString();
 		}
 
+		if ($this->mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
+			$json = new CJson();
+			$value = $json->decode($result);
+			$output['response'] = [
+				'type' => $json->hasError() ? _('Response type: String') : _('Response type: JSON'),
+				'value' => $json->hasError() ? $result : $json->encode($value, [], false, true, true)
+			];
+		}
+
 		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
 	}
 }

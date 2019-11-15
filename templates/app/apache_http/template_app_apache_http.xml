@@ -16,7 +16,7 @@ https://httpd.apache.org/docs/current/mod/mod_status.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache&#13;
 &#13;
-Template tooling version used: 0.32</description>
+Template tooling version used: 0.33</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -877,7 +877,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Requests per second</name>
                         <host>Template App Apache by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -899,7 +899,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Workers total</name>
                         <host>Template App Apache by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -921,7 +921,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Current async connections{#SINGLETON}</name>
                         <host>Template App Apache by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -943,7 +943,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Current async processes{#SINGLETON}</name>
                         <host>Template App Apache by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -965,7 +965,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Worker states</name>
                         <host>Template App Apache by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>

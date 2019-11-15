@@ -50,8 +50,12 @@ function mediatypeTestSend(formname) {
 				$form.parent().find('.link-action').click();
 			}
 
-			$form_fields.prop('disabled', false);
 			$submit_btn.prop('disabled', false).removeClass('is-loading');
+
+			if ('response' in ret) {
+				jQuery('#webhook_response_value', form).val(ret.response.value);
+				jQuery('#webhook_response_type', form).text(ret.response.type);
+			}
 		},
 		error: function(request, status, error) {
 			if (request.status == 200) {

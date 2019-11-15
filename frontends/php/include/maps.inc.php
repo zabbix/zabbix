@@ -1771,7 +1771,7 @@ function getMapHighligts(array $map, array $map_info) {
  *
  * @return array
  */
-function getMapLinktriggerInfo($sysmap, $options) {
+function getMapLinkTriggerInfo($sysmap, $options) {
 	if (!array_key_exists('severity_min', $options)) {
 		$options['severity_min'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	}

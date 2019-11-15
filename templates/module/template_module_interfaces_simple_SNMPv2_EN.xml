@@ -546,7 +546,7 @@ and {Template Module Interfaces Simple SNMPv2:net.if.out.errors[ifOutErrors.{#SN
                         <name>Interface {#IFDESCR}: Network traffic</name>
                         <host>Template Module Interfaces Simple SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>

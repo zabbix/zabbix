@@ -101,7 +101,6 @@ svg a {
 	&:focus {
 		outline: none;
 		border-bottom: 2px solid rgba($link-hover-color, 0.35);
-
 	}
 }
 
@@ -229,7 +228,9 @@ pre {
 
 %space-pre-wrap {
 	white-space: pre-wrap;
-	word-wrap: break-word;
+	word-break: break-all;  // For the Internet Explorer.
+	word-break: break-word; // Override for the other browsers.
+	overflow-wrap: break-word;
 }
 
 .top-nav-container {
@@ -340,7 +341,7 @@ ul.top-nav-icons {
 		}
 	}
 
-	a {
+	a, span.top-nav-guest {
 		display: block;
 		width: 24px;
 		height: 45px;
@@ -368,6 +369,10 @@ ul.top-nav-icons {
 
 	.top-nav-profile {
 		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
+	}
+
+	.top-nav-guest {
+		background: url(../img/icon-sprite.svg) no-repeat -241px -104px;
 	}
 
 	.top-nav-signout {
@@ -525,24 +530,59 @@ ul.top-nav-icons {
 }
 
 .header-title {
-	border-bottom: 1px solid $ui-border-color;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 	margin: -10px 0 10px;
 	padding: 10px 0 6px;
-	width: 100%;
+	border-bottom: 1px solid $ui-border-color;
 
-	.cell {
+	& > div {
+		overflow: hidden;
 
-		&:first-child {
-			max-width: calc(100vw - 370px);
+		&:last-child {
+			flex-shrink: 0;
 		}
 	}
 
 	h1 {
+		position: relative;
 		line-height: 24px;
 		overflow: hidden;
 		padding-top: 1px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	a.link-action {
+		display: block;
+		box-sizing: border-box;
+		height: 25px;
+
+		h1 {
+			padding-right: 1em;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 50%;
+				right: .15em;
+				margin-top: -.15em;
+				width: .3em;
+				height: .3em;
+				border-right: 2px solid $font-color;
+				border-bottom: 2px solid $font-color;
+				transform: rotate(45deg);
+				@include transition(border-color .2s ease-out);
+			}
+		}
+
+		&:hover,
+		&:focus {
+			h1::after {
+				border-color: $link-hover-color;
+			}
+		}
 	}
 
 	form {
@@ -1659,17 +1699,35 @@ output {
 	}
 
 	.multiselect-list {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
 		padding-left: 2px;
 		padding-bottom: 2px;
 
 		li {
-			display: inline-block;
-			margin: 2px 14px 0 0;
+			display: block; // Override ".table-forms li".
+			margin: 2px 2px 0 0;
+			overflow: hidden;
 			white-space: nowrap;
+			cursor: default;
 
 			.subfilter-enabled {
-				padding: 0 9px 0 4px;
+				display: flex;
+				flex-direction: row;
+				padding: 0 3px 0 4px;
 				line-height: 18px;
+
+				& > span:first-child {
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				& > .subfilter-disable-btn {
+					position: relative;
+					left: 3px;
+					flex-shrink: 0;
+				}
 			}
 
 			&.selected {
@@ -1753,13 +1811,10 @@ output {
 	@extend .multiselect-suggest;
 }
 
-.available {
+.multiselect-available {
 	position: absolute;
-	z-index: 1000;
-	margin-top: 1px;
+	z-index: 20000;
 	border: 1px solid $action-border-color;
-	border-top: none;
-	max-height: 400px;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
 	@include box-shadow(0 6px 10px 0 $action-shadow-color);
@@ -2237,6 +2292,25 @@ select {
 }
 
 .checkbox-radio {
+
+	&:checked[readonly] + label span {
+		&::after {
+			border-color: $form-border-color !important;
+		}
+		@include transition(none);
+	}
+
+	&[readonly] {
+		&, + label {
+			pointer-events: none;
+		}
+	}
+
+	&[readonly] + label span {
+		@include transition(none);
+		@extend %form-disabled;
+	}
+
 	&[type="checkbox"] {
 		+ label span {
 			@include border-radius(2px);
@@ -4459,6 +4533,19 @@ $form-icon-btn: (
 		line-height: 24px;
 		@extend %overflow-ellipsis;
 	}
+
+	&.page-title-submenu::before {
+		content: '';
+		position: absolute;
+		top: -7px;
+		left: 10px;
+		width: 12px;
+		height: 12px;
+		background-color: $ui-bg-color;
+		border-top: 1px solid $action-border-color;
+		border-left: 1px solid $action-border-color;
+		transform: rotate(45deg);
+	}
 }
 
 .search-suggest {
@@ -4556,6 +4643,13 @@ $form-icon-btn: (
 		max-height: calc(100vh - 190px);
 		max-width: 45vw;
 		white-space: nowrap;
+		@extend %webkit-scrollbar;
+	}
+
+	.hintbox-description {
+		overflow: auto;
+		max-height: 240px;
+		max-width: 800px;
 		@extend %webkit-scrollbar;
 	}
 
@@ -6067,10 +6161,6 @@ a.overlay-close-btn {
 	width: 18px;
 	height: 18px;
 	line-height: 18px;
-	display: inline-block;
-	position: absolute;
-	top: 0;
-	right: -12px;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
@@ -6441,18 +6531,21 @@ tr.cursor-move {
 	display: inline;
 }
 
+// Dashboard widget: URL
+.widget-url {
+	display: block;
+}
+
 // Analog Clock
 .clock {
+	display: flex;
+	justify-content: center;
 	padding: 0 10px;
-	height: 99%;
-	width: auto;
+	height: 100%;
 }
 
 .clock-svg {
-	max-height: 100%;
-	max-width: 100%;
-	display: block;
-	margin: 0 auto;
+	flex-grow: 1;
 }
 
 .time-zone {
@@ -6582,9 +6675,10 @@ svg {
 			}
 
 			> .subfilter-disable-btn {
-				border: none !important;
+				position: absolute;
 				right: 0px;
 				top: 0px;
+				border: 0;
 
 				&:focus,
 				&:hover {
@@ -6642,33 +6736,15 @@ svg {
 	}
 }
 
-ul.checkbox-list {
-	line-height: 20px;
-	display: flex;
-	flex-wrap: wrap;
-	> li {
-		ms-flex: 0 0 100%;
-		flex: 0 0 100%;
-		max-width: 100%;
-		-webkit-box-flex: 0;
+.checkbox-list {
+	li {
+		margin-top: 4px;
 	}
 }
-
-@each $num, $width in (
-	3: 33.33333%
-) {
-	ul.checkbox-list.col-#{$num} > li {
-		display: inline-block;
-		-ms-flex: 0 0 $width;
-		flex: 0 0 $width;
-		max-width: $width;
-	}
-}
-
 
 .columns-wrapper {
-
-	$columns: (
+	$column-count: (2, 3);
+	$column-size: (
 		5: 5%,
 		10: 10%,
 		15: 15%,
@@ -6689,10 +6765,33 @@ ul.checkbox-list {
 		-webkit-box-flex: 0;
 	}
 
-	/**
-	 * Dynamically generated classes, e.g. .column-50.
-	 */
-	@each $class, $width in $columns {
+	// Dynamically generated classes for the columns count:
+	//  .columns-2
+	//  .columns-3
+	@each $count in $column-count {
+		&.columns-#{$count} > {
+			div, li {
+				display: block;
+				-ms-flex: 0 0 (100% / $count);
+				flex: 0 0 (100% / $count);
+				max-width: (100% / $count);
+			}
+		}
+	}
+
+	// Dynamically generated classes for the column width:
+	//  .column-5
+	//  .column-10
+	//  .column-15
+	//  .column-20
+	//  .column-33
+	//  .column-35
+	//  .column-40
+	//  .column-50
+	//  .column-75
+	//  .column-90
+	//  .column-95
+	@each $class, $width in $column-size {
 		.column-#{$class} {
 			-ms-flex: 0 0 $width;
 			flex: 0 0 $width;

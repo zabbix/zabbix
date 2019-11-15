@@ -73,26 +73,38 @@ if ($blink_period > 0) {
 // header right
 $web_layout_mode = CView::getLayoutMode();
 
+$submenu_source = [
+	SHOW_TRIGGERS => _('Trigger overview'),
+	SHOW_DATA => _('Data overview')
+];
+
+$submenu = [];
+foreach ($submenu_source as $value => $label) {
+	$url = (new CUrl('overview.php'))
+		->setArgument('type', $value)
+		->getUrl();
+
+	$submenu[$url] = $label;
+}
+
 $widget = (new CWidget())
-	->setTitle(_('Overview'))
+	->setTitle(array_key_exists($this->data['type'], $submenu_source) ? $submenu_source[$this->data['type']] : null)
+	->setTitleSubmenu([
+		'main_section' => [
+			'items' => $submenu
+		]
+	])
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
+			->addItem(new CInput('hidden', 'type', $this->data['type']))
 			->addItem((new CList())
 				->addItem([
 					new CLabel(_('Group'), 'groupid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$this->data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
-					new CLabel(_('Type'), 'type'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('type', $this->data['type'], 'submit()', [
-						SHOW_TRIGGERS => _('Triggers'),
-						SHOW_DATA => _('Data')
-					])
 				])
 				->addItem([
 					new CLabel(_('Hosts location'), 'view_style'),

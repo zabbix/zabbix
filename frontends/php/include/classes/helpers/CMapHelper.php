@@ -252,7 +252,7 @@ class CMapHelper {
 		$labels = getMapLabels($sysmap, $map_info);
 		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
-		$linktrigger_info = getMapLinktriggerInfo($sysmap, $options);
+		$linktrigger_info = getMapLinkTriggerInfo($sysmap, $options);
 
 		$problems_total = 0;
 		$status_problems = [];

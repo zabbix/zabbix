@@ -396,7 +396,9 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->checkInput($items, true, $db_items);
 		$this->validateUpdateLLDMacroPaths($items);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'master_itemid']);
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'authtype',
+			'master_itemid'
+		]);
 		$this->validateDependentItems($items);
 
 		$defaults = DB::getDefaults('items');
@@ -452,10 +454,9 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 			}
 
-			if ($db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
-				// Clean username and password on authtype change to HTTPTEST_AUTH_NONE.
-				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE
-						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
+				if ($item['authtype'] == HTTPTEST_AUTH_NONE) {
 					$item['username'] = '';
 					$item['password'] = '';
 				}

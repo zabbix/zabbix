@@ -24,7 +24,6 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
 		$this->zbxTestLogin('adm.housekeeper.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
 
 		$this->zbxTestCheckTitle('Configuration of housekeeping');
 		$this->zbxTestCheckHeader('Housekeeping');

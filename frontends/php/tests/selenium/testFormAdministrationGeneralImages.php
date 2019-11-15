@@ -29,8 +29,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 	public function testFormAdministrationGeneralImages_CheckLayout() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Images');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Images');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Images', 'Type']);

@@ -21,11 +21,11 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Images'))
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.images.php'))
 				->addItem([
 					new CLabel(_('Type'), 'imagetype'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

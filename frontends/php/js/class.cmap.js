@@ -209,8 +209,6 @@ ZABBIX.apps.map = (function($) {
 			// initialize selectable
 			this.container.selectable({
 				start: $.proxy(function(event) {
-					this.hideMenuPopups();
-
 					if (!event.ctrlKey && !event.metaKey) {
 						this.clearSelection();
 					}
@@ -611,8 +609,7 @@ ZABBIX.apps.map = (function($) {
 					var target = $(event.target),
 						item_data = {
 							id: target.attr('data-id'),
-							type: target.attr('data-type'),
-							popupid: target.data('menu-popup-id')
+							type: target.attr('data-type')
 						},
 						can_copy = false,
 						can_paste = (that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0),
@@ -630,11 +627,6 @@ ZABBIX.apps.map = (function($) {
 					event.preventDefault();
 					event.stopPropagation();
 
-					// Recreate menu everytime due copy/paste function availability changes.
-					if (item_data.popupid) {
-						$('#' + item_data.popupid).filter('.menu-popup').remove();
-					}
-
 					var items = [
 						{
 							'items': [
@@ -643,7 +635,6 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'last');
-										that.hideMenuPopups();
 									}
 								},
 								{
@@ -651,7 +642,6 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'next');
-										that.hideMenuPopups();
 									}
 								},
 								{
@@ -659,7 +649,6 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'previous');
-										that.hideMenuPopups();
 									}
 								},
 								{
@@ -667,7 +656,6 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'first');
-										that.hideMenuPopups();
 									}
 								}
 							]
@@ -679,7 +667,6 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_copy,
 									clickCallback: function() {
 										that.copypaste_buffer = that.getSelectionBuffer(that);
-										that.hideMenuPopups();
 									}
 								},
 								{
@@ -699,7 +686,6 @@ ZABBIX.apps.map = (function($) {
 										);
 										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, true);
 										that.selectElements(selectedids, false);
-										that.hideMenuPopups();
 										that.updateImage();
 										that.linkForm.updateList(that.selection.selements);
 									}
@@ -721,7 +707,6 @@ ZABBIX.apps.map = (function($) {
 										);
 										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, false);
 										that.selectElements(selectedids, false);
-										that.hideMenuPopups();
 										that.updateImage();
 										that.linkForm.updateList(that.selection.selements);
 									}
@@ -742,7 +727,6 @@ ZABBIX.apps.map = (function($) {
 
 										}
 
-										that.hideMenuPopups();
 										that.toggleForm();
 										that.updateImage();
 									}
@@ -1448,12 +1432,6 @@ ZABBIX.apps.map = (function($) {
 				this.updateImage();
 			},
 
-			hideMenuPopups: function () {
-				$('.menu-popup').each(function() {
-					$(this).data('is-active', false).fadeOut(0);
-				});
-			},
-
 			selectElements: function(ids, addSelection) {
 				var i, ln;
 
@@ -1506,9 +1484,6 @@ ZABBIX.apps.map = (function($) {
 
 						$('#link-connect-to').show();
 						this.form.show();
-
-						// resize multiselect
-						$('.multiselect').multiSelect('resize');
 					}
 
 					// only one shape is selected
@@ -2332,7 +2307,10 @@ ZABBIX.apps.map = (function($) {
 					this.data.inherited_label = null;
 				}
 
-				if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
+				if (this.data.label_type == CMap.LABEL_TYPE_LABEL) {
+					this.data.inherited_label = this.data.label;
+				}
+				else if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
 					if (this.data.elementtype != Selement.TYPE_IMAGE) {
 						this.data.inherited_label = this.data.elements[0].elementName;
 					}
