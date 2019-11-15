@@ -77,10 +77,10 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 			PKG_CHECK_EXISTS(libpcre,[
 				LIBPCRE_LIBS=`$PKG_CONFIG --static --libs libpcre`
 			],[
-				AC_MSG_ERROR([Not found libpcre library])
+				AC_MSG_ERROR([Not found libpcre package])
 			])
 		else
-			AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libpcre_dir/lib/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre]) || AC_MSG_ERROR([Not found libpcre library])
+			AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libpcre_dir/lib/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre]) || AC_MSG_ERROR(["Not found libpcre package in $_libpcre_dir/lib/pkgconfig"])
 			LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_dir/lib/pkgconfig" $PKG_CONFIG --static --libs libpcre`
 		fi
 

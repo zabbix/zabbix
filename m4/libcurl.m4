@@ -150,8 +150,17 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 						AC_CHECK_LIB($_lib_name , main,[
 								if test "x$enable_static_libs" = "xyes"; then
 									case $i in
-										-lssl|-lcrypto|-lssl_a|-lcrypto_a)
-											i="-Wl,-Bstatic $i -Wl,-Bdynamic -ldl"
+										-lssl|-lcrypto)
+											test "x$want_openssl" = "xyes" && i="-Wl,-Bstatic $i -Wl,-Bdynamic -ldl"
+									;;
+										-lldap|-lldap_r|-llber)
+											test "x$want_ldap" = "xyes" && i="-Wl,-Bstatic $i -Wl,-Bdynamic"
+									;;
+										-lssl_a|-lcrypto_a)
+											test "x$want_openssl" = "xyes" && i="-Wl,-Bstatic $i -Wl,-Bdynamic"
+									;;
+										-lldap_a|-lldap_r_a|-llber_a)
+											test "x$want_ldap" = "xyes" && i="-Wl,-Bstatic $i -Wl,-Bdynamic"
 									;;
 									esac
 								fi

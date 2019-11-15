@@ -140,10 +140,10 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
         PKG_CHECK_EXISTS(openssl,[
           OPENSSL_LIBS=`$PKG_CONFIG --static --libs openssl`
         ],[
-          AC_MSG_ERROR([Not found openssl library])
+          AC_MSG_ERROR([Not found openssl package])
         ])
       else
-        AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libopenssl_dir/lib/pkgconfig" $PKG_CONFIG --exists --print-errors openssl]) || AC_MSG_ERROR([Not found openssl library])
+        AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libopenssl_dir/lib/pkgconfig" $PKG_CONFIG --exists --print-errors openssl]) || AC_MSG_ERROR(["Not found openssl package in $_libopenssl_dir/lib/pkgconfig"])
         OPENSSL_LIBS=`PKG_CONFIG_LIBDIR="$_libopenssl_dir/lib/pkgconfig" $PKG_CONFIG --static --libs openssl`
       fi
 
