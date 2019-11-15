@@ -1379,8 +1379,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			ret = xml_xpath_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_MULTIPLIER:
-			if (FAIL == (ret = is_double(pp->params)))
-				zbx_snprintf(err, sizeof(err), "value is not numeric: %s", pp->params);
+			if (FAIL == (ret = is_double(pp->params, NULL)))
+				zbx_snprintf(err, sizeof(err), "value is not numeric or out of range: %s", pp->params);
 			break;
 	}
 
