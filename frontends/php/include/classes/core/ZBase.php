@@ -50,7 +50,7 @@ class ZBase {
 	 *
 	 * @static
 	 *
-	 * @return Z
+	 * @return APP
 	 */
 	public static function getInstance() {
 		if (self::$instance === null) {

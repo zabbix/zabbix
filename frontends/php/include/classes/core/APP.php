@@ -27,5 +27,18 @@ require_once dirname(__FILE__).'/ZBase.php';
  * Feel free to modify and extend it to change the functionality of ZBase.
  */
 class APP extends ZBase {
+	protected static $component_registry;
 
+	/**
+	 * Get component registry instance.
+	 *
+	 * @return CComponentRegistry
+	 */
+	public static function component() {
+		if (self::$component_registry === null) {
+			self::$component_registry = new CComponentRegistry;
+		}
+
+		return self::$component_registry;
+	}
 }
