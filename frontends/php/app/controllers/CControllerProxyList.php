@@ -57,11 +57,11 @@ class CControllerProxyList extends CController {
 		CProfile::update('web.proxies.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		// filter
-		if (hasRequest('filter_set')) {
-			CProfile::update('web.proxies.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.proxies.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.proxies.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.proxies.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
 		}
-		elseif (hasRequest('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.proxies.filter_name');
 			CProfile::delete('web.proxies.filter_status');
 		}

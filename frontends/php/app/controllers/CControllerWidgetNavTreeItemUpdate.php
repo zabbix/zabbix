@@ -31,16 +31,11 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 			'depth' => 'ge 0|le '.WIDGET_NAVIGATION_TREE_MAX_DEPTH,
 			'map_mapid' => 'db sysmaps.sysmapid',
 			'add_submaps' => 'in 0,1',
-			'map_name' => 'required|string',
+			'map_name' => 'required|not_empty|string',
 			'mapid' => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret && trim(getRequest('map_name', '')) === '') {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
-			$ret = false;
-		}
 
 		if (!$ret) {
 			$output = [];

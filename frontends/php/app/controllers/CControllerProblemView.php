@@ -110,7 +110,7 @@ class CControllerProblemView extends CController {
 		CProfile::update('web.problem.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		// filter
-		if (hasRequest('filter_set')) {
+		if ($this->hasInput('filter_set')) {
 			$show_db_type = CProfile::get('web.problem.filter.show', TRIGGERS_OPTION_RECENT_PROBLEM);
 			$show_type = $this->getInput('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM);
 
@@ -199,7 +199,7 @@ class CControllerProblemView extends CController {
 				PROFILE_TYPE_INT
 			);
 		}
-		elseif (hasRequest('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.problem.filter.show');
 			CProfile::deleteIdx('web.problem.filter.groupids');
 			CProfile::deleteIdx('web.problem.filter.hostids');
