@@ -2734,7 +2734,7 @@ int	is_double(const char *str, double *value)
 	errno = 0;
 	tmp = strtod(str, &endptr);
 
-	if ('\0' != *endptr || ERANGE == errno)
+	if ('\0' != *endptr || HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
 		return FAIL;
 
 	if (NULL != value)

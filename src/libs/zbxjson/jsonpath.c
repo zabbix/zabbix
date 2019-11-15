@@ -464,6 +464,7 @@ static int	jsonpath_parse_number(const char *start, int *len)
 	const char	*ptr = start;
 	char		*end;
 	int		size;
+	double		tmp;
 
 	if ('-' == *ptr || '+' == *ptr)
 		ptr++;
@@ -488,9 +489,9 @@ static int	jsonpath_parse_number(const char *start, int *len)
 	}
 
 	errno = 0;
-	strtod(start, &end);
+	tmp = strtod(start, &end);
 
-	if (ptr != end || ERANGE == errno)
+	if (ptr != end || HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
 		return FAIL;
 
 	*len = (int)(ptr - start);
