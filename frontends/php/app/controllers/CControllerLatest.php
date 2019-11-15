@@ -67,8 +67,9 @@ abstract class CControllerLatest extends CController {
 		}
 
 		// Only display the values if the filter is set.
-		$filter_set = $filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids']
-			|| $filter['hostids'];
+		$filter_set = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids']
+			|| $filter['hostids']
+		);
 
 		if ($filter_set) {
 			$groupids = null;
