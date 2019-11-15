@@ -49,7 +49,7 @@ class CControllerLatestView extends CControllerLatest {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
+		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
