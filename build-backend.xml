@@ -32,6 +32,10 @@
 		<property name="conf5" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap  --with-libcurl"/>
 		<property name="conf6" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		<property name="conf7" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
+	</target>
+	
+	<!-- Additional Zabbix configuration parameters -->
+	<target name="init-conf-options-2">
 		<property name="conf8" value="--enable-agent2"/>
 	</target>
 
@@ -304,7 +308,7 @@
 		</exec>
 	</target>
 
-	<target name="make-gcc" depends="init-conf-options">
+	<target name="make-gcc" depends="init-conf-options,init-conf-options-2">
 		<!-- Build Zabbix with various configuration parameters -->
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
