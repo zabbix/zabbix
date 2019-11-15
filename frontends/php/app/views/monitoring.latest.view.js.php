@@ -59,14 +59,18 @@ jQuery(function($) {
 			}
 		},
 		onDataFail: function(jqXHR) {
+			// Ignore failures caused by page unload.
+			if (jqXHR.status == 0) {
+				return;
+			}
+
+			this.clearLoading();
+
 			var messages = $(jqXHR.responseText).find('.msg-global');
 			if (messages.length) {
-				this.clearLoading();
 				this.getCurrentForm().html(messages);
 			}
-			// Not showing errors if XHR failed due to page unload.
-			else if (jqXHR.status != 0) {
-				this.clearLoading();
+			else {
 				this.removeMessages();
 				this.addMessages(makeMessageBox('bad', t('Fatal error, please report to the Zabbix team')));
 			}
