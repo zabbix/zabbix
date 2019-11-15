@@ -127,8 +127,6 @@ foreach ($data['users'] as $user) {
 	$users_groups = [];
 	$i = 0;
 
-	$url = (new CUrl('usergrps.php'))->setArgument('form', 'update');
-
 	foreach ($user['usrgrps'] as $user_group) {
 		$i++;
 
@@ -144,7 +142,10 @@ foreach ($data['users'] as $user) {
 
 		$users_groups[] = (new CLink(
 			$user_group['name'],
-			$url->setArgument('usrgrpid', $user_group['usrgrpid'])
+			(new CUrl('usergrps.php'))
+				->setArgument('form', 'update')
+				->setArgument('usrgrpid', $user_group['usrgrpid'])
+				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass($user_group['gui_access'] == GROUP_GUI_ACCESS_DISABLED
