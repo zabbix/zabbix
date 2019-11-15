@@ -23,23 +23,40 @@
  * The Zabbix autoloader class.
  */
 class CAutoloader {
-	protected $root_dir;
 	/**
-	 * An array of directories, where the autoloader will look for the classes.
+	 * Autoloader root directory will be prepended to any registered relative path.
+	 *
+	 * @var string
+	 */
+	protected $root_dir;
+
+	/**
+	 * Registered namespace array. Key is namespace name with trailing '\' and value is array of directories
+	 * relative path with trailing '/'.
 	 *
 	 * @var array
 	 */
-	protected $include_paths = [];
+	protected $namespaces = [];
 
 	/**
 	 * Initializes object with array of include paths.
 	 *
-	 * @param array  $include_paths     absolute paths
 	 * @param string $root_dir          web root directory
 	 */
-	public function __construct(array $include_paths, $root_dir) {
-		$this->include_paths = $include_paths;
+	public function __construct($root_dir) {
 		$this->root_dir = $root_dir;
+	}
+
+	/**
+	 * Register supported namespace.
+	 *
+	 * @param string $prefix      Namespace value, should not have '\' as last character.
+	 * @param array  $paths       Array of namespace files directory relative path, should not have '/' as last character.
+	 */
+	public function addNamespace($namespace, array $paths) {
+		foreach ($paths as $path) {
+			$this->namespaces[$namespace][] = realpath($this->root_dir.$path).'/';
+		}
 	}
 
 	/**
@@ -54,56 +71,23 @@ class CAutoloader {
 	/**
 	 * Attempts to find and load the given class.
 	 *
-	 * @param string $class_name
+	 * @param string $fq_class_name
 	 */
-	protected function loadClass($class_name) {
-		$class_path = $this->findClassFile($class_name);
+	protected function loadClass($fq_class_name) {
+		$chunks = explode('\\', $fq_class_name);
+		$class_name = array_pop($chunks);
+		$namespace = implode('\\', $chunks);
 
-		if ($class_path === false) {
-			$class_path = $this->findNamespaceClassFile($class_name);
-		}
+		if (array_key_exists($namespace, $this->namespaces)) {
+			$file_name = $class_name.'.php';
 
-		if ($class_path) {
-			require $class_path;
-		}
-	}
+			foreach ($this->namespaces[$namespace] as $dir) {
+				if (is_file($dir.$file_name)) {
+					require $dir.$file_name;
 
-	/**
-	 * Attempts to find corresponding file for given class name in the current include directories.
-	 *
-	 * @param string $class_name
-	 *
-	 * @return bool|string
-	 */
-	protected function findClassFile($class_name) {
-		foreach ($this->include_paths as $path) {
-			$file_path = $path.'/'.$class_name.'.php';
-
-			if (is_file($file_path)) {
-				return $file_path;
+					return true;
+				}
 			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get path to class with namespace. All namespace parts except class name will be lowercased.
-	 *
-	 * @param string $fqcn    Fully qualified class name.
-	 * @return bool|string
-	 */
-	protected function findNamespaceClassFile($fqcn) {
-		$path = explode('\\', $fqcn);
-
-		if (count($path) > 1) {
-			$name = array_pop($path);
-			$path = array_map('strtolower', $path);
-			array_unshift($path, $this->root_dir);
-			$path[] = $name.'.php';
-			$file_path = implode('/', $path);
-
-			return is_file($file_path) ? $file_path : false;
 		}
 
 		return false;
