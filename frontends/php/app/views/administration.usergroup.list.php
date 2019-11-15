@@ -196,22 +196,26 @@ $form->addItem([
 		['name' => _('Enable'), 'confirm' => _('Enable selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
-				->setArgument('users_status', GROUP_STATUS_ENABLED)->getUrl()
+				->setArgument('users_status', GROUP_STATUS_ENABLED)
+				->getUrl()
 		],
 		['name' => _('Disable'), 'confirm' => _('Disable selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
-				->setArgument('users_status', GROUP_STATUS_DISABLED)->getUrl()
+				->setArgument('users_status', GROUP_STATUS_DISABLED)
+				->getUrl()
 		],
 		['name' => _('Enable debug mode'), 'confirm' => _('Enable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
-				->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)->getUrl()
+				->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
+				->getUrl()
 		],
 		['name' => _('Disable debug mode'), 'confirm' => _('Disable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
-				->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)->getUrl()
+				->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)
+				->getUrl()
 		],
 		'usergroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?')]
 	], 'usergroup')
