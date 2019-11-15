@@ -5456,7 +5456,7 @@ const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const s
 
 			key_byte_count = zbx_strlcpy_utf8(*buf, key, key_byte_count);
 			key_byte_count += zbx_strlcpy_utf8(&(*buf)[key_byte_count], SUFFIX, sizeof(SUFFIX));
-			key_byte_count = zbx_strlcpy_utf8(&(*buf)[key_byte_count], BSUFFIX, sizeof(BSUFFIX));
+			zbx_strlcpy_utf8(&(*buf)[key_byte_count], BSUFFIX, sizeof(BSUFFIX));
 
 			return *buf;
 		}
