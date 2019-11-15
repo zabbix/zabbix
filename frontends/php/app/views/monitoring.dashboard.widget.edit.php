@@ -27,7 +27,8 @@ $form = $widget_view['form'];
 $form->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyle('display: none;'));
 
 $output = [
-	'body' => $form->toString()
+	'body' => $form->toString(),
+	'options' => $data['dialogue']['options']
 ];
 
 if (array_key_exists('jq_templates', $widget_view)) {

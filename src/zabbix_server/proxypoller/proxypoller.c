@@ -313,13 +313,13 @@ static int	proxy_check_error_response(const struct zbx_json_parse *jp, char **er
 	size_t	info_alloc = 0;
 
 	/* response tag will be set only in the case of errors */
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_RESPONSE, response, sizeof(response)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_RESPONSE, response, sizeof(response), NULL))
 		return SUCCEED;
 
 	if (0 != strcmp(response, ZBX_PROTO_VALUE_FAILED))
 		return SUCCEED;
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc, NULL))
 	{
 		zbx_free(*error);
 		*error = info;
@@ -694,7 +694,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 	{
 		char	value[MAX_STRING_LEN];
 
-		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MORE, value, sizeof(value)))
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
 			*more = atoi(value);
 	}
 out:

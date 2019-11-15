@@ -217,7 +217,7 @@ jQuery(function($) {
 					'new': t('new'),
 					'Select': t('Select')
 				},
-				data: {},
+				data: [],
 				only_hostid: 0,
 				excludeids: [],
 				addNew: false,
@@ -363,10 +363,12 @@ jQuery(function($) {
 					var search = $input.val();
 
 					if (search !== '') {
+						search = search.trim();
+
 						$('.selected li.selected', $obj).removeClass('selected');
+					}
 
-						search = search.replace(/^\s+|\s+$/g, '');
-
+					if (search !== '') {
 						/*
 						 * Strategy:
 						 * 1. Load the cached result set if such exists for the given term and show the list.
@@ -396,7 +398,7 @@ jQuery(function($) {
 									.then(function(response) {
 										ms.values.searches[search] = response.result;
 
-										if (search === $input.val().replace(/^\s+|\s+$/g, '')) {
+										if (search === $input.val().trim()) {
 											ms.values.search = search;
 											loadAvailable($obj);
 											showAvailable($obj);
@@ -865,6 +867,9 @@ jQuery(function($) {
 		$obj.parents().add(window).one('scroll', hide_handler);
 		$(window).one('resize', hide_handler);
 
+		// For auto-test purposes.
+		$available.attr('data-opener', $obj.attr('id'));
+
 		var obj_offset = $obj.offset(),
 			obj_padding_y = $obj.outerHeight() - $obj.height(),
 			// Subtract 1px for borders of the input and available container to overlap.
@@ -930,7 +935,9 @@ jQuery(function($) {
 		$obj.parents().add(window).off('scroll', hide_handler);
 		$(window).off('resize', hide_handler);
 
-		$available.removeData(['obj', 'hide_handler']);
+		$available
+			.removeData(['obj', 'hide_handler'])
+			.removeAttr('data-opener');
 	}
 
 	function cleanAvailable($obj) {

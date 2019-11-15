@@ -2294,7 +2294,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
+static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
 		zbx_vector_ptr_t *items, zbx_hashset_t *items_index, char **error)
 {
 	const char			*__function_name = "lld_items_make";
@@ -4129,7 +4129,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
+static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
 		zbx_hashset_t *items_index)
 {
 	int				i, j;
@@ -5125,7 +5125,7 @@ static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *ite
  *               FAIL    - items cannot be added/updated                      *
  *                                                                            *
  ******************************************************************************/
-int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error,
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error,
 		int lifetime, int lastcheck)
 {
 	const char		*__function_name = "lld_update_items";
@@ -5185,7 +5185,12 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 					&host_record_is_locked))
 	{
 		lld_items_applications_save(&items_applications, &items, &applications);
-		DBcommit();
+
+		if (ZBX_DB_OK != DBcommit())
+		{
+			ret = FAIL;
+			goto clean;
+		}
 	}
 	else
 	{
