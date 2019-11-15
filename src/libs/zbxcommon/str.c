@@ -5391,7 +5391,7 @@ fail:
  * Return value: The item key that does not exceed passed length              *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const size_t buf_len, char **buf)
+const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const size_t buf_len, char *buf)
 {
 #	define SUFFIX	"..."
 #	define BSUFFIX	"[...]"
@@ -5428,11 +5428,11 @@ const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const s
 			if (buf_len < key_byte_count + ZBX_CONST_STRLEN(SUFFIX) + param_byte_count - 1)
 				return key;
 
-			key_byte_count = zbx_strlcpy_utf8(*buf, key, key_byte_count);
-			key_byte_count += zbx_strlcpy_utf8(&(*buf)[key_byte_count], SUFFIX, sizeof(SUFFIX));
-			zbx_strlcpy_utf8(&(*buf)[key_byte_count], bracket_l, param_byte_count);
+			key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
+			key_byte_count += zbx_strlcpy_utf8(&buf[key_byte_count], SUFFIX, sizeof(SUFFIX));
+			zbx_strlcpy_utf8(&buf[key_byte_count], bracket_l, param_byte_count);
 
-			return *buf;
+			return buf;
 		}
 
 		if (key_char_count + ZBX_CONST_STRLEN(BSUFFIX) > char_max)
@@ -5446,11 +5446,11 @@ const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const s
 			if (buf_len < key_byte_count + ZBX_CONST_STRLEN(SUFFIX) + ZBX_CONST_STRLEN(BSUFFIX))
 				return key;
 
-			key_byte_count = zbx_strlcpy_utf8(*buf, key, key_byte_count);
-			key_byte_count += zbx_strlcpy_utf8(&(*buf)[key_byte_count], SUFFIX, sizeof(SUFFIX));
-			zbx_strlcpy_utf8(&(*buf)[key_byte_count], BSUFFIX, sizeof(BSUFFIX));
+			key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
+			key_byte_count += zbx_strlcpy_utf8(&buf[key_byte_count], SUFFIX, sizeof(SUFFIX));
+			zbx_strlcpy_utf8(&buf[key_byte_count], BSUFFIX, sizeof(BSUFFIX));
 
-			return *buf;
+			return buf;
 		}
 	}
 
@@ -5459,11 +5459,11 @@ const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const s
 	if (buf_len < key_byte_count + ZBX_CONST_STRLEN(SUFFIX) + is_bracket)
 		return key;
 
-	key_byte_count = zbx_strlcpy_utf8(*buf, key, key_byte_count);
-	zbx_strlcpy_utf8(&(*buf)[key_byte_count], SUFFIX, sizeof(SUFFIX));
+	key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
+	zbx_strlcpy_utf8(&buf[key_byte_count], SUFFIX, sizeof(SUFFIX));
 
 	if (0 != is_bracket)
-		zbx_strlcpy_utf8(&(*buf)[key_byte_count + ZBX_CONST_STRLEN(SUFFIX)], "]", sizeof("]"));
+		zbx_strlcpy_utf8(&buf[key_byte_count + ZBX_CONST_STRLEN(SUFFIX)], "]", sizeof("]"));
 
-	return *buf;
+	return buf;
 }
