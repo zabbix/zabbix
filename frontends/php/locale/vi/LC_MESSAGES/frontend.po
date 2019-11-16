@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-10 01:42+0200\n"
+"POT-Creation-Date: 2019-11-17 01:42+0200\n"
 "PO-Revision-Date: 2019-03-12 09:36+0300\n"
 "Last-Translator: Quang <quangnh@tnmt.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -5936,7 +5936,7 @@ msgstr "Trường \"%1$s\" không thể bị thiết lập là NULL."
 #: include/classes/api/services/CHost.php:743
 #: include/classes/api/services/CTemplate.php:783
 #: include/classes/api/services/CTriggerGeneral.php:237
-#: include/classes/validators/CNewValidator.php:255
+#: include/classes/validators/CNewValidator.php:256
 #: include/validate.inc.php:300
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
@@ -6289,7 +6289,7 @@ msgstr "Các tập lệnh toàn cục"
 msgid "Global value"
 msgstr "Giá trị toàn cục"
 
-#: include/classes/html/CDashboardWidgetMap.php:227
+#: include/classes/html/CDashboardWidgetMap.php:223
 #, c-format
 msgid "Go back to %1$s"
 msgstr "Quay trở về %1$s"
@@ -7472,20 +7472,20 @@ msgstr "Đang bảo trì"
 msgid "In progress"
 msgstr "Đang tiến hành"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:109
+#: app/controllers/CControllerDashboardWidgetEdit.php:112
 msgid "Inaccessible graph"
 msgstr "Đồ thị không thể tiếp cận"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:241
+#: app/controllers/CControllerDashboardWidgetEdit.php:244
 #: host_prototypes.php:354
 msgid "Inaccessible group"
 msgstr "Nhóm không thể tiếp cận"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:242
+#: app/controllers/CControllerDashboardWidgetEdit.php:245
 msgid "Inaccessible host"
 msgstr "Máy chủ không thể tiếp cận"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:243
+#: app/controllers/CControllerDashboardWidgetEdit.php:246
 msgid "Inaccessible item"
 msgstr "Item không thể tiếp cận"
 
@@ -7496,7 +7496,7 @@ msgstr "Item không thể tiếp cận"
 msgid "Inaccessible maintenance"
 msgstr "Bảo trì không thể tiếp cận"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:105
+#: app/controllers/CControllerDashboardWidgetEdit.php:108
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:85
 msgid "Inaccessible map"
 msgstr "Sơ đồ không thể tiếp cận"
@@ -8331,10 +8331,10 @@ msgstr "Nhóm người dùng không chính xác."
 #: include/classes/validators/CNewValidator.php:142
 #: include/classes/validators/CNewValidator.php:158
 #: include/classes/validators/CNewValidator.php:172
-#: include/classes/validators/CNewValidator.php:191
-#: include/classes/validators/CNewValidator.php:207
-#: include/classes/validators/CNewValidator.php:223
-#: include/classes/validators/CNewValidator.php:242
+#: include/classes/validators/CNewValidator.php:192
+#: include/classes/validators/CNewValidator.php:208
+#: include/classes/validators/CNewValidator.php:224
+#: include/classes/validators/CNewValidator.php:243
 #: include/validate.inc.php:355
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
@@ -8398,8 +8398,8 @@ msgstr "Giá trị \"%1$s\" không chính xác trong trường \"%2$s\" cho lo�
 #: include/classes/validators/CNewValidator.php:130
 #: include/classes/validators/CNewValidator.php:143
 #: include/classes/validators/CNewValidator.php:159
-#: include/classes/validators/CNewValidator.php:192
-#: include/classes/validators/CNewValidator.php:243
+#: include/classes/validators/CNewValidator.php:193
+#: include/classes/validators/CNewValidator.php:244
 #: include/validate.inc.php:358
 #, c-format
 msgid "Incorrect value for \"%1$s\" field."
@@ -8561,8 +8561,8 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/import/CConfigurationImport.php:2671
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
-#: include/classes/validators/CNewValidator.php:266
-#: include/classes/validators/CNewValidator.php:278
+#: include/classes/validators/CNewValidator.php:267
+#: include/classes/validators/CNewValidator.php:279
 #: include/screens.inc.php:321 include/screens.inc.php:335
 #: include/screens.inc.php:450 include/screens.inc.php:464
 #: include/sounds.inc.php:111 usergrps.php:318 usergrps.php:358
@@ -10003,7 +10003,7 @@ msgstr "Các macro được cập nhật"
 msgid "Main filter"
 msgstr "Bộ lọc chính"
 
-#: app/views/layout.htmlpage.menu.php:96
+#: app/views/layout.htmlpage.menu.php:95
 msgid "Main navigation"
 msgstr "Điều hướng chính"
 
@@ -15053,7 +15053,7 @@ msgstr "Cấu trúc dữ liệu"
 msgid "Style"
 msgstr "Kiểu "
 
-#: app/views/layout.htmlpage.menu.php:103
+#: app/views/layout.htmlpage.menu.php:102
 msgid "Sub navigation"
 msgstr "Điều hướng phụ"
 
@@ -17919,7 +17919,7 @@ msgstr "Một boolean được mong đợi "
 #: include/classes/api/services/CUser.php:668
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CApiInputValidator.php:246
-#: include/classes/validators/CNewValidator.php:278
+#: include/classes/validators/CNewValidator.php:279
 msgid "a character string is expected"
 msgstr "Chuỗi kí tự được mong đợi "
 
@@ -17951,7 +17951,7 @@ msgstr "một số là quá lớn"
 msgid "a numeric value is expected"
 msgstr "một giá trị số được mong đợi"
 
-#: include/classes/validators/CNewValidator.php:266
+#: include/classes/validators/CNewValidator.php:267
 msgid "a time is expected"
 msgstr "một thời gian được kì vọng"
 

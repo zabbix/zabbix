@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-10 01:42+0200\n"
+"POT-Creation-Date: 2019-11-17 01:42+0200\n"
 "PO-Revision-Date: 2019-03-23 23:44+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -6008,7 +6008,7 @@ msgstr "Feld \"%1$s\" darf nicht NULL sein."
 #: include/classes/api/services/CHost.php:743
 #: include/classes/api/services/CTemplate.php:783
 #: include/classes/api/services/CTriggerGeneral.php:237
-#: include/classes/validators/CNewValidator.php:255
+#: include/classes/validators/CNewValidator.php:256
 #: include/validate.inc.php:300
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
@@ -6362,7 +6362,7 @@ msgstr "Globale Skripts"
 msgid "Global value"
 msgstr ""
 
-#: include/classes/html/CDashboardWidgetMap.php:227
+#: include/classes/html/CDashboardWidgetMap.php:223
 #, c-format
 msgid "Go back to %1$s"
 msgstr "Zurück zu %1$s"
@@ -7555,20 +7555,20 @@ msgstr "In Wartung"
 msgid "In progress"
 msgstr "In Bearbeitung"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:109
+#: app/controllers/CControllerDashboardWidgetEdit.php:112
 msgid "Inaccessible graph"
 msgstr "Unzugängliches Diagramm"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:241
+#: app/controllers/CControllerDashboardWidgetEdit.php:244
 #: host_prototypes.php:354
 msgid "Inaccessible group"
 msgstr "Unerreichbare Gruppe"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:242
+#: app/controllers/CControllerDashboardWidgetEdit.php:245
 msgid "Inaccessible host"
 msgstr "Unerreichbarer Host"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:243
+#: app/controllers/CControllerDashboardWidgetEdit.php:246
 msgid "Inaccessible item"
 msgstr "Unerreichbarer Datenpunkt"
 
@@ -7579,7 +7579,7 @@ msgstr "Unerreichbarer Datenpunkt"
 msgid "Inaccessible maintenance"
 msgstr ""
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:105
+#: app/controllers/CControllerDashboardWidgetEdit.php:108
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:85
 msgid "Inaccessible map"
 msgstr "Unerreichbare Karte"
@@ -8414,10 +8414,10 @@ msgstr "Falsche Benutzergruppe."
 #: include/classes/validators/CNewValidator.php:142
 #: include/classes/validators/CNewValidator.php:158
 #: include/classes/validators/CNewValidator.php:172
-#: include/classes/validators/CNewValidator.php:191
-#: include/classes/validators/CNewValidator.php:207
-#: include/classes/validators/CNewValidator.php:223
-#: include/classes/validators/CNewValidator.php:242
+#: include/classes/validators/CNewValidator.php:192
+#: include/classes/validators/CNewValidator.php:208
+#: include/classes/validators/CNewValidator.php:224
+#: include/classes/validators/CNewValidator.php:243
 #: include/validate.inc.php:355
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
@@ -8481,8 +8481,8 @@ msgstr "Falscher Wert \"%1$s\" im Feld \"%2$s\" für Medientyp \"%3$s\"."
 #: include/classes/validators/CNewValidator.php:130
 #: include/classes/validators/CNewValidator.php:143
 #: include/classes/validators/CNewValidator.php:159
-#: include/classes/validators/CNewValidator.php:192
-#: include/classes/validators/CNewValidator.php:243
+#: include/classes/validators/CNewValidator.php:193
+#: include/classes/validators/CNewValidator.php:244
 #: include/validate.inc.php:358
 #, c-format
 msgid "Incorrect value for \"%1$s\" field."
@@ -8644,8 +8644,8 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:2671
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
-#: include/classes/validators/CNewValidator.php:266
-#: include/classes/validators/CNewValidator.php:278
+#: include/classes/validators/CNewValidator.php:267
+#: include/classes/validators/CNewValidator.php:279
 #: include/screens.inc.php:321 include/screens.inc.php:335
 #: include/screens.inc.php:450 include/screens.inc.php:464
 #: include/sounds.inc.php:111 usergrps.php:318 usergrps.php:358
@@ -10097,7 +10097,7 @@ msgstr "Makros geändert"
 msgid "Main filter"
 msgstr ""
 
-#: app/views/layout.htmlpage.menu.php:96
+#: app/views/layout.htmlpage.menu.php:95
 msgid "Main navigation"
 msgstr ""
 
@@ -15175,7 +15175,7 @@ msgstr ""
 msgid "Style"
 msgstr "Stil"
 
-#: app/views/layout.htmlpage.menu.php:103
+#: app/views/layout.htmlpage.menu.php:102
 msgid "Sub navigation"
 msgstr ""
 
@@ -18057,7 +18057,7 @@ msgstr "boolescher Wert erwartet"
 #: include/classes/api/services/CUser.php:668
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CApiInputValidator.php:246
-#: include/classes/validators/CNewValidator.php:278
+#: include/classes/validators/CNewValidator.php:279
 msgid "a character string is expected"
 msgstr "Zeichenfolge erwartet"
 
@@ -18089,7 +18089,7 @@ msgstr "eine Zahl ist zu groß"
 msgid "a numeric value is expected"
 msgstr "ein numerischer Wert erwartet"
 
-#: include/classes/validators/CNewValidator.php:266
+#: include/classes/validators/CNewValidator.php:267
 msgid "a time is expected"
 msgstr "Zeitangabe erwartet"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-10 01:42+0200\n"
+"POT-Creation-Date: 2019-11-17 01:42+0200\n"
 "PO-Revision-Date: 2019-03-13 13:33+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -6058,7 +6058,7 @@ msgstr "Поле \"%1$s\" не может быть NULL."
 #: include/classes/api/services/CHost.php:743
 #: include/classes/api/services/CTemplate.php:783
 #: include/classes/api/services/CTriggerGeneral.php:237
-#: include/classes/validators/CNewValidator.php:255
+#: include/classes/validators/CNewValidator.php:256
 #: include/validate.inc.php:300
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
@@ -6411,7 +6411,7 @@ msgstr "Глобальные скрипты"
 msgid "Global value"
 msgstr "Глобальное значение"
 
-#: include/classes/html/CDashboardWidgetMap.php:227
+#: include/classes/html/CDashboardWidgetMap.php:223
 #, c-format
 msgid "Go back to %1$s"
 msgstr "Вернуться к %1$s"
@@ -7606,20 +7606,20 @@ msgstr "В обслуживании"
 msgid "In progress"
 msgstr "В работе"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:109
+#: app/controllers/CControllerDashboardWidgetEdit.php:112
 msgid "Inaccessible graph"
 msgstr "Недоступный график"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:241
+#: app/controllers/CControllerDashboardWidgetEdit.php:244
 #: host_prototypes.php:354
 msgid "Inaccessible group"
 msgstr "Недоступная группа"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:242
+#: app/controllers/CControllerDashboardWidgetEdit.php:245
 msgid "Inaccessible host"
 msgstr "Недоступный узел сети"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:243
+#: app/controllers/CControllerDashboardWidgetEdit.php:246
 msgid "Inaccessible item"
 msgstr "Недоступный элемент данных"
 
@@ -7630,7 +7630,7 @@ msgstr "Недоступный элемент данных"
 msgid "Inaccessible maintenance"
 msgstr "Недоступное обслуживание"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:105
+#: app/controllers/CControllerDashboardWidgetEdit.php:108
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:85
 msgid "Inaccessible map"
 msgstr "Недоступная карта сети"
@@ -8465,10 +8465,10 @@ msgstr "Некорректная группа пользователей."
 #: include/classes/validators/CNewValidator.php:142
 #: include/classes/validators/CNewValidator.php:158
 #: include/classes/validators/CNewValidator.php:172
-#: include/classes/validators/CNewValidator.php:191
-#: include/classes/validators/CNewValidator.php:207
-#: include/classes/validators/CNewValidator.php:223
-#: include/classes/validators/CNewValidator.php:242
+#: include/classes/validators/CNewValidator.php:192
+#: include/classes/validators/CNewValidator.php:208
+#: include/classes/validators/CNewValidator.php:224
+#: include/classes/validators/CNewValidator.php:243
 #: include/validate.inc.php:355
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
@@ -8532,8 +8532,8 @@ msgstr "Некорректное значение \"%1$s\" в поле \"%2$s\" 
 #: include/classes/validators/CNewValidator.php:130
 #: include/classes/validators/CNewValidator.php:143
 #: include/classes/validators/CNewValidator.php:159
-#: include/classes/validators/CNewValidator.php:192
-#: include/classes/validators/CNewValidator.php:243
+#: include/classes/validators/CNewValidator.php:193
+#: include/classes/validators/CNewValidator.php:244
 #: include/validate.inc.php:358
 #, c-format
 msgid "Incorrect value for \"%1$s\" field."
@@ -8695,8 +8695,8 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/import/CConfigurationImport.php:2671
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
-#: include/classes/validators/CNewValidator.php:266
-#: include/classes/validators/CNewValidator.php:278
+#: include/classes/validators/CNewValidator.php:267
+#: include/classes/validators/CNewValidator.php:279
 #: include/screens.inc.php:321 include/screens.inc.php:335
 #: include/screens.inc.php:450 include/screens.inc.php:464
 #: include/sounds.inc.php:111 usergrps.php:318 usergrps.php:358
@@ -10157,7 +10157,7 @@ msgstr "Макросы обновлены"
 msgid "Main filter"
 msgstr "Основной фильтр"
 
-#: app/views/layout.htmlpage.menu.php:96
+#: app/views/layout.htmlpage.menu.php:95
 msgid "Main navigation"
 msgstr "Основная навигация"
 
@@ -15225,7 +15225,7 @@ msgstr "Составные данные"
 msgid "Style"
 msgstr "Стиль"
 
-#: app/views/layout.htmlpage.menu.php:103
+#: app/views/layout.htmlpage.menu.php:102
 msgid "Sub navigation"
 msgstr "Поднавигация"
 
@@ -18113,7 +18113,7 @@ msgstr "ожидается логическое"
 #: include/classes/api/services/CUser.php:668
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CApiInputValidator.php:246
-#: include/classes/validators/CNewValidator.php:278
+#: include/classes/validators/CNewValidator.php:279
 msgid "a character string is expected"
 msgstr "ожидается строка символов"
 
@@ -18145,7 +18145,7 @@ msgstr "число слишком большое"
 msgid "a numeric value is expected"
 msgstr "ожидается цифровое значение"
 
-#: include/classes/validators/CNewValidator.php:266
+#: include/classes/validators/CNewValidator.php:267
 msgid "a time is expected"
 msgstr "ожидается время"
 

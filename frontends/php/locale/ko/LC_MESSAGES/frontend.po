@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-10 01:42+0200\n"
+"POT-Creation-Date: 2019-11-17 01:42+0200\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -5929,7 +5929,7 @@ msgstr "항목 \"%1$s\"는 NULL로 설정할 수 없습니다."
 #: include/classes/api/services/CHost.php:743
 #: include/classes/api/services/CTemplate.php:783
 #: include/classes/api/services/CTriggerGeneral.php:237
-#: include/classes/validators/CNewValidator.php:255
+#: include/classes/validators/CNewValidator.php:256
 #: include/validate.inc.php:300
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
@@ -6282,7 +6282,7 @@ msgstr "글로벌 스크립트"
 msgid "Global value"
 msgstr "글로벌 값"
 
-#: include/classes/html/CDashboardWidgetMap.php:227
+#: include/classes/html/CDashboardWidgetMap.php:223
 #, c-format
 msgid "Go back to %1$s"
 msgstr "%1$s에 돌아감"
@@ -7465,20 +7465,20 @@ msgstr "메인터넌스 중"
 msgid "In progress"
 msgstr "진행 중"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:109
+#: app/controllers/CControllerDashboardWidgetEdit.php:112
 msgid "Inaccessible graph"
 msgstr "접근할 수 없는 그래프"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:241
+#: app/controllers/CControllerDashboardWidgetEdit.php:244
 #: host_prototypes.php:354
 msgid "Inaccessible group"
 msgstr "접근할 수 없는 그룹"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:242
+#: app/controllers/CControllerDashboardWidgetEdit.php:245
 msgid "Inaccessible host"
 msgstr "접근할 수 없는 호스트"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:243
+#: app/controllers/CControllerDashboardWidgetEdit.php:246
 msgid "Inaccessible item"
 msgstr "접근할 수 없는 아이템"
 
@@ -7489,7 +7489,7 @@ msgstr "접근할 수 없는 아이템"
 msgid "Inaccessible maintenance"
 msgstr ""
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:105
+#: app/controllers/CControllerDashboardWidgetEdit.php:108
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:85
 msgid "Inaccessible map"
 msgstr "접근할 수 없는 맵"
@@ -8324,10 +8324,10 @@ msgstr "유저 그룹이 올바르지 않습니다."
 #: include/classes/validators/CNewValidator.php:142
 #: include/classes/validators/CNewValidator.php:158
 #: include/classes/validators/CNewValidator.php:172
-#: include/classes/validators/CNewValidator.php:191
-#: include/classes/validators/CNewValidator.php:207
-#: include/classes/validators/CNewValidator.php:223
-#: include/classes/validators/CNewValidator.php:242
+#: include/classes/validators/CNewValidator.php:192
+#: include/classes/validators/CNewValidator.php:208
+#: include/classes/validators/CNewValidator.php:224
+#: include/classes/validators/CNewValidator.php:243
 #: include/validate.inc.php:355
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
@@ -8391,8 +8391,8 @@ msgstr "미디어 타입 \"%3$s\"를 위한 필드 \"%2$s\"내의 값 \"%1$s\"�
 #: include/classes/validators/CNewValidator.php:130
 #: include/classes/validators/CNewValidator.php:143
 #: include/classes/validators/CNewValidator.php:159
-#: include/classes/validators/CNewValidator.php:192
-#: include/classes/validators/CNewValidator.php:243
+#: include/classes/validators/CNewValidator.php:193
+#: include/classes/validators/CNewValidator.php:244
 #: include/validate.inc.php:358
 #, c-format
 msgid "Incorrect value for \"%1$s\" field."
@@ -8554,8 +8554,8 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:2671
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
-#: include/classes/validators/CNewValidator.php:266
-#: include/classes/validators/CNewValidator.php:278
+#: include/classes/validators/CNewValidator.php:267
+#: include/classes/validators/CNewValidator.php:279
 #: include/screens.inc.php:321 include/screens.inc.php:335
 #: include/screens.inc.php:450 include/screens.inc.php:464
 #: include/sounds.inc.php:111 usergrps.php:318 usergrps.php:358
@@ -9996,7 +9996,7 @@ msgstr "매크로를 갱신하였습니다"
 msgid "Main filter"
 msgstr "메인 필터"
 
-#: app/views/layout.htmlpage.menu.php:96
+#: app/views/layout.htmlpage.menu.php:95
 msgid "Main navigation"
 msgstr "메인 네비게이션"
 
@@ -15046,7 +15046,7 @@ msgstr "계층화 데이터"
 msgid "Style"
 msgstr "표시 형식"
 
-#: app/views/layout.htmlpage.menu.php:103
+#: app/views/layout.htmlpage.menu.php:102
 msgid "Sub navigation"
 msgstr "서브 네비게이션"
 
@@ -17912,7 +17912,7 @@ msgstr "boolean을 지정해주세요"
 #: include/classes/api/services/CUser.php:668
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CApiInputValidator.php:246
-#: include/classes/validators/CNewValidator.php:278
+#: include/classes/validators/CNewValidator.php:279
 msgid "a character string is expected"
 msgstr "문자열로 지정해 주십시오"
 
@@ -17944,7 +17944,7 @@ msgstr "숫자가 너무 큽니다"
 msgid "a numeric value is expected"
 msgstr "숫자로 지정해주세요"
 
-#: include/classes/validators/CNewValidator.php:266
+#: include/classes/validators/CNewValidator.php:267
 msgid "a time is expected"
 msgstr "시간으로 지정해주세요."
 
