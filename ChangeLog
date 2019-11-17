@@ -1,6 +1,11 @@
 Changes for 5.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-5413] reworked discovery checks form as popup (agriscenko, rlataria)
+...G...... [ZBXNEXT-5570] changed agent2 plugin configuration, moved MaxLinesPerSecond, EnableRemoteCommands, LogRemoteCommands from global to plugin configuration (wiper)
+..F....... [ZBXNEXT-170] implemented possibility to "unlink" specific templates in hosts and templates massupdate (talbergs)
+..F....... [ZBXNEXT-3322] implemented popup submenus on page headings instead of select controls (averza)
+..F....... [ZBX-16871] fixed not setting the default values of multiselects on initial load (averza)
 ..F....... [ZBX-16776] reworked custom item select to multiselect (rlataria)
 ...G...PS. [ZBXNEXT-5543] added compression support for Zabbix agent 2 (MVekslers)
 ....I..... [ZBXNEXT-5532] disabled guest user by default (talbergs)
@@ -12,6 +17,20 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
+...G...PS. [ZBX-16842] added range validation and optional conversion to is_double() (Andris)
+..F....... [ZBX-16893] fixed "Y-axis" graph widget field type (vasilijs)
+...G...... [ZBX-16790] fixed log rotation on Windows (akozlovs)
+..F....... [ZBX-16865] fixed dynamic graphs not updating when changing host in combo box (talbergs)
+..F....... [ZBX-16856] fixed "readonly" feature for checkbox and combobox (talbergs)
+........S. [ZBX-9146] fixed json null value being treated as empty string for LLD filters (atumilovics)
+..F....... [ZBX-16828] fixed array_db validation when validated value is not an array (miks)
+..F....... [ZBX-11659] made user profile icon visible for guest user (miks)
+..F.....S. [ZBX-16745] implemeted webhook returned tags preview in media type test modal window, added server improvements in webhook processing, removed webhooks from watchdog media type lists (gcalenko, wiper)
+........S. [ZBX-16849] moved INTERFACE_TYPE_PRIORITY definition to misc.c (mabele)
+..F....... [ZBX-16844] fixed the process of saving the scroll position on the Latest data page in Internet Explorer (vasilijs)
+........S. [ZBX-16343] fixed LLD not to create items on wrong host if there are failed transactions (vso)
+..F....... [ZBX-16730] fixed disappearance of successful modification message while saving the Dashboards (talbergs, vasilijs)
+.........T [ZBX-16823] fixed preprocessing regex for ping.time (afayantsev)
 .......PS. [ZBX-16883] fixed possible out of bounds access in csv to json preprocessing (asestakovs)
 ..F....... [ZBX-16787] fixed wrong placeholder in graph widget form (rlataria)
 .......PS. [ZBX-16835] fixed throttled LLD items being shown in queue when monitored through Zabbix proxy (vso)
