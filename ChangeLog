@@ -1,6 +1,7 @@
 Changes for 4.0.15rc1
 
 New features:
+..F....... [ZBX-16871] fixed not setting the default values of multiselects on initial load (averza)
 ..F....... [ZBX-16776] reworked custom item select to multiselect (rlataria)
 ....I..... [ZBXNEXT-5532] disabled guest user by default (talbergs)
 .........T [ZBXNEXT-5493] updated "Template OS Windows SNMP template","Template Module Interfaces Windows SNMPv2" (mchudinov)
@@ -8,6 +9,16 @@ New features:
 ..F....... [ZBXNEXT-4825] implemented in Monitoring -> Problems the button "Export to CSV" to export all pages (talbergs)
 
 Bug fixes:
+...G...PS. [ZBX-16842] added range validation and optional conversion to is_double() (Andris)
+...G...... [ZBX-16790] fixed log rotation on Windows (akozlovs)
+..F....... [ZBX-16865] fixed dynamic graphs not updating when changing host in combo box (talbergs)
+........S. [ZBX-9146] fixed json null value being treated as empty string for LLD filters (atumilovics)
+..F....... [ZBX-16828] fixed array_db validation when validated value is not an array (miks)
+..F....... [ZBX-11659] made user profile icon visible for guest user (miks)
+........S. [ZBX-16849] moved INTERFACE_TYPE_PRIORITY definition to misc.c (mabele)
+..F....... [ZBX-16844] fixed the process of saving the scroll position on the Latest data page in Internet Explorer (vasilijs)
+........S. [ZBX-16343] fixed LLD not to create items on wrong host if there are failed transactions (vso)
+..F....... [ZBX-16730] fixed disappearance of successful modification message while saving the Dashboards (talbergs, vasilijs)
 A......... [ZBX-16679] fixed username and password fields resetting and saving for item, item prototype and LLD rule on type change (Ivo)
 ........S. [ZBX-16785] improved performance of timer process when reading from "problem_tag" table (vso)
 ..F....... [ZBX-16696] fixed multiselect suggest box clipping when overflowing not allowed in parent containers (averza)
