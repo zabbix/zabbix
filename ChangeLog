@@ -17,6 +17,7 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
+..F....... [ZBX-16884] fixed links to usergroups in user list (vmurzins)
 ...G...PS. [ZBX-16842] added range validation and optional conversion to is_double() (Andris)
 ..F....... [ZBX-16893] fixed "Y-axis" graph widget field type (vasilijs)
 ...G...... [ZBX-16790] fixed log rotation on Windows (akozlovs)
