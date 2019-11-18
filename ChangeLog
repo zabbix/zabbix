@@ -1,6 +1,7 @@
 Changes for 5.0.0alpha1
 
 New features:
+..F....... [ZBX-11991] reworked event correlation operations page (rlataria)
 ..F....... [ZBXNEXT-5413] reworked discovery checks form as popup (agriscenko, rlataria)
 ...G...... [ZBXNEXT-5570] changed agent2 plugin configuration, moved MaxLinesPerSecond, EnableRemoteCommands, LogRemoteCommands from global to plugin configuration (wiper)
 ..F....... [ZBXNEXT-170] implemented possibility to "unlink" specific templates in hosts and templates massupdate (talbergs)
