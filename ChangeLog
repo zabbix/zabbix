@@ -122,6 +122,7 @@ New features:
 ..F....... [ZBXNEXT-4825] implemented in Monitoring -> Problems the button "Export to CSV" to export all pages (talbergs)
 
 Bug fixes:
+..F....... [ZBX-16884] fixed links to usergroups in user list (vmurzins)
 ...G...PS. [ZBX-16842] added range validation and optional conversion to is_double() (Andris)
 ..F....... [ZBX-16893] fixed "Y-axis" graph widget field type (vasilijs)
 ...G...... [ZBX-16790] fixed log rotation on Windows (akozlovs)
