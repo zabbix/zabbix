@@ -37,7 +37,7 @@ function mediatypeTestSend(formname) {
 
 	$form_fields.prop('disabled', true);
 
-	$submit_btn.prop('disabled', true).addClass('is-loading');
+	$submit_btn.prop('disabled', true).addClass('is-loading').blur();
 
 	jQuery.ajax({
 		url: url.getUrl(),

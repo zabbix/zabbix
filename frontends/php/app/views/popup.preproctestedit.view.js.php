@@ -69,7 +69,7 @@ function itemPreprocessingTest(form) {
 				jQuery('#prev_value, #prev_time').prop('disabled', true);
 			}
 
-			jQuery('.submit-test-btn').prop('disabled', true).addClass('is-loading');
+			jQuery('.submit-test-btn').prop('disabled', true).addClass('is-loading').blur();
 
 			// Clean previous results.
 			jQuery('[id^="preproc-test-step-"][id$="-result"]').empty();
