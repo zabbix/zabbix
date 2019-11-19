@@ -1,7 +1,7 @@
 Changes for 5.0.0alpha1
 
 New features:
-.........T [ZBXNEXT-5493,ZBX-16540] LLD rules moved from parent templates to linked templates for Module HOST-RESOURCES-MIB SNMPv2, Module Interfaces Windows SNMPv2, Net Arista SNMPv2, OS Windows SNMPv2 (vitaly)
+.........T [ZBXNEXT-5493,ZBX-16540] moved LLD rules from parent templates to linked templates for Module HOST-RESOURCES-MIB SNMPv2, Module Interfaces Windows SNMPv2, Net Arista SNMPv2, OS Windows SNMPv2 (vitaly)
 ..F....... [ZBX-11991] reworked event correlation operations page (rlataria)
 ..F....... [ZBXNEXT-5413] reworked discovery checks form as popup (agriscenko, rlataria)
 ...G...... [ZBXNEXT-5570] changed agent2 plugin configuration, moved MaxLinesPerSecond, EnableRemoteCommands, LogRemoteCommands from global to plugin configuration (wiper)
@@ -112,7 +112,7 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 Changes for 4.4.2rc1
 
 New features:
-.........T [ZBXNEXT-5493,ZBX-16540] LLD rules moved from parent templates to linked templates for Module HOST-RESOURCES-MIB SNMPv2, Module Interfaces Windows SNMPv2, Net Arista SNMPv2, OS Windows SNMPv2 (vitaly)
+.........T [ZBXNEXT-5493,ZBX-16540] moved LLD rules from parent templates to linked templates for Module HOST-RESOURCES-MIB SNMPv2, Module Interfaces Windows SNMPv2, Net Arista SNMPv2, OS Windows SNMPv2 (vitaly)
 ...G...... [ZBXNEXT-5570] changed agent2 plugin configuration, moved MaxLinesPerSecond, EnableRemoteCommands, LogRemoteCommands from global to plugin configuration (wiper)
 ..F....... [ZBX-16871] fixed not setting the default values of multiselects on initial load (averza)
 ..F....... [ZBX-16776] reworked custom item select to multiselect (rlataria)
@@ -1012,7 +1012,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.15rc1
 
 New features:
-.........T [ZBXNEXT-5493,ZBX-16540] LLD rules moved from parent templates to linked templates for Module HOST-RESOURCES-MIB SNMPv2, Module Interfaces Windows SNMPv2, Net Arista SNMPv2, OS Windows SNMPv2 (vitaly)
+.........T [ZBXNEXT-5493,ZBX-16540] moved LLD rules from parent templates to linked templates for Module HOST-RESOURCES-MIB SNMPv2, Module Interfaces Windows SNMPv2, Net Arista SNMPv2, OS Windows SNMPv2 (vitaly)
 ..F....... [ZBX-16871] fixed not setting the default values of multiselects on initial load (averza)
 ..F....... [ZBX-16776] reworked custom item select to multiselect (rlataria)
 ....I..... [ZBXNEXT-5532] disabled guest user by default (talbergs)
