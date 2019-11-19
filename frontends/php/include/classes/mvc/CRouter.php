@@ -149,6 +149,7 @@ class CRouter {
 		'popup.httpstep'				=> ['CControllerPopupHttpStep',						'layout.json',			'popup.httpstep'],
 		'popup.media'					=> ['CControllerPopupMedia',						'layout.json',			'popup.media'],
 		'popup.itemtest.edit'			=> ['CControllerPopupItemTestEdit',					'layout.json',			'popup.itemtestedit.view'],
+		'popup.itemtest.getvalue'		=> ['CControllerPopupItemTestGetValue',				'layout.json',			null],
 		'popup.itemtest.send'			=> ['CControllerPopupItemTestSend',					'layout.json',			null],
 		'popup.scriptexec'				=> ['CControllerPopupScriptExec',					'layout.json',			'popup.scriptexec'],
 		'popup.triggerexpr'				=> ['CControllerPopupTriggerExpr',					'layout.json',			'popup.triggerexpr'],

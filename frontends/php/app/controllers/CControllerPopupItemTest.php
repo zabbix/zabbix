@@ -70,4 +70,15 @@ abstract class CControllerPopupItemTest extends CController {
 				return new CDiscoveryRule;
 		}
 	}
+
+	protected function getHostProxies() {
+		$proxies = API::Proxy()->get([
+			'output' => ['host'],
+			'preservekeys' => true
+		]);
+
+		CArrayHelper::sort($proxies, [['field' => 'host', 'order' => ZBX_SORT_UP]]);
+
+		return $proxies;
+	}
 }

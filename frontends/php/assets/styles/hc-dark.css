@@ -5277,8 +5277,10 @@ svg {
 .inline-sr-only {
   font-size: 0; }
 
+.item-test-popup-value-row,
 .preproc-test-popup-value-row {
   display: flex; }
+  .item-test-popup-value-row label,
   .preproc-test-popup-value-row label {
     padding: 0 10px;
     margin-left: auto;

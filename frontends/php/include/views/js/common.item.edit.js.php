@@ -283,17 +283,19 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 	 * @param {bool}   show_final_result  Either the final result should be displayed.
 	 * @param {object} trigger_elmnt      UI element triggered function.
 	 */
-	function openPreprocessingTestDialog(step_nums, show_final_result, trigger_elmnt) {
+	function openPreprocessingTestDialog(step_nums, show_final_result, get_value, trigger_elmnt) {
 		var $step_obj = jQuery(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot');
 
 		PopUp('popup.itemtest.edit', jQuery.extend({
 			delay: jQuery('#delay').val() || '',
+			item_type: jQuery('#type').val(),
 			value_type: jQuery('#value_type').val() || <?= CControllerPopupItemTest::ZBX_DEFAULT_VALUE_TYPE ?>,
 			steps: getPreprocessingSteps(step_nums),
 			hostid: <?= $data['hostid'] ?>,
 			test_type: <?= $data['preprocessing_test_type'] ?>,
 			step_obj: $step_obj.attr('data-step') || -1,
-			show_final_result: show_final_result ? 1 : 0
+			show_final_result: show_final_result ? 1 : 0,
+			get_value: get_value ? 1 : 0
 		}, {'data': $step_obj.data('test-data') || []}), 'preprocessing-test', trigger_elmnt);
 	}
 
@@ -359,7 +361,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				step_nums.push(str.substr(14, str.length - 21));
 			});
 
-			openPreprocessingTestDialog(step_nums, true, this);
+			openPreprocessingTestDialog(step_nums, true, true, this);
 		});
 
 		$('#authtype').bind('change', function() {

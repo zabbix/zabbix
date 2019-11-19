@@ -241,13 +241,13 @@
 					step_nums.push(str.substr(14, str.length - 21));
 				});
 
-				openPreprocessingTestDialog(step_nums, true, this);
+				openPreprocessingTestDialog(step_nums, true, false, this);
 			})
 			.on('click', '.preprocessing-step-test', function() {
 				var str = $(this).attr('name'),
 					num = str.substr(14, str.length - 21);
 
-				openPreprocessingTestDialog([num], false, this);
+				openPreprocessingTestDialog([num], false, false, this);
 			})
 			.on('click', '.element-table-remove', function() {
 				$(this).closest('li.sortable').remove();

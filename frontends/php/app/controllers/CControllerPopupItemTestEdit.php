@@ -29,11 +29,13 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'hostid' => 'db hosts.hostid',
 			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
 			'test_type' => 'in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'item_type' => 'required|int32',
 			'steps' => 'required|array',
 			'delay' => 'string',
 			'data' => 'array',
 			'step_obj' => 'required|int32',
-			'show_final_result' => 'in 0,1'
+			'show_final_result' => 'in 0,1',
+			'get_value' => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -120,6 +122,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'test_type' => $this->getInput('test_type'),
 			'step_obj' => $this->getInput('step_obj'),
 			'show_final_result' => $this->getInput('show_final_result'),
+			'get_value' => (bool) $this->getInput('get_value'),
+			'is_item_testable' => in_array($this->getInput('item_type'), self::$testable_item_types),
+			'proxies' => $this->getHostProxies(),
+			'proxy_hostid' => 0,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

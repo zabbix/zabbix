@@ -84,7 +84,39 @@ foreach ($data['steps'] as $i => $step) {
 	]);
 }
 
-$form_list = (new CFormList())
+$form_list = new CFormList();
+
+if ($data['is_item_testable']) {
+	$form_list
+		->addRow(
+			new CLabel(_('Get value from host'), 'get_value'),
+			(new CCheckBox('get_value', 1))->setChecked($data['get_value'])
+		)
+		->addRow(
+			new CLabel(_('Host address'), 'host_address'),
+			(new CDiv([
+				(new CTextBox('host_address', $data['host_address']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				new CLabel(_('Port'), 'port'),
+				(new CTextBox('host_port', $data['host_address']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			]))->addClass('item-test-popup-value-row'),
+			'host_address_row'
+		)
+		->addRow(
+			new CLabel(_('Proxy'), 'host_proxy'),
+			new CComboBox('host_proxy', $data['proxy_hostid'], null, [0 => _('(no proxy)')] + $data['proxies']),
+			'host_proxy_row'
+		)
+		->addRow(
+			null,
+			(new CSimpleButton(_('Get value')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('get_value_btn')
+				->addStyle('float: right'),
+			'get_value_row'
+		);
+}
+
+$form_list
 	->addRow(
 		new CLabel(_('Value'), 'value'),
 		(new CDiv([
@@ -200,7 +232,7 @@ $output = [
 			'class' => 'submit-test-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return itemPreprocessingTest("#'.$form->getId().'");'
+			'action' => 'return itemCompleteTest("#'.$form->getId().'");'
 		]
 	]
 ];

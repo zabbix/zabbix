@@ -50,12 +50,90 @@ function makeStepResult(step) {
 	}
 }
 
+function disableItemTestForm() {
+	jQuery('#value, #time, [name^=macros]').prop('disabled', true);
+
+	<?php if ($data['is_item_testable']) { ?>
+	jQuery('#get_value, #host_address, #host_port, #host_proxy, #get_value_btn').prop('disabled', true);
+	<?php } ?>
+
+	<?php if ($data['show_prev']) { ?>
+	jQuery('#prev_value, #prev_time').prop('disabled', true);
+	<?php } ?>
+
+	jQuery('#eol input').prop('disabled', true);
+
+	jQuery('<span>')
+		.addClass('preloader')
+		.insertAfter(jQuery('.submit-test-btn'))
+		.css({
+			'display': 'inline-block',
+			'margin': '0 10px -8px'
+		});
+
+	jQuery('.submit-test-btn')
+		.prop('disabled', true)
+		.hide();
+}
+
+function enableItemTestForm() {
+	jQuery('#value, #time, [name^=macros]').prop('disabled', false);
+
+	<?php if ($data['is_item_testable']) { ?>
+	jQuery('#get_value, #host_address, #host_port, #host_proxy, #get_value_btn').prop('disabled', false);
+	<?php } ?>
+
+	<?php if ($data['show_prev']) { ?>
+	jQuery('#prev_value, #prev_time').prop('disabled', false);
+	<?php } ?>
+
+	jQuery('#eol input').prop('disabled', false);
+	jQuery('.preloader').remove();
+	jQuery('.submit-test-btn')
+		.prop('disabled', false)
+		.show();
+}
+
+function getItemValueTestDetails() {
+	return {};
+}
+
+/**
+ * Send item get value request and display retrieved results.
+ *
+ * @param string formid  Selector for form to send.
+ */
+function itemGetValueTest(form) {
+	var form = jQuery(form),
+		url;
+
+	url = new Curl('zabbix.php');
+	url.setArgument('action', 'popup.itemtest.getvalue');
+
+	jQuery.ajax({
+		url: url.getUrl(),
+		data: getItemValueTestDetails(),
+		beforeSend: disableItemTestForm,
+		success: function(ret) {
+			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
+
+			if (typeof ret.messages !== 'undefined') {
+				jQuery(ret.messages).insertBefore(jQuery(form));
+			}
+
+			enableItemTestForm();
+		},
+		dataType: 'json',
+		type: 'post'
+	});
+}
+
 /**
  * Send item preprocessing test details and display results in table.
  *
  * @param string formid  Selector for form to send.
  */
-function itemPreprocessingTest(form) {
+function itemCompleteTest(form) {
 	var form = jQuery(form),
 		url = new Curl(jQuery(form).attr('action')),
 		is_prev_enabled = <?= $data['show_prev'] ? 'true' : 'false' ?>;
@@ -64,22 +142,7 @@ function itemPreprocessingTest(form) {
 		url: url.getUrl(),
 		data: jQuery(form).serialize(),
 		beforeSend: function() {
-			jQuery('#value, #time, [name^=macros]').prop('disabled', true);
-			if (is_prev_enabled) {
-				jQuery('#prev_value, #prev_time').prop('disabled', true);
-			}
-
-			jQuery('<span>')
-				.addClass('preloader')
-				.insertAfter(jQuery('.submit-test-btn'))
-				.css({
-					'display': 'inline-block',
-					'margin': '0 10px -8px'
-				});
-
-			jQuery('.submit-test-btn')
-				.prop('disabled', true)
-				.hide();
+			disableItemTestForm();
 
 			// Clean previous results.
 			jQuery('[id^="preproc-test-step-"][id$="-result"]').empty();
@@ -111,15 +174,7 @@ function itemPreprocessingTest(form) {
 						.append($result);
 			}
 
-			jQuery('#value, #time, [name^=macros]').prop('disabled', false);
-			if (is_prev_enabled) {
-				jQuery('#prev_value, #prev_time').prop('disabled', false);
-			}
-
-			jQuery('.preloader').remove();
-			jQuery('.submit-test-btn')
-				.prop('disabled', false)
-				.show();
+			enableItemTestForm();
 		},
 		dataType: 'json',
 		type: 'post'
@@ -225,6 +280,22 @@ jQuery(document).ready(function($) {
 		grow: 'auto',
 		rows: 0
 	});
+
+	<?php if ($data['is_item_testable']) { ?>
+	$('#get_value').on('change', function() {
+		$rows = $('#host_address_row, #host_proxy_row, #get_value_row');
+		if ($(this).is(':checked')) {
+			$('input, select', $rows).prop('disabled', false);
+			$rows.show();
+		}
+		else {
+			$('input, select', $rows).prop('disabled', true);
+			$rows.hide();
+		}
+	}).trigger('change');
+
+	$('#get_value_btn').on('click', itemGetValueTest);
+	<?php } ?>
 
 	$('#preprocessing-test-form .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 });
