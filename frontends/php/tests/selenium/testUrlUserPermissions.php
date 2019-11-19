@@ -655,7 +655,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'usergrps.php',
+				'url' => 'zabbix.php?action=usergroup.list',
 				'title' =>	'Configuration of user groups',
 				'users' => [
 					'guest' => false,

@@ -27,10 +27,28 @@
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_4050000(void)
+extern unsigned char	program_type;
+
+static int	DBpatch_4050000(void)
 {
-	*** Feel free to use this function for the first DB patch! ***
-}*/
+	int		i;
+	const char      *values[] = {
+			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
+			"web.usergrps.php.sort", "web.usergroup.sort",
+			"web.usergrps.php.sortorder", "web.usergroup.sortorder"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
 
 #endif
 
@@ -38,6 +56,6 @@ DBPATCH_START(4050)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(4050000, 0, 1)*/
+DBPATCH_ADD(4050000, 0, 1)
 
 DBPATCH_END()

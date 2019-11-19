@@ -183,7 +183,7 @@ function getHostGroupsRights(array $usrgrpids = []) {
 		]
 	];
 
-	$host_groups = API::HostGroup()->get(['groupid', 'name']);
+	$host_groups = API::HostGroup()->get(['output' => ['groupid', 'name']]);
 
 	foreach ($host_groups as $host_group) {
 		$groups_rights[$host_group['groupid']] = [
