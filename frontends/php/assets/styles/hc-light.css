@@ -4490,6 +4490,8 @@ tr.cursor-move td * {
 .flickerfreescreen {
   position: relative;
   overflow: hidden; }
+  .flickerfreescreen.is-loading {
+    min-height: 30px; }
 
 .graph-wrapper {
   display: inline; }

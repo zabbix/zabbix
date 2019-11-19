@@ -6525,6 +6525,10 @@ tr.cursor-move {
 .flickerfreescreen {
 	position: relative;
 	overflow: hidden;
+
+	&.is-loading {
+		min-height: 30px;
+	}
 }
 
 .graph-wrapper {
