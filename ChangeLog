@@ -1,6 +1,7 @@
 Changes for 4.0.15rc1
 
 New features:
+.........T [ZBXNEXT-5493] LLD rules moved from parent templates to linked templates for Module HOST-RESOURCES-MIB SNMPv2, Module Interfaces Windows SNMPv2, Net Arista SNMPv2, OS Windows SNMPv2 (vitaly)
 ..F....... [ZBX-16871] fixed not setting the default values of multiselects on initial load (averza)
 ..F....... [ZBX-16776] reworked custom item select to multiselect (rlataria)
 ....I..... [ZBXNEXT-5532] disabled guest user by default (talbergs)
