@@ -37,7 +37,7 @@ void	zbx_mock_test_entry(void **state)
 
 	exp_result = zbx_mock_get_parameter_string("out.key");
 
-	act_result = zbx_truncate_itemkey(key, key_len, buf_len, buf);
+	act_result = zbx_truncate_itemkey(key, key_len, buf, buf_len);
 
 	zbx_mock_assert_str_eq("return value", exp_result, act_result);
 

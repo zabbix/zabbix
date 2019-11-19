@@ -1124,7 +1124,7 @@ int	int_in_list(char *list, int value);
 int	ip_in_list(const char *list, const char *ip);
 
 #define ITEMKEY_ERRMSG_MAX	255
-const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, const size_t buf_len, char *buf);
+const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len);
 
 /* IP range support */
 #define ZBX_IPRANGE_V4	0
