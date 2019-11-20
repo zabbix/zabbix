@@ -5473,17 +5473,17 @@ const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *b
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_truncate_itemkey                                             *
+ * Function: zbx_truncate_value                                               *
  *                                                                            *
  * Purpose: check the value characters length and, if the length exceeds      *
  *          max allowable characters length, truncate the value               *
  *                                                                            *
- * Parameters: val      - [IN] item key for processing                        *
- *             char_max - [IN] item key max characters length                 *
- *             buf      - [IN/OUT] buffer for short version of item key       *
- *             buf_len  - [IN] buffer size for short version of item key      *
+ * Parameters: val      - [IN] value for processing                           *
+ *             char_max - [IN] value max characters length                    *
+ *             buf      - [IN/OUT] buffer for short version of value          *
+ *             buf_len  - [IN] buffer size for short version of value         *
  *                                                                            *
- * Return value: The item key that does not exceed passed length              *
+ * Return value: The value that does not exceed passed length                 *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len)
