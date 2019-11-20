@@ -420,7 +420,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1',
 				'ListenPort' => 10053,
-				'EnableRemoteCommands' => '1',
+				'Plugins.SystemRun.EnableRemoteCommands' => '1',
 				'Plugins.Uptime.Capacity' => '10'
 			]
 		];
