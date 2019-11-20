@@ -49,6 +49,7 @@ class CControllerMacrosUpdate extends CController {
 		/** @var array $macros */
 		$macros = $this->getInput('macros', []);
 		foreach ($macros as &$macro) {
+			$macro['macro'] = trim($macro['macro']);
 			$macro['value'] = trim($macro['value']);
 			$macro['description'] = trim($macro['description']);
 		}
