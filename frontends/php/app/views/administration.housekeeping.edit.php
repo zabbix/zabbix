@@ -37,6 +37,7 @@ $widget = (new CWidget())
 	);
 
 $form = (new CForm())
+	->setId('housekeeping')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'housekeeping.update')
 		->getUrl()

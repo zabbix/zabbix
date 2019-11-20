@@ -65,7 +65,7 @@ class CControllerMiscConfigUpdate extends CController {
 
 		DBstart();
 		$result = update_config([
-			'refresh_unsupported'    => $this->getInput('refresh_unsupported'),
+			'refresh_unsupported'    => trim($this->getInput('refresh_unsupported')),
 			'alert_usrgrpid'         => $this->getInput('alert_usrgrpid'),
 			'discovery_groupid'      => $this->getInput('discovery_groupid'),
 			'default_inventory_mode' => $this->getInput('default_inventory_mode'),

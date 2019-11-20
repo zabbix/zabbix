@@ -23,7 +23,15 @@ $schema = DB::getSchema('config');
 ?>
 
 <script type="text/javascript">
-	jQuery(document).ready(function() {
+	jQuery(function($) {
+		var $form = $('form#housekeeping');
+
+		$form.on('submit', function() {
+			$form.trimValues(['#hk_events_trigger', '#hk_events_internal', '#hk_events_discovery', '#hk_events_autoreg',
+				'#hk_services', '#hk_audit', '#hk_sessions', '#hk_history', '#hk_trends'
+			]);
+		});
+
 		jQuery('#hk_events_mode').change(function() {
 			jQuery('#hk_events_trigger').prop('disabled', !this.checked);
 			jQuery('#hk_events_internal').prop('disabled', !this.checked);

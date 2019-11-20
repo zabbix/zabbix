@@ -73,9 +73,16 @@ class CControllerValuemapUpdate extends CController {
 	}
 
 	protected function doAction() {
+		$mappings = $this->getInput('mappings');
+		foreach ($mappings as &$mapping) {
+			$mapping['value'] = trim($mapping['value']);
+			$mapping['newvalue'] = trim($mapping['newvalue']);
+		}
+		unset($mapping);
+
 		$result = (bool) API::ValueMap()->update([
 			'name'       => $this->getInput('name'),
-			'mappings'   => $this->getInput('mappings'),
+			'mappings'   => $mappings,
 			'valuemapid' => $this->getInput('valuemapid')
 		]);
 

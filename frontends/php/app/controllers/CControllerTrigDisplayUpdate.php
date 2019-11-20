@@ -63,8 +63,8 @@ class CControllerTrigDisplayUpdate extends CController {
 			'problem_ack_style'   => $this->getInput('problem_ack_style'),
 			'ok_unack_style'      => $this->getInput('ok_unack_style'),
 			'ok_ack_style'        => $this->getInput('ok_ack_style'),
-			'ok_period'           => $this->getInput('ok_period'),
-			'blink_period'        => $this->getInput('blink_period')
+			'ok_period'           => trim($this->getInput('ok_period')),
+			'blink_period'        => trim($this->getInput('blink_period'))
 		];
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))

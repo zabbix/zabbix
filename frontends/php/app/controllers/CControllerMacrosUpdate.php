@@ -48,6 +48,11 @@ class CControllerMacrosUpdate extends CController {
 
 		/** @var array $macros */
 		$macros = $this->getInput('macros', []);
+		foreach ($macros as &$macro) {
+			$macro['value'] = trim($macro['value']);
+			$macro['description'] = trim($macro['description']);
+		}
+		unset($macro);
 
 		foreach ($macros as $idx => $macro) {
 			if (!array_key_exists('globalmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
