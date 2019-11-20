@@ -1,0 +1,1 @@
+........S. [ZBX-16955] fixed performance of history syncers and timer processes by not locking each other when suppressing events (vso)
