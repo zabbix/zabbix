@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 The template to monitor Nginx by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -83,11 +83,11 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Nginx: Service is down|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p>|
-|Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].min(5m)}>{$NGINX.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Service is down</p>|
-|Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p>|`{TEMPLATE_NAME:nginx.connections.dropped.rate.min(5m)} > {$NGINX.DROP_RATE.MAX.WARN}`|WARNING|<p>**Depends on**:</p><p>- Nginx: Service is down</p>|
-|Nginx: Version has changed (new version: {ITEM.VALUE})|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Nginx version has changed. Ack to close.</p>|`{TEMPLATE_NAME:nginx.version.diff()}=1 and {TEMPLATE_NAME:nginx.version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
-|Nginx: Failed to fetch stub status page (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:nginx.get_stub_status.str("HTTP/1.1 200")}=0 or  {TEMPLATE_NAME:nginx.get_stub_status.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Service is down</p>|
+|Nginx: Service is down|<p>-</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p>|
+|Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>-</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].min(5m)}>{$NGINX.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Service is down</p>|
+|Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)|<p>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p>|`{TEMPLATE_NAME:nginx.connections.dropped.rate.min(5m)} > {$NGINX.DROP_RATE.MAX.WARN}`|WARNING|<p>**Depends on**:</p><p>- Nginx: Service is down</p>|
+|Nginx: Version has changed (new version: {ITEM.VALUE})|<p>Nginx version has changed. Ack to close.</p>|`{TEMPLATE_NAME:nginx.version.diff()}=1 and {TEMPLATE_NAME:nginx.version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
+|Nginx: Failed to fetch stub status page (or no data for 30m)|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:nginx.get_stub_status.str("HTTP/1.1 200")}=0 or  {TEMPLATE_NAME:nginx.get_stub_status.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Service is down</p>|
 
 ## Feedback
 

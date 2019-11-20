@@ -22,6 +22,10 @@
 class CTabView extends CDiv {
 
 	protected $id = 'tabs';
+
+	/**
+	 * @var CDiv[]
+	 */
 	protected $tabs = [];
 	protected $headers = [];
 	protected $footer = null;
@@ -101,7 +105,20 @@ class CTabView extends CDiv {
 			$this->addItem($tab);
 		}
 		else {
-			$headersList = (new CList())->addClass(ZBX_STYLE_TABS_NAV);
+			$visible_tab = (int) get_cookie('tab', (int) $this->selectedTab);
+			foreach (array_values($this->tabs) as $index => $tab) {
+				if ($visible_tab == $index) {
+					$tab->setAttribute('aria-hidden', 'false');
+				}
+				else {
+					$tab->addStyle('display: none');
+					$tab->setAttribute('aria-hidden', 'true');
+				}
+			}
+
+			$headersList = (new CList())
+				->addClass('ui-tabs-nav')
+				->addClass(ZBX_STYLE_TABS_NAV);
 
 			foreach ($this->headers as $id => $header) {
 				$tabLink = (new CLink($header, '#'.$id))
@@ -121,13 +138,18 @@ class CTabView extends CDiv {
 	}
 
 	public function makeJavascript() {
-		if ($this->selectedTab === null) {
-			$active_tab = (int) get_cookie('tab', 0);
-			$create_event = '';
+		$create_event = '';
+
+		if ($this->selectedTab !== null) {
+			$create_event = 'create: function() {'.
+				'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", '.CJs::encodeJson($this->selectedTab).');'.
+			'},';
+			$active_tab = 'active: '.CJs::encodeJson($this->selectedTab).',';
 		}
 		else {
-			$active_tab = $this->selectedTab;
-			$create_event = 'create: function() { jQuery.cookie("tab", '.CJs::encodeJson($this->selectedTab).'); },';
+			$active_tab = 'active: function() {'.
+				'return sessionStorage.getItem(ZBX_SESSION_NAME + "_tab") || 0;'.
+			'}(),';
 		}
 
 		$disabled_tabs = ($this->disabledTabs === null) ? '' : 'disabled: '.CJs::encodeJson($this->disabledTabs).',';
@@ -136,12 +158,12 @@ class CTabView extends CDiv {
 			'jQuery("#'.$this->id.'").tabs({'.
 				$create_event.
 				$disabled_tabs.
-				'active: '.CJs::encodeJson($active_tab).','.
+				$active_tab.
 				'activate: function(event, ui) {'.
+					'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", ui.newTab.index().toString());'.
 					'jQuery.cookie("tab", ui.newTab.index().toString());'.
 					$this->tab_change_js.
 				'}'.
-			'})'.
-			'.css("visibility", "visible");';
+			'})';
 	}
 }

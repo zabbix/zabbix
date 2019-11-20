@@ -469,7 +469,7 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 
 	for (c = suppressed_chars; '\0' != *c; c++)
 	{
-		if (NULL == strchr(param, *c))
+		if (NULL == param || NULL == strchr(param, *c))
 			continue;
 
 		buf = (char *)zbx_malloc(buf, buf_alloc);
@@ -668,6 +668,8 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 
 	switch (value_type)
 	{
+		double	dbl_tmp;
+
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_trim_integer(c);
 			del_zeros(c);
@@ -681,9 +683,9 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_trim_float(c);
 
-			if (SUCCEED == is_double(c))
+			if (SUCCEED == is_double(c, &dbl_tmp))
 			{
-				SET_DBL_RESULT(result, atof(c));
+				SET_DBL_RESULT(result, dbl_tmp);
 				ret = SUCCEED;
 			}
 			break;
@@ -774,10 +776,8 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_trim_float(result->str);
 
-		if (SUCCEED != is_double(result->str))
+		if (SUCCEED != is_double(result->str, &value))
 			return NULL;
-
-		value = atof(result->str);
 
 		SET_DBL_RESULT(result, value);
 	}
@@ -785,10 +785,8 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_trim_float(result->text);
 
-		if (SUCCEED != is_double(result->text))
+		if (SUCCEED != is_double(result->text, &value))
 			return NULL;
-
-		value = atof(result->text);
 
 		SET_DBL_RESULT(result, value);
 	}

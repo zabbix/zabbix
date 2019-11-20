@@ -1093,14 +1093,15 @@ const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char 
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len)
+int	zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len,
+		zbx_json_type_t *type)
 {
 	const char	*p;
 
 	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
 		return FAIL;
 
-	if (NULL == zbx_json_decodevalue(p, string, len, NULL))
+	if (NULL == zbx_json_decodevalue(p, string, len, type))
 		return FAIL;
 
 	return SUCCEED;
@@ -1117,14 +1118,15 @@ int	zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, ch
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc)
+int	zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string,
+		size_t *string_alloc, zbx_json_type_t *type)
 {
 	const char	*p;
 
 	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
 		return FAIL;
 
-	if (NULL == zbx_json_decodevalue_dyn(p, string, string_alloc, NULL))
+	if (NULL == zbx_json_decodevalue_dyn(p, string, string_alloc, type))
 		return FAIL;
 
 	return SUCCEED;

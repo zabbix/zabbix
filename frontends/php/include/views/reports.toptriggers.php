@@ -21,13 +21,12 @@
 
 $filterForm = new CFilter(new CUrl('toptriggers.php'));
 
-// severities
-$severity_columns = [0 => [], 1 => []];
-
+$severities = [];
 foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-	$severity_columns[$severity % 2][] = (new CCheckBox('severities['.$severity.']'))
-		->setLabel(getSeverityName($severity, $data['config']))
-		->setChecked(in_array($severity, $data['filter']['severities']));
+	$severities[] = [
+		'name' => getSeverityName($severity, $data['config']),
+		'value' => $severity
+	];
 }
 
 $filter_column = (new CFormList())
@@ -64,9 +63,11 @@ $filter_column = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
 	->addRow(_('Severity'),
-		(new CTable())
-			->addRow($severity_columns[0])
-			->addRow($severity_columns[1])
+		(new CCheckBoxList('severities'))
+			->setOptions($severities)
+			->setChecked($data['filter']['severities'])
+			->addClass(ZBX_STYLE_COLUMNS)
+			->addClass(ZBX_STYLE_COLUMNS_3)
 	);
 
 $filterForm

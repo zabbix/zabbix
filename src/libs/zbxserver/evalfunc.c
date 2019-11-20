@@ -578,7 +578,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 	int				seconds = 0, nvalues = 0;
 	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL, buf[ZBX_MAX_UINT64_LEN];
 	double				arg2_dbl;
-	zbx_uint64_t			arg2_ui64, arg2_2_ui64;
+	zbx_uint64_t			arg2_ui64 = 0, arg2_2_ui64 = 0;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;

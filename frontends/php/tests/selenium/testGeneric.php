@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup profiles
+ */
 class testGeneric extends CLegacyWebTest {
 
 	public static function provider() {
@@ -95,7 +98,7 @@ class testGeneric extends CLegacyWebTest {
 
 			['zabbix.php?action=proxy.list',						'Configuration of proxies'],
 			['zabbix.php?action=authentication.edit',				'Configuration of authentication'],
-			['usergrps.php',					'Configuration of user groups'],
+			['zabbix.php?action=usergroup.list',					'Configuration of user groups'],
 			['zabbix.php?action=user.edit',		'Configuration of users'],
 			['zabbix.php?action=mediatype.list',					'Configuration of media types'],
 			['zabbix.php?action=script.list',						'Configuration of scripts'],

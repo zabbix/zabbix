@@ -18,8 +18,12 @@
 				$('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 			});
 
-		$('#mass_replace_tpls').on('change', function() {
-			$('#mass_clear_tpls').prop('disabled', !this.checked);
+		var mass_action_tpls = $('#mass_action_tpls'),
+			mass_clear_tpls = $('#mass_clear_tpls');
+
+		mass_action_tpls.on('change', function() {
+			var action = mass_action_tpls.find('input[name="mass_action_tpls"]:checked').val();
+			mass_clear_tpls.prop('disabled', action === '<?= ZBX_ACTION_ADD ?>');
 		}).trigger('change');
 
 		$('#inventory_mode').on('change', function() {

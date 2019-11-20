@@ -39,7 +39,7 @@
 		(new CRow([
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
-					->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
+					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAttribute('placeholder', _('description'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8),
@@ -67,7 +67,7 @@
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
-					->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
+					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setAttribute('placeholder', _('description'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),

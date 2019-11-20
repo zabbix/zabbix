@@ -308,6 +308,16 @@ function objectSize(obj) {
 	return size;
 }
 
+function addMessage(html) {
+	var $message_div = jQuery('<div>').attr('id', 'messages');
+	$message_div.append(html);
+	jQuery('main').prepend($message_div);
+}
+
+function removeMessages() {
+	jQuery('#messages', 'main').remove();
+}
+
 /**
  * Replace placeholders like %<number>$s with arguments.
  * Can be used like usual sprintf but only for %<number>$s placeholders.
@@ -608,6 +618,18 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	}
 
 	var center_overlay_dialog = function() {
+			var body = jQuery('.overlay-dialogue-body', overlay_dialogue),
+				body_scroll_height = body[0].scrollHeight,
+				body_height = body.height();
+
+			if (body_height != Math.floor(body_height)) {
+				// The body height is often about a half pixel less than the height.
+				body_height = Math.floor(body_height) + 1;
+			}
+
+			// A fix for IE and Edge to stop popup width flickering when having vertical scrollbar.
+			body.css('overflow-y', body_scroll_height > body_height ? 'scroll' : 'hidden');
+
 			overlay_dialogue.css({
 				'left': Math.round((jQuery(window).width() - jQuery(overlay_dialogue).outerWidth()) / 2) + 'px',
 				'top': overlay_dialogue.hasClass('sticked-to-top')
@@ -1057,7 +1079,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 				.attr('title', t('Close'))
 				.click(function() {
 					jQuery(this)
-						.closest('.' + classes[index])
+						.closest('.' + msg_class)
 						.remove();
 				});
 		$msg_box.append($button);

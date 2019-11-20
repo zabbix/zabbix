@@ -1100,11 +1100,6 @@ if (!empty($data['new_operation'])) {
 			->setHeader([_('Label'), _('Name'), _('Action')]);
 
 		$i = 0;
-
-		$operationConditionStringValues = actionOperationConditionValueToString(
-			$data['new_operation']['opconditions']
-		);
-
 		foreach ($data['new_operation']['opconditions'] as $cIdx => $opcondition) {
 			if (!isset($opcondition['conditiontype'])) {
 				$opcondition['conditiontype'] = 0;
@@ -1120,15 +1115,14 @@ if (!empty($data['new_operation'])) {
 			}
 
 			$label = num2letter($i);
+			$cond_value = $opcondition['value'] ? _('Ack') : _('Not Ack');
 			$labelCol = (new CCol($label))
 				->addClass('label')
 				->setAttribute('data-conditiontype', $opcondition['conditiontype'])
 				->setAttribute('data-formulaid', $label);
 			$operationConditionsTable->addRow([
 					$labelCol,
-					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
-						$operationConditionStringValues[$cIdx], ''
-					),
+					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'], $cond_value, ''),
 					(new CCol([
 						(new CButton('remove', _('Remove')))
 							->onClick('javascript: removeOperationCondition('.$i.');')

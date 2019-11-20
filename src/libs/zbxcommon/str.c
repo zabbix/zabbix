@@ -438,7 +438,7 @@ void	del_zeros(char *s)
 
 			if (1 == trim)
 			{
-				/* don't touch invalid numbers with more than one decimal seprator */
+				/* don't touch invalid numbers with more than one decimal separator */
 				return;
 			}
 
@@ -762,7 +762,7 @@ char	*zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Function: zbx_strdcatf                                                     *
  *                                                                            *
- * Purpose: dynamical cating of formated strings                              *
+ * Purpose: dynamical cating of formatted strings                             *
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
@@ -1364,14 +1364,6 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 	}
 }
 
-const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
-{
-	INTERFACE_TYPE_AGENT,
-	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_IPMI
-};
-
 const char	*zbx_sysinfo_ret_string(int ret)
 {
 	switch (ret)
@@ -1765,6 +1757,30 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	char		*utf8_string = NULL;
 	int		utf8_size;
 	unsigned int	codepage;
+	int		bom_detected = 0;
+
+	/* try to guess encoding using BOM if it exists */
+	if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
+	{
+		bom_detected = 1;
+
+		if ('\0' == *encoding)
+			encoding = "UTF-8";
+	}
+	else if (2 <= in_size && 0 == strncmp("\xff\xfe", in, 2))
+	{
+		bom_detected = 1;
+
+		if ('\0' == *encoding)
+			encoding = "UTF-16";
+	}
+	else if (2 <= in_size && 0 == strncmp("\xfe\xff", in, 2))
+	{
+		bom_detected = 1;
+
+		if ('\0' == *encoding)
+			encoding = "UNICODEFFFE";
+	}
 
 	if ('\0' == *encoding || FAIL == get_codepage(encoding, &codepage))
 	{
@@ -1778,18 +1794,42 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding,
 			codepage);
 
+	if (65001 == codepage)
+	{
+		/* remove BOM */
+		if (bom_detected)
+			in += 3;
+	}
+
 	if (1200 == codepage)		/* Unicode UTF-16, little-endian byte order */
 	{
-		wide_string = (wchar_t *)in;
 		wide_size = (int)in_size / 2;
+
+		/* remove BOM */
+		if (bom_detected)
+		{
+			in += 2;
+			wide_size--;
+		}
+
+		wide_string = (wchar_t *)in;
+
 	}
 	else if (1201 == codepage)	/* unicodeFFFE UTF-16, big-endian byte order */
 	{
-		wchar_t	*wide_string_be = (wchar_t *)in;
+		wchar_t *wide_string_be;
 		int	i;
 
 		wide_size = (int)in_size / 2;
 
+		/* remove BOM */
+		if (bom_detected)
+		{
+			in += 2;
+			wide_size--;
+		}
+
+		wide_string_be = (wchar_t *)in;
 
 		if (wide_size > STATIC_SIZE)
 			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
@@ -1836,6 +1876,23 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	out_alloc = in_size + 1;
 	p = out = (char *)zbx_malloc(out, out_alloc);
 
+	/* try to guess encoding using BOM if it exists */
+	if ('\0' == *encoding)
+	{
+		if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
+		{
+			encoding = "UTF-8";
+		}
+		else if (2 <= in_size && 0 == strncmp("\xff\xfe", in, 2))
+		{
+			encoding = "UTF-16LE";
+		}
+		else if (2 <= in_size && 0 == strncmp("\xfe\xff", in, 2))
+		{
+			encoding = "UTF-16BE";
+		}
+	}
+
 	if ('\0' == *encoding || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
 	{
 		memcpy(out, in, in_size);
@@ -1861,6 +1918,10 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	*p = '\0';
 
 	iconv_close(cd);
+
+	/* remove BOM */
+	if (3 <= p - out && 0 == strncmp("\xef\xbb\xbf", out, 3))
+		memmove(out, out + 3, (size_t)(p - out - 2));
 
 	return out;
 }
@@ -3362,6 +3423,122 @@ static int	zbx_token_parse_objectid(const char *expression, const char *macro, z
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_token_parse_macro_segment                                    *
+ *                                                                            *
+ * Purpose: parses macro name segment                                         *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             segment    - [IN] the segment start                            *
+ *             strict     - [OUT] 1 - macro contains only standard characters *
+ *                                    (upper case alphanumeric characters,    *
+ *                                     dots and underscores)                  *
+ *                                0 - the last segment contains lowercase or  *
+ *                                    quoted characters                       *
+ *             next       - [OUT] offset of the next character after the      *
+ *                                segment                                     *
+ *                                                                            *
+ * Return value: SUCCEED - the segment was parsed successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_macro_segment(const char *expression, const char *segment, int *strict, int *next)
+{
+	const char	*ptr = segment;
+
+	if ('"' != *ptr)
+	{
+		for (*strict = 1; '\0' != *ptr; ptr++)
+		{
+			if (0 != isalpha((unsigned char)*ptr))
+			{
+				if (0 == isupper((unsigned char)*ptr))
+					*strict = 0;
+				continue;
+			}
+
+			if (0 != isdigit((unsigned char)*ptr))
+				continue;
+
+			if ('_' == *ptr)
+				continue;
+
+			break;
+		}
+
+		/* check for empty segment */
+		if (ptr == segment)
+			return FAIL;
+
+		*next = ptr - expression;
+	}
+	else
+	{
+		for (*strict = 0, ptr++; '"' != *ptr; ptr++)
+		{
+			if ('\0' == *ptr)
+				return FAIL;
+
+			if ('\\' == *ptr)
+			{
+				ptr++;
+				if ('\\' != *ptr && '"' != *ptr)
+					return FAIL;
+			}
+		}
+
+		/* check for empty segment */
+		if (1 == ptr - segment)
+			return FAIL;
+
+		*next = ptr - expression + 1;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_macro_name                                       *
+ *                                                                            *
+ * Purpose: parses macro name                                                 *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             ptr        - [IN] the beginning of macro name                  *
+ *             loc        - [OUT] the macro name location                     *
+ *                                                                            *
+ * Return value: SUCCEED - the simple macro was parsed successfully           *
+ *               FAIL    - macro does not point at valid macro                *
+ *                                                                            *
+ * Comments: Note that the character following macro name must be inspected   *
+ *           to draw any conclusions. For example for normal macros it must   *
+ *           be '}' or it's not a valid macro.                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_macro_name(const char *expression, const char *ptr, zbx_strloc_t *loc)
+{
+	int	strict, offset, ret;
+
+	loc->l = ptr - expression;
+
+	while (SUCCEED == (ret = zbx_token_parse_macro_segment(expression, ptr, &strict, &offset)))
+	{
+		if (0 == strict && expression + loc->l == ptr)
+			return FAIL;
+
+		ptr = expression + offset;
+
+		if ('.' != *ptr || 0 == strict)
+		{
+			loc->r = ptr - expression - 1;
+			break;
+		}
+		ptr++;
+	}
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_token_parse_macro                                            *
  *                                                                            *
  * Purpose: parses normal macro token                                         *
@@ -3380,35 +3557,23 @@ static int	zbx_token_parse_objectid(const char *expression, const char *macro, z
  ******************************************************************************/
 static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
-	const char		*ptr;
-	size_t			offset;
+	zbx_strloc_t		loc;
 	zbx_token_macro_t	*data;
 
-	/* find the end of simple macro by validating its name until the closing bracket } */
-	for (ptr = macro + 1; '}' != *ptr; ptr++)
-	{
-		if ('\0' == *ptr)
-			return FAIL;
-
-		if (SUCCEED != is_macro_char(*ptr))
-			return FAIL;
-	}
-
-	/* empty macro name */
-	if (1 == ptr - macro)
+	if (SUCCEED != zbx_token_parse_macro_name(expression, macro + 1, &loc))
 		return FAIL;
 
-	offset = macro - expression;
+	if ('}' != expression[loc.r + 1])
+		return FAIL;
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_MACRO;
-	token->loc.l = offset;
-	token->loc.r = offset + (ptr - macro);
+	token->loc.l = loc.l - 1;
+	token->loc.r = loc.r + 1;
 
 	/* initialize token data */
 	data = &token->data.macro;
-	data->name.l = offset + 1;
-	data->name.r = token->loc.r - 1;
+	data->name = loc;
 
 	return SUCCEED;
 }
@@ -3674,26 +3839,35 @@ static int	zbx_token_parse_simple_macro(const char *expression, const char *macr
 static int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
 	const char	*ptr;
-	int		macro_offset;
 
 	if ('#' == macro[2])
-		macro_offset = 3;
-	else
-		macro_offset = 2;
-
-	/* find the end of the nested macro by validating its name until the closing bracket } */
-	for (ptr = macro + macro_offset; '}' != *ptr; ptr++)
 	{
-		if ('\0' == *ptr)
-			return FAIL;
+		/* find the end of the nested macro by validating its name until the closing bracket '}' */
+		for (ptr = macro + 3; '}' != *ptr; ptr++)
+		{
+			if ('\0' == *ptr)
+				return FAIL;
 
-		if (SUCCEED != is_macro_char(*ptr))
+			if (SUCCEED != is_macro_char(*ptr))
+				return FAIL;
+		}
+
+		/* empty macro name */
+		if (3 == ptr - macro)
 			return FAIL;
 	}
+	else
+	{
+		zbx_strloc_t	loc;
 
-	/* empty macro name */
-	if (macro_offset == ptr - macro)
-		return FAIL;
+		if (SUCCEED != zbx_token_parse_macro_name(expression, macro + 2, &loc))
+			return FAIL;
+
+		if ('}' != expression[loc.r + 1])
+			return FAIL;
+
+		ptr = expression + loc.r + 1;
+	}
 
 	/* Determine the token type.                                                   */
 	/* Nested macros formats:                                                      */
@@ -4220,7 +4394,7 @@ int	num_param(const char *p)
  *                                                                            *
  * Author: Eugene Grigorjev, rewritten by Alexei Vladishev                    *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_param(const char *p, int num, char *buf, size_t max_len)
@@ -4369,7 +4543,7 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
+ * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_param_len(const char *p, int num, size_t *sz)
@@ -4499,7 +4673,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 char	*get_param_dyn(const char *p, int num)
@@ -4562,7 +4736,7 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
  *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
  *      cb        - [IN] callback function                                    *
  *      cb_data   - [IN] callback function custom data                        *
- *      error     - [OUT] error messsage                                      *
+ *      error     - [OUT] error message                                       *
  *      maxerrlen - [IN] error size                                           *
  *                                                                            *
  * Return value: SUCCEED - function executed successfully                     *
@@ -4823,7 +4997,7 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_key_param(char *param, int num, char *buf, size_t max_len)
@@ -4858,7 +5032,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	num_key_param(char *param)
@@ -5090,6 +5264,7 @@ void	zbx_trim_float(char *str)
  *                                                                            *
  * Return value: The protocol version if it was successfully extracted,       *
  *               otherwise -1                                                 *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_get_component_version(char *value)
 {
@@ -5104,4 +5279,74 @@ int	zbx_get_component_version(char *value)
 		*ptr = '\0';
 
 	return ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_str_extract                                                  *
+ *                                                                            *
+ * Purpose: extracts value from a string, unquoting if necessary              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *    text  - [IN] the text containing value to extract                       *
+ *    len   - [IN] length (in bytes) of the value to extract.                 *
+ *            It can be 0. It must not exceed length of 'text' string.        *
+ *    value - [OUT] the extracted value                                       *
+ *                                                                            *
+ * Return value: SUCCEED - the value was extracted successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: When unquoting value only " and \ character escapes are accepted.*
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_str_extract(const char *text, size_t len, char **value)
+{
+	char		*tmp, *out;
+	const char	*in;
+
+	tmp = zbx_malloc(NULL, len + 1);
+
+	if (0 == len)
+	{
+		*tmp = '\0';
+		*value = tmp;
+		return SUCCEED;
+	}
+
+	if ('"' != *text)
+	{
+		memcpy(tmp, text, len);
+		tmp[len] = '\0';
+		*value = tmp;
+		return SUCCEED;
+	}
+
+	if (2 > len)
+		goto fail;
+
+	for (out = tmp, in = text + 1; '"' != *in; in++)
+	{
+		if ((size_t)(in - text) >= len - 1)
+			goto fail;
+
+		if ('\\' == *in)
+		{
+			if ((size_t)(++in - text) >= len - 1)
+				goto fail;
+
+			if ('"' != *in && '\\' != *in)
+				goto fail;
+		}
+		*out++ = *in;
+	}
+
+	if ((size_t)(in - text) != len - 1)
+		goto fail;
+
+	*out = '\0';
+	*value = tmp;
+	return SUCCEED;
+fail:
+	zbx_free(tmp);
+	return FAIL;
 }

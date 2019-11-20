@@ -23,6 +23,7 @@
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/locales.inc.php';
+require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 
 // if we must provide language constants on language different from English
 if (isset($_GET['lang'])) {
@@ -44,8 +45,6 @@ if (isset($_GET['lang'])) {
 	// numeric Locale to default
 	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8']);
 }
-
-require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = [
@@ -325,10 +324,8 @@ $tranStrings = [
 	],
 ];
 
+$js = '';
 if (empty($_GET['files'])) {
-	if (array_key_exists('zbx_sessionid', $_COOKIE)) {
-		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']));
-	}
 
 	$files = [
 		'prototype.js',
@@ -351,6 +348,12 @@ if (empty($_GET['files'])) {
 
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
+		require_once dirname(__FILE__).'/include/defines.inc.php';
+
+		if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
+			$js .= 'window.ZBX_SESSION_NAME = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
+		}
+
 		$files[] = 'class.promise.js';
 		$files[] = 'class.localstorage.js';
 		$files[] = 'class.browsertab.js';
@@ -364,7 +367,7 @@ else {
 	$files = $_GET['files'];
 }
 
-$js = 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
+$js .= 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
 		foreach ($tranStrings[$file] as $origStr => $str) {
@@ -377,6 +380,20 @@ foreach ($files as $file) {
 	if (isset($availableJScripts[$file])) {
 		$js .= file_get_contents('js/'.$availableJScripts[$file].$file)."\n";
 	}
+}
+
+if (in_array('prototype.js', $files)) {
+	// This takes care of the Array toJSON incompatibility with JSON.stringify.
+	$js .=
+		'var _json_stringify = JSON.stringify;'.
+		'JSON.stringify = function(value) {'.
+			'var _array_tojson = Array.prototype.toJSON,'.
+				'ret;'.
+			'delete Array.prototype.toJSON;'.
+			'ret = _json_stringify(value);'.
+			'Array.prototype.toJSON = _array_tojson;'.
+			'return ret;'.
+		'};';
 }
 
 $etag = md5($js);
@@ -392,20 +409,6 @@ if (array_key_exists('HTTP_IF_NONE_MATCH', $_SERVER) && strpos($_SERVER['HTTP_IF
 	header('HTTP/1.1 304 Not Modified');
 	header('ETag: "'.$etag.'"');
 	exit;
-}
-
-if (in_array('prototype.js', $files)) {
-	// This takes care of the Array toJSON incompatibility with JSON.stringify.
-	$js .=
-		'var _json_stringify = JSON.stringify;'.
-		'JSON.stringify = function(value) {'.
-			'var _array_tojson = Array.prototype.toJSON,'.
-				'ret;'.
-			'delete Array.prototype.toJSON;'.
-			'ret = _json_stringify(value);'.
-			'Array.prototype.toJSON = _array_tojson;'.
-			'return ret;'.
-		'};';
 }
 
 header('Content-Type: application/javascript; charset=UTF-8');

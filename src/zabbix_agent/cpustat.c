@@ -22,6 +22,9 @@
 #include "cpustat.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
+/* defined in sysinfo lib */
+extern int get_cpu_group_num_win32(void);
+extern int get_numa_node_num_win32(void);
 #endif
 #include "mutexs.h"
 #include "log.h"
@@ -123,7 +126,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	char				*error = NULL;
 	int				idx, ret = FAIL;
 #ifdef _WINDOWS
-	wchar_t				cpu[8];
+	wchar_t				cpu[16]; /* 16 is enough to store instance name string (group and index) */
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
@@ -131,32 +134,90 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 #ifdef _WINDOWS
 	cpe.szMachineName = NULL;
-	cpe.szObjectName = get_counter_name(PCI_PROCESSOR);
+	cpe.szObjectName = get_counter_name(get_builtin_counter_index(PCI_PROCESSOR));
 	cpe.szInstanceName = cpu;
 	cpe.szParentInstance = NULL;
 	cpe.dwInstanceIndex = (DWORD)-1;
-	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_TIME);
+	cpe.szCounterName = get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_TIME));
 
-	for (idx = 0; idx <= pcpus->count; idx++)
+	/* 64 logical CPUs (threads) is a hard limit for 32-bit Windows systems and some old 64-bit versions,  */
+	/* such as Windows Vista. Systems with <= 64 threads will always have one processor group, which means */
+	/* it's ok to use old performance counter "\Processor(n)\% Processor Time". However, for systems with  */
+	/* more than 64 threads Windows distributes them evenly across multiple processor groups with maximum  */
+	/* 64 threads per single group. Given that "\Processor(n)" doesn't report values for n >= 64 we need   */
+	/* to use "\Processor Information(g, n)" where g is a group number and n is a thread number within     */
+	/* the group. So, for 72-thread system there will be two groups with 36 threads each and Windows will  */
+	/* report counters "\Processor Information(0, n)" with 0 <= n <= 31 and "\Processor Information(1,n)". */
+
+	if (pcpus->count <= 64)
 	{
-		if (0 == idx)
-			StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
-		else
-			_itow_s(idx - 1, cpu, ARRSIZE(cpu), 10);
-
-		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
-			goto clean;
-
-		if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
-				PERF_COUNTER_LANG_DEFAULT, &error)))
+		for (idx = 0; idx <= pcpus->count; idx++)
 		{
-			goto clean;
+			if (0 == idx)
+				StringCchPrintf(cpu, ARRSIZE(cpu), L"_Total");
+			else
+				_itow_s(idx - 1, cpu, ARRSIZE(cpu), 10);
+
+			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
+				goto clean;
+
+			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+					PERF_COUNTER_LANG_DEFAULT, &error)))
+			{
+				goto clean;
+			}
+		}
+	}
+	else
+	{
+		int	gidx, cpu_groups, cpus_per_group, numa_nodes;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "more than 64 CPUs, using \"Processor Information\" counter");
+
+		cpe.szObjectName = get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_INFORMATION));
+
+		/* This doesn't seem to be well documented but it looks like Windows treats Processor Information */
+		/* object differently on NUMA-enabled systems. First index for the object may either mean logical */
+		/* processor group on non-NUMA systems or NUMA node number when NUMA is available. There may be more */
+		/* NUMA nodes than processor groups. */
+		numa_nodes = get_numa_node_num_win32();
+		cpu_groups = numa_nodes == 1 ? get_cpu_group_num_win32() : numa_nodes;
+		cpus_per_group = pcpus->count / cpu_groups;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "cpu_groups = %d, cpus_per_group = %d, cpus = %d", cpu_groups,
+				cpus_per_group, pcpus->count);
+
+		for (gidx = 0; gidx < cpu_groups; gidx++)
+		{
+			for (idx = 0; idx <= cpus_per_group; idx++)
+			{
+				if (0 == idx)
+				{
+					if (0 != gidx)
+						continue;
+					StringCchPrintf(cpu, ARRSIZE(cpu), L"_Total");
+				}
+				else
+				{
+					StringCchPrintf(cpu, ARRSIZE(cpu), L"%d,%d", gidx, idx - 1);
+				}
+
+				if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
+					goto clean;
+
+				if (NULL == (pcpus->cpu_counter[gidx * cpus_per_group + idx] =
+						add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+								PERF_COUNTER_LANG_DEFAULT, &error)))
+				{
+					goto clean;
+				}
+			}
 		}
 	}
 
-	cpe.szObjectName = get_counter_name(PCI_SYSTEM);
+	cpe.szObjectName = get_counter_name(get_builtin_counter_index(PCI_SYSTEM));
 	cpe.szInstanceName = NULL;
-	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_QUEUE_LENGTH);
+	cpe.szCounterName = get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_QUEUE_LENGTH));
 
 	if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
 		goto clean;

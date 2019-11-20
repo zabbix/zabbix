@@ -3,11 +3,11 @@
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 The template to monitor RabbitMQ by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template App RabbitMQ Cluster — (Zabbix version >= 4.2) collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with Zabbix agent.
+Template App RabbitMQ Cluster — collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with Zabbix agent.
 
 
 
@@ -116,7 +116,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|RabbitMQ: Failed to fetch overview data (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes</p>|`{TEMPLATE_NAME:web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"].nodata(30m)}=1`|WARNING|<p>Manual close: YES</p>|
+|RabbitMQ: Failed to fetch overview data (or no data for 30m)|<p>Zabbix has not received data for items for the last 30 minutes</p>|`{TEMPLATE_NAME:web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"].nodata(30m)}=1`|WARNING|<p>Manual close: YES</p>|
 
 ## Feedback
 
@@ -129,7 +129,7 @@ You can also provide feedback, discuss the template or ask for help with it at
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 The template to monitor RabbitMQ by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -245,18 +245,18 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|RabbitMQ: Node healthcheck failed|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/monitoring.html#health-checks</p>|`{TEMPLATE_NAME:web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node"].last()}=0`|AVERAGE||
-|RabbitMQ: Version has changed (new version: {ITEM.VALUE})|<p>Last value: {ITEM.LASTVALUE1}.</p><p>RabbitMQ version has changed. Ack to close.</p>|`{TEMPLATE_NAME:rabbitmq.node.overview.rabbitmq_version.diff()}=1 and {TEMPLATE_NAME:rabbitmq.node.overview.rabbitmq_version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
-|RabbitMQ: Number of network partitions is too high (more than 0 for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/partitions.html#detecting</p>|`{TEMPLATE_NAME:rabbitmq.node.partitions.min(5m)}>0`|WARNING||
-|RabbitMQ: Node is not running|<p>Last value: {ITEM.LASTVALUE1}.</p><p>RabbitMQ node is not running</p>|`{TEMPLATE_NAME:rabbitmq.node.running.max(5m)}=0`|AVERAGE|<p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p>|
-|RabbitMQ: Memory alarm (Memory usage threshold has been reached)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/memory.html</p>|`{TEMPLATE_NAME:rabbitmq.node.mem_alarm.last()}=1`|AVERAGE||
-|RabbitMQ: Free disk space alarm (Free space threshold has been reached)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/disk-alarms.html</p>|`{TEMPLATE_NAME:rabbitmq.node.disk_free_alarm.last()}=1`|AVERAGE||
-|RabbitMQ: has been restarted (uptime < 10m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>The RabbitMQ uptime is less than 10 minutes</p>|`{TEMPLATE_NAME:rabbitmq.node.uptime.last()}<10m`|INFO|<p>Manual close: YES</p>|
-|RabbitMQ: Process is not running|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:proc.num["{$RABBITMQ.PROCESS_NAME}"].last()}=0`|HIGH||
-|RabbitMQ: Service is down|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p>|
-|RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].min(5m)}>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p>|
-|RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"].min(5m)}>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}`|WARNING||
-|RabbitMQ: Failed to fetch nodes data (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"].nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p>|
+|RabbitMQ: Node healthcheck failed|<p>https://www.rabbitmq.com/monitoring.html#health-checks</p>|`{TEMPLATE_NAME:web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node"].last()}=0`|AVERAGE||
+|RabbitMQ: Version has changed (new version: {ITEM.VALUE})|<p>RabbitMQ version has changed. Ack to close.</p>|`{TEMPLATE_NAME:rabbitmq.node.overview.rabbitmq_version.diff()}=1 and {TEMPLATE_NAME:rabbitmq.node.overview.rabbitmq_version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
+|RabbitMQ: Number of network partitions is too high (more than 0 for 5m)|<p>https://www.rabbitmq.com/partitions.html#detecting</p>|`{TEMPLATE_NAME:rabbitmq.node.partitions.min(5m)}>0`|WARNING||
+|RabbitMQ: Node is not running|<p>RabbitMQ node is not running</p>|`{TEMPLATE_NAME:rabbitmq.node.running.max(5m)}=0`|AVERAGE|<p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p>|
+|RabbitMQ: Memory alarm (Memory usage threshold has been reached)|<p>https://www.rabbitmq.com/memory.html</p>|`{TEMPLATE_NAME:rabbitmq.node.mem_alarm.last()}=1`|AVERAGE||
+|RabbitMQ: Free disk space alarm (Free space threshold has been reached)|<p>https://www.rabbitmq.com/disk-alarms.html</p>|`{TEMPLATE_NAME:rabbitmq.node.disk_free_alarm.last()}=1`|AVERAGE||
+|RabbitMQ: has been restarted (uptime < 10m)|<p>Uptime is less than 10 minutes</p>|`{TEMPLATE_NAME:rabbitmq.node.uptime.last()}<10m`|INFO|<p>Manual close: YES</p>|
+|RabbitMQ: Process is not running|<p>-</p>|`{TEMPLATE_NAME:proc.num["{$RABBITMQ.PROCESS_NAME}"].last()}=0`|HIGH||
+|RabbitMQ: Service is down|<p>-</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p>|
+|RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>-</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].min(5m)}>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p>|
+|RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m)|<p>-</p>|`{TEMPLATE_NAME:rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"].min(5m)}>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}`|WARNING||
+|RabbitMQ: Failed to fetch nodes data (or no data for 30m)|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"].nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p>|
 
 ## Feedback
 

@@ -91,22 +91,20 @@ class CClock extends CDiv {
 	}
 
 	public function getScriptRun() {
-		return ($this->error === null)
-			? 'jQuery(function($) {'.
-				'$("#'.$this->getId().'").zbx_clock('.
-					CJs::encodeJson([
-						'time' => $this->time,
-						'time_zone_string' => $this->time_zone_string,
-						'time_zone_offset' => $this->time_zone_offset,
-						'clock_id' => $this->getId()
-					]).
-				');'.
-				// Hack for Safari to manually accept parent container height in pixels when clock widget is loaded.
-				'if (SF) {'.
-					'$("#'.$this->getId().'").height($("#'.$this->getId().'").parent().height());'.
-				'}'.
-			'});'
-			: '';
+		if ($this->error !== null) {
+			return '';
+		}
+
+		return 'jQuery(function($) {'.
+			'$("#'.$this->getId().'").zbx_clock('.
+				CJs::encodeJson([
+					'time' => $this->time,
+					'time_zone_string' => $this->time_zone_string,
+					'time_zone_offset' => $this->time_zone_offset,
+					'clock_id' => $this->getId()
+				]).
+			');'.
+		'});';
 	}
 
 	private function makeClockLine($width, $height, $x, $y, $deg) {
@@ -185,9 +183,7 @@ class CClock extends CDiv {
 			->addClass(ZBX_STYLE_CLOCK_SVG);
 
 		if ($this->width !== null && $this->height !== null) {
-			$clock
-				->setAttribute('width', $this->width.'px')
-				->setAttribute('height', $this->height.'px');
+			$clock->setAttribute('style', 'width: '.$this->width.'px; height:'.$this->height.'px;');
 		}
 
 		if ($this->error !== null) {

@@ -29,9 +29,7 @@ $output = [
 $form = (new CForm('post', 'zabbix.php'))
 	->cleanItems()
 	->setName('sform')
-	->addVar('sform', '1')
 	->addVar('action', 'popup.triggerwizard')
-	->addVar('itemid', $options['itemid'])
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 if (array_key_exists('triggerid', $options)) {
@@ -42,12 +40,7 @@ $expression_table = (new CTable())
 	->addClass('ui-sortable')
 	->setId('expressions_list')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([
-		'',
-		_('Expression'),
-		_('Type'),
-		_('Action')
-	]);
+	->setHeader(['', _('Expression'), _('Type'), _('Action')]);
 
 $expressions = [];
 
@@ -62,6 +55,22 @@ foreach ($data['expressions'] as $expr) {
 $output['script_inline'] = 'jQuery("#'.$expression_table->getId().'").data("rows", '.CJs::encodeJson($expressions).');'
 	.$output['script_inline'];
 
+$ms_itemid = (new CMultiSelect([
+	'name' => 'itemid',
+	'object_name' => 'items',
+	'multiple' => false,
+	'data' => [['id' => $options['itemid'], 'name' => $options['item_name']]],
+	'popup' => [
+		'parameters' => [
+			'srctbl' => 'items',
+			'srcfld1' => 'itemid',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'itemid',
+			'value_types' => [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]
+		]
+	]
+]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
 $form->addItem(
 	(new CFormList())
 		->addRow(
@@ -70,33 +79,12 @@ $form->addItem(
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
-		->addRow(
-			new CLabel(_('Operational data'), 'opdata'),
-			(new CTextBox('opdata', $options['opdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-		->addRow(_('Item'), [
-			(new CTextBox('item', $options['item_name']))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('disabled', 'disabled'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton(null, _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
-						'srctbl' => 'items',
-						'srcfld1' => 'itemid',
-						'srcfld2' => 'name',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'itemid',
-						'dstfld2' => 'item'
-					]).', null, this);'
-				)
-		])
+		->addRow((new CLabel(_('Item'), 'itemid'))->setAsteriskMark(), $ms_itemid)
 		->addRow(_('Severity'), new CSeverity([
 			'name' => 'priority',
 			'value' => (int) $options['priority']
 		]))
-		->addRow((new CLabel(_('Expression'), $expression_table->getId()))->setAsteriskMark(),
+		->addRow((new CLabel(_('Expression'), 'logexpr'))->setAsteriskMark(),
 			(new CTextBox('expression'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('logexpr')
@@ -141,6 +129,8 @@ $form->addItem(
 			(new CCheckBox('status'))->setChecked($options['status'] == TRIGGER_STATUS_ENABLED)
 		)
 );
+
+$output['script_inline'] .= $ms_itemid->getPostJS();
 
 $output['body'] = $form->toString();
 

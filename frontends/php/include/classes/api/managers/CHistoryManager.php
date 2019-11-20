@@ -1013,7 +1013,7 @@ class CHistoryManager {
 		global $HISTORY;
 
 		if (is_array($HISTORY) && array_key_exists('types', $HISTORY) && is_array($HISTORY['types'])
-				&& count($HISTORY['types'] > 0)) {
+				&& count($HISTORY['types']) > 0) {
 
 			$query = [
 				'query' => [

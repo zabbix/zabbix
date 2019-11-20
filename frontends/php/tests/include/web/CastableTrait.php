@@ -167,14 +167,25 @@ trait CastableTrait {
 	}
 
 	/**
-	 * Cast object to Range Control element.
+	 * Cast object to CompositeInput element.
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return CRangeControlElement
+	 * @return CCompositeInputElement
 	 */
-	public function asRangeControl($options = []) {
-		return $this->cast(CRangeControlElement::class, $options);
+	public function asCompositeInput($options = []) {
+		return $this->cast(CCompositeInputElement::class, $options);
+	}
+
+	/**
+	 * Cast object to ColorPicker element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CColorPickerElement
+	 */
+	public function asColorPicker($options = []) {
+		return $this->cast(CColorPickerElement::class, $options);
 	}
 
 	/**
@@ -186,6 +197,17 @@ trait CastableTrait {
 	 */
 	public function asMultifieldTable($options = []) {
 		return $this->cast(CMultifieldTableElement::class, $options);
+	}
+
+	/**
+	 * Cast object to PopupMenu element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CPopupMenuElement
+	 */
+	public function asPopupMenu($options = []) {
+		return $this->cast(CPopupMenuElement::class, $options);
 	}
 
 	/**
@@ -208,5 +230,16 @@ trait CastableTrait {
 	 */
 	public function asMultiline($options = []) {
 		return $this->cast(CMultilineElement::class, $options);
+	}
+
+	/**
+	 * Cast object to PopupButton element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CPopupButtonElement
+	 */
+	public function asPopupButton($options = []) {
+		return $this->cast(CPopupButtonElement::class, $options);
 	}
 }

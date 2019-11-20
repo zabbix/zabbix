@@ -53,7 +53,6 @@ class CHost extends CHostGeneral {
 	 * @param bool			$options['selectApplications']			select Applications
 	 * @param bool			$options['selectMacros']				select Macros
 	 * @param bool|array	$options['selectInventory']				select Inventory
-	 * @param bool			$options['withInventory']				select only hosts with inventory
 	 * @param int			$options['count']						count Hosts, returned column name is rowscount
 	 * @param string		$options['pattern']						search hosts by pattern in Host name
 	 * @param string		$options['extendPattern']				search hosts by pattern in Host name, ip and DNS
@@ -103,7 +102,6 @@ class CHost extends CHostGeneral {
 			'with_graphs'						=> null,
 			'with_graph_prototypes'				=> null,
 			'with_applications'					=> null,
-			'withInventory'						=> null,
 			'editable'							=> false,
 			'nopermissions'						=> null,
 			// filter
@@ -417,14 +415,6 @@ class CHost extends CHostGeneral {
 			$sqlParts['where'][] = 'a.hostid=h.hostid';
 		}
 
-		// withInventory
-		if (!is_null($options['withInventory']) && $options['withInventory']) {
-			$sqlParts['where'][] = ' h.hostid IN ('.
-					' SELECT hin.hostid'.
-					' FROM host_inventory hin'.
-					')';
-		}
-
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
@@ -474,6 +464,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
+		$sqlParts = $this->applyQueryFilterOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -505,6 +496,52 @@ class CHost extends CHostGeneral {
 		}
 
 		return $result;
+	}
+
+	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		if ($options['filter'] && array_key_exists('inventory_mode', $options['filter'])) {
+			if ($options['filter']['inventory_mode'] !== null) {
+				$inventory_mode_query = (array) $options['filter']['inventory_mode'];
+
+				$inventory_mode_where = [];
+				$null_position = array_search(HOST_INVENTORY_DISABLED, $inventory_mode_query);
+
+				if ($null_position !== false) {
+					unset($inventory_mode_query[$null_position]);
+					$inventory_mode_where[] = 'hinv.inventory_mode IS NULL';
+				}
+
+				if ($null_position === false || $inventory_mode_query) {
+					$inventory_mode_where[] = dbConditionInt('hinv.inventory_mode', $inventory_mode_query);
+				}
+
+				$sqlParts['where'][] = (count($inventory_mode_where) > 1)
+					? '('.implode(' OR ', $inventory_mode_where).')'
+					: $inventory_mode_where[0];
+			}
+		}
+
+		return $sqlParts;
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])) {
+			$sqlParts['select']['inventory_mode'] =
+				dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
+		}
+
+		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
+				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
+			$sqlParts['left_join'][] = [
+				'from' => 'host_inventory hinv',
+				'on' => $this->tableAlias().'.'.$this->pk().'=hinv.hostid'
+			];
+			$sqlParts['left_table'] = $this->tableName();
+		}
+
+		return $sqlParts;
 	}
 
 	/**
@@ -1443,18 +1480,8 @@ class CHost extends CHostGeneral {
 				'preservekeys' => true
 			]);
 
-			foreach ($hostids as $hostid) {
-				// There is no DB record if inventory mode is HOST_INVENTORY_DISABLED.
-				if (!array_key_exists($hostid, $inventory)) {
-					$inventory[$hostid] = [
-						'hostid' => (string) $hostid,
-						'inventory_mode' => (string) HOST_INVENTORY_DISABLED
-					];
-				}
-			}
-
+			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], []);
 			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
-			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], $options['selectInventory']);
 			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 

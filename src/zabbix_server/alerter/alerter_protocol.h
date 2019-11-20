@@ -109,6 +109,7 @@ typedef struct
 	zbx_uint64_t	mediatypeid;
 	int		retries;
 	int		status;
+	int		source;
 	char		*value;
 	char		*error;
 }

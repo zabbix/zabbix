@@ -472,7 +472,7 @@ ZBX_LocalStorageKey.prototype.write = function(string) {
 /**
  * Fetch key value.
  *
- * @return {string|null}  Null is retuned if key is deleted.
+ * @return {string|null}  Null is returned if key is deleted.
  */
 ZBX_LocalStorageKey.prototype.fetchPrimary = function() {
 	return this.primary_store.getItem(this.absolute_key);
@@ -481,7 +481,7 @@ ZBX_LocalStorageKey.prototype.fetchPrimary = function() {
 /**
  * Fetch key value.
  *
- * @return {string|null}  Null is retuned if key is deleted.
+ * @return {string|null}  Null is returned if key is deleted.
  */
 ZBX_LocalStorageKey.prototype.fetchBackup = function() {
 	return this.backup_store.getItem(this.absolute_key);
@@ -490,7 +490,7 @@ ZBX_LocalStorageKey.prototype.fetchBackup = function() {
 /**
  * Fetch key value.
  *
- * @return {string|null}  Null is retuned if key is deleted.
+ * @return {string|null}  Null is returned if key is deleted.
  */
 ZBX_LocalStorageKey.prototype.fetch = function() {
 	return this.fetchPrimary() || this.fetchBackup();
@@ -554,5 +554,5 @@ ZBX_LocalStorageKey.prototype.publish = function(payload) {
 
 ZABBIX.namespace(
 	'instances.localStorage',
-	new ZBX_LocalStorage('1', cookie.read('localstoragePath'))
+	new ZBX_LocalStorage('1', window.ZBX_SESSION_NAME)
 );

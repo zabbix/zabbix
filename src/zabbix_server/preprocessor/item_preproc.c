@@ -267,8 +267,8 @@ static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *valu
 
 	zbx_trim_float(buffer);
 
-	if (FAIL == is_double(buffer))
-		err = zbx_dsprintf(NULL, "a numerical value is expected");
+	if (FAIL == is_double(buffer, NULL))
+		err = zbx_dsprintf(NULL, "a numerical value is expected or the value is out of range");
 	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, buffer, &err))
 		return SUCCEED;
 
@@ -369,7 +369,7 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
  *             value         - [IN/OUT] the value to process                  *
  *             ts            - [IN] the value timestamp                       *
  *             op_type       - [IN] the operation type                        *
- *             history_value - [IN/OUT] the historical (previuous) data       *
+ *             history_value - [IN/OUT] the historical (previous) data        *
  *             history_ts    - [IN/OUT] the timestamp of the historical data  *
  *             errmsg        - [OUT] error message                            *
  *                                                                            *
@@ -1921,7 +1921,12 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 
 	for (field = NULL; value->data.str + data_len >= data; data += step)
 	{
-		step = zbx_utf8_char_len(data);
+		if (0 == (step = zbx_utf8_char_len(data)))
+		{
+			*errmsg = zbx_strdup(*errmsg, "cannot convert CSV to JSON: invalid UTF-8 character in value");
+			ret = FAIL;
+			goto out;
+		}
 
 		if (CSV_STATE_FIELD_QUOTED != state)
 		{
@@ -1966,7 +1971,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 				zbx_json_close(&json);
 				state = CSV_STATE_DELIM;
 			}
-			else if (0 == memcmp(data, delim, delim_sz))
+			else if (step == delim_sz && 0 == memcmp(data, delim, delim_sz))
 			{
 				*data = '\0';
 
@@ -1980,7 +1985,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 				fld_num++;
 				state = CSV_STATE_DELIM;
 			}
-			else if (0 < quote_sz && 0 == memcmp(data, quote, quote_sz) && CSV_STATE_DELIM == state)
+			else if (CSV_STATE_DELIM == state && step == quote_sz && 0 == memcmp(data, quote, quote_sz))
 			{
 				state = CSV_STATE_FIELD_QUOTED;
 			}
@@ -1990,11 +1995,15 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 				state = CSV_STATE_FIELD;
 			}
 		}
-		else if (0 < quote_sz && 0 == memcmp(data, quote, quote_sz))
+		else if (step == quote_sz && 0 == memcmp(data, quote, quote_sz))
 		{
 			char	*data_next = data + quote_sz;
+			size_t	char_sz;
 
-			if (0 == memcmp(data_next, quote, quote_sz))
+			if (0 == (char_sz = zbx_utf8_char_len(data_next)))
+				continue;	/* invalid UTF-8 */
+
+			if (char_sz == quote_sz && 0 == memcmp(data_next, quote, quote_sz))
 			{
 				if (NULL == field)
 					field = data;
@@ -2005,7 +2014,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 				data = data_next;
 			}
 			else if ('\r' == *data_next || '\n' == *data_next || '\0' == *data_next ||
-					0 == memcmp(data_next, delim, delim_sz))
+					(char_sz == delim_sz && 0 == memcmp(data_next, delim, delim_sz)))
 			{
 				state = CSV_STATE_FIELD;
 				*data = '\0';
@@ -2029,13 +2038,6 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 		else if (NULL == field)
 		{
 			field = data;
-		}
-
-		if (0 == step)
-		{
-			*errmsg = zbx_strdup(*errmsg, "cannot convert CSV to JSON: invalid UTF-8 character in value");
-			ret = FAIL;
-			goto out;
 		}
 	}
 

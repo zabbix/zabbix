@@ -543,6 +543,7 @@ $triggersFormList
 	->addRow(_('Description'),
 		(new CTextArea('comments', $data['comments']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 			->setReadonly($discovered_trigger)
 	)
 	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));

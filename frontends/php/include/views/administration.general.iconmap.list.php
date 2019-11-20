@@ -21,11 +21,11 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Icon mapping'))
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php'))
 				->addItem(new CSubmit('form', _('Create icon map')))
 			)
 		))

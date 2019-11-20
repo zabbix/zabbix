@@ -33,10 +33,13 @@ require_once dirname(__FILE__).'/elements/COverlayDialogElement.php';
 require_once dirname(__FILE__).'/elements/CMessageElement.php';
 require_once dirname(__FILE__).'/elements/CMultiselectElement.php';
 require_once dirname(__FILE__).'/elements/CSegmentedRadioElement.php';
-require_once dirname(__FILE__).'/elements/CRangeControlElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
 require_once dirname(__FILE__).'/elements/CMultifieldTableElement.php';
 require_once dirname(__FILE__).'/elements/CMultilineElement.php';
+require_once dirname(__FILE__).'/elements/CColorPickerElement.php';
+require_once dirname(__FILE__).'/elements/CCompositeInputElement.php';
+require_once dirname(__FILE__).'/elements/CPopupMenuElement.php';
+require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -460,20 +463,27 @@ class CElementQuery implements IWaitable {
 			'CDropdownElement'			=> '/select[@name]',
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> [
-				'/div[@class="multiselect-control"]',
-				'/div/div[@class="multiselect-control"]' // TODO: remove after fix DEV-1071.
+				'/div[contains(@class, "multiselect-control")]',
+				'/div/div[contains(@class, "multiselect-control")]' // TODO: remove after fix DEV-1071.
 			],
 			'CSegmentedRadioElement'	=> [
-				'/ul[@class="radio-list-control"]',
-				'/div/ul[@class="radio-list-control"]' // TODO: remove after fix DEV-1071.
+				'/ul[contains(@class, "radio-list-control")]',
+				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
 			],
-			'CCheckboxListElement'		=> '/ul[@class="checkbox-list col-3"]',
+			'CCheckboxListElement'		=> [
+				'/ul[contains(@class, "checkbox-list")]',
+				'/ul[contains(@class, "list-check-radio")]'
+			],
 			'CTableElement'				=> [
 				'/table',
-				'/*[@class="table-forms-separator"]/table'
+				'/*[contains(@class, "table-forms-separator")]/table'
 			],
-			'CRangeControlElement'		=> '/div[@class="range-control"]',
-			'CMultilineElement'			=> '/div[@class="multilineinput-control"]'
+			'CCompositeInputElement'	=> [
+				'/div[contains(@class, "range-control")]',
+				'/div[contains(@class, "calendar-control")]'
+			],
+			'CColorPickerElement'		=> '/div[contains(@class, "input-color-picker")]',
+			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]'
 		];
 
 		if ($class !== null) {

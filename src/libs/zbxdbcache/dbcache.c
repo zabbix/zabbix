@@ -57,7 +57,7 @@ static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
 
 extern unsigned char	program_type;
 
-#define ZBX_IDS_SIZE	8
+#define ZBX_IDS_SIZE	9
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
@@ -3454,18 +3454,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		return;
 	}
 
-	if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_flags))
-	{
-		if (NULL == GET_TEXT_RESULT(result))
-			return;
-
-		/* proxy stores low-level discovery (lld) values in db */
-		if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
-			dc_local_add_history_lld(itemid, ts, result->text);
-
-		return;
-	}
-
 	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
 	if (!ISSET_VALUE(result) && !ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return;
@@ -3484,6 +3472,18 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
 	{
+		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_flags))
+		{
+			if (NULL == GET_TEXT_RESULT(result))
+				return;
+
+			/* proxy stores low-level discovery (lld) values in db */
+			if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+				dc_local_add_history_lld(itemid, ts, result->text);
+
+			return;
+		}
+
 		if (ISSET_LOG(result))
 		{
 			dc_local_add_history_log(itemid, item_value_type, ts, result->log, result->lastlogsize,
@@ -4366,12 +4366,13 @@ void	DCupdate_hosts_availability(void)
 
 	for (i = 0; i < hosts.values_num; i++)
 	{
-		if (SUCCEED == zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
+		if (SUCCEED != zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
 				(zbx_host_availability_t *)hosts.values[i]))
 		{
-			zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
+			continue;
 		}
 
+		zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
 		DBexecute_overflowed_sql(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
 	}
 

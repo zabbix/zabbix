@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 
 ## Setup
 
@@ -46,9 +46,9 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:vm.memory.util[snmp].min(5m)}>{$MEMORY.UTIL.MAX}`|AVERAGE|<p>**Depends on**:</p><p>- Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p>|
-|Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:vm.memory.available[snmp].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory SNMPv2:vm.memory.total[memTotalReal.0].last()}>0`|AVERAGE||
-|High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>This trigger is ignored, if there is no swap configured</p>|`{TEMPLATE_NAME:system.swap.pfree[snmp].min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory SNMPv2:system.swap.total[memTotalSwap.0].last()}>0`|WARNING|<p>**Depends on**:</p><p>- High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)</p><p>- Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p>|
+|High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)|<p>-</p>|`{TEMPLATE_NAME:vm.memory.util[snmp].min(5m)}>{$MEMORY.UTIL.MAX}`|AVERAGE|<p>**Depends on**:</p><p>- Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p>|
+|Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})|<p>-</p>|`{TEMPLATE_NAME:vm.memory.available[snmp].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory SNMPv2:vm.memory.total[memTotalReal.0].last()}>0`|AVERAGE||
+|High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)|<p>This trigger is ignored, if there is no swap configured</p>|`{TEMPLATE_NAME:system.swap.pfree[snmp].min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory SNMPv2:system.swap.total[memTotalSwap.0].last()}>0`|WARNING|<p>**Depends on**:</p><p>- High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)</p><p>- Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p>|
 
 ## Feedback
 
@@ -62,7 +62,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 
 ## Setup
 
@@ -108,7 +108,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 
 ## Setup
 
@@ -159,8 +159,8 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Per CPU load average is too high. Your system may be slow to respond.</p>|`{TEMPLATE_NAME:system.cpu.load.avg1[laLoad.1].min(5m)}/{Template Module Linux CPU SNMPv2:system.cpu.num[snmp].last()}>{$LOAD_AVG_PER_CPU.MAX.WARN}`|AVERAGE||
-|High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:system.cpu.util[snmp,{#SNMPINDEX}].min(5m)}>{$CPU.UTIL.CRIT}`|WARNING||
+|Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)|<p>Per CPU load average is too high. Your system may be slow to respond.</p>|`{TEMPLATE_NAME:system.cpu.load.avg1[laLoad.1].min(5m)}/{Template Module Linux CPU SNMPv2:system.cpu.num[snmp].last()}>{$LOAD_AVG_PER_CPU.MAX.WARN} and {Template Module Linux CPU SNMPv2:system.cpu.load.avg5[laLoad.2].last()}>0 and {Template Module Linux CPU SNMPv2:system.cpu.load.avg15[laLoad.3].last()}>0`|AVERAGE||
+|High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)|<p>-</p>|`{TEMPLATE_NAME:system.cpu.util[snmp,{#SNMPINDEX}].min(5m)}>{$CPU.UTIL.CRIT}`|WARNING||
 
 ## Feedback
 
@@ -170,7 +170,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 
 ## Setup
 
@@ -214,10 +214,10 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1}), time left till full: < 24h.</p><p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 5G.</p><p> - The disk will be full in less than 24hours.</p>|`{TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and (({Template Module Linux filesystems SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMPv2:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<5G or {TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)`|AVERAGE|<p>Manual close: YES</p>|
-|{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1}), time left till full: < 24h.</p><p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 10G.</p><p> - The disk will be full in less than 24hours.</p>|`{TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and (({Template Module Linux filesystems SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMPv2:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<10G or {TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</p>|
-|{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>It may become impossible to write to disk if there are no index nodes left.</p><p>As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</p>|`{TEMPLATE_NAME:vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}].min(5m)}<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}`|AVERAGE||
-|{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>It may become impossible to write to disk if there are no index nodes left.</p><p>As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</p>|`{TEMPLATE_NAME:vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}].min(5m)}<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}`|WARNING|<p>**Depends on**:</p><p>- {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)</p>|
+|{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)|<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 5G.</p><p> - The disk will be full in less than 24 hours.</p>|`{TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and (({Template Module Linux filesystems SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMPv2:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<5G or {TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)`|AVERAGE|<p>Manual close: YES</p>|
+|{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)|<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 10G.</p><p> - The disk will be full in less than 24 hours.</p>|`{TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and (({Template Module Linux filesystems SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMPv2:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<10G or {TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</p>|
+|{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)|<p>It may become impossible to write to disk if there are no index nodes left.</p><p>As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</p>|`{TEMPLATE_NAME:vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}].min(5m)}<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}`|AVERAGE||
+|{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)|<p>It may become impossible to write to disk if there are no index nodes left.</p><p>As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</p>|`{TEMPLATE_NAME:vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}].min(5m)}<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}`|WARNING|<p>**Depends on**:</p><p>- {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)</p>|
 
 ## Feedback
 
@@ -227,7 +227,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 
 ## Setup
 

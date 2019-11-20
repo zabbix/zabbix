@@ -267,7 +267,9 @@ else {
 }
 
 $hostList->addRow(_('Description'),
-	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextArea('description', $data['description']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setMaxlength(DB::getFieldLength('hosts', 'description'))
 );
 
 // Proxy

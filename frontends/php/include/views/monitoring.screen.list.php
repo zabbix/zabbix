@@ -19,7 +19,17 @@
 **/
 
 
-$widget = (new CWidget())->setTitle(_('Screens'));
+$widget = (new CWidget())
+	->setTitle(_('Screens'))
+	->setTitleSubmenu([
+		'main_section' => [
+			'items' => [
+				'screens.php' => _('Screens'),
+				'slides.php' => _('Slide shows')
+			]
+		]
+	]);
+
 $form = (new CForm('get'))->cleanItems();
 
 $content_control = (new CList())->addItem(new CSubmit('form', _('Create screen')));
@@ -29,14 +39,6 @@ if ($data['templateid']) {
 	$widget->addItem(get_header_host_table('screens', $data['templateid']));
 }
 else {
-	$form->addItem((new CList())
-		->addItem(
-			(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
-				'screens.php' => _('Screens'),
-				'slides.php' => _('Slide shows')
-			]))->removeId()
-		)
-	);
 	$content_control->addItem(
 		(new CButton('form', _('Import')))
 			->onClick('redirect("screen.import.php?rules_preset=screen")')
