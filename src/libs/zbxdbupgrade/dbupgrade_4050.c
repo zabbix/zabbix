@@ -32,7 +32,7 @@ extern unsigned char	program_type;
 static int	DBpatch_4050000(void)
 {
 	int		i;
-	const char      *values[] = {
+	const char	*values[] = {
 			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
 			"web.usergrps.php.sort", "web.usergroup.sort",
 			"web.usergrps.php.sortorder", "web.usergroup.sortorder"
@@ -48,6 +48,7 @@ static int	DBpatch_4050000(void)
 	}
 
 	return SUCCEED;
+}
 
 static int	DBpatch_4050001(void)
 {
