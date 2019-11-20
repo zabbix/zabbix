@@ -333,7 +333,7 @@ class CSetupWizard extends CForm {
 	function stage5() {
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
-		$config_file_name = Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
+		$config_file_name = APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($config_file_name);
 		$config->config = [
 			'DB' => [
@@ -502,7 +502,7 @@ class CSetupWizard extends CForm {
 				// make zabbix.conf.php downloadable
 				header('Content-Type: application/x-httpd-php');
 				header('Content-Disposition: attachment; filename="'.basename(CConfigFile::CONFIG_FILE_PATH).'"');
-				$config = new CConfigFile(Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
+				$config = new CConfigFile(APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
 				$config->config = [
 					'DB' => [
 						'TYPE' => $this->getConfig('DB_TYPE'),

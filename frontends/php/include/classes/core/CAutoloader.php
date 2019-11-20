@@ -23,21 +23,40 @@
  * The Zabbix autoloader class.
  */
 class CAutoloader {
+	/**
+	 * Autoloader root directory will be prepended to any registered relative path.
+	 *
+	 * @var string
+	 */
+	protected $root_dir;
 
 	/**
-	 * An array of directories, where the autoloader will look for the classes.
+	 * Registered namespace array. Key is namespace name with trailing '\' and value is array of directories
+	 * relative path with trailing '/'.
 	 *
 	 * @var array
 	 */
-	protected $includePaths = [];
+	protected $namespaces = [];
 
 	/**
 	 * Initializes object with array of include paths.
 	 *
-	 * @param array $includePaths absolute paths
+	 * @param string $root_dir          web root directory
 	 */
-	public function __construct(array $includePaths) {
-		$this->includePaths = $includePaths;
+	public function __construct($root_dir) {
+		$this->root_dir = $root_dir;
+	}
+
+	/**
+	 * Register supported namespace.
+	 *
+	 * @param string $prefix      Namespace value, should not have '\' as last character.
+	 * @param array  $paths       Array of namespace files directory relative path, should not have '/' as last character.
+	 */
+	public function addNamespace($namespace, array $paths) {
+		foreach ($paths as $path) {
+			$this->namespaces[$namespace][] = realpath($this->root_dir.$path).'/';
+		}
 	}
 
 	/**
@@ -52,27 +71,22 @@ class CAutoloader {
 	/**
 	 * Attempts to find and load the given class.
 	 *
-	 * @param $className
+	 * @param string $fq_class_name
 	 */
-	protected function loadClass($className) {
-		if ($classFile = $this->findClassFile($className)) {
-			require $classFile;
-		}
-	}
+	protected function loadClass($fq_class_name) {
+		$chunks = explode('\\', $fq_class_name);
+		$class_name = array_pop($chunks);
+		$namespace = implode('\\', $chunks);
 
-	/**
-	 * Attempts to find corresponding file for given class name in the current include directories.
-	 *
-	 * @param string $className
-	 *
-	 * @return bool|string
-	 */
-	protected function findClassFile($className) {
-		foreach ($this->includePaths as $includePath) {
-			$filePath = $includePath.'/'.$className.'.php';
+		if (array_key_exists($namespace, $this->namespaces)) {
+			$file_name = $class_name.'.php';
 
-			if (is_file($filePath)) {
-				return $filePath;
+			foreach ($this->namespaces[$namespace] as $dir) {
+				if (is_file($dir.$file_name)) {
+					require $dir.$file_name;
+
+					return true;
+				}
 			}
 		}
 
