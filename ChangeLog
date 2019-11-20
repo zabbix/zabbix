@@ -115,6 +115,7 @@ Changes for 4.4.2rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-16955] fixed performance of history syncers and timer processes by not locking each other when suppressing events (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.2rc1
