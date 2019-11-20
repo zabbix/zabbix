@@ -74,6 +74,7 @@
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
+			<arg line="--enable-agent2"/>
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
 		</exec>
@@ -196,6 +197,7 @@
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
+			<arg line="--enable-agent2"/>
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 		</exec>
