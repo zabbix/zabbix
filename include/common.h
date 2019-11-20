@@ -935,7 +935,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 #define ZBX_FLAG_DOUBLE_PLAIN	0x00
 #define ZBX_FLAG_DOUBLE_SUFFIX	0x01
 int	is_double_suffix(const char *str, unsigned char flags);
-int	is_double(const char *c);
+int	is_double(const char *str, double *value);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
 int	is_time_suffix(const char *c, int *value, int length);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);

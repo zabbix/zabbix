@@ -181,7 +181,9 @@ class testPageTriggers extends CLegacyWebTest {
 	 */
 	public function testPageTriggers_TagsFilter($data) {
 		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
-		$form = $this->setTags($data['tag_options']['type'], $data['tag_options']['tags']);
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
+		$this->setTags($data['tag_options']['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
@@ -429,7 +431,8 @@ class testPageTriggers extends CLegacyWebTest {
 		$form->fill($data['filter_options']);
 
 		if (array_key_exists('tag_options', $data)) {
-			$this->setTags($data['tag_options']['type'], $data['tag_options']['tags']);
+			$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
+			$this->setTags($data['tag_options']['tags']);
 		}
 
 		$form->submit();

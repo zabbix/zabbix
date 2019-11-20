@@ -140,7 +140,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'pointsize' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'transparency' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'fill' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'axisy' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'axisy' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'timeshift' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'missingdatafunc' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,

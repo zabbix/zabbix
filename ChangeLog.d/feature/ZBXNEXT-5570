@@ -1,1 +1,0 @@
-...G...... [ZBXNEXT-5570] changed agent2 plugin configuration, moved MaxLinesPerSecond, EnableRemoteCommands, LogRemoteCommands from global to plugin configuration (wiper)

@@ -593,7 +593,7 @@ $item_form_list->addRow(
 		->setChecked(isset($data['visible']['description'])),
 	(new CTextArea('description', $data['description']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setMaxlength(DB::getFieldLength('items' , 'description'))
+		->setMaxlength(DB::getFieldLength('items', 'description'))
 );
 
 $tabs = (new CTabView())

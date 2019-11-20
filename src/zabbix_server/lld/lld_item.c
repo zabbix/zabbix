@@ -1394,8 +1394,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			ret = xml_xpath_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_MULTIPLIER:
-			if (FAIL == (ret = is_double(pp->params)))
-				zbx_snprintf(err, sizeof(err), "value is not numeric: %s", pp->params);
+			if (FAIL == (ret = is_double(pp->params, NULL)))
+				zbx_snprintf(err, sizeof(err), "value is not numeric or out of range: %s", pp->params);
 			break;
 		case ZBX_PREPROC_VALIDATE_RANGE:
 			zbx_strlcpy(param1, pp->params, sizeof(param1));
@@ -1409,13 +1409,15 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			zbx_lrtrim(param1, " ");
 			zbx_lrtrim(param2, " ");
 
-			if ('\0' != *param1 && FAIL == (ret = is_double(param1)))
+			if ('\0' != *param1 && FAIL == (ret = is_double(param1, NULL)))
 			{
-				zbx_snprintf(err, sizeof(err), "first parameter is not numeric: %s", param1);
+				zbx_snprintf(err, sizeof(err), "first parameter is not numeric or out of range: %s",
+						param1);
 			}
-			else if ('\0' != *param2 && FAIL == (ret = is_double(param2)))
+			else if ('\0' != *param2 && FAIL == (ret = is_double(param2, NULL)))
 			{
-				zbx_snprintf(err, sizeof(err), "second parameter is not numeric: %s", param2);
+				zbx_snprintf(err, sizeof(err), "second parameter is not numeric or out of range: %s",
+						param2);
 			}
 			else if ('\0' == *param1 && '\0' == *param2)
 			{
