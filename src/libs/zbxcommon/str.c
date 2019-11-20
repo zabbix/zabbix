@@ -5470,3 +5470,40 @@ const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *b
 #	undef ZBX_SUFFIX
 #	undef ZBX_BSUFFIX
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_truncate_itemkey                                             *
+ *                                                                            *
+ * Purpose: check the value characters length and, if the length exceeds      *
+ *          max allowable characters length, truncate the value               *
+ *                                                                            *
+ * Parameters: val      - [IN] item key for processing                        *
+ *             char_max - [IN] item key max characters length                 *
+ *             buf      - [IN/OUT] buffer for short version of item key       *
+ *             buf_len  - [IN] buffer size for short version of item key      *
+ *                                                                            *
+ * Return value: The item key that does not exceed passed length              *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len)
+{
+#	define ZBX_SUFFIX	"..."
+
+	size_t	key_byte_count;
+
+	if (char_max >= zbx_strlen_utf8(val))
+		return val;
+
+	key_byte_count = 1 + zbx_strlen_utf8_nchars(val, char_max - ZBX_CONST_STRLEN(ZBX_SUFFIX));
+
+	if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX))
+		return val;
+
+	key_byte_count = zbx_strlcpy_utf8(buf, val, key_byte_count);
+	zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
+
+	return buf;
+
+#	undef ZBX_SUFFIX
+}
