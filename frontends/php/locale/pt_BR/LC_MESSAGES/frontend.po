@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-17 01:43+0200\n"
+"POT-Creation-Date: 2019-11-20 15:09+0200\n"
 "PO-Revision-Date: 2018-11-12 12:53+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -393,6 +393,7 @@ msgstr "Eventos confirmados RESOLVIDOS"
 #: app/views/administration.mediatype.edit.php:147
 #: app/views/administration.mediatype.list.php:70
 #: app/views/administration.user.edit.php:214
+#: app/views/administration.usergroup.tagfilters.html.php:25
 #: app/views/dashboard.sharing.edit.php:24
 #: app/views/dashboard.sharing.edit.php:45
 #: app/views/monitoring.widget.actionlog.view.php:30
@@ -405,7 +406,6 @@ msgstr "Eventos confirmados RESOLVIDOS"
 #: include/views/administration.general.iconmap.edit.php:47
 #: include/views/administration.general.regularexpressions.edit.php:45
 #: include/views/administration.general.valuemapping.edit.php:47
-#: include/views/administration.usergroups.edit.php:184
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
@@ -569,6 +569,9 @@ msgstr "Ativo até"
 #: app/views/administration.script.edit.php:121
 #: app/views/administration.user.edit.php:287
 #: app/views/administration.user.edit.php:459
+#: app/views/administration.usergroup.edit.php:136
+#: app/views/administration.usergroup.edit.php:190
+#: app/views/administration.usergroup.edit.php:227
 #: app/views/dashboard.sharing.edit.php:28
 #: app/views/dashboard.sharing.edit.php:49
 #: app/views/monitoring.problem.view.php:210
@@ -589,9 +592,6 @@ msgstr "Ativo até"
 #: include/views/administration.general.regularexpressions.edit.php:149
 #: include/views/administration.general.valuemapping.edit.php:67
 #: include/views/administration.general.valuemapping.edit.php:107
-#: include/views/administration.usergroups.edit.php:165
-#: include/views/administration.usergroups.edit.php:255
-#: include/views/administration.usergroups.edit.php:287
 #: include/views/common.filter.trigger.php:116
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:678
@@ -891,7 +891,7 @@ msgstr "Todos os dashboards"
 
 #: app/views/administration.user.edit.php:323
 #: app/views/administration.user.edit.php:329
-#: include/views/administration.usergroups.edit.php:109
+#: app/views/administration.usergroup.grouprights.html.php:42
 msgid "All groups"
 msgstr "Todos os grupos"
 
@@ -925,7 +925,7 @@ msgstr "Todas as telas"
 msgid "All slide shows"
 msgstr "Todas as apresentações de telas"
 
-#: include/views/administration.usergroups.edit.php:208
+#: app/views/administration.usergroup.tagfilters.html.php:43
 msgid "All tags"
 msgstr "Todas as etiquetas"
 
@@ -981,9 +981,9 @@ msgstr "E/OU"
 
 #: app/views/administration.mediatype.list.php:46
 #: app/views/administration.proxy.list.php:45
+#: app/views/administration.usergroup.list.php:47
 #: app/views/administration.user.list.php:63
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:34
-#: include/views/administration.usergroups.list.php:42
 #: include/views/common.filter.trigger.php:43
 #: include/views/configuration.action.list.php:66
 #: include/views/configuration.correlation.list.php:44
@@ -1604,6 +1604,7 @@ msgstr "Não pode ser removido"
 #: app/views/administration.user.edit.php:453
 #: app/views/administration.user.edit.php:460
 #: app/views/administration.user.edit.php:467
+#: app/views/administration.usergroup.edit.php:209
 #: app/views/monitoring.acknowledge.edit.php:88
 #: app/views/monitoring.dashboard.view.php:100
 #: include/classes/html/CButtonCancel.php:25
@@ -1687,7 +1688,7 @@ msgstr "Gráfico não foi adicionado"
 msgid "Cannot add graph prototype"
 msgstr "Não foi possível adicionar o protótipo de gráfico"
 
-#: hostgroups.php:113 usergrps.php:143
+#: hostgroups.php:113
 msgid "Cannot add group"
 msgstr "Não foi possível adicionar grupo"
 
@@ -1803,6 +1804,11 @@ msgstr "Protótipo de trigger não adicionado"
 #: app/controllers/CControllerUserCreate.php:111
 msgid "Cannot add user"
 msgstr "Usuário não foi incluído"
+
+#: app/controllers/CControllerUsergroupCreate.php:51
+#: app/controllers/CControllerUsergroupCreate.php:101
+msgid "Cannot add user group"
+msgstr ""
 
 #: adm.valuemapping.php:80
 msgid "Cannot add value map"
@@ -2001,7 +2007,7 @@ msgstr "Protótipo de gráfico não excluído"
 msgid "Cannot delete graphs"
 msgstr "Não foi possível exluir gráficos"
 
-#: hostgroups.php:133 hostgroups.php:155 usergrps.php:158 usergrps.php:173
+#: hostgroups.php:133 hostgroups.php:155
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Não foi possível excluir o grupo"
@@ -2188,6 +2194,12 @@ msgid_plural "Cannot delete users"
 msgstr[0] "Usuário não foi removido"
 msgstr[1] "Usuário não foi removido"
 
+#: app/controllers/CControllerUsergroupDelete.php:59
+msgid "Cannot delete user group"
+msgid_plural "Cannot delete user groups"
+msgstr[0] ""
+msgstr[1] ""
+
 #: adm.valuemapping.php:108
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
@@ -2240,12 +2252,6 @@ msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "Não foi possível desativar a trigger"
 msgstr[1] "Não foi possível desativar as triggers"
-
-#: usergrps.php:227
-msgid "Cannot disable user group"
-msgid_plural "Cannot disable user groups"
-msgstr[0] "Não foi possível desativar o grupo de usuários"
-msgstr[1] "Não foi possível desativar os grupos de usuários"
 
 #: httpconf.php:462
 msgid "Cannot disable web scenario"
@@ -2303,12 +2309,6 @@ msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "Não foi possível ativar a trigger"
 msgstr[1] "Não foi possível ativar as triggers"
-
-#: usergrps.php:226
-msgid "Cannot enable user group"
-msgid_plural "Cannot enable user groups"
-msgstr[0] "Não foi possível ativar o grupo de usuários"
-msgstr[1] "Não foi possível ativar os grupos de usuários"
 
 #: httpconf.php:461
 msgid "Cannot enable web scenario"
@@ -2784,10 +2784,6 @@ msgstr "Não foi possível atualizar a configuração"
 msgid "Cannot update correlation"
 msgstr "Não foi possível atualizar o correlacionamento"
 
-#: usergrps.php:205
-msgid "Cannot update debug mode"
-msgstr "Modo de depuração não foi atualizado"
-
 #: include/classes/api/services/CApplication.php:363
 #, c-format
 msgid "Cannot update discovered application \"%1$s\"."
@@ -2804,10 +2800,6 @@ msgid_plural "Cannot update events"
 msgstr[0] "Não é possível atualizar evento"
 msgstr[1] "Não é possível atualizar os eventos"
 
-#: usergrps.php:188
-msgid "Cannot update frontend access"
-msgstr "Não é possível atualizar o acesso ao frontend"
-
 #: graphs.php:237
 msgid "Cannot update graph"
 msgstr "Gráfico não foi atualizado"
@@ -2816,7 +2808,7 @@ msgstr "Gráfico não foi atualizado"
 msgid "Cannot update graph prototype"
 msgstr "Não foi possível atualizar o protótipo de gráfico"
 
-#: hostgroups.php:75 usergrps.php:148
+#: hostgroups.php:75
 msgid "Cannot update group"
 msgstr "Grupo não foi atualizado"
 
@@ -2980,6 +2972,14 @@ msgstr "Não foi possível atualizar os protótipos de trigger"
 #: app/controllers/CControllerUserUpdate.php:123
 msgid "Cannot update user"
 msgstr "Usuário não foi atualizado"
+
+#: app/controllers/CControllerUsergroupMassUpdate.php:69
+#: app/controllers/CControllerUsergroupUpdate.php:53
+#: app/controllers/CControllerUsergroupUpdate.php:106
+msgid "Cannot update user group"
+msgid_plural "Cannot update user groups"
+msgstr[0] ""
+msgstr[1] ""
 
 #: adm.valuemapping.php:75
 msgid "Cannot update value map"
@@ -3566,7 +3566,8 @@ msgstr "Configuração de severidades de trigger"
 msgid "Configuration of triggers"
 msgstr "Configuração das triggers"
 
-#: usergrps.php:29
+#: app/controllers/CControllerUsergroupEdit.php:130
+#: app/controllers/CControllerUsergroupList.php:115
 msgid "Configuration of user groups"
 msgstr "Configuração de grupos de usuários"
 
@@ -3720,6 +3721,7 @@ msgstr "Contêm"
 #: app/views/administration.mediatype.list.php:33
 #: app/views/administration.proxy.list.php:32
 #: app/views/administration.script.list.php:32
+#: app/views/administration.usergroup.list.php:33
 #: app/views/administration.user.list.php:43
 #: app/views/monitoring.dashboard.list.php:42
 #: app/views/monitoring.dashboard.view.php:91
@@ -3733,7 +3735,6 @@ msgstr "Contêm"
 #: include/views/administration.general.image.list.php:44
 #: include/views/administration.general.regularexpressions.list.php:32
 #: include/views/administration.general.valuemapping.list.php:35
-#: include/views/administration.usergroups.list.php:29
 #: include/views/configuration.action.list.php:53
 #: include/views/configuration.application.list.php:48
 #: include/views/configuration.correlation.list.php:31
@@ -4055,7 +4056,7 @@ msgstr "Criar triggers a partir de seus protótipos como ativos?"
 msgid "Create user"
 msgstr "Criar usuário"
 
-#: include/views/administration.usergroups.list.php:25
+#: app/views/administration.usergroup.list.php:30
 msgid "Create user group"
 msgstr "Criar grupo de usuários"
 
@@ -4373,15 +4374,11 @@ msgstr ""
 msgid "Debug"
 msgstr "Depuração"
 
+#: app/views/administration.usergroup.edit.php:91
+#: app/views/administration.usergroup.list.php:68
 #: app/views/administration.user.list.php:91
-#: include/views/administration.usergroups.edit.php:94
-#: include/views/administration.usergroups.list.php:63
 msgid "Debug mode"
 msgstr "Modo de depuração"
-
-#: usergrps.php:205
-msgid "Debug mode updated"
-msgstr "Modo de depuração atualizado"
 
 #: include/func.inc.php:247
 msgid "Dec"
@@ -4472,6 +4469,8 @@ msgstr "Atrasado por"
 #: app/views/administration.script.edit.php:131
 #: app/views/administration.script.list.php:113
 #: app/views/administration.user.edit.php:447
+#: app/views/administration.usergroup.edit.php:216
+#: app/views/administration.usergroup.list.php:220
 #: app/views/administration.user.list.php:202
 #: app/views/monitoring.dashboard.list.php:76
 #: include/classes/html/CButtonDelete.php:25
@@ -4480,7 +4479,6 @@ msgstr "Atrasado por"
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.list.php:81
-#: include/views/administration.usergroups.list.php:178
 #: include/views/configuration.action.list.php:147
 #: include/views/configuration.application.list.php:128
 #: include/views/configuration.correlation.list.php:128
@@ -4642,12 +4640,12 @@ msgstr "Excluir o protótipos de gráfico selecionados?"
 msgid "Delete selected graphs?"
 msgstr "Excluir gráficos selecionados?"
 
-#: include/views/administration.usergroups.edit.php:280
+#: app/views/administration.usergroup.edit.php:219
 #: include/views/configuration.hostgroups.edit.php:59
 msgid "Delete selected group?"
 msgstr "Excluir grupo selecionado?"
 
-#: include/views/administration.usergroups.list.php:178
+#: app/views/administration.usergroup.list.php:220
 msgid "Delete selected groups?"
 msgstr "Excluir grupos selecionados?"
 
@@ -4811,9 +4809,9 @@ msgstr "Excluído: Template \"%1$s\"."
 msgid "Delimiter"
 msgstr "Delimitador"
 
+#: app/views/administration.usergroup.edit.php:126
+#: app/views/administration.usergroup.grouprights.html.php:65
 #: include/perm.inc.php:33 include/users.inc.php:436
-#: include/views/administration.usergroups.edit.php:126
-#: include/views/administration.usergroups.edit.php:158
 msgid "Deny"
 msgstr "Nega"
 
@@ -4909,8 +4907,8 @@ msgid "Directory size (in bytes). Returns integer"
 msgstr "Tamanho do diretório (em bytes). Retorna inteiro"
 
 #: app/views/administration.mediatype.list.php:154
+#: app/views/administration.usergroup.list.php:202
 #: include/views/administration.auditlogs.list.php:50
-#: include/views/administration.usergroups.list.php:171
 #: include/views/configuration.action.list.php:146
 #: include/views/configuration.application.list.php:127
 #: include/views/configuration.correlation.list.php:127
@@ -4923,11 +4921,11 @@ msgstr "Tamanho do diretório (em bytes). Retorna inteiro"
 msgid "Disable"
 msgstr "Desativar"
 
-#: include/views/administration.usergroups.list.php:175
+#: app/views/administration.usergroup.list.php:214
 msgid "Disable debug mode"
 msgstr "Desabilitar o modo de depuração"
 
-#: include/views/administration.usergroups.list.php:176
+#: app/views/administration.usergroup.list.php:214
 msgid "Disable debug mode in selected groups?"
 msgstr "Desativar modo depuração nos grupos selecionados?"
 
@@ -4969,7 +4967,7 @@ msgstr "Desativar os correlacionamentos selecionados?"
 msgid "Disable selected discovery rules?"
 msgstr "Desativar regras de descoberta selecionadas?"
 
-#: include/views/administration.usergroups.list.php:171
+#: app/views/administration.usergroup.list.php:202
 msgid "Disable selected groups?"
 msgstr "Desabilitar grupos selecionados?"
 
@@ -4996,6 +4994,10 @@ msgstr "Desativar os cenários web selecionados?"
 #: app/views/administration.mediatype.list.php:48
 #: app/views/administration.mediatype.list.php:122
 #: app/views/administration.user.edit.php:224
+#: app/views/administration.usergroup.list.php:49
+#: app/views/administration.usergroup.list.php:83
+#: app/views/administration.usergroup.list.php:121
+#: app/views/administration.usergroup.list.php:135
 #: app/views/administration.user.list.php:189
 #: app/views/administration.user.list.php:191 auditlogs.php:147
 #: include/discovery.inc.php:108 include/hosts.inc.php:1321
@@ -5004,10 +5006,6 @@ msgstr "Desativar os cenários web selecionados?"
 #: include/items.inc.php:187 include/triggers.inc.php:2220
 #: include/users.inc.php:86
 #: include/views/administration.general.other.edit.php:49
-#: include/views/administration.usergroups.list.php:44
-#: include/views/administration.usergroups.list.php:75
-#: include/views/administration.usergroups.list.php:100
-#: include/views/administration.usergroups.list.php:109
 #: include/views/configuration.action.list.php:68
 #: include/views/configuration.action.list.php:114
 #: include/views/configuration.correlation.list.php:46
@@ -5641,8 +5639,8 @@ msgid "Empty screen ID."
 msgstr "ID de tela ausente."
 
 #: app/views/administration.mediatype.list.php:153
+#: app/views/administration.usergroup.list.php:196
 #: include/views/administration.auditlogs.list.php:49
-#: include/views/administration.usergroups.list.php:170
 #: include/views/configuration.action.list.php:145
 #: include/views/configuration.application.list.php:126
 #: include/views/configuration.correlation.list.php:126
@@ -5667,11 +5665,11 @@ msgstr "Habilitar autenticação LDAP"
 msgid "Enable confirmation"
 msgstr "Ativar confirmação"
 
-#: include/views/administration.usergroups.list.php:172
+#: app/views/administration.usergroup.list.php:208
 msgid "Enable debug mode"
 msgstr "Ativar modo de depuração"
 
-#: include/views/administration.usergroups.list.php:173
+#: app/views/administration.usergroup.list.php:208
 msgid "Enable debug mode in selected groups?"
 msgstr "Ativar modo depuração nos grupos selecionados?"
 
@@ -5720,7 +5718,7 @@ msgstr "Ativar correlacionamentos selecionados?"
 msgid "Enable selected discovery rules?"
 msgstr "Ativar regras de descoberta selecionadas?"
 
-#: include/views/administration.usergroups.list.php:170
+#: app/views/administration.usergroup.list.php:196
 msgid "Enable selected groups?"
 msgstr "Ativar grupos selecionados?"
 
@@ -5757,6 +5755,13 @@ msgstr "Ativar traps"
 #: app/views/administration.mediatype.list.php:47
 #: app/views/administration.mediatype.list.php:118
 #: app/views/administration.user.edit.php:218
+#: app/views/administration.usergroup.edit.php:71
+#: app/views/administration.usergroup.edit.php:84
+#: app/views/administration.usergroup.edit.php:85
+#: app/views/administration.usergroup.list.php:48
+#: app/views/administration.usergroup.list.php:74
+#: app/views/administration.usergroup.list.php:112
+#: app/views/administration.usergroup.list.php:134
 #: app/views/administration.user.list.php:188
 #: app/views/administration.user.list.php:192 app/views/popup.media.php:74
 #: app/views/popup.triggerwizard.php:128 auditlogs.php:144
@@ -5764,13 +5769,6 @@ msgstr "Ativar traps"
 #: include/httptest.inc.php:46 include/items.inc.php:140
 #: include/items.inc.php:143 include/items.inc.php:184
 #: include/triggers.inc.php:1292 include/triggers.inc.php:2217
-#: include/views/administration.usergroups.edit.php:73
-#: include/views/administration.usergroups.edit.php:88
-#: include/views/administration.usergroups.edit.php:89
-#: include/views/administration.usergroups.list.php:43
-#: include/views/administration.usergroups.list.php:71
-#: include/views/administration.usergroups.list.php:96
-#: include/views/administration.usergroups.list.php:108
 #: include/views/configuration.action.edit.php:402
 #: include/views/configuration.action.list.php:67
 #: include/views/configuration.action.list.php:122
@@ -6260,6 +6258,7 @@ msgstr "Região preenchida"
 #: app/views/administration.mediatype.list.php:38
 #: app/views/administration.proxy.list.php:37
 #: app/views/administration.script.list.php:37
+#: app/views/administration.usergroup.list.php:39
 #: app/views/administration.user.list.php:49
 #: app/views/monitoring.discovery.view.php:39
 #: app/views/monitoring.problem.view.php:342
@@ -6268,7 +6267,6 @@ msgstr "Região preenchida"
 #: include/forms.inc.php:732
 #: include/views/administration.auditacts.list.php:47
 #: include/views/administration.auditlogs.list.php:61
-#: include/views/administration.usergroups.list.php:34
 #: include/views/common.filter.trigger.php:133
 #: include/views/configuration.action.list.php:58
 #: include/views/configuration.correlation.list.php:36
@@ -6399,16 +6397,12 @@ msgstr "Sexta-feira"
 msgid "From"
 msgstr "De"
 
+#: app/views/administration.usergroup.edit.php:63
+#: app/views/administration.usergroup.edit.php:79
+#: app/views/administration.usergroup.list.php:67
 #: app/views/administration.user.list.php:90
-#: include/views/administration.usergroups.edit.php:65
-#: include/views/administration.usergroups.edit.php:83
-#: include/views/administration.usergroups.list.php:62
 msgid "Frontend access"
 msgstr "Acesso à interface web"
-
-#: usergrps.php:188
-msgid "Frontend access updated"
-msgstr "Acesso à interface web atualizado"
 
 #: app/views/administration.user.edit.php:353
 msgid "Frontend messaging"
@@ -6783,11 +6777,11 @@ msgstr "O grupo \"%1$s\" não existe."
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "O grupo \"%1$s\" para o host \"%2$s\" não existe."
 
-#: hostgroups.php:112 usergrps.php:143
+#: hostgroups.php:112
 msgid "Group added"
 msgstr "Grupo incluído"
 
-#: hostgroups.php:133 hostgroups.php:154 usergrps.php:158 usergrps.php:173
+#: hostgroups.php:133 hostgroups.php:154
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Grupo removido"
@@ -6802,8 +6796,8 @@ msgstr "Grupo para hosts descobertos"
 msgid "Group for discovered hosts \"%1$s\"."
 msgstr "Grupo para a descoberta de hosts \"%1$s\"."
 
-#: hostgroups.php:36 include/views/administration.usergroups.edit.php:36
-#: include/views/configuration.hostgroups.edit.php:32 usergrps.php:42
+#: app/views/administration.usergroup.edit.php:36 hostgroups.php:36
+#: include/views/configuration.hostgroups.edit.php:32
 msgid "Group name"
 msgstr "Nome do grupo"
 
@@ -6816,7 +6810,7 @@ msgstr "O protótipo de grupo não pode ser baseado em regra de autobusca no hos
 msgid "Group prototypes"
 msgstr "Protótipos de grupo"
 
-#: hostgroups.php:74 usergrps.php:148
+#: hostgroups.php:74
 msgid "Group updated"
 msgstr "Grupo atualizado"
 
@@ -7156,13 +7150,13 @@ msgstr[1] "Hosts ativados"
 #: app/views/administration.script.edit.php:79
 #: app/views/administration.script.list.php:61
 #: app/views/administration.user.edit.php:320
+#: app/views/administration.usergroup.grouprights.html.php:25
+#: app/views/administration.usergroup.tagfilters.html.php:25
 #: app/views/monitoring.widget.problemhosts.view.php:27
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:26 app/views/search.php:129
 #: include/actions.inc.php:48 include/audit.inc.php:37
 #: include/blocks.inc.php:343 include/maps.inc.php:25
-#: include/views/administration.usergroups.edit.php:103
-#: include/views/administration.usergroups.edit.php:184
 #: include/views/configuration.hostgroups.edit.php:47
 #: include/views/js/configuration.action.edit.js.php:67
 #: include/views/js/configuration.action.edit.js.php:200
@@ -7210,6 +7204,8 @@ msgid "Host group with ID \"%1$s\" is not available."
 msgstr "O grupo de hosts com o ID \"%1$s\" não está disponível."
 
 #: app/controllers/CControllerPopupGeneric.php:99
+#: app/controllers/CControllerUsergroupGrouprightAdd.php:36
+#: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/views/monitoring.problem.view.php:96 app/views/search.php:178
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:31
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:31
@@ -7228,8 +7224,7 @@ msgstr "O grupo de hosts com o ID \"%1$s\" não está disponível."
 #: include/views/configuration.maintenance.edit.php:235
 #: include/views/configuration.template.massupdate.php:53
 #: include/views/configuration.triggers.list.php:25
-#: include/views/reports.toptriggers.php:33 latest.php:323 usergrps.php:318
-#: usergrps.php:358
+#: include/views/reports.toptriggers.php:33 latest.php:323
 msgid "Host groups"
 msgstr "Grupos de hosts"
 
@@ -7777,8 +7772,8 @@ msgstr "Incluir"
 msgid "Include event menu entry"
 msgstr ""
 
-#: include/views/administration.usergroups.edit.php:163
-#: include/views/administration.usergroups.edit.php:252
+#: app/views/administration.usergroup.edit.php:133
+#: app/views/administration.usergroup.edit.php:187
 msgid "Include subgroups"
 msgstr "Incluir subgrupos"
 
@@ -8676,6 +8671,9 @@ msgstr ""
 #: app/controllers/CControllerPopupPreprocTestSend.php:96
 #: app/controllers/CControllerPopupPreprocTestSend.php:101
 #: app/controllers/CControllerPopupTriggerWizard.php:134
+#: app/controllers/CControllerUsergroupGrouprightAdd.php:36
+#: app/controllers/CControllerUsergroupTagfilterAdd.php:41
+#: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:98
 #: app/controllers/CControllerWidgetNavTreeItemUpdate.php:41
 #: correlation.php:225 correlation.php:235 correlation.php:241
@@ -8861,8 +8859,7 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:279
 #: include/screens.inc.php:300 include/screens.inc.php:314
 #: include/screens.inc.php:429 include/screens.inc.php:443
-#: include/sounds.inc.php:112 include/validate.inc.php:346 usergrps.php:318
-#: usergrps.php:358 usergrps.php:361
+#: include/sounds.inc.php:112 include/validate.inc.php:346
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Valor inválido para o campo \"%1$s\": %2$s."
@@ -10251,7 +10248,7 @@ msgstr "Registrar traps SNMP não correspondentes"
 #: app/views/administration.authentication.edit.php:123
 #: app/views/administration.user.list.php:89 auditlogs.php:138
 #: include/func.inc.php:1790 include/func.inc.php:1805
-#: include/menu.inc.php:297 include/views/administration.auditlogs.list.php:44
+#: include/menu.inc.php:299 include/views/administration.auditlogs.list.php:44
 #: index_http.php:91
 msgid "Login"
 msgstr "Login"
@@ -10736,7 +10733,7 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "O tipo de mídia com o ID \"%1$s\" não está disponível."
 
 #: app/views/administration.mediatype.edit.php:25
-#: app/views/administration.mediatype.list.php:27 include/menu.inc.php:282
+#: app/views/administration.mediatype.list.php:27 include/menu.inc.php:284
 #: include/views/conf.import.php:47
 msgid "Media types"
 msgstr "Tipos de mídias"
@@ -10746,7 +10743,7 @@ msgstr "Tipos de mídias"
 msgid "Media types used by action \"%s\"."
 msgstr "Tipos de mídia utilizados pela ação \"%s\"."
 
-#: include/views/administration.usergroups.list.php:61
+#: app/views/administration.usergroup.list.php:66
 #: include/views/configuration.hostgroups.list.php:60
 msgid "Members"
 msgstr "Membros"
@@ -11051,6 +11048,8 @@ msgstr "NTLM"
 #: app/views/administration.script.edit.php:35
 #: app/views/administration.script.list.php:38
 #: app/views/administration.script.list.php:56
+#: app/views/administration.usergroup.list.php:40
+#: app/views/administration.usergroup.list.php:64
 #: app/views/administration.user.list.php:55
 #: app/views/dashboard.properties.edit.php:50
 #: app/views/monitoring.dashboard.list.php:53
@@ -11071,8 +11070,6 @@ msgstr "NTLM"
 #: include/views/administration.general.regularexpressions.list.php:42
 #: include/views/administration.general.valuemapping.edit.php:38
 #: include/views/administration.general.valuemapping.list.php:47
-#: include/views/administration.usergroups.list.php:35
-#: include/views/administration.usergroups.list.php:59
 #: include/views/common.filter.trigger.php:66
 #: include/views/configuration.action.edit.php:40
 #: include/views/configuration.action.edit.php:51
@@ -11861,6 +11858,8 @@ msgstr "Marcadores não booleanos serão descontinuados."
 #: app/views/administration.mediatype.edit.php:80
 #: app/views/administration.proxy.list.php:113
 #: app/views/administration.proxy.list.php:126
+#: app/views/administration.usergroup.edit.php:127
+#: app/views/administration.usergroup.grouprights.html.php:66
 #: app/views/monitoring.problem.view.php:265
 #: app/views/monitoring.problem.view.php:276
 #: app/views/monitoring.problem.view.php:293
@@ -11875,8 +11874,6 @@ msgstr "Marcadores não booleanos serão descontinuados."
 #: include/profiles.inc.php:271 include/users.inc.php:437
 #: include/views/administration.general.gui.edit.php:35
 #: include/views/administration.general.other.edit.php:34
-#: include/views/administration.usergroups.edit.php:127
-#: include/views/administration.usergroups.edit.php:159
 #: include/views/configuration.host.discovery.edit.php:275
 #: include/views/configuration.host.list.php:340
 #: include/views/configuration.host.list.php:346
@@ -13021,12 +13018,12 @@ msgstr "Períodos"
 #: app/views/administration.user.edit.php:320
 #: app/views/administration.user.edit.php:340
 #: app/views/administration.user.edit.php:347
+#: app/views/administration.usergroup.edit.php:98
+#: app/views/administration.usergroup.edit.php:149
+#: app/views/administration.usergroup.edit.php:203
+#: app/views/administration.usergroup.grouprights.html.php:25
 #: app/views/dashboard.sharing.edit.php:24
 #: app/views/dashboard.sharing.edit.php:45
-#: include/views/administration.usergroups.edit.php:103
-#: include/views/administration.usergroups.edit.php:133
-#: include/views/administration.usergroups.edit.php:217
-#: include/views/administration.usergroups.edit.php:269
 #: include/views/monitoring.screen.edit.php:124
 #: include/views/monitoring.screen.edit.php:160
 #: include/views/monitoring.slideconf.edit.php:173
@@ -13520,7 +13517,7 @@ msgstr "Arquivo de chave pública"
 msgid "Query fields"
 msgstr "Campos da consulta"
 
-#: include/menu.inc.php:292 queue.php:25
+#: include/menu.inc.php:294 queue.php:25
 msgid "Queue"
 msgstr "Fila"
 
@@ -13563,9 +13560,10 @@ msgid "Raw post"
 msgstr "Dado bruto"
 
 #: app/views/administration.script.edit.php:101
-#: app/views/administration.script.list.php:104 include/users.inc.php:435
-#: include/views/administration.usergroups.edit.php:125
-#: include/views/administration.usergroups.edit.php:157
+#: app/views/administration.script.list.php:104
+#: app/views/administration.usergroup.edit.php:125
+#: app/views/administration.usergroup.grouprights.html.php:64
+#: include/users.inc.php:435
 msgid "Read"
 msgstr "Leitura"
 
@@ -13584,12 +13582,11 @@ msgstr "Somente leitura"
 msgid "Read-only"
 msgstr "Leitura"
 
+#: app/views/administration.usergroup.edit.php:124
+#: app/views/administration.usergroup.grouprights.html.php:63
 #: app/views/monitoring.dashboard.view.js.php:10
 #: app/views/monitoring.dashboard.view.js.php:33 include/perm.inc.php:31
-#: include/users.inc.php:434
-#: include/views/administration.usergroups.edit.php:124
-#: include/views/administration.usergroups.edit.php:156
-#: include/views/js/monitoring.screen.edit.js.php:18
+#: include/users.inc.php:434 include/views/js/monitoring.screen.edit.js.php:18
 #: include/views/js/monitoring.screen.edit.js.php:52
 #: include/views/js/monitoring.slideconf.edit.js.php:45
 #: include/views/js/monitoring.slideconf.edit.js.php:78
@@ -13756,6 +13753,7 @@ msgstr "Comando remoto"
 #: app/views/administration.mediatype.edit.php:161
 #: app/views/administration.mediatype.edit.php:179
 #: app/views/administration.user.edit.php:275
+#: app/views/administration.usergroup.tagfilters.html.php:47
 #: app/views/monitoring.dashboard.view.js.php:14
 #: app/views/monitoring.dashboard.view.js.php:37
 #: app/views/monitoring.problem.view.js.php:6
@@ -13769,7 +13767,6 @@ msgstr "Comando remoto"
 #: include/views/administration.general.macros.edit.php:54
 #: include/views/administration.general.regularexpressions.edit.php:69
 #: include/views/administration.general.valuemapping.edit.php:57
-#: include/views/administration.usergroups.edit.php:189
 #: include/views/common.filter.trigger.php:106
 #: include/views/configuration.action.edit.php:89
 #: include/views/configuration.action.edit.php:512
@@ -14654,7 +14651,7 @@ msgstr "Script atualizado"
 
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:25
-#: app/views/administration.script.list.php:27 include/menu.inc.php:288
+#: app/views/administration.script.list.php:27 include/menu.inc.php:290
 #: jsLoader.php:286
 msgid "Scripts"
 msgstr "Scripts"
@@ -15515,6 +15512,8 @@ msgstr "Estático"
 #: app/controllers/CControllerPopupGeneric.php:213
 #: app/views/administration.mediatype.list.php:44
 #: app/views/administration.mediatype.list.php:67
+#: app/views/administration.usergroup.list.php:45
+#: app/views/administration.usergroup.list.php:69
 #: app/views/administration.user.list.php:92
 #: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/monitoring.widget.problems.view.php:54
@@ -15530,8 +15529,6 @@ msgstr "Estático"
 #: include/events.inc.php:256 include/events.inc.php:469
 #: include/forms.inc.php:244 include/forms.inc.php:693
 #: include/views/administration.auditacts.list.php:61
-#: include/views/administration.usergroups.list.php:40
-#: include/views/administration.usergroups.list.php:64
 #: include/views/configuration.action.list.php:64
 #: include/views/configuration.action.list.php:87
 #: include/views/configuration.correlation.list.php:42
@@ -15829,9 +15826,9 @@ msgstr "A tabela \"%1$s\" não existe."
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "A tabela \"%1$s\" não possui um campo chamado \"%2$s\"."
 
+#: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: include/actions.inc.php:66 include/actions.inc.php:333
 #: include/hosts.inc.php:144 include/views/inventory.host.list.php:70
-#: usergrps.php:361
 msgid "Tag"
 msgstr "Plaqueta"
 
@@ -15845,7 +15842,7 @@ msgstr "A etiqueta \"%1$s\" com o valor \"%2$s\" já existe."
 msgid "Tag display priority"
 msgstr "Prioridade de exibição de etiquetas"
 
-#: include/views/administration.usergroups.edit.php:270
+#: app/views/administration.usergroup.edit.php:204
 msgid "Tag filter"
 msgstr "Filtro de etiqueta"
 
@@ -15863,6 +15860,7 @@ msgstr "Nome da etiqueta"
 msgid "Tag value"
 msgstr "Valor da etiqueta"
 
+#: app/views/administration.usergroup.tagfilters.html.php:25
 #: app/views/monitoring.problem.view.php:283
 #: app/views/monitoring.widget.problems.view.php:66 include/blocks.inc.php:745
 #: include/classes/screens/CScreenProblem.php:881
@@ -15871,7 +15869,6 @@ msgstr "Valor da etiqueta"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
 #: include/events.inc.php:243 include/events.inc.php:472
-#: include/views/administration.usergroups.edit.php:184
 #: include/views/configuration.host.edit.php:687
 #: include/views/configuration.host.list.php:159
 #: include/views/configuration.host.list.php:187
@@ -17185,6 +17182,7 @@ msgstr "Ligado"
 #: app/views/administration.script.edit.php:129
 #: app/views/administration.user.edit.php:445
 #: app/views/administration.user.edit.php:466
+#: app/views/administration.usergroup.edit.php:214
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
 #: app/views/popup.discovery.check.php:124 app/views/popup.httpstep.php:176
@@ -17201,7 +17199,6 @@ msgstr "Ligado"
 #: include/views/administration.general.triggerSeverity.edit.php:87
 #: include/views/administration.general.valuemapping.edit.php:97
 #: include/views/administration.general.workingtime.edit.php:36
-#: include/views/administration.usergroups.edit.php:278
 #: include/views/configuration.action.edit.php:1242
 #: include/views/configuration.action.edit.php:1843
 #: include/views/configuration.action.edit.php:2328
@@ -17407,8 +17404,8 @@ msgstr[1] "Usuário removido"
 
 #: app/views/administration.script.edit.php:77
 #: app/views/administration.script.list.php:60
+#: app/views/administration.usergroup.edit.php:202
 #: app/views/administration.user.list.php:35 include/audit.inc.php:33
-#: include/views/administration.usergroups.edit.php:268
 #: include/views/configuration.action.edit.php:676
 #: include/views/configuration.action.edit.php:1422
 #: include/views/configuration.action.edit.php:1971
@@ -17435,17 +17432,15 @@ msgstr "O grupo de usuários \"%1$s\" está configurado para alerta de quedas de
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "O grupo de usuários \"%1$s\" é utilizado pelo script \"%2$s\"."
 
-#: usergrps.php:224
-msgid "User group disabled"
-msgid_plural "User groups disabled"
-msgstr[0] "Grupo de usuários desativado"
-msgstr[1] "Grupos de usuários desativados"
+#: app/controllers/CControllerUsergroupCreate.php:94
+msgid "User group added"
+msgstr ""
 
-#: usergrps.php:223
-msgid "User group enabled"
-msgid_plural "User groups enabled"
-msgstr[0] "Grupo de usuários ativado"
-msgstr[1] "Grupos de usuários ativados"
+#: app/controllers/CControllerUsergroupDelete.php:56
+msgid "User group deleted"
+msgid_plural "User groups deleted"
+msgstr[0] ""
+msgstr[1] ""
 
 #: adm.other.php:39 include/views/administration.general.other.edit.php:54
 msgid "User group for database down message"
@@ -17472,6 +17467,13 @@ msgstr "O grupo de usuários compartilhado possui parâmetros ausentes: %1$s no 
 msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "O compartilhamento de grupos de usuários tem parâmetros ausentes: %1$s para a tela \"%2$s\"."
 
+#: app/controllers/CControllerUsergroupMassUpdate.php:66
+#: app/controllers/CControllerUsergroupUpdate.php:98
+msgid "User group updated"
+msgid_plural "User groups updated"
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/classes/api/services/CDashboard.php:531
 #: include/classes/api/services/CScript.php:418
 #: include/classes/api/services/CUser.php:515
@@ -17480,9 +17482,9 @@ msgid "User group with ID \"%1$s\" is not available."
 msgstr "O grupo de usuários com o ID \"%1$s\" não está disponível."
 
 #: app/controllers/CControllerPopupGeneric.php:175
-#: app/views/dashboard.sharing.edit.php:24 include/menu.inc.php:270
-#: include/views/administration.usergroups.edit.php:22
-#: include/views/administration.usergroups.list.php:22
+#: app/views/administration.usergroup.edit.php:24
+#: app/views/administration.usergroup.list.php:27
+#: app/views/dashboard.sharing.edit.php:24 include/menu.inc.php:272
 #: include/views/monitoring.screen.edit.php:124
 #: include/views/monitoring.slideconf.edit.php:173
 #: include/views/monitoring.sysmap.edit.php:291
@@ -17600,10 +17602,10 @@ msgstr "Usuário e senha"
 
 #: app/controllers/CControllerPopupGeneric.php:187
 #: app/views/administration.user.edit.php:30
+#: app/views/administration.usergroup.edit.php:44
+#: app/views/administration.usergroup.list.php:180
 #: app/views/administration.user.list.php:27
-#: app/views/dashboard.sharing.edit.php:45 include/menu.inc.php:276
-#: include/views/administration.usergroups.edit.php:44
-#: include/views/administration.usergroups.list.php:155
+#: app/views/dashboard.sharing.edit.php:45 include/menu.inc.php:278
 #: include/views/monitoring.screen.edit.php:160
 #: include/views/monitoring.slideconf.edit.php:211
 #: include/views/monitoring.sysmap.edit.php:327
@@ -18907,6 +18909,9 @@ msgstr "não pode ser modificado"
 #: app/controllers/CControllerPopupMedia.php:99
 #: app/controllers/CControllerPopupMedia.php:110
 #: app/controllers/CControllerPopupTriggerWizard.php:134
+#: app/controllers/CControllerUsergroupGrouprightAdd.php:36
+#: app/controllers/CControllerUsergroupTagfilterAdd.php:41
+#: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:98
 #: app/controllers/CControllerWidgetNavTreeItemUpdate.php:41
 #: correlation.php:225 correlation.php:235 correlation.php:241
@@ -18974,8 +18979,7 @@ msgstr "não pode ser modificado"
 #: include/classes/validators/CApiInputValidator.php:990
 #: include/classes/validators/CApiInputValidator.php:1032
 #: include/classes/validators/CNewValidator.php:91
-#: include/validate.inc.php:346 usergrps.php:318 usergrps.php:358
-#: usergrps.php:361
+#: include/validate.inc.php:346
 msgid "cannot be empty"
 msgstr "não pode ser vazio"
 
@@ -19230,7 +19234,7 @@ msgid "in"
 msgstr "em"
 
 #: app/views/administration.user.edit.php:330
-#: include/views/administration.usergroups.edit.php:116
+#: app/views/administration.usergroup.grouprights.html.php:55
 msgid "including subgroups"
 msgstr "incluindo subgrupos"
 
@@ -19761,12 +19765,12 @@ msgstr "sum() - Total de valores em um período T"
 msgid "supplied credentials are not unique"
 msgstr "as credenciais informadas não são únicas"
 
+#: app/views/administration.usergroup.edit.php:177
 #: app/views/monitoring.problem.view.js.php:19
 #: app/views/monitoring.problem.view.php:237
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/widgets/CWidgetHelper.php:457
 #: include/classes/widgets/CWidgetHelper.php:504 include/forms.inc.php:2350
-#: include/views/administration.usergroups.edit.php:242
 #: include/views/configuration.action.edit.php:360
 #: include/views/configuration.action.edit.php:370
 #: include/views/configuration.correlation.edit.php:120
@@ -19945,6 +19949,7 @@ msgstr ""
 msgid "unsupported version number"
 msgstr "número de versão não suportado"
 
+#: app/views/administration.usergroup.edit.php:182
 #: app/views/monitoring.problem.view.js.php:26
 #: app/views/monitoring.problem.view.php:244
 #: app/views/popup.preproctestedit.view.js.php:209
@@ -19956,7 +19961,6 @@ msgstr "número de versão não suportado"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:247
 #: include/forms.inc.php:2355
 #: include/views/administration.general.macros.edit.php:46
-#: include/views/administration.usergroups.edit.php:247
 #: include/views/configuration.action.edit.php:366
 #: include/views/configuration.correlation.edit.php:152
 #: include/views/configuration.host.discovery.edit.php:128
