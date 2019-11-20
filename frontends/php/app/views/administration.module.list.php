@@ -106,6 +106,7 @@ foreach ($data['modules'] as $moduleid => $module) {
 // append table to form
 $form->addItem([
 	$table,
+	$data['paging'],
 	new CActionButtonList('action', 'moduleids', [
 		'module.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected modules?')],
 		'module.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected modules?')]

@@ -127,12 +127,17 @@ class CControllerModuleList extends CController {
 		}
 		unset($module);
 
+		$paging = getPagingLine($modules, $sort_order,
+			(new CUrl('zabbix.php'))->setArgument('action', 'module.list')
+		);
+
 		$data = [
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'filter' => $filter,
 			'uncheck' => $this->hasInput('uncheck'),
 			'modules' => $modules,
+			'paging' => $paging,
 			'filter_profile' => 'web.modules.filter',
 			'filter_active_tab' => CProfile::get('web.modules.filter.active', 1),
 		];
