@@ -156,7 +156,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,init-integration,make-dbschema,init-server-postgresql">
+	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
 		<exec executable="psql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
@@ -285,7 +285,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,make-binaries-mysql,init-server-mysql,init-proxy-mysql">
+	<target name="init-integration-mysql" depends="create-configs,init-integration,make-binaries-mysql,init-server-mysql,init-proxy-mysql">
 		<exec executable="mysql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
