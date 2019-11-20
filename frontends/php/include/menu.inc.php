@@ -251,7 +251,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 						'adm.triggerdisplayoptions.php',
 						'adm.other.php'
 					],
-					'active_if' => ['autoreg.edit']
+					'active_if' => ['autoreg.edit', 'module.list', 'module.edit']
 				],
 				[
 					'url' => 'zabbix.php',

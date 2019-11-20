@@ -757,9 +757,8 @@ function makePageFooter($with_version = true) {
  * @return array  Menu definition for CWidget::setTitleSubmenu.
  */
 function getAdministrationGeneralSubmenu() {
-	$autoreg_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'autoreg.edit')
-		->getUrl();
+	$autoreg_url = (new CUrl('zabbix.php'))->setArgument('action', 'autoreg.edit')->getUrl();
+	$modules_url = (new CUrl('zabbix.php'))->setArgument('action', 'module.list')->getUrl();
 
 	return [
 		'main_section' => [
@@ -775,6 +774,7 @@ function getAdministrationGeneralSubmenu() {
 				'adm.workingtime.php' => _('Working time'),
 				'adm.triggerseverities.php' => _('Trigger severities'),
 				'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+				$modules_url => _('Modules'),
 				'adm.other.php' => _('Other')
 			]
 		]
