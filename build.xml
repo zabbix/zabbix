@@ -49,6 +49,11 @@
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
 	</target>
 
+	<target name="init-integration">
+		<!-- Copy agent2 configuration file -->
+		<copy overwrite="true" file="src/go/conf/zabbix_agent2.conf" tofile="conf/zabbix_agent2.conf"/>
+	</target>
+
 	<target name="make-dbschema">
 		<!-- Create database schema -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
@@ -150,7 +155,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
+	<target name="init-frontend-postgresql" depends="create-configs,init-integration,make-dbschema,init-server-postgresql">
 		<exec executable="psql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
@@ -172,7 +177,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-postgresql" depends="create-configs,make-binaries-postgresql,init-server-postgresql,init-proxy-postgresql">
+	<target name="init-integration-postgresql" depends="create-configs,init-integration,make-binaries-postgresql,init-server-postgresql,init-proxy-postgresql">
 		<exec executable="psql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
