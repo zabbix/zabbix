@@ -1602,6 +1602,7 @@ define('ZBX_STYLE_FLH_NA_BG', 'flh-na-bg');
 define('ZBX_STYLE_FLH_WARNING_BG', 'flh-warning-bg');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
+define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
 define('ZBX_STYLE_GRAPH_WRAPPER', 'graph-wrapper');
 define('ZBX_STYLE_GREEN', 'green');
@@ -1782,6 +1783,7 @@ define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
+define('ZBX_STYLE_COLUMNS_NOWRAP', 'columns-nowrap');
 define('ZBX_STYLE_COLUMNS_2', 'columns-2');
 define('ZBX_STYLE_COLUMNS_3', 'columns-3');
 // column occupies x% width of column wrapper
