@@ -2297,6 +2297,10 @@ typedef struct duk_hthread duk_context;
 #elif defined(DUK_F_AIX)
 /* Older versions may be missing isnan(), etc. */
 #define DUK_F_USE_REPL_ALL
+#elif defined(DUK_F_OLD_SOLARIS)
+/* Solaris 11.3 seem to be missing fsnotify, isnan etc and also ast/endian.h header.        */
+/* Forcing DUK_F_OLD_SOLARIS fixes include, so bind the replacements to this define as well */
+#define DUK_F_USE_REPL_ALL
 #endif
 
 #if defined(DUK_F_USE_REPL_ALL)
