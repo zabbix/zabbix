@@ -84,18 +84,31 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
+		function init_fields($parent) {
+			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $parent).not('.initialized-field').each(function() {
+				var $obj = $(this);
+
+				$obj.addClass('initialized-field');
+
+				if ($obj.hasClass('macro')) {
+					$obj.on('change keydown', function(e) {
+						if (e.type === 'change' || e.which === 13) {
+							macroToUpperCase(this);
+							$obj.textareaFlexible();
+						}
+					});
+				}
+
+				$obj.textareaFlexible();
+			});
+		}
+
 		$('#tbl_macros')
 			.dynamicRows({remove_next_sibling: <?= (int) $data['show_inherited_macros'] ?>,
 				template: <?= $data['show_inherited_macros'] ? "'#macro-row-tmpl-inherited'" : "'#macro-row-tmpl'" ?>
 			})
-			.on('blur', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', function() {
-				if ($(this).hasClass('macro')) {
-					macroToUpperCase(this);
-				}
-				$(this).trigger('input');
-			})
 			.on('click', 'button.element-table-add', function() {
-				$('#tbl_macros .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
+				init_fields($('#tbl_macros'));
 			})
 			.on('click', 'button.element-table-change', function() {
 				var macroNum = $(this).attr('id').split('_')[1];
@@ -105,10 +118,12 @@
 						.val($('#macros_' + macroNum + '_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
 					$('#macros_' + macroNum + '_value')
 						.prop('readonly', true)
-						.val($('#macros_' + macroNum + '_inherited_value').val());
+						.val($('#macros_' + macroNum + '_inherited_value').val())
+						.trigger('input');
 					$('#macros_' + macroNum + '_description')
 						.prop('readonly', true)
-						.val($('#macros_' + macroNum + '_inherited_description').val());
+						.val($('#macros_' + macroNum + '_inherited_description').val())
+						.trigger('input');
 					$('#macros_' + macroNum + '_change')
 						.text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
 				}
@@ -124,6 +139,8 @@
 						.text(<?= CJs::encodeJson(_('Remove')) ?>);
 				}
 			});
+
+		init_fields($('#tbl_macros'));
 
 		$('form[name="hostsForm"], form[name="templatesForm"]').submit(function() {
 			$('input.macro').each(function() {
