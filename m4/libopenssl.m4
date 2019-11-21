@@ -92,6 +92,13 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
     ],[want_openssl=ifelse([$1],,[no],[$1])]
   )
 
+  if test "x$enable_static_libs" = "xyes"; then
+      AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+      PKG_PROG_PKG_CONFIG()
+      test -z $PKG_CONFIG && AC_MSG_ERROR([Not found pkg-config library])
+      m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
+  fi
+
   if test "x$want_openssl" = "xyes"; then
      AC_MSG_CHECKING(for OpenSSL support)
      if test "x$_libopenssl_dir" = "xno"; then		# if OpenSSL directory is not specified
@@ -131,11 +138,6 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
     am_save_libs="$LIBS"
 
     if test "x$enable_static_libs" = "xyes"; then
-      AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-      PKG_PROG_PKG_CONFIG()
-      test -z $PKG_CONFIG && AC_MSG_ERROR([Not found pkg-config library])
-      m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
-
       if test "x$_libopenssl_dir" = "xno" -o -z "$_libopenssl_dir"; then
         PKG_CHECK_EXISTS(openssl,[
           OPENSSL_LIBS=`$PKG_CONFIG --static --libs openssl`

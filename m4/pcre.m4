@@ -61,6 +61,13 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 		]
 	)
 
+	if test "x$enable_static_libs" = "xyes"; then
+		AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+		PKG_PROG_PKG_CONFIG()
+		test -z $PKG_CONFIG && AC_MSG_ERROR([Not found pkg-config library])
+		m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
+	fi
+
 	AC_MSG_CHECKING(for libpcre support)
 
 	LIBPCRE_LIBS="-lpcre"
@@ -68,11 +75,6 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 	if test "x$enable_static" = "xyes"; then
 		LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
 	elif test "x$enable_static_libs" = "xyes"; then
-		AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-		PKG_PROG_PKG_CONFIG()
-		test -z $PKG_CONFIG && AC_MSG_ERROR([Not found pkg-config library])
-		m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
-
 		if test "x$_libpcre_dir" = "xyes" -o -z "$_libpcre_dir"; then
 			PKG_CHECK_EXISTS(libpcre,[
 				LIBPCRE_LIBS=`$PKG_CONFIG --static --libs libpcre`
