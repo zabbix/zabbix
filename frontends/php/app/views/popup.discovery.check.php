@@ -45,7 +45,7 @@ $form_list = (new CFormList())
 		'row_dcheck_ports'
 	)
 	->addRow((new CLabel(_('Key'), 'key_'))->setAsteriskMark(),
-		(new CTextBox('key_', $data['params']['key_']))
+		(new CTextBox('key_', $data['params']['key_'], false, DB::getFieldLength('items', 'key_')))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired(),
 		'row_dcheck_key'
