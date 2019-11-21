@@ -89,7 +89,7 @@ class CControllerModuleUpdate extends CController {
 
 		if ($result) {
 			$response = new CControllerResponseRedirect(
-				(new Curl('zabbix.php'))
+				(new CUrl('zabbix.php'))
 					->setArgument('action', 'module.list')
 					->setArgument('uncheck', '1')
 					->getUrl()
@@ -98,7 +98,7 @@ class CControllerModuleUpdate extends CController {
 		}
 		else {
 			$response = new CControllerResponseRedirect(
-				(new Curl('zabbix.php'))
+				(new CUrl('zabbix.php'))
 					->setArgument('action', 'module.edit')
 					->setArgument('moduleid', $moduleid)
 					->getUrl()
