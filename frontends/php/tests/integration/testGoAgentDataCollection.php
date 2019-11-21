@@ -439,6 +439,9 @@ class testGoAgentDataCollection extends CIntegrationTest {
 					$component.'": host became available', false
 			);
 		}
+
+		// Delay to ensure that all metrics were collected.
+		sleep(45);
 	}
 
 	/**
