@@ -19,7 +19,9 @@
 **/
 
 
-$widget = (new CWidget())->setTitle(_('Modules'));
+$widget = (new CWidget())
+	->setTitle(_('Modules'))
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 // create form
 $form = (new CForm())
