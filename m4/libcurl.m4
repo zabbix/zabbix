@@ -148,27 +148,26 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 								-l*)
 									_lib_name=`echo "$i" | cut -b3-`
 									AC_CHECK_LIB($_lib_name , main,[
-											if test "x$enable_static_libs" = "xyes"; then
-												case $i in
-													-lssl|-lcrypto)
-														test "x$want_openssl" = "xyes" && i="$OPENSSL_LIBS"
-												;;
-													-lldap|-lldap_r|-llber)
-														test "x$want_ldap" = "xyes" && i="$LDAP_LIBS"
-												;;
-													-lssl_a|-lcrypto_a)
-														test "x$want_openssl" = "xyes" && i="$OPENSSL_LIBS"
-												;;
-													-lldap_a|-lldap_r_a|-llber_a)
-														test "x$want_ldap" = "xyes" && i="$LDAP_LIBS"
-												;;
-												esac
-											fi
-											test -z "${LIBCURL_LIBS##*$i*}" || LIBCURL_LIBS="$LIBCURL_LIBS $i"
-										],[
-											AC_MSG_ERROR([static library $_lib_name required for linking libcurl not found])
-										])
-
+										if test "x$enable_static_libs" = "xyes"; then
+											case $i in
+												-lssl|-lcrypto)
+													test "x$want_openssl" = "xyes" && i="$OPENSSL_LIBS"
+											;;
+												-lldap|-lldap_r|-llber)
+													test "x$want_ldap" = "xyes" && i="$LDAP_LIBS"
+											;;
+												-lssl_a|-lcrypto_a)
+													test "x$want_openssl" = "xyes" && i="$OPENSSL_LIBS"
+											;;
+												-lldap_a|-lldap_r_a|-llber_a)
+													test "x$want_ldap" = "xyes" && i="$LDAP_LIBS"
+											;;
+											esac
+										fi
+										test -z "${LIBCURL_LIBS##*$i*}" || LIBCURL_LIBS="$LIBCURL_LIBS $i"
+									],[
+										AC_MSG_ERROR([static library $_lib_name required for linking libcurl not found])
+									])
 							;;
 							esac
 						done
