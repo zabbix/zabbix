@@ -25,6 +25,8 @@
 		var $textarea = $(this);
 
 		if (e.which === 13) {
+			// Simulate input behavior by submitting form on enter key.
+
 			var $form = $(this).closest('form'),
 				$submit = $form.find('button:submit:first');
 
