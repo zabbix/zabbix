@@ -537,7 +537,6 @@ switch ($data['operationtype']) {
 				(new CTextArea('operation[opcommand][command]', $opr_data['opcommand']['command']))
 					->addClass(ZBX_STYLE_MONOSPACE_FONT)
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->addStyle('resize: vertical;')
 					->setAriaRequired()
 			)
 			->addRow(
