@@ -542,7 +542,7 @@ class CDRule extends CApiService {
 					}
 
 					$length = mb_strlen($dcheck['key_']);
-					if ($length > 255) {
+					if ($length > DB::getFieldLength('dchecks', 'key_')) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value for field "%1$s": %2$s.', 'key_',
 								_s('%1$d characters exceeds maximum length of %2$d characters', $length, 255)
