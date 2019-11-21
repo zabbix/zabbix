@@ -467,7 +467,10 @@ $item_form_list
 			->setLabel(_('Show value'))
 			->setChecked(array_key_exists('valuemapid', $data['visible'])),
 		(new CDiv([$valuemaps_combo_box, ' ',
-			(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')
+			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'valuemap.list')
+				->getUrl()
+			))->setAttribute('target', '_blank')
 		]))->setId('valuemap')
 	)
 	->addRow(

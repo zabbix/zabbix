@@ -841,7 +841,10 @@ else {
 
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$valuemapComboBox = [$valuemapComboBox, '&nbsp;',
-		(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')
+		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.list')
+			->getUrl()
+		))->setAttribute('target', '_blank')
 	];
 }
 
