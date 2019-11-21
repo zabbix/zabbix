@@ -113,6 +113,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form->getField('Type')->getValue());
 		$form->submit();
+		$this->page->waitUntilReady();
 		// Check that widget type is still remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
@@ -231,8 +232,8 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $overlay->asForm();
 		// Set type to "Clock".
 		$form->getField('Type')->asDropdown()->select('Clock');
-		// Wait until form is reloaded.
-		$form->waitUntilReloaded();
+		// Wait until overlay is reloaded.
+		$overlay->waitUntilReady();
 		// Set name of widget.
 		$form->getField('Name')->type('Clock test');
 		$form->submit();

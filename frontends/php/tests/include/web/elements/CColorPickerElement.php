@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/CCompositeInputElement.php';
 class CColorPickerElement extends CCompositeInputElement {
 
 	/**
-	 * Overwrite composite input value.
+	 * Overwrite color picker value.
 	 *
 	 * @inheritdoc
 	 */
