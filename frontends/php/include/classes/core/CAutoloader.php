@@ -75,20 +75,23 @@ class CAutoloader {
 	 */
 	protected function loadClass($fq_class_name) {
 		$chunks = explode('\\', $fq_class_name);
-		$class_name = array_pop($chunks);
-		$namespace = implode('\\', $chunks);
+		$file_name = array_pop($chunks).'.php';
 
-		if (array_key_exists($namespace, $this->namespaces)) {
-			$file_name = $class_name.'.php';
+		do {
+			$namespace = implode('\\', $chunks);
 
-			foreach ($this->namespaces[$namespace] as $dir) {
-				if (is_file($dir.$file_name)) {
-					require $dir.$file_name;
+			if (array_key_exists($namespace, $this->namespaces)) {
+				foreach ($this->namespaces[$namespace] as $dir) {
+					if (is_file($dir.$file_name)) {
+						require $dir.$file_name;
 
-					return true;
+						return true;
+					}
 				}
 			}
-		}
+
+			$file_name = strtolower(array_pop($chunks)).DIRECTORY_SEPARATOR.$file_name;
+		} while ($chunks);
 
 		return false;
 	}
