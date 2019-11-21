@@ -17,6 +17,45 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+AC_DEFUN([LIBLDAP_TRY_LINK],
+[
+_save_ldap_cppflags="$CPPFLAGS"
+_save_ldap_cflags="$CFLAGS"
+_save_ldap_ldflags="$LDFLAGS"
+_save_ldap_libs="$LIBS"
+
+LIBS="$LIBS $1"
+LDFLAGS="$LDFLAGS $2"
+CPPFLAGS="$CPPFLAGS $3"
+CFLAGS="$CFLAGS $4"
+ldap_link="no"
+
+AC_TRY_LINK([
+#include <stdio.h>
+#include <ldap.h>
+#include <lber.h>
+#include <ldap_schema.h>
+],[
+printf("%p,%p", ldap_initialize, ldap_str2attributetype);
+printf("%p", ber_free);
+return 0;
+],[
+ldap_link="yes"
+])
+
+CPPFLAGS="$_save_ldap_cppflags"
+CFLAGS="$_save_ldap_cflags"
+LDFLAGS="$_save_ldap_ldflags"
+LIBS="$_save_ldap_libs"
+unset _save_ldap_cppflags
+unset _save_ldap_cflags
+unset _save_ldap_ldflags
+unset _save_ldap_libs
+]dnl
+[AS_IF([test "x$ldap_link" = "xyes"], [$5], [$6])]dnl
+)dnl
+
+
 AC_DEFUN([LIBLDAP_CHECK_CONFIG],
 [
   AC_ARG_WITH(ldap,[
@@ -35,58 +74,102 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
      ],[_libldap_with=ifelse([$1],,[no],[$1])])
 
   if test "x$_libldap_with" != x"no"; then
-       AC_MSG_CHECKING(for LDAP support)
+        AC_MSG_CHECKING([for LDAP support of ldap.h])
 
-       if test "$_libldap_with" = "yes"; then
-               if test -f /usr/local/openldap/include/ldap.h; then
-                       LDAP_INCDIR=/usr/local/openldap/include/
-                       LDAP_LIBDIR=/usr/local/openldap/lib/
-		       found_ldap="yes"
-               elif test -f /usr/include/ldap.h; then
-                       LDAP_INCDIR=/usr/include
-                       LDAP_LIBDIR=/usr/lib
-		       found_ldap="yes"
-               elif test -f /usr/local/include/ldap.h; then
-                       LDAP_INCDIR=/usr/local/include
-                       LDAP_LIBDIR=/usr/local/lib
-		       found_ldap="yes"
-               else
-                       found_ldap="no"
-                       AC_MSG_RESULT(no)
-               fi
-       else
-               if test -f $_libldap_with/include/ldap.h; then
-                       LDAP_INCDIR=$_libldap_with/include
-                       LDAP_LIBDIR=$_libldap_with/lib
-		       found_ldap="yes"
-               else
-                       found_ldap="no"
-                       AC_MSG_RESULT(no)
-               fi
-       fi
+        if test "$_libldap_with" = "yes"; then
+                if test -f /usr/local/openldap/include/ldap.h; then
+                        LDAP_INCDIR=/usr/local/openldap/include/
+                        LDAP_LIBDIR=/usr/local/openldap/lib/
+                        found_ldap="yes"
+                elif test -f /usr/include/ldap.h; then
+                        LDAP_INCDIR=/usr/include
+                        LDAP_LIBDIR=/usr/lib
+                        found_ldap="yes"
+                elif test -f /usr/local/include/ldap.h; then
+                        LDAP_INCDIR=/usr/local/include
+                        LDAP_LIBDIR=/usr/local/lib
+                        found_ldap="yes"
+                else
+                        found_ldap="no"
+                        AC_MSG_RESULT(no)
+                fi
+        else
+                if test -f $_libldap_with/include/ldap.h; then
+                        LDAP_INCDIR=$_libldap_with/include
+                        LDAP_LIBDIR=$_libldap_with/lib
+                        found_ldap="yes"
+                else
+                        found_ldap="no"
+                        AC_MSG_RESULT(no)
+                fi
+        fi
 
-       if test "x$found_ldap" != "xno"; then
+        if test "x$found_ldap" != "xno"; then
 
-               LDAP_CPPFLAGS="-I$LDAP_INCDIR"
-               LDAP_LDFLAGS="-L$LDAP_LIBDIR"
-               LDAP_LIBS="-lldap -llber $LDAP_LIBS"
+                AC_MSG_RESULT(yes)
+                LDAP_CPPFLAGS="-I$LDAP_INCDIR"
+                LDAP_LDFLAGS="-L$LDAP_LIBDIR"
+                LDAP_LIBS="-lldap -llber $LDAP_LIBS"
 
-               if test "x$enable_static" = "xyes"; then
-                       LDAP_LIBS="$LDAP_LIBS -lgnutls -lpthread -lsasl2"
-               fi
+                if test "x$enable_static" = "xyes"; then
+                        LDAP_LIBS="$LDAP_LIBS -lgnutls -lpthread -lsasl2"
+                elif test "x$enable_static_libs" = "xyes"; then
+                        AC_MSG_CHECKING([compatibility of static LDAP libs])
 
-               found_ldap="yes"
-               AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
-	       AC_DEFINE(LDAP_DEPRECATED, 1, [Define to 1 if LDAP deprecated functions is used.])
-               AC_MSG_RESULT(yes)
+                        # without SSL
+                        TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lpthread -lsasl2"
+                        LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
+                                LDAP_LIBS=$TRY_LDAP_LIBS
+                                AC_MSG_RESULT([without SSL])
+                        ])
 
-	       if test "x$enable_static" = "xyes"; then
-                       AC_CHECK_LIB(gnutls, main, , AC_MSG_ERROR([Not found GnuTLS library]))
-                       AC_CHECK_LIB(pthread, main, , AC_MSG_ERROR([Not found Pthread library]))
-                       AC_CHECK_LIB(sasl2, main, , AC_MSG_ERROR([Not found SASL2 library]))
-               fi
+                        # with system GnuTLS
+                        if test "x$ldap_link" = "xno"; then
+                                TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lgnutls -lsasl2 -lgssapi_krb5 -lpthread"
+                                LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
+                                        LDAP_LIBS=$TRY_LDAP_LIBS
+                                        AC_MSG_RESULT([with system GnuTLS dynamic linking])
+                                ])
+                        fi
 
-       fi
+                        # with static OpenSSL
+                        if test "x$ldap_link" = "xno" -a "x$want_openssl" = "xyes"; then
+                                OSSL_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic $OPENSSL_LIBS -lsasl2"
+                                OSSL_LDAP_CPPFLAGS="$LDAP_CPPFLAGS $OPENSSL_CPPFLAGS"
+                                OSSL_LDAP_CFLAGS="$LDAP_CPPFLAGS $OPENSSL_CFLAGS"
+                                OSSL_LDAP_LDFLAGS="$LDAP_LDFLAGS $OPENSSL_LDFLAGS"
+                                LIBLDAP_TRY_LINK([$OSSL_LDAP_LIBS], [$OSSL_LDAP_LDFLAGS], [$OSSL_LDAP_CPPFLAGS], [$OSSL_LDAP_CFLAGS],[
+                                        LDAP_LIBS="$OSSL_LDAP_LIBS"
+                                        AC_MSG_RESULT([with static OpenSSL])
+                                ],[
+                                        AC_MSG_ERROR([Not compatible with static OpenLDAP libs version of static OpenSSL: "$OPENSSL_LDFLAGS"])
+                                ])
+                        fi
+
+                        # with system OpenSSL
+                        if test "x$ldap_link" = "xno"; then
+                                TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lssl -lsasl2 -lcrypto"
+                                LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
+                                        LDAP_LIBS=$TRY_LDAP_LIBS
+                                        AC_MSG_RESULT([with system OpenSSL dynamic linking])
+                                ])
+                        fi
+
+                        if test "x$ldap_link" = "xno"; then
+                                AC_MSG_ERROR([Not found compatible version of OpenLDAP static libs])
+                        fi
+                fi
+
+                found_ldap="yes"
+                AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
+                AC_DEFINE(LDAP_DEPRECATED, 1, [Define to 1 if LDAP deprecated functions is used.])
+
+                if test "x$enable_static" = "xyes"; then
+                        AC_CHECK_LIB(gnutls, main, , AC_MSG_ERROR([Not found GnuTLS library]))
+                        AC_CHECK_LIB(pthread, main, , AC_MSG_ERROR([Not found Pthread library]))
+                        AC_CHECK_LIB(sasl2, main, , AC_MSG_ERROR([Not found SASL2 library]))
+                fi
+        fi
   fi
 
   AC_SUBST(LDAP_CPPFLAGS)
