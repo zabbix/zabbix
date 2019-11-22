@@ -23,7 +23,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/CCompositeInputElement.php';
 
 /**
- * Color picker element.
+ * Overwrite color picker value.
  */
 class CColorPickerElement extends CCompositeInputElement {
 

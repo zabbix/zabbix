@@ -55,7 +55,7 @@ trait FilterTrait {
 	}
 
 	/**
-	 * Select type of tags. Add new tag, select tag operator, name and value.
+	 * Add new tag, select tag operator, name and value.
 	 *
 	 * @param array   $tags        tag operator, name and value
 	 * @param type	  $selector	   tags table selector
