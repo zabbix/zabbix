@@ -57,6 +57,7 @@ class CApiServiceFactory extends CRegistryFactory {
 			'maintenance' => 'CMaintenance',
 			'map' => 'CMap',
 			'mediatype' => 'CMediatype',
+			'module' => 'CModule',
 			'problem' => 'CProblem',
 			'proxy' => 'CProxy',
 			'service' => 'CService',
