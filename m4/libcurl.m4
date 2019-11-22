@@ -176,7 +176,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 									])
 							;;
 								-framework|CoreFoundation|Security)
-									test "x$static_linking_support" = "xno" && LIBCURL_LIBS="$LIBCURL_LIBS $i"
+									LIBCURL_LIBS="$LIBCURL_LIBS $i"
 							;;
 							esac
 						done
