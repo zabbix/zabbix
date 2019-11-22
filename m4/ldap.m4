@@ -141,6 +141,18 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 LIBLDAP_TRY_LINK([$OSSL_LDAP_LIBS], [$OSSL_LDAP_LDFLAGS], [$OSSL_LDAP_CPPFLAGS], [$OSSL_LDAP_CFLAGS],[
                                         LDAP_LIBS="$OSSL_LDAP_LIBS"
                                         AC_MSG_RESULT([with static OpenSSL])
+                                ])
+                        fi
+
+                        # with static OpenSSL for Solaris
+                        if test "x$ldap_link" = "xno" -a "x$want_openssl" = "xyes"; then
+                                OSSL_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic $OPENSSL_LIBS -lsasl"
+                                OSSL_LDAP_CPPFLAGS="$LDAP_CPPFLAGS $OPENSSL_CPPFLAGS"
+                                OSSL_LDAP_CFLAGS="$LDAP_CPPFLAGS $OPENSSL_CFLAGS"
+                                OSSL_LDAP_LDFLAGS="$LDAP_LDFLAGS $OPENSSL_LDFLAGS"
+                                LIBLDAP_TRY_LINK([$OSSL_LDAP_LIBS], [$OSSL_LDAP_LDFLAGS], [$OSSL_LDAP_CPPFLAGS], [$OSSL_LDAP_CFLAGS],[
+                                        LDAP_LIBS="$OSSL_LDAP_LIBS"
+                                        AC_MSG_RESULT([with static OpenSSL for Solaris])
                                 ],[
                                         AC_MSG_ERROR([Not compatible with static OpenLDAP libs version of static OpenSSL: "$OPENSSL_LDFLAGS"])
                                 ])
@@ -152,6 +164,15 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                         LDAP_LIBS=$TRY_LDAP_LIBS
                                         AC_MSG_RESULT([with system OpenSSL dynamic linking])
+                                ])
+                        fi
+
+                        # with system OpenSSL for Solaris
+                        if test "x$ldap_link" = "xno"; then
+                                TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lssl -lsasl -lcrypto"
+                                LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
+                                        LDAP_LIBS=$TRY_LDAP_LIBS
+                                        AC_MSG_RESULT([with system OpenSSL for Solaris dynamic linking])
                                 ])
                         fi
 
