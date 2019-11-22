@@ -558,6 +558,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					switch ($key) {
 						case 'check_action':
 							$action = $value;
+							$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_bg'));
 							$this->zbxTestClickButtonText($action);
 							if ($action !== 'Remove') {
 								$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('overlay_dialogue'));
