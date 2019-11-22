@@ -111,6 +111,8 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 				fi
 
 				if test "x$LIBCURL_LIBS" = "x"; then
+					_curl_dir_lib=`$_libcurl_config --prefix`
+					_curl_dir_lib="$_curl_dir_lib/lib"
 					_full_libcurl_libs=`$_libcurl_config --libs`
 					for i in $_full_libcurl_libs; do
 						case $i in
@@ -121,7 +123,11 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 								LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS -Wl,$i"
 						;;
 							-lcurl)
-								test "x$enable_static_libs" = "xyes" && i="-Wl,-Bstatic $i -Wl,-Bdynamic"
+								if test "x$enable_static_libs" = "xyes" -a "x$static_linking_support" = "xno"; then
+									i="$_curl_dir_lib/libcurl.a"
+								elif test "x$enable_static_libs" = "xyes"; then
+									i="-Wl,-Bstatic $i -Wl,-Bdynamic"
+								fi
 								LIBCURL_LIBS="$LIBCURL_LIBS $i"
 						;;
 							-l*)
@@ -168,6 +174,9 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 									],[
 										AC_MSG_ERROR([static library $_lib_name required for linking libcurl not found])
 									])
+							;;
+								-framework|CoreFoundation|Security)
+									test "x$static_linking_support" = "xno" && LIBCURL_LIBS="$LIBCURL_LIBS $i"
 							;;
 							esac
 						done

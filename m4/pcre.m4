@@ -33,9 +33,10 @@ If you want to specify libpcre installation directories:
 AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
 		[
 			_libpcre_dir="$withval"
+			_libpcre_dir_lib="$withval/lib"
 			test "x$withval" = "xyes" && withval=/usr
 			LIBPCRE_CFLAGS="-I$withval/include"
-			LIBPCRE_LDFLAGS="-L$withval/lib"
+			LIBPCRE_LDFLAGS="-L$_libpcre_dir_lib"
 			_libpcre_dir_set="yes"
 		]
 	)
@@ -56,6 +57,7 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 		),
 		[
 			_libpcre_dir="$withval"
+			_libpcre_dir_lib="$withval"
 			LIBPCRE_LDFLAGS="-L$withval"
 			_libpcre_dir_set="yes"
 		]
@@ -75,6 +77,9 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 	if test "x$enable_static" = "xyes"; then
 		LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
 	elif test "x$enable_static_libs" = "xyes"; then
+
+		test "x$static_linking_support" = "xno" -a -z "$_libpcre_dir_lib" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
+
 		if test "x$_libpcre_dir" = "xyes" -o -z "$_libpcre_dir"; then
 			PKG_CHECK_EXISTS(libpcre,[
 				LIBPCRE_LIBS=`$PKG_CONFIG --static --libs libpcre`
@@ -86,7 +91,11 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 			LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_dir/lib/pkgconfig" $PKG_CONFIG --static --libs libpcre`
 		fi
 
-		if test "x$ARCH" = "xaix"; then
+		if test "x$static_linking_support" = "xno" -a "x$ARCH" = "xaix"; then
+			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s|-lpcre_a|$_libpcre_dir_lib/libpcre_a|g"`
+		elif test "x$static_linking_support" = "xno"; then
+			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s|-lpcre|$_libpcre_dir_lib/libpcre.a|g"`
+		elif test "x$ARCH" = "xaix"; then
 			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed 's/-lpcre_a/-Wl,-Bstatic -lpcre_a -Wl,-Bdynamic/g'`
 		else
 			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed 's/-lpcre/-Wl,-Bstatic -lpcre -Wl,-Bdynamic/g'`
