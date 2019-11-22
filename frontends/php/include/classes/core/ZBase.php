@@ -46,7 +46,26 @@ class ZBase {
 	protected $config = [];
 
 	/**
-	 * Returns the current instance of Z.
+	 * @var CAutoloader
+	 */
+	protected $autoloader;
+
+	/**
+	 * @var CComponentRegistry
+	 */
+	protected static $component_registry;
+
+	/**
+	 * Getter for component registry instance.
+	 *
+	 * @return CComponentRegistry
+	 */
+	public static function component() {
+		return self::$component_registry;
+	}
+
+	/**
+	 * Returns the current instance of APP.
 	 *
 	 * @static
 	 *
@@ -65,10 +84,13 @@ class ZBase {
 	 */
 	protected function init() {
 		$this->rootDir = $this->findRootDir();
+		// Register base directory path for 'include' and 'require' functions.
+		set_include_path(get_include_path().PATH_SEPARATOR.$this->rootDir);
 		$autoloader = new CAutoloader($this->rootDir);
 		$autoloader->addNamespace('', $this->getIncludePaths());
 		$autoloader->register();
-		APP::Component()->autoloader = $autoloader;
+		$this->autoloader = $autoloader;
+		static::$component_registry = new CComponentRegistry;
 
 		// initialize API classes
 		$apiServiceFactory = new CApiServiceFactory();
@@ -81,39 +103,39 @@ class ZBase {
 		API::setApiServiceFactory($apiServiceFactory);
 
 		// system includes
-		require_once $this->getRootDir().'/include/debug.inc.php';
-		require_once $this->getRootDir().'/include/gettextwrapper.inc.php';
-		require_once $this->getRootDir().'/include/defines.inc.php';
-		require_once $this->getRootDir().'/include/func.inc.php';
-		require_once $this->getRootDir().'/include/html.inc.php';
-		require_once $this->getRootDir().'/include/perm.inc.php';
-		require_once $this->getRootDir().'/include/audit.inc.php';
-		require_once $this->getRootDir().'/include/js.inc.php';
-		require_once $this->getRootDir().'/include/users.inc.php';
-		require_once $this->getRootDir().'/include/validate.inc.php';
-		require_once $this->getRootDir().'/include/profiles.inc.php';
-		require_once $this->getRootDir().'/include/locales.inc.php';
-		require_once $this->getRootDir().'/include/db.inc.php';
+		require_once 'include/debug.inc.php';
+		require_once 'include/gettextwrapper.inc.php';
+		require_once 'include/defines.inc.php';
+		require_once 'include/func.inc.php';
+		require_once 'include/html.inc.php';
+		require_once 'include/perm.inc.php';
+		require_once 'include/audit.inc.php';
+		require_once 'include/js.inc.php';
+		require_once 'include/users.inc.php';
+		require_once 'include/validate.inc.php';
+		require_once 'include/profiles.inc.php';
+		require_once 'include/locales.inc.php';
+		require_once 'include/db.inc.php';
 
 		// page specific includes
-		require_once $this->getRootDir().'/include/actions.inc.php';
-		require_once $this->getRootDir().'/include/discovery.inc.php';
-		require_once $this->getRootDir().'/include/draw.inc.php';
-		require_once $this->getRootDir().'/include/events.inc.php';
-		require_once $this->getRootDir().'/include/graphs.inc.php';
-		require_once $this->getRootDir().'/include/hostgroups.inc.php';
-		require_once $this->getRootDir().'/include/hosts.inc.php';
-		require_once $this->getRootDir().'/include/httptest.inc.php';
-		require_once $this->getRootDir().'/include/ident.inc.php';
-		require_once $this->getRootDir().'/include/images.inc.php';
-		require_once $this->getRootDir().'/include/items.inc.php';
-		require_once $this->getRootDir().'/include/maintenances.inc.php';
-		require_once $this->getRootDir().'/include/maps.inc.php';
-		require_once $this->getRootDir().'/include/media.inc.php';
-		require_once $this->getRootDir().'/include/services.inc.php';
-		require_once $this->getRootDir().'/include/sounds.inc.php';
-		require_once $this->getRootDir().'/include/triggers.inc.php';
-		require_once $this->getRootDir().'/include/valuemap.inc.php';
+		require_once 'include/actions.inc.php';
+		require_once 'include/discovery.inc.php';
+		require_once 'include/draw.inc.php';
+		require_once 'include/events.inc.php';
+		require_once 'include/graphs.inc.php';
+		require_once 'include/hostgroups.inc.php';
+		require_once 'include/hosts.inc.php';
+		require_once 'include/httptest.inc.php';
+		require_once 'include/ident.inc.php';
+		require_once 'include/images.inc.php';
+		require_once 'include/items.inc.php';
+		require_once 'include/maintenances.inc.php';
+		require_once 'include/maps.inc.php';
+		require_once 'include/media.inc.php';
+		require_once 'include/services.inc.php';
+		require_once 'include/sounds.inc.php';
+		require_once 'include/triggers.inc.php';
+		require_once 'include/valuemap.inc.php';
 	}
 
 	/**
@@ -132,6 +154,15 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
+
+				$router = new CRouter;
+				$router->setAction(getRequest('action', basename($_SERVER['SCRIPT_NAME'])));
+
+				if ($router->getController() !== null) {
+					CProfiler::getInstance()->start();
+					$this->processRequest($router);
+					exit;
+				}
 				break;
 
 			case self::EXEC_MODE_API:
@@ -150,18 +181,6 @@ class ZBase {
 				}
 				catch (ConfigFileException $e) {}
 				break;
-		}
-
-		// new MVC processing, otherwise we continue execution old style
-		if (hasRequest('action')) {
-			$router = new CRouter;
-			$router->setAction(getRequest('action'));
-
-			if ($router->getController() !== null) {
-				CProfiler::getInstance()->start();
-				$this->processRequest($router);
-				exit;
-			}
 		}
 	}
 
@@ -273,7 +292,7 @@ class ZBase {
 	 * @throws Exception
 	 */
 	protected function setMaintenanceMode() {
-		require_once $this->getRootDir().'/conf/maintenance.inc.php';
+		require_once 'conf/maintenance.inc.php';
 
 		if (defined('ZBX_DENY_GUI_ACCESS')) {
 			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
@@ -354,7 +373,7 @@ class ZBase {
 		setlocale(LC_NUMERIC, $defaultLocales);
 
 		// should be after locale initialization
-		require_once $this->getRootDir().'/include/translateDefines.inc.php';
+		require_once 'include/translateDefines.inc.php';
 	}
 
 	/**
