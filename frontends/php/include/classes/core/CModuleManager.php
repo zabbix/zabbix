@@ -35,7 +35,7 @@ class CModuleManager {
 	 * array  [namespace]['manifest']    module parsed manifest.json file.
 	 * string [namespace]['dir']         module directory absolute path with trailing slash.
 	 * bool   [namespace]['status']      module enabled status.
-	 * array  [namespace]['errors']      module intialization errors, array of string.
+	 * array  [namespace]['errors']      module intialization errors, array of exception objects.
 	 * array  [namespace]['path']        module absolute path to directory, manifest.json and Module.php files.
 	 *
 	 */
@@ -161,17 +161,18 @@ class CModuleManager {
 	 */
 	public function getModulesRoutes() {
 		$routes = [];
+		$default = [
+			'layout' => 'layout.htmlpage',
+			'view' => null
+		];
 
 		foreach ($this->modules as $namespace => $module) {
 			if ($module['status']) {
-				$default = [
-					'layout' => 'layout.htmlpage',
-					'view' => null
-				];
+				$namespace = 'Modules\\'.$namespace.'\\Actions\\';
 
 				foreach ($module['manifest']['actions'] as $action => $data) {
 					$routes[$action] = [
-						'class' => 'Modules\\'.$namespace.'\\Actions\\'.$data['class']
+						'class' => $namespace.$data['class']
 					] + $default + $data;
 				}
 			}
