@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-20 15:09+0200\n"
+"POT-Creation-Date: 2019-11-24 01:43+0200\n"
 "PO-Revision-Date: 2018-01-01 00:41+0300\n"
 "Last-Translator: Daniel <mail@dlaube.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -36,8 +36,8 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:353
 #: include/classes/api/services/CMaintenance.php:358
 #: include/classes/api/services/CMaintenance.php:569
-#: include/classes/api/services/CMaintenance.php:583 maintenance.php:139
-#: maintenance.php:145 services.php:182 services.php:191
+#: include/classes/api/services/CMaintenance.php:583 maintenance.php:130
+#: maintenance.php:136 services.php:182 services.php:191
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" muss zwischen 01.01.1970 und 18.01.2038 liegen."
@@ -320,7 +320,7 @@ msgstr ""
 msgid "<sub-menu/sub-menu/...>script"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:747
+#: include/classes/widgets/CWidgetHelper.php:748
 msgid "ADD OVERRIDE"
 msgstr ""
 
@@ -549,7 +549,7 @@ msgstr "Aktiv"
 #: include/classes/api/services/CMaintenance.php:569
 #: include/views/configuration.maintenance.edit.php:54
 #: include/views/configuration.maintenance.list.php:72 maintenance.php:45
-#: maintenance.php:139
+#: maintenance.php:130
 msgid "Active since"
 msgstr "Aktiv seit"
 
@@ -557,7 +557,7 @@ msgstr "Aktiv seit"
 #: include/classes/api/services/CMaintenance.php:583
 #: include/views/configuration.maintenance.edit.php:60
 #: include/views/configuration.maintenance.list.php:73 maintenance.php:48
-#: maintenance.php:145
+#: maintenance.php:136
 msgid "Active till"
 msgstr "Aktiv bis"
 
@@ -580,10 +580,11 @@ msgstr "Aktiv bis"
 #: app/views/popup.discovery.check.php:124 app/views/popup.httpstep.php:68
 #: app/views/popup.httpstep.php:94 app/views/popup.httpstep.php:118
 #: app/views/popup.httpstep.php:137 app/views/popup.httpstep.php:176
-#: app/views/popup.media.php:48 app/views/popup.media.php:111
-#: app/views/popup.triggerwizard.php:104 app/views/popup.triggerwizard.php:138
+#: app/views/popup.maintenance.period.php:164 app/views/popup.media.php:48
+#: app/views/popup.media.php:111 app/views/popup.triggerwizard.php:104
+#: app/views/popup.triggerwizard.php:138
 #: include/classes/widgets/CWidgetHelper.php:484 include/forms.inc.php:1487
-#: include/forms.inc.php:2382
+#: include/forms.inc.php:2007
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/administration.general.iconmap.edit.php:93
 #: include/views/administration.general.iconmap.edit.php:134
@@ -651,9 +652,9 @@ msgstr "Aktiv bis"
 #: include/views/configuration.item.prototype.massupdate.php:378
 #: include/views/configuration.item.prototype.massupdate.php:492
 #: include/views/configuration.item.prototype.massupdate.php:567
-#: include/views/configuration.maintenance.edit.php:137
-#: include/views/configuration.maintenance.edit.php:224
-#: include/views/configuration.maintenance.edit.php:295
+#: include/views/configuration.maintenance.edit.php:117
+#: include/views/configuration.maintenance.edit.php:193
+#: include/views/configuration.maintenance.edit.php:264
 #: include/views/configuration.services.edit.php:155
 #: include/views/configuration.services.edit.php:324
 #: include/views/configuration.services.edit.php:361
@@ -732,11 +733,11 @@ msgstr "Host hinzufügen"
 msgid "Add multiple maps"
 msgstr "Mehrere Karten hinzufügen"
 
-#: include/classes/widgets/CWidgetHelper.php:1167
+#: include/classes/widgets/CWidgetHelper.php:1170
 msgid "Add new data set"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:701
+#: include/classes/widgets/CWidgetHelper.php:702
 msgid "Add new override"
 msgstr ""
 
@@ -837,7 +838,7 @@ msgstr "Agent-Schnittstellen"
 msgid "Agent or SNMP or JMX or IPMI interface"
 msgstr "Agent-, SNMP-, JMX- oder IPMI-Schnittstelle"
 
-#: include/classes/widgets/CWidgetHelper.php:1107
+#: include/classes/widgets/CWidgetHelper.php:1109
 msgid "Aggregate"
 msgstr ""
 
@@ -845,11 +846,11 @@ msgstr ""
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
 msgstr "Aggregierte Prüfungen benötigen keinen Agent auf dem überwachten Host. Der Zabbix-Server sammelt aggregierte Informationen mittels direkter Datenbankabfragen. Siehe Zabbix-Handbuch."
 
-#: include/classes/widgets/CWidgetHelper.php:1080
+#: include/classes/widgets/CWidgetHelper.php:1082
 msgid "Aggregation function"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1098
+#: include/classes/widgets/CWidgetHelper.php:1100
 msgid "Aggregation interval"
 msgstr ""
 
@@ -973,7 +974,7 @@ msgstr "Und"
 #: include/views/configuration.correlation.edit.php:93
 #: include/views/configuration.host.discovery.edit.php:621
 #: include/views/configuration.host.list.php:59
-#: include/views/configuration.maintenance.edit.php:170
+#: include/views/configuration.maintenance.edit.php:139
 #: include/views/configuration.template.list.php:33
 #: include/views/configuration.triggers.list.php:99
 msgid "And/Or"
@@ -1077,6 +1078,7 @@ msgid "Applications"
 msgstr "Kategorien"
 
 #: app/views/dashboard.properties.edit.php:65
+#: app/views/popup.maintenance.period.php:164
 #: include/classes/html/CFilter.php:207 include/classes/html/CFilter.php:298
 #: include/views/js/monitoring.sysmaps.js.php:266
 #: include/views/js/monitoring.sysmaps.js.php:414
@@ -1101,8 +1103,7 @@ msgstr "Kommend"
 msgid "Apr"
 msgstr "Apr"
 
-#: include/forms.inc.php:2186 include/func.inc.php:119
-#: include/func.inc.php:256 jsLoader.php:155
+#: include/func.inc.php:119 include/func.inc.php:256 jsLoader.php:155
 msgid "April"
 msgstr "April"
 
@@ -1110,7 +1111,7 @@ msgstr "April"
 msgid "Are you sure you want perform this action?"
 msgstr "Wollen Sie diese Aktion wirklich durchführen?"
 
-#: include/views/js/administration.general.macros.edit.js.php:57
+#: include/views/js/administration.general.macros.edit.js.php:72
 msgid "Are you sure you want to delete"
 msgstr "Wollen sie wirklich löschen"
 
@@ -1170,13 +1171,13 @@ msgstr "Um %1$s:%2$s Uhr am %3$s %4$s im %5$s"
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
 msgstr "Um %1$s:%2$s Uhr am %3$s. Tag im %4$s"
 
-#: include/forms.inc.php:2304
+#: app/views/popup.maintenance.period.php:135
 msgid "At (hour:minute)"
 msgstr ""
 
 #: include/classes/api/services/CMaintenance.php:279
 #: include/classes/api/services/CMaintenance.php:664
-#: include/views/configuration.maintenance.edit.php:233
+#: include/views/configuration.maintenance.edit.php:202
 msgid "At least one host group or host must be selected."
 msgstr ""
 
@@ -1257,8 +1258,7 @@ msgstr "Änderungsprotokoll"
 msgid "Aug"
 msgstr "Aug"
 
-#: include/forms.inc.php:2173 include/func.inc.php:123
-#: include/func.inc.php:260 jsLoader.php:159
+#: include/func.inc.php:123 include/func.inc.php:260 jsLoader.php:159
 msgid "August"
 msgstr "August"
 
@@ -1422,9 +1422,9 @@ msgstr "Hintergrundfarbe"
 msgid "Background image"
 msgstr "Hintergrundbild"
 
-#: include/classes/widgets/CWidgetHelper.php:723
-#: include/classes/widgets/CWidgetHelper.php:766
-#: include/classes/widgets/CWidgetHelper.php:1011
+#: include/classes/widgets/CWidgetHelper.php:724
+#: include/classes/widgets/CWidgetHelper.php:767
+#: include/classes/widgets/CWidgetHelper.php:1013
 msgid "Bar"
 msgstr ""
 
@@ -1432,8 +1432,8 @@ msgstr ""
 msgid "Base DN"
 msgstr "Base-DN"
 
-#: include/classes/widgets/CWidgetHelper.php:749
-#: include/classes/widgets/CWidgetHelper.php:1002
+#: include/classes/widgets/CWidgetHelper.php:750
+#: include/classes/widgets/CWidgetHelper.php:1004
 msgid "Base colour"
 msgstr ""
 
@@ -1615,7 +1615,6 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1245
 #: include/views/configuration.action.edit.php:1848
 #: include/views/configuration.action.edit.php:2331
-#: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.services.parent.list.php:85
 #: include/views/conf.import.php:121
 #: include/views/js/administration.general.housekeeper.edit.js.php:40
@@ -1727,7 +1726,7 @@ msgstr "Kann Datenpunktprototyp nicht hinzufügen"
 msgid "Cannot add items."
 msgstr "Kann Datenpunkte nicht hinzufügen."
 
-#: maintenance.php:125
+#: maintenance.php:116
 msgid "Cannot add maintenance"
 msgstr "Kann Wartung nicht hinzufügen"
 
@@ -2070,7 +2069,7 @@ msgstr "Kann Datenpunktprototypen nicht löschen"
 msgid "Cannot delete items"
 msgstr "Kann Datenpunkte nicht löschen"
 
-#: maintenance.php:224
+#: maintenance.php:215
 msgid "Cannot delete maintenance"
 msgstr "Kann Wartung nicht löschen"
 
@@ -2875,7 +2874,7 @@ msgstr "Kann Datenpunkte nicht ändern"
 msgid "Cannot update macros"
 msgstr "Kann Makros nicht ändern"
 
-#: maintenance.php:121
+#: maintenance.php:112
 msgid "Cannot update maintenance"
 msgstr "Kann Wartung nicht ändern"
 
@@ -3039,7 +3038,7 @@ msgstr "Ändern"
 #: include/classes/screens/CScreenBuilder.php:499
 #: include/classes/screens/CScreenMap.php:45
 #: include/views/configuration.services.edit.php:62
-#: include/views/hostmacros.php:127 include/views/js/hostmacros.js.php:113
+#: include/views/hostmacros.php:127 include/views/js/hostmacros.js.php:128
 msgctxt "verb"
 msgid "Change"
 msgstr "Ändern"
@@ -3259,7 +3258,7 @@ msgstr "Uhr"
 #: include/views/configuration.httpconf.edit.php:237
 #: include/views/configuration.item.edit.php:955
 #: include/views/configuration.item.prototype.edit.php:782
-#: include/views/configuration.maintenance.edit.php:287
+#: include/views/configuration.maintenance.edit.php:256
 #: include/views/configuration.template.edit.php:442
 #: include/views/configuration.trigger.prototype.edit.php:629
 #: include/views/configuration.triggers.edit.php:629
@@ -3300,7 +3299,7 @@ msgid "Close problem"
 msgstr "Schließe Problem"
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:946 jsLoader.php:226
+#: include/classes/widgets/CWidgetHelper.php:947 jsLoader.php:226
 #: jsLoader.php:231
 msgid "Collapse"
 msgstr "Einklappen"
@@ -3619,9 +3618,9 @@ msgstr "Herzlichen Glückwunsch! Sie haben das Zabbix Frontend erfolgreich insta
 msgid "Connect to"
 msgstr "Verbinden mit"
 
-#: include/classes/widgets/CWidgetHelper.php:729
-#: include/classes/widgets/CWidgetHelper.php:804
-#: include/classes/widgets/CWidgetHelper.php:1060
+#: include/classes/widgets/CWidgetHelper.php:730
+#: include/classes/widgets/CWidgetHelper.php:805
+#: include/classes/widgets/CWidgetHelper.php:1062
 msgctxt "missing data function"
 msgid "Connected"
 msgstr ""
@@ -3710,8 +3709,8 @@ msgstr "Kontakt"
 #: include/classes/widgets/CWidgetHelper.php:462
 #: include/classes/widgets/CWidgetHelper.php:508
 #: include/views/configuration.host.list.php:72
-#: include/views/configuration.maintenance.edit.php:185
-#: include/views/configuration.maintenance.edit.php:206
+#: include/views/configuration.maintenance.edit.php:154
+#: include/views/configuration.maintenance.edit.php:175
 #: include/views/configuration.template.list.php:46
 #: include/views/configuration.triggers.list.php:112
 #: include/views/js/configuration.host.list.js.php:7
@@ -4198,7 +4197,7 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "DNS-Name"
 
-#: app/views/report.services.php:34 include/forms.inc.php:2081
+#: app/views/popup.maintenance.period.php:67 app/views/report.services.php:34
 #: include/maintenances.inc.php:33 report4.php:111
 msgid "Daily"
 msgstr "Täglich"
@@ -4282,7 +4281,7 @@ msgstr "Daten sind nicht ordnungsgemäß codiert."
 msgid "Data overview"
 msgstr "Datenübersicht"
 
-#: include/classes/widgets/CWidgetHelper.php:1113
+#: include/classes/widgets/CWidgetHelper.php:1115
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
 #: include/classes/widgets/views/widget.svggraph.form.view.php:268
 msgid "Data set"
@@ -4336,7 +4335,8 @@ msgstr "Datenbank-Typ"
 msgid "Database user"
 msgstr "Datenbank-Benutzer"
 
-#: include/forms.inc.php:2210 include/forms.inc.php:2295 maintenance.php:50
+#: app/views/popup.maintenance.period.php:98
+#: app/views/popup.maintenance.period.php:128
 msgid "Date"
 msgstr "Datum"
 
@@ -4364,16 +4364,18 @@ msgstr "Tag"
 msgid "Day before yesterday"
 msgstr ""
 
-#: include/forms.inc.php:2212 include/forms.inc.php:2273
+#: app/views/popup.maintenance.period.php:100
+#: app/views/popup.maintenance.period.php:122
 msgid "Day of month"
 msgstr ""
 
-#: include/forms.inc.php:2114 include/forms.inc.php:2213
-#: include/forms.inc.php:2221
+#: app/views/popup.maintenance.period.php:84
+#: app/views/popup.maintenance.period.php:101
+#: app/views/popup.maintenance.period.php:105
 msgid "Day of week"
 msgstr ""
 
-#: include/forms.inc.php:2322
+#: app/views/popup.maintenance.period.php:146
 msgid "Days"
 msgstr ""
 
@@ -4391,8 +4393,7 @@ msgstr "Debug-Modus"
 msgid "Dec"
 msgstr "Dez"
 
-#: include/forms.inc.php:2205 include/func.inc.php:127
-#: include/func.inc.php:264 jsLoader.php:163
+#: include/func.inc.php:127 include/func.inc.php:264 jsLoader.php:163
 msgid "December"
 msgstr "Dezember"
 
@@ -4481,8 +4482,8 @@ msgstr "Verspätung"
 #: app/views/administration.user.list.php:202
 #: app/views/monitoring.dashboard.list.php:76
 #: include/classes/html/CButtonDelete.php:25
-#: include/classes/widgets/CWidgetHelper.php:639
-#: include/classes/widgets/CWidgetHelper.php:989 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:640
+#: include/classes/widgets/CWidgetHelper.php:991 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.list.php:81
@@ -4586,7 +4587,7 @@ msgstr "Datenpunkt löschen?"
 msgid "Delete links between selected elements?"
 msgstr "Verknüpfung zwischen ausgewählten Elementen löschen?"
 
-#: include/views/configuration.maintenance.edit.php:288
+#: include/views/configuration.maintenance.edit.php:257
 msgid "Delete maintenance period?"
 msgstr "Wartungszeitraum löschen?"
 
@@ -5285,12 +5286,12 @@ msgstr "Konfigurationsdatei herunterladen"
 msgid "Downtime"
 msgstr "Downtime"
 
-#: include/classes/widgets/CWidgetHelper.php:719
-#: include/classes/widgets/CWidgetHelper.php:763
+#: include/classes/widgets/CWidgetHelper.php:720
 #: include/classes/widgets/CWidgetHelper.php:764
 #: include/classes/widgets/CWidgetHelper.php:765
 #: include/classes/widgets/CWidgetHelper.php:766
-#: include/classes/widgets/CWidgetHelper.php:1006
+#: include/classes/widgets/CWidgetHelper.php:767
+#: include/classes/widgets/CWidgetHelper.php:1008
 msgid "Draw"
 msgstr ""
 
@@ -5429,7 +5430,7 @@ msgstr ""
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Jede URL sollte einzigartig sein. Bitte überprüfen Sie, dass nur eine URL existiert namens"
 
-#: include/classes/widgets/CWidgetHelper.php:1112
+#: include/classes/widgets/CWidgetHelper.php:1114
 msgid "Each item"
 msgstr ""
 
@@ -5438,7 +5439,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:527
 #: include/views/configuration.action.edit.php:1310
 #: include/views/configuration.action.edit.php:1908
-#: include/views/configuration.maintenance.edit.php:90
+#: include/views/configuration.maintenance.edit.php:100
 #: include/views/configuration.trigger.prototype.edit.php:96
 #: include/views/configuration.trigger.prototype.edit.php:290
 #: include/views/configuration.triggers.edit.php:134
@@ -5825,8 +5826,8 @@ msgstr "Englisch (en_US)"
 #: include/classes/widgets/CWidgetHelper.php:463
 #: include/classes/widgets/CWidgetHelper.php:509
 #: include/views/configuration.host.list.php:73
-#: include/views/configuration.maintenance.edit.php:186
-#: include/views/configuration.maintenance.edit.php:207
+#: include/views/configuration.maintenance.edit.php:155
+#: include/views/configuration.maintenance.edit.php:176
 #: include/views/configuration.template.list.php:47
 #: include/views/configuration.triggers.list.php:113
 #: include/views/js/configuration.host.list.js.php:8
@@ -5911,11 +5912,11 @@ msgstr[1] ""
 msgid "Events and alerts"
 msgstr "Ereignisse und Alarmierungen"
 
-#: include/forms.inc.php:2095
+#: app/views/popup.maintenance.period.php:72
 msgid "Every day(s)"
 msgstr ""
 
-#: include/forms.inc.php:2108
+#: app/views/popup.maintenance.period.php:78
 msgid "Every week(s)"
 msgstr ""
 
@@ -5974,7 +5975,7 @@ msgid "Execution confirmation"
 msgstr "Ausführbestätigung"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:946 jsLoader.php:227
+#: include/classes/widgets/CWidgetHelper.php:947 jsLoader.php:227
 #: jsLoader.php:230
 msgid "Expand"
 msgstr "Erweitern"
@@ -6138,8 +6139,7 @@ msgstr "Tafel-Favoriten"
 msgid "Feb"
 msgstr "Feb"
 
-#: include/forms.inc.php:2170 include/func.inc.php:117
-#: include/func.inc.php:254 jsLoader.php:153
+#: include/func.inc.php:117 include/func.inc.php:254 jsLoader.php:153
 msgid "February"
 msgstr "Februar"
 
@@ -6245,8 +6245,7 @@ msgstr ""
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:725
-#: include/classes/widgets/CWidgetHelper.php:780
+#: include/classes/widgets/CWidgetHelper.php:726
 #: include/classes/widgets/CWidgetHelper.php:781
 #: include/classes/widgets/CWidgetHelper.php:782
 #: include/classes/widgets/CWidgetHelper.php:783
@@ -6257,7 +6256,8 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:788
 #: include/classes/widgets/CWidgetHelper.php:789
 #: include/classes/widgets/CWidgetHelper.php:790
-#: include/classes/widgets/CWidgetHelper.php:1040
+#: include/classes/widgets/CWidgetHelper.php:791
+#: include/classes/widgets/CWidgetHelper.php:1042
 msgid "Fill"
 msgstr ""
 
@@ -6393,7 +6393,6 @@ msgstr "Französisch (fr_FR)"
 msgid "Fri"
 msgstr "Fr"
 
-#: include/forms.inc.php:2138 include/forms.inc.php:2253
 #: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:168
 msgid "Friday"
 msgstr "Freitag"
@@ -7236,7 +7235,7 @@ msgstr "Host-Gruppe mit ID \"%1$s\" ist nicht verfügbar."
 #: include/views/configuration.hostgroups.edit.php:22
 #: include/views/configuration.hostgroups.list.php:23
 #: include/views/configuration.host.massupdate.php:51
-#: include/views/configuration.maintenance.edit.php:235
+#: include/views/configuration.maintenance.edit.php:204
 #: include/views/configuration.template.massupdate.php:53
 #: include/views/configuration.triggers.list.php:25
 #: include/views/reports.toptriggers.php:33 latest.php:323
@@ -7422,14 +7421,14 @@ msgstr "Host mit gleichem sichtbaren Namen \"%s\" existiert bereits."
 #: include/views/configuration.hostgroups.list.php:137
 #: include/views/configuration.host.list.php:25
 #: include/views/configuration.host.massupdate.php:24
-#: include/views/configuration.maintenance.edit.php:251
+#: include/views/configuration.maintenance.edit.php:220
 #: include/views/configuration.triggers.list.php:41
 #: include/views/conf.import.php:29 include/views/reports.toptriggers.php:50
 #: latest.php:340
 msgid "Hosts"
 msgstr "Hosts"
 
-#: include/views/configuration.maintenance.edit.php:277
+#: include/views/configuration.maintenance.edit.php:246
 msgid "Hosts and groups"
 msgstr ""
 
@@ -7445,7 +7444,7 @@ msgstr "Hoststandort"
 msgid "Hosts updated"
 msgstr "Hosts geändert"
 
-#: include/forms.inc.php:2324
+#: app/views/popup.maintenance.period.php:148
 msgid "Hours"
 msgstr ""
 
@@ -8315,37 +8314,13 @@ msgstr "Falscher Datenpunkt-Wert \"%1$s\" für Auslöser-Funktion \"%2$s\" über
 msgid "Incorrect list of items."
 msgstr ""
 
-#: maintenance.php:297
+#: app/controllers/CControllerPopupMaintenancePeriod.php:89
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
 msgstr "Falsches Wartungsdatum - muss zwischen 01.01.1970 und 18.01.2038 liegen"
 
-#: maintenance.php:325
-msgid "Incorrect maintenance date"
-msgstr "Falsches Wartungsdatum"
-
-#: maintenance.php:302
-msgid "Incorrect maintenance day period"
-msgstr "Falsche Wartungstage"
-
-#: maintenance.php:311 maintenance.php:321
-msgid "Incorrect maintenance days of week"
-msgstr "Falsche Wartungswochentage"
-
-#: maintenance.php:317
-msgid "Incorrect maintenance month period"
-msgstr "Falscher Wartungsmonat"
-
-#: maintenance.php:287
-msgid "Incorrect maintenance period"
-msgstr "Falscher Wartungszeitraum"
-
-#: maintenance.php:283
+#: app/controllers/CControllerPopupMaintenancePeriod.php:125
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Falscher Wartungszeitraum (mindestens 5 Minuten)"
-
-#: maintenance.php:307
-msgid "Incorrect maintenance week period"
-msgstr "Falsche Wartungswoche"
 
 #: include/classes/api/services/CScreenItem.php:710
 #, c-format
@@ -9771,8 +9746,7 @@ msgstr ""
 msgid "Jan"
 msgstr "Jan"
 
-#: include/forms.inc.php:2162 include/func.inc.php:116
-#: include/func.inc.php:253 jsLoader.php:152
+#: include/func.inc.php:116 include/func.inc.php:253 jsLoader.php:152
 msgid "January"
 msgstr "Januar"
 
@@ -9789,8 +9763,7 @@ msgstr ""
 msgid "Jul"
 msgstr "Jul"
 
-#: include/forms.inc.php:2165 include/func.inc.php:122
-#: include/func.inc.php:259 jsLoader.php:158
+#: include/func.inc.php:122 include/func.inc.php:259 jsLoader.php:158
 msgid "July"
 msgstr "Juli"
 
@@ -9798,8 +9771,7 @@ msgstr "Juli"
 msgid "Jun"
 msgstr "Jun"
 
-#: include/forms.inc.php:2202 include/func.inc.php:121
-#: include/func.inc.php:258 jsLoader.php:157
+#: include/func.inc.php:121 include/func.inc.php:258 jsLoader.php:157
 msgid "June"
 msgstr "Juni"
 
@@ -10042,9 +10014,9 @@ msgstr "Lettisch (lv_LV)"
 msgid "Layout"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:732
-#: include/classes/widgets/CWidgetHelper.php:807
-#: include/classes/widgets/CWidgetHelper.php:1071
+#: include/classes/widgets/CWidgetHelper.php:733
+#: include/classes/widgets/CWidgetHelper.php:808
+#: include/classes/widgets/CWidgetHelper.php:1073
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
@@ -10076,9 +10048,9 @@ msgstr ""
 msgid "Limit for search and filter results"
 msgstr "Suche/Filter nach Elementen"
 
-#: include/classes/widgets/CWidgetHelper.php:720
-#: include/classes/widgets/CWidgetHelper.php:763
-#: include/classes/widgets/CWidgetHelper.php:1008 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:721
+#: include/classes/widgets/CWidgetHelper.php:764
+#: include/classes/widgets/CWidgetHelper.php:1010 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:301
 #: include/views/js/monitoring.sysmaps.js.php:350
 #: include/views/js/monitoring.sysmaps.js.php:694
@@ -10394,7 +10366,7 @@ msgstr ""
 
 #: include/audit.inc.php:50 include/maps.inc.php:511 include/maps.inc.php:600
 #: include/menu.inc.php:213
-#: include/views/configuration.maintenance.edit.php:275
+#: include/views/configuration.maintenance.edit.php:244
 #: include/views/js/monitoring.sysmaps.js.php:226
 msgid "Maintenance"
 msgstr "Wartung"
@@ -10412,19 +10384,19 @@ msgstr "Wartung \"%1$s\" bereits vorhanden."
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr "Der Wert für \"Aktiv seit\" kann bei Wartungen nicht größer sein als \"Aktiv bis\"."
 
-#: maintenance.php:124
+#: maintenance.php:115
 msgid "Maintenance added"
 msgstr "Wartung hinzugefügt"
 
-#: maintenance.php:224
+#: maintenance.php:215
 msgid "Maintenance deleted"
 msgstr "Wartung gelöscht"
 
-#: include/views/configuration.maintenance.edit.php:140
+#: app/controllers/CControllerPopupMaintenancePeriod.php:212
 msgid "Maintenance period"
 msgstr "Wartungszeitraum"
 
-#: include/forms.inc.php:2318
+#: app/views/popup.maintenance.period.php:143
 msgid "Maintenance period length"
 msgstr ""
 
@@ -10437,7 +10409,7 @@ msgstr "Wartungszeiträume"
 msgid "Maintenance type"
 msgstr "Wartungsart"
 
-#: maintenance.php:120
+#: maintenance.php:111
 msgid "Maintenance updated"
 msgstr "Wartung geändert"
 
@@ -10571,8 +10543,7 @@ msgstr "Karten"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/forms.inc.php:2178 include/func.inc.php:118
-#: include/func.inc.php:255 jsLoader.php:154
+#: include/func.inc.php:118 include/func.inc.php:255 jsLoader.php:154
 msgid "March"
 msgstr "März"
 
@@ -10672,8 +10643,7 @@ msgstr[1] "Maximal darstellbare Zeitspanne ist %1$s Tage."
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr ""
 
-#: include/forms.inc.php:2194 include/func.inc.php:120
-#: include/func.inc.php:257 jsLoader.php:156
+#: include/func.inc.php:120 include/func.inc.php:257 jsLoader.php:156
 msgid "May"
 msgstr "Mai"
 
@@ -10883,7 +10853,7 @@ msgid_plural "Minimum time period to display is %1$s minutes."
 msgstr[0] "Anzuzeigende Mindestzeit ist %1$s Minute."
 msgstr[1] "Anzuzeigende Mindestzeit ist %1$s Minutne."
 
-#: include/forms.inc.php:2326
+#: app/views/popup.maintenance.period.php:150
 msgid "Minutes"
 msgstr ""
 
@@ -10909,11 +10879,11 @@ msgstr ""
 msgid "Missing \"name\" field for graph."
 msgstr "Feld \"name\" fehlt bei Diagramm."
 
-#: include/classes/widgets/CWidgetHelper.php:727
-#: include/classes/widgets/CWidgetHelper.php:803
+#: include/classes/widgets/CWidgetHelper.php:728
 #: include/classes/widgets/CWidgetHelper.php:804
 #: include/classes/widgets/CWidgetHelper.php:805
-#: include/classes/widgets/CWidgetHelper.php:1055
+#: include/classes/widgets/CWidgetHelper.php:806
+#: include/classes/widgets/CWidgetHelper.php:1057
 msgid "Missing data"
 msgstr ""
 
@@ -10946,7 +10916,6 @@ msgstr "Modell"
 msgid "Mon"
 msgstr "Mo"
 
-#: include/forms.inc.php:2118 include/forms.inc.php:2233
 #: include/func.inc.php:135 include/func.inc.php:225 jsLoader.php:164
 msgid "Monday"
 msgstr "Montag"
@@ -10973,11 +10942,12 @@ msgstr "Überwachung"
 msgid "Monospace"
 msgstr "Festschrittschrift"
 
-#: app/views/report.services.php:67 include/forms.inc.php:2158 report4.php:170
+#: app/views/popup.maintenance.period.php:91 app/views/report.services.php:67
+#: report4.php:170
 msgid "Month"
 msgstr "Monat"
 
-#: app/views/report.services.php:36 include/forms.inc.php:2083
+#: app/views/popup.maintenance.period.php:69 app/views/report.services.php:36
 #: include/maintenances.inc.php:37 report4.php:113
 msgid "Monthly"
 msgstr "Monatlich"
@@ -11229,7 +11199,6 @@ msgstr "Niemals"
 #: include/views/configuration.action.edit.php:1664
 #: include/views/configuration.action.edit.php:2142
 #: include/views/configuration.action.edit.php:2343
-#: include/views/configuration.maintenance.edit.php:123
 msgid "New"
 msgstr "Neu"
 
@@ -11874,9 +11843,9 @@ msgstr "Nicht boolesche Markierungen sind veraltet."
 #: app/views/monitoring.problem.view.php:265
 #: app/views/monitoring.problem.view.php:276
 #: app/views/monitoring.problem.view.php:293
-#: include/classes/widgets/CWidgetHelper.php:728
-#: include/classes/widgets/CWidgetHelper.php:803
-#: include/classes/widgets/CWidgetHelper.php:1059
+#: include/classes/widgets/CWidgetHelper.php:729
+#: include/classes/widgets/CWidgetHelper.php:804
+#: include/classes/widgets/CWidgetHelper.php:1061
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:114
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
@@ -11995,8 +11964,7 @@ msgstr ""
 msgid "Nov"
 msgstr "Nov"
 
-#: include/forms.inc.php:2197 include/func.inc.php:126
-#: include/func.inc.php:263 jsLoader.php:162
+#: include/func.inc.php:126 include/func.inc.php:263 jsLoader.php:162
 msgid "November"
 msgstr "November"
 
@@ -12229,8 +12197,7 @@ msgstr "Okt"
 msgid "Octal to decimal"
 msgstr "Oktal zu Dezimal"
 
-#: include/forms.inc.php:2189 include/func.inc.php:125
-#: include/func.inc.php:262 jsLoader.php:161
+#: include/func.inc.php:125 include/func.inc.php:262 jsLoader.php:161
 msgid "October"
 msgstr "Oktober"
 
@@ -12284,7 +12251,7 @@ msgstr "Einer"
 msgid "One of the objects is left without a host group."
 msgstr "Eines der Objekte bleibt ohne eine Host-Gruppe."
 
-#: include/forms.inc.php:2080 include/maintenances.inc.php:31
+#: app/views/popup.maintenance.period.php:66 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Einmalig"
 
@@ -12482,7 +12449,7 @@ msgstr "Einstellungen"
 #: include/views/configuration.correlation.edit.php:95
 #: include/views/configuration.host.discovery.edit.php:623
 #: include/views/configuration.host.list.php:60
-#: include/views/configuration.maintenance.edit.php:171
+#: include/views/configuration.maintenance.edit.php:140
 #: include/views/configuration.template.list.php:34
 #: include/views/configuration.trigger.prototype.edit.php:147
 #: include/views/configuration.trigger.prototype.edit.php:340
@@ -13021,14 +12988,14 @@ msgstr ""
 msgid "Period"
 msgstr "Zeitraum"
 
-#: include/forms.inc.php:2078
+#: app/views/popup.maintenance.period.php:64
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.services.edit.php:228
 msgid "Period type"
 msgstr "Art des Zeitraumes"
 
-#: include/views/configuration.maintenance.edit.php:129
-#: include/views/configuration.maintenance.edit.php:276
+#: include/views/configuration.maintenance.edit.php:123
+#: include/views/configuration.maintenance.edit.php:245
 msgid "Periods"
 msgstr "Zeitspannen"
 
@@ -13098,8 +13065,7 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "Bitte zwei Elemente auswählen"
 
-#: include/classes/widgets/CWidgetHelper.php:726
-#: include/classes/widgets/CWidgetHelper.php:792
+#: include/classes/widgets/CWidgetHelper.php:727
 #: include/classes/widgets/CWidgetHelper.php:793
 #: include/classes/widgets/CWidgetHelper.php:794
 #: include/classes/widgets/CWidgetHelper.php:795
@@ -13109,13 +13075,14 @@ msgstr "Bitte zwei Elemente auswählen"
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:800
 #: include/classes/widgets/CWidgetHelper.php:801
-#: include/classes/widgets/CWidgetHelper.php:1023
+#: include/classes/widgets/CWidgetHelper.php:802
+#: include/classes/widgets/CWidgetHelper.php:1025
 msgid "Point size"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:721
-#: include/classes/widgets/CWidgetHelper.php:764
-#: include/classes/widgets/CWidgetHelper.php:1009
+#: include/classes/widgets/CWidgetHelper.php:722
+#: include/classes/widgets/CWidgetHelper.php:765
+#: include/classes/widgets/CWidgetHelper.php:1011
 #: include/views/js/monitoring.sysmaps.js.php:370
 msgid "Points"
 msgstr "Punkte"
@@ -13781,7 +13748,7 @@ msgstr "Befehl ausführen"
 #: app/views/monitoring.problem.view.php:247 app/views/popup.media.php:41
 #: app/views/popup.media.php:95 include/classes/widgets/CWidgetHelper.php:472
 #: include/classes/widgets/CWidgetHelper.php:516 include/forms.inc.php:1467
-#: include/forms.inc.php:2357
+#: include/forms.inc.php:1982
 #: include/views/administration.general.iconmap.edit.php:76
 #: include/views/administration.general.macros.edit.php:54
 #: include/views/administration.general.regularexpressions.edit.php:69
@@ -13815,9 +13782,9 @@ msgstr "Befehl ausführen"
 #: include/views/configuration.item.prototype.massupdate.php:371
 #: include/views/configuration.item.prototype.massupdate.php:494
 #: include/views/configuration.item.prototype.massupdate.php:569
-#: include/views/configuration.maintenance.edit.php:95
-#: include/views/configuration.maintenance.edit.php:193
-#: include/views/configuration.maintenance.edit.php:213
+#: include/views/configuration.maintenance.edit.php:103
+#: include/views/configuration.maintenance.edit.php:162
+#: include/views/configuration.maintenance.edit.php:182
 #: include/views/configuration.services.edit.php:134
 #: include/views/configuration.services.edit.php:208
 #: include/views/configuration.tags.tab.php:70
@@ -13865,7 +13832,7 @@ msgstr "Befehl ausführen"
 #: include/views/js/configuration.template.list.js.php:14
 #: include/views/js/configuration.triggers.list.js.php:14
 #: include/views/js/hostmacros.js.php:19 include/views/js/hostmacros.js.php:75
-#: include/views/js/hostmacros.js.php:124
+#: include/views/js/hostmacros.js.php:139
 #: include/views/js/item.preprocessing.js.php:28
 #: include/views/js/monitoring.screen.edit.js.php:24
 #: include/views/js/monitoring.screen.edit.js.php:58
@@ -14188,9 +14155,9 @@ msgstr ""
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:733
-#: include/classes/widgets/CWidgetHelper.php:808
-#: include/classes/widgets/CWidgetHelper.php:1072
+#: include/classes/widgets/CWidgetHelper.php:734
+#: include/classes/widgets/CWidgetHelper.php:809
+#: include/classes/widgets/CWidgetHelper.php:1074
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:121
@@ -14482,7 +14449,6 @@ msgstr "Serifenlos"
 msgid "Sat"
 msgstr "Sa"
 
-#: include/forms.inc.php:2143 include/forms.inc.php:2258
 #: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:169
 msgid "Saturday"
 msgstr "Samstag"
@@ -14882,8 +14848,7 @@ msgstr "Getrennt"
 msgid "Separately"
 msgstr ""
 
-#: include/forms.inc.php:2181 include/func.inc.php:124
-#: include/func.inc.php:261 jsLoader.php:160
+#: include/func.inc.php:124 include/func.inc.php:261 jsLoader.php:160
 msgid "September"
 msgstr "September"
 
@@ -15498,9 +15463,9 @@ msgstr "Geschwindigkeit"
 msgid "Stacked"
 msgstr "Gestapelt"
 
-#: include/classes/widgets/CWidgetHelper.php:722
-#: include/classes/widgets/CWidgetHelper.php:765
-#: include/classes/widgets/CWidgetHelper.php:1010
+#: include/classes/widgets/CWidgetHelper.php:723
+#: include/classes/widgets/CWidgetHelper.php:766
+#: include/classes/widgets/CWidgetHelper.php:1012
 msgid "Staircase"
 msgstr ""
 
@@ -15729,7 +15694,6 @@ msgstr ""
 msgid "Sun"
 msgstr "So"
 
-#: include/forms.inc.php:2148 include/forms.inc.php:2263
 #: include/func.inc.php:142 include/func.inc.php:224 jsLoader.php:170
 msgid "Sunday"
 msgstr "Sonntag"
@@ -15905,7 +15869,7 @@ msgstr "Maker-Wert"
 #: include/views/configuration.host.list.php:187
 #: include/views/configuration.host.massupdate.php:211
 #: include/views/configuration.host.massupdate.php:302
-#: include/views/configuration.maintenance.edit.php:267
+#: include/views/configuration.maintenance.edit.php:236
 #: include/views/configuration.template.edit.php:418
 #: include/views/configuration.template.list.php:97
 #: include/views/configuration.template.list.php:145
@@ -16302,7 +16266,6 @@ msgstr ""
 msgid "Thu"
 msgstr "Do"
 
-#: include/forms.inc.php:2133 include/forms.inc.php:2248
 #: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:167
 msgid "Thursday"
 msgstr "Donnerstag"
@@ -16368,9 +16331,9 @@ msgstr "Zeitspanne"
 #: app/controllers/CControllerPopupTriggerExpr.php:155
 #: app/controllers/CControllerPopupTriggerExpr.php:169
 #: app/controllers/CControllerPopupTriggerExpr.php:198
-#: include/classes/widgets/CWidgetHelper.php:734
-#: include/classes/widgets/CWidgetHelper.php:810
-#: include/classes/widgets/CWidgetHelper.php:1075
+#: include/classes/widgets/CWidgetHelper.php:735
+#: include/classes/widgets/CWidgetHelper.php:811
+#: include/classes/widgets/CWidgetHelper.php:1077
 msgid "Time shift"
 msgstr "Zeitverschiebung"
 
@@ -16474,8 +16437,7 @@ msgstr ""
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:724
-#: include/classes/widgets/CWidgetHelper.php:768
+#: include/classes/widgets/CWidgetHelper.php:725
 #: include/classes/widgets/CWidgetHelper.php:769
 #: include/classes/widgets/CWidgetHelper.php:770
 #: include/classes/widgets/CWidgetHelper.php:771
@@ -16486,7 +16448,8 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:776
 #: include/classes/widgets/CWidgetHelper.php:777
 #: include/classes/widgets/CWidgetHelper.php:778
-#: include/classes/widgets/CWidgetHelper.php:1031
+#: include/classes/widgets/CWidgetHelper.php:779
+#: include/classes/widgets/CWidgetHelper.php:1033
 msgid "Transparency"
 msgstr ""
 
@@ -16494,9 +16457,9 @@ msgstr ""
 msgid "Transport error."
 msgstr "Transportfehler."
 
-#: include/classes/widgets/CWidgetHelper.php:730
-#: include/classes/widgets/CWidgetHelper.php:805
-#: include/classes/widgets/CWidgetHelper.php:1063
+#: include/classes/widgets/CWidgetHelper.php:731
+#: include/classes/widgets/CWidgetHelper.php:806
+#: include/classes/widgets/CWidgetHelper.php:1065
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr ""
@@ -16799,7 +16762,6 @@ msgstr "Versuch, nicht verfügbare Eigenschaft \"%s\" zu lesen"
 msgid "Tue"
 msgstr "Di"
 
-#: include/forms.inc.php:2123 include/forms.inc.php:2238
 #: include/func.inc.php:136 include/func.inc.php:226 jsLoader.php:165
 msgid "Tuesday"
 msgstr "Dienstag"
@@ -17249,8 +17211,7 @@ msgstr "Erreichbar"
 #: include/views/configuration.item.massupdate.php:603
 #: include/views/configuration.item.prototype.edit.php:781
 #: include/views/configuration.item.prototype.massupdate.php:617
-#: include/views/configuration.maintenance.edit.php:134
-#: include/views/configuration.maintenance.edit.php:285
+#: include/views/configuration.maintenance.edit.php:254
 #: include/views/configuration.services.edit.php:355
 #: include/views/configuration.template.edit.php:440
 #: include/views/configuration.template.massupdate.php:171
@@ -18174,12 +18135,11 @@ msgstr ""
 msgid "Wed"
 msgstr "Mi"
 
-#: include/forms.inc.php:2128 include/forms.inc.php:2243
 #: include/func.inc.php:137 include/func.inc.php:227 jsLoader.php:166
 msgid "Wednesday"
 msgstr "Mittwoch"
 
-#: app/views/report.services.php:35 include/forms.inc.php:2082
+#: app/views/popup.maintenance.period.php:68 app/views/report.services.php:35
 #: include/maintenances.inc.php:35 report4.php:112
 msgid "Weekly"
 msgstr "wöchentlich"
@@ -18201,8 +18161,7 @@ msgstr "Aktiv um"
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
 
-#: graphs.php:45 include/classes/widgets/CWidgetHelper.php:718
-#: include/classes/widgets/CWidgetHelper.php:751
+#: graphs.php:45 include/classes/widgets/CWidgetHelper.php:719
 #: include/classes/widgets/CWidgetHelper.php:752
 #: include/classes/widgets/CWidgetHelper.php:753
 #: include/classes/widgets/CWidgetHelper.php:754
@@ -18213,7 +18172,8 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:759
 #: include/classes/widgets/CWidgetHelper.php:760
 #: include/classes/widgets/CWidgetHelper.php:761
-#: include/classes/widgets/CWidgetHelper.php:1015
+#: include/classes/widgets/CWidgetHelper.php:762
+#: include/classes/widgets/CWidgetHelper.php:1017
 #: include/views/configuration.graph.edit.php:87
 #: include/views/configuration.graph.list.php:88
 #: include/views/js/monitoring.sysmaps.js.php:92
@@ -18403,10 +18363,10 @@ msgstr "Mindestwert Y-Achse"
 msgid "Y axis side"
 msgstr "Y-Achse"
 
-#: include/classes/widgets/CWidgetHelper.php:731
-#: include/classes/widgets/CWidgetHelper.php:807
+#: include/classes/widgets/CWidgetHelper.php:732
 #: include/classes/widgets/CWidgetHelper.php:808
-#: include/classes/widgets/CWidgetHelper.php:1069
+#: include/classes/widgets/CWidgetHelper.php:809
+#: include/classes/widgets/CWidgetHelper.php:1071
 msgid "Y-axis"
 msgstr ""
 
@@ -18430,7 +18390,7 @@ msgstr "J1"
 msgid "Y2"
 msgstr "J2"
 
-#: include/forms.inc.php:2298
+#: app/views/popup.maintenance.period.php:131
 #: include/views/configuration.maintenance.edit.php:57
 #: include/views/configuration.maintenance.edit.php:63
 #: include/views/configuration.services.edit.php:248
@@ -19179,7 +19139,7 @@ msgstr "Ausdruck ist leer"
 msgid "failed to parse JSON"
 msgstr ""
 
-#: include/forms.inc.php:2224 include/graphs.inc.php:104
+#: app/views/popup.maintenance.period.php:107 include/graphs.inc.php:104
 #: include/maintenances.inc.php:111
 msgid "first"
 msgstr ""
@@ -19193,7 +19153,7 @@ msgstr "erster Parameter erwartet"
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr ""
 
-#: include/forms.inc.php:2227 include/maintenances.inc.php:114
+#: app/views/popup.maintenance.period.php:110 include/maintenances.inc.php:114
 msgid "fourth"
 msgstr ""
 
@@ -19239,7 +19199,7 @@ msgid "host is not monitored"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:593
-#: include/classes/widgets/CWidgetHelper.php:951
+#: include/classes/widgets/CWidgetHelper.php:952
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:340
 msgid "host pattern"
 msgstr ""
@@ -19354,7 +19314,7 @@ msgid "item is disabled"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:613
-#: include/classes/widgets/CWidgetHelper.php:968
+#: include/classes/widgets/CWidgetHelper.php:969
 msgid "item pattern"
 msgstr ""
 
@@ -19362,10 +19322,10 @@ msgstr ""
 msgid "key is empty"
 msgstr "Schlüssel ist leer"
 
+#: app/views/popup.maintenance.period.php:111
 #: include/classes/graphdraw/CLineGraphDraw.php:1851
-#: include/classes/graphdraw/CPieGraphDraw.php:333 include/forms.inc.php:2228
-#: include/graphs.inc.php:82 include/graphs.inc.php:106
-#: include/maintenances.inc.php:115
+#: include/classes/graphdraw/CPieGraphDraw.php:333 include/graphs.inc.php:82
+#: include/graphs.inc.php:106 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
 msgid "last"
 msgstr "letzte"
@@ -19422,7 +19382,7 @@ msgstr ""
 msgid "macro is empty"
 msgstr "Makro ist leer"
 
-#: include/views/js/administration.general.macros.edit.js.php:57
+#: include/views/js/administration.general.macros.edit.js.php:72
 msgid "macro(s)"
 msgstr "Makro(s)"
 
@@ -19550,7 +19510,7 @@ msgstr "Keine Daten"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1077 include/graphs.inc.php:92
+#: include/classes/widgets/CWidgetHelper.php:1079 include/graphs.inc.php:92
 msgid "none"
 msgstr ""
 
@@ -19711,7 +19671,7 @@ msgstr "s"
 msgid "script"
 msgstr ""
 
-#: include/forms.inc.php:2225 include/maintenances.inc.php:112
+#: app/views/popup.maintenance.period.php:108 include/maintenances.inc.php:112
 msgctxt "adjective"
 msgid "second"
 msgstr ""
@@ -19799,19 +19759,19 @@ msgstr ""
 #: app/views/monitoring.problem.view.php:237
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/widgets/CWidgetHelper.php:457
-#: include/classes/widgets/CWidgetHelper.php:504 include/forms.inc.php:2350
+#: include/classes/widgets/CWidgetHelper.php:504 include/forms.inc.php:1975
 #: include/views/configuration.action.edit.php:360
 #: include/views/configuration.action.edit.php:370
 #: include/views/configuration.correlation.edit.php:120
 #: include/views/configuration.correlation.edit.php:155
 #: include/views/configuration.host.list.php:69
-#: include/views/configuration.maintenance.edit.php:203
+#: include/views/configuration.maintenance.edit.php:172
 #: include/views/configuration.tags.tab.php:51
 #: include/views/configuration.template.list.php:43
 #: include/views/configuration.triggers.list.php:109
 #: include/views/js/configuration.host.list.js.php:4
 #: include/views/js/configuration.maintenance.edit.js.php:4
-#: include/views/js/configuration.maintenance.edit.js.php:35
+#: include/views/js/configuration.maintenance.edit.js.php:34
 #: include/views/js/configuration.template.list.js.php:4
 #: include/views/js/configuration.triggers.list.js.php:4
 msgid "tag"
@@ -19850,7 +19810,7 @@ msgstr "der Parameter \"%1$s\" fehlt"
 msgid "the tag \"%1$s\" is missing"
 msgstr "Marker \"%1$s\" fehlt"
 
-#: include/forms.inc.php:2226 include/maintenances.inc.php:113
+#: app/views/popup.maintenance.period.php:109 include/maintenances.inc.php:113
 msgid "third"
 msgstr ""
 
@@ -19988,7 +19948,7 @@ msgstr "nicht unterstützte Version"
 #: include/classes/widgets/CWidgetHelper.php:512
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:247
-#: include/forms.inc.php:2355
+#: include/forms.inc.php:1980
 #: include/views/administration.general.macros.edit.php:46
 #: include/views/configuration.action.edit.php:366
 #: include/views/configuration.correlation.edit.php:152
@@ -19999,7 +19959,7 @@ msgstr "nicht unterstützte Version"
 #: include/views/configuration.item.edit.php:258
 #: include/views/configuration.item.prototype.edit.php:148
 #: include/views/configuration.item.prototype.edit.php:240
-#: include/views/configuration.maintenance.edit.php:210
+#: include/views/configuration.maintenance.edit.php:179
 #: include/views/configuration.tags.tab.php:61
 #: include/views/configuration.template.list.php:50
 #: include/views/configuration.triggers.list.php:116
@@ -20008,7 +19968,7 @@ msgstr "nicht unterstützte Version"
 #: include/views/js/configuration.host.list.js.php:11
 #: include/views/js/configuration.httpconf.edit.js.php:47
 #: include/views/js/configuration.maintenance.edit.js.php:11
-#: include/views/js/configuration.maintenance.edit.js.php:36
+#: include/views/js/configuration.maintenance.edit.js.php:35
 #: include/views/js/configuration.template.list.js.php:11
 #: include/views/js/configuration.triggers.list.js.php:11
 #: include/views/js/hostmacros.js.php:16 include/views/js/hostmacros.js.php:66
