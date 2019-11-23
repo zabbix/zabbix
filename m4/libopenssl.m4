@@ -93,15 +93,16 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
     ],[want_openssl=ifelse([$1],,[no],[$1])]
   )
 
-  if test "x$enable_static_libs" = "xyes"; then
-      test "x$static_linking_support" = "xno" -a -z "$_libopenssl_dir_lib" && AC_MSG_ERROR(["OpenSSL: Compiler not support statically linked libs from default folders"])
-      AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-      PKG_PROG_PKG_CONFIG()
-      test -z $PKG_CONFIG && AC_MSG_ERROR([Not found pkg-config library])
-      m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
-  fi
-
   if test "x$want_openssl" = "xyes"; then
+
+    if test "x$enable_static_libs" = "xyes"; then
+        test "x$static_linking_support" = "xno" -a -z "$_libopenssl_dir_lib" && AC_MSG_ERROR(["OpenSSL: Compiler not support statically linked libs from default folders"])
+        AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+        PKG_PROG_PKG_CONFIG()
+        test -z $PKG_CONFIG && AC_MSG_ERROR([Not found pkg-config library])
+        m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
+    fi
+
      AC_MSG_CHECKING(for OpenSSL support)
      if test "x$_libopenssl_dir" = "xno"; then		# if OpenSSL directory is not specified
        if test -f /usr/local/include/openssl/ssl.h -a -f /usr/local/include/openssl/crypto.h; then
