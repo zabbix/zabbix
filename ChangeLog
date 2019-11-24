@@ -1,6 +1,7 @@
 Changes for 5.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-5414] moved maintenance period configuration settings to modal window to decrease page refresh count (gcalenko)
 A.F.I..... [ZBXNEXT-5538] moved Adminitration->User groups pages to MVC framework (Sasha, talbergs)
 .........T [ZBXNEXT-5493,ZBX-16540] moved LLD rules from parent templates to linked templates for Module HOST-RESOURCES-MIB SNMPv2, Module Interfaces Windows SNMPv2, Net Arista SNMPv2, OS Windows SNMPv2 (vitaly)
 ..F....... [ZBX-11991] reworked event correlation operations page (rlataria)
@@ -18,6 +19,7 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
+..F....... [ZBX-16649] fixed flexible textarea behavior (averza, vasilijs)
 ........S. [ZBX-16955] fixed performance of history syncers and timer processes by not locking each other when suppressing events (vso)
 ..F....... [ZBX-16884] fixed links to usergroups in user list (vmurzins)
 ...G...PS. [ZBX-16842] added range validation and optional conversion to is_double() (Andris)
