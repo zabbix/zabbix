@@ -163,8 +163,8 @@ class ZBase {
 				$view_paths = array_reduce($this->module_manager->getRegisteredNamespaces(), 'array_merge', []);
 				$module = $this->module_manager->getModuleByAction($router->getAction());
 
-				if ($module && $module['instance'] instanceof CModule) {
-					$moduleid = $module['instance']->getManifest()['id'];
+				if ($module instanceof CModule) {
+					$moduleid = $module->getManifest()['id'];
 					array_unshift($view_paths, $this->module_manager->getModuleRootDir($moduleid));
 				}
 
@@ -415,8 +415,26 @@ class ZBase {
 
 		/** @var \CController $controller */
 		$controller = new $controller();
-		$controller->setAction($router->getAction());
-		$response = $controller->run();
+
+		if ($controller instanceof CController) {
+			$controller->setAction($router->getAction());
+			$response = $controller->run();
+		}
+		else {
+			error(_s('%s must extend CController class', get_class($controller)));
+			$response = new CControllerResponseData([
+				'controller' => [
+					'action' => $router->getAction()
+				],
+				'main_block' => '',
+				'page' => 0,
+				'javascript' => [
+					'files' => [],
+					'pre' => '',
+					'post' => ''
+				]
+			]);
+		}
 
 		// Controller returned data
 		if ($response instanceof CControllerResponseData) {
