@@ -185,6 +185,16 @@ class CModuleManager {
 	}
 
 	/**
+	 * Get module instance by module id.
+	 *
+	 * @param string $id           Module unique id as defined in manifest.json file.
+	 * @return CModule
+	 */
+	public function getModuleById($id) {
+		return $this->modules[$id]['instance'];
+	}
+
+	/**
 	 * Create instance of module and call init for enabled module.
 	 *
 	 * @param string $moduleid      Module unique identifier.
@@ -211,7 +221,7 @@ class CModuleManager {
 			$this->modules[$moduleid]['instance'] = $instance;
 		}
 		catch (Exception $e) {
-			//$this->disable($moduleid);
+			$this->disable($moduleid);
 			$this->modules[$moduleid]['errors'][] = $e;
 		}
 	}
