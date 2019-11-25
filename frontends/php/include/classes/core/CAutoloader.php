@@ -23,12 +23,6 @@
  * The Zabbix autoloader class.
  */
 class CAutoloader {
-	/**
-	 * Autoloader root directory will be prepended to any registered relative path.
-	 *
-	 * @var string
-	 */
-	protected $root_dir;
 
 	/**
 	 * Registered namespace array. Key is namespace name with trailing '\' and value is array of directories
@@ -39,23 +33,18 @@ class CAutoloader {
 	protected $namespaces = [];
 
 	/**
-	 * Initializes object with array of include paths.
-	 *
-	 * @param string $root_dir          web root directory
-	 */
-	public function __construct($root_dir) {
-		$this->root_dir = $root_dir;
-	}
-
-	/**
 	 * Register supported namespace.
 	 *
-	 * @param string $prefix      Namespace value, should not have '\' as last character.
-	 * @param array  $paths       Array of namespace files directory relative path, should not have '/' as last character.
+	 * @param string $prefix      Namespace value without trainling '\'.
+	 * @param array  $paths       Array of namespace files directory absolute path without trailing '/'.
 	 */
 	public function addNamespace($namespace, array $paths) {
 		foreach ($paths as $path) {
-			$this->namespaces[$namespace][] = realpath($this->root_dir.$path).'/';
+			$path = realpath($path);
+
+			if ($path) {
+				$this->namespaces[$namespace][] = $path.'/';
+			}
 		}
 	}
 
