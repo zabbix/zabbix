@@ -208,7 +208,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		[
 			'key' => 'log['.PHPUNIT_COMPONENT_DIR.'zabbix_server.log]',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
+			'valueType' => ITEM_VALUE_TYPE_LOG
 		],
 		[
 			'key' => 'log.count['.PHPUNIT_COMPONENT_DIR.'zabbix_server.log, server ]',
@@ -309,7 +309,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		],
 		[// Should be treated as a special case, since this metric returns JSON object.
 			// Maybe, it should e pulled to separate test suite. At this point we just compare it as string.
-			'key' => 'zabbix.stats',
+			'key' => 'zabbix.stats[127.0.0.1,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'treshold' => 50
@@ -407,18 +407,18 @@ class testGoAgentDataCollection extends CIntegrationTest {
 	public function agentConfigurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'UnreachablePeriod' => 5,
-				'UnavailableDelay' => 5,
-				'UnreachableDelay' => 1
+				'UnreachablePeriod' => 25,
+				'UnavailableDelay' => 15,
+				'UnreachableDelay' => 5
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::COMPONENT_AGENT,
-				'ServerActive' => '127.0.0.1',
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'EnableRemoteCommands' => '1'
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::COMPONENT_AGENT2,
-				'ServerActive' => '127.0.0.1',
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'ListenPort' => 10053,
 				'Plugins.SystemRun.EnableRemoteCommands' => '1',
 				'Plugins.Uptime.Capacity' => '10'
@@ -441,7 +441,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		}
 
 		// Delay to ensure that all metrics were collected.
-		sleep(45);
+		sleep(90);
 	}
 
 	/**
@@ -522,6 +522,22 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		}
 
 		switch ($item['valueType']) {
+			case ITEM_VALUE_TYPE_LOG:
+				$count = min([count($values[self::COMPONENT_AGENT]), count($values[self::COMPONENT_AGENT2])]);
+				for ($i = 0; $i < $count; $i++) {
+					$a = $values[self::COMPONENT_AGENT][$i];
+					$b = $values[self::COMPONENT_AGENT2][$i];
+
+					if (array_key_exists('treshold', $item) && $item['treshold'] !== 0) {
+						$a = substr($a, 0, $item['treshold']);
+						$b = substr($b, 0, $item['treshold']);
+					}
+
+					$this->assertEquals($a, $b, 'Strings do not match for '.$item['key']);
+				}
+
+				break;
+
 			case ITEM_VALUE_TYPE_TEXT:
 				$a = end($values[self::COMPONENT_AGENT]);
 				$b = end($values[self::COMPONENT_AGENT2]);
