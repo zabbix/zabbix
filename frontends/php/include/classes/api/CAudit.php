@@ -50,7 +50,7 @@ class CAudit {
 		AUDIT_RESOURCE_USER =>				['userid', 'alias', 'users'],
 		AUDIT_RESOURCE_USER_GROUP =>		['usrgrpid', 'name', 'usrgrp'],
 		AUDIT_RESOURCE_VALUE_MAP =>			['valuemapid', 'name', 'valuemaps'],
-		AUDIT_RESOURCE_MODULE =>			['moduleid', 'name', 'module']
+		AUDIT_RESOURCE_MODULE =>			['moduleid', 'id', 'module']
 	];
 
 	/**
