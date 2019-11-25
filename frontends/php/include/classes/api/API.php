@@ -284,6 +284,13 @@ class API {
 	}
 
 	/**
+	 * @return CMaintenance
+	 */
+	public static function ModuleDetails() {
+		return self::getApi('moduledetails');
+	}
+
+	/**
 	 * @return CMap
 	 */
 	public static function Map() {
