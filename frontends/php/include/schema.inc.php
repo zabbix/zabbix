@@ -7798,7 +7798,7 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 			],
-			'name' => [
+			'id' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
@@ -7807,11 +7807,6 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-			],
-			'version' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 16,
 			],
 			'status' => [
 				'null' => false,
