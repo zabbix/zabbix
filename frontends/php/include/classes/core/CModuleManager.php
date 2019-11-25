@@ -59,23 +59,7 @@ class CModuleManager {
 				continue;
 			}
 
-			$dir = $path->getPathname();
-			$manifest_path = $dir.'/manifest.json';
-			$module_path = $dir.'/Module.php';
-			$manifest = $this->parseManifestFile($manifest_path);
-
-			if ($manifest) {
-				$this->modules[$manifest['namespace']] = [
-					'path' => [
-						'root' => $dir,
-						'manifest' => $manifest_path,
-						'module' =>  file_exists($module_path) ? $module_path : ''
-					],
-					'manifest' => $manifest,
-					'status' => false,
-					'errors' => []
-				];
-			}
+			$this->loadModule($path->getFilename());
 		}
 	}
 
@@ -103,7 +87,12 @@ class CModuleManager {
 			return null;
 		}
 
-		if (!preg_match('/^[a-z_]+$/i', $manifest['namespace'])) {
+		if (!array_key_exists('id', $manifest)) {
+			// Required id does not exists.
+			return null;
+		}
+
+		if ($manifest['namespace'] === '' || !preg_match('/^[a-z_]+$/i', $manifest['namespace'])) {
 			// Wrong namespace.
 			return null;
 		}
@@ -134,24 +123,97 @@ class CModuleManager {
 	}
 
 	/**
-	 * Create instance of enabled module and call init.
+	 * Load and parse it manifest file.
 	 */
-	public function initModules() {
-		foreach ($this->modules as $namespace => &$module_details) {
-			if ($module_details['status'] && $module_details['path']['module']) {
-				$module_class = 'Modules\\'.$namespace.'\\Module';
-				$manifest = $module_details['manifest'];
-				try {
-					$instance = new $module_class($manifest);
-					$instance->init();
-					$module_details['instance'] = $instance;
-				}
-				catch (Exception $e) {
-					$module_details['errors'][] = $e;
-				}
+	public function loadModule($relative_path) {
+		$dir = $this->modules_dir.'/'.trim($relative_path, '/');
+		$manifest_path = $dir.'/manifest.json';
+		$module_path = $dir.'/Module.php';
+		$manifest = $this->parseManifestFile($manifest_path);
+
+		if ($manifest) {
+			$this->modules[$manifest['id']] = [
+				'path' => [
+					'root' => $dir,
+					'manifest' => $manifest_path,
+					'module' => file_exists($module_path) ? $module_path : ''
+				],
+				'manifest' => $manifest,
+				'namespace' => 'Modules\\'.$manifest['namespace'],
+				'status' => false,
+				'instance' => null,
+				'errors' => []
+			];
+		}
+	}
+
+	/**
+	 * Get enabled modules namespaces array.
+	 *
+	 * @return array
+	 */
+	public function getRegisteredNamespaces() {
+		$global_namespace = 'Modules\\';
+		$namespaces = [];
+
+		foreach ($this->modules as $module) {
+			if ($module['status']) {
+				$namespaces[$global_namespace.$module['manifest']['namespace']] = [$module['path']['root']];
 			}
 		}
-		unset($module_details);
+
+		return $namespaces;
+	}
+
+	/**
+	 * Get module by action.
+	 *
+	 * @param string $action       Action of module.
+	 * @return CModule|null
+	 */
+	public function getModuleByAction($action) {
+		$module = null;
+
+		foreach ($this->modules as $module) {
+			if ($module['instance'] && array_key_exists('actions', $module['manifest'])
+					&& array_key_exists($action, $module['manifest']['actions'])) {
+				return $module['instance'];
+			}
+		}
+
+		return $module;
+	}
+
+	/**
+	 * Create instance of module and call init for enabled module.
+	 *
+	 * @param string $moduleid      Module unique identifier.
+	 * @param array  $config        Module configuration array, will be passed to init method.
+	 */
+	public function initModule($moduleid, array $config) {
+		$module = $this->modules[$moduleid];
+		$main_class = '\\CModule';
+		$module_class = $module['path']['module']
+			? 'Modules\\'.$module['manifest']['namespace'].'\\Module'
+			: $main_class;
+
+		try {
+			$instance = new $module_class($module['manifest']);
+
+			if (!($instance instanceof CModule) || is_null($instance->getManifest())) {
+				throw new Exception(_s('%s class must extend %s class.', $module_class, $main_class));
+			}
+
+			if ($this->modules[$moduleid]['status']) {
+				$instance->init($config);
+			}
+
+			$this->modules[$moduleid]['instance'] = $instance;
+		}
+		catch (Exception $e) {
+			//$this->disable($moduleid);
+			$this->modules[$moduleid]['errors'][] = $e;
+		}
 	}
 
 	/**
@@ -159,7 +221,7 @@ class CModuleManager {
 	 *
 	 * @return array
 	 */
-	public function getModulesRoutes() {
+	public function getRoutes() {
 		$routes = [];
 		$default = [
 			'layout' => 'layout.htmlpage',
@@ -179,6 +241,16 @@ class CModuleManager {
 		}
 
 		return $routes;
+	}
+
+	/**
+	 * Get module directory absolute path.
+	 *
+	 * @param string $moduleid      Module unique identifier.
+	 * @return string
+	 */
+	public function getModuleRootDir($moduleid) {
+		return $this->modules[$moduleid]['path']['root'];
 	}
 
 	/**

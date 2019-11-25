@@ -154,9 +154,21 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
+				$this->initModules();
 
 				$router = new CRouter;
+				$router->addActions($this->module_manager->getRoutes());
 				$router->setAction(getRequest('action', basename($_SERVER['SCRIPT_NAME'])));
+				array_map('error', $this->module_manager->getErrors());
+				$view_paths = array_reduce($this->module_manager->getRegisteredNamespaces(), 'array_merge', []);
+				$module = $this->module_manager->getModuleByAction($router->getAction());
+
+				if ($module && $module['instance'] instanceof CModule) {
+					$moduleid = $module['instance']->getManifest()['id'];
+					array_unshift($view_paths, $this->module_manager->getModuleRootDir($moduleid));
+				}
+
+				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
 
 				if ($router->getController() !== null) {
 					CProfiler::getInstance()->start();
@@ -209,66 +221,66 @@ class ZBase {
 	 */
 	private function getIncludePaths() {
 		return [
-			'/include/classes/core',
-			'/include/classes/mvc',
-			'/include/classes/api',
-			'/include/classes/api/services',
-			'/include/classes/api/helpers',
-			'/include/classes/api/managers',
-			'/include/classes/api/clients',
-			'/include/classes/api/wrappers',
-			'/include/classes/db',
-			'/include/classes/debug',
-			'/include/classes/validators',
-			'/include/classes/validators/schema',
-			'/include/classes/validators/string',
-			'/include/classes/validators/object',
-			'/include/classes/validators/hostgroup',
-			'/include/classes/validators/host',
-			'/include/classes/validators/hostprototype',
-			'/include/classes/validators/event',
-			'/include/classes/export',
-			'/include/classes/export/writers',
-			'/include/classes/export/elements',
-			'/include/classes/graph',
-			'/include/classes/graphdraw',
-			'/include/classes/import',
-			'/include/classes/import/converters',
-			'/include/classes/import/importers',
-			'/include/classes/import/preprocessors',
-			'/include/classes/import/readers',
-			'/include/classes/import/validators',
-			'/include/classes/items',
-			'/include/classes/triggers',
-			'/include/classes/server',
-			'/include/classes/screens',
-			'/include/classes/services',
-			'/include/classes/sysmaps',
-			'/include/classes/helpers',
-			'/include/classes/helpers/trigger',
-			'/include/classes/macros',
-			'/include/classes/tree',
-			'/include/classes/html',
-			'/include/classes/html/pageheader',
-			'/include/classes/html/svg',
-			'/include/classes/html/widget',
-			'/include/classes/html/interfaces',
-			'/include/classes/parsers',
-			'/include/classes/parsers/results',
-			'/include/classes/controllers',
-			'/include/classes/routing',
-			'/include/classes/json',
-			'/include/classes/user',
-			'/include/classes/setup',
-			'/include/classes/regexp',
-			'/include/classes/ldap',
-			'/include/classes/pagefilter',
-			'/include/classes/widgets/fields',
-			'/include/classes/widgets/forms',
-			'/include/classes/widgets',
-			'/include/classes/xml',
-			'/local/app/controllers',
-			'/app/controllers'
+			$this->rootDir.'/include/classes/core',
+			$this->rootDir.'/include/classes/mvc',
+			$this->rootDir.'/include/classes/api',
+			$this->rootDir.'/include/classes/api/services',
+			$this->rootDir.'/include/classes/api/helpers',
+			$this->rootDir.'/include/classes/api/managers',
+			$this->rootDir.'/include/classes/api/clients',
+			$this->rootDir.'/include/classes/api/wrappers',
+			$this->rootDir.'/include/classes/db',
+			$this->rootDir.'/include/classes/debug',
+			$this->rootDir.'/include/classes/validators',
+			$this->rootDir.'/include/classes/validators/schema',
+			$this->rootDir.'/include/classes/validators/string',
+			$this->rootDir.'/include/classes/validators/object',
+			$this->rootDir.'/include/classes/validators/hostgroup',
+			$this->rootDir.'/include/classes/validators/host',
+			$this->rootDir.'/include/classes/validators/hostprototype',
+			$this->rootDir.'/include/classes/validators/event',
+			$this->rootDir.'/include/classes/export',
+			$this->rootDir.'/include/classes/export/writers',
+			$this->rootDir.'/include/classes/export/elements',
+			$this->rootDir.'/include/classes/graph',
+			$this->rootDir.'/include/classes/graphdraw',
+			$this->rootDir.'/include/classes/import',
+			$this->rootDir.'/include/classes/import/converters',
+			$this->rootDir.'/include/classes/import/importers',
+			$this->rootDir.'/include/classes/import/preprocessors',
+			$this->rootDir.'/include/classes/import/readers',
+			$this->rootDir.'/include/classes/import/validators',
+			$this->rootDir.'/include/classes/items',
+			$this->rootDir.'/include/classes/triggers',
+			$this->rootDir.'/include/classes/server',
+			$this->rootDir.'/include/classes/screens',
+			$this->rootDir.'/include/classes/services',
+			$this->rootDir.'/include/classes/sysmaps',
+			$this->rootDir.'/include/classes/helpers',
+			$this->rootDir.'/include/classes/helpers/trigger',
+			$this->rootDir.'/include/classes/macros',
+			$this->rootDir.'/include/classes/tree',
+			$this->rootDir.'/include/classes/html',
+			$this->rootDir.'/include/classes/html/pageheader',
+			$this->rootDir.'/include/classes/html/svg',
+			$this->rootDir.'/include/classes/html/widget',
+			$this->rootDir.'/include/classes/html/interfaces',
+			$this->rootDir.'/include/classes/parsers',
+			$this->rootDir.'/include/classes/parsers/results',
+			$this->rootDir.'/include/classes/controllers',
+			$this->rootDir.'/include/classes/routing',
+			$this->rootDir.'/include/classes/json',
+			$this->rootDir.'/include/classes/user',
+			$this->rootDir.'/include/classes/setup',
+			$this->rootDir.'/include/classes/regexp',
+			$this->rootDir.'/include/classes/ldap',
+			$this->rootDir.'/include/classes/pagefilter',
+			$this->rootDir.'/include/classes/widgets/fields',
+			$this->rootDir.'/include/classes/widgets/forms',
+			$this->rootDir.'/include/classes/widgets',
+			$this->rootDir.'/include/classes/xml',
+			$this->rootDir.'/local/app/controllers',
+			$this->rootDir.'/app/controllers'
 		];
 	}
 
@@ -482,5 +494,34 @@ class ZBase {
 
 		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
 		unset($_GET['fullscreen'], $_GET['kiosk']);
+	}
+
+	/**
+	 * Initialize module manager, load enabled modules and register module namespaces for autoloader. Also call init
+	 * for enabled modules.
+	 */
+	protected function initModules() {
+		$manager = new CModuleManager($this->rootDir.'/modules');
+		$modules = API::ModuleDetails()->get([
+			'output' => ['relative_path', 'id', 'config'],
+			'filter' => ['status' => 1]
+		]);
+
+		if ($modules) {
+			foreach ($modules as $module) {
+				$manager->loadModule($module['relative_path']);
+				$manager->enable($module['id']);
+			}
+
+			foreach ($manager->getRegisteredNamespaces() as $namespace => $paths) {
+				$this->autoloader->addNamespace($namespace, $paths);
+			}
+
+			foreach ($modules as $module) {
+				$manager->initModule($module['id'], $module['config']);
+			}
+		}
+
+		$this->module_manager = $manager;
 	}
 }
