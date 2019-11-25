@@ -230,7 +230,7 @@ class CModuleManager {
 
 		foreach ($this->modules as $namespace => $module) {
 			if ($module['status']) {
-				$namespace = 'Modules\\'.$namespace.'\\Actions\\';
+				$namespace = 'Modules\\'.$module['manifest']['namespace'].'\\Actions\\';
 
 				foreach ($module['manifest']['actions'] as $action => $data) {
 					$routes[$action] = [
