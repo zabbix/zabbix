@@ -100,8 +100,10 @@ class CModule extends CApiService {
 				return $module['rowscount'];
 			}
 
-			$config = json_decode($module['config'], true);
-			$module['config'] = is_null($config) ? [] : $config;
+			if ($this->outputIsRequested('config', $options)) {
+				$config = json_decode($module['config'], true);
+				$module['config'] = is_null($config) ? [] : $config;
+			}
 
 			if ($options['preservekeys']) {
 				$result[$module['moduleid']] = $module;
