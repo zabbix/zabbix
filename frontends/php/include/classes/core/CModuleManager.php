@@ -235,7 +235,7 @@ class CModuleManager {
 				foreach ($module['manifest']['actions'] as $action => $data) {
 					$routes[$action] = [
 						'class' => $namespace.$data['class']
-					] + $default + $data;
+					] + $data + $default;
 				}
 			}
 		}
