@@ -166,6 +166,7 @@ class ZBase {
 				if ($module instanceof CModule) {
 					$moduleid = $module->getManifest()['id'];
 					array_unshift($view_paths, $this->module_manager->getModuleRootDir($moduleid));
+					$module->beforeAction($router->getAction());
 				}
 
 				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);

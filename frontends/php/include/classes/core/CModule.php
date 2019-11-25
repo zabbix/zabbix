@@ -30,6 +30,19 @@ class CModule {
 		return $this->manifest;
 	}
 
+	/**
+	 * Module initalization method.
+	 *
+	 * @param array $config      Database stored config settings.
+	 */
 	public function init(array $config) {
+	}
+
+	/**
+	 * Module before action event.
+	 *
+	 * @param string $action     Action name to be called.
+	 */
+	public function beforeAction($action) {
 	}
 }
