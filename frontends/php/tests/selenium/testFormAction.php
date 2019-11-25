@@ -69,27 +69,6 @@ class testFormAction extends CLegacyWebTest {
 				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
-					'opCmdTarget' => 'Current host'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'opCmdTarget' => 'Host'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'opCmdTarget' => 'Host group'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Custom script'
 				]
 			],
@@ -220,27 +199,6 @@ class testFormAction extends CLegacyWebTest {
 				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
-					'opCmdTarget' => 'Current host'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
-					'opCmdTarget' => 'Host'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
-					'opCmdTarget' => 'Host group'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Custom script'
 				]
 			],
@@ -334,27 +292,6 @@ class testFormAction extends CLegacyWebTest {
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_default_msg' => 'unchecked'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Auto registration',
-					'new_operation_operationtype' => 'Remote command',
-					'opCmdTarget' => 'Current host'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Auto registration',
-					'new_operation_operationtype' => 'Remote command',
-					'opCmdTarget' => 'Host'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Auto registration',
-					'new_operation_operationtype' => 'Remote command',
-					'opCmdTarget' => 'Host group'
 				]
 			],
 			[
@@ -922,13 +859,14 @@ class testFormAction extends CLegacyWebTest {
 		if (isset($data['new_operation_operationtype'])) {
 			$new_operation_operationtype = $data['new_operation_operationtype'];
 			$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
-			COverlayDialogElement::find()->one()->waitUntilVisible();
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			switch ($eventsource) {
 				case 'Triggers':
 				case 'Discovery':
 				case 'Auto registration':
 					$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operationtype'));
 					$this->zbxTestDropdownSelectWait('operationtype', $new_operation_operationtype);
+					COverlayDialogElement::find()->one()->waitUntilReady();
 					break;
 				case 'Internal':
 					$this->zbxTestTextPresent ('Send message');
@@ -976,18 +914,11 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['add_opcondition'])) {
 			$this->zbxTestClickXpathWait('//table[@id="operationConditionTable"]//button[text()="Add"]');
-			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('condition_type'));
+			$this->page->query('xpath://div[@id="overlay_dialogue"][2]')->asOverlayDialog()->waitUntilReady();
 			$add_opcondition = $data['add_opcondition'];
 		}
 		else {
 			$add_opcondition = null;
-		}
-
-		if (isset($data['opCmdTarget'])) {
-			$opCmdTarget = $data['opCmdTarget'];
-		}
-		else {
-			$opCmdTarget = null;
 		}
 
 		switch ($eventsource) {
@@ -1113,14 +1044,14 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if ($new_operation_operationtype === 'Remote command') {
-			$this->zbxTestTextPresent(['Current host', 'Host', 'Host group']);
-			$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_chst\']/parent::div');
+			$this->zbxTestTextPresent(['Target list', 'Current host', 'Host', 'Host group']);
 			$this->query('id:operation_opcommand_chst')->one()->isSelected(false);
 			$this->zbxTestAssertVisibleId('operation_opcommand_hst_');
 			$this->zbxTestAssertVisibleId('operation_opcommand_grp_');
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentId('opCmdList');
+			$this->zbxTestTextNotPresent (['Target list', 'Execute on']);
 		}
 
 		if ($new_operation_operationtype == 'Send message') {
@@ -1235,7 +1166,7 @@ class testFormAction extends CLegacyWebTest {
 			}
 			else {
 				$this->zbxTestTextPresent ('New condition');
-				$this->zbxTestAssertVisibleXpath('//h4[text()="New condition"]//ancestor::div//button[text()="Cancel"]');
+				$this->query('xpath://div[@id="overlay_dialogue"][2]//button[text()="Cancel"]')->one()->waitUntilVisible();
 
 				$this->zbxTestAssertVisibleXpath('//select[@id="condition_type"]');
 				$this->zbxTestDropdownAssertSelected('condition_type', 'Event acknowledged');
@@ -1261,15 +1192,6 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_conditiontype\']');
 			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_operator\']');
 			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_value\']');
-		}
-
-		if ($new_operation_operationtype == 'Remote command') {
-			$this->zbxTestTextPresent ([
-				'Target list', 'Current host','Host' ,'Host group'
-			]);
-		}
-		else {
-			$this->zbxTestTextNotPresent (['Target list', 'Execute on']);
 		}
 
 		if ($new_operation_opcommand_type != null) {
@@ -1947,9 +1869,7 @@ class testFormAction extends CLegacyWebTest {
 			);
 			$this->zbxTestWaitForPageToLoad();
 		}
-
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
-
+		$this->query('xpath://button[@id="add"]')->waitUntilClickable()->one()->click();
 		switch ($data['expected']) {
 			case ACTION_GOOD:
 				$this->zbxTestCheckTitle('Configuration of actions');
@@ -2080,10 +2000,9 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath('//tr[@id="opmsgUserListFooter"]//button'));
 
 		$this->zbxTestClickXpath('//tr[@id="opmsgUserListFooter"]//button');
-		$this->zbxTestLaunchOverlayDialog('Users');
-		$this->zbxTestCheckboxSelect('all_records');
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+		$this->page->query('xpath://div[@id="overlay_dialogue"][2]//button[text()="Cancel"]')->waitUntilClickable()->one()->click();
+		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
 
 		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
