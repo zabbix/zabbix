@@ -1634,6 +1634,7 @@ class testGraphWidget extends CWebTest {
 		$this->fillForm($data, $form);
 		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
+		sleep(3); // TODO: remove after fix in ZBX-16918
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 
 		// Check valuse in updated widget.
@@ -1653,6 +1654,7 @@ class testGraphWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
+		sleep(3); // TODO: remove after fix in ZBX-16918
 		$this->saveGraphWidget($name);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
