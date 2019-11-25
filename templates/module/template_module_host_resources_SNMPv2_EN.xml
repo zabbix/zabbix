@@ -11,7 +11,7 @@
       <template>
          <template>Template Module HOST-RESOURCES-MIB CPU SNMPv2</template>
          <name>Template Module HOST-RESOURCES-MIB CPU SNMPv2</name>
-         <description>Requires server of Zabbix 4.0.14rc1, 4.2.8rc1, 4.4.0rc1 and newer.&#13;
+         <description>Requires Zabbix server 4.0.14, 4.2.8, 4.4.0 or newer (JSONPath function avg() used with types autoconversion).&#13;
 &#13;
 MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
