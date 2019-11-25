@@ -131,10 +131,26 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 								LIBCURL_LIBS="$LIBCURL_LIBS $i"
 						;;
 							-l*)
+								if test "x$enable_static_libs" = "xyes"; then
+									_lib_name=`echo "$i" | cut -b3-`
+									test -f "$_curl_dir_lib/lib$_lib_name.a" && i="$_curl_dir_lib/lib$_lib_name.a"
+								fi
 								LIBCURL_LIBS="$LIBCURL_LIBS $i"
 						;;
 						esac
 					done
+
+					_save_curl_cflags="$CFLAGS"
+					_save_curl_ldflags="$LDFLAGS"
+					_save_curl_libs="$LIBS"
+					CFLAGS="$CFLAGS $LIBCURL_CFLAGS"
+					LDFLAGS="$LDFLAGS $LIBCURL_LDFLAGS"
+					if test "x$enable_static_libs" = "xyes"; then
+						test "x$want_openssl" = "xyes" && CFLAGS="$OPENSSL_CFLAGS $CFLAGS"
+						test "x$want_openssl" = "xyes" && LDFLAGS="$OPENSSL_LDFLAGS $LDFLAGS"
+						test "x$want_ldap" = "xyes" && CFLAGS="$LDAP_CPPFLAGS $CFLAGS"
+						test "x$want_ldap" = "xyes" && LDFLAGS="$LDAP_LDFLAGS $LDFLAGS"
+					fi
 
 					if test "x$enable_static" = "xyes" -o "x$enable_static_libs" = "xyes"; then
 						_full_libcurl_libs=`$_libcurl_config --static-libs`
@@ -152,6 +168,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 								-lcurl)
 							;;
 								-l*)
+									_lib_i=$i
 									_lib_name=`echo "$i" | cut -b3-`
 									AC_CHECK_LIB($_lib_name , main,[
 										if test "x$enable_static_libs" = "xyes"; then
@@ -168,8 +185,12 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 												-lldap_a|-lldap_r_a|-llber_a)
 													test "x$want_ldap" = "xyes" && i="$LDAP_LIBS"
 											;;
+												-l*)
+													test -f "$_curl_dir_lib/lib$_lib_name.a" && i="$_curl_dir_lib/lib$_lib_name.a"
+											;;
 											esac
 										fi
+										test -z "${LIBCURL_LIBS##*$_lib_i*}" && LIBCURL_LIBS=`echo "$LIBCURL_LIBS"|sed "s|$_lib_i||g"`
 										test -z "${LIBCURL_LIBS##*$i*}" || LIBCURL_LIBS="$LIBCURL_LIBS $i"
 									],[
 										AC_MSG_ERROR([static library $_lib_name required for linking libcurl not found])
@@ -182,18 +203,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 						done
 					fi # "x$enable_static" or "x$enable_static_libs"
 
-					_save_curl_cflags="$CFLAGS"
-					_save_curl_ldflags="$LDFLAGS"
-					_save_curl_libs="$LIBS"
-					CFLAGS="$CFLAGS $LIBCURL_CFLAGS"
-					LDFLAGS="$LDFLAGS $LIBCURL_LDFLAGS"
 					LIBS="$LIBS $LIBCURL_LIBS"
-					if test "x$enable_static_libs" = "xyes"; then
-						test "x$want_openssl" = "xyes" && CFLAGS="$OPENSSL_CFLAGS $CFLAGS"
-						test "x$want_openssl" = "xyes" && LDFLAGS="$OPENSSL_LDFLAGS $LDFLAGS"
-						test "x$want_ldap" = "xyes" && CFLAGS="$LDAP_CPPFLAGS $CFLAGS"
-						test "x$want_ldap" = "xyes" && LDFLAGS="$LDAP_LDFLAGS $LDFLAGS"
-					fi
 
 					AC_CHECK_LIB(curl, main, , [AC_MSG_ERROR([libcurl library not found])])
 

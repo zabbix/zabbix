@@ -32,6 +32,13 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 If you want to specify libpcre installation directories:
 AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
 		[
+			if test "$withval" = "yes"; then
+				if test -f /usr/local/include/pcre.h; then
+					withval="/usr/local"
+				else
+					withval="/usr"
+				fi
+			fi
 			_libpcre_dir="$withval"
 			_libpcre_dir_lib="$withval/lib"
 			test "x$withval" = "xyes" && withval=/usr

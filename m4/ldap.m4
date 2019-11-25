@@ -136,6 +136,19 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 AC_MSG_RESULT([without SSL])
                         ])
 
+                        # without SSL for Solaris
+                        if test "x$ldap_link" = "xno"; then
+                                if test "x$static_linking_support" = "xno"; then
+                                        TRY_LDAP_LIBS="$LDAP_LIBS -lpthread -lsasl"
+                                else
+                                        TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lpthread -lsasl"
+                                fi
+                                LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
+                                        LDAP_LIBS=$TRY_LDAP_LIBS
+                                        AC_MSG_RESULT([without SSL and with sasl])
+                                ])
+                        fi
+
                         # with system GnuTLS
                         if test "x$ldap_link" = "xno"; then
                                 if test "x$static_linking_support" = "xno"; then
@@ -145,7 +158,23 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 fi
                                 LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                         LDAP_LIBS=$TRY_LDAP_LIBS
-                                        AC_MSG_RESULT([with system GnuTLS dynamic linking])
+                                        AC_MSG_RESULT([with system GnuTLS linking])
+                                ])
+                        fi
+
+                        # with static OpenSSL and SASL2
+                        if test "x$ldap_link" = "xno" -a "x$want_openssl" = "xyes"; then
+                                if test "x$static_linking_support" = "xno"; then
+                                        OSSL_LDAP_LIBS="$LDAP_LIBS $OPENSSL_LIBS -lsasl2"
+                                else
+                                        OSSL_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -lsasl2 -Wl,-Bdynamic $OPENSSL_LIBS"
+                                fi
+                                OSSL_LDAP_CPPFLAGS="$LDAP_CPPFLAGS $OPENSSL_CPPFLAGS"
+                                OSSL_LDAP_CFLAGS="$LDAP_CPPFLAGS $OPENSSL_CFLAGS"
+                                OSSL_LDAP_LDFLAGS="$LDAP_LDFLAGS $OPENSSL_LDFLAGS"
+                                LIBLDAP_TRY_LINK([$OSSL_LDAP_LIBS], [$OSSL_LDAP_LDFLAGS], [$OSSL_LDAP_CPPFLAGS], [$OSSL_LDAP_CFLAGS],[
+                                        LDAP_LIBS="$OSSL_LDAP_LIBS"
+                                        AC_MSG_RESULT([with static OpenSSL and static sasl2])
                                 ])
                         fi
 
@@ -177,9 +206,22 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 OSSL_LDAP_LDFLAGS="$LDAP_LDFLAGS $OPENSSL_LDFLAGS"
                                 LIBLDAP_TRY_LINK([$OSSL_LDAP_LIBS], [$OSSL_LDAP_LDFLAGS], [$OSSL_LDAP_CPPFLAGS], [$OSSL_LDAP_CFLAGS],[
                                         LDAP_LIBS="$OSSL_LDAP_LIBS"
-                                        AC_MSG_RESULT([with static OpenSSL for Solaris])
+                                        AC_MSG_RESULT([with static OpenSSL and sasl])
                                 ],[
                                         AC_MSG_ERROR([Not compatible with static OpenLDAP libs version of static OpenSSL: "$OPENSSL_LDFLAGS"])
+                                ])
+                        fi
+
+                        # with system OpenSSL and SASL2
+                        if test "x$ldap_link" = "xno"; then
+                                if test "x$static_linking_support" = "xno"; then
+                                        TRY_LDAP_LIBS="$LDAP_LIBS -lssl -lsasl2 -lcrypto"
+                                else
+                                        TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -lsasl2 -Wl,-Bdynamic -lssl -lcrypto"
+                                fi
+                                LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
+                                        LDAP_LIBS=$TRY_LDAP_LIBS
+                                        AC_MSG_RESULT([with system OpenSSL and static sasl2 linking])
                                 ])
                         fi
 
@@ -192,7 +234,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 fi
                                 LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                         LDAP_LIBS=$TRY_LDAP_LIBS
-                                        AC_MSG_RESULT([with system OpenSSL dynamic linking])
+                                        AC_MSG_RESULT([with system OpenSSL linking])
                                 ])
                         fi
 
@@ -205,7 +247,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 fi
                                 LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                         LDAP_LIBS=$TRY_LDAP_LIBS
-                                        AC_MSG_RESULT([with system OpenSSL for Solaris dynamic linking])
+                                        AC_MSG_RESULT([with system OpenSSL and sasl linking])
                                 ])
                         fi
 
