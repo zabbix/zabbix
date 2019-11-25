@@ -322,7 +322,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 	public function prepareData() {
 		// Create host "agentd" and "agent2".
 		$hosts = [];
-		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 => 53] as $component => $port) {
 			$hosts[] = [
 				'host' => $component,
 				'interfaces' => [
@@ -332,7 +332,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 						'useip' => 1,
 						'ip' => '127.0.0.1',
 						'dns' => '',
-						'port' => $this->getConfigurationValue($component, 'ListenPort')
+						'port' => PHPUNIT_PORT_PREFIX.$port
 					]
 				],
 				'groups' => [
@@ -419,7 +419,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'ListenPort' => 10053,
+				'ListenPort' => PHPUNIT_PORT_PREFIX.'53',
 				'Plugins.SystemRun.EnableRemoteCommands' => '1',
 				'Plugins.Uptime.Capacity' => '10'
 			]
