@@ -22,21 +22,20 @@
 /**
  * Class containing methods for operations module.
  */
-class CModule extends CApiService {
+class CModuleDetails extends CApiService {
 
 	protected $tableName = 'module';
 	protected $tableAlias = 'md';
-	protected $sortColumns = ['moduleid', 'name'];
+	protected $sortColumns = ['moduleid'];
 
 	/**
 	 * Get module data.
 	 *
 	 * @param array    $options
 	 * @param int      $options['moduleid']
-	 * @param string   $options['name']             Module visual name.
+	 * @param string   $options['id']               Module unique identifier as defined in manifest.json file.
 	 * @param string   $options['relative_path']    Relative path to module directory.
-	 * @param string   $options['version']          Module version.
-	 * @param bool     $options['status']           Module status, true - enabled.
+	 * @param bool     $options['status']           Module status.
 	 * @param array    $options['config']           Module configuration data.
 	 * @return array
 	 */
@@ -100,7 +99,7 @@ class CModule extends CApiService {
 				return $module['rowscount'];
 			}
 
-			if ($this->outputIsRequested('config', $options)) {
+			if (array_key_exists('config', $module)) {
 				$config = json_decode($module['config'], true);
 				$module['config'] = is_null($config) ? [] : $config;
 			}
@@ -120,10 +119,10 @@ class CModule extends CApiService {
 	 * Create module.
 	 *
 	 * @param array    $options
-	 * @param string   $options['name']             Module visual name.
+	 * @param int      $options['moduleid']
+	 * @param string   $options['id']               Module unique identifier as defined in manifest.json file.
 	 * @param string   $options['relative_path']    Relative path to module directory.
-	 * @param string   $options['version']          Module version.
-	 * @param bool     $options['status']           Module status, true - enabled. (optional)
+	 * @param bool     $options['status']           Module status. (optional)
 	 * @param array    $options['config']           Module configuration data. (optional)
 	 * @return array
 	 */
@@ -134,10 +133,10 @@ class CModule extends CApiService {
 		$rules = [
 			'type' => API_OBJECT,
 			'fields' => [
-				'name' => [
+				'id' => [
 					'type' => API_STRING_UTF8,
 					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength($this->tableName, 'name')
+					'length' => DB::getFieldLength($this->tableName, 'id')
 				],
 				'relative_path' => [
 					'type' => API_STRING_UTF8,
@@ -194,7 +193,7 @@ class CModule extends CApiService {
 		$this->validate($rules, $modules);
 
 		$db_modules = DB::select($this->tableName, [
-			'output' => ['moduleid', 'name', 'status'],
+			'output' => ['moduleid', 'id', 'status'],
 			'filter' => ['moduleid' => zbx_objectValues($modules, 'moduleid')],
 			'preservekeys' => true
 		]);
@@ -238,7 +237,7 @@ class CModule extends CApiService {
 		$this->denyAccessUnlessGranted();
 
 		$db_modules = DB::select($this->tableName, [
-			'output' => [$this->pk, 'name'],
+			'output' => [$this->pk, 'id'],
 			'moduleids' => $moduleids,
 			'preservekeys' => true
 		]);
