@@ -308,6 +308,16 @@ function objectSize(obj) {
 	return size;
 }
 
+function addMessage(html) {
+	var $message_div = jQuery('<div>').attr('id', 'messages');
+	$message_div.append(html);
+	jQuery('main').prepend($message_div);
+}
+
+function removeMessages() {
+	jQuery('#messages', 'main').remove();
+}
+
 /**
  * Replace placeholders like %<number>$s with arguments.
  * Can be used like usual sprintf but only for %<number>$s placeholders.
@@ -1069,7 +1079,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 				.attr('title', t('Close'))
 				.click(function() {
 					jQuery(this)
-						.closest('.' + classes[index])
+						.closest('.' + msg_class)
 						.remove();
 				});
 		$msg_box.append($button);

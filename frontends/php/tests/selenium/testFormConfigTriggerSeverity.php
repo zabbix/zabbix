@@ -115,7 +115,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
 
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger severities');
 
 		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
 		$this->zbxTestAssertElementPresentId('severity_name_0');

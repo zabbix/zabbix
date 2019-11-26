@@ -606,7 +606,7 @@ $item_form_list
 			->setChecked(array_key_exists('description', $data['visible'])),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('items' , 'description'))
+			->setMaxlength(DB::getFieldLength('items', 'description'))
 	);
 
 $tabs = (new CTabView())

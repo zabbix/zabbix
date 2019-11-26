@@ -23,15 +23,7 @@ require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Macros'))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.macros.php'))
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $table = (new CTable())
 	->setId('tbl_macros')
@@ -55,7 +47,7 @@ foreach ($data['macros'] as $i => $macro) {
 
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-		->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
+		->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 		->setAttribute('placeholder', _('description'));
 
 	$button_cell = [

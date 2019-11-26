@@ -7,16 +7,22 @@ import (
 	"strconv"
 	"time"
 
-	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxcomms"
 )
 
+type Options struct {
+	Timeout  int    `conf:"optional,range=1:30"`
+	Capacity int    `conf:"optional,range=1:100"`
+	SourceIP string `conf:"optional"`
+}
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	timeout   time.Duration
 	localAddr net.Addr
+	options   Options
 }
 
 type queue struct {
@@ -42,7 +48,7 @@ var impl Plugin
 func (p *Plugin) getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
 	var parse response
 
-	resp, err := zbxcomms.Exchange(addr, &p.localAddr, p.timeout, req)
+	resp, err := zbxcomms.Exchange(addr, &p.localAddr, time.Duration(p.options.Timeout)*time.Second, req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", err)
@@ -131,10 +137,21 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return str, nil
 }
 
-// Configure -
-func (p *Plugin) Configure(options map[string]string) {
-	p.timeout = time.Second * time.Duration(agent.Options.Timeout)
-	p.localAddr = &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0}
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+	if err := conf.Unmarshal(options, &p.options); err != nil {
+		p.Warningf("cannot unmarshal configuration options: %s", err)
+	}
+	if p.options.Timeout == 0 {
+		p.options.Timeout = global.Timeout
+	}
+	if p.options.SourceIP == "" {
+		p.options.SourceIP = global.SourceIP
+	}
+}
+
+func (p *Plugin) Validate(options interface{}) error {
+	var o Options
+	return conf.Unmarshal(options, &o)
 }
 
 func init() {

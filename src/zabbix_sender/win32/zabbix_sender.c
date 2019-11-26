@@ -92,7 +92,7 @@ int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_
 	if (SUCCEED != (ret = zbx_json_open(result, &jp)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value))))
+	if (SUCCEED != (ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value), NULL)))
 		goto out;
 
 	*response = (0 == strcmp(value, ZBX_PROTO_VALUE_SUCCESS)) ? 0 : -1;
@@ -100,7 +100,7 @@ int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_
 	if (NULL == info)
 		goto out;
 
-	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, value, sizeof(value)) ||
+	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, value, sizeof(value), NULL) ||
 			3 != sscanf(value, "processed: %*d; failed: %d; total: %d; seconds spent: %lf",
 				&info->failed, &info->total, &info->time_spent))
 	{

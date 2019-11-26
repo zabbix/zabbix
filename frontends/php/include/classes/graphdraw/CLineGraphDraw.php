@@ -365,7 +365,7 @@ class CLineGraphDraw extends CGraphDraw {
 						}
 
 						$dy = $var[$ci] - $var[$first_idx];
-						$var[$ci - ($dx - $cj)] = bcadd($var[$first_idx] , bcdiv(($cj * $dy) , $dx));
+						$var[$ci - ($dx - $cj)] = bcadd($var[$first_idx], bcdiv(($cj * $dy), $dx));
 					}
 				}
 			}

@@ -68,7 +68,7 @@ else {
 
 // Append key to form list.
 $key_controls = [
-	(new CTextBox('key', $data['key'], $readonly))
+	(new CTextBox('key', $data['key'], $readonly, DB::getFieldLength('item_discovery', 'key_')))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired()
 ];
@@ -754,7 +754,7 @@ $form_list
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('items' , 'description'))
+			->setMaxlength(DB::getFieldLength('items', 'description'))
 	)
 	// Append status to form list.
 	->addRow(_('Create enabled'),

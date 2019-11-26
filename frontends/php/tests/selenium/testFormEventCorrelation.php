@@ -34,14 +34,30 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'select_tag' => 'New event tag',
 					'tag' => 'Test tag',
 					'description' => 'Event correlation with description',
-					'operation' => 'Close new event'
+					'operation' => [
+						'Close new event'
+					]
 				]
 			],
 			[
 				[
 					'name' => 'Test create with minimum fields',
 					'select_tag' => 'Old event tag',
-					'tag' => 'Test tag'
+					'tag' => 'Test tag',
+					'operation' => [
+						'Close old event'
+					]
+				]
+			],
+			[
+				[
+					'name' => 'Test create with both operations selected',
+					'select_tag' => 'Old event tag',
+					'tag' => 'Test tag',
+					'operation' => [
+						'Close old event',
+						'Close new event'
+					]
 				]
 			]
 		];
@@ -69,11 +85,11 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestTabSwitch('Operations');
 
-		if (array_key_exists('operation', $data)) {
-			$this->zbxTestDropdownSelect('new_operation_type', $data['operation']);
+		foreach($data['operation'] as $operation) {
+			$operation_id = ($operation === 'Close old event') ? 'operation_0_type' : 'operation_1_type';
+			$this->zbxTestCheckboxSelect($operation_id);
 		}
 
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 		$this->zbxTestTextPresent($data['name']);
@@ -169,7 +185,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
+		$this->zbxTestCheckboxSelect('operation_0_type');
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
@@ -337,7 +353,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
+		$this->zbxTestCheckboxSelect('operation_0_type');
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
@@ -501,7 +517,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		}
 
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
+		$this->zbxTestCheckboxSelect('operation_0_type');
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
@@ -691,9 +707,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('description', 'New test description update');
 
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'removeOperation\')]');
-		$this->zbxTestDropdownSelect('new_operation_type', 'Close new event');
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_operation\')]');
+		$this->zbxTestCheckboxSelect('operation_0_type', false);
+		$this->zbxTestCheckboxSelect('operation_1_type');
 		$this->zbxTestClick('update');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation updated');

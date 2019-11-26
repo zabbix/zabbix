@@ -35,19 +35,7 @@ import (
 	"zabbix.com/pkg/std"
 )
 
-// Node structure is used to store parsed conf file parameters or parameter components.
-type Node struct {
-	name        string
-	used        bool
-	values      [][]byte
-	nodes       []*Node
-	parent      *Node
-	line        int
-	level       int
-	includeFail bool
-}
-
-// Meta structure is used to stroe the 'conf' tag metadata.
+// Meta structure is used to store the 'conf' tag metadata.
 type Meta struct {
 	name         string
 	defaultValue *string
@@ -56,64 +44,10 @@ type Meta struct {
 	max          int64
 }
 
-// get returns child node by name
-func (n *Node) get(name string) (node *Node) {
-	for _, child := range n.nodes {
-		if child.name == name {
-			return child
-		}
-	}
-	return nil
-}
-
 func validateParameterName(key []byte) (err error) {
 	for i, b := range key {
 		if ('A' > b || b > 'Z') && ('a' > b || b > 'z') && ('0' > b || b > '9') && b != '_' && b != '.' {
 			return fmt.Errorf("invalid character '%c' at position %d", b, i+1)
-		}
-	}
-	return
-}
-
-// add appends new child node
-func (n *Node) add(name []byte, value []byte, lineNum int) {
-	var node *Node
-	var key string
-
-	split := bytes.IndexByte(name, '.')
-	if split == -1 {
-		key = string(name)
-	} else {
-		key = string(name[:split])
-	}
-
-	if node = n.get(key); node == nil {
-		node = &Node{
-			name:   string(key),
-			used:   false,
-			values: make([][]byte, 0),
-			nodes:  make([]*Node, 0),
-			parent: n,
-			line:   lineNum}
-		n.nodes = append(n.nodes, node)
-	}
-
-	if split != -1 {
-		node.add(name[split+1:], value, lineNum)
-	} else {
-		node.values = append(node.values, value)
-	}
-}
-
-// checkUsage checks if all conf nodes were recognized.
-// This is done by recursively checking 'used' flag for all nodes.
-func (n *Node) checkUsage() (err error) {
-	for _, node := range n.nodes {
-		if !node.used {
-			return newNodeError(node, "unknown parameter")
-		}
-		if err = node.checkUsage(); err != nil {
-			return
 		}
 	}
 	return
@@ -140,28 +74,45 @@ func parseLine(line []byte) (key []byte, value []byte, err error) {
 }
 
 // getMeta returns 'conf' tag metadata.
-// The metadata has format <name>,<optional>,<range>,<default value>
+// The metadata has format [name=<name>,][optional,][range=<range>,][default=<default value>]
 //   where:
 //   <name> - the parameter name,
-//   <optional> - string 'optional' if the value is optional,
+//   optional - set if the value is optional,
 //   <range> - the allowed range <min>:<max>, where <min>, <max> values are optional,
-//   <default value> - the default value.
+//   <default value> - the default value. If specified it must always be the last tag.
 func getMeta(field reflect.StructField) (meta *Meta, err error) {
-	t := field.Tag
 	m := Meta{name: "", optional: false, min: -1, max: -1}
-	tag := t.Get("conf")
-	if tag != "" {
-		tags := strings.SplitN(tag, ",", 4)
-		switch len(tags) {
-		case 4:
-			m.defaultValue = &tags[3]
-			fallthrough
-		case 3:
-			rangeTag := strings.Trim(tags[2], " \t")
-			if len(rangeTag) > 0 {
-				limits := strings.Split(rangeTag, ":")
+	conf := field.Tag.Get("conf")
+
+loop:
+	for conf != "" {
+		tags := strings.SplitN(conf, ",", 2)
+		fields := strings.SplitN(tags[0], "=", 2)
+		tag := strings.TrimSpace(fields[0])
+		if len(fields) == 1 {
+			// boolean tag
+			switch tag {
+			case "optional":
+				m.optional = true
+			default:
+				return nil, fmt.Errorf("invalid conf tag '%s'", tag)
+			}
+		} else {
+			// value tag
+			switch tag {
+			case "default":
+				value := fields[1]
+				if len(tags) == 2 {
+					value += "," + tags[1]
+				}
+				m.defaultValue = &value
+				break loop
+			case "name":
+				m.name = strings.TrimSpace(fields[1])
+			case "range":
+				limits := strings.Split(fields[1], ":")
 				if len(limits) != 2 {
-					return nil, errors.New("invalid range tag format")
+					return nil, errors.New("invalid range format")
 				}
 				if limits[0] != "" {
 					m.min, _ = strconv.ParseInt(limits[0], 10, 64)
@@ -169,65 +120,21 @@ func getMeta(field reflect.StructField) (meta *Meta, err error) {
 				if limits[1] != "" {
 					m.max, _ = strconv.ParseInt(limits[1], 10, 64)
 				}
+			default:
+				return nil, fmt.Errorf("invalid conf tag '%s'", tag)
 			}
-			fallthrough
-		case 2:
-			if strings.Trim(tags[1], " \t") == "optional" {
-				m.optional = true
-			} else if tags[1] != "" {
-				return nil, fmt.Errorf("unknown 'conf' tag: %s", tags[1])
-			}
-			fallthrough
-		case 1:
-			m.name = strings.Trim(tags[0], " \t")
 		}
+
+		if len(tags) == 1 {
+			break
+		}
+		conf = tags[1]
 	}
+
 	if m.name == "" {
 		m.name = field.Name
 	}
 	return &m, nil
-}
-
-// getNodeValue returns node value or meta data default value or nil if
-// metadata 'optional' tag is set. Otherwise error is returned.
-func getNodeValue(node *Node, meta *Meta) (value *string, err error) {
-	if node != nil {
-		count := len(node.values)
-		if count > 0 {
-			tmp := string(node.values[count-1])
-			value = &tmp
-		}
-	}
-
-	if value == nil && meta != nil {
-		if meta.defaultValue != nil {
-			value = meta.defaultValue
-		} else if meta.optional {
-			return
-		} else {
-			return nil, fmt.Errorf("cannot find mandatory parameter %s", meta.name)
-		}
-	}
-	return
-}
-
-// newNodeError creates error based on the specified node. The error message will
-// have full node name (parameter name up to the node, including it) and the line
-// number where parameter was defined.
-func newNodeError(node *Node, format string, a ...interface{}) (err error) {
-	if node == nil {
-		return fmt.Errorf(format, a...)
-	}
-	var name string
-	for parent := node; parent.parent != nil; parent = parent.parent {
-		if name == "" {
-			name = parent.name
-		} else {
-			name = parent.name + "." + name
-		}
-	}
-	desc := fmt.Sprintf(format, a...)
-	return fmt.Errorf("invalid parameter %s at line %d: %s", name, node.line, desc)
 }
 
 func setBasicValue(value reflect.Value, meta *Meta, str *string) (err error) {
@@ -354,9 +261,9 @@ func setValue(value reflect.Value, meta *Meta, node *Node) (err error) {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 		reflect.Float32, reflect.Float64, reflect.Bool, reflect.String:
-		if str, err = getNodeValue(node, meta); err == nil {
+		if str, err = node.getValue(meta); err == nil {
 			if err = setBasicValue(value, meta, str); err != nil {
-				return newNodeError(node, "%s", err.Error())
+				return node.newError("%s", err.Error())
 			}
 		}
 	case reflect.Struct:
@@ -375,6 +282,9 @@ func setValue(value reflect.Value, meta *Meta, node *Node) (err error) {
 		v := reflect.New(value.Type().Elem())
 		value.Set(v)
 		return setValue(v.Elem(), meta, node)
+	case reflect.Interface:
+		value.Set(reflect.ValueOf(node))
+		node.markUsed(true)
 	}
 
 	return nil
@@ -399,7 +309,6 @@ func assignValues(v interface{}, root *Node) (err error) {
 	default:
 		return errors.New("output variable must be a pointer to a structure")
 	}
-
 	return root.checkUsage()
 }
 
@@ -531,26 +440,61 @@ func parseConfig(root *Node, data []byte) (err error) {
 	return nil
 }
 
-func Unmarshal(data []byte, v interface{}) (err error) {
+// Unmarshal unmarshals input data into specified structure. The input data can be either
+// a byte array ([]byte) with configuration file or interface{} either returned by Marshal
+// or a configuration file Unmarshaled into interface{} variable before.
+// The third is optional 'strict' parameter that forces strict validation of configuration
+// and structure fields (enabled by efault). When disabled it will unmarshal part of
+// configuration into incomplete target structures.
+func Unmarshal(data interface{}, v interface{}, args ...interface{}) (err error) {
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
 		return errors.New("Invalid output parameter")
 	}
 
-	root := &Node{
-		name:   "",
-		used:   false,
-		values: make([][]byte, 0),
-		nodes:  make([]*Node, 0),
-		parent: nil,
-		line:   0}
+	strict := true
+	if len(args) > 0 {
+		var ok bool
+		if strict, ok = args[0].(bool); !ok {
+			return errors.New("Invalid mode parameter")
+		}
+	}
 
-	if err = parseConfig(root, data); err != nil {
-		return fmt.Errorf("Cannot read configuration: %s", err.Error())
+	var root *Node
+	switch u := data.(type) {
+	case nil:
+		root = &Node{
+			name:   "",
+			used:   false,
+			values: make([][]byte, 0),
+			nodes:  make([]*Node, 0),
+			parent: nil,
+			line:   0}
+	case []byte:
+		root = &Node{
+			name:   "",
+			used:   false,
+			values: make([][]byte, 0),
+			nodes:  make([]*Node, 0),
+			parent: nil,
+			line:   0}
+
+		if err = parseConfig(root, u); err != nil {
+			return fmt.Errorf("Cannot read configuration: %s", err.Error())
+		}
+	case *Node:
+		root = u
+		root.markUsed(false)
+	default:
+		return errors.New("Invalid input parameter")
+	}
+
+	if !strict {
+		root.markUsed(true)
 	}
 
 	if err = assignValues(v, root); err != nil {
-		return fmt.Errorf("Cannot read configuration: %s", err.Error())
+		return fmt.Errorf("Cannot assign configuration: %s", err.Error())
 	}
 
 	return nil

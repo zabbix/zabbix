@@ -29,6 +29,13 @@ define('ACTION_BAD', 1);
  */
 class testFormAction extends CLegacyWebTest {
 
+	private $event_sources = [
+		EVENT_SOURCE_TRIGGERS => 'Trigger actions',
+		EVENT_SOURCE_DISCOVERY => 'Discovery actions',
+		EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
+		EVENT_SOURCE_INTERNAL => 'Internal actions'
+	];
+
 	public static function layout() {
 		return [
 			[
@@ -1540,23 +1547,24 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestLogin('actionconf.php');
 		switch ($eventsource) {
 			case EVENT_SOURCE_TRIGGERS:
-				$this->zbxTestDropdownSelectWait('eventsource', 'Triggers');
+				$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger actions');
 				break;
 			case EVENT_SOURCE_DISCOVERY:
-				$this->zbxTestDropdownSelectWait('eventsource', 'Discovery');
+				$this->query('id:page-title-general')->asPopupButton()->one()->select('Discovery actions');
 				break;
 			case EVENT_SOURCE_AUTO_REGISTRATION:
-				$this->zbxTestDropdownSelectWait('eventsource', 'Auto registration');
+				$this->query('id:page-title-general')->asPopupButton()->one()->select('Auto registration actions');
 				break;
 			case EVENT_SOURCE_INTERNAL;
-				$this->zbxTestDropdownSelectWait('eventsource', 'Internal');
+				$this->query('id:page-title-general')->asPopupButton()->one()->select('Internal actions');
 				break;
 		}
 
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestCheckHeader('Actions');
+
+		$this->zbxTestCheckHeader($this->event_sources[$data['eventsource']]);
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestTextPresent([
 				'Action updated',
@@ -1873,7 +1881,8 @@ class testFormAction extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case ACTION_GOOD:
 				$this->zbxTestCheckTitle('Configuration of actions');
-				$this->zbxTestCheckHeader('Actions');
+
+				$this->zbxTestCheckHeader($this->event_sources[$data['eventsource']]);
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add action']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 				$sql = "SELECT actionid FROM actions WHERE name='".$data['name']."'";

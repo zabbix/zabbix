@@ -82,15 +82,15 @@ func (ap *AllowedPeers) CheckPeer(ip net.IP) bool {
 }
 
 func (ap *AllowedPeers) isPresent(value interface{}) bool {
-	switch value.(type) {
+	switch v := value.(type) {
 	case *net.IPNet:
 		for _, v := range ap.nets {
-			if v.Contains(value.(*net.IPNet).IP) {
+			if v.Contains(v.IP) {
 				return true
 			}
 		}
 	case net.IP:
-		if ap.checkNetIP(value.(net.IP)) {
+		if ap.checkNetIP(v) {
 			return true
 		}
 	case string:

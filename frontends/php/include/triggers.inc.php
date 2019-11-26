@@ -1273,11 +1273,11 @@ function make_trigger_details($trigger, $eventid) {
 	$table
 		->addRow([
 			new CCol(_('Problem expression')),
-			new CCol($trigger['expression'])
+			new CCol((new CDiv($trigger['expression']))->addClass(ZBX_STYLE_WORDWRAP))
 		])
 		->addRow([
 			new CCol(_('Recovery expression')),
-			new CCol($trigger['recovery_expression'])
+			new CCol((new CDiv($trigger['recovery_expression']))->addClass(ZBX_STYLE_WORDWRAP))
 		])
 		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 			? SPACE.'+'.SPACE._('Multiple PROBLEM events')

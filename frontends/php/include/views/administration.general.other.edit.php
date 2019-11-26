@@ -21,15 +21,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Other configuration parameters'))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.other.php'))
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $otherTab = new CFormList();
 

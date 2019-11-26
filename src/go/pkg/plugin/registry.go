@@ -63,23 +63,23 @@ func registerMetric(plugin Accessor, name string, key string, description string
 		switch method.Name {
 		case "Export":
 			if _, ok := plugin.(Exporter); !ok {
-				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Exporter interface`, name, method.Name))
+				panic(fmt.Sprintf(`the "%s" plugin has %s method, but does implement Exporter interface`, name, method.Name))
 			}
 		case "Collect", "Period":
 			if _, ok := plugin.(Collector); !ok {
-				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Collector interface`, name, method.Name))
+				panic(fmt.Sprintf(`the "%s" plugin has %s method, but does not implement Collector interface`, name, method.Name))
 			}
 		case "Watch":
 			if _, ok := plugin.(Watcher); !ok {
-				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Watcher interface`, name, method.Name))
+				panic(fmt.Sprintf(`the "%s" plugin has %s method, but does not implement Watcher interface`, name, method.Name))
 			}
-		case "Configure":
+		case "Configure", "Validate":
 			if _, ok := plugin.(Configurator); !ok {
-				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Configurator interface`, name, method.Name))
+				panic(fmt.Sprintf(`the "%s" plugin has %s method, but does not implement Configurator interface`, name, method.Name))
 			}
 		case "Start", "Stop":
 			if _, ok := plugin.(Runner); !ok {
-				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Runner interface`, name, method.Name))
+				panic(fmt.Sprintf(`the "%s" plugin has %s method, but does not implement Runner interface`, name, method.Name))
 			}
 		}
 	}
