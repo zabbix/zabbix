@@ -143,11 +143,6 @@ class CModuleDetails extends CApiService {
 					'flags' => API_REQUIRED | API_NOT_EMPTY,
 					'length' => DB::getFieldLength($this->tableName, 'relative_path')
 				],
-				'version' => [
-					'type' => API_STRING_UTF8,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength($this->tableName, 'version')
-				],
 				'status' => ['type' => API_INT32, 'in' => '0,1']
 			]
 		];
@@ -159,11 +154,19 @@ class CModuleDetails extends CApiService {
 		];
 
 		foreach ($modules as &$module) {
+			if (array_key_exists('config', $module)) {
+				$module['config'] = json_encode($module['config']);
+			}
+
 			$module += $defaults;
 		}
 		unset($module);
 
 		$moduleids = DB::insert($this->tableName, $modules);
+
+		foreach ($moduleids as $index => $moduleid) {
+			$modules[$index]['moduleid'] = $moduleid;
+		}
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MODULE, $modules);
 
@@ -242,11 +245,13 @@ class CModuleDetails extends CApiService {
 			'preservekeys' => true
 		]);
 
-		DB::delete($this->tableName, [$this->pk => $moduleids]);
+		if ($moduleids) {
+			DB::delete($this->tableName, [$this->pk => $moduleids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MODULE, $db_modules);
+			$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MODULE, $db_modules);
+		}
 
-		return ['mediatypeids' => $moduleids];
+		return ['moduleids' => $moduleids];
 	}
 
 	/**

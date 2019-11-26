@@ -284,7 +284,7 @@ class API {
 	}
 
 	/**
-	 * @return CMaintenance
+	 * @return CModuleDetails
 	 */
 	public static function ModuleDetails() {
 		return self::getApi('moduledetails');

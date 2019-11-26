@@ -31,6 +31,17 @@ class CModule {
 	}
 
 	/**
+	 * Module register action, called once module is regsitered in Zabbix. Returned array will be stored as initial
+	 * 'config' data in moduledetails.config field.
+	 *
+	 * @param string $path       Relative path to module code.
+	 * @return array
+	 */
+	public function register($path) {
+		return [];
+	}
+
+	/**
 	 * Module initalization method.
 	 *
 	 * @param array $config      Database stored config settings.

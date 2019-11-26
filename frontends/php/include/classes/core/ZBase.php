@@ -414,15 +414,8 @@ class ZBase {
 	private function processRequest(CRouter $router) {
 		$controller = $router->getController();
 
-		/** @var \CController $controller */
-		$controller = new $controller();
-
-		if ($controller instanceof CController) {
-			$controller->setAction($router->getAction());
-			$response = $controller->run();
-		}
-		else {
-			error(_s('%s must extend CController class', get_class($controller)));
+		if (!class_exists($controller)) {
+			error(_s('%s must extend CController class', $controller));
 			$response = new CControllerResponseData([
 				'controller' => [
 					'action' => $router->getAction()
@@ -435,6 +428,30 @@ class ZBase {
 					'post' => ''
 				]
 			]);
+		}
+		else {
+			/** @var \CController $controller */
+			$controller = new $controller();
+
+			if ($controller instanceof CController) {
+				$controller->setAction($router->getAction());
+				$response = $controller->run();
+			}
+			else {
+				error(_s('%s must extend CController class', $controller));
+				$response = new CControllerResponseData([
+					'controller' => [
+						'action' => $router->getAction()
+					],
+					'main_block' => '',
+					'page' => 0,
+					'javascript' => [
+						'files' => [],
+						'pre' => '',
+						'post' => ''
+					]
+				]);
+			}
 		}
 
 		// Controller returned data
