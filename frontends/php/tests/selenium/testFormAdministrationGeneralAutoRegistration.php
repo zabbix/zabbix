@@ -89,6 +89,8 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 						'Action' => 'Updated',
 						'ID' => 1,
 						'Details' => "config.tls_accept: 1 => 2\nconfig.tls_psk_identity: ******** => ********\nconfig.tls_psk: ******** => ********"
+
+//						'Details' => ['config.tls_accept: 1 => 2', 'config.tls_psk_identity: ******** => ********', 'config.tls_psk: ******** => ********']
 					]
 				]
 			],
@@ -103,7 +105,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 						'Resource' => 'Auto registration',
 						'Action' => 'Updated',
 						'ID' => 1,
-						'Details' => 'config.tls_accept: 2 => 3'
+						'Details' => "config.tls_accept: 2 => 3"
 					]
 				]
 			],
@@ -119,6 +121,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 						'Action' => 'Updated',
 						'ID' => 1,
 						'Details' => "config.tls_accept: 3 => 1\nconfig.tls_psk_identity: ******** => ********\nconfig.tls_psk: ******** => ********"
+//						'Details' => ['config.tls_accept: 3 => 1', 'config.tls_psk_identity: ******** => ********', 'config.tls_psk: ******** => ********']
 					]
 				]
 			]
@@ -147,8 +150,16 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 		// Get first row data.
 		$row = $rows->get(0);
 		foreach ($data['audit'] as $column => $value) {
-			$text = $row->getColumnData($column, $value);
-			$this->assertEquals($value, $text);
+//			if ($column === 'Details') {
+//				$text = $row->getColumn($column)->getText();
+//				foreach ($value as $textline) {
+//					$this->assertContains($textline, $text);
+//				}
+//			}
+//			else {
+				$text = $row->getColumnData($column, $value);
+				$this->assertEquals($value, $text);
+//			}
 		}
 	}
 

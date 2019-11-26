@@ -103,22 +103,22 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 		$this->zbxTestInputType('severity_name_5', 'Disaster2');
 
 		$this->zbxTestClick('lbl_severity_color_5');
-		$this->zbxTestClickXpath("//div[@title=\"#FF0000\"]");
+		$this->zbxTestClickXpath('//div[@title="#FF0000"]');
 
 		$this->zbxTestClick('lbl_severity_color_4');
-		$this->zbxTestClickXpath("//div[@title=\"#CC6600\"]");
+		$this->zbxTestClickXpath('//div[@title="#CC6600"]');
 
 		$this->zbxTestClick('lbl_severity_color_3');
-		$this->zbxTestClickXpath("//div[@title=\"#E57373\"]");
+		$this->zbxTestClickXpath('//div[@title="#E57373"]');
 
 		$this->zbxTestClick('lbl_severity_color_2');
-		$this->zbxTestClickXpath("//div[@title=\"#FFA000\"]");
+		$this->zbxTestClickXpath('//div[@title="#FFA000"]');
 
 		$this->zbxTestClick('lbl_severity_color_1');
-		$this->zbxTestClickXpath("//div[@title=\"#0097A7\"]");
+		$this->zbxTestClickXpath('//div[@title="#0097A7"]');
 
 		$this->zbxTestClick('lbl_severity_color_0');
-		$this->zbxTestClickXpath("//div[@title=\"#A5A5A5\"]");
+		$this->zbxTestClickXpath('//div[@title="#A5A5A5"]');
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');

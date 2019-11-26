@@ -57,7 +57,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open GUI page due access.
 						[
-							'page' => 'adm.gui.php',
+							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
 							'error' => 'Access denied'
 						],
 						// Login after logout.
@@ -106,7 +106,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open GUI page due access.
 						[
-							'page' => 'adm.gui.php',
+							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
 							'error' => 'Access denied'
 						],
 						// Login after logout.
@@ -172,7 +172,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open GUI page due access.
 						[
-							'page' => 'adm.gui.php',
+							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
 							'error' => 'Access denied'
 						]
 					],
@@ -229,7 +229,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Redirect to HTTP login form and user is signed on GUI page.
 						[
-							'page' => 'adm.gui.php',
+							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
 							'action' => self::LOGIN_HTTP,
 							'target' => 'GUI'
 						]

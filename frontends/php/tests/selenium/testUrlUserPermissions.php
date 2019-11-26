@@ -534,7 +534,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// Administration
 			[[
-				'url' => 'adm.gui.php',
+				'url' => 'zabbix.php?action=gui.edit&ddreset=1',
 				'title' =>	'Configuration of GUI',
 				'users' => [
 					'guest' => false,
@@ -543,7 +543,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.housekeeper.php',
+				'url' => 'zabbix.php?action=housekeeping.edit',
 				'title' =>	'Configuration of housekeeping',
 				'users' => [
 					'guest' => false,
@@ -552,7 +552,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.images.php',
+				'url' => 'zabbix.php?action=image.list',
 				'title' =>	'Configuration of images',
 				'users' => [
 					'guest' => false,
@@ -561,7 +561,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.iconmapping.php',
+				'url' => 'zabbix.php?action=iconmap.list',
 				'title' =>	'Configuration of icon mapping',
 				'users' => [
 					'guest' => false,
@@ -570,7 +570,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.regexps.php',
+				'url' => 'zabbix.php?action=regex.list',
 				'title' =>	'Configuration of regular expressions',
 				'users' => [
 					'guest' => false,
@@ -579,7 +579,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.macros.php',
+				'url' => 'zabbix.php?action=macros.edit',
 				'title' =>	'Configuration of macros',
 				'users' => [
 					'guest' => false,
@@ -588,7 +588,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.valuemapping.php',
+				'url' => 'zabbix.php?action=valuemap.list',
 				'title' =>	'Configuration of value mapping',
 				'users' => [
 					'guest' => false,
@@ -597,7 +597,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.workingtime.php',
+				'url' => 'zabbix.php?action=workingtime.edit',
 				'title' =>	'Configuration of working time',
 				'users' => [
 					'guest' => false,
@@ -606,7 +606,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.triggerseverities.php',
+				'url' => 'zabbix.php?action=trigseverity.edit',
 				'title' =>	'Configuration of trigger severities',
 				'users' => [
 					'guest' => false,
@@ -615,7 +615,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.triggerdisplayoptions.php',
+				'url' => 'zabbix.php?action=trigdisplay.edit',
 				'title' =>	'Configuration of trigger displaying options',
 				'users' => [
 					'guest' => false,
@@ -624,7 +624,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'adm.other.php',
+				'url' => 'zabbix.php?action=miscconfig.edit',
 				'title' =>	'Other configuration parameters',
 				'users' => [
 					'guest' => false,
