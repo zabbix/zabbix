@@ -20,237 +20,140 @@
 
 
 /**
- * Controller to perform preprocessing test send action.
+ * Controller to perform 'get value from host' action in item test dialog.
  */
 class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 	protected function checkInput() {
+
 		$fields = [
-//			'proxy_hostid' => 'db hosts.hostid',
-//			'item_type' => 'required|in '.implode(',', self::$testable_item_types),
-//			'key' => 'required|db items.key_',
-//			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
-//			'params' => 'db items.params',
-//			'' => '',
-//			
-//			'hostid' => 'db hosts.hostid',
-//			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
-//			'test_type' => 'in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
-//			'eol' => 'in '.implode(',', [ZBX_EOL_LF, ZBX_EOL_CRLF]),
-//			'steps' => 'required|array',
-//			'macros' => 'array',
-//			'value' => 'string',
-//			'prev_value' => 'string',
-//			'prev_time' => 'string',
-//			'show_final_result' => 'in 0,1'
+			'authtype' => 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'headers' => 'array',
+			'host_proxy' => 'db hosts.proxy_hostid',
+			//'hostid' => 'db hosts.hostid',
+			'http_proxy' => 'string',
+			'follow_redirects' => 'in 0,1',
+			'key' => 'string',
+			'interface' => 'array',
+			'ipmi_sensor' => 'string',
+			'item_type' => 'required|in '.implode(',', self::$testable_item_properties),
+			'jmx_endpoint' => 'string',
+			'output_format' => 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
+			'params' => 'string',
+			'password' => 'string',
+			'post_type' => 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
+			'posts' => 'string',
+			'privatekey' => 'string',
+			'publickey' => 'string',
+			'query_fields' => 'array',
+			'request_method' => 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
+			'retrieve_mode' => 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
+			'snmp_oid' => 'string',
+			'snmp_community' => 'string',
+			'snmpv3_securityname' => 'string',
+			'snmpv3_contextname' => 'string',
+			'snmpv3_securitylevel' => 'string',
+			'snmpv3_authprotocol' => 'in '.implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA]),
+			'snmpv3_authpassphrase' => 'string',
+			'snmpv3_privprotocol' => 'string',
+			'snmpv3_privpassphrase' => 'string',
+			'ssl_cert_file' => 'string',
+			'ssl_key_file' => 'string',
+			'ssl_key_password' => 'string',
+			'status_codes' => 'string',
+			'test_type' => 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'time_change' => 'int32',
+			'timeout' => 'string',
+			'username' => 'string',
+			'url' => 'string',
+			'value' => 'string',
+			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
+			'verify_host' => 'in 0,1',
+			'verify_peer' => 'in 0,1'
 		];
-//
-//		$ret = $this->validateInput($fields);
-//
-//		if ($ret) {
-//			$steps = $this->getInput('steps');
-//			$prepr_types = zbx_objectValues($steps, 'type');
-//			$this->preproc_item = self::getPreprocessingItemType($this->getInput('test_type'));
-//			$this->use_prev_value = (count(array_intersect($prepr_types, self::$preproc_steps_using_prev_value)) > 0);
-//			$this->show_final_result = ($this->getInput('show_final_result') == 1);
-//
-//			// Check preprocessing steps.
-//			if (($error = $this->preproc_item->validateItemPreprocessingSteps($steps)) !== true) {
-//				error($error);
-//			}
-//
-//			// Check previous time.
-//			if ($this->use_prev_value) {
-//				$prev_time = $this->getInput('prev_time', '');
-//
-//				$relative_time_parser = new CRelativeTimeParser();
-//				if ($relative_time_parser->parse($prev_time) != CParser::PARSE_SUCCESS) {
-//					error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-//						_('a relative time is expected')
-//					));
-//				}
-//				else {
-//					$tokens = $relative_time_parser->getTokens();
-//
-//					if (count($tokens) > 1) {
-//						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-//							_('only one time unit is allowed')
-//						));
-//					}
-//					elseif ($tokens && $tokens[0]['type'] == CRelativeTimeParser::ZBX_TOKEN_PRECISION) {
-//						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-//							_('a relative time is expected')
-//						));
-//					}
-//					elseif ($tokens && !in_array($tokens[0]['suffix'], self::$supported_time_suffixes)) {
-//						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-//							_('unsupported time suffix')
-//						));
-//					}
-//					elseif ($tokens && $tokens[0]['sign'] !== '-') {
-//						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-//							_('should be less than current time')
-//						));
-//					}
-//				}
-//			}
-//		}
-//
-//		if (($messages = getMessages()) !== null) {
-//			$this->setResponse(
-//				(new CControllerResponseData([
-//					'main_block' => CJs::encodeJson([
-//						'messages' => $messages->toString(),
-//						'steps' => [],
-//						'user' => [
-//							'debug_mode' => $this->getDebugMode()
-//						]
-//					])
-//				]))->disableView()
-//			);
-//			$ret = false;
-//		}
-//
-//		return $ret;
+
+		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
+
+			/*
+			 * Check if key is not empty if 'get value from host' is checked and test is made for item with mandatory
+			 * key.
+			 */
+			if ($this->getInput('key', '') === '' && in_array($this->item_type, $this->item_types_has_key_mandatory)) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', _('cannot be empty')));
+				$ret = false;
+			}
+
+			// Test interface options.
+			$interface = $this->getInput('interface');
+
+			if (!array_key_exists('address', $interface) || $interface['address'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
+				$ret = false;
+			}
+
+			if (!array_key_exists('port', $interface) || $interface['port'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
+				$ret = false;
+			}
+		}
+
+		if (($messages = getMessages()) !== null) {
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => CJs::encodeJson([
+						'messages' => $messages->toString(),
+						'user' => [
+							'debug_mode' => $this->getDebugMode()
+						]
+					])
+				]))->disableView()
+			);
+			$ret = false;
+		}
+
+		return $ret;
 	}
 
 	protected function doAction() {
-//		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-//
-//		$data = [
-//			'value' => $this->getInput('value', ''),
-//			'value_type' => $this->getInput('value_type', ITEM_VALUE_TYPE_STR),
-//			'steps' => $this->getInput('steps'),
-//			'single' => !$this->show_final_result
-//		];
-//
-//		// Resolve macros used in parameter fields.
-//		$macros_posted = $this->getInput('macros', []);
-//		$macros_types = ($this->preproc_item instanceof CItemPrototype)
-//			? ['usermacros' => true, 'lldmacros' => true]
-//			: ['usermacros' => true];
-//
-//		foreach ($data['steps'] as &$step) {
-//			/**
-//			 * Values received from html form may be transformed so we must removed redundant "\r" before sending data
-//			 * to Zabbix server.
-//			 */
-//			$step['params'] = str_replace("\r\n", "\n", $step['params']);
-//
-//			// Resolve macros in parameter fields before send data to Zabbix server.
-//			foreach (['params', 'error_handler_params'] as $field) {
-//				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
-//
-//				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-//					$macro_value = array_key_exists($macro, $macros_posted)
-//						? $macros_posted[$macro]
-//						: '';
-//
-//					$step[$field] = substr_replace($step[$field], $macro_value, $pos, strlen($macro));
-//				}
-//			}
-//		}
-//		unset($step);
-//
-//		// Get previous value and time.
-//		if ($this->use_prev_value) {
-//			$data['history'] = [
-//				'value' => $this->getInput('prev_value', ''),
-//				'timestamp' => $this->getInput('prev_time')
-//			];
-//		}
-//
-//		$output = [
-//			'steps' => [],
-//			'user' => [
-//				'debug_mode' => $this->getDebugMode()
-//			]
-//		];
-//
-//		// Send test details to Zabbix server.
-//		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-//		$result = $server->testPreprocessingSteps($data, get_cookie('zbx_sessionid'));
-//
-//		if ($result === false) {
-//			error($server->getError());
-//		}
-//		elseif (is_array($result)) {
-//			$test_failed = false;
-//			$test_outcome = null;
-//			foreach ($data['steps'] as $i => &$step) {
-//				if ($test_failed) {
-//					// If test is failed, proceesing steps are skipped from results.
-//					unset($data['steps'][$i]);
-//					continue;
-//				}
-//				elseif (array_key_exists($i, $result['steps'])) {
-//					$step += $result['steps'][$i];
-//
-//					if (array_key_exists('error', $step)) {
-//						// If error happened and no value is set, frontend shows label 'No value'.
-//						if (!array_key_exists('action', $step) || $step['action'] != ZBX_PREPROC_FAIL_SET_VALUE) {
-//							unset($step['result']);
-//							$test_failed = true;
-//						}
-//					}
-//				}
-//
-//				unset($step['type']);
-//				unset($step['params']);
-//				unset($step['error_handler']);
-//				unset($step['error_handler_params']);
-//
-//				// Latest executed step due to the error or end of preprocessing.
-//				$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
-//			}
-//			unset($step);
-//
-//			if (array_key_exists('previous', $result) && $result['previous'] === true) {
-//				error(_s('Incorrect value for "%1$s" field.', _('Previous value')));
-//			}
-//			elseif ($this->show_final_result) {
-//				if (array_key_exists('result', $result)) {
-//					$output['final'] = [
-//						'action' => _s('Result converted to %1$s', itemValueTypeString($data['value_type'])),
-//						'result' => $result['result']
-//					];
-//				}
-//				elseif (array_key_exists('error', $result)) {
-//					$output['final'] = [
-//						'action' => ($test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR)
-//							? _('Set error to')
-//							: '',
-//						'error' => $result['error']
-//					];
-//				}
-//
-//				if ($output['final']['action'] !== '') {
-//					$output['final']['action'] = (new CSpan($output['final']['action']))
-//						->addClass(ZBX_STYLE_GREY)
-//						->toString();
-//				}
-//			}
-//
-//			$output['steps'] = $data['steps'];
-//		}
-//
-//		if (($messages = getMessages(false)) !== null) {
-//			$output['messages'] = $messages->toString();
-//		}
-//
-//		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
-	}
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	public function getInput($var, $default = null) {
-//		$value = parent::getInput($var, $default);
-//		if ($var === 'value' || $var === 'prev_value') {
-//			$value = str_replace("\r\n", "\n", $value);
-//
-//			if (parent::getInput('eol', ZBX_EOL_LF) == ZBX_EOL_CRLF) {
-//				$value = str_replace("\n", "\r\n", $value);
-//			}
-//		}
-//
-//		return $value;
+		$this->item_type = $this->getInput('item_type');
+		$this->is_item_testable = in_array($this->item_type, self::$testable_item_properties);
+
+		$data = $this->getItemTestProperties($this->getInputAll());
+
+		$output = [
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
+
+		// Send test to be executed on Zabbix server.
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+		$result = $server->testItem($data, get_cookie('zbx_sessionid'));
+
+		if ($result === false) {
+			error($server->getError());
+		}
+		elseif (is_array($result)) {
+			if (array_key_exists('value', $result)) {
+				$output['prev_value'] = $this->getInput('value', '');
+				$output['prev_time'] = $this->getPrevTime();
+				$output['value'] = $result['value'];
+			}
+
+			if (array_key_exists('error', $result) && $result['error'] !== '') {
+				error($result['error']);
+			}
+		}
+
+		if (($messages = getMessages(false)) !== null) {
+			$output['messages'] = $messages->toString();
+		}
+
+		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
 	}
 }

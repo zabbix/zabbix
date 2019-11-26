@@ -171,6 +171,28 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Request server to test item.
+	 *
+	 * @param array  $data    Array of item properties to test.
+	 * @param string $sid     User session ID.
+	 *
+	 * @return array
+	 */
+	public function testItem(array $data, $sid) {
+		// TODO miks: remove hardcoded value; uncomment code bellow.
+		return [
+			'value' => '',
+			'error' => ''
+		];
+
+//		return $this->request([
+//			'request' => 'item.test',
+//			'data' => $data,
+//			'sid' => $sid
+//		]);
+	}
+
+	/**
 	 * Retrieve item queue information.
 	 *
 	 * Possible $type values:

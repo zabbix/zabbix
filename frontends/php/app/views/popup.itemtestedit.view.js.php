@@ -94,31 +94,62 @@ function enableItemTestForm() {
 		.show();
 }
 
-function getItemValueTestDetails() {
-	return {};
-}
-
 /**
  * Send item get value request and display retrieved results.
- *
- * @param string formid  Selector for form to send.
  */
-function itemGetValueTest(form) {
-	var form = jQuery(form),
-		url;
+function itemGetValueTest() {
+	var $form = jQuery('#preprocessing-test-form'),
+		post_data = getItemTestProperties('#preprocessing-test-form'),
+		url = new Curl('zabbix.php');
 
-	url = new Curl('zabbix.php');
 	url.setArgument('action', 'popup.itemtest.getvalue');
+
+	post_data = jQuery.extend(post_data, {
+		interface: {
+			address: jQuery('#interface_address', $form).val(),
+			port: jQuery('#interface_port', $form).val()
+		},
+		host_proxy: jQuery('#host_proxy', $form).val(),
+		test_type: <?= $data['test_type'] ?>,
+		hostid: <?= $data['hostid'] ?>,
+		value: jQuery('#value', $form).multilineInput('value')
+	});
+
+	<?php if ($data['show_prev']) { ?>
+	post_data['time_change'] = (jQuery('#upd_prev').val() !== '')
+		? parseInt(jQuery('#upd_last').val()) - parseInt(jQuery('#upd_prev').val())
+		: Math.ceil(+new Date()/1000) - parseInt(jQuery('#upd_last').val());
+	<?php } ?>
+
+	delete post_data.interfaceid;
+	delete post_data.delay;
 
 	jQuery.ajax({
 		url: url.getUrl(),
-		data: getItemValueTestDetails(),
+		data: post_data,
 		beforeSend: disableItemTestForm,
 		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
+			$form.parent().find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(form));
+				jQuery(ret.messages).insertBefore($form);
+			}
+			else {
+				<?php if ($data['show_prev']) { ?>
+				if (typeof ret.prev_value !== 'undefined') {
+					jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
+					jQuery('#prev_time', $form).val(ret.prev_time);
+
+					jQuery('#upd_prev', $form).val(jQuery('#upd_last', $form).val());
+					jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
+				}
+				<?php } ?>
+
+				jQuery('#value', $form).multilineInput('value', ret.value);
+
+				if (typeof ret.eol !== 'undefined') {
+					jQuery("input[value="+ret.eol+"]", jQuery("#eol")).prop("checked", "checked");
+				}
 			}
 
 			enableItemTestForm();
@@ -133,14 +164,52 @@ function itemGetValueTest(form) {
  *
  * @param string formid  Selector for form to send.
  */
-function itemCompleteTest(form) {
-	var form = jQuery(form),
-		url = new Curl(jQuery(form).attr('action')),
-		is_prev_enabled = <?= $data['show_prev'] ? 'true' : 'false' ?>;
+function itemCompleteTest() {
+	var $form = jQuery('#preprocessing-test-form'),
+		url = new Curl('zabbix.php'),
+		is_prev_enabled = <?= $data['show_prev'] ? 'true' : 'false' ?>,
+		post_data = getItemTestProperties('#preprocessing-test-form'),
+		step_nums = [];
+
+	url.setArgument('action', 'popup.itemtest.send');
+
+	if (<?= $data['steps_num']; ?> > 0) {
+		step_nums = [...Array(<?= $data['steps_num']; ?>).keys()];
+	}
+	else {
+		step_nums = [0];
+	}
+
+	post_data = jQuery.extend(post_data, {
+		get_value: jQuery('#get_value', $form).is(":checked") ? 1 : 0,
+		steps: getPreprocessingSteps(step_nums),
+		interface: {
+			address: jQuery('#interface_address', $form).val(),
+			port: jQuery('#interface_port', $form).val()
+		},
+		host_proxy: jQuery('#host_proxy', $form).val(),
+		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
+		test_type: <?= $data['test_type'] ?>,
+		hostid: <?= $data['hostid'] ?>,
+		value: jQuery('#value', $form).multilineInput('value')
+	});
+
+	<?php if ($data['show_prev']) { ?>
+	if (post_data.get_value) {
+		post_data['time_change'] = (jQuery('#upd_prev').val() !== '')
+			? parseInt(jQuery('#upd_last').val()) - parseInt(jQuery('#upd_prev').val())
+			: Math.ceil(+new Date()/1000) - parseInt(jQuery('#upd_last').val());
+	}
+
+	post_data = jQuery.extend(post_data, {
+		prev_time: jQuery('#prev_time', $form).val(),
+		prev_value: jQuery('#prev_value', $form).multilineInput('value')
+	});
+	<?php } ?>
 
 	jQuery.ajax({
 		url: url.getUrl(),
-		data: jQuery(form).serialize(),
+		data: post_data,
 		beforeSend: function() {
 			disableItemTestForm();
 
@@ -153,12 +222,28 @@ function itemCompleteTest(form) {
 				.empty();
 		},
 		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
+			$form.parent().find('.msg-bad, .msg-good').remove();
+
+			if (typeof ret.messages !== 'undefined') {
+				jQuery(ret.messages).insertBefore($form);
+			}
 
 			processItemPreprocessingTestResults(ret.steps);
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(form));
+			<?php if ($data['show_prev']) { ?>
+			if (typeof ret.prev_value !== 'undefined') {
+				jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
+				jQuery('#prev_time', $form).val(ret.prev_time);
+
+				jQuery('#upd_prev', $form).val(jQuery('#upd_last', $form).val());
+				jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
+			}
+			<?php } ?>
+
+			jQuery('#value', $form).multilineInput('value', ret.value);
+
+			if (typeof ret.eol !== 'undefined') {
+				jQuery("input[value="+ret.eol+"]", jQuery("#eol")).prop("checked", "checked");
 			}
 
 			if (typeof ret.final !== 'undefined') {
@@ -230,20 +315,34 @@ function processItemPreprocessingTestResults(steps) {
 }
 
 /**
- * Collect values from opened preprocessing test dialog and save input values for repeated use.
+ * Collect values from opened item test dialog and save input values for repeated use.
  */
-function savePreprocessingTestInputs() {
-	var is_prev_enabled = <?= $data['show_prev'] ? 'true' : 'false' ?>,
+function saveItemTestInputs() {
+	var $form = jQuery('#preprocessing-test-form'),
+		$test_obj,
 		input_values = {
 			value: jQuery('#value').multilineInput('value'),
 			eol: jQuery('#eol').find(':checked').val()
 		},
 		macros = {};
 
-	if (is_prev_enabled) {
-		input_values.prev_value = jQuery('#prev_value').multilineInput('value');
-		input_values.prev_time = jQuery('#prev_time').val();
-	}
+	<?php if ($data['is_item_testable']) { ?>
+	input_values = jQuery.extend(input_values, {
+		get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
+		host_proxy: jQuery('#host_proxy', $form).val(),
+		interface: {
+			address: jQuery('#interface_address', $form).val(),
+			port: jQuery('#interface_port', $form).val()
+		}
+	});
+	<?php } ?>
+
+	<?php if ($data['show_prev']) { ?>
+	input_values = jQuery.extend(input_values, {
+		prev_value: jQuery('#prev_value').multilineInput('value'),
+		prev_time: jQuery('#prev_time').val()
+	});
+	<?php } ?>
 
 	jQuery('[name^=macros]').each(function(i, macro) {
 		var name = macro.name.toString();
@@ -251,14 +350,24 @@ function savePreprocessingTestInputs() {
 	});
 	input_values.macros = macros;
 
-	jQuery('<?= ($data['step_obj'] == -1)
-		? '.preprocessing-list-foot'
-		: '.preprocessing-list-item[data-step='.$data['step_obj'].']'
-	?>', jQuery('#preprocessing')).data('test-data', input_values);
+	<?php if ($data['step_obj'] == -2) { ?>
+		$test_obj = jQuery('.tfoot-buttons');
+	<?php } elseif ($data['step_obj'] == -1) { ?>
+		$test_obj = jQuery('preprocessing-list-foot', jQuery('#preprocessing'));
+	<?php } else { ?>
+		$test_obj = jQuery('.preprocessing-list-item[data-step=<?= $data['step_obj'] ?>]', jQuery('#preprocessing'));
+	<?php } ?>
+
+	console.log(input_values);
+	$test_obj.data('test-data', input_values)
 }
 
 jQuery(document).ready(function($) {
 	$('#final-result').hide();
+
+	<?php if ($data['show_prev']) { ?>
+	jQuery('#upd_last').val(Math.ceil(+new Date()/1000));
+	<?php } ?>
 
 	$('#value').multilineInput({
 		placeholder: <?= CJs::encodeJson(_('value')) ?>,
@@ -285,10 +394,18 @@ jQuery(document).ready(function($) {
 	$('#get_value').on('change', function() {
 		$rows = $('#host_address_row, #host_proxy_row, #get_value_row');
 		if ($(this).is(':checked')) {
+			<?php if (!$data['steps']) { ?>
+			$('.submit-test-btn').prop('disabled', false);
+			<?php } ?>
+
 			$('input, select', $rows).prop('disabled', false);
 			$rows.show();
 		}
 		else {
+			<?php if (!$data['steps']) { ?>
+			$('.submit-test-btn').prop('disabled', true);
+			<?php } ?>
+
 			$('input, select', $rows).prop('disabled', true);
 			$rows.hide();
 		}

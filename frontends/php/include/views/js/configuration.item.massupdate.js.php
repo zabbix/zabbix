@@ -1,6 +1,7 @@
 <?php
 include dirname(__FILE__).'/item.preprocessing.js.php';
 include dirname(__FILE__).'/editabletable.js.php';
+include dirname(__FILE__).'/itemtest.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="custom_intervals_row">
 	<tr class="form_row">

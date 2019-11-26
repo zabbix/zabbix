@@ -26,26 +26,80 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 	protected function checkInput() {
 		$fields = [
-			'hostid' => 'db hosts.hostid',
-			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
-			'test_type' => 'in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
-			'item_type' => 'required|int32',
-			'steps' => 'required|array',
-			'delay' => 'string',
+			'authtype' => 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'data' => 'array',
-			'step_obj' => 'required|int32',
+			'delay' => 'string',
+			'get_value' => 'in 0,1',
+			'headers' => 'array',
+			'host_proxy' => 'db hosts.proxy_hostid',
+			'hostid' => 'db hosts.hostid',
+			'http_proxy' => 'string',
+			'follow_redirects' => 'in 0,1',
+			'key' => 'string',
+			'interfaceid' => 'db interface.interfaceid',
+			'ipmi_sensor' => 'string',
+			'item_type' => 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT]),
+			'jmx_endpoint' => 'string',
+			'output_format' => 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
+			'params' => 'string',
+			'password' => 'string',
+			'post_type' => 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
+			'posts' => 'string',
+			'privatekey' => 'string',
+			'publickey' => 'string',
+			'query_fields' => 'array',
+			'request_method' => 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
+			'retrieve_mode' => 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
 			'show_final_result' => 'in 0,1',
-			'get_value' => 'in 0,1'
+			'snmp_oid' => 'string',
+			'snmp_community' => 'string',
+			'snmpv3_securityname' => 'string',
+			'snmpv3_contextname' => 'string',
+			'snmpv3_securitylevel' => 'string',
+			'snmpv3_authprotocol' => 'in '.implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA]),
+			'snmpv3_authpassphrase' => 'string',
+			'snmpv3_privprotocol' => 'string',
+			'snmpv3_privpassphrase' => 'string',
+			'step_obj' => 'required|int32',
+			'steps' => 'array',
+			'ssl_cert_file' => 'string',
+			'ssl_key_file' => 'string',
+			'ssl_key_password' => 'string',
+			'status_codes' => 'string',
+			'test_type' => 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'timeout' => 'string',
+			'username' => 'string',
+			'url' => 'string',
+			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
+			'verify_host' => 'in 0,1',
+			'verify_peer' => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
+			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
 			$this->preproc_item = self::getPreprocessingItemType($this->getInput('test_type'));
+			$this->is_item_testable = in_array($this->item_type, self::$testable_item_properties);
 
-			if (($error = $this->preproc_item->validateItemPreprocessingSteps($this->getInput('steps'))) !== true) {
+			// Check if key is not empty for item types it's mandatory.
+			if (in_array($this->item_type, $this->item_types_has_key_mandatory) && $this->getInput('key', '') === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', _('cannot be empty')));
 				$ret = false;
-				error($error);
+			}
+
+			/*
+			 * Either the item must be testable or at least one preprocessing test must be passed ("Test" button should
+			 * be disabled otherwise).
+			 */
+			$steps = $this->getInput('steps', []);
+			$steps_validation_response = $steps ? $this->preproc_item->validateItemPreprocessingSteps($steps) : true;
+			if (!$this->is_item_testable && $steps_validation_response !== true) {
+				error(($steps_validation_response !== true)
+					? $steps_validation_response
+					: _s('Test of "%1$s" items is not supported.', item_type2str($this->item_type))
+				);
+				$ret = false;
 			}
 		}
 
@@ -61,17 +115,21 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 	}
 
 	protected function doAction() {
-		$preprocessing_steps = $this->getInput('steps');
+		// Get item and host properties and values from cache.
+		$data = $this->getInput('data', []);
+		$inputs = $this->getItemTestProperties($data);
+
+		// Work with preprocessing steps.
+		$preprocessing_steps = $this->getInput('steps', []);
 		$preprocessing_types = zbx_objectValues($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
 		$support_lldmacros = ($this->preproc_item instanceof CItemPrototype);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
-		$data = $this->getInput('data', []);
 
 		// Extract macros and get effective values.
 		$usermacros = CMacrosResolverHelper::extractMacrosFromPreprocessingSteps([
 			'steps' => $preprocessing_steps,
-			'hostid' => $this->getInput('hostid', 0),
+			'hostid' => $this->host ? $this->host['hostid'] : 0,
 			'delay' => $show_prev ? $this->getInput('delay', ZBX_ITEM_DELAY_DEFAULT) : ''
 		], $support_lldmacros);
 
@@ -109,8 +167,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		unset($step);
 
 		$this->setResponse(new CControllerResponseData([
-			'title' => _('Test item preprocessing'),
+			'title' => _('Test item'),
 			'steps' => $preprocessing_steps,
+			'steps_num' => count($preprocessing_steps),
 			'value' => array_key_exists('value', $data) ? $data['value'] : '',
 			'eol' => array_key_exists('eol', $data) ? (int) $data['eol'] : ZBX_EOL_LF,
 			'prev_value' => ($show_prev && array_key_exists('prev_value', $data)) ? $data['prev_value'] : '',
@@ -118,14 +177,15 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'show_prev' => $show_prev,
 			'prev_time' => $prev_time,
 			'hostid' => $this->getInput('hostid'),
-			'value_type' => $this->getInput('value_type'),
 			'test_type' => $this->getInput('test_type'),
 			'step_obj' => $this->getInput('step_obj'),
 			'show_final_result' => $this->getInput('show_final_result'),
-			'get_value' => (bool) $this->getInput('get_value'),
-			'is_item_testable' => in_array($this->getInput('item_type'), self::$testable_item_types),
+			'get_value' => array_key_exists('get_value', $data)
+				? $data['get_value']
+				: $this->getInput('get_value', 0),
+			'is_item_testable' => $this->is_item_testable,
+			'inputs' => $inputs,
 			'proxies' => $this->getHostProxies(),
-			'proxy_hostid' => 0,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

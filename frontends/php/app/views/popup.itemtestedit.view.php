@@ -21,12 +21,23 @@
 
 $form = (new CForm())
 	->cleanItems()
-	->addVar('action', 'popup.itemtest.send')
-	->addVar('hostid', $data['hostid'])
-	->addVar('value_type', $data['value_type'])
-	->addVar('test_type', $data['test_type'])
-	->addVar('show_final_result', $data['show_final_result'])
-	->setId('preprocessing-test-form');
+	->setId('preprocessing-test-form')
+	->addVar('upd_last', '')
+	->addVar('upd_prev', '');
+
+if ($data['show_prev']) {
+	$form
+		->addVar('upd_last', '')
+		->addVar('upd_prev', '');
+}
+
+foreach ($data['inputs'] as $name => $value) {
+	if (in_array($name, ['interface'])) {
+		continue;
+	}
+
+	$form->addVar($name, $value);
+}
 
 // Create macros table.
 $macros_table = $data['macros'] ? (new CTable())->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER) : null;
@@ -95,9 +106,9 @@ if ($data['is_item_testable']) {
 		->addRow(
 			new CLabel(_('Host address'), 'host_address'),
 			(new CDiv([
-				(new CTextBox('host_address', $data['host_address']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				(new CTextBox('interface[address]', $data['inputs']['interface']['address']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				new CLabel(_('Port'), 'port'),
-				(new CTextBox('host_port', $data['host_address']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				(new CTextBox('interface[port]', $data['inputs']['interface']['port']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			]))->addClass('item-test-popup-value-row'),
 			'host_address_row'
 		)
@@ -225,14 +236,14 @@ $output = [
 	'header' => $data['title'],
 	'script_inline' => require 'app/views/popup.itemtestedit.view.js.php',
 	'body' => (new CDiv([$form, $templates]))->toString(),
-	'cancel_action' => 'return savePreprocessingTestInputs();',
+	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [
 		[
 			'title' => _('Test'),
 			'class' => 'submit-test-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return itemCompleteTest("#'.$form->getId().'");'
+			'action' => 'return itemCompleteTest();'
 		]
 	]
 ];
