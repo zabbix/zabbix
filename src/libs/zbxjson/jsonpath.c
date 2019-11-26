@@ -2367,9 +2367,6 @@ void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath)
 		jsonpath_segment_clear(&jsonpath->segments[i]);
 
 	zbx_free(jsonpath->segments);
-	jsonpath->segments_num = 0;
-	jsonpath->segments_alloc = 0;
-	jsonpath->definite = 0;
 }
 
 /******************************************************************************
@@ -2493,7 +2490,7 @@ int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char *
 	int			path_depth = 0, ret = SUCCEED;
 	zbx_vector_str_t	objects;
 
-	if (SUCCEED != zbx_jsonpath_compile(path, &jsonpath))
+	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
 		return FAIL;
 
 	zbx_vector_str_create(&objects);

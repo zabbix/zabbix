@@ -378,7 +378,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 
 	if (STAT_SUCCESS == status)
 	{
-		zbx_snprintf(error, max_error_len, "SNMP error: %s", response ? snmp_errstring(response->errstat) : "");
+		zbx_snprintf(error, max_error_len, "SNMP error: %s", snmp_errstring(response->errstat));
 		ret = NOTSUPPORTED;
 	}
 	else if (STAT_ERROR == status)
@@ -1107,7 +1107,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 			goto next;
 		}
-		else if (STAT_SUCCESS != status || (NULL != response && SNMP_ERR_NOERROR != response->errstat))
+		else if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
 			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
 			running = 0;
@@ -1115,105 +1115,102 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		}
 
 		/* process response */
-		if (NULL != response)
+		for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
 		{
-			for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
+			/* verify if we are in the same subtree */
+			if (SNMP_ENDOFMIBVIEW == var->type || var->name_length < rootOID_len ||
+					0 != memcmp(rootOID, var->name, rootOID_len * sizeof(oid)))
 			{
-				/* verify if we are in the same subtree */
-				if (SNMP_ENDOFMIBVIEW == var->type || var->name_length < rootOID_len ||
-						0 != memcmp(rootOID, var->name, rootOID_len * sizeof(oid)))
-				{
-					/* reached the end or past this subtree */
-					running = 0;
-					break;
-				}
-				else if (SNMP_NOSUCHOBJECT != var->type && SNMP_NOSUCHINSTANCE != var->type)
-				{
-					/* not an exception value */
+				/* reached the end or past this subtree */
+				running = 0;
+				break;
+			}
+			else if (SNMP_NOSUCHOBJECT != var->type && SNMP_NOSUCHINSTANCE != var->type)
+			{
+				/* not an exception value */
 
-					if (1 == check_oid_increase)	/* typical case */
+				if (1 == check_oid_increase)	/* typical case */
+				{
+					int	res;
+
+					/* normally devices return OIDs in increasing order, */
+					/* snmp_oid_compare() will return -1 in this case */
+
+					if (-1 != (res = snmp_oid_compare(anOID, anOID_len, var->name,
+							var->name_length)))
 					{
-						int	res;
-
-						/* normally devices return OIDs in increasing order, */
-						/* snmp_oid_compare() will return -1 in this case */
-
-						if (-1 != (res = snmp_oid_compare(anOID, anOID_len, var->name,
-								var->name_length)))
+						if (0 == res)	/* got the same OID */
 						{
-							if (0 == res)	/* got the same OID */
-							{
-								zbx_strlcpy(error, "OID not changing.", max_error_len);
-								ret = NOTSUPPORTED;
-								running = 0;
-								break;
-							}
-							else	/* 1 == res */
-							{
-								/* OID decreased. Disable further checks of increasing */
-								/* and set up a protection against endless looping. */
+							zbx_strlcpy(error, "OID not changing.", max_error_len);
+							ret = NOTSUPPORTED;
+							running = 0;
+							break;
+						}
+						else	/* 1 == res */
+						{
+							/* OID decreased. Disable further checks of increasing */
+							/* and set up a protection against endless looping. */
 
-								check_oid_increase = 0;
-								zbx_detect_loop_init(&oids_seen);
-							}
+							check_oid_increase = 0;
+							zbx_detect_loop_init(&oids_seen);
 						}
 					}
-
-					if (0 == check_oid_increase && FAIL == zbx_oid_is_new(&oids_seen, rootOID_len,
-							var->name, var->name_length))
-					{
-						zbx_strlcpy(error, "OID loop detected or too many OIDs.", max_error_len);
-						ret = NOTSUPPORTED;
-						running = 0;
-						break;
-					}
-
-					if (SUCCEED != zbx_snmp_choose_index(oid_index, sizeof(oid_index), var->name,
-							var->name_length, root_string_len, root_numeric_len))
-					{
-						zbx_snprintf(error, max_error_len, "zbx_snmp_choose_index():"
-								" cannot choose appropriate index while walking for"
-								" OID \"%s\".", snmp_oid);
-						ret = NOTSUPPORTED;
-						running = 0;
-						break;
-					}
-
-					init_result(&snmp_result);
-
-					if (SUCCEED == zbx_snmp_set_result(var, &snmp_result) &&
-							NULL != GET_STR_RESULT(&snmp_result))
-					{
-						walk_cb_func(walk_cb_arg, snmp_oid, oid_index, snmp_result.str);
-					}
-					else
-					{
-						char	**msg;
-
-						msg = GET_MSG_RESULT(&snmp_result);
-
-						zabbix_log(LOG_LEVEL_DEBUG, "cannot get index '%s' string value: %s",
-								oid_index, NULL != msg && NULL != *msg ? *msg : "(null)");
-					}
-
-					free_result(&snmp_result);
-
-					/* go to next variable */
-					memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
-					anOID_len = var->name_length;
 				}
-				else
-				{
-					/* an exception value, so stop */
-					char	*errmsg;
 
-					errmsg = zbx_get_snmp_type_error(var->type);
-					zbx_strlcpy(error, errmsg, max_error_len);
-					zbx_free(errmsg);
+				if (0 == check_oid_increase && FAIL == zbx_oid_is_new(&oids_seen, rootOID_len,
+						var->name, var->name_length))
+				{
+					zbx_strlcpy(error, "OID loop detected or too many OIDs.", max_error_len);
 					ret = NOTSUPPORTED;
 					running = 0;
 					break;
 				}
+
+				if (SUCCEED != zbx_snmp_choose_index(oid_index, sizeof(oid_index), var->name,
+						var->name_length, root_string_len, root_numeric_len))
+				{
+					zbx_snprintf(error, max_error_len, "zbx_snmp_choose_index():"
+							" cannot choose appropriate index while walking for"
+							" OID \"%s\".", snmp_oid);
+					ret = NOTSUPPORTED;
+					running = 0;
+					break;
+				}
+
+				init_result(&snmp_result);
+
+				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result) &&
+						NULL != GET_STR_RESULT(&snmp_result))
+				{
+					walk_cb_func(walk_cb_arg, snmp_oid, oid_index, snmp_result.str);
+				}
+				else
+				{
+					char	**msg;
+
+					msg = GET_MSG_RESULT(&snmp_result);
+
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot get index '%s' string value: %s",
+							oid_index, NULL != msg && NULL != *msg ? *msg : "(null)");
+				}
+
+				free_result(&snmp_result);
+
+				/* go to next variable */
+				memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
+				anOID_len = var->name_length;
+			}
+			else
+			{
+				/* an exception value, so stop */
+				char	*errmsg;
+
+				errmsg = zbx_get_snmp_type_error(var->type);
+				zbx_strlcpy(error, errmsg, max_error_len);
+				zbx_free(errmsg);
+				ret = NOTSUPPORTED;
+				running = 0;
+				break;
 			}
 		}
 
@@ -1294,7 +1291,7 @@ retry:
 			__func__, status, ss->s_snmp_errno, NULL == response ? (long)-1 : response->errstat,
 			mapping_num);
 
-	if (STAT_SUCCESS == status && NULL != response && SNMP_ERR_NOERROR == response->errstat)
+	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
 		for (i = 0, var = response->variables;; i++, var = var->next_variable)
 		{
@@ -1384,8 +1381,7 @@ retry:
 				*min_fail = mapping_num;
 		}
 	}
-	else if (STAT_SUCCESS == status && NULL != response && SNMP_ERR_NOSUCHNAME == response->errstat &&
-			0 != response->errindex)
+	else if (STAT_SUCCESS == status && SNMP_ERR_NOSUCHNAME == response->errstat && 0 != response->errindex)
 	{
 		/* If a request PDU contains a bad variable, the specified behavior is different between SNMPv1 and */
 		/* later versions. In SNMPv1, the whole PDU is rejected and "response->errindex" is set to indicate */
