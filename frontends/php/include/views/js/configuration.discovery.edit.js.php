@@ -21,8 +21,7 @@
 			(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 				->setId('uniqueness_criteria_#{dcheckid}'),
-			(new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}'))
-				->addClass(ZBX_STYLE_WORDWRAP)
+			(new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
 		]))
 			->setId('uniqueness_criteria_row_#{dcheckid}')
 			->toString()
@@ -34,7 +33,7 @@
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 				->setAttribute('data-id', '#{dcheckid}')
 				->setId('host_source_#{dcheckid}'),
-			new CLabel([new CSpan(), '#{name}'], 'host_source_#{dcheckid}')
+			(new CLabel([new CSpan(), '#{name}'], 'host_source_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
 		]))
 			->setId('host_source_row_#{dcheckid}')
 			->toString()
@@ -46,7 +45,7 @@
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 				->setAttribute('data-id', '#{dcheckid}')
 				->setId('name_source_#{dcheckid}'),
-			new CLabel([new CSpan(), '#{name}'], 'name_source_#{dcheckid}')
+			(new CLabel([new CSpan(), '#{name}'], 'name_source_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
 		]))
 			->setId('name_source_row_#{dcheckid}')
 			->toString()

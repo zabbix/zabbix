@@ -3173,20 +3173,22 @@ static int	parse_history_data_row_itemid(const struct zbx_json_parse *jp_row, zb
  ******************************************************************************/
 static int	parse_history_data_row_hostkey(const struct zbx_json_parse *jp_row, zbx_host_key_t *hk)
 {
-	char	buffer[MAX_STRING_LEN];
+	size_t str_alloc;
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_HOST, buffer, sizeof(buffer), NULL))
+	str_alloc = 0;
+	zbx_free(hk->host);
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_HOST, &hk->host, &str_alloc, NULL))
 		return FAIL;
 
-	hk->host = zbx_strdup(hk->host, buffer);
+	str_alloc = 0;
+	zbx_free(hk->key);
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_KEY, buffer, sizeof(buffer), NULL))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_KEY, &hk->key, &str_alloc, NULL))
 	{
 		zbx_free(hk->host);
 		return FAIL;
 	}
-
-	hk->key = zbx_strdup(hk->key, buffer);
 
 	return SUCCEED;
 }
@@ -3532,6 +3534,7 @@ static int	agent_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error)
 {
 	zbx_host_rights_t	*rights;
+	char			key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	if (0 != item->host.proxy_hostid)
 		return FAIL;
@@ -3542,7 +3545,8 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 			if (0 == item->allow_traps)
 			{
 				*error = zbx_dsprintf(*error, "cannot process HTTP agent item \"%s\" trap:"
-						" trapping is not enabled", item->key_orig);
+						" trapping is not enabled", zbx_truncate_itemkey(item->key_orig,
+						VALUE_ERRMSG_MAX, key_short, sizeof(key_short)));
 				return FAIL;
 			}
 			break;
@@ -3550,7 +3554,9 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap:"
-					" item type \"%d\" cannot be used with traps", item->key_orig, item->type);
+					" item type \"%d\" cannot be used with traps",
+					zbx_truncate_itemkey(item->key_orig, VALUE_ERRMSG_MAX, key_short,
+					sizeof(key_short)), item->type);
 			return FAIL;
 	}
 
@@ -3568,7 +3574,8 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 		if (FAIL == ret)
 		{
 			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap: %s",
-					item->key_orig, zbx_socket_strerror());
+					zbx_truncate_itemkey(item->key_orig, VALUE_ERRMSG_MAX, key_short,
+					sizeof(key_short)), zbx_socket_strerror());
 			return FAIL;
 		}
 	}

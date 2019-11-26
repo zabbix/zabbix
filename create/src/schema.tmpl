@@ -214,7 +214,7 @@ TABLE|dchecks|dcheckid|ZBX_DATA
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0
 FIELD		|druleid	|t_id		|	|NOT NULL	|ZBX_PROXY		|1|drules
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|key_		|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY
@@ -301,7 +301,7 @@ FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_oid	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|delay		|t_varchar(1024)|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|history	|t_varchar(255)	|'90d'	|NOT NULL	|0
 FIELD		|trends		|t_varchar(255)	|'365d'	|NOT NULL	|0
@@ -354,7 +354,7 @@ FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|verify_peer	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-UNIQUE		|1		|hostid,key_
+INDEX		|1		|hostid,key_(1021)
 INDEX		|3		|status
 INDEX		|4		|templateid
 INDEX		|5		|valuemapid
@@ -1326,7 +1326,7 @@ TABLE|item_discovery|itemdiscoveryid|ZBX_TEMPLATE
 FIELD		|itemdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|parent_itemid	|t_id		|	|NOT NULL	|0			|2|items	|itemid
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|itemid,parent_itemid
@@ -1705,4 +1705,4 @@ UNIQUE		|1		|tls_psk_identity
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4050000	|4050000
+ROW		|4050007	|4050007

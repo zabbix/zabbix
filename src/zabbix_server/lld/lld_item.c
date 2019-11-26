@@ -937,8 +937,16 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	}
 	else if (zbx_strlen_utf8(*field) > field_len)
 	{
+		const char	*err_val;
+		char		key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+		if (0 != (flag & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
+			err_val = zbx_truncate_itemkey(*field, VALUE_ERRMSG_MAX, key_short, sizeof(key_short));
+		else
+			err_val = zbx_truncate_value(*field, VALUE_ERRMSG_MAX, key_short, sizeof(key_short));
+
 		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" is too long.\n",
-				(0 != item->itemid ? "update" : "create"), *field);
+				(0 != item->itemid ? "update" : "create"), err_val);
 	}
 	else
 	{
@@ -1615,8 +1623,12 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 		if (NULL != zbx_hashset_search(&items_keys, &item->key))
 		{
+			char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
 			*error = zbx_strdcatf(*error, "Cannot %s item: item with the same key \"%s\" already exists.\n",
-						(0 != item->itemid ? "update" : "create"), item->key);
+						(0 != item->itemid ? "update" : "create"),
+						zbx_truncate_itemkey(item->key, VALUE_ERRMSG_MAX,
+						key_short, sizeof(key_short)));
 
 			if (0 != item->itemid)
 			{
@@ -1706,9 +1718,13 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 				if (0 == strcmp(item->key, row[0]))
 				{
+					char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
 					*error = zbx_strdcatf(*error, "Cannot %s item:"
 							" item with the same key \"%s\" already exists.\n",
-							(0 != item->itemid ? "update" : "create"), item->key);
+							(0 != item->itemid ? "update" : "create"),
+							zbx_truncate_itemkey(item->key, VALUE_ERRMSG_MAX,
+							key_short, sizeof(key_short)));
 
 					if (0 != item->itemid)
 					{
