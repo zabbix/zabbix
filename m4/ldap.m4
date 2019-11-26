@@ -119,9 +119,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                         AC_MSG_CHECKING([compatibility of static LDAP libs])
                         test "x$static_linking_support" = "xno" -a -z "$_ldap_dir_lib" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
 
-                        if test "x$static_linking_support" = "xno" -a "x$ARCH" = "xaix"; then
-                                LDAP_LIBS=`echo "$LDAP_LIBS"|sed "s|-lldap|$_ldap_dir_lib/libldap_a|g"|sed "s|-llber|$_ldap_dir_lib/liblber_a|g"`
-                        elif test "x$static_linking_support" = "xno"; then
+                        if test "x$static_linking_support" = "xno"; then
                                 LDAP_LIBS=`echo "$LDAP_LIBS"|sed "s|-lldap|$_ldap_dir_lib/libldap.a|g"|sed "s|-llber|$_ldap_dir_lib/liblber.a|g"`
                         fi
 
@@ -129,7 +127,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                         if test "x$static_linking_support" = "xno"; then
                                 TRY_LDAP_LIBS="$LDAP_LIBS -lpthread -lsasl2"
                         else
-                                TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lpthread -lsasl2"
+                                TRY_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic -lpthread -lsasl2"
                         fi
                         LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                 LDAP_LIBS=$TRY_LDAP_LIBS
@@ -141,7 +139,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 if test "x$static_linking_support" = "xno"; then
                                         TRY_LDAP_LIBS="$LDAP_LIBS -lpthread -lsasl"
                                 else
-                                        TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lpthread -lsasl"
+                                        TRY_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic -lpthread -lsasl"
                                 fi
                                 LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                         LDAP_LIBS=$TRY_LDAP_LIBS
@@ -154,7 +152,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 if test "x$static_linking_support" = "xno"; then
                                         TRY_LDAP_LIBS="$LDAP_LIBS -lgnutls -lsasl2 -lgssapi_krb5 -lpthread"
                                 else
-                                        TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lgnutls -lsasl2 -lgssapi_krb5 -lpthread"
+                                        TRY_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic -lgnutls -lsasl2 -lgssapi_krb5 -lpthread"
                                 fi
                                 LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                         LDAP_LIBS=$TRY_LDAP_LIBS
@@ -167,7 +165,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 if test "x$static_linking_support" = "xno"; then
                                         OSSL_LDAP_LIBS="$LDAP_LIBS $OPENSSL_LIBS -lsasl2"
                                 else
-                                        OSSL_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -lsasl2 -Wl,-Bdynamic $OPENSSL_LIBS"
+                                        OSSL_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS -lsasl2 ${static_linking_support}dynamic $OPENSSL_LIBS"
                                 fi
                                 OSSL_LDAP_CPPFLAGS="$LDAP_CPPFLAGS $OPENSSL_CPPFLAGS"
                                 OSSL_LDAP_CFLAGS="$LDAP_CPPFLAGS $OPENSSL_CFLAGS"
@@ -183,7 +181,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 if test "x$static_linking_support" = "xno"; then
                                         OSSL_LDAP_LIBS="$LDAP_LIBS $OPENSSL_LIBS -lsasl2"
                                 else
-                                        OSSL_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic $OPENSSL_LIBS -lsasl2"
+                                        OSSL_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic $OPENSSL_LIBS -lsasl2"
                                 fi
                                 OSSL_LDAP_CPPFLAGS="$LDAP_CPPFLAGS $OPENSSL_CPPFLAGS"
                                 OSSL_LDAP_CFLAGS="$LDAP_CPPFLAGS $OPENSSL_CFLAGS"
@@ -199,7 +197,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 if test "x$static_linking_support" = "xno"; then
                                         OSSL_LDAP_LIBS="$LDAP_LIBS $OPENSSL_LIBS -lsasl"
                                 else
-                                        OSSL_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic $OPENSSL_LIBS -lsasl"
+                                        OSSL_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic $OPENSSL_LIBS -lsasl"
                                 fi
                                 OSSL_LDAP_CPPFLAGS="$LDAP_CPPFLAGS $OPENSSL_CPPFLAGS"
                                 OSSL_LDAP_CFLAGS="$LDAP_CPPFLAGS $OPENSSL_CFLAGS"
@@ -217,7 +215,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 if test "x$static_linking_support" = "xno"; then
                                         TRY_LDAP_LIBS="$LDAP_LIBS -lssl -lsasl2 -lcrypto"
                                 else
-                                        TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -lsasl2 -Wl,-Bdynamic -lssl -lcrypto"
+                                        TRY_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS -lsasl2 ${static_linking_support}dynamic -lssl -lcrypto"
                                 fi
                                 LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                         LDAP_LIBS=$TRY_LDAP_LIBS
@@ -230,7 +228,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 if test "x$static_linking_support" = "xno"; then
                                         TRY_LDAP_LIBS="$LDAP_LIBS -lssl -lsasl2 -lcrypto"
                                 else
-                                        TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lssl -lsasl2 -lcrypto"
+                                        TRY_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic -lssl -lsasl2 -lcrypto"
                                 fi
                                 LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                         LDAP_LIBS=$TRY_LDAP_LIBS
@@ -243,7 +241,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 if test "x$static_linking_support" = "xno"; then
                                         TRY_LDAP_LIBS="$LDAP_LIBS -lssl -lsasl -lcrypto"
                                 else
-                                        TRY_LDAP_LIBS="-Wl,-Bstatic $LDAP_LIBS -Wl,-Bdynamic -lssl -lsasl -lcrypto"
+                                        TRY_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic -lssl -lsasl -lcrypto"
                                 fi
                                 LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                         LDAP_LIBS=$TRY_LDAP_LIBS

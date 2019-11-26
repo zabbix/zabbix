@@ -99,7 +99,7 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
         test "x$static_linking_support" = "xno" -a -z "$_libopenssl_dir_lib" && AC_MSG_ERROR(["OpenSSL: Compiler not support statically linked libs from default folders"])
         AC_REQUIRE([PKG_PROG_PKG_CONFIG])
         PKG_PROG_PKG_CONFIG()
-        test -z $PKG_CONFIG && AC_MSG_ERROR([Not found pkg-config library])
+        test -z "$PKG_CONFIG" -a -z "$_libopenssl_dir_lib" && AC_MSG_ERROR([Not found pkg-config library])
         m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
     fi
 
@@ -140,7 +140,9 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
     am_save_ldflags="$LDFLAGS"
     am_save_libs="$LIBS"
 
-    if test "x$enable_static_libs" = "xyes"; then
+    if test "x$enable_static_libs" = "xyes" -a -z "$PKG_CONFIG"; then
+      OPENSSL_LIBS="$_libopenssl_dir_lib/libssl.a $_libopenssl_dir_lib/libcrypto.a"
+    elif test "x$enable_static_libs" = "xyes"; then
       if test "x$_libopenssl_dir" = "xno" -o -z "$_libopenssl_dir"; then
         PKG_CHECK_EXISTS(openssl,[
           OPENSSL_LIBS=`$PKG_CONFIG --static --libs openssl`
@@ -152,14 +154,10 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
         OPENSSL_LIBS=`PKG_CONFIG_LIBDIR="$_libopenssl_dir/lib/pkgconfig" $PKG_CONFIG --static --libs openssl`
       fi
 
-      if test "x$static_linking_support" = "xno" -a "x$ARCH" = "xaix"; then
-        OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed "s|-lssl_a|$_libopenssl_dir_lib/ssl_a|g"|sed "s|-lcrypto_a|$_libopenssl_dir_lib/crypto_a|g"`
-      elif test "x$static_linking_support" = "xno"; then
+      if test "x$static_linking_support" = "xno"; then
         OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed "s|-lssl|$_libopenssl_dir_lib/libssl.a|g"|sed "s|-lcrypto|$_libopenssl_dir_lib/libcrypto.a|g"`
-      elif test "x$ARCH" = "xaix"; then
-        OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed 's/-lssl_a/-Wl,-Bstatic -lssl_a -Wl,-Bdynamic/g'|sed 's/-lcrypto_a/-Wl,-Bstatic -lcrypto_a -Wl,-Bdynamic/g'`
       else
-        OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed 's/-lssl/-Wl,-Bstatic -lssl -Wl,-Bdynamic/g'|sed 's/-lcrypto/-Wl,-Bstatic -lcrypto -Wl,-Bdynamic/g'`
+        OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed "s/-lssl/${static_linking_support}static -lssl ${static_linking_support}dynamic/g'|sed 's/-lcrypto/${static_linking_support}static -lcrypto ${static_linking_support}dynamic/g"`
       fi
     fi
 

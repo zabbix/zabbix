@@ -98,14 +98,10 @@ AC_HELP_STRING([--with-iconv@<:@=DIR@:>@], [use iconv from given base install di
 			if test "x$enable_static_libs" = "xyes"; then
 				test "x$static_linking_support" = "xno" -a -z "$_iconv_dir_lib" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
 
-				if test "x$static_linking_support" = "xno" -a "x$ARCH" = "xaix"; then
-					ICONV_LIBS="$_iconv_dir_lib/libiconv_a"
-				elif test "x$static_linking_support" = "xno"; then
+				if test "x$static_linking_support" = "xno"; then
 					ICONV_LIBS="$_iconv_dir_lib/libiconv.a"
-				elif test "x$ARCH" = "xaix"; then
-					ICONV_LIBS="-Wl,-Bstatic -liconv_a -Wl,-Bdynamic"
 				else
-					ICONV_LIBS="-Wl,-Bstatic $ICONV_LIBS -Wl,-Bdynamic"
+					ICONV_LIBS="${static_linking_support}static $ICONV_LIBS ${static_linking_support}dynamic"
 				fi
 			fi
 			LIBS="$LIBS $ICONV_LIBS"

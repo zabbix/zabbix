@@ -126,7 +126,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 								if test "x$enable_static_libs" = "xyes" -a "x$static_linking_support" = "xno"; then
 									i="$_curl_dir_lib/libcurl.a"
 								elif test "x$enable_static_libs" = "xyes"; then
-									i="-Wl,-Bstatic $i -Wl,-Bdynamic"
+									i="${static_linking_support}static $i ${static_linking_support}dynamic"
 								fi
 								LIBCURL_LIBS="$LIBCURL_LIBS $i"
 						;;
@@ -177,12 +177,6 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 													test "x$want_openssl" = "xyes" && i="$OPENSSL_LIBS"
 											;;
 												-lldap|-lldap_r|-llber)
-													test "x$want_ldap" = "xyes" && i="$LDAP_LIBS"
-											;;
-												-lssl_a|-lcrypto_a)
-													test "x$want_openssl" = "xyes" && i="$OPENSSL_LIBS"
-											;;
-												-lldap_a|-lldap_r_a|-llber_a)
 													test "x$want_ldap" = "xyes" && i="$LDAP_LIBS"
 											;;
 												-l*)

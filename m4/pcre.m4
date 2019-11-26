@@ -73,7 +73,7 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 	if test "x$enable_static_libs" = "xyes"; then
 		AC_REQUIRE([PKG_PROG_PKG_CONFIG])
 		PKG_PROG_PKG_CONFIG()
-		test -z $PKG_CONFIG && AC_MSG_ERROR([Not found pkg-config library])
+		test -z "$PKG_CONFIG" -a -z "$_libpcre_dir_lib" && AC_MSG_ERROR([Not found pkg-config library])
 		m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
 	fi
 
@@ -83,6 +83,8 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 
 	if test "x$enable_static" = "xyes"; then
 		LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
+	elif test "x$enable_static_libs" = "xyes" -a -z "$PKG_CONFIG"; then
+		LIBPCRE_LIBS="$_libpcre_dir_lib/libpcre.a"
 	elif test "x$enable_static_libs" = "xyes"; then
 
 		test "x$static_linking_support" = "xno" -a -z "$_libpcre_dir_lib" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
@@ -98,14 +100,10 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 			LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_dir/lib/pkgconfig" $PKG_CONFIG --static --libs libpcre`
 		fi
 
-		if test "x$static_linking_support" = "xno" -a "x$ARCH" = "xaix"; then
-			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s|-lpcre_a|$_libpcre_dir_lib/libpcre_a|g"`
-		elif test "x$static_linking_support" = "xno"; then
+		if test "x$static_linking_support" = "xno"; then
 			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s|-lpcre|$_libpcre_dir_lib/libpcre.a|g"`
-		elif test "x$ARCH" = "xaix"; then
-			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed 's/-lpcre_a/-Wl,-Bstatic -lpcre_a -Wl,-Bdynamic/g'`
 		else
-			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed 's/-lpcre/-Wl,-Bstatic -lpcre -Wl,-Bdynamic/g'`
+			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s/-lpcre/${static_linking_support}static -lpcre ${static_linking_support}dynamic/g"`
 		fi
 	fi
 
