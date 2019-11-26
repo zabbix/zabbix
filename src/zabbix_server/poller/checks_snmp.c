@@ -1007,7 +1007,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, root_string_len, root_numeric_len;
 	char			oid_index[MAX_STRING_LEN];
 	struct variable_list	*var;
-	int			status, level, running, num_vars = 0, check_oid_increase = 1, ret = SUCCEED;
+	int			status, level, running, num_vars, check_oid_increase = 1, ret = SUCCEED;
 	AGENT_RESULT		snmp_result;
 	zbx_hashset_t		oids_seen;
 
@@ -1438,8 +1438,8 @@ retry:
 		}
 	}
 	else if (1 < mapping_num &&
-			((STAT_SUCCESS == status && NULL != response && SNMP_ERR_TOOBIG == response->errstat) ||
-			STAT_TIMEOUT == status || (STAT_ERROR == status && SNMPERR_TOO_LONG == ss->s_snmp_errno)))
+			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status ||
+			(STAT_ERROR == status && SNMPERR_TOO_LONG == ss->s_snmp_errno)))
 	{
 		/* Since we are trying to obtain multiple values from the SNMP agent, the response that it has to  */
 		/* generate might be too big. It seems to be required by the SNMP standard that in such cases the  */
