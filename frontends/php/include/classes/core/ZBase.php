@@ -520,7 +520,7 @@ class ZBase {
 	 * for enabled modules.
 	 */
 	protected function initModules() {
-		$manager = new CModuleManager($this->rootDir.'/modules');
+		$manager = new CModuleManager($this->rootDir);
 		$modules = API::ModuleDetails()->get([
 			'output' => ['relative_path', 'id', 'config'],
 			'filter' => ['status' => 1]

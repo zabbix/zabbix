@@ -44,10 +44,10 @@ class CModuleManager {
 		/**
 	 * Create class object instance
 	 *
-	 * @param string $modules_dir    Absolute path to modules directory.
+	 * @param string $modules_dir    Absolute path to frontend root directory.
 	 */
-	public function __construct($modules_dir) {
-		$this->modules_dir = $modules_dir;
+	public function __construct($root_dir) {
+		$this->modules_dir = $root_dir.'/modules';
 	}
 
 	/**
