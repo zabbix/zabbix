@@ -353,6 +353,31 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_parameter_deprecated                                       *
+ *                                                                            *
+ * Purpose: check if configuration parameter is deprecated                    *
+ *                                                                            *
+ * Parameters: parameter_name - [IN] parameter name to check for deprecation  *
+ *                                                                            *
+ * Return value: SUCCEED - parameter is not deprecated                        *
+ *               FAIL    - parameter is deprecated                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_parameter_deprecated(const char *parameter_name)
+{
+	if (0 == strcmp(parameter_name, "EnableRemoteCommands"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s parameter is deprecated,"
+				" use AllowKey=system.run[*] or DenyKey=system.run[*] instead",
+				parameter_name);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: parse_cfg_file                                                   *
  *                                                                            *
  * Purpose: parse configuration file                                          *
@@ -431,6 +456,8 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 			zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
 
+			check_parameter_deprecated(parameter);
+
 			if (0 == strcmp(parameter, "Include"))
 			{
 				if (FAIL == parse_cfg_object(value, cfg, level, strict))
@@ -453,6 +480,14 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",
 						parameter, value);
+
+				if (NULL != cfg[i].custom_parser)
+				{
+					if (SUCCEED == cfg[i].custom_parser(value, &cfg[i]))
+						continue;
+					else
+						goto incorrect_config;
+				}
 
 				switch (cfg[i].type)
 				{

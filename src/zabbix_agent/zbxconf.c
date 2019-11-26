@@ -109,6 +109,36 @@ void	load_user_parameters(char **lines)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: load_key_access_rule                                             *
+ *                                                                            *
+ * Purpose: Adds key access rule from configuration                           *
+ *                                                                            *
+ * Parameters: value - [IN] key access rule parameter value                   *
+ *             cfg   - [IN] configuration parameter information               *
+ *                                                                            *
+ * Return value: SUCCEED - successful execution                               *
+ *               FAIL    - failed to add rule                                 *
+ *                                                                            *
+ * Author: Andrejs Tumilovics                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	load_key_access_rule(const char *value, void *cfg)
+{
+	zbx_key_access_rule_type_t	rule_type;
+	struct cfg_line			*line = (struct cfg_line*)cfg;
+
+	if (0 == strcmp(line->parameter, "AllowKey"))
+		rule_type = ZBX_KEY_ACCESS_ALLOW;
+	else if (0 == strcmp(line->parameter, "DenyKey"))
+		rule_type = ZBX_KEY_ACCESS_DENY;
+	else
+		return FAIL;
+
+	return add_key_access_rule(value, rule_type);
+}
+
 #ifdef _WINDOWS
 /******************************************************************************
  *                                                                            *

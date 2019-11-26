@@ -1141,3 +1141,33 @@ void	zbx_regexp_escape(char **string)
 	*string = buffer;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_wildcard_match                                               *
+ *                                                                            *
+ * Purpose: Matches string value to specified wildcard.                       *
+ *          Asterisk (*) characters match to any characters of any length.    *
+ *          Question mark (?) characters match any single character.          *
+ *                                                                            *
+ * Parameters: value    - [IN] string to match                                *
+ *             wildcard - [IN] wildcard string expression                     *
+ *                                                                            *
+ * Return value: 1 - value match the wildcard                                 *
+ *               0 - otherwise                                                *
+ *                                                                            *
+ * Author: Andrejs Tumilovics                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_wildcard_match(const char *value, const char *wildcard)
+{
+	if (*wildcard == '\0')
+		return *value == '\0';
+
+	if (*value == '\0')
+		return *wildcard == '\0' || (*wildcard == '*' && *(wildcard + 1) == '\0');
+
+	if (*wildcard == '*')
+		return zbx_wildcard_match(value, wildcard + 1) || zbx_wildcard_match(value + 1, wildcard);
+
+	return zbx_wildcard_match(value + 1, wildcard + 1) && ((*wildcard == '?') ? 1 : *value == *wildcard);
+}

@@ -47,14 +47,17 @@ extern int	CONFIG_LOG_FILE_SIZE;
 extern int	CONFIG_ALLOW_ROOT;
 extern int	CONFIG_TIMEOUT;
 
+typedef int	(*cfg_custom_parameter_parser_t)(const char *value, void *cfg);
+
 struct cfg_line
 {
-	const char	*parameter;
-	void		*variable;
-	int		type;
-	int		mandatory;
-	zbx_uint64_t	min;
-	zbx_uint64_t	max;
+	const char			*parameter;
+	void				*variable;
+	int				type;
+	int				mandatory;
+	zbx_uint64_t			min;
+	zbx_uint64_t			max;
+	cfg_custom_parameter_parser_t	custom_parser;
 };
 
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict);

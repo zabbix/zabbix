@@ -422,7 +422,12 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		else
 			mtime = atoi(tmp);
 
-		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime);
+		if (ZBX_KEY_ACCESS_ALLOW == check_key_access_rules(name))
+		{
+			add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime);
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "Key access denied: \"%s\"", name);
 
 		/* remember what was received */
 		zbx_vector_str_append(&received_metrics, zbx_strdup(NULL, key_orig));
