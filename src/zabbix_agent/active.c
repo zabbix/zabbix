@@ -423,9 +423,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 			mtime = atoi(tmp);
 
 		if (ZBX_KEY_ACCESS_ALLOW == check_key_access_rules(name))
-		{
 			add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime);
-		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Key access denied: \"%s\"", name);
 

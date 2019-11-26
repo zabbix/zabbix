@@ -69,6 +69,7 @@ void	zbx_mock_test_entry(void **state)
 		}
 
 		cfg[parameter_count].parameter = tmp;
+		cfg[parameter_count].custom_parser = NULL;
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_object_member(parameter, "type", &handle)) ||
 				ZBX_MOCK_SUCCESS != (error = zbx_mock_string(handle, &tmp)))
@@ -228,6 +229,7 @@ void	zbx_mock_test_entry(void **state)
 
 	cfg = zbx_realloc(cfg, (parameter_count + 1) * sizeof(struct cfg_line));
 	cfg[parameter_count].parameter = NULL;
+	cfg[parameter_count].custom_parser = NULL;
 
 	parse_cfg_file(cfg_file, cfg, ZBX_CFG_FILE_REQUIRED, strict);
 
