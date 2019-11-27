@@ -21,7 +21,7 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
-...G...PS. [ZBX-16988] reverted DEV-1334 changes (atumilovics)
+...G...PS. [ZBX-16988] fixed agent memory leak (atumilovics)
 ..F....... [ZBX-16649] fixed flexible textarea behavior (averza, vasilijs)
 ........S. [ZBX-16955] fixed performance of history syncers and timer processes by not locking each other when suppressing events (vso)
 ..F....... [ZBX-16884] fixed links to usergroups in user list (vmurzins)
