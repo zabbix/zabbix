@@ -71,6 +71,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'username' => 'string',
 			'url' => 'string',
 			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
+			'valuemapid' => 'int32',
 			'verify_host' => 'in 0,1',
 			'verify_peer' => 'in 0,1'
 		];
@@ -180,6 +181,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'test_type' => $this->getInput('test_type'),
 			'step_obj' => $this->getInput('step_obj'),
 			'show_final_result' => $this->getInput('show_final_result'),
+			'valuemapid' => $this->getInput('valuemapid', 0),
 			'get_value' => array_key_exists('get_value', $data)
 				? $data['get_value']
 				: $this->getInput('get_value', 0),

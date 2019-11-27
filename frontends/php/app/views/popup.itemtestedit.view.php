@@ -21,9 +21,7 @@
 
 $form = (new CForm())
 	->cleanItems()
-	->setId('preprocessing-test-form')
-	->addVar('upd_last', '')
-	->addVar('upd_prev', '');
+	->setId('preprocessing-test-form');
 
 if ($data['show_prev']) {
 	$form
@@ -179,7 +177,17 @@ if ($data['show_final_result']) {
 	$form_list->addRow(
 		_('Result'),
 		new CDiv(),
-		'final-result'
+		'final-result',
+		ZBX_STYLE_TABLE_FORMS_TIGHT
+	);
+
+	$form_list->addRow(
+		null,
+		[
+			(new CSpan(_('Result with value map applied')))->addClass(ZBX_STYLE_GREY)
+		],
+		'value-mapped-result',
+		ZBX_STYLE_TABLE_FORMS_TIGHT
 	);
 }
 

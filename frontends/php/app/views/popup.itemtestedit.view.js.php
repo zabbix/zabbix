@@ -94,6 +94,23 @@ function enableItemTestForm() {
 		.show();
 }
 
+function cleanPreviousTestResults() {
+	var $form = jQuery('#preprocessing-test-form');
+
+	jQuery('[id^="preproc-test-step-"][id$="-result"]', $form).empty();
+	jQuery('[id^="preproc-test-step-"][id$="-name"] > div', $form).remove();
+	jQuery('#final-result', $form)
+		.hide()
+		.find('.table-forms-td-right')
+		.empty();
+
+	jQuery('#value-mapped-result', $form)
+		.hide()
+		.find('.table-forms-td-right > *')
+		.not('.grey')
+		.remove();
+}
+
 /**
  * Send item get value request and display retrieved results.
  */
@@ -127,7 +144,10 @@ function itemGetValueTest() {
 	jQuery.ajax({
 		url: url.getUrl(),
 		data: post_data,
-		beforeSend: disableItemTestForm,
+		beforeSend: function() {
+			disableItemTestForm();
+			cleanPreviousTestResults();
+		},
 		success: function(ret) {
 			$form.parent().find('.msg-bad, .msg-good').remove();
 
@@ -191,6 +211,7 @@ function itemCompleteTest() {
 		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
+		valuemapid: <?= $data['valuemapid'] ?>,
 		value: jQuery('#value', $form).multilineInput('value')
 	});
 
@@ -212,14 +233,7 @@ function itemCompleteTest() {
 		data: post_data,
 		beforeSend: function() {
 			disableItemTestForm();
-
-			// Clean previous results.
-			jQuery('[id^="preproc-test-step-"][id$="-result"]').empty();
-			jQuery('[id^="preproc-test-step-"][id$="-name"] > div').remove();
-			jQuery('#final-result')
-				.hide()
-				.find('.table-forms-td-right')
-				.empty();
+			cleanPreviousTestResults();
 		},
 		success: function(ret) {
 			$form.parent().find('.msg-bad, .msg-good').remove();
@@ -257,6 +271,19 @@ function itemCompleteTest() {
 					.find('.table-forms-td-right')
 						.append(ret.final.action)
 						.append($result);
+
+				if (typeof ret.mapped_value != 'undefined') {
+					$mapped_value = makeStepResult({result: ret.mapped_value});
+					$mapped_value.css('float', 'right');
+
+					jQuery('#value-mapped-result')
+						.show()
+						.find('.table-forms-td-right')
+						.append($mapped_value);
+				}
+				else {
+					jQuery('#value-mapped-result').hide();
+				}
 			}
 
 			enableItemTestForm();
@@ -363,7 +390,7 @@ function saveItemTestInputs() {
 }
 
 jQuery(document).ready(function($) {
-	$('#final-result').hide();
+	$('#final-result, #value-mapped-result').hide();
 
 	<?php if ($data['show_prev']) { ?>
 	jQuery('#upd_last').val(Math.ceil(+new Date()/1000));

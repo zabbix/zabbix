@@ -1956,6 +1956,13 @@ output {
 		}
 	}
 
+	.tight {
+		.table-forms-td-left,
+		.table-forms-td-right {
+			padding: 0 0 0 10px;
+		}
+	}
+
 	h4 {
 		margin-bottom: -5px;
 	}

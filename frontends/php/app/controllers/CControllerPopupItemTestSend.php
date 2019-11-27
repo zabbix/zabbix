@@ -101,6 +101,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'url' => 'string',
 			'value' => 'string',
 			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
+			'valuemapid' => 'int32',
 			'verify_host' => 'in 0,1',
 			'verify_peer' => 'in 0,1'
 		];
@@ -362,6 +363,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 								itemValueTypeString($preproc_test_data['value_type'])),
 							'result' => $result['result']
 						];
+
+						if ($this->getInput('valuemapid', 0)) {
+							$mapped_value = getMappedValue($result['result'], $this->getInput('valuemapid'));
+							if ($mapped_value !== false) {
+								$output['mapped_value'] = $mapped_value;
+							}
+						}
 					}
 					elseif (array_key_exists('error', $result)) {
 						$output['final'] = [

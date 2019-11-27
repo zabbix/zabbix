@@ -1322,6 +1322,9 @@ output {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
+  .table-forms .tight .table-forms-td-left,
+  .table-forms .tight .table-forms-td-right {
+    padding: 0 0 0 10px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
