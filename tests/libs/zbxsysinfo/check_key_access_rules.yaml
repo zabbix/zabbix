@@ -32,10 +32,8 @@ out:
   metrics:
     - metric: 'vfs.file.contents'
       result: ZBX_KEY_ACCESS_DENY
-  metrics:
     - metric: 'vfs.file.contents[]'
       result: ZBX_KEY_ACCESS_ALLOW
-  metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_ALLOW
 ---

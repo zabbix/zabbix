@@ -127,7 +127,7 @@ void	load_user_parameters(char **lines)
 int	load_key_access_rule(const char *value, void *cfg)
 {
 	zbx_key_access_rule_type_t	rule_type;
-	struct cfg_line			*line = (struct cfg_line*)cfg;
+	const struct cfg_line		*line = (struct cfg_line*)cfg;
 
 	if (0 == strcmp(line->parameter, "AllowKey"))
 		rule_type = ZBX_KEY_ACCESS_ALLOW;
