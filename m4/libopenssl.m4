@@ -157,7 +157,7 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
       if test "x$static_linking_support" = "xno"; then
         OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed "s|-lssl|$_libopenssl_dir_lib/libssl.a|g"|sed "s|-lcrypto|$_libopenssl_dir_lib/libcrypto.a|g"`
       else
-        OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed "s/-lssl/${static_linking_support}static -lssl ${static_linking_support}dynamic/g'|sed 's/-lcrypto/${static_linking_support}static -lcrypto ${static_linking_support}dynamic/g"`
+        OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed "s/-lssl/${static_linking_support}static -lssl ${static_linking_support}dynamic/g"|sed "s/-lcrypto/${static_linking_support}static -lcrypto ${static_linking_support}dynamic/g"`
       fi
     fi
 

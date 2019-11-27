@@ -1257,7 +1257,7 @@ AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked bin
     static_linking_libs=yes
     saved_LIBS="$LIBS"
     LIBS="${saved_LIBS} -Wl,-bstatic -Wl,-bdynamic"
-    AC_MSG_CHECKING(if libs static linking with "-Wl,-b" is possible)
+    AC_MSG_CHECKING([if libs static linking with "-Wl,-b" is possible])
     AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
       [AC_MSG_RESULT([yes])
         static_linking_support="-Wl,-b"],
@@ -1267,7 +1267,7 @@ AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked bin
 
     if test "x$static_linking_support" = "xno"; then
       LIBS="${saved_LIBS} -Wl,-Bstatic -Wl,-Bdynamic"
-      AC_MSG_CHECKING(if libs static linking with "-Wl,-B" is possible)
+      AC_MSG_CHECKING([if libs static linking with "-Wl,-B" is possible])
       AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
         [AC_MSG_RESULT([yes])
           static_linking_support="-Wl,-B"],
