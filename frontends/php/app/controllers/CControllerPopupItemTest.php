@@ -383,7 +383,7 @@ abstract class CControllerPopupItemTest extends CController {
 				$interface = CMacrosResolverHelper::resolveHostInterfaces($interface);
 
 				$interface_data = [
-					'address' => ($interface[0]['useup'] == INTERFACE_USE_IP)
+					'address' => ($interface[0]['useip'] == INTERFACE_USE_IP)
 						? $interface[0]['ip']
 						: $interface[0]['dns'],
 					'port' => $interface[0]['port'],
