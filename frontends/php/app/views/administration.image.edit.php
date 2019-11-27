@@ -23,14 +23,7 @@ $this->includeJSfile('app/views/administration.image.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Images'))
-	->setControls((new CForm())
-		->cleanItems()
-		->setAttribute('aria-label', _('Main filter'))
-		->addItem(makeAdministrationGeneralMenu((new CUrl('zabbix.php'))
-			->setArgument('action', 'image.list')
-			->getUrl()
-		))
-	);
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $form = (new CForm('post', (new CUrl('zabbix.php'))
 		->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
