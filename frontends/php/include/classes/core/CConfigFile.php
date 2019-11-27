@@ -27,7 +27,6 @@ class CConfigFile {
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
 	private static $supported_db_types = [
-		ZBX_DB_DB2 => true,
 		ZBX_DB_MYSQL => true,
 		ZBX_DB_ORACLE => true,
 		ZBX_DB_POSTGRESQL => true
