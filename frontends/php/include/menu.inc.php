@@ -19,6 +19,7 @@
 **/
 
 
+$user_type = CWebUser::getType();
 $menu = APP::component()->get('menu.main');
 $menu
 	->add('Monitoring', [
@@ -85,7 +86,7 @@ $menu
 		]
 	]);
 
-if (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN) {
+if ($user_type >= USER_TYPE_ZABBIX_ADMIN) {
 	$menu
 		->find('Monitoring')
 			->insertAfter('Maps', 'Discovery', [
@@ -123,7 +124,7 @@ if (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN) {
 
 }
 
-if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+if ($user_type == USER_TYPE_SUPER_ADMIN) {
 	$menu
 		->find('Reports')
 			->insertBefore('Availability report', 'System information', [
@@ -150,7 +151,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		'items' => [
 			'General' => [
 				'action' => 'adm.gui.php',
-				'alias' => [ 'adm.housekeeper.php', 'adm.images.php', 'adm.iconmapping.php', 'adm.regexps.php',
+				'alias' => ['adm.housekeeper.php', 'adm.images.php', 'adm.iconmapping.php', 'adm.regexps.php',
 					'adm.macros.php', 'adm.valuemapping.php', 'adm.workingtime.php', 'adm.triggerseverities.php',
 					'adm.triggerdisplayoptions.php', 'adm.other.php', 'autoreg.edit', 'module.list', 'module.edit'
 				]

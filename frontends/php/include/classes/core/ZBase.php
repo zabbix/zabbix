@@ -158,7 +158,8 @@ class ZBase {
 				$this->initModules();
 				array_map('error', $this->module_manager->getErrors());
 
-				$action = getRequest('action', basename($_SERVER['SCRIPT_NAME']));
+				$file = basename($_SERVER['SCRIPT_NAME']);
+				$action = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
 				$router = new CRouter;
 				$router->addActions($this->module_manager->getRoutes());
 				$router->setAction($action);
@@ -178,6 +179,10 @@ class ZBase {
 					CProfiler::getInstance()->start();
 					$this->processRequest($router);
 					exit;
+				}
+
+				if (resourceAccessDenied($file)) {
+					access_deny(ACCESS_DENY_PAGE);
 				}
 				break;
 
@@ -418,7 +423,7 @@ class ZBase {
 		$controller = $router->getController();
 
 		if (!class_exists($controller)) {
-			error(_s('%s must extend CController class', $controller));
+			error(_s('%s action class is not found.', $controller));
 			$response = new CControllerResponseData([
 				'controller' => [
 					'action' => $router->getAction()
@@ -441,7 +446,7 @@ class ZBase {
 				$response = $controller->run();
 			}
 			else {
-				error(_s('%s must extend CController class', $controller));
+				error(_s('%s must extend CController class', get_class($controller)));
 				$response = new CControllerResponseData([
 					'controller' => [
 						'action' => $router->getAction()

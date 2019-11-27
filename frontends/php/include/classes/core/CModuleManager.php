@@ -43,7 +43,7 @@ class CModuleManager {
 	 */
 	protected $modules = [];
 
-		/**
+	/**
 	 * Create class object instance
 	 *
 	 * @param string $modules_dir    Absolute path to frontend root directory.
@@ -156,7 +156,7 @@ class CModuleManager {
 		$manifest = $this->parseManifestFile($manifest_path);
 
 		if (!$manifest) {
-			return;
+			return null;
 		}
 
 		$index = $this->getModuleIndexById($manifest['id']);
@@ -248,7 +248,7 @@ class CModuleManager {
 
 		foreach ($this->modules as $module) {
 			if ($module['status']) {
-				$namespaces[static::MODULES_NAMESPACE.$module['manifest']['namespace']] = [$module['path']['root']];
+				$namespaces[$module['namespace']] = [$module['path']['root']];
 			}
 		}
 
@@ -264,7 +264,7 @@ class CModuleManager {
 		$namespaces = [];
 
 		foreach ($this->modules as $module) {
-			$namespaces[static::MODULES_NAMESPACE.$module['manifest']['namespace']] = [$module['path']['root']];
+			$namespaces[$module['namespace']] = [$module['path']['root']];
 		}
 
 		return $namespaces;
@@ -325,8 +325,9 @@ class CModuleManager {
 
 		$instance = null;
 		$main_class = '\\CModule';
-		$namespace = static::MODULES_NAMESPACE.$this->modules[$index]['manifest']['namespace'];
-		$module_class = $this->modules[$index]['path']['module'] ? $namespace.'\\Module' : $main_class;
+		$module_class = $this->modules[$index]['path']['module']
+			? $this->modules[$index]['namespace'].'\\Module'
+			: $main_class;
 
 		try {
 			if (!class_exists($module_class, true)) {
@@ -379,7 +380,7 @@ class CModuleManager {
 
 		foreach ($this->modules as $module) {
 			if ($module['status']) {
-				$namespace = static::MODULES_NAMESPACE.$module['manifest']['namespace'].'\\Actions\\';
+				$namespace = $module['namespace'].'\\Actions\\';
 
 				foreach ($module['manifest']['actions'] as $action => $data) {
 					$routes[$action] = [
@@ -398,7 +399,7 @@ class CModuleManager {
 	 * @return array
 	 */
 	public function getLoadedModules() {
-		return zbx_objectValues($this->modules, 'id');
+		return CArrayHelper::getByKeysStrict($this->modules, 'id');
 	}
 
 	/**

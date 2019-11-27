@@ -92,7 +92,7 @@ class CMenu {
 	}
 
 	public function find($label) {
-		return array_key_exists($label, $this->items) ? $this->items[$label] : new CMenu;
+		return array_key_exists($label, $this->items) ? $this->items[$label] : null;
 	}
 
 	public function insertBefore($before_label, $label, $data) {
