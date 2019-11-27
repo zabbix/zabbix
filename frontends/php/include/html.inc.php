@@ -786,7 +786,7 @@ function getAdministrationGeneralSubmenu() {
 		->getUrl();
 
 	$valuemap_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'valuemap.edit')
+		->setArgument('action', 'valuemap.list')
 		->getUrl();
 
 	$workingtime_url = (new CUrl('zabbix.php'))

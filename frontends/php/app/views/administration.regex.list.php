@@ -29,9 +29,9 @@ $widget = (new CWidget())
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
-			->addItem((new CList())
-				->addItem(new CSubmit('form', _('New regular expression')))
-			)
+			->addItem(new CRedirectButton(_('New regular expression'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'regex.edit')
+			))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	);
