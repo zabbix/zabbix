@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-24 01:43+0200\n"
+"POT-Creation-Date: 2019-11-27 10:06+0200\n"
 "PO-Revision-Date: 2019-02-03 00:51+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -55,7 +55,7 @@ msgstr "ожидается пара \"узел сети:ключ\""
 msgid "$.path.to.node"
 msgstr "$.путь.к.ноде"
 
-#: include/classes/api/services/CDRule.php:548
+#: include/classes/api/services/CDRule.php:549
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
 msgstr "%1$d символов превышают максимальную длину в %2$d символов"
@@ -341,8 +341,8 @@ msgstr "ДОБАВЛЕНИЕ ЗАМЕЩЕНИЯ"
 
 #: app/views/popup.discovery.check.php:101
 #: include/views/configuration.host.discovery.edit.php:461
-#: include/views/configuration.item.edit.php:554
-#: include/views/configuration.item.edit.php:561
+#: include/views/configuration.item.edit.php:555
+#: include/views/configuration.item.edit.php:562
 #: include/views/configuration.item.massupdate.php:240
 #: include/views/configuration.item.prototype.edit.php:503
 #: include/views/configuration.item.prototype.massupdate.php:236
@@ -446,7 +446,7 @@ msgstr "Подтвержденные РЕШЁННЫЕ события"
 #: include/views/configuration.host.massupdate.php:221
 #: include/views/configuration.host.prototype.edit.php:258
 #: include/views/configuration.httpconf.edit.php:202
-#: include/views/configuration.item.edit.php:693
+#: include/views/configuration.item.edit.php:694
 #: include/views/configuration.item.massupdate.php:343
 #: include/views/configuration.item.prototype.edit.php:618
 #: include/views/configuration.item.prototype.massupdate.php:340
@@ -654,10 +654,10 @@ msgstr "Активно до"
 #: include/views/configuration.httpconf.edit.php:140
 #: include/views/configuration.httpconf.edit.php:208
 #: include/views/configuration.httpconf.edit.php:257
-#: include/views/configuration.item.edit.php:151
-#: include/views/configuration.item.edit.php:243
-#: include/views/configuration.item.edit.php:742
-#: include/views/configuration.item.edit.php:981
+#: include/views/configuration.item.edit.php:152
+#: include/views/configuration.item.edit.php:244
+#: include/views/configuration.item.edit.php:743
+#: include/views/configuration.item.edit.php:982
 #: include/views/configuration.item.massupdate.php:156
 #: include/views/configuration.item.massupdate.php:381
 #: include/views/configuration.item.massupdate.php:517
@@ -704,7 +704,7 @@ msgstr "Активно до"
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
-#: include/views/js/configuration.discovery.edit.js.php:225
+#: include/views/js/configuration.discovery.edit.js.php:224
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -960,7 +960,7 @@ msgid "Allow manual close"
 msgstr "Разрешить закрывать вручную"
 
 #: include/views/configuration.host.discovery.edit.php:601
-#: include/views/configuration.item.edit.php:860
+#: include/views/configuration.item.edit.php:861
 #: include/views/configuration.item.massupdate.php:482
 #: include/views/configuration.item.prototype.edit.php:721
 #: include/views/configuration.item.prototype.massupdate.php:482
@@ -1081,7 +1081,7 @@ msgstr "Группа элементов данных с applicationid \"%1$s\" �
 #: include/views/configuration.host.edit.php:311
 #: include/views/configuration.host.list.php:173
 #: include/views/configuration.host.list.php:385
-#: include/views/configuration.item.edit.php:895
+#: include/views/configuration.item.edit.php:896
 #: include/views/configuration.item.list.php:69
 #: include/views/configuration.item.massupdate.php:543
 #: include/views/configuration.item.prototype.edit.php:737
@@ -1148,8 +1148,8 @@ msgstr "Тип области"
 msgid "Arithmetic"
 msgstr "Арифметические"
 
-#: include/views/configuration.item.edit.php:830
-#: include/views/configuration.item.edit.php:836
+#: include/views/configuration.item.edit.php:831
+#: include/views/configuration.item.edit.php:837
 #: include/views/configuration.item.massupdate.php:459
 #: include/views/configuration.item.prototype.edit.php:699
 #: include/views/configuration.item.prototype.edit.php:705
@@ -1305,7 +1305,7 @@ msgstr "Ошибка при аутентификации: %1$s."
 #: include/views/configuration.action.edit.php:1731
 #: include/views/configuration.action.edit.php:2191
 #: include/views/configuration.host.discovery.edit.php:481
-#: include/views/configuration.item.edit.php:601
+#: include/views/configuration.item.edit.php:602
 #: include/views/configuration.item.massupdate.php:283
 #: include/views/configuration.item.prototype.edit.php:523
 #: include/views/configuration.item.prototype.massupdate.php:278
@@ -1318,7 +1318,7 @@ msgstr "Метод аутентификации изменён"
 
 #: app/views/popup.discovery.check.php:92
 #: include/views/configuration.host.discovery.edit.php:453
-#: include/views/configuration.item.edit.php:543
+#: include/views/configuration.item.edit.php:544
 #: include/views/configuration.item.massupdate.php:227
 #: include/views/configuration.item.prototype.edit.php:495
 #: include/views/configuration.item.prototype.massupdate.php:223
@@ -1327,7 +1327,7 @@ msgstr "Пароль аутентификации"
 
 #: app/views/popup.discovery.check.php:85
 #: include/views/configuration.host.discovery.edit.php:446
-#: include/views/configuration.item.edit.php:538
+#: include/views/configuration.item.edit.php:539
 #: include/views/configuration.item.massupdate.php:215
 #: include/views/configuration.item.prototype.edit.php:488
 #: include/views/configuration.item.prototype.massupdate.php:211
@@ -1459,7 +1459,7 @@ msgstr "Основной цвет"
 
 #: include/httptest.inc.php:28
 #: include/views/configuration.host.discovery.edit.php:276
-#: include/views/configuration.item.edit.php:322
+#: include/views/configuration.item.edit.php:323
 #: include/views/configuration.item.prototype.edit.php:304
 msgid "Basic"
 msgstr "Простая"
@@ -1487,14 +1487,14 @@ msgstr "Голубая"
 
 #: app/views/popup.httpstep.php:155
 #: include/views/configuration.host.discovery.edit.php:254
-#: include/views/configuration.item.edit.php:292
+#: include/views/configuration.item.edit.php:293
 #: include/views/configuration.item.prototype.edit.php:274
 msgid "Body"
 msgstr "Тело"
 
 #: app/views/popup.httpstep.php:157
 #: include/views/configuration.host.discovery.edit.php:256
-#: include/views/configuration.item.edit.php:294
+#: include/views/configuration.item.edit.php:295
 #: include/views/configuration.item.prototype.edit.php:276
 msgid "Body and headers"
 msgstr "Тело и заголовки"
@@ -3117,7 +3117,7 @@ msgid "Change severity"
 msgstr "Изменение важности"
 
 #: include/forms.inc.php:199 include/items.inc.php:129
-#: include/views/configuration.item.edit.php:671
+#: include/views/configuration.item.edit.php:672
 #: include/views/configuration.item.massupdate.php:268
 #: include/views/configuration.item.prototype.edit.php:596
 #: include/views/configuration.item.prototype.massupdate.php:263
@@ -3141,7 +3141,7 @@ msgstr "Шасси"
 msgid "Chassis information. Returns string"
 msgstr "Информация о шасси. Возвращает строку"
 
-#: include/views/js/configuration.discovery.edit.js.php:372
+#: include/views/js/configuration.discovery.edit.js.php:371
 msgid "Check already exists."
 msgstr "Проверка уже существует."
 
@@ -3164,7 +3164,7 @@ msgstr "Проверьте на ошибку при использовании �
 
 #: include/views/configuration.host.discovery.edit.php:803
 #: include/views/configuration.host.discovery.list.php:175
-#: include/views/configuration.item.edit.php:958
+#: include/views/configuration.item.edit.php:959
 #: include/views/configuration.item.list.php:244
 msgid "Check now"
 msgstr "Проверить сейчас"
@@ -3242,7 +3242,7 @@ msgstr "Проверяется производительность TCP серв
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Проверяется производительность UDP сервиса. Возвращает 0 - сервис недоступен; секунды - количество секунд потраченных в процессе подключения к сервису"
 
-#: include/classes/api/services/CDRule.php:652
+#: include/classes/api/services/CDRule.php:653
 msgid "Checks should be unique."
 msgstr "Проверки должны быть уникальными."
 
@@ -3274,7 +3274,7 @@ msgid "Clear history"
 msgstr "Очистить историю"
 
 #: include/views/configuration.httpconf.edit.php:244
-#: include/views/configuration.item.edit.php:968
+#: include/views/configuration.item.edit.php:969
 msgid "Clear history and trends"
 msgstr "Очистить историю и динамику изменений"
 
@@ -3311,7 +3311,7 @@ msgstr "Часы"
 #: include/views/configuration.hostgroups.edit.php:58
 #: include/views/configuration.host.prototype.edit.php:424
 #: include/views/configuration.httpconf.edit.php:237
-#: include/views/configuration.item.edit.php:955
+#: include/views/configuration.item.edit.php:956
 #: include/views/configuration.item.prototype.edit.php:782
 #: include/views/configuration.maintenance.edit.php:256
 #: include/views/configuration.template.edit.php:442
@@ -3833,7 +3833,7 @@ msgstr "Меню содержимого"
 
 #: app/views/popup.discovery.check.php:66
 #: include/views/configuration.host.discovery.edit.php:419
-#: include/views/configuration.item.edit.php:484
+#: include/views/configuration.item.edit.php:485
 #: include/views/configuration.item.massupdate.php:190
 #: include/views/configuration.item.prototype.edit.php:463
 #: include/views/configuration.item.prototype.massupdate.php:186
@@ -3844,7 +3844,7 @@ msgstr "Имя контекста"
 msgid "Contract number"
 msgstr "Номер контракта"
 
-#: include/views/configuration.item.edit.php:301
+#: include/views/configuration.item.edit.php:302
 #: include/views/configuration.item.prototype.edit.php:283
 msgid "Convert to JSON"
 msgstr "Конвертация в JSON"
@@ -4159,7 +4159,7 @@ msgid "Custom graphs"
 msgstr "Пользовательские графики"
 
 #: include/views/configuration.host.discovery.edit.php:584
-#: include/views/configuration.item.edit.php:747
+#: include/views/configuration.item.edit.php:748
 #: include/views/configuration.item.massupdate.php:387
 #: include/views/configuration.item.prototype.edit.php:659
 #: include/views/configuration.item.prototype.massupdate.php:384
@@ -4222,8 +4222,8 @@ msgstr "DD.MM.YY"
 
 #: app/views/popup.discovery.check.php:100
 #: include/views/configuration.host.discovery.edit.php:460
-#: include/views/configuration.item.edit.php:553
-#: include/views/configuration.item.edit.php:560
+#: include/views/configuration.item.edit.php:554
+#: include/views/configuration.item.edit.php:561
 #: include/views/configuration.item.massupdate.php:239
 #: include/views/configuration.item.prototype.edit.php:502
 #: include/views/configuration.item.prototype.massupdate.php:235
@@ -4633,7 +4633,7 @@ msgstr "Удалить соответствие иконок?"
 msgid "Delete item prototype?"
 msgstr "Удалить прототип элементов данных?"
 
-#: include/views/configuration.item.edit.php:973
+#: include/views/configuration.item.edit.php:974
 msgid "Delete item?"
 msgstr "Удалить элемент данных?"
 
@@ -4917,7 +4917,7 @@ msgstr "Состояние развертывания"
 #: include/views/configuration.host.discovery.edit.php:605
 #: include/views/configuration.host.edit.php:269
 #: include/views/configuration.host.massupdate.php:82
-#: include/views/configuration.item.edit.php:928
+#: include/views/configuration.item.edit.php:929
 #: include/views/configuration.item.massupdate.php:592
 #: include/views/configuration.item.prototype.edit.php:754
 #: include/views/configuration.item.prototype.massupdate.php:605
@@ -5107,7 +5107,7 @@ msgstr "Обнаружен"
 
 #: include/views/configuration.graph.edit.php:71
 #: include/views/configuration.host.edit.php:55
-#: include/views/configuration.item.edit.php:57
+#: include/views/configuration.item.edit.php:58
 #: include/views/configuration.triggers.edit.php:72
 msgid "Discovered by"
 msgstr "Обнаружено"
@@ -5188,8 +5188,8 @@ msgstr "Правило обнаружения \"%1$s\" уже существуе
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:835
-#: include/classes/api/services/CDRule.php:852
+#: include/classes/api/services/CDRule.php:836
+#: include/classes/api/services/CDRule.php:853
 #, c-format
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr "Правило обнаружения \"%1$s\" используется в \"%2$s\" действии."
@@ -5292,14 +5292,14 @@ msgstr ""
 msgid "Do not calculate"
 msgstr "Без вычисления"
 
-#: include/views/configuration.item.edit.php:775
+#: include/views/configuration.item.edit.php:776
 #: include/views/configuration.item.massupdate.php:407
 #: include/views/configuration.item.prototype.edit.php:668
 #: include/views/configuration.item.prototype.massupdate.php:404
 msgid "Do not keep history"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:809
+#: include/views/configuration.item.edit.php:810
 #: include/views/configuration.item.massupdate.php:425
 #: include/views/configuration.item.prototype.edit.php:680
 #: include/views/configuration.item.prototype.massupdate.php:422
@@ -5806,7 +5806,7 @@ msgid "Enable selected web scenarios?"
 msgstr "Активировать выбранные веб-сценарии?"
 
 #: include/views/configuration.host.discovery.edit.php:596
-#: include/views/configuration.item.edit.php:851
+#: include/views/configuration.item.edit.php:852
 #: include/views/configuration.item.massupdate.php:475
 #: include/views/configuration.item.prototype.edit.php:716
 #: include/views/configuration.item.prototype.massupdate.php:475
@@ -5844,7 +5844,7 @@ msgstr "Активировать трапы"
 #: include/views/configuration.host.list.php:242
 #: include/views/configuration.host.massupdate.php:108
 #: include/views/configuration.httpconf.edit.php:150
-#: include/views/configuration.item.edit.php:935
+#: include/views/configuration.item.edit.php:936
 #: include/views/configuration.triggers.edit.php:549
 msgid "Enabled"
 msgstr "Активировано"
@@ -6018,7 +6018,7 @@ msgstr "Выполнено"
 
 #: include/items.inc.php:1665
 #: include/views/configuration.host.discovery.edit.php:517
-#: include/views/configuration.item.edit.php:631
+#: include/views/configuration.item.edit.php:632
 #: include/views/configuration.item.prototype.edit.php:559
 msgid "Executed script"
 msgstr "Выполняемый скрипт"
@@ -6397,8 +6397,8 @@ msgid "Fixed"
 msgstr "Фиксированное"
 
 #: include/views/configuration.host.discovery.edit.php:547
-#: include/views/configuration.item.edit.php:700
-#: include/views/configuration.item.edit.php:707
+#: include/views/configuration.item.edit.php:701
+#: include/views/configuration.item.edit.php:708
 #: include/views/configuration.item.massupdate.php:350
 #: include/views/configuration.item.prototype.edit.php:623
 #: include/views/configuration.item.prototype.massupdate.php:347
@@ -6409,7 +6409,7 @@ msgstr "Переменный"
 
 #: app/views/popup.httpstep.php:148
 #: include/views/configuration.host.discovery.edit.php:244
-#: include/views/configuration.item.edit.php:282
+#: include/views/configuration.item.edit.php:283
 #: include/views/configuration.item.prototype.edit.php:264
 msgid "Follow redirects"
 msgstr "Следовать перенаправлениям"
@@ -6432,7 +6432,7 @@ msgstr "Размер шрифта"
 msgid "Form data"
 msgstr "Данные формы"
 
-#: include/items.inc.php:1669 include/views/configuration.item.edit.php:649
+#: include/items.inc.php:1669 include/views/configuration.item.edit.php:650
 #: include/views/configuration.item.prototype.edit.php:575
 msgid "Formula"
 msgstr "Формула"
@@ -6915,7 +6915,7 @@ msgstr "HTTP агент"
 
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.httpconf.edit.php:158
-#: include/views/configuration.item.edit.php:317
+#: include/views/configuration.item.edit.php:318
 #: include/views/configuration.item.prototype.edit.php:299
 msgid "HTTP authentication"
 msgstr "HTTP аутентификация"
@@ -6927,7 +6927,7 @@ msgstr "HTTP диалог входа в систему"
 #: include/views/configuration.host.discovery.edit.php:263
 #: include/views/configuration.httpconf.edit.php:109
 #: include/views/configuration.httpconf.list.php:93
-#: include/views/configuration.item.edit.php:309
+#: include/views/configuration.item.edit.php:310
 #: include/views/configuration.item.prototype.edit.php:291
 msgid "HTTP proxy"
 msgstr "HTTP прокси"
@@ -6961,8 +6961,8 @@ msgstr "Значение аппаратного сенсора. Возвраща
 #: include/views/configuration.host.discovery.edit.php:197
 #: include/views/configuration.host.discovery.edit.php:255
 #: include/views/configuration.httpconf.edit.php:132
-#: include/views/configuration.item.edit.php:235
-#: include/views/configuration.item.edit.php:293
+#: include/views/configuration.item.edit.php:236
+#: include/views/configuration.item.edit.php:294
 #: include/views/configuration.item.massupdate.php:147
 #: include/views/configuration.item.prototype.edit.php:217
 #: include/views/configuration.item.prototype.edit.php:275
@@ -7054,7 +7054,7 @@ msgid "History cleared"
 msgstr "История очищена"
 
 #: include/views/configuration.httpconf.edit.php:245
-#: include/views/configuration.item.edit.php:969
+#: include/views/configuration.item.edit.php:970
 msgid "History clearing can take a long time. Continue?"
 msgstr "Очистка истории может занять продолжительное время. Продолжить?"
 
@@ -7075,7 +7075,7 @@ msgstr "Период хранения данных истории \"%1$s\"."
 msgid "History of events"
 msgstr "История событий"
 
-#: disc_prototypes.php:198 include/views/configuration.item.edit.php:772
+#: disc_prototypes.php:198 include/views/configuration.item.edit.php:773
 #: include/views/configuration.item.massupdate.php:403
 #: include/views/configuration.item.prototype.edit.php:665
 #: include/views/configuration.item.prototype.massupdate.php:400 items.php:65
@@ -7299,8 +7299,8 @@ msgid "Host info"
 msgstr "Информация об узлах сети"
 
 #: include/views/configuration.host.discovery.edit.php:400
-#: include/views/configuration.item.edit.php:423
-#: include/views/configuration.item.edit.php:467
+#: include/views/configuration.item.edit.php:424
+#: include/views/configuration.item.edit.php:468
 #: include/views/configuration.item.massupdate.php:84
 #: include/views/configuration.item.prototype.edit.php:448
 #: include/views/configuration.item.prototype.massupdate.php:80
@@ -7588,7 +7588,7 @@ msgstr "IPMI скрипты можно выполнять только на се
 
 #: disc_prototypes.php:164 host_discovery.php:142
 #: include/views/configuration.host.discovery.edit.php:474
-#: include/views/configuration.item.edit.php:580
+#: include/views/configuration.item.edit.php:581
 #: include/views/configuration.item.prototype.edit.php:516 items.php:178
 msgid "IPMI sensor"
 msgstr "IPMI датчик"
@@ -7919,11 +7919,11 @@ msgstr "Некорректное значение %1$s типа подписи �
 msgid "Incorrect API \"%1$s\"."
 msgstr "Некорректный API \"%1$s\"."
 
-#: include/classes/api/services/CDRule.php:571
+#: include/classes/api/services/CDRule.php:572
 msgid "Incorrect SNMP OID."
 msgstr "Некорректный SNMP OID."
 
-#: include/classes/api/services/CDRule.php:565
+#: include/classes/api/services/CDRule.php:566
 msgid "Incorrect SNMP community."
 msgstr "Некорректное SNMP community."
 
@@ -8618,8 +8618,8 @@ msgstr "Некорректная группа пользователей."
 #: include/classes/api/services/CDRule.php:393
 #: include/classes/api/services/CDRule.php:445
 #: include/classes/api/services/CDRule.php:525
-#: include/classes/api/services/CDRule.php:586
-#: include/classes/api/services/CDRule.php:599
+#: include/classes/api/services/CDRule.php:587
+#: include/classes/api/services/CDRule.php:600
 #: include/classes/api/services/CItemGeneral.php:520
 #: include/classes/api/services/CItemGeneral.php:2298
 #: include/classes/validators/CNewValidator.php:116
@@ -8749,7 +8749,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:500
 #: include/classes/api/services/CDRule.php:506
 #: include/classes/api/services/CDRule.php:540
-#: include/classes/api/services/CDRule.php:547
+#: include/classes/api/services/CDRule.php:548
 #: include/classes/api/services/CEvent.php:737
 #: include/classes/api/services/CEvent.php:780
 #: include/classes/api/services/CEvent.php:837
@@ -9086,7 +9086,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.host.discovery.edit.php:542
 #: include/views/configuration.host.discovery.list.php:57
 #: include/views/configuration.httpconf.list.php:90
-#: include/views/configuration.item.edit.php:693
+#: include/views/configuration.item.edit.php:694
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.massupdate.php:341
 #: include/views/configuration.item.prototype.edit.php:618
@@ -9205,7 +9205,7 @@ msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Ошибочный ключ \"%1$s\" для прототипа элементов данных \"%2$s\" у \"%3$s\": %4$s."
 
 #: app/controllers/CControllerPopupDiscoveryCheck.php:66
-#: include/classes/api/services/CDRule.php:555
+#: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Ошибочный ключ \"%1$s\": %2$s."
@@ -9746,7 +9746,7 @@ msgid "JMX agent"
 msgstr "JMX агент"
 
 #: include/views/configuration.host.discovery.edit.php:488
-#: include/views/configuration.item.edit.php:602
+#: include/views/configuration.item.edit.php:603
 #: include/views/configuration.item.massupdate.php:97
 #: include/views/configuration.item.prototype.edit.php:530
 #: include/views/configuration.item.prototype.massupdate.php:93
@@ -9761,7 +9761,7 @@ msgid "JMX interfaces"
 msgstr "Интерфейсы JMX"
 
 #: include/views/configuration.host.discovery.edit.php:168
-#: include/views/configuration.item.edit.php:206
+#: include/views/configuration.item.edit.php:207
 #: include/views/configuration.item.massupdate.php:117
 #: include/views/configuration.item.prototype.edit.php:188
 #: include/views/configuration.item.prototype.massupdate.php:113
@@ -9838,7 +9838,7 @@ msgstr "Период сохранения потерянных ресурсов"
 
 #: include/httptest.inc.php:30
 #: include/views/configuration.host.discovery.edit.php:278
-#: include/views/configuration.item.edit.php:324
+#: include/views/configuration.item.edit.php:325
 #: include/views/configuration.item.prototype.edit.php:306
 msgid "Kerberos"
 msgstr ""
@@ -9850,7 +9850,7 @@ msgstr ""
 #: host_discovery.php:50 include/forms.inc.php:315
 #: include/views/configuration.host.discovery.edit.php:67
 #: include/views/configuration.host.discovery.list.php:56
-#: include/views/configuration.item.edit.php:109
+#: include/views/configuration.item.edit.php:110
 #: include/views/configuration.item.list.php:64
 #: include/views/configuration.item.prototype.edit.php:92
 #: include/views/configuration.item.prototype.list.php:53 items.php:49
@@ -10266,7 +10266,7 @@ msgid "Location longitude"
 msgstr "Размещение (долгота)"
 
 #: include/forms.inc.php:200 include/items.inc.php:131
-#: include/views/configuration.item.edit.php:672
+#: include/views/configuration.item.edit.php:673
 #: include/views/configuration.item.massupdate.php:269
 #: include/views/configuration.item.prototype.edit.php:597
 #: include/views/configuration.item.prototype.massupdate.php:264
@@ -10281,7 +10281,7 @@ msgstr "Мониторинг файлов журналов с поддержко
 msgid "Log file monitoring. Returns log"
 msgstr "Мониторинг файлов журналов логов. Возвращает лог"
 
-#: include/views/configuration.item.edit.php:821
+#: include/views/configuration.item.edit.php:822
 #: include/views/configuration.item.massupdate.php:452
 #: include/views/configuration.item.prototype.edit.php:690
 #: include/views/configuration.item.prototype.massupdate.php:451
@@ -10349,8 +10349,8 @@ msgstr "MD2"
 
 #: app/views/popup.discovery.check.php:87 include/hosts.inc.php:34
 #: include/views/configuration.host.discovery.edit.php:448
-#: include/views/configuration.item.edit.php:525
-#: include/views/configuration.item.edit.php:532
+#: include/views/configuration.item.edit.php:526
+#: include/views/configuration.item.edit.php:533
 #: include/views/configuration.item.massupdate.php:219
 #: include/views/configuration.item.prototype.edit.php:490
 #: include/views/configuration.item.prototype.massupdate.php:215
@@ -10645,7 +10645,7 @@ msgstr "Массовое обновление фигур"
 
 #: disc_prototypes.php:53 host_discovery.php:54
 #: include/views/configuration.host.discovery.edit.php:340
-#: include/views/configuration.item.edit.php:383
+#: include/views/configuration.item.edit.php:384
 #: include/views/configuration.item.massupdate.php:583
 #: include/views/configuration.item.prototype.edit.php:410
 #: include/views/configuration.item.prototype.massupdate.php:595 items.php:53
@@ -11060,7 +11060,7 @@ msgstr "NNTP"
 
 #: include/httptest.inc.php:29
 #: include/views/configuration.host.discovery.edit.php:277
-#: include/views/configuration.item.edit.php:323
+#: include/views/configuration.item.edit.php:324
 #: include/views/configuration.item.prototype.edit.php:305
 msgid "NTLM"
 msgstr "NTLM"
@@ -11156,9 +11156,9 @@ msgstr "NTLM"
 #: include/views/configuration.httpconf.edit.php:137
 #: include/views/configuration.httpconf.edit.php:195
 #: include/views/configuration.httpconf.list.php:88
-#: include/views/configuration.item.edit.php:66
-#: include/views/configuration.item.edit.php:147
-#: include/views/configuration.item.edit.php:239
+#: include/views/configuration.item.edit.php:67
+#: include/views/configuration.item.edit.php:148
+#: include/views/configuration.item.edit.php:240
 #: include/views/configuration.item.list.php:62
 #: include/views/configuration.item.list.php:140
 #: include/views/configuration.item.massupdate.php:152
@@ -11269,7 +11269,7 @@ msgid "New"
 msgstr "Новый"
 
 #: include/views/configuration.httpconf.edit.php:74
-#: include/views/configuration.item.edit.php:884
+#: include/views/configuration.item.edit.php:885
 #: include/views/configuration.item.prototype.edit.php:725
 msgid "New application"
 msgstr "Новая группа элементов данных"
@@ -11603,7 +11603,7 @@ msgid "No image"
 msgstr "Нет изображения"
 
 #: include/views/configuration.host.discovery.edit.php:402
-#: include/views/configuration.item.edit.php:462
+#: include/views/configuration.item.edit.php:463
 #: include/views/configuration.item.massupdate.php:77
 #: include/views/configuration.item.prototype.edit.php:443
 #: include/views/configuration.item.prototype.massupdate.php:74
@@ -11724,7 +11724,7 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CDRule.php:183
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CDRule.php:336
-#: include/classes/api/services/CDRule.php:819
+#: include/classes/api/services/CDRule.php:820
 #: include/classes/api/services/CEvent.php:763
 #: include/classes/api/services/CEvent.php:802
 #: include/classes/api/services/CEvent.php:827
@@ -11924,9 +11924,9 @@ msgstr "Не-логические флаги устарели."
 #: include/views/configuration.host.list.php:346
 #: include/views/configuration.host.list.php:358
 #: include/views/configuration.host.list.php:361
-#: include/views/configuration.item.edit.php:321
-#: include/views/configuration.item.edit.php:889
-#: include/views/configuration.item.edit.php:903
+#: include/views/configuration.item.edit.php:322
+#: include/views/configuration.item.edit.php:890
+#: include/views/configuration.item.edit.php:904
 #: include/views/configuration.item.prototype.edit.php:303
 #: include/views/configuration.item.prototype.edit.php:732
 #: include/views/configuration.item.prototype.edit.php:747
@@ -12180,7 +12180,7 @@ msgid "Numeral systems"
 msgstr "Системы счисления"
 
 #: include/forms.inc.php:198 include/items.inc.php:127
-#: include/triggers.inc.php:1890 include/views/configuration.item.edit.php:670
+#: include/triggers.inc.php:1890 include/views/configuration.item.edit.php:671
 #: include/views/configuration.item.massupdate.php:267
 #: include/views/configuration.item.prototype.edit.php:595
 #: include/views/configuration.item.prototype.massupdate.php:262
@@ -12192,7 +12192,7 @@ msgid "Numeric (integer)"
 msgstr "Числовой (целочисленный)"
 
 #: include/forms.inc.php:197 include/items.inc.php:125
-#: include/views/configuration.item.edit.php:669
+#: include/views/configuration.item.edit.php:670
 #: include/views/configuration.item.massupdate.php:266
 #: include/views/configuration.item.prototype.edit.php:594
 #: include/views/configuration.item.prototype.massupdate.php:261
@@ -12381,7 +12381,7 @@ msgstr ""
 msgid "Only one change step is allowed."
 msgstr "Разрешен только один шаг изменения."
 
-#: include/classes/api/services/CDRule.php:611
+#: include/classes/api/services/CDRule.php:612
 msgid "Only one check can be unique."
 msgstr "Только одна проверка может быть уникальной."
 
@@ -12643,8 +12643,8 @@ msgstr "Другие"
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "Статистика исходящего трафика на сетевом интерфейсе. Возвращает число"
 
-#: include/views/configuration.item.edit.php:764
-#: include/views/configuration.item.edit.php:797
+#: include/views/configuration.item.edit.php:765
+#: include/views/configuration.item.edit.php:798
 msgctxt "item_form"
 msgid "Overridden by"
 msgstr "Переопределено"
@@ -12917,7 +12917,7 @@ msgstr "Родительские правила обнаружения"
 msgid "Parent graphs"
 msgstr "Родительские графики"
 
-#: include/views/configuration.item.edit.php:44
+#: include/views/configuration.item.edit.php:45
 #: include/views/configuration.item.prototype.edit.php:40
 msgid "Parent items"
 msgstr "Родительские элементы данных"
@@ -12941,7 +12941,7 @@ msgstr "Родительские веб-сценарии"
 
 #: app/views/popup.httpstep.php:53
 #: include/views/configuration.host.discovery.edit.php:80
-#: include/views/configuration.item.edit.php:118
+#: include/views/configuration.item.edit.php:119
 #: include/views/configuration.item.prototype.edit.php:101
 msgid "Parse"
 msgstr "Анализ"
@@ -12980,9 +12980,9 @@ msgstr "Пассивный"
 #: include/views/configuration.host.massupdate.php:185
 #: include/views/configuration.host.prototype.edit.php:326
 #: include/views/configuration.httpconf.edit.php:166
-#: include/views/configuration.item.edit.php:338
-#: include/views/configuration.item.edit.php:589
-#: include/views/configuration.item.edit.php:626
+#: include/views/configuration.item.edit.php:339
+#: include/views/configuration.item.edit.php:590
+#: include/views/configuration.item.edit.php:627
 #: include/views/configuration.item.massupdate.php:286
 #: include/views/configuration.item.massupdate.php:314
 #: include/views/configuration.item.prototype.edit.php:320
@@ -13039,7 +13039,7 @@ msgstr "Выполнение DNS запроса. Возвращает строк
 
 #: app/views/report.services.php:31
 #: include/views/configuration.host.discovery.edit.php:542
-#: include/views/configuration.item.edit.php:693
+#: include/views/configuration.item.edit.php:694
 #: include/views/configuration.item.massupdate.php:342
 #: include/views/configuration.item.prototype.edit.php:618
 #: include/views/configuration.item.prototype.massupdate.php:339
@@ -13151,7 +13151,7 @@ msgstr "Точки"
 msgid "Polish (pl_PL)"
 msgstr "Польский (pl_PL)"
 
-#: include/views/configuration.item.edit.php:923
+#: include/views/configuration.item.edit.php:924
 msgid "Populates host inventory field"
 msgstr "Заполнение поля инвентаря узла сети"
 
@@ -13166,7 +13166,7 @@ msgstr "Заполнение поля инвентаря узла сети"
 #: include/views/configuration.host.edit.php:199
 #: include/views/configuration.host.list.php:130
 #: include/views/configuration.host.prototype.edit.php:88
-#: include/views/configuration.item.edit.php:575
+#: include/views/configuration.item.edit.php:576
 #: include/views/configuration.item.massupdate.php:256
 #: include/views/configuration.item.prototype.edit.php:512
 #: include/views/configuration.item.prototype.massupdate.php:251
@@ -13205,7 +13205,7 @@ msgid "Pre-installation summary"
 msgstr "Предварительный обзор инсталляции"
 
 #: include/views/configuration.host.discovery.edit.php:785
-#: include/views/configuration.item.edit.php:942
+#: include/views/configuration.item.edit.php:943
 #: include/views/configuration.item.massupdate.php:601
 #: include/views/configuration.item.prototype.edit.php:767
 #: include/views/configuration.item.prototype.massupdate.php:614
@@ -13214,7 +13214,7 @@ msgstr "Предобработка"
 
 #: app/views/popup.preproctestedit.view.php:129
 #: include/views/configuration.host.discovery.edit.php:787
-#: include/views/configuration.item.edit.php:944
+#: include/views/configuration.item.edit.php:945
 #: include/views/configuration.item.massupdate.php:324
 #: include/views/configuration.item.prototype.edit.php:769
 #: include/views/configuration.item.prototype.massupdate.php:319
@@ -13288,7 +13288,7 @@ msgstr "Первичное ник-имя для контакта"
 
 #: app/views/popup.discovery.check.php:105
 #: include/views/configuration.host.discovery.edit.php:465
-#: include/views/configuration.item.edit.php:570
+#: include/views/configuration.item.edit.php:571
 #: include/views/configuration.item.massupdate.php:248
 #: include/views/configuration.item.prototype.edit.php:507
 #: include/views/configuration.item.prototype.massupdate.php:243
@@ -13297,7 +13297,7 @@ msgstr "Ключевая фраза безопасности"
 
 #: app/views/popup.discovery.check.php:98
 #: include/views/configuration.host.discovery.edit.php:458
-#: include/views/configuration.item.edit.php:565
+#: include/views/configuration.item.edit.php:566
 #: include/views/configuration.item.massupdate.php:235
 #: include/views/configuration.item.prototype.edit.php:500
 #: include/views/configuration.item.prototype.massupdate.php:231
@@ -13315,7 +13315,7 @@ msgstr "Приватный"
 #: include/views/configuration.action.edit.php:1750
 #: include/views/configuration.action.edit.php:2215
 #: include/views/configuration.host.discovery.edit.php:506
-#: include/views/configuration.item.edit.php:620
+#: include/views/configuration.item.edit.php:621
 #: include/views/configuration.item.massupdate.php:307
 #: include/views/configuration.item.prototype.edit.php:548
 #: include/views/configuration.item.prototype.massupdate.php:302
@@ -13537,7 +13537,7 @@ msgstr "Публичный"
 #: include/views/configuration.action.edit.php:1727
 #: include/views/configuration.action.edit.php:2196
 #: include/views/configuration.host.discovery.edit.php:484
-#: include/views/configuration.item.edit.php:590
+#: include/views/configuration.item.edit.php:591
 #: include/views/configuration.item.massupdate.php:287
 #: include/views/configuration.item.prototype.edit.php:526
 #: include/views/configuration.item.prototype.massupdate.php:282
@@ -13548,7 +13548,7 @@ msgstr "Публичный ключ"
 #: include/views/configuration.action.edit.php:1741
 #: include/views/configuration.action.edit.php:2207
 #: include/views/configuration.host.discovery.edit.php:499
-#: include/views/configuration.item.edit.php:613
+#: include/views/configuration.item.edit.php:614
 #: include/views/configuration.item.massupdate.php:300
 #: include/views/configuration.item.prototype.edit.php:541
 #: include/views/configuration.item.prototype.massupdate.php:295
@@ -13557,7 +13557,7 @@ msgstr "Файл публичного ключа"
 
 #: app/views/popup.httpstep.php:59
 #: include/views/configuration.host.discovery.edit.php:105
-#: include/views/configuration.item.edit.php:143
+#: include/views/configuration.item.edit.php:144
 #: include/views/configuration.item.prototype.edit.php:125
 msgid "Query fields"
 msgstr "Поля запроса"
@@ -13593,7 +13593,7 @@ msgstr "RMCP+"
 
 #: app/views/popup.httpstep.php:81
 #: include/views/configuration.host.discovery.edit.php:167
-#: include/views/configuration.item.edit.php:205
+#: include/views/configuration.item.edit.php:206
 #: include/views/configuration.item.massupdate.php:116
 #: include/views/configuration.item.prototype.edit.php:187
 #: include/views/configuration.item.prototype.massupdate.php:112
@@ -13829,9 +13829,9 @@ msgstr "Удаленная команда"
 #: include/views/configuration.host.list.php:79
 #: include/views/configuration.host.massupdate.php:58
 #: include/views/configuration.host.massupdate.php:217
-#: include/views/configuration.item.edit.php:168
-#: include/views/configuration.item.edit.php:260
-#: include/views/configuration.item.edit.php:734
+#: include/views/configuration.item.edit.php:169
+#: include/views/configuration.item.edit.php:261
+#: include/views/configuration.item.edit.php:735
 #: include/views/configuration.item.massupdate.php:169
 #: include/views/configuration.item.massupdate.php:374
 #: include/views/configuration.item.massupdate.php:519
@@ -13981,7 +13981,7 @@ msgid "Reports"
 msgstr "Отчеты"
 
 #: include/views/configuration.host.discovery.edit.php:176
-#: include/views/configuration.item.edit.php:214
+#: include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:125
 #: include/views/configuration.item.prototype.edit.php:196
 #: include/views/configuration.item.prototype.massupdate.php:121
@@ -13989,7 +13989,7 @@ msgid "Request body"
 msgstr "Запрос тела"
 
 #: include/views/configuration.host.discovery.edit.php:165
-#: include/views/configuration.item.edit.php:203
+#: include/views/configuration.item.edit.php:204
 #: include/views/configuration.item.massupdate.php:112
 #: include/views/configuration.item.prototype.edit.php:185
 #: include/views/configuration.item.prototype.massupdate.php:108
@@ -14001,7 +14001,7 @@ msgid "Request sent successfully"
 msgstr "Запрос успешно отправлен"
 
 #: include/views/configuration.host.discovery.edit.php:145
-#: include/views/configuration.item.edit.php:183
+#: include/views/configuration.item.edit.php:184
 #: include/views/configuration.item.prototype.edit.php:165
 msgid "Request type"
 msgstr "Тип запроса"
@@ -14029,7 +14029,7 @@ msgstr "Требуемое быстродействие сервера, новы
 
 #: app/views/popup.httpstep.php:170
 #: include/views/configuration.host.discovery.edit.php:237
-#: include/views/configuration.item.edit.php:275
+#: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.prototype.edit.php:257
 msgid "Required status codes"
 msgstr "Требуемые коды состояния"
@@ -14154,7 +14154,7 @@ msgstr "Тип результата"
 
 #: app/views/popup.httpstep.php:153
 #: include/views/configuration.host.discovery.edit.php:252
-#: include/views/configuration.item.edit.php:290
+#: include/views/configuration.item.edit.php:291
 #: include/views/configuration.item.prototype.edit.php:272
 msgid "Retrieve mode"
 msgstr "Режим получения"
@@ -14322,8 +14322,8 @@ msgstr "Вс"
 
 #: app/views/popup.discovery.check.php:88
 #: include/views/configuration.host.discovery.edit.php:449
-#: include/views/configuration.item.edit.php:526
-#: include/views/configuration.item.edit.php:533
+#: include/views/configuration.item.edit.php:527
+#: include/views/configuration.item.edit.php:534
 #: include/views/configuration.item.massupdate.php:220
 #: include/views/configuration.item.prototype.edit.php:491
 #: include/views/configuration.item.prototype.massupdate.php:216
@@ -14372,7 +14372,7 @@ msgstr "SNMP"
 #: app/views/popup.discovery.check.php:59 disc_prototypes.php:116
 #: host_discovery.php:106 include/forms.inc.php:299
 #: include/views/configuration.host.discovery.edit.php:412
-#: include/views/configuration.item.edit.php:477
+#: include/views/configuration.item.edit.php:478
 #: include/views/configuration.item.prototype.edit.php:456 items.php:130
 msgid "SNMP OID"
 msgstr "SNMP OID"
@@ -14380,7 +14380,7 @@ msgstr "SNMP OID"
 #: app/views/popup.discovery.check.php:53 disc_prototypes.php:109
 #: host_discovery.php:101 include/forms.inc.php:274
 #: include/views/configuration.host.discovery.edit.php:424
-#: include/views/configuration.item.edit.php:490
+#: include/views/configuration.item.edit.php:491
 #: include/views/configuration.item.massupdate.php:183
 #: include/views/configuration.item.prototype.edit.php:468
 #: include/views/configuration.item.prototype.massupdate.php:179 items.php:123
@@ -14421,7 +14421,7 @@ msgstr "SQL запросов: %1$s (selects: %2$s | executes: %3$s)"
 
 #: include/items.inc.php:1667
 #: include/views/configuration.host.discovery.edit.php:525
-#: include/views/configuration.item.edit.php:640
+#: include/views/configuration.item.edit.php:641
 #: include/views/configuration.item.prototype.edit.php:567
 msgid "SQL query"
 msgstr "SQL запрос"
@@ -14450,21 +14450,21 @@ msgstr "SSH агент"
 
 #: include/views/configuration.host.discovery.edit.php:317
 #: include/views/configuration.httpconf.edit.php:175
-#: include/views/configuration.item.edit.php:361
+#: include/views/configuration.item.edit.php:362
 #: include/views/configuration.item.prototype.edit.php:343
 msgid "SSL certificate file"
 msgstr "Файл SSL сертификата"
 
 #: include/views/configuration.host.discovery.edit.php:325
 #: include/views/configuration.httpconf.edit.php:178
-#: include/views/configuration.item.edit.php:368
+#: include/views/configuration.item.edit.php:369
 #: include/views/configuration.item.prototype.edit.php:350
 msgid "SSL key file"
 msgstr "Файл SSL ключа"
 
 #: include/views/configuration.host.discovery.edit.php:332
 #: include/views/configuration.httpconf.edit.php:181
-#: include/views/configuration.item.edit.php:375
+#: include/views/configuration.item.edit.php:376
 #: include/views/configuration.item.prototype.edit.php:357
 msgid "SSL key password"
 msgstr "Пароль к SSL ключу"
@@ -14472,7 +14472,7 @@ msgstr "Пароль к SSL ключу"
 #: app/views/administration.mediatype.edit.php:77
 #: include/views/configuration.host.discovery.edit.php:309
 #: include/views/configuration.httpconf.edit.php:172
-#: include/views/configuration.item.edit.php:353
+#: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.prototype.edit.php:335
 msgid "SSL verify host"
 msgstr "Проверка SSL хоста"
@@ -14480,7 +14480,7 @@ msgstr "Проверка SSL хоста"
 #: app/views/administration.mediatype.edit.php:76
 #: include/views/configuration.host.discovery.edit.php:301
 #: include/views/configuration.httpconf.edit.php:169
-#: include/views/configuration.item.edit.php:345
+#: include/views/configuration.item.edit.php:346
 #: include/views/configuration.item.prototype.edit.php:327
 msgid "SSL verify peer"
 msgstr "Проверка SSL узла"
@@ -14531,8 +14531,8 @@ msgid "Scheduled check"
 msgstr "Запланированная проверка"
 
 #: include/views/configuration.host.discovery.edit.php:548
-#: include/views/configuration.item.edit.php:701
-#: include/views/configuration.item.edit.php:708
+#: include/views/configuration.item.edit.php:702
+#: include/views/configuration.item.edit.php:709
 #: include/views/configuration.item.massupdate.php:351
 #: include/views/configuration.item.prototype.edit.php:624
 #: include/views/configuration.item.prototype.massupdate.php:348
@@ -14745,7 +14745,7 @@ msgstr "Вторичное ник-имя для контакта"
 
 #: app/views/popup.discovery.check.php:77
 #: include/views/configuration.host.discovery.edit.php:438
-#: include/views/configuration.item.edit.php:519
+#: include/views/configuration.item.edit.php:520
 #: include/views/configuration.item.massupdate.php:204
 #: include/views/configuration.item.prototype.edit.php:480
 #: include/views/configuration.item.prototype.massupdate.php:200
@@ -14754,7 +14754,7 @@ msgstr "Уровень безопасности"
 
 #: app/views/popup.discovery.check.php:71 include/forms.inc.php:278
 #: include/views/configuration.host.discovery.edit.php:430
-#: include/views/configuration.item.edit.php:496
+#: include/views/configuration.item.edit.php:497
 #: include/views/configuration.item.massupdate.php:197
 #: include/views/configuration.item.prototype.edit.php:474
 #: include/views/configuration.item.prototype.massupdate.php:193
@@ -14776,7 +14776,7 @@ msgstr "Имя безопасности"
 #: include/views/configuration.action.edit.php:2177
 #: include/views/configuration.graph.edit.php:188
 #: include/views/configuration.graph.edit.php:270
-#: include/views/configuration.item.edit.php:94
+#: include/views/configuration.item.edit.php:95
 #: include/views/configuration.item.prototype.edit.php:77
 #: include/views/configuration.item.prototype.edit.php:376
 #: include/views/configuration.item.prototype.massupdate.php:530
@@ -15256,7 +15256,7 @@ msgstr "Отображать только неподтвержденные"
 msgid "Show unavailable maps"
 msgstr "Отображать недоступные карты"
 
-#: include/views/configuration.item.edit.php:849
+#: include/views/configuration.item.edit.php:850
 #: include/views/configuration.item.massupdate.php:467
 #: include/views/configuration.item.prototype.edit.php:712
 #: include/views/configuration.item.prototype.massupdate.php:467
@@ -15675,8 +15675,8 @@ msgstr "Шаги"
 msgid "Stop"
 msgstr "Остановить"
 
-#: include/views/configuration.item.edit.php:776
-#: include/views/configuration.item.edit.php:810
+#: include/views/configuration.item.edit.php:777
+#: include/views/configuration.item.edit.php:811
 #: include/views/configuration.item.massupdate.php:408
 #: include/views/configuration.item.massupdate.php:426
 #: include/views/configuration.item.prototype.edit.php:669
@@ -16151,7 +16151,7 @@ msgstr ""
 #: include/forms.inc.php:201 include/items.inc.php:133
 #: include/items.inc.php:1699 include/items.inc.php:1703
 #: include/items.inc.php:1707 include/items.inc.php:1711
-#: include/views/configuration.item.edit.php:673
+#: include/views/configuration.item.edit.php:674
 #: include/views/configuration.item.massupdate.php:270
 #: include/views/configuration.item.prototype.edit.php:598
 #: include/views/configuration.item.prototype.massupdate.php:265
@@ -16401,7 +16401,7 @@ msgstr "Часовой пояс для PHP не задан (параметр к�
 #: app/views/popup.httpstep.php:160
 #: include/views/configuration.host.discovery.edit.php:159
 #: include/views/configuration.httpconf.edit.php:196
-#: include/views/configuration.item.edit.php:197
+#: include/views/configuration.item.edit.php:198
 #: include/views/configuration.item.prototype.edit.php:179
 msgid "Timeout"
 msgstr "Время ожидания"
@@ -16524,7 +16524,7 @@ msgstr "Период хранения данных динамики измене
 msgid "Trend data storage period \"%1$s\"."
 msgstr "Период хранения данных динамики изменений \"%1$s\"."
 
-#: disc_prototypes.php:206 include/views/configuration.item.edit.php:806
+#: disc_prototypes.php:206 include/views/configuration.item.edit.php:807
 #: include/views/configuration.item.massupdate.php:421
 #: include/views/configuration.item.prototype.edit.php:677
 #: include/views/configuration.item.prototype.massupdate.php:418 items.php:83
@@ -16861,9 +16861,9 @@ msgstr "Необходимо выбрать два элемента карты"
 #: include/views/configuration.host.discovery.edit.php:59
 #: include/views/configuration.host.discovery.edit.php:542
 #: include/views/configuration.host.discovery.list.php:58
-#: include/views/configuration.item.edit.php:76
-#: include/views/configuration.item.edit.php:81
-#: include/views/configuration.item.edit.php:693
+#: include/views/configuration.item.edit.php:77
+#: include/views/configuration.item.edit.php:82
+#: include/views/configuration.item.edit.php:694
 #: include/views/configuration.item.list.php:68
 #: include/views/configuration.item.massupdate.php:41
 #: include/views/configuration.item.massupdate.php:340
@@ -16911,8 +16911,8 @@ msgstr "Тип вычисления"
 
 #: app/controllers/CControllerPopupGeneric.php:212
 #: app/controllers/CControllerPopupGeneric.php:275 include/forms.inc.php:194
-#: include/forms.inc.php:688 include/views/configuration.item.edit.php:661
-#: include/views/configuration.item.edit.php:667
+#: include/forms.inc.php:688 include/views/configuration.item.edit.php:662
+#: include/views/configuration.item.edit.php:668
 #: include/views/configuration.item.massupdate.php:263
 #: include/views/configuration.item.prototype.edit.php:586
 #: include/views/configuration.item.prototype.edit.php:592
@@ -16940,7 +16940,7 @@ msgstr "НЕИЗВЕСТНО"
 #: include/screens.inc.php:43
 #: include/views/configuration.host.discovery.edit.php:74
 #: include/views/configuration.httpconf.edit.php:197
-#: include/views/configuration.item.edit.php:112
+#: include/views/configuration.item.edit.php:113
 #: include/views/configuration.item.massupdate.php:104
 #: include/views/configuration.item.prototype.edit.php:95
 #: include/views/configuration.item.prototype.massupdate.php:100
@@ -17048,7 +17048,7 @@ msgstr "Разблокировать выбранных пользователе
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
-#: include/views/configuration.item.edit.php:679
+#: include/views/configuration.item.edit.php:680
 #: include/views/configuration.item.massupdate.php:276
 #: include/views/configuration.item.prototype.edit.php:604
 #: include/views/configuration.item.prototype.massupdate.php:271
@@ -17261,7 +17261,7 @@ msgstr "Доступен"
 #: include/views/configuration.host.massupdate.php:313
 #: include/views/configuration.host.prototype.edit.php:422
 #: include/views/configuration.httpconf.edit.php:253
-#: include/views/configuration.item.edit.php:977
+#: include/views/configuration.item.edit.php:978
 #: include/views/configuration.item.massupdate.php:603
 #: include/views/configuration.item.prototype.edit.php:781
 #: include/views/configuration.item.prototype.massupdate.php:617
@@ -17289,7 +17289,7 @@ msgstr "Обновить существующее"
 #: include/forms.inc.php:240 include/views/configuration.discovery.edit.php:59
 #: include/views/configuration.host.discovery.edit.php:532
 #: include/views/configuration.httpconf.edit.php:79
-#: include/views/configuration.item.edit.php:683
+#: include/views/configuration.item.edit.php:684
 #: include/views/configuration.item.massupdate.php:396
 #: include/views/configuration.item.prototype.edit.php:608
 #: include/views/configuration.item.prototype.massupdate.php:393 items.php:59
@@ -17557,8 +17557,8 @@ msgstr "Меню пользователя"
 #: include/views/configuration.action.edit.php:2199
 #: include/views/configuration.host.discovery.edit.php:285
 #: include/views/configuration.host.discovery.edit.php:494
-#: include/views/configuration.item.edit.php:331
-#: include/views/configuration.item.edit.php:608
+#: include/views/configuration.item.edit.php:332
+#: include/views/configuration.item.edit.php:609
 #: include/views/configuration.item.massupdate.php:293
 #: include/views/configuration.item.prototype.edit.php:313
 #: include/views/configuration.item.prototype.edit.php:536
@@ -17892,8 +17892,8 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:221
 #: include/views/configuration.httpconf.edit.php:119
 #: include/views/configuration.httpconf.edit.php:137
-#: include/views/configuration.item.edit.php:147
-#: include/views/configuration.item.edit.php:239
+#: include/views/configuration.item.edit.php:148
+#: include/views/configuration.item.edit.php:240
 #: include/views/configuration.item.massupdate.php:152
 #: include/views/configuration.item.prototype.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:221
@@ -18377,7 +18377,7 @@ msgid "XML XPath"
 msgstr "XML XPath"
 
 #: include/views/configuration.host.discovery.edit.php:169
-#: include/views/configuration.item.edit.php:207
+#: include/views/configuration.item.edit.php:208
 #: include/views/configuration.item.massupdate.php:118
 #: include/views/configuration.item.prototype.edit.php:189
 #: include/views/configuration.item.prototype.massupdate.php:114
@@ -19221,10 +19221,10 @@ msgstr "четвёртый"
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:759
-#: include/views/configuration.item.edit.php:761
-#: include/views/configuration.item.edit.php:792
-#: include/views/configuration.item.edit.php:794
+#: include/views/configuration.item.edit.php:760
+#: include/views/configuration.item.edit.php:762
+#: include/views/configuration.item.edit.php:793
+#: include/views/configuration.item.edit.php:795
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "глобальные настройки очистки истории"
@@ -19538,8 +19538,8 @@ msgstr "должно содержать по крайней мере один м
 
 #: include/views/configuration.host.discovery.edit.php:124
 #: include/views/configuration.host.discovery.edit.php:216
-#: include/views/configuration.item.edit.php:162
-#: include/views/configuration.item.edit.php:254
+#: include/views/configuration.item.edit.php:163
+#: include/views/configuration.item.edit.php:255
 #: include/views/configuration.item.prototype.edit.php:144
 #: include/views/configuration.item.prototype.edit.php:236
 #: include/views/js/configuration.httpconf.edit.js.php:42
@@ -19786,7 +19786,7 @@ msgstr ""
 msgid "show icon mappings"
 msgstr "показать соответствия иконок"
 
-#: include/views/configuration.item.edit.php:844
+#: include/views/configuration.item.edit.php:845
 #: include/views/configuration.item.massupdate.php:470
 #: include/views/configuration.item.prototype.edit.php:713
 #: include/views/configuration.item.prototype.massupdate.php:470
@@ -20014,8 +20014,8 @@ msgstr "неподдерживаемый номер версии"
 #: include/views/configuration.host.discovery.edit.php:128
 #: include/views/configuration.host.discovery.edit.php:220
 #: include/views/configuration.host.list.php:76
-#: include/views/configuration.item.edit.php:166
-#: include/views/configuration.item.edit.php:258
+#: include/views/configuration.item.edit.php:167
+#: include/views/configuration.item.edit.php:259
 #: include/views/configuration.item.prototype.edit.php:148
 #: include/views/configuration.item.prototype.edit.php:240
 #: include/views/configuration.maintenance.edit.php:179
