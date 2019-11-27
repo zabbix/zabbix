@@ -757,7 +757,10 @@ $keep_history_hint = null;
 if ($data['config']['hk_history_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-		? (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'housekeeping.edit')
+				->getUrl()
+			))
 				->setAttribute('target', '_blank')
 		: _x('global housekeeping settings', 'item_form');
 
@@ -790,7 +793,10 @@ $keep_trend_hint = null;
 if ($data['config']['hk_trends_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-		? (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'housekeeping.edit')
+				->getUrl()
+			))
 				->setAttribute('target', '_blank')
 		: _x('global housekeeping settings', 'item_form');
 
@@ -842,7 +848,10 @@ else {
 
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$valuemapComboBox = [$valuemapComboBox, '&nbsp;',
-		(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')
+		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.list')
+			->getUrl()
+		))->setAttribute('target', '_blank')
 	];
 }
 
