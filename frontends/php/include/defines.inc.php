@@ -121,7 +121,6 @@ define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);
 define('ZBX_AUTH_CASE_SENSITIVE',	1);
 
-define('ZBX_DB_DB2',		'IBM_DB2');
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');

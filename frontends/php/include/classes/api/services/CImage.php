@@ -219,22 +219,6 @@ class CImage extends CApiService {
 					$lob->free();
 					oci_free_statement($stmt);
 				break;
-				case ZBX_DB_DB2:
-					$stmt = db2_prepare($DB['DB'], 'INSERT INTO images ('.implode(' ,', array_keys($values)).',image)'.
-						' VALUES ('.implode(',', $values).', ?)');
-
-					if (!$stmt) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-					}
-
-					$variable = $image['image'];
-					if (!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-					}
-					if (!db2_execute($stmt)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-					}
-				break;
 				case ZBX_DB_MYSQL:
 						$values['image'] = zbx_dbstr($image['image']);
 						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
@@ -321,23 +305,6 @@ class CImage extends CApiService {
 						$row['IMAGE']->truncate();
 						$row['IMAGE']->save($image['image']);
 						$row['IMAGE']->free();
-						break;
-
-					case ZBX_DB_DB2:
-						$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.zbx_dbstr($image['imageid']));
-
-						if (!$stmt) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-						}
-
-						// not unused, db2_bind_param requires variable name as string
-						$variable = $image['image'];
-						if (!db2_bind_param($stmt, 1, 'variable', DB2_PARAM_IN, DB2_BINARY)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-						}
-						if (!db2_execute($stmt)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-						}
 						break;
 				}
 			}
