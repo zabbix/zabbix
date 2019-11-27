@@ -385,7 +385,6 @@ function saveItemTestInputs() {
 		$test_obj = jQuery('.preprocessing-list-item[data-step=<?= $data['step_obj'] ?>]', jQuery('#preprocessing'));
 	<?php } ?>
 
-	console.log(input_values);
 	$test_obj.data('test-data', input_values)
 }
 
