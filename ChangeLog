@@ -118,6 +118,7 @@ Changes for 4.4.3
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-16988] reverted DEV-1334 changes (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.2
