@@ -546,7 +546,10 @@ class ZBase {
 		if ($modules) {
 			foreach ($modules as $module) {
 				$manager->loadModule($module['relative_path']);
-				$manager->enable($module['id']);
+
+				if (!array_key_exists($module['id'], $manager->getErrors())) {
+					$manager->enable($module['id']);
+				}
 			}
 
 			foreach ($manager->getRegisteredNamespaces() as $namespace => $paths) {
