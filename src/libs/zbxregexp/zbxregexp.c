@@ -1147,7 +1147,6 @@ void	zbx_regexp_escape(char **string)
  *                                                                            *
  * Purpose: Matches string value to specified wildcard.                       *
  *          Asterisk (*) characters match to any characters of any length.    *
- *          Question mark (?) characters match any single character.          *
  *                                                                            *
  * Parameters: value    - [IN] string to match                                *
  *             wildcard - [IN] wildcard string expression                     *
@@ -1160,14 +1159,34 @@ void	zbx_regexp_escape(char **string)
  ******************************************************************************/
 int	zbx_wildcard_match(const char *value, const char *wildcard)
 {
-	if (*wildcard == '\0')
-		return *value == '\0';
+	int	i, j = 0;
+	char	*pattern;
 
-	if (*value == '\0')
-		return *wildcard == '\0' || (*wildcard == '*' && *(wildcard + 1) == '\0');
+	for (i = 0; '\0' != wildcard[i]; i++)
+	{
+		if ('*' == wildcard[i])
+			j++;
+	}
 
-	if (*wildcard == '*')
-		return zbx_wildcard_match(value, wildcard + 1) || zbx_wildcard_match(value + 1, wildcard);
+	if (0 == j)
+		return 0 == strcmp(value, wildcard);
 
-	return zbx_wildcard_match(value + 1, wildcard + 1) && ((*wildcard == '?') ? 1 : *value == *wildcard);
+	pattern = (char*)zbx_malloc(NULL, i + j + 1);
+	j = 0;
+
+	for (i = 0; '\0' != wildcard[i]; i++, j++)
+	{
+		if ('*' == wildcard[i])
+			pattern[j++] = '.';
+
+		pattern[j] = wildcard[i];
+	}
+
+	pattern[j] = '\0';
+
+	j = NULL != zbx_regexp_match(value, pattern, NULL);
+
+	zbx_free(pattern);
+
+	return j;
 }

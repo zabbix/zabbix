@@ -226,7 +226,7 @@ out:
 test case: Combined wildcard in key
 in:
   rules:
-    - pattern: 't*t?[a]'
+    - pattern: 't*t*[a]'
       type: ZBX_KEY_ACCESS_DENY
 out:
   metrics:
@@ -237,6 +237,8 @@ out:
     - metric: 'tests[a]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'test[a]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'best[a]'
       result: ZBX_KEY_ACCESS_ALLOW
 ---
 test case: Any second parameter value
@@ -272,7 +274,7 @@ out:
 test case: Single character pattern
 in:
   rules:
-    - pattern: '?est[lo*m,ip?um]'
+    - pattern: '*est[lo*,*um]'
       type: ZBX_KEY_ACCESS_DENY
 out:
   metrics:
@@ -280,10 +282,10 @@ out:
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'best[lorem,ipsum]'
       result: ZBX_KEY_ACCESS_DENY
-    - metric: 'test[lom,ipsum]'
+    - metric: 'west[lom,ipsum]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'quest[lom,ipsum]'
-      result: ZBX_KEY_ACCESS_ALLOW
-    - metric: 'test[lom,ipum]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'test[lo]'
       result: ZBX_KEY_ACCESS_ALLOW
 ...
