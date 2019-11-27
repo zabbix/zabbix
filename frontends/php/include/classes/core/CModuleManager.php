@@ -137,21 +137,30 @@ class CModuleManager {
 		$module_path = $dir.'/Module.php';
 		$manifest = $this->parseManifestFile($manifest_path);
 
-		if ($manifest) {
-			$this->modules[] = [
-				'id' => $manifest['id'],
-				'path' => [
-					'root' => $dir,
-					'manifest' => $manifest_path,
-					'module' => file_exists($module_path) ? $module_path : ''
-				],
-				'manifest' => $manifest,
-				'namespace' => 'Modules\\'.$manifest['namespace'],
-				'status' => false,
-				'instance' => null,
-				'errors' => []
-			];
+		if (!$manifest) {
+			return;
 		}
+
+		$index = $this->getModuleIndexById($manifest['id']);
+		$module = [
+			'id' => $manifest['id'],
+			'path' => [
+				'root' => $dir,
+				'manifest' => $manifest_path,
+				'module' => file_exists($module_path) ? $module_path : ''
+			],
+			'manifest' => $manifest,
+			'namespace' => 'Modules\\'.$manifest['namespace'],
+			'status' => false,
+			'instance' => null,
+			'errors' => []
+		];
+
+		if (!is_null($index)) {
+			$module['errors'][] = new Exception(_s('Conflict for module %s id.', $manifest['id']));
+		}
+
+		$this->modules[] = $module;
 	}
 
 	/**
@@ -236,25 +245,58 @@ class CModuleManager {
 	 */
 	public function registerModule($moduleid) {
 		$config = [];
+		$instance = $this->getModuleInstance($moduleid);
+
+		if ($instance) {
+			$relative_path = $this->getModuleRootDir($moduleid, true);
+			$config = $instance->register($relative_path);
+		}
+
+		return $config;
+	}
+
+	/**
+	 * Create instance of module and call init for enabled module.
+	 *
+	 * @param string $moduleid      Module unique identifier.
+	 * @param array  $config        Module configuration array, will be passed to init method.
+	 */
+	public function initModule($moduleid, array $config) {
+		$instance = $this->getModuleInstance($moduleid);
+
+		if ($instance) {
+			$instance->init($config);
+		}
+	}
+
+	/**
+	 * Get module class instance.
+	 *
+	 * @param string $moduleid      Module manifest id.
+	 * @return CModule|null
+	 */
+	public function getModuleInstance($moduleid) {
 		$index = $this->getModuleIndexById($moduleid);
 
+		if (is_null($index)) {
+			return null;
+		}
+
+		if ($this->modules[$index]['instance']) {
+			return $this->modules[$index]['instance'];
+		}
+
+		$instance = null;
+		$registered = $this->getRegisteredNamespaces();
+		$namespace = static::MODULES_NAMESPACE.$this->modules[$index]['manifest']['namespace'];
+		$main_class = '\\CModule';
+		$module_class = $this->modules[$index]['path']['module']
+			? 'Modules\\'.$this->modules[$index]['manifest']['namespace'].'\\Module'
+			: $main_class;
+
 		try {
-			if (is_null($index)) {
-				throw new Exception(_('Cannot register %s module.', $moduleid));
-			}
-
-			$registered = $this->getRegisteredNamespaces();
-			$namespace = static::MODULES_NAMESPACE.$this->modules[$index]['manifest']['namespace'];
-			$main_class = '\\CModule';
-			$module_class = $this->modules[$index]['path']['module']
-				? 'Modules\\'.$this->modules[$index]['manifest']['namespace'].'\\Module'
-				: $main_class;
-
-			if ($module_class === $main_class && $this->modules[$index]['manifest']['actions']) {
-				throw new Exception(_s('Module %s should have Module.php file.', $moduleid));
-			}
-
-			if (array_key_exists($namespace, $registered)) {
+			if (array_key_exists($namespace, $registered)
+					&& !in_array($this->modules[$index]['path']['root'], $registered[$namespace])) {
 				throw new Exception(_s('Module %s use already reserved namespace %s.', $moduleid, $namespace));
 			}
 
@@ -268,56 +310,13 @@ class CModuleManager {
 				throw new Exception(_s('%s class must extend %s class.', $module_class, $main_class));
 			}
 
-			$relative_path = $this->getModuleRootDir($moduleid, true);
-			$config = $instance->register($relative_path);
 			$this->modules[$index]['instance'] = $instance;
-		}
-		catch (Exception $e) {
-			$this->modules[$index]['errors'][] = $e;
-		}
-
-		return $config;
-	}
-
-	/**
-	 * Create instance of module and call init for enabled module.
-	 *
-	 * @param string $moduleid      Module unique identifier.
-	 * @param array  $config        Module configuration array, will be passed to init method.
-	 */
-	public function initModule($moduleid, array $config) {
-		$index = $this->getModuleIndexById($moduleid);
-
-		if (is_null($index)) {
-			return;
-		}
-
-		$main_class = '\\CModule';
-		$module_class = $this->modules[$index]['path']['module']
-			? 'Modules\\'.$this->modules[$index]['manifest']['namespace'].'\\Module'
-			: $main_class;
-
-		try {
-			if (!class_exists($module_class, true)) {
-				throw new Exception(_s('Module %s class %s not found.', $moduleid, $module_class));
-			}
-
-			$instance = new $module_class($this->modules[$index]['manifest']);
-
-			if (!($instance instanceof CModule) || is_null($instance->getManifest())) {
-				throw new Exception(_s('%s class must extend %s class.', $module_class, $main_class));
-			}
-
-			if ($this->modules[$index]['status']) {
-				$instance->init($config);
-			}
-
-			$this->modules[$index]['instance'] = $instance;
-		}
-		catch (Exception $e) {
+		} catch (Exception $e) {
 			$this->disable($moduleid);
 			$this->modules[$index]['errors'][] = $e;
 		}
+
+		return $instance;
 	}
 
 	/**
@@ -334,7 +333,7 @@ class CModuleManager {
 
 		foreach ($this->modules as $module) {
 			if ($module['status']) {
-				$namespace = 'Modules\\'.$module['manifest']['namespace'].'\\Actions\\';
+				$namespace = static::MODULES_NAMESPACE.$module['manifest']['namespace'].'\\Actions\\';
 
 				foreach ($module['manifest']['actions'] as $action => $data) {
 					$routes[$action] = [
