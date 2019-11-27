@@ -19,407 +19,168 @@
 **/
 
 
-/**
- * NOTE - menu array format:
- * first level:
- *	'label' = main menu title.
- *	'default_page_id	= default page url from 'pages' then opened menu.
- *	'pages' = collection of pages which are displayed from this menu.
- *	these pages are saved a last visited submenu of main menu.
- *
- * second level (pages):
- *	'url' = real url for this page
- *	'label' =  submenu title, if missing, menu skipped, but remembered as last visited page.
- *	'sub_pages' = collection of pages for displaying but not remembered as last visited.
- */
-function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
-	$zbx_menu = [
-		'view' => [
-			'label' => _('Monitoring'),
-			'user_type' => USER_TYPE_ZABBIX_USER,
-			'default_page_id' => 0,
-			'pages' => [
-				[
-					'url' => 'zabbix.php',
-					'action' => 'dashboard.view',
-					'active_if' => ['dashboard.list', 'dashboard.view'],
-					'label' => _('Dashboard'),
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'problem.view',
-					'active_if' => ['problem.view', 'acknowledge.edit'],
-					'label' => _('Problems'),
-					'sub_pages' => ['tr_events.php']
-				],
-				[
-					'url' => 'overview.php',
-					'label' => _('Overview')
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'web.view',
-					'active_if' => ['web.view'],
-					'label' => _('Web'),
-					'sub_pages' => ['httpdetails.php']
-				],
-				[
-					'url' => 'latest.php',
-					'label' => _('Latest data'),
-					'sub_pages' => ['history.php', 'chart.php']
-				],
-				[
-					'url' => 'charts.php',
-					'label' => _('Graphs'),
-					'sub_pages' => ['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php']
-				],
-				[
-					'url' => 'screens.php',
-					'label' => _('Screens'),
-					'sub_pages' => [
-						'screenconf.php',
-						'screenedit.php',
-						'screen.import.php',
-						'slides.php',
-						'slideconf.php'
-					]
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'map.view',
-					'active_if' => ['map.view'],
-					'label' => _('Maps'),
-					'sub_pages' => ['image.php', 'sysmaps.php', 'sysmap.php', 'map.php', 'map.import.php']
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'discovery.view',
-					'active_if' => ['discovery.view'],
-					'label' => _('Discovery'),
-					'user_type' => USER_TYPE_ZABBIX_ADMIN
-				],
-				[
-					'url' => 'srv_status.php',
-					'active_if' => ['report.services'],
-					'label' => _('Services'),
-					'sub_pages' => ['chart5.php']
-				],
-				[
-					'url' => 'chart3.php'
-				],
-				[
-					'url' => 'imgstore.php'
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'search',
-					'active_if' => ['search']
-				],
-				[
-					'url' => 'jsrpc.php'
-				]
-			]
-		],
-		'cm' => [
-			'label' => _('Inventory'),
-			'user_type' => USER_TYPE_ZABBIX_USER,
-			'default_page_id' => 0,
-			'pages' => [
-				[
-					'url' => 'hostinventoriesoverview.php',
-					'label' => _('Overview')
-				],
-				[
-					'url' => 'hostinventories.php',
-					'label' => _('Hosts')
-				]
-			]
-		],
-		'reports' => [
-			'label' => _('Reports'),
-			'user_type' => USER_TYPE_ZABBIX_USER,
-			'default_page_id' => 0,
-			'pages' => [
-				[
-					'url' => 'zabbix.php',
-					'action' => 'report.status',
-					'active_if' => ['report.status'],
-					'label' => _('System information'),
-					'user_type' => USER_TYPE_SUPER_ADMIN
-				],
-				[
-					'url' => 'report2.php',
-					'label' => _('Availability report'),
-					'sub_pages' => ['chart4.php']
-				],
-				[
-					'url' => 'toptriggers.php',
-					'label' => _('Triggers top 100')
-				],
-				[
-					'url' => 'auditlogs.php',
-					'label' => _('Audit'),
-					'user_type' => USER_TYPE_SUPER_ADMIN
-				],
-				[
-					'url' => 'auditacts.php',
-					'label' => _('Action log'),
-					'user_type' => USER_TYPE_SUPER_ADMIN
-				],
-				[
-					'url' => 'report4.php',
-					'label' => _('Notifications'),
-					'user_type' => USER_TYPE_ZABBIX_ADMIN
-				]
-			]
-		],
-		'config' => [
-			'label' => _('Configuration'),
-			'user_type' => USER_TYPE_ZABBIX_ADMIN,
-			'default_page_id' => 0,
-			'pages' => [
-				[
-					'url' => 'conf.import.php'
-				],
-				[
-					'url' => 'hostgroups.php',
-					'label' => _('Host groups')
-				],
-				[
-					'url' => 'templates.php',
-					'label' => _('Templates'),
-					'sub_pages' => [
-						'screenconf.php',
-						'screenedit.php'
-					]
-				],
-				[
-					'url' => 'hosts.php',
-					'label' => _('Hosts'),
-					'sub_pages' => [
-						'items.php',
-						'triggers.php',
-						'graphs.php',
-						'applications.php',
-						'host_discovery.php',
-						'disc_prototypes.php',
-						'trigger_prototypes.php',
-						'host_prototypes.php',
-						'httpconf.php'
-					]
-				],
-				[
-					'url' => 'maintenance.php',
-					'label' => _('Maintenance')
-				],
-				[
-					'url' => 'actionconf.php',
-					'label' => _('Actions')
-				],
-				[
-					'user_type' => USER_TYPE_SUPER_ADMIN,
-					'url' => 'correlation.php',
-					'label' => _('Event correlation')
-				],
-				[
-					'url' => 'discoveryconf.php',
-					'label' => _('Discovery')
-				],
-				[
-					'url' => 'services.php',
-					'label' => _('Services')
-				]
-			]
-		],
-		'admin' => [
-			'label' => _('Administration'),
-			'user_type' => USER_TYPE_SUPER_ADMIN,
-			'default_page_id' => 0,
-			'pages' => [
-				[
-					'url' => 'adm.gui.php',
-					'label' => _('General'),
-					'sub_pages' => [
-						'adm.housekeeper.php',
-						'adm.images.php',
-						'adm.iconmapping.php',
-						'adm.regexps.php',
-						'adm.macros.php',
-						'adm.valuemapping.php',
-						'adm.workingtime.php',
-						'adm.triggerseverities.php',
-						'adm.triggerdisplayoptions.php',
-						'adm.other.php'
-					],
-					'active_if' => ['autoreg.edit', 'module.list', 'module.edit']
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'proxy.list',
-					'active_if' => ['proxy.edit', 'proxy.list'],
-					'label' => _('Proxies')
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'authentication.edit',
-					'active_if' => ['authentication.edit', 'authentication.update'],
-					'label' => _('Authentication')
-				],
-				[
-					'url' => 'usergrps.php',
-					'label' => _('User groups')
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'user.list',
-					'active_if' => ['user.edit', 'user.list'],
-					'label' => _('Users')
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'mediatype.list',
-					'active_if' => ['mediatype.edit', 'mediatype.list'],
-					'label' => _('Media types')
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'script.list',
-					'active_if' => ['script.edit', 'script.list'],
-					'label' => _('Scripts')
-				],
-				[
-					'url' => 'queue.php',
-					'label' => _('Queue')
-				]
-			]
-		],
-		'login' => [
-			'label' => _('Login'),
-			'user_type' => 0,
-			'default_page_id' => 0,
-			'pages' => [
-				[
-					'url' => 'index.php',
-					'sub_pages' => ['zabbix.php']
-				]
+$menu = APP::component()->get('menu.main');
+$menu
+	->add('Monitoring', [
+		'alias' => [],
+		'items' => [
+			'Dashboard' => [
+				'action' => 'dashboard.view',
+				'alias' => ['dashboard.list', 'dashboard.view']
+			],
+			'Problems' => [
+				'action' => 'problem.view',
+				'alias' => ['problem.view', 'acknowledge.edit', 'tr_events.php']
+			],
+			'Overview' => [
+				'action' => 'overview.php'
+			],
+			'Web' => [
+				'action' => 'web.view',
+				'alias' => ['httpdetails.php']
+			],
+			'Latest data' => [
+				'action' => 'latest.php',
+				'alias' => ['history.php', 'chart.php']
+			],
+			'Graphs' => [
+				'action' => 'charts.php',
+				'alias' => ['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php']
+			],
+			'Screens' => [
+				'action' => 'screens.php',
+				'alias' => ['screenconf.php', 'screenedit.php', 'screen.import.php', 'slides.php', 'slideconf.php']
+			],
+			'Maps' => [
+				'action' => 'map.view',
+				'alias' => ['image.php', 'sysmaps.php', 'sysmap.php', 'map.php', 'map.import.php']
+			],
+			'Services' => [
+				'action' => 'srv_status.php',
+				'alias' => ['report.services', 'chart5.php']
 			]
 		]
-	];
+	])
+	->add('Inventory', [
+		'alias' => [],
+		'items' => [
+			'Overview' => [
+				'action' => 'hostinventoriesoverview.php'
+			],
+			'Hosts' => [
+				'action' => 'hostinventories.php'
+			]
+		]
+	])
+	->add('Reports', [
+		'alias' => [],
+		'items' => [
+			'Availability report' => [
+				'action' => 'report2.php',
+				'alias' => ['chart4.php']
+			],
+			'Triggers top 100' => [
+				'action' => 'toptriggers.php'
+			]
+		]
+	]);
 
-	$denied_page_requested = false;
-	$page_exists = false;
-	$deny = true;
+if (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN) {
+	$menu
+		->find('Monitoring')
+			->insertAfter('Maps', 'Discovery', [
+				'action' => 'discovery.view'
+			]);
+	$menu->insertAfter('Reports', 'Configuration', [
+		'alias' => ['conf.import.php'],
+		'items' => [
+			'Host groups' => [
+				'action' => 'hostgroups.php'
+			],
+			'Templates' => [
+				'action' => 'templates.php'
+			],
+			'Hosts' => [
+				'action' => 'hosts.php',
+				'alias' => ['items.php', 'triggers.php', 'graphs.php', 'applications.php', 'host_discovery.php',
+					'disc_prototypes.php', 'trigger_prototypes.php', 'host_prototypes.php', 'httpconf.php'
+				]
+			],
+			'Maintenance' => [
+				'action' => 'maintenance.php'
+			],
+			'Actions' => [
+				'action' => 'actionconf.php'
+			],
+			'Discovery' => [
+				'action' => 'discoveryconf.php'
+			],
+			'Services' => [
+				'action' => 'services.php'
+			]
+		]
+	]);
 
-	foreach ($zbx_menu as $label => $menu) {
-		$show_menu = true;
+}
 
-		if (isset($menu['user_type'])) {
-			$show_menu &= ($menu['user_type'] <= CWebUser::$data['type']);
-		}
-		if ($label == 'login') {
-			$show_menu = false;
-		}
+if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+	$menu
+		->find('Reports')
+			->insertBefore('Availability report', 'System information', [
+				'action' => 'report.status'
+			])
+			->add('Audit', [
+				'action' => 'auditlogs.php'
+			])
+			->add('Action log', [
+				'action' => 'auditacts.php'
+			])
+			->add('Audit', [
+				'Notifications' => 'report4.php'
+			]);
 
-		$menu_class = null;
-		$sub_menus[$label] = [];
+	$menu
+		->find('Configuration')
+			->insertAfter('Actions', 'Event correlation', [
+				'action' => 'correlation.php'
+			]);
 
-		foreach ($menu['pages'] as $sub_page) {
-			$show_sub_menu = true;
-
-			// show check
-			if (!isset($sub_page['label'])) {
-				$show_sub_menu = false;
-			}
-			if (!isset($sub_page['user_type'])) {
-				$sub_page['user_type'] = $menu['user_type'];
-			}
-			if (CWebUser::$data['type'] < $sub_page['user_type']) {
-				$show_sub_menu = false;
-			}
-
-			$row = [
-				'menu_text' => array_key_exists('label', $sub_page) ? $sub_page['label'] : '',
-				'menu_url' => $sub_page['url'],
-				'menu_action' => array_key_exists('action', $sub_page) ? $sub_page['action'] : null,
-				'selected' => false
-			];
-
-			if ($action == null) {
-				$sub_menu_active = ($page['file'] == $sub_page['url']);
-
-				// Quick and dirty hack to display correct menu for templated screens.
-				if (array_key_exists('sub_pages', $sub_page)) {
-					if ((str_in_array('screenconf.php', $sub_page['sub_pages'])
-							|| str_in_array('screenedit.php', $sub_page['sub_pages']))
-								&& ($page['file'] === 'screenconf.php' || $page['file'] === 'screenedit.php')) {
-						if ($label === 'view') {
-							$sub_menu_active |= getRequest('templateid') ? false : true;
-						}
-						elseif ($label === 'config') {
-							$sub_menu_active |= getRequest('templateid') ? true : false;
-						}
-					}
-					elseif (str_in_array($page['file'], $sub_page['sub_pages'])) {
-						$sub_menu_active |= true;
-					}
-				}
-				else {
-					$sub_menu_active |= false;
-				}
-			}
-			else {
-				$sub_menu_active = array_key_exists('active_if', $sub_page) && str_in_array($action, $sub_page['active_if']);
-			}
-
-			if ($sub_menu_active) {
-				// permission check
-				$deny &= (CWebUser::$data['type'] < $menu['user_type'] || CWebUser::$data['type'] < $sub_page['user_type']);
-
-				$menu_class = 'selected';
-				$page_exists = true;
-				$page['menu'] = $label;
-				$row['selected'] = true;
-
-				if (!defined('ZBX_PAGE_NO_MENU')) {
-					CProfile::update('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
-				}
-			}
-
-			if ($show_sub_menu) {
-				$sub_menus[$label][] = $row;
-			}
-		}
-
-		if ($page_exists && $deny) {
-			$denied_page_requested = true;
-		}
-
-		if (!$show_menu) {
-			unset($sub_menus[$label]);
-			continue;
-		}
-
-		if ($sub_menus[$label][$menu['default_page_id']]['menu_action'] === null) {
-			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'];
-		}
-		else {
-			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
-		}
-		$mmenu_entry = (new CListItem(
-			(new CLink($menu['label']))
-				->onClick('javascript: MMenu.mouseOver(\''.$label.'\');')
-				->onKeyup('javascript: MMenu.keyUp(\''.$label.'\', event);')
-				->setAttribute('tabindex', 0)
-		))
-			->addClass($menu_class)
-			->setId($label);
-
-		array_push($main_menu, $mmenu_entry);
-	}
-
-	if (!$page_exists && $page['type'] != PAGE_TYPE_XML && $page['type'] != PAGE_TYPE_CSV && $page['type'] != PAGE_TYPE_TEXT_FILE) {
-		$denied_page_requested = true;
-	}
-
-	return $denied_page_requested;
+	$menu->add('Administration', [
+		'alias' => [],
+		'items' => [
+			'General' => [
+				'action' => 'adm.gui.php',
+				'alias' => [ 'adm.housekeeper.php', 'adm.images.php', 'adm.iconmapping.php', 'adm.regexps.php',
+					'adm.macros.php', 'adm.valuemapping.php', 'adm.workingtime.php', 'adm.triggerseverities.php',
+					'adm.triggerdisplayoptions.php', 'adm.other.php', 'autoreg.edit', 'module.list', 'module.edit'
+				]
+			],
+			'Proxies' => [
+				'action' => 'proxy.list',
+				'alias' => ['proxy.edit', 'proxy.list']
+			],
+			'Authentication' => [
+				'action' => 'authentication.edit',
+				'alias' => ['authentication.edit', 'authentication.update']
+			],
+			'User groups' => [
+				'action' => 'usergrps.php'
+			],
+			'Users' => [
+				'action' => 'user.list',
+				'alias' => ['user.edit']
+			],
+			'Media types' => [
+				'action' => 'mediatype.list',
+				'alias' => ['mediatype.edit']
+			],
+			'Scripts' => [
+				'action' => 'script.list',
+				'alias' => ['script.edit']
+			],
+			'Queue' => [
+				'action' => 'queue.php'
+			]
+		]
+	]);
 }

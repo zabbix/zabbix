@@ -81,6 +81,18 @@ $user_menu->addItem(
 
 $user_navigation->addItem($user_menu);
 
+$menu = [];
+$index = 0;
+
+foreach ($data['menu']->getItems() as $item) {
+	$menu[] = (new CListItem(
+		(new CLink($item->getLabel()))
+			->setAttribute('data-main-menu', $index)
+		))
+		->addClass($item->getSelected() ? ZBX_STYLE_SELECTED : null);
+	++$index;
+}
+
 // 1st level menu
 $top_menu = (new CDiv())
 	->addItem(
@@ -93,7 +105,7 @@ $top_menu = (new CDiv())
 			->addClass(ZBX_STYLE_HEADER_LOGO)
 	)
 	->addItem(
-		(new CTag('nav', true, (new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)))
+		(new CTag('nav', true, (new CList($menu))->addClass(ZBX_STYLE_TOP_NAV)))
 			->setAttribute('aria-label', _('Main navigation'))
 	)
 	->addItem($user_navigation)
@@ -102,42 +114,26 @@ $top_menu = (new CDiv())
 
 $sub_menu_div = (new CTag('nav', true))
 	->setAttribute('aria-label', _('Sub navigation'))
-	->addClass(ZBX_STYLE_TOP_SUBNAV_CONTAINER)
-	->onMouseover('javascript: MMenu.submenu_mouseOver();')
-	->onMouseout('javascript: MMenu.mouseOut();');
+	->addClass(ZBX_STYLE_TOP_SUBNAV_CONTAINER);
 
 // 2nd level menu
-foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
-	$sub_menu_row = (new CList())
-		->addClass(ZBX_STYLE_TOP_SUBNAV)
-		->setId('sub_'.$label);
+foreach ($data['menu']->getItems() as $item) {
+	$child_menu = (new CList())->addClass(ZBX_STYLE_TOP_SUBNAV);
 
-	foreach ($sub_menu as $id => $sub_page) {
-		$url = new CUrl($sub_page['menu_url']);
-		if ($sub_page['menu_action'] !== null) {
-			$url->setArgument('action', $sub_page['menu_action']);
-		}
+	foreach ($item->getItems() as $child_item) {
+		// TODO: remove if statements, use CUrl instead.
+		$action = $child_item->getAction();
+		$url = substr($action, -4) === '.php' ? $action : 'zabbix.php?action='.$action;
+		$selected = $child_item->getSelected() ? ZBX_STYLE_SELECTED : null;
 
-		$url
-			->setArgument('ddreset', 1)
-			->removeArgument('sid');
-
-		$sub_menu_item = (new CLink($sub_page['menu_text'], $url->getUrl()))->setAttribute('tabindex', 0);
-		if ($sub_page['selected']) {
-			$sub_menu_item->addClass(ZBX_STYLE_SELECTED);
-		}
-
-		$sub_menu_row->addItem($sub_menu_item);
+		$child_menu->addItem((new CLink($child_item->getLabel(), $url))->addClass($selected));
 	}
 
-	if ($data['menu']['selected'] === $label) {
-		$sub_menu_row->setAttribute('style', 'display: block;');
-		insert_js('MMenu.def_label = '.zbx_jsvalue($label));
+	if (!$item->getSelected()) {
+		$child_menu->setAttribute('style', 'display: none;');
 	}
-	else {
-		$sub_menu_row->setAttribute('style', 'display: none;');
-	}
-	$sub_menu_div->addItem($sub_menu_row);
+
+	$sub_menu_div->addItem($child_menu);
 }
 
 if ($data['server_name'] !== '') {

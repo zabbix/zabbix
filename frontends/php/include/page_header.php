@@ -134,16 +134,13 @@ switch ($page['type']) {
 		break;
 }
 
-// construct menu
-$main_menu = [];
-$sub_menus = [];
+// TODO: permissions level check should be done on controller level
+// $denied_page_requested = false;
 
-$denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
-
-// render the "Deny access" page
-if ($denied_page_requested) {
-	access_deny(ACCESS_DENY_PAGE);
-}
+// // render the "Deny access" page
+// if ($denied_page_requested) {
+// 	access_deny(ACCESS_DENY_PAGE);
+// }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	global $ZBX_SERVER_NAME;
@@ -253,11 +250,7 @@ if ($page['type'] == PAGE_TYPE_HTML && (CSession::keyExists('messageOk') || CSes
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 	$pageMenu = new CView('layout.htmlpage.menu', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
-		'menu' => [
-			'main_menu' => $main_menu,
-			'sub_menus' => $sub_menus,
-			'selected' => $page['menu']
-		],
+		'menu' => APP::component()->get('menu.main'),
 		'user' => [
 			'is_guest' => CWebUser::isGuest(),
 			'alias' => CWebUser::$data['alias'],
@@ -272,9 +265,6 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORM
 if ($page['type'] == PAGE_TYPE_HTML) {
 	echo '<main>';
 }
-
-// unset multiple variables
-unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 
 // if a user logs in after several unsuccessful attempts, display a warning
 if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {

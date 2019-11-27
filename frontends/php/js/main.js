@@ -105,89 +105,22 @@ var PageRefresh = {
 /*
  * Main menu
  */
-var MMenu = {
-	menus:			{'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
-	def_label:		null,
-	sub_active: 	false,
-	timeout_reset:	null,
-	timeout_change:	null,
+jQuery(function($) {
+	$('[data-main-menu]').click(function() {
+		var $item = $(this),
+			$sub_menus = $('.top-subnav-container').children(),
+			$active = $sub_menus.eq($item.attr('data-main-menu'));
 
-	init: function() {
-		// Detects when none of the selected elements are focused.
-		var elems = jQuery('.top-nav a, .top-subnav a').on('keydown', function(event) {
-			clearTimeout(this.timeout_reset);
+		$sub_menus.hide();
+		$active.show();
 
-			if (event.which == 9) {
-				setTimeout(function() {
-					if (elems.toArray().indexOf(document.querySelector(':focus')) == -1) {
-						clearTimeout(this.timeout_reset);
-						this.timeout_reset = setTimeout(function() {
-							if (elems.toArray().indexOf(document.querySelector(':focus')) == -1){
-								MMenu.showSubMenu(MMenu.def_label)
-							}
-						}, 2500);
-					}
-				});
-			}
-		});
-	},
-
-	mouseOver: function(show_label) {
-		clearTimeout(this.timeout_reset);
-		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
-		PageRefresh.restart();
-	},
-
-	keyUp: function(show_label, event) {
-		if (event.which == 13) {
-			clearTimeout(this.timeout_reset);
-			this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
-			PageRefresh.restart();
+		if ($active.find('.selected').focus().length == 0) {
+			$active.find('li:first-child a').focus();
 		}
-	},
 
-	submenu_mouseOver: function() {
-		clearTimeout(this.timeout_reset);
-		clearTimeout(this.timeout_change);
-		PageRefresh.restart();
-	},
-
-	mouseOut: function() {
-		clearTimeout(this.timeout_change);
-		this.timeout_reset = setTimeout('MMenu.showSubMenu("' + this.def_label + '")', 2500);
-	},
-
-	showSubMenu: function(show_label, focus_subitem) {
-		var sub_menu = $('sub_' + show_label),
-			focus_subitem = focus_subitem || false;
-
-		if (sub_menu !== null) {
-			$(show_label).className = 'selected';
-			sub_menu.show();
-
-			if (focus_subitem) {
-				jQuery('li:first > a', sub_menu).focus();
-			}
-
-			for (var key in this.menus) {
-				if (key == show_label) {
-					continue;
-				}
-
-				var menu_cell = $(key);
-				if (menu_cell !== null) {
-					menu_cell.className = '';
-					jQuery('a', menu_cell).blur();
-				}
-
-				var sub_menu_cell = $('sub_' + key);
-				if (sub_menu_cell !== null) {
-					sub_menu_cell.hide();
-				}
-			}
-		}
-	}
-};
+		$item.closest('li').addClass('selected').siblings().removeClass('selected');
+	});
+});
 
 /*
  * Audio control system

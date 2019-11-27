@@ -154,12 +154,14 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
+				$this->initMenu();
 				$this->initModules();
+				array_map('error', $this->module_manager->getErrors());
 
+				$action = getRequest('action', basename($_SERVER['SCRIPT_NAME']));
 				$router = new CRouter;
 				$router->addActions($this->module_manager->getRoutes());
-				$router->setAction(getRequest('action', basename($_SERVER['SCRIPT_NAME'])));
-				array_map('error', $this->module_manager->getErrors());
+				$router->setAction($action);
 				$view_paths = array_reduce($this->module_manager->getRegisteredNamespaces(), 'array_merge', []);
 				$module = $this->module_manager->getModuleByAction($router->getAction());
 
@@ -169,6 +171,7 @@ class ZBase {
 					$module->beforeAction($router->getAction());
 				}
 
+				$this->component()->get('menu.main')->setSelected($action);
 				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
 
 				if ($router->getController() !== null) {
@@ -562,5 +565,14 @@ class ZBase {
 		}
 
 		$this->module_manager = $manager;
+	}
+
+	/**
+	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
+	 */
+	protected function initMenu() {
+		$menu = new CMenu('menu.main', []);
+		$this->component()->register('menu.main', $menu);
+		include 'include/menu.inc.php';
 	}
 }
