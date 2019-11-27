@@ -177,7 +177,7 @@ $DB[\'DATABASE\'] = \''.addcslashes($this->config['DB']['DATABASE'], "'\\").'\';
 $DB[\'USER\']     = \''.addcslashes($this->config['DB']['USER'], "'\\").'\';
 $DB[\'PASSWORD\'] = \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 
-// Schema name. Used for IBM DB2 and PostgreSQL.
+// Schema name. Used for PostgreSQL.
 $DB[\'SCHEMA\'] = \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
 
 $ZBX_SERVER      = \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';

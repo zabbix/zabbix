@@ -426,7 +426,7 @@ function DBselect($query, $limit = null, $offset = 0) {
  * PostgreSQL:
  * SELECT a FROM tbl LIMIT 10 OFFSET 5
  *
- * Oracle, DB2:
+ * Oracle:
  * SELECT a FROM tbe WHERE rownum < 15 // ONLY < 15
  * SELECT * FROM (SELECT * FROM tbl) WHERE rownum BETWEEN 6 AND 15
  *
