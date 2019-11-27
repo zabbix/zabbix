@@ -49,7 +49,6 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 	public function testPageAdministrationGeneralImages_CheckLayoutBgImages() {
 
 		$this->zbxTestLogin('zabbix.php?action=image.list');
-		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestAssertElementPresentXpath('//button[text()="Create background"]');
 		$this->zbxTestCheckTitle('Configuration of images');

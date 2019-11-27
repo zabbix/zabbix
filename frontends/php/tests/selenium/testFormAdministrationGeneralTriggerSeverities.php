@@ -34,10 +34,8 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 	public function testFormAdministrationGeneralTriggerSeverities_CheckLayout($allValues) {
 
 		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
-		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
 		$this->zbxTestTextPresent(['Info', 'Custom severity names affect all locales and require manual translation!']);
 
@@ -90,7 +88,6 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 	public function testFormAdministrationGeneralTriggerSeverities_ChangeTriggerSeverities() {
 
 		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
 		$this->zbxTestTextPresent('Custom severity names affect all locales and require manual translation!');
@@ -166,7 +163,6 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
 		$this->zbxTestCheckHeader('Trigger severities');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestTextPresent(
 			[
