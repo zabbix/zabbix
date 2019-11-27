@@ -44,7 +44,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 	/**
 	 * Item types requiring interface.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $items_require_interface = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C,
@@ -53,7 +53,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 	/**
 	 * Item types which item key is mandatory.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $item_types_has_key_mandatory = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
