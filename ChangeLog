@@ -118,10 +118,8 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 --------------------------------------------------------------------------------
 Changes for 4.4.3
 
-New features:
-
 Bug fixes:
-...G...PS. [ZBX-16988] reverted DEV-1334 changes (atumilovics)
+...G...PS. [ZBX-16988] fixed agent memory leak (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.2
