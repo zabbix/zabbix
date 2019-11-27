@@ -2747,13 +2747,14 @@ function resourceAccessDenied($resource) {
 			'services.php'
 		];
 	}
-	else if ($user_type != USER_TYPE_SUPER_ADMIN) {
-		$denied = [
+
+	if ($user_type != USER_TYPE_SUPER_ADMIN) {
+		$denied = array_merge($denied, [
 			'auditlogs.php', 'auditacts.php', 'report4.php', 'correlation.php', 'adm.gui.php', 'adm.housekeeper.php',
 			'adm.images.php', 'adm.iconmapping.php', 'adm.regexps.php', 'adm.macros.php', 'adm.valuemapping.php',
 			'adm.workingtime.php', 'adm.triggerseverities.php', 'adm.triggerdisplayoptions.php', 'adm.other.php',
 			'autoreg.edit', 'module.list', 'module.edit', 'usergrps.php', 'queue.php'
-		];
+		]);
 	}
 
 	return in_array($resource, $denied);
