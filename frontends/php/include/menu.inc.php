@@ -153,7 +153,8 @@ if ($user_type == USER_TYPE_SUPER_ADMIN) {
 				'action' => 'adm.gui.php',
 				'alias' => ['adm.housekeeper.php', 'adm.images.php', 'adm.iconmapping.php', 'adm.regexps.php',
 					'adm.macros.php', 'adm.valuemapping.php', 'adm.workingtime.php', 'adm.triggerseverities.php',
-					'adm.triggerdisplayoptions.php', 'adm.other.php', 'autoreg.edit', 'module.list', 'module.edit'
+					'adm.triggerdisplayoptions.php', 'adm.other.php', 'autoreg.edit', 'module.list', 'module.edit',
+					'module.scan'
 				]
 			],
 			'Proxies' => [

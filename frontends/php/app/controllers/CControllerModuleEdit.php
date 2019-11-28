@@ -37,14 +37,7 @@ class CControllerModuleEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			/*
-				PROTOTYPE:
-
-				'moduleid' =>		'required|array_db module.moduleid',
-			*/
-
-			// Testing dummy moduleid.
-			'moduleid' =>		'required',
+			'moduleid' =>		'required|db module.moduleid',
 
 			// form update fields
 			'status' =>			'in 1',
@@ -65,96 +58,54 @@ class CControllerModuleEdit extends CController {
 			return false;
 		}
 
-		/*
-			PROTOTYPE:
+		$modules = API::ModuleDetails()->get([
+			'output' => ['id', 'relative_path', 'status'],
+			'moduleids' => [$this->getInput('moduleid')]
+		]);
 
-			$modules = API::Module()->get([
-				'output' => ['moduleid', 'relative_path', 'name', 'version', 'status'],
-				'moduleids' => $this->getInput('moduleid'),
-				'editable' => true
-			]);
+		if (!$modules) {
+			return false;
+		}
 
-			if (!$modules) {
-				return false;
-			}
-
-			$this->module = $modules[0];
-		*/
-
-		// Testing dummy modules.
-		$modules = self::getModules(['name' => '', 'status' => -1], 'name', 'ASC');
-		$this->module = $modules[$this->getInput('moduleid')];
+		$this->module = $modules[0];
 
 		return true;
 	}
 
 	protected function doAction() {
-		$moduleid = $this->getInput('moduleid');
+		$manager = new CModuleManager(APP::getRootDir());
 
-		/*
-			PROTOTYPE:
+		if ($loaded_module = $manager->loadModule($this->module['relative_path'])) {
+			$manifest = $loaded_module['manifest'];
 
-			$manifest = CModuleRegistry::getManifest($moduleid);
-		*/
-
-		// Testing dummy manifest.
-		$manifest = [
-			'author' => 'John Smith',
-			'description' => 'Test data module description. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-			'namespace' => 'Modules\Example',
-			'url' => 'http://www.module.com',
-		];
-
-		$data = [
-			'moduleid' => $moduleid,
-			'relative_path' => $this->module['relative_path'],
-			'name' => $this->module['name'],
-			'version' => $this->module['version'],
-			'status' => $this->hasInput('form_refresh')
-				? $this->hasInput('status')
-					? MODULE_STATUS_ENABLED
-					: MODULE_STATUS_DISABLED
-				: $this->module['status'],
-			'author' => ($manifest !== null && array_key_exists('author', $manifest)) ? $manifest['author'] : null,
-			'description' => ($manifest !== null && array_key_exists('description', $manifest))
-				? $manifest['description']
-				: null,
-			'namespace' => ($manifest !== null) ? $manifest['namespace'] : null,
-			'url' => ($manifest !== null && array_key_exists('url', $manifest)) ? $manifest['url'] : null
-		];
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Modules'));
-		$this->setResponse($response);
-	}
-
-	// Dummy substitute for API::Module()->get().
-	private static function getModules($filter, $sort_field, $sort_order) {
-		$modules = [];
-
-		for ($i = 1; $i <= 100; $i++) {
-			$modules[$i] = [
-				'moduleid' => $i,
-				'relative_path' => './modules/module'.$i,
-				'name' => 'Test Module - '.$i,
-				'version' => '1.0.'.$i,
-				'status' => $i % 2 ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED
+			$data = [
+				'moduleid' => $this->getInput('moduleid'),
+				'name' => array_key_exists('name', $manifest) ? $manifest['name'] : null,
+				'version' => array_key_exists('version', $manifest) ? $manifest['version'] : null,
+				'author' => array_key_exists('author', $manifest) ? $manifest['author'] : null,
+				'description' => array_key_exists('description', $manifest) ? $manifest['description'] : null,
+				'relative_path' => $this->module['relative_path'],
+				'namespace' => $manifest['namespace'],
+				'url' => array_key_exists('url', $manifest) ? $manifest['url'] : null,
+				'status' => $this->hasInput('form_refresh')
+					? $this->hasInput('status')
+						? MODULE_STATUS_ENABLED
+						: MODULE_STATUS_DISABLED
+					: $this->module['status'],
 			];
+
+			$response = new CControllerResponseData($data);
+			$response->setTitle(_('Modules'));
+			$this->setResponse($response);
 		}
-
-		$modules = array_filter($modules, function($module, $key) use ($filter) {
-			if ($filter['status'] != -1 && $filter['status'] != $module['status']) {
-				return false;
-			}
-			if ($filter['name'] !== '' && stripos($module['name'], $filter['name']) === false) {
-				return false;
-			}
-
-			return true;
-		}, ARRAY_FILTER_USE_BOTH);
-
-		order_result($modules, $sort_field, $sort_order);
-
-		return $modules;
+		else {
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'module.list')
+					->getUrl()
+			);
+			$response->setMessageError(_s('Cannot load module: %s', $this->module['id']));
+			$this->setResponse($response);
+		}
 	}
 }

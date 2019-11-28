@@ -28,7 +28,7 @@ $form = (new CForm())
 	->setName('module-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'module.update')
-		->setArgument('moduleid', $data['moduleid'])
+		->setArgument('moduleids[]', $data['moduleid'])
 		->getUrl()
 	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);

@@ -76,56 +76,30 @@ class CControllerModuleList extends CController {
 		];
 
 		// data prepare
+		$modules = [];
 
-		/*
-			PROTOTYPE:
+		$config = select_config();
+		$manager = new CModuleManager(APP::getRootDir());
 
-			$config = select_config();
+		$db_modules = API::ModuleDetails()->get([
+			'output' => ['relative_path', 'status'],
+			'search' => [
+				'id' => ($filter['name'] === '') ? null : $filter['name']
+			],
+			'filter' => [
+				'status' => ($filter['status'] == -1) ? null : $filter['status']
+			],
+			'limit' => $config['search_limit'] + 1,
+			'preservekeys' => true
+		]);
 
-			$modules = API::Module()->get([
-				'output' => ['name', 'version', 'status'],
-				'search' => [
-					'name' => ($filter['name'] === '') ? null : $filter['name']
-				],
-				'filter' => [
-					'status' => ($filter['status'] == -1) ? null : $filter['status']
-				],
-				'limit' => $config['search_limit'] + 1,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-		*/
+		foreach ($db_modules as $moduleid => $db_module) {
+			$module_loaded = $manager->loadModule($db_module['relative_path']);
 
-		// Testing dummy modules.
-		$modules = self::getModules($filter, $sort_field, $sort_order);
-
-		foreach ($modules as $moduleid => &$module) {
-			/*
-				PROTOTYPE:
-
-				$manifest = CModuleRegistry::getManifest($moduleid);
-			*/
-
-			// Testing dummy manifest.
-			$manifest = [
-				'author' => 'John Smith',
-				'description' => 'Test data module description. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-			];
-
-			if ($manifest !== null) {
-				$module = array_replace($module, [
-					'author' => array_key_exists('author', $manifest) ? $manifest['author'] : null,
-					'description' => array_key_exists('description', $manifest) ? $manifest['description'] : null
-				]);
-			}
-			else {
-				$module = array_replace($module, [
-					'author' => null,
-					'description' => null
-				]);
+			if ($module_loaded) {
+				$modules[$moduleid] = $db_module + $module_loaded['manifest'];
 			}
 		}
-		unset($module);
 
 		$paging = getPagingLine($modules, $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', 'module.list')
@@ -145,33 +119,5 @@ class CControllerModuleList extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Modules'));
 		$this->setResponse($response);
-	}
-
-	// Dummy substitute for API::Module()->get().
-	private static function getModules($filter, $sort_field, $sort_order) {
-		$modules = [];
-
-		for ($i = 1; $i <= 100; $i++) {
-			$modules[$i] = [
-				'name' => 'Test Module - '.$i,
-				'version' => '1.0.'.$i,
-				'status' => $i % 2 ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED
-			];
-		}
-
-		$modules = array_filter($modules, function($module, $key) use ($filter) {
-			if ($filter['status'] != -1 && $filter['status'] != $module['status']) {
-				return false;
-			}
-			if ($filter['name'] !== '' && stripos($module['name'], $filter['name']) === false) {
-				return false;
-			}
-
-			return true;
-		}, ARRAY_FILTER_USE_BOTH);
-
-		order_result($modules, $sort_field, $sort_order);
-
-		return $modules;
 	}
 }

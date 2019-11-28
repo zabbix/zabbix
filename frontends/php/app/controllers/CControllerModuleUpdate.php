@@ -24,16 +24,16 @@
  */
 class CControllerModuleUpdate extends CController {
 
+	/**
+	 * List of modules to update.
+	 *
+	 * @var array
+	 */
+	private $modules = [];
+
 	protected function checkInput() {
 		$fields = [
-			/*
-				PROTOTYPE:
-
-				'moduleid' =>		'required|db module.moduleid',
-			*/
-
-			// Testing dummy moduleid.
-			'moduleid' =>		'required',
+			'moduleids' =>		'required|array_db module.moduleid',
 
 			// form update fields
 			'status' =>			'in 1',
@@ -54,57 +54,86 @@ class CControllerModuleUpdate extends CController {
 			return false;
 		}
 
-		/*
-			PROTOTYPE:
+		$moduleids = $this->getInput('moduleids');
 
-			return (bool) API::Module()->get([
-				'moduleids' => $this->getInput('moduleid'),
-				'countOutput' => true,
-				'editable' => true
-			]);
-		*/
+		$this->modules = API::ModuleDetails()->get([
+			'output' => ['id', 'status'],
+			'moduleids' => $moduleids,
+			'preservekeys' => true
+		]);
 
-		// Testing dummy return.
-		return true;
+		return (count($this->modules) == count($moduleids));
 	}
 
 	protected function doAction() {
-		$moduleid = $this->getInput('moduleid');
+		$set_status = ($this->getAction() === 'module.update')
+			? $this->hasInput('status')
+				? MODULE_STATUS_ENABLED
+				: MODULE_STATUS_DISABLED
+			: ($this->getAction() === 'module.enable')
+				? MODULE_STATUS_ENABLED
+				: MODULE_STATUS_DISABLED;
 
-		/*
-			PROTOTYPE:
+		$manager = new CModuleManager(APP::getRootDir());
 
-			$module = [
-				'moduleid' => $moduleid,
-				'status' => $this->hasInput('status')
-					? MODULE_STATUS_ENABLED
-					: MODULE_STATUS_DISABLED
-			];
+		$db_modules = API::ModuleDetails()->get([
+			'output' => ['id', 'relative_path', 'status'],
+			'preservekeys' => true
+		]);
 
-			$result = API::Module()->update($module);
-		*/
+		foreach ($db_modules as $moduleid => $db_module) {
+			$new_status = array_key_exists($moduleid, $this->modules)
+				? $set_status
+				: $db_module['status'];
 
-		// Testing dummy result.
-		$result = true;
-
-		if ($result) {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'module.list')
-					->setArgument('uncheck', '1')
-					->getUrl()
-			);
-			$response->setMessageOk(_('Module updated'));
+			if ($new_status == MODULE_STATUS_ENABLED) {
+				if ($manager->loadModule($db_module['relative_path'])) {
+					$manager->initModule($db_module['id'], $manager->registerModule($db_module['id']));
+				}
+			}
 		}
-		else {
+
+		$manager_errors = $manager->getErrors();
+
+		array_map('error', $manager_errors);
+
+		$result = false;
+
+		if (!$manager_errors) {
+			$update = [];
+
+			foreach (array_keys($this->modules) as $moduleid) {
+				$update[] = [
+					'moduleid' => $moduleid,
+					'status' => $set_status
+				];
+			}
+
+			$result = API::ModuleDetails()->update($update);
+		}
+
+		if (!$result && $this->getAction() === 'module.update') {
 			$response = new CControllerResponseRedirect(
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'module.edit')
-					->setArgument('moduleid', $moduleid)
+					->setArgument('moduleid', array_keys($this->modules)[0])
 					->getUrl()
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update module'));
+		}
+		else {
+			$curl = (new CUrl('zabbix.php'))->setArgument('action', 'module.list');
+			if ($result) {
+				$curl->setArgument('uncheck', '1');
+			}
+			$response = new CControllerResponseRedirect($curl->getUrl());
+		}
+
+		if ($result) {
+			$response->setMessageOk(_n('Module updated', 'Modules updated', count($this->modules)));
+		}
+		else {
+			$response->setMessageError(_n('Cannot update module', 'Cannot update modules', count($this->modules)));
 		}
 
 		$this->setResponse($response);

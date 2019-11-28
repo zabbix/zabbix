@@ -26,6 +26,16 @@ if ($data['uncheck']) {
 $widget = (new CWidget())
 	->setTitle(_('Modules'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setControls(
+		(new CTag('nav', true,
+			(new CForm())
+				->cleanItems()
+				->addVar('action', 'module.scan')
+				->addItem((new CList())
+					->addItem(new CSubmit('form', _('Scan directory')))
+				)
+		))->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem(
 		(new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'module.list')))
 			->addVar('action', 'module.list')
