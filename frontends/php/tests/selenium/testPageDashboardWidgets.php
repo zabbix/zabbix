@@ -41,7 +41,6 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form->getField('Type')->getValue());
 		$form->submit();
-		$form->parents('xpath://div[contains(@class, "overlay-dialogue")]')->one()->waitUntilNotVisible();
 		// Check that widget type isn't changed in frontend and in DB.
 		$this->checkLastSelectedWidgetType();
 
@@ -56,7 +55,6 @@ class testPageDashboardWidgets extends CWebTest {
 		];
 		$form->fill($data);
 		$form->submit();
-		$form->parents('xpath://div[contains(@class, "overlay-dialogue")]')->one()->waitUntilNotVisible();
 		$this->checkLastSelectedWidgetType();
 
 		// Add widget with current default type "Action log".
@@ -78,6 +76,7 @@ class testPageDashboardWidgets extends CWebTest {
 	 */
 	private function checkLastSelectedWidgetType($type = 'Action log', $db_type = null) {
 		$dashboard = CDashboardElement::find()->one();
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$this->assertEquals($type, $form->getField('Type')->getValue());
@@ -113,6 +112,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form->getField('Type')->getValue());
 		$form->submit();
+		$this->page->waitUntilReady();
 		// Check that widget type is still remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
@@ -231,8 +231,8 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $overlay->asForm();
 		// Set type to "Clock".
 		$form->getField('Type')->asDropdown()->select('Clock');
-		// Wait until form is reloaded.
-		$form->waitUntilReloaded();
+		// Wait until overlay is reloaded.
+		$overlay->waitUntilReady();
 		// Set name of widget.
 		$form->getField('Name')->type('Clock test');
 		$form->submit();

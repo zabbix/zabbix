@@ -29,6 +29,7 @@ if (!empty($data['hostid'])) {
 
 // Create form.
 $form = (new CForm())
+	->setId('itemForm')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -84,7 +85,7 @@ else {
 }
 
 // Append key to form list.
-$key_controls = [(new CTextBox('key', $data['key'], $readonly))
+$key_controls = [(new CTextBox('key', $data['key'], $readonly, DB::getFieldLength('items', 'key_')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAriaRequired()
 ];
@@ -928,7 +929,7 @@ $form_list
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('items' , 'description'))
+			->setMaxlength(DB::getFieldLength('items', 'description'))
 			->setReadonly($discovered_item)
 	)
 	// Append status to form list.

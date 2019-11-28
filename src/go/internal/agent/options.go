@@ -28,48 +28,47 @@ import (
 	"strings"
 	"unicode"
 
+	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/tls"
 )
 
 type AgentOptions struct {
-	LogType              string   `conf:",optional,,file"`
-	LogFile              string   `conf:",optional,,/tmp/zabbix_agent2.log"`
-	LogFileSize          int      `conf:",optional,0:1024,1"`
-	DebugLevel           int      `conf:",optional,0:5,3"`
-	PidFile              string   `conf:",optional,,/tmp/zabbix_agent2.pid"`
-	ServerActive         string   `conf:",optional"`
-	RefreshActiveChecks  int      `conf:",optional,30:3600,120"`
-	Timeout              int      `conf:",optional,1:30,3"`
-	Hostname             string   `conf:",optional"`
-	HostnameItem         string   `conf:",optional"`
-	HostMetadata         string   `conf:",optional"`
-	HostMetadataItem     string   `conf:",optional"`
-	BufferSend           int      `conf:",optional,1:3600,5"`
-	BufferSize           int      `conf:",optional,2:65535,100"`
-	ListenIP             string   `conf:",optional"`
-	ListenPort           int      `conf:",,1024:32767,10050"`
-	StatusPort           int      `conf:",optional,1024:32767"`
-	SourceIP             string   `conf:",optional"`
-	Server               string   `conf:",optional"`
-	MaxLinesPerSecond    int      `conf:",,1:1000,20"`
-	UserParameter        []string `conf:",optional"`
-	UnsafeUserParameters int      `conf:",optional,0:1,0"`
-	LogRemoteCommands    int      `conf:",optional,0:1,0"`
-	EnableRemoteCommands int      `conf:",optional,0:1,0"`
-	ControlSocket        string   `conf:",optional"`
-	Alias                []string `conf:",optional"`
-	TLSConnect           string   `conf:",optional"`
-	TLSAccept            string   `conf:",optional"`
-	TLSPSKIdentity       string   `conf:",optional"`
-	TLSPSKFile           string   `conf:",optional"`
-	TLSCAFile            string   `conf:",optional"`
-	TLSCRLFile           string   `conf:",optional"`
-	TLSCertFile          string   `conf:",optional"`
-	TLSKeyFile           string   `conf:",optional"`
-	TLSServerCertIssuer  string   `conf:",optional"`
-	TLSServerCertSubject string   `conf:",optional"`
+	LogType              string   `conf:"optional,default=file"`
+	LogFile              string   `conf:"optional,default=/tmp/zabbix_agent2.log"`
+	LogFileSize          int      `conf:"optional,range=0:1024,default=1"`
+	DebugLevel           int      `conf:"optional,range=0:5,default=3"`
+	PidFile              string   `conf:"optional,default=/tmp/zabbix_agent2.pid"`
+	ServerActive         string   `conf:"optional"`
+	RefreshActiveChecks  int      `conf:"optional,range=30:3600,default=120"`
+	Timeout              int      `conf:"optional,range=1:30,default=3"`
+	Hostname             string   `conf:"optional"`
+	HostnameItem         string   `conf:"optional"`
+	HostMetadata         string   `conf:"optional"`
+	HostMetadataItem     string   `conf:"optional"`
+	BufferSend           int      `conf:"optional,range=1:3600,default=5"`
+	BufferSize           int      `conf:"optional,range=2:65535,default=100"`
+	ListenIP             string   `conf:"optional"`
+	ListenPort           int      `conf:"optional,range=1024:32767,default=10050"`
+	StatusPort           int      `conf:"optional,range=1024:32767"`
+	SourceIP             string   `conf:"optional"`
+	Server               string   `conf:"optional"`
+	MaxLinesPerSecond    int      `conf:"optional,range=1:1000,default=20"`
+	UserParameter        []string `conf:"optional"`
+	UnsafeUserParameters int      `conf:"optional,range=0:1,default=0"`
+	ControlSocket        string   `conf:"optional"`
+	Alias                []string `conf:"optional"`
+	TLSConnect           string   `conf:"optional"`
+	TLSAccept            string   `conf:"optional"`
+	TLSPSKIdentity       string   `conf:"optional"`
+	TLSPSKFile           string   `conf:"optional"`
+	TLSCAFile            string   `conf:"optional"`
+	TLSCRLFile           string   `conf:"optional"`
+	TLSCertFile          string   `conf:"optional"`
+	TLSKeyFile           string   `conf:"optional"`
+	TLSServerCertIssuer  string   `conf:"optional"`
+	TLSServerCertSubject string   `conf:"optional"`
 
-	Plugins map[string]map[string]string `conf:",optional"`
+	Plugins map[string]interface{} `conf:"optional"`
 }
 
 var Options AgentOptions
@@ -216,4 +215,12 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 	}
 
 	return c, nil
+}
+
+func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
+	options = &plugin.GlobalOptions{
+		Timeout:  Options.Timeout,
+		SourceIP: Options.SourceIP,
+	}
+	return
 }

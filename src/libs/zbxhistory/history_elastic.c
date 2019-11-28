@@ -144,17 +144,17 @@ static int	history_parse_value(struct zbx_json_parse *jp, unsigned char value_ty
 	size_t	value_alloc = 0;
 	int	ret = FAIL;
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, "clock", &value, &value_alloc))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, "clock", &value, &value_alloc, NULL))
 		goto out;
 
 	hr->timestamp.sec = atoi(value);
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, "ns", &value, &value_alloc))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, "ns", &value, &value_alloc, NULL))
 		goto out;
 
 	hr->timestamp.ns = atoi(value);
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, "value", &value, &value_alloc))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, "value", &value, &value_alloc, NULL))
 		goto out;
 
 	hr->value = history_str2value(value, value_type);
@@ -162,22 +162,22 @@ static int	history_parse_value(struct zbx_json_parse *jp, unsigned char value_ty
 	if (ITEM_VALUE_TYPE_LOG == value_type)
 	{
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(jp, "timestamp", &value, &value_alloc))
+		if (SUCCEED != zbx_json_value_by_name_dyn(jp, "timestamp", &value, &value_alloc, NULL))
 			goto out;
 
 		hr->value.log->timestamp = atoi(value);
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(jp, "logeventid", &value, &value_alloc))
+		if (SUCCEED != zbx_json_value_by_name_dyn(jp, "logeventid", &value, &value_alloc, NULL))
 			goto out;
 
 		hr->value.log->logeventid = atoi(value);
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(jp, "severity", &value, &value_alloc))
+		if (SUCCEED != zbx_json_value_by_name_dyn(jp, "severity", &value, &value_alloc, NULL))
 			goto out;
 
 		hr->value.log->severity = atoi(value);
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(jp, "source", &value, &value_alloc))
+		if (SUCCEED != zbx_json_value_by_name_dyn(jp, "source", &value, &value_alloc, NULL))
 			goto out;
 
 		hr->value.log->source = zbx_strdup(NULL, value);
@@ -284,17 +284,17 @@ static int	elastic_is_error_present(zbx_httppage_t *page, char **err)
 					SUCCEED == zbx_json_brackets_by_name(&jp_item, "index", &jp_index) &&
 					SUCCEED == zbx_json_brackets_by_name(&jp_index, "error", &jp_error))
 			{
-				if (SUCCEED != zbx_json_value_by_name_dyn(&jp_error, "type", &type, &type_alloc))
+				if (SUCCEED != zbx_json_value_by_name_dyn(&jp_error, "type", &type, &type_alloc, NULL))
 					rc_js = FAIL;
-				if (SUCCEED != zbx_json_value_by_name_dyn(&jp_error, "reason", &reason, &reason_alloc))
+				if (SUCCEED != zbx_json_value_by_name_dyn(&jp_error, "reason", &reason, &reason_alloc, NULL))
 					rc_js = FAIL;
 			}
 			else
 				continue;
 
-			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_index, "status", &status, &status_alloc))
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_index, "status", &status, &status_alloc, NULL))
 				rc_js = FAIL;
-			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_index, "_index", &index, &index_alloc))
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_index, "_index", &index, &index_alloc, NULL))
 				rc_js = FAIL;
 
 			break;
@@ -721,7 +721,7 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 		zbx_json_brackets_open(jp.start, &jp_values);
 
 		/* get the scroll id immediately, for being used in subsequent queries */
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_values, "_scroll_id", &scroll_id, &id_alloc))
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_values, "_scroll_id", &scroll_id, &id_alloc, NULL))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "elasticsearch version is not compatible with zabbix server. "
 					"_scroll_id tag is absent");

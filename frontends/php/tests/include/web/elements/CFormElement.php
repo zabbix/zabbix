@@ -26,6 +26,11 @@ require_once dirname(__FILE__).'/../CElement.php';
  * Form element.
  */
 class CFormElement extends CElement {
+
+	const TABLE_FORM = 'ul[contains(@class, "table-forms")]';
+	const TABLE_FORM_LEFT = 'div[contains(@class, "table-forms-td-left")]';
+	const TABLE_FORM_RIGHT = 'div[contains(@class, "table-forms-td-right")]';
+
 	/**
 	 * Local form input cache.
 	 * @var array
@@ -64,7 +69,7 @@ class CFormElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getLabels() {
-		return $this->query('xpath:.//ul[@class="table-forms"]/li/div[@class="table-forms-td-left"]/label')->all();
+		return $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT.'/label')->all();
 	}
 
 	/**
@@ -77,7 +82,7 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getLabel($name) {
-		$prefix = 'xpath:.//ul[@class="table-forms"]/li/div[@class="table-forms-td-left"]';
+		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
 		$labels = $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
 
 		if ($labels->isEmpty()) {
@@ -107,14 +112,12 @@ class CFormElement extends CElement {
 	 * @return CElement|null
 	 */
 	public function getFieldByLabelElement($label) {
-		$prefix = './../../div[@class="table-forms-td-right"]';
-
-		if (($element = CElementQuery::getInputElement($label, $prefix)) !== null) {
+		if (($element = CElementQuery::getInputElement($label, './../../'.self::TABLE_FORM_RIGHT)) !== null) {
 			return $element;
 		}
 
 		// Nested table forms.
-		$element = $label->query('xpath', $prefix.'//ul[@class="table-forms"]/..')
+		$element = $label->query('xpath', './../../'.self::TABLE_FORM_RIGHT.'//'.self::TABLE_FORM.'/..')
 				->cast('CFormElement', ['normalized' => true])
 				->one(false);
 
@@ -193,13 +196,13 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getFieldById($id) {
-		$prefix = 'xpath:.//ul[@class="table-forms"]/li/div[@class="table-forms-td-left"]';
+		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
 		$label = $this->query($prefix.'/label[@for='.CXPathHelper::escapeQuotes($id).']')->one(false);
 
 		if (!$label) {
-			$label = $this->query('xpath:.//ul[@class="table-forms"]/li/div[@class="table-forms-td-right"]//*[@id='.
-					CXPathHelper::escapeQuotes($id).']/ancestor::div[@class="table-forms-td-right"]/../'.
-					'div[@class="table-forms-td-left"]/label')->one(false);
+			$label = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_RIGHT.'//*[@id='.
+					CXPathHelper::escapeQuotes($id).']/ancestor::'.self::TABLE_FORM_RIGHT.'/../'.
+					self::TABLE_FORM_LEFT.'/label')->one(false);
 
 			if (!$label) {
 				throw new Exception('Failed to find form label by field id: "'.$id.'".');
@@ -223,7 +226,7 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getFieldContainer($name) {
-		return $this->getLabel($name)->query('xpath:./../../div[@class="table-forms-td-right"]')->one();
+		return $this->getLabel($name)->query('xpath:./../../'.self::TABLE_FORM_RIGHT)->one();
 	}
 
 	/**
@@ -270,7 +273,7 @@ class CFormElement extends CElement {
 	 */
 	public function getOverlayMessage() {
 		return $this->parents('class:overlay-dialogue-body')->one()
-				->query('tag:output')->waitUntilPresent()->asMessage()->one();
+				->query('tag:output')->asMessage()->waitUntilVisible()->one();
 	}
 
 	/**

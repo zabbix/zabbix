@@ -20,17 +20,20 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup usrgrp
+ */
 class testFormAdministrationUserGroups extends CLegacyWebTest {
 	private $userGroup = 'Selenium user group';
 
 	public function testFormAdministrationUserGroups_CheckLayout() {
-		$this->zbxTestLogin('usergrps.php');
+		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickButtonText('Create user group');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestCheckHeader('User groups');
 
 		$this->zbxTestTextPresent(['Group name', 'Users', 'Frontend access', 'Enabled', 'Debug mode']);
-		$this->zbxTestAssertAttribute('//input[@id=\'gname\']', 'maxlength', '64');
+		$this->zbxTestAssertAttribute('//input[@id="name"]', 'maxlength', '64');
 
 		$this->zbxTestDropdownHasOptions('gui_access', ['System default', 'Internal', 'LDAP', 'Disabled']);
 		$this->zbxTestDropdownAssertSelected('gui_access', 'System default');
@@ -43,15 +46,15 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => '',
-					'error_msg' => 'Page received incorrect data',
-					'error' => 'Incorrect value for field "Group name": cannot be empty.'
+					'error_msg' => 'Cannot add user group',
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Zabbix administrators',
-					'error_msg' => 'Cannot add group',
+					'error_msg' => 'Cannot add user group',
 					'error' => 'User group "Zabbix administrators" already exists.'
 				]
 			],
@@ -62,7 +65,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 					'user_group' => 'Zabbix administrators',
 					'user' => 'Admin',
 					'enabled' => false,
-					'error_msg' => 'Cannot add group',
+					'error_msg' => 'Cannot add user group',
 					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 				]
 			],
@@ -73,7 +76,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 					'user_group' => 'Zabbix administrators',
 					'user' => 'Admin',
 					'frontend_access' => 'Disabled',
-					'error_msg' => 'Cannot add group',
+					'error_msg' => 'Cannot add user group',
 					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 				]
 			],
@@ -101,11 +104,11 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormAdministrationUserGroups_Create($data) {
-		$this->zbxTestLogin('usergrps.php?form=Create+user+group');
+		$this->zbxTestLogin('zabbix.php?action=usergroup.edit');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestCheckHeader('User groups');
 
-		$this->zbxTestInputTypeOverwrite('gname', $data['name']);
+		$this->zbxTestInputTypeOverwrite('name', $data['name']);
 		if (array_key_exists('user_group', $data)) {
 			$this->zbxTestClickButtonMultiselect('userids_');
 			$this->zbxTestLaunchOverlayDialog('Users');
@@ -130,8 +133,8 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of user groups');
 				$this->zbxTestCheckHeader('User groups');
-				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add group']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group added');
+				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add user group']);
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group added');
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 
@@ -155,15 +158,15 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => ' ',
-					'error_msg' => 'Page received incorrect data',
-					'error' => 'Incorrect value for field "Group name": cannot be empty.'
+					'error_msg' => 'Cannot update user group',
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Zabbix administrators',
-					'error_msg' => 'Cannot update group',
+					'error_msg' => 'Cannot update user group',
 					'error' => 'User group "Zabbix administrators" already exists.'
 				]
 			],
@@ -174,7 +177,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 					'user_group' => 'Zabbix administrators',
 					'user' => 'Admin',
 					'enabled' => false,
-					'error_msg' => 'Cannot update group',
+					'error_msg' => 'Cannot update user group',
 					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 				]
 			],
@@ -185,7 +188,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 					'user_group' => 'Zabbix administrators',
 					'user' => 'Admin',
 					'frontend_access' => 'Disabled',
-					'error_msg' => 'Cannot update group',
+					'error_msg' => 'Cannot update user group',
 					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 				]
 			],
@@ -207,12 +210,12 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormAdministrationUserGroups_Update($data) {
-		$this->zbxTestLogin('usergrps.php');
+		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickLinkTextWait($this->userGroup);
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestCheckHeader('User groups');
 
-		$this->zbxTestInputTypeOverwrite('gname', $data['name']);
+		$this->zbxTestInputTypeOverwrite('name', $data['name']);
 		if (array_key_exists('user_group', $data)) {
 			$this->zbxTestClickButtonMultiselect('userids_');
 			$this->zbxTestLaunchOverlayDialog('Users');
@@ -231,14 +234,14 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 			$this->zbxTestCheckboxSelect('debug_mode', $data['debug_mode']);
 		}
 
-		$this->zbxTestClickButton('Update');
+		$this->zbxTestClickButton('usergroup.update');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of user groups');
 				$this->zbxTestCheckHeader('User groups');
-				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot update group']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
+				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot update user group']);
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 
@@ -299,7 +302,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 	 * @dataProvider delete
 	 */
 	public function testFormAdministrationUserGroups_Delete($data) {
-		$this->zbxTestLogin('usergrps.php');
+		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickLinkTextWait($data['name']);
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestCheckHeader('User groups');
@@ -311,13 +314,13 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of user groups');
 				$this->zbxTestCheckHeader('User groups');
-				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot delete group']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group deleted');
+				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot delete user group']);
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group deleted');
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(0, CDBHelper::getCount($sql));
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete group');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete user group');
 				$this->zbxTestTextPresent($data['error']);
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));

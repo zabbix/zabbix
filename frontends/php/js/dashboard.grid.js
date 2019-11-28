@@ -2969,7 +2969,7 @@
 	function updateWidgetDynamic($obj, data, widget) {
 		// This function may be called for widget that is not in data['widgets'] array yet.
 		if (typeof widget['fields']['dynamic'] !== 'undefined') {
-			if (widget['fields']['dynamic'] === '1' && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
+			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
 					'hostid': data['dashboard']['dynamic']['hostid'],
 					'groupid': data['dashboard']['dynamic']['groupid']

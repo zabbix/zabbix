@@ -161,7 +161,9 @@ static void	rotate_log(const char *filename)
 		strscpy(filename_old, filename);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
 		remove(filename_old);
-
+#ifdef _WINDOWS
+		zbx_redirect_stdio(NULL);
+#endif
 		if (0 != rename(filename, filename_old))
 		{
 			FILE	*log_file = NULL;

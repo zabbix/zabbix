@@ -49,37 +49,44 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
 
 		// Add "One time only" maintenance period.
-		$this->zbxTestClickButtonText('New');
-		$this->zbxTestClickXpathWait('//button[@class=\'btn-link\' and text()=\'Add\']');
-		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr/td','One time only');
+		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
+		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr/td','One time only');
 
 		// Add "Daily" maintenance period.
-		$this->zbxTestClickButtonText('New');
-		$this->zbxTestDropdownSelectWait('new_timeperiod_timeperiod_type', 'Daily');
-		$this->zbxTestClickXpathWait('//button[@class=\'btn-link\' and text()=\'Add\']');
-		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[2]/td','Daily');
+		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Daily');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->page->waitUntilReady();
+		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[2]/td','Daily');
 
 		// Add "Weekly" maintenance period with "Monday" and "Sunday".
-		$this->zbxTestClickButtonText('New');
-		$this->zbxTestDropdownSelectWait('new_timeperiod_timeperiod_type', 'Weekly');
-		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_mo');
-		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_su');
-		$this->zbxTestClickXpathWait('//button[@class=\'btn-link\' and text()=\'Add\']');
+		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Weekly');
+		$this->zbxTestCheckboxSelect('days_1');
+		$this->zbxTestCheckboxSelect('days_64');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->page->waitUntilReady();
 		// Check weekly period in frontend.
-		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[3]/td','Weekly');
-		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[3]/td[2]');
+		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[3]/td','Weekly');
+		$text = $this->zbxTestGetText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[3]/td[2]');
 		$this->assertRegexp('/Monday/', $text);
 		$this->assertRegexp('/Sunday/', $text);
 
 		// Add "Monthly" maintenace period with "January" and "November".
-		$this->zbxTestClickButtonText('New');
-		$this->zbxTestDropdownSelectWait('new_timeperiod_timeperiod_type', 'Monthly');
-		$this->zbxTestCheckboxSelect('new_timeperiod_month_jan');
-		$this->zbxTestCheckboxSelect('new_timeperiod_month_nov');
-		$this->zbxTestClickXpathWait('//button[@class=\'btn-link\' and text()=\'Add\']');
+		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Monthly');
+		$this->zbxTestCheckboxSelect('months_1');
+		$this->zbxTestCheckboxSelect('months_1024');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->page->waitUntilReady();
 		// Check monthly period in frontend.
-		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[4]/td','Monthly');
-		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[4]/td[2]');
+		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[4]/td','Monthly');
+		$text = $this->zbxTestGetText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[4]/td[2]');
 		$this->assertRegexp('/January/', $text);
 		$this->assertRegexp('/November/', $text);
 
@@ -101,7 +108,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		}
 
 		// Create maintenance and check the results in frontend.
-		$this->zbxTestClickXpath('//button[@id=\'add\'][@type=\'submit\']');
+		$this->zbxTestClickXpath('//button[@id="add"][@type="submit"]');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance added');
 		$this->zbxTestTextPresent($this->name);
 
@@ -125,7 +132,7 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		// Open "Periods" tab and remove 4th defined period.
 		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
-		$this->zbxTestClickXpathWait('//td[contains(text(), \'Monthly\')]/..//button[text()=\'Remove\']');
+		$this->zbxTestClickXpathWait('//td[contains(text(), "Monthly")]/..//button[text()="Remove"]');
 		$this->zbxTestWaitForPageToLoad();
 
 		// Close the form.
@@ -143,7 +150,7 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		// "Periods" tab, check that 4th period exist.
 		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
-		$this->zbxTestAssertElementPresentXpath('//td[contains(text(), \'Monthly\')]/..//button[text()=\'Edit\']');
+		$this->zbxTestAssertElementPresentXpath('//td[contains(text(), "Monthly")]/..//button[text()="Edit"]');
 	}
 
 	/**
@@ -158,44 +165,45 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->name);
 
 		// Change maintenance type.
-		$this->zbxTestClickXpathWait('//label[contains(text(), \'No data collection\')]');
+		$this->zbxTestClickXpathWait('//label[contains(text(), "No data collection")]');
 
 		// Open "Periods" tab.
 		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
 		// Remove "One time only".
-		$this->zbxTestClickXpath('//td[contains(text(), \'One time only\')]/..//button[text()=\'Remove\']');
+		$this->zbxTestClickXpath('//td[contains(text(), "One time only")]/..//button[text()="Remove"]');
 		$this->zbxTestWaitForPageToLoad();
 		// Edit "Weekly".
-		$this->zbxTestClickXpathWait('//td[contains(text(), \'Weekly\')]/..//button[text()=\'Edit\']');
-		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_we');
-		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_fr');
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_timeperiod\')]');
+		$this->zbxTestClickXpathWait('//td[contains(text(), "Weekly")]/..//button[text()="Edit"]');
+		$this->zbxTestCheckboxSelect('days_4');
+		$this->zbxTestCheckboxSelect('days_16');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Apply"]');
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
 		$this->zbxTestWaitForPageToLoad();
-		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[2]/td[2]');
+		$text = $this->query('xpath://div[@id="maintenance_periods"]//tbody/tr[2]/td[2]')->waitUntilVisible()->one()->getText();
 		$this->assertRegexp('/Monday/', $text);
 		$this->assertRegexp('/Wednesday/', $text);
 		$this->assertRegexp('/Friday/', $text);
 		$this->assertRegexp('/Sunday/', $text);
 		// Edit "Monthly".
-		$this->zbxTestClickXpath('//td[contains(text(), \'Monthly\')]/..//button[text()=\'Edit\']');
-		$this->zbxTestCheckboxSelect('new_timeperiod_month_sep');
-		$this->zbxTestCheckboxSelect('new_timeperiod_month_jun');
-		$this->zbxTestClickXpath('//label[contains(text(), \'Day of week\')]');
-		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_we');
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_timeperiod\')]');
+		$this->zbxTestClickXpath('//td[contains(text(), "Monthly")]/..//button[text()="Edit"]');
+		$this->zbxTestCheckboxSelect('months_32');
+		$this->zbxTestCheckboxSelect('months_256');
+		$this->zbxTestClickXpath('//ul[@id="month_date_type"]//label[contains(text(), "Day of week")]');
+		$this->zbxTestCheckboxSelect('monthly_days_4');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Apply"]');
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
 		$this->zbxTestWaitForPageToLoad();
-		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[3]/td[2]');
+		$text = $this->query('xpath://div[@id="maintenance_periods"]//tbody/tr[3]/td[2]')->waitUntilVisible()->one()->getText();
 		$this->assertRegexp('/Wednesday/', $text);
 		$this->assertRegexp('/January/', $text);
 		$this->assertRegexp('/June/', $text);
 		$this->assertRegexp('/September/', $text);
 		$this->assertRegexp('/November/', $text);
-
 		$this->zbxTestClick('update');
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance updated');
-		$this->zbxTestAssertElementText('//a[text()=\''.$this->name.'\']/../../td[3]', 'No data collection');
+		$this->zbxTestAssertElementText('//a[text()="'.$this->name.'"]/../../td[3]', 'No data collection');
 		$this->zbxTestTextPresent($this->name);
 
 		// Check the results in DB.
@@ -247,7 +255,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		// Clone maintenance, rename the clone and save it.
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputTypeOverwrite('mname', $this->name.$suffix);
-		$this->zbxTestClickXpath('//button[@id=\'add\'][@type=\'submit\']');
+		$this->zbxTestClickXpath('//button[@id="add"][@type="submit"]');
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance added');

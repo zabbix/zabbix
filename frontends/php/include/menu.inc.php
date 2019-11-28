@@ -165,7 +165,8 @@ if ($user_type == USER_TYPE_SUPER_ADMIN) {
 				'alias' => ['authentication.edit', 'authentication.update']
 			],
 			'User groups' => [
-				'action' => 'usergrps.php'
+				'action' => 'usergroup.list',
+				'alias' => ['usergroup.edit']
 			],
 			'Users' => [
 				'action' => 'user.list',

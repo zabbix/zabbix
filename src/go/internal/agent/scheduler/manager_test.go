@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
@@ -168,11 +169,15 @@ func (p *mockRunnerWatcherPlugin) watched() []*plugin.Request {
 type mockConfiguratorPlugin struct {
 	plugin.Base
 	mockPlugin
-	options map[string]string
+	options interface{}
 }
 
-func (p *mockConfiguratorPlugin) Configure(options map[string]string) {
+func (p *mockConfiguratorPlugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	p.call("$configure")
+}
+
+func (p *mockConfiguratorPlugin) Validate(options interface{}) (err error) {
+	return
 }
 
 type resultCacheMock struct {
@@ -244,7 +249,7 @@ func (m *mockManager) mockTasks() {
 		tasks := p.tasks
 		p.tasks = make(performerHeap, 0, len(tasks))
 		for j, task := range tasks {
-			switch task.(type) {
+			switch t := task.(type) {
 			case *collectorTask:
 				collector := p.impl.(plugin.Collector)
 				mockTask := &mockCollectorTask{
@@ -259,24 +264,23 @@ func (m *mockManager) mockTasks() {
 				}
 				p.enqueueTask(mockTask)
 			case *exporterTask:
-				e := task.(*exporterTask)
 				mockTask := &mockExporterTask{
 					exporterTask: exporterTask{
 						taskBase: taskBase{
 							plugin:    task.getPlugin(),
-							scheduled: getNextcheck(e.item.delay, m.now).Add(priorityExporterTaskNs),
+							scheduled: getNextcheck(t.item.delay, m.now).Add(priorityExporterTaskNs),
 							index:     -1,
 							active:    task.isActive(),
 							recurring: true,
 						},
-						item:   e.item,
-						client: e.client,
-						meta:   e.meta,
+						item:   t.item,
+						client: t.client,
+						meta:   t.meta,
 					},
 					sink: m.sink,
 				}
 				p.enqueueTask(mockTask)
-				m.clients[index[e]].exporters[e.item.itemid] = mockTask
+				m.clients[index[t]].exporters[t.item.itemid] = mockTask
 			case *starterTask:
 				mockTask := &mockStarterTask{
 					taskBase: taskBase{
@@ -300,7 +304,6 @@ func (m *mockManager) mockTasks() {
 				}
 				p.enqueueTask(mockTask)
 			case *watcherTask:
-				w := task.(*watcherTask)
 				mockTask := &mockWatcherTask{
 					taskBase: taskBase{
 						plugin:    task.getPlugin(),
@@ -309,12 +312,11 @@ func (m *mockManager) mockTasks() {
 						active:    task.isActive(),
 					},
 					sink:     m.sink,
-					requests: w.requests,
-					client:   w.client,
+					requests: t.requests,
+					client:   t.client,
 				}
 				p.enqueueTask(mockTask)
 			case *configuratorTask:
-				c := task.(*configuratorTask)
 				mockTask := &mockConfigerTask{
 					taskBase: taskBase{
 						plugin:    task.getPlugin(),
@@ -322,7 +324,7 @@ func (m *mockManager) mockTasks() {
 						index:     -1,
 						active:    task.isActive(),
 					},
-					options: c.options,
+					options: t.options,
 					sink:    m.sink,
 				}
 				p.enqueueTask(mockTask)
@@ -540,11 +542,11 @@ func (t *mockWatcherTask) GlobalRegexp() plugin.RegexpMatcher {
 type mockConfigerTask struct {
 	taskBase
 	sink    chan performer
-	options map[string]string
+	options *agent.AgentOptions
 }
 
 func (t *mockConfigerTask) perform(s Scheduler) {
-	t.plugin.impl.(plugin.Configurator).Configure(t.options)
+	t.plugin.impl.(plugin.Configurator).Configure(agent.GlobalOptions(t.options), t.options.Plugins[t.plugin.name()])
 	t.sink <- t
 }
 
@@ -615,7 +617,7 @@ func TestTaskCreate(t *testing.T) {
 		plugin.RegisterMetrics(p, name, name, "Debug.")
 	}
 
-	manager, _ := NewManager(agent.Options)
+	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
 		&clientItem{itemid: 1, delay: "151", key: "debug1"},
@@ -668,7 +670,7 @@ func TestTaskUpdate(t *testing.T) {
 		plugin.RegisterMetrics(p, name, name, "Debug.")
 	}
 
-	manager, _ := NewManager(agent.Options)
+	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
 		&clientItem{itemid: 1, delay: "151", key: "debug1"},
@@ -736,7 +738,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 		plugin.RegisterMetrics(p, name, name, "Debug.")
 	}
 
-	manager, _ := NewManager(agent.Options)
+	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
 		&clientItem{itemid: 1, delay: "151", key: "debug1"},
@@ -792,7 +794,7 @@ func TestTaskDelete(t *testing.T) {
 		plugin.RegisterMetrics(p, name, name, "Debug.")
 	}
 
-	manager, _ := NewManager(agent.Options)
+	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
 		&clientItem{itemid: 1, delay: "151", key: "debug1"},
@@ -1685,15 +1687,23 @@ func TestPassiveRunner(t *testing.T) {
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 }
 
+type configuratorOption struct {
+	Params interface{} `conf:"optional"`
+}
+
 func TestConfigurator(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	options := map[string]map[string]string{
-		"Debug1": map[string]string{"delay": "5"},
-		"Debug2": map[string]string{"delay": "30"},
-		"Debug3": map[string]string{"delay": "60"},
+	var opt1, opt2, opt3 configuratorOption
+	_ = conf.Unmarshal([]byte("Delay=5"), &opt1)
+	_ = conf.Unmarshal([]byte("Delay=30"), &opt2)
+	_ = conf.Unmarshal([]byte("Delay=60"), &opt3)
+
+	agent.Options.Plugins = map[string]interface{}{
+		"Debug1": opt1.Params,
+		"Debug2": opt2.Params,
+		"Debug3": opt3.Params,
 	}
-	agent.Options.Plugins = options
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1703,7 +1713,7 @@ func TestConfigurator(t *testing.T) {
 		plugins[i] = &mockConfiguratorPlugin{
 			Base:       plugin.Base{},
 			mockPlugin: mockPlugin{now: &manager.now},
-			options:    options[name]}
+			options:    agent.Options.Plugins[name]}
 		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)

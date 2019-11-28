@@ -417,15 +417,15 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 					case OPERATION_TYPE_GROUP_ADD:
 					case OPERATION_TYPE_GROUP_REMOVE:
-						foreach ($operation['groupids'] as $groupid) {
-							$groupids[$groupid] = true;
+						foreach ($operation['opgroup'] as $groupid) {
+							$groupids[$groupid['groupid']] = true;
 						}
 						break;
 
 					case OPERATION_TYPE_TEMPLATE_ADD:
 					case OPERATION_TYPE_TEMPLATE_REMOVE:
-						foreach ($operation['templateids'] as $templateid) {
-							$templateids[$templateid] = true;
+						foreach ($operation['optemplate'] as $templateid) {
+							$templateids[$templateid['templateid']] = true;
 						}
 						break;
 				}
@@ -650,9 +650,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 					case OPERATION_TYPE_GROUP_REMOVE:
 						$host_group_list = [];
 
-						foreach ($operation['groupids'] as $groupid) {
-							if (array_key_exists($groupid, $host_groups)) {
-								$host_group_list[] = $host_groups[$groupid]['name'];
+						foreach ($operation['opgroup'] as $groupid) {
+							if (array_key_exists($groupid['groupid'], $host_groups)) {
+								$host_group_list[] = $host_groups[$groupid['groupid']]['name'];
 							}
 						}
 
@@ -672,9 +672,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 					case OPERATION_TYPE_TEMPLATE_REMOVE:
 						$template_list = [];
 
-						foreach ($operation['templateids'] as $templateid) {
-							if (array_key_exists($templateid, $templates)) {
-								$template_list[] = $templates[$templateid]['name'];
+						foreach ($operation['optemplate'] as $templateid) {
+							if (array_key_exists($templateid['templateid'], $templates)) {
+								$template_list[] = $templates[$templateid['templateid']]['name'];
 							}
 						}
 

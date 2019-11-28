@@ -341,7 +341,7 @@ ul.top-nav-icons {
 		}
 	}
 
-	a {
+	a, span.top-nav-guest {
 		display: block;
 		width: 24px;
 		height: 45px;
@@ -369,6 +369,10 @@ ul.top-nav-icons {
 
 	.top-nav-profile {
 		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
+	}
+
+	.top-nav-guest {
+		background: url(../img/icon-sprite.svg) no-repeat -241px -104px;
 	}
 
 	.top-nav-signout {
@@ -1956,6 +1960,12 @@ output {
 		}
 	}
 
+	.form-fields-inline {
+		label {
+			margin: 0 8px 0 3px;
+		}
+	}
+
 	h4 {
 		margin-bottom: -5px;
 	}
@@ -2288,6 +2298,25 @@ select {
 }
 
 .checkbox-radio {
+
+	&:checked[readonly] + label span {
+		&::after {
+			border-color: $form-border-color !important;
+		}
+		@include transition(none);
+	}
+
+	&[readonly] {
+		&, + label {
+			pointer-events: none;
+		}
+	}
+
+	&[readonly] + label span {
+		@include transition(none);
+		@extend %form-disabled;
+	}
+
 	&[type="checkbox"] {
 		+ label span {
 			@include border-radius(2px);
@@ -4581,7 +4610,6 @@ $form-icon-btn: (
 			}
 
 			.columns-wrapper {
-				flex-wrap: nowrap;
 
 				.column-50:last-of-type {
 					margin-left: 10px;
@@ -6715,6 +6743,10 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+
+	&.columns-nowrap {
+		flex-wrap: nowrap;
+	}
 
 	[class^=column-] {
 		-webkit-box-flex: 0;
