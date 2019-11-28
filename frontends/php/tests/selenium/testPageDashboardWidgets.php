@@ -76,6 +76,7 @@ class testPageDashboardWidgets extends CWebTest {
 	 */
 	private function checkLastSelectedWidgetType($type = 'Action log', $db_type = null) {
 		$dashboard = CDashboardElement::find()->one();
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$this->assertEquals($type, $form->getField('Type')->getValue());
@@ -111,6 +112,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form->getField('Type')->getValue());
 		$form->submit();
+		$this->page->waitUntilReady();
 		// Check that widget type is still remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
@@ -229,8 +231,8 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $overlay->asForm();
 		// Set type to "Clock".
 		$form->getField('Type')->asDropdown()->select('Clock');
-		// Wait until form is reloaded.
-		$form->waitUntilReloaded();
+		// Wait until overlay is reloaded.
+		$overlay->waitUntilReady();
 		// Set name of widget.
 		$form->getField('Name')->type('Clock test');
 		$form->submit();

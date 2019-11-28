@@ -34,14 +34,30 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'select_tag' => 'New event tag',
 					'tag' => 'Test tag',
 					'description' => 'Event correlation with description',
-					'operation' => 'Close new event'
+					'operation' => [
+						'Close new event'
+					]
 				]
 			],
 			[
 				[
 					'name' => 'Test create with minimum fields',
 					'select_tag' => 'Old event tag',
-					'tag' => 'Test tag'
+					'tag' => 'Test tag',
+					'operation' => [
+						'Close old event'
+					]
+				]
+			],
+			[
+				[
+					'name' => 'Test create with both operations selected',
+					'select_tag' => 'Old event tag',
+					'tag' => 'Test tag',
+					'operation' => [
+						'Close old event',
+						'Close new event'
+					]
 				]
 			]
 		];
@@ -59,9 +75,12 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Event correlation rules');
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
-		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
-		$this->zbxTestInputType('new_condition_tag', $data['tag']);
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('overlay_dialogue'));
+		$this->zbxTestDropdownSelectWait('condition_type', $data['select_tag']);
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
+		$this->zbxTestInputType('tag', $data['tag']);
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 
 		if (array_key_exists('description', $data)) {
 			$this->zbxTestInputType('description', $data['description']);
@@ -69,11 +88,11 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestTabSwitch('Operations');
 
-		if (array_key_exists('operation', $data)) {
-			$this->zbxTestDropdownSelect('new_operation_type', $data['operation']);
+		foreach($data['operation'] as $operation) {
+			$operation_id = ($operation === 'Close old event') ? 'operation_0_type' : 'operation_1_type';
+			$this->zbxTestCheckboxSelect($operation_id);
 		}
 
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 		$this->zbxTestTextPresent($data['name']);
@@ -131,8 +150,10 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('tag', $data)) {
-			$this->zbxTestInputType('new_condition_tag', $data['tag']);
-			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+			$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
+			$this->zbxTestInputType('tag', $data['tag']);
+			$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 		}
 
 		$this->zbxTestClick('add');
@@ -165,11 +186,13 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Event correlation rules');
 
 		$this->zbxTestInputType('name', $name);
-		$this->zbxTestInputType('new_condition_tag', 'Test tag');
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
+		$this->zbxTestInputType('tag', 'Test tag');
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
+		$this->zbxTestCheckboxSelect('operation_0_type');
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
@@ -309,35 +332,36 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Event correlation rules');
 
 		$this->zbxTestInputType('name', $data['name']);
-		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
-		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+		$this->zbxTestDropdownSelectWait('condition_type', $data['select_tag']);
 
 		if (array_key_exists('operator', $data)) {
-			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
+			$this->zbxTestClickXpathWait('//label[text()="'.$data['operator'].'"]');
 		}
 
 		if ($data['select_tag'] === 'New event host group') {
-			$this->zbxTestClickButtonMultiselect('new_condition_groupids_');
+			$this->zbxTestClickButtonMultiselect('groupids_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
 			$this->zbxTestClickLinkText($host_group);
 		}
 
 		if ($data['select_tag'] === 'Event tag pair') {
-			$this->zbxTestInputTypeWait('new_condition_oldtag', $data['oldtag']);
-			$this->zbxTestInputType('new_condition_newtag', $data['newtag']);
+			$this->zbxTestInputTypeWait('oldtag', $data['oldtag']);
+			$this->zbxTestInputType('newtag', $data['newtag']);
 		}
 
 		if ($data['select_tag'] === 'Old event tag value' || $data['select_tag'] === 'New event tag value') {
-			$this->zbxTestInputType('new_condition_tag', $data['tag']);
-			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputType('new_condition_value', $data['value']);
+			$this->zbxTestInputType('tag', $data['tag']);
+			$this->zbxTestClickXpathWait('//label[text()="'.$data['operator'].'"]');
+			$this->zbxTestInputType('value', $data['value']);
 		}
 
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 		$this->zbxTestWaitForPageToLoad();
 
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
+		$this->zbxTestCheckboxSelect('operation_0_type');
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
@@ -407,22 +431,22 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Event correlation rules');
 
 		$this->zbxTestInputType('name', $data['name']);
-		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
-		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+		$this->zbxTestDropdownSelectWait('condition_type', $data['select_tag']);
 
 		if ($data['select_tag'] === 'Event tag pair' && array_key_exists('newtag', $data)) {
-			$this->zbxTestInputType('new_condition_newtag', $data['newtag']);
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('newtag'));
+			$this->zbxTestInputType('newtag', $data['newtag']);
 		}
 
 		if ($data['select_tag'] === 'Event tag pair' && array_key_exists('oldtag', $data)) {
-			$this->zbxTestInputType('new_condition_oldtag', $data['oldtag']);
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('oldtag'));
+			$this->zbxTestInputType('oldtag', $data['oldtag']);
 		}
 
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
-
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation condition');
-		$this->zbxTestAssertElementText('//ul[@class=\'msg-details-border\']', $data['error_message']);
-
+		$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
+		$this->zbxTestAssertElementText('//div[@class="msg-details"]', $data['error_message']);
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
@@ -488,12 +512,16 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestInputType('name', $data['name']);
 
 		foreach ($data['tags'] as $tag) {
-			$this->zbxTestDropdownSelectWait('new_condition_type', $tag['select_tag']);
-			$this->zbxTestInputType('new_condition_tag', $tag['tag_name']);
-			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+			$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+			$this->zbxTestDropdownSelectWait('condition_type', $tag['select_tag']);
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
+			$this->zbxTestInputType('tag', $tag['tag_name']);
+			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 		}
 
 		if (array_key_exists('calculation', $data)) {
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('evaltype'));
 			$this->zbxTestDropdownSelect('evaltype', $data['calculation']);
 			if ($data['calculation'] === 'Custom expression') {
 				$this->zbxTestInputType('formula', $data['formula']);
@@ -501,7 +529,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		}
 
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
+		$this->zbxTestCheckboxSelect('operation_0_type');
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
@@ -609,17 +637,21 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestInputType('name', $data['name']);
 
 		foreach ($data['tags'] as $tag) {
-			$this->zbxTestDropdownSelectWait('new_condition_type', $tag['select_tag']);
-			$this->zbxTestInputType('new_condition_tag', $tag['tag_name']);
+			$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+			$this->zbxTestDropdownSelectWait('condition_type', $tag['select_tag']);
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
+			$this->zbxTestInputType('tag', $tag['tag_name']);
 
 			if (array_key_exists('operator', $tag)) {
-				$this->zbxTestDropdownSelectWait('new_condition_operator', $tag['operator']);
-				$this->zbxTestInputType('new_condition_value', $tag['value']);
+				$this->zbxTestClickXpathWait('//label[text()="'.$tag['operator'].'"]');
+				$this->zbxTestInputType('value', $tag['value']);
 			}
 
-			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 		}
 
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('evaltype'));
 		$this->zbxTestDropdownSelectWait('evaltype', 'Custom expression');
 		$this->zbxTestInputType('formula', $data['formula']);
 		$this->zbxTestClick('add');
@@ -684,16 +716,19 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('name', 'New event correlation for update');
 
 		$this->zbxTestClickXpathWait('//tr[@id=\'conditions_0\']//button[text()=\'Remove\']');
-		$this->zbxTestDropdownSelectWait('new_condition_type', 'New event tag');
-		$this->zbxTestInputTypeOverwrite('new_condition_tag', 'New update tag');
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+		$this->zbxTestDropdownSelectWait('condition_type', 'New event tag');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
+		$this->zbxTestInputTypeOverwrite('tag', 'New update tag');
+		$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 
 		$this->zbxTestInputTypeOverwrite('description', 'New test description update');
 
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'removeOperation\')]');
-		$this->zbxTestDropdownSelect('new_operation_type', 'Close new event');
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_operation\')]');
+		$this->zbxTestCheckboxSelect('operation_0_type', false);
+		$this->zbxTestCheckboxSelect('operation_1_type');
 		$this->zbxTestClick('update');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation updated');

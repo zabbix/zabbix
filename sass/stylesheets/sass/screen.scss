@@ -101,7 +101,6 @@ svg a {
 	&:focus {
 		outline: none;
 		border-bottom: 2px solid rgba($link-hover-color, 0.35);
-
 	}
 }
 
@@ -342,7 +341,7 @@ ul.top-nav-icons {
 		}
 	}
 
-	a {
+	a, span.top-nav-guest {
 		display: block;
 		width: 24px;
 		height: 45px;
@@ -370,6 +369,10 @@ ul.top-nav-icons {
 
 	.top-nav-profile {
 		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
+	}
+
+	.top-nav-guest {
+		background: url(../img/icon-sprite.svg) no-repeat -241px -104px;
 	}
 
 	.top-nav-signout {
@@ -527,24 +530,59 @@ ul.top-nav-icons {
 }
 
 .header-title {
-	border-bottom: 1px solid $ui-border-color;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 	margin: -10px 0 10px;
 	padding: 10px 0 6px;
-	width: 100%;
+	border-bottom: 1px solid $ui-border-color;
 
-	.cell {
+	& > div {
+		overflow: hidden;
 
-		&:first-child {
-			max-width: calc(100vw - 370px);
+		&:last-child {
+			flex-shrink: 0;
 		}
 	}
 
 	h1 {
+		position: relative;
 		line-height: 24px;
 		overflow: hidden;
 		padding-top: 1px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	a.link-action {
+		display: block;
+		box-sizing: border-box;
+		height: 25px;
+
+		h1 {
+			padding-right: 1em;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 50%;
+				right: .15em;
+				margin-top: -.15em;
+				width: .3em;
+				height: .3em;
+				border-right: 2px solid $font-color;
+				border-bottom: 2px solid $font-color;
+				transform: rotate(45deg);
+				@include transition(border-color .2s ease-out);
+			}
+		}
+
+		&:hover,
+		&:focus {
+			h1::after {
+				border-color: $link-hover-color;
+			}
+		}
 	}
 
 	form {
@@ -1922,6 +1960,12 @@ output {
 		}
 	}
 
+	.form-fields-inline {
+		label {
+			margin: 0 8px 0 3px;
+		}
+	}
+
 	h4 {
 		margin-bottom: -5px;
 	}
@@ -2254,6 +2298,25 @@ select {
 }
 
 .checkbox-radio {
+
+	&:checked[readonly] + label span {
+		&::after {
+			border-color: $form-border-color !important;
+		}
+		@include transition(none);
+	}
+
+	&[readonly] {
+		&, + label {
+			pointer-events: none;
+		}
+	}
+
+	&[readonly] + label span {
+		@include transition(none);
+		@extend %form-disabled;
+	}
+
 	&[type="checkbox"] {
 		+ label span {
 			@include border-radius(2px);
@@ -4476,6 +4539,19 @@ $form-icon-btn: (
 		line-height: 24px;
 		@extend %overflow-ellipsis;
 	}
+
+	&.page-title-submenu::before {
+		content: '';
+		position: absolute;
+		top: -7px;
+		left: 10px;
+		width: 12px;
+		height: 12px;
+		background-color: $ui-bg-color;
+		border-top: 1px solid $action-border-color;
+		border-left: 1px solid $action-border-color;
+		transform: rotate(45deg);
+	}
 }
 
 .search-suggest {
@@ -4534,7 +4610,6 @@ $form-icon-btn: (
 			}
 
 			.columns-wrapper {
-				flex-wrap: nowrap;
 
 				.column-50:last-of-type {
 					margin-left: 10px;
@@ -4564,7 +4639,10 @@ $form-icon-btn: (
 
 	&.modal-popup {
 		max-width: 1024px;
-		min-width: 650px;
+
+		&.modal-popup-generic {
+			min-width: 650px;
+		}
 	}
 
 	.hintbox-scrollable {
@@ -4798,6 +4876,7 @@ $form-icon-btn: (
 	resize: none;
 	word-break: break-all;
 	white-space: normal;
+	height: 24px;
 }
 
 // Map widget back to parent button.
@@ -6446,16 +6525,14 @@ tr.cursor-move {
 
 // Analog Clock
 .clock {
+	display: flex;
+	justify-content: center;
 	padding: 0 10px;
-	height: 99%;
-	width: auto;
+	height: 100%;
 }
 
 .clock-svg {
-	max-height: 100%;
-	max-width: 100%;
-	display: block;
-	margin: 0 auto;
+	flex-grow: 1;
 }
 
 .time-zone {
@@ -6670,6 +6747,10 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+
+	&.columns-nowrap {
+		flex-wrap: nowrap;
+	}
 
 	[class^=column-] {
 		-webkit-box-flex: 0;

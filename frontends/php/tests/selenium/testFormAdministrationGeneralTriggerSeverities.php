@@ -33,11 +33,9 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 	*/
 	public function testFormAdministrationGeneralTriggerSeverities_CheckLayout($allValues) {
 
-		$this->zbxTestLogin('adm.triggerseverities.php');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
+		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
-		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
 		$this->zbxTestTextPresent(['Info', 'Custom severity names affect all locales and require manual translation!']);
 
@@ -89,8 +87,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralTriggerSeverities_ChangeTriggerSeverities() {
 
-		$this->zbxTestLogin('adm.triggerseverities.php');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
+		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
 		$this->zbxTestTextPresent('Custom severity names affect all locales and require manual translation!');
@@ -103,22 +100,22 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 		$this->zbxTestInputType('severity_name_5', 'Disaster2');
 
 		$this->zbxTestClick('lbl_severity_color_5');
-		$this->zbxTestClickXpath("//div[@title='\"#880000\"']");
+		$this->zbxTestClickXpath('//div[@title="#FF0000"]');
 
 		$this->zbxTestClick('lbl_severity_color_4');
-		$this->zbxTestClickXpath("//div[@title='\"#FF3333\"']");
+		$this->zbxTestClickXpath('//div[@title="#CC6600"]');
 
 		$this->zbxTestClick('lbl_severity_color_3');
-		$this->zbxTestClickXpath("//div[@title='\"#FF6666\"']");
+		$this->zbxTestClickXpath('//div[@title="#E57373"]');
 
 		$this->zbxTestClick('lbl_severity_color_2');
-		$this->zbxTestClickXpath("//div[@title='\"#DDDD00\"']");
+		$this->zbxTestClickXpath('//div[@title="#FFA000"]');
 
 		$this->zbxTestClick('lbl_severity_color_1');
-		$this->zbxTestClickXpath("//div[@title='\"#00CCCC\"']");
+		$this->zbxTestClickXpath('//div[@title="#0097A7"]');
 
 		$this->zbxTestClick('lbl_severity_color_0');
-		$this->zbxTestClickXpath("//div[@title='\"#999999\"']");
+		$this->zbxTestClickXpath('//div[@title="#A5A5A5"]');
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
@@ -143,30 +140,29 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 
 		// checking severity colors in the DB
 
-		$sql = 'SELECT severity_color_0 FROM config where severity_color_0='.zbx_dbstr('999999');
+		$sql = 'SELECT severity_color_0 FROM config where severity_color_0='.zbx_dbstr('A5A5A5');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_0"');
 
-		$sql = 'SELECT severity_color_1 FROM config WHERE severity_color_1='.zbx_dbstr('00CCCC');
+		$sql = 'SELECT severity_color_1 FROM config WHERE severity_color_1='.zbx_dbstr('0097A7');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_1"');
 
-		$sql = 'SELECT severity_color_2 FROM config WHERE severity_color_2='.zbx_dbstr('DDDD00');
+		$sql = 'SELECT severity_color_2 FROM config WHERE severity_color_2='.zbx_dbstr('FFA000');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_2"');
 
-		$sql = 'SELECT severity_color_3 FROM config WHERE severity_color_3='.zbx_dbstr('FF6666');
+		$sql = 'SELECT severity_color_3 FROM config WHERE severity_color_3='.zbx_dbstr('E57373');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_3"');
 
-		$sql = 'SELECT severity_color_4 FROM config WHERE severity_color_4='.zbx_dbstr('FF3333');
+		$sql = 'SELECT severity_color_4 FROM config WHERE severity_color_4='.zbx_dbstr('CC6600');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_4"');
 
-		$sql = 'SELECT severity_color_5 FROM config WHERE severity_color_5='.zbx_dbstr('880000');
+		$sql = 'SELECT severity_color_5 FROM config WHERE severity_color_5='.zbx_dbstr('FF0000');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_5"');
 	}
 
 	public function testFormAdministrationGeneralTriggerSeverities_ResetDefaults() {
 
-		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
 		$this->zbxTestCheckHeader('Trigger severities');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestTextPresent(
 			[

@@ -40,7 +40,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'iprange' => '192.168.0.1-25',
 					'delay' => '1m',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'HTTP', 'ports' => '7555']
+						['check_action' => 'Add', 'type' => 'HTTP', 'ports' => '7555']
 					],
 					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
@@ -49,7 +49,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'name' => 'Local network',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'HTTPS', 'ports' => '447']
+						['check_action' => 'Add', 'type' => 'HTTPS', 'ports' => '447']
 					],
 					'error' => 'Discovery rule "Local network" already exists.',
 				]
@@ -59,7 +59,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'name' => 'Discovery rule with empty IP range',
 					'iprange' => ' ',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'FTP', 'ports' => '22']
+						['check_action' => 'Add', 'type' => 'FTP', 'ports' => '22']
 					],
 					'error' => 'Incorrect value for field "iprange": cannot be empty.'
 				]
@@ -71,7 +71,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'iprange' => 'text',
 					'delay' => '1m',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'HTTP', 'ports' => '7555']
+						['check_action' => 'Add', 'type' => 'HTTP', 'ports' => '7555']
 					],
 					'error' => 'Incorrect value for field "iprange": invalid address range "text".'
 				]
@@ -82,7 +82,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'proxy' => 'Active proxy 1',
 					'delay' => '1G',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'HTTP', 'ports' => '7555']
+						['check_action' => 'Add', 'type' => 'HTTP', 'ports' => '7555']
 					],
 					'error' => 'Field "Update interval" is not correct: a time unit is expected'
 				]
@@ -101,7 +101,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'name' => 'Discovery rule without checks, add check and then remove it',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'POP'],
+						['check_action' => 'Add', 'type' => 'POP'],
 						['check_action' => 'Remove']
 					],
 					'error' => 'Cannot save discovery rule without checks.'
@@ -111,7 +111,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'name' => 'Discovery rule with incorrect port range',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'POP', 'ports' => 'abc']
+						['check_action' => 'Add', 'type' => 'POP', 'ports' => 'abc']
 					],
 					'error_in_checks' => ['Incorrect port range.']
 				]
@@ -120,8 +120,8 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'name' => 'Discovery rule with existen check',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'ICMP ping'],
-						['check_action' => 'New', 'type' => 'ICMP ping']
+						['check_action' => 'Add', 'type' => 'ICMP ping'],
+						['check_action' => 'Add', 'type' => 'ICMP ping']
 					],
 					'error_in_checks' => ['Check already exists.']
 				]
@@ -130,18 +130,18 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'name' => 'Discovery rule with incorrect Zabbix agent check',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'Zabbix agent']
+						['check_action' => 'Add', 'type' => 'Zabbix agent']
 					],
-					'error_in_checks' => ['Invalid key "": key is empty.']
+					'error_in_checks' => ['Incorrect value for field "key_": cannot be empty.']
 				]
 			],
 			[
 				[
 					'name' => 'Discovery rule with incorrect SNMP',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'SNMPv1 agent']
+						['check_action' => 'Add', 'type' => 'SNMPv1 agent']
 					],
-					'error_in_checks' => ['Incorrect SNMP community.', 'Incorrect SNMP OID.']
+					'error_in_checks' => ['Incorrect value for field "snmp_community": cannot be empty.', 'Incorrect value for field "snmp_oid": cannot be empty.']
 				]
 			]
 		];
@@ -163,9 +163,8 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$this->fillInFields($data);
 
 		if (array_key_exists('error_in_checks', $data)) {
-			$this->zbxTestLaunchOverlayDialog('Discovery check error');
 			foreach ($data['error_in_checks'] as $error) {
-				$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//span[text()='".$error."']");
+				$this->zbxTestTextPresentInMessageDetails($error);
 			}
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="Cancel"]');
 			return;
@@ -184,7 +183,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'name' => 'Discovery rule with HTTP check',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'HTTP', 'ports' => '7555']
+						['check_action' => 'Add', 'type' => 'HTTP', 'ports' => '7555']
 					]
 				]
 			],
@@ -192,7 +191,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'name' => 'Discovery rule with Zabbix agent',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'Zabbix agent', 'key' => 'ping']
+						['check_action' => 'Add', 'type' => 'Zabbix agent', 'key' => 'ping']
 					],
 					'radio_buttons' => [
 						'Device uniqueness criteria' => 'Zabbix agent "ping"',
@@ -209,68 +208,68 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'delay' => '1m',
 					'checks' => [
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'FTP'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'HTTP'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'HTTPS'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'ICMP ping'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'IMAP',
 							'ports' => '144'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'LDAP'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'NNTP'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'POP'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'SMTP'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'SSH'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'TCP'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'Telnet'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'Zabbix agent',
 							'key' => 'ping'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'SNMPv1 agent',
 							'port' => '156',
 							'community' => '1',
 							'snmp_oid' => '1'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'SNMPv3 agent',
 							'port' => '157',
 							'snmp_oid' => '1',
@@ -279,7 +278,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							'security_level' => 'noAuthNoPriv'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'SNMPv3 agent',
 							'port' => '158',
 							'snmp_oid' => '2',
@@ -290,7 +289,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							'auth_passphrase' => '2'
 						],
 						[
-							'check_action' => 'New',
+							'check_action' => 'Add',
 							'type' => 'SNMPv3 agent',
 							'port' => '159',
 							'snmp_oid' => '3',
@@ -369,7 +368,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'old_name' => 'Local network',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'Zabbix agent', 'key' => 'system.uname']
+						['check_action' => 'Add', 'type' => 'Zabbix agent', 'key' => 'system.uname']
 					],
 					'error_in_checks' => ['Check already exists.']
 				]
@@ -402,10 +401,10 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$this->fillInFields($data);
 
 		if (array_key_exists('error_in_checks', $data)) {
-			$this->zbxTestLaunchOverlayDialog('Discovery check error');
 			foreach ($data['error_in_checks'] as $error) {
-				$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//span[text()='".$error."']");
+				$this->zbxTestTextPresentInMessageDetails($error);
 			}
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="Cancel"]');
 			return;
 		}
 
@@ -430,7 +429,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'old_name' => 'Disabled discovery rule for update',
 					'checks' => [
 						['check_action' => 'Remove'],
-						['check_action' => 'New', 'type' => 'HTTP', 'ports' => '10500']
+						['check_action' => 'Add', 'type' => 'HTTP', 'ports' => '10500']
 					],
 					'enabled' => true
 				]
@@ -449,7 +448,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'old_name' => 'Local network',
 					'checks' => [
-						['check_action' => 'New', 'type' => 'POP', 'ports' => '111']
+						['check_action' => 'Add', 'type' => 'POP', 'ports' => '111']
 					]
 				]
 			],
@@ -478,8 +477,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 		// Get amount of check rows in discovery form.
 		$checks_on_page = count($this->webDriver->findElements(WebDriverBy::xpath('//div[@id="dcheckList"]'.
-								'//tr[not(@id="dcheckListFooter")]')));
-
+								'//tr[contains(@id,"dcheckRow")]')));
 		$this->zbxTestClick('update');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
@@ -560,12 +558,14 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					switch ($key) {
 						case 'check_action':
 							$action = $value;
+							$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_bg'));
 							$this->zbxTestClickButtonText($action);
 							if ($action !== 'Remove') {
-								$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('new_check_form'));
+								$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('overlay_dialogue'));
 							}
 							break;
 						case 'type':
+							$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('type'));
 							$this->zbxTestDropdownSelectWait('type', $value);
 							break;
 						case 'ports':
@@ -603,10 +603,11 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							break;
 					}
 				}
-				if ($action === 'New' || $action === 'Edit') {
-					$this->zbxTestClick('add_new_dcheck');
+				if ($action === 'Add' || $action === 'Edit') {
+					$button = ($action === 'Add') ? 'Add' : 'Update';
+					$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="'.$button.'"]');
 					if (!array_key_exists('error_in_checks', $data)) {
-						$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('new_check_form'));
+						$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
 					}
 				}
 			}
@@ -708,7 +709,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 			$discovery = [
 				'name' => 'Discovery rule Cancel creation',
 				'checks' => [
-					['check_action' => 'New', 'type' => 'ICMP ping']
+					['check_action' => 'Add', 'type' => 'ICMP ping']
 				]
 			];
 			$this->zbxTestClickButtonText('Create discovery rule');

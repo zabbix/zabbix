@@ -937,8 +937,16 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	}
 	else if (zbx_strlen_utf8(*field) > field_len)
 	{
+		const char	*err_val;
+		char		key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+		if (0 != (flag & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
+			err_val = zbx_truncate_itemkey(*field, VALUE_ERRMSG_MAX, key_short, sizeof(key_short));
+		else
+			err_val = zbx_truncate_value(*field, VALUE_ERRMSG_MAX, key_short, sizeof(key_short));
+
 		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" is too long.\n",
-				(0 != item->itemid ? "update" : "create"), *field);
+				(0 != item->itemid ? "update" : "create"), err_val);
 	}
 	else
 	{
@@ -1394,8 +1402,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			ret = xml_xpath_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_MULTIPLIER:
-			if (FAIL == (ret = is_double(pp->params)))
-				zbx_snprintf(err, sizeof(err), "value is not numeric: %s", pp->params);
+			if (FAIL == (ret = is_double(pp->params, NULL)))
+				zbx_snprintf(err, sizeof(err), "value is not numeric or out of range: %s", pp->params);
 			break;
 		case ZBX_PREPROC_VALIDATE_RANGE:
 			zbx_strlcpy(param1, pp->params, sizeof(param1));
@@ -1409,13 +1417,15 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			zbx_lrtrim(param1, " ");
 			zbx_lrtrim(param2, " ");
 
-			if ('\0' != *param1 && FAIL == (ret = is_double(param1)))
+			if ('\0' != *param1 && FAIL == (ret = is_double(param1, NULL)))
 			{
-				zbx_snprintf(err, sizeof(err), "first parameter is not numeric: %s", param1);
+				zbx_snprintf(err, sizeof(err), "first parameter is not numeric or out of range: %s",
+						param1);
 			}
-			else if ('\0' != *param2 && FAIL == (ret = is_double(param2)))
+			else if ('\0' != *param2 && FAIL == (ret = is_double(param2, NULL)))
 			{
-				zbx_snprintf(err, sizeof(err), "second parameter is not numeric: %s", param2);
+				zbx_snprintf(err, sizeof(err), "second parameter is not numeric or out of range: %s",
+						param2);
 			}
 			else if ('\0' == *param1 && '\0' == *param2)
 			{
@@ -1613,8 +1623,12 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 		if (NULL != zbx_hashset_search(&items_keys, &item->key))
 		{
+			char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
 			*error = zbx_strdcatf(*error, "Cannot %s item: item with the same key \"%s\" already exists.\n",
-						(0 != item->itemid ? "update" : "create"), item->key);
+						(0 != item->itemid ? "update" : "create"),
+						zbx_truncate_itemkey(item->key, VALUE_ERRMSG_MAX,
+						key_short, sizeof(key_short)));
 
 			if (0 != item->itemid)
 			{
@@ -1704,9 +1718,13 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 				if (0 == strcmp(item->key, row[0]))
 				{
+					char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
 					*error = zbx_strdcatf(*error, "Cannot %s item:"
 							" item with the same key \"%s\" already exists.\n",
-							(0 != item->itemid ? "update" : "create"), item->key);
+							(0 != item->itemid ? "update" : "create"),
+							zbx_truncate_itemkey(item->key, VALUE_ERRMSG_MAX,
+							key_short, sizeof(key_short)));
 
 					if (0 != item->itemid)
 					{
@@ -2400,7 +2418,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
+static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_ptr_t *items, zbx_hashset_t *items_index,
 		char **error)
 {
@@ -3578,7 +3596,7 @@ static int	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applicat
 	int					ret = SUCCEED, i, new_applications = 0, new_discoveries = 0, index;
 	zbx_lld_application_t			*application;
 	const zbx_lld_application_prototype_t	*application_prototype;
-	zbx_uint64_t				applicationid = 0, application_discoveryid = 0;
+	zbx_uint64_t				applicationid, application_discoveryid;
 	zbx_db_insert_t				db_insert, db_insert_discovery;
 	zbx_vector_uint64_t			del_applicationids, del_discoveryids;
 	char					*sql_a = NULL, *sql_ad = NULL, *name;
@@ -4238,7 +4256,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
+static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
 		zbx_hashset_t *items_index)
 {
 	int				i, j;
@@ -5232,7 +5250,7 @@ static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *ite
  *               FAIL    - items cannot be added/updated                      *
  *                                                                            *
  ******************************************************************************/
-int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	zbx_vector_ptr_t	applications, application_prototypes, items, item_prototypes, item_dependencies;
@@ -5290,7 +5308,12 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 					&host_record_is_locked))
 	{
 		lld_items_applications_save(&items_applications, &items, &applications);
-		DBcommit();
+
+		if (ZBX_DB_OK != DBcommit())
+		{
+			ret = FAIL;
+			goto clean;
+		}
 	}
 	else
 	{

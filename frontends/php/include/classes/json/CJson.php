@@ -144,10 +144,12 @@ class CJson {
 	 * @param array  $deQuote          Array of keys whose values should **not** be quoted in encoded string.
 	 * @param bool   $force_object     Force all arrays to objects.
 	 * @param bool   $escape_slashes
+	 * @param bool   $pretty           Use whitespace in returned data to format it. Supported only by native
+	 *                                 json_encode implementation.
 	 *
 	 * @return string JSON encoded value
 	 */
-	public function encode($valueToEncode, $deQuote = [], $force_object = false, $escape_slashes = true) {
+	public function encode($valueToEncode, $deQuote = [], $force_object = false, $escape_slashes = true, $pretty = false) {
 		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')
 				&& defined('JSON_UNESCAPED_SLASHES')) {
 			if ($this->_config['noerror']) {
@@ -155,7 +157,8 @@ class CJson {
 			}
 
 			$encoded = json_encode($valueToEncode,
-				($escape_slashes ? 0 : JSON_UNESCAPED_SLASHES) | ($force_object ? JSON_FORCE_OBJECT : 0)
+				($escape_slashes ? 0 : JSON_UNESCAPED_SLASHES) | ($force_object ? JSON_FORCE_OBJECT : 0) |
+				($pretty ? JSON_PRETTY_PRINT : 0)
 			);
 
 			if ($this->_config['noerror']) {

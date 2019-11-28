@@ -27,7 +27,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 	private $macroSize = 20;
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';
-	private $macroClass = 'textarea-flexible macro';
+	private $macroClass = 'textarea-flexible macro initialized-field';
 
 	private $valueSize = 20;
 	private $valueMaxLength = 255;
@@ -46,8 +46,8 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 	private $oldHashGlobalMacros = '';
 
 	private function openGlobalMacros() {
-		$this->zbxTestLogin('adm.macros.php');
-		$this->zbxTestDropdownAssertSelected('configDropDown', 'Macros');
+		$this->zbxTestLogin('zabbix.php?action=macros.edit');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Macros');
 
 		$this->zbxTestCheckTitle('Configuration of macros');
 		$this->zbxTestCheckHeader('Macros');

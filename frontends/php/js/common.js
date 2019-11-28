@@ -440,7 +440,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				.addClass('preloader-container')
 				.append(jQuery('<div>').addClass('preloader'))
 			),
-		'class': 'modal-popup',
+		'class': 'modal-popup' + ((action === 'popup.generic') ? ' modal-popup-generic' : ''),
 		'buttons': [],
 		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
 	};
@@ -822,7 +822,7 @@ function validate_trigger_expression(formname, dialogueid) {
 	});
 }
 
-function redirect(uri, method, needle, invert_needle, add_sid) {
+function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
 	method = (method || 'get').toLowerCase();
 	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
 
@@ -843,7 +843,7 @@ function redirect(uri, method, needle, invert_needle, add_sid) {
 
 		var args = url.getArguments();
 		for (var key in args) {
-			if (empty(args[key])) {
+			if (!allow_empty && empty(args[key])) {
 				continue;
 			}
 

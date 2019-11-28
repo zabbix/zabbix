@@ -22,6 +22,10 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testMultiselect extends CWebTest {
 
+	public function testMultiselect_disableDebugMode() {
+		DBexecute('UPDATE usrgrp SET debug_mode=0 WHERE usrgrpid=7');
+	}
+
 	public function testMultiselect_SuggestExisting() {
 		$this->checkSuggest('zabbix.php?action=problem.view', 'zbx_filter',
 			'Host groups', 'z', 'multiselect-suggest'
@@ -54,6 +58,20 @@ class testMultiselect extends CWebTest {
 		);
 	}
 
+	public function testMultiselect_NotSuggestAlreadySelected() {
+		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
+		$this->page->updateViewport();
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$field = $form->getField('Host groups');
+		$field->select('Zabbix servers');
+		$element = $field->query('tag:input')->one();
+		$element->type('Zabbix server');
+		$this->query('class:multiselect-matches')->waitUntilVisible();
+		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(),
+			[$element]
+		);
+	}
+
 	public function testMultiselect_SuggestInOverlay() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->query('button:Create dashboard')->one()->click();
@@ -69,6 +87,9 @@ class testMultiselect extends CWebTest {
 		$element = $form->getField('Items')->query('tag:input')->one();
 		$element->type('Zab');
 		$this->query('class:multiselect-suggest')->waitUntilVisible();
-		$this->assertScreenshotExcept(null, [$element]);
+		$this->assertScreenshotExcept(null, [
+			$element,
+			['query' => 'xpath://footer[text()]']
+		]);
 	}
 }

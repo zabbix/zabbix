@@ -2242,3 +2242,36 @@ INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) 
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200021, 200021, 9, 50011, 500, 100, 0, 0, 1, 1, 0, 0, 0, 1, '', 0, 0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200022, 200021, 16, 50011, 500, 100, 0, 1, 1, 1, 25, 0, 0, 0, '', 0, 0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200023, 200021, 14, 50011, 500, 100, 0, 2, 1, 1, 25, 0, 0, 0, '', 0, 0);
+
+-- Dashboard for graph widget
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (103, 'Dashboard for graph widgets', 1, 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (104, 103, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (105, 103, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
+-- widget "Test cases for simple update and deletion"
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90006, 105, 0, 'righty', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 105, 1, 'ds.hosts.0.0', 0, 'Host*');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90009, 105, 1, 'ds.items.0.0', 0, 'Available memory');
+-- widget "Test cases for update"
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 104, 1, 'ds.axisy.0', 0, '1');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 104, 0, 'ds.pointsize.0', 4, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 104, 0, 'ds.transparency.0', 6, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90014, 104, 0, 'ds.type.0', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90015, 104, 0, 'graph_time', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90016, 104, 0, 'lefty', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90017, 104, 0, 'legend_lines', 2, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90018, 104, 0, 'or.pointsize.0', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90019, 104, 0, 'righty_units', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90020, 104, 0, 'severities', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90021, 104, 0, 'show_problems', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90022, 104, 0, 'source', 2, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90024, 104, 1, 'ds.hosts.0.0', 0, 'update host');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90025, 104, 1, 'ds.items.0.0', 0, 'update item');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90026, 104, 1, 'ds.timeshift.0', 0, '1m');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90027, 104, 1, 'or.hosts.0.0', 0, 'override host');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90028, 104, 1, 'or.items.0.0', 0, 'override item');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90029, 104, 1, 'problemhosts.0', 0, 'ЗАББИКС Сервер');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90030, 104, 1, 'righty_max', 0, '5');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90031, 104, 1, 'righty_min', 0, '-2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90032, 104, 1, 'righty_static_units', 0, 'KB');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90033, 104, 1, 'time_from', 0, 'now-10m');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90034, 104, 1, 'time_to', 0, 'now-5m');

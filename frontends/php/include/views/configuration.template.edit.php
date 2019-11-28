@@ -111,7 +111,7 @@ $templateList = (new CFormList('hostlist'))
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('hosts' , 'description'))
+			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	);
 
 if ($data['form'] === 'full_clone') {

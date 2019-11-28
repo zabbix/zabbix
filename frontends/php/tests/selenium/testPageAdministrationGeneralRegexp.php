@@ -51,14 +51,16 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	public function testPageAdministrationGeneralRegexp_CheckLayout() {
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestDropdownHasOptions('configDropDown', [
-			'GUI', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros', 'Value mapping',
+		$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
+		$this->assertEquals([
+			'GUI', 'Auto registration', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros', 'Value mapping',
 			'Working time', 'Trigger severities', 'Trigger displaying options', 'Other'
-		]);
-		$this->zbxTestAssertElementPresentId('form');
+		], $popup_menu->getItems()->asText());
+
+		$this->zbxTestAssertElementPresentXpath('//button[text()="New regular expression"]');
 
 		$this->zbxTestTextPresent(['Name', 'Expressions']);
 
@@ -68,15 +70,15 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 			$this->zbxTestTextPresent($dbRow['name']);
 		}
 
-		$this->zbxTestAssertElementPresentXpath("//button[@value='regexp.massdelete' and @disabled]");
+		$this->zbxTestAssertElementPresentXpath('//button[@value="regex.delete" and @disabled]');
 	}
 
 	public function testPageAdministrationGeneralRegexp_MassDeleteAllCancel() {
 		$this->calculateHash();
 
-		$this->zbxTestLogin('adm.regexps.php');
-		$this->zbxTestCheckboxSelect('all_regexps');
-		$this->zbxTestClickButton('regexp.massdelete');
+		$this->zbxTestLogin('zabbix.php?action=regex.list');
+		$this->zbxTestCheckboxSelect('all-regexes');
+		$this->zbxTestClickButton('regex.delete');
 		$this->zbxTestDismissAlert();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextNotPresent(['Regular expression deleted', 'Regular expressions deleted']);
@@ -91,9 +93,9 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
 		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
 
-		$this->zbxTestLogin('adm.regexps.php');
-		$this->zbxTestCheckboxSelect('regexpids_'.$regexp['regexpid']);
-		$this->zbxTestClickButton('regexp.massdelete');
+		$this->zbxTestLogin('zabbix.php?action=regex.list');
+		$this->zbxTestCheckboxSelect('regexids_'.$regexp['regexpid']);
+		$this->zbxTestClickButton('regex.delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('Regular expression deleted');
@@ -107,9 +109,9 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 	 * @backup-once regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
-		$this->zbxTestLogin('adm.regexps.php');
-		$this->zbxTestCheckboxSelect('all_regexps');
-		$this->zbxTestClickButton('regexp.massdelete');
+		$this->zbxTestLogin('zabbix.php?action=regex.list');
+		$this->zbxTestCheckboxSelect('all-regexes');
+		$this->zbxTestClickButton('regex.delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('Regular expressions deleted');

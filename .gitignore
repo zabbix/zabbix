@@ -166,8 +166,6 @@ tests/zabbix_server/preprocessor/zbx_item_preproc
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
 /zabbix-*.tar.gz
 .vscode
-go/src/zabbix/cmd/zabbix_agent2/zabbix_agent2
-go/src/zabbix/cmd/mock_server/mock_server
 sbin/zabbix_agentd
 sbin/zabbix_proxy
 sbin/zabbix_server
@@ -195,3 +193,5 @@ bin/zabbix_get
 bin/zabbix_sender
 .cproject
 etc/agent.conf
+sbin/zabbix_agent2
+etc/zabbix_agent2.conf

@@ -904,7 +904,7 @@
 
 	/**
 	 * @param {string} msg                 Error message.
-	 * @param {Node|jQuery} trigger_elmnt  An element that the focus will be retuned to.
+	 * @param {Node|jQuery} trigger_elmnt  An element that the focus will be returned to.
 	 */
 	StepEditForm.prototype.errorDialog = function(msg, trigger_elmnt) {
 		overlayDialogue({
