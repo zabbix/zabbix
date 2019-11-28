@@ -969,8 +969,6 @@ class testFormAction extends CLegacyWebTest {
 			switch ($new_operation_operationtype) {
 				case 'Send message':
 				case 'Remote command':
-					$this->zbxTestTextPresent ('Step');
-
 					$this->zbxTestTextPresent ('Steps');
 					$this->zbxTestAssertVisibleId('operation_esc_step_from');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'maxlength', 5);
@@ -1189,7 +1187,8 @@ class testFormAction extends CLegacyWebTest {
 						'Not Ack',
 						'Ack'
 				]);
-				$this->zbxTestClickXpathWait('//h4[text()="New condition"]//ancestor::div//button[text()="Add"]');
+				$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"][2]//button[text()="Add"]');
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"][2]'));
 			}
 		}
 		else {
@@ -1877,6 +1876,7 @@ class testFormAction extends CLegacyWebTest {
 			);
 			$this->zbxTestWaitForPageToLoad();
 		}
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
 		$this->query('xpath://button[@id="add"]')->waitUntilClickable()->one()->click();
 		switch ($data['expected']) {
 			case ACTION_GOOD:
