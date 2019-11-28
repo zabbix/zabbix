@@ -553,7 +553,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Key');
 		$this->zbxTestAssertVisibleId('key');
-		$this->zbxTestAssertAttribute("//input[@id='key']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='key']", 'maxlength', 2048);
 		$this->zbxTestAssertAttribute("//input[@id='key']", 'size', 20);
 		if (!isset($templateid)) {
 			$this->zbxTestAssertElementPresentId('keyButton');
@@ -2327,7 +2327,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 	public function testFormItem_HousekeeperUpdate() {
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit&ddreset=1');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
@@ -2343,7 +2343,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
 		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
 
-		$this->zbxTestOpen('adm.gui.php');
+		$this->zbxTestOpen('zabbix.php?action=gui.edit&ddreset=1');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global');
@@ -2364,7 +2364,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickWait('trends_mode_hint');
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
 
-		$this->zbxTestOpen('adm.gui.php');
+		$this->zbxTestOpen('zabbix.php?action=gui.edit&ddreset=1');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestInputType('hk_history', 90);

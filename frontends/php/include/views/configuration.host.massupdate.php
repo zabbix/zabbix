@@ -83,7 +83,7 @@ $hostFormList->addRow(
 		->setChecked(array_key_exists('description', $data['visible'])),
 	(new CTextArea('description', $data['description']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setMaxlength(DB::getFieldLength('hosts' , 'description'))
+		->setMaxlength(DB::getFieldLength('hosts', 'description'))
 );
 
 // append proxy to form list

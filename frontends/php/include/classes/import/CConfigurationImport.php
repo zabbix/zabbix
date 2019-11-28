@@ -1810,7 +1810,7 @@ class CConfigurationImport {
 		$new_media_types = [];
 
 		foreach ($all_media_types as $name => $media_type) {
-			if (array_key_exists($name , $db_media_types)) {
+			if (array_key_exists($name, $db_media_types)) {
 				$media_type['mediatypeid'] = $db_media_types[$name]['mediatypeid'];
 				$upd_media_types[] = $media_type;
 			}

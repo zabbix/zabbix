@@ -29,6 +29,7 @@ if (!empty($data['hostid'])) {
 
 // Create form.
 $form = (new CForm())
+	->setId('itemForm')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -84,7 +85,7 @@ else {
 }
 
 // Append key to form list.
-$key_controls = [(new CTextBox('key', $data['key'], $readonly))
+$key_controls = [(new CTextBox('key', $data['key'], $readonly, DB::getFieldLength('items', 'key_')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAriaRequired()
 ];
@@ -756,7 +757,10 @@ $keep_history_hint = null;
 if ($data['config']['hk_history_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-		? (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'housekeeping.edit')
+				->getUrl()
+			))
 				->setAttribute('target', '_blank')
 		: _x('global housekeeping settings', 'item_form');
 
@@ -789,7 +793,10 @@ $keep_trend_hint = null;
 if ($data['config']['hk_trends_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-		? (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'housekeeping.edit')
+				->getUrl()
+			))
 				->setAttribute('target', '_blank')
 		: _x('global housekeeping settings', 'item_form');
 
@@ -841,7 +848,10 @@ else {
 
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$valuemapComboBox = [$valuemapComboBox, '&nbsp;',
-		(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')
+		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.list')
+			->getUrl()
+		))->setAttribute('target', '_blank')
 	];
 }
 
@@ -928,7 +938,7 @@ $form_list
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('items' , 'description'))
+			->setMaxlength(DB::getFieldLength('items', 'description'))
 			->setReadonly($discovered_item)
 	)
 	// Append status to form list.

@@ -307,7 +307,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Key');
 		$this->zbxTestAssertVisibleId('key');
-		$this->zbxTestAssertAttribute("//input[@id='key']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='key']", 'maxlength', 2048);
 		$this->zbxTestAssertAttribute("//input[@id='key']", 'size', 20);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='key']", 'readonly');

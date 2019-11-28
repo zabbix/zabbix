@@ -1960,6 +1960,12 @@ output {
 		}
 	}
 
+	.form-fields-inline {
+		label {
+			margin: 0 8px 0 3px;
+		}
+	}
+
 	h4 {
 		margin-bottom: -5px;
 	}
@@ -4604,7 +4610,6 @@ $form-icon-btn: (
 			}
 
 			.columns-wrapper {
-				flex-wrap: nowrap;
 
 				.column-50:last-of-type {
 					margin-left: 10px;
@@ -4634,7 +4639,10 @@ $form-icon-btn: (
 
 	&.modal-popup {
 		max-width: 1024px;
-		min-width: 650px;
+
+		&.modal-popup-generic {
+			min-width: 650px;
+		}
 	}
 
 	.hintbox-scrollable {
@@ -4868,6 +4876,7 @@ $form-icon-btn: (
 	resize: none;
 	word-break: break-all;
 	white-space: normal;
+	height: 24px;
 }
 
 // Map widget back to parent button.
@@ -6768,6 +6777,10 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+
+	&.columns-nowrap {
+		flex-wrap: nowrap;
+	}
 
 	[class^=column-] {
 		-webkit-box-flex: 0;

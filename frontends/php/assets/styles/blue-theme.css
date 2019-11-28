@@ -1300,6 +1300,8 @@ output {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
+  .table-forms .form-fields-inline label {
+    margin: 0 8px 0 3px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -3147,10 +3149,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0 10px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
-      .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper {
-        flex-wrap: nowrap; }
-        .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
-          margin-left: 10px; }
+      .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
+        margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
       text-align: right;
       padding: 0px 0px 10px 0px; }
@@ -3165,8 +3165,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue.sticked-to-top {
     top: 50px; }
   .overlay-dialogue.modal-popup {
-    max-width: 1024px;
-    min-width: 650px; }
+    max-width: 1024px; }
+    .overlay-dialogue.modal-popup.modal-popup-generic {
+      min-width: 650px; }
   .overlay-dialogue .hintbox-scrollable {
     overflow: auto;
     width: 100%;
@@ -3303,7 +3304,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   overflow: hidden;
   resize: none;
   word-break: break-all;
-  white-space: normal; }
+  white-space: normal;
+  height: 24px; }
 
 .btn-back-map-container {
   text-align: left;
@@ -4674,6 +4676,8 @@ svg {
 .columns-wrapper {
   display: flex;
   flex-wrap: wrap; }
+  .columns-wrapper.columns-nowrap {
+    flex-wrap: nowrap; }
   .columns-wrapper [class^=column-] {
     -webkit-box-flex: 0; }
   .columns-wrapper.columns-2 > div, .columns-wrapper.columns-2 > li {

@@ -168,7 +168,7 @@ static int	get_housekeeper_period(double time_slept)
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
-	int	records, start, sleeptime = 0;
+	int	records, start, sleeptime;
 	double	sec, time_slept, time_now;
 	char	sleeptext[25];
 

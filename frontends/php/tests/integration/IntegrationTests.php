@@ -20,12 +20,14 @@
 
 require_once dirname(__FILE__).'/testDataCollection.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
 
 class IntegrationTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('Integration');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testLowLevelDiscovery');
+		$suite->addTestSuite('testGoAgentDataCollection');
 
 		return $suite;
 	}

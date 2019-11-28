@@ -152,7 +152,7 @@ foreach ($data['discoveries'] as $discovery) {
 			CViewHelper::showNum($discovery['graphs'])
 		],
 		$hostPrototypeLink,
-		$discovery['key_'],
+		(new CDiv(CHtml::encode($discovery['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,

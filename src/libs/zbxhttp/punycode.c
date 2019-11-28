@@ -347,7 +347,7 @@ int	zbx_http_punycode_encode_url(char **url)
 	if ('\0' != (delimiter = *ptr))
 		*ptr = '\0';
 
-	if (SUCCEED != zbx_http_punycode_encode(domain, &iri))
+	if (FAIL == zbx_http_punycode_encode(domain, &iri))
 	{
 		*ptr = delimiter;
 		return FAIL;
