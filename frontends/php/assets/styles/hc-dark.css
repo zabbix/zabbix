@@ -4491,7 +4491,9 @@ tr.cursor-move td * {
   position: relative;
   overflow: hidden; }
   .flickerfreescreen.is-loading {
-    min-height: 30px; }
+    min-height: 64px; }
+    .flickerfreescreen.is-loadingimg {
+      opacity: 0; }
 
 .graph-wrapper {
   display: inline; }

@@ -6527,7 +6527,11 @@ tr.cursor-move {
 	overflow: hidden;
 
 	&.is-loading {
-		min-height: 30px;
+		min-height: 64px;
+
+		&img {
+			opacity: 0;
+		}
 	}
 }
 
