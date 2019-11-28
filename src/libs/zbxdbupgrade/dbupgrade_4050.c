@@ -97,6 +97,22 @@ static int	DBpatch_4050007(void)
 	return DBmodify_field_type("dchecks", &field, NULL);
 }
 
+static int	DBpatch_4050008(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.valuemap.list.sortorder'"
+				" where idx='web.adm.valuemapping.php.sortorder'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.valuemap.list.sort'"
+				" where idx='web.adm.valuemapping.php.sort'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -111,5 +127,6 @@ DBPATCH_ADD(4050004, 0, 1)
 DBPATCH_ADD(4050005, 0, 1)
 DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
+DBPATCH_ADD(4050008, 0, 1)
 
 DBPATCH_END()

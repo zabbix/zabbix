@@ -132,7 +132,7 @@ if (hasRequest('rules_preset') && !hasRequest('rules')) {
 		case 'valuemap':
 			$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 
-			$data['backurl'] = 'adm.valuemapping.php';
+			$data['backurl'] = (new CUrl('zabbix.php'))->setArgument('action', 'valuemap.list')->getUrl();
 			break;
 
 	}
