@@ -25,9 +25,9 @@ $widget = (new CWidget())
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
-			->addItem((new CList())
-				->addItem(new CSubmit('form', _('Create icon map')))
-			)
+			->addItem(new CRedirectButton(_('Create icon map'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'iconmap.edit')
+			))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	);
