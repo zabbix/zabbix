@@ -4639,7 +4639,10 @@ $form-icon-btn: (
 
 	&.modal-popup {
 		max-width: 1024px;
-		min-width: 650px;
+
+		&.modal-popup-generic {
+			min-width: 650px;
+		}
 	}
 
 	.hintbox-scrollable {
@@ -4873,6 +4876,7 @@ $form-icon-btn: (
 	resize: none;
 	word-break: break-all;
 	white-space: normal;
+	height: 24px;
 }
 
 // Map widget back to parent button.

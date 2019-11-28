@@ -109,9 +109,12 @@ function validateOperationPopup() {
 			method: 'POST'
 		})
 		.done(function(response) {
-			if (typeof response.errors !== 'undefined') {
-				$form.parent().find('.msg-bad').remove();
+			$form
+				.parent()
+				.find('.msg-bad')
+				.remove();
 
+			if (typeof response.errors !== 'undefined') {
 				return jQuery(response.errors).insertBefore($form);
 			}
 

@@ -115,6 +115,8 @@ class CRouter {
 		'popup.action.acknowledge'		=> ['CControllerPopupActionAcknowledge',			'layout.json',			'popup.operation.common'],
 		'popup.action.operation'		=> ['CControllerPopupActionOperation',				'layout.json',			'popup.operation.common'],
 		'popup.action.recovery'			=> ['CControllerPopupActionRecovery',				'layout.json',			'popup.operation.common'],
+		'popup.condition.actions'		=> ['CControllerPopupConditionActions',				'layout.json',			'popup.condition.common'],
+		'popup.condition.event.corr'	=> ['CControllerPopupConditionEventCorr',			'layout.json',			'popup.condition.common'],
 		'popup.condition.operations'	=> ['CControllerPopupConditionOperations',			'layout.json',			'popup.condition.common'],
 		'popup.discovery.check'			=> ['CControllerPopupDiscoveryCheck',				'layout.json',			'popup.discovery.check'],
 		'popup.generic'					=> ['CControllerPopupGeneric',						'layout.json',			'popup.generic'],
