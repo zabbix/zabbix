@@ -103,7 +103,8 @@ $availableJScripts = [
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
-	'popup.condition.common.js' => 'pages/'
+	'popup.condition.common.js' => 'pages/',
+	'popup.operation.common.js' => 'pages/'
 ];
 
 $tranStrings = [

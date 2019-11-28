@@ -1300,6 +1300,8 @@ output {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
+  .table-forms .form-fields-inline label {
+    margin: 0 8px 0 3px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -1495,6 +1497,18 @@ select {
   z-index: 1;
   opacity: 0;
   filter: alpha(opacity=0); }
+  .checkbox-radio:checked[readonly] + label span {
+    -webkit-transition: none;
+    -moz-transition: none;
+    transition: none; }
+    .checkbox-radio:checked[readonly] + label span::after {
+      border-color: #acbbc2 !important; }
+  .checkbox-radio[readonly], .checkbox-radio[readonly] + label {
+    pointer-events: none; }
+  .checkbox-radio[readonly] + label span {
+    -webkit-transition: none;
+    -moz-transition: none;
+    transition: none; }
   .checkbox-radio[type="checkbox"] + label span {
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
@@ -2052,7 +2066,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: 0.3;
     background-color: transparent; }
 
-.multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
+.multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
   color: #acbbc2;
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }
@@ -3135,10 +3149,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0 10px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
-      .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper {
-        flex-wrap: nowrap; }
-        .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
-          margin-left: 10px; }
+      .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
+        margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
       text-align: right;
       padding: 0px 0px 10px 0px; }
@@ -4680,6 +4692,8 @@ svg {
 .columns-wrapper {
   display: flex;
   flex-wrap: wrap; }
+  .columns-wrapper.columns-nowrap {
+    flex-wrap: nowrap; }
   .columns-wrapper [class^=column-] {
     -webkit-box-flex: 0; }
   .columns-wrapper.columns-2 > div, .columns-wrapper.columns-2 > li {

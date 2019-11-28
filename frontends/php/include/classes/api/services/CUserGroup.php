@@ -932,10 +932,14 @@ class CUserGroup extends CApiService {
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'userid', 'users_groups');
 
+			$get_access = ($this->outputIsRequested('gui_access', $options['selectUsers'])
+				|| $this->outputIsRequested('debug_mode', $options['selectUsers'])
+				|| $this->outputIsRequested('users_status', $options['selectUsers'])) ? true : null;
+
 			$dbUsers = API::User()->get([
 				'output' => $options['selectUsers'],
 				'userids' => $relationMap->getRelatedIds(),
-				'getAccess' => ($options['selectUsers'] == API_OUTPUT_EXTEND) ? true : null,
+				'getAccess' => $get_access,
 				'preservekeys' => true
 			]);
 

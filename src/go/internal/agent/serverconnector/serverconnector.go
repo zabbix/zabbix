@@ -316,13 +316,13 @@ run:
 				c.refreshActiveChecks()
 				lastRefresh = time.Now()
 			}
-		case v := <-c.input:
-			if v == nil {
+		case u := <-c.input:
+			if u == nil {
 				break run
 			}
-			switch v.(type) {
+			switch v := u.(type) {
 			case *agent.AgentOptions:
-				c.updateOptions(v.(*agent.AgentOptions))
+				c.updateOptions(v)
 				// TODO: when runtime configuration reload is implemented the result cache active
 				// connection properties must be updated too
 			}

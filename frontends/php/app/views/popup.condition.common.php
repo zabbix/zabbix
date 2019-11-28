@@ -141,7 +141,6 @@ switch ($data['type']) {
 		// Collect all operators options.
 		$combobox_options = [];
 		$action_condition_options = [];
-
 		foreach ($data['allowed_conditions'] as $type) {
 			$action_condition_options[$type] = condition_type2str($type);
 

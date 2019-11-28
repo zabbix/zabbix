@@ -54,7 +54,7 @@ class CRouter {
 	 * @var array
 	 */
 	private $routes = [
-		// action							controller										layout					view
+		// action						controller											layout					view
 		'acknowledge.create'			=> ['CControllerAcknowledgeCreate',					null,					null],
 		'acknowledge.edit'				=> ['CControllerAcknowledgeEdit',					'layout.htmlpage',		'monitoring.acknowledge.edit'],
 		'authentication.edit'			=> ['CControllerAuthenticationEdit',				'layout.htmlpage',		'administration.authentication.edit'],
@@ -121,6 +121,14 @@ class CRouter {
 		'user.update'					=> ['CControllerUserUpdate',						null,					null],
 		'userprofile.update'			=> ['CControllerUserProfileUpdate',					null,					null],
 		'user.unblock'					=> ['CControllerUserUnblock',						null,					null],
+		'usergroup.groupright.add'		=> ['CControllerUsergroupGrouprightAdd',			'layout.json',			'administration.usergroup.grouprights'],
+		'usergroup.tagfilter.add'		=> ['CControllerUsergroupTagfilterAdd',				'layout.json',			'administration.usergroup.tagfilters'],
+		'usergroup.create'				=> ['CControllerUsergroupCreate',					null,					null],
+		'usergroup.delete'				=> ['CControllerUsergroupDelete',					null,					null],
+		'usergroup.edit'				=> ['CControllerUsergroupEdit',						'layout.htmlpage',		'administration.usergroup.edit'],
+		'usergroup.list'				=> ['CControllerUsergroupList',						'layout.htmlpage',		'administration.usergroup.list'],
+		'usergroup.massupdate'			=> ['CControllerUsergroupMassUpdate',				null,					null],
+		'usergroup.update'				=> ['CControllerUsergroupUpdate',					null,					null],
 		'web.view'						=> ['CControllerWebView',							'layout.htmlpage',		'monitoring.web.view'],
 		'widget.favgraphs.view'			=> ['CControllerWidgetFavGraphsView',				'layout.widget',		'monitoring.widget.favgraphs.view'],
 		'widget.favmaps.view'			=> ['CControllerWidgetFavMapsView',					'layout.widget',		'monitoring.widget.favmaps.view'],
@@ -145,9 +153,13 @@ class CRouter {
 		'widget.url.view'				=> ['CControllerWidgetUrlView',						'layout.widget',		'monitoring.widget.url.view'],
 		'widget.plaintext.view'			=> ['CControllerWidgetPlainTextView',				'layout.widget',		'monitoring.widget.plaintext.view'],
 		'widget.hostavail.view'			=> ['CControllerWidgetHostAvailView',				'layout.widget',		'monitoring.widget.hostavail.view'],
-		'popup.condition.event.corr'	=> ['CControllerPopupConditionEventCorr',			'layout.json',			'popup.condition.common'],
+		'popup.action.acknowledge'		=> ['CControllerPopupActionAcknowledge',			'layout.json',			'popup.operation.common'],
+		'popup.action.operation'		=> ['CControllerPopupActionOperation',				'layout.json',			'popup.operation.common'],
+		'popup.action.recovery'			=> ['CControllerPopupActionRecovery',				'layout.json',			'popup.operation.common'],
 		'popup.condition.actions'		=> ['CControllerPopupConditionActions',				'layout.json',			'popup.condition.common'],
+		'popup.condition.event.corr'	=> ['CControllerPopupConditionEventCorr',			'layout.json',			'popup.condition.common'],
 		'popup.condition.operations'	=> ['CControllerPopupConditionOperations',			'layout.json',			'popup.condition.common'],
+		'popup.discovery.check'			=> ['CControllerPopupDiscoveryCheck',				'layout.json',			'popup.discovery.check'],
 		'popup.generic'					=> ['CControllerPopupGeneric',						'layout.json',			'popup.generic'],
 		'popup.httpstep'				=> ['CControllerPopupHttpStep',						'layout.json',			'popup.httpstep'],
 		'popup.media'					=> ['CControllerPopupMedia',						'layout.json',			'popup.media'],
@@ -158,6 +170,7 @@ class CRouter {
 		'popup.services'				=> ['CControllerPopupServices',						'layout.json',			'popup.services'],
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',				'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
+		'popup.maintenance.period'		=> ['CControllerPopupMaintenancePeriod',			'layout.json',			'popup.maintenance.period'],
 		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
 		'search'						=> ['CControllerSearch',							'layout.htmlpage',		'search']

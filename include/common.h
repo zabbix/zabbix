@@ -935,7 +935,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 #define ZBX_FLAG_DOUBLE_PLAIN	0x00
 #define ZBX_FLAG_DOUBLE_SUFFIX	0x01
 int	is_double_suffix(const char *str, unsigned char flags);
-int	is_double(const char *c);
+int	is_double(const char *str, double *value);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
 int	is_time_suffix(const char *c, int *value, int length);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
@@ -1123,6 +1123,10 @@ void	zbx_backtrace(void);
 int	int_in_list(char *list, int value);
 int	ip_in_list(const char *list, const char *ip);
 
+#define VALUE_ERRMSG_MAX	128
+const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len);
+const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len);
+
 /* IP range support */
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1
@@ -1198,6 +1202,7 @@ size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
 size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
 size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
+size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'

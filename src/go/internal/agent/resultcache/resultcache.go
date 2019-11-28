@@ -256,17 +256,17 @@ func (c *ResultCache) run() {
 	log.Debugf("[%d] starting result cache", c.clientID)
 
 	for {
-		v := <-c.input
-		if v == nil {
+		u := <-c.input
+		if u == nil {
 			break
 		}
-		switch v.(type) {
+		switch v := u.(type) {
 		case Uploader:
-			c.flushOutput(v.(Uploader))
+			c.flushOutput(v)
 		case *plugin.Result:
-			c.write(v.(*plugin.Result))
+			c.write(v)
 		case *agent.AgentOptions:
-			c.updateOptions(v.(*agent.AgentOptions))
+			c.updateOptions(v)
 		}
 	}
 	log.Debugf("[%d] result cache has been stopped", c.clientID)

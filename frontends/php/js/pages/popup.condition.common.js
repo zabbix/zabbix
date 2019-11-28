@@ -27,7 +27,17 @@ function submitConditionPopup(response) {
 	var form_name = response.form.name,
 		form_param = response.form.param,
 		input_name = response.form.input_name,
-		inputs = response.inputs;
+		inputs = response.inputs,
+		cond_dialogueid = jQuery(document.forms['popup.condition'])
+			.closest('[data-dialogueid]')
+			.data('dialogueid'),
+		opr_dialogueid = jQuery(document.forms['popup.operation'])
+			.closest('[data-dialogueid]')
+			.data('dialogueid');
+
+	if (!cond_dialogueid) {
+		return false;
+	}
 
 	for (var i in inputs) {
 		if (inputs.hasOwnProperty(i) && inputs[i] !== null) {
@@ -44,7 +54,14 @@ function submitConditionPopup(response) {
 		}
 	}
 
-	submitFormWithParam(form_name, form_param, '1');
+	if (form_param === 'add_opcondition') {
+		overlayDialogueDestroy(cond_dialogueid);
+
+		PopUp('popup.action.operation', jQuery(document.forms['popup.operation']).serialize(), opr_dialogueid);
+	}
+	else {
+		submitFormWithParam(form_name, form_param, '1');
+	}
 }
 
 /**
@@ -63,12 +80,12 @@ function validateConditionPopup() {
 			url: url.getUrl(),
 			data: $form.serialize(),
 			dataType: 'json',
-			type: 'post'
+			method: 'POST'
 		})
 		.done(function(response) {
 			$form
 				.parent()
-				.find(".msg-bad")
+				.find('.msg-bad')
 				.remove();
 
 			if (typeof response.errors !== 'undefined') {

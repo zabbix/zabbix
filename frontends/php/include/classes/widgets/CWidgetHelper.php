@@ -631,8 +631,9 @@ class CWidgetHelper {
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50)
 				]))
-					->addClass(ZBX_STYLE_COLUMN_95)
-					->addClass(ZBX_STYLE_COLUMNS),
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
+					->addClass(ZBX_STYLE_COLUMN_95),
 
 				(new CDiv(
 					(new CButton())
@@ -982,8 +983,9 @@ class CWidgetHelper {
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50),
 				]))
-					->addClass(ZBX_STYLE_COLUMN_95)
-					->addClass(ZBX_STYLE_COLUMNS),
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
+					->addClass(ZBX_STYLE_COLUMN_95),
 				(new CDiv([
 					(new CButton())
 						->setAttribute('title', _('Delete'))
@@ -1118,6 +1120,7 @@ class CWidgetHelper {
 						->addClass(ZBX_STYLE_COLUMN_50),
 				]))
 					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
 					->addClass(ZBX_STYLE_COLUMN_95)
 			))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)

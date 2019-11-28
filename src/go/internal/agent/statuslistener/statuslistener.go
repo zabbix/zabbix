@@ -55,8 +55,8 @@ func Start(taskManager scheduler.Scheduler, confFilePath string) (err error) {
 	mux := http.NewServeMux()
 	mux.Handle("/status", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Debugf("received status request from %s", r.RemoteAddr)
-		fmt.Fprintf(w, getConf(confFilePath))
-		fmt.Fprintf(w, taskManager.Query("metrics"))
+		_, _ = w.Write([]byte(getConf(confFilePath)))
+		_, _ = w.Write([]byte(taskManager.Query("metrics")))
 	}))
 
 	srv = http.Server{Addr: fmt.Sprintf(":%d", agent.Options.StatusPort), Handler: mux}

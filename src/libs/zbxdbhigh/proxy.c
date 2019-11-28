@@ -1217,8 +1217,6 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __func__, table->table);
 
-	memset(fields, 0, sizeof(fields));
-
 	/************************************************************************************/
 	/* T1. RECEIVED JSON (jp_obj) DATA FORMAT                                           */
 	/************************************************************************************/
@@ -2496,7 +2494,7 @@ static int	proxy_add_hist_data(struct zbx_json *j, int records_num, const DC_ITE
 		hd = (const zbx_history_data_t *)records->values[i];
 		*lastid = hd->id;
 
-		if (NULL != errcodes && SUCCEED != errcodes[i])
+		if (SUCCEED != errcodes[i])
 			continue;
 
 		if (ITEM_STATUS_ACTIVE != dc_items[i].status)
@@ -2623,12 +2621,10 @@ int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 			errcodes = (int *)zbx_realloc(errcodes, items_alloc * sizeof(int));
 		}
 
-		if (NULL != dc_items)
-		{
-			DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
-			records_num = proxy_add_hist_data(j, records_num, dc_items, errcodes, &records, string_buffer, lastid);
-			DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
-		}
+		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
+
+		records_num = proxy_add_hist_data(j, records_num, dc_items, errcodes, &records, string_buffer, lastid);
+		DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
 
 		/* got less data than requested - either no more data to read or the history is full of */
 		/* holes. In this case send retrieved data before attempting to read/wait for more data */
@@ -3173,20 +3169,22 @@ static int	parse_history_data_row_itemid(const struct zbx_json_parse *jp_row, zb
  ******************************************************************************/
 static int	parse_history_data_row_hostkey(const struct zbx_json_parse *jp_row, zbx_host_key_t *hk)
 {
-	char	buffer[MAX_STRING_LEN];
+	size_t str_alloc;
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_HOST, buffer, sizeof(buffer), NULL))
+	str_alloc = 0;
+	zbx_free(hk->host);
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_HOST, &hk->host, &str_alloc, NULL))
 		return FAIL;
 
-	hk->host = zbx_strdup(hk->host, buffer);
+	str_alloc = 0;
+	zbx_free(hk->key);
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_KEY, buffer, sizeof(buffer), NULL))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_KEY, &hk->key, &str_alloc, NULL))
 	{
 		zbx_free(hk->host);
 		return FAIL;
 	}
-
-	hk->key = zbx_strdup(hk->key, buffer);
 
 	return SUCCEED;
 }
@@ -3532,6 +3530,7 @@ static int	agent_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error)
 {
 	zbx_host_rights_t	*rights;
+	char			key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	if (0 != item->host.proxy_hostid)
 		return FAIL;
@@ -3542,7 +3541,8 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 			if (0 == item->allow_traps)
 			{
 				*error = zbx_dsprintf(*error, "cannot process HTTP agent item \"%s\" trap:"
-						" trapping is not enabled", item->key_orig);
+						" trapping is not enabled", zbx_truncate_itemkey(item->key_orig,
+						VALUE_ERRMSG_MAX, key_short, sizeof(key_short)));
 				return FAIL;
 			}
 			break;
@@ -3550,7 +3550,9 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap:"
-					" item type \"%d\" cannot be used with traps", item->key_orig, item->type);
+					" item type \"%d\" cannot be used with traps",
+					zbx_truncate_itemkey(item->key_orig, VALUE_ERRMSG_MAX, key_short,
+					sizeof(key_short)), item->type);
 			return FAIL;
 	}
 
@@ -3568,7 +3570,8 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 		if (FAIL == ret)
 		{
 			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap: %s",
-					item->key_orig, zbx_socket_strerror());
+					zbx_truncate_itemkey(item->key_orig, VALUE_ERRMSG_MAX, key_short,
+					sizeof(key_short)), zbx_socket_strerror());
 			return FAIL;
 		}
 	}
@@ -4235,7 +4238,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
-		unsigned int	connection_type = ZBX_TCP_SEC_UNENCRYPTED;
+		unsigned int	connection_type;
 
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;

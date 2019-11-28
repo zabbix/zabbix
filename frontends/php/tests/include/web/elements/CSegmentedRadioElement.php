@@ -64,7 +64,7 @@ class CSegmentedRadioElement extends CElement {
 	 * @return string
 	 */
 	public function getSelected() {
-		return $this->query('css:input[type="radio"]:checked + label')->one()->getText();
+		return $this->getText();
 	}
 
 	/**

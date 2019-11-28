@@ -34,12 +34,12 @@ import (
 )
 
 type MockServerOptions struct {
-	LogType          string `conf:",,,console"`
-	LogFile          string `conf:",optional"`
-	DebugLevel       int    `conf:",,0:5,3"`
-	Port             int    `conf:",,1:65535,10051"`
-	Timeout          int    `conf:",,1:30,5"`
-	ActiveChecksFile string `conf:",optional"`
+	LogType          string `conf:"default=console"`
+	LogFile          string `conf:"optional"`
+	DebugLevel       int    `conf:"range=0:5,default=3"`
+	Port             int    `conf:"range=1:65535,default=10051"`
+	Timeout          int    `conf:"range=1:30,default=5"`
+	ActiveChecksFile string `conf:"optional"`
 }
 
 var options MockServerOptions

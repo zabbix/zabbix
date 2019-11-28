@@ -1177,7 +1177,7 @@ static char	*zbx_fgets_alloc(char **buffer, size_t *buffer_alloc, FILE *fp)
 int	main(int argc, char **argv)
 {
 	char			*error = NULL;
-	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp = 0;
+	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp;
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = NULL;
 
 	progname = get_program_name(argv[0]);
@@ -1261,9 +1261,9 @@ int	main(int argc, char **argv)
 	if (INPUT_FILE)
 	{
 		FILE	*in;
-		char	*in_line = NULL, *key_value = NULL;
+		char	*in_line = NULL, *key = NULL, *key_value = NULL;
 		int	buffer_count = 0;
-		size_t	in_line_alloc = MAX_BUFFER_LEN;
+		size_t	key_alloc = 0, in_line_alloc = MAX_BUFFER_LEN;
 		double	last_send = 0;
 
 		if (0 == strcmp(INPUT_FILE, "-"))
@@ -1289,7 +1289,7 @@ int	main(int argc, char **argv)
 		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
 				NULL != zbx_fgets_alloc(&in_line, &in_line_alloc, in))
 		{
-			char		hostname[MAX_STRING_LEN], key[MAX_STRING_LEN], clock[32];
+			char		hostname[MAX_STRING_LEN], clock[32];
 			int		read_more = 0;
 			size_t		key_value_alloc = 0;
 			const char	*p;
@@ -1322,7 +1322,13 @@ int	main(int argc, char **argv)
 					zbx_strlcpy(hostname, ZABBIX_HOSTNAME, sizeof(hostname));
 			}
 
-			if ('\0' == *p || NULL == (p = get_string(p, key, sizeof(key))) || '\0' == *key)
+			if (key_alloc != in_line_alloc)
+			{
+				key_alloc = in_line_alloc;
+				key = (char *)zbx_realloc(key, key_alloc);
+			}
+
+			if ('\0' == *p || NULL == (p = get_string(p, key, key_alloc)) || '\0' == *key)
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Key' required", total_count);
 				ret = FAIL;
@@ -1433,6 +1439,7 @@ int	main(int argc, char **argv)
 		if (in != stdin)
 			fclose(in);
 
+		zbx_free(key);
 		zbx_free(key_value);
 		zbx_free(in_line);
 	}

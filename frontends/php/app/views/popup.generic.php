@@ -424,7 +424,7 @@ switch ($data['popup_type']) {
 					($options['hostid'] > 0) ? null : $item['hostname'],
 					$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
 					$description,
-					$item['key_'],
+					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
 					($data['popup_type'] === 'items')
@@ -463,7 +463,7 @@ switch ($data['popup_type']) {
 							CJs::encodeJson($item['itemid']).', '.
 							$options['parentid'].
 							');'.$js_action_onclick),
-					$item['key_'],
+					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
 					($data['popup_type'] === 'items')
