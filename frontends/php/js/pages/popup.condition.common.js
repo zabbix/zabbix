@@ -66,6 +66,8 @@ function submitConditionPopup(response) {
 
 /**
  * Validate popup form.
+ *
+ * @return {object} jQuery
  */
 function validateConditionPopup() {
 	var $form = jQuery(document.forms['popup.condition']),

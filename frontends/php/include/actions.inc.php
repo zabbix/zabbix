@@ -340,6 +340,9 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 			? [_('Problem is suppressed')]
 			: [_('Problem is not suppressed')];
 	}
+	elseif ($condition_type == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
+		return $value ? _('Event is acknowledged') : _('Event is not acknowledged');
+	}
 	else {
 		$description = [condition_type2str($condition_type)];
 		$description[] = ' ';
