@@ -141,6 +141,7 @@ tests/libs/zbxprometheus/prometheus_filter_init
 tests/libs/zbxprometheus/prometheus_parse_row
 tests/libs/zbxprometheus/zbx_prometheus_pattern
 tests/libs/zbxprometheus/zbx_prometheus_to_json
+tests/libs/zbxregexp/wildcard_match
 tests/libs/zbxsysinfo/common/SYSTEM_LOCALTIME
 tests/libs/zbxsysinfo/common/VFS_FILE_EXISTS
 tests/libs/zbxsysinfo/common/WEB_PAGE_GET

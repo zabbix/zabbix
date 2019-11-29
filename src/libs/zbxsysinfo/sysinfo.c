@@ -57,7 +57,7 @@ extern ZBX_METRIC	parameter_hostname;
 #endif
 
 static ZBX_METRIC	*commands = NULL;
-static zbx_vector_ptr_t	key_access_rules;
+zbx_vector_ptr_t	key_access_rules;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -274,29 +274,48 @@ void	init_key_access_rules(void)
 void finalize_key_access_rules_configuration(void)
 {
 	static int		first_run;
-	int			i, whitelist = 1;
+	int			i, allow_rules = 0, deny_rules = 0;
 	zbx_key_access_rule_t	*rule;
 
 	if (0 == first_run)
 	{
-		/* If there are only AllowKey rules defined, add DenyKey=* */
-		whitelist = 0;
-
 		for (i = 0; key_access_rules.values_num > i; i++)
 		{
 			rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
 
-			if (ZBX_KEY_ACCESS_DENY == rule->type)
+			switch(rule->type)
 			{
-				whitelist = 0;
+			case ZBX_KEY_ACCESS_ALLOW:
+				allow_rules++;
 				break;
+			case ZBX_KEY_ACCESS_DENY:
+				deny_rules++;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
 			}
 		}
 
-		if (1 == whitelist && 0 < i)
+		/* if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration */
+		if (0 < allow_rules && 0 == deny_rules)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Adding DenyKey=* rule for proper whitelist confuration");
+			zabbix_log(LOG_LEVEL_DEBUG, "adding DenyKey=* rule for proper whitelist confuration");
 			add_key_access_rule("*", ZBX_KEY_ACCESS_DENY);
+			deny_rules++;
+		}
+		else
+		{
+			/* trailing AllowKey rules are meaningless, because AllowKey=* is default behavior */
+			for (i = key_access_rules.values_num - 1; 0 <= i; i--)
+			{
+				rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
+
+				if (ZBX_KEY_ACCESS_DENY == rule->type)
+					break;
+
+				zabbix_log(LOG_LEVEL_DEBUG, "removed trailing AllowKey=%s rule", rule->elements.values[0]);
+				zbx_vector_ptr_remove(&key_access_rules, i);
+			}
 		}
 
 		first_run = 1;
@@ -310,7 +329,7 @@ void finalize_key_access_rules_configuration(void)
  * Purpose: parses key access rule expression from AllowKey and DenyKey       *
  *                                                                            *
  * Parameters: pattern - [IN] key access rule wildcard                        *
- *             flags   - [OUT] key access rule elemement to fill              *
+ *             rule    - [IN] key access rule element to fill                 *
  *                                                                            *
  * Return value: SUCCEED - successful execution                               *
  *               FAIL    - pattern parsing failed                             *
@@ -322,7 +341,7 @@ static int	parse_key_access_rule(const char *pattern, zbx_key_access_rule_t *rul
 	size_t		alloc = 0, offset = 0;
 	int		i, size;
 
-	for (pl = (char*)pattern; SUCCEED == is_key_char(*pl) || '*' == *pl || '?' == *pl; pl++);
+	for (pl = (char*)pattern; SUCCEED == is_key_char(*pl) || '*' == *pl; pl++);
 
 	if (pl == pattern)
 		return FAIL; /* empty key */
@@ -368,6 +387,40 @@ static int	parse_key_access_rule(const char *pattern, zbx_key_access_rule_t *rul
 
 /******************************************************************************
  *                                                                            *
+ * Function: compare_key_access_rules                                         *
+ *                                                                            *
+ * Purpose: Compares two zbx_key_access_rule_t values to perform search       *
+ *          within vector. Rule type (allow/deny) is not checked here.        *
+ *                                                                            *
+ * Parameters: rule_a - [IN] key access rule 1                                *
+ *             rule_b - [IN] key access rule 2                                *
+ *                                                                            *
+ * Return value: If key access rule values are the same, 0 is returned        *
+ *               otherwise nonzero value is returned.                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
+{
+	const zbx_key_access_rule_t	*a, *b;
+	int				i;
+
+	a = *((zbx_key_access_rule_t **)rule_a);
+	b = *((zbx_key_access_rule_t **)rule_b);
+
+	if (a->empty_arguments != b->empty_arguments || a->elements.values_num != b->elements.values_num)
+		return 1;
+
+	for (i = 0; a->elements.values_num > i; i++)
+	{
+		if (0 != strcmp(a->elements.values[i], b->elements.values[i]))
+			return 1;
+	}
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: add_key_access_rule                                              *
  *                                                                            *
  * Purpose: adds new key access rule from AllowKey and DenyKey parameters     *
@@ -381,6 +434,7 @@ static int	parse_key_access_rule(const char *pattern, zbx_key_access_rule_t *rul
  ******************************************************************************/
 int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 {
+	static int		no_more_rules = 0;
 	int			ret;
 	zbx_key_access_rule_t	*rule;
 
@@ -390,13 +444,43 @@ int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 
 	if (SUCCEED != (ret = parse_key_access_rule(pattern, rule)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to process key access rule %s", pattern);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to process key access rule \"%s\"", pattern);
 
 		zbx_vector_str_clear_ext(&rule->elements, zbx_str_free);
 		zbx_vector_str_destroy(&rule->elements);
 	}
+	else if (0 != no_more_rules)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "key access rule \"%s\" ignored because it follows %sKey=*",
+				pattern, 1 == no_more_rules ? "Allow" : "Deny");
+	}
 	else
-		zbx_vector_ptr_append(&key_access_rules, rule);
+	{
+		if (FAIL != zbx_vector_ptr_search(&key_access_rules, rule, compare_key_access_rules))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "key access rule \"%s\" ignored as duplicate", pattern);
+		}
+		else
+		{
+			if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
+			{
+				switch(rule->type)
+				{
+				case ZBX_KEY_ACCESS_ALLOW:
+					no_more_rules = 1;	/* any rules after "allow all" are meaningless */
+					break;
+				case ZBX_KEY_ACCESS_DENY:
+					zbx_vector_ptr_append(&key_access_rules, rule);
+					no_more_rules = 2;	/* any rules after "deny all" are meaningless */
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+				}
+			}
+			else
+				zbx_vector_ptr_append(&key_access_rules, rule);
+		}
+	}
 
 	return ret;
 }
@@ -865,6 +949,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	if (ZBX_KEY_ACCESS_ALLOW != check_request_access_rules(&request))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Key access denied: \"%s\"", in_command);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
 		goto notsupported;
 	}
 

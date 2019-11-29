@@ -59,6 +59,6 @@ int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps);
 void	zbx_regexp_escape(char **string);
 
 /* wildcards */
-int	zbx_wildcard_match(const char *wildcard, const char *value);
+int	zbx_wildcard_match(const char *value, const char *wildcard);
 
 #endif /* ZABBIX_ZBXREGEXP_H */

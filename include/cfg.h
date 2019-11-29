@@ -25,6 +25,7 @@
 #define	TYPE_MULTISTRING	2
 #define	TYPE_UINT64		3
 #define	TYPE_STRING_LIST	4
+#define	TYPE_CUSTOM_PARSER	5
 
 #define	PARM_OPT	0
 #define	PARM_MAND	1
@@ -47,18 +48,17 @@ extern int	CONFIG_LOG_FILE_SIZE;
 extern int	CONFIG_ALLOW_ROOT;
 extern int	CONFIG_TIMEOUT;
 
-typedef int	(*cfg_custom_parameter_parser_t)(const char *value, void *cfg);
-
 struct cfg_line
 {
-	const char			*parameter;
-	void				*variable;
-	int				type;
-	int				mandatory;
-	zbx_uint64_t			min;
-	zbx_uint64_t			max;
-	cfg_custom_parameter_parser_t	custom_parser;
+	const char	*parameter;
+	void		*variable;
+	int		type;
+	int		mandatory;
+	zbx_uint64_t	min;
+	zbx_uint64_t	max;
 };
+
+typedef int	(*cfg_custom_parameter_parser_t)(const char *value, struct cfg_line *cfg);
 
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict);
 

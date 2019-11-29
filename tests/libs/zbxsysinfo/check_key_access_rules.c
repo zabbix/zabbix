@@ -28,6 +28,8 @@
 #include "sysinfo.h"
 
 
+extern zbx_vector_ptr_t	key_access_rules;
+
 static int	zbx_mock_str_to_key_access_type(const char *str)
 {
 	if (0 == strcmp(str, "ZBX_KEY_ACCESS_ALLOW"))
@@ -45,6 +47,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	hrules, hrule, hmetrics, hmetric;
 	const char		*type, *pattern, *key;
 	int			expected_ret, actual_ret;
+	zbx_uint64_t		rules;
+
+	ZBX_UNUSED(state);
 
 	hrules = zbx_mock_get_parameter_handle("in.rules");
 	init_key_access_rules();
@@ -61,6 +66,14 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	finalize_key_access_rules_configuration();
+
+	rules = zbx_mock_get_parameter_uint64("out.number_of_rules");
+
+	if ((int)rules != key_access_rules.values_num)
+	{
+		fail_msg("Number of key access rules is %d, but %d expected", key_access_rules.values_num, (int)rules);
+	}
+
 	hmetrics = zbx_mock_get_parameter_handle("out.metrics");
 
 	while (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(hmetrics, &hmetric))

@@ -3,6 +3,7 @@ test case: No rules (all allowed)
 in:
   rules: []
 out:
+  number_of_rules: 0
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_ALLOW
@@ -15,6 +16,7 @@ in:
     - pattern: '*'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_DENY
@@ -29,6 +31,7 @@ in:
     - pattern: 'vfs.file.contents'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents'
       result: ZBX_KEY_ACCESS_DENY
@@ -43,6 +46,7 @@ in:
     - pattern: 'vfs.file.contents[]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[]'
       result: ZBX_KEY_ACCESS_DENY
@@ -57,6 +61,7 @@ in:
     - pattern: 'vfs.file.contents[*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[]'
       result: ZBX_KEY_ACCESS_DENY
@@ -71,6 +76,7 @@ in:
     - pattern: 'vfs.file.contents[/etc/passwd,*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd,]'
       result: ZBX_KEY_ACCESS_DENY
@@ -89,6 +95,7 @@ in:
     - pattern: 'vfs.file.contents[*passwd*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_DENY
@@ -97,12 +104,28 @@ out:
     - metric: 'vfs.file.contents[/etc/passwd,utf8]'
       result: ZBX_KEY_ACCESS_ALLOW
 ---
+test case: Any second parameter value
+in:
+  rules:
+    - pattern: 'test[a,*]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'test[a]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'test[a,]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'test[a,anything]'
+      result: ZBX_KEY_ACCESS_DENY
+---
 test case: First argument pattern and any following arguments
 in:
   rules:
     - pattern: 'vfs.file.contents[*passwd*,*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd,]'
       result: ZBX_KEY_ACCESS_DENY
@@ -113,12 +136,30 @@ out:
     - metric: 'vfs.file.contents[/tmp/test]'
       result: ZBX_KEY_ACCESS_ALLOW
 ---
+test case: Any first parameter value
+in:
+  rules:
+    - pattern: 'test[*,b]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'test[anything,c]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'test[anything,b]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'test[anything,b,c]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'test[anything,b,]'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
 test case: Any second parameter value
 in:
   rules:
     - pattern: 'vfs.file.contents[/var/log/zabbix_server.log,*,abc]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[/var/log/zabbix_server.log,,abc]'
       result: ZBX_KEY_ACCESS_DENY
@@ -133,6 +174,7 @@ in:
     - pattern: 'vfs.file.contents[/etc/passwd,utf8]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd,utf8]'
       result: ZBX_KEY_ACCESS_DENY
@@ -147,6 +189,7 @@ in:
     - pattern: 'vfs.file.*'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents'
       result: ZBX_KEY_ACCESS_DENY
@@ -165,6 +208,7 @@ in:
     - pattern: 'vfs.*.contents'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.size.bytes[]'
       result: ZBX_KEY_ACCESS_DENY
@@ -189,6 +233,7 @@ in:
     - pattern: '*'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 3
   metrics:
     - metric: 'vfs.file.size[/var/log/zabbix_server.log]'
       result: ZBX_KEY_ACCESS_ALLOW
@@ -209,6 +254,7 @@ in:
     - pattern: 'system.run[*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_ALLOW
@@ -229,6 +275,7 @@ in:
     - pattern: 't*t*[a]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
     - metric: 'test1[a]'
       result: ZBX_KEY_ACCESS_DENY
@@ -241,51 +288,160 @@ out:
     - metric: 'best[a]'
       result: ZBX_KEY_ACCESS_ALLOW
 ---
-test case: Any second parameter value
+test case: Duplicate rules
 in:
   rules:
-    - pattern: 'test[a,*]'
+    - pattern: 'vfs.file.*'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'vfs.file.*'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'vfs.file.contents'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'vfs.file.contents[]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'vfs.file.contents[/etc/passwd]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'vfs.file.contents[/etc/passwd,*]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'vfs.file.*'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'vfs.file.contents'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'vfs.file.contents[]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'vfs.file.contents[/etc/passwd]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'vfs.file.contents[/etc/passwd,*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'net.*.in'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'net.*.in'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'net.*.in[]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'net.*.in[eth0]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'net.*.in[eth0,*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'net.*.in'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'net.*.in[]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'net.*.in[eth0]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'net.*.in[eth0,*]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'net.*.in[eth0,bytes]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: '*'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 11
   metrics:
-    - metric: 'test[a]'
-      result: ZBX_KEY_ACCESS_ALLOW
-    - metric: 'test[a,]'
+    - metric: 'vfs.file.size'
       result: ZBX_KEY_ACCESS_DENY
-    - metric: 'test[a,anything]'
+    - metric: 'vfs.file.contents'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.contents[]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.contents[/etc/passwd,utf8]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'net.if.in'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'net.if.in[]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'net.if.in[eth0]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'net.if.in[eth0,]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'net.if.in[eth0,packets]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'net.if.in[eth0,bytes]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[echo 1]'
       result: ZBX_KEY_ACCESS_DENY
 ---
-test case: Any first parameter value
+test case: No rules after AllowKey=*
 in:
   rules:
-    - pattern: 'test[*,b]'
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: '*'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'system.run[*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
+  number_of_rules: 1
   metrics:
-    - metric: 'test[anything,c]'
-      result: ZBX_KEY_ACCESS_ALLOW
-    - metric: 'test[anything,b]'
+    - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_DENY
-    - metric: 'test[anything,b,c]'
-      result: ZBX_KEY_ACCESS_ALLOW
-    - metric: 'test[anything,b,]'
+    - metric: 'vfs.file.size[/etc/systemd.conf]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.run[echo 1]'
       result: ZBX_KEY_ACCESS_ALLOW
 ---
-test case: Single character pattern
+test case: No rules after DenyKey=*
 in:
   rules:
-    - pattern: '*est[lo*,*um]'
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: '*'
       type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'system.run[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
 out:
+  number_of_rules: 2
   metrics:
-    - metric: 'test[lorem,ipsum]'
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'vfs.file.size[/etc/systemd.conf]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[echo 1]'
       result: ZBX_KEY_ACCESS_DENY
-    - metric: 'best[lorem,ipsum]'
+    - metric: 'system.localtime'
       result: ZBX_KEY_ACCESS_DENY
-    - metric: 'west[lom,ipsum]'
+---
+test case: Incomplete whitelist (no deny all at the end)
+in:
+  rules:
+    - pattern: 'vfs.file.*[/var/log/*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'system.localtime[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+out:
+  number_of_rules: 3
+  metrics:
+    - metric: 'vfs.file.size[/var/log/zabbix_server.log]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'vfs.file.contents[/var/log/zabbix_server.log]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.localtime[]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.localtime[utc]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.localtime'
       result: ZBX_KEY_ACCESS_DENY
-    - metric: 'quest[lom,ipsum]'
+---
+test case: No trailing AllowKey rules
+in:
+  rules:
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'system.run[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: '*'
+      type: ZBX_KEY_ACCESS_ALLOW
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_DENY
-    - metric: 'test[lo]'
+    - metric: 'vfs.file.size[/etc/systemd.conf]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.localtime'
       result: ZBX_KEY_ACCESS_ALLOW
 ...

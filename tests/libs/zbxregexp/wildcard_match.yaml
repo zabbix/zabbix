@@ -1,0 +1,135 @@
+---
+test case: String match
+in:
+  pattern: 'foo'
+out:
+  values:
+    - value: 'foo'
+      result: SUCCEED
+    - value: 'fooo'
+      result: FAIL
+    - value: 'fo'
+      result: FAIL
+    - value: 'bar'
+      result: FAIL
+---
+test case: Match all
+in:
+  pattern: '*'
+out:
+  values:
+    - value: 'abc'
+      result: SUCCEED
+    - value: '123'
+      result: SUCCEED
+    - value: ''
+      result: SUCCEED
+---
+test case: Empty
+in:
+  pattern: ''
+out:
+  values:
+    - value: ''
+      result: SUCCEED
+    - value: '123'
+      result: FAIL
+---
+test case: Wildcard lo*ip*m
+in:
+  pattern: 'lo*ip*m'
+out:
+  values:
+    - value: 'lorem_ipsum'
+      result: SUCCEED
+---
+test case: Wildcard a*bc
+in:
+  pattern: 'a*bc'
+out:
+  values:
+    - value: 'aaa123bc'
+      result: SUCCEED
+    - value: 'aXbXbcXbc'
+      result: SUCCEED
+    - value: 'aXbXbcXb'
+      result: FAIL
+---
+test case: Wildcard a*bc*d
+in:
+  pattern: 'a*bc*d'
+out:
+  values:
+    - value: 'aXbXbcXXd'
+      result: SUCCEED
+    - value: 'aXbXabcXXd'
+      result: SUCCEED
+    - value: 'aXbXbcXb'
+      result: FAIL
+---
+test case: Wildcard abc*
+in:
+  pattern: 'abc*'
+out:
+  values:
+    - value: 'abc'
+      result: SUCCEED
+    - value: 'abcdef'
+      result: SUCCEED
+---
+test case: Wildcard *abc
+in:
+  pattern: '*abc'
+out:
+  values:
+    - value: 'abc'
+      result: SUCCEED
+    - value: '123abc'
+      result: SUCCEED
+---
+test case: Wildcard *abc*
+in:
+  pattern: '*abc*'
+out:
+  values:
+    - value: 'abc'
+      result: SUCCEED
+    - value: '123abcdef'
+      result: SUCCEED
+---
+test case: Wildcard a***c
+in:
+  pattern: 'a***c'
+out:
+  values:
+    - value: 'ac'
+      result: SUCCEED
+    - value: 'abc'
+      result: SUCCEED
+    - value: 'a_whatever_c'
+      result: SUCCEED
+---
+test case: Wildcard ***c*e
+in:
+  pattern: '***c*e'
+out:
+  values:
+    - value: 'cde'
+      result: SUCCEED
+    - value: 'abce'
+      result: SUCCEED
+    - value: 'whatever_c123e'
+      result: SUCCEED
+---
+test case: Wildcard a*c***
+in:
+  pattern: 'a*c***'
+out:
+  values:
+    - value: 'ac'
+      result: SUCCEED
+    - value: 'abc'
+      result: SUCCEED
+    - value: 'a1c_whatever'
+      result: SUCCEED
+...

@@ -353,31 +353,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: check_parameter_deprecated                                       *
- *                                                                            *
- * Purpose: check if configuration parameter is deprecated                    *
- *                                                                            *
- * Parameters: parameter_name - [IN] parameter name to check for deprecation  *
- *                                                                            *
- * Return value: SUCCEED - parameter is not deprecated                        *
- *               FAIL    - parameter is deprecated                            *
- *                                                                            *
- ******************************************************************************/
-static int	check_parameter_deprecated(const char *parameter_name)
-{
-	if (0 == strcmp(parameter_name, "EnableRemoteCommands"))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s parameter is deprecated,"
-				" use AllowKey=system.run[*] or DenyKey=system.run[*] instead",
-				parameter_name);
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: parse_cfg_file                                                   *
  *                                                                            *
  * Purpose: parse configuration file                                          *
@@ -456,7 +431,12 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 			zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
 
-			check_parameter_deprecated(parameter);
+			if (0 == strcmp(parameter, "EnableRemoteCommands"))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "%s parameter is deprecated,"
+						" use AllowKey=system.run[*] or DenyKey=system.run[*] instead",
+						parameter);
+			}
 
 			if (0 == strcmp(parameter, "Include"))
 			{
@@ -480,14 +460,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",
 						parameter, value);
-
-				if (NULL != cfg[i].custom_parser)
-				{
-					if (SUCCEED == cfg[i].custom_parser(value, &cfg[i]))
-						continue;
-					else
-						goto incorrect_config;
-				}
 
 				switch (cfg[i].type)
 				{
@@ -518,6 +490,18 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 							goto incorrect_config;
 
 						*((zbx_uint64_t *)cfg[i].variable) = var;
+						break;
+					case TYPE_CUSTOM_PARSER:
+						if (NULL != cfg[i].variable)
+						{
+							cfg_custom_parameter_parser_t custom_parser =
+									(cfg_custom_parameter_parser_t)cfg[i].variable;
+
+							if (SUCCEED != custom_parser(value, &cfg[i]))
+								goto incorrect_config;
+
+							continue;
+						}
 						break;
 					default:
 						assert(0);

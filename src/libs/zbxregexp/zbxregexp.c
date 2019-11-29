@@ -1159,34 +1159,43 @@ void	zbx_regexp_escape(char **string)
  ******************************************************************************/
 int	zbx_wildcard_match(const char *value, const char *wildcard)
 {
-	int	i, j = 0;
-	char	*pattern;
+	int s = 0, w = 0, s_pivot = 0, w_pivot = 0;
 
-	for (i = 0; '\0' != wildcard[i]; i++)
+	while('\0' != value[s] && '*' != wildcard[w])
 	{
-		if ('*' == wildcard[i])
-			j++;
+		if (value[s] != wildcard[w])
+			return 0;
+
+		w++;
+		s++;
 	}
 
-	if (0 == j)
-		return 0 == strcmp(value, wildcard);
-
-	pattern = (char*)zbx_malloc(NULL, i + j + 1);
-	j = 0;
-
-	for (i = 0; '\0' != wildcard[i]; i++, j++)
+	while('\0' != value[s])
 	{
-		if ('*' == wildcard[i])
-			pattern[j++] = '.';
+		if ('*' == wildcard[w])
+		{
+			w++;
 
-		pattern[j] = wildcard[i];
+			if ('\0' == wildcard[w])
+				return 1;
+
+			w_pivot = w;
+			s_pivot = s + 1;
+		}
+		else if (value[s] == wildcard[w])
+		{
+			s++;
+			w++;
+		}
+		else
+		{
+			w = w_pivot;
+			s = s_pivot++;
+		}
 	}
 
-	pattern[j] = '\0';
+	while('*' == wildcard[w])
+		w++;
 
-	j = NULL != zbx_regexp_match(value, pattern, NULL);
-
-	zbx_free(pattern);
-
-	return j;
+	return '\0' == wildcard[w];
 }

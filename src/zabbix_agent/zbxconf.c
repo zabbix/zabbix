@@ -124,14 +124,13 @@ void	load_user_parameters(char **lines)
  * Author: Andrejs Tumilovics                                                 *
  *                                                                            *
  ******************************************************************************/
-int	load_key_access_rule(const char *value, void *cfg)
+int	load_key_access_rule(const char *value, struct cfg_line *cfg)
 {
 	zbx_key_access_rule_type_t	rule_type;
-	const struct cfg_line		*line = (struct cfg_line*)cfg;
 
-	if (0 == strcmp(line->parameter, "AllowKey"))
+	if (0 == strcmp(cfg->parameter, "AllowKey"))
 		rule_type = ZBX_KEY_ACCESS_ALLOW;
-	else if (0 == strcmp(line->parameter, "DenyKey"))
+	else if (0 == strcmp(cfg->parameter, "DenyKey"))
 		rule_type = ZBX_KEY_ACCESS_DENY;
 	else
 		return FAIL;
