@@ -243,7 +243,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'proc.cpu.util[,,,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 0.5,
+			'treshold' => 10.0,
 			'compareType' => COMPARE_AVERAGE
 		],
 		[
