@@ -425,19 +425,19 @@ class testFormAction extends CLegacyWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		if (array_key_exists('evaltype', $data)) {
-			// Open Condition overlay dialog.
+			// Open Condition overlay dialog and fill first condition.
 			$this->zbxTestClickXpath('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
-			// Fill and Add first value.
+			$this->zbxTestLaunchOverlayDialog('New condition');
 			$this->zbxTestInputTypeWait('value', 'TEST1');
 			$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
-			// Open Condition overlay dialog again.
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('conditions_0'));
+			// Open Condition overlay dialog again and fill second condition.
 			$this->zbxTestClickXpath('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
-			// Fill and Add second value.
+			$this->zbxTestLaunchOverlayDialog('New condition');
 			$this->zbxTestInputTypeWait('value', 'TEST2');
 			$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 			// Wait until overlay is closed and value is added, so that Type of calculation dropdown is clickable.
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('evaltype'));
-			// Select Type of calculation.
 			$this->zbxTestDropdownSelectWait('evaltype', $data['evaltype']);
 			$evaltype = $data['evaltype'];
 		}
@@ -494,8 +494,6 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
 		$new_condition_conditiontype = $this->zbxTestGetSelectedLabel('condition_type');
 
-		$this->zbxTestTextPresent('New condition');
-		$this->zbxTestAssertElementPresentId('condition_type');
 		switch ($eventsource) {
 			case 'Triggers':
 				$this->zbxTestDropdownHasOptions('condition_type', [
@@ -701,13 +699,12 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertElementPresentXpath('//ul[@id="value" and contains(@class, "radio")]');
 				break;
 			case 'Event type':
+			case 'Service type':
+				$this->zbxTestAssertElementPresentXpath('//input[@type="radio" and contains(@id, "0") and @checked]');
 				$this->zbxTestAssertElementPresentXpath('//select[@id="value"]');
 				break;
-			case 'Service type':
-				$this->zbxTestAssertElementPresentXpath('//ul[@id="operator" and contains(@class, "radio")]');
-				break;
 			default:
-				$this->zbxTestAssertElementNotPresentXpath('//ul[@id="value" and contains(@class, "radio")]');
+				$this->zbxTestAssertElementNotPresentXpath('//ul[@id="value"]|//select[@id="value"]');
 				break;
 		}
 
@@ -1749,6 +1746,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
 				$this->zbxTestDropdownSelectWait('condition_type', $condition['type']);
+				COverlayDialogElement::find()->one()->waitUntilReady();
 				switch ($condition['type']) {
 					case 'Application':
 					case 'Host name':
@@ -1800,7 +1798,7 @@ class testFormAction extends CLegacyWebTest {
 						break;
 					case 'Event type':
 					case 'Service type':
-						$this->zbxTestDropdownSelect('value', $condition['value']);
+						$this->zbxTestDropdownSelectWait('value', $condition['value']);
 						$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 						switch($condition['type']){
 							case 'Service type':
@@ -1858,6 +1856,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('operations_0'));
 			}
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_bg'));
 		}
 
 		if (isset($data['esc_period'])){
@@ -1899,18 +1898,21 @@ class testFormAction extends CLegacyWebTest {
 
 // adding conditions
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestLaunchOverlayDialog('New condition');
 		$this->zbxTestDropdownSelectWait('condition_type', 'Trigger name');
 		$this->zbxTestInputTypeWait('value', 'trigger');
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Trigger name contains trigger');
 
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestLaunchOverlayDialog('New condition');
 		$this->zbxTestDropdownSelectWait('condition_type', 'Trigger severity');
 		$this->zbxTestClickXpathWait('//label[text()="Average"]');
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 		$this->zbxTestAssertElementText("//tr[@id='conditions_1']/td[2]", 'Trigger severity equals Average');
 
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestLaunchOverlayDialog('New condition');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
 		$this->zbxTestDropdownSelectWait('condition_type', 'Application');
 		$this->zbxTestInputTypeWait('value', 'app');
