@@ -36,7 +36,7 @@ if ($data['params']['dcheckid']) {
 $form_list = (new CFormList())
 	->cleanItems()
 	->addRow(new CLabel(_('Check type'), 'type'),
-		(new CComboBox('type', $data['params']['type'], 'setDCheckDefaultPort()', $discovery_ckeck_types))
+		(new CComboBox('type', $data['params']['type'], '', $discovery_ckeck_types))
 	)
 	->addRow((new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
 		(new CTextBox('ports', $data['params']['ports']))
