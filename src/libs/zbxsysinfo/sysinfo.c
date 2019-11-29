@@ -605,6 +605,7 @@ void	free_key_access_rules(void)
 		zbx_vector_str_destroy(&rule->elements);
 		zbx_free(key_access_rules.values[i]);
 	}
+
 	zbx_vector_ptr_destroy(&key_access_rules);
 }
 

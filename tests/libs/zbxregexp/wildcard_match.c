@@ -39,9 +39,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		str = zbx_mock_get_object_member_string(hvalue, "value");
 		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_object_member_string(hvalue, "result"));
-		ret = zbx_wildcard_match(str, pattern);
-		printf(">>> (%s, %s) %d\n", str, pattern, ret);
-		ret = (1 == ret) ? SUCCEED : FAIL;
+		ret = (1 == zbx_wildcard_match(str, pattern)) ? SUCCEED : FAIL;
 
 		if (ret != expected_ret)
 			fail_msg("String \"%s\" unexpectedly %s wildcard \"%s\"",
