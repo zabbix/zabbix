@@ -8,6 +8,7 @@ use CControllerResponseFatal;
 use CUrl;
 use API;
 use APP;
+use CAutoloader;
 use CModuleManager;
 
 class ModuleUpdateAction extends CController {
@@ -116,13 +117,29 @@ class ModuleUpdateAction extends CController {
 		$modules = array_merge($enabled, $disabled);
 		$allowedids = [];
 
+		// Create and register additioinal autoloader for module manager.
+		$autoloader = new CAutoloader;
+		$autoloader->register();
+
 		foreach ($modules as $module) {
 			$manager->loadModule($module['relative_path']);
-			$manager->enable($module['id']);
-			$manager->initModule($module['id'], $module['config']);
 
 			if (!array_key_exists($module['id'], $manager->getErrors())) {
-				$moduleids[] = $module['moduleid'];
+				$manager->enable($module['id']);
+			}
+		}
+
+		foreach ($manager->getRegisteredNamespaces() as $namespace => $paths) {
+			$autoloader->addNamespace($namespace, $paths);
+		}
+
+		foreach ($modules as $module) {
+			if (in_array($module['moduleid'], $moduleids)) {
+				$manager->initModule($module['id'], $module['config']);
+
+				if (!array_key_exists($module['id'], $manager->getErrors())) {
+					$allowedids[] = $module['moduleid'];
+				}
 			}
 		}
 
