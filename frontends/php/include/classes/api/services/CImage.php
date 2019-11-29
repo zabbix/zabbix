@@ -31,18 +31,23 @@ class CImage extends CApiService {
 	/**
 	 * Get images data
 	 *
-	 * @param array  $options
-	 * @param array  $options['itemids']
-	 * @param array  $options['hostids']
-	 * @param array  $options['groupids']
-	 * @param array  $options['triggerids']
-	 * @param array  $options['imageids']
-	 * @param bool   $options['status']
-	 * @param bool   $options['editable']
-	 * @param bool   $options['count']
-	 * @param string $options['pattern']
-	 * @param int    $options['limit']
-	 * @param string $options['order']
+	 * @param array   $options
+	 * @param array   $options['imageids']
+	 * @param array   $options['sysmapids']
+	 * @param array   $options['filter']
+	 * @param array   $options['search']
+	 * @param bool    $options['searchByAny']
+	 * @param bool    $options['startSearch']
+	 * @param bool    $options['excludeSearch']
+	 * @param bool    $options['searchWildcardsEnabled']
+	 * @param array   $options['output']
+	 * @param int     $options['select_image']
+	 * @param bool    $options['editable']
+	 * @param bool    $options['countOutput']
+	 * @param bool    $options['preservekeys']
+	 * @param string  $options['sortfield']
+	 * @param string  $options['sortorder']
+	 * @param int     $options['limit']
 	 *
 	 * @return array|boolean image data as array or false if error
 	 */

@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.0.0alpha1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4050007);
+define('ZABBIX_DB_VERSION',		4050008);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -156,10 +156,6 @@ define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
 define('T_ZBX_RANGE_TIME',	3);
-define('T_ZBX_CLR',			5);
-define('T_ZBX_DBL_BIG',		9);
-define('T_ZBX_DBL_STR',		10);
-define('T_ZBX_TP',			11);
 define('T_ZBX_TU',			12);
 define('T_ZBX_ABS_TIME',	13);
 
