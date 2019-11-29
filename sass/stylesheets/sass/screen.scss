@@ -1656,16 +1656,16 @@ output {
 }
 
 .multiselect-control {
+	display: flex;
 	position: relative;
 	vertical-align: top;
-	display: inline-block;
 	white-space: nowrap;
 }
 
 .multiselect {
 	@extend %form-input-style;
-	@extend .multiselect-button;
-	position: relative;
+	display: flex;
+	flex-direction: column;
 	margin-right: 3px;
 	min-height: 24px;
 	white-space: normal;
@@ -1763,20 +1763,7 @@ output {
 	}
 }
 
-.multiselect-collapsed {
-	&.multiselect-control,
-	.multiselect {
-		overflow: hidden;
-		max-height: 24px;
-
-		input[type="text"] {
-			display: none;
-		}
-	}
-}
-
 .multiselect-button {
-	display: inline-block;
 	vertical-align: top;
 }
 
@@ -6714,8 +6701,15 @@ svg {
 	}
 
 	.list-accordion-item-closed {
-		@extend .multiselect-collapsed;
-		height: 30px;
+
+		.multiselect {
+			height: 24px;
+			overflow: hidden;
+		}
+
+		.list-accordion-item-head {
+			margin-bottom: 5px;
+		}
 
 		.list-accordion-item-body {
 			display: none;
