@@ -152,6 +152,7 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
       else
         AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libopenssl_dir_lib/pkgconfig" $PKG_CONFIG --exists --print-errors openssl]) || AC_MSG_ERROR(["Not found openssl package in $_libopenssl_dir/lib/pkgconfig"])
         OPENSSL_LIBS=`PKG_CONFIG_LIBDIR="$_libopenssl_dir_lib/pkgconfig" $PKG_CONFIG --static --libs openssl`
+        test -z "$OPENSSL_LIBS" && OPENSSL_LIBS=`PKG_CONFIG_LIBDIR="$_libopenssl_dir_lib/pkgconfig" $PKG_CONFIG --libs openssl`
       fi
 
       if test "x$static_linking_support" = "xno"; then

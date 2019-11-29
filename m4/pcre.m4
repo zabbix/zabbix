@@ -99,6 +99,7 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 		else
 			AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libpcre_dir_lib/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre]) || AC_MSG_ERROR(["Not found libpcre package in $_libpcre_dir/lib/pkgconfig"])
 			LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_dir_lib/pkgconfig" $PKG_CONFIG --static --libs libpcre`
+			test -z "$LIBPCRE_LIBS" && LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_dir_lib/pkgconfig" $PKG_CONFIG --libs libpcre`
 		fi
 
 		if test "x$static_linking_support" = "xno"; then
