@@ -121,6 +121,8 @@ Changes for 4.4.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-16852] fixed graph widget multiselect collapse (ashubin, rlataria)
+..F....... [ZBX-16649] fixed flexible textarea behavior (averza, vasilijs)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.3
