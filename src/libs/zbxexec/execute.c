@@ -179,13 +179,13 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	if (-1 == (stdout_orig = dup(STDOUT_FILENO)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to duplicate stdout: %s",
-				__function_name, zbx_strerror(errno));
+				__func__, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	if (-1 == (stderr_orig = dup(STDERR_FILENO)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to duplicate stderr: %s",
-				__function_name, zbx_strerror(errno));
+				__func__, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	fcntl(stdout_orig, F_SETFD, FD_CLOEXEC);
