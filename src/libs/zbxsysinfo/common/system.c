@@ -20,7 +20,7 @@
 #include "common.h"
 #include "system.h"
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "perfmon.h"
 #	pragma comment(lib, "user32.lib")
 #endif
@@ -73,7 +73,7 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	char		counter_path[64];
 	AGENT_REQUEST	request_tmp;
 	int		ret;

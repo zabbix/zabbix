@@ -207,7 +207,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	int				*ovector = NULL;
 	int				ovecsize = 3 * count;		/* see pcre_exec() in "man pcreapi" why 3 */
 	struct pcre_extra		extra, *pextra;
-#if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION) && !defined(_WINDOWS)
+#if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION) && !defined(_WINDOWS) && !defined(__MINGW32__)
 	static unsigned long int	recursion_limit = 0;
 
 	if (0 == recursion_limit)
@@ -238,7 +238,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 #if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
 	pextra->flags |= PCRE_EXTRA_MATCH_LIMIT | PCRE_EXTRA_MATCH_LIMIT_RECURSION;
 	pextra->match_limit = 1000000;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	pextra->match_limit_recursion = ZBX_PCRE_RECURSION_LIMIT;
 #else
 	pextra->match_limit_recursion = recursion_limit;

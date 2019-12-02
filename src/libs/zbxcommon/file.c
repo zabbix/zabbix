@@ -19,7 +19,7 @@
 
 #include "common.h"
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 int	__zbx_open(const char *pathname, int flags)
 {
 	int	ret;
