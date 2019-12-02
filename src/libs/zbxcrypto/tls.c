@@ -28,23 +28,6 @@
 #include "tls_tcp.h"
 #include "tls_tcp_active.h"
 
-#if defined(HAVE_POLARSSL)
-#	include <polarssl/entropy.h>
-#	include <polarssl/ctr_drbg.h>
-#	include <polarssl/ssl.h>
-#	include <polarssl/error.h>
-#	include <polarssl/debug.h>
-#	include <polarssl/oid.h>
-#	include <polarssl/version.h>
-#elif defined(HAVE_GNUTLS)
-#	include <gnutls/gnutls.h>
-#	include <gnutls/x509.h>
-#elif defined(HAVE_OPENSSL)
-#	include <openssl/ssl.h>
-#	include <openssl/err.h>
-#	include <openssl/rand.h>
-#endif
-
 /* use only TLS 1.2 (which has number 3.3) with PolarSSL */
 #if defined(HAVE_POLARSSL)
 #	define ZBX_TLS_MIN_MAJOR_VER	SSL_MAJOR_VERSION_3
@@ -119,19 +102,6 @@ static void	zbx_openssl_thread_cleanup(void)
 	zbx_free(crypto_mutexes);
 }
 #endif	/* _WINDOWS */
-
-#if !defined(LIBRESSL_VERSION_NUMBER)
-#define OPENSSL_INIT_LOAD_SSL_STRINGS			0
-#define OPENSSL_INIT_LOAD_CRYPTO_STRINGS		0
-#define OPENSSL_VERSION					SSLEAY_VERSION
-#endif
-#define OpenSSL_version					SSLeay_version
-#define TLS_method					TLSv1_2_method
-#define TLS_client_method				TLSv1_2_client_method
-#define SSL_CTX_get_ciphers(ciphers)			((ciphers)->cipher_list)
-#if !defined(LIBRESSL_VERSION_NUMBER)
-#define SSL_CTX_set_min_proto_version(ctx, TLSv)	1
-#endif
 
 static int	zbx_openssl_init_ssl(int opts, void *settings)
 {
