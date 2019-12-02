@@ -58,8 +58,6 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 			maintenanceids->values_num);
 #if defined(HAVE_MYSQL)
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid lock in share mode");
-#elif defined(HAVE_IBM_DB2)
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid with rs use and keep share locks");
 #else
 	/* Row level shared locks are not supported in Oracle. For PostgreSQL table level locks */
 	/* are used because row level shared locks have reader preference, which could lead to  */

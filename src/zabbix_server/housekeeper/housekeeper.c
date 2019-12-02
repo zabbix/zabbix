@@ -772,7 +772,7 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 	}
 	else
 	{
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 		return DBexecute(
 				"delete from %s"
 				" where %s"
