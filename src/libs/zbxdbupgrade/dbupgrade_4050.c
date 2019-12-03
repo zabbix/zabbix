@@ -312,7 +312,7 @@ static int	DBpatch_4050016(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_DBROW2UINT64(mediatypeid, row[0]);
-		content_type = (MEDIA_TYPE_SMS == (zbx_media_type_t)atoi(row[1])) ? 2 : atoi(row[2]);
+		content_type = MEDIA_TYPE_SMS == (zbx_media_type_t)atoi(row[1]) ? 2 : atoi(row[2]);
 
 		for (i = 0; 2 >= i; i++)
 		{
@@ -321,7 +321,7 @@ static int	DBpatch_4050016(void)
 				if (NULL != messages[i][k][0])
 				{
 					msg_esc = DBdyn_escape_string(messages[i][k][content_type]);
-					subj_esc = (content_type == 2) ? NULL : DBdyn_escape_string(messages[i][k][3]);
+					subj_esc = content_type == 2 ? NULL : DBdyn_escape_string(messages[i][k][3]);
 
 					if (ZBX_DB_OK > DBexecute(
 							"insert into media_type_message"
