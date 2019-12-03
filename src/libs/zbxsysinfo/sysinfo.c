@@ -382,6 +382,18 @@ static int	parse_key_access_rule(const char *pattern, zbx_key_access_rule_t *rul
 
 	*pr = ']';
 
+	/* remove repeated trailing "*" parameters */
+	if (1 < size && 0 == strcmp(rule->elements.values[i--], "*"))
+	{
+		for (; 0 < i; i--)
+		{
+			if (0 != strcmp(rule->elements.values[i], "*"))
+				break;
+
+			zbx_vector_str_remove(&rule->elements, i + 1);
+		}
+	}
+
 	return SUCCEED;
 }
 
@@ -404,8 +416,8 @@ static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
 	const zbx_key_access_rule_t	*a, *b;
 	int				i;
 
-	a = *((zbx_key_access_rule_t **)rule_a);
-	b = *((zbx_key_access_rule_t **)rule_b);
+	a = *(zbx_key_access_rule_t **)rule_a;
+	b = *(zbx_key_access_rule_t **)rule_b;
 
 	if (a->empty_arguments != b->empty_arguments || a->elements.values_num != b->elements.values_num)
 		return 1;
@@ -512,12 +524,22 @@ int	check_request_access_rules(AGENT_REQUEST *request)
 		if (0 == strcmp("*", rule->elements.values[0]) && 1 == rule->elements.values_num)
 			return rule->type; /* match all */
 
-		if (request->nparam < (rule->elements.values_num - 1))
-			continue;	/* too few parameters */
+		if (1 < rule->elements.values_num)
+		{
+			if (0 == strcmp("*", rule->elements.values[rule->elements.values_num - 1]))
+			{
+				if (2 == rule->elements.values_num && 0 == request->nparam)
+					continue;	/* rule: key[*], request: key */
+			}
+			else
+			{
+				if (request->nparam < (rule->elements.values_num - 1))
+					continue;	/* too few parameters */
 
-		if (request->nparam > (rule->elements.values_num - 1) && 0 == empty_arguments &&
-				0 != strcmp("*", rule->elements.values[rule->elements.values_num - 1]))
-			continue;	/* too many parameters */
+				if (request->nparam > (rule->elements.values_num - 1) && 0 == empty_arguments)
+					continue;	/* too many parameters */
+			}
+		}
 
 		if (0 == zbx_wildcard_match(request->key, rule->elements.values[0]))
 			continue;	/* key doesn't match */
@@ -543,13 +565,17 @@ int	check_request_access_rules(AGENT_REQUEST *request)
 				if (0 == strcmp("*", rule->elements.values[j]))
 					return rule->type;	/* skip next parameter checks */
 
+				if (request->nparam < j)
+					break;
+
 				if (0 == zbx_wildcard_match(request->params[j - 1], rule->elements.values[j]))
 					break;		/* parameter doesn't match pattern */
 
 				return rule->type;
 			}
 
-			if (0 == zbx_wildcard_match(request->params[j - 1], rule->elements.values[j]))
+			if (request->nparam < j ||
+					0 == zbx_wildcard_match(request->params[j - 1], rule->elements.values[j]))
 				break;	/* parameter doesn't match pattern */
 		}
 	}

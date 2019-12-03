@@ -83,7 +83,7 @@ out:
     - metric: 'vfs.file.contents[/etc/passwd,utf8]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'vfs.file.contents[/etc/passwd]'
-      result: ZBX_KEY_ACCESS_ALLOW
+      result: ZBX_KEY_ACCESS_DENY
     - metric: 'vfs.file.contents[/var/log/zabbix_server.log]'
       result: ZBX_KEY_ACCESS_ALLOW
     - metric: 'vfs.file.contents[]'
@@ -113,11 +113,13 @@ out:
   number_of_rules: 1
   metrics:
     - metric: 'test[a]'
-      result: ZBX_KEY_ACCESS_ALLOW
+      result: ZBX_KEY_ACCESS_DENY
     - metric: 'test[a,]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'test[a,anything]'
       result: ZBX_KEY_ACCESS_DENY
+    - metric: 'test[]'
+      result: ZBX_KEY_ACCESS_ALLOW
 ---
 test case: First argument pattern and any following arguments
 in:
@@ -132,7 +134,7 @@ out:
     - metric: 'vfs.file.contents[/etc/passwd,utf8]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'vfs.file.contents[/etc/passwd]'
-      result: ZBX_KEY_ACCESS_ALLOW
+      result: ZBX_KEY_ACCESS_DENY
     - metric: 'vfs.file.contents[/tmp/test]'
       result: ZBX_KEY_ACCESS_ALLOW
 ---
@@ -151,6 +153,19 @@ out:
     - metric: 'test[anything,b,c]'
       result: ZBX_KEY_ACCESS_ALLOW
     - metric: 'test[anything,b,]'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
+test case: Empty second parameter value
+in:
+  rules:
+    - pattern: 'test[a,,c]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'test[a,,c]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'test[a,b,c]'
       result: ZBX_KEY_ACCESS_ALLOW
 ---
 test case: Any second parameter value
@@ -257,7 +272,7 @@ out:
   number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
-      result: ZBX_KEY_ACCESS_ALLOW
+      result: ZBX_KEY_ACCESS_DENY
     - metric: 'vfs.file.contents[/etc/passwd,]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'system.run[]'
@@ -443,5 +458,26 @@ out:
     - metric: 'system.run[echo 1]'
       result: ZBX_KEY_ACCESS_ALLOW
     - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
+test case: Empty parameters match
+in:
+  rules:
+    - pattern: 'web.page.get[localhost,*,*]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'web.page.get[localhost]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'web.page.get[localhost,]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'web.page.get[localhost,/,80]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'web.page.get[localhost,/]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'web.page.get[localhost,,80]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'web.page.get[127.0.0.1]'
       result: ZBX_KEY_ACCESS_ALLOW
 ...
