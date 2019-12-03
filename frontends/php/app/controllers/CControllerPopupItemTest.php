@@ -141,6 +141,11 @@ abstract class CControllerPopupItemTest extends CController {
 
 		CArrayHelper::sort($proxies, [['field' => 'host', 'order' => ZBX_SORT_UP]]);
 
+		foreach ($proxies as &$proxy) {
+			$proxy = $proxy['host'];
+		}
+		unset($proxy);
+
 		return $proxies;
 	}
 

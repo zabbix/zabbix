@@ -31,7 +31,6 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'delay' => 'string',
 			'get_value' => 'in 0,1',
 			'headers' => 'array',
-			'host_proxy' => 'db hosts.proxy_hostid',
 			'hostid' => 'db hosts.hostid',
 			'http_proxy' => 'string',
 			'follow_redirects' => 'in 0,1',
