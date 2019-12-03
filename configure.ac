@@ -686,6 +686,12 @@ AC_MSG_RESULT(no)
 )
 LDFLAGS="$saved_LDFLAGS"
 
+AC_MSG_CHECKING(for '__thread' compiler support)
+AC_TRY_COMPILE([#include <stdio.h>],[static __thread int a = 0;],
+AC_DEFINE(HAVE_THREAD_LOCAL,1,[Define to 1 if compiler keyword '__thread' supported.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no)
+HAVE_THREAD_LOCAL="no")
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
@@ -1283,7 +1289,9 @@ AC_ARG_ENABLE(agent2,[  --enable-agent2         Turn on build of Zabbix agent 2]
   yes) agent2=yes ;;
   no)  agent2=no ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent2]) ;;
-esac],
+esac
+test "x$agent2" = "xyes" -a "x$HAVE_THREAD_LOCAL" = "xno" && AC_MSG_ERROR([C compiler is not compatible with agent2 assembly])
+],
 [agent2=no])
 AM_CONDITIONAL(AGENT2, test "x$agent2" = "xyes")
 
