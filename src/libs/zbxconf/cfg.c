@@ -491,7 +491,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 						*((zbx_uint64_t *)cfg[i].variable) = var;
 						break;
-					case TYPE_CUSTOM_PARSER:
+					case TYPE_CUSTOM:
 						if (NULL != cfg[i].variable)
 						{
 							cfg_custom_parameter_parser_t custom_parser =

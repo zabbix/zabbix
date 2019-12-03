@@ -811,9 +811,9 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"AllowKey",			load_key_access_rule,			TYPE_CUSTOM_PARSER,
+		{"AllowKey",			load_key_access_rule,			TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
-		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM_PARSER,
+		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};

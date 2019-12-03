@@ -25,7 +25,7 @@
 #define	TYPE_MULTISTRING	2
 #define	TYPE_UINT64		3
 #define	TYPE_STRING_LIST	4
-#define	TYPE_CUSTOM_PARSER	5
+#define	TYPE_CUSTOM		5
 
 #define	PARM_OPT	0
 #define	PARM_MAND	1
