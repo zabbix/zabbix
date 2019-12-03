@@ -68,6 +68,7 @@ class CMediatype extends CApiService {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
+			'selectMessageTemplates'	=> null,
 			'selectUsers'				=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -1119,6 +1120,20 @@ class CMediatype extends CApiService {
 
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
+
+		// adding message templates
+		if ($options['selectMessageTemplates'] !== null && $options['selectMessageTemplates'] != API_OUTPUT_COUNT) {
+			$relation_map = $this->createRelationMap($result, 'mediatypeid', 'mediatype_messageid',
+				'media_type_message'
+			);
+			$message_templates = API::getApiService()->select('media_type_message', [
+				'output' => $options['selectMessageTemplates'],
+				'filter' => ['mediatype_messageid' => $relation_map->getRelatedIds()],
+				'preservekeys' => true
+			]);
+			$message_templates = $this->unsetExtraFields($message_templates, ['mediatypeid'], []);
+			$result = $relation_map->mapMany($result, $message_templates, 'message_templates');
+		}
 
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
