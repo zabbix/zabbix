@@ -447,7 +447,7 @@ static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
 int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 {
 	static int		no_more_rules = 0;
-	int			ret;
+	int			ret, rule_added = 0;
 	zbx_key_access_rule_t	*rule;
 
 	rule = zbx_malloc(NULL, sizeof(zbx_key_access_rule_t));
@@ -457,9 +457,6 @@ int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 	if (SUCCEED != (ret = parse_key_access_rule(pattern, rule)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to process key access rule \"%s\"", pattern);
-
-		zbx_vector_str_clear_ext(&rule->elements, zbx_str_free);
-		zbx_vector_str_destroy(&rule->elements);
 	}
 	else if (0 != no_more_rules)
 	{
@@ -483,6 +480,7 @@ int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 					break;
 				case ZBX_KEY_ACCESS_DENY:
 					zbx_vector_ptr_append(&key_access_rules, rule);
+					rule_added = 1;
 					no_more_rules = 2;	/* any rules after "deny all" are meaningless */
 					break;
 				default:
@@ -490,8 +488,18 @@ int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 				}
 			}
 			else
+			{
 				zbx_vector_ptr_append(&key_access_rules, rule);
+				rule_added = 1;
+			}
 		}
+	}
+
+	if (0 == rule_added)
+	{
+		zbx_vector_str_clear_ext(&rule->elements, zbx_str_free);
+		zbx_vector_str_destroy(&rule->elements);
+		zbx_free(rule);
 	}
 
 	return ret;
