@@ -1159,43 +1159,41 @@ void	zbx_regexp_escape(char **string)
  ******************************************************************************/
 int	zbx_wildcard_match(const char *value, const char *wildcard)
 {
-	int s = 0, w = 0, s_pivot = 0, w_pivot = 0;
+	int s = 0, w = 0;
+	const char *s_pivot = value, *w_pivot = wildcard;
 
-	while('\0' != value[s] && '*' != wildcard[w])
+	while('\0' != *value && '*' != *wildcard)
 	{
-		if (value[s] != wildcard[w])
+		if (*value++ != *wildcard++)
 			return 0;
-
-		w++;
-		s++;
 	}
 
-	while('\0' != value[s])
+	while('\0' != *value)
 	{
-		if ('*' == wildcard[w])
+		if ('*' == *wildcard)
 		{
-			w++;
+			wildcard++;
 
-			if ('\0' == wildcard[w])
+			if ('\0' == *wildcard)
 				return 1;
 
-			w_pivot = w;
-			s_pivot = s + 1;
+			w_pivot = wildcard;
+			s_pivot = value + 1;
 		}
-		else if (value[s] == wildcard[w])
+		else if (*value == *wildcard)
 		{
-			s++;
-			w++;
+			value++;
+			wildcard++;
 		}
 		else
 		{
-			w = w_pivot;
-			s = s_pivot++;
+			wildcard = w_pivot;
+			value = s_pivot++;
 		}
 	}
 
-	while('*' == wildcard[w])
-		w++;
+	while('*' == *wildcard)
+		wildcard++;
 
-	return '\0' == wildcard[w];
+	return '\0' == *wildcard;
 }
