@@ -285,21 +285,21 @@ void finalize_key_access_rules_configuration(void)
 
 			switch(rule->type)
 			{
-			case ZBX_KEY_ACCESS_ALLOW:
-				allow_rules++;
-				break;
-			case ZBX_KEY_ACCESS_DENY:
-				deny_rules++;
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
+				case ZBX_KEY_ACCESS_ALLOW:
+					allow_rules++;
+					break;
+				case ZBX_KEY_ACCESS_DENY:
+					deny_rules++;
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
 			}
 		}
 
 		/* if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration */
 		if (0 < allow_rules && 0 == deny_rules)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "adding DenyKey=* rule for proper whitelist confuration");
+			zabbix_log(LOG_LEVEL_WARNING, "adding DenyKey=* rule for proper whitelist confuration");
 			add_key_access_rule("*", ZBX_KEY_ACCESS_DENY);
 			deny_rules++;
 		}
@@ -313,7 +313,6 @@ void finalize_key_access_rules_configuration(void)
 				if (ZBX_KEY_ACCESS_DENY == rule->type)
 					break;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "removed trailing AllowKey=%s rule", rule->elements.values[0]);
 				zbx_vector_ptr_remove(&key_access_rules, i);
 			}
 		}
@@ -458,23 +457,13 @@ int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to process key access rule \"%s\"", pattern);
 	}
-	else if (0 != no_more_rules)
+	else if (0 == no_more_rules &&
+			FAIL == zbx_vector_ptr_search(&key_access_rules, rule, compare_key_access_rules))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "key access rule \"%s\" ignored because it follows %sKey=*",
-				pattern, 1 == no_more_rules ? "Allow" : "Deny");
-	}
-	else
-	{
-		if (FAIL != zbx_vector_ptr_search(&key_access_rules, rule, compare_key_access_rules))
+		if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "key access rule \"%s\" ignored as duplicate", pattern);
-		}
-		else
-		{
-			if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
+			switch(rule->type)
 			{
-				switch(rule->type)
-				{
 				case ZBX_KEY_ACCESS_ALLOW:
 					no_more_rules = 1;	/* any rules after "allow all" are meaningless */
 					break;
@@ -485,13 +474,12 @@ int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
-				}
 			}
-			else
-			{
-				zbx_vector_ptr_append(&key_access_rules, rule);
-				rule_added = 1;
-			}
+		}
+		else
+		{
+			zbx_vector_ptr_append(&key_access_rules, rule);
+			rule_added = 1;
 		}
 	}
 
