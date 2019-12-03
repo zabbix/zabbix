@@ -71,7 +71,7 @@ class CConfigurationImport {
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
 			'templateScreens' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'applications' => ['createMissing' => false, 'deleteMissing' => false],
-			'templateLinkage' => ['createMissing' => false],
+			'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
 			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -88,6 +88,7 @@ class CConfigurationImport {
 
 		$object_options = (
 			$options['templateLinkage']['createMissing']
+			|| $options['templateLinkage']['deleteMissing']
 			|| $options['applications']['createMissing']
 			|| $options['applications']['deleteMissing']
 			|| $options['items']['updateExisting']
