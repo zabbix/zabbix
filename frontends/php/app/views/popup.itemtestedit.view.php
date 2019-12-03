@@ -104,15 +104,21 @@ if ($data['is_item_testable']) {
 		->addRow(
 			new CLabel(_('Host address'), 'host_address'),
 			(new CDiv([
-				(new CTextBox('interface[address]', $data['inputs']['interface']['address']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				(new CTextBox('interface[address]', $data['inputs']['interface']['address']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired(),
 				new CLabel(_('Port'), 'port'),
-				(new CTextBox('interface[port]', $data['inputs']['interface']['port']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				(new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setAriaRequired()
 			]))->addClass('item-test-popup-value-row'),
 			'host_address_row'
 		)
 		->addRow(
 			new CLabel(_('Proxy'), 'host_proxy'),
-			new CComboBox('host_proxy', $data['inputs']['proxy_hostid'], null, [0 => _('(no proxy)')] + $data['proxies']),
+			new CComboBox('host_proxy', $data['inputs']['proxy_hostid'], null,
+				[0 => _('(no proxy)')] + $data['proxies']
+			),
 			'host_proxy_row'
 		)
 		->addRow(
