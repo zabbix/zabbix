@@ -454,12 +454,6 @@ typedef struct
 {
 	zbx_uint64_t	actionid;
 	char		*name;
-	char		*shortdata;
-	char		*longdata;
-	char		*r_shortdata;
-	char		*r_longdata;
-	char		*ack_shortdata;
-	char		*ack_longdata;
 	int		esc_period;
 	unsigned char	eventsource;
 	unsigned char	pause_suppressed;

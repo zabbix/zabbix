@@ -2091,8 +2091,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "actionid", actionids->values,
 			actionids->values_num);
 
-	result = DBselect("select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
-				"r_longdata,pause_suppressed,ack_shortdata,ack_longdata"
+	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -2116,13 +2115,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		}
 		zbx_free(tmp);
 
-		action->shortdata = zbx_strdup(NULL, row[5]);
-		action->longdata = zbx_strdup(NULL, row[6]);
-		action->r_shortdata = zbx_strdup(NULL, row[7]);
-		action->r_longdata = zbx_strdup(NULL, row[8]);
-		ZBX_STR2UCHAR(action->pause_suppressed, row[9]);
-		action->ack_shortdata = zbx_strdup(NULL, row[10]);
-		action->ack_longdata = zbx_strdup(NULL, row[11]);
+		ZBX_STR2UCHAR(action->pause_suppressed, row[5]);
 		action->name = zbx_strdup(NULL, row[1]);
 		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 
@@ -2152,13 +2145,6 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 
 void	free_db_action(DB_ACTION *action)
 {
-	zbx_free(action->shortdata);
-	zbx_free(action->longdata);
-	zbx_free(action->r_shortdata);
-	zbx_free(action->r_longdata);
-	zbx_free(action->ack_shortdata);
-	zbx_free(action->ack_longdata);
 	zbx_free(action->name);
-
 	zbx_free(action);
 }

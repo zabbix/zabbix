@@ -124,7 +124,7 @@ static int	DBpatch_4050009(void)
 					{"recovery", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"subject", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};
@@ -153,6 +153,9 @@ static int	DBpatch_4050012(void)
 
 static int	DBpatch_4050013(void)
 {
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > DBexecute(
 			"update opmessage m"
 			" join operations o on m.operationid=o.operationid"
@@ -198,9 +201,6 @@ static int	DBpatch_4050015(void)
 
 static int	DBpatch_4050016(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	char	*messages[3][3][4] =
 			{
 				{
@@ -304,6 +304,9 @@ static int	DBpatch_4050016(void)
 	int		content_type, i, k;
 	char		*msg_esc = NULL, *subj_esc = NULL;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	result = DBselect("SELECT mediatypeid,type,content_type FROM media_type");
 
 	while (NULL != (row = DBfetch(result)))
@@ -318,7 +321,7 @@ static int	DBpatch_4050016(void)
 				if (NULL != messages[i][k][0])
 				{
 					msg_esc = DBdyn_escape_string(messages[i][k][content_type]);
-					subj_esc = DBdyn_escape_string(messages[i][k][3]);
+					subj_esc = (content_type == 2) ? NULL : DBdyn_escape_string(messages[i][k][3]);
 
 					if (ZBX_DB_OK > DBexecute(
 							"insert into media_type_message"
@@ -326,7 +329,7 @@ static int	DBpatch_4050016(void)
 							"subject,message)"
 							" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%i,%i,'%s','%s')",
 							DBget_maxid_num("media_type_message", 1), mediatypeid, i, k,
-							subj_esc, msg_esc))
+							ZBX_NULL2EMPTY_STR(subj_esc), msg_esc))
 					{
 						ret = FAIL;
 						goto out;
