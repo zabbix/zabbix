@@ -36,7 +36,7 @@ class COverlayDialogElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('xpath://div[@class="overlay-dialogue modal modal-popup"]'))->asOverlayDialog();
+		return (new CElementQuery('xpath://div[contains(@class, "overlay-dialogue modal modal-popup")]'))->asOverlayDialog();
 	}
 
 	/**
