@@ -271,9 +271,9 @@ switch ($data['operationtype']) {
 	// Notify all involved form elements.
 	case OPERATION_TYPE_RECOVERY_MESSAGE:
 		$form_list
-			->addRow(_('Default message'),
+			->addRow(_('Custom message'),
 				(new CCheckBox('operation[opmessage][default_msg]'))
-					->setChecked($opr_data['opmessage']['default_msg'] == 1)
+					->setChecked($opr_data['opmessage']['default_msg'] == 0)
 			)
 			->addRow(_('Subject'),
 				(new CTextBox('operation[opmessage][subject]', $opr_data['opmessage']['subject']))
@@ -293,7 +293,7 @@ switch ($data['operationtype']) {
 						"#".zbx_formatDomId('operation[opmessage][message]').
 					"')".
 						".closest('li')".
-						".toggle(!default_message);".
+						".toggle(default_message);".
 				"});".
 				"jQuery('#".zbx_formatDomId('operation[opmessage][default_msg]')."').trigger('change');";
 		break;
