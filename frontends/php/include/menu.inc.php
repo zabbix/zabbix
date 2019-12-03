@@ -22,41 +22,41 @@
 $user_type = CWebUser::getType();
 $menu = APP::component()->get('menu.main');
 $menu
-	->add('Monitoring', [
+	->add(_('Monitoring'), [
 		'alias' => [],
 		'items' => [
-			'Dashboard' => [
+			_('Dashboard') => [
 				'action' => 'dashboard.view',
 				'alias' => ['dashboard.list', 'dashboard.view']
 			],
-			'Problems' => [
+			_('Problems') => [
 				'action' => 'problem.view',
 				'alias' => ['problem.view', 'acknowledge.edit', 'tr_events.php']
 			],
-			'Overview' => [
+			_('Overview') => [
 				'action' => 'overview.php'
 			],
-			'Web' => [
+			_('Web') => [
 				'action' => 'web.view',
 				'alias' => ['httpdetails.php']
 			],
-			'Latest data' => [
+			_('Latest data') => [
 				'action' => 'latest.php',
 				'alias' => ['history.php', 'chart.php']
 			],
-			'Graphs' => [
+			_('Graphs') => [
 				'action' => 'charts.php',
 				'alias' => ['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php']
 			],
-			'Screens' => [
+			_('Screens') => [
 				'action' => 'screens.php',
 				'alias' => ['screenconf.php', 'screenedit.php', 'screen.import.php', 'slides.php', 'slideconf.php']
 			],
-			'Maps' => [
+			_('Maps') => [
 				'action' => 'map.view',
 				'alias' => ['image.php', 'sysmaps.php', 'sysmap.php', 'map.php', 'map.import.php']
 			],
-			'Services' => [
+			_('Services') => [
 				'action' => 'srv_status.php',
 				'alias' => ['report.services', 'chart5.php']
 			]
@@ -65,10 +65,10 @@ $menu
 	->add('Inventory', [
 		'alias' => [],
 		'items' => [
-			'Overview' => [
+			_('Overview') => [
 				'action' => 'hostinventoriesoverview.php'
 			],
-			'Hosts' => [
+			_('Hosts') => [
 				'action' => 'hostinventories.php'
 			]
 		]
@@ -76,11 +76,11 @@ $menu
 	->add('Reports', [
 		'alias' => [],
 		'items' => [
-			'Availability report' => [
+			_('Availability report') => [
 				'action' => 'report2.php',
 				'alias' => ['chart4.php']
 			],
-			'Triggers top 100' => [
+			_('Triggers top 100') => [
 				'action' => 'toptriggers.php'
 			]
 		]
@@ -95,28 +95,28 @@ if ($user_type >= USER_TYPE_ZABBIX_ADMIN) {
 	$menu->insertAfter('Reports', 'Configuration', [
 		'alias' => ['conf.import.php'],
 		'items' => [
-			'Host groups' => [
+			_('Host groups') => [
 				'action' => 'hostgroups.php'
 			],
-			'Templates' => [
+			_('Templates') => [
 				'action' => 'templates.php'
 			],
-			'Hosts' => [
+			_('Hosts') => [
 				'action' => 'hosts.php',
 				'alias' => ['items.php', 'triggers.php', 'graphs.php', 'applications.php', 'host_discovery.php',
 					'disc_prototypes.php', 'trigger_prototypes.php', 'host_prototypes.php', 'httpconf.php'
 				]
 			],
-			'Maintenance' => [
+			_('Maintenance') => [
 				'action' => 'maintenance.php'
 			],
-			'Actions' => [
+			_('Actions') => [
 				'action' => 'actionconf.php'
 			],
-			'Discovery' => [
+			_('Discovery') => [
 				'action' => 'discoveryconf.php'
 			],
-			'Services' => [
+			_('Services') => [
 				'action' => 'services.php'
 			]
 		]
@@ -149,7 +149,7 @@ if ($user_type == USER_TYPE_SUPER_ADMIN) {
 	$menu->add('Administration', [
 		'alias' => [],
 		'items' => [
-			'General' => [
+			_('General') => [
 				'action' => 'adm.gui.php',
 				'alias' => ['adm.housekeeper.php', 'adm.images.php', 'adm.iconmapping.php', 'adm.regexps.php',
 					'adm.macros.php', 'adm.valuemapping.php', 'adm.workingtime.php', 'adm.triggerseverities.php',
@@ -157,31 +157,31 @@ if ($user_type == USER_TYPE_SUPER_ADMIN) {
 					'module.scan'
 				]
 			],
-			'Proxies' => [
+			_('Proxies') => [
 				'action' => 'proxy.list',
 				'alias' => ['proxy.edit', 'proxy.list']
 			],
-			'Authentication' => [
+			_('Authentication') => [
 				'action' => 'authentication.edit',
 				'alias' => ['authentication.edit', 'authentication.update']
 			],
-			'User groups' => [
+			_('User groups') => [
 				'action' => 'usergroup.list',
 				'alias' => ['usergroup.edit']
 			],
-			'Users' => [
+			_('Users') => [
 				'action' => 'user.list',
 				'alias' => ['user.edit']
 			],
-			'Media types' => [
+			_('Media types') => [
 				'action' => 'mediatype.list',
 				'alias' => ['mediatype.edit']
 			],
-			'Scripts' => [
+			_('Scripts') => [
 				'action' => 'script.list',
 				'alias' => ['script.edit']
 			],
-			'Queue' => [
+			_('Queue') => [
 				'action' => 'queue.php'
 			]
 		]
