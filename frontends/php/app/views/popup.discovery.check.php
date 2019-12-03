@@ -26,8 +26,7 @@ $form = (new CForm())
 	->cleanItems()
 	->setName('dcheck_form')
 	->addVar('action', 'popup.discovery.check')
-	->addVar('validate', 1)
-	->addVar('index', $data['index']);
+	->addVar('validate', 1);
 
 if ($data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
