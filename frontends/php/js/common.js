@@ -434,12 +434,7 @@ function openWinCentered(url, name, width, height, params) {
 function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var ovelay_properties = {
 		'title': '',
-		'content': jQuery('<div>')
-			.css({'height': '68px'})
-			.append(jQuery('<div>')
-				.addClass('preloader-container')
-				.append(jQuery('<div>').addClass('preloader'))
-			),
+		'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
 		'class': 'modal-popup' + ((action === 'popup.generic') ? ' modal-popup-generic' : ''),
 		'buttons': [],
 		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid

@@ -35,10 +35,10 @@
 			var elm = $('#flickerfreescreen_'+id);
 
 			if (in_progress) {
-				elm.addClass('in-progress delayed-15s');
+				elm.addClass('is-loading is-loading-fadein delayed-15s');
 			}
 			else {
-				elm.removeClass('in-progress delayed-15s');
+				elm.removeClass('is-loading is-loading-fadein delayed-15s');
 			}
 		},
 

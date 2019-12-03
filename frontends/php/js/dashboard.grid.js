@@ -1573,32 +1573,25 @@
 	}
 
 	function showPreloader(widget) {
-		if (typeof widget['preloader_div'] === 'undefined') {
-			if (widget['iterator']) {
-				widget['div'].addClass('iterator-loading');
-			}
-
-			widget['preloader_div'] = $('<div>')
-				.addClass('preloader-container')
-				.append($('<div>').addClass('preloader'));
-
-			widget['div'].append(widget['preloader_div']);
+		if (widget['iterator']) {
+			widget['div'].find('.dashbrd-grid-iterator-content').addClass('is-loading');
+		}
+		else {
+			widget['div'].find('.dashbrd-grid-widget-content').addClass('is-loading');
 		}
 	}
 
 	function hidePreloader(widget) {
-		if (typeof widget['preloader_div'] !== 'undefined') {
-			if (widget['iterator']) {
-				widget['div'].removeClass('iterator-loading');
-			}
-
-			widget['preloader_div'].remove();
-			delete widget['preloader_div'];
+		if (widget['iterator']) {
+			widget['div'].find('.dashbrd-grid-iterator-content').removeClass('is-loading');
+		}
+		else {
+			widget['div'].find('.dashbrd-grid-widget-content').removeClass('is-loading');
 		}
 	}
 
 	function startPreloader(widget) {
-		if (typeof widget['preloader_timeoutid'] !== 'undefined' || typeof widget['preloader_div'] !== 'undefined') {
+		if (typeof widget['preloader_timeoutid'] !== 'undefined' || widget['div'].find('.is-loading').length) {
 			return;
 		}
 
@@ -1606,7 +1599,6 @@
 			delete widget['preloader_timeoutid'];
 
 			showPreloader(widget);
-			widget['content_body'].stop(true, true).fadeTo(widget['preloader_fadespeed'], 0.4);
 		}, widget['preloader_timeout']);
 	}
 
@@ -1617,10 +1609,6 @@
 		}
 
 		hidePreloader(widget);
-
-		// Stop animations and set to visible state.
-		// Do not use .show(), nor .fadeTo(0, 1) here, since these set display: block, which will break css rules.
-		widget['content_body'].stop(true, true).css('opacity', 1);
 	}
 
 	function setUpdateWidgetContentTimer($obj, data, widget, rf_rate) {
@@ -1775,7 +1763,6 @@
 			'header': '',
 			'view_mode': iterator['view_mode'],
 			'preloader_timeout': 10000,	// in milliseconds
-			'preloader_fadespeed': 500,
 			'update_paused': false,
 			'initial_load': true,
 			'ready': false,
@@ -3268,7 +3255,6 @@
 				},
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
-				'preloader_fadespeed': 500,
 				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
@@ -3559,17 +3545,14 @@
 						jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
 
 						body.empty()
+							.addClass('is-loading')
 							.append($('<div>')
 								// The smallest possible size of configuration dialog.
 								.css({
 									'width': '544px',
 									'height': '68px',
 									'max-width': '100%'
-								})
-								.append($('<div>')
-									.addClass('preloader-container')
-									.append($('<div>').addClass('preloader'))
-								));
+								}))
 					}
 				})
 					.done(function(response) {
@@ -3609,6 +3592,8 @@
 						}
 
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
+
+						body.removeClass('is-loading');
 					});
 			});
 		},
