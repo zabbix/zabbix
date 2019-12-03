@@ -108,7 +108,7 @@ var PageRefresh = {
 jQuery(function($) {
 	$('[data-main-menu]').click(function() {
 		var $item = $(this),
-			$sub_menus = $('.top-subnav-container').children(),
+			$sub_menus = $('.top-subnav-container').children('.top-subnav'),
 			$active = $sub_menus.eq($item.attr('data-main-menu'));
 
 		$sub_menus.hide();
