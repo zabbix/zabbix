@@ -248,7 +248,7 @@
 					step_nr = $(this).attr('data-step'),
 					num = str.substr(14, str.length - 21);
 
-				openItemTestDialog([num], false, false, this, nr);
+				openItemTestDialog([num], false, false, this, num);
 			})
 			.on('click', '.element-table-remove', function() {
 				$(this).closest('li.sortable').remove();

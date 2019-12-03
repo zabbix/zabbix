@@ -317,6 +317,10 @@
 	 * @param {bool}   show_final_result  Either the final result should be displayed.
 	 * @param {bool}   get_value          Either to show 'get value from host' section.
 	 * @param {object} trigger_elmnt      UI element triggered function.
+	 * @param {int}    step_obj_nr        Value defines which 'test' button was pressed to open test item dialog:
+	 *                                     - 'test' button in edit form footer (-2);
+	 *                                     - 'test all' button in preprocessinf tab (-1);
+	 *                                     - 'test' button to test single preprocessing step (step index).
 	 */
 	function openItemTestDialog(step_nums, show_final_result, get_value, trigger_elmnt, step_obj_nr) {
 		var $step_obj = jQuery(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot, .tfoot-buttons'),
