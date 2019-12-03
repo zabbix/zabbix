@@ -62,7 +62,7 @@ $menu
 			]
 		]
 	])
-	->add('Inventory', [
+	->add(_('Inventory'), [
 		'alias' => [],
 		'items' => [
 			_('Overview') => [
@@ -73,7 +73,7 @@ $menu
 			]
 		]
 	])
-	->add('Reports', [
+	->add(_('Reports'), [
 		'alias' => [],
 		'items' => [
 			_('Availability report') => [
@@ -88,11 +88,11 @@ $menu
 
 if ($user_type >= USER_TYPE_ZABBIX_ADMIN) {
 	$menu
-		->find('Monitoring')
-			->insertAfter('Maps', 'Discovery', [
+		->find(_('Monitoring'))
+			->insertAfter(_('Maps'), _('Discovery'), [
 				'action' => 'discovery.view'
 			]);
-	$menu->insertAfter('Reports', 'Configuration', [
+	$menu->insertAfter(_('Reports'), _('Configuration'), [
 		'alias' => ['conf.import.php'],
 		'items' => [
 			_('Host groups') => [
@@ -126,27 +126,27 @@ if ($user_type >= USER_TYPE_ZABBIX_ADMIN) {
 
 if ($user_type == USER_TYPE_SUPER_ADMIN) {
 	$menu
-		->find('Reports')
-			->insertBefore('Availability report', 'System information', [
+		->find(_('Reports'))
+			->insertBefore(_('Availability report'), _('System information'), [
 				'action' => 'report.status'
 			])
-			->add('Audit', [
+			->add(_('Audit'), [
 				'action' => 'auditlogs.php'
 			])
-			->add('Action log', [
+			->add(_('Action log'), [
 				'action' => 'auditacts.php'
 			])
-			->add('Audit', [
+			->add(_('Audit'), [
 				'Notifications' => 'report4.php'
 			]);
 
 	$menu
-		->find('Configuration')
-			->insertAfter('Actions', 'Event correlation', [
+		->find(_('Configuration'))
+			->insertAfter(_('Actions'), _('Event correlation'), [
 				'action' => 'correlation.php'
 			]);
 
-	$menu->add('Administration', [
+	$menu->add(_('Administration'), [
 		'alias' => [],
 		'items' => [
 			_('General') => [
