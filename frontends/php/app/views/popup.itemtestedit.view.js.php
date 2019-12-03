@@ -54,7 +54,7 @@ function disableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', true);
 
 	<?php if ($data['is_item_testable']) { ?>
-	jQuery('#get_value, #host_address, #host_port, #host_proxy, #get_value_btn').prop('disabled', true);
+	jQuery('#get_value, #interface_address, #interface_port, #host_proxy, #get_value_btn').prop('disabled', true);
 	<?php } ?>
 
 	<?php if ($data['show_prev']) { ?>
@@ -80,7 +80,7 @@ function enableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', false);
 
 	<?php if ($data['is_item_testable']) { ?>
-	jQuery('#get_value, #host_address, #host_port, #host_proxy, #get_value_btn').prop('disabled', false);
+	jQuery('#get_value, #interface_address, #interface_port, #host_proxy, #get_value_btn').prop('disabled', false);
 	<?php } ?>
 
 	<?php if ($data['show_prev']) { ?>
