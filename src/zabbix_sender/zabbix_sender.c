@@ -26,9 +26,10 @@
 #include "zbxgetopt.h"
 #include "zbxjson.h"
 #include "mutexs.h"
-#include "../libs/zbxcrypto/tls.h"
-
-#ifndef _WINDOWS
+#include "zbxcrypto.h"
+#if defined(_WINDOWS)
+#	include "../libs/zbxcrypto/tls.h"
+#else
 #	include "zbxnix.h"
 #endif
 

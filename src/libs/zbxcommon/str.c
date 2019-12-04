@@ -21,7 +21,7 @@
 #include "threads.h"
 #include "module.h"
 
-#include "../zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>

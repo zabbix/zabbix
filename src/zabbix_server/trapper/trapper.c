@@ -36,7 +36,7 @@
 #include "trapper_preproc.h"
 
 #include "daemon.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "zbxipcservice.h"
 

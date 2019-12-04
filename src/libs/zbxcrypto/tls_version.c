@@ -21,6 +21,7 @@
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
+#include "zbxcrypto.h"
 #include "tls.h"
 
 #if defined(HAVE_POLARSSL)

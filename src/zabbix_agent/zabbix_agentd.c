@@ -108,7 +108,7 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 #include "setproctitle.h"
-#include "../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 const char	*progname = NULL;
 

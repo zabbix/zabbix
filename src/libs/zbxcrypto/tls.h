@@ -60,7 +60,7 @@
 /* 250 values to be sent. To avoid TLS initialization on every start of 'send_value' thread we initialize TLS in  */
 /* 'main' thread and use this structure for passing minimum TLS variables into 'send_value' thread. */
 
-typedef struct
+struct zbx_thread_sendval_tls_args
 {
 #if defined(HAVE_POLARSSL)
 	char			*my_psk;
@@ -90,21 +90,9 @@ typedef struct
 	size_t			psk_len_for_cb;
 #endif
 #endif
-}
-ZBX_THREAD_SENDVAL_TLS_ARGS;
-
-void	zbx_tls_pass_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
-void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
+};
 
 #endif	/* #if defined(_WINDOWS) */
-
-void	zbx_tls_validate_config(void);
-void	zbx_tls_library_deinit(void);
-void	zbx_tls_init_parent(void);
-void	zbx_tls_init_child(void);
-void	zbx_tls_free(void);
-void	zbx_tls_free_on_signal(void);
-void	zbx_tls_version(void);
 
 #endif	/* #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 

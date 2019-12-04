@@ -30,7 +30,7 @@
 #include "../actions.h"
 #include "../events.h"
 #include "../scripts/scripts.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "comms.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;

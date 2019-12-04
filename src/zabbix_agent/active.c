@@ -41,7 +41,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 #	include "daemon.h"
 #endif
 
-#include "../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 static ZBX_THREAD_LOCAL ZBX_ACTIVE_BUFFER	buffer;
 static ZBX_THREAD_LOCAL zbx_vector_ptr_t	active_metrics;
