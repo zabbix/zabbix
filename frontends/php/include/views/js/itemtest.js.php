@@ -78,62 +78,6 @@
 	}
 
 	/**
-	 * Collect current preprocessing step properties.
-	 *
-	 * @param {array}  step_nums      List of step numbers to collect.
-	 *
-	 * @return array
-	 */
-	function getPreprocessingSteps(step_nums) {
-		var $preprocessing = jQuery('#preprocessing'),
-			steps = [];
-
-		step_nums.each(function(num) {
-			var type = jQuery('[name="preprocessing[' + num + '][type]"]', $preprocessing).val(),
-				error_handler = jQuery('[name="preprocessing[' + num + '][on_fail]"]').is(':checked')
-					? jQuery('[name="preprocessing[' + num + '][error_handler]"]:checked').val()
-					: <?= ZBX_PREPROC_FAIL_DEFAULT ?>,
-				params = [];
-
-			var on_fail = {
-				error_handler: error_handler,
-				error_handler_params: (error_handler == <?= ZBX_PREPROC_FAIL_SET_VALUE ?>
-						|| error_handler == <?= ZBX_PREPROC_FAIL_SET_ERROR ?>)
-					? jQuery('[name="preprocessing[' + num + '][error_handler_params]"]').val()
-					: ''
-			};
-
-			if (jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
-				params.push(jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
-			}
-			if (jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
-				params.push(jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
-			}
-			if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).length) {
-				// ZBX-16642
-				if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
-					if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
-						params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
-					}
-					else {
-						params.push(0);
-					}
-				}
-				else {
-					params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
-				}
-			}
-
-			steps.push(jQuery.extend({
-				type: type,
-				params: params.join("\n")
-			}, on_fail));
-		});
-
-		return steps;
-	}
-
-	/**
 	 * Collect item properties based on it's type.
 	 *
 	 * @param {string}  form_selector    Form selector.

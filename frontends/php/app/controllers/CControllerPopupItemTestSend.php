@@ -89,7 +89,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'snmpv3_authpassphrase' => 'string',
 			'snmpv3_privprotocol' => 'string',
 			'snmpv3_privpassphrase' => 'string',
-			'steps' => 'array',
+			'steps' => 'required|array',
 			'ssl_cert_file' => 'string',
 			'ssl_key_file' => 'string',
 			'ssl_key_password' => 'string',
@@ -115,7 +115,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$this->is_item_testable = in_array($this->item_type, self::$testable_item_properties);
 
 			$interface = $this->getInput('interface', []);
-			$steps = $this->getInput('steps', []);
+			$steps = $this->getInput('steps');
+			$prepr_types = zbx_objectValues($steps, 'type');
+			$this->use_prev_value = (count(array_intersect($prepr_types, self::$preproc_steps_using_prev_value)) > 0);
+			$this->show_final_result = ($this->getInput('show_final_result') == 1);
 
 			/*
 			 * Check if key is not empty if 'get value from host' is checked and test is made for item with mandatory
@@ -127,9 +130,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				$ret = false;
 			}
 
-			/*
-			 * Test interface properties.
-			 */
+			// Test interface properties.
 			if ($this->get_value_from_host) {
 				if (!array_key_exists('address', $interface) || $interface['address'] === '') {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
@@ -140,23 +141,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
 					$ret = false;
 				}
-			}
-
-			/*
-			 * Check if available data allws to make at least one test. Negative result cannot be achieved
-			 * from UI (test button is disabled) so there is no error message.
-			 */
-			if (!$steps && !$this->get_value_from_host) {
-				$ret = false;
-			}
-
-			/*
-			 * Test preprocessing steps.
-			 */
-			if ($steps) {
-				$prepr_types = zbx_objectValues($steps, 'type');
-				$this->use_prev_value = (count(array_intersect($prepr_types, self::$preproc_steps_using_prev_value)) > 0);
-				$this->show_final_result = ($this->getInput('show_final_result') == 1);
 			}
 
 			// Check preprocessing steps.
