@@ -434,7 +434,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$this->fillFormAndSaveDashboard($dashboard, $form, $data, $header);
 		$widget = $dashboard->getWidget($header);
 		// Check that Dashboard has been saved and that there are no errors in the widget
-		$this->checkMessages($widget);
+		$this->checkDashboardMessage();
 		$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
 		$show = CTestArrayHelper::get($data['fields'], 'Show', 'Host groups');
 		if ($show === 'Host groups') {
@@ -887,7 +887,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$this->fillFormAndSaveDashboard($dashboard, $form, $data, $header);
 		$widget = $dashboard->getWidget($header);
 		// Check that Dashboard has been saved and that there are no errors in the widget
-		$this->checkMessages($widget);
+		$this->checkDashboardMessage();
 
 		if ((CTestArrayHelper::get($data, 'widget to update', 'Reference widget') === 'Reference widget'
 				&& CTestArrayHelper::get($data['fields'], 'Show', 'Host groups') === 'Host groups')
@@ -917,11 +917,11 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		$widget = $dashboard->getWidget('Reference widget');
+		$dashboard->getWidget('Reference widget');
 		$dashboard->save();
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
-		$this->checkMessages($widget);
+		$this->checkDashboardMessage();
 		$this->assertEquals($initial_values, CDBHelper::getHash($this->sql));
 	}
 
@@ -1021,7 +1021,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 			$this->page->waitUntilReady();
 			$dashboard->save();
 			// Check that Dashboard has been saved
-			$this->checkMessages('deleted');
+			$this->checkDashboardMessage();
 			// Confirm that widget is not present on dashboard.
 			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
 					CXPathHelper::escapeQuotes($name).']')->count());
@@ -1225,14 +1225,12 @@ class testProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
-	private function checkMessages($widget) {
-		// Check dashboard update message
+	/*
+	 * Check dashboard update message.
+	 */
+	private function checkDashboardMessage() {
 		$message = CMessageElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Dashboard updated', $message->getTitle());
-		// Check that there are no error messages on the widget
-		if ($widget != 'deleted') {
-			$this->assertEquals(0, $widget->query('class:msg-bad')->count(), 'Errors are found in the widget');
-		}
 	}
 }
