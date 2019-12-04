@@ -425,18 +425,10 @@ jQuery(document).ready(function($) {
 	$('#get_value').on('change', function() {
 		$rows = $('#host_address_row, #host_proxy_row, #get_value_row');
 		if ($(this).is(':checked')) {
-			<?php if (count($data['steps']) > 0) { ?>
-			$('.submit-test-btn').prop('disabled', false);
-			<?php } ?>
-
 			$('input, select', $rows).prop('disabled', false);
 			$rows.show();
 		}
 		else {
-			<?php if (count($data['steps']) > 0) { ?>
-			$('.submit-test-btn').prop('disabled', true);
-			<?php } ?>
-
 			$('input, select', $rows).prop('disabled', true);
 			$rows.hide();
 		}
