@@ -189,7 +189,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				: $this->getInput('get_value', 0),
 			'is_item_testable' => $this->is_item_testable,
 			'inputs' => $inputs,
-			'proxies' => $this->getHostProxies(),
+			'proxies' => in_array($this->item_type, $this->items_support_proxy) ? $this->getHostProxies() : [],
+			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy),
+			'interface_enabled' => in_array($this->item_type, $this->items_require_interface),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

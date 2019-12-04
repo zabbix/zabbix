@@ -47,12 +47,22 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @var array
 	 */
-	protected $items_require_interface = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C,
-		ITEM_TYPE_SNMPV3, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE
+	protected $items_require_interface = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3,
+		ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE
 	];
 
 	/**
-	 * Item types which item key is mandatory.
+	 * Item types with proxy support.
+	 *
+	 * @var array
+	 */
+	protected $items_support_proxy = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C,
+		ITEM_TYPE_SNMPV3, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT,
+		ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX
+	];
+
+	/**
+	 * Item types with mandatory item key.
 	 *
 	 * @var array
 	 */
@@ -374,7 +384,7 @@ abstract class CControllerPopupItemTest extends CController {
 		];
 
 		if (($this->host['status'] == HOST_STATUS_MONITORED || $this->host['status'] == HOST_STATUS_NOT_MONITORED)
-			&& in_array($this->item_type, $this->items_require_interface)
+				&& in_array($this->item_type, $this->items_require_interface)
 		) {
 			$interface = $this->getInput('interfaceid', 0)
 				? API::HostInterface()->get([

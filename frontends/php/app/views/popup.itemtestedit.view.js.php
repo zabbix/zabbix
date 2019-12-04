@@ -53,8 +53,14 @@ function makeStepResult(step) {
 function disableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', true);
 
-	<?php if ($data['is_item_testable']) { ?>
-	jQuery('#get_value, #interface_address, #interface_port, #host_proxy, #get_value_btn').prop('disabled', true);
+	<?php if ($data['is_item_testable'] && $data['interface_enabled']) { ?>
+	jQuery('#get_value, #interface_address, #interface_port, #get_value_btn').prop('disabled', true);
+	<?php } else { ?>
+	jQuery('#get_value, #get_value_btn').prop('disabled', true);
+	<?php } ?>
+
+	<?php if ($data['proxies_enabled']) { ?>
+	jQuery('#host_proxy').prop('disabled', true);
 	<?php } ?>
 
 	<?php if ($data['show_prev']) { ?>
@@ -81,8 +87,14 @@ function disableItemTestForm() {
 function enableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', false);
 
-	<?php if ($data['is_item_testable']) { ?>
-	jQuery('#get_value, #interface_address, #interface_port, #host_proxy, #get_value_btn').prop('disabled', false);
+	<?php if ($data['is_item_testable'] && $data['interface_enabled']) { ?>
+	jQuery('#get_value, #interface_address, #interface_port, #get_value_btn').prop('disabled', false);
+	<?php } else { ?>
+	jQuery('#get_value, #get_value_btn').prop('disabled', false);
+	<?php } ?>
+
+	<?php if ($data['proxies_enabled']) { ?>
+	jQuery('#host_proxy').prop('disabled', false);
 	<?php } ?>
 
 	<?php if ($data['show_prev']) { ?>
@@ -425,11 +437,25 @@ jQuery(document).ready(function($) {
 	$('#get_value').on('change', function() {
 		$rows = $('#host_address_row, #host_proxy_row, #get_value_row');
 		if ($(this).is(':checked')) {
-			$('input, select', $rows).prop('disabled', false);
+			<?php if ($data['proxies_enabled']) { ?>
+			$('#host_proxy').prop('disabled', false);
+			<?php } ?>
+
+			<?php if ($data['interface_enabled']) { ?>
+			$('#interface_address, #interface_port').prop('disabled', false);
+			<?php } ?>
+
 			$rows.show();
 		}
 		else {
-			$('input, select', $rows).prop('disabled', true);
+			<?php if ($data['proxies_enabled']) { ?>
+			$('#host_proxy').prop('disabled', true);
+			<?php } ?>
+
+			<?php if ($data['interface_enabled']) { ?>
+			$('#interface_address, #interface_port').prop('disabled', false);
+			<?php } ?>
+
 			$rows.hide();
 		}
 	}).trigger('change');
