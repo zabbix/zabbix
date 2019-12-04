@@ -63,6 +63,7 @@ function disableItemTestForm() {
 
 	jQuery('#eol input').prop('disabled', true);
 
+	<?php if (count($data['steps']) > 0) { ?>
 	jQuery('<span>')
 		.addClass('preloader')
 		.insertAfter(jQuery('.submit-test-btn'))
@@ -74,6 +75,7 @@ function disableItemTestForm() {
 	jQuery('.submit-test-btn')
 		.prop('disabled', true)
 		.hide();
+	<?php } ?>
 }
 
 function enableItemTestForm() {
@@ -88,10 +90,13 @@ function enableItemTestForm() {
 	<?php } ?>
 
 	jQuery('#eol input').prop('disabled', false);
+
+	<?php if (count($data['steps']) > 0) { ?>
 	jQuery('.preloader').remove();
 	jQuery('.submit-test-btn')
 		.prop('disabled', false)
 		.show();
+	<?php } ?>
 }
 
 function cleanPreviousTestResults() {
@@ -420,7 +425,7 @@ jQuery(document).ready(function($) {
 	$('#get_value').on('change', function() {
 		$rows = $('#host_address_row, #host_proxy_row, #get_value_row');
 		if ($(this).is(':checked')) {
-			<?php if (!$data['steps']) { ?>
+			<?php if (count($data['steps']) > 0) { ?>
 			$('.submit-test-btn').prop('disabled', false);
 			<?php } ?>
 
@@ -428,7 +433,7 @@ jQuery(document).ready(function($) {
 			$rows.show();
 		}
 		else {
-			<?php if (!$data['steps']) { ?>
+			<?php if (count($data['steps']) > 0) { ?>
 			$('.submit-test-btn').prop('disabled', true);
 			<?php } ?>
 

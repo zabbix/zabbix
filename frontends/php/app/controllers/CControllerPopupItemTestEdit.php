@@ -93,12 +93,15 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			 * be disabled otherwise).
 			 */
 			$steps = $this->getInput('steps', []);
-			$steps_validation_response = $steps ? $this->preproc_item->validateItemPreprocessingSteps($steps) : true;
-			if (!$this->is_item_testable && $steps_validation_response !== true) {
-				error(($steps_validation_response !== true)
-					? $steps_validation_response
-					: _s('Test of "%1$s" items is not supported.', item_type2str($this->item_type))
-				);
+			if ($ret && $steps) {
+				$steps_validation_response = $this->preproc_item->validateItemPreprocessingSteps($steps);
+				if ($steps_validation_response !== true) {
+					error($steps_validation_response);
+					$ret = false;
+				}
+			}
+			elseif ($ret && !$this->is_item_testable) {
+				error(_s('Test of "%1$s" items is not supported.', item_type2str($this->item_type)));
 				$ret = false;
 			}
 		}

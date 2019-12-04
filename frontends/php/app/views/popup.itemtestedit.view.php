@@ -59,40 +59,6 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 	]);
 }
 
-// Create results table.
-$result_table = (new CTable())
-	->setId('preprocessing-steps')
-	->addClass('preprocessing-test-results')
-	->addStyle('width: 100%;')
-	->setHeader([
-		'',
-		(new CColHeader(_('Name')))->addStyle('width: 100%;'),
-		(new CColHeader(_('Result')))->addClass(ZBX_STYLE_RIGHT)
-	]);
-
-foreach ($data['steps'] as $i => $step) {
-	$form
-		->addVar('steps['.$i.'][type]', $step['type'])
-		->addVar('steps['.$i.'][error_handler]', $step['error_handler'])
-		->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
-
-	// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
-	if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON) {
-		$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
-	}
-	else {
-		$form->addVar('steps['.$i.'][params]', $step['params']);
-	}
-
-	$result_table->addRow([
-		$step['num'].':',
-		(new CCol($step['name']))->setId('preproc-test-step-'.$i.'-name'),
-		(new CCol())
-			->addClass(ZBX_STYLE_RIGHT)
-			->setId('preproc-test-step-'.$i.'-result')
-	]);
-}
-
 $form_list = new CFormList();
 
 if ($data['is_item_testable']) {
@@ -172,12 +138,48 @@ if ($macros_table) {
 	);
 }
 
-$form_list->addRow(
-	_('Preprocessing steps'),
-	(new CDiv($result_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+if (count($data['steps']) > 0) {
+	// Create results table.
+	$result_table = (new CTable())
+		->setId('preprocessing-steps')
+		->addClass('preprocessing-test-results')
 		->addStyle('width: 100%;')
-);
+		->setHeader([
+			'',
+			(new CColHeader(_('Name')))->addStyle('width: 100%;'),
+			(new CColHeader(_('Result')))->addClass(ZBX_STYLE_RIGHT)
+		]);
+
+	foreach ($data['steps'] as $i => $step) {
+		$form
+			->addVar('steps['.$i.'][type]', $step['type'])
+			->addVar('steps['.$i.'][error_handler]', $step['error_handler'])
+			->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
+
+		// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
+		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON) {
+			$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
+		}
+		else {
+			$form->addVar('steps['.$i.'][params]', $step['params']);
+		}
+
+		$result_table->addRow([
+			$step['num'].':',
+			(new CCol($step['name']))->setId('preproc-test-step-'.$i.'-name'),
+			(new CCol())
+				->addClass(ZBX_STYLE_RIGHT)
+				->setId('preproc-test-step-'.$i.'-result')
+		]);
+	}
+
+	$form_list->addRow(
+		_('Preprocessing steps'),
+		(new CDiv($result_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('width: 100%;')
+	);
+}
 
 if ($data['show_final_result']) {
 	$form_list->addRow(
@@ -256,7 +258,8 @@ $output = [
 			'title' => _('Test'),
 			'class' => 'submit-test-btn',
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'enabled' => (bool) $data['steps_num'],
+			'isSubmit' => (bool) $data['steps_num'],
 			'action' => 'return itemCompleteTest();'
 		]
 	]
