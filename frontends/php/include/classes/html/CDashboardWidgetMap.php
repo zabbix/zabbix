@@ -197,6 +197,24 @@ class CDashboardWidgetMap extends CDiv {
 				');';
 		}
 
+		// Fix text label disappearing on DOM change in Internet Explorer 11 on Windows 7 (important).
+		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_MAP && $this->initial_load) {
+			$script_run .=
+				'if (IE11) {'.
+					'jQuery(".dashbrd-grid-container")'.
+						'.dashboardGrid("getWidgetsBy", "uniqueid", "'.$this->uniqueid.'")'.
+						'.each(function(widget) {'.
+							'var observer = new MutationObserver(function() {'.
+									'widget.content_body.find("svg text").each(function() {'.
+										'jQuery(this).attr("textLength", this.getBBox().width);'.
+									'});'.
+								'});'.
+
+							'observer.observe(widget.div[0], {attributes: true});'.
+						'});'.
+				'}';
+		}
+
 		return $script_run;
 	}
 
