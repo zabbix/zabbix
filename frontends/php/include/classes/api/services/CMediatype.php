@@ -1131,7 +1131,9 @@ class CMediatype extends CApiService {
 				'filter' => ['mediatype_messageid' => $relation_map->getRelatedIds()],
 				'preservekeys' => true
 			]);
-			$message_templates = $this->unsetExtraFields($message_templates, ['mediatypeid'], []);
+			$message_templates = $this->unsetExtraFields($message_templates, ['mediatype_messageid', 'mediatypeid'],
+				[]
+			);
 			$result = $relation_map->mapMany($result, $message_templates, 'message_templates');
 		}
 
