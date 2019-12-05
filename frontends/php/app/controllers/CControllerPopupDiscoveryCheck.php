@@ -35,7 +35,6 @@ class CControllerPopupDiscoveryCheck extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'index' =>					'required|int32', // Count of existing checks.
 			'update' =>					'in 1',
 			'validate' =>				'in 1',
 			'dcheckid' =>				'string',
@@ -109,7 +108,6 @@ class CControllerPopupDiscoveryCheck extends CController {
 		$output = [
 			'title' => _('Discovery check'),
 			'params' => $params,
-			'index' => $this->getInput('index'),
 			'update' => $this->getInput('update', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
