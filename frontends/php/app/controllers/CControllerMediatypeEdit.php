@@ -94,7 +94,7 @@ class CControllerMediatypeEdit extends CController {
 					'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
 					'event_menu_url', 'event_menu_name', 'parameters', 'description'
 				],
-				'selectMessageTemplates' => ['medaitype_messageid', 'eventsource', 'recovery', 'subject', 'message'],
+				'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
 			]);

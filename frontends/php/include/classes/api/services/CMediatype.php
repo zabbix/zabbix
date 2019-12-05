@@ -223,7 +223,7 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $mediatype['name']));
 			}
 
-			// Check additional fields and values depeding on type.
+			// Check additional fields and values depending on type.
 			$this->checkRequiredFieldsByType($mediatype);
 
 			switch ($mediatype['type']) {
@@ -840,6 +840,7 @@ class CMediatype extends CApiService {
 
 		$mediatypeids = DB::insert('media_type', $mediatypes);
 		$ins_media_type_param = [];
+		$ins_media_type_message = [];
 
 		foreach ($mediatypes as $i => $mediatype) {
 			$mediatypeid = $mediatypeids[$i];
@@ -854,10 +855,20 @@ class CMediatype extends CApiService {
 
 				$this->validateEventMenu($mediatype);
 			}
+
+			if (array_key_exists('message_templates', $mediatype)) {
+				foreach ($mediatype['message_templates'] as $message_template) {
+					$ins_media_type_message[] = ['mediatypeid' => $mediatypeid] + $message_template;
+				}
+			}
 		}
 
 		if ($ins_media_type_param) {
 			DB::insertBatch('media_type_param', $ins_media_type_param);
+		}
+
+		if ($ins_media_type_message) {
+			DB::insertBatch('media_type_message', $ins_media_type_message);
 		}
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MEDIA_TYPE, $mediatypes);
@@ -909,6 +920,7 @@ class CMediatype extends CApiService {
 
 		$update = [];
 		$webhooks_params = [];
+		$message_templates = [];
 		$default_values = DB::getDefaults('media_type');
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
@@ -963,6 +975,11 @@ class CMediatype extends CApiService {
 				}
 
 				$this->validateEventMenu($mediatype, $db_mediatype);
+			}
+
+			if (array_key_exists('message_templates', $mediatype)) {
+				$message_templates[$mediatypeid] = $mediatype['message_templates'];
+				unset($mediatype['message_templates']);
 			}
 
 			if ($type != $db_type) {
@@ -1029,6 +1046,40 @@ class CMediatype extends CApiService {
 
 			if ($ins_media_type_param) {
 				DB::insert('media_type_param', $ins_media_type_param);
+			}
+		}
+
+		if ($message_templates) {
+			$ins_media_type_message = [];
+			$del_media_type_message = [];
+			$upd_media_type_message = [];
+			$db_media_type_messages = DB::select('media_type_message', [
+				'output' => ['mediatype_messageid', 'mediatypeid', 'eventsource', 'recovery', 'subject', 'message'],
+				'filter' => ['mediatypeid' => array_keys($message_templates)]
+			]);
+
+			foreach ($db_media_type_messages as $db_message) {
+				$db_mediatypeid = $db_message['mediatypeid'];
+			}
+
+			foreach ($message_templates as $mediatypeid => $templates) {
+				foreach ($templates as $template) {
+					$ins_media_type_message[] = ['mediatypeid' => $mediatypeid] + $template;
+				}
+			}
+
+			if ($del_media_type_message) {
+//				DB::delete('media_type_message', [
+//					'mediatype_messageid' => array_keys(array_flip($del_media_type_message))
+//				]);
+			}
+
+			if ($upd_media_type_message) {
+//				DB::update('media_type_message', $upd_media_type_message);
+			}
+
+			if ($ins_media_type_message) {
+//				DB::insert('media_type_message', $ins_media_type_message);
 			}
 		}
 
@@ -1179,7 +1230,13 @@ class CMediatype extends CApiService {
 	 */
 	protected function getValidationRules($type, $method) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')]
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')],
+			'message_templates' =>	['type' => API_OBJECTS, 'uniq' => [['eventsource', 'recovery']], 'fields' => [
+				'eventsource' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL])],
+				'recovery' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_ACKNOWLEDGE_OPERATION])],
+				'subject' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'subject')],
+				'message' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'message')]
+			]]
 		]];
 
 		if ($type == MEDIA_TYPE_WEBHOOK) {
@@ -1188,7 +1245,7 @@ class CMediatype extends CApiService {
 				'timeout' =>			['type' => API_TIME_UNIT, 'length' => DB::getFieldLength('media_type', 'timeout'), 'in' => '1:60'],
 				'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
 				'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
-				// Should be checked as string not as url because it can contain maros tags.
+				// Should be checked as string not as url because it can contain macros tags.
 				'event_menu_url' =>		['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
 				'event_menu_name' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_name')],
 				'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
