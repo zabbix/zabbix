@@ -336,7 +336,7 @@ class CModuleManager {
 
 			$instance = new $module_class($this->modules[$index]['manifest']);
 
-			if (!($instance instanceof CModule) || is_null($instance->getManifest())) {
+			if (!($instance instanceof CModule) || !is_subclass_of($instance, CModule::class)) {
 				throw new Exception(_s('%s class must extend %s class.', $module_class, $main_class));
 			}
 
