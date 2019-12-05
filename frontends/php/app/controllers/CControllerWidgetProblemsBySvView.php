@@ -55,23 +55,21 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 
 		$data = getSystemStatusData($filter);
 
-		$severity_names = [
-			'severity_name_0' => $config['severity_name_0'],
-			'severity_name_1' => $config['severity_name_1'],
-			'severity_name_2' => $config['severity_name_2'],
-			'severity_name_3' => $config['severity_name_3'],
-			'severity_name_4' => $config['severity_name_4'],
-			'severity_name_5' => $config['severity_name_5']
-		];
-
 		if ($filter['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
-			$data['groups'] = getSystemStatusTotals($data, $severity_names);
+			$data['groups'] = getSystemStatusTotals($data);
 		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'data' => $data,
-			'severity_names' => $severity_names,
+			'severity_names' => [
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
+			],
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

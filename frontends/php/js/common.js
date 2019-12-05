@@ -44,7 +44,7 @@ jQuery.noConflict();
 	};
 }(jQuery));
 
-var overlays_stack = [];
+var overlays_stack = new OverlayCollection();
 
 function isset(key, obj) {
 	return (is_null(key) || is_null(obj)) ? false : (typeof(obj[key]) != 'undefined');
@@ -496,32 +496,13 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
  *                          type 'popup' only.
  */
 function addToOverlaysStack(id, element, type, xhr) {
-	var index = null,
-		id = id.toString();
 
-	jQuery(overlays_stack).each(function(i, item) {
-		if (item.dialogueid === id) {
-			index = i;
-			return;
-		}
+	overlays_stack.pushUnique({
+		dialogueid: id.toString(),
+		element: element,
+		type: type,
+		xhr: xhr
 	});
-
-	if (index === null) {
-		// Add new overlay.
-		overlays_stack.push({
-			dialogueid: id,
-			element: element,
-			type: type,
-			xhr: xhr
-		});
-	}
-	else {
-		overlays_stack[index]['element'] = element;
-
-		// Move existing overlay to the end of array.
-		overlays_stack.push(overlays_stack[index]);
-		overlays_stack.splice(index, 1);
-	}
 
 	// Only one instance of handler should be present at any time.
 	jQuery(document)
@@ -532,12 +513,12 @@ function addToOverlaysStack(id, element, type, xhr) {
 // Keydown handler. Closes last opened overlay UI element.
 function closeDialogHandler(event) {
 	if (event.which == 27) { // ESC
-		var dialog = overlays_stack[overlays_stack.length - 1];
+		var dialog = overlays_stack.end();
 		if (typeof dialog !== 'undefined') {
 			switch (dialog.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(dialog.dialogueid, dialog.xhr);
+					overlayDialogueDestroy(dialog.dialogueid);
 					break;
 
 				// Close overlay hintbox.
@@ -552,7 +533,7 @@ function closeDialogHandler(event) {
 
 				// Close context menu preloader.
 				case 'preloader':
-					overlayPreloaderDestroy(dialog.dialogueid, dialog.xhr);
+					overlayPreloaderDestroy(dialog.dialogueid);
 					break;
 
 				// Close overlay time picker.
@@ -592,24 +573,9 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
 		return_focus = true;
 	}
 
-	jQuery(overlays_stack).each(function(i, item) {
-		if (item.dialogueid === dialogueid) {
-			overlay = item,
-			index = i;
-			return;
-		}
-	});
-
-	var result = null;
-
-	if (overlay) {
-		// Focus UI element that was clicked to open an overlay.
-		if (return_focus) {
-			jQuery(overlay.element).focus();
-		}
-
-		// Remove dialogue from the stack.
-		result = overlays_stack.splice(index, 1)[0];
+	overlay = overlays_stack.removeById(dialogueid);
+	if (overlay && return_focus) {
+		jQuery(overlay.element).focus();
 	}
 
 	// Remove event listener.
@@ -617,8 +583,7 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
 		jQuery(document).off('keydown', closeDialogHandler);
 	}
 
-	// Return the removed layer.
-	return result;
+	return overlay;
 }
 
 /**
