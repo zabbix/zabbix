@@ -2104,7 +2104,6 @@ output {
 				border-color: $form-border-focus-color;
 				background-color: $btn-form-hover-color;
 				position: relative;
-				z-index: 2;
 			}
 
 		&:checked + label {
@@ -2112,13 +2111,11 @@ output {
 			border-color: $ui-bg-selected-color;
 			background-color: $ui-bg-selected-color;
 			position: relative;
-			z-index: 1;
 		}
 
 		&:checked:focus + label {
 			@include box-shadow(0 0 0 2px rgba($blue, .35));
 			position: relative;
-			z-index: 2;
 		}
 
 		&:checked[disabled] + label {
@@ -5265,7 +5262,6 @@ $form-icon-btn: (
 		left: 0;
 		right: 0;
 		top: 0;
-		z-index: 999;
 	}
 }
 

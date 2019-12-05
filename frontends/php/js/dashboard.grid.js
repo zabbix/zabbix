@@ -3532,39 +3532,15 @@
 					ajax_data['fields'] = JSON.stringify(fields);
 				}
 
+				body.addClass('is-loading');
 				jQuery.ajax({
 					url: url.getUrl(),
 					method: 'POST',
 					data: ajax_data,
-					dataType: 'json',
-					beforeSend: function() {
-						/*
-						 * Clear the 'sticked-to-top' class before updating the body for it's mutation handler
-						 * to center the popup while the widget form is being loaded.
-						 */
-						jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
-
-						body.empty()
-							.addClass('is-loading')
-							.append($('<div>')
-								// The smallest possible size of configuration dialog.
-								.css({
-									'width': '544px',
-									'height': '68px',
-									'max-width': '100%'
-								}))
-					}
+					dataType: 'json'
 				})
 					.done(function(response) {
 						data.dialogue['widget_type'] = response.type;
-
-						/*
-						 * Set the 'sticked-to-top' class before updating the body for it's mutation handler
-						 * to have actual data for the popup positioning.
-						 */
-						if (response.options.stick_to_top) {
-							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
-						}
 
 						body.empty();
 						body.append(response.body);
@@ -3589,6 +3565,13 @@
 						else {
 							// Enable save button after successful form update.
 							$('.dialogue-widget-save', footer).prop('disabled', false);
+						}
+
+						if (data.dialogue['widget_type'] === 'svggraph') {
+							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
+						}
+						else {
+							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
 						}
 
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));

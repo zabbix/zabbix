@@ -1403,20 +1403,17 @@ output {
     .radio-list-control input[type="radio"]:focus + label {
       border-color: #02659f;
       background-color: #e8f5ff;
-      position: relative;
-      z-index: 2; }
+      position: relative; }
     .radio-list-control input[type="radio"]:checked + label {
       color: #fff;
       border-color: #768d99;
       background-color: #768d99;
-      position: relative;
-      z-index: 1; }
+      position: relative; }
     .radio-list-control input[type="radio"]:checked:focus + label {
       -webkit-box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
       -moz-box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
       box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
-      position: relative;
-      z-index: 2; }
+      position: relative; }
     .radio-list-control input[type="radio"]:checked[disabled] + label {
       background-color: #d6dde1 !important;
       -webkit-transition: none;
@@ -3567,8 +3564,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     position: absolute;
     left: 0;
     right: 0;
-    top: 0;
-    z-index: 999; }
+    top: 0; }
 
 .svg-graph {
   display: block; }
