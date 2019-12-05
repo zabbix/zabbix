@@ -1284,6 +1284,10 @@ class CWidgetHelper {
 					'})'.
 				'.on("collapse", function(event, data) {'.
 					'jQuery("textarea, .multiselect", data.section).scrollTop(0);'.
+					'jQuery(window).trigger("resize");'.
+				'})'.
+				'.on("expand", function() {'.
+					'jQuery(window).trigger("resize");'.
 				'})'.
 				'.zbx_vertical_accordion({handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"});',
 
