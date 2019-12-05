@@ -19,8 +19,10 @@
 **/
 
 
+use CController as Action;
+
 class CModule {
-	private $manifest = null;
+	protected $manifest = null;
 
 	public function __construct(array $manifest) {
 		$this->manifest = $manifest;
@@ -34,7 +36,7 @@ class CModule {
 	 * Module register action, called once module is regsitered in Zabbix. Returned array will be stored as initial
 	 * 'config' data in moduledetails.config field.
 	 *
-	 * @param string $path       Relative path to module code.
+	 * @param string $path         Relative path to module code.
 	 * @return array
 	 */
 	public function register($path) {
@@ -44,7 +46,7 @@ class CModule {
 	/**
 	 * Module initalization method.
 	 *
-	 * @param array $config      Database stored config settings.
+	 * @param array $config        Database stored config settings.
 	 */
 	public function init(array $config) {
 	}
@@ -52,8 +54,17 @@ class CModule {
 	/**
 	 * Module before action event.
 	 *
-	 * @param string $action     Action name to be called.
+	 * @param Action $action       Action instance responsible for current request
 	 */
-	public function beforeAction($action) {
+	public function beforeAction(Action $action) {
+	}
+
+	/**
+	 * Module method to be called before application will exit and send response to browser. Will be called only for
+	 * module responsible for current request.
+	 *
+	 * @param Action $action       Action instance responsible for current request.
+	 */
+	public function beforeAppTerminate(Action $action) {
 	}
 }
