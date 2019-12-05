@@ -485,12 +485,17 @@ function stripslashes(str) {
  * Function to remove preloader and moves focus to IU element that was clicked to open it.
  *
  * @param string   id			Preloader identifier.
- * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayPreloaderDestroy(id, xhr) {
+function overlayPreloaderDestroy(id) {
 	if (typeof id !== 'undefined') {
-		if (typeof xhr !== 'undefined') {
-			xhr.abort();
+
+		var overlay = overlays_stack.getById(id)
+		if (!overlay) {
+			return;
+		}
+		if (typeof overlay.xhr !== 'undefined') {
+			overlay.xhr.abort();
+			delete overlay.xhr;
 		}
 
 		jQuery('#' + id).remove();
@@ -502,12 +507,16 @@ function overlayPreloaderDestroy(id, xhr) {
  * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
  *
  * @param string   dialogueid	Dialogue identifier to identify dialogue.
- * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayDialogueDestroy(dialogueid, xhr) {
+function overlayDialogueDestroy(dialogueid) {
 	if (typeof dialogueid !== 'undefined') {
-		if (typeof xhr !== 'undefined') {
-			xhr.abort();
+		var overlay = overlays_stack.getById(dialogueid)
+		if (!overlay) {
+			return;
+		}
+		if (typeof overlay.xhr !== 'undefined') {
+			overlay.xhr.abort();
+			delete overlay.xhr;
 		}
 
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
@@ -729,7 +738,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 
 		setTimeout(function() {
 			jQuery(overlay_bg).off('remove'); // Remove to avoid repeated execution.
-			overlayDialogueDestroy(params.dialogueid, xhr);
+			overlayDialogueDestroy(params.dialogueid);
 		});
 
 		return false;
