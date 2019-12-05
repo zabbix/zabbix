@@ -163,22 +163,13 @@ class ZBase {
 				$router = new CRouter;
 				$router->addActions($this->module_manager->getRoutes());
 				$router->setAction($action);
-				$view_paths = array_reduce($this->module_manager->getRegisteredNamespaces(), 'array_merge', []);
-				$module = $this->module_manager->getModuleByAction($router->getAction());
-
-				if ($module instanceof CModule) {
-					$moduleid = $module->getManifest()['id'];
-					array_unshift($view_paths, $this->module_manager->getModuleRootDir($moduleid));
-					$module->beforeAction($router->getAction());
-				}
-
-				$this->component()->get('menu.main')->setSelected($action);
-				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
+				$this->module = $this->module_manager->getModuleByAction($router->getAction());
+				static::component()->get('menu.main')->setSelected($action);
 
 				if ($router->getController() !== null) {
 					CProfiler::getInstance()->start();
 					$this->processRequest($router);
-					exit;
+					static::stop();
 				}
 
 				if (resourceAccessDenied($file)) {
@@ -203,6 +194,19 @@ class ZBase {
 				catch (ConfigFileException $e) {}
 				break;
 		}
+	}
+
+	/**
+	 * Call beforeAppTerminate event for current module.
+	 */
+	public static function stop() {
+		$app = static::getInstance();
+
+		if ($app->module instanceof CModule && $app->action instanceof CController) {
+			$app->module->beforeAppTerminate($app->action);
+		}
+
+		exit;
 	}
 
 	/**
@@ -421,9 +425,15 @@ class ZBase {
 	 */
 	private function processRequest(CRouter $router) {
 		$controller = $router->getController();
+		$this->action = class_exists($controller, true) ? new $controller : null;
 
-		if (!class_exists($controller)) {
-			error(_s('%s action class is not found.', $controller));
+		if ($this->action instanceof CController == false) {
+			$message = is_null($this->action)
+				? _s('%s action class is not found.', $controller)
+				: _s('%s must extend CController class', $controller);
+
+			error($message);
+
 			$response = new CControllerResponseData([
 				'controller' => [
 					'action' => $router->getAction()
@@ -438,28 +448,20 @@ class ZBase {
 			]);
 		}
 		else {
-			/** @var \CController $controller */
-			$controller = new $controller();
+			$view_paths = array_reduce($this->module_manager->getRegisteredNamespaces(), 'array_merge', []);
 
-			if ($controller instanceof CController) {
-				$controller->setAction($router->getAction());
-				$response = $controller->run();
+			if ($this->module instanceof CModule) {
+				$moduleid = $this->module->getManifest()['id'];
+				array_unshift($view_paths, $this->module_manager->getModuleRootDir($moduleid));
+				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
+				$this->module->beforeAction($this->action);
 			}
 			else {
-				error(_s('%s must extend CController class', get_class($controller)));
-				$response = new CControllerResponseData([
-					'controller' => [
-						'action' => $router->getAction()
-					],
-					'main_block' => '',
-					'page' => 0,
-					'javascript' => [
-						'files' => [],
-						'pre' => '',
-						'post' => ''
-					]
-				]);
+				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
 			}
+
+			$this->action->setAction($router->getAction());
+			$response = $this->action->run();
 		}
 
 		// Controller returned data
@@ -546,7 +548,7 @@ class ZBase {
 	 */
 	protected function initModules() {
 		$manager = new CModuleManager($this->rootDir);
-		$modules = API::ModuleDetails()->get([
+		$modules = DB::select('module', [
 			'output' => ['relative_path', 'id', 'config'],
 			'filter' => ['status' => 1]
 		]);
@@ -565,7 +567,7 @@ class ZBase {
 			}
 
 			foreach ($modules as $module) {
-				$manager->initModule($module['id'], $module['config']);
+				$manager->initModule($module['id'], json_decode($module['config'], true));
 			}
 		}
 
