@@ -67,10 +67,10 @@ class CControllerLatestView extends CControllerLatest {
 				PROFILE_TYPE_ID
 			);
 			CProfile::updateArray('web.latest.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
-			CProfile::update('web.latest.filter.application', $this->getInput('filter_application', ''),
+			CProfile::update('web.latest.filter.application', trim($this->getInput('filter_application', '')),
 				PROFILE_TYPE_STR
 			);
-			CProfile::update('web.latest.filter.select', $this->getInput('filter_select', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.latest.filter.select', trim($this->getInput('filter_select', '')), PROFILE_TYPE_STR);
 			CProfile::update('web.latest.filter.show_without_data', $this->getInput('filter_show_without_data', 0),
 				PROFILE_TYPE_INT
 			);
