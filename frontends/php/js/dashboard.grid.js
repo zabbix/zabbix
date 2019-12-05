@@ -2237,15 +2237,18 @@
 			ajax_data['fields'] = JSON.stringify(fields);
 		}
 
-		var $save_btn = data.dialogue.div.find('.dialogue-widget-save');
-		$save_btn.prop('disabled', true);
+		var $save_btn = data.dialogue.div.find('.dialogue-widget-save'),
+			overlay = overlays_stack.getById('widgetConfg');
 
-		overlays_stack.getById('widgetConfg').xhr = $.ajax({
+		$save_btn.prop('disabled', true);
+		overlay.xhr = $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
 			data: ajax_data
-		})
+		});
+
+		overlay.xhr
 			.then(function(response) {
 				if (typeof(response.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
