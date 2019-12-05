@@ -2010,7 +2010,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	if (0 != escalation->esc_step)
 	{
 		add_sentusers_msg(&user_msg, action->actionid, event, NULL, NULL, NULL, NULL, action->eventsource,
-				ZBX_OPERATION_MODE_NORMAL, error);
+				ZBX_OPERATION_MODE_NORMAL, ZBX_NULL2EMPTY_STR(error));
 		flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid, NULL);
 	}
 
