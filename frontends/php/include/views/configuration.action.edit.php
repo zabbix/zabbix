@@ -173,13 +173,6 @@ else {
 if ($data['action']['operations']) {
 	$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_OPERATION);
 
-	$default_message = [
-		'subject' => '',
-		'message' => ''
-	];
-
-	$action_operation_hints = getActionOperationHints($data['action']['operations'], $default_message);
-
 	$simple_interval_parser = new CSimpleIntervalParser();
 
 	foreach ($data['action']['operations'] as $operationid => $operation) {
@@ -194,10 +187,6 @@ if ($data['action']['operations']) {
 		}
 
 		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
-
-		if (array_key_exists($operationid, $action_operation_hints) && $action_operation_hints[$operationid]) {
-			$details->setHint($action_operation_hints[$operationid]);
-		}
 
 		$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 		foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
@@ -316,13 +305,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	if ($data['action']['recovery_operations']) {
 		$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_RECOVERY_OPERATION);
 
-		$default_message = [
-			'subject' => '',
-			'message' => ''
-		];
-
-		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations'], $default_message);
-
 		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
 				continue;
@@ -334,12 +316,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$operation['mediatypeid'] = 0;
 			}
 
-			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
-
-			if (array_key_exists($operationid, $action_operation_hints) && $action_operation_hints[$operationid]) {
-				$details->setHint($action_operation_hints[$operationid]);
-			}
-
 			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
 				if (array_key_exists($var, $operation_for_popup)) {
@@ -348,7 +324,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			}
 
 			$operations_table->addRow([
-				$details,
+				new CSpan($actionOperationDescriptions[0][$operationid]),
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
@@ -403,13 +379,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	if ($data['action']['ack_operations']) {
 		$operation_descriptions = getActionOperationDescriptions([$data['action']], ACTION_ACKNOWLEDGE_OPERATION);
 
-		$default_message = [
-			'subject' => '',
-			'message' => ''
-		];
-
-		$operation_hints = getActionOperationHints($data['action']['ack_operations'], $default_message);
-
 		foreach ($data['action']['ack_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION])) {
 				continue;
@@ -419,12 +388,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				'mediatypeid'	=> 0
 			];
 
-			$details = new CSpan($operation_descriptions[0][$operationid]);
-
-			if (array_key_exists($operationid, $operation_hints) && $operation_hints[$operationid]) {
-				$details->setHint($operation_hints[$operationid]);
-			}
-
 			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
 				if (array_key_exists($var, $operation_for_popup)) {
@@ -433,7 +396,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			}
 
 			$operations_table->addRow([
-				$details,
+				new CSpan($operation_descriptions[0][$operationid]),
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
