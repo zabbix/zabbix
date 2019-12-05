@@ -659,13 +659,13 @@ $form_list
 // Append value type to form list.
 if ($readonly) {
 	$form->addVar('value_type', $data['value_type']);
-	$form_list->addRow((new CLabel(_('Type of information'), 'value_type_name'))->setAsteriskMark(),
+	$form_list->addRow(new CLabel(_('Type of information'), 'value_type_name'),
 		(new CTextBox('value_type_name', itemValueTypeString($data['value_type']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 }
 else {
-	$form_list->addRow((new CLabel(_('Type of information'), 'value_type')),
+	$form_list->addRow(new CLabel(_('Type of information'), 'value_type'),
 		(new CComboBox('value_type', $data['value_type'], null, [
 			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
