@@ -299,7 +299,7 @@ void finalize_key_access_rules_configuration(void)
 		/* if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration */
 		if (0 < allow_rules && 0 == deny_rules)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "adding DenyKey=* rule for proper whitelist confuration");
+			zabbix_log(LOG_LEVEL_WARNING, "adding DenyKey=* rule for proper whitelist configuration");
 			add_key_access_rule("*", ZBX_KEY_ACCESS_DENY);
 			deny_rules++;
 		}
@@ -457,10 +457,14 @@ int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to process key access rule \"%s\"", pattern);
 	}
-	else if (0 == no_more_rules &&
-			FAIL == zbx_vector_ptr_search(&key_access_rules, rule, compare_key_access_rules))
+	else if (0 == no_more_rules)
 	{
-		if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
+		if (FAIL != zbx_vector_ptr_search(&key_access_rules, rule, compare_key_access_rules))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "key access rule \"%s\" conflicts with"
+					" another rule defined above", pattern);
+		}
+		else if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
 		{
 			switch(rule->type)
 			{
