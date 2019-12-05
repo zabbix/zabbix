@@ -8,8 +8,211 @@
 		</td>
 	</tr>
 </script>
+
+<script type="text/x-jquery-tmpl" id="message-templates-row-tmpl">
+	<?= (new CRow([
+			(new CCol())->setId('message_type_cell_#{index}'),
+			(new CCol(new CSpan('#{message}')))
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;')
+				->setId('message_template_cell_#{index}'),
+			(new CHorList([
+				(new CButton(null, _('Edit')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('data-action', 'edit'),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick("removeMessageTemplate('#{index}');")
+			]))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setAttribute('data-index', '#{index}')
+			->toString()
+	?>
+</script>
+
 <script type="text/javascript">
-	jQuery(document).ready(function($) {
+	var message_templates = <?= CJs::encodeJson(CMediatypeHelper::getAllMessageTemplates()) ?>,
+		message_template_list = [];
+
+	/**
+	 * Draws message template table.
+	 *
+	 * @param {array} list  The list of message templates.
+	 */
+	function populateMessageTemplates(list) {
+		var addTemplate = function(template) {
+				var index = template.index;
+
+				message_template_list[index] = template;
+
+				jQuery('#message-templates-footer').before(
+					new Template(jQuery('#message-templates-row-tmpl').html()).evaluate(template)
+				);
+
+				delete(template.index);
+
+				for (var field_name in template) {
+					if (!template.hasOwnProperty(field_name)) {
+						continue;
+					}
+
+					var $input = jQuery('<input>', {
+						name: 'message_templates[' + index + '][' + field_name + ']',
+						type: 'hidden',
+						value: template[field_name]
+					});
+
+					jQuery('#message_template_cell_' + index).append($input);
+				}
+
+				jQuery('#message_type_cell_' + index).text(getMessageTypeName(template.eventsource, template.recovery));
+			},
+			updateTemplate = function(template) {
+				var index = template.index;
+
+				message_template_list[index] = template;
+
+				delete(template.index);
+
+				for (var field_name in template) {
+					if (!template.hasOwnProperty(field_name)) {
+						continue;
+					}
+
+					var $obj = jQuery('input[name="message_templates[' + index + '][' + field_name + ']"]');
+
+					if ($obj.length) {
+						$obj.val(template[field_name]);
+					}
+					else {
+						var $input = jQuery('<input>', {
+							name: 'message_templates[' + index + '][' + field_name + ']',
+							type: 'hidden',
+							value: template[field_name]
+						});
+
+						jQuery('#message_template_cell_' + index).append($input);
+					}
+				}
+
+				jQuery('#message_template_cell_' + index + ' span').text(template.message);
+				jQuery('#message_type_cell_' + index).text(getMessageTypeName(template.eventsource, template.recovery));
+			};
+
+		for (var i = 0; i < list.length; i++) {
+			var template = list[i];
+
+			if (empty(template)) {
+				continue;
+			}
+
+			if (typeof template.index === 'undefined') {
+				template.index = i;
+			}
+
+			if (typeof message_template_list[template.index] === 'undefined') {
+				addTemplate(template);
+			}
+			else {
+				updateTemplate(template);
+			}
+		}
+	}
+
+	/**
+	 * Gets message type name by the specified event source and operation mode.
+	 *
+	 * @param {int|string} eventsource  Event source.
+	 * @param {int|string} recovery     Operation mode.
+	 *
+	 * @return {string}
+	 */
+	function getMessageTypeName(eventsource, recovery) {
+		for (var message_type in message_templates) {
+			if (!message_templates.hasOwnProperty(message_type)) {
+				continue;
+			}
+
+			if (message_templates[message_type].eventsource == eventsource
+					&& message_templates[message_type].recovery == recovery) {
+				return message_templates[message_type].name;
+			}
+		}
+
+		return <?= CJs::encodeJson(_('Unknown')) ?>;
+	}
+
+	/**
+	 * Gets message type by the specified event source and operation mode.
+	 *
+	 * @param {int|string} eventsource  Event source.
+	 * @param {int|string} recovery     Operation mode.
+	 *
+	 * @return {int|string}
+	 */
+	function transformToMessageType(eventsource, recovery) {
+		for (var message_type in message_templates) {
+			if (!message_templates.hasOwnProperty(message_type)) {
+				continue;
+			}
+
+			if (eventsource == message_template_list[message_type].eventsource
+					&& recovery == message_template_list[message_type].recovery) {
+				return message_type;
+			}
+		}
+
+		return <?= CMediatypeHelper::MSG_TYPE_PROBLEM ?>;
+	}
+
+	/**
+	 * Removes a template from the list of message templates.
+	 *
+	 * @param {int|string} index  Template index.
+	 */
+	function removeMessageTemplate(index) {
+		jQuery('tr[data-index=' + index + ']').remove();
+
+		delete(message_template_list[index]);
+	}
+
+	jQuery(function($) {
+		populateMessageTemplates(<?= CJs::encodeJson(array_values($this->data['message_templates'])) ?>);
+
+		$('#message-templates').on('click', '[data-action]', function() {
+			var $btn = $(this),
+				params = {
+					type: $('#type').val(),
+					content_type: $('input[name="content_type"]:checked').val()
+				};
+
+			switch ($btn.data('action')) {
+				case 'add':
+					params.index = $('tr[data-index]:last').length ? $('tr[data-index]:last').data('index') + 1 : 0;
+
+					PopUp('popup.mediatype.message', params, null, $btn);
+					break;
+
+				case 'edit':
+					var $row = $btn.closest('tr');
+
+					params.update = 1;
+					params.index = $row.data('index');
+
+					$row.find('input[type="hidden"]').each(function() {
+						var $input = $(this),
+							name = $input.attr('name').match(/\[([^\]]+)]$/);
+
+						if (name) {
+							params[name[1]] = $input.val();
+						}
+					});
+
+					PopUp('popup.mediatype.message', params, null, $btn);
+					break;
+			}
+		});
+
 		var old_media_type = $('#type').val();
 
 		// type of media
