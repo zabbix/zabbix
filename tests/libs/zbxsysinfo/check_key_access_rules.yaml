@@ -50,6 +50,8 @@ out:
   metrics:
     - metric: 'vfs.file.contents[]'
       result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.contents[""]'
+      result: ZBX_KEY_ACCESS_DENY
     - metric: 'vfs.file.contents'
       result: ZBX_KEY_ACCESS_ALLOW
     - metric: 'vfs.file.contents[/etc/passwd]'
@@ -66,6 +68,23 @@ out:
     - metric: 'vfs.file.contents[]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'vfs.file.contents[/path/to/file]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.contents'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
+test case: Any arguments double asterisk
+in:
+  rules:
+    - pattern: 'vfs.file.contents[**]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'vfs.file.contents[]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.contents[/path/to/file]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.contents[/path/to/file,UTF8]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'vfs.file.contents'
       result: ZBX_KEY_ACCESS_ALLOW
@@ -197,6 +216,25 @@ out:
       result: ZBX_KEY_ACCESS_ALLOW
     - metric: 'vfs.file.contents[/etc/passwd,utf16]'
       result: ZBX_KEY_ACCESS_ALLOW
+---
+test case: Quoted parameters
+in:
+  rules:
+    - pattern: 'vfs.file.contents[/etc/passwd,utf8]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'system.run[*]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 2
+  metrics:
+    - metric: 'vfs.file.contents["/etc/passwd","utf8"]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.contents["/etc/passwd",""]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'vfs.file.contents["/etc/passwd","utf16"]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run["echo 1"]'
+      result: ZBX_KEY_ACCESS_DENY
 ---
 test case: Key pattern without arguments
 in:

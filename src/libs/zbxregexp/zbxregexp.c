@@ -1141,6 +1141,39 @@ void	zbx_regexp_escape(char **string)
 	*string = buffer;
 }
 
+/**********************************************************************************
+ *                                                                                *
+ * Function: zbx_wildcard_minimize                                                *
+ *                                                                                *
+ * Purpose: remove repeated wildcard characters from the expression               *
+ *                                                                                *
+ * Parameters: str - [IN/OUT] the string to update                                *
+ *                                                                                *
+ **********************************************************************************/
+void	zbx_wildcard_minimize(char *str)
+{
+	char	*p1, *p2;
+	int	w = 0;
+
+	for(p1 = p2 = str; '\0' != *p2; p2++)
+	{
+		if ('*' == *p2)
+		{
+			if (0 != w)
+				continue;
+
+			w = 1;
+		}
+		else
+			w = 0;
+
+		*p1 = *p2;
+		p1++;
+	}
+
+	*p1 = '\0';
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_wildcard_match                                               *

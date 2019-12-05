@@ -347,6 +347,7 @@ static int	parse_key_access_rule(const char *pattern, zbx_key_access_rule_t *rul
 
 	/* extract rule elements [0] = key pattern and all parameters follow */
 	zbx_strncpy_alloc(&pr, &alloc, &offset, pattern, pl - pattern);
+	zbx_wildcard_minimize(pr);
 	zbx_vector_str_append(&rule->elements, pr);
 	rule->empty_arguments = 0;
 
@@ -376,6 +377,7 @@ static int	parse_key_access_rule(const char *pattern, zbx_key_access_rule_t *rul
 		if (NULL == (param = get_param_dyn(pl, i + 1)))
 			return FAIL;
 
+		zbx_wildcard_minimize(param);
 		zbx_vector_str_append(&rule->elements, param);
 	}
 
