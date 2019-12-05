@@ -47,10 +47,11 @@ class CMapHelper {
 			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'permission'
+				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls', 'permission'
 			],
 			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
-				'permission'],
+				'permission'
+			],
 			'sysmapids' => $sysmapids,
 			'preservekeys' => true
 		]);
