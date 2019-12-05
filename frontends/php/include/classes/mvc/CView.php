@@ -122,7 +122,7 @@ class CView {
 	 * @throws Exception if invalid filename or file does not exist.
 	 */
 	public function assign($view) {
-		if (!preg_match("/[a-z\.]+/", $view)) {
+		if (!preg_match("/^[a-z\.]+$/", $view)) {
 			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and ".".', $view));
 		}
 
