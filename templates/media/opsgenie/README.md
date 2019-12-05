@@ -78,7 +78,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 8\. Use the Opsgenie User in any Actions of your choice. Text from "Action Operations" will be sent to "Opsgenie Alert" when the problem happens. Text from "Action Recovery Operations" and "Action Update Operations" will be sent to "Opsgenie Alert Notes" when the problem is resolved or updated.
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/4.4/manual/config/notifications) and [Opsgenie](https://docs.opsgenie.com/docs/alert-api) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Opsgenie](https://docs.opsgenie.com/docs/alert-api) documentations.
 
 ## Supported Versions
 
