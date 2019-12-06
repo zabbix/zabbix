@@ -72,7 +72,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$actionForm = (new CForm())->setName('actionForm')->addVar('page', $data['page']);
+$actionForm = (new CForm())->setName('actionForm');
 
 // create table
 $actionTable = (new CTableInfo())
@@ -90,8 +90,6 @@ $actionTable = (new CTableInfo())
 if ($this->data['actions']) {
 	$actionConditionStringValues = actionConditionValueToString($this->data['actions'], $this->data['config']);
 	$actionOperationDescriptions = getActionOperationDescriptions($this->data['actions'], ACTION_OPERATION);
-
-	$page_param = url_param($data['page'], false, 'page');
 
 	foreach ($this->data['actions'] as $aIdx => $action) {
 		$conditions = [];
@@ -113,17 +111,17 @@ if ($this->data['actions']) {
 		}
 
 		if ($action['status'] == ACTION_STATUS_DISABLED) {
-			$status = (new CLink(_('Disabled'), 'actionconf.php?action=action.massenable&g_actionid[]='.
-				$action['actionid'].url_param('eventsource').$page_param
-			))
+			$status = (new CLink(_('Disabled'),
+				'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
+			)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
 				->addSID();
 		}
 		else {
-			$status = (new CLink(_('Enabled'), 'actionconf.php?action=action.massdisable&g_actionid[]='.
-				$action['actionid'].url_param('eventsource').$page_param
-			))
+			$status = (new CLink(_('Enabled'),
+				'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
+			)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
 				->addSID();
@@ -131,7 +129,7 @@ if ($this->data['actions']) {
 
 		$actionTable->addRow([
 			new CCheckBox('g_actionid['.$action['actionid'].']', $action['actionid']),
-			new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid'].$page_param),
+			new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']),
 			$conditions,
 			$operations,
 			$status
@@ -142,7 +140,7 @@ if ($this->data['actions']) {
 // append table to form
 $actionForm->addItem([
 	$actionTable,
-	$this->data['pager'],
+	$this->data['paging'],
 	new CActionButtonList('action', 'g_actionid', [
 		'action.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected actions?')],
 		'action.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
