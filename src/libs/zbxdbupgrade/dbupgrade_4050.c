@@ -297,7 +297,7 @@ static int	DBpatch_4050016(void)
 				}
 			};
 
-	int		ret = SUCCEED;
+	int		ret = SUCCEED, res;
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	mediatypeid;
@@ -323,13 +323,18 @@ static int	DBpatch_4050016(void)
 					msg_esc = DBdyn_escape_string(messages[i][k][content_type]);
 					subj_esc = content_type == 2 ? NULL : DBdyn_escape_string(messages[i][k][3]);
 
-					if (ZBX_DB_OK > DBexecute(
+					res = DBexecute(
 							"insert into media_type_message"
 							" (mediatype_messageid,mediatypeid,eventsource,recovery,"
 							"subject,message)"
 							" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%i,%i,'%s','%s')",
 							DBget_maxid_num("media_type_message", 1), mediatypeid, i, k,
-							ZBX_NULL2EMPTY_STR(subj_esc), msg_esc))
+							ZBX_NULL2EMPTY_STR(subj_esc), msg_esc);
+
+					zbx_free(msg_esc);
+					zbx_free(subj_esc);
+
+					if (ZBX_DB_OK > res)
 					{
 						ret = FAIL;
 						goto out;
@@ -338,10 +343,7 @@ static int	DBpatch_4050016(void)
 			}
 		}
 	}
-
 out:
-	zbx_free(msg_esc);
-	zbx_free(subj_esc);
 	DBfree_result(result);
 
 	return ret;
