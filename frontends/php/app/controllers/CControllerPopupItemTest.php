@@ -204,7 +204,8 @@ abstract class CControllerPopupItemTest extends CController {
 					'snmpv3_securitylevel' => $this->getInput('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV),
 					'host' => [
 						'host' => $this->host['host']
-					]
+					],
+					'interface' => $this->getItemTestInterface($interface_inputs)
 				];
 
 				if ($data['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
