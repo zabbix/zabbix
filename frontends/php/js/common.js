@@ -160,42 +160,6 @@ function cancelEvent(e) {
 	return false;
 }
 
-function add_variable(o_el, s_name, x_value, s_formname, o_document) {
-	var form;
-
-	if (!o_document) {
-		o_document = document;
-	}
-
-	if (s_formname) {
-		if (!(form = o_document.forms[s_formname])) {
-			throw "Missing form with name '" + s_formname + "'.";
-		}
-	}
-	else if (o_el) {
-		if (!(form = o_el.form)) {
-			throw "Missing form in 'o_el' object";
-		}
-	}
-	else {
-		if (!(form = this.form)) {
-			throw "Missing form in 'this' object";
-		}
-	}
-
-	var o_variable = o_document.createElement('input');
-	if (!o_variable) {
-		throw "Can't create element";
-	}
-	o_variable.type = 'hidden';
-	o_variable.name = s_name;
-	o_variable.id = s_name;
-	o_variable.value = x_value;
-	form.appendChild(o_variable);
-
-	return true;
-}
-
 function checkAll(form_name, chkMain, shkName) {
 	var frmForm = document.forms[form_name],
 		value = frmForm.elements[chkMain].checked;
@@ -205,24 +169,6 @@ function checkAll(form_name, chkMain, shkName) {
 	chkbxRange.saveSessionStorage(shkName);
 
 	return true;
-}
-
-function checkLocalAll(form_name, chkMain, chkName) {
-	var frmForm = document.forms[form_name];
-	var checkboxes = $$('input[name=' + chkName + ']');
-
-	for (var i = 0; i < checkboxes.length; i++) {
-		if (isset('type', checkboxes[i]) && checkboxes[i].type == 'checkbox') {
-			checkboxes[i].checked = frmForm.elements[chkMain].checked;
-		}
-	}
-
-	return true;
-}
-
-function close_window() {
-	window.setTimeout('window.close();', 500); // solve bug for Internet Explorer
-	return false;
 }
 
 function Confirm(msg) {
@@ -365,60 +311,6 @@ function get_bodywidth() {
 	var w2 = parseInt(document.body.offsetWidth);
 
 	return (w2 < w) ? w2 : w;
-}
-
-function get_cursor_position(e) {
-	e = e || window.event;
-	var cursor = {x: 0, y: 0};
-
-	if (e.pageX || e.pageY) {
-		cursor.x = e.pageX;
-		cursor.y = e.pageY;
-	}
-	else {
-		var de = document.documentElement;
-		var b = document.body;
-		cursor.x = e.clientX + (de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
-		cursor.y = e.clientY + (de.scrollTop || b.scrollTop) - (de.clientTop || 0);
-	}
-
-	return cursor;
-}
-
-function get_scroll_pos() {
-	var scrOfX = 0, scrOfY = 0;
-
-	// netscape compliant
-	if (typeof(window.pageYOffset) == 'number') {
-		scrOfY = window.pageYOffset;
-		scrOfX = window.pageXOffset;
-	}
-	// DOM compliant
-	else if (document.body && (document.body.scrollLeft || document.body.scrollTop)) {
-		scrOfY = document.body.scrollTop;
-		scrOfX = document.body.scrollLeft;
-	}
-	// IE6 standards compliant mode
-	else if (document.documentElement && (document.documentElement.scrollLeft || document.documentElement.scrollTop)) {
-		scrOfY = document.documentElement.scrollTop;
-		scrOfX = document.documentElement.scrollLeft;
-	}
-
-	return [scrOfX, scrOfY];
-}
-
-function openWinCentered(url, name, width, height, params) {
-	var top = Math.ceil((screen.height - height) / 2),
-		left = Math.ceil((screen.width - width) / 2);
-
-	if (params.length > 0) {
-		params = ', ' + params;
-	}
-
-	var windowObj = window.open(new Curl(url).getUrl(), name,
-		'width=' + width + ', height=' + height + ', top=' + top + ', left=' + left + params
-	);
-	windowObj.focus();
 }
 
 /**
