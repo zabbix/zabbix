@@ -123,16 +123,29 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                                 LDAP_LIBS=`echo "$LDAP_LIBS"|sed "s|-lldap|$_ldap_dir_lib/libldap.a|g"|sed "s|-llber|$_ldap_dir_lib/liblber.a|g"`
                         fi
 
-                        # without SSL
+                        # without SSL and SASL
                         if test "x$static_linking_support" = "xno"; then
-                                TRY_LDAP_LIBS="$LDAP_LIBS -lpthread -lsasl2"
+                                TRY_LDAP_LIBS="$LDAP_LIBS -lpthread"
                         else
-                                TRY_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic -lpthread -lsasl2"
+                                TRY_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic -lpthread"
                         fi
                         LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
                                 LDAP_LIBS=$TRY_LDAP_LIBS
                                 AC_MSG_RESULT([without SSL])
                         ])
+
+                        # without SSL
+                        if test "x$ldap_link" = "xno"; then
+                                if test "x$static_linking_support" = "xno"; then
+                                        TRY_LDAP_LIBS="$LDAP_LIBS -lpthread -lsasl2"
+                                else
+                                        TRY_LDAP_LIBS="${static_linking_support}static $LDAP_LIBS ${static_linking_support}dynamic -lpthread -lsasl2"
+                                fi
+                                LIBLDAP_TRY_LINK([$TRY_LDAP_LIBS], [$LDAP_LDFLAGS], [$LDAP_CPPFLAGS], ,[
+                                        LDAP_LIBS=$TRY_LDAP_LIBS
+                                        AC_MSG_RESULT([without SSL])
+                                ])
+                        fi
 
                         # without SSL for Solaris
                         if test "x$ldap_link" = "xno"; then
