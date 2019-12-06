@@ -456,9 +456,6 @@ class ZBase {
 				array_unshift(CView::$viewsDir, $this->module_manager->getModuleRootDir($moduleid));
 				$this->module->beforeAction($this->action);
 			}
-			else {
-				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
-			}
 
 			$this->action->setAction($router->getAction());
 			$response = $this->action->run();
