@@ -1050,16 +1050,48 @@ class CMediatype extends CApiService {
 		}
 
 		if ($message_templates) {
-			$ins_media_type_message = [];
-			$del_media_type_message = [];
-			$upd_media_type_message = [];
 			$db_media_type_messages = DB::select('media_type_message', [
 				'output' => ['mediatype_messageid', 'mediatypeid', 'eventsource', 'recovery', 'subject', 'message'],
-				'filter' => ['mediatypeid' => array_keys($message_templates)]
+				'filter' => ['mediatypeid' => array_keys($message_templates)],
+				'preservekeys' => true
 			]);
 
-			foreach ($db_media_type_messages as $db_message) {
-				$db_mediatypeid = $db_message['mediatypeid'];
+			$ins_media_type_message = [];
+			$del_media_type_message = zbx_toHash(array_keys($db_media_type_messages));
+			$upd_media_type_message = [];
+
+			$message_template_defaults = [
+				'subject' => DB::getDefault('media_type_message', 'subject'),
+				'message' => DB::getDefault('media_type_message', 'message')
+			];
+
+			foreach ($db_media_type_messages as $mediatype_messageid => $db_message_template) {
+				$db_mediatypeid = $db_message_template['mediatypeid'];
+
+				foreach ($message_templates[$db_mediatypeid] as $idx => $message_template) {
+					if ($db_message_template['eventsource'] == $message_template['eventsource']
+							&& $db_message_template['recovery'] == $message_template['recovery']) {
+						$values = [];
+						$message_template += $message_template_defaults;
+
+						if ($db_message_template['subject'] !== $message_template['subject']) {
+							$values['subject'] = $message_template['subject'];
+						}
+
+						if ($db_message_template['message'] !== $message_template['message']) {
+							$values['message'] = $message_template['message'];
+						}
+
+						if ($values) {
+							$upd_media_type_message[] = [
+								'values' => $values,
+								'where' => ['mediatype_messageid' => $mediatype_messageid]
+							];
+						}
+
+						unset($message_templates[$db_mediatypeid][$idx], $del_media_type_message[$mediatype_messageid]);
+					}
+				}
 			}
 
 			foreach ($message_templates as $mediatypeid => $templates) {
@@ -1069,17 +1101,15 @@ class CMediatype extends CApiService {
 			}
 
 			if ($del_media_type_message) {
-//				DB::delete('media_type_message', [
-//					'mediatype_messageid' => array_keys(array_flip($del_media_type_message))
-//				]);
+				DB::delete('media_type_message', ['mediatype_messageid' => $del_media_type_message]);
 			}
 
 			if ($upd_media_type_message) {
-//				DB::update('media_type_message', $upd_media_type_message);
+				DB::update('media_type_message', $upd_media_type_message);
 			}
 
 			if ($ins_media_type_message) {
-//				DB::insert('media_type_message', $ins_media_type_message);
+				DB::insert('media_type_message', $ins_media_type_message);
 			}
 		}
 
