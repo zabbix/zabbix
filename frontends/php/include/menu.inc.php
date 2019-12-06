@@ -135,9 +135,6 @@ if ($user_type == USER_TYPE_SUPER_ADMIN) {
 			])
 			->add(_('Action log'), [
 				'action' => 'auditacts.php'
-			])
-			->add(_('Audit'), [
-				'Notifications' => 'report4.php'
 			]);
 
 	$menu
