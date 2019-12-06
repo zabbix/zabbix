@@ -284,4 +284,13 @@ class CXmlConstantName {
 
 	const CONTENT_TYPE_TEXT = 'TEXT'; // Duplicate.
 	const CONTENT_TYPE_HTML = 'HTML';
+
+	const TRIGGERS = 'TRIGGERS';
+	const DISCOVERY = 'DISCOVERY';
+	const AUTOREGISTRATION = 'AUTOREGISTRATION';
+	// const INTERNAL = 'INTERNAL'; // Duplicate.
+
+	const PROBLEM = 'PROBLEM';
+	const RECOVERY = 'RECOVERY';
+	const UPDATE = 'UPDATE';
 }
