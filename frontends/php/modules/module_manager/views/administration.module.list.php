@@ -81,7 +81,7 @@ foreach ($data['modules'] as $moduleid => $module) {
 	$name = new CLink($module['name'],
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'module.edit')
-			->setArgument('moduleid', $moduleid)
+			->setArgument('moduleids[]', $moduleid)
 			->getUrl()
 	);
 

@@ -45,7 +45,11 @@ class ModuleUpdateAction extends CController {
 				$fields = ['status' => $this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED];
 				$success = _('Module updated');
 				$error = _('Cannot update module');
-				$moduleids = $this->getAllowedToEnable([$this->getInput('moduleid')]);
+
+				if ($fields['status'] === MODULE_STATUS_ENABLED) {
+					$moduleids = $this->getAllowedToEnable($moduleids);
+				}
+
 				break;
 
 			case 'module.enable':
@@ -106,7 +110,7 @@ class ModuleUpdateAction extends CController {
 		$disabledids = array_diff($moduleids, array_keys($enabled));
 
 		if (!$disabledids) {
-			return $disabledids;
+			return $moduleids;
 		}
 
 		// Modules to be enabled.

@@ -8,6 +8,7 @@ use CControllerResponseFatal;
 use CUrl;
 use API;
 use APP;
+use CAutoloader;
 use CModuleManager;
 
 class ModuleScanAction extends CController {
@@ -61,8 +62,17 @@ class ModuleScanAction extends CController {
 			}
 
 			$instance = $manager->loadModule($module['relative_path']);
+		}
 
-			if ($instance) {
+		$autoloader = new CAutoloader;
+		$autoloader->register();
+
+		foreach ($manager->getLoadedNamespaces() as $namespace => $paths) {
+			$autoloader->addNamespace($namespace, $paths);
+		}
+
+		foreach ($modules as $module) {
+			if (!in_array($module['relative_path'], $registered)) {
 				$module['config'] = $manager->registerModule($module['id']);
 				$add_modules[] = $module;
 				$added[] = $module['id'];

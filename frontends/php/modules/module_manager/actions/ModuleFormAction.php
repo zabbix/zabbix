@@ -26,29 +26,29 @@ class ModuleFormAction extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'moduleid' =>		'required|id',
+			'moduleids' =>		'required',
 			// form update fields
 			'status' =>			'in 1',
 			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
-		$module = API::ModuleDetails()->get([
-			'output' => ['relative_path', 'id', 'status', 'config'],
-			'moduleids' => [$this->getInput('moduleid')]
-		]);
 
-		if (!$ret || !$module) {
+		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
-
-		$this->module = reset($module);
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+		$modules = API::ModuleDetails()->get([
+			'output' => ['relative_path', 'id', 'status', 'config'],
+			'moduleids' => $this->getInput('moduleids')
+		]);
+		$this->module = reset($modules);
+
+		return $this->module && $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
 	protected function doAction() {
