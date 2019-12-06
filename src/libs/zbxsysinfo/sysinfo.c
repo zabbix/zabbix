@@ -461,10 +461,15 @@ int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type)
 	}
 	else if (0 == no_more_rules)
 	{
-		if (FAIL != zbx_vector_ptr_search(&key_access_rules, rule, compare_key_access_rules))
+		int			i;
+		zbx_key_access_rule_t	*r;
+
+		if (FAIL != (i = zbx_vector_ptr_search(&key_access_rules, rule, compare_key_access_rules)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "key access rule \"%s\" conflicts with"
-					" another rule defined above", pattern);
+			r = (zbx_key_access_rule_t*)key_access_rules.values[i];
+
+			zabbix_log(LOG_LEVEL_WARNING, "key access rule \"%s\" %s another rule defined above",
+					pattern, r->type == type ? "duplicates" : "conflicts with");
 		}
 		else if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
 		{
