@@ -1388,17 +1388,20 @@ output {
     .radio-list-control input[type="radio"]:focus + label {
       border-color: #bbb;
       background-color: #414141;
-      position: relative; }
+      position: relative;
+      z-index: 2; }
     .radio-list-control input[type="radio"]:checked + label {
       color: #000 !important;
       border-color: #ddd;
       background-color: #ddd;
-      position: relative; }
+      position: relative;
+      z-index: 1; }
     .radio-list-control input[type="radio"]:checked:focus + label {
       -webkit-box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
       -moz-box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
       box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
-      position: relative; }
+      position: relative;
+      z-index: 2; }
     .radio-list-control input[type="radio"]:checked[disabled] + label {
       background-color: white !important;
       -webkit-transition: none;
@@ -4299,7 +4302,7 @@ a.link-action {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1; }
+    z-index: 2; }
   .is-loading:after {
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
@@ -4319,7 +4322,7 @@ a.link-action {
     border: 2px solid #ccd5d9;
     border-bottom-color: #0275b8;
     animation: is-loading-kf 0.6s infinite linear;
-    z-index: 1;
+    z-index: 2;
     content: ''; }
   .is-loading.is-loading-fadein:before {
     opacity: 0;
