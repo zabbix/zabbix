@@ -166,6 +166,9 @@ class ZBase {
 				$this->module = $this->module_manager->getModuleByAction($router->getAction());
 				static::component()->get('menu.main')->setSelected($action);
 
+				$view_paths = array_reduce($this->module_manager->getRegisteredNamespaces(), 'array_merge', []);
+				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
+
 				if ($router->getController() !== null) {
 					CProfiler::getInstance()->start();
 					$this->processRequest($router);
@@ -448,12 +451,9 @@ class ZBase {
 			]);
 		}
 		else {
-			$view_paths = array_reduce($this->module_manager->getRegisteredNamespaces(), 'array_merge', []);
-
 			if ($this->module instanceof CModule) {
 				$moduleid = $this->module->getManifest()['id'];
-				array_unshift($view_paths, $this->module_manager->getModuleRootDir($moduleid));
-				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
+				array_unshift(CView::$viewsDir, $this->module_manager->getModuleRootDir($moduleid));
 				$this->module->beforeAction($this->action);
 			}
 			else {
