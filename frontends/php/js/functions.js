@@ -18,17 +18,6 @@
 **/
 
 
-function getIdFromNodeId(id) {
-	if (typeof(id) == 'string') {
-		var reg = /logtr([0-9])/i;
-		id = parseInt(id.replace(reg, '$1'));
-	}
-	if (typeof(id) == 'number') {
-		return id;
-	}
-	return null;
-}
-
 function check_target(e, type) {
 	// If type is expression.
 	if (type == 0) {
@@ -182,45 +171,6 @@ function validateNumericBox(obj, allowempty, allownegative) {
 	if (!allownegative) {
 		if (obj.value < 0) {
 			obj.value = obj.value * -1;
-		}
-	}
-}
-
-/**
- * Validates and formats input element containing a part of date.
- *
- * @param object {obj}       Input element value of which is being validated.
- * @param int {min}          Minimal allowed value (inclusive).
- * @param int {max}          Maximum allowed value (inclusive).
- * @param int {paddingSize}  Number of zeros used for padding.
- */
-function validateDatePartBox(obj, min, max, paddingSize) {
-	if (obj != null) {
-		min = min ? min : 0;
-		max = max ? max : 59;
-		paddingSize = paddingSize ? paddingSize : 2;
-
-		var paddingZeros = [];
-		for (var i = 0; i != paddingSize; i++) {
-			paddingZeros.push('0');
-		}
-		paddingZeros = paddingZeros.join('');
-
-		var currentValue = obj.value.toString();
-
-		if (/^[0-9]+$/.match(currentValue)) {
-			var intValue = parseInt(currentValue, 10);
-
-			if (intValue < min || intValue > max) {
-				obj.value = paddingZeros;
-			}
-			else if (currentValue.length < paddingSize) {
-				var paddedValue = paddingZeros + obj.value;
-				obj.value = paddedValue.substring(paddedValue.length - paddingSize);
-			}
-		}
-		else {
-			obj.value = paddingZeros;
 		}
 	}
 }
