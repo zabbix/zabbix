@@ -657,10 +657,14 @@ else {
 		'limit' => $config['search_limit'] + 1
 	]);
 
-
 	// sorting && paging
 	order_result($data['actions'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['actions'], $sortOrder, new CUrl('actionconf.php'));
+
+	$data['page'] = getRequest('page', 1);
+	$data['pager'] =
+		CPagerHelper::paginateRows($data['page'], $data['actions'], $sortOrder, new CUrl('actionconf.php'));
+
+	CPagerHelper::store('action.list', $data['page']);
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);

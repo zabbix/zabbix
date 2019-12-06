@@ -29,7 +29,8 @@ $actionForm = (new CForm())
 	->setName('action.edit')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
-	->addVar('eventsource', $data['eventsource']);
+	->addVar('eventsource', $data['eventsource'])
+	->addVar('page', CPagerHelper::fetch('action.list'));
 
 if ($data['actionid']) {
 	$actionForm->addVar('actionid', $data['actionid']);
