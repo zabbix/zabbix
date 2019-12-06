@@ -377,7 +377,7 @@ out:
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg, const char *subj,
 		const char *msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACKNOWLEDGE *ack, int macro_type)
+		const DB_ACKNOWLEDGE *ack, int macro_type, const char *error)
 {
 	ZBX_USER_MSG	*p, **pnext;
 	char		*subject, *message;
@@ -385,7 +385,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	subject = zbx_strdup(NULL, subj);
-	message = zbx_strdup(NULL, msg);
+	message = (NULL == error ? zbx_strdup(NULL, msg) :
+			zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\n%s", error, msg));
 
 	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
 			&subject, macro_type, NULL, 0);
@@ -440,11 +441,11 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 }
 
 static void	add_user_messages(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		const char *subject, const char *message, zbx_uint64_t actionid, const DB_EVENT *event,
+		const char *subj, const char *msg, zbx_uint64_t actionid, const DB_EVENT *event,
 		const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, int macro_t, unsigned char evt_src,
-		unsigned char op_mode, const char *error)
+		unsigned char op_mode, const char *err)
 {
-	if (NULL == subject)
+	if (NULL == subj)
 	{
 		DB_RESULT	result;
 		DB_ROW		row;
@@ -458,23 +459,18 @@ static void	add_user_messages(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX
 				"select m.mediatypeid,m.subject,m.message from media_type_message m"
 				" where%s m.eventsource=%d and m.recovery=%d",
 				ZBX_NULL2EMPTY_STR(tmp), evt_src, op_mode);
+		zbx_free(tmp);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			if (NULL == error)
-				tmp = zbx_strdup(tmp, row[2]);
-			else
-				tmp = zbx_dsprintf(tmp, "NOTE: Escalation cancelled: %s\n%s", error, row[2]);
-
 			ZBX_STR2UINT64(mtid, row[0]);
-			add_user_msg(userid, mtid, user_msg, row[1], tmp, actionid, event, r_event, ack, macro_t);
+			add_user_msg(userid, mtid, user_msg, row[1], row[2], actionid, event, r_event, ack, macro_t,
+					err);
 		}
-
-		zbx_free(tmp);
 		DBfree_result(result);
 	}
 	else
-		add_user_msg(userid, mediatypeid, user_msg, subject, message, actionid, event, r_event, ack, macro_t);
+		add_user_msg(userid, mediatypeid, user_msg, subj, msg, actionid, event, r_event, ack, macro_t, err);
 }
 
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
