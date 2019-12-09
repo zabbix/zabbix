@@ -173,12 +173,7 @@ else {
 if ($data['action']['operations']) {
 	$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_OPERATION);
 
-	$default_message = [
-		'subject' => '',
-		'message' => ''
-	];
-
-	$action_operation_hints = getActionOperationHints($data['action']['operations'], $default_message);
+	$action_operation_hints = getActionOperationHints($data['action']['operations']);
 
 	$simple_interval_parser = new CSimpleIntervalParser();
 
@@ -316,12 +311,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	if ($data['action']['recovery_operations']) {
 		$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_RECOVERY_OPERATION);
 
-		$default_message = [
-			'subject' => '',
-			'message' => ''
-		];
-
-		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations'], $default_message);
+		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations']);
 
 		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
@@ -403,12 +393,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	if ($data['action']['ack_operations']) {
 		$operation_descriptions = getActionOperationDescriptions([$data['action']], ACTION_ACKNOWLEDGE_OPERATION);
 
-		$default_message = [
-			'subject' => '',
-			'message' => ''
-		];
-
-		$operation_hints = getActionOperationHints($data['action']['ack_operations'], $default_message);
+		$operation_hints = getActionOperationHints($data['action']['ack_operations']);
 
 		foreach ($data['action']['ack_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION])) {
