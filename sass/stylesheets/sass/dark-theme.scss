@@ -308,13 +308,13 @@ $multiselect-selected-bg-color: #696969;
 .ui-tabs-nav {
 	.ui-tabs-active {
 		.btn-time {
-			&:after {
+			&::after {
 				background-position: -87px -583px;
 			}
 		}
 
 		.filter-trigger {
-			&:after {
+			&::after {
 				background-position: -87px -547px;
 			}
 		}
@@ -346,6 +346,7 @@ $multiselect-selected-bg-color: #696969;
 }
 
 .icon-actions-number-gray {
+
 	&[data-count]::after {
 		color: $font-selected-color;
 	}

@@ -28,7 +28,6 @@ a {
 	&:link {
 		color: $link-color;
 		text-decoration: none;
-		//@include transition(color .2s ease-out);
 		transition: color .2s ease-out;
 	}
 
@@ -214,9 +213,8 @@ pre {
 }
 
 .disabled {
-	//@include opacity(0.35);
-	opacity: .35;
 	cursor: default !important;
+	opacity: .35;
 
 	.disabled,
 	[disabled] {
@@ -266,7 +264,7 @@ pre {
 		&.selected {
 			position: relative;
 
-			&::after{
+			&::after {
 				content:'';
 				position: absolute;
 				bottom: -1px;
@@ -352,19 +350,15 @@ ul.top-nav-icons {
 		font-size: $font-h3-size;
 		text-decoration: none;
 		outline: 0;
-		//@include opacity(0.75);
 		opacity: .75;
-		//@include transition(opacity .2s ease-out);
 		transition: opacity .2s ease-out;
 
 		&:hover {
-			//@include opacity(1);
 			opacity: 1;
 		}
 
 		&:focus {
 			background-color: $ui-hover-color !important;
-			//@include opacity(1);
 			opacity: 1;
 		}
 	}
@@ -409,7 +403,6 @@ ul.top-nav-icons {
 		margin: 6px 3px 0 0;
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
-		//@include opacity(1);
 		opacity: 1;
 
 		@media (max-width: 1050px) {
@@ -422,12 +415,10 @@ ul.top-nav-icons {
 		&:focus {
 			background-color: $form-bg-color;
 			border: 1px solid $form-border-color;
-			//@include opacity(1);
 			opacity: 1;
 		}
 
 		&:focus + .btn-search {
-			//@include opacity(1);
 			opacity: 1;
 		}
 	}
@@ -452,7 +443,6 @@ ul.top-nav-icons {
 		padding: 0 10px;
 
 		&:last-child {
-			//@include box-shadow (25px 0 10px -10px rgba($main-subnav-bg-color, 1));
 			box-shadow: 25px 0 10px -10px $main-subnav-bg-color
 		}
 	}
@@ -522,12 +512,11 @@ ul.top-nav-icons {
 }
 
 %arrow {
-	width: 0;
+	display: inline-block;
 	height: 0;
+	width: 0;
 	font-size: 0;
 	line-height: 0;
-	display: inline-block;
-	//@include transform(scale(.9999));
 }
 
 .header-title,
@@ -583,7 +572,6 @@ ul.top-nav-icons {
 				border-right: 2px solid $font-color;
 				border-bottom: 2px solid $font-color;
 				transform: rotate(45deg);
-				//@include transition(border-color .2s ease-out);
 				transition: border-color .2s ease-out;
 			}
 		}
@@ -621,12 +609,11 @@ ul.top-nav-icons {
 	}
 
 	.dashbrd-edit {
-		position: relative;
-		display: inline-block;
 		background-color: $ui-bg-color;
-		margin-right: 5px;
-		//@include box-shadow(0 0 0 4px $ui-bg-color);
 		box-shadow: 0 0 0 4px $ui-bg-color;
+		display: inline-block;
+		margin-right: 5px;
+		position: relative;
 
 		&::after {
 			content: "";
@@ -689,10 +676,8 @@ article {
 
 	.selected {
 		background-color: $ui-bg-color;
-		//@include box-shadow(inset 0 0 0 1px $ui-border-color);
-		box-shadow: inset 0 0 0 1px $ui-border-color;
-		//@include border-radius(2px);
 		border-radius: 2px;
+		box-shadow: inset 0 0 0 1px $ui-border-color;
 	}
 
 	.arrow-right {
@@ -820,7 +805,6 @@ output {
 	margin: 10px 10px 0 0;
 
 	&:focus {
-		//@include box-shadow(0 0 0 2px rgba($blue, .35));
 		box-shadow: 0 0 0 2px rgba($blue, .35);
 	}
 }
@@ -906,9 +890,8 @@ output {
 					&:not(.row-selected):not(:hover) {
 						td {
 							[class*='icon-'] {
-								//@include border-radius(2px);
-								border-radius: 2px;
 								background-color: $ui-bg-color;
+								border-radius: 2px;
 							}
 
 							[class*='icon-depend-'],
@@ -961,7 +944,7 @@ output {
 			[class*='icon-'] {
 				vertical-align: middle;
 
-				&:after {
+				&::after {
 					margin: 0;
 					line-height: 14px;
 				}
@@ -1141,7 +1124,6 @@ output {
 			margin: -1em;
 			padding: 1em;
 			border: none;
-			//@include transition(background-color .2s ease-out);
 			transition: background-color .2s ease-out;
 
 			&:hover,
@@ -1214,9 +1196,8 @@ output {
 	}
 
 	.vertical_rotation_inner {
-		white-space: nowrap;
-		//@include rotate(270);
 		transform: rotate(270deg);
+		white-space: nowrap;
 	}
 
 	.list-table-footer {
@@ -1282,7 +1263,6 @@ output {
 	text-decoration: none;
 	color: $font-color;
 	outline: 0;
-	//@include transition(background-color .2s ease-out);
 	transition: background-color .2s ease-out;
 
 	&:hover {
@@ -1304,12 +1284,10 @@ output {
 	}
 
 	&:first-of-type {
-		//@include border-radius(2px 0 0 2px);
 		border-radius: 2px 0 0 2px;
 	}
 
 	&:last-of-type {
-		//@include border-radius(0 2px 2px 0);
 		border-radius: 0 2px 2px 0;
 	}
 
@@ -1343,13 +1321,12 @@ output {
 	display: inline-block;
 	background-color: $ui-bg-color;
 	border: 1px solid $form-border-color;
+	border-radius: 2px;
 	cursor: pointer;
 	width: 12px;
 	height: 12px;
 	line-height: 12px;
 	text-align: center;
-	//@include border-radius(2px);
-	border-radius: 2px;
 
 	&:link {
 		color: $font-color;
@@ -1496,11 +1473,10 @@ output {
 
 	&::after {
 		@extend %timeline-dot;
-		top: 11px;
-		border: 2px solid $ui-bg-color;
 		background-color: $btn-bg-color;
-		//@include border-radius(100%);
+		border: 2px solid $ui-bg-color;
 		border-radius: 100%;
+		top: 11px;
 	}
 }
 
@@ -1508,11 +1484,10 @@ output {
 
 	&::after {
 		@extend %timeline-dot;
-		top: 10px;
-		border: 2px solid $btn-bg-color;
 		background-color: $ui-bg-color;
-		//@include border-radius(100%);
+		border: 2px solid $btn-bg-color;
 		border-radius: 100%;
+		top: 10px;
 	}
 }
 
@@ -1533,7 +1508,6 @@ output {
 	width: 4px;
 	height: 4px;
 	right: -5px;
-	//@include border-radius(100%);
 	border-radius: 100%;
 }
 
@@ -1595,10 +1569,9 @@ output {
 
 .subfilter-enabled {
 	background-color: $ui-bg-selected-color;
+	border-radius: 2px;
 	color: $font-selected-color;
 	padding: 0 4px;
-	//@include border-radius(2px);
-	border-radius: 2px;
 
 	.link-action {
 		color: $font-selected-color;
@@ -1768,9 +1741,8 @@ output {
 	}
 
 	.disabled {
-		//@include opacity(1);
-		opacity: 1;
 		background-color: $multiselect-disabled-bg-color;
+		opacity: 1;
 
 		.subfilter-enabled,
 		.subfilter-disable-btn {
@@ -1810,7 +1782,6 @@ output {
 		cursor: pointer;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		//@include transition(background-color .2s ease-out);
 		transition: background-color .2s ease-out;
 
 		&.suggest-hover {
@@ -1832,7 +1803,6 @@ output {
 	border: 1px solid $action-border-color;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
-	//@include box-shadow(0 6px 10px 0 $action-shadow-color);
 	box-shadow: 0 6px 10px 0 $action-shadow-color;
 }
 
@@ -1995,12 +1965,11 @@ output {
 }
 
 .table-forms-separator {
+	border: 1px solid $table-border-color;
+	box-sizing: border-box;
 	display: inline-block;
 	padding: 5px;
 	position: relative;
-	border: 1px solid $table-border-color;
-	//@include box-sizing(border-box);
-	box-sizing: border-box;
 }
 
 .drag-drop-area {
@@ -2014,10 +1983,9 @@ output {
 
 .form-new-group {
 	border: 5px solid $lighter-green;
-	padding: 4px 0;
-	margin-left: -5px;
-	//@include border-radius(2px);
 	border-radius: 2px;
+	margin-left: -5px;
+	padding: 4px 0;
 }
 
 .list-check-radio {
@@ -2077,43 +2045,36 @@ output {
 		margin: 0 -1px 0 0;
 
 		&:first-child{
-			//@include border-radius(3px 0 0 3px);
 			border-radius: 3px 0 0 3px;
 
 			label {
-				//@include border-radius(2px 0 0 2px);
 				border-radius: 2px 0 0 2px;
 			}
 		}
 
 		&:last-child {
-			//@include border-radius(0 3px 3px 0);
 			border-radius: 0 3px 3px 0;
 
 			label {
-				//@include border-radius(0 2px 2px 0);
 				border-radius: 0 2px 2px 0;
 			}
 		}
 
 		&:only-child {
-			//@include border-radius(3px);
 			border-radius: 3px;
 
 			label {
-				//@include border-radius(2px);
 				border-radius: 2px;
 			}
 		}
 	}
 
 	label {
-		padding: 4px 11px;
-		border: 1px solid $form-border-color;
-		//@include transition(background-color .2s ease-out);
-		transition: background-color .2s ease-out;
-		line-height: 1.2em;
 		display: inline-block;
+		border: 1px solid $form-border-color;
+		line-height: 1.2em;
+		padding: 4px 11px;
+		transition: background-color .2s ease-out;
 	}
 
 	input[type="radio"] {
@@ -2121,7 +2082,6 @@ output {
 		top: auto !important;
 		width: 1px !important;
 		height: 1px !important;
-		//@include opacity(0);
 		opacity: 0;
 
 		+ label {
@@ -2155,7 +2115,6 @@ output {
 		}
 
 		&:checked:focus + label {
-			//@include box-shadow(0 0 0 2px rgba($blue, .35));
 			box-shadow: 0 0 0 2px rgba($blue, .35);
 			position: relative;
 			z-index: 2;
@@ -2163,12 +2122,10 @@ output {
 
 		&:checked[disabled] + label {
 			background-color: lighten($ui-bg-selected-color, 33%) !important;
-			//@include transition(none);
 			transition: none;
 		}
 
 		&[disabled] + label {
-			//@include transition(none);
 			transition: none;
 			@extend %form-disabled;
 		}
@@ -2177,7 +2134,7 @@ output {
 
 label {
 	&.form-label-asterisk {
-		&:before {
+		&::before {
 			color: $form-label-asterisk-color;
 			display: inline-block;
 			content: '*';
@@ -2329,11 +2286,11 @@ select {
 .checkbox-radio {
 
 	&:checked[readonly] + label span {
+		transition: none;
+
 		&::after {
 			border-color: $form-border-color !important;
 		}
-		//@include transition(none);
-		transition: none;
 	}
 
 	&[readonly] {
@@ -2343,18 +2300,18 @@ select {
 	}
 
 	&[readonly] + label span {
-		//@include transition(none);
 		transition: none;
 		@extend %form-disabled;
 	}
 
 	&[type="checkbox"] {
+
 		+ label span {
-			//@include border-radius(2px);
 			border-radius: 2px;
 		}
 
 		&:checked + label span {
+
 			&::after {
 				content:'';
 				position: absolute;
@@ -2365,12 +2322,12 @@ select {
 				left: 7px;
 				border-left: 2px solid $btn-bg-color;
 				border-bottom: 2px solid $btn-bg-color;
-				//@include transform(translate(-50%, -50%) rotate(-45deg));
 				transform: translate(-50%, -50%) rotate(-45deg);
 			}
 		}
 
 		&:checked[disabled] + label span {
+
 			&::after {
 				border-color: $form-border-color !important;
 			}
@@ -2378,12 +2335,13 @@ select {
 	}
 
 	&[type="radio"] {
+
 		+ label span {
-			//@include border-radius(50%);
 			border-radius: 50%;
 		}
 
 		&:checked + label span {
+
 			&::after {
 				content: '';
 				position: absolute;
@@ -2393,12 +2351,12 @@ select {
 				top: 3px;
 				left: 3px;
 				background-color: $btn-bg-color;
-				//@include border-radius(50%);
 				border-radius: 50%;
 			}
 		}
 
 		&:checked[disabled] + label span {
+
 			&::after {
 				background-color: $form-border-color !important;
 			}
@@ -2409,9 +2367,8 @@ select {
 	top: auto !important;
 	width: 16px !important;
 	height: 16px !important;
-	z-index: 1;
-	//@include opacity(0);
 	opacity: 0;
+	z-index: 1;
 
 	+ label span {
 		position: relative;
@@ -2442,15 +2399,14 @@ select {
 	}
 
 	&:checked[disabled] + label span {
+		transition: none;
+
 		&::after {
 			border-color: $form-border-color !important;
 		}
-		//@include transition(none);
-		transition: none;
 	}
 
 	&[disabled] + label span {
-		//@include transition(none);
 		transition: none;
 		@extend %form-disabled;
 	}
@@ -2476,13 +2432,11 @@ select {
 }
 
 %form-input-style {
-	border: 1px solid $form-border-color;
-	color: $font-color;
 	background-color: $form-bg-color;
-	outline: 0;
-	//@include box-sizing(border-box);
+	border: 1px solid $form-border-color;
 	box-sizing: border-box;
-	//@include transition(border-color .2s ease-out);
+	color: $font-color;
+	outline: 0;
 	transition: border-color .2s ease-out;
 
 	&:focus {
@@ -2501,17 +2455,15 @@ button {
 		family: $font-stack;
 		size: $font-form-size;
 	}
-	color: $btn-font-color;
 	background-color: $btn-bg-color;
 	border: 1px solid $btn-bg-color;
+	border-radius: 2px;
+	color: $btn-font-color;
 	margin: 0;
 	padding: 0 11px;
 	min-height: 24px;
 	cursor: pointer;
 	outline: 0;
-	//@include border-radius(2px);
-	border-radius: 2px;
-	//@include transition(border-color, background-color .2s ease-out);
 	transition: border-color, background-color .2s ease-out;
 
 	&:hover {
@@ -2519,7 +2471,6 @@ button {
 	}
 
 	&:focus {
-		//@include box-shadow(0 0 0 2px rgba($blue, .35));
 		box-shadow: 0 0 0 2px rgba($blue, .35);
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
@@ -2608,13 +2559,12 @@ button {
 	position: relative;
 	background-color: $transparent;
 	border: none;
+	border-bottom: 1px dotted $link-color;
+	border-radius: 0;
 	color: $link-color;
 	font-size: inherit;
-	border-bottom: 1px dotted $link-color;
 	padding: 0;
 	min-height: inherit;
-	//@include border-radius(0);
-	border-radius: 0;
 
 	&:hover {
 		@extend .btn-link;
@@ -2653,19 +2603,11 @@ button {
 	min-height: 22px;
 	height: 22px;
 	padding: 0;
-	//@include opacity(0.75);
 	opacity: .75;
-	//@include transition(opacity .2s ease-out);
 	transition: opacity .2s ease-out;
 
-	&:hover {
-		@extend %btn-search-hover-focus;
-	}
-
-	&:active {
-		@extend %btn-search-hover-focus;
-	}
-
+	&:hover,
+	&:active,
 	&:focus {
 		@extend %btn-search-hover-focus;
 	}
@@ -2675,7 +2617,6 @@ button {
 
 		&:hover {
 			background-color: $transparent;
-			//@include opacity(0.75);
 			opacity: .75;
 		}
 	}
@@ -2722,10 +2663,11 @@ $icon-widget-btn: (
 }
 
 // TIME SELECTION
+
 .ui-tabs-nav {
+
 	.btn-time,
 	.filter-trigger {
-		//@include border-radius(2px);
 		border-radius: 2px;
 		color: $btn-font-color;
 		background-color: $btn-bg-color;
@@ -2735,8 +2677,8 @@ $icon-widget-btn: (
 		min-height: 24px;
 		vertical-align: bottom;
 
-		&:after {
-			content: "";
+		&::after {
+			content: '';
 			position: absolute;
 		}
 
@@ -2750,7 +2692,7 @@ $icon-widget-btn: (
 	.btn-time {
 		padding: 0 34px 0 10px;
 
-		&:after {
+		&::after {
 			margin: 0 5px;
 			right: 0;
 			top: 0;
@@ -2763,7 +2705,7 @@ $icon-widget-btn: (
 	.filter-trigger {
 		padding: 0 34px 0 10px;
 
-		&:after {
+		&::after {
 			margin: 0 5px;
 			right: 0;
 			top: 0;
@@ -2774,36 +2716,36 @@ $icon-widget-btn: (
 	}
 
 	.ui-state-focus {
+
 		.btn-time,
 		.filter-trigger {
-			//@include box-shadow(0 0 0 2px rgba($blue, .35));
 			box-shadow: 0 0 0 2px rgba($blue, .35);
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
 	.ui-tabs-active {
+
 		.btn-time,
 		.filter-trigger {
 			color: $font-color;
 			background-color: $ui-bg-color;
 			border: 1px solid $ui-border-color;
 			border-bottom: none;
+			border-radius: 2px 2px 0 0;
 			margin: -1px 0 0 6px;
 			padding: 1px 34px 7px 10px;
-			//@include border-radius(2px 2px 0 0);
-			border-radius: 2px 2px 0 0;
 		}
 
 		.btn-time {
-			&:after {
+			&::after {
 				background-position: -246px -583px;
 				top: 1px;
 			}
 		}
 
 		.filter-trigger {
-			&:after {
+			&::after {
 				background-position: -246px -547px;
 			}
 		}
@@ -2819,10 +2761,11 @@ $icon-widget-btn: (
 	}
 
 	.ui-state-focus {
+
 		&.ui-tabs-active {
+
 			.btn-time,
 			.filter-trigger {
-				//@include box-shadow(0 0 0 2px rgba($blue, .35));
 				box-shadow: 0 0 0 2px rgba($blue, .35);
 			}
 		}
@@ -2946,26 +2889,22 @@ $icon-widget-btn: (
 			&:hover,
 			&:focus,
 			&.selected {
-				//@include border-radius(2px);
 				border-radius: 2px;
 				border-bottom: 0;
 			}
 
 			&:hover {
 				background: $action-hover-color;
-				//@include transition(background-color .2s ease-out);
 				transition: background-color .2s ease-out;
 			}
 
 			&:focus {
-				//@include box-shadow(0 0 0 2px rgba($blue, .35));
 				box-shadow: 0 0 0 2px rgba($blue, .35);
 			}
 
 			&.selected {
 				background: $ui-bg-selected-color;
 				color: $white;
-				//@include transition(background-color .2s ease-out);
 				transition: background-color .2s ease-out;
 			}
 		}
@@ -3032,19 +2971,15 @@ $icon-widget-btn: (
 }
 
 .btn-dashbrd-normal {
-	//@include box-shadow(1px 1px 2px $action-shadow-color);
 	box-shadow: 1px 1px 2px $action-shadow-color;
-	//@include opacity(1);
-	opacity: 1;
 	position: fixed;
 	right: 45px;
 	top: 5px;
+	opacity: 1;
 	z-index: 1010;
-	//@include transition(opacity 1s);
 	transition: opacity 1s;
 
 	&.hidden {
-		//@include opacity(0);
 		opacity: 0;
 	}
 }
@@ -3067,9 +3002,7 @@ $icon-widget-btn: (
 	min-height: 0;
 	padding: 0;
 	-webkit-transform-style: preserve-3d;
-	//@include opacity(0.5);
 	opacity: .5;
-	//@include transition(opacity .2s ease-out);
 	transition: opacity .2s ease-out;
 
 	&:hover {
@@ -3117,13 +3050,11 @@ $icon-widget-btn: (
 
 %btn-search-hover-focus {
 	background-color: $transparent;
-	//@include opacity(1);
 	opacity: 1;
 }
 
 %btn-widget-hover-active {
 	background-color: $transparent;
-	//@include opacity(1);
 	opacity: 1;
 }
 
@@ -3164,17 +3095,10 @@ button[disabled] {
 		a {
 			border: none;
 			padding: 8px 10px;
-			//@include transition(background-color .2s ease-out);
 			transition: background-color .2s ease-out;
 
-			&:hover {
-				background-color: $ui-hover-color;
-			}
-
-			&:focus {
-				background-color: $ui-hover-color;
-			}
-
+			&:hover,
+			&:focus,
 			&:active {
 				background-color: $ui-hover-color;
 			}
@@ -3270,28 +3194,15 @@ $form-icon-btn: (
 
 %form-icon-btn {
 	border: none;
-	position: absolute;
 	cursor: pointer;
+	position: absolute;
 	@extend %button-icon-size;
-	//@include opacity(0.75);
 	opacity: .75;
-	//@include transition(opacity .2s ease-out);
 	transition: opacity .2s ease-out;
 
-	&:hover {
-		//@include opacity(1);
-		opacity: 1;
-		background-color: $transparent;
-	}
-
-	&:focus {
-		//@include opacity(1);
-		opacity: 1;
-		background-color: $transparent;
-	}
-
+	&:hover,
+	&:focus,
 	&:active {
-		//@include opacity(1);
 		opacity: 1;
 		background-color: $transparent;
 	}
@@ -3568,19 +3479,17 @@ $form-icon-btn: (
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,
 	.dashbrd-grid-widget-set-size {
-		//@include box-shadow(2px 2px 6px $action-shadow-color);
-		box-shadow: 2px 2px 6px $action-shadow-color;
-		border: 1px dashed $form-border-color;
 		background-color: rgba($ui-bg-color, .7);
+		border: 1px dashed $form-border-color;
+		box-shadow: 2px 2px 6px $action-shadow-color;
 		flex: 1;
 		position: relative;
 		overflow: hidden;
 	}
 
 	.dashbrd-grid-widget-set-size {
-		//@include box-shadow(inset 2px 2px 6px $action-shadow-color);
-		box-shadow: inset 2px 2px 6px $action-shadow-color;
 		background: darken($body-bg-color, 6%);
+		box-shadow: inset 2px 2px 6px $action-shadow-color;
 	}
 
 	.dashbrd-grid-new-widget-label {
@@ -3607,7 +3516,6 @@ $form-icon-btn: (
 	}
 
 	&.disabled {
-		//@include opacity(1);
 		opacity: 1;
 
 		.dashbrd-grid-widget-new-box {
@@ -3689,9 +3597,7 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-actions {
-	//@include opacity(0);
 	opacity: 0;
-	//@include transition(opacity .2s ease-out);
 	transition: opacity .2s ease-out;
 }
 
@@ -3774,13 +3680,14 @@ $form-icon-btn: (
 	}
 
 	&.dashbrd-grid-widget-focus {
+
 		.dashbrd-grid-widget-actions {
-			//@include opacity(1);
 			opacity: 1;
 		}
 	}
 
 	&.ui-resizable-resizing.resizing-top {
+
 		.dashbrd-grid-widget-container {
 			top: auto;
 			bottom: 0;
@@ -3788,6 +3695,7 @@ $form-icon-btn: (
 	}
 
 	&.ui-resizable-resizing.resizing-left {
+
 		.dashbrd-grid-widget-container {
 			left: auto;
 			right: 0;
@@ -4013,7 +3921,6 @@ $form-icon-btn: (
 
 .dashbrd-grid-container.dashbrd-mode-edit {
 	.dashbrd-grid-widget-actions {
-		//@include opacity(1);
 		opacity: 1;
 	}
 
@@ -4307,7 +4214,6 @@ $form-icon-btn: (
 	.ui-resize-dot {
 		left: 0;
 		top: 50%;
-		//@include transform(translateY(-50%));
 		transform: translateY(-50%);
 	}
 }
@@ -4353,7 +4259,6 @@ $form-icon-btn: (
 	.ui-resize-dot {
 		right: 0;
 		top: 50%;
-		//@include transform(translateY(-50%));
 		transform: translateY(-50%);
 	}
 }
@@ -4403,7 +4308,6 @@ $form-icon-btn: (
 	position: absolute;
 	background-color: $ui-bg-color;
 	border: 1px solid $form-border-focus-color;
-	//@include border-radius(100%);
 	border-radius: 100%;
 }
 
@@ -4421,7 +4325,6 @@ $form-icon-btn: (
 .dashbrd-widget-draggable {
 	border-color: $action-border-color !important;
 	border-bottom-color: darken($action-border-color, 1%) !important;
-	//@include box-shadow(0 4px 20px 0 $action-shadow-color);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 }
 
@@ -4468,9 +4371,8 @@ $form-icon-btn: (
 }
 
 %nothing-to-show {
-	text-align: center;
 	color: $font-alt-color;
-	//@include transition(0s);
+	text-align: center;
 	transition: 0s;
 
 	td:hover {
@@ -4544,7 +4446,6 @@ $form-icon-btn: (
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
-	//@include box-shadow(0 4px 20px 0 $action-shadow-color);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 	&:focus {
@@ -4573,7 +4474,6 @@ $form-icon-btn: (
 		margin: 0 -15px 0 -25px;
 		position: relative;
 		@extend %overflow-ellipsis;
-		//@include transition(background-color .2s ease-out);
 		transition: background-color .2s ease-out;
 
 		&:hover,
@@ -4646,7 +4546,6 @@ $form-icon-btn: (
 	background-color: $form-bg-color;
 	border: 1px solid $action-border-color;
 	border-top: none;
-	//@include box-shadow(0 6px 10px 0 $action-shadow-color);
 	box-shadow: 0 6px 10px 0 $action-shadow-color;
 
 	li {
@@ -4657,7 +4556,6 @@ $form-icon-btn: (
 		padding: 0.4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
-		//@include transition(background-color .2s ease-out);
 		transition: background-color .2s ease-out;
 
 		&.suggest-hover {
@@ -4674,7 +4572,6 @@ $form-icon-btn: (
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
-	//@include box-shadow(0 4px 20px 0 $action-shadow-color);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 	&.modal {
@@ -4840,7 +4737,7 @@ $form-icon-btn: (
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
 
-		&:after {
+		&::after {
 			background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
 			content: '';
 			position: absolute;
@@ -4873,7 +4770,7 @@ $form-icon-btn: (
 			cursor: default;
 		}
 
-		button:after {
+		button::after {
 			opacity: .5;
 		}
 	}
@@ -5043,7 +4940,6 @@ $form-icon-btn: (
 	z-index: 1000;
 	top: 0;
 	left: 0;
-	//@include opacity(0.35);
 	opacity: .35;
 }
 
@@ -5074,7 +4970,6 @@ $form-icon-btn: (
 			text-align: center;
 
 			td {
-				//@include transition(background-color .2s ease-out);
 				transition: background-color .2s ease-out;
 
 				&.selected {
@@ -5213,7 +5108,6 @@ $form-icon-btn: (
 	height: 14px;
 	float: left;
 	margin: 2px 0 0 -19px;
-	//@include border-radius(2px);
 	border-radius: 2px;
 
 	.notif-indic-snooze {
@@ -5400,7 +5294,7 @@ $form-icon-btn: (
 		border: 0 none transparent;
 	}
 
-	div:before {
+	div::before {
 		content: ' ';
 		display: inline-block;
 		margin-right: 4px;
@@ -5498,7 +5392,6 @@ $form-icon-btn: (
 	padding: 4px 11px;
 	border: 1px solid $ui-border-color;
 	background-color: rgba($body-bg-color, .8);
-	//@include border-radius(2px);
 	border-radius: 2px;
 }
 
@@ -5719,21 +5612,17 @@ a.link-action {
 	}
 
 	span {
-		//@include border-radius(0);
 		border-radius: 0;
 
 		&:only-child {
-			//@include border-radius(2px)
 			border-radius: 2px;
 		}
 
 		&:first-of-type:not(:only-child) {
-			//@include border-radius(2px 0 0 2px);
 			border-radius: 2px 0 0 2px;
 		}
 
 		&:last-of-type:not(:only-child) {
-			//@include border-radius(0 2px 2px 0);
 			border-radius: 0 2px 2px 0;
 		}
 	}
@@ -5795,7 +5684,6 @@ a.link-action {
 	max-width: 133px;
 	vertical-align: middle;
 	@extend %overflow-ellipsis;
-	//@include border-radius(2px);
 	border-radius: 2px;
 
 	&:last-child {
@@ -5811,7 +5699,6 @@ a.link-action {
 	min-width: .7em;
 	line-height: 1em;
 	display: inline-block;
-	//@include border-radius(2px);
 	border-radius: 2px;
 
 	&:not(:last-of-type) {
@@ -5955,7 +5842,6 @@ td.inactive-bg {
 	text-align: left;
 	vertical-align: middle;
 	position: relative;
-	//@include border-radius(2px);
 	border-radius: 2px;
 
 	.overlay-close-btn {
@@ -5980,7 +5866,7 @@ td.inactive-bg {
 		background-color: $white;
 	}
 
-	&:before {
+	&::before {
 		content: "";
 		width: 61px;
 		position: absolute;
@@ -5989,7 +5875,7 @@ td.inactive-bg {
 		bottom: 0;
 	}
 
-	&:after {
+	&::after {
 		content: "";
 		background: url(../img/icon-sprite.svg) no-repeat;
 		margin-top: 2px;
@@ -6026,11 +5912,11 @@ td.inactive-bg {
 		border-color: $msg-bad-border-color;
 	}
 
-	&:before {
+	&::before {
 		background-color: $msg-bad-border-color;
 	}
 
-	&:after {
+	&::after {
 		background-position: -122px -325px;
 	}
 }
@@ -6059,11 +5945,11 @@ td.inactive-bg {
 		border-color: $msg-good-border-color;
 	}
 
-	&:before {
+	&::before {
 		background-color: $msg-good-border-color;
 	}
 
-	&:after {
+	&::after {
 		background-position: -122px -244px;
 	}
 }
@@ -6092,11 +5978,11 @@ td.inactive-bg {
 		border-color: $msg-warning-border-color;
 	}
 
-	&:before {
+	&::before {
 		background-color: $msg-warning-border-color;
 	}
 
-	&:after {
+	&::after {
 		background-position: -122px -325px;
 	}
 }
@@ -6206,34 +6092,19 @@ td.inactive-bg {
 	font-weight: bold;
 	text-decoration: none;
 	cursor: pointer;
-	//@include opacity(0.5);
 	opacity: .5;
-	//@include transition(opacity .2s ease-out);
 	transition: opacity .2s ease-out;
 
 	&::before {
 		content:"\00d7";
 	}
 
-	&:hover {
-		//@include opacity(1);
-		opacity: 1;
-		text-decoration: none;
-		color: $font-alt-color;
-	}
-
-	&:focus {
-		//@include opacity(1);
-		opacity: 1;
-		text-decoration: none;
-		color: $font-alt-color;
-	}
-
+	&:hover,
+	&:focus,
 	&:active {
-		//@include opacity(1);
-		opacity: 1;
-		text-decoration: none;
 		color: $font-alt-color;
+		text-decoration: none;
+		opacity: 1;
 	}
 }
 
@@ -6245,11 +6116,10 @@ td.inactive-bg {
 	border: none;
 	background-color: $transparent !important;
 	@extend %close-icon;
-	//@include border-radius(2px);
 	border-radius: 2px;
 
 	&:focus {
-	box-shadow: none;
+		box-shadow: none;
 	}
 }
 
@@ -6262,7 +6132,6 @@ td.inactive-bg {
 	border: none;
 	background-color: $transparent !important;
 	@extend %close-icon;
-	//@include border-radius(2px);
 	border-radius: 2px;
 }
 
@@ -6277,19 +6146,14 @@ a.overlay-close-btn {
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
-	//@include border-radius(2px);
 	border-radius: 2px;
-	//@include opacity(1);
 	opacity: 1;
 
 	&:hover {
 		color: darken($font-selected-color, 5%);
 	}
 
-	&:focus {
-		color: darken($font-selected-color, 10%);
-	}
-
+	&:focus,
 	&:active {
 		color: darken($font-selected-color, 10%);
 	}
@@ -6308,16 +6172,14 @@ a.overlay-close-btn {
 		border: 1px solid $ui-bg-color;
 
 		&:hover {
-			cursor: pointer;
-			//@include box-shadow(inset 0 0 0 1px $ui-bg-color);
-			box-shadow: inset 0 0 0 1px $ui-bg-color;
 			border-color: $alt-dark-blue;
+			box-shadow: inset 0 0 0 1px $ui-bg-color;
+			cursor: pointer;
 		}
 
 		&:active {
-			cursor: pointer;
-			//@include box-shadow(inset 0 0 0 2px $ui-bg-color);
 			box-shadow: inset 0 0 0 2px $ui-bg-color;
+			cursor: pointer;
 		}
 	}
 }
@@ -6359,14 +6221,13 @@ a.overlay-close-btn {
 // Preloader
 
 @keyframes is-loading-kf {
-	//to { @include rotate(360); }
 	to { transform: rotate(360deg); }
 }
 
 .is-loading {
 	pointer-events: none;
 
-	&:before {
+	&::before {
 		background-color: rgba($ui-bg-color, .8);
 		content: 'loading'; // For screen-reader
 		text-indent: 200%;  // For screen-reader, for IE 200% instead of 100%
@@ -6379,12 +6240,12 @@ a.overlay-close-btn {
 		z-index: 1;
 	}
 
-	&:after {
-		//@include border-radius(50%);
-		border-radius: 50%;
-		//@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
-		box-shadow: 0 0 0 7px rgba($ui-bg-color, .8);
+	&::after {
 		background-color: rgba($ui-bg-color, .8);
+		border: 2px solid $preloader-color;
+		border-bottom-color: $preloader-accent-color;
+		border-radius: 50%;
+		box-shadow: 0 0 0 7px rgba($ui-bg-color, .8);
 		width: 20px;
 		height: 20px;
 		position: absolute;
@@ -6393,8 +6254,6 @@ a.overlay-close-btn {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		border: 2px solid $preloader-color;
-		border-bottom-color: $preloader-accent-color;
 		animation: is-loading-kf 0.6s infinite linear;
 		z-index: 1;
 		content: '';
@@ -6402,20 +6261,20 @@ a.overlay-close-btn {
 
 	&.is-loading-fadein {
 
-		&:before {
+		&::before {
 			opacity: 0;
 			animation: fadein 2s ease-in 0.5s normal forwards;
 		}
 
-		&:after {
+		&::after {
 			opacity: 0;
 			animation: fadein 2s ease-in 0.5s normal forwards, is-loading-kf 0.6s infinite linear;
 		}
 
 		.delayed-15s {
 
-			&:before,
-			&:after {
+			&::before,
+			&::after {
 				animation-delay: 15s;
 			}
 		}
@@ -6427,11 +6286,11 @@ button {
 	&.is-loading {
 		position: relative;
 
-		&:before {
+		&::before {
 			background: none;
 		}
 
-		&:after {
+		&::after {
 			box-shadow: none;
 			background: none;
 			border: 1px solid $preloader-disabled-color;
@@ -6445,7 +6304,7 @@ button {
 .dashbrd-grid-widget-content,
 .dashbrd-grid-iterator-content {
 
-	&.is-loading:before {
+	&.is-loading::before {
 		margin: calc(.25rem + 1px);
 	}
 }
@@ -6459,10 +6318,9 @@ button {
 }
 
 .menu-popup-preloader {
-	//@include box-shadow (0 4px 20px 0 $action-shadow-color);
-	box-shadow: 0 4px 20px 0 $action-shadow-color;
 	background: $preloader-bg-color;
 	border: 1px solid $action-border-color;
+	box-shadow: 0 4px 20px 0 $action-shadow-color;
 	height: 128px;
 	width: 128px;
 	position: fixed;
@@ -6470,7 +6328,7 @@ button {
 	bottom: auto;
 	z-index: 1010;
 
-	&:before {
+	&::before {
 		background: $preloader-bg-color;
 	}
 }
@@ -6972,7 +6830,7 @@ svg {
 		top: 5px;
 	}
 
-	.list-numbered-item:before {
+	.list-numbered-item::before {
 		content: counter(line) ":";
 		flex: 0 0 15px;
 		max-width: 15px;

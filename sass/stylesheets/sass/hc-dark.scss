@@ -453,16 +453,16 @@ ul.top-nav-icons {
 // COLORS AND GENERAL
 
 button {
+
 	&:focus {
-		//@include box-shadow(0 0 0 2px rgba($blue, 1));
+		background-color: darken($btn-bg-color, 10%);
 		box-shadow: 0 0 0 2px $blue;
-		background-color: darken($btn-bg-color, 10%)
 	}
 }
 
 .btn-alt {
+
 	&:focus {
-		//@include box-shadow(0 0 0 2px rgba($blue, 1));
 		box-shadow: 0 0 0 2px $blue;
 	}
 }
@@ -476,8 +476,8 @@ button {
 	.na-bg,
 	.warning-bg {
 
-		&:before,
-		&:after {
+		&::before,
+		&::after {
 			display: none;
 		}
 	}
@@ -495,9 +495,8 @@ button {
 			}
 
 			&:focus + label {
-				//@include box-shadow(0 0 0 2px rgba($blue, 1) !important);
-				box-shadow: 0 0 0 2px $blue !important;
 				background-color: darken($btn-bg-color, 10%) !important;
+				box-shadow: 0 0 0 2px $blue !important;
 				color: $white;
 			}
 
@@ -574,11 +573,9 @@ a.link-action {
 .top-nav {
 	a {
 		&:focus {
-			color: $link-main-nav-active-color;
 			background-color: lighten($ui-hover-color, 10%) !important;
-			//@include box-shadow(0 0 0 2px $blue);
 			box-shadow: 0 0 0 2px $blue;
-			//@include transition(box-shadow .2s ease-out);
+			color: $link-main-nav-active-color;
 			transition: box-shadow .2s ease-out;
 		}
 	}
@@ -599,11 +596,8 @@ ul.top-nav-icons {
 	a {
 		&:focus {
 			background-color: lighten($ui-hover-color, 10%) !important;
-			//@include opacity(1);
-			opacity: 1;
-			//@include box-shadow(0 0 0 2px $blue);
 			box-shadow: 0 0 0 2px $blue;
-			//@include transition(box-shadow .2s ease-out);
+			opacity: 1;
 			transition: box-shadow .2s ease-out;
 		}
 	}
@@ -665,7 +659,6 @@ ul.top-nav-icons {
 }
 
 .disabled {
-	//@include opacity(0.6);
 	opacity: .6;
 }
 
@@ -678,7 +671,6 @@ ul.top-nav-icons {
 			.subfilter-enabled,
 			.subfilter-disable-btn,
 			.subfilter-disable-btn:active {
-				//@include box-shadow(0 0 0 1px rgba($blue, 1));
 				box-shadow: 0 0 0 1px $blue;
 			}
 		}
@@ -686,40 +678,38 @@ ul.top-nav-icons {
 }
 
 .header-logo {
+
 	&:focus {
-		//@include box-shadow(0 0 0 2px $blue);
 		box-shadow: 0 0 0 2px $blue;
-		//@include transition(box-shadow .2s ease-out);
 		transition: box-shadow .2s ease-out;
 	}
 }
 
 .checkbox-radio {
+
 	&:focus + label span {
-		//@include box-shadow(0 0 0 1px $blue);
 		box-shadow: 0 0 0 1px $blue;
-		//@include transition(box-shadow .2s ease-out);
 		transition: box-shadow .2s ease-out;
 	}
 }
 
 %form-input-style {
+
 	&:focus {
-		//@include box-shadow(0 0 0 1px $blue);
 		box-shadow: 0 0 0 1px $blue;
-		//@include transition(box-shadow .2s ease-out);
 		transition: box-shadow .2s ease-out;
 	}
 }
 
 .multiselect {
+
 	&.active {
-		//@include box-shadow(0 0 0 1px $blue);
 		box-shadow: 0 0 0 1px $blue;
-		//@include transition(box-shadow .2s ease-out);
 		transition: box-shadow .2s ease-out;
 	}
-	input[type="text"]{
+
+	input[type="text"] {
+
 		&:focus {
 			box-shadow: none;
 		}
@@ -752,7 +742,7 @@ ul.top-nav-icons {
 
 	&:focus {
 
-		&:after {
+		&::after {
 			background: $blue;
 			height: 3px;
 			bottom: -3px;
@@ -772,14 +762,14 @@ ul.top-nav-icons {
 		}
 
 		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
-			&:before {
+			&::before {
 				min-height: 20px;
 				box-shadow: inset 0 -1px 0 0 $table-border-color;
 			}
 		}
 
 		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
-			&:after {
+			&::after {
 				top: 1px;
 				transform: scale(0.8);
 			}
@@ -822,7 +812,7 @@ ul.top-nav-icons {
 .log-disaster-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 
-	&:before {
+	&::before {
 		content: "";
 		position: absolute;
 		top: 0;
@@ -832,7 +822,7 @@ ul.top-nav-icons {
 		width: 34px;
 	}
 
-	&:after {
+	&::after {
 		background: url(../img/icon-sprite.svg) no-repeat;
 		content: "";
 		position: absolute;
@@ -843,31 +833,31 @@ ul.top-nav-icons {
 	}
 }
 
-.na-bg:after, .log-na-bg:after {
+.na-bg::after, .log-na-bg::after {
 	background-position: -106px -443px;
 }
 
-.normal-bg:after {
+.normal-bg::after {
 	background-position: -76px -443px;
 }
 
-.info-bg:after, .log-info-bg:after {
+.info-bg::after, .log-info-bg::after {
 	background-position: -136px -443px;
 }
 
-.average-bg:after {
+.average-bg::after {
 	background-position: -196px -442px;
 }
 
-.warning-bg:after, .log-warning-bg:after {
+.warning-bg::after, .log-warning-bg::after {
 	background-position: -166px -443px;
 }
 
-.high-bg:after, .log-high-bg:after {
+.high-bg::after, .log-high-bg::after {
 	background-position: -226px -443px;
 }
 
-.disaster-bg:after, .log-disaster-bg:after {
+.disaster-bg::after, .log-disaster-bg::after {
 	background-position: -256px -443px;
 }
 
@@ -875,7 +865,7 @@ ul.top-nav-icons {
 .log-na-bg,
 .normal-bg {
 
-	&:before {
+	&::before {
 		background-color: $alt-green;
 	}
 }
@@ -888,7 +878,7 @@ ul.top-nav-icons {
 .high-bg,
 .disaster-bg {
 
-	&.blink-hidden:after {
+	&.blink-hidden::after {
 		content: none;
 	}
 
@@ -904,7 +894,7 @@ ul.top-nav-icons {
 	high-bg: $alt-dark-orange,
 	disaster-bg: $alt-red
 ) {
-	.log-#{$class}:before {
+	.log-#{$class}::before {
 		color: darken($color, 45%) !important;
 		background-color: $color !important;
 	}
@@ -962,7 +952,7 @@ td.inactive-bg {
 	padding-left: 42px;
 }
 
-.inactive-bg:before {
+.inactive-bg::before {
 	content: "";
 	width: 34px;
 	position: absolute;
@@ -973,7 +963,7 @@ td.inactive-bg {
 	background-color: $alt-red;
 }
 
-.inactive-bg:after {
+.inactive-bg::after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -256px -443px;
 	width: 22px;
@@ -1023,11 +1013,11 @@ td.inactive-bg {
 
 	button {
 
-		&:after {
+		&::after {
 			background-position: -359px -478px;
 		}
 
-		&:focus:after {
+		&:focus::after {
 			background-position: -359px -478px;
 		}
 	}
@@ -1049,13 +1039,13 @@ td.inactive-bg {
 // TIME SELECTION
 .ui-tabs-nav {
 	.btn-time {
-		&:after {
+		&::after {
 			background-position: -246px -583px;
 		}
 	}
 
 	.filter-trigger {
-		&:after {
+		&::after {
 			background-position: -246px -547px;
 		}
 	}
@@ -1067,39 +1057,36 @@ td.inactive-bg {
 		}
 
 		&:focus {
-			//@include box-shadow(0 0 0 2px rgba($blue, 1));
-			box-shadow: 0 0 0 2px $blue;
 			background-color: darken($btn-bg-color, 10%);
+			box-shadow: 0 0 0 2px $blue;
 		}
 	}
 
 	.ui-state-focus {
 		.btn-time,
 		.filter-trigger {
-			//@include box-shadow(0 0 0 2px rgba($blue, 1));
-			box-shadow: 0 0 0 2px $blue;
 			background-color: darken($btn-bg-color, 10%);
+			box-shadow: 0 0 0 2px $blue;
 		}
 
 		&.ui-tabs-active {
 			.btn-time,
 			.filter-trigger {
-				//@include box-shadow(0 0 0 2px rgba($blue, 1));
-				box-shadow: 0 0 0 2px $blue;
 				background-color: $ui-hover-color;
+				box-shadow: 0 0 0 2px $blue;
 			}
 		}
 	}
 
 	.ui-tabs-active {
 		.btn-time {
-			&:after {
+			&::after {
 				background-position: -87px -583px;
 			}
 		}
 
 		.filter-trigger {
-			&:after {
+			&::after {
 				background-position: -87px -547px;
 			}
 		}
@@ -1146,10 +1133,8 @@ td.inactive-bg {
 	li {
 		a {
 			&:focus {
-				//@include box-shadow(0 0 0 2px rgba($blue, 1));
-				box-shadow: 0 0 0 2px $blue;
-				//@include border-radius(2px);
 				border-radius: 2px;
+				box-shadow: 0 0 0 2px $blue;
 			}
 		}
 	}
@@ -1282,7 +1267,7 @@ td.inactive-bg {
 		min-width: 65px;
 		padding-left: 42px;
 
-		&:after {
+		&::after {
 			top: 50%;
 			transform: translateY(-50%);
 		}
