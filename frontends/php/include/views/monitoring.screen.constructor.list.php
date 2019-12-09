@@ -21,7 +21,7 @@
 
 $widget = (new CWidget())->setTitle(_('Screens').': '.$data['screen']['name']);
 
-if ($data['screen']['templateid']) {
+if (array_key_exists('templateid', $data['screen'])) {
 	$widget->addItem(get_header_host_table('screens', $data['screen']['templateid']));
 }
 
