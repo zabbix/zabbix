@@ -63,7 +63,7 @@ function condition_type2str($type) {
 		CONDITION_TYPE_PROXY => _('Proxy'),
 		CONDITION_TYPE_EVENT_TYPE => _('Event type'),
 		CONDITION_TYPE_HOST_METADATA => _('Host metadata'),
-		CONDITION_TYPE_EVENT_TAG => _('Tag'),
+		CONDITION_TYPE_EVENT_TAG => _('Tag name'),
 		CONDITION_TYPE_EVENT_TAG_VALUE => _('Tag value')
 	];
 
@@ -330,7 +330,7 @@ function actionConditionValueToString(array $actions, array $config) {
  */
 function getConditionDescription($condition_type, $operator, $value, $value2) {
 	if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
-		$description = [_('Tag')];
+		$description = [_('Value of tag')];
 		$description[] = ' ';
 		$description[] = italic(CHtml::encode($value2));
 		$description[] = ' ';

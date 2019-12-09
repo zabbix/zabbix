@@ -119,6 +119,71 @@ $correlation_tab
 			->setAriaRequired()
 	);
 
+$condition2 = null;
+
+switch ($data['new_condition']['type']) {
+	case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+	case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+		$condition = (new CTextBox('new_condition[tag]'))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('tag'));
+		break;
+
+	case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+		$condition = (new CMultiSelect([
+			'name' => 'new_condition[groupids][]',
+			'object_name' => 'hostGroup',
+			'default_value' => 0,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'new_condition_groupids_'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+		break;
+
+	case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+		$condition = (new CTextBox('new_condition[newtag]', $data['new_condition']['newtag']))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('new event tag name'));
+		$condition2 = (new CTextBox('new_condition[oldtag]', $data['new_condition']['oldtag']))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('old event tag name'));
+		break;
+
+	case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+	case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+		$condition = (new CTextBox('new_condition[value]', $data['new_condition']['value']))
+			->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+			->setAttribute('placeholder', _('value'));
+		$condition2 = (new CTextBox('new_condition[tag]'))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('tag'));
+		break;
+
+	default:
+		$condition = null;
+}
+
+// Create operator combobox separately, since they depend on condition type.
+$condition_operators_list = getOperatorsByCorrConditionType($data['new_condition']['type']);
+
+if (count($condition_operators_list) > 1) {
+	$condition_operator = new CComboBox('new_condition[operator]', $data['new_condition']['operator']);
+
+	foreach ($condition_operators_list as $operator) {
+		$condition_operator->addItem($operator, corrConditionOperatorToString($operator));
+	}
+}
+else {
+	$condition_operator = [new CVar('new_condition[operator]', $condition_operators_list[0]),
+		corrConditionOperatorToString($condition_operators_list[0])
+	];
+}
+
 $correlation_tab
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['correlation']['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
