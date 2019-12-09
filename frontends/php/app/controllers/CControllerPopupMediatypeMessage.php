@@ -30,15 +30,15 @@ class CControllerPopupMediatypeMessage extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'update' =>					'in 0,1',
-			'index' =>					'string',
-			'type' =>					'in '.implode(',', array_keys(media_type2str())),
-			'content_type' =>			'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_type' =>			'in '.implode(',', CMediatypeHelper::getAllMessageTypes()),
-			'eventsource' =>			'db media_type_message.eventsource|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL]),
-			'recovery' =>				'db media_type_message.recovery|in '.implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_ACKNOWLEDGE_OPERATION]),
-			'subject' =>				'db media_type_message.subject',
-			'message' =>				'db media_type_message.message'
+			'update' =>			'in 0,1',
+			'index' =>			'string',
+			'type' =>			'in '.implode(',', array_keys(media_type2str())),
+			'content_type' =>	'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
+			'message_type' =>	'in '.implode(',', CMediatypeHelper::getAllMessageTypes()),
+			'eventsource' =>	'db media_type_message.eventsource|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL]),
+			'recovery' =>		'db media_type_message.recovery|in '.implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_ACKNOWLEDGE_OPERATION]),
+			'subject' =>		'db media_type_message.subject',
+			'message' =>		'db media_type_message.message'
 		];
 
 		$ret = $this->validateInput($fields);

@@ -800,40 +800,41 @@ class CMediatype extends CApiService {
 	/**
 	 * Add Media types.
 	 *
-	 * @param array		$mediatypes							multidimensional array with media types data
-	 * @param int		$mediatypes['type']					type
-	 * @param string	$mediatypes['name']
-	 * @param string	$mediatypes['smtp_server']			SMTP server
-	 * @param int		$mediatypes['smtp_port']			SMTP port
-	 * @param string	$mediatypes['smtp_helo']			SMTP hello
-	 * @param string	$mediatypes['smtp_email']			SMTP email
-	 * @param int		$mediatypes['smtp_security']		SMTP connection security
-	 * @param int		$mediatypes['smtp_verify_peer']		SMTP verify peer
-	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
-	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
-	 * @param int		$mediatypes['content_type']			Message format
-	 * @param string	$mediatypes['exec_path']			script name/message text limit
-	 * @param string	$mediatypes['exec_params']			script parameters
-	 * @param string	$mediatypes['gsm_modem']			GSM modem
-	 * @param string	$mediatypes['username']				username
-	 * @param string	$mediatypes['passwd']				password
-	 * @param int		$mediatypes['status']				media type status
-	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
-	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
-	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
-	 * @param string    $mediatypes['script']               Webhook javascript body.
-	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
-	 *                                                      ['name' => .. 'value' => .. ]
-	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
-	 * @param string    $mediatypes['process_tags']         Webhook HTTP response should be saved as tags.
-	 * @param string    $mediatypes['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
-	 * @param string    $mediatypes['event_menu_url']       Webhook additional info in frontend, supports received tags.
-	 * @param string    $mediatypes['event_menu_name']	    Webhook 'url' visual name.
-	 * @param string    $mediatypes['description']          Media type description.
+	 * @param array  $mediatypes                           A multidimensional array with media types data.
+	 * @param int    $mediatypes[]['type']                 Type.
+	 * @param string $mediatypes[]['name']                 Name.
+	 * @param string $mediatypes[]['smtp_server']          SMTP server.
+	 * @param int    $mediatypes[]['smtp_port']            SMTP server port.
+	 * @param string $mediatypes[]['smtp_helo']            SMTP HELO.
+	 * @param string $mediatypes[]['smtp_email']           SMTP email.
+	 * @param int    $mediatypes[]['smtp_security']        SMTP connection security level.
+	 * @param int    $mediatypes[]['smtp_verify_peer']     SMTP verify peer.
+	 * @param int    $mediatypes[]['smtp_verify_host']     SMTP verify host.
+	 * @param int    $mediatypes[]['smtp_authentication']  SMTP authentication.
+	 * @param int    $mediatypes[]['content_type']         Message format.
+	 * @param string $mediatypes[]['exec_path']            Script name.
+	 * @param string $mediatypes[]['exec_params']          Script parameters.
+	 * @param string $mediatypes[]['gsm_modem']            Serial device name of the GSM modem.
+	 * @param string $mediatypes[]['username']             Username.
+	 * @param string $mediatypes[]['passwd']               Password.
+	 * @param int    $mediatypes[]['status']               Media type status.
+	 * @param int    $mediatypes[]['maxsessions']          Limit of simultaneously processed alerts.
+	 * @param int    $mediatypes[]['maxattempts']          Maximum attempts to deliver alert successfully.
+	 * @param string $mediatypes[]['attempt_interval']     Interval between alert delivery attempts.
+	 * @param string $mediatypes[]['script']               Webhook JavaScript body.
+	 * @param array  $mediatypes[]['parameters']           Array of webhook parameters:
+	 *                                                     ['name' => .., 'value' => ..]
+	 * @param string $mediatypes[]['timeout']              Webhook JavaScript HTTP request timeout.
+	 * @param string $mediatypes[]['process_tags']         Webhook HTTP response should be saved as tags.
+	 * @param string $mediatypes[]['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
+	 * @param string $mediatypes[]['event_menu_url']       Webhook additional info in frontend, supports received tags.
+	 * @param string $mediatypes[]['event_menu_name']      Webhook 'url' visual name.
+	 * @param string $mediatypes[]['description']          Media type description.
+	 * @param array  $mediatypes[]['message_templates']    An array of media type message templates.
 	 *
 	 * @return array
 	 */
-	public function create($mediatypes) {
+	public function create(array $mediatypes) {
 		$mediatypes = zbx_toArray($mediatypes);
 
 		$this->validateCreate($mediatypes);
@@ -879,41 +880,42 @@ class CMediatype extends CApiService {
 	/**
 	 * Update Media types.
 	 *
-	 * @param array		$mediatypes							multidimensional array with media types data
-	 * @param int		$mediatypes['mediatypeid']			id
-	 * @param int		$mediatypes['type']					type
-	 * @param string	$mediatypes['name']
-	 * @param string	$mediatypes['smtp_server']			SMTP server
-	 * @param int		$mediatypes['smtp_port']			SMTP port
-	 * @param string	$mediatypes['smtp_helo']			SMTP hello
-	 * @param string	$mediatypes['smtp_email']			SMTP email
-	 * @param int		$mediatypes['smtp_security']		SMTP connection security
-	 * @param int		$mediatypes['smtp_verify_peer']		SMTP verify peer
-	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
-	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
-	 * @param int		$mediatypes['content_type']			Message format
-	 * @param string	$mediatypes['exec_path']			script name/message text limit
-	 * @param string	$mediatypes['exec_params']			script parameters
-	 * @param string	$mediatypes['gsm_modem']			GSM modem
-	 * @param string	$mediatypes['username']				username
-	 * @param string	$mediatypes['passwd']				password
-	 * @param int		$mediatypes['status']				media type status
-	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
-	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
-	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
-	 * @param string    $mediatypes['script']               Webhook javascript body.
-	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
-	 *                                                      ['name' => .. 'value' => .. ]
-	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
-	 * @param string    $mediatypes['process_tags']         Webhook HTTP response should be saved as tags.
-	 * @param string    $mediatypes['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
-	 * @param string    $mediatypes['event_menu_url']       Webhook additional info in frontend, supports received tags.
-	 * @param string    $mediatypes['event_menu_name']	    Webhook 'url' visual name.
-	 * @param string    $mediatypes['description']          Media type description.
+	 * @param array  $mediatypes                           A multidimensional array with media types data.
+	 * @param int    $mediatypes[]['mediatypeid']          Media type ID.
+	 * @param int    $mediatypes[]['type']                 Type.
+	 * @param string $mediatypes[]['name']                 Name.
+	 * @param string $mediatypes[]['smtp_server']          SMTP server.
+	 * @param int    $mediatypes[]['smtp_port']            SMTP server port.
+	 * @param string $mediatypes[]['smtp_helo']            SMTP HELO.
+	 * @param string $mediatypes[]['smtp_email']           SMTP email.
+	 * @param int    $mediatypes[]['smtp_security']        SMTP connection security level.
+	 * @param int    $mediatypes[]['smtp_verify_peer']     SMTP verify peer.
+	 * @param int    $mediatypes[]['smtp_verify_host']     SMTP verify host.
+	 * @param int    $mediatypes[]['smtp_authentication']  SMTP authentication.
+	 * @param int    $mediatypes[]['content_type']         Message format.
+	 * @param string $mediatypes[]['exec_path']            Script name.
+	 * @param string $mediatypes[]['exec_params']          Script parameters.
+	 * @param string $mediatypes[]['gsm_modem']            Serial device name of the GSM modem.
+	 * @param string $mediatypes[]['username']             Username.
+	 * @param string $mediatypes[]['passwd']               Password.
+	 * @param int    $mediatypes[]['status']               Media type status.
+	 * @param int    $mediatypes[]['maxsessions']          Limit of simultaneously processed alerts.
+	 * @param int    $mediatypes[]['maxattempts']          Maximum attempts to deliver alert successfully.
+	 * @param string $mediatypes[]['attempt_interval']     Interval between alert delivery attempts.
+	 * @param string $mediatypes[]['script']               Webhook JavaScript body.
+	 * @param array  $mediatypes[]['parameters']           An array of webhook parameters:
+	 *                                                     ['name' => .., 'value' => ..]
+	 * @param string $mediatypes[]['timeout']              Webhook JavaScript HTTP request timeout.
+	 * @param string $mediatypes[]['process_tags']         Webhook HTTP response should be saved as tags.
+	 * @param string $mediatypes[]['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
+	 * @param string $mediatypes[]['event_menu_url']       Webhook additional info in frontend, supports received tags.
+	 * @param string $mediatypes[]['event_menu_name']      Webhook 'url' visual name.
+	 * @param string $mediatypes[]['description']          Media type description.
+	 * @param array  $mediatypes[]['message_templates']    An array of media type message templates.
 	 *
 	 * @return array
 	 */
-	public function update($mediatypes) {
+	public function update(array $mediatypes) {
 		$mediatypes = zbx_toArray($mediatypes);
 
 		$this->validateUpdate($mediatypes);
