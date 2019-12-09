@@ -180,6 +180,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'show_prev' => $show_prev,
 			'prev_time' => $prev_time,
 			'hostid' => $this->getInput('hostid'),
+			'interfaceid' => $this->getInput('interfaceid', 0),
 			'test_type' => $this->getInput('test_type'),
 			'step_obj' => $this->getInput('step_obj'),
 			'show_final_result' => $this->getInput('show_final_result'),
