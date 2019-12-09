@@ -269,16 +269,25 @@
 	function openItemTestDialog(step_nums, show_final_result, get_value, trigger_elmnt, step_obj_nr) {
 		var $step_obj = jQuery(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot, .tfoot-buttons'),
 			item_properties = getItemTestProperties('form[name="itemForm"]'),
-			options = jQuery.extend(item_properties, {
-				steps: getPreprocessingSteps(step_nums),
-				hostid: <?= $data['hostid'] ?>,
-				test_type: <?= $data['preprocessing_test_type'] ?>,
-				step_obj: step_obj_nr,
-				show_final_result: show_final_result ? 1 : 0,
-				get_value: get_value ? 1 : 0,
-				data: $step_obj.data('test-data') || []
-			});
+			cached_values = $step_obj.data('test-data') || [];
 
-		PopUp('popup.itemtest.edit', options, 'item-test', trigger_elmnt);
+		if (typeof item_properties.interfaceid !== 'undefiened' && typeof cached_values.interface !== 'undefined') {
+			if (cached_values.interface.interfaceid != item_properties.interfaceid) {
+				delete cached_values.interface;
+			}
+			else {
+				delete cached_values.interface.interfaceid2;
+			}
+		}
+
+		PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
+			steps: getPreprocessingSteps(step_nums),
+			hostid: <?= $data['hostid'] ?>,
+			test_type: <?= $data['preprocessing_test_type'] ?>,
+			step_obj: step_obj_nr,
+			show_final_result: show_final_result ? 1 : 0,
+			get_value: get_value ? 1 : 0,
+			data: cached_values
+		}), 'item-test', trigger_elmnt);
 	}
 </script>
