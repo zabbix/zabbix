@@ -153,53 +153,47 @@ static int	DBpatch_4050012(void)
 
 static int	DBpatch_4050013(void)
 {
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	operationid;
+	int		ret = SUCCEED, res, col;
+	char		*subject, *message;
+
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute(
-			"update opmessage m"
-			" join operations o on m.operationid=o.operationid"
-			" join actions a on o.actionid=a.actionid"
-			" set m.subject=a.def_shortdata,m.message=a.def_longdata,m.default_msg='0'"
-			" where m.default_msg='1' and o.recovery='0'"))
-		return FAIL;
+	result = DBselect(
+			"select m.operationid,o.recovery,a.def_shortdata,a.def_longdata,a.r_shortdata,a.r_longdata,"
+			"a.ack_shortdata,a.ack_longdata from opmessage m"
+			" left join operations o on m.operationid=o.operationid"
+			" left join actions a on o.actionid=a.actionid"
+			" where m.default_msg='1' and o.recovery in (0,1,2)");
 
-	return SUCCEED;
+	while (NULL != (row = DBfetch(result)))
+	{
+		col = 2 + (atoi(row[1]) * 2);
+		subject = DBdyn_escape_string(row[col]);
+		message = DBdyn_escape_string(row[col + 1]);
+		ZBX_DBROW2UINT64(operationid, row[0]);
+
+		res = DBexecute("update opmessage set subject='%s',message='%s',default_msg='0'"
+				" where operationid=" ZBX_FS_UI64, subject, message, operationid);
+
+		zbx_free(subject);
+		zbx_free(message);
+
+		if (ZBX_DB_OK > res)
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+	DBfree_result(result);
+
+	return ret;
 }
 
 static int	DBpatch_4050014(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update opmessage m"
-			" join operations o on m.operationid=o.operationid"
-			" join actions a on o.actionid=a.actionid"
-			" set m.subject=a.r_shortdata,m.message=a.r_longdata,m.default_msg='0'"
-			" where m.default_msg='1' and o.recovery='1'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_4050015(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update opmessage m"
-			" join operations o on m.operationid=o.operationid"
-			" join actions a on o.actionid=a.actionid"
-			" set m.subject=a.ack_shortdata,m.message=a.ack_longdata,m.default_msg='0'"
-			" where m.default_msg='1' and o.recovery='2'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_4050016(void)
 {
 	char	*messages[3][3][4] =
 			{
@@ -296,18 +290,17 @@ static int	DBpatch_4050016(void)
 					{NULL, NULL, NULL, NULL}
 				}
 			};
-
 	int		ret = SUCCEED, res;
 	DB_ROW		row;
 	DB_RESULT	result;
-	zbx_uint64_t	mediatypeid;
+	zbx_uint64_t	mediatypeid, mediatypemessageid = 1;
 	int		content_type, i, k;
 	char		*msg_esc = NULL, *subj_esc = NULL;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = DBselect("SELECT mediatypeid,type,content_type FROM media_type");
+	result = DBselect("select mediatypeid,type,content_type from media_type");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -328,7 +321,7 @@ static int	DBpatch_4050016(void)
 							" (mediatype_messageid,mediatypeid,eventsource,recovery,"
 							"subject,message)"
 							" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%i,%i,'%s','%s')",
-							DBget_maxid_num("media_type_message", 1), mediatypeid, i, k,
+							mediatypemessageid++, mediatypeid, i, k,
 							ZBX_NULL2EMPTY_STR(subj_esc), msg_esc);
 
 					zbx_free(msg_esc);
@@ -349,32 +342,32 @@ out:
 	return ret;
 }
 
-static int	DBpatch_4050017(void)
+static int	DBpatch_4050015(void)
 {
 	return DBdrop_field("actions", "def_shortdata");
 }
 
-static int	DBpatch_4050018(void)
+static int	DBpatch_4050016(void)
 {
 	return DBdrop_field("actions", "def_longdata");
 }
 
-static int	DBpatch_4050019(void)
+static int	DBpatch_4050017(void)
 {
 	return DBdrop_field("actions", "r_shortdata");
 }
 
-static int	DBpatch_4050020(void)
+static int	DBpatch_4050018(void)
 {
 	return DBdrop_field("actions", "r_longdata");
 }
 
-static int	DBpatch_4050021(void)
+static int	DBpatch_4050019(void)
 {
 	return DBdrop_field("actions", "ack_shortdata");
 }
 
-static int	DBpatch_4050022(void)
+static int	DBpatch_4050020(void)
 {
 	return DBdrop_field("actions", "ack_longdata");
 }
@@ -406,7 +399,5 @@ DBPATCH_ADD(4050017, 0, 1)
 DBPATCH_ADD(4050018, 0, 1)
 DBPATCH_ADD(4050019, 0, 1)
 DBPATCH_ADD(4050020, 0, 1)
-DBPATCH_ADD(4050021, 0, 1)
-DBPATCH_ADD(4050022, 0, 1)
 
 DBPATCH_END()
