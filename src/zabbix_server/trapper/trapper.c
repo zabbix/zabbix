@@ -591,6 +591,72 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
+static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
+{
+	char			tmp[ZBX_MAX_UINT64_LEN + 1], *error = NULL;
+	DC_ITEM			item;
+	static const ZBX_TABLE	*table_items;
+
+	if (NULL == table_items)
+		table_items = DBget_table("items");
+
+	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_PROXY_HOSTID, tmp, sizeof(tmp)))
+		ZBX_STR2UINT64(item.host.proxy_hostid, tmp);
+	else
+		item.host.proxy_hostid = 0;
+
+	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp)))
+		ZBX_STR2UCHAR(item.type, tmp);
+	else
+		ZBX_STR2UCHAR(item.type, DBget_field(table_items, "type")->default_value);
+
+
+	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
+	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
+
+	if (NULL == error)
+		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, "foo", ZBX_JSON_TYPE_STRING);
+	else
+		zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+}
+
+static void	recv_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+{
+	char			sessionid[MAX_STRING_LEN];
+	zbx_user_t		user;
+	struct zbx_json_parse	jp_data;
+	struct zbx_json		json;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
+	{
+		zbx_send_response(sock, FAIL,  "Permission denied.", CONFIG_TIMEOUT);
+		return;
+	}
+
+	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	{
+		char	*error;
+
+		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
+		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
+		zbx_free(error);
+		return;
+	}
+
+	zbx_json_init(&json, 1024);
+
+	perform_item_test(&jp_data, &json);
+
+	zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, CONFIG_TIMEOUT);
+
+	zbx_json_free(&json);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 static int	DBget_template_count(zbx_uint64_t *count)
 {
 	DB_RESULT	result;
@@ -1196,6 +1262,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					ret = zbx_trapper_preproc_test(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					recv_item_test(sock, &jp);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer, value);
