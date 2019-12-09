@@ -454,14 +454,16 @@ ul.top-nav-icons {
 
 button {
 	&:focus {
-		@include box-shadow(0 0 0 2px rgba($blue, 1));
+		//@include box-shadow(0 0 0 2px rgba($blue, 1));
+		box-shadow: 0 0 0 2px $blue;
 		background-color: darken($btn-bg-color, 10%)
 	}
 }
 
 .btn-alt {
 	&:focus {
-		@include box-shadow(0 0 0 2px rgba($blue, 1));
+		//@include box-shadow(0 0 0 2px rgba($blue, 1));
+		box-shadow: 0 0 0 2px $blue;
 	}
 }
 
@@ -493,7 +495,8 @@ button {
 			}
 
 			&:focus + label {
-				@include box-shadow(0 0 0 2px rgba($blue, 1) !important);
+				//@include box-shadow(0 0 0 2px rgba($blue, 1) !important);
+				box-shadow: 0 0 0 2px $blue !important;
 				background-color: darken($btn-bg-color, 10%) !important;
 				color: $white;
 			}
@@ -573,8 +576,10 @@ a.link-action {
 		&:focus {
 			color: $link-main-nav-active-color;
 			background-color: lighten($ui-hover-color, 10%) !important;
-			@include box-shadow(0 0 0 2px $blue);
-			@include transition(box-shadow .2s ease-out);
+			//@include box-shadow(0 0 0 2px $blue);
+			box-shadow: 0 0 0 2px $blue;
+			//@include transition(box-shadow .2s ease-out);
+			transition: box-shadow .2s ease-out;
 		}
 	}
 }
@@ -594,9 +599,12 @@ ul.top-nav-icons {
 	a {
 		&:focus {
 			background-color: lighten($ui-hover-color, 10%) !important;
-			@include opacity(1);
-			@include box-shadow(0 0 0 2px $blue);
-			@include transition(box-shadow .2s ease-out);
+			//@include opacity(1);
+			opacity: 1;
+			//@include box-shadow(0 0 0 2px $blue);
+			box-shadow: 0 0 0 2px $blue;
+			//@include transition(box-shadow .2s ease-out);
+			transition: box-shadow .2s ease-out;
 		}
 	}
 }
@@ -657,7 +665,8 @@ ul.top-nav-icons {
 }
 
 .disabled {
-	@include opacity(0.6);
+	//@include opacity(0.6);
+	opacity: .6;
 }
 
 .multiselect {
@@ -669,7 +678,8 @@ ul.top-nav-icons {
 			.subfilter-enabled,
 			.subfilter-disable-btn,
 			.subfilter-disable-btn:active {
-				@include box-shadow(0 0 0 1px rgba($blue, 1));
+				//@include box-shadow(0 0 0 1px rgba($blue, 1));
+				box-shadow: 0 0 0 1px $blue;
 			}
 		}
 	}
@@ -677,29 +687,37 @@ ul.top-nav-icons {
 
 .header-logo {
 	&:focus {
-		@include box-shadow(0 0 0 2px $blue);
-		@include transition(box-shadow .2s ease-out);
+		//@include box-shadow(0 0 0 2px $blue);
+		box-shadow: 0 0 0 2px $blue;
+		//@include transition(box-shadow .2s ease-out);
+		transition: box-shadow .2s ease-out;
 	}
 }
 
 .checkbox-radio {
 	&:focus + label span {
-		@include box-shadow(0 0 0 1px $blue);
-		@include transition(box-shadow .2s ease-out);
+		//@include box-shadow(0 0 0 1px $blue);
+		box-shadow: 0 0 0 1px $blue;
+		//@include transition(box-shadow .2s ease-out);
+		transition: box-shadow .2s ease-out;
 	}
 }
 
 %form-input-style {
 	&:focus {
-		@include box-shadow(0 0 0 1px $blue);
-		@include transition(box-shadow .2s ease-out);
+		//@include box-shadow(0 0 0 1px $blue);
+		box-shadow: 0 0 0 1px $blue;
+		//@include transition(box-shadow .2s ease-out);
+		transition: box-shadow .2s ease-out;
 	}
 }
 
 .multiselect {
 	&.active {
-		@include box-shadow(0 0 0 1px $blue);
-		@include transition(box-shadow .2s ease-out);
+		//@include box-shadow(0 0 0 1px $blue);
+		box-shadow: 0 0 0 1px $blue;
+		//@include transition(box-shadow .2s ease-out);
+		transition: box-shadow .2s ease-out;
 	}
 	input[type="text"]{
 		&:focus {
@@ -1049,7 +1067,8 @@ td.inactive-bg {
 		}
 
 		&:focus {
-			@include box-shadow(0 0 0 2px rgba($blue, 1));
+			//@include box-shadow(0 0 0 2px rgba($blue, 1));
+			box-shadow: 0 0 0 2px $blue;
 			background-color: darken($btn-bg-color, 10%);
 		}
 	}
@@ -1057,14 +1076,16 @@ td.inactive-bg {
 	.ui-state-focus {
 		.btn-time,
 		.filter-trigger {
-			@include box-shadow(0 0 0 2px rgba($blue, 1));
+			//@include box-shadow(0 0 0 2px rgba($blue, 1));
+			box-shadow: 0 0 0 2px $blue;
 			background-color: darken($btn-bg-color, 10%);
 		}
 
 		&.ui-tabs-active {
 			.btn-time,
 			.filter-trigger {
-				@include box-shadow(0 0 0 2px rgba($blue, 1));
+				//@include box-shadow(0 0 0 2px rgba($blue, 1));
+				box-shadow: 0 0 0 2px $blue;
 				background-color: $ui-hover-color;
 			}
 		}
@@ -1125,8 +1146,10 @@ td.inactive-bg {
 	li {
 		a {
 			&:focus {
-				@include box-shadow(0 0 0 2px rgba($blue, 1));
-				@include border-radius(2px);
+				//@include box-shadow(0 0 0 2px rgba($blue, 1));
+				box-shadow: 0 0 0 2px $blue;
+				//@include border-radius(2px);
+				border-radius: 2px;
 			}
 		}
 	}
