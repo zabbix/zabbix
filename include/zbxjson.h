@@ -124,6 +124,9 @@
 #define ZBX_PROTO_TAG_FLAGS			"flags"
 #define ZBX_PROTO_TAG_PARAMETERS		"parameters"
 #define ZBX_PROTO_TAG_PROXY_HOSTID		"proxy_hostid"
+#define ZBX_PROTO_TAG_INTERFACE_ID		"interfaceid"
+#define ZBX_PROTO_TAG_USEIP			"useip"
+#define ZBX_PROTO_TAG_ADDRESS			"address"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

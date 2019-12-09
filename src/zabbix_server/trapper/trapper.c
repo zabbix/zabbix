@@ -596,6 +596,7 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	char			tmp[ZBX_MAX_UINT64_LEN + 1], *error = NULL;
 	DC_ITEM			item;
 	static const ZBX_TABLE	*table_items;
+	struct zbx_json_parse	jp_interface;
 
 	if (NULL == table_items)
 		table_items = DBget_table("items");
@@ -610,6 +611,46 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	else
 		ZBX_STR2UCHAR(item.type, DBget_field(table_items, "type")->default_value);
 
+	/*if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, tmp, sizeof(tmp)))
+		ZBX_STR2UCHAR(item.value_type, tmp);
+	else
+		ZBX_STR2UCHAR(item.value_type, DBget_field(table_items, "value_type")->default_value);*/
+
+	if (SUCCEED != zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_KEY, item.key_orig, sizeof(item.key_orig)))
+	{
+		zbx_strlcpy(item.key_orig, DBget_field(table_items, "key_")->default_value,
+				sizeof(item.key_orig));
+	}
+
+	item.key = zbx_strdup(NULL, item.key_orig);
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
+	{
+		static const ZBX_TABLE	*table_interface;
+		char			*fieldname;
+		size_t			size = 0;
+		char			*value = NULL;
+
+		if (NULL == table_interface)
+			table_interface = DBget_table("interface");
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_INTERFACE_ID, tmp, sizeof(tmp)))
+			ZBX_STR2UINT64(item.interface.interfaceid, tmp);
+		else
+			item.interface.interfaceid = 0;
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_USEIP, tmp, sizeof(tmp)))
+			ZBX_STR2UCHAR(item.interface.useip, tmp);
+		else
+			ZBX_STR2UCHAR(item.interface.useip, DBget_field(table_interface, "useip")->default_value);
+
+		fieldname = 1 == item.interface.useip ? "ip" : "dns";
+
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, &value, &size))
+			item.interface.addr = zbx_strdup(NULL, DBget_field(table_interface, fieldname)->default_value);
+		else
+			item.interface.addr = value;
+	}
 
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
