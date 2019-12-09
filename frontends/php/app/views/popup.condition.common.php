@@ -108,9 +108,9 @@ switch ($data['type']) {
 				$inline_js .= $new_condition_newtag->getPostJS();
 
 				$form_list
-					->addRow(_('Old tag'), $new_condition_oldtag)
+					->addRow(_('Old tag name'), $new_condition_oldtag)
 					->addRow(_('Operator'), [$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
-					->addRow(_('New tag'), $new_condition_newtag);
+					->addRow(_('New tag name'), $new_condition_newtag);
 				break;
 
 			// Old|New event tag value form elements.
