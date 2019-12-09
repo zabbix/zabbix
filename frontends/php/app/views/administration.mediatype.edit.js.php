@@ -11,11 +11,16 @@
 
 <script type="text/x-jquery-tmpl" id="message-templates-row-tmpl">
 	<?= (new CRow([
-			(new CCol())->setId('message_type_cell_#{index}'),
-			(new CCol(new CSpan('#{message}')))
+			new CCol('#{message_type_name}'),
+			(new CCol([
+				new CSpan('#{message}'),
+				new CInput('hidden', 'message_templates[#{index}][eventsource]', '#{eventsource}'),
+				new CInput('hidden', 'message_templates[#{index}][recovery]', '#{recovery}'),
+				new CInput('hidden', 'message_templates[#{index}][subject]', '#{subject}'),
+				new CInput('hidden', 'message_templates[#{index}][message]', '#{message}'),
+			]))
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;')
-				->setId('message_template_cell_#{index}'),
+				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;'),
 			(new CHorList([
 				(new CButton(null, _('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -32,90 +37,30 @@
 
 <script type="text/javascript">
 	var message_templates = <?= CJs::encodeJson(CMediatypeHelper::getAllMessageTemplates()) ?>,
-		message_template_list = [];
+		message_template_list = {};
 
 	/**
 	 * Draws message template table.
 	 *
-	 * @param {array} list  The list of message templates.
+	 * @param {object} list  The list of message templates.
 	 */
 	function populateMessageTemplates(list) {
-		var addTemplate = function(template) {
-				var index = template.index;
-
-				message_template_list[index] = template;
-
-				jQuery('#message-templates-footer').before(
-					new Template(jQuery('#message-templates-row-tmpl').html()).evaluate(template)
-				);
-
-				delete(template.index);
-
-				for (var field_name in template) {
-					if (!template.hasOwnProperty(field_name)) {
-						continue;
-					}
-
-					var $input = jQuery('<input>', {
-						name: 'message_templates[' + index + '][' + field_name + ']',
-						type: 'hidden',
-						value: template[field_name]
-					});
-
-					jQuery('#message_template_cell_' + index).append($input);
-				}
-
-				jQuery('#message_type_cell_' + index).text(getMessageTypeName(template.eventsource, template.recovery));
-			},
-			updateTemplate = function(template) {
-				var index = template.index;
-
-				message_template_list[index] = template;
-
-				delete(template.index);
-
-				for (var field_name in template) {
-					if (!template.hasOwnProperty(field_name)) {
-						continue;
-					}
-
-					var $obj = jQuery('input[name="message_templates[' + index + '][' + field_name + ']"]');
-
-					if ($obj.length) {
-						$obj.val(template[field_name]);
-					}
-					else {
-						var $input = jQuery('<input>', {
-							name: 'message_templates[' + index + '][' + field_name + ']',
-							type: 'hidden',
-							value: template[field_name]
-						});
-
-						jQuery('#message_template_cell_' + index).append($input);
-					}
-				}
-
-				jQuery('#message_template_cell_' + index + ' span').text(template.message);
-				jQuery('#message_type_cell_' + index).text(getMessageTypeName(template.eventsource, template.recovery));
-			};
+		var row_template = new Template(jQuery('#message-templates-row-tmpl').html());
 
 		for (var i = 0; i < list.length; i++) {
 			var template = list[i];
 
-			if (empty(template)) {
-				continue;
-			}
-
-			if (typeof template.index === 'undefined') {
-				template.index = i;
-			}
+			template.index = template.index || i;
+			template.message_type_name = getMessageTypeName(template.eventsource, template.recovery);
 
 			if (typeof message_template_list[template.index] === 'undefined') {
-				addTemplate(template);
+				jQuery('#message-templates-footer').before(row_template.evaluate(template));
 			}
 			else {
-				updateTemplate(template);
+				jQuery('tr[data-index=' + template.index + ']').replaceWith(row_template.evaluate(template));
 			}
+
+			message_template_list[template.index] = template;
 		}
 	}
 
@@ -188,7 +133,7 @@
 
 			switch ($btn.data('action')) {
 				case 'add':
-					params.index = $('tr[data-index]:last').length ? $('tr[data-index]:last').data('index') + 1 : 0;
+					params.index = $('tr[data-index]:last').data('index') + 1 || 0;
 
 					PopUp('popup.mediatype.message', params, null, $btn);
 					break;

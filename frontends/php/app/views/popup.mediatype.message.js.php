@@ -100,10 +100,6 @@ function submitMessageTemplate() {
 				return false;
 			}
 
-			delete(template.type);
-			delete(template.content_type);
-			delete(template.message_type);
-
 			populateMessageTemplates([template]);
 
 			overlayDialogueDestroy($form.closest('[data-dialogueid]').data('dialogueid'));
