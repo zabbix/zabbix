@@ -175,6 +175,7 @@ typedef off_t	zbx_offset_t;
 #define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
 
 #define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
+#define ZBX_STR2USHORT(var, string) var = (unsigned short)atoi(string)
 
 #define ZBX_CONST_STRING(str) "" str
 #define ZBX_CONST_STRLEN(str) (sizeof(ZBX_CONST_STRING(str)) - 1)

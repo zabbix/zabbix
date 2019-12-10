@@ -48,7 +48,7 @@ extern unsigned char	program_type;
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_agent(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
 	char		*tls_arg1, *tls_arg2;

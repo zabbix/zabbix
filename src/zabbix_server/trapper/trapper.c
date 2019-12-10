@@ -593,7 +593,7 @@ fail:
 
 static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
 {
-	char			tmp[ZBX_MAX_UINT64_LEN + 1], *error = NULL;
+	char			tmp[MAX_STRING_LEN + 1], *error = NULL;
 	DC_ITEM			item;
 	static const ZBX_TABLE	*table_items;
 	struct zbx_json_parse	jp_interface;
@@ -611,10 +611,10 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	else
 		ZBX_STR2UCHAR(item.type, DBget_field(table_items, "type")->default_value);
 
-	/*if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, tmp, sizeof(tmp)))
+	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, tmp, sizeof(tmp)))
 		ZBX_STR2UCHAR(item.value_type, tmp);
 	else
-		ZBX_STR2UCHAR(item.value_type, DBget_field(table_items, "value_type")->default_value);*/
+		ZBX_STR2UCHAR(item.value_type, DBget_field(table_items, "value_type")->default_value);
 
 	if (SUCCEED != zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_KEY, item.key_orig, sizeof(item.key_orig)))
 	{
@@ -627,9 +627,7 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	if (SUCCEED == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
 	{
 		static const ZBX_TABLE	*table_interface;
-		char			*fieldname;
 		size_t			size = 0;
-		char			*value = NULL;
 
 		if (NULL == table_interface)
 			table_interface = DBget_table("interface");
@@ -644,12 +642,25 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 		else
 			ZBX_STR2UCHAR(item.interface.useip, DBget_field(table_interface, "useip")->default_value);
 
-		fieldname = 1 == item.interface.useip ? "ip" : "dns";
+		item.interface.addr = NULL;
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, &item.interface.addr,
+				&size))
+		{
+			char	*fieldname;
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, &value, &size))
+			fieldname = 1 == item.interface.useip ? "ip" : "dns";
+
 			item.interface.addr = zbx_strdup(NULL, DBget_field(table_interface, fieldname)->default_value);
-		else
-			item.interface.addr = value;
+		}
+
+		if (SUCCEED != zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_PORT, item.interface.port_orig,
+				sizeof(item.interface.port_orig)))
+		{
+			zbx_strlcpy(item.interface.port_orig, DBget_field(table_items, "port")->default_value,
+							sizeof(item.interface.port_orig));
+		}
+
+		ZBX_STR2USHORT(item.interface.port, item.interface.port_orig);
 	}
 
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
@@ -659,6 +670,10 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, "foo", ZBX_JSON_TYPE_STRING);
 	else
 		zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+
+	zbx_free(item.interface.addr);
+	zbx_free(item.key);
+	zbx_free(error);
 }
 
 static void	recv_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
