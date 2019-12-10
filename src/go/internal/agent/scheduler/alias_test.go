@@ -75,7 +75,7 @@ func TestGetAlias(t *testing.T) {
 	_ = conf.Unmarshal([]byte{}, &options)
 	options.Alias = aliases
 
-	if manager, err := NewManager(options); err == nil {
+	if manager, err := NewManager(&options); err == nil {
 		for _, result := range results {
 			t.Run(result.input, func(t *testing.T) {
 				t.Logf("result.input: %s", result.input)

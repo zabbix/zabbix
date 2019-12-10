@@ -23,10 +23,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"os/signal"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -42,6 +40,7 @@ import (
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/pidfile"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxlib"
@@ -136,7 +135,7 @@ func processMetricsCommand(c *remotecontrol.Client, params []string) (err error)
 }
 
 func processVersionCommand(c *remotecontrol.Client, params []string) (err error) {
-	data := version.Short()
+	data := version.Long()
 	return c.Reply(data)
 }
 
@@ -170,47 +169,11 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 	return
 }
 
-var pidFile *os.File
-
-func writePidFile() (err error) {
-	if agent.Options.PidFile == "" {
-		return nil
-	}
-
-	pid := os.Getpid()
-	flockT := syscall.Flock_t{
-		Type:   syscall.F_WRLCK,
-		Whence: io.SeekStart,
-		Start:  0,
-		Len:    0,
-		Pid:    int32(pid),
-	}
-	if pidFile, err = os.OpenFile(agent.Options.PidFile, os.O_WRONLY|os.O_CREATE|syscall.O_CLOEXEC, 0644); nil != err {
-		return fmt.Errorf("cannot open PID file [%s]: %s", agent.Options.PidFile, err.Error())
-	}
-	if err = syscall.FcntlFlock(pidFile.Fd(), syscall.F_SETLK, &flockT); nil != err {
-		pidFile.Close()
-		return fmt.Errorf("Is this process already running? Could not lock PID file [%s]: %s",
-			agent.Options.PidFile, err.Error())
-	}
-	pidFile.Truncate(0)
-	pidFile.WriteString(strconv.Itoa(pid))
-	pidFile.Sync()
-
-	return nil
-}
-
-func deletePidFile() {
-	if nil == pidFile {
-		return
-	}
-	pidFile.Close()
-	os.Remove(pidFile.Name())
-}
+var pidFile *pidfile.File
 
 func run() (err error) {
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	var control *remotecontrol.Conn
 	if control, err = remotecontrol.New(agent.Options.ControlSocket); err != nil {
@@ -224,9 +187,6 @@ loop:
 		case sig := <-sigs:
 			switch sig {
 			case syscall.SIGINT, syscall.SIGTERM:
-				break loop
-			case syscall.SIGUSR1:
-				log.Debugf("user signal received")
 				break loop
 			}
 		case client := <-control.Client():
@@ -321,16 +281,12 @@ func main() {
 			os.Exit(1)
 		}
 		// create default configuration for testing options
-		if argConfig == false {
-			conf.Unmarshal([]byte{}, &agent.Options)
+		if !argConfig {
+			_ = conf.Unmarshal([]byte{}, &agent.Options)
 		}
 	}
 
 	if argTest || argPrint {
-		if argConfig == false {
-			conf.Unmarshal([]byte{}, &agent.Options)
-		}
-
 		if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 			os.Exit(1)
@@ -411,11 +367,11 @@ func main() {
 		}
 	}
 
-	if err = writePidFile(); err != nil {
+	if pidFile, err = pidfile.New(agent.Options.PidFile); err != nil {
 		log.Critf(err.Error())
 		os.Exit(1)
 	}
-	defer deletePidFile()
+	defer pidFile.Delete()
 
 	if foregroundFlag {
 		if agent.Options.LogType != "console" {
@@ -431,7 +387,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if manager, err = scheduler.NewManager(agent.Options); err != nil {
+	if manager, err = scheduler.NewManager(&agent.Options); err != nil {
 		log.Critf("cannot create scheduling manager: %s", err)
 		os.Exit(1)
 	}

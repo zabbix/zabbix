@@ -65,7 +65,7 @@ $form_list
 	// Append key to form list.
 	->addRow(
 		(new CLabel(_('Key'), 'key'))->setAsteriskMark(),
-		(new CTextBox('key', $data['key'], $data['limited']))
+		(new CTextBox('key', $data['key'], $data['limited'], DB::getFieldLength('item_discovery', 'key_')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	)

@@ -24,7 +24,6 @@ package file
 import (
 	"reflect"
 	"testing"
-	"time"
 
 	"zabbix.com/pkg/std"
 )
@@ -34,7 +33,7 @@ var CrcFile = "1234"
 func TestFileCksum(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.timeout = time.Second * 3
+	impl.options.Timeout = 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
 	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}, nil); err != nil {

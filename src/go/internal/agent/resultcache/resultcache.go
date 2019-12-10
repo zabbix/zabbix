@@ -75,15 +75,19 @@ type ResultCache struct {
 }
 
 type AgentData struct {
-	Id          uint64  `json:"id"`
-	Itemid      uint64  `json:"itemid"`
-	LastLogsize *uint64 `json:"lastlogsize,omitempty"`
-	Mtime       *int    `json:"mtime,omitempty"`
-	State       *int    `json:"state,omitempty"`
-	Value       *string `json:"value,omitempty"`
-	Clock       int     `json:"clock,omitempty"`
-	Ns          int     `json:"ns,omitempty"`
-	persistent  bool
+	Id             uint64  `json:"id"`
+	Itemid         uint64  `json:"itemid"`
+	LastLogsize    *uint64 `json:"lastlogsize,omitempty"`
+	Mtime          *int    `json:"mtime,omitempty"`
+	State          *int    `json:"state,omitempty"`
+	Value          *string `json:"value,omitempty"`
+	EventSource    *string `json:"source,omitempty"`
+	EventID        *int    `json:"eventid,omitempty"`
+	EventSeverity  *int    `json:"severity,omitempty"`
+	EventTimestamp *int    `json:"timestamp,omitempty"`
+	Clock          int     `json:"clock,omitempty"`
+	Ns             int     `json:"ns,omitempty"`
+	persistent     bool
 }
 
 type AgentDataRequest struct {
@@ -233,15 +237,19 @@ func (c *ResultCache) write(r *plugin.Result) {
 	}
 
 	data := &AgentData{
-		Id:          c.lastDataID,
-		Itemid:      r.Itemid,
-		LastLogsize: r.LastLogsize,
-		Mtime:       r.Mtime,
-		Clock:       clock,
-		Ns:          ns,
-		Value:       value,
-		State:       state,
-		persistent:  r.Persistent,
+		Id:             c.lastDataID,
+		Itemid:         r.Itemid,
+		LastLogsize:    r.LastLogsize,
+		Mtime:          r.Mtime,
+		Clock:          clock,
+		Ns:             ns,
+		Value:          value,
+		State:          state,
+		EventSource:    r.EventSource,
+		EventID:        r.EventID,
+		EventSeverity:  r.EventSeverity,
+		EventTimestamp: r.EventTimestamp,
+		persistent:     r.Persistent,
 	}
 
 	if c.totalValueNum >= c.maxBufferSize {
@@ -256,17 +264,17 @@ func (c *ResultCache) run() {
 	log.Debugf("[%d] starting result cache", c.clientID)
 
 	for {
-		v := <-c.input
-		if v == nil {
+		u := <-c.input
+		if u == nil {
 			break
 		}
-		switch v.(type) {
+		switch v := u.(type) {
 		case Uploader:
-			c.flushOutput(v.(Uploader))
+			c.flushOutput(v)
 		case *plugin.Result:
-			c.write(v.(*plugin.Result))
+			c.write(v)
 		case *agent.AgentOptions:
-			c.updateOptions(v.(*agent.AgentOptions))
+			c.updateOptions(v)
 		}
 	}
 	log.Debugf("[%d] result cache has been stopped", c.clientID)

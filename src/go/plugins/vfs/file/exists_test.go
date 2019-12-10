@@ -24,7 +24,6 @@ package file
 import (
 	"reflect"
 	"testing"
-	"time"
 
 	"zabbix.com/pkg/std"
 )
@@ -32,7 +31,7 @@ import (
 func TestFileExists(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.timeout = time.Second * 3
+	impl.options.Timeout = 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
 	if result, err := impl.Export("vfs.file.exists", []string{"text.txt"}, nil); err != nil {
@@ -51,7 +50,7 @@ func TestFileExists(t *testing.T) {
 func TestFileNotExists(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.timeout = time.Second * 3
+	impl.options.Timeout = 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
 	if result, err := impl.Export("vfs.file.exists", []string{"text2.txt"}, nil); err != nil {

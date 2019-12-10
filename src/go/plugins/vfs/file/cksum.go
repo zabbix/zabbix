@@ -109,7 +109,7 @@ func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
 		}
 
 		flen += uint32(bnum)
-		if time.Since(start) > p.timeout {
+		if time.Since(start) > time.Duration(p.options.Timeout)*time.Second {
 			return nil, errors.New("Timeout while processing item")
 		}
 	}

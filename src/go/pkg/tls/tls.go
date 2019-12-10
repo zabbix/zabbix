@@ -22,6 +22,8 @@ package tls
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
+#cgo openssl LDFLAGS: -lssl -lcrypto -lwsock32 -lws2_32
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -1247,7 +1249,7 @@ func CopyrightMessage() (message string) {
 	}
 	return fmt.Sprintf("\n\nThis product includes software developed by the OpenSSL Project\n"+
 		"for use in the OpenSSL Toolkit (http://www.openssl.org/).\n\n"+
-		"Compiled with %s\nRunning with %s\n", C.GoString(version), C.GoString(C.tls_version_static()))
+		"Compiled with %s\nRunning with %s\n", C.GoString(C.tls_version_static()), C.GoString(version))
 }
 
 func Init(config *Config) (err error) {

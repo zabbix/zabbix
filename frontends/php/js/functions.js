@@ -308,6 +308,16 @@ function objectSize(obj) {
 	return size;
 }
 
+function addMessage(html) {
+	var $message_div = jQuery('<div>').attr('id', 'messages');
+	$message_div.append(html);
+	jQuery('main').prepend($message_div);
+}
+
+function removeMessages() {
+	jQuery('#messages', 'main').remove();
+}
+
 /**
  * Replace placeholders like %<number>$s with arguments.
  * Can be used like usual sprintf but only for %<number>$s placeholders.
@@ -475,12 +485,17 @@ function stripslashes(str) {
  * Function to remove preloader and moves focus to IU element that was clicked to open it.
  *
  * @param string   id			Preloader identifier.
- * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayPreloaderDestroy(id, xhr) {
+function overlayPreloaderDestroy(id) {
 	if (typeof id !== 'undefined') {
-		if (typeof xhr !== 'undefined') {
-			xhr.abort();
+
+		var overlay = overlays_stack.getById(id)
+		if (!overlay) {
+			return;
+		}
+		if (typeof overlay.xhr !== 'undefined') {
+			overlay.xhr.abort();
+			delete overlay.xhr;
 		}
 
 		jQuery('#' + id).remove();
@@ -492,12 +507,16 @@ function overlayPreloaderDestroy(id, xhr) {
  * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
  *
  * @param string   dialogueid	Dialogue identifier to identify dialogue.
- * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayDialogueDestroy(dialogueid, xhr) {
+function overlayDialogueDestroy(dialogueid) {
 	if (typeof dialogueid !== 'undefined') {
-		if (typeof xhr !== 'undefined') {
-			xhr.abort();
+		var overlay = overlays_stack.getById(dialogueid)
+		if (!overlay) {
+			return;
+		}
+		if (typeof overlay.xhr !== 'undefined') {
+			overlay.xhr.abort();
+			delete overlay.xhr;
 		}
 
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
@@ -719,7 +738,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 
 		setTimeout(function() {
 			jQuery(overlay_bg).off('remove'); // Remove to avoid repeated execution.
-			overlayDialogueDestroy(params.dialogueid, xhr);
+			overlayDialogueDestroy(params.dialogueid);
 		});
 
 		return false;
@@ -1069,7 +1088,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 				.attr('title', t('Close'))
 				.click(function() {
 					jQuery(this)
-						.closest('.' + classes[index])
+						.closest('.' + msg_class)
 						.remove();
 				});
 		$msg_box.append($button);

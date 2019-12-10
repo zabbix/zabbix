@@ -37,7 +37,10 @@ else {
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-			$link = (new CLink(_('configure'), 'adm.macros.php'))
+			$link = (new CLink(_('configure'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'macros.edit')
+					->getUrl()
+				))
 				->setAttribute('target', '_blank');
 			$link = [' (', $link, ')'];
 		}
@@ -193,7 +196,7 @@ else {
 			$table->addRow((new CRow([
 				(new CCol(
 					(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
-						->setMaxlength(DB::getFieldLength('hostmacro' , 'description'))
+						->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
 						->setReadonly($data['readonly'] || !($macro['type'] & ZBX_PROPERTY_OWN))

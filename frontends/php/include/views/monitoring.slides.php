@@ -108,7 +108,7 @@ $widget
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
 	)
 	->addItem(
-		(new CDiv((new CDiv())->addClass('preloader')))
+		(new CDiv((new CDiv())->addStyle('position: relative;margin-top: 20px;')->addClass('is-loading')))
 			->setId(WIDGET_SLIDESHOW)
 	);
 

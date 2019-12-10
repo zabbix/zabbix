@@ -37,17 +37,7 @@ function mediatypeTestSend(formname) {
 
 	$form_fields.prop('disabled', true);
 
-	jQuery('<span></span>')
-		.addClass('preloader')
-		.insertAfter($submit_btn)
-		.css({
-			'display': 'inline-block',
-			'margin': '0 10px -8px'
-		});
-
-	$submit_btn
-		.prop('disabled', true)
-		.hide();
+	$submit_btn.prop('disabled', true).addClass('is-loading').blur();
 
 	jQuery.ajax({
 		url: url.getUrl(),
@@ -60,15 +50,16 @@ function mediatypeTestSend(formname) {
 				$form.parent().find('.link-action').click();
 			}
 
-			$form_fields.prop('disabled', false);
+			$submit_btn.prop('disabled', false).removeClass('is-loading');
 
-			jQuery('.preloader').remove();
-			$submit_btn
-				.prop('disabled', false)
-				.show();
+			if ('response' in ret) {
+				jQuery('#webhook_response_value', form).val(ret.response.value);
+				jQuery('#webhook_response_type', form).text(ret.response.type);
+			}
 		},
 		error: function(request, status, error) {
 			if (request.status == 200) {
+				$submit_btn.prop('disabled', false).removeClass('is-loading');
 				alert(error);
 			}
 			else if (window.document.forms[formname]) {

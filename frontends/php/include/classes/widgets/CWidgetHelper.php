@@ -631,8 +631,9 @@ class CWidgetHelper {
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50)
 				]))
-					->addClass(ZBX_STYLE_COLUMN_95)
-					->addClass(ZBX_STYLE_COLUMNS),
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
+					->addClass(ZBX_STYLE_COLUMN_95),
 
 				(new CDiv(
 					(new CButton())
@@ -982,8 +983,9 @@ class CWidgetHelper {
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50),
 				]))
-					->addClass(ZBX_STYLE_COLUMN_95)
-					->addClass(ZBX_STYLE_COLUMNS),
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
+					->addClass(ZBX_STYLE_COLUMN_95),
 				(new CDiv([
 					(new CButton())
 						->setAttribute('title', _('Delete'))
@@ -1118,6 +1120,7 @@ class CWidgetHelper {
 						->addClass(ZBX_STYLE_COLUMN_50),
 				]))
 					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
 					->addClass(ZBX_STYLE_COLUMN_95)
 			))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
@@ -1274,9 +1277,19 @@ class CWidgetHelper {
 				'});',
 
 			// Intialize vertical accordion.
-			'jQuery("#data_sets").zbx_vertical_accordion({'.
-				'handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"'.
-			'});',
+			'jQuery("#data_sets")'.
+				'.on("focus", ".'.CMultiSelect::ZBX_STYLE_CLASS.' input.input", function() {'.
+					'jQuery("#data_sets").zbx_vertical_accordion("expandNth",'.
+						'jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());'.
+					'})'.
+				'.on("collapse", function(event, data) {'.
+					'jQuery("textarea, .multiselect", data.section).scrollTop(0);'.
+					'jQuery(window).trigger("resize");'.
+				'})'.
+				'.on("expand", function() {'.
+					'jQuery(window).trigger("resize");'.
+				'})'.
+				'.zbx_vertical_accordion({handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"});',
 
 			// Initialize rangeControl UI elements.
 			'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'", jQuery("#data_sets")).rangeControl();',
@@ -1285,9 +1298,10 @@ class CWidgetHelper {
 			'jQuery("#data_sets").on("click", "'.implode(', ', [
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CPatternSelect::ZBX_STYLE_CLASS,
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
-			]).'", function() {'.
+			]).'", function(event) {'.
 				'var index = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index();'.
 				'jQuery("#data_sets").zbx_vertical_accordion("expandNth", index);'.
+				'jQuery(event.currentTarget).find("input.input").focus();'.
 			'});',
 
 			// Initialize pattern fields.

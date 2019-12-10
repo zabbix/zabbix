@@ -41,7 +41,7 @@
 #include "checks_java.h"
 #include "checks_calculated.h"
 #include "checks_http.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
 

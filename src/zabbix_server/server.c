@@ -66,7 +66,7 @@
 #include "events.h"
 #include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
-#include "../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "zbxipcservice.h"
 #include "zbxhistory.h"
 #include "postinit.h"

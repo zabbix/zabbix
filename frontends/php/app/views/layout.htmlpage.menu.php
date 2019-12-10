@@ -35,51 +35,53 @@ $user_navigation = (new CList())
 					->setTitle(_('Search'))
 			])
 			->setAttribute('role', 'search')
-	);
-
-$user_menu = (new CList())
-	->setAttribute('role', 'navigation')
-	->setAttribute('aria-label', _('User menu'))
-	->addItem(CBrandHelper::isRebranded()
-		? null
-		: (new CListItem(
-			(new CLink(_('Support'), $data['support_url']))
-				->addClass(ZBX_STYLE_TOP_NAV_SUPPORT)
-				->setAttribute('target', '_blank')
-				->setTitle(_('Zabbix Technical Support'))
-		))->addStyle('padding-left:0')
 	)
-	->addItem(CBrandHelper::isRebranded()
-		? null
-		: (new CListItem(
-			(new CLink('Share', 'https://share.zabbix.com/'))
-				->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
+	->addItem(
+		(new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('User menu'))
+			->addItem(CBrandHelper::isRebranded()
+				? null
+				: (new CListItem(
+					(new CLink(_('Support'), $data['support_url']))
+						->addClass(ZBX_STYLE_TOP_NAV_SUPPORT)
+						->setAttribute('target', '_blank')
+						->setTitle(_('Zabbix Technical Support'))
+				))->addStyle('padding-left:0')
+			)
+			->addItem(CBrandHelper::isRebranded()
+				? null
+				: (new CListItem(
+					(new CLink('Share', 'https://share.zabbix.com/'))
+						->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
+						->setAttribute('target', '_blank')
+						->setTitle(_('Zabbix Share'))
+				))
+			)
+			->addItem((new CLink(SPACE, CBrandHelper::getHelpUrl()))
+				->addClass(ZBX_STYLE_TOP_NAV_HELP)
 				->setAttribute('target', '_blank')
-				->setTitle(_('Zabbix Share'))
-		))
-	)
-	->addItem((new CLink(SPACE, CBrandHelper::getHelpUrl()))
-		->addClass(ZBX_STYLE_TOP_NAV_HELP)
-		->setAttribute('target', '_blank')
-		->setTitle(_('Help'))
+				->setTitle(_('Help'))
+			)
+			->addItem(
+				$data['user']['is_guest']
+					? (new CSpan())
+						->addClass(ZBX_STYLE_TOP_NAV_GUEST)
+						->setTitle(getUserFullname($data['user']))
+					: (new CLink(null, (new CUrl('zabbix.php'))
+							->setArgument('action', 'userprofile.edit')
+							->getUrl()
+						))
+						->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
+						->setTitle(getUserFullname($data['user']))
+			)
+			->addItem(
+				(new CLink(SPACE, 'javascript:;'))
+					->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
+					->setTitle(_('Sign out'))
+					->onClick('ZABBIX.logout()')
+			)
 	);
-
-if (!$data['user']['is_guest']) {
-	$user_menu->addItem(
-		(new CLink(SPACE, 'zabbix.php?action=userprofile.edit'))
-			->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
-			->setTitle(getUserFullname($data['user']))
-	);
-}
-
-$user_menu->addItem(
-	(new CLink(SPACE, 'javascript:;'))
-		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
-		->setTitle(_('Sign out'))
-		->onClick('ZABBIX.logout()')
-);
-
-$user_navigation->addItem($user_menu);
 
 // 1st level menu
 $top_menu = (new CDiv())

@@ -75,84 +75,53 @@ $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
 $maintenance_period_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')])
-	->setId('maintenance_periods')
 	->setAriaRequired();
 
-foreach ($data['timeperiods'] as $id => $timeperiod) {
+foreach (array_values($data['timeperiods']) as $index => $timeperiod) {
+	$period_data = [];
+
+	if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
+		unset($timeperiod['start_date']);
+	}
+
+	foreach ($timeperiod as $field => $value) {
+		$period_data[] = (new CVar(sprintf('timeperiods[%s][%s]', $index, $field), $value))->removeId();
+	}
+
 	$maintenance_period_table->addRow([
 		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
 		($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME)
 			? $timeperiod['start_date']
 			: schedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
-		(new CCol(
+		(new CCol([
+			$period_data,
 			new CHorList([
 				(new CSimpleButton(_('Edit')))
-					->onClick('javascript: submitFormWithParam('.
-						'"'.$maintenanceForm->getName().'", "edit_timeperiodid['.$id.']", "1"'.
-					');')
+					->setAttribute('data-action', 'edit')
 					->addClass(ZBX_STYLE_BTN_LINK),
 				(new CSimpleButton(_('Remove')))
-					->onClick('javascript: submitFormWithParam('.
-						'"'.$maintenanceForm->getName().'", "del_timeperiodid['.$id.']", "1"'.
-					');')
+					->setAttribute('data-action', 'remove')
 					->addClass(ZBX_STYLE_BTN_LINK)
 			])
-		))->addClass(ZBX_STYLE_NOWRAP)
+		]))->addClass(ZBX_STYLE_NOWRAP)
 	]);
-	if (isset($timeperiod['timeperiodid'])) {
-		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
-	}
-	$maintenanceForm
-		->addVar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type'])
-		->addVar('timeperiods['.$id.'][every]', $timeperiod['every'])
-		->addVar('timeperiods['.$id.'][month]', $timeperiod['month'])
-		->addVar('timeperiods['.$id.'][dayofweek]', $timeperiod['dayofweek'])
-		->addVar('timeperiods['.$id.'][day]', $timeperiod['day'])
-		->addVar('timeperiods['.$id.'][start_time]', $timeperiod['start_time'])
-		->addVar('timeperiods['.$id.'][start_date]', $timeperiod['start_date'])
-		->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
 }
 
 $periodsDiv = (new CDiv($maintenance_period_table))
+	->setId('maintenance_periods')
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;');
 
-if (!isset($_REQUEST['new_timeperiod'])) {
-	$periodsDiv->addItem(
-		(new CSimpleButton(_('New')))
-			->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "new_timeperiod", "1");')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	);
-}
-$maintenancePeriodFormList->addRow(
-	(new CLabel(_('Periods'), $maintenance_period_table->getId()))->setAsteriskMark(), $periodsDiv
+$periodsDiv->addItem(
+	(new CSimpleButton(_('Add')))
+		->setAttribute('data-action', 'add')
+		->addClass(ZBX_STYLE_BTN_LINK)
 );
 
-if ($data['new_timeperiod']) {
-	if (is_array($data['new_timeperiod']) && array_key_exists('id', $data['new_timeperiod'])) {
-		$save_label = _('Update');
-	}
-	else {
-		$save_label = _('Add');
-	}
-
-	$maintenancePeriodFormList->addRow(_('Maintenance period'),
-		(new CDiv([
-			getTimeperiodForm($data),
-			new CHorList([
-				(new CSimpleButton($save_label))
-					->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "add_timeperiod", "1");')
-					->addClass(ZBX_STYLE_BTN_LINK),
-				(new CSimpleButton(_('Cancel')))
-					->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "cancel_new_timeperiod", "1");')
-					->addClass(ZBX_STYLE_BTN_LINK)
-			])
-		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
-}
+$maintenancePeriodFormList->addRow(
+	(new CLabel(_('Periods'), $periodsDiv->getId()))->setAsteriskMark(), $periodsDiv
+);
 
 /*
  * Hosts and groups tab.

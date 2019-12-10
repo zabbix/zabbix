@@ -22,7 +22,12 @@
 class CLineGraphDraw extends CGraphDraw {
 	const GRAPH_WIDTH_MIN = 20;
 	const GRAPH_HEIGHT_MIN = 20;
-	const legendOffsetY = 90;
+	const LEGEND_OFFSET_Y = 90;
+	const MAX_SIDE_OFFSET = 130;
+	const GRAPH_BORDER_OFFSET = 10;
+
+	protected $side_labels = [];
+	protected $side_width = [];
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		parent::__construct($type);
@@ -35,18 +40,18 @@ class CLineGraphDraw extends CGraphDraw {
 			GRAPH_YAXIS_SIDE_LEFT => false,
 			GRAPH_YAXIS_SIDE_RIGHT => false
 		];
-		$this->skipLeftScale = 0; // in case if left axis should be drawn but doesn't contain any data
-		$this->skipRightScale = 0; // in case if right axis should be drawn but doesn't contain any data
+		$this->skipLeftScale = 0; // In case if left axis should be drawn but doesn't contain any data.
+		$this->skipRightScale = 0; // In case if right axis should be drawn but doesn't contain any data.
 		$this->ymin_itemid = 0;
 		$this->ymax_itemid = 0;
 		$this->percentile = [
 			GRAPH_YAXIS_SIDE_LEFT => [
-				'percent' => 0, // draw percentage line
-				'value' => 0 // calculated percentage value left y axis
+				'percent' => 0, // Draw percentage line.
+				'value' => 0 // Calculated percentage value left y axis.
 			],
 			GRAPH_YAXIS_SIDE_RIGHT => [
-				'percent' => 0, // draw percentage line
-				'value' => 0 // calculated percentage value right y axis
+				'percent' => 0, // Draw percentage line.
+				'value' => 0 // Calculated percentage value right y axis.
 			]
 		];
 		$this->outer = false;
@@ -57,14 +62,14 @@ class CLineGraphDraw extends CGraphDraw {
 			GRAPH_YAXIS_SIDE_LEFT => '',
 			GRAPH_YAXIS_SIDE_RIGHT => ''
 		];
-		$this->grid = []; // vertical & horizontal grids params
-		$this->gridLinesCount = []; // How many grids to draw
-		$this->gridStep = []; // grid step
-		$this->gridPixels = 30; // optimal grid size
+		$this->grid = []; // Vertical & horizontal grids params.
+		$this->gridLinesCount = []; // How many grids to draw.
+		$this->gridStep = []; // Grid step.
+		$this->gridPixels = 30; // Optimal grid size.
 		$this->gridPixelsVert = 40;
-		$this->axis_valuetype = []; // overal items type (int/float)
-		$this->drawItemsLegend = false; // draw items legend
-		$this->drawExLegend = false; // draw percentile and triggers legend
+		$this->axis_valuetype = []; // Overal items type (int/float).
+		$this->drawItemsLegend = false; // Draw items legend.
+		$this->drawExLegend = false; // Draw percentile and triggers legend.
 	}
 
 	/********************************************************************************************************/
@@ -365,7 +370,7 @@ class CLineGraphDraw extends CGraphDraw {
 						}
 
 						$dy = $var[$ci] - $var[$first_idx];
-						$var[$ci - ($dx - $cj)] = bcadd($var[$first_idx] , bcdiv(($cj * $dy) , $dx));
+						$var[$ci - ($dx - $cj)] = bcadd($var[$first_idx], bcdiv(($cj * $dy), $dx));
 					}
 				}
 			}
@@ -777,7 +782,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 
-		foreach ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] as $num) {
+		foreach (range(0, 18) as $num) {
 			$dec = bcpow(10, $num);
 			foreach ([1, 2, 5] as $int) {
 				$intervals[] = bcmul($int, $dec);
@@ -1655,15 +1660,7 @@ class CLineGraphDraw extends CGraphDraw {
 				// marker Y coordinate
 				$posY = $this->sizeY + $this->shiftY - $this->gridStepX[$side] * $i + 4;
 
-				imageText(
-					$this->im,
-					8,
-					0,
-					$posX,
-					$posY,
-					$this->getColor($this->graphtheme['textcolor'], 0),
-					$str
-				);
+				$this->side_labels[$side][] = [$str, $posY];
 			}
 
 			$str = convert_units([
@@ -1676,6 +1673,8 @@ class CLineGraphDraw extends CGraphDraw {
 				'length' => $maxLength
 			]);
 
+			$this->side_labels[$side][] = [$str, $this->shiftY + 4];
+
 			if ($side == GRAPH_YAXIS_SIDE_LEFT) {
 				$dims = imageTextSize(8, 0, $str);
 				$posX = $this->shiftXleft - $dims['width'] - 9;
@@ -1685,16 +1684,6 @@ class CLineGraphDraw extends CGraphDraw {
 				$posX = $this->sizeX + $this->shiftXleft + 12;
 				$color = $this->getColor(GRAPH_ZERO_LINE_COLOR_RIGHT);
 			}
-
-			imageText(
-				$this->im,
-				8,
-				0,
-				$posX,
-				$this->shiftY + 4,
-				$this->getColor($this->graphtheme['textcolor'], 0),
-				$str
-			);
 
 			if ($this->zero[$side] != $this->sizeY + $this->shiftY && $this->zero[$side] != $this->shiftY) {
 				zbx_imageline(
@@ -1838,7 +1827,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$units = [GRAPH_YAXIS_SIDE_LEFT => 0, GRAPH_YAXIS_SIDE_RIGHT => 0];
 
 		// draw item legend
-		$legend = new CImageTextTable($this->im, $leftXShift - 5, $this->sizeY + $this->shiftY + self::legendOffsetY);
+		$legend = new CImageTextTable($this->im, $leftXShift - 5, $this->sizeY + $this->shiftY + self::LEGEND_OFFSET_Y);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
 		$legend->fontsize = 9;
@@ -1968,7 +1957,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$legend = new CImageTextTable(
 			$this->im,
 			$leftXShift + 10,
-			$this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY
+			$this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y
 		);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
@@ -1997,9 +1986,9 @@ class CLineGraphDraw extends CGraphDraw {
 					imagefilledpolygon(
 						$this->im,
 						[
-							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
-							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
-							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY - 10
+							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
+							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
+							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
 						],
 						3,
 						$this->getColor($color)
@@ -2008,9 +1997,9 @@ class CLineGraphDraw extends CGraphDraw {
 					imagepolygon(
 						$this->im,
 						[
-							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
-							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
-							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY - 10
+							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
+							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
+							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
 						],
 						3,
 						$this->getColor('Black No Alpha')
@@ -2025,7 +2014,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$legend = new CImageTextTable(
 			$this->im,
 			$leftXShift + 10,
-			$this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY + 5
+			$this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y + 5
 		);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
@@ -2036,7 +2025,7 @@ class CLineGraphDraw extends CGraphDraw {
 			imagefilledellipse(
 				$this->im,
 				$leftXShift,
-				$this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
+				$this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
 				10,
 				10,
 				$this->getColor($trigger['color'])
@@ -2045,7 +2034,7 @@ class CLineGraphDraw extends CGraphDraw {
 			imageellipse(
 				$this->im,
 				$leftXShift,
-				$this->sizeY + $this->shiftY + 14 * $rowNum + self::legendOffsetY,
+				$this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
 				10,
 				10,
 				$this->getColor('Black No Alpha')
@@ -2375,12 +2364,12 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	private function calcDimentions() {
+	private function calcDimensions() {
 		$this->shiftXleft = $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
 		$this->shiftXright = $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
 
 		$x_offsets = $this->shiftXleft + $this->shiftXright + 1;
-		$y_offsets = $this->shiftY + self::legendOffsetY;
+		$y_offsets = $this->shiftY + self::LEGEND_OFFSET_Y;
 
 		if (!$this->with_vertical_padding) {
 			$y_offsets -= ($this->m_showTriggers && count($this->triggers) > 0)
@@ -2446,7 +2435,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$min_dimentions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
 			$min_dimentions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
 			$min_dimentions['width'] ++;
-			$min_dimentions['height'] += $this->shiftY + self::legendOffsetY;
+			$min_dimentions['height'] += $this->shiftY + self::LEGEND_OFFSET_Y;
 		}
 
 		return $min_dimentions;
@@ -2520,7 +2509,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->calculateTopPadding();
 		$this->selectTriggers();
-		$this->calcDimentions();
+		$this->calcDimensions();
 
 		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
 				&& @imagecreatetruecolor(1, 1)
@@ -2536,6 +2525,48 @@ class CLineGraphDraw extends CGraphDraw {
 		imageOut($this->im);
 	}
 
+	/**
+	 * Draw side lables.
+	 */
+	public function drawSidesLegend() {
+		foreach ($this->side_labels as $side => $side_values) {
+			foreach ($side_values as $value) {
+				list($str, $y) = $value;
+
+				imageText(
+					$this->im,
+					8,
+					0,
+					($side == GRAPH_YAXIS_SIDE_LEFT)
+						? self::GRAPH_BORDER_OFFSET
+						: $this->fullSizeX - $this->side_width[$side] - self::GRAPH_BORDER_OFFSET,
+					$y,
+					$this->getColor($this->graphtheme['textcolor'], 0),
+					mb_strimwidth($str, 0, 19, '...')
+				);
+			}
+		}
+	}
+
+	/**
+	 * Calculating proper side label width.
+	 */
+	protected function calcSidesLegend() {
+		foreach ($this->side_labels as $side => $side_values) {
+			$max_str = '';
+
+			foreach ($side_values as $value) {
+				$str = mb_strimwidth($value[0], 0, 19, '...');
+
+				if (strlen($str) > strlen($max_str)) {
+					$max_str = $str;
+				}
+			}
+
+			$this->side_width[$side] = min(self::MAX_SIDE_OFFSET, imageTextSize(8, 0, $max_str)['width']);
+		}
+	}
+
 	public function draw() {
 		$debug_mode = CWebUser::getDebugMode();
 		if ($debug_mode) {
@@ -2548,15 +2579,16 @@ class CLineGraphDraw extends CGraphDraw {
 		// $this->sizeX is required for selectData() method
 		$this->expandItems();
 		$this->selectTriggers();
-		$this->calcDimentions();
 		$this->selectData();
 
+		$this->calcDimensions();
 		$this->calcSides();
 		$this->calcPercentile();
 		$this->calcMinMaxInterval();
 		$this->calcZero();
 
-		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
+		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
+				&& @imagecreatetruecolor(1, 1)) {
 			$this->im = imagecreatetruecolor($this->fullSizeX, $this->fullSizeY);
 		}
 		else {
@@ -2566,6 +2598,17 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->initColors();
 		$this->drawRectangle();
 		$this->drawHeader();
+		$this->drawSides();
+
+		$this->calcSidesLegend();
+		$this->drawSidesLegend();
+
+		// Change graph width to proper.
+		$this->shiftXleft = $this->side_width[GRAPH_YAXIS_SIDE_LEFT] + 15;
+		$this->shiftXright = $this->side_width[GRAPH_YAXIS_SIDE_RIGHT];
+		$this->sizeX = $this->fullSizeX - $this->side_width[GRAPH_YAXIS_SIDE_LEFT]
+			- $this->side_width[GRAPH_YAXIS_SIDE_RIGHT] - 35;
+
 		$this->drawWorkPeriod();
 		$this->drawTimeGrid();
 		$this->drawHorizontalGrid();
@@ -2671,8 +2714,6 @@ class CLineGraphDraw extends CGraphDraw {
 				$j = $i;
 			}
 		}
-
-		$this->drawSides();
 
 		if ($this->drawLegend) {
 			$this->drawTriggers();

@@ -89,8 +89,12 @@ func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	p.input <- &watchRequest{sink: ctx.Output(), requests: requests}
 }
 
-func (p *Plugin) Configure(options map[string]string) {
+func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 	p.Debugf("configure")
+}
+
+func (p *Plugin) Validate(private interface{}) (err error) {
+	return
 }
 
 func init() {

@@ -1075,7 +1075,7 @@ jQuery(function($) {
 
 				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
 
-				if (overlay !== null && typeof overlay['element'] !== undefined) {
+				if (overlay && typeof overlay['element'] !== undefined) {
 					// Remove expanded attribute of the original opener.
 					$(overlay['element']).removeAttr('data-expanded');
 				}

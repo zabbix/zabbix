@@ -27,36 +27,35 @@ class CActionCondValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function validValuesProvider()
-	{
+	public function validValuesProvider() {
 		return [
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_GROUP,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TEMPLATE,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DRULE,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DCHECK,
-				'value' => 1,
+				'value' => '1',
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_PROXY,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DOBJECT,
@@ -170,64 +169,63 @@ class CActionCondValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function invalidValuesProvider()
-	{
+	public function invalidValuesProvider() {
 		return [
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST_GROUP,
 					'value' => ''
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TEMPLATE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DRULE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DCHECK,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_PROXY,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DOBJECT,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
@@ -255,7 +253,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => ''
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
@@ -304,7 +302,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
@@ -318,7 +316,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
@@ -332,7 +330,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DSTATUS,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
@@ -346,14 +344,14 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_SUPPRESSED,
 					'value' => 123,
 				],
-				'Action condition value must be empty.'
+				'Incorrect value for field "value": should be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
@@ -367,7 +365,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
@@ -381,42 +379,42 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DUPTIME,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DVALUE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_APPLICATION,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST_NAME,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			// invalid condition type
 			[[],
@@ -452,7 +450,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_HOST_GROUP,
 					'value' => ''
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			]
 		];
 	}

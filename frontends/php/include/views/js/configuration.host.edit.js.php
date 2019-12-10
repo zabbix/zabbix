@@ -482,13 +482,6 @@
 			}
 		});
 
-		/**
-		 * Mass update
-		 */
-		jQuery('#mass_replace_tpls').on('change', function() {
-			jQuery('#mass_clear_tpls').prop('disabled', !this.checked);
-		}).change();
-
 		// Refresh field visibility on document load.
 		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
 			jQuery('#tls_in_none').prop('checked', true);
