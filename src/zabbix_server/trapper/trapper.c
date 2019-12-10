@@ -591,13 +591,18 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
+void	free_result_ptr(AGENT_RESULT *result);
+int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
+
 static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
 {
-	char			tmp[MAX_STRING_LEN + 1], *error = NULL;
-	DC_ITEM			item;
+	char			tmp[MAX_STRING_LEN + 1], *error = NULL, **pvalue;
+	DC_ITEM			item, item_tmp;
 	static const ZBX_TABLE	*table_items, *table_interface, *table_hosts;
 	struct zbx_json_parse	jp_interface, jp_host;
 	size_t			size = 0;
+	AGENT_RESULT		result;
+	zbx_vector_ptr_t	add_results;
 
 	if (NULL == table_items)
 		table_items = DBget_table("items");
@@ -671,14 +676,27 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	else
 		ZBX_STR2UCHAR(item.host.tls_connect, DBget_field(table_hosts, "tls_connect")->default_value);
 
+	zbx_vector_ptr_create(&add_results);
+
+	init_result(&result);
+	item_tmp = item;
+	get_value(&item_tmp, &result, &add_results);
+
+	if (NULL == (pvalue = GET_TEXT_RESULT(&result)))
+		error = zbx_strdup(NULL, "no value");
+
+	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
+	zbx_vector_ptr_destroy(&add_results);
+
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
 
 	if (NULL == error)
-		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, "foo", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, *pvalue, ZBX_JSON_TYPE_STRING);
 	else
 		zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
 
+	free_result(&result);
 	zbx_free(item.interface.addr);
 	zbx_free(item.key);
 	zbx_free(error);

@@ -332,13 +332,13 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	free_result_ptr(AGENT_RESULT *result)
+void	free_result_ptr(AGENT_RESULT *result)
 {
 	free_result(result);
 	zbx_free(result);
 }
 
-static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	int	res = FAIL;
 
