@@ -621,6 +621,7 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	size_t			size = 0;
 	AGENT_RESULT		result;
 	zbx_vector_ptr_t	add_results;
+	int			errcode;
 
 	if (NULL == table_items)
 		table_items = DBget_table("items");
@@ -686,20 +687,34 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 
 	init_result(&result);
 	item_tmp = item;
-	get_value(&item_tmp, &result, &add_results);
 
-	if (NULL == (pvalue = GET_TEXT_RESULT(&result)))
-		error = zbx_strdup(NULL, "no value");
+	switch (errcode = get_value(&item_tmp, &result, &add_results))
+	{
+		case SUCCEED:
+			if (NULL == (pvalue = GET_TEXT_RESULT(&result)))
+				error = zbx_strdup(NULL, "no value");
+			else
+				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, *pvalue, ZBX_JSON_TYPE_STRING);
+			break;
+		case NOTSUPPORTED:
+		case AGENT_ERROR:
+		case CONFIG_ERROR:
+		case NETWORK_ERROR:
+		case GATEWAY_ERROR:
+		case TIMEOUT_ERROR:
+		default:
+			if (NULL != (pvalue = GET_MSG_RESULT(&result)))
+				error = zbx_strdup(NULL, *pvalue);
+			else
+				error = zbx_dsprintf(NULL, "unknown error with code %d", errcode);
+	}
 
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
-
-	if (NULL == error)
-		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, *pvalue, ZBX_JSON_TYPE_STRING);
-	else
+	if (NULL != error)
 		zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
 
 	free_result(&result);
