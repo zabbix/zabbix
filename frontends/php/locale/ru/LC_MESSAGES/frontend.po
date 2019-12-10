@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-09 12:47+0200\n"
-"PO-Revision-Date: 2019-02-03 00:51+0300\n"
+"PO-Revision-Date: 2019-12-10 02:15+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1549147899.000000\n"
+"X-POOTLE-MTIME: 1575936926.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -204,7 +204,7 @@ msgstr[2] "%1$s секунд"
 #: jsLoader.php:238
 #, c-format
 msgid "%1$s symbols remaining"
-msgstr ""
+msgstr "осталось %1$s символов"
 
 #: app/views/monitoring.widget.problems.view.php:280
 #, c-format
@@ -315,11 +315,11 @@ msgstr "500 последних значений"
 #: app/views/popup.preproctestedit.view.js.php:34
 #: app/views/popup.preproctestedit.view.js.php:41
 msgid "<empty string>"
-msgstr ""
+msgstr "<пустая строка>"
 
 #: include/forms.inc.php:1361 include/views/js/item.preprocessing.js.php:244
 msgid "<label name>"
-msgstr ""
+msgstr "<имя метки>"
 
 #: include/views/monitoring.sysmap.edit.php:116
 msgid "<manual>"
@@ -329,7 +329,7 @@ msgstr "<вручную>"
 #: include/views/js/item.preprocessing.js.php:242
 #: include/views/js/item.preprocessing.js.php:251
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<имя метрики>{<имя метки>=\"<значение метки>\", ...} == <значение>"
 
 #: app/views/administration.script.edit.php:39
 msgid "<sub-menu/sub-menu/...>script"
@@ -850,7 +850,7 @@ msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:1100
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Интервал агрегации"
 
 #: include/actions.inc.php:2151
 msgid "Alert message"
@@ -1196,7 +1196,7 @@ msgstr "Должна поддерживаться по крайней мере �
 
 #: include/views/configuration.correlation.edit.php:210
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "Должна быть выбрана по крайней мере одна операция."
 
 #: include/views/configuration.action.edit.php:323
 msgid "At least one operation must exist."
