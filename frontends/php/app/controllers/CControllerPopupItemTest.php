@@ -219,10 +219,24 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
 			case ITEM_TYPE_SNMPV3:
+				switch ($this->getInput('test_type')) {
+					case self::ZBX_TEST_TYPE_LLD:
+						$item_flag = ZBX_FLAG_DISCOVERY_RULE;
+						break;
+
+					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
+						$item_flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+						break;
+
+					default:
+						$item_flag = ZBX_FLAG_DISCOVERY_NORMAL;
+						break;
+				}
+
 				$data += [
 					'snmp_oid' => $this->getInput('snmp_oid'),
 					'snmp_community' => $this->getInput('snmp_community'),
-					'flags' => $this->host['flags'], // TODO miks: is this really host property?
+					'flags' => $item_flag,
 					'snmpv3_securityname' => $this->getInput('snmpv3_securityname'),
 					'snmpv3_contextname' => $this->getInput('snmpv3_contextname'),
 					'snmpv3_securitylevel' => $this->getInput('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV),
