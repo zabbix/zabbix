@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class shares common properties, constants and methods for different controllers used for item tests.
+ */
 abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Types of preprocessing tests, depending on type of item.
@@ -32,10 +35,10 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @var array
 	 */
-	public static $testable_item_properties = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C,
+	public static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C,
 		ITEM_TYPE_SNMPV3, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 		ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED
-	]; // TODO miks: rename
+	];
 
 	/**
 	 * Item value type used if user has not specified one.
@@ -68,7 +71,8 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected $item_types_has_key_mandatory = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 		ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI,
-		ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED];
+		ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED
+	];
 
 	/**
 	 * Tested item type.
@@ -107,7 +111,7 @@ abstract class CControllerPopupItemTest extends CController {
 		$ret = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
 
 		/*
-		 * Preprocessing test can be made from mass-update screens so host is not mandatary but if it is used, it must
+		 * Preprocessing test can be done from mass-update section so host is non mandatory but if it is used, it must
 		 * be editable.
 		 */
 		$hostid = $this->getInput('hostid', false);
@@ -117,7 +121,8 @@ abstract class CControllerPopupItemTest extends CController {
 				'output' => ['hostid', 'host', 'status', 'available', 'flags', 'proxy_hostid', 'tls_subject',
 					'ipmi_available', 'jmx_available', 'snmp_available', 'maintenance_status', 'maintenance_type',
 					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_psk_identity', 'tls_psk',
-					'tls_issuer', 'tls_connect'],
+					'tls_issuer', 'tls_connect'
+				],
 				'hostids' => [$hostid],
 				'templated_hosts' => true,
 				'editable' => true
@@ -130,7 +135,14 @@ abstract class CControllerPopupItemTest extends CController {
 		return $ret;
 	}
 
-	protected function getPreprocessingItemType($test_type) {
+	/**
+	 * Function returns instance of item, item prototype or discovery rule class.
+	 *
+	 * @param int $test_type
+	 *
+	 * @return CItem|CItemPrototype|CDiscoveryRule
+	 */
+	protected function getPreprocessingItemClassInstance($test_type) {
 		switch ($test_type) {
 			case self::ZBX_TEST_TYPE_ITEM:
 				return new CItem;
@@ -143,6 +155,11 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 	}
 
+	/**
+	 * Function returns list of proxies.
+	 *
+	 * @return array
+	 */
 	protected function getHostProxies() {
 		$proxies = API::Proxy()->get([
 			'output' => ['host'],
@@ -159,6 +176,13 @@ abstract class CControllerPopupItemTest extends CController {
 		return $proxies;
 	}
 
+	/**
+	 * Function returns array of item specific properties used for item testing.
+	 *
+	 * @param array $input  Stored user input used to overwrite values retrieved from database.
+	 *
+	 * @return array
+	 */
 	protected function getItemTestProperties(array $input) {
 		$data = [
 			'value_type' => $this->getInput('value_type')
@@ -173,7 +197,7 @@ abstract class CControllerPopupItemTest extends CController {
 			'type' => $this->item_type
 		];
 
-		$interface_inputs = array_key_exists('interface', $input) ? $input['interface'] : [];
+		$interface_input = array_key_exists('interface', $input) ? $input['interface'] : [];
 
 		switch ($this->item_type) {
 			case ITEM_TYPE_ZABBIX:
@@ -186,7 +210,7 @@ abstract class CControllerPopupItemTest extends CController {
 						'tls_issuer' => $this->host['tls_issuer'],
 						'tls_connect' => $this->host['tls_connect']
 					],
-					'interface' => $this->getItemTestInterface($interface_inputs)
+					'interface' => $this->getItemTestInterface($interface_input)
 				];
 
 				unset($data['interface']['useip'], $data['interface']['interfaceid']);
@@ -205,7 +229,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'host' => [
 						'host' => $this->host['host']
 					],
-					'interface' => $this->getItemTestInterface($interface_inputs)
+					'interface' => $this->getItemTestInterface($interface_input)
 				];
 
 				if ($data['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
@@ -290,7 +314,7 @@ abstract class CControllerPopupItemTest extends CController {
 				$data += [
 					'key' => $this->getInput('key'),
 					'ipmi_sensor' => $this->getInput('ipmi_sensor', ''),
-					'interface' => $this->getItemTestInterface($interface_inputs),
+					'interface' => $this->getItemTestInterface($interface_input),
 					'host' => [
 						'hostid' => $this->host['hostid'],
 						'ipmi_authtype' => $this->host['ipmi_authtype'],
@@ -308,7 +332,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'key' => $this->getInput('key'),
 					'authtype' => $this->getInput('authtype', ITEM_AUTHTYPE_PASSWORD),
 					'params' => $this->getInput('params', ''),
-					'interface' => $this->getItemTestInterface($interface_inputs),
+					'interface' => $this->getItemTestInterface($interface_input),
 					'username' => $this->getInput('username', ''),
 					'password' => $this->getInput('password', '')
 				];
@@ -329,7 +353,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'params' => $this->getInput('params', ''),
 					'publickey' => $this->getInput('publickey', ''),
 					'privatekey' => $this->getInput('privatekey', ''),
-					'interface' => $this->getItemTestInterface($interface_inputs)
+					'interface' => $this->getItemTestInterface($interface_input)
 				];
 
 				unset($data['interface']['interfaceid'], $data['interface']['useip']);
@@ -358,7 +382,7 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SIMPLE:
 				$data += [
 					'key' => $this->getInput('key'),
-					'interface' => $this->getItemTestInterface($interface_inputs),
+					'interface' => $this->getItemTestInterface($interface_input),
 					'username' => $this->getInput('username', ''),
 					'password' => $this->getInput('password', '')
 				];
@@ -371,11 +395,11 @@ abstract class CControllerPopupItemTest extends CController {
 	}
 
 	/**
-	 * Check if item belong to host and select and resolve interface properties. Left fields empty otherwise.
+	 * Check if item belongs to host and select and resolve interface properties. Leave fields empty otherwise.
 	 *
-	 * @var (array) $inputs    Form values to override values from database.
+	 * @var array $inputs  Stored user input used to overwrite values retrieved from database.
 	 *
-	 * @param array $data
+	 * @param array $interface_data
 	 */
 	protected function getItemTestInterface(array $inputs) {
 		$interface_data = [
@@ -386,8 +410,7 @@ abstract class CControllerPopupItemTest extends CController {
 		];
 
 		if (($this->host['status'] == HOST_STATUS_MONITORED || $this->host['status'] == HOST_STATUS_NOT_MONITORED)
-				&& in_array($this->item_type, $this->items_require_interface)
-		) {
+				&& in_array($this->item_type, $this->items_require_interface)) {
 			$interface = $this->getInput('interfaceid', 0)
 				? API::HostInterface()->get([
 					'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip'],
@@ -417,6 +440,11 @@ abstract class CControllerPopupItemTest extends CController {
 		return $interface_data;
 	}
 
+	/**
+	 * Function returns human readable time used for previous time field in item test.
+	 *
+	 * @return string
+	 */
 	protected function getPrevTime() {
 		$time_change = max($this->getInput('time_change', 1), 1);
 

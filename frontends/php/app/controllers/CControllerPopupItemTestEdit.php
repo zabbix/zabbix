@@ -26,7 +26,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 	protected function checkInput() {
 		$fields = [
-			'authtype' => 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'authtype' => 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
+				HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY
+			]),
 			'data' => 'array',
 			'delay' => 'string',
 			'get_value' => 'in 0,1',
@@ -37,7 +39,12 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'key' => 'string',
 			'interfaceid' => 'db interface.interfaceid',
 			'ipmi_sensor' => 'string',
-			'item_type' => 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT]),
+			'item_type' => 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+				ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
+				ITEM_TYPE_HTTPAGENT
+			]),
 			'jmx_endpoint' => 'string',
 			'output_format' => 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params' => 'string',
@@ -47,8 +54,12 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'privatekey' => 'string',
 			'publickey' => 'string',
 			'query_fields' => 'array',
-			'request_method' => 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
-			'retrieve_mode' => 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
+			'request_method' => 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST,
+				HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD
+			]),
+			'retrieve_mode' => 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT,
+				HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH
+			]),
 			'show_final_result' => 'in 0,1',
 			'snmp_oid' => 'string',
 			'snmp_community' => 'string',
@@ -65,11 +76,15 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'ssl_key_file' => 'string',
 			'ssl_key_password' => 'string',
 			'status_codes' => 'string',
-			'test_type' => 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'test_type' => 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
+				self::ZBX_TEST_TYPE_LLD
+			]),
 			'timeout' => 'string',
 			'username' => 'string',
 			'url' => 'string',
-			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
+			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR,
+				ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT
+			]),
 			'valuemapid' => 'int32',
 			'verify_host' => 'in 0,1',
 			'verify_peer' => 'in 0,1'
@@ -79,8 +94,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		if ($ret) {
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
-			$this->preproc_item = self::getPreprocessingItemType($this->getInput('test_type'));
-			$this->is_item_testable = in_array($this->item_type, self::$testable_item_properties);
+			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
+			$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
 			// Check if key is not empty for item types it's mandatory.
 			if (in_array($this->item_type, $this->item_types_has_key_mandatory) && $this->getInput('key', '') === '') {
@@ -139,8 +154,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		// Set resolved macros to previously specified values.
 		if ($usermacros['macros'] && array_key_exists('macros', $data) && is_array($data['macros'])) {
 			foreach (array_keys($usermacros['macros']) as $macro_name) {
-				if (array_key_exists($macro_name, $data['macros']))
-				$usermacros['macros'][$macro_name] = $data['macros'][$macro_name];
+				if (array_key_exists($macro_name, $data['macros'])) {
+					$usermacros['macros'][$macro_name] = $data['macros'][$macro_name];
+				}
 			}
 		}
 

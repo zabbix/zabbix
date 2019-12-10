@@ -1,30 +1,8 @@
-<?php
-/*
-** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-**/
-
-
-?>
 <script type="text/javascript">
 	/**
 	 * Collect current preprocessing step properties.
 	 *
-	 * @param {array}  step_nums      List of step numbers to collect.
+	 * @param {array}  step_nums  List of step numbers to collect.
 	 *
 	 * @return array
 	 */
@@ -267,9 +245,9 @@
 	 *                                     - 'test' button to test single preprocessing step (step index).
 	 */
 	function openItemTestDialog(step_nums, show_final_result, get_value, trigger_elmnt, step_obj_nr) {
-		var $step_obj = jQuery(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot, .tfoot-buttons'),
+		var $row = jQuery(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot, .tfoot-buttons'),
 			item_properties = getItemTestProperties('form[name="itemForm"]'),
-			cached_values = $step_obj.data('test-data') || [];
+			cached_values = $row.data('test-data') || [];
 
 		if (typeof item_properties.interfaceid !== 'undefiened' && typeof cached_values.interface !== 'undefined') {
 			if (cached_values.interface.interfaceid != item_properties.interfaceid) {

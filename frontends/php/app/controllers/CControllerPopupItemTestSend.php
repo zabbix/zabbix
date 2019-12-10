@@ -53,18 +53,24 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 	protected function checkInput() {
 		$fields = [
-			'authtype' => 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'authtype' => 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
+				HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY
+			]),
 			'get_value' => 'in 0,1',
 			'eol' => 'in '.implode(',', [ZBX_EOL_LF, ZBX_EOL_CRLF]),
 			'headers' => 'array',
 			'host_proxy' => 'db hosts.proxy_hostid',
-			//'hostid' => 'db hosts.hostid',
 			'http_proxy' => 'string',
 			'follow_redirects' => 'in 0,1',
 			'key' => 'string',
 			'interface' => 'array',
 			'ipmi_sensor' => 'string',
-			'item_type' => 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT]),
+			'item_type' => 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+				ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
+				ITEM_TYPE_HTTPAGENT
+			]),
 			'jmx_endpoint' => 'string',
 			'macros' => 'array',
 			'output_format' => 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
@@ -77,8 +83,12 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'privatekey' => 'string',
 			'publickey' => 'string',
 			'query_fields' => 'array',
-			'request_method' => 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
-			'retrieve_mode' => 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
+			'request_method' => 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST,
+				HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD
+			]),
+			'retrieve_mode' => 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT,
+				HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH
+			]),
 			'show_final_result' => 'in 0,1',
 			'snmp_oid' => 'string',
 			'snmp_community' => 'string',
@@ -94,13 +104,17 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'ssl_key_file' => 'string',
 			'ssl_key_password' => 'string',
 			'status_codes' => 'string',
-			'test_type' => 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'test_type' => 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
+				self::ZBX_TEST_TYPE_LLD
+			]),
 			'time_change' => 'int32',
 			'timeout' => 'string',
 			'username' => 'string',
 			'url' => 'string',
 			'value' => 'string',
-			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
+			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR,
+				ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT
+			]),
 			'valuemapid' => 'int32',
 			'verify_host' => 'in 0,1',
 			'verify_peer' => 'in 0,1'
@@ -111,8 +125,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		if ($ret) {
 			$this->get_value_from_host = (bool) $this->getInput('get_value');
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
-			$this->preproc_item = self::getPreprocessingItemType($this->getInput('test_type'));
-			$this->is_item_testable = in_array($this->item_type, self::$testable_item_properties);
+			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
+			$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
 			$interface = $this->getInput('interface', []);
 			$steps = $this->getInput('steps');
@@ -271,16 +285,16 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 		// Test preprocessing steps.
 		if ($test_preprocessing_steps && !array_key_exists('messages', $output)) {
-		// Resolve macros used in parameter fields.
+			// Resolve macros used in parameter fields.
 			$macros_posted = $this->getInput('macros', []);
 			$macros_types = ($this->preproc_item instanceof CItemPrototype)
 				? ['usermacros' => true, 'lldmacros' => true]
 				: ['usermacros' => true];
 
 			foreach ($preproc_test_data['steps'] as &$step) {
-				/**
-				 * Values received from html form may be transformed so we must removed redundant "\r" before sending
-				 * data to Zabbix server.
+				/*
+				 * Values received from user input form may be transformed so we must remove redundant "\r" before
+				 * sending data to Zabbix server.
 				 */
 				$step['params'] = str_replace("\r\n", "\n", $step['params']);
 
