@@ -139,10 +139,10 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			error($server->getError());
 		}
 		elseif (is_array($result)) {
-			if (array_key_exists('value', $result)) {
+			if (array_key_exists('result', $result)) {
 				$output['prev_value'] = $this->getInput('value', '');
 				$output['prev_time'] = $this->getPrevTime();
-				$output['value'] = $result['value'];
+				$output['value'] = $result['result'];
 			}
 
 			if (array_key_exists('error', $result) && $result['error'] !== '') {

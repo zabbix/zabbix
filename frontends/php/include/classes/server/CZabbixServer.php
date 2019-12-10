@@ -179,17 +179,11 @@ class CZabbixServer {
 	 * @return array
 	 */
 	public function testItem(array $data, $sid) {
-		// TODO miks: remove hardcoded value; uncomment code bellow.
-		return [
-			'value' => '',
-			'error' => ''
-		];
-
-//		return $this->request([
-//			'request' => 'item.test',
-//			'data' => $data,
-//			'sid' => $sid
-//		]);
+		return $this->request([
+			'request' => 'item.test',
+			'data' => $data,
+			'sid' => $sid
+		]);
 	}
 
 	/**

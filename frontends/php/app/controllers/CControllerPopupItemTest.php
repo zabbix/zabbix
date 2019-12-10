@@ -219,26 +219,45 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
 			case ITEM_TYPE_SNMPV3:
+				switch ($this->getInput('test_type')) {
+					case self::ZBX_TEST_TYPE_LLD:
+						$item_flag = ZBX_FLAG_DISCOVERY_RULE;
+						break;
+
+					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
+						$item_flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+						break;
+
+					default:
+						$item_flag = ZBX_FLAG_DISCOVERY_NORMAL;
+						break;
+				}
+
 				$data += [
 					'snmp_oid' => $this->getInput('snmp_oid'),
 					'snmp_community' => $this->getInput('snmp_community'),
-					'flags' => $this->host['flags'], // TODO miks: is this really host property?
-					'snmpv3_securityname' => $this->getInput('snmpv3_securityname'),
-					'snmpv3_contextname' => $this->getInput('snmpv3_contextname'),
-					'snmpv3_securitylevel' => $this->getInput('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV),
+					'flags' => $item_flag,
 					'host' => [
 						'host' => $this->host['host']
 					],
 					'interface' => $this->getItemTestInterface($interface_input)
 				];
 
-				if ($data['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+				if ($this->item_type == ITEM_TYPE_SNMPV3) {
 					$data += [
-						'snmpv3_authprotocol' => $this->getInput('snmpv3_authprotocol'),
-						'snmpv3_authpassphrase' => $this->getInput('snmpv3_authpassphrase'),
-						'snmpv3_privprotocol' => $this->getInput('snmpv3_privprotocol'),
-						'snmpv3_privpassphrase' => $this->getInput('snmpv3_privpassphrase')
+						'snmpv3_securityname' => $this->getInput('snmpv3_securityname', ''),
+						'snmpv3_contextname' => $this->getInput('snmpv3_contextname', ''),
+						'snmpv3_securitylevel' => $this->getInput('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
 					];
+
+					if ($data['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+						$data += [
+							'snmpv3_authprotocol' => $this->getInput('snmpv3_authprotocol', ''),
+							'snmpv3_authpassphrase' => $this->getInput('snmpv3_authpassphrase', ''),
+							'snmpv3_privprotocol' => $this->getInput('snmpv3_privprotocol', ''),
+							'snmpv3_privpassphrase' => $this->getInput('snmpv3_privpassphrase', '')
+						];
+					}
 				}
 				break;
 
