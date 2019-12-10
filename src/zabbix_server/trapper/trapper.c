@@ -594,6 +594,24 @@ fail:
 void	free_result_ptr(AGENT_RESULT *result);
 int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
 
+static void	db_string_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
+		const char *fieldname, char *string, size_t len)
+{
+	if (SUCCEED != zbx_json_value_by_name(jp, name, string, len, NULL))
+		zbx_strlcpy(string, DBget_field(table, fieldname)->default_value, len);
+}
+
+static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
+		const char *fieldname, unsigned char *string)
+{
+	char	tmp[ZBX_MAX_UINT64_LEN + 1];
+
+	if (SUCCEED == zbx_json_value_by_name(jp, name, tmp, sizeof(tmp), NULL))
+		ZBX_STR2UCHAR(*string, tmp);
+	else
+		ZBX_STR2UCHAR(*string, DBget_field(table, fieldname)->default_value);
+}
+
 static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
 {
 	char			tmp[MAX_STRING_LEN + 1], *error = NULL, **pvalue;
@@ -612,21 +630,9 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	else
 		item.host.proxy_hostid = 0;
 
-	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp), NULL))
-		ZBX_STR2UCHAR(item.type, tmp);
-	else
-		ZBX_STR2UCHAR(item.type, DBget_field(table_items, "type")->default_value);
-
-	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, tmp, sizeof(tmp), NULL))
-		ZBX_STR2UCHAR(item.value_type, tmp);
-	else
-		ZBX_STR2UCHAR(item.value_type, DBget_field(table_items, "value_type")->default_value);
-
-	if (SUCCEED != zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_KEY, item.key_orig, sizeof(item.key_orig), NULL))
-	{
-		zbx_strlcpy(item.key_orig, DBget_field(table_items, "key_")->default_value,
-				sizeof(item.key_orig));
-	}
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_TYPE, table_items, "type", &item.type);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, table_items, "value_type", &item.value_type);
+	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
 
 	item.key = zbx_strdup(NULL, item.key_orig);
 
@@ -641,10 +647,7 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	else
 		item.interface.interfaceid = 0;
 
-	if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_USEIP, tmp, sizeof(tmp), NULL))
-		ZBX_STR2UCHAR(item.interface.useip, tmp);
-	else
-		ZBX_STR2UCHAR(item.interface.useip, DBget_field(table_interface, "useip")->default_value);
+	db_uchar_from_json(&jp_interface, ZBX_PROTO_TAG_USEIP, table_interface, "useip", &item.interface.useip);
 
 	item.interface.addr = NULL;
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, &item.interface.addr,
@@ -657,12 +660,8 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 		item.interface.addr = zbx_strdup(NULL, DBget_field(table_interface, fieldname)->default_value);
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_PORT, item.interface.port_orig,
-			sizeof(item.interface.port_orig), NULL))
-	{
-		zbx_strlcpy(item.interface.port_orig, DBget_field(table_items, "port")->default_value,
-						sizeof(item.interface.port_orig));
-	}
+	db_string_from_json(&jp_interface, ZBX_PROTO_TAG_PORT, table_interface, "port", item.interface.port_orig,
+			sizeof(item.interface.port_orig));
 	ZBX_STR2USHORT(item.interface.port, item.interface.port_orig);
 
 	if (NULL == table_hosts)
@@ -671,11 +670,18 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
 		zbx_json_open("{}", &jp_host);
 
-	if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_TLS_CONNECT, tmp, sizeof(tmp), NULL))
-		ZBX_STR2UCHAR(item.host.tls_connect, tmp);
-	else
-		ZBX_STR2UCHAR(item.host.tls_connect, DBget_field(table_hosts, "tls_connect")->default_value);
-
+	db_string_from_json(&jp_host, ZBX_PROTO_TAG_HOST, table_hosts, "host", item.host.host, sizeof(item.host.host));
+	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_TLS_CONNECT, table_hosts, "tls_connect", &item.host.tls_connect);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_ISSUER, table_hosts, "tls_issuer", item.host.tls_issuer,
+			sizeof(item.host.tls_issuer));
+	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_SUBJECT, table_hosts, "tls_subject", item.host.tls_subject,
+			sizeof(item.host.tls_subject));
+	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK_IDENTITY, table_hosts, "tls_psk_identity",
+			item.host.tls_psk_identity, sizeof(item.host.tls_psk_identity));
+	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK, table_hosts, "tls_psk", item.host.tls_psk,
+			sizeof(item.host.tls_psk));
+#endif
 	zbx_vector_ptr_create(&add_results);
 
 	init_result(&result);

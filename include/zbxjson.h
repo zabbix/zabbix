@@ -128,6 +128,10 @@
 #define ZBX_PROTO_TAG_USEIP			"useip"
 #define ZBX_PROTO_TAG_ADDRESS			"address"
 #define ZBX_PROTO_TAG_TLS_CONNECT		"tls_connect"
+#define ZBX_PROTO_TAG_TLS_ISSUER		"tls_issuer"
+#define ZBX_PROTO_TAG_TLS_SUBJECT		"tls_subject"
+#define ZBX_PROTO_TAG_TLS_PSK_IDENTITY		"tls_psk_identity"
+#define ZBX_PROTO_TAG_TLS_PSK			"tls_psk"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
