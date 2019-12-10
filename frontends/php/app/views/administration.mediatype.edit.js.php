@@ -42,7 +42,7 @@
 	/**
 	 * Draws message template table.
 	 *
-	 * @param {object} list  The list of message templates.
+	 * @param {array} list  An array of message templates.
 	 */
 	function populateMessageTemplates(list) {
 		var row_template = new Template(jQuery('#message-templates-row-tmpl').html());
@@ -85,29 +85,6 @@
 		}
 
 		return <?= CJs::encodeJson(_('Unknown')) ?>;
-	}
-
-	/**
-	 * Gets message type by the specified event source and operation mode.
-	 *
-	 * @param {int|string} eventsource  Event source.
-	 * @param {int|string} recovery     Operation mode.
-	 *
-	 * @return {int|string}
-	 */
-	function transformToMessageType(eventsource, recovery) {
-		for (var message_type in message_templates) {
-			if (!message_templates.hasOwnProperty(message_type)) {
-				continue;
-			}
-
-			if (eventsource == message_template_list[message_type].eventsource
-					&& recovery == message_template_list[message_type].recovery) {
-				return message_type;
-			}
-		}
-
-		return <?= CMediatypeHelper::MSG_TYPE_PROBLEM ?>;
 	}
 
 	/**
