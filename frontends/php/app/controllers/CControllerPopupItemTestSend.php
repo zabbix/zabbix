@@ -245,7 +245,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				error($server->getError());
 			}
 			elseif (is_array($result)) {
-				if (array_key_exists('value', $result)) {
+				if (array_key_exists('result', $result)) {
 					if ($test_preprocessing_steps && $this->use_prev_value) {
 						$preproc_test_data['history']['value'] = $preproc_test_data['value'];
 						$preproc_test_data['history']['timestamp'] = $this->getPrevTime();
@@ -254,8 +254,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						$output['prev_time'] = $preproc_test_data['history']['timestamp'];
 					}
 
-					$preproc_test_data['value'] = $result['value'];
-					$output['value'] = $result['value'];
+					$preproc_test_data['value'] = $result['result'];
+					$output['value'] = $result['result'];
 				}
 
 				if (array_key_exists('error', $result) && $result['error'] !== '') {
