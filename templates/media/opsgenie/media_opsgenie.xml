@@ -118,7 +118,7 @@
         url = params.url+&quot;/&quot;+params.eventid+&quot;?identifierType=alias&quot;;&#13;
         resp = req.Get(url);&#13;
         resp = JSON.parse(resp);&#13;
-        result.tags.issue_key = params.web+&quot;/alert/detail/&quot;+resp.data.id+&quot;/details&quot;;&#13;
+        result.tags.opsgenie_issue_key = params.web+&quot;/alert/detail/&quot;+resp.data.id+&quot;/details&quot;;&#13;
     }&#13;
 &#13;
 } catch (error) {&#13;
@@ -130,7 +130,7 @@
 return JSON.stringify(result);&#13;
 </script>
             <process_tags>YES</process_tags>
-            <event_menu_url>{EVENT.TAGS.issue_key}</event_menu_url>
+            <event_menu_url>{EVENT.TAGS.opsgenie_issue_key}</event_menu_url>
             <event_menu_name>Alert in Opsgenie</event_menu_name>
             <description>Please refer to https://docs.opsgenie.com/docs/alert-api and https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook#example_scripts.&#13;
   &#13;
