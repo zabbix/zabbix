@@ -123,6 +123,10 @@
 #define ZBX_PROTO_TAG_INTERFACE			"interface"
 #define ZBX_PROTO_TAG_FLAGS			"flags"
 #define ZBX_PROTO_TAG_PARAMETERS		"parameters"
+#define ZBX_PROTO_TAG_PROXY_HOSTID		"proxy_hostid"
+#define ZBX_PROTO_TAG_INTERFACE_ID		"interfaceid"
+#define ZBX_PROTO_TAG_USEIP			"useip"
+#define ZBX_PROTO_TAG_ADDRESS			"address"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -151,6 +155,7 @@
 #define ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE	"queue"
 
 #define ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND	"alert.send"
+#define ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST	"item.test"
 #define ZBX_PROTO_VALUE_PREPROCESSING_TEST	"preprocessing.test"
 
 typedef enum
