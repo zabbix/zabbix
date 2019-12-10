@@ -595,8 +595,8 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 {
 	char			tmp[MAX_STRING_LEN + 1], *error = NULL;
 	DC_ITEM			item;
-	static const ZBX_TABLE	*table_items, *table_interface;
-	struct zbx_json_parse	jp_interface;
+	static const ZBX_TABLE	*table_items, *table_interface, *table_hosts;
+	struct zbx_json_parse	jp_interface, jp_host;
 	size_t			size = 0;
 
 	if (NULL == table_items)
@@ -625,11 +625,11 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 
 	item.key = zbx_strdup(NULL, item.key_orig);
 
-	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
-		zbx_json_open("{}", &jp_interface);
-
 	if (NULL == table_interface)
 		table_interface = DBget_table("interface");
+
+	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
+		zbx_json_open("{}", &jp_interface);
 
 	if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_INTERFACE_ID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(item.interface.interfaceid, tmp);
@@ -659,6 +659,17 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 						sizeof(item.interface.port_orig));
 	}
 	ZBX_STR2USHORT(item.interface.port, item.interface.port_orig);
+
+	if (NULL == table_hosts)
+		table_hosts = DBget_table("hosts");
+
+	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
+		zbx_json_open("{}", &jp_host);
+
+	if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_TLS_CONNECT, tmp, sizeof(tmp), NULL))
+		ZBX_STR2UCHAR(item.host.tls_connect, tmp);
+	else
+		ZBX_STR2UCHAR(item.host.tls_connect, DBget_field(table_hosts, "tls_connect")->default_value);
 
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
