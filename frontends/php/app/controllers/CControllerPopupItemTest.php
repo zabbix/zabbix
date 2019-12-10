@@ -446,7 +446,7 @@ abstract class CControllerPopupItemTest extends CController {
 						? $interface[0]['ip']
 						: $interface[0]['dns'],
 					'port' => $interface[0]['port'],
-					'useip' => $interface[0]['useup'],
+					'useip' => $interface[0]['useip'],
 					'interfaceid' => $interface[0]['interfaceid']
 				];
 			}
