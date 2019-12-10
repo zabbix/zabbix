@@ -1581,7 +1581,7 @@ class testFormAction extends CLegacyWebTest {
 						'value' => 'application',
 					],
 					[
-						'type' => 'Tag',
+						'type' => 'Tag name',
 						'operator' => 'does not contain',
 						'value' => 'Does not contain Tag',
 					],
@@ -1752,7 +1752,7 @@ class testFormAction extends CLegacyWebTest {
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
-					case 'Tag':
+					case 'Tag name':
 						if (array_key_exists('operator', $condition)) {
 							$this->zbxTestClickXpathWait('//label[text()="'.$condition['operator'].'"]');
 						}
