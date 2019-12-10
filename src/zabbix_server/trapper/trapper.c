@@ -595,28 +595,29 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 {
 	char			tmp[MAX_STRING_LEN + 1], *error = NULL;
 	DC_ITEM			item;
-	static const ZBX_TABLE	*table_items;
+	static const ZBX_TABLE	*table_items, *table_interface;
 	struct zbx_json_parse	jp_interface;
+	size_t			size = 0;
 
 	if (NULL == table_items)
 		table_items = DBget_table("items");
 
-	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_PROXY_HOSTID, tmp, sizeof(tmp)))
+	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_PROXY_HOSTID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(item.host.proxy_hostid, tmp);
 	else
 		item.host.proxy_hostid = 0;
 
-	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp)))
+	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UCHAR(item.type, tmp);
 	else
 		ZBX_STR2UCHAR(item.type, DBget_field(table_items, "type")->default_value);
 
-	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, tmp, sizeof(tmp)))
+	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UCHAR(item.value_type, tmp);
 	else
 		ZBX_STR2UCHAR(item.value_type, DBget_field(table_items, "value_type")->default_value);
 
-	if (SUCCEED != zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_KEY, item.key_orig, sizeof(item.key_orig)))
+	if (SUCCEED != zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_KEY, item.key_orig, sizeof(item.key_orig), NULL))
 	{
 		zbx_strlcpy(item.key_orig, DBget_field(table_items, "key_")->default_value,
 				sizeof(item.key_orig));
@@ -624,44 +625,40 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 
 	item.key = zbx_strdup(NULL, item.key_orig);
 
-	if (SUCCEED == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
+	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
+		zbx_json_open("{}", &jp_interface);
+
+	if (NULL == table_interface)
+		table_interface = DBget_table("interface");
+
+	if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_INTERFACE_ID, tmp, sizeof(tmp), NULL))
+		ZBX_STR2UINT64(item.interface.interfaceid, tmp);
+	else
+		item.interface.interfaceid = 0;
+
+	if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_USEIP, tmp, sizeof(tmp), NULL))
+		ZBX_STR2UCHAR(item.interface.useip, tmp);
+	else
+		ZBX_STR2UCHAR(item.interface.useip, DBget_field(table_interface, "useip")->default_value);
+
+	item.interface.addr = NULL;
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, &item.interface.addr,
+			&size, NULL))
 	{
-		static const ZBX_TABLE	*table_interface;
-		size_t			size = 0;
+		char	*fieldname;
 
-		if (NULL == table_interface)
-			table_interface = DBget_table("interface");
+		fieldname = 1 == item.interface.useip ? "ip" : "dns";
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_INTERFACE_ID, tmp, sizeof(tmp)))
-			ZBX_STR2UINT64(item.interface.interfaceid, tmp);
-		else
-			item.interface.interfaceid = 0;
-
-		if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_USEIP, tmp, sizeof(tmp)))
-			ZBX_STR2UCHAR(item.interface.useip, tmp);
-		else
-			ZBX_STR2UCHAR(item.interface.useip, DBget_field(table_interface, "useip")->default_value);
-
-		item.interface.addr = NULL;
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, &item.interface.addr,
-				&size))
-		{
-			char	*fieldname;
-
-			fieldname = 1 == item.interface.useip ? "ip" : "dns";
-
-			item.interface.addr = zbx_strdup(NULL, DBget_field(table_interface, fieldname)->default_value);
-		}
-
-		if (SUCCEED != zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_PORT, item.interface.port_orig,
-				sizeof(item.interface.port_orig)))
-		{
-			zbx_strlcpy(item.interface.port_orig, DBget_field(table_items, "port")->default_value,
-							sizeof(item.interface.port_orig));
-		}
-
-		ZBX_STR2USHORT(item.interface.port, item.interface.port_orig);
+		item.interface.addr = zbx_strdup(NULL, DBget_field(table_interface, fieldname)->default_value);
 	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_PORT, item.interface.port_orig,
+			sizeof(item.interface.port_orig), NULL))
+	{
+		zbx_strlcpy(item.interface.port_orig, DBget_field(table_items, "port")->default_value,
+						sizeof(item.interface.port_orig));
+	}
+	ZBX_STR2USHORT(item.interface.port, item.interface.port_orig);
 
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
@@ -685,7 +682,7 @@ static void	recv_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		zbx_send_response(sock, FAIL,  "Permission denied.", CONFIG_TIMEOUT);
