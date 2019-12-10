@@ -27,7 +27,7 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 			['http://zabbix.com',				[], true],
 			['https://zabbix.com',				[], true],
 			['zabbix.php?a=1',					[], true],
-			['adm.images.php?a=1',				[], true],
+			['zabbix.php?action=image.list',	[], true],
 			['chart_bar.php?a=1&b=2',			[], true],
 			['mailto:example@example.com',		[], true],
 			['file://localhost/path',			[], true],

@@ -24,7 +24,6 @@ package file
 import (
 	"reflect"
 	"testing"
-	"time"
 
 	"zabbix.com/pkg/std"
 )
@@ -32,7 +31,7 @@ import (
 func TestFileModifyTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.timeout = time.Second * 3
+	impl.options.Timeout = 3
 
 	var filetime int64
 
@@ -58,7 +57,7 @@ func TestFileModifyTime(t *testing.T) {
 func TestFileAccessTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.timeout = time.Second * 3
+	impl.options.Timeout = 3
 
 	var filetime int64
 
@@ -84,7 +83,7 @@ func TestFileAccessTime(t *testing.T) {
 func TestFileChangeTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.timeout = time.Second * 3
+	impl.options.Timeout = 3
 
 	var filetime int64
 

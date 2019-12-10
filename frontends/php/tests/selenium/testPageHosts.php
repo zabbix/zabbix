@@ -411,7 +411,8 @@ class testPageHosts extends CLegacyWebTest {
 		// Reset filter from possible previous scenario.
 		$form->query('button:Reset')->one()->click();
 
-		$this->setTags($data['evaluation_type'], $data['tags']);
+		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
+		$this->setTags($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.

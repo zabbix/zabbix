@@ -24,9 +24,9 @@ ob_start(); ?>
 /**
  * Make step result UI element.
  *
- * @param array step  Step object returned from server.
+ * @param {array} step  Step object returned from server.
  *
- * @return jQuery
+ * @return {jQuery}
  */
 function makeStepResult(step) {
 	if (typeof step.error !== 'undefined') {
@@ -50,6 +50,9 @@ function makeStepResult(step) {
 	}
 }
 
+/**
+ * Disable item test form.
+ */
 function disableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', true);
 
@@ -69,21 +72,15 @@ function disableItemTestForm() {
 
 	jQuery('#eol input').prop('disabled', true);
 
-	<?php if (count($data['steps']) > 0) { ?>
-	jQuery('<span>')
-		.addClass('preloader')
-		.insertAfter(jQuery('.submit-test-btn'))
-		.css({
-			'display': 'inline-block',
-			'margin': '0 10px -8px'
-		});
-
 	jQuery('.submit-test-btn')
-		.prop('disabled', true)
-		.hide();
-	<?php } ?>
+		.prop('disabled', false)
+		.addClass('is-loading')
+		.blur();
 }
 
+/**
+ * Enable item test form.
+ */
 function enableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', false);
 
@@ -103,14 +100,14 @@ function enableItemTestForm() {
 
 	jQuery('#eol input').prop('disabled', false);
 
-	<?php if (count($data['steps']) > 0) { ?>
-	jQuery('.preloader').remove();
 	jQuery('.submit-test-btn')
 		.prop('disabled', false)
-		.show();
-	<?php } ?>
+		.removeClass('is-loading');
 }
 
+/**
+ * Clear previous test results.
+ */
 function cleanPreviousTestResults() {
 	var $form = jQuery('#preprocessing-test-form');
 
@@ -210,8 +207,8 @@ function itemCompleteTest() {
 
 	url.setArgument('action', 'popup.itemtest.send');
 
-	if (<?= $data['steps_num']; ?> > 0) {
-		step_nums = [...Array(<?= $data['steps_num']; ?>).keys()];
+	if (<?= $data['steps_num'] ?> > 0) {
+		step_nums = [...Array(<?= $data['steps_num'] ?>).keys()];
 	}
 	else {
 		step_nums = [0];
@@ -274,7 +271,7 @@ function itemCompleteTest() {
 			jQuery('#value', $form).multilineInput('value', ret.value);
 
 			if (typeof ret.eol !== 'undefined') {
-				jQuery("input[value="+ret.eol+"]", jQuery("#eol")).prop("checked", "checked");
+				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 			}
 
 			if (typeof ret.final !== 'undefined') {
@@ -289,7 +286,7 @@ function itemCompleteTest() {
 						.append(ret.final.action)
 						.append($result);
 
-				if (typeof ret.mapped_value != 'undefined') {
+				if (typeof ret.mapped_value !== 'undefined') {
 					$mapped_value = makeStepResult({result: ret.mapped_value});
 					$mapped_value.css('float', 'right');
 
@@ -349,12 +346,12 @@ function processItemPreprocessingTestResults(steps) {
 		step.result = makeStepResult(step);
 
 		if (typeof step.action !== 'undefined' && step.action !== null) {
-			jQuery('#preproc-test-step-'+i+'-name').append(jQuery(tmpl_gray_label.evaluate(<?= CJs::encodeJson([
+			jQuery('#preproc-test-step-' + i + '-name').append(jQuery(tmpl_gray_label.evaluate(<?= CJs::encodeJson([
 				'label' => _('Custom on fail')
 			]) ?>)));
 		}
 
-		jQuery('#preproc-test-step-'+i+'-result').append(step.result, step.action);
+		jQuery('#preproc-test-step-' + i + '-result').append(step.result, step.action);
 	});
 }
 

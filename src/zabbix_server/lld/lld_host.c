@@ -619,7 +619,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 		zbx_vector_ptr_append(hosts, host);
 	}
-	else if (NULL != host && NULL != host->host_proto)
+	else
 	{
 		/* host technical name */
 		if (0 != strcmp(host->host_proto, host_proto))	/* the new host prototype differs */
@@ -967,7 +967,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 
 		zbx_vector_ptr_append(groups, group);
 	}
-	else if (NULL != group)
+	else
 	{
 		/* update an already existing group */
 
@@ -2705,7 +2705,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 
 		zbx_vector_ptr_append(interfaces, interface);
 	}
-	else if (NULL != interface)
+	else
 	{
 		/* interface which are already added */
 		if (interface->type != type)
@@ -2730,8 +2730,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK;
 	}
 
-	if (NULL != interface)
-		interface->interfaceid = interfaceid;
+	interface->interfaceid = interfaceid;
 }
 
 /******************************************************************************

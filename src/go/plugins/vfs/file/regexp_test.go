@@ -25,7 +25,6 @@ import (
 	"reflect"
 	"regexp"
 	"testing"
-	"time"
 
 	"zabbix.com/pkg/std"
 )
@@ -72,7 +71,7 @@ func TestExecuteRegex(t *testing.T) {
 func TestFileRegexpOutput(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.timeout = time.Second * 3
+	impl.options.Timeout = 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xe4, 0xd5, 0xde, 0xe4, 0xd0, 0xdd, 0x0d, 0x0a})
 	if result, err := impl.Export("vfs.file.regexp", []string{"text.txt", "(ф)", "iso-8859-5", "", "", "group 0: \\0 group 1: \\1 group 4: \\4"}, nil); err != nil {
@@ -91,7 +90,7 @@ func TestFileRegexpOutput(t *testing.T) {
 func TestFileRegexp(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.timeout = time.Second * 3
+	impl.options.Timeout = 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a})
 	if result, err := impl.Export("vfs.file.regexp", []string{"text.txt", "(а)", "iso-8859-5", "", ""}, nil); err != nil {

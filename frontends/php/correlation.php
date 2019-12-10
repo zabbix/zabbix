@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/correlation.inc.php';
 
 $page['title'] = _('Event correlation rules');
 $page['file'] = 'correlation.php';
-$page['scripts'] = ['multiselect.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'popup.condition.common.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 // VAR									TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -51,14 +51,12 @@ $fields = [
 	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
 	'operations' =>						[null,		O_OPT,	null,	null,		null],
 	'edit_operationid' =>				[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
-	'new_operation' =>					[null,		O_OPT,	null,	null,		null],
 	// actions
 	'action' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 											IN('"correlation.massdelete","correlation.massdisable","correlation.massenable"'),
 											null
 										],
 	'add_condition' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_operation' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -291,47 +289,6 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 		$_REQUEST['conditions'] = $valid_conditions;
 	}
 }
-elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
-	$new_operation = getRequest('new_operation');
-	$result = true;
-
-	$_REQUEST['operations'] = getRequest('operations', []);
-
-	$uniqOperations = [
-		ZBX_CORR_OPERATION_CLOSE_OLD => 0,
-		ZBX_CORR_OPERATION_CLOSE_NEW => 0
-	];
-
-	if (array_key_exists($new_operation['type'], $uniqOperations)) {
-		$uniqOperations[$new_operation['type']]++;
-
-		foreach ($_REQUEST['operations'] as $operationId => $operation) {
-			if (array_key_exists($operation['type'], $uniqOperations)
-					&& (!array_key_exists('id', $new_operation) || bccomp($new_operation['id'], $operationId) != 0)) {
-				$uniqOperations[$operation['type']]++;
-			}
-		}
-
-		if ($uniqOperations[$new_operation['type']] > 1) {
-			$result = false;
-			error(_s('Operation "%s" already exists.', corrOperationTypes($new_operation['type'])));
-			show_messages();
-		}
-	}
-
-	if ($result) {
-		if (array_key_exists('id', $new_operation)) {
-			$_REQUEST['operations'][$new_operation['id']] = $new_operation;
-		}
-		else {
-			$_REQUEST['operations'][] = $new_operation;
-		}
-
-		CArrayHelper::sort($_REQUEST['operations'], ['type']);
-	}
-
-	unset($_REQUEST['new_operation']);
-}
 elseif (hasRequest('action')
 		&& str_in_array(getRequest('action'), ['correlation.massenable', 'correlation.massdisable'])) {
 
@@ -386,7 +343,6 @@ if (hasRequest('form')) {
 		'form' => getRequest('form'),
 		'correlationid' => $correlationid,
 		'new_condition' => getRequest('new_condition', []),
-		'new_operation' => getRequest('new_operation'),
 		'config' => $config
 	];
 
@@ -450,6 +406,23 @@ if (hasRequest('form')) {
 			'tag' => ''
 		];
 	}
+
+	$checked = [
+		ZBX_CORR_OPERATION_CLOSE_OLD => false,
+		ZBX_CORR_OPERATION_CLOSE_NEW => false
+	];
+
+	if ($data['correlation']['operations']) {
+		foreach ($data['correlation']['operations'] as $operationid => $operation) {
+			if (!array_key_exists($operation['type'], $data['allowedOperations'])) {
+				continue;
+			}
+
+			$checked[$operation['type']] = true;
+		}
+	}
+
+	$data['correlation']['operations'] = $checked;
 
 	// Render view.
 	$correlationView = new CView('configuration.correlation.edit', $data);

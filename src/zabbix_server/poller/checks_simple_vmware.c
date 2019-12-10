@@ -224,7 +224,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 {
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
-	zbx_str_uint64_pair_t		*perfvalue = NULL;
+	zbx_str_uint64_pair_t		*perfvalue;
 	int				i, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t			value;
 
@@ -280,13 +280,13 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 	}
 
 	/* VMware returns -1 value if the performance data for the specified period is not ready - ignore it */
-	if (NULL != perfvalue && ZBX_MAX_UINT64 == perfvalue->value)
+	if (ZBX_MAX_UINT64 == perfvalue->value)
 	{
 		ret = SYSINFO_RET_OK;
 		goto out;
 	}
 
-	value = perfvalue ? perfvalue->value * coeff : 0;
+	value = perfvalue->value * coeff;
 	SET_UI64_RESULT(result, value);
 	ret = SYSINFO_RET_OK;
 out:
@@ -693,6 +693,8 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 
 			zbx_vector_ptr_append(add_results, add_result);
 		}
+		else
+			zbx_free(add_result);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __func__, add_results->values_num);

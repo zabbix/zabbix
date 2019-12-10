@@ -101,9 +101,11 @@ class CComboBox extends CTag {
 	public function setReadonly($value) {
 		if ($value) {
 			$this->setAttribute('readonly', 'readonly');
+			$this->setAttribute('tabindex', '-1');
 		}
 		else {
 			$this->removeAttribute('readonly');
+			$this->removeAttribute('tabindex');
 		}
 
 		return $this;

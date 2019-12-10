@@ -101,10 +101,13 @@ class CPopupMenuElement extends CElement {
 			throw new Exception('Failed to find menu item by name: "'.$name.'".');
 		}
 
-		$element->click();
 		if ($items) {
+			$element->hover();
 			$element->parents()->query('class:menu-popup')->asPopupMenu()
 					->waitUntilPresent()->one()->select($items);
+		}
+		else {
+			$element->click();
 		}
 
 		return $this;

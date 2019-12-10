@@ -29,7 +29,7 @@
 #include "zbxjson.h"
 #include "log.h"
 #include "proxy.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "../trapper/proxydata.h"
 
 extern unsigned char	process_type, program_type;
@@ -344,7 +344,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 	{
 		char	value[MAX_STRING_LEN];
 
-		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MORE, value, sizeof(value)))
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
 			*more = atoi(value);
 	}
 out:

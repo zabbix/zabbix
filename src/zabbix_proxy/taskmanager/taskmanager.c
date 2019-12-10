@@ -24,7 +24,7 @@
 #include "log.h"
 #include "db.h"
 #include "dbcache.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 #include "../../zabbix_server/scripts/scripts.h"
 #include "taskmanager.h"

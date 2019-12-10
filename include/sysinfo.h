@@ -141,7 +141,7 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 #define ZBX_AVG15		2
 #define ZBX_AVG_COUNT		3
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS)
 #	define MAX_COLLECTOR_PERIOD	(15 * SEC_PER_MIN)
 #endif
 
@@ -269,7 +269,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PERF_COUNTER_EN(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -288,7 +288,7 @@ int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event);
 #else
 typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -310,7 +310,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 #define ZBX_SYSINFO_PROC_CMDLINE	0x0004
 #define ZBX_SYSINFO_PROC_USER		0x0008
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #define ZBX_MUTEX_ALL_ALLOW		0
 #define ZBX_MUTEX_THREAD_DENIED		1
 #define ZBX_MUTEX_LOGGING_DENIED	2

@@ -31,7 +31,7 @@ type keyAlias struct {
 	name, key string
 }
 
-func (m *Manager) loadAlias(options agent.AgentOptions) (err error) {
+func (m *Manager) loadAlias(options *agent.AgentOptions) (err error) {
 	m.aliases = make([]keyAlias, 0)
 	for _, data := range options.Alias {
 		var name, key string

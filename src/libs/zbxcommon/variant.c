@@ -166,10 +166,8 @@ static int	variant_to_dbl(zbx_variant_t *value)
 	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
 	zbx_trim_float(buffer);
 
-	if (SUCCEED != is_double(buffer))
+	if (SUCCEED != is_double(buffer, &value_dbl))
 		return FAIL;
-
-	value_dbl = atof(buffer);
 
 	zbx_variant_clear(value);
 	zbx_variant_set_dbl(value, value_dbl);
@@ -258,6 +256,7 @@ int	zbx_variant_convert(zbx_variant_t *value, int type)
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 {
 	zbx_uint64_t	value_ui64;
+	double		dbl_tmp;
 	char		buffer[MAX_STRING_LEN];
 
 	zbx_strlcpy(buffer, text, sizeof(buffer));
@@ -278,9 +277,9 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 		return SUCCEED;
 	}
 
-	if (SUCCEED == is_double(buffer))
+	if (SUCCEED == is_double(buffer, &dbl_tmp))
 	{
-		zbx_variant_set_dbl(value, atof(buffer));
+		zbx_variant_set_dbl(value, dbl_tmp);
 		return SUCCEED;
 	}
 
@@ -526,8 +525,8 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	if (ZBX_VARIANT_UI64 == value1->type && ZBX_VARIANT_UI64 == value2->type)
 		return  variant_compare_ui64(value1, value2);
 
-	if ((ZBX_VARIANT_STR != value1->type || SUCCEED == is_double(value1->data.str)) &&
-			(ZBX_VARIANT_STR != value2->type || SUCCEED == is_double(value2->data.str)))
+	if ((ZBX_VARIANT_STR != value1->type || SUCCEED == is_double(value1->data.str, NULL)) &&
+			(ZBX_VARIANT_STR != value2->type || SUCCEED == is_double(value2->data.str, NULL)))
 	{
 		return variant_compare_dbl(value1, value2);
 	}

@@ -57,7 +57,6 @@ $ui-sortable-helper-border-color: $ui-border-color !default;
 
 $action-hover-color: #e8f5ff !default;
 $action-border-color: #ccd5d9 !default;
-$action-preloader-bg-color: $body-bg-color !default;
 $action-shadow-color: rgba(#768d99, 0.5) !default;
 
 $table-border-color: #ebeef0 !default;
@@ -153,3 +152,9 @@ $host-avail-true-bg-color: $alt-light-green !default;
 $host-avail-false-bg-color: $alt-red !default;
 $host-avail-unknown-bg-color: $alt-blue-grey !default;
 $host-avail-total-bg-color: $transparent !default;
+
+// PRELOADER
+$preloader-bg-color: $body-bg-color !default;
+$preloader-color: #ccd5d9 !default;
+$preloader-disabled-color: #fdfdfd !default;
+$preloader-accent-color: #0275b8 !default;

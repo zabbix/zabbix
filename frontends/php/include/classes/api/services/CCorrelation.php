@@ -1144,6 +1144,13 @@ class CCorrelation extends CApiService {
 								_('Incorrect arguments passed to function.')
 							);
 						}
+						elseif (($condition['operator'] == CONDITION_OPERATOR_LIKE
+									|| $condition['operator'] == CONDITION_OPERATOR_NOT_LIKE)
+								&& (!array_key_exists('value', $condition) || $condition['value'] === '')) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+							);
+						}
 						elseif (!$filter_condition_tagval_operator_validator->validate($condition['operator'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 								'Incorrect value "%1$s" in field "%2$s" for correlation "%3$s".',

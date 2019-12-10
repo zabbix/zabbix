@@ -41,11 +41,17 @@ class CNewValidator {
 	 */
 	private $range_time_parser;
 
+	/**
+	 * A parser for a list of time periods separated by a semicolon.
+	 *
+	 * @var CTimePeriodsParser
+	 */
+	private $time_periods_parser;
+
 	public function __construct(array $input, array $rules) {
 		$this->input = $input;
 		$this->rules = $rules;
 		$this->validationRuleParser = new CValidationRule();
-		$this->range_time_parser = null;
 
 		$this->validate();
 	}
@@ -184,8 +190,9 @@ class CNewValidator {
 				 */
 				case 'array_db':
 					if (array_key_exists($field, $this->input)) {
-						if (!$this->is_array_db($this->input[$field], $params['table'], $params['field'], $flags)
-								|| !is_array($this->input[$field])) {
+						if (!is_array($this->input[$field])
+								|| !$this->is_array_db($this->input[$field], $params['table'], $params['field'], $flags)
+						) {
 							$this->addError($fatal,
 								is_scalar($this->input[$field])
 									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
@@ -264,6 +271,32 @@ class CNewValidator {
 					if (array_key_exists($field, $this->input) && !$this->isRangeTime($this->input[$field])) {
 						$this->addError($fatal,
 							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time is expected'))
+						);
+						return false;
+					}
+					break;
+
+				/*
+				 * 'time_periods' => true
+				 */
+				case 'time_periods':
+					if (array_key_exists($field, $this->input) && !$this->isTimePeriods($this->input[$field])) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time period is expected'))
+						);
+						return false;
+					}
+					break;
+
+				/*
+				 * 'rgb' => true
+				 */
+				case 'rgb':
+					if (array_key_exists($field, $this->input) && !$this->isRgb($this->input[$field])) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field,
+								_('a hexadecimal colour code (6 symbols) is expected')
+							)
 						);
 						return false;
 					}
@@ -412,20 +445,12 @@ class CNewValidator {
 		return (is_string($value) && $this->check_db_value($table_schema['fields'][$field], $value, $flags));
 	}
 
-	private function isLeapYear($year) {
-		return (0 == $year % 4 && (0 != $year % 100 || 0 == $year % 400));
-	}
-
-	private function getDaysInMonth($year, $month) {
-		if (in_array($month, [4, 6, 9, 11], true)) {
-			return 30;
+	private function isTimePeriods($value) {
+		if ($this->time_periods_parser === null) {
+			$this->time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);
 		}
 
-		if ($month == 2) {
-			return $this->isLeapYear($year) ? 29 : 28;
-		}
-
-		return 31;
+		return is_string($value) && $this->time_periods_parser->parse($value) == CParser::PARSE_SUCCESS;
 	}
 
 	private function isRangeTime($value) {
@@ -434,6 +459,10 @@ class CNewValidator {
 		}
 
 		return is_string($value) && $this->range_time_parser->parse($value) == CParser::PARSE_SUCCESS;
+	}
+
+	private function isRgb($value) {
+		return is_string($value) && preg_match('/^[A-F0-9]{6}$/', $value);
 	}
 
 	/**

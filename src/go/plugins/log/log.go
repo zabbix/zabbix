@@ -25,20 +25,34 @@ import (
 	"time"
 	"unsafe"
 
-	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxlib"
 )
 
+type Options struct {
+	MaxLinesPerSecond int `conf:"range=1:1000,default=20"`
+	Capacity          int `conf:"optional,range=1:100"`
+}
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	options Options
 }
 
-func (p *Plugin) Configure(options map[string]string) {
-	zbxlib.SetMaxLinesPerSecond(agent.Options.MaxLinesPerSecond)
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+	if err := conf.Unmarshal(options, &p.options); err != nil {
+		p.Warningf("cannot unmarshal configuration options: %s", err)
+	}
+	zbxlib.SetMaxLinesPerSecond(p.options.MaxLinesPerSecond)
+}
+
+func (p *Plugin) Validate(options interface{}) error {
+	var o Options
+	return conf.Unmarshal(options, &o)
 }
 
 type metadata struct {
@@ -56,11 +70,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	var data *metadata
 	if meta.Data == nil {
 		data = &metadata{key: key, params: params}
-		meta.Data = data
 		runtime.SetFinalizer(data, func(d *metadata) { zbxlib.FreeActiveMetric(d.blob) })
 		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
 			return nil, err
 		}
+		meta.Data = data
 	} else {
 		data = meta.Data.(*metadata)
 		if !itemutil.CompareKeysParams(key, params, data.key, data.params) {

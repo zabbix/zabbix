@@ -263,8 +263,8 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>,
-					testable_item_types = <?= CJs::encodeJson(CControllerPopupItemTest::$testable_item_properties) ?>,
+				var itemInterfaceTypes = <?= CJs::encodeJson(itemTypeInterface()) ?>,
+					testable_item_types = <?= CJs::encodeJson(CControllerPopupItemTest::$testable_item_types) ?>,
 					type = parseInt($('#type').val());
 
 				$('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));

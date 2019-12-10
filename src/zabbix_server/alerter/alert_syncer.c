@@ -483,7 +483,7 @@ static void	am_db_update_event_tags(zbx_db_insert_t *db_event, zbx_db_insert_t *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " tags:%s", __func__, eventid, params);
 
-	result = DBselect("select e.source,p.eventid"
+	result = DBselect("select p.eventid"
 			" from events e left join problem p"
 				" on p.eventid=e.eventid"
 			" where e.eventid=" ZBX_FS_UI64, eventid);
@@ -494,13 +494,7 @@ static void	am_db_update_event_tags(zbx_db_insert_t *db_event, zbx_db_insert_t *
 		goto out;
 	}
 
-	if (EVENT_SOURCE_TRIGGERS != atoi(row[0]))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "tags can be added only for problem trigger events");
-		goto out;
-	}
-
-	if (SUCCEED != DBis_null(row[1]))
+	if (SUCCEED != DBis_null(row[0]))
 		problem = 1;
 
 	if (FAIL == zbx_json_open(params, &jp))
@@ -610,62 +604,78 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 	{
 		int 		i;
 		char		*sql;
-		size_t		sql_alloc = results_num * 128, sql_offset = 0;
+		size_t		sql_alloc = results_num * 128, sql_offset;
 		zbx_db_insert_t	db_event, db_problem;
 
 		sql = (char *)zbx_malloc(NULL, sql_alloc);
 
-		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-		zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
-		zbx_db_insert_prepare(&db_problem, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
+		do {
+			sql_offset = 0;
+
+			DBbegin();
+			DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+			zbx_db_insert_prepare(&db_problem, "problem_tag", "problemtagid", "eventid", "tag", "value",
+					NULL);
+
+			for (i = 0; i < results_num; i++)
+			{
+				zbx_am_db_mediatype_t	*mediatype;
+				zbx_am_result_t		*result = results[i];
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"update alerts set status=%d,retries=%d",
+						result->status, result->retries);
+
+				if (NULL != result->error)
+				{
+					char	*error_esc;
+					error_esc = DBdyn_escape_field("alerts", "error", result->error);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",error='%s'", error_esc);
+					zbx_free(error_esc);
+				}
+				else
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",error=''");
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where alertid=" ZBX_FS_UI64 ";\n",
+						result->alertid);
+
+				if (EVENT_SOURCE_TRIGGERS == result->source && NULL != result->value)
+				{
+					mediatype = zbx_hashset_search(&amdb->mediatypes, &result->mediatypeid);
+					if (NULL != mediatype && 0 != mediatype->process_tags)
+					{
+						am_db_update_event_tags(&db_event, &db_problem, result->eventid,
+								result->value);
+					}
+				}
+
+				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			}
+
+			DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+			if (16 < sql_offset)
+				DBexecute("%s", sql);
+
+			zbx_db_insert_autoincrement(&db_event, "eventtagid");
+			zbx_db_insert_execute(&db_event);
+			zbx_db_insert_clean(&db_event);
+
+			zbx_db_insert_autoincrement(&db_problem, "problemtagid");
+			zbx_db_insert_execute(&db_problem);
+			zbx_db_insert_clean(&db_problem);
+		}
+		while (ZBX_DB_DOWN == DBcommit());
 
 		for (i = 0; i < results_num; i++)
 		{
-			zbx_am_db_mediatype_t	*mediatype;
-			zbx_am_result_t		*result = results[i];
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update alerts set status=%d,retries=%d", result->status, result->retries);
-			if (NULL != result->error)
-			{
-				char	*error_esc;
-				error_esc = DBdyn_escape_field("alerts", "error", result->error);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",error='%s'", error_esc);
-				zbx_free(error_esc);
-			}
-			else
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",error=''");
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where alertid=" ZBX_FS_UI64 ";\n",
-					result->alertid);
-
-			if (NULL != (mediatype = zbx_hashset_search(&amdb->mediatypes, &result->mediatypeid)) &&
-					0 != mediatype->process_tags && NULL != result->value)
-			{
-				am_db_update_event_tags(&db_event, &db_problem, result->eventid, result->value);
-			}
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_am_result_t	*result = results[i];
 
 			zbx_free(result->value);
 			zbx_free(result->error);
 			zbx_free(result);
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-		if (16 < sql_offset)
-			DBexecute("%s", sql);
-
-		zbx_db_insert_autoincrement(&db_event, "eventtagid");
-		zbx_db_insert_execute(&db_event);
-		zbx_db_insert_clean(&db_event);
-
-		zbx_db_insert_autoincrement(&db_problem, "problemtagid");
-		zbx_db_insert_execute(&db_problem);
-		zbx_db_insert_clean(&db_problem);
-
-		DBcommit();
 		zbx_free(sql);
 	}
 
@@ -753,9 +763,11 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 				" and u.usrgrpid=c.alert_usrgrpid"
 				" and m.mediatypeid=mt.mediatypeid"
 				" and m.active=%d"
-				" and mt.status=%d",
+				" and mt.status=%d"
+				" and mt.type<>%d",
 				MEDIA_STATUS_ACTIVE,
-				MEDIA_TYPE_STATUS_ACTIVE);
+				MEDIA_TYPE_STATUS_ACTIVE,
+				MEDIA_TYPE_WEBHOOK);
 
 	zbx_vector_uint64_create(&mediatypeids);
 	zbx_vector_ptr_create(&medias);
@@ -773,21 +785,22 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	}
 	DBfree_result(result);
 
-	if (0 == medias.values_num)
-		goto out;
 
 	/* update media types used for watchdog alerts */
 
-	zbx_vector_uint64_sort(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	am_db_update_mediatypes(amdb, mediatypeids.values, mediatypeids.values_num, &mediatypes);
-
-	if (0 != mediatypes.values_num)
+	if (0 != mediatypeids.values_num)
 	{
-		data_len = zbx_alerter_serialize_mediatypes(&data, (zbx_am_db_mediatype_t **)mediatypes.values,
-				mediatypes.values_num);
-		zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
-		zbx_free(data);
+		zbx_vector_uint64_sort(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		am_db_update_mediatypes(amdb, mediatypeids.values, mediatypeids.values_num, &mediatypes);
+
+		if (0 != mediatypes.values_num)
+		{
+			data_len = zbx_alerter_serialize_mediatypes(&data, (zbx_am_db_mediatype_t **)mediatypes.values,
+					mediatypes.values_num);
+			zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
+			zbx_free(data);
+		}
 	}
 
 	data_len = zbx_alerter_serialize_medias(&data, (zbx_am_media_t **)medias.values, medias.values_num);
@@ -797,7 +810,6 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	medias_num = medias.values_num;
 
 	zbx_vector_ptr_clear_ext(&medias, (zbx_clean_func_t)zbx_am_media_free);
-out:
 	zbx_vector_ptr_destroy(&mediatypes);
 	zbx_vector_uint64_destroy(&mediatypeids);
 	zbx_vector_ptr_destroy(&medias);

@@ -22,6 +22,10 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testMultiselect extends CWebTest {
 
+	public function testMultiselect_disableDebugMode() {
+		DBexecute('UPDATE usrgrp SET debug_mode=0 WHERE usrgrpid=7');
+	}
+
 	public function testMultiselect_SuggestExisting() {
 		$this->checkSuggest('zabbix.php?action=problem.view', 'zbx_filter',
 			'Host groups', 'z', 'multiselect-suggest'
@@ -82,9 +86,10 @@ class testMultiselect extends CWebTest {
 		$form->invalidate();
 		$element = $form->getField('Items')->query('tag:input')->one();
 		$element->type('Zab');
-		$debug_button = $this->query('class:btn-debug')->one();
-		$zabbix_version = $this->query('xpath://footer[text()]')->one();
 		$this->query('class:multiselect-suggest')->waitUntilVisible();
-		$this->assertScreenshotExcept(null, [$element, $debug_button,$zabbix_version]);
+		$this->assertScreenshotExcept(null, [
+			$element,
+			['query' => 'xpath://footer[text()]']
+		]);
 	}
 }

@@ -167,14 +167,25 @@ trait CastableTrait {
 	}
 
 	/**
-	 * Cast object to Range Control element.
+	 * Cast object to CompositeInput element.
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return CRangeControlElement
+	 * @return CCompositeInputElement
 	 */
-	public function asRangeControl($options = []) {
-		return $this->cast(CRangeControlElement::class, $options);
+	public function asCompositeInput($options = []) {
+		return $this->cast(CCompositeInputElement::class, $options);
+	}
+
+	/**
+	 * Cast object to ColorPicker element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CColorPickerElement
+	 */
+	public function asColorPicker($options = []) {
+		return $this->cast(CColorPickerElement::class, $options);
 	}
 
 	/**

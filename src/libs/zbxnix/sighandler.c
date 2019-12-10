@@ -23,7 +23,7 @@
 #include "log.h"
 #include "fatal.h"
 #include "sigcommon.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 int			sig_parent_pid = -1;
 volatile sig_atomic_t	sig_exiting;

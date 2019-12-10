@@ -35,7 +35,7 @@ static void	check_param(const char *name, const char *value, const struct zbx_js
 	size_t		json_value_sz = 0;
 	int		ret;
 
-	ret = zbx_json_value_by_name_dyn(jp, name, &json_value, &json_value_sz);
+	ret = zbx_json_value_by_name_dyn(jp, name, &json_value, &json_value_sz, NULL);
 
 	if (SUCCEED != ret)
 		fail_msg("Expected parameter/label (%s) is not found in JSON output", name);
