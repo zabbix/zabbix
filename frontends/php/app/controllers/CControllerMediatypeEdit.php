@@ -171,6 +171,8 @@ class CControllerMediatypeEdit extends CController {
 			$data['description'] = $this->mediatype['description'];
 			$data['message_templates'] = $this->mediatype['message_templates'];
 
+			CArrayHelper::sort($data['message_templates'], ['eventsource', 'recovery']);
+
 			$this->mediatype['exec_params'] = explode("\n", $this->mediatype['exec_params']);
 			foreach ($this->mediatype['exec_params'] as $exec_param) {
 				$data['exec_params'][] = ['exec_param' => $exec_param];
