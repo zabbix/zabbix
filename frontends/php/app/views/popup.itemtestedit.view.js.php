@@ -56,19 +56,19 @@ function makeStepResult(step) {
 function disableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', true);
 
-	<?php if ($data['is_item_testable'] && $data['interface_enabled']) { ?>
-	jQuery('#get_value, #interface_address, #interface_port, #get_value_btn').prop('disabled', true);
-	<?php } else { ?>
-	jQuery('#get_value, #get_value_btn').prop('disabled', true);
-	<?php } ?>
+	<?php if ($data['is_item_testable'] && $data['interface_enabled']): ?>
+		jQuery('#get_value, #interface_address, #interface_port, #get_value_btn').prop('disabled', true);
+	<?php else: ?>
+		jQuery('#get_value, #get_value_btn').prop('disabled', true);
+	<?php endif ?>
 
-	<?php if ($data['proxies_enabled']) { ?>
-	jQuery('#host_proxy').prop('disabled', true);
-	<?php } ?>
+	<?php if ($data['proxies_enabled']): ?>
+		jQuery('#host_proxy').prop('disabled', true);
+	<?php endif ?>
 
-	<?php if ($data['show_prev']) { ?>
-	jQuery('#prev_value, #prev_time').prop('disabled', true);
-	<?php } ?>
+	<?php if ($data['show_prev']): ?>
+		jQuery('#prev_value, #prev_time').prop('disabled', true);
+	<?php endif ?>
 
 	jQuery('#eol input').prop('disabled', true);
 
@@ -84,19 +84,19 @@ function disableItemTestForm() {
 function enableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', false);
 
-	<?php if ($data['is_item_testable'] && $data['interface_enabled']) { ?>
-	jQuery('#get_value, #interface_address, #interface_port, #get_value_btn').prop('disabled', false);
-	<?php } else { ?>
-	jQuery('#get_value, #get_value_btn').prop('disabled', false);
-	<?php } ?>
+	<?php if ($data['is_item_testable'] && $data['interface_enabled']): ?>
+		jQuery('#get_value, #interface_address, #interface_port, #get_value_btn').prop('disabled', false);
+	<?php else: ?>
+		jQuery('#get_value, #get_value_btn').prop('disabled', false);
+	<?php endif ?>
 
-	<?php if ($data['proxies_enabled']) { ?>
-	jQuery('#host_proxy').prop('disabled', false);
-	<?php } ?>
+	<?php if ($data['proxies_enabled']): ?>
+		jQuery('#host_proxy').prop('disabled', false);
+	<?php endif ?>
 
-	<?php if ($data['show_prev']) { ?>
-	jQuery('#prev_value, #prev_time').prop('disabled', false);
-	<?php } ?>
+	<?php if ($data['show_prev']): ?>
+		jQuery('#prev_value, #prev_time').prop('disabled', false);
+	<?php endif ?>
 
 	jQuery('#eol input').prop('disabled', false);
 
@@ -146,11 +146,11 @@ function itemGetValueTest() {
 		value: jQuery('#value', $form).multilineInput('value')
 	});
 
-	<?php if ($data['show_prev']) { ?>
-	post_data['time_change'] = (jQuery('#upd_prev').val() !== '')
-		? parseInt(jQuery('#upd_last').val()) - parseInt(jQuery('#upd_prev').val())
-		: Math.ceil(+new Date()/1000) - parseInt(jQuery('#upd_last').val());
-	<?php } ?>
+	<?php if ($data['show_prev']): ?>
+		post_data['time_change'] = (jQuery('#upd_prev').val() !== '')
+			? parseInt(jQuery('#upd_last').val()) - parseInt(jQuery('#upd_prev').val())
+			: Math.ceil(+new Date()/1000) - parseInt(jQuery('#upd_last').val());
+	<?php endif ?>
 
 	delete post_data.interfaceid;
 	delete post_data.delay;
@@ -169,15 +169,15 @@ function itemGetValueTest() {
 				jQuery(ret.messages).insertBefore($form);
 			}
 			else {
-				<?php if ($data['show_prev']) { ?>
-				if (typeof ret.prev_value !== 'undefined') {
-					jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
-					jQuery('#prev_time', $form).val(ret.prev_time);
+				<?php if ($data['show_prev']): ?>
+					if (typeof ret.prev_value !== 'undefined') {
+						jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
+						jQuery('#prev_time', $form).val(ret.prev_time);
 
-					jQuery('#upd_prev', $form).val(jQuery('#upd_last', $form).val());
-					jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
-				}
-				<?php } ?>
+						jQuery('#upd_prev', $form).val(jQuery('#upd_last', $form).val());
+						jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
+					}
+				<?php endif ?>
 
 				jQuery('#value', $form).multilineInput('value', ret.value);
 
@@ -229,18 +229,18 @@ function itemCompleteTest() {
 		value: jQuery('#value', $form).multilineInput('value')
 	});
 
-	<?php if ($data['show_prev']) { ?>
-	if (post_data.get_value) {
-		post_data['time_change'] = (jQuery('#upd_prev').val() !== '')
-			? parseInt(jQuery('#upd_last').val()) - parseInt(jQuery('#upd_prev').val())
-			: Math.ceil(+new Date()/1000) - parseInt(jQuery('#upd_last').val());
-	}
+	<?php if ($data['show_prev']): ?>
+		if (post_data.get_value) {
+			post_data['time_change'] = (jQuery('#upd_prev').val() !== '')
+				? parseInt(jQuery('#upd_last').val()) - parseInt(jQuery('#upd_prev').val())
+				: Math.ceil(+new Date()/1000) - parseInt(jQuery('#upd_last').val());
+		}
 
-	post_data = jQuery.extend(post_data, {
-		prev_time: jQuery('#prev_time', $form).val(),
-		prev_value: jQuery('#prev_value', $form).multilineInput('value')
-	});
-	<?php } ?>
+		post_data = jQuery.extend(post_data, {
+			prev_time: jQuery('#prev_time', $form).val(),
+			prev_value: jQuery('#prev_value', $form).multilineInput('value')
+		});
+	<?php endif ?>
 
 	jQuery.ajax({
 		url: url.getUrl(),
@@ -258,15 +258,15 @@ function itemCompleteTest() {
 
 			processItemPreprocessingTestResults(ret.steps);
 
-			<?php if ($data['show_prev']) { ?>
-			if (typeof ret.prev_value !== 'undefined') {
-				jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
-				jQuery('#prev_time', $form).val(ret.prev_time);
+			<?php if ($data['show_prev']): ?>
+				if (typeof ret.prev_value !== 'undefined') {
+					jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
+					jQuery('#prev_time', $form).val(ret.prev_time);
 
-				jQuery('#upd_prev', $form).val(jQuery('#upd_last', $form).val());
-				jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
-			}
-			<?php } ?>
+					jQuery('#upd_prev', $form).val(jQuery('#upd_last', $form).val());
+					jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
+				}
+			<?php endif ?>
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
 
@@ -367,24 +367,24 @@ function saveItemTestInputs() {
 		},
 		macros = {};
 
-	<?php if ($data['is_item_testable']) { ?>
-	input_values = jQuery.extend(input_values, {
-		get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
-		host_proxy: jQuery('#host_proxy', $form).val(),
-		interface: {
-			interfaceid: <?= $data['interfaceid'] ?>,
-			address: jQuery('#interface_address', $form).val(),
-			port: jQuery('#interface_port', $form).val()
-		}
-	});
-	<?php } ?>
+	<?php if ($data['is_item_testable']): ?>
+		input_values = jQuery.extend(input_values, {
+			get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
+			host_proxy: jQuery('#host_proxy', $form).val(),
+			interface: {
+				interfaceid: <?= $data['interfaceid'] ?>,
+				address: jQuery('#interface_address', $form).val(),
+				port: jQuery('#interface_port', $form).val()
+			}
+		});
+	<?php endif ?>
 
-	<?php if ($data['show_prev']) { ?>
-	input_values = jQuery.extend(input_values, {
-		prev_value: jQuery('#prev_value').multilineInput('value'),
-		prev_time: jQuery('#prev_time').val()
-	});
-	<?php } ?>
+	<?php if ($data['show_prev']): ?>
+		input_values = jQuery.extend(input_values, {
+			prev_value: jQuery('#prev_value').multilineInput('value'),
+			prev_time: jQuery('#prev_time').val()
+		});
+	<?php endif ?>
 
 	jQuery('[name^=macros]').each(function(i, macro) {
 		var name = macro.name.toString();
@@ -392,13 +392,13 @@ function saveItemTestInputs() {
 	});
 	input_values.macros = macros;
 
-	<?php if ($data['step_obj'] == -2) { ?>
+	<?php if ($data['step_obj'] == -2): ?>
 		$test_obj = jQuery('.tfoot-buttons');
-	<?php } elseif ($data['step_obj'] == -1) { ?>
+	<?php elseif ($data['step_obj'] == -1): ?>
 		$test_obj = jQuery('preprocessing-list-foot', jQuery('#preprocessing'));
-	<?php } else { ?>
+	<?php else: ?>
 		$test_obj = jQuery('.preprocessing-list-item[data-step=<?= $data['step_obj'] ?>]', jQuery('#preprocessing'));
-	<?php } ?>
+	<?php endif ?>
 
 	$test_obj.data('test-data', input_values)
 }
@@ -406,9 +406,9 @@ function saveItemTestInputs() {
 jQuery(document).ready(function($) {
 	$('#final-result, #value-mapped-result').hide();
 
-	<?php if ($data['show_prev']) { ?>
-	jQuery('#upd_last').val(Math.ceil(+new Date()/1000));
-	<?php } ?>
+	<?php if ($data['show_prev']): ?>
+		jQuery('#upd_last').val(Math.ceil(+new Date()/1000));
+	<?php endif ?>
 
 	$('#value').multilineInput({
 		placeholder: <?= CJs::encodeJson(_('value')) ?>,
@@ -431,35 +431,35 @@ jQuery(document).ready(function($) {
 		rows: 0
 	});
 
-	<?php if ($data['is_item_testable']) { ?>
-	$('#get_value').on('change', function() {
-		$rows = $('#host_address_row, #host_proxy_row, #get_value_row');
-		if ($(this).is(':checked')) {
-			<?php if ($data['proxies_enabled']) { ?>
-			$('#host_proxy').prop('disabled', false);
-			<?php } ?>
+	<?php if ($data['is_item_testable']): ?>
+		$('#get_value').on('change', function() {
+			$rows = $('#host_address_row, #host_proxy_row, #get_value_row');
+			if ($(this).is(':checked')) {
+				<?php if ($data['proxies_enabled']): ?>
+					$('#host_proxy').prop('disabled', false);
+				<?php endif ?>
 
-			<?php if ($data['interface_enabled']) { ?>
-			$('#interface_address, #interface_port').prop('disabled', false);
-			<?php } ?>
+				<?php if ($data['interface_enabled']): ?>
+					$('#interface_address, #interface_port').prop('disabled', false);
+				<?php endif ?>
 
-			$rows.show();
-		}
-		else {
-			<?php if ($data['proxies_enabled']) { ?>
-			$('#host_proxy').prop('disabled', true);
-			<?php } ?>
+				$rows.show();
+			}
+			else {
+				<?php if ($data['proxies_enabled']): ?>
+					$('#host_proxy').prop('disabled', true);
+				<?php endif ?>
 
-			<?php if ($data['interface_enabled']) { ?>
-			$('#interface_address, #interface_port').prop('disabled', false);
-			<?php } ?>
+				<?php if ($data['interface_enabled']): ?>
+					$('#interface_address, #interface_port').prop('disabled', false);
+				<?php endif ?>
 
-			$rows.hide();
-		}
-	}).trigger('change');
+				$rows.hide();
+			}
+		}).trigger('change');
 
-	$('#get_value_btn').on('click', itemGetValueTest);
-	<?php } ?>
+		$('#get_value_btn').on('click', itemGetValueTest);
+	<?php endif ?>
 
 	$('#preprocessing-test-form .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 });
