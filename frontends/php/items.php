@@ -2114,6 +2114,22 @@ else {
 			order_result($data['items'], $sortField, $sortOrder);
 	}
 
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif ((isRequestMethod('get') || hasRequest('filter_set') || hasRequest('filter_rst') || hasRequest('sort'))
+			&& !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch('item.list');
+	}
+
+	CPagerHelper::store('item.list', $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['items'], $sortOrder, new CUrl('items.php'));
+
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	$itemTriggerIds = [];
@@ -2133,22 +2149,6 @@ else {
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
-
-	// pager
-	if (hasRequest('page')) {
-		$page_num = getRequest('page');
-	}
-	elseif ((isRequestMethod('get') || hasRequest('filter_set') || hasRequest('filter_rst') || hasRequest('sort'))
-			&& !hasRequest('cancel')) {
-		$page_num = 1;
-	}
-	else {
-		$page_num = CPagerHelper::fetch('item.list');
-	}
-
-	CPagerHelper::store('item.list', $page_num);
-
-	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['items'], $sortOrder, new CUrl('items.php'));
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);
