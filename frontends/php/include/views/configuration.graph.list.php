@@ -84,10 +84,10 @@ $graphTable = (new CTableInfo())
 			(new CCheckBox('all_graphs'))->onClick("checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		!empty($this->data['hostid']) ? null : _('Hosts'),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], 'graphs.php'),
 		_('Width'),
 		_('Height'),
-		make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'], 'graphs.php')
 	]);
 
 foreach ($data['graphs'] as $graph) {

@@ -44,6 +44,7 @@ $fields = [
 	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,			null,	null],
 	// sort and sortorder
@@ -296,12 +297,24 @@ else {
 		$data['applications'] = [];
 	}
 
-	// get paging
-	$url = (new CUrl('applications.php'))
-		->setArgument('groupid', $data['groupid'])
-		->setArgument('hostid', $data['hostid']);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif ((isRequestMethod('get') || hasRequest('sort')) && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch('application.list');
+	}
 
-	$data['paging'] = getPagingLine($data['applications'], $sortOrder, $url);
+	CPagerHelper::store('application.list', $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['applications'], $sortOrder,
+		(new CUrl('applications.php'))
+			->setArgument('groupid', $data['groupid'])
+			->setArgument('hostid', $data['hostid'])
+	);
 
 	// render view
 	$applicationView = new CView('configuration.application.list', $data);

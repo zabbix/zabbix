@@ -834,11 +834,23 @@ else {
 		order_result($prefetched_triggers, $sort, $sortorder);
 	}
 
-	$url = (new CUrl('triggers.php'))
-		->setArgument('filter_groupids', $filter_groupids)
-		->setArgument('filter_hostids', $filter_hostids);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif ((isRequestMethod('get') || hasRequest('filter_set') || hasRequest('filter_rst') || hasRequest('sort'))
+			&& !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch('trigger.list');
+	}
 
-	$paging = getPagingLine($prefetched_triggers, $sortorder, $url);
+	CPagerHelper::store('trigger.list', $page_num);
+
+	$paging = CPagerHelper::paginateRows($page_num, $prefetched_triggers, $sortorder, new CUrl('triggers.php'));
+
+	// fetch triggers
 	$triggers = [];
 	if ($prefetched_triggers) {
 		$triggers = API::Trigger()->get([

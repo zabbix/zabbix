@@ -51,6 +51,10 @@ function jsRedirect($url, $timeout = null) {
 	insert_js($script);
 }
 
+function isRequestMethod($method) {
+	return (strtolower($method) === strtolower($_SERVER['REQUEST_METHOD']));
+}
+
 /**
  * Check if request exist.
  *

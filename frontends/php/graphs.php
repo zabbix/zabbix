@@ -657,11 +657,24 @@ else {
 		order_result($data['graphs'], $sortField, $sortOrder);
 	}
 
-	$url = (new CUrl('graphs.php'))
-		->setArgument('groupid', $pageFilter->groupid)
-		->setArgument('hostid', $data['hostid']);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif ((isRequestMethod('get') || hasRequest('sort')) && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch('graph.list');
+	}
 
-	$data['paging'] = getPagingLine($data['graphs'], $sortOrder, $url);
+	CPagerHelper::store('graph.list', $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['graphs'], $sortOrder,
+		(new CUrl('graphs.php'))
+			->setArgument('groupid', $pageFilter->groupid)
+			->setArgument('hostid', $data['hostid'])
+	);
 
 	if ($data['pageFilter']->hostsSelected) {
 		// Get graphs after paging.
