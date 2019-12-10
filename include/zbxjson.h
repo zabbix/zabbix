@@ -127,6 +127,7 @@
 #define ZBX_PROTO_TAG_INTERFACE_ID		"interfaceid"
 #define ZBX_PROTO_TAG_USEIP			"useip"
 #define ZBX_PROTO_TAG_ADDRESS			"address"
+#define ZBX_PROTO_TAG_TLS_CONNECT		"tls_connect"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
