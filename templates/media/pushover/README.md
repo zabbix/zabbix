@@ -20,11 +20,12 @@ You would need both in Zabbix pushover webhook.
 
 ### Setup Pushover media type
 
-Proceed to Administration→ Media types at the Zabbix frontend and find Pushover. If you don't have it, import it from official Zabbix repository here:
+Proceed to Administration→ Media types at the Zabbix frontend and find Pushover. If you don't have it, import it from the official Zabbix repository here:
 
 https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/pushover
 
 Edit Pushover media type parameters and replace token with your Pushover application key.
+
 [![](images/tn/zabbix1.png?raw=true)](images/zabbix1.png)
 
 ### Setup media in user profile
