@@ -261,8 +261,8 @@ $output = [
 			'title' => _('Test'),
 			'class' => 'submit-test-btn',
 			'keepOpen' => true,
-			'enabled' => (bool) $data['steps_num'],
-			'isSubmit' => (bool) $data['steps_num'],
+			'enabled' => true,
+			'isSubmit' => true,
 			'action' => 'return itemCompleteTest();'
 		]
 	]
