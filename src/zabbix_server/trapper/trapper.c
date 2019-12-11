@@ -626,7 +626,7 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 
 static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
 {
-	char			tmp[MAX_STRING_LEN + 1], *error = NULL, **pvalue, *fieldname;
+	char			tmp[MAX_STRING_LEN + 1], **pvalue, *fieldname;
 	DC_ITEM			item, item_tmp;
 	static const ZBX_TABLE	*table_items, *table_interface, *table_hosts;
 	struct zbx_json_parse	jp_interface, jp_host;
@@ -737,6 +737,9 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK, table_hosts, "tls_psk", item.host.tls_psk,
 			sizeof(item.host.tls_psk));
 #endif
+	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
+	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
+
 	zbx_vector_ptr_create(&add_results);
 
 	init_result(&result);
@@ -746,24 +749,25 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	{
 		case SUCCEED:
 			if (NULL == (pvalue = GET_TEXT_RESULT(&result)))
-				error = zbx_strdup(NULL, "no value");
+				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, "no value", ZBX_JSON_TYPE_STRING);
 			else
 				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, *pvalue, ZBX_JSON_TYPE_STRING);
 			break;
 		default:
-			if (NULL != (pvalue = GET_MSG_RESULT(&result)))
-				error = zbx_strdup(NULL, *pvalue);
-			else
+			if (NULL == (pvalue = GET_MSG_RESULT(&result)))
+			{
+				char	*error;
+
 				error = zbx_dsprintf(NULL, "unknown error with code %d", errcode);
+				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+				zbx_free(error);
+			}
+			else
+				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, *pvalue, ZBX_JSON_TYPE_STRING);
 	}
 
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
-
-	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
-	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
-	if (NULL != error)
-		zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
 
 	free_result(&result);
 	zbx_free(item.interface.addr);
@@ -790,7 +794,6 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	zbx_free(item.ssl_cert_file);
 	zbx_free(item.ssl_key_file);
 	zbx_free(item.ssl_key_password);
-	zbx_free(error);
 }
 
 static void	recv_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
