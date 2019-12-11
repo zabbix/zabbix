@@ -594,6 +594,18 @@ fail:
 void	free_result_ptr(AGENT_RESULT *result);
 int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
 
+static char	*db_string_from_json_dyn(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
+		const char *fieldname)
+{
+	char	*string = NULL;
+	size_t	size = 0;
+
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp, name, &string, &size, NULL))
+		return string;
+
+	return zbx_strdup(NULL, DBget_field(table, fieldname)->default_value);
+}
+
 static void	db_string_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
 		const char *fieldname, char *string, size_t len)
 {
@@ -614,11 +626,10 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 
 static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
 {
-	char			tmp[MAX_STRING_LEN + 1], *error = NULL, **pvalue;
+	char			tmp[MAX_STRING_LEN + 1], *error = NULL, **pvalue, *fieldname;
 	DC_ITEM			item, item_tmp;
 	static const ZBX_TABLE	*table_items, *table_interface, *table_hosts;
 	struct zbx_json_parse	jp_interface, jp_host;
-	size_t			size = 0;
 	AGENT_RESULT		result;
 	zbx_vector_ptr_t	add_results;
 	int			errcode;
@@ -633,9 +644,60 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_TYPE, table_items, "type", &item.type);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, table_items, "value_type", &item.value_type);
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_SECURITYLEVEL, table_items, "snmpv3_securitylevel",
+			&item.snmpv3_securitylevel);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_AUTHTYPE, table_items, "authtype", &item.authtype);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FLAGS, table_items, "flags", &item.flags);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FLAGS, table_items, "flags", &item.flags);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_AUTHPROTOCOL, table_items, "snmpv3_authprotocol",
+			&item.snmpv3_authprotocol);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPROTOCOL, table_items, "snmpv3_privprotocol",
+			&item.snmpv3_privprotocol);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPROTOCOL, table_items, "snmpv3_privprotocol",
+			&item.snmpv3_privprotocol);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FOLLOW_REDIRECTS, table_items, "follow_redirects",
+			&item.follow_redirects);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_POST_TYPE, table_items, "post_type", &item.post_type);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_RETRIEVE_MODE, table_items, "retrieve_mode", &item.retrieve_mode);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_REQUEST_METHOD, table_items, "request_method", &item.request_method);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_OUTPUT_FORMAT, table_items, "output_format", &item.output_format);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_PEER, table_items, "verify_peer", &item.verify_peer);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_HOST, table_items, "verify_host", &item.verify_host);
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_HOST, table_items, "verify_host", &item.verify_host);
 
-	item.key = zbx_strdup(NULL, item.key_orig);
+	db_string_from_json(jp_data, ZBX_PROTO_TAG_IPMI_SENSOR, table_items, "ipmi_sensor", item.ipmi_sensor,
+			sizeof(item.ipmi_sensor));
+
+	item.key = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_");
+	item.snmp_community = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SNMP_COMMUNITY, table_items,
+			"snmp_community");
+	item.snmp_oid = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SNMP_OID, table_items, "snmp_oid");
+	item.snmpv3_securityname = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SNMPV3_SECURITYNAME, table_items,
+			"snmpv3_securityname");
+	item.snmpv3_authpassphrase = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SNMPV3_AUTHPASSPHRASE, table_items,
+			"snmpv3_authpassphrase");
+	item.snmpv3_privpassphrase = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPASSPHRASE, table_items,
+			"snmpv3_privpassphrase");
+	item.params = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PARAMS, table_items, "params");
+	item.username = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_USERNAME, table_items, "username");
+	item.publickey = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PUBLICKEY, table_items, "publickey");
+	item.privatekey = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PRIVATEKEY, table_items, "privatekey");
+	item.password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PASSWORD, table_items, "password");
+	item.snmpv3_contextname = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SNMPV3_CONTEXTNAME, table_items,
+			"snmpv3_contextname");
+	item.jmx_endpoint = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_JMX_ENDPOINT, table_items, "jmx_endpoint");
+	item.timeout = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout");
+	item.url = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_URL, table_items, "url");
+	item.query_fields = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_QUERY_FIELDS, table_items, "query_fields");
+	item.posts = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_POSTS, table_items, "posts");
+	item.status_codes = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_STATUS_CODES, table_items, "status_codes");
+	item.http_proxy = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_HTTP_PROXY, table_items, "http_proxy");
+	item.headers = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_HTTP_HEADERS, table_items, "headers");
+	item.ssl_cert_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items,
+			"ssl_cert_file");
+	item.ssl_key_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
+	item.ssl_key_password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
+			"ssl_key_password");
 
 	if (NULL == table_interface)
 		table_interface = DBget_table("interface");
@@ -650,16 +712,8 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 
 	db_uchar_from_json(&jp_interface, ZBX_PROTO_TAG_USEIP, table_interface, "useip", &item.interface.useip);
 
-	item.interface.addr = NULL;
-	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, &item.interface.addr,
-			&size, NULL))
-	{
-		char	*fieldname;
-
-		fieldname = 1 == item.interface.useip ? "ip" : "dns";
-
-		item.interface.addr = zbx_strdup(NULL, DBget_field(table_interface, fieldname)->default_value);
-	}
+	fieldname = 1 == item.interface.useip ? "ip" : "dns";
+	item.interface.addr = db_string_from_json_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, fieldname);
 
 	db_string_from_json(&jp_interface, ZBX_PROTO_TAG_PORT, table_interface, "port", item.interface.port_orig,
 			sizeof(item.interface.port_orig));
@@ -696,12 +750,6 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 			else
 				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, *pvalue, ZBX_JSON_TYPE_STRING);
 			break;
-		case NOTSUPPORTED:
-		case AGENT_ERROR:
-		case CONFIG_ERROR:
-		case NETWORK_ERROR:
-		case GATEWAY_ERROR:
-		case TIMEOUT_ERROR:
 		default:
 			if (NULL != (pvalue = GET_MSG_RESULT(&result)))
 				error = zbx_strdup(NULL, *pvalue);
@@ -720,6 +768,28 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	free_result(&result);
 	zbx_free(item.interface.addr);
 	zbx_free(item.key);
+	zbx_free(item.snmp_community);
+	zbx_free(item.snmp_oid);
+	zbx_free(item.snmpv3_securityname);
+	zbx_free(item.snmpv3_authpassphrase);
+	zbx_free(item.snmpv3_privpassphrase);
+	zbx_free(item.params);
+	zbx_free(item.username);
+	zbx_free(item.publickey);
+	zbx_free(item.privatekey);
+	zbx_free(item.password);
+	zbx_free(item.snmpv3_contextname);
+	zbx_free(item.jmx_endpoint);
+	zbx_free(item.timeout);
+	zbx_free(item.url);
+	zbx_free(item.query_fields);
+	zbx_free(item.posts);
+	zbx_free(item.status_codes);
+	zbx_free(item.http_proxy);
+	zbx_free(item.headers);
+	zbx_free(item.ssl_cert_file);
+	zbx_free(item.ssl_key_file);
+	zbx_free(item.ssl_key_password);
 	zbx_free(error);
 }
 
