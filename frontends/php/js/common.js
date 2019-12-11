@@ -316,36 +316,34 @@ function get_bodywidth() {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action			Popup controller related action.
- * @param {array} options			Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid		(optional) id of overlay dialogue.
- * @param {object} trigger_elmnt	(optional) UI element which was clicked to open overlay dialogue.
+ * @param {string} action         Popup controller related action.
+ * @param {array}  options        (optional) Array with key/value pairs that will be used as query for popup request.
+ * @param {string} dialogueid     (optional) id of overlay dialogue.
+ * @param {object} trigger_elmnt  (optional) UI element which was clicked to open overlay dialogue.
  *
- * @returns false
+ * @returns {Overlay}
  */
 function PopUp(action, options, dialogueid, trigger_elmnt) {
-	var ovelay_properties = {
-		'title': '',
-		'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
-		'class': 'modal-popup' + ((action === 'popup.generic') ? ' modal-popup-generic' : ''),
-		'buttons': [],
-		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
-	};
+	var overlay = overlays_stack.getById(dialogueid);
+	if (!overlay) {
+		overlay = overlayDialogue({
+			'title': '',
+			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
+			'class': 'modal-popup' + ((action === 'popup.generic') ? ' modal-popup-generic' : ''),
+			'buttons': [],
+			'element': trigger_elmnt,
+			'type': 'popup'
+		});
+	}
 
-	var url = new Curl('zabbix.php');
-	url.setArgument('action', action);
-
-	jQuery.ajax({
-		url: url.getUrl(),
-		type: 'post',
-		dataType: 'json',
-		data: options,
-		beforeSend: function(jqXHR) {
-			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
-		},
-		success: function(resp) {
+	overlay
+		.load(action, options)
+		.then(function(resp) {
+			var ovelay_properties = {};
 			if (typeof resp.errors !== 'undefined') {
-				ovelay_properties['content'] = resp.errors;
+				overlay.setProperties({
+					content: resp.errors
+				});
 			}
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
@@ -357,46 +355,47 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
 				});
 
-				ovelay_properties['title'] = resp.header;
-				ovelay_properties['content'] = resp.body;
-				ovelay_properties['controls'] = resp.controls;
-				ovelay_properties['buttons'] = buttons;
-
-				if (typeof resp.debug !== 'undefined') {
-					ovelay_properties['debug'] = resp.debug;
-				}
-
-				if (typeof resp.script_inline !== 'undefined') {
-					ovelay_properties['script_inline'] = resp.script_inline;
-				}
+				overlay.setProperties({
+					title: resp.header,
+					content: resp.body,
+					controls: resp.controls,
+					buttons: buttons,
+					debug: resp.debug,
+					script_inline: resp.script_inline,
+				});
 			}
 
-			overlayDialogue(ovelay_properties);
-		}
-	});
+			overlay.recoverFocus();
+			overlay.containFocus();
+		});
 
-	return false;
+	addToOverlaysStack(overlay);
+
+	return overlay;
 }
 
 /**
  * Function to add details about overlay UI elements in global overlays_stack variable.
  *
- * @param {string} id       Unique overlay element identifier.
- * @param {object} element  UI element which must be focused when overlay UI element will be closed.
- * @param {object} type     Type of overlay UI element.
- * @param {object} xhr      (optional) XHR request used to load content. Used to abort loading. Currently used with
- *                          type 'popup' only.
+ * @param {string|Overlay} id       Unique overlay element identifier or Overlay object.
+ * @param {object} element          UI element which must be focused when overlay UI element will be closed.
+ * @param {object} type             Type of overlay UI element.
+ * @param {object} xhr              (optional) XHR request used to load content. Used to abort loading. Currently used
+ *                                  with type 'popup' only.
  */
 function addToOverlaysStack(id, element, type, xhr) {
+	if (id instanceof Overlay) {
+		overlays_stack.pushUnique(id);
+	}
+	else {
+		overlays_stack.pushUnique({
+			dialogueid: id.toString(),
+			element: element,
+			type: type,
+			xhr: xhr
+		});
+	}
 
-	overlays_stack.pushUnique({
-		dialogueid: id.toString(),
-		element: element,
-		type: type,
-		xhr: xhr
-	});
-
-	// Only one instance of handler should be present at any time.
 	jQuery(document)
 		.off('keydown', closeDialogHandler)
 		.on('keydown', closeDialogHandler);

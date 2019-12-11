@@ -120,7 +120,9 @@ jQuery(function ($) {
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
 			data.isHintBoxFrozen = true;
 			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
-			overlayDialogueOnLoad(true, graph.hintBoxItem);
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				$('.dashbrd-grid-container')

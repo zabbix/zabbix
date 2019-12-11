@@ -3577,14 +3577,11 @@
 							$('.dialogue-widget-save', footer).prop('disabled', false);
 						}
 
-						if (data.dialogue['widget_type'] === 'svggraph') {
-							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
-						}
-						else {
-							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
-						}
+						var $overlay = jQuery('[data-dialogueid="widgetConfg"]');
+						$overlay.toggleClass('sticked-to-top', data.dialogue['widget_type'] === 'svggraph');
 
-						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
+						Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});
+						Overlay.prototype.containFocus.call({'$dialogue': $overlay});
 
 						body.removeClass('is-loading');
 					});

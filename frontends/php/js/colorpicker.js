@@ -139,6 +139,7 @@
 				});
 				colorbox = null;
 				input = null;
+				removeFromOverlaysStack('color_picker');
 			},
 			/**
 			 * Show colorpicker for specific element.
@@ -163,7 +164,9 @@
 				});
 
 				addToOverlaysStack('color_picker', target, 'color_picker');
-				overlayDialogueOnLoad(true, overlay);
+
+				Overlay.prototype.recoverFocus.call({'$dialogue': overlay});
+				Overlay.prototype.containFocus.call({'$dialogue': overlay});
 			},
 			/**
 			 * Set color as background color value of colorbox and as value for input.
