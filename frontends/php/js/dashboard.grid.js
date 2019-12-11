@@ -3543,13 +3543,20 @@
 				}
 
 				body.addClass('is-loading');
-				jQuery.ajax({
+
+				var overlay = overlays_stack.getById('widgetConfg');
+				if (overlay.xhr) {
+					overlay.xhr.abort();
+				}
+
+				overlay.xhr = jQuery.ajax({
 					url: url.getUrl(),
 					method: 'POST',
 					data: ajax_data,
 					dataType: 'json'
-				})
-					.done(function(response) {
+				});
+
+				overlay.xhr.done(function(response) {
 						data.dialogue['widget_type'] = response.type;
 
 						body.empty();
