@@ -298,7 +298,9 @@ class CUser extends CApiService {
 			 * If user is created without a password (e.g. for GROUP_GUI_ACCESS_LDAP), store an empty string
 			 * as his password in database.
 			 */
-			$user['passwd'] = (array_key_exists('passwd', $user)) ? md5($user['passwd']) : '';
+			$user['passwd'] = array_key_exists('passwd', $user)
+				? password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])
+				: '';
 		}
 		unset($user);
 
@@ -440,7 +442,7 @@ class CUser extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set password for user "guest".'));
 				}
 
-				$user['passwd'] = md5($user['passwd']);
+				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
 			}
 		}
 		unset($user);
@@ -1190,7 +1192,7 @@ class CUser extends CApiService {
 					break;
 
 				case ZBX_AUTH_INTERNAL:
-					if (md5($user['password']) !== $db_user['passwd']) {
+                    if (!$this->isPasswordVerified($user['password'], $db_user)) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Login name or password is incorrect.'));
 					}
 					break;
@@ -1235,6 +1237,28 @@ class CUser extends CApiService {
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
 
 		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
+	}
+
+	/**
+	 * @param string $password
+	 * @param array  $user
+	 *
+	 * @return bool
+	 */
+    private function isPasswordVerified($password, $db_user) {
+		if (strlen($db_user['passwd']) > ZBX_MD5_SIZE) {
+			return password_verify($password, $db_user['passwd']);
+		}
+		elseif (hash_equals(md5($password), $db_user['passwd'])) {
+			DB::update('users', [
+				'values' => ['passwd' => password_hash($password, PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])],
+				'where' => ['userid' => $db_user['userid']]
+			]);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
