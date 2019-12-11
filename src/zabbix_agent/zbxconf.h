@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXCONF_H
 #define ZABBIX_ZBXCONF_H
 
+#include "cfg.h"
+
 extern char	*CONFIG_HOSTS_ALLOWED;
 extern char	*CONFIG_HOSTNAME;
 extern char	*CONFIG_HOSTNAME_ITEM;
@@ -58,6 +60,7 @@ extern char	*CONFIG_TLS_PSK_FILE;
 
 void	load_aliases(char **lines);
 void	load_user_parameters(char **lines);
+int	load_key_access_rule(const char *value, struct cfg_line *cfg);
 #ifdef _WINDOWS
 void	load_perf_counters(const char **def_lines, const char **eng_lines);
 #endif

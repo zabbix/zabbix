@@ -2410,7 +2410,7 @@
 				data['options']['updated'] = true;
 			})
 			.always(function() {
-				$save_btn.prop('disabled', true);
+				$save_btn.prop('disabled', false);
 				delete data['options']['updating_config'];
 			});
 	}
