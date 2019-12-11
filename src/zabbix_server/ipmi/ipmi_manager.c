@@ -798,13 +798,21 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, zbx_ipc_message_t *message)
 {
 	zbx_uint32_t	size;
+	AGENT_REQUEST	request;
 
 	size = zbx_ipmi_serialize_request(&message->data, item->itemid, item->interface.addr,
 			item->interface.port, item->host.ipmi_authtype, item->host.ipmi_privilege,
 			item->host.ipmi_username, item->host.ipmi_password, item->ipmi_sensor, command);
 
-	message->code = ZBX_IPC_IPMI_VALUE_REQUEST;
+	init_request(&request);
+
+	if (SUCCEED == parse_item_key(item->key_orig, &request) && 0 == strcmp(request.key, "ipmi.get"))
+		message->code = ZBX_IPC_IPMI_DISCOVERY_REQUEST;
+	else
+		message->code = ZBX_IPC_IPMI_VALUE_REQUEST;
 	message->size = size;
+
+	free_request(&request);
 }
 
 /******************************************************************************
@@ -1035,6 +1043,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 						ipmi_manager_process_poller_queue(&ipmi_manager, poller, now);
 					}
 					break;
+				case ZBX_IPC_IPMI_DISCOVERY_RESULT:
 				case ZBX_IPC_IPMI_VALUE_RESULT:
 					ipmi_manager_process_value_result(&ipmi_manager, client, message, now);
 					polled_num++;

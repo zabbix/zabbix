@@ -109,8 +109,16 @@ static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zb
 			" sensor:%s", __func__, itemid, addr, (int)port, (int)authtype, (int)privilege,
 			username, sensor);
 
-	errcode = get_value_ipmi(itemid, addr, port, authtype, privilege, username, password, sensor, &value);
-	ipmi_poller_send_result(socket, ZBX_IPC_IPMI_VALUE_RESULT, errcode, value);
+	if (ZBX_IPC_IPMI_DISCOVERY_REQUEST != message->code)
+	{
+		errcode = get_value_ipmi(itemid, addr, port, authtype, privilege, username, password, sensor, &value);
+		ipmi_poller_send_result(socket, ZBX_IPC_IPMI_VALUE_RESULT, errcode, value);
+	}
+	else
+	{
+		errcode = get_discovery_ipmi(itemid, addr, port, authtype, privilege, username, password, &value);
+		ipmi_poller_send_result(socket, ZBX_IPC_IPMI_DISCOVERY_RESULT, errcode, value);
+	}
 
 	zbx_free(value);
 	zbx_free(addr);
@@ -247,6 +255,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 		switch (message->code)
 		{
+			case ZBX_IPC_IPMI_DISCOVERY_REQUEST:
 			case ZBX_IPC_IPMI_VALUE_REQUEST:
 				ipmi_poller_process_value_request(&ipmi_socket, message);
 				polled_num++;
