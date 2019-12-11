@@ -434,11 +434,10 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
  * @param array  $data['groups'][]['stats'][]['problems']
  * @param int    $data['groups'][]['stats'][]['count_unack']
  * @param array  $data['groups'][]['stats'][]['problems_unack']
- * @param array  $severity_names
  *
  * @return array
  */
-function getSystemStatusTotals(array $data, array $severity_names) {
+function getSystemStatusTotals(array $data) {
 	$groups_totals = [
 		0 => [
 			'groupid' => 0,
@@ -446,12 +445,11 @@ function getSystemStatusTotals(array $data, array $severity_names) {
 		]
 	];
 
-	foreach (array_reverse($severity_names) as $key => $value) {
-		$i = explode('_', $key)[2];
-		$groups_totals[0]['stats'][$i] = [
-			'count' => $data['stats'][$i]['count'],
+	foreach ($data['stats'] as $severity => $value) {
+		$groups_totals[0]['stats'][$severity] = [
+			'count' => $value['count'],
 			'problems' => [],
-			'count_unack' => $data['stats'][$i]['count_unack'],
+			'count_unack' => $value['count_unack'],
 			'problems_unack' => []
 		];
 	}

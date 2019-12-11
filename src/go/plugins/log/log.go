@@ -70,11 +70,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	var data *metadata
 	if meta.Data == nil {
 		data = &metadata{key: key, params: params}
-		meta.Data = data
 		runtime.SetFinalizer(data, func(d *metadata) { zbxlib.FreeActiveMetric(d.blob) })
 		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
 			return nil, err
 		}
+		meta.Data = data
 	} else {
 		data = meta.Data.(*metadata)
 		if !itemutil.CompareKeysParams(key, params, data.key, data.params) {

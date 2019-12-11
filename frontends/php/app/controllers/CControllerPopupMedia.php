@@ -38,7 +38,7 @@ class CControllerPopupMedia extends CController {
 			'mediatypeid' =>	'db media_type.mediatypeid',
 			'sendto' =>			'string',
 			'sendto_emails'	=>	'array',
-			'period' =>			'string',
+			'period' =>			'time_periods',
 			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
 			'severity' =>		'',
 			'add' =>			'in 1'
@@ -108,11 +108,6 @@ class CControllerPopupMedia extends CController {
 			}
 			elseif ($page_options['sendto'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
-			}
-
-			$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
-			if ($time_period_parser->parse($page_options['period']) != CParser::PARSE_SUCCESS) {
-				error(_s('Field "%1$s" is not correct: %2$s', _('When active'), _('a time period is expected')));
 			}
 
 			if (($messages = getMessages()) !== null) {

@@ -137,6 +137,7 @@ int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 	return SUCCEED;
 }
 
+#if !defined(__MINGW32__)
 int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
 {
 	int		ret;
@@ -170,6 +171,7 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 
 	return ret;
 }
+#endif
 
 void	init_metrics(void)
 {
@@ -1454,7 +1456,7 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 }
 #endif
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 /******************************************************************************
  *                                                                            *
  * Function: serialize_agent_result                                           *

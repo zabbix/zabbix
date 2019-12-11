@@ -91,6 +91,7 @@ $availableJScripts = [
 	'class.csvggraph.js' => '',
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
+	'class.overlaycollection.js' => '',
 	'class.cverticalaccordion.js' => '',
 	'class.mapWidget.js' => '',
 	'class.svg.canvas.js' => 'vector/',
@@ -103,6 +104,8 @@ $availableJScripts = [
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
+	'popup.condition.common.js' => 'pages/',
+	'popup.operation.common.js' => 'pages/'
 ];
 
 $tranStrings = [
@@ -333,6 +336,7 @@ if (empty($_GET['files'])) {
 		'jquery-ui.js',
 		'common.js',
 		'class.cdebug.js',
+		'class.overlaycollection.js',
 		'class.cdate.js',
 		'class.cookie.js',
 		'class.curl.js',

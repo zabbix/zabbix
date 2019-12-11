@@ -29,27 +29,6 @@
 
 extern unsigned char	program_type;
 
-static int	DBpatch_4050000(void)
-{
-	int		i;
-	const char	*values[] = {
-			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
-			"web.usergrps.php.sort", "web.usergroup.sort",
-			"web.usergrps.php.sortorder", "web.usergroup.sortorder"
-		};
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	for (i = 0; i < (int)ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static int	DBpatch_4050001(void)
 {
 	return DBdrop_foreign_key("items", 1);
@@ -97,13 +76,35 @@ static int	DBpatch_4050007(void)
 	return DBmodify_field_type("dchecks", &field, NULL);
 }
 
+static int	DBpatch_4050009(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
+			"web.usergrps.php.sort", "web.usergroup.sort",
+			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
+			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
+			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(4050000, 0, 1)
 DBPATCH_ADD(4050001, 0, 1)
 DBPATCH_ADD(4050002, 0, 1)
 DBPATCH_ADD(4050003, 0, 1)
@@ -111,5 +112,6 @@ DBPATCH_ADD(4050004, 0, 1)
 DBPATCH_ADD(4050005, 0, 1)
 DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
+DBPATCH_ADD(4050009, 0, 1)
 
 DBPATCH_END()

@@ -200,7 +200,7 @@ func (c *Connector) refreshActiveChecks() {
 		} else {
 			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address)
 		}
-
+		c.taskManager.UpdateTasks(c.clientID, c.resultCache, 0, []*glexpr.Expression{}, []*plugin.Request{})
 		return
 	}
 

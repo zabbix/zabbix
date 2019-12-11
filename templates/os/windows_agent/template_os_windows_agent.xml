@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Windows CPU by Zabbix agent</template>
          <name>Template Module Windows CPU by Zabbix agent</name>
-         <description>Template tooling version used: 0.33</description>
+         <description>Template tooling version used: 0.34</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -215,7 +215,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows filesystems by Zabbix agent</template>
          <name>Template Module Windows filesystems by Zabbix agent</name>
-         <description>Template tooling version used: 0.33</description>
+         <description>Template tooling version used: 0.34</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -420,7 +420,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows generic by Zabbix agent</template>
          <name>Template Module Windows generic by Zabbix agent</name>
-         <description>Template tooling version used: 0.33</description>
+         <description>Template tooling version used: 0.34</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -586,7 +586,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows memory by Zabbix agent</template>
          <name>Template Module Windows memory by Zabbix agent</name>
-         <description>Template tooling version used: 0.33</description>
+         <description>Template tooling version used: 0.34</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -808,7 +808,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
       <template>
          <template>Template Module Windows network by Zabbix agent</template>
          <name>Template Module Windows network by Zabbix agent</name>
-         <description>Template tooling version used: 0.33</description>
+         <description>Template tooling version used: 0.34</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1372,7 +1372,7 @@ return JSON.stringify({"data": output})</params>
       <template>
          <template>Template Module Windows physical disks by Zabbix agent</template>
          <name>Template Module Windows physical disks by Zabbix agent</name>
-         <description>Template tooling version used: 0.33</description>
+         <description>Template tooling version used: 0.34</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1619,7 +1619,7 @@ return JSON.stringify({"data": output})</params>
          <name>Template Module Windows services by Zabbix agent</name>
          <description>Template Services OS Windows&#13;
 &#13;
-Template tooling version used: 0.33</description>
+Template tooling version used: 0.34</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1720,7 +1720,7 @@ Template tooling version used: 0.33</description>
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows&#13;
 &#13;
-Template tooling version used: 0.33</description>
+Template tooling version used: 0.34</description>
          <templates>
             <template>
                <name>Template Module Windows CPU by Zabbix agent</name>

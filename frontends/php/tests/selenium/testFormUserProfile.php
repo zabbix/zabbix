@@ -489,37 +489,37 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_BAD,
 				'send_to' => 'test',
 				'period' => ' ',
-				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => '0-0,00:00-00:00',
-				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => '1-11,00:00-24:00',
-				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => '1-7,00:00-25:00',
-				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => '1-7,24:00-00:00',
-				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => 'test',
-				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
 			]]
 		];
 	}

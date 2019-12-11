@@ -420,6 +420,7 @@ static int zbx_getopt_internal (int argc, char **argv, const char *optstring,
           zbx_optind++;
           return BAD_OPTION;
         }
+#if OFF	/* disable since ambig is always 0*/
       if (ambig && !exact)
         {
           if (zbx_opterr)
@@ -429,6 +430,7 @@ static int zbx_getopt_internal (int argc, char **argv, const char *optstring,
           zbx_optind++;
           return BAD_OPTION;
         }
+#endif
 
       if (pfound != NULL)
         {
