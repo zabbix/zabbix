@@ -315,6 +315,9 @@ void finalize_key_access_rules_configuration(void)
 				if (ZBX_KEY_ACCESS_DENY == rule->type)
 					break;
 
+				zbx_vector_str_clear_ext(&rule->elements, zbx_str_free);
+				zbx_vector_str_destroy(&rule->elements);
+				zbx_free(rule);
 				zbx_vector_ptr_remove(&key_access_rules, i);
 			}
 		}
@@ -393,6 +396,7 @@ static int	parse_key_access_rule(const char *pattern, zbx_key_access_rule_t *rul
 			if (0 != strcmp(rule->elements.values[i], "*"))
 				break;
 
+			zbx_free(rule->elements.values[i + 1]);
 			zbx_vector_str_remove(&rule->elements, i + 1);
 		}
 	}
@@ -611,10 +615,10 @@ int	check_key_access_rules(const char *metric)
 
 	init_request(&request);
 
-	if (SUCCEED != parse_item_key(metric, &request))
-		return ZBX_KEY_ACCESS_DENY;
-
-	ret = check_request_access_rules(&request);
+	if (SUCCEED == parse_item_key(metric, &request))
+		ret = check_request_access_rules(&request);
+	else
+		ret = ZBX_KEY_ACCESS_DENY;
 
 	free_request(&request);
 
