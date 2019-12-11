@@ -298,7 +298,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 						stat_ok = 1;
 					break;
 				case ZBX_PROC_STAT_ZOMB:
-					if (SZOMB == pproc->p_stat || LSDEAD == pproc->p_stat)
+					if (0 != P_ZOMBIE(pproc))
 						stat_ok = 1;
 					break;
 				case ZBX_PROC_STAT_DISK:
