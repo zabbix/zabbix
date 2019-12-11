@@ -317,7 +317,7 @@ void finalize_key_access_rules_configuration(void)
 
 				zbx_vector_str_clear_ext(&rule->elements, zbx_str_free);
 				zbx_vector_str_destroy(&rule->elements);
-				zbx_free(key_access_rules.values[i]);
+				zbx_free(rule);
 				zbx_vector_ptr_remove(&key_access_rules, i);
 			}
 		}
