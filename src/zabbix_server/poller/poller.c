@@ -418,7 +418,7 @@ int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results
 	return res;
 }
 
-static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
+static int	parse_query_fields(const DC_ITEM *item, char **query_fields, unsigned char expand_macros)
 {
 	struct zbx_json_parse	jp_array, jp_object;
 	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN];
@@ -461,15 +461,22 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
 			zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '&');
 
 		data = zbx_strdup(data, name);
-		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
-				MACRO_TYPE_HTTP_RAW, NULL, 0);
+		if (1 == expand_macros)
+		{
+			substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
+					MACRO_TYPE_HTTP_RAW, NULL, 0);
+		}
 		zbx_http_url_encode(data, &data);
 		zbx_strcpy_alloc(query_fields, &alloc_len, &offset, data);
 		zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '=');
 
 		data = zbx_strdup(data, value);
-		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
-				MACRO_TYPE_HTTP_RAW, NULL, 0);
+		if (1 == expand_macros)
+		{
+			substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
+					MACRO_TYPE_HTTP_RAW, NULL, 0);
+		}
+
 		zbx_http_url_encode(data, &data);
 		zbx_strcpy_alloc(query_fields, &alloc_len, &offset, data);
 
@@ -480,7 +487,7 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
 	return SUCCEED;
 }
 
-void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results)
+void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros)
 {
 	int	i;
 	char	*port = NULL, error[ITEM_ERROR_LEN_MAX];
@@ -491,7 +498,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 		errcodes[i] = SUCCEED;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
+		if (1 == expand_macros && SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
 				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
@@ -507,8 +514,12 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 			case ITEM_TYPE_SNMPv3:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
+				if (1 == expand_macros)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
+				}
+
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
@@ -527,28 +538,34 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
 				ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].snmpv3_securityname,
-						MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].snmpv3_authpassphrase,
-						MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].snmpv3_privpassphrase,
-						MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].snmpv3_contextname,
-						MACRO_TYPE_COMMON, NULL, 0);
+				if (1 == expand_macros)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].snmpv3_securityname,
+							MACRO_TYPE_COMMON, NULL, 0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].snmpv3_authpassphrase,
+							MACRO_TYPE_COMMON, NULL, 0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].snmpv3_privpassphrase,
+							MACRO_TYPE_COMMON, NULL, 0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].snmpv3_contextname,
+							MACRO_TYPE_COMMON, NULL, 0);
+				}
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
+				if (0 == expand_macros)
+					break;
+
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
-				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid, NULL,
-						NULL, NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
+				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid,
+						NULL, NULL, NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
@@ -559,19 +576,30 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
+				if (1 == expand_macros)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].publickey, MACRO_TYPE_COMMON, NULL,
+							0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].privatekey, MACRO_TYPE_COMMON, NULL,
+							0);
+				}
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
-				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
-						NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+				if (1 == expand_macros)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
+							NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+				}
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_SIMPLE:
 				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
+
+				if (0 == expand_macros)
+					break;
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
@@ -582,6 +610,9 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 				items[i].jmx_endpoint = zbx_strdup(items[i].jmx_endpoint, items[i].jmx_endpoint_orig);
+
+				if (0 == expand_macros)
+					break;
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
@@ -601,10 +632,14 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].url, MACRO_TYPE_HTTP_RAW, NULL, 0);
+				if (1 == expand_macros)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL,
+							0);
+					substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i],
+							NULL, NULL, &items[i].url, MACRO_TYPE_HTTP_RAW, NULL, 0);
+				}
 
 				if (SUCCEED != zbx_http_punycode_encode_url(&items[i].url))
 				{
@@ -613,12 +648,15 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 					continue;
 				}
 
-				if (FAIL == parse_query_fields(&items[i], &items[i].query_fields))
+				if (FAIL == parse_query_fields(&items[i], &items[i].query_fields, expand_macros))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
 					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
+
+				if (0 == expand_macros)
+					break;
 
 				switch (items[i].post_type)
 				{
@@ -791,7 +829,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zbx_vector_ptr_create(&add_results);
 
-	prepare_items(items, errcodes, num, results);
+	prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
 	check_items(items, errcodes, num, results, &add_results);
 
 	zbx_timespec(&timespec);

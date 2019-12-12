@@ -624,7 +624,7 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 		ZBX_STR2UCHAR(*string, DBget_field(table, fieldname)->default_value);
 }
 
-void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results);
+void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros);
 void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results);
 
@@ -781,7 +781,7 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 
 	zbx_vector_ptr_create(&add_results);
 
-	prepare_items(&item, &errcode, 1, &result);
+	prepare_items(&item, &errcode, 1, &result, MACRO_EXPAND_NO);
 	check_items(&item, &errcode, 1, &result, &add_results);
 
 	switch (errcode)
