@@ -83,7 +83,7 @@ class testGraphWidget extends CWebTest {
 	private function saveGraphWidget($name) {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget($name);
-		$widget->query('class:preloader')->waitUntilNotPresent();
+		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$widget->getContent()->query('class:svg-graph')->waitUntilVisible();
 		$dashboard->save();
 		$message = CMessageElement::find()->waitUntilPresent()->one();
