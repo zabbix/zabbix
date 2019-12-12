@@ -89,8 +89,8 @@ $scripts[] =
 			'data = {'.
 				'uniqueid: 0,'.
 				'preview: 1,'.
-				'content_width: $preview.width(),'.
-				'content_height: $preview.height() - 10'.
+				'content_width: Math.floor($preview.width()),'.
+				'content_height: Math.floor($preview.height()) - 10'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
 
