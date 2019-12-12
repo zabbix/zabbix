@@ -733,71 +733,51 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 			sizeof(item.ipmi_sensor));
 
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
-	item.key = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMP_COMMUNITY, table_items, "snmp_community",
 			item.snmp_community_orig, sizeof(item.snmp_community_orig));
-	item.snmp_community = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMP_OID, table_items, "snmp_oid", item.snmp_oid_orig,
 			sizeof(item.snmp_oid_orig));
-	item.snmp_oid = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_SECURITYNAME, table_items, "snmpv3_securityname",
 			item.snmpv3_securityname_orig, sizeof(item.snmpv3_securityname_orig));
-	item.snmpv3_securityname = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_AUTHPASSPHRASE, table_items, "snmpv3_authpassphrase",
 			item.snmpv3_authpassphrase_orig, sizeof(item.snmpv3_authpassphrase_orig));
-	item.snmpv3_authpassphrase = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPASSPHRASE, table_items, "snmpv3_privpassphrase",
-			item.snmpv3_privpassphrase_orig, sizeof(item.snmpv3_privpassphrase_orig));
-	item.snmpv3_privpassphrase = NULL;
+			item.snmpv3_privpassphrase_orig, sizeof(item.snmpv3_privpassphrase_orig));;
 	item.params = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PARAMS, table_items, "params");
 
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_USERNAME, table_items, "username", item.username_orig,
 			sizeof(item.username_orig));
-	item.username = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_PUBLICKEY, table_items, "publickey", item.publickey_orig,
 			sizeof(item.publickey_orig));
-	item.publickey = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_PRIVATEKEY, table_items, "privatekey", item.privatekey_orig,
 			sizeof(item.privatekey_orig));
-	item.privatekey = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_PASSWORD, table_items, "password", item.password_orig,
 			sizeof(item.password_orig));
-	item.password = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_CONTEXTNAME, table_items, "snmpv3_contextname",
 			item.snmpv3_contextname_orig, sizeof(item.snmpv3_contextname_orig));
-	item.snmpv3_contextname = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_JMX_ENDPOINT, table_items, "jmx_endpoint",
 			item.jmx_endpoint_orig, sizeof(item.jmx_endpoint_orig));
-	item.jmx_endpoint = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig,
 			sizeof(item.timeout_orig));
-	item.timeout = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_URL, table_items, "url", item.url_orig, sizeof(item.url_orig));
-	item.url = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_QUERY_FIELDS, table_items, "query_fields",
 			item.query_fields_orig, sizeof(item.query_fields_orig));
-	item.query_fields = NULL;
 
 	item.posts = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_POSTS, table_items, "posts");
 
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_STATUS_CODES, table_items, "status_codes", item.status_codes_orig,
 			sizeof(item.status_codes_orig));
-	item.status_codes = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_HTTP_PROXY, table_items, "http_proxy", item.http_proxy_orig,
 			sizeof(item.http_proxy_orig));
-	item.http_proxy = NULL;
 
 	item.headers = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_HTTP_HEADERS, table_items, "headers");
 
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items, "ssl_cert_file",
 			item.ssl_cert_file_orig, sizeof(item.ssl_cert_file_orig));
-	item.ssl_cert_file = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file", item.ssl_key_file_orig,
 			sizeof(item.ssl_key_file_orig));
-	item.ssl_key_file = NULL;
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items, "ssl_key_password",
 			item.ssl_key_password_orig, sizeof(item.ssl_key_password_orig));
-	item.ssl_key_password = NULL;
 
 	if (NULL == table_interface)
 		table_interface = DBget_table("interface");
