@@ -110,7 +110,9 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			$response->setMessageOk(_('User added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=user.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'user.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add user'));
 		}

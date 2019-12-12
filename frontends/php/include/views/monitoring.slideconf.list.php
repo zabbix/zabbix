@@ -58,7 +58,7 @@ $widget->addItem(
 $form = (new CForm())->setName('slideForm');
 
 // create table
-$url = 'slideconf.php';
+$url = (new CUrl('slideconf.php'))->getUrl();
 
 $slidesTable = (new CTableInfo())
 	->setHeader([

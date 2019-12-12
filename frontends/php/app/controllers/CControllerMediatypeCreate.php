@@ -157,7 +157,7 @@ class CControllerMediatypeCreate extends CController {
 		}
 		else {
 			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))->setArgument('action', 'mediatype.edit')->getUrl()
+				(new CUrl('zabbix.php'))->setArgument('action', 'mediatype.edit')
 			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add media type'));

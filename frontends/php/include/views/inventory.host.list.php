@@ -60,7 +60,8 @@ $hostInventoryWidget->addItem(
 		])
 );
 
-$url = 'hostinventories.php';
+// create table
+$url = (new CUrl('hostinventories.php'))->getUrl();
 
 $table = (new CTableInfo())
 	->setHeader([

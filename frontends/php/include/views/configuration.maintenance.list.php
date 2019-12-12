@@ -62,7 +62,7 @@ $widget = (new CWidget())
 $maintenanceForm = (new CForm())->setName('maintenanceForm');
 
 // create table
-$url = 'maintenance.php';
+$url = (new CUrl('maintenance.php'))->getUrl();
 
 $maintenanceTable = (new CTableInfo())
 	->setHeader([

@@ -78,7 +78,9 @@ $screenTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_screens'))->onClick("checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'screenconf.php'),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
+			(new CUrl('screenconf.php'))->getUrl()
+		),
 		_('Dimension (cols x rows)'),
 		_('Actions')
 	]);

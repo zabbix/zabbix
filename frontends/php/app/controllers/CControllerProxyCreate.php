@@ -105,7 +105,9 @@ class CControllerProxyCreate extends CController {
 			$response->setMessageOk(_('Proxy added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'proxy.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add proxy'));
 		}

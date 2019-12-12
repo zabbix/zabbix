@@ -127,12 +127,15 @@ $widget = (new CWidget())
 
 $form = (new CForm())->setName('templates');
 
+// create table
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], 'templates.php'),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
+			(new CUrl('templates.php'))->getUrl()
+		),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),

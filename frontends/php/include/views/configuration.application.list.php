@@ -61,7 +61,7 @@ $applicationTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		($this->data['hostid'] > 0) ? null : _('Host'),
 		make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder'],
-			'applications.php'
+			(new CUrl('applications.php'))->getUrl()
 		),
 		_('Items'),
 		$data['showInfoColumn'] ? _('Info') : null

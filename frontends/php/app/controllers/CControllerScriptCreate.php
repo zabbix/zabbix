@@ -90,7 +90,9 @@ class CControllerScriptCreate extends CController {
 			$response->setMessageOk(_('Script added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=script.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'script.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add script'));
 		}

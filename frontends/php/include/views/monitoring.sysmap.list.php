@@ -50,7 +50,7 @@ $widget = (new CWidget())
 $sysmapForm = (new CForm())->setName('frm_maps');
 
 // create table
-$url = 'sysmaps.php';
+$url = (new CUrl('sysmaps.php'))->getUrl();
 
 $sysmapTable = (new CTableInfo())
 	->setHeader([

@@ -101,7 +101,6 @@ class CControllerUsergroupUpdate extends CController {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.edit')
 				->setArgument('usrgrpid', $this->getInput('usrgrpid'))
-				->getUrl()
 			);
 			$response->setMessageError(_('Cannot update user group'));
 			$response->setFormData($this->getInputAll());

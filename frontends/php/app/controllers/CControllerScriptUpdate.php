@@ -100,7 +100,10 @@ class CControllerScriptUpdate extends CController {
 			$response->setMessageOk(_('Script updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=script.edit&scriptid='.$this->getInput('scriptid'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'script.edit')
+				->setArgument('scriptid', $this->getInput('scriptid'))
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update script'));
 		}

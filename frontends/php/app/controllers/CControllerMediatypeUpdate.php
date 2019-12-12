@@ -171,7 +171,9 @@ class CControllerMediatypeUpdate extends CController {
 			$response->setMessageOk(_('Media type updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'mediatype.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update media type'));
 		}

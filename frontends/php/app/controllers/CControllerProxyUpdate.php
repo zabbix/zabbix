@@ -115,8 +115,9 @@ class CControllerProxyUpdate extends CController {
 			$response->setMessageOk(_('Proxy updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect(
-				'zabbix.php?action=proxy.edit&proxyid='.$this->getInput('proxyid')
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'proxy.edit')
+				->setArgument('proxyid', $this->getInput('proxyid'))
 			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update proxy'));
