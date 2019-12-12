@@ -76,7 +76,7 @@ static int	DBpatch_4050007(void)
 	return DBmodify_field_type("dchecks", &field, NULL);
 }
 
-static int	DBpatch_4050009(void)
+static int	DBpatch_4050010(void)
 {
 	int		i;
 	const char	*values[] = {
@@ -85,6 +85,8 @@ static int	DBpatch_4050009(void)
 			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
 			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
 			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort"
+			"web.latest.php.sort", "web.latest.sort",
+			"web.latest.php.sortorder", "web.latest.sortorder"
 		};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -112,6 +114,6 @@ DBPATCH_ADD(4050004, 0, 1)
 DBPATCH_ADD(4050005, 0, 1)
 DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
-DBPATCH_ADD(4050009, 0, 1)
+DBPATCH_ADD(4050010, 0, 1)
 
 DBPATCH_END()
