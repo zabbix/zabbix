@@ -630,8 +630,8 @@ void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 
 static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
 {
-	char			tmp[MAX_STRING_LEN + 1], **pvalue, *fieldname;
-	DC_ITEM			item;
+	char			tmp[MAX_STRING_LEN + 1], **pvalue, *fieldname, *addr;
+	DC_ITEM			item = {0};
 	static const ZBX_TABLE	*table_items, *table_interface, *table_hosts;
 	struct zbx_json_parse	jp_interface, jp_host;
 	AGENT_RESULT		result;
@@ -753,7 +753,7 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	db_uchar_from_json(&jp_interface, ZBX_PROTO_TAG_USEIP, table_interface, "useip", &item.interface.useip);
 
 	fieldname = 1 == item.interface.useip ? "ip" : "dns";
-	item.interface.addr = db_string_from_json_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, fieldname);
+	addr = item.interface.addr = db_string_from_json_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, fieldname);
 	db_string_from_json(&jp_interface, ZBX_PROTO_TAG_PORT, table_interface, "port", item.interface.port_orig,
 			sizeof(item.interface.port_orig));
 	ZBX_STR2USHORT(item.interface.port, item.interface.port_orig);
@@ -765,6 +765,32 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 		zbx_json_open("{}", &jp_host);
 
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_HOST, table_hosts, "host", item.host.host, sizeof(item.host.host));
+
+	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
+		ZBX_STR2UINT64(item.host.hostid, tmp);
+	else
+		item.host.hostid = 0;
+
+	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_STATUS, table_hosts, "maintenance_status",
+			&item.host.maintenance_status);
+	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
+			&item.host.maintenance_type);
+	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_SNMP_AVAILABLE, table_hosts, "snmp_available",
+			&item.host.snmp_available);
+	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_AVAILABLE, table_hosts, "ipmi_available",
+			&item.host.ipmi_available);
+	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
+		item.host.ipmi_authtype = atoi(tmp);
+	else
+		item.host.ipmi_authtype = atoi(DBget_field(table_hosts, "ipmi_authtype")->default_value);
+	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PRIVILEGE, table_hosts, "ipmi_privilege",
+			&item.host.ipmi_privilege);
+	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_USERNAME, table_hosts, "ipmi_username",
+			item.host.ipmi_username, sizeof(item.host.ipmi_username));
+	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PASSWORD, table_hosts, "ipmi_password",
+			item.host.ipmi_password, sizeof(item.host.ipmi_password));
+	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_JMX_AVAILABLE, table_hosts, "jmx_available",
+			&item.host.jmx_available);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_TLS_CONNECT, table_hosts, "tls_connect", &item.host.tls_connect);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_ISSUER, table_hosts, "tls_issuer", item.host.tls_issuer,
@@ -809,7 +835,7 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	zbx_vector_ptr_destroy(&add_results);
 
 	clean_items(&item, 1, &result);
-	zbx_free(item.interface.addr);
+	zbx_free(addr);
 	zbx_free(item.params);
 	zbx_free(item.posts);
 	zbx_free(item.headers);
