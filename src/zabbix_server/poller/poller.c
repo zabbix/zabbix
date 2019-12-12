@@ -480,7 +480,7 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
 	return SUCCEED;
 }
 
-int	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results)
+void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results)
 {
 	int	i;
 	char	*port = NULL, error[ITEM_ERROR_LEN_MAX];
@@ -666,6 +666,94 @@ int	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results)
 	zbx_free(port);
 }
 
+void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
+		zbx_vector_ptr_t *add_results)
+{
+	if (SUCCEED == is_snmp_type(items[0].type))
+	{
+#ifdef HAVE_NETSNMP
+		/* SNMP checks use their own timeouts */
+		get_values_snmp(items, results, errcodes, num);
+#else
+		for (i = 0; i < num; i++)
+		{
+			if (SUCCEED != errcodes[i])
+				continue;
+
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
+			errcodes[i] = CONFIG_ERROR;
+		}
+#endif
+	}
+	else if (ITEM_TYPE_JMX == items[0].type)
+	{
+		zbx_alarm_on(CONFIG_TIMEOUT);
+		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
+		zbx_alarm_off();
+	}
+	else if (1 == num)
+	{
+		if (SUCCEED == errcodes[0])
+			errcodes[0] = get_value(&items[0], &results[0], add_results);
+	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
+}
+
+void	clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
+{
+	int	i;
+
+	for (i = 0; i < num; i++)
+	{
+		zbx_free(items[i].key);
+
+		switch (items[i].type)
+		{
+			case ITEM_TYPE_SNMPv3:
+				zbx_free(items[i].snmpv3_securityname);
+				zbx_free(items[i].snmpv3_authpassphrase);
+				zbx_free(items[i].snmpv3_privpassphrase);
+				zbx_free(items[i].snmpv3_contextname);
+				ZBX_FALLTHROUGH;
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+				zbx_free(items[i].snmp_community);
+				zbx_free(items[i].snmp_oid);
+				break;
+			case ITEM_TYPE_HTTPAGENT:
+				zbx_free(items[i].timeout);
+				zbx_free(items[i].url);
+				zbx_free(items[i].query_fields);
+				zbx_free(items[i].status_codes);
+				zbx_free(items[i].http_proxy);
+				zbx_free(items[i].ssl_cert_file);
+				zbx_free(items[i].ssl_key_file);
+				zbx_free(items[i].ssl_key_password);
+				zbx_free(items[i].username);
+				zbx_free(items[i].password);
+				break;
+			case ITEM_TYPE_SSH:
+				zbx_free(items[i].publickey);
+				zbx_free(items[i].privatekey);
+				ZBX_FALLTHROUGH;
+			case ITEM_TYPE_TELNET:
+			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_SIMPLE:
+				zbx_free(items[i].username);
+				zbx_free(items[i].password);
+				break;
+			case ITEM_TYPE_JMX:
+				zbx_free(items[i].username);
+				zbx_free(items[i].password);
+				zbx_free(items[i].jmx_endpoint);
+				break;
+		}
+
+		free_result(&results[i]);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_values                                                       *
@@ -701,40 +789,10 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 		goto exit;
 	}
 
-	prepare_items(items, errcodes, num, results);
-
 	zbx_vector_ptr_create(&add_results);
 
-	/* retrieve item values */
-	if (SUCCEED == is_snmp_type(items[0].type))
-	{
-#ifdef HAVE_NETSNMP
-		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num);
-#else
-		for (i = 0; i < num; i++)
-		{
-			if (SUCCEED != errcodes[i])
-				continue;
-
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
-			errcodes[i] = CONFIG_ERROR;
-		}
-#endif
-	}
-	else if (ITEM_TYPE_JMX == items[0].type)
-	{
-		zbx_alarm_on(CONFIG_TIMEOUT);
-		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
-		zbx_alarm_off();
-	}
-	else if (1 == num)
-	{
-		if (SUCCEED == errcodes[0])
-			errcodes[0] = get_value(&items[0], &results[0], &add_results);
-	}
-	else
-		THIS_SHOULD_NEVER_HAPPEN;
+	prepare_items(items, errcodes, num, results);
+	check_items(items, errcodes, num, results, &add_results);
 
 	zbx_timespec(&timespec);
 
@@ -821,55 +879,10 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &errcodes[i], 1, poller_type,
 				nextcheck);
-
-		zbx_free(items[i].key);
-
-		switch (items[i].type)
-		{
-			case ITEM_TYPE_SNMPv3:
-				zbx_free(items[i].snmpv3_securityname);
-				zbx_free(items[i].snmpv3_authpassphrase);
-				zbx_free(items[i].snmpv3_privpassphrase);
-				zbx_free(items[i].snmpv3_contextname);
-				ZBX_FALLTHROUGH;
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
-				zbx_free(items[i].snmp_community);
-				zbx_free(items[i].snmp_oid);
-				break;
-			case ITEM_TYPE_HTTPAGENT:
-				zbx_free(items[i].timeout);
-				zbx_free(items[i].url);
-				zbx_free(items[i].query_fields);
-				zbx_free(items[i].status_codes);
-				zbx_free(items[i].http_proxy);
-				zbx_free(items[i].ssl_cert_file);
-				zbx_free(items[i].ssl_key_file);
-				zbx_free(items[i].ssl_key_password);
-				zbx_free(items[i].username);
-				zbx_free(items[i].password);
-				break;
-			case ITEM_TYPE_SSH:
-				zbx_free(items[i].publickey);
-				zbx_free(items[i].privatekey);
-				ZBX_FALLTHROUGH;
-			case ITEM_TYPE_TELNET:
-			case ITEM_TYPE_DB_MONITOR:
-			case ITEM_TYPE_SIMPLE:
-				zbx_free(items[i].username);
-				zbx_free(items[i].password);
-				break;
-			case ITEM_TYPE_JMX:
-				zbx_free(items[i].username);
-				zbx_free(items[i].password);
-				zbx_free(items[i].jmx_endpoint);
-				break;
-		}
-
-		free_result(&results[i]);
 	}
 
 	zbx_preprocessor_flush();
+	clean_items(items, num, results);
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 
