@@ -101,6 +101,22 @@ static int	DBpatch_4050010(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4050011(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set value_id=value_str,"
+				" value_str='',"
+				" type=1"	/* PROFILE_TYPE_ID */
+			" where type=3"	/* PROFILE_TYPE_STR */
+				" and (idx='web.latest.filter.groupids' or idx='web.latest.filter.hostids')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -115,5 +131,6 @@ DBPATCH_ADD(4050005, 0, 1)
 DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
 DBPATCH_ADD(4050010, 0, 1)
+DBPATCH_ADD(4050011, 0, 1)
 
 DBPATCH_END()
