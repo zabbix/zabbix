@@ -56,14 +56,16 @@ $widget = (new CWidget())
 $mediaTypeForm = (new CForm())->setName('mediaTypesForm');
 
 // create table
+$url = (new CUrl('zabbix.php'))->setArgument('action', 'mediatype.list')->getUrl();
+
 $mediaTypeTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_media_types'))
 				->onClick("checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
-		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Status'),
 		_('Used in actions'),
 		_('Details'),

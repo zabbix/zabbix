@@ -107,7 +107,11 @@ class CControllerProxyUpdate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'proxy.list')
+				->setArgument('page', CPagerHelper::fetch('proxy.list', null))
+			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Proxy updated'));
 		}
 		else {

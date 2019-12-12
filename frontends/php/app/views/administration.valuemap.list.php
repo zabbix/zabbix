@@ -49,7 +49,9 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_valuemaps'))
 				->onClick("checkAll('".$form->getName()."', 'all_valuemaps', 'valuemapids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
+			(new CUrl('zabbix.php'))->setArgument('action', 'valuemap.list')->getUrl()
+		),
 		_('Value map'),
 		_('Used in items')
 	]);
@@ -83,7 +85,7 @@ $form->addItem([
 				->setArgument('action', 'export.valuemaps.xml')
 				->setArgument('backurl', (new CUrl('zabbix.php'))
 					->setArgument('action', 'valuemap.list')
-					->setArgument('page', getPageNumber())
+					->setArgument('page', $data['page'])
 					->getUrl())
 				->getUrl()
 		],

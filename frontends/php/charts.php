@@ -93,6 +93,8 @@ updateTimeSelectorPeriod($timeselector_options);
 
 $data = [
 	'pageFilter' => $pageFilter,
+	'groupid' => $pageFilter->groupid,
+	'hostid' => $pageFilter->hostid,
 	'graphid' => $pageFilter->graphid,
 	'action' => getRequest('action', HISTORY_GRAPH),
 	'actions' => [

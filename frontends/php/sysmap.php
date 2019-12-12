@@ -99,7 +99,11 @@ if (isset($_REQUEST['favobj'])) {
 				$result = API::Map()->update($sysmapUpdate);
 
 				if ($result !== false) {
-					echo 'if (confirm('.CJs::encodeJson(_('Map is updated! Return?')).')) { location.href = "sysmaps.php"; }';
+					$url = (new CUrl('sysmaps.php'))
+						->setArgument('page', CPagerHelper::fetch('sysmaps.php', null))
+						->getUrl();
+
+					echo 'if (confirm('.CJs::encodeJson(_('Map is updated! Return?')).')) { location.href = "'.$url.'"; }';
 				}
 				else {
 					throw new Exception(_('Map update failed.'));

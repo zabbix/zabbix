@@ -132,7 +132,7 @@ $table = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], 'templates.php'),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),
@@ -283,7 +283,7 @@ $form->addItem([
 					->setArgument('action', 'export.templates.xml')
 					->setArgument('backurl', (new CUrl('templates.php'))
 						->setArgument('groupid', $data['pageFilter']->groupid)
-						->setArgument('page', getPageNumber())
+						->setArgument('page', $data['page'])
 						->getUrl())
 					->getUrl()
 			],

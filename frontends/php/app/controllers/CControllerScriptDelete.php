@@ -56,9 +56,13 @@ class CControllerScriptDelete extends CController {
 
 		$deleted = count($scriptids);
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=script.list&uncheck=1');
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'script.list')
+			->setArgument('page', CPagerHelper::fetch('script.list', null))
+		);
 
 		if ($result) {
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_n('Script deleted', 'Scripts deleted', $deleted));
 		}
 		else {

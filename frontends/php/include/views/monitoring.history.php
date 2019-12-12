@@ -26,8 +26,8 @@ $historyWidget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
 	'right' => (new CForm('get'))
+		->cleanItems()
 		->addVar('itemids', getRequest('itemids'))
-		->addVar('page', 1)
 ];
 $header_row = [];
 $first_item = reset($data['items']);
@@ -172,10 +172,16 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 
 // create history screen
 if ($data['itemids']) {
+	$url = (new CUrl('history.php'))
+		->setArgument('action', $data['action'])
+		->setArgument('itemids', $data['itemids'])
+		->getUrl();
+
 	$screen = CScreenBuilder::getScreen([
 		'resourcetype' => SCREEN_RESOURCE_HISTORY,
 		'action' => $data['action'],
 		'itemids' => $data['itemids'],
+		'pageFile' => $url,
 		'profileIdx' => $data['profileIdx'],
 		'profileIdx2' => $data['profileIdx2'],
 		'from' => $data['from'],
@@ -218,6 +224,7 @@ else {
 			->hideFilterButtons()
 			->addVar('action', $data['action'])
 			->addVar('itemids', $data['itemids']);
+
 		$filter_tab = [
 			(new CFormList())->addRow(_('Graph type'),
 				(new CRadioButtonList('graphtype', (int) $data['graphtype']))
@@ -236,7 +243,6 @@ else {
 	if ($filter_tab) {
 		$filter_form->addFilterTab(_('Filter'), $filter_tab);
 	}
-
 
 	if ($data['itemids']) {
 		if ($data['action'] !== HISTORY_LATEST) {

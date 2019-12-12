@@ -75,15 +75,17 @@ $form = (new CForm())
 	->setId('users');
 
 // create users table
+$url = (new CUrl('zabbix.php'))->setArgument('action', 'user.list')->getUrl();
+
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_users'))->onClick("checkAll('".$form->getName()."', 'all_users', 'userids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Alias'), 'alias', $data['sort'], $data['sortorder']),
-		make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder']),
-		make_sorting_header(_('Surname'), 'surname', $data['sort'], $data['sortorder']),
-		make_sorting_header(_('User type'), 'type', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Alias'), 'alias', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Surname'), 'surname', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('User type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Groups'),
 		_('Is online?'),
 		_('Login'),

@@ -1602,10 +1602,24 @@ else {
 			order_result($data['items'], $sortField, $sortOrder);
 	}
 
-	$url = (new CUrl('disc_prototypes.php'))
-		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch($page['file']);
+	}
 
-	$data['paging'] = getPagingLine($data['items'], $sortOrder, $url);
+	CPagerHelper::store($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['items'], $sortOrder,
+		(new CUrl('disc_prototypes.php'))
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	);
+
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	// render view

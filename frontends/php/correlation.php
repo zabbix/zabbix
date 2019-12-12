@@ -475,9 +475,22 @@ else {
 		'limit' => $config['search_limit'] + 1
 	]);
 
-	// sorting && paging
 	order_result($data['correlations'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['correlations'], $sortOrder, new CUrl('correlation.php'));
+
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch($page['file']);
+	}
+
+	CPagerHelper::store($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['correlations'], $sortOrder, new CUrl('correlation.php'));
 
 	// Render view.
 	$correlationView = new CView('configuration.correlation.list', $data);

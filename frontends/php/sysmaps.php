@@ -418,8 +418,20 @@ else {
 
 	order_result($data['maps'], $sortField, $sortOrder);
 
-	// paging
-	$data['paging'] = getPagingLine($data['maps'], $sortOrder, new CUrl('sysmaps.php'));
+	// pager
+	if (hasRequest('page')) {
+		$data['page'] = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$data['page'] = 1;
+	}
+	else {
+		$data['page'] = CPagerHelper::fetch($page['file']);
+	}
+
+	CPagerHelper::store($page['file'], $data['page']);
+
+	$data['paging'] = CPagerHelper::paginateRows($data['page'], $data['maps'], $sortOrder, new CUrl('sysmaps.php'));
 
 	if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 		$editable_maps = API::Map()->get([

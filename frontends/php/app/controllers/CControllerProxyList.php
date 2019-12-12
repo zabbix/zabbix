@@ -98,13 +98,15 @@ class CControllerProxyList extends CController {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-		// sorting & paging
+
+		// data sort and pager
 		order_result($data['proxies'], $sortField, $sortOrder);
 
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'proxy.list');
-
-		$data['paging'] = getPagingLine($data['proxies'], $sortOrder, $url);
+		$page_num = getRequest('page', 1);
+		CPagerHelper::store('proxy.list', $page_num);
+		$data['paging'] = CPagerHelper::paginateRows($page_num, $data['proxies'], $sortOrder,
+			(new CUrl('zabbix.php'))->setArgument('action', 'proxy.list')
+		);
 
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'auto_compress'],

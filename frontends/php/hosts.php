@@ -1328,10 +1328,23 @@ else {
 	}
 	order_result($hosts, $sortField, $sortOrder);
 
-	$url = (new CUrl('hosts.php'))
-		->setArgument('groupid', $pageFilter->groupid);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch($page['file']);
+	}
 
-	$pagingLine = getPagingLine($hosts, $sortOrder, $url);
+	CPagerHelper::store($page['file'], $page_num);
+
+	$pagingLine = CPagerHelper::paginateRows($page_num, $hosts, $sortOrder,
+		(new CUrl('hosts.php'))
+			->setArgument('groupid', $pageFilter->groupid)
+	);
 
 	$hosts = API::Host()->get([
 		'output' => API_OUTPUT_EXTEND,
@@ -1436,6 +1449,7 @@ else {
 		'pageFilter' => $pageFilter,
 		'hosts' => $hosts,
 		'paging' => $pagingLine,
+		'page' => $page_num,
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,

@@ -421,7 +421,20 @@ else {
 
 	order_result($data['slides'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['slides'], $sortOrder, new CUrl('slideconf.php'));
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch($page['file']);
+	}
+
+	CPagerHelper::store($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['slides'], $sortOrder, new CUrl('slideconf.php'));
 
 	// render view
 	$slideshowView = new CView('monitoring.slideconf.list', $data);

@@ -389,10 +389,23 @@ else {
 
 	order_result($data['maintenances'], $sortField, $sortOrder);
 
-	$url = (new CUrl('maintenance.php'))
-		->setArgument('groupid', $pageFilter->groupid);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch($page['file']);
+	}
 
-	$data['paging'] = getPagingLine($data['maintenances'], $sortOrder, $url);
+	CPagerHelper::store($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['maintenances'], $sortOrder,
+		(new CUrl('maintenance.php'))
+			->setArgument('groupid', $pageFilter->groupid)
+	);
 
 	$data['pageFilter'] = $pageFilter;
 

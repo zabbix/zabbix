@@ -298,7 +298,21 @@ else {
 	]);
 	order_result($groups, $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($groups, $sortOrder, new CUrl('hostgroups.php'));
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch($page['file']);
+	}
+
+	CPagerHelper::store($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $groups, $sortOrder, new CUrl('hostgroups.php'));
+
 	$groupIds = zbx_objectValues($groups, 'groupid');
 
 	// get hosts and templates count

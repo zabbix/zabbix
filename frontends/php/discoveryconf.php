@@ -393,8 +393,20 @@ else {
 		order_result($data['drules'], $sortField, $sortOrder);
 	}
 
-	// get paging
-	$data['paging'] = getPagingLine($data['drules'], $sortOrder, new CUrl('discoveryconf.php'));
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch($page['file']);
+	}
+
+	CPagerHelper::store($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['drules'], $sortOrder, new CUrl('discoveryconf.php'));
 
 	// render view
 	$discoveryView = new CView('configuration.discovery.list', $data);

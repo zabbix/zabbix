@@ -408,10 +408,23 @@ else {
 
 	order_result($data['hostPrototypes'], $sortField, $sortOrder);
 
-	$url = (new CUrl('host_prototypes.php'))
-		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::fetch($page['file']);
+	}
 
-	$data['paging'] = getPagingLine($data['hostPrototypes'], $sortOrder, $url);
+	CPagerHelper::store($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['hostPrototypes'], $sortOrder,
+		(new CUrl('host_prototypes.php'))
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	);
 
 	$data['parent_templates'] = getHostPrototypeParentTemplates($data['hostPrototypes']);
 

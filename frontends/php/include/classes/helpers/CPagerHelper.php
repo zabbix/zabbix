@@ -82,18 +82,26 @@ class CPagerHelper {
 	 * @param int     $page
 	 */
 	public static function store($entity, $page) {
-		CProfile::update('web.pager.'.$entity, $page, PROFILE_TYPE_INT);
+		CProfile::update('web.pager.entity', $entity, PROFILE_TYPE_STR);
+		CProfile::update('web.pager.page', $page, PROFILE_TYPE_INT);
 	}
 
 	/**
 	 * Fetch stored page number for given entity.
 	 *
 	 * @param string  $entity
+	 * @param mixed   $first_page  substitute return value for the first page
 	 *
-	 * @return int  page number (defaults to 1, if never stored)
+	 * @return mixed  page number (or the $first_page if wasn't stored or first page was stored)
 	 */
-	public static function fetch($entity) {
-		return CProfile::get('web.pager.'.$entity, 1);
+	public static function fetch($entity, $first_page = 1) {
+		if ($entity !== CProfile::get('web.pager.entity')) {
+			return $first_page;
+		}
+
+		$page = CProfile::get('web.pager.page', 1);
+
+		return ($page == 1 ? $first_page : $page);
 	}
 
 	/**
@@ -188,17 +196,28 @@ class CPagerHelper {
 			$start_page = ($end_page > self::RANGE) ? $end_page - self::RANGE + 1 : 1;
 
 			if ($start_page > 1) {
-				$url->setArgument('page', 1);
+				$url->removeArgument('page');
 				$tags[] = new CLink(_x('First', 'page navigation'), $url->getUrl());
 			}
 
 			if ($page > 1) {
-				$url->setArgument('page', $page - 1);
+				if ($page == 2) {
+					$url->removeArgument('page');
+				}
+				else {
+					$url->setArgument('page', $page - 1);
+				}
 				$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl());
 			}
 
 			for ($i = $start_page; $i <= $end_page; $i++) {
-				$url->setArgument('page', $i);
+				if ($i == 1) {
+					$url->removeArgument('page');
+				}
+				else {
+					$url->setArgument('page', $i);
+				}
+
 				$link = new CLink($i, $url->getUrl());
 				if ($i == $page) {
 					$link->addClass(ZBX_STYLE_PAGING_SELECTED);

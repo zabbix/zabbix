@@ -77,9 +77,12 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		// sorting & paging
 		order_result($data['dashboards'], $sort_field, $sort_order);
 
-		$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
-
-		$data['paging'] = getPagingLine($data['dashboards'], $sort_order, $url);
+		// pager
+		$page_num = getRequest('page', 1);
+		CPagerHelper::store('dashboard.list', $page_num);
+		$data['paging'] = CPagerHelper::paginateRows($page_num, $data['dashboards'], $sort_order,
+			(new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list')
+		);
 
 		if ($data['dashboards']) {
 			$this->prepareEditableFlag($data['dashboards']);
