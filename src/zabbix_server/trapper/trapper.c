@@ -594,6 +594,69 @@ fail:
 void	free_result_ptr(AGENT_RESULT *result);
 int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
 
+static void	dump_item(const DC_ITEM *item)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "key:'%s'", item->key);
+	zabbix_log(LOG_LEVEL_TRACE, "  type: %u", item->type);
+	zabbix_log(LOG_LEVEL_TRACE, "  value_type: %u", item->value_type);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3_securitylevel: %u", item->snmpv3_securitylevel);
+	zabbix_log(LOG_LEVEL_TRACE, "  authtype: %u", item->authtype);
+	zabbix_log(LOG_LEVEL_TRACE, "  flags: %u", item->flags);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3_authprotocol: %u", item->snmpv3_authprotocol);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3_privprotocol: %u", item->snmpv3_privprotocol);
+	zabbix_log(LOG_LEVEL_TRACE, "  follow_redirects: %u", item->follow_redirects);
+	zabbix_log(LOG_LEVEL_TRACE, "  post_type: %u", item->post_type);
+	zabbix_log(LOG_LEVEL_TRACE, "  retrieve_mode: %u", item->retrieve_mode);
+	zabbix_log(LOG_LEVEL_TRACE, "  request_method: %u", item->request_method);
+	zabbix_log(LOG_LEVEL_TRACE, "  output_format: %u", item->output_format);
+	zabbix_log(LOG_LEVEL_TRACE, "  verify_peer: %u", item->verify_peer);
+	zabbix_log(LOG_LEVEL_TRACE, "  verify_host: %u", item->verify_host);
+	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_sensor:'%s'", item->ipmi_sensor);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmp_community:'%s'", item->snmp_community);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmp_oid:'%s'", item->snmp_oid);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3_securityname:'%s'", item->snmpv3_securityname);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3_authpassphrase:'%s'", item->snmpv3_authpassphrase);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3_privpassphrase:'%s'", item->snmpv3_privpassphrase);
+	zabbix_log(LOG_LEVEL_TRACE, "  params:'%s'", ZBX_NULL2STR(item->params));
+	zabbix_log(LOG_LEVEL_TRACE, "  username:'%s'", item->username);
+	zabbix_log(LOG_LEVEL_TRACE, "  publickey:'%s'", item->publickey);
+	zabbix_log(LOG_LEVEL_TRACE, "  privatekey:'%s'", item->privatekey);
+	zabbix_log(LOG_LEVEL_TRACE, "  password:'%s'", item->password);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3_contextname:'%s'", item->snmpv3_contextname);
+	zabbix_log(LOG_LEVEL_TRACE, "  jmx_endpoint:'%s'", item->jmx_endpoint);
+	zabbix_log(LOG_LEVEL_TRACE, "  timeout:'%s'", item->timeout);
+	zabbix_log(LOG_LEVEL_TRACE, "  url:'%s'", item->url);
+	zabbix_log(LOG_LEVEL_TRACE, "  query_fields:'%s'", item->query_fields);
+	zabbix_log(LOG_LEVEL_TRACE, "  posts:'%s'", ZBX_NULL2STR(item->posts));
+	zabbix_log(LOG_LEVEL_TRACE, "  status_codes:'%s'", item->status_codes);
+	zabbix_log(LOG_LEVEL_TRACE, "  http_proxy:'%s'", item->http_proxy);
+	zabbix_log(LOG_LEVEL_TRACE, "  headers:'%s'", ZBX_NULL2STR(item->headers));
+	zabbix_log(LOG_LEVEL_TRACE, "  ssl_cert_file:'%s'", item->ssl_cert_file);
+	zabbix_log(LOG_LEVEL_TRACE, "  ssl_key_file:'%s'", item->ssl_key_file);
+	zabbix_log(LOG_LEVEL_TRACE, "  ssl_key_password:'%s'", item->ssl_key_password);
+	zabbix_log(LOG_LEVEL_TRACE, "interfaceid: " ZBX_FS_UI64, item->interface.interfaceid);
+	zabbix_log(LOG_LEVEL_TRACE, "  useip: %u", item->interface.useip);
+	zabbix_log(LOG_LEVEL_TRACE, "  address:'%s'", ZBX_NULL2STR(item->interface.addr));
+	zabbix_log(LOG_LEVEL_TRACE, "  port:'%u'", item->interface.port);
+	zabbix_log(LOG_LEVEL_TRACE, "hostid: " ZBX_FS_UI64, item->host.hostid);
+	zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid: " ZBX_FS_UI64, item->host.proxy_hostid);
+	zabbix_log(LOG_LEVEL_TRACE, "  host:'%s'", item->host.host);
+	zabbix_log(LOG_LEVEL_TRACE, "  maintenance_status: %u", item->host.maintenance_status);
+	zabbix_log(LOG_LEVEL_TRACE, "  maintenance_type: %u", item->host.maintenance_type);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmp_available: %u", item->host.snmp_available);
+	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_available: %u", item->host.ipmi_available);
+	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_authtype: %d", item->host.ipmi_authtype);
+	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_privilege: %u", item->host.ipmi_privilege);
+	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_username:'%s'", item->host.ipmi_username);
+	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_password:'%s'", item->host.ipmi_password);
+	zabbix_log(LOG_LEVEL_TRACE, "  jmx_available: %u", item->host.jmx_available);
+	zabbix_log(LOG_LEVEL_TRACE, "  tls_connect: %u", item->host.tls_connect);
+	zabbix_log(LOG_LEVEL_TRACE, "  tls_issuer:'%s'", item->host.tls_issuer);
+	zabbix_log(LOG_LEVEL_TRACE, "  tls_subject:'%s'", item->host.tls_subject);
+	zabbix_log(LOG_LEVEL_TRACE, "  tls_psk_identity:'%s'", item->host.tls_psk_identity);
+	zabbix_log(LOG_LEVEL_TRACE, "  tls_psk:'%s'", item->host.tls_psk);
+}
+
 static char	*db_string_from_json_dyn(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
 		const char *fieldname)
 {
@@ -609,6 +672,7 @@ static char	*db_string_from_json_dyn(const struct zbx_json_parse *jp, const char
 static void	db_string_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
 		const char *fieldname, char *string, size_t len)
 {
+
 	if (SUCCEED != zbx_json_value_by_name(jp, name, string, len, NULL))
 		zbx_strlcpy(string, DBget_field(table, fieldname)->default_value, len);
 }
@@ -652,11 +716,8 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 			&item.snmpv3_securitylevel);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_AUTHTYPE, table_items, "authtype", &item.authtype);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FLAGS, table_items, "flags", &item.flags);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FLAGS, table_items, "flags", &item.flags);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_AUTHPROTOCOL, table_items, "snmpv3_authprotocol",
 			&item.snmpv3_authprotocol);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPROTOCOL, table_items, "snmpv3_privprotocol",
-			&item.snmpv3_privprotocol);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPROTOCOL, table_items, "snmpv3_privprotocol",
 			&item.snmpv3_privprotocol);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FOLLOW_REDIRECTS, table_items, "follow_redirects",
@@ -666,7 +727,6 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_REQUEST_METHOD, table_items, "request_method", &item.request_method);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_OUTPUT_FORMAT, table_items, "output_format", &item.output_format);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_PEER, table_items, "verify_peer", &item.verify_peer);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_HOST, table_items, "verify_host", &item.verify_host);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_HOST, table_items, "verify_host", &item.verify_host);
 
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_IPMI_SENSOR, table_items, "ipmi_sensor", item.ipmi_sensor,
@@ -833,7 +893,8 @@ static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_j
 
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
-
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		dump_item(&item);
 	clean_items(&item, 1, &result);
 	zbx_free(addr);
 	zbx_free(item.params);
