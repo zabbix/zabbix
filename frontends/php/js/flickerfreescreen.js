@@ -85,8 +85,6 @@
 		},
 
 		refresh: function(id) {
-			console.trace();
-
 			var screen = this.screens[id];
 
 			if (empty(screen.id)) {
