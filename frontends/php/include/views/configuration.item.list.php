@@ -176,7 +176,7 @@ foreach ($data['items'] as $item) {
 		$triggerHintTable->addRow([
 			getSeverityCell($trigger['priority'], $data['config']),
 			$trigger_description,
-			$expression,
+			(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
@@ -222,7 +222,7 @@ foreach ($data['items'] as $item) {
 		($data['hostid'] == 0) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
-		CHtml::encode($item['key_']),
+		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
 		$item['trends'],

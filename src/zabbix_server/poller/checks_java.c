@@ -36,7 +36,7 @@ static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *r
 
 	if (SUCCEED == zbx_json_open(response, &jp))
 	{
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_RESPONSE, &value, &value_alloc))
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_RESPONSE, &value, &value_alloc, NULL))
 		{
 			zbx_snprintf(error, max_error_len, "No '%s' tag in received JSON", ZBX_PROTO_TAG_RESPONSE);
 			goto exit;
@@ -69,12 +69,14 @@ static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *r
 					goto exit;
 				}
 
-				if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
+				if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value,
+						&value_alloc, NULL))
 				{
 					set_result_type(&results[i], ITEM_VALUE_TYPE_TEXT, value);
 					errcodes[i] = SUCCEED;
 				}
-				else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &value, &value_alloc))
+				else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &value,
+						&value_alloc, NULL))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, value));
 					errcodes[i] = NOTSUPPORTED;
@@ -90,7 +92,7 @@ static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *r
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_FAILED))
 		{
-			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, error, max_error_len))
+			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, error, max_error_len, NULL))
 				ret = NETWORK_ERROR;
 			else
 				zbx_strlcpy(error, "Cannot get error message describing reasons for failure", max_error_len);

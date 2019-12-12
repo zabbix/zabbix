@@ -254,7 +254,8 @@ jQuery(function($) {
 	 * @param string options['data'][prefix]		(optional)
 	 * @param bool   options['data'][inaccessible]	(optional)
 	 * @param bool   options['data'][disabled]		(optional)
-	 * @param array  options['excludeids']			an array of excluded ids (optional)
+	 * @param string options['placeholder']			set custom placeholder (optional)
+	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off readonly state (optional)
 	 * @param bool   options['addNew']				allow user to create new names (optional)
@@ -286,7 +287,8 @@ jQuery(function($) {
 					'new': t('new'),
 					'Select': t('Select')
 				},
-				data: {},
+				placeholder: t('type here to search'),
+				data: [],
 				only_hostid: 0,
 				excludeids: [],
 				addNew: false,
@@ -349,7 +351,13 @@ jQuery(function($) {
 				css: ms.options.styles
 			}));
 
-			var $selected_div = $('<div>', {'class': 'selected'}),
+			var $selected_div = $('<div>', {'class': 'selected'}).on('click', function() {
+					/*
+					 * Focus without options because here it don't matter.
+					 * Click used instead focus because in patternselect listen only click.
+					 */
+					$('input[type="text"]', $obj).click().focus();
+				}),
 				$selected_ul = $('<ul>', {'class': 'multiselect-list'});
 
 			$obj.append($selected_div.append($selected_ul));
@@ -367,7 +375,6 @@ jQuery(function($) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
-						$('input[type="text"]', $obj).focus();
 					}
 				});
 
@@ -396,6 +403,8 @@ jQuery(function($) {
 				}
 
 				popup_button.on('click', function(event) {
+					// Click used instead focus because in patternselect listen only click.
+					$('input[type="text"]', $obj).click();
 					return PopUp('popup.generic', ms.options.popup.parameters, null, event.target);
 				});
 
@@ -412,8 +421,8 @@ jQuery(function($) {
 				'id': $label.length ? $label.attr('for') : null,
 				'class': 'input',
 				'type': 'text',
-				'placeholder': ms.options.labels['type here to search'],
-				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.labels['type here to search'],
+				'placeholder': ms.options.placeholder,
+				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.placeholder,
 				'aria-required': ms.options.required_str
 			})
 				.on('keyup', function(e) {
@@ -436,10 +445,12 @@ jQuery(function($) {
 					var search = $input.val();
 
 					if (search !== '') {
+						search = search.trim();
+
 						$('.selected li.selected', $obj).removeClass('selected');
+					}
 
-						search = search.replace(/^\s+|\s+$/g, '');
-
+					if (search !== '') {
 						/*
 						 * Strategy:
 						 * 1. Load the cached result set if such exists for the given term and show the list.
@@ -469,7 +480,7 @@ jQuery(function($) {
 									.then(function(response) {
 										ms.values.searches[search] = response.result;
 
-										if (search === $input.val().replace(/^\s+|\s+$/g, '')) {
+										if (search === $input.val().trim()) {
 											ms.values.search = search;
 											loadAvailable($obj);
 											showAvailable($obj);
@@ -612,17 +623,17 @@ jQuery(function($) {
 							break;
 					}
 				})
-				.on('focusin', function() {
+				.on('focusin', function($event) {
 					$obj.addClass('active');
 				})
-				.on('focusout', function() {
+				.on('focusout', function($event) {
 					if (ms.values.available_false_click) {
 						ms.values.available_false_click = false;
-						$('input[type="text"]', $obj).focus();
+						$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 					}
 					else {
 						$obj.removeClass('active');
-						$('.selected li:selected', $obj).removeClass('selected');
+						$('.selected li.selected', $obj).removeClass('selected');
 						cleanSearchInput($obj);
 						hideAvailable($obj);
 					}
@@ -654,7 +665,7 @@ jQuery(function($) {
 		addSelected($obj, ms.values.available[id]);
 
 		if (isSearchFieldVisible($obj)) {
-			$('input[type="text"]', $obj).focus();
+			$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 		}
 
 		$obj.trigger('change', ms);
@@ -699,7 +710,7 @@ jQuery(function($) {
 								if (!ms.options.disabled && !item_disabled) {
 									removeSelected($obj, item.id);
 									if (isSearchFieldVisible($obj)) {
-										$('input[type="text"]', $obj).focus();
+										$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 									}
 
 									$obj.trigger('change', ms);
@@ -711,7 +722,6 @@ jQuery(function($) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
-						$('input[type="text"]', $obj).focus();
 					}
 				});
 
@@ -858,7 +868,7 @@ jQuery(function($) {
 					text: ms.options.labels['No matches found']
 				})
 					.on('click', function() {
-						$('input[type="text"]', $obj).focus();
+						$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 					});
 
 			ms.values.available_div.append(div);
@@ -896,7 +906,7 @@ jQuery(function($) {
 					text: ms.options.labels['More matches found...']
 				})
 					.on('click', function() {
-						$('input[type="text"]', $obj).focus();
+						$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 					});
 
 			ms.values.available_div.prepend(div);
@@ -926,6 +936,9 @@ jQuery(function($) {
 
 		$obj.parents().add(window).one('scroll', hide_handler);
 		$(window).one('resize', hide_handler);
+
+		// For auto-test purposes.
+		$available.attr('data-opener', $obj.attr('id'));
 
 		var obj_offset = $obj.offset(),
 			obj_padding_y = $obj.outerHeight() - $obj.height(),
@@ -992,7 +1005,9 @@ jQuery(function($) {
 		$obj.parents().add(window).off('scroll', hide_handler);
 		$(window).off('resize', hide_handler);
 
-		$available.removeData(['obj', 'hide_handler']);
+		$available
+			.removeData(['obj', 'hide_handler'])
+			.removeAttr('data-opener');
 	}
 
 	function cleanAvailable($obj) {
@@ -1086,8 +1101,8 @@ jQuery(function($) {
 			$obj.removeClass('search-disabled')
 				.find('input[type="text"]')
 				.attr({
-					placeholder: ms.options.labels['type here to search'],
-					'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.labels['type here to search'],
+					placeholder: ms.options.placeholder,
+					'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.placeholder,
 					readonly: false
 				});
 		}

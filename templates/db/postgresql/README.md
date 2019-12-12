@@ -17,11 +17,14 @@ This template was tested on Zabbix 4.2.1 and PostgreSQL vesions 9.6, 10 and 11 o
     GRANT pg_monitor TO zbx_monitor;
     ```
 
-    For older PostgreSQL versions:
+    For PostgreSQL version 9.6 and below:
 
     ```sql
     CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>';
     GRANT SELECT ON pg_stat_database TO zbx_monitor;
+
+    -- To collect WAL metrics, the user must have a `superuser` role.
+    ALTER USER zbx_monitor WITH SUPERUSER;
     ```
 
 2. Copy `postgresql/` to Zabbix agent home directory `/var/lib/zabbix/`. The `postgresql/` directory contains the files needed to obtain metrics from PostgreSQL.
@@ -154,7 +157,7 @@ There are no template links in this template.
 | WAL                                                | Master item to collect WAL metrics                                                                                                                  | Zabbix agent   |
 | WAL: Bytes written per second                      | WAL write in bytes                                                                                                                                  | Dependent item |
 | WAL: Segments count                                | Number of WAL segments                                                                                                                              | Dependent item |
-| Locks                                              | Collect all metrics from pg_locks per databasehttps://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES                          | Zabbix agent   |
+| Locks                                              | Collect all metrics from pg_locks per database https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES                          | Zabbix agent   |
 | DB {#DBNAME} locks: Total                          | Total number of locks in the database                                                                                                               | Dependent item |
 | DB {#DBNAME} scans                                 | Number of scans done for table/index in the database                                                                                                | Zabbix agent   |
 | DB {#DBNAME} scans: Index                          | Number of index scans in the database                                                                                                               | Dependent item |

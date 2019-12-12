@@ -431,6 +431,13 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 			zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
 
+			if (0 == strcmp(parameter, "EnableRemoteCommands"))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "%s parameter is deprecated,"
+						" use AllowKey=system.run[*] or DenyKey=system.run[*] instead",
+						parameter);
+			}
+
 			if (0 == strcmp(parameter, "Include"))
 			{
 				if (FAIL == parse_cfg_object(value, cfg, level, strict))
@@ -483,6 +490,18 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 							goto incorrect_config;
 
 						*((zbx_uint64_t *)cfg[i].variable) = var;
+						break;
+					case TYPE_CUSTOM:
+						if (NULL != cfg[i].variable)
+						{
+							cfg_custom_parameter_parser_t custom_parser =
+									(cfg_custom_parameter_parser_t)cfg[i].variable;
+
+							if (SUCCEED != custom_parser(value, &cfg[i]))
+								goto incorrect_config;
+
+							continue;
+						}
 						break;
 					default:
 						assert(0);

@@ -126,58 +126,67 @@ jQuery(function($) {
 		});
 	});
 
-	function showMenuPopup($obj, data, event) {
+	function showMenuPopup($obj, data, event, options) {
+		var sections;
+
 		switch (data.type) {
 			case 'history':
-				data = getMenuPopupHistory(data);
+				sections = getMenuPopupHistory(data);
 				break;
 
 			case 'host':
-				data = getMenuPopupHost(data, $obj);
+				sections = getMenuPopupHost(data, $obj);
 				break;
 
 			case 'map_element_submap':
-				data = getMenuPopupMapElementSubmap(data);
+				sections = getMenuPopupMapElementSubmap(data);
 				break;
 
 			case 'map_element_group':
-				data = getMenuPopupMapElementGroup(data);
+				sections = getMenuPopupMapElementGroup(data);
 				break;
 
 			case 'map_element_trigger':
-				data = getMenuPopupMapElementTrigger(data);
+				sections = getMenuPopupMapElementTrigger(data);
 				break;
 
 			case 'map_element_image':
-				data = getMenuPopupMapElementImage(data);
+				sections = getMenuPopupMapElementImage(data);
 				break;
 
 			case 'refresh':
-				data = getMenuPopupRefresh(data, $obj);
+				sections = getMenuPopupRefresh(data, $obj);
 				break;
 
 			case 'trigger':
-				data = getMenuPopupTrigger(data, $obj);
+				sections = getMenuPopupTrigger(data, $obj);
 				break;
 
 			case 'trigger_macro':
-				data = getMenuPopupTriggerMacro(data);
+				sections = getMenuPopupTriggerMacro(data);
 				break;
 
 			case 'dashboard':
-				data = getMenuPopupDashboard(data, $obj);
+				sections = getMenuPopupDashboard(data, $obj);
 				break;
 
 			case 'item':
-				data = getMenuPopupItem(data, $obj);
+				sections = getMenuPopupItem(data, $obj);
 				break;
 
 			case 'item_prototype':
-				data = getMenuPopupItemPrototype(data);
+				sections = getMenuPopupItemPrototype(data);
 				break;
+
+			case 'submenu':
+				sections = getMenuPopupSubmenu(data);
+				break;
+
+			default:
+				return;
 		}
 
-		$obj.menuPopup(data, event);
+		$obj.menuPopup(sections, event, options);
 	}
 
 	/**
@@ -186,9 +195,8 @@ jQuery(function($) {
 	function createMenuPopupPreloader() {
 		return $('<div>', {
 			'id': 'menu-popup-preloader',
-			'class': 'preloader-container menu-popup-preloader'
+			'class': 'is-loading menu-popup-preloader'
 		})
-			.append($('<div>').addClass('preloader'))
 			.appendTo($('body'))
 			.on('click', function(e) {
 				e.stopPropagation();
@@ -200,7 +208,49 @@ jQuery(function($) {
 	 * Event handler for the preloader elements destroy.
 	 */
 	function menuPopupPreloaderCloseHandler(event) {
-		overlayPreloaderDestroy(event.data.id, event.data.xhr);
+		overlayPreloaderDestroy(event.data.id);
+	}
+
+	/**
+	 * Is request to a server required to process and update the data passed to the popup menu?
+	 *
+	 * @param string type  A menu popup type.
+	 *
+	 * @returns boolean
+	 */
+	function isServerRequestRequired(type) {
+		switch (type) {
+			case 'submenu':
+				return false;
+
+			default:
+				return true;
+		}
+	}
+
+	/**
+	 * Make a default position object for the menu popup, based on it's type.
+	 *
+	 * @param object $obj   Menu popup opener object.
+	 * @param object data   Menu popup data object.
+	 * @param object event  Original opener event.
+	 */
+	function makeDefaultPosition($obj, data, event) {
+		switch (data.type) {
+			case 'submenu':
+				return {
+					of: $obj,
+					my: 'left top',
+					at: 'left bottom+10'
+				};
+
+			default:
+				return {
+					of: event,
+					my: 'left top',
+					at: 'left bottom'
+				};
+		}
 	}
 
 	/**
@@ -208,15 +258,10 @@ jQuery(function($) {
 	 */
 	$(document).on('keydown click', '[data-menu-popup]', function(event) {
 		var $obj = $(this),
-			data = $obj.data('menu-popup'),
-			position_target = event.target;
+			data = $obj.data('menu-popup');
 
 		if (event.type === 'keydown' && event.which != 13) {
 			return;
-		}
-		else if (event.type === 'contextmenu' || (IE && $obj.closest('svg').length > 0)
-			|| event.originalEvent.detail !== 0) {
-			position_target = event;
 		}
 
 		// Manually trigger event for menuPopupPreloaderCloseHandler call for the previous preloader.
@@ -224,45 +269,49 @@ jQuery(function($) {
 			$(document).trigger('click');
 		}
 
-		var	$preloader = createMenuPopupPreloader(),
-			url = new Curl('zabbix.php');
+		// Close other action menus and prevent focus jumping before opening a new popup.
+		$('.menu-popup-top').menuPopup('close', null, false);
 
-		url.setArgument('action', 'menu.popup');
-		url.setArgument('type', data.type);
+		// Create options object based on original options.
+		var options = $.extend({
+			position: makeDefaultPosition($obj, data, event)
+		}, data.options || {});
 
-		var xhr = $.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			data: {
-				data: data.data
-			},
-			dataType: 'json',
-			beforeSend: function() {
-				// Close other action menus and prevent focus jumping before opening a new popup.
-				$('.menu-popup-top').menuPopup('close', null, false);
-				setTimeout(function(){
-					$preloader
-						.fadeIn(200)
-						.position({
-							of: position_target,
-							my: 'left top',
-							at: 'left bottom'
-						});
-				}, 500);
-			},
-			success: function(resp) {
+		if (isServerRequestRequired(data.type)) {
+			var url = new Curl('zabbix.php');
+
+			url.setArgument('action', 'menu.popup');
+			url.setArgument('type', data.type);
+
+			var xhr = $.ajax({
+					url: url.getUrl(),
+					method: 'POST',
+					data: {
+						data: data.data
+					},
+					dataType: 'json'
+				});
+
+			var	$preloader = createMenuPopupPreloader();
+
+			setTimeout(function() {
+				$preloader.fadeIn(200).position(options.position);
+			}, 500);
+
+			addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
+
+			xhr.done(function(resp) {
 				overlayPreloaderDestroy($preloader.prop('id'));
-				showMenuPopup($obj, resp.data, event);
-			},
-			error: function() {
-			}
-		});
+				showMenuPopup($obj, resp.data, event, options);
+			});
 
-		addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
-
-		$(document)
-			.off('click', menuPopupPreloaderCloseHandler)
-			.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
+			$(document)
+				.off('click', menuPopupPreloaderCloseHandler)
+				.on('click', {id: $preloader.prop('id')}, menuPopupPreloaderCloseHandler);
+		}
+		else {
+			showMenuPopup($obj, jQuery.extend({type: data.type}, data.data), event, options);
+		}
 
 		return false;
 	});

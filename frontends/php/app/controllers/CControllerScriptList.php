@@ -56,10 +56,10 @@ class CControllerScriptList extends CController {
 		CProfile::update('web.scripts.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		// filter
-		if (hasRequest('filter_set')) {
-			CProfile::update('web.scripts.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.scripts.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 		}
-		elseif (hasRequest('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.scripts.filter_name');
 		}
 

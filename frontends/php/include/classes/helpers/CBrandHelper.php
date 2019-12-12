@@ -111,7 +111,7 @@ class CBrandHelper {
 			[
 				$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
 				'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
-				(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
+				(new CLink('Zabbix SIA', 'https://www.zabbix.com/'))
 					->addClass(ZBX_STYLE_GREY)
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->setAttribute('target', '_blank')

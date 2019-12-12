@@ -239,21 +239,27 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'default_page_id' => 0,
 			'pages' => [
 				[
-					'url' => 'adm.gui.php',
+					'url' => 'zabbix.php',
+					'action' => 'gui.edit',
 					'label' => _('General'),
-					'sub_pages' => [
-						'adm.housekeeper.php',
-						'adm.images.php',
-						'adm.iconmapping.php',
-						'adm.regexps.php',
-						'adm.macros.php',
-						'adm.valuemapping.php',
-						'adm.workingtime.php',
-						'adm.triggerseverities.php',
-						'adm.triggerdisplayoptions.php',
-						'adm.other.php'
-					],
-					'active_if' => ['autoreg.edit']
+					'active_if' => [
+						'gui.edit',
+						'autoreg.edit',
+						'housekeeping.edit',
+						'image.list',
+						'image.edit',
+						'iconmap.list',
+						'iconmap.edit',
+						'regex.list',
+						'regex.edit',
+						'macros.edit',
+						'valuemap.list',
+						'valuemap.edit',
+						'workingtime.edit',
+						'trigseverity.edit',
+						'trigdisplay.edit',
+						'miscconfig.edit'
+					]
 				],
 				[
 					'url' => 'zabbix.php',
@@ -268,7 +274,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'label' => _('Authentication')
 				],
 				[
-					'url' => 'usergrps.php',
+					'url' => 'zabbix.php',
+					'action' => 'usergroup.list',
+					'active_if' => ['usergroup.list', 'usergroup.edit'],
 					'label' => _('User groups')
 				],
 				[

@@ -180,7 +180,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 					'SELECT graphid'.
 					' FROM graphs_items'.
 					' WHERE itemid='.$item_id.
-				')';
+				') ORDER BY graphid';
 
 		$old_hash = CDBHelper::getHash($sql_hash);
 

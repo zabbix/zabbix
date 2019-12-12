@@ -111,11 +111,11 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 	}
 
 	public function testFormTriggerSeverity_Layout() {
-		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
 
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger severities');
 
 		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
 		$this->zbxTestAssertElementPresentId('severity_name_0');
@@ -148,7 +148,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 	 * @dataProvider providerTriggerSeverity
 	 */
 	public function testFormTriggerSeverity_Update($data, $resultSave, $DBvalues) {
-		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
 
@@ -172,7 +172,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextPresent('Page received incorrect data');
+			$this->zbxTestTextPresent('Cannot update configuration');
 			$this->assertEquals($hash, CDBHelper::getHash($sql), "DB fields changed after unsuccessful save.");
 		}
 

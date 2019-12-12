@@ -28,34 +28,34 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_CheckLayout() {
 
-		$this->zbxTestLogin('adm.gui.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Images');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Images');
+
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Images', 'Type']);
 		$this->zbxTestAssertElementPresentXpath("//select[@id='imagetype']/option[text()='Icon']");
 		$this->zbxTestAssertElementPresentXpath("//select[@id='imagetype']/option[text()='Background']");
-		$this->zbxTestAssertElementPresentId('form');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Create icon']");
+		$this->zbxTestClickButtonText('Create icon');
 
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", '64');
 		$this->zbxTestAssertElementPresentId('image');
-		$this->zbxTestAssertElementPresentId('add');
-		$this->zbxTestAssertElementPresentId('cancel');
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Add']");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 	}
 
 	public function testFormAdministrationGeneralImages_AddImage() {
 
-		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
+		$this->zbxTestClickButtonText('Create icon');
 
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestInputType('name', $this->icon_image_name);
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
-		$this->zbxTestClickWait('add');
+		$this->zbxTestClickButtonText('Add');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Images', 'Type', 'Image added']);
@@ -70,11 +70,11 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 		$sqlIcons = 'SELECT * FROM images WHERE imagetype=1';
 		$oldHashIcons=CDBHelper::getHash($sqlIcons);
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
 		$this->zbxTestClickLinkText($this->icon_image_name);
 		$this->zbxTestInputTypeWait('name', $this->icon_image_name2);
 		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
-		$this->zbxTestClick('cancel');
+		$this->zbxTestClickButtonText('Cancel');
 
 		// checking that image has not been changed after clicking on the "Cancel" button in the confirm dialog box
 		$this->assertEquals($oldHashIcons, CDBHelper::getHash($sqlIcons), 'Chuck Norris: No-change images update should not update data in table "images"');
@@ -83,11 +83,11 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_UpdateImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
 		$this->zbxTestClickLinkText($this->icon_image_name);
 		$this->zbxTestInputTypeOverwrite('name', $this->icon_image_name2);
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickButtonText('Update');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
 
@@ -97,9 +97,9 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_DeleteImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
 		$this->zbxTestClickLinkTextWait($this->icon_image_name2);
-		$this->zbxTestClickWait('delete');
+		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image deleted');
@@ -111,12 +111,12 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_AddBgImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestClickButtonText('Create background');
 		$this->zbxTestInputType('name', $this->bg_image_name);
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
-		$this->zbxTestClickWait('add');
+		$this->zbxTestClickButtonText('Add');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(['Images', 'Type', 'Image added']);
 
@@ -126,14 +126,14 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_UpdateBgImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestTextPresent('Type');
 		$this->zbxTestWaitUntilElementVisible(WebdriverBy::xpath("//div[@class='cell']"));
 		$this->zbxTestClickLinkText($this->bg_image_name);
 		$this->zbxTestInputTypeOverwrite('name', $this->bg_image_name2);
 		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickButtonText('Update');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
 
@@ -143,10 +143,10 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_DeleteBgImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestClickLinkTextWait($this->bg_image_name2);
-		$this->zbxTestClickWait('delete');
+		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Images', 'Image deleted']);

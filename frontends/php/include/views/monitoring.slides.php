@@ -26,6 +26,14 @@ $widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	$widget
 		->setTitle(_('Slide shows'))
+		->setTitleSubmenu([
+			'main_section' => [
+				'items' => [
+					'screens.php' => _('Screens'),
+					'slides.php' => _('Slide shows')
+				]
+			]
+		])
 		->addItem((new CList())
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
@@ -45,14 +53,6 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		);
 }
 
-$controls = (new CList())
-	->addItem(
-		new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
-			'screens.php' => _('Screens'),
-			'slides.php' => _('Slide shows')
-		])
-	);
-
 $favourite_icon = get_icon('favourite', [
 	'fav' => 'web.favorite.screenids',
 	'elname' => 'slideshowid',
@@ -65,17 +65,20 @@ $refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SLIDESHOW, 'x'.$
 	true, ['elementid' => $this->data['elementId']]
 ));
 
+$controls = null;
+
 if (isset($this->data['isDynamicItems'])) {
-	$controls->addItem([
-		new CLabel(_('Group'), 'groupid'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$this->data['pageFilter']->getGroupsCB()
-	]);
-	$controls->addItem([
-		new CLabel(_('Host'), 'hostid'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$this->data['pageFilter']->getHostsCB()
-	]);
+	$controls = (new CList())
+		->addItem([
+			new CLabel(_('Group'), 'groupid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$this->data['pageFilter']->getGroupsCB()
+		])
+		->addItem([
+			new CLabel(_('Host'), 'hostid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$this->data['pageFilter']->getHostsCB()
+		]);
 }
 
 $widget->setControls((new CList([
@@ -105,7 +108,7 @@ $widget
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
 	)
 	->addItem(
-		(new CDiv((new CDiv())->addClass('preloader')))
+		(new CDiv((new CDiv())->addStyle('position: relative;margin-top: 20px;')->addClass('is-loading')))
 			->setId(WIDGET_SLIDESHOW)
 	);
 

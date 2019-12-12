@@ -175,6 +175,21 @@ class CMultiselectElement extends CElement {
 	}
 
 	/**
+	 * Get collection of multiselect controls (buttons).
+	 *
+	 * @return CElement
+	 */
+	public function getControls() {
+		$buttons = [];
+
+		foreach ($this->query('xpath:.//button')->all() as $button) {
+			$buttons[$button->getText()] = $button;
+		}
+
+		return new CElementCollection($buttons);
+	}
+
+	/**
 	 * Open selection overlay dialog.
 	 *
 	 * @param mixed $context  overlay dialog context (hostgroup / host)
@@ -182,7 +197,10 @@ class CMultiselectElement extends CElement {
 	 * @return COverlayDialogElement
 	 */
 	public function edit($context = null) {
-		$this->query('xpath:.//div[@class="multiselect-button"]/button')->one()->click();
+		/* TODO: extend the function for composite elements with two buttons,
+		 * Example of such multiselect: [ Input field ] ( Select item ) ( Select prototype )
+		 */
+		$this->getControls()->first()->click();
 
 		return COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($context);
 	}
@@ -195,7 +213,8 @@ class CMultiselectElement extends CElement {
 			$text = [$text];
 		}
 
-		$input = $this->query('xpath:.//input[not(@type="hidden")]')->one();
+		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one();
+		$id = CXPathHelper::escapeQuotes($this->query('class:multiselect')->one()->getAttribute('id'));
 		foreach ($text as $value) {
 			$input->overwrite($value)->fireEvent();
 
@@ -206,8 +225,9 @@ class CMultiselectElement extends CElement {
 			$content = CXPathHelper::escapeQuotes($value);
 			try {
 				$element = $this->query('xpath', implode('|', [
-					'//ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
-					'//ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]/span[text()='.$content.']'
+					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
+					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]'.
+					'/span[text()='.$content.']'
 				]))->waitUntilPresent();
 			}
 			catch (NoSuchElementException $exception) {
@@ -282,5 +302,32 @@ class CMultiselectElement extends CElement {
 	 */
 	public function getValue() {
 		return $this->getSelected();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one(false);
+		if ($input === null && $enabled) {
+			return false;
+		}
+
+		if ($input !== null && !$input->isEnabled($enabled)) {
+			return false;
+		}
+
+		$multiselect = $this->query('class:multiselect')->one(false);
+		if ($multiselect && ($multiselect->getAttribute('aria-disabled') === 'true') === $enabled) {
+			return false;
+		}
+
+		foreach ($this->getControls() as $control) {
+			if ($control->isEnabled() !== $enabled) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

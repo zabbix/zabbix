@@ -278,7 +278,12 @@ switch ($data['popup_type']) {
 					$options['dstfld2'] => $trigger[$options['srcfld2']]
 				];
 				if (array_key_exists('dstfld3', $options)) {
-					$values[$options['dstfld3']] = $trigger[$trigger[$options['srcfld3']]];
+					if (array_key_exists($options['srcfld3'], $trigger) && array_key_exists($trigger[$options['srcfld3']], $trigger)) {
+						$values[$options['dstfld3']] = $trigger[$trigger[$options['srcfld3']]];
+					}
+					else {
+						$values[$options['dstfld3']] = null;
+					}
 				}
 				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).','.zbx_jsvalue($values).');';
 			}
@@ -424,7 +429,7 @@ switch ($data['popup_type']) {
 					($options['hostid'] > 0) ? null : $item['hostname'],
 					$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
 					$description,
-					$item['key_'],
+					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
 					($data['popup_type'] === 'items')
@@ -463,7 +468,7 @@ switch ($data['popup_type']) {
 							CJs::encodeJson($item['itemid']).', '.
 							$options['parentid'].
 							');'.$js_action_onclick),
-					$item['key_'],
+					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
 					($data['popup_type'] === 'items')

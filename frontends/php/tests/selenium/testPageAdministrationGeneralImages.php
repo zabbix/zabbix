@@ -27,9 +27,8 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testPageAdministrationGeneralImages_CheckLayoutIcons() {
 
-		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
-		$this->zbxTestAssertElementPresentId('form');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
+		$this->zbxTestAssertElementPresentXpath('//button[text()="Create icon"]');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent('Type');
@@ -49,10 +48,9 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 // TODO: need background images
 	public function testPageAdministrationGeneralImages_CheckLayoutBgImages() {
 
-		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
-		$this->zbxTestAssertElementPresentId('form');
+		$this->zbxTestAssertElementPresentXpath('//button[text()="Create background"]');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestDropdownHasOptions('imagetype', ['Icon', 'Background']);
@@ -75,8 +73,8 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 		$sql_image = 'SELECT * FROM images WHERE imageid='.$image['imageid'];
 		$old_image_hash = CDBHelper::getHash($sql_image);
 
-		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestAssertElementPresentId('form');
+		$this->zbxTestLogin('zabbix.php?action=image.list');
+		$this->zbxTestAssertElementPresentXpath('//button[text()="Create icon"]');
 		$this->zbxTestDropdownSelectWait('imagetype', $image['imagetype'] == IMAGE_TYPE_ICON ? 'Icon' : 'Background');
 		$this->zbxTestClickLinkTextWait($image['name']);
 		$this->zbxTestCheckHeader('Images');

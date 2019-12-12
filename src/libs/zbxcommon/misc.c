@@ -76,6 +76,14 @@ struct zbx_custom_interval
 	zbx_scheduler_interval_t	*scheduling;
 };
 
+const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
+{
+	INTERFACE_TYPE_AGENT,
+	INTERFACE_TYPE_SNMP,
+	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_IPMI
+};
+
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
 #ifdef _WINDOWS
@@ -156,7 +164,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 {
 	static ZBX_THREAD_LOCAL zbx_timespec_t	last_ts = {0, 0};
 	static ZBX_THREAD_LOCAL int		corr = 0;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	static ZBX_THREAD_LOCAL LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;
 #else
@@ -166,7 +174,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	struct timespec	tp;
 #	endif
 #endif
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 
 	if (0 == tickPerSecond.QuadPart)
 		QueryPerformanceFrequency(&tickPerSecond);
@@ -338,7 +346,7 @@ static int	is_leap_year(int year)
  ******************************************************************************/
 void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 {
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	struct _timeb	current_time;
 
 	_ftime(&current_time);
@@ -359,7 +367,7 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 #	define ZBX_UTC_OFF	offset
 		long		offset;
 		struct tm	tm_utc;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 		tm_utc = *gmtime(&current_time.time);	/* gmtime() cannot return NULL if called with valid parameter */
 #else
 		gmtime_r(&current_time.tv_sec, &tm_utc);
@@ -2661,23 +2669,12 @@ int	is_double_suffix(const char *str, unsigned char flags)
 	return '\0' == *str ? SUCCEED : FAIL;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: is_double                                                        *
- *                                                                            *
- * Purpose: check if the string is double                                     *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the string is double                              *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- ******************************************************************************/
-int	is_double(const char *str)
+static int	is_double_valid_syntax(const char *str)
 {
 	int	len;
+
+	/* Valid syntax is a decimal number optionally followed by a decimal exponent. */
+	/* Leading and trailing white space, NAN, INF and hexadecimal notation are not allowed. */
 
 	if ('-' == *str || '+' == *str)		/* check leading sign */
 		str++;
@@ -2702,6 +2699,48 @@ int	is_double(const char *str)
 	}
 
 	return '\0' == *str ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_double                                                        *
+ *                                                                            *
+ * Purpose: validate and optionally convert a string to a number of type      *
+ *         'double'                                                           *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             value - [OUT] output buffer where to write the converted value *
+ *                     (optional, can be NULL)                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the string can be converted to 'double' and       *
+ *                          was converted if 'value' is not NULL              *
+ *                FAIL - the string does not represent a valid 'double' or    *
+ *                       its value is outside of valid range                  *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ ******************************************************************************/
+int	is_double(const char *str, double *value)
+{
+	double	tmp;
+	char	*endptr;
+
+	/* Not all strings accepted by strtod() can be accepted in Zabbix. */
+	/* Therefore additional, more strict syntax check is used before strtod(). */
+
+	if (SUCCEED != is_double_valid_syntax(str))
+		return FAIL;
+
+	errno = 0;
+	tmp = strtod(str, &endptr);
+
+	if ('\0' != *endptr || HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
+		return FAIL;
+
+	if (NULL != value)
+		*value = tmp;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -2784,7 +2823,7 @@ int	is_time_suffix(const char *str, int *value, int length)
 	return SUCCEED;
 }
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 int	_wis_uint(const wchar_t *wide_string)
 {
 	const wchar_t	*wide_char = wide_string;
@@ -2945,15 +2984,14 @@ int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_boolean(const char *str, zbx_uint64_t *value)
 {
+	double	dbl_tmp;
 	int	res;
 
-	if (SUCCEED == (res = is_double(str)))
-		*value = (0 != atof(str));
+	if (SUCCEED == (res = is_double(str, &dbl_tmp)))
+		*value = (0 != dbl_tmp);
 	else
 	{
 		char	tmp[16];
@@ -3643,7 +3681,7 @@ void	zbx_alarm_flag_clear(void)
 	zbx_timed_out = 0;
 }
 
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 unsigned int	zbx_alarm_on(unsigned int seconds)
 {
 	zbx_alarm_flag_clear();

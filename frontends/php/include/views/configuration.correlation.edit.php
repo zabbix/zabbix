@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/js/configuration.correlation.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
+	->setId('correlation.edit')
 	->setName('correlation.edit')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
@@ -87,6 +88,14 @@ if ($data['correlation']['filter']['conditions']) {
 	}
 }
 
+$condition_table->addRow([
+	(new CSimpleButton(_('Add')))
+		->onClick('return PopUp("popup.condition.event.corr",'.CJs::encodeJson([
+			'type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR
+		]).', null, this);')
+		->addClass(ZBX_STYLE_BTN_LINK)
+]);
+
 $correlation_tab
 	->addRow(_('Type of calculation'), [
 		new CComboBox('evaltype', $data['correlation']['filter']['evaltype'], 'processTypeOfCalculation()', [
@@ -110,98 +119,7 @@ $correlation_tab
 			->setAriaRequired()
 	);
 
-$condition2 = null;
-
-switch ($data['new_condition']['type']) {
-	case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
-	case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-		$condition = (new CTextBox('new_condition[tag]'))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('tag'));
-		break;
-
-	case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-		$condition = (new CMultiSelect([
-			'name' => 'new_condition[groupids][]',
-			'object_name' => 'hostGroup',
-			'default_value' => 0,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'new_condition_groupids_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-		$condition = (new CTextBox('new_condition[newtag]', $data['new_condition']['newtag']))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('new event tag'));
-		$condition2 = (new CTextBox('new_condition[oldtag]', $data['new_condition']['oldtag']))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('old event tag'));
-		break;
-
-	case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-	case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-		$condition = (new CTextBox('new_condition[value]', $data['new_condition']['value']))
-			->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-			->setAttribute('placeholder', _('value'));
-		$condition2 = (new CTextBox('new_condition[tag]'))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('tag'));
-		break;
-
-	default:
-		$condition = null;
-}
-
-// Create operator combobox separately, since they depend on condition type.
-$condition_operators_list = getOperatorsByCorrConditionType($data['new_condition']['type']);
-
-if (count($condition_operators_list) > 1) {
-	$condition_operator = new CComboBox('new_condition[operator]', $data['new_condition']['operator']);
-
-	foreach ($condition_operators_list as $operator) {
-		$condition_operator->addItem($operator, corrConditionOperatorToString($operator));
-	}
-}
-else {
-	$condition_operator = [new CVar('new_condition[operator]', $condition_operators_list[0]),
-		corrConditionOperatorToString($condition_operators_list[0])
-	];
-}
-
 $correlation_tab
-	->addRow(_('New condition'),
-		(new CDiv(
-			(new CTable())
-				->setAttribute('style', 'width: 100%;')
-				->addRow(
-					new CCol([
-						new CComboBox('new_condition[type]', $data['new_condition']['type'], 'submit()',
-							$data['allowedConditions']
-						),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$condition2,
-						($condition2 === null) ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$condition_operator,
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$condition
-					])
-				)
-				->addRow(
-					(new CSimpleButton(_('Add')))
-						->onClick('javascript: submitFormWithParam("'.$form->getName().'", "add_condition", "1");')
-						->addClass(ZBX_STYLE_BTN_LINK)
-				)
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['correlation']['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
@@ -211,55 +129,20 @@ $correlation_tab
 	);
 
 // Operations tab.
-$operation_tab = new CFormList();
-
-$operations_table = (new CTable())
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Details'), _('Action')])
-	->setId('operations_table');
-
-if ($data['correlation']['operations']) {
-	foreach ($data['correlation']['operations'] as $operationid => $operation) {
-		if (!array_key_exists($operation['type'], $data['allowedOperations'])) {
-			continue;
-		}
-
-		$operations_table->addRow([
-			getCorrOperationDescription($operation),
-			(new CCol([
-				(new CButton('remove', _('Remove')))
-					->onClick('javascript: removeOperation('.$operationid.');')
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->removeId(),
-				new CVar('operations['.$operationid.']', $operation)
-			]))->addClass(ZBX_STYLE_NOWRAP)
-		], null, 'operations_'.$operationid);
-	}
-}
-
-$operation_tab
+$operation_tab = (new CFormList())
 	->addRow(
-		(new CLabel(_('Operations'), $operations_table->getId()))->setAsteriskMark(),
-		(new CDiv([$operations_table]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		_('Close old events'),
+		(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_OLD))
+			->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_OLD])
+			->setId('operation_0_type')
 	)
-	->addRow(_('New operation'),
-		(new CDiv(
-			(new CTable())
-				->setAttribute('style', 'width: 100%;')
-				->addRow(new CComboBox('new_operation[type]', $data['new_operation']['type'], null,
-					corrOperationTypes()
-				))
-				->addRow(
-					(new CSimpleButton(_('Add')))
-						->onClick('javascript: submitFormWithParam("'.$form->getName().'", "add_operation", "1");')
-						->addClass(ZBX_STYLE_BTN_LINK)
-				)
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
+	->addRow(
+		_('Close new event'),
+		(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_NEW))
+			->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_NEW])
+			->setId('operation_1_type')
+	)
+	->addRow('', (new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())));
 
 // Append tabs to form.
 $correlation_tabs = (new CTabView())

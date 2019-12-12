@@ -2275,7 +2275,6 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 		return;
 
 	pair.first = dep_itemid;
-	pair.second = 0;
 	if (FAIL == (index = zbx_vector_uint64_pair_search(&masteritem->dep_itemids, pair,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 	{
@@ -5526,12 +5525,19 @@ void	DCsync_configuration(unsigned char mode)
 
 		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
+out:
+	if (0 == sync_in_progress)
+	{
+		/* non recoverable database error is encountered */
+		THIS_SHOULD_NEVER_HAPPEN;
+		START_SYNC;
+	}
 
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
 	FINISH_SYNC;
-out:
+
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
 	zbx_dbsync_clear(&hosts_sync);
@@ -9226,6 +9232,14 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 int	DCconfig_get_last_sync_time(void)
 {
 	return config->sync_ts;
+}
+
+void	DCconfig_wait_sync(void)
+{
+	struct timespec	ts = {0, 1e8};
+
+	while (0 == config->sync_ts)
+		nanosleep(&ts, NULL);
 }
 
 /******************************************************************************

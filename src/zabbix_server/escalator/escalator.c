@@ -30,7 +30,7 @@
 #include "../actions.h"
 #include "../events.h"
 #include "../scripts/scripts.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "comms.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
@@ -1795,7 +1795,10 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 
 		if (ITEM_STATUS_DISABLED == items[i].status)
 		{
-			*error = zbx_dsprintf(*error, "item \"%s\" disabled.", items[i].key_orig);
+			char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+			*error = zbx_dsprintf(*error, "item \"%s\" disabled.", zbx_truncate_itemkey(items[i].key_orig,
+					VALUE_ERRMSG_MAX, key_short, sizeof(key_short)));
 			break;
 		}
 		if (HOST_STATUS_NOT_MONITORED == items[i].host.status)
@@ -1897,7 +1900,11 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 			}
 			else if (ITEM_STATUS_DISABLED == item.status)
 			{
-				*error = zbx_dsprintf(*error, "item \"%s\" disabled.", item.key_orig);
+				char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+				*error = zbx_dsprintf(*error, "item \"%s\" disabled.",
+						zbx_truncate_itemkey(item.key_orig, VALUE_ERRMSG_MAX,
+						key_short, sizeof(key_short)));
 			}
 			else if (HOST_STATUS_NOT_MONITORED == item.host.status)
 			{

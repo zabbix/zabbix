@@ -30,9 +30,9 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 	* @dataProvider WorkingTime
 	*/
 	public function testFormAdministrationGeneralWorkperiod_CheckLayout($WorkingTime) {
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
 
@@ -45,10 +45,9 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 		$sqlHash = 'SELECT * FROM config ORDER BY configid';
 		$oldHash = CDBHelper::getHash($sqlHash);
 
-		$this->zbxTestLogin('adm.workingtime.php');
+		$this->zbxTestLogin('zabbix.php?action=workingtime.edit');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
-		$this->zbxTestDropdownAssertSelected('configDropDown', 'Working time');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
 
@@ -60,72 +59,72 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 			[
 				'work_period' => 'test',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7 09:00-24:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '0-7,09:00-24:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-5,09:00-18:00,6-7,10:00-16:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-8,09:00-24:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,09:00-25:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,24:00-00:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,14:00-13:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,25:00-26:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,13:60-14:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '09:00-24:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '{WORKING_HOURS}',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '{$WORKING_HOURS}',
@@ -149,7 +148,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testFormAdministrationGeneralWorkperiod_SavingWorkperiod($work_period, $expected, $msg) {
-		$this->zbxTestLogin('adm.workingtime.php');
+		$this->zbxTestLogin('zabbix.php?action=workingtime.edit');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
 
@@ -164,7 +163,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 				$this->assertEquals($work_period, $result['work_period']);
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
 				$this->zbxTestTextPresent($msg);
 				break;
 		}

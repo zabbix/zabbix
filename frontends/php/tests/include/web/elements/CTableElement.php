@@ -149,7 +149,7 @@ class CTableElement extends CElement {
 		}
 
 		$suffix = '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
-		$xpaths = ['//tbody/tr/td'.$suffix, '//tbody/tr/th'.$suffix];
+		$xpaths = ['.//tbody/tr/td'.$suffix, './/tbody/tr/th'.$suffix];
 
 		return $this->query('xpath', implode('|', $xpaths))->asTableRow(['parent' => $this])->one(false);
 	}

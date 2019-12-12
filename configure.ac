@@ -686,6 +686,12 @@ AC_MSG_RESULT(no)
 )
 LDFLAGS="$saved_LDFLAGS"
 
+AC_MSG_CHECKING(for '__thread' compiler support)
+AC_TRY_COMPILE([#include <stdio.h>],[static __thread int a = 0;],
+AC_DEFINE(HAVE_THREAD_LOCAL,1,[Define to 1 if compiler keyword '__thread' supported.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no)
+HAVE_THREAD_LOCAL="no")
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
@@ -1283,7 +1289,9 @@ AC_ARG_ENABLE(agent2,[  --enable-agent2         Turn on build of Zabbix agent 2]
   yes) agent2=yes ;;
   no)  agent2=no ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent2]) ;;
-esac],
+esac
+test "x$agent2" = "xyes" -a "x$HAVE_THREAD_LOCAL" = "xno" && AC_MSG_ERROR([C compiler is not compatible with agent2 assembly])
+],
 [agent2=no])
 AM_CONDITIONAL(AGENT2, test "x$agent2" = "xyes")
 
@@ -1858,13 +1866,11 @@ AC_SUBST(CURL_SSL_KEY_LOCATION)
 AC_SUBST(LOAD_MODULE_PATH)
 
 GOBIN=${sbindir}
-GOPATH=$ac_abs_confdir/go
 GOCMD=go
 GOWORKDIR=$ac_abs_confdir/go/src/zabbix
 
 export GOBIN=${GOBIN}
 AC_SUBST(GOBIN)
-AC_SUBST(GOPATH)
 AC_SUBST(GOCMD)
 AC_SUBST(GOWORKDIR)
 
@@ -1909,6 +1915,7 @@ AC_OUTPUT([
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
+	src/go/Makefile
 	src/libs/Makefile
 	src/libs/zbxlog/Makefile
 	src/libs/zbxalgo/Makefile
@@ -1987,53 +1994,6 @@ AC_OUTPUT([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
 	man/Makefile
-	go/Makefile
-	go/src/Makefile
-	go/src/zabbix/Makefile
-	go/src/zabbix/cmd/Makefile
-	go/src/zabbix/cmd/zabbix_agent2/Makefile
-	go/src/zabbix/cmd/mock_server/Makefile
-	go/src/zabbix/pkg/Makefile
-	go/src/zabbix/pkg/conf/Makefile
-	go/src/zabbix/pkg/glexpr/Makefile
-	go/src/zabbix/pkg/itemutil/Makefile
-	go/src/zabbix/pkg/log/Makefile
-	go/src/zabbix/pkg/plugin/Makefile
-	go/src/zabbix/pkg/std/Makefile
-	go/src/zabbix/pkg/tls/Makefile
-	go/src/zabbix/pkg/version/Makefile
-	go/src/zabbix/pkg/watch/Makefile
-	go/src/zabbix/pkg/zbxcomms/Makefile
-	go/src/zabbix/pkg/zbxlib/Makefile
-	go/src/zabbix/pkg/zbxcmd/Makefile
-	go/src/zabbix/internal/Makefile
-	go/src/zabbix/internal/agent/Makefile
-	go/src/zabbix/internal/agent/remotecontrol/Makefile
-	go/src/zabbix/internal/agent/resultcache/Makefile
-	go/src/zabbix/internal/agent/scheduler/Makefile
-	go/src/zabbix/internal/agent/serverconnector/Makefile
-	go/src/zabbix/internal/agent/serverlistener/Makefile
-	go/src/zabbix/internal/agent/statuslistener/Makefile
-	go/src/zabbix/internal/monitor/Makefile
-	go/src/zabbix/plugins/Makefile
-	go/src/zabbix/plugins/log/Makefile
-	go/src/zabbix/plugins/system/Makefile
-	go/src/zabbix/plugins/system/cpucollector/Makefile
-	go/src/zabbix/plugins/system/uptime/Makefile
-	go/src/zabbix/plugins/system/uname/Makefile
-	go/src/zabbix/plugins/systemd/Makefile
-	go/src/zabbix/plugins/systemrun/Makefile
-	go/src/zabbix/plugins/kernel/Makefile
-	go/src/zabbix/plugins/proc/Makefile
-	go/src/zabbix/plugins/vfs/Makefile
-	go/src/zabbix/plugins/vfs/dev/Makefile
-	go/src/zabbix/plugins/vfs/file/Makefile
-	go/src/zabbix/plugins/zabbix/Makefile
-	go/src/zabbix/plugins/zabbix/stats/Makefile
-	go/src/zabbix/plugins/zabbix/sync/Makefile
-	go/src/zabbix/plugins/zabbix/async/Makefile
-	go/src/zabbix/plugins/net/Makefile
-	go/src/zabbix/plugins/net/netif/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

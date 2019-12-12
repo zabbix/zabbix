@@ -34,7 +34,7 @@ class CPopupButtonElement extends CElement {
 	 *
 	 * @return $this
 	 */
-	public function fill($text) {
+	public function select($text) {
 		$is_nested = false;
 		if (is_array($text)) {
 			foreach ($text as $item) {
@@ -50,12 +50,34 @@ class CPopupButtonElement extends CElement {
 		}
 
 		foreach ($text as $item) {
-			$this->click();
-
-			$this->query('xpath://ul[contains(@class, "menu-popup-top")]')->waitUntilVisible()->asPopupMenu()->one()
-					->waitUntilReady()->fill($item);
+			$this->getMenu()->waitUntilReady()->fill($item);
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Get popup menu.
+	 *
+	 * @return CPopupMenuElement
+	 */
+	public function getMenu() {
+		$query = $this->query('xpath://ul[contains(@class, "menu-popup-top")]')->asPopupMenu();
+
+		$menu = $query->one(false);
+		if ($menu !== null) {
+			return $menu;
+		}
+
+		$this->click();
+
+		return $query->waitUntilVisible()->one();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function fill($text) {
+		return $this->select($text);
 	}
 }

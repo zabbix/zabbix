@@ -24,39 +24,14 @@ class CControllerExportXml extends CController {
 	protected function checkInput() {
 		$fields = [
 			'action' => 'required|string',
-			'backurl' => 'required|string'
+			'backurl' => 'required|string',
+			'valuemapids' => 'not_empty|array_db valuemaps.valuemapid',
+			'hosts' => 'not_empty|array_db hosts.hostid',
+			'mediatypeids' => 'not_empty|array_db media_type.mediatypeid',
+			'screens' => 'not_empty|array_db screens.screenid',
+			'maps' => 'not_empty|array_db sysmaps.sysmapid',
+			'templates' => 'not_empty|array_db hosts.hostid'
 		];
-
-		switch (getRequest('action')) {
-			case 'export.valuemaps.xml':
-				$fields['valuemapids'] = 'required|array_db valuemaps.valuemapid';
-				break;
-
-			case 'export.hosts.xml':
-				$fields['hosts'] = 'required|array_db hosts.hostid';
-				break;
-
-			case 'export.mediatypes.xml':
-				$fields['mediatypeids'] = 'required|array_db media_type.mediatypeid';
-				break;
-
-			case 'export.screens.xml':
-				$fields['screens'] = 'required|array_db screens.screenid';
-				break;
-
-			case 'export.sysmaps.xml':
-				$fields['maps'] = 'required|array_db sysmaps.sysmapid';
-				break;
-
-			case 'export.templates.xml':
-				$fields['templates'] = 'required|array_db hosts.hostid';
-				break;
-
-			default:
-				$this->setResponse(new CControllerResponseFatal());
-
-				return false;
-		}
 
 		$ret = $this->validateInput($fields);
 

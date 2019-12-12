@@ -33,7 +33,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$this->query('link:Administration')->one()->click();
 		$this->query('xpath://nav[@class="top-subnav-container"]//a[text()="General"]')->one()->click();
-		$this->query('id:configDropDown')->asDropdown()->one()->select('Auto registration');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Auto registration');
 
 		// Check elements dafault state.
 		$form = $this->query('id:autoreg-form')->asForm()->one();
@@ -103,7 +103,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 						'Resource' => 'Auto registration',
 						'Action' => 'Updated',
 						'ID' => 1,
-						'Details' => 'config.tls_accept: 2 => 3'
+						'Details' => "config.tls_accept: 2 => 3"
 					]
 				]
 			],
