@@ -480,43 +480,11 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: get_values                                                       *
- *                                                                            *
- * Purpose: retrieve values of metrics from monitored hosts                   *
- *                                                                            *
- * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
- *                                                                            *
- * Return value: number of items processed                                    *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: processes single item at a time except for Java, SNMP items,     *
- *           see DCconfig_get_poller_items()                                  *
- *                                                                            *
- ******************************************************************************/
-static int	get_values(unsigned char poller_type, int *nextcheck)
+int	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results)
 {
-	DC_ITEM			items[MAX_POLLER_ITEMS];
-	AGENT_RESULT		results[MAX_POLLER_ITEMS];
-	int			errcodes[MAX_POLLER_ITEMS];
-	zbx_timespec_t		timespec;
-	char			*port = NULL, error[ITEM_ERROR_LEN_MAX];
-	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
-	zbx_vector_ptr_t	add_results;
+	int	i;
+	char	*port = NULL, error[ITEM_ERROR_LEN_MAX];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	num = DCconfig_get_poller_items(poller_type, items);
-
-	if (0 == num)
-	{
-		*nextcheck = DCconfig_get_poller_nextcheck(poller_type);
-		goto exit;
-	}
-
-	/* prepare items */
 	for (i = 0; i < num; i++)
 	{
 		init_result(&results[i]);
@@ -696,6 +664,44 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	}
 
 	zbx_free(port);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_values                                                       *
+ *                                                                            *
+ * Purpose: retrieve values of metrics from monitored hosts                   *
+ *                                                                            *
+ * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
+ *                                                                            *
+ * Return value: number of items processed                                    *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: processes single item at a time except for Java, SNMP items,     *
+ *           see DCconfig_get_poller_items()                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_values(unsigned char poller_type, int *nextcheck)
+{
+	DC_ITEM			items[MAX_POLLER_ITEMS];
+	AGENT_RESULT		results[MAX_POLLER_ITEMS];
+	int			errcodes[MAX_POLLER_ITEMS];
+	zbx_timespec_t		timespec;
+	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
+	zbx_vector_ptr_t	add_results;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	num = DCconfig_get_poller_items(poller_type, items);
+
+	if (0 == num)
+	{
+		*nextcheck = DCconfig_get_poller_nextcheck(poller_type);
+		goto exit;
+	}
+
+	prepare_items(items, errcodes, num, results);
 
 	zbx_vector_ptr_create(&add_results);
 
