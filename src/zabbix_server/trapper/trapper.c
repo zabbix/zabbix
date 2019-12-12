@@ -637,7 +637,7 @@ static void	dump_item(const DC_ITEM *item)
 	zabbix_log(LOG_LEVEL_TRACE, "interfaceid: " ZBX_FS_UI64, item->interface.interfaceid);
 	zabbix_log(LOG_LEVEL_TRACE, "  useip: %u", item->interface.useip);
 	zabbix_log(LOG_LEVEL_TRACE, "  address:'%s'", ZBX_NULL2STR(item->interface.addr));
-	zabbix_log(LOG_LEVEL_TRACE, "  port:'%u'", item->interface.port);
+	zabbix_log(LOG_LEVEL_TRACE, "  port: %u", item->interface.port);
 	zabbix_log(LOG_LEVEL_TRACE, "hostid: " ZBX_FS_UI64, item->host.hostid);
 	zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid: " ZBX_FS_UI64, item->host.proxy_hostid);
 	zabbix_log(LOG_LEVEL_TRACE, "  host:'%s'", item->host.host);
