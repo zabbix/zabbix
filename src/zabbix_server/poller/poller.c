@@ -883,10 +883,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zbx_preprocessor_flush();
 	clean_items(items, num, results);
+	DCconfig_clean_items(items, NULL, num);
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
-
-	DCconfig_clean_items(items, NULL, num);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
