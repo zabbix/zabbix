@@ -838,15 +838,14 @@ else {
 	if (hasRequest('page')) {
 		$page_num = getRequest('page');
 	}
-	elseif ((isRequestMethod('get') || hasRequest('filter_set') || hasRequest('filter_rst') || hasRequest('sort'))
-			&& !hasRequest('cancel')) {
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
 		$page_num = 1;
 	}
 	else {
-		$page_num = CPagerHelper::fetch('trigger.list');
+		$page_num = CPagerHelper::fetch($page['file']);
 	}
 
-	CPagerHelper::store('trigger.list', $page_num);
+	CPagerHelper::store($page['file'], $page_num);
 
 	$paging = CPagerHelper::paginateRows($page_num, $prefetched_triggers, $sortorder, new CUrl('triggers.php'));
 
