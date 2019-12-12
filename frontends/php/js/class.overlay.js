@@ -59,30 +59,16 @@ function Overlay(type, dialogueid) {
 
 	this.$dialogue.append($close_btn);
 
-	var $header = jQuery('<h4 id="' + this.headerid + '">');
-	var $head = jQuery('<div>', {class: 'dashbrd-widget-head'});
+	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
+	this.$dialogue.$script = jQuery('<script>');
+	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output', name: 'zbx_debug_info'});
+	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
+	this.$dialogue.$body = jQuery('<div>', {class: 'overlay-dialogue-body'});
+	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
 
-	$head.append($header);
-	this.$dialogue.append($head);
-
-	this.$dialogue.$header = $header;
-
-	var $script = jQuery('<script>');
-	this.$dialogue.$script = $script;
-
-	var $debug = jQuery('<pre>', {class: 'debug-output', name: 'zbx_debug_info'});
-	this.$dialogue.$debug = $debug;
-
-	var $controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
-	this.$dialogue.$controls = $controls;
-
-	var $body = jQuery('<div>', {class: 'overlay-dialogue-body'});
-	this.$dialogue.append($body);
-	this.$dialogue.$body = $body;
-
-	var $footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
-	this.$dialogue.append($footer);
-	this.$dialogue.$footer = $footer;
+	this.$dialogue.append(jQuery('<div>', {class: 'dashbrd-widget-head'}).append(this.$dialogue.$header));
+	this.$dialogue.append(this.$dialogue.$body);
+	this.$dialogue.append(this.$dialogue.$footer);
 
 	var body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver;
 	this.body_mutation_observer = new body_mutation_observer(this.centerDialog.bind(this));
@@ -183,6 +169,8 @@ Overlay.prototype.containFocus = function() {
 /**
  * @param {string} action
  * @param {array|object} options (optional)
+ *
+ * @return {jQuery.XHR}
  */
 Overlay.prototype.load = function(action, options) {
 	var url = new Curl('zabbix.php');
@@ -318,7 +306,6 @@ Overlay.prototype.makeButtons = function(arr) {
  */
 Overlay.prototype.unsetProperty = function(key) {
 	switch (key) {
-
 		case 'title':
 			this.$dialogue.$header.text('');
 			break;
@@ -358,7 +345,6 @@ Overlay.prototype.setProperties = function(obj) {
 		}
 
 		switch (key) {
-
 			case 'class':
 				this.$dialogue.addClass(obj[key]);
 				break;

@@ -361,7 +361,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					controls: resp.controls,
 					buttons: buttons,
 					debug: resp.debug,
-					script_inline: resp.script_inline,
+					script_inline: resp.script_inline
 				});
 			}
 
