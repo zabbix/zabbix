@@ -584,30 +584,24 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Latest data [refreshed every 30 sec.]',
+				'title' => 'Latest data',
 				'check_server_name' => true,
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'latest.php?groupid=4&hostid=50009',
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=4&filter_hostids[]=50009',
 						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'latest.php?groupids[]=9999999&hostids[]=50009',
-						'text_not_present' => 'Latest data',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=9999999&filter_hostids[]=50009',
+						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'latest.php?groupids[]=4&hostids[]=9999999',
-						'text_not_present' => 'Latest data',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=4&filter_hostids[]=9999999',
+						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'latest.php?groupids[]=abc&hostids[]=abc',
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=abc&filter_hostids[]=abc',
 						'text_not_present' => 'Latest data',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
@@ -616,7 +610,7 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'latest.php?groupids[]=&hostids[]=',
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=&filter_hostids[]=',
 						'text_not_present' => 'Latest data',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
@@ -625,7 +619,7 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'latest.php?groupids[]=-1&hostids[]=-1',
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=-1&filter_hostids[]=-1',
 						'text_not_present' => 'Latest data',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
@@ -634,7 +628,7 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'latest.php',
+						'url' => 'zabbix.php?action=latest.view',
 						'text_present' => 'Latest data'
 					]
 				]
