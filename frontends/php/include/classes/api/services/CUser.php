@@ -1231,7 +1231,7 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-		$db_user = $this->createSession($user, $db_user);
+		$db_user = self::createSession($user['user'], $db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1283,10 +1283,7 @@ class CUser extends CApiService {
 		);
 
 		unset($db_user['passwd']);
-		$db_user = $this->createSession([
-			'user' => $alias,
-			'password' => mt_rand()
-		], $db_user);
+		$db_user = self::createSession($alias, $db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1484,14 +1481,13 @@ class CUser extends CApiService {
 	/**
 	 * Initialize session for user. Returns user data array with valid sessionid.
 	 *
-	 * @param array  $user              Authentication credentials.
-	 * @param string $user['user']      User alias value.
-	 * @param array  $db_user           User data from database.
+	 * @param string $alias    User alias value.
+	 * @param array  $db_user  User data from database.
 	 *
 	 * @return array
 	 */
-	private function createSession($user, $db_user) {
-		$db_user['sessionid'] = md5(microtime().$user['user'].mt_rand());
+	private static function createSession($alias, $db_user) {
+		$db_user['sessionid'] = md5(microtime().$alias.mt_rand());
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
