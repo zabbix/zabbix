@@ -43,6 +43,7 @@ class CModuleDetails extends CApiService {
 	 * @throws APIException
 	 */
 	public function get(array $options = []) {
+		$this->denyAccessUnlessGranted();
 		$result = [];
 
 		$sqlParts = [
