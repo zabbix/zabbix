@@ -707,6 +707,8 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results)
 {
+	int	i;
+
 	if (SUCCEED == is_snmp_type(items[0].type))
 	{
 #ifdef HAVE_NETSNMP

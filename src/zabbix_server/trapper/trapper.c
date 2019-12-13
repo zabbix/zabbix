@@ -651,10 +651,12 @@ static void	dump_item(const DC_ITEM *item)
 	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_password:'%s'", item->host.ipmi_password);
 	zabbix_log(LOG_LEVEL_TRACE, "  jmx_available: %u", item->host.jmx_available);
 	zabbix_log(LOG_LEVEL_TRACE, "  tls_connect: %u", item->host.tls_connect);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zabbix_log(LOG_LEVEL_TRACE, "  tls_issuer:'%s'", item->host.tls_issuer);
 	zabbix_log(LOG_LEVEL_TRACE, "  tls_subject:'%s'", item->host.tls_subject);
 	zabbix_log(LOG_LEVEL_TRACE, "  tls_psk_identity:'%s'", item->host.tls_psk_identity);
 	zabbix_log(LOG_LEVEL_TRACE, "  tls_psk:'%s'", item->host.tls_psk);
+#endif
 }
 
 static char	*db_string_from_json_dyn(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
