@@ -1247,7 +1247,7 @@ class CUser extends CApiService {
 	 *
 	 * @return bool
 	 */
-	private function verifyPassword($password, $db_user) {
+	private function verifyPassword($password, array $db_user) {
 		if (strlen($db_user['passwd']) > ZBX_MD5_SIZE) {
 			return password_verify($password, $db_user['passwd']);
 		}
