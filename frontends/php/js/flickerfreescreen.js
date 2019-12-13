@@ -239,10 +239,10 @@
 						to_ts: time_object.to_ts
 					});
 
+					// Reset pager on time range update.
 					switch (parseInt(screen.resourcetype)) {
 						// SCREEN_RESOURCE_HISTORY
 						case 17:
-							// Reset pager on time range update.
 							if (typeof screen.data.page !== 'undefined') {
 								screen.data.page = 1;
 							}
@@ -250,7 +250,6 @@
 
 						// SCREEN_RESOURCE_PROBLEM
 						case 24:
-							// Reset pager on time range update.
 							screen.data.page = 1;
 							break;
 					}
