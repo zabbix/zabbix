@@ -78,7 +78,6 @@ class CPage {
 		);
 
 		CElementQuery::setPage($this);
-		$this->setViewport(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT);
 	}
 
 	/**
@@ -280,9 +279,14 @@ class CPage {
 		}
 
 		if (isset($this->height) && $this->height > self::DEFAULT_PAGE_HEIGHT) {
-			$this->setViewport(self::DEFAULT_PAGE_WIDTH,
-				self::DEFAULT_PAGE_HEIGHT
-			);
+			try {
+				CommandExecutor::executeCustom($this->driver, [
+					'cmd' => 'Emulation.clearDeviceMetricsOverride',
+					'params' => ['clear' => true]
+				]);
+			} catch (Exception $exception) {
+				// Code is not missing here.
+			}
 
 			$this->height = self::DEFAULT_PAGE_HEIGHT;
 		}

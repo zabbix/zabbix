@@ -156,6 +156,16 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 						? $macros_posted[$macro]
 						: '';
 
+					/*
+					 * Additional escaping of preprocessing params is required for JSONPath and Prometheus preprocessing
+					 * steps. Quote and backslash characters should be escaped when LLD macros are used in params field.
+					 */
+					if ($field === 'params' && ($macro[1] === '#' || ($macro[1] === '{' && $macro[2] === '#'))
+							&& ($step['type'] == ZBX_PREPROC_JSONPATH || $step['type'] == ZBX_PREPROC_PROMETHEUS_TO_JSON
+							|| $step['type'] == ZBX_PREPROC_PROMETHEUS_PATTERN)) {
+						$macro_value = str_replace(['\\', '"'], ['\\\\', '\"'], $macro_value);
+					}
+
 					$step[$field] = substr_replace($step[$field], $macro_value, $pos, strlen($macro));
 				}
 			}

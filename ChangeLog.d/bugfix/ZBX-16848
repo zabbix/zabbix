@@ -1,0 +1,1 @@
+..F....... [ZBX-16848] fixed fatal error occurring in user profile and user edit forms when PHP FileInfo extension does not exist (Ivo)
