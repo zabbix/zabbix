@@ -987,7 +987,7 @@ jQuery(function($) {
 
 			options = $.extend({
 				position: {
-					of: event,
+					of: (event.type === 'click' ? event : event.target),
 					my: 'left top',
 					at: 'left bottom'
 				}
