@@ -20,26 +20,13 @@
 
 
 class CComponentRegistry {
+
 	protected $components = [];
 
 	/**
-	 * Register component.
-	 *
-	 * @param string $name        Component name.
-	 * @param object $instance    Component class instance.
-	 *
-	 * @throws Exception when name is already registered.
-	 */
-	public function register($name, $instance) {
-		if (array_key_exists($name, $this->components)) {
-			throw new Exception(_s('Component %s already registered.', $name));
-		}
-
-		$this->components[$name] = $instance;
-	}
-
-	/**
 	 * Return registered component class nstance.
+	 *
+	 * @param string $name  Component name.
 	 *
 	 * @return object
 	 *
@@ -54,12 +41,28 @@ class CComponentRegistry {
 	}
 
 	/**
-	 * Magic method to allow short syntax:
-	 *    App::component()->user->type
-	 *    App::component()->{'menu.main'}->add(['New entry' => []])
+	 * Register component.
 	 *
-	 * @param string $name        Component name.
-	 * @param object $instance    Component class instance.
+	 * @param string $name      Component name.
+	 * @param object $instance  Component class instance.
+	 *
+	 * @throws Exception when name is already registered.
+	 */
+	public function register($name, $instance) {
+		if (array_key_exists($name, $this->components)) {
+			throw new Exception(_s('Component %s already registered.', $name));
+		}
+
+		$this->components[$name] = $instance;
+	}
+
+	/**
+	 * Magic method to allow short syntax:
+	 *    App::Component()->user->type
+	 *
+	 * @param string $name  Component name.
+	 *
+	 * @return object
 	 *
 	 * @throws Exception when component with $name is not found.
 	 */
@@ -69,11 +72,10 @@ class CComponentRegistry {
 
 	/**
 	 * Magic method to allow short syntax:
-	 *    App::component()->user = new User
-	 *    App::component()->{'menu.main'} = new CMenu
+	 *    App::Component()->user = new User
 	 *
-	 * @param string $name       Requested property name.
-	 * @return object
+	 * @param string $name      Requested property name.
+	 * @param object $instance  Component class instance.
 	 *
 	 * @throws Exception when name is already registered.
 	 */

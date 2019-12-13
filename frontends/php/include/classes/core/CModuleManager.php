@@ -33,12 +33,12 @@ class CModuleManager {
 	/**
 	 * Contains array of modules information.
 	 *
-	 * object []['instance']    module class instance.
-	 * array  []['manifest']    module parsed manifest.json file.
-	 * string []['dir']         module directory absolute path with trailing slash.
-	 * bool   []['status']      module enabled status.
-	 * array  []['errors']      module intialization errors, array of exception objects.
-	 * array  []['path']        module absolute path to directory, manifest.json and Module.php files.
+	 * object []['instance']  module class instance.
+	 * array  []['manifest']  module parsed manifest.json file.
+	 * string []['dir']       module directory absolute path with trailing slash.
+	 * bool   []['status']    module enabled status.
+	 * array  []['errors']    module intialization errors, array of exception objects.
+	 * array  []['path']      module absolute path to directory, manifest.json and Module.php files.
 	 *
 	 */
 	protected $modules = [];
@@ -46,7 +46,7 @@ class CModuleManager {
 	/**
 	 * Create class object instance
 	 *
-	 * @param string $modules_dir    Absolute path to frontend root directory.
+	 * @param string $root_dir  Absolute path to frontend root directory.
 	 */
 	public function __construct($root_dir) {
 		$this->modules_dir = $root_dir.'/modules';
@@ -83,7 +83,8 @@ class CModuleManager {
 	/**
 	 * Parse manifest.json file and check it syntax, will return null for invalid manifest.json.
 	 *
-	 * @param string $path    Absolute path to manifest.json file.
+	 * @param string $path  Absolute path to manifest.json file.
+	 *
 	 * @return array|null
 	 */
 	public function parseManifestFile($path) {
@@ -120,7 +121,7 @@ class CModuleManager {
 	/**
 	 * Set module runtime enabled/disabled status.
 	 *
-	 * @param string $id   Module manifest id.
+	 * @param string $id  Module manifest id.
 	 */
 	public function enable($id) {
 		$index = $this->getModuleIndexById($id);
@@ -133,7 +134,7 @@ class CModuleManager {
 	/**
 	 * Set module runtime disabled status.
 	 *
-	 * @param string $id    Module manifest id.
+	 * @param string $id  Module manifest id.
 	 */
 	public function disable($id) {
 		$index = $this->getModuleIndexById($id);
@@ -146,8 +147,9 @@ class CModuleManager {
 	/**
 	 * Load and parse it manifest file.
 	 *
-	 * @param string $relative_path    Relative path to module folder.
-	 * @return CModule|null
+	 * @param string $relative_path  Relative path to module folder.
+	 *
+	 * @return array|null
 	 */
 	public function loadModule($relative_path) {
 		$dir = $this->modules_dir.'/'.trim($relative_path, '/');
@@ -200,7 +202,8 @@ class CModuleManager {
 	/**
 	 * Get module by action.
 	 *
-	 * @param string $action       Action of module.
+	 * @param string $action  Action of module.
+	 *
 	 * @return CModule|null
 	 */
 	public function getModuleByAction($action) {
@@ -218,8 +221,9 @@ class CModuleManager {
 	/**
 	 * Get module directory absolute path.
 	 *
-	 * @param string $id          Module manifest id.
-	 * @param bool   $relative    Return relative or absolute path to module directory.
+	 * @param string $id        Module manifest id.
+	 * @param bool   $relative  Return relative or absolute path to module directory.
+	 *
 	 * @return string|null
 	 */
 	public function getModuleRootDir($id, $relative = false) {
@@ -274,7 +278,8 @@ class CModuleManager {
 	 * Create instance of module and call register. Return module register method response. Is used only once when
 	 * module folder scan find new modules.
 	 *
-	 * @param string $id     Module manifest id.
+	 * @param string $id  Module manifest id.
+	 *
 	 * @return array
 	 */
 	public function registerModule($id) {
@@ -294,6 +299,7 @@ class CModuleManager {
 	 *
 	 * @param string $id      Module manifest id.
 	 * @param array  $config  Module configuration array, will be passed to init method.
+	 *
 	 * @return CModule|null
 	 */
 	public function initModule($id, array $config) {
@@ -309,13 +315,14 @@ class CModuleManager {
 	/**
 	 * Get module class instance.
 	 *
-	 * @param string $id      Module manifest id.
+	 * @param string $id  Module manifest id.
+	 *
 	 * @return CModule|null
 	 */
 	public function getModuleInstance($id) {
 		$index = $this->getModuleIndexById($id);
 
-		if (is_null($index)) {
+		if ($index === null) {
 			return null;
 		}
 
@@ -353,13 +360,14 @@ class CModuleManager {
 	 * module instance available or there is error during module instance creation. For healthy module instances
 	 * $instance->getManifest() method should be used instead.
 	 *
-	 * @param string $id      Module manifest id.
+	 * @param string $id  Module manifest id.
+	 *
 	 * @return array|null
 	 */
 	public function getModuleManifest($id) {
 		$index = $this->getModuleIndexById($id);
 
-		if (!is_null($index)) {
+		if ($index != null) {
 			return $this->modules[$index]['manifest'];
 		}
 
@@ -399,7 +407,7 @@ class CModuleManager {
 	 * @return array
 	 */
 	public function getLoadedModules() {
-		return CArrayHelper::getByKeysStrict($this->modules, 'id');
+		return CArrayHelper::getByKeysStrict($this->modules, ['id']);
 	}
 
 	/**
@@ -426,7 +434,8 @@ class CModuleManager {
 	/**
 	 * Get index in modules collection for module by module manifest.id
 	 *
-	 * @param string $id      Module manifest id.
+	 * @param string $id  Module manifest id.
+	 *
 	 * @return int|null
 	 */
 	protected function getModuleIndexById($id) {

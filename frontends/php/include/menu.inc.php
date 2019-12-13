@@ -20,7 +20,7 @@
 
 
 $user_type = CWebUser::getType();
-$menu = APP::component()->get('menu.main');
+$menu = APP::Component()->get('menu.main');
 $menu
 	->add(_('Monitoring'), [
 		'alias' => [],

@@ -34,7 +34,7 @@ require_once __DIR__.'/../../include/db.inc.php';
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
 
-$autoloader = new CAutoloader(__DIR__);
+$autoloader = new CAutoloader;
 $autoloader->addNamespace('', [
 	'/../../include/classes',
 	'/../../include/classes/core',

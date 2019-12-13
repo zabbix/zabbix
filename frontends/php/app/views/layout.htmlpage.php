@@ -74,7 +74,7 @@ function local_generateHeader($data) {
 
 		$pageMenu = new CView('layout.htmlpage.menu', [
 			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
-			'menu' => APP::component()->get('menu.main'),
+			'menu' => APP::Component()->get('menu.main'),
 			'user' => [
 				'is_guest' => CWebUser::isGuest(),
 				'alias' => CWebUser::$data['alias'],

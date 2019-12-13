@@ -27,9 +27,9 @@ class ZBase {
 	const EXEC_MODE_API = 'api';
 
 	/**
-	 * An instance of the current Z object.
+	 * An instance of the current APP object.
 	 *
-	 * @var Z
+	 * @var APP
 	 */
 	protected static $instance;
 
@@ -60,7 +60,7 @@ class ZBase {
 	 *
 	 * @return CComponentRegistry
 	 */
-	public static function component() {
+	public static function Component() {
 		return self::$component_registry;
 	}
 
@@ -73,7 +73,7 @@ class ZBase {
 	 */
 	public static function getInstance() {
 		if (self::$instance === null) {
-			self::$instance = new APP();
+			self::$instance = new static;
 		}
 
 		return self::$instance;
@@ -86,7 +86,7 @@ class ZBase {
 		$this->rootDir = $this->findRootDir();
 		// Register base directory path for 'include' and 'require' functions.
 		set_include_path(get_include_path().PATH_SEPARATOR.$this->rootDir);
-		$autoloader = new CAutoloader($this->rootDir);
+		$autoloader = new CAutoloader;
 		$autoloader->addNamespace('', $this->getIncludePaths());
 		$autoloader->register();
 		$this->autoloader = $autoloader;
@@ -164,7 +164,7 @@ class ZBase {
 				$router->addActions($this->module_manager->getRoutes());
 				$router->setAction($action);
 				$this->module = $this->module_manager->getModuleByAction($router->getAction());
-				static::component()->get('menu.main')->setSelected($action);
+				static::Component()->get('menu.main')->setSelected($action);
 
 				$view_paths = array_reduce($this->module_manager->getRegisteredNamespaces(), 'array_merge', []);
 				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
@@ -200,13 +200,13 @@ class ZBase {
 	}
 
 	/**
-	 * Call beforeAppTerminate event for current module.
+	 * Call beforeTerminate event for current module.
 	 */
 	public static function stop() {
 		$app = static::getInstance();
 
 		if ($app->module instanceof CModule && $app->action instanceof CController) {
-			$app->module->beforeAppTerminate($app->action);
+			$app->module->beforeTerminate($app->action);
 		}
 
 		exit;
@@ -576,7 +576,7 @@ class ZBase {
 	 */
 	protected function initMenu() {
 		$menu = new CMenu('menu.main', []);
-		$this->component()->register('menu.main', $menu);
+		static::Component()->register('menu.main', $menu);
 		include 'include/menu.inc.php';
 	}
 }

@@ -31,15 +31,18 @@ class CModuleDetails extends CApiService {
 	/**
 	 * Get module data.
 	 *
-	 * @param array    $options
-	 * @param int      $options['moduleid']
-	 * @param string   $options['id']               Module unique identifier as defined in manifest.json file.
-	 * @param string   $options['relative_path']    Relative path to module directory.
-	 * @param bool     $options['status']           Module status.
-	 * @param array    $options['config']           Module configuration data.
+	 * @param array  $options
+	 * @param int    $options['moduleid']
+	 * @param string $options['id']             Module unique identifier as defined in manifest.json file.
+	 * @param string $options['relative_path']  Relative path to module directory.
+	 * @param bool   $options['status']         Module status.
+	 * @param array  $options['config']         Module configuration data.
+	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
-	public function get($options = []) {
+	public function get(array $options = []) {
 		$result = [];
 
 		$sqlParts = [
@@ -118,13 +121,16 @@ class CModuleDetails extends CApiService {
 	/**
 	 * Create module.
 	 *
-	 * @param array    $options
-	 * @param int      $options['moduleid']
-	 * @param string   $options['id']               Module unique identifier as defined in manifest.json file.
-	 * @param string   $options['relative_path']    Relative path to module directory.
-	 * @param bool     $options['status']           Module status. (optional)
-	 * @param array    $options['config']           Module configuration data. (optional)
+	 * @param array  $modules
+	 * @param int    $modules[]['moduleid']
+	 * @param string $modules[]['id']             Module unique identifier as defined in manifest.json file.
+	 * @param string $modules[]['relative_path']  Relative path to module directory.
+	 * @param bool   $modules[]['status']         Module status. (optional)
+	 * @param array  $modules[]['config']         Module configuration data. (optional)
+	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function create($modules) {
 		$this->denyAccessUnlessGranted();
@@ -176,11 +182,14 @@ class CModuleDetails extends CApiService {
 	/**
 	 * Update module data
 	 *
-	 * @param array    $options
-	 * @param int      $options['moduleid']
-	 * @param bool     $options['status']           Module status, true - enabled.
-	 * @param array    $options['config']           Module configuration data.
+	 * @param array $modules
+	 * @param int   $modules[]['moduleid']
+	 * @param bool  $modules[]['status']    Module status, true - enabled.
+	 * @param array $modules[]['config']    Module configuration data.
+	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function update($modules) {
 		$this->denyAccessUnlessGranted();
@@ -232,9 +241,11 @@ class CModuleDetails extends CApiService {
 	/**
 	 * Delete modules
 	 *
-	 * @param array $moduleids    Array of module ids to be deleted.
+	 * @param array $moduleids Array of module ids to be deleted.
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function delete(array $moduleids) {
 		$this->denyAccessUnlessGranted();

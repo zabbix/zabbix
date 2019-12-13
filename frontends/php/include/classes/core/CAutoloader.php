@@ -35,7 +35,7 @@ class CAutoloader {
 	/**
 	 * Register supported namespace.
 	 *
-	 * @param string $prefix      Namespace value without trainling '\'.
+	 * @param string $namespace      Namespace value without trainling '\'.
 	 * @param array  $paths       Array of namespace files directory absolute path without trailing '/'.
 	 */
 	public function addNamespace($namespace, array $paths) {
@@ -60,10 +60,12 @@ class CAutoloader {
 	/**
 	 * Attempts to find and load the given class.
 	 *
-	 * @param string $fq_class_name
+	 * @param string $class_name
+	 *
+	 * @return bool
 	 */
-	protected function loadClass($fq_class_name) {
-		$chunks = explode('\\', $fq_class_name);
+	protected function loadClass($class_name) {
+		$chunks = explode('\\', $class_name);
 		$file_name = array_pop($chunks).'.php';
 
 		do {

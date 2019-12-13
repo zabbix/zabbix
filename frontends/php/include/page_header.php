@@ -134,14 +134,6 @@ switch ($page['type']) {
 		break;
 }
 
-// TODO: permissions level check should be done on controller level
-// $denied_page_requested = false;
-
-// // render the "Deny access" page
-// if ($denied_page_requested) {
-// 	access_deny(ACCESS_DENY_PAGE);
-// }
-
 if ($page['type'] == PAGE_TYPE_HTML) {
 	global $ZBX_SERVER_NAME;
 
@@ -250,7 +242,7 @@ if ($page['type'] == PAGE_TYPE_HTML && (CSession::keyExists('messageOk') || CSes
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 	$pageMenu = new CView('layout.htmlpage.menu', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
-		'menu' => APP::component()->get('menu.main'),
+		'menu' => APP::Component()->get('menu.main'),
 		'user' => [
 			'is_guest' => CWebUser::isGuest(),
 			'alias' => CWebUser::$data['alias'],

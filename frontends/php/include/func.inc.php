@@ -2732,7 +2732,8 @@ function relativeDateToText($from, $to) {
 /**
  * Return true if user requested resource is denied.
  *
- * @param string $resource    non-MVC file name to check.
+ * @param string $resource  non-MVC file name to check.
+ *
  * @return bool
  */
 function resourceAccessDenied($resource) {

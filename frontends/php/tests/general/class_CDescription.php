@@ -35,8 +35,8 @@ function error($error) {
 class class_CDescription extends PHPUnit_Framework_TestCase {
 
 	public static function setUpBeforeClass() {
-		$z = new Z();
-		$z->run();
+		$app = new App();
+		$app->run();
 		DBconnect($error);
 	}
 
