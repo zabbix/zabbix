@@ -1240,8 +1240,10 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * @param string $password
-	 * @param array  $user
+	 * @param string $password           User-specified password.
+	 * @param array  $db_user            Saved user profile.
+	 * @param string $db_user['passwd']  Saved password hash.
+	 * @param int    $db_user['userid']  User id.
 	 *
 	 * @return bool
 	 */
