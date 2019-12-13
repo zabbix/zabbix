@@ -2469,7 +2469,7 @@
 		data.dialogue = {};
 		data.dialogue.widget = widget;
 
-		overlayDialogue({
+		var overlay = overlayDialogue({
 			'title': (edit_mode ? t('Edit widget') : t('Add widget')),
 			'content': '',
 			'buttons': [
@@ -2490,9 +2490,8 @@
 			'dialogueid': 'widgetConfg'
 		}, trigger_elmnt);
 
-		var overlay_dialogue = $('#overlay_dialogue');
-		data.dialogue.div = overlay_dialogue;
-		data.dialogue.body = $('.overlay-dialogue-body', overlay_dialogue);
+		data.dialogue.div = overlay.$dialogue;
+		data.dialogue.body = overlay.$dialogue.$body;
 
 		updateWidgetConfigDialogue();
 	}

@@ -119,13 +119,6 @@
 
 				overlay.appendTo($(options.appendTo));
 
-				if ($(options.appendTo).prop('tagName') !== 'BODY') {
-					$(options.appendTo).on('remove', function() {
-						overlay.remove();
-						overlay = null;
-					});
-				}
-
 				methods.hide();
 			},
 			/**
@@ -219,7 +212,7 @@
 		/**
 		 * Initialize colorpicker overlay if it is not initialized.
 		 */
-		if (!overlay) {
+		if (!overlay || !$.contains(overlay, document.body)) {
 			methods.init(options);
 		}
 

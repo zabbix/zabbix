@@ -34,13 +34,11 @@ function Overlay(type, dialogueid) {
 	this.dialogueid = dialogueid || overlays_stack.getNextId();
 	this.headerid = 'dashbrd-widget-head-title-' + this.dialogueid;
 	this.$backdrop = jQuery('<div>', {
-		'id': 'overlay_bg',
 		'class': 'overlay-bg',
 		'data-dialogueid': this.dialogueid
 	});
 
 	this.$dialogue = jQuery('<div>', {
-		'id': 'overlay_dialogue',
 		'class': 'overlay-dialogue modal',
 		'data-dialogueid': this.dialogueid,
 		'role': 'dialog',
