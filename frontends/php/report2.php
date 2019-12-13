@@ -182,6 +182,7 @@ if ($triggerData) {
 }
 elseif (hasRequest('filter_hostid')) {
 	$reportWidget->setControls((new CForm('get'))
+		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
 			->addItem([
@@ -457,19 +458,7 @@ elseif (hasRequest('filter_hostid')) {
 	CArrayHelper::sort($triggers, ['host_name', 'description']);
 
 	// pager
-	if (hasRequest('page')) {
-		$page_num = getRequest('page');
-	}
-	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
-		$page_num = 1;
-	}
-	else {
-		$page_num = CPagerHelper::fetch($page['file']);
-	}
-
-	CPagerHelper::store($page['file'], $page_num);
-
-	$paging = CPagerHelper::paginateRows($page_num, $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
+	$paging = CPagerHelper::paginateRows(getRequest('page', 1), $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 
 	foreach ($triggers as $trigger) {
 		$availability = calculateAvailability($trigger['triggerid'], $data['filter']['timeline']['from_ts'],
