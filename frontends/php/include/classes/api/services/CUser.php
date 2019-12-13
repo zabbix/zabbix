@@ -1251,7 +1251,7 @@ class CUser extends CApiService {
 		if (strlen($db_user['passwd']) > ZBX_MD5_SIZE) {
 			return password_verify($password, $db_user['passwd']);
 		}
-		elseif (hash_equals(md5($password), $db_user['passwd'])) {
+		elseif (hash_equals($db_user['passwd'], md5($password))) {
 			DB::update('users', [
 				'values' => ['passwd' => password_hash($password, PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])],
 				'where' => ['userid' => $db_user['userid']]
