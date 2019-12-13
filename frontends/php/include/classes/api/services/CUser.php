@@ -1192,7 +1192,7 @@ class CUser extends CApiService {
 					break;
 
 				case ZBX_AUTH_INTERNAL:
-					if (!$this->verifyPassword($user['password'], $db_user)) {
+					if (!self::verifyPassword($user['password'], $db_user)) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Login name or password is incorrect.'));
 					}
 					break;
@@ -1247,7 +1247,7 @@ class CUser extends CApiService {
 	 *
 	 * @return bool
 	 */
-	private function verifyPassword($password, array $db_user) {
+	private static function verifyPassword($password, array $db_user) {
 		if (strlen($db_user['passwd']) > ZBX_MD5_SIZE) {
 			return password_verify($password, $db_user['passwd']);
 		}
