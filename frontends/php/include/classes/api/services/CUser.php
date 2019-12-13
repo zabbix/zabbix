@@ -1486,13 +1486,12 @@ class CUser extends CApiService {
 	 *
 	 * @param array  $user              Authentication credentials.
 	 * @param string $user['user']      User alias value.
-	 * @param string $user['password']  User password, is used in sessionid generation.
 	 * @param array  $db_user           User data from database.
 	 *
 	 * @return array
 	 */
 	private function createSession($user, $db_user) {
-		$db_user['sessionid'] = md5(microtime().md5($user['password']).$user['user'].mt_rand());
+		$db_user['sessionid'] = md5(microtime().$user['user'].mt_rand());
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
