@@ -2471,7 +2471,8 @@
 
 		var overlay = overlayDialogue({
 			'title': (edit_mode ? t('Edit widget') : t('Add widget')),
-			'content': '',
+			'class': 'modal-popup modal-popup-generic',
+			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
 			'buttons': [
 				{
 					'title': (edit_mode ? t('Apply') : t('Add')),
