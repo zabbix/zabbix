@@ -43,6 +43,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($adapter->getScreens(), []);
 		$this->assertEquals($adapter->getImages(), []);
 		$this->assertEquals($adapter->getMaps(), []);
+		$this->assertEquals($adapter->getMediaTypes(), []);
 	}
 
 	public function testGetGroups() {
@@ -2069,6 +2070,168 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		]);
 	}
 
+	public function testGetMediaTypes() {
+		$adapter = $this->getAdapter($this->getMediaTypeXml());
+
+		$this->assertEquals($adapter->getMediaTypes(), [
+			[
+				'name' => 'Email',
+				'type' => '0',
+				'smtp_server' => 'mail.example.com',
+				'smtp_helo' => 'example.com',
+				'smtp_email' => 'zabbix@example.com',
+				'content_type' => '0',
+				'message_templates' => [
+					[
+						'subject' => 'Problem: {EVENT.NAME}',
+						'eventsource' => '0',
+						'recovery' => '0',
+						'message' => 'Problem started at {EVENT.TIME} on {EVENT.DATE}
+Problem name: {EVENT.NAME}
+Host: {HOST.NAME}
+Severity: {EVENT.SEVERITY}
+Operational data: {EVENT.OPDATA}
+Original problem ID: {EVENT.ID}
+{TRIGGER.URL}'
+					],
+					[
+						'subject' => 'Resolved: {EVENT.NAME}',
+						'eventsource' => '0',
+						'recovery' => '1',
+						'message' => 'Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+Problem name: {EVENT.NAME}
+Host: {HOST.NAME}
+Severity: {EVENT.SEVERITY}
+
+Original problem ID: {EVENT.ID}
+{TRIGGER.URL}'
+					],
+					[
+						'subject' => 'Updated problem: {EVENT.NAME}',
+						'eventsource' => '0',
+						'recovery' => '2',
+						'message' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+{EVENT.UPDATE.MESSAGE}
+
+Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.'
+					],
+					[
+						'subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
+						'eventsource' => '1',
+						'recovery' => '0',
+						'message' => 'Discovery rule: {DISCOVERY.RULE.NAME}
+
+Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+Device DNS: {DISCOVERY.DEVICE.DNS}
+Device status: {DISCOVERY.DEVICE.STATUS}
+Device uptime: {DISCOVERY.DEVICE.UPTIME}
+
+Device service name: {DISCOVERY.SERVICE.NAME}
+Device service port: {DISCOVERY.SERVICE.PORT}
+Device service status: {DISCOVERY.SERVICE.STATUS}
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}'
+					],
+					[
+						'subject' => 'Autoregistration: {HOST.HOST}',
+						'eventsource' => '2',
+						'recovery' => '0',
+						'message' => 'Host name: {HOST.HOST}
+Host IP: {HOST.IP}
+Agent port: {HOST.PORT}'
+					]
+				],
+				'smtp_port' => '25',
+				'smtp_security' => '0',
+				'smtp_verify_host' => '0',
+				'smtp_verify_peer' => '0',
+				'smtp_authentication' => '0',
+				'username' => '',
+				'parameters' => '',
+				'gsm_modem' => '',
+				'status' => '0',
+				'attempt_interval' => '10s',
+				'script' => '',
+				'timeout' => '30s',
+				'process_tags' => '0',
+				'show_event_menu' => '1',
+				'event_menu_url' => '',
+				'event_menu_name' => '',
+				'description' => '',
+				'passwd' => '',
+				'exec_path' => '',
+				'maxsessions' => '1',
+				'maxattempts' => '3'
+			],
+			[
+				'name' => 'SMS',
+				'type' => '2',
+				'gsm_modem' => '/dev/ttyS0',
+				'message_templates' => [
+					[
+						'subject' => '',
+						'eventsource' => '0',
+						'recovery' => '0',
+						'message' => '{EVENT.SEVERITY}: {EVENT.NAME}
+Host: {HOST.NAME}
+{EVENT.DATE} {EVENT.TIME}'
+					],
+					[
+						'subject' => '',
+						'eventsource' => '0',
+						'recovery' => '1',
+						'message' => 'RESOLVED: {EVENT.NAME}
+Host: {HOST.NAME}
+{EVENT.DATE} {EVENT.TIME}'
+					],
+					[
+						'subject' => '',
+						'eventsource' => '0',
+						'recovery' => '2',
+						'message' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}'
+					],
+					[
+						'subject' => '',
+						'eventsource' => '1',
+						'recovery' => '0',
+						'message' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+					],
+					[
+						'subject' => '',
+						'eventsource' => '2',
+						'recovery' => '0',
+						'message' => 'Autoregistration: {HOST.HOST}
+Host IP: {HOST.IP}
+Agent port: {HOST.PORT}'
+					]
+				],
+				'smtp_server' => '',
+				'smtp_port' => '25',
+				'smtp_helo' => '',
+				'smtp_email' => '',
+				'smtp_security' => '0',
+				'smtp_verify_host' => '0',
+				'smtp_verify_peer' => '0',
+				'smtp_authentication' => '0',
+				'username' => '',
+				'content_type' => '1',
+				'parameters' => '',
+				'status' => '0',
+				'attempt_interval' => '10s',
+				'script' => '',
+				'timeout' => '30s',
+				'process_tags' => '0',
+				'show_event_menu' => '1',
+				'event_menu_url' => '',
+				'event_menu_name' => '',
+				'description' => '',
+				'passwd' => '',
+				'exec_path' => '',
+				'maxsessions' => '1',
+				'maxattempts' => '3'
+			]
+		]);
+	}
+
 	public function testConversion() {
 		$adapter = $this->getAdapter($this->get18Xml());
 
@@ -3013,7 +3176,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
-
 	protected function getAdapter($source) {
 		$reader = CImportReaderFactory::getReader(CImportReaderFactory::XML);
 		$source = $reader->read($source);
@@ -3022,7 +3184,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 
 		$source = (new CXmlValidator)->validate($source, 'xml');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2'] as $version) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4'] as $version) {
 			if ($source['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -3069,6 +3231,10 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		return $this->getFile('screen.xml');
 	}
 
+	protected function getMediaTypeXml() {
+		return $this->getFile('mediatype.xml');
+	}
+
 	protected function get10Xml() {
 		return $this->getFile('schema_1.0.xml');
 	}
@@ -3080,5 +3246,4 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 
 		return $this->sources[$name];
 	}
-
 }

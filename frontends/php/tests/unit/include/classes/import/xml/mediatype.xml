@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2020-01-01T00:00:00Z</date>
+    <media_types>
+        <media_type>
+            <name>Email</name>
+            <type>EMAIL</type>
+            <smtp_server>mail.example.com</smtp_server>
+            <smtp_helo>example.com</smtp_helo>
+            <smtp_email>zabbix@example.com</smtp_email>
+            <content_type>TEXT</content_type>
+            <message_templates>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Problem: {EVENT.NAME}</subject>
+                    <body>Problem started at {EVENT.TIME} on {EVENT.DATE}
+Problem name: {EVENT.NAME}
+Host: {HOST.NAME}
+Severity: {EVENT.SEVERITY}
+Operational data: {EVENT.OPDATA}
+Original problem ID: {EVENT.ID}
+{TRIGGER.URL}</body>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>RECOVERY</operation_mode>
+                    <subject>Resolved: {EVENT.NAME}</subject>
+                    <body>Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+Problem name: {EVENT.NAME}
+Host: {HOST.NAME}
+Severity: {EVENT.SEVERITY}
+
+Original problem ID: {EVENT.ID}
+{TRIGGER.URL}</body>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>UPDATE</operation_mode>
+                    <subject>Updated problem: {EVENT.NAME}</subject>
+                    <body>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+{EVENT.UPDATE.MESSAGE}
+
+Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.</body>
+                </message_template>
+                <message_template>
+                    <event_source>DISCOVERY</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}</subject>
+                    <body>Discovery rule: {DISCOVERY.RULE.NAME}
+
+Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+Device DNS: {DISCOVERY.DEVICE.DNS}
+Device status: {DISCOVERY.DEVICE.STATUS}
+Device uptime: {DISCOVERY.DEVICE.UPTIME}
+
+Device service name: {DISCOVERY.SERVICE.NAME}
+Device service port: {DISCOVERY.SERVICE.PORT}
+Device service status: {DISCOVERY.SERVICE.STATUS}
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}</body>
+                </message_template>
+                <message_template>
+                    <event_source>AUTOREGISTRATION</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Autoregistration: {HOST.HOST}</subject>
+                    <body>Host name: {HOST.HOST}
+Host IP: {HOST.IP}
+Agent port: {HOST.PORT}</body>
+                </message_template>
+            </message_templates>
+        </media_type>
+        <media_type>
+            <name>SMS</name>
+            <type>SMS</type>
+            <gsm_modem>/dev/ttyS0</gsm_modem>
+            <message_templates>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <body>{EVENT.SEVERITY}: {EVENT.NAME}
+Host: {HOST.NAME}
+{EVENT.DATE} {EVENT.TIME}</body>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>RECOVERY</operation_mode>
+                    <body>RESOLVED: {EVENT.NAME}
+Host: {HOST.NAME}
+{EVENT.DATE} {EVENT.TIME}</body>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>UPDATE</operation_mode>
+                    <body>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}</body>
+                </message_template>
+                <message_template>
+                    <event_source>DISCOVERY</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <body>Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}</body>
+                </message_template>
+                <message_template>
+                    <event_source>AUTOREGISTRATION</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <body>Autoregistration: {HOST.HOST}
+Host IP: {HOST.IP}
+Agent port: {HOST.PORT}</body>
+                </message_template>
+            </message_templates>
+        </media_type>
+    </media_types>
+</zabbix_export>
