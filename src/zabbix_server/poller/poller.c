@@ -461,7 +461,7 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields, unsigned
 			zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '&');
 
 		data = zbx_strdup(data, name);
-		if (1 == expand_macros)
+		if (MACRO_EXPAND_YES == expand_macros)
 		{
 			substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
 					MACRO_TYPE_HTTP_RAW, NULL, 0);
@@ -471,7 +471,7 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields, unsigned
 		zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '=');
 
 		data = zbx_strdup(data, value);
-		if (1 == expand_macros)
+		if (MACRO_EXPAND_YES == expand_macros)
 		{
 			substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
 					MACRO_TYPE_HTTP_RAW, NULL, 0);
@@ -498,8 +498,8 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 		errcodes[i] = SUCCEED;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		if (1 == expand_macros && SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
-				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
+		if (MACRO_EXPAND_YES == expand_macros && SUCCEED != substitute_key_macros(&items[i].key, NULL,
+				&items[i], NULL, NULL, MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = CONFIG_ERROR;
@@ -514,7 +514,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 			case ITEM_TYPE_SNMPv3:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
-				if (1 == expand_macros)
+				if (MACRO_EXPAND_YES == expand_macros)
 				{
 					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 							NULL, NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
@@ -538,7 +538,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
 				ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
-				if (1 == expand_macros)
+				if (MACRO_EXPAND_YES == expand_macros)
 				{
 					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 							NULL, NULL, NULL, &items[i].snmpv3_securityname,
@@ -559,7 +559,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
-				if (0 == expand_macros)
+				if (MACRO_EXPAND_NO == expand_macros)
 					break;
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
@@ -576,7 +576,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
-				if (1 == expand_macros)
+				if (MACRO_EXPAND_YES == expand_macros)
 				{
 					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 							NULL, NULL, NULL, &items[i].publickey, MACRO_TYPE_COMMON, NULL,
@@ -588,7 +588,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
-				if (1 == expand_macros)
+				if (MACRO_EXPAND_YES == expand_macros)
 				{
 					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 							NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
@@ -598,7 +598,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 
-				if (0 == expand_macros)
+				if (MACRO_EXPAND_NO == expand_macros)
 					break;
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
@@ -611,7 +611,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 				items[i].jmx_endpoint = zbx_strdup(items[i].jmx_endpoint, items[i].jmx_endpoint_orig);
 
-				if (0 == expand_macros)
+				if (MACRO_EXPAND_NO == expand_macros)
 					break;
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
@@ -632,7 +632,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
-				if (1 == expand_macros)
+				if (MACRO_EXPAND_YES == expand_macros)
 				{
 					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 							NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL,
@@ -655,7 +655,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 					continue;
 				}
 
-				if (0 == expand_macros)
+				if (MACRO_EXPAND_NO == expand_macros)
 					break;
 
 				switch (items[i].post_type)
