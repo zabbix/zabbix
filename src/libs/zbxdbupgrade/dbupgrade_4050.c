@@ -165,7 +165,7 @@ static int	DBpatch_4050013(void)
 	result = DBselect(
 			"select m.operationid,o.recovery,a.def_shortdata,a.def_longdata,a.r_shortdata,a.r_longdata,"
 			"a.ack_shortdata,a.ack_longdata from opmessage m"
-			" left join operations o on m.operationid=o.operationid"
+			" join operations o on m.operationid=o.operationid"
 			" left join actions a on o.actionid=a.actionid"
 			" where m.default_msg='1' and o.recovery in (0,1,2)");
 
