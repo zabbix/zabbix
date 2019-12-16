@@ -326,10 +326,15 @@ function get_bodywidth() {
 function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var overlay = overlays_stack.getById(dialogueid);
 	if (!overlay) {
+		var generic_actions = ['popup.generic', 'popup.scriptexec', 'dashboard.share.edit', 'dashboard.properties.edit',
+				'popup.services', 'popup.media'
+			],
+			dialogue_class = generic_actions.indexOf(action) !== -1 ? ' modal-popup-generic' : '';
+
 		overlay = overlayDialogue({
 			'title': '',
 			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
-			'class': 'modal-popup' + ((action === 'popup.generic') ? ' modal-popup-generic' : ''),
+			'class': 'modal-popup' + dialogue_class,
 			'buttons': [],
 			'element': trigger_elmnt,
 			'type': 'popup'
