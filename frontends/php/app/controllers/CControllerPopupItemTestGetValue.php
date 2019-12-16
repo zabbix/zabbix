@@ -124,6 +124,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
 		$data = $this->getItemTestProperties($this->getInputAll());
+		$data = $this->unsetEmptyValues($data);
 
 		$output = [
 			'user' => [
