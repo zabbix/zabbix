@@ -171,8 +171,6 @@ class CControllerMediatypeEdit extends CController {
 			$data['description'] = $this->mediatype['description'];
 			$data['message_templates'] = $this->mediatype['message_templates'];
 
-			CArrayHelper::sort($data['message_templates'], ['eventsource', 'recovery']);
-
 			$this->mediatype['exec_params'] = explode("\n", $this->mediatype['exec_params']);
 			foreach ($this->mediatype['exec_params'] as $exec_param) {
 				$data['exec_params'][] = ['exec_param' => $exec_param];
@@ -215,8 +213,10 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'exec_path', 'gsm_modem',
 			'smtp_username', 'passwd', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'maxsessionsType',
 			'form_refresh', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
-			'event_menu_name', 'description'
+			'event_menu_name', 'description', 'message_templates'
 		]);
+
+		CArrayHelper::sort($data['message_templates'], ['eventsource', 'recovery']);
 
 		if ($this->hasInput('form_refresh')) {
 			$data['parameters'] = [];
