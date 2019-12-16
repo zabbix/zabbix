@@ -179,6 +179,7 @@ Overlay.prototype.load = function(action, options) {
 	}
 
 	this.$dialogue.$body.addClass('is-loading');
+	this.$dialogue.$controls.find('select').prop('disabled', true);
 	this.$btn_submit && this.$btn_submit.prop('disabled', true);
 
 	this.xhr = jQuery.ajax({
