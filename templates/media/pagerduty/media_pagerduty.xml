@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2019-12-13T13:11:48Z</date>
+    <media_types>
+        <media_type>
+            <name>PagerDuty</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>token</name>
+                    <value>&lt;put your key&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>eventid</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>eventname</name>
+                    <value>{EVENT.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>hostname</name>
+                    <value>{HOST.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>hostip</name>
+                    <value>{HOST.IP}</value>
+                </parameter>
+                <parameter>
+                    <name>severity</name>
+                    <value>{EVENT.NSEVERITY} </value>
+                </parameter>
+                <parameter>
+                    <name>triggerdesc</name>
+                    <value>{TRIGGER.DESCRIPTION}</value>
+                </parameter>
+                <parameter>
+                    <name>triggeropdata</name>
+                    <value>{EVENT.OPDATA}</value>
+                </parameter>
+                <parameter>
+                    <name>eventtags</name>
+                    <value>{EVENT.TAGS}</value>
+                </parameter>
+                <parameter>
+                    <name>triggerid</name>
+                    <value>{TRIGGER.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>eventdate</name>
+                    <value>{EVENT.DATE}</value>
+                </parameter>
+                <parameter>
+                    <name>eventtime</name>
+                    <value>{EVENT.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>eventseverity</name>
+                    <value>{EVENT.SEVERITY} ​ ​</value>
+                </parameter>
+                <parameter>
+                    <name>eventack</name>
+                    <value>{EVENT.ACK.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>eventupdate</name>
+                    <value>{EVENT.UPDATE.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>eventvalue</name>
+                    <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>url</name>
+                    <value>{$ZABBIX.URL}</value>
+                </parameter>
+            </parameters>
+            <script>try {&#13;
+  &#13;
+    params = JSON.parse(value),&#13;
+    req = new CurlHttpRequest(),&#13;
+    fields = {};&#13;
+  &#13;
+    req.AddHeader('Content-Type: application/json');&#13;
+    //Zabbix: 0 - Not classified, 1 - Information, 2 - Warning, 3 - Average, 4 - High, 5 - Disaster.&#13;
+    //PagerDuty: info, warning, error, critical&#13;
+    if ((params.severity == 0) || (params.severity == 1))&#13;
+      severity = &quot;info&quot;&#13;
+    else if ((params.severity == 2) || (params.severity == 3))&#13;
+      severity = &quot;warning&quot;&#13;
+    else if (params.severity == 4)&#13;
+      severity = &quot;error&quot;&#13;
+    else if (params.severity == 5)&#13;
+      severity = &quot;critical&quot;&#13;
+&#13;
+    fields.routing_key = params.token;&#13;
+    fields.dedup_key = params.eventid;&#13;
+&#13;
+    if ((params.eventvalue == 1) &amp;&amp; (params.eventupdate == 0)) {&#13;
+        fields.event_action = &quot;trigger&quot;;&#13;
+        fields.payload = {&#13;
+            &quot;summary&quot;: params.eventname,&#13;
+            &quot;source&quot;: params.hostname+&quot; : &quot;+params.hostip,&#13;
+            &quot;severity&quot;: severity,&#13;
+            &quot;timestamp&quot;: &quot;2015-07-17T08:42:58.315+0000&quot;,&#13;
+            &quot;custom_details&quot;: {&#13;
+                &quot;Event date&quot;: params.eventdate,&#13;
+                &quot;Event time&quot;: params.eventtime, &#13;
+                &quot;Trigger description&quot;: params.triggerdesc,&#13;
+                &quot;Trigger opdata&quot;: params.triggeropdata,&#13;
+                &quot;Event tags&quot;: params.eventtags,&#13;
+                &quot;Event host&quot;: params.hostname,&#13;
+                &quot;Event host ip&quot;: params.hostip&#13;
+            }&#13;
+          };&#13;
+        fields.links = [{&#13;
+            &quot;href&quot;: params.url+&quot;/tr_events.php?triggerid=&quot;+params.triggerid+&quot;&amp;eventid=&quot;+params.eventid,&#13;
+            &quot;text&quot;: &quot;Event link&quot;&#13;
+          }];&#13;
+        fields.client = &quot;Zabbix&quot;;&#13;
+        fields.client_url = params.url;&#13;
+    }&#13;
+    else if ((params.eventvalue == 1) &amp;&amp; (params.eventupdate == 1) &amp;&amp; (params.eventack == 'Yes'))&#13;
+        fields.event_action = &quot;acknowledge&quot;;&#13;
+    else if (params.eventvalue == 0)&#13;
+        fields.event_action = &quot;resolve&quot;;&#13;
+    else&#13;
+        return &quot;Update message without ack will not be send.&quot;;&#13;
+&#13;
+    var resp = req.Post('https://events.pagerduty.com/v2/enqueue',&#13;
+        JSON.stringify(fields)&#13;
+    );&#13;
+&#13;
+    if (req.Status() != 202) {&#13;
+        throw JSON.parse(resp).errors[0];&#13;
+    }&#13;
+&#13;
+    resp = JSON.parse(resp);&#13;
+    return &quot;OK&quot;;&#13;
+} catch (error) {&#13;
+    Zabbix.Log(3, 'PagerDuty notification failed : '+error);&#13;
+    throw 'PagerDuty notification failed : '+error;&#13;
+}</script>
+            <show_event_menu>NO</show_event_menu>
+            <description>Please refer to https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2 and https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook#example_scripts.&#13;
+  &#13;
+Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;
+Add a dedicated user with the media type &quot;PagerDuty&quot; and place the integration key in the &quot;token&quot; parameter to integrate into the service.</description>
+        </media_type>
+    </media_types>
+</zabbix_export>
