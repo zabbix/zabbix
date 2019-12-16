@@ -100,7 +100,7 @@ class CControllerUsergroupList extends CController {
 		$page_num = getRequest('page', 1);
 		CPagerHelper::store('usergroup.list', $page_num);
 		$data['paging'] = CPagerHelper::paginateRows($page_num, $data['usergroups'], $sort_order,
-			(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
 		foreach ($data['usergroups'] as &$usergroup) {

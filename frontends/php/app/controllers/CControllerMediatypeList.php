@@ -134,7 +134,7 @@ class CControllerMediatypeList extends CController {
 		$page_num = getRequest('page', 1);
 		CPagerHelper::store('mediatype.list', $page_num);
 		$data['paging'] = CPagerHelper::paginateRows($page_num, $data['mediatypes'], $sortOrder,
-			(new CUrl('zabbix.php'))->setArgument('action', 'mediatype.list')
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
 		$response = new CControllerResponseData($data);

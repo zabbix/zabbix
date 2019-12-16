@@ -193,7 +193,7 @@ class CPagerHelper {
 
 		if ($num_pages > 1) {
 			$end_page = min($num_pages, max(self::RANGE, $page + floor(self::RANGE / 2)));
-			$start_page = ($end_page > self::RANGE) ? $end_page - self::RANGE + 1 : 1;
+			$start_page = max(1, ($page < (self::RANGE - 1)) ? 1 : ($end_page - self::RANGE) + 1);
 
 			if ($start_page > 1) {
 				$url->removeArgument('page');

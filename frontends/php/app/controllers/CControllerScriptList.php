@@ -96,7 +96,7 @@ class CControllerScriptList extends CController {
 		$page_num = getRequest('page', 1);
 		CPagerHelper::store('script.list', $page_num);
 		$data['paging'] = CPagerHelper::paginateRows($page_num, $data['scripts'], $sortOrder,
-			(new CUrl('zabbix.php'))->setArgument('action', 'script.list')
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
 		// find script host group name and user group name. set to '' if all host/user groups used.

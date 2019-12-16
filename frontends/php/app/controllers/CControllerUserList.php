@@ -131,7 +131,7 @@ class CControllerUserList extends CController {
 		$page_num = getRequest('page', 1);
 		CPagerHelper::store('user.list', $page_num);
 		$data['paging'] = CPagerHelper::paginateRows($page_num, $data['users'], $sortorder,
-			(new CUrl('zabbix.php'))->setArgument('action', 'user.list')
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
 		// set default lastaccess time to 0
