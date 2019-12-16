@@ -157,24 +157,4 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
 	}
-
-	protected function unsetEmptyValues(array $data) {
-		foreach ($data as $key => $value) {
-			if ($key === 'host') {
-				$data[$key] = $this->unsetEmptyValues($value);
-
-				if (!$data[$key]) {
-					unset($data[$key]);
-				}
-			}
-			elseif ($key === 'interface') {
-				continue;
-			}
-			elseif ($value === '' || $value === null) {
-				unset($data[$key]);
-			}
-		}
-
-		return $data;
-	}
 }
