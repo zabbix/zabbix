@@ -2,7 +2,7 @@
 # ----------------------------------------------------------
 #    Alexander Vladishev                      Feb-02-2007
 #
-# Checks for ldap.  DEFAULT-ACTION is the string yes or no to
+# Checks for iconv.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-iconv or --without-iconv.
 # If not supplied, DEFAULT-ACTION is no.
 #
