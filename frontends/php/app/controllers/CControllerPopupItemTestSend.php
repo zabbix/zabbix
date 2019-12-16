@@ -236,6 +236,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		// Get value from host.
 		if ($this->get_value_from_host) {
 			$item_test_data = $this->getItemTestProperties($this->getInputAll());
+			$item_test_data = $this->unsetEmptyValues($item_test_data);
 
 			// Send test to be executed on Zabbix server.
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);

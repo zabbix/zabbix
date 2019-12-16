@@ -483,4 +483,31 @@ abstract class CControllerPopupItemTest extends CController {
 			return 'now-'.$time_change.'s';
 		}
 	}
+
+	/**
+	 * Function to unset unspecified values before sending 'get value' request to server.
+	 *
+	 * @param array $data  Data array containing all parameters prepared to be sent to server.
+	 *
+	 * @return array
+	 */
+	protected function unsetEmptyValues(array $data) {
+		foreach ($data as $key => $value) {
+			if ($key === 'host') {
+				$data[$key] = $this->unsetEmptyValues($value);
+
+				if (!$data[$key]) {
+					unset($data[$key]);
+				}
+			}
+			elseif ($key === 'interface') {
+				continue;
+			}
+			elseif ($value === '' || $value === null) {
+				unset($data[$key]);
+			}
+		}
+
+		return $data;
+	}
 }
