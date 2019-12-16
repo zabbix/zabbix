@@ -19,16 +19,7 @@
 **/
 
 
-$widget = (new CWidget())
-	->setTitle(_('Screens'))
-	->setTitleSubmenu([
-		'main_section' => [
-			'items' => [
-				'screens.php' => _('Screens'),
-				'slides.php' => _('Slide shows')
-			]
-		]
-	]);
+$widget = (new CWidget())->setTitle(_('Screens'));
 
 $form = (new CForm('get'))->cleanItems();
 
@@ -39,6 +30,15 @@ if ($data['templateid']) {
 	$widget->addItem(get_header_host_table('screens', $data['templateid']));
 }
 else {
+	$widget->setTitleSubmenu([
+		'main_section' => [
+			'items' => [
+				'screens.php' => _('Screens'),
+				'slides.php' => _('Slide shows')
+			]
+		]
+	]);
+
 	$content_control->addItem(
 		(new CButton('form', _('Import')))
 			->onClick('redirect("screen.import.php?rules_preset=screen")')

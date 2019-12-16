@@ -29,7 +29,7 @@
 #include "zbxjson.h"
 #include "log.h"
 #include "proxy.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "../trapper/proxydata.h"
 
 extern unsigned char	process_type, program_type;

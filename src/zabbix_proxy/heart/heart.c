@@ -25,7 +25,7 @@
 
 #include "heart.h"
 #include "../servercomms.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;

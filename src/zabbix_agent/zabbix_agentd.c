@@ -46,7 +46,8 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 int	CONFIG_BUFFER_SIZE		= 100;
 int	CONFIG_BUFFER_SEND		= 5;
 
-int	CONFIG_MAX_LINES_PER_SECOND	= 20;
+int	CONFIG_MAX_LINES_PER_SECOND		= 20;
+int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND	= 20;
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 
@@ -107,7 +108,7 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 #include "setproctitle.h"
-#include "../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 const char	*progname = NULL;
 
@@ -680,6 +681,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #endif
 	if (0 != err)
 		exit(EXIT_FAILURE);
+
+	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = CONFIG_MAX_LINES_PER_SECOND;
 }
 
 static int	add_serveractive_host_cb(const char *host, unsigned short port)
@@ -811,6 +814,10 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"AllowKey",			load_key_access_rule,			TYPE_CUSTOM,
+			PARM_OPT,	0,			0},
+		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -834,6 +841,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		zbx_set_data_destination_hosts(active_hosts, add_serveractive_host_cb);
 
 	zbx_free(active_hosts);
+	finalize_key_access_rules_configuration();
 
 	if (ZBX_CFG_FILE_REQUIRED == requirement)
 	{

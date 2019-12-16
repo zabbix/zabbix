@@ -104,8 +104,15 @@ type ContextProvider interface {
 }
 
 type Result struct {
-	Itemid      uint64
-	Value       *string
+	Itemid uint64
+	Value  *string
+
+	// additional windows eventlog fields
+	EventSource    *string
+	EventID        *int
+	EventTimestamp *int
+	EventSeverity  *int
+
 	Ts          time.Time
 	Error       error
 	LastLogsize *uint64

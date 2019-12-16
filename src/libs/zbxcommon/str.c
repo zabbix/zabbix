@@ -21,7 +21,7 @@
 #include "threads.h"
 #include "module.h"
 
-#include "../zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>
@@ -1574,7 +1574,7 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 	return "unknown";
 }
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {
 	typedef struct
@@ -1747,7 +1747,7 @@ void	zbx_strupper(char *str)
 		*str = toupper(*str);
 }
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #include "log.h"
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 {

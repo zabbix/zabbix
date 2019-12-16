@@ -195,9 +195,8 @@ jQuery(function($) {
 	function createMenuPopupPreloader() {
 		return $('<div>', {
 			'id': 'menu-popup-preloader',
-			'class': 'preloader-container menu-popup-preloader'
+			'class': 'is-loading menu-popup-preloader'
 		})
-			.append($('<div>').addClass('preloader'))
 			.appendTo($('body'))
 			.on('click', function(e) {
 				e.stopPropagation();
@@ -209,7 +208,7 @@ jQuery(function($) {
 	 * Event handler for the preloader elements destroy.
 	 */
 	function menuPopupPreloaderCloseHandler(event) {
-		overlayPreloaderDestroy(event.data.id, event.data.xhr);
+		overlayPreloaderDestroy(event.data.id);
 	}
 
 	/**
@@ -308,7 +307,7 @@ jQuery(function($) {
 
 			$(document)
 				.off('click', menuPopupPreloaderCloseHandler)
-				.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
+				.on('click', {id: $preloader.prop('id')}, menuPopupPreloaderCloseHandler);
 		}
 		else {
 			showMenuPopup($obj, jQuery.extend({type: data.type}, data.data), event, options);

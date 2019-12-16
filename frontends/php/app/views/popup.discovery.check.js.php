@@ -69,14 +69,20 @@ $type.on('change', function() {
 });
 
 if ($type.val() == <?= SVC_SNMPv3 ?>) {
-	// Fire the change event to initialize CViewSwitcher.
+	// Fires the change event to initialize CViewSwitcher.
 	$type.trigger('change');
 
 	// Now we can add the event to clear the form on type change.
-	$type.on('change', clearDCheckForm);
+	$type.on('change', function() {
+		clearDCheckForm();
+		setDCheckDefaultPort();
+	});
 }
 else {
-	$type.on('change', clearDCheckForm);
+	$type.on('change', function() {
+		clearDCheckForm();
+		setDCheckDefaultPort();
+	});
 }
 
 /**
