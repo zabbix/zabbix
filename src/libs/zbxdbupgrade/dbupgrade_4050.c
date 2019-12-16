@@ -98,6 +98,58 @@ static int	DBpatch_4050009(void)
 
 	return SUCCEED;
 }
+static int	DBpatch_4050010(void)
+{
+	const ZBX_TABLE table =
+			{"task_data", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050011(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_data", 1, &field);
+}
+
+
+static int	DBpatch_4050012(void)
+{
+	const ZBX_TABLE	table =
+			{"task_result", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050013(void)
+{
+	return DBcreate_index("task_result", "task_result_1", "parent_taskid", 0);
+}
+
+static int	DBpatch_4050014(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_result", 1, &field);
+}
 
 #endif
 
@@ -113,5 +165,10 @@ DBPATCH_ADD(4050005, 0, 1)
 DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
 DBPATCH_ADD(4050009, 0, 1)
+DBPATCH_ADD(4050010, 0, 1)
+DBPATCH_ADD(4050011, 0, 1)
+DBPATCH_ADD(4050012, 0, 1)
+DBPATCH_ADD(4050013, 0, 1)
+DBPATCH_ADD(4050014, 0, 1)
 
 DBPATCH_END()
