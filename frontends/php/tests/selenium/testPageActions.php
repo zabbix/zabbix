@@ -54,7 +54,7 @@ class testPageActions extends CLegacyWebTest {
 	private $event_sources = [
 		EVENT_SOURCE_TRIGGERS => 'Trigger actions',
 		EVENT_SOURCE_DISCOVERY => 'Discovery actions',
-		EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
+		EVENT_SOURCE_AUTOREGISTRATION => 'Autoregistration actions',
 		EVENT_SOURCE_INTERNAL => 'Internal actions'
 	];
 
@@ -141,7 +141,7 @@ class testPageActions extends CLegacyWebTest {
 		return [
 			[EVENT_SOURCE_TRIGGERS],
 			[EVENT_SOURCE_DISCOVERY],
-			[EVENT_SOURCE_AUTO_REGISTRATION],
+			[EVENT_SOURCE_AUTOREGISTRATION],
 			[EVENT_SOURCE_INTERNAL]
 		];
 	}

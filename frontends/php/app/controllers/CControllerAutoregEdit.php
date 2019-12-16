@@ -64,7 +64,7 @@ class CControllerAutoregEdit extends CController {
 		$this->getInputs($data, ['tls_accept', 'tls_psk_identity', 'tls_psk']);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Auto registration'));
+		$response->setTitle(_('Autoregistration'));
 		$this->setResponse($response);
 	}
 }

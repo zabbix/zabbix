@@ -937,7 +937,7 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_DSERVICE_TYPE,
 		CONDITION_TYPE_DUPTIME
 	];
-	$conditions[EVENT_SOURCE_AUTO_REGISTRATION] = [
+	$conditions[EVENT_SOURCE_AUTOREGISTRATION] = [
 		CONDITION_TYPE_HOST_NAME,
 		CONDITION_TYPE_HOST_METADATA,
 		CONDITION_TYPE_PROXY
@@ -1011,7 +1011,7 @@ function getAllowedOperations($eventsource) {
 		];
 	}
 
-	if ($eventsource == EVENT_SOURCE_AUTO_REGISTRATION) {
+	if ($eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
 		$operations[ACTION_OPERATION] = [
 			OPERATION_TYPE_MESSAGE,
 			OPERATION_TYPE_COMMAND,

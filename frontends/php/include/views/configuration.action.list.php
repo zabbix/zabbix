@@ -22,7 +22,7 @@
 $submenu_source = [
 	EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
 	EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
-	EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration actions'),
+	EVENT_SOURCE_AUTOREGISTRATION => _('Autoregistration actions'),
 	EVENT_SOURCE_INTERNAL => _('Internal actions')
 ];
 

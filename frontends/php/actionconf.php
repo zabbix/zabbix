@@ -37,7 +37,7 @@ $fields = [
 										],
 	'eventsource' =>					[T_ZBX_INT, O_OPT, null,
 											IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-												EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL
+												EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL
 											]),
 											null
 										],

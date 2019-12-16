@@ -280,11 +280,11 @@ static int	DBpatch_4050014(void)
 						,
 						"placeholder-registration-normal-html"
 						,
-						"Auto registration: {HOST.HOST}\n"
+						"Autoregistration: {HOST.HOST}\n"
 						"Host IP: {HOST.IP}\n"
 						"Agent port: {HOST.PORT}"
 						,
-						"Auto registration: {HOST.HOST}"
+						"Autoregistration: {HOST.HOST}"
 					},
 					{NULL, NULL, NULL, NULL},
 					{NULL, NULL, NULL, NULL}

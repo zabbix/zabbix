@@ -97,13 +97,13 @@ class CMediatypeHelper {
 				]
 			],
 			self::MSG_TYPE_AUTOREG => [
-				'eventsource' => EVENT_SOURCE_AUTO_REGISTRATION,
+				'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Autoregistration'),
 				'template' => [
-					'subject' => 'Auto registration: {HOST.HOST}',
+					'subject' => 'Autoregistration: {HOST.HOST}',
 					'html' => 'Autoregistration HTML',
-					'sms' => "Auto registration: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}",
+					'sms' => "Autoregistration: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}",
 					'text' => "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}"
 				]
 			],
