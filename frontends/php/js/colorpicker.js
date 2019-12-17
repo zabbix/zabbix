@@ -212,7 +212,7 @@
 		/**
 		 * Initialize colorpicker overlay if it is not initialized.
 		 */
-		if (!overlay || !$.contains(overlay, document.body)) {
+		if (!overlay || !$('#color_picker').length) {
 			methods.init(options);
 		}
 
