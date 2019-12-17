@@ -1313,7 +1313,7 @@ class CWidgetHelper {
 			'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color){'.
 				'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
 				'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
-			'}, appendTo: ".overlay-dialogue-body"});'.
+			'}, appendTo: ".overlay-dialogue-body"});',
 
 			// Initialize sortability.
 			'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2) {'.
