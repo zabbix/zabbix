@@ -461,8 +461,8 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 	if (0 != operationid)
 	{
 		custom_msg = DBselect(
-				"select om.mediatypeid,om.default_msg,om.subject,om.message"
-				" from opmessage om where om.operationid=" ZBX_FS_UI64, operationid);
+				"select mediatypeid,default_msg,subject,message"
+				" from opmessage where operationid=" ZBX_FS_UI64, operationid);
 
 		if (NULL != (row = DBfetch(custom_msg)))
 		{
@@ -483,10 +483,10 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 	}
 
 	if (0 != mtid)
-		tmp = zbx_dsprintf(tmp, " mt.mediatypeid=" ZBX_FS_UI64 " and", mtid);
+		tmp = zbx_dsprintf(tmp, " mediatypeid=" ZBX_FS_UI64 " and", mtid);
 
-	sql_q = zbx_dsprintf(NULL, "select null from media_type_message mt"
-			" where%s mt.eventsource=%d and mt.recovery=%d", ZBX_NULL2EMPTY_STR(tmp), evt_src, op_mode);
+	sql_q = zbx_dsprintf(NULL, "select null from media_type_message"
+			" where%s eventsource=%d and recovery=%d", ZBX_NULL2EMPTY_STR(tmp), evt_src, op_mode);
 	default_msg = DBselectN(sql_q, 1);
 	zbx_free(tmp);
 	zbx_free(sql_q);
@@ -511,9 +511,9 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 	else
 	{
 		default_msg = DBselect(
-				"select mt.mediatypeid,mt.subject,mt.message"
-				" from media_type_message mt"
-				" where mt.mediatypeid=" ZBX_FS_UI64 " and mt.eventsource=%d and mt.recovery=%d",
+				"select mediatypeid,subject,message"
+				" from media_type_message"
+				" where mediatypeid=" ZBX_FS_UI64 " and eventsource=%d and recovery=%d",
 				mtid, evt_src, op_mode);
 	}
 	mtid = 0;
