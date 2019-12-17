@@ -73,7 +73,6 @@ if ($data['is_item_testable']) {
 				$data['interface_enabled']
 					? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAriaRequired()
 					: (new CTextBox('interface[address]'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setEnabled(false),
@@ -81,7 +80,6 @@ if ($data['is_item_testable']) {
 				$data['interface_enabled']
 					? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-						->setAriaRequired()
 					: (new CTextBox('interface[port]'))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setEnabled(false)
