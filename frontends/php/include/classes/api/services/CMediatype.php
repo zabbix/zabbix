@@ -801,8 +801,8 @@ class CMediatype extends CApiService {
 	 * Add Media types.
 	 *
 	 * @param array  $mediatypes                           A multidimensional array with media types data.
-	 * @param int    $mediatypes[]['type']                 Type.
-	 * @param string $mediatypes[]['name']                 Name.
+	 * @param int    $mediatypes[]['type']                 Transport used by the media type.
+	 * @param string $mediatypes[]['name']                 Name of the media type.
 	 * @param string $mediatypes[]['smtp_server']          SMTP server.
 	 * @param int    $mediatypes[]['smtp_port']            SMTP server port.
 	 * @param string $mediatypes[]['smtp_helo']            SMTP HELO.
@@ -815,14 +815,14 @@ class CMediatype extends CApiService {
 	 * @param string $mediatypes[]['exec_path']            Script name.
 	 * @param string $mediatypes[]['exec_params']          Script parameters.
 	 * @param string $mediatypes[]['gsm_modem']            Serial device name of the GSM modem.
-	 * @param string $mediatypes[]['username']             Username.
-	 * @param string $mediatypes[]['passwd']               Password.
+	 * @param string $mediatypes[]['username']             User name used for authentication.
+	 * @param string $mediatypes[]['passwd']               Password used for authentication.
 	 * @param int    $mediatypes[]['status']               Media type status.
 	 * @param int    $mediatypes[]['maxsessions']          Limit of simultaneously processed alerts.
 	 * @param int    $mediatypes[]['maxattempts']          Maximum attempts to deliver alert successfully.
 	 * @param string $mediatypes[]['attempt_interval']     Interval between alert delivery attempts.
 	 * @param string $mediatypes[]['script']               Webhook JavaScript body.
-	 * @param array  $mediatypes[]['parameters']           Array of webhook parameters:
+	 * @param array  $mediatypes[]['parameters']           An array of webhook parameters:
 	 *                                                     ['name' => .., 'value' => ..]
 	 * @param string $mediatypes[]['timeout']              Webhook JavaScript HTTP request timeout.
 	 * @param string $mediatypes[]['process_tags']         Webhook HTTP response should be saved as tags.
@@ -882,8 +882,8 @@ class CMediatype extends CApiService {
 	 *
 	 * @param array  $mediatypes                           A multidimensional array with media types data.
 	 * @param int    $mediatypes[]['mediatypeid']          Media type ID.
-	 * @param int    $mediatypes[]['type']                 Type.
-	 * @param string $mediatypes[]['name']                 Name.
+	 * @param int    $mediatypes[]['type']                 Transport used by the media type.
+	 * @param string $mediatypes[]['name']                 Name of the media type.
 	 * @param string $mediatypes[]['smtp_server']          SMTP server.
 	 * @param int    $mediatypes[]['smtp_port']            SMTP server port.
 	 * @param string $mediatypes[]['smtp_helo']            SMTP HELO.
@@ -896,8 +896,8 @@ class CMediatype extends CApiService {
 	 * @param string $mediatypes[]['exec_path']            Script name.
 	 * @param string $mediatypes[]['exec_params']          Script parameters.
 	 * @param string $mediatypes[]['gsm_modem']            Serial device name of the GSM modem.
-	 * @param string $mediatypes[]['username']             Username.
-	 * @param string $mediatypes[]['passwd']               Password.
+	 * @param string $mediatypes[]['username']             User name used for authentication.
+	 * @param string $mediatypes[]['passwd']               Password used for authentication.
 	 * @param int    $mediatypes[]['status']               Media type status.
 	 * @param int    $mediatypes[]['maxsessions']          Limit of simultaneously processed alerts.
 	 * @param int    $mediatypes[]['maxattempts']          Maximum attempts to deliver alert successfully.
@@ -1277,7 +1277,7 @@ class CMediatype extends CApiService {
 				'timeout' =>			['type' => API_TIME_UNIT, 'length' => DB::getFieldLength('media_type', 'timeout'), 'in' => '1:60'],
 				'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
 				'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
-				// Should be checked as string not as url because it can contain macros tags.
+				// Should be checked as string not as URL because it can contain macros tags.
 				'event_menu_url' =>		['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
 				'event_menu_name' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_name')],
 				'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [

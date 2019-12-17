@@ -24,7 +24,7 @@ ob_start(); ?>
 /**
  * Returns a message template object with message subject and body.
  *
- * @param {int|string} message_type  Message type.
+ * @param {number|string} message_type  Message type.
  *
  * @return {object}
  */
@@ -94,8 +94,8 @@ function submitMessageTemplate() {
 
 			if (isDuplicateMessageTemplate(template)) {
 				jQuery(makeMessageBox('bad', <?= CJs::encodeJson(_('Message template already exists.')) ?>, null, true,
-					false)
-				).insertBefore($form);
+					false
+				)).insertBefore($form);
 
 				return false;
 			}

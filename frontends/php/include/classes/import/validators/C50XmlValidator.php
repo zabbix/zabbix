@@ -274,6 +274,19 @@ class C50XmlValidator {
 		CXmlConstantValue::TRIGGER_NONE => CXmlConstantName::NONE
 	];
 
+	private $EVENT_SOURCE = [
+		CXmlConstantValue::EVENT_SOURCE_TRIGGERS => CXmlConstantName::TRIGGERS,
+		CXmlConstantValue::EVENT_SOURCE_DISCOVERY => CXmlConstantName::DISCOVERY,
+		CXmlConstantValue::EVENT_SOURCE_AUTOREGISTRATION => CXmlConstantName::AUTOREGISTRATION,
+		CXmlConstantValue::EVENT_SOURCE_INTERNAL => CXmlConstantName::INTERNAL
+	];
+
+	private $OPERATION_MODE = [
+		CXmlConstantValue::OPERATION_MODE_PROBLEM => CXmlConstantName::PROBLEM,
+		CXmlConstantValue::OPERATION_MODE_RECOVERY => CXmlConstantName::RECOVERY,
+		CXmlConstantValue::OPERATION_MODE_UPDATE => CXmlConstantName::UPDATE
+	];
+
 	/**
 	 * Format of import source.
 	 *
@@ -1708,8 +1721,8 @@ class C50XmlValidator {
 					'description' => 			['type' => XML_STRING, 'default' => ''],
 					'message_templates' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'message_template', 'rules' => [
 						'message_template' =>		['type' => XML_ARRAY, 'rules' => [
-							'event_source' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => [CXmlConstantValue::EVENT_SOURCE_TRIGGERS => CXmlConstantName::TRIGGERS, CXmlConstantValue::EVENT_SOURCE_DISCOVERY => CXmlConstantName::DISCOVERY, CXmlConstantValue::EVENT_SOURCE_AUTOREGISTRATION => CXmlConstantName::AUTOREGISTRATION, CXmlConstantValue::EVENT_SOURCE_INTERNAL => CXmlConstantName::INTERNAL]],
-							'operation_mode' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => [CXmlConstantValue::OPERATION_MODE_PROBLEM => CXmlConstantName::PROBLEM, CXmlConstantValue::OPERATION_MODE_RECOVERY => CXmlConstantName::RECOVERY, CXmlConstantValue::OPERATION_MODE_UPDATE => CXmlConstantName::UPDATE]],
+							'event_source' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => $this->EVENT_SOURCE],
+							'operation_mode' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => $this->OPERATION_MODE],
 							'subject' =>				['type' => XML_STRING, 'default' => ''],
 							'body' =>					['type' => XML_STRING, 'default' => '']
 						]]

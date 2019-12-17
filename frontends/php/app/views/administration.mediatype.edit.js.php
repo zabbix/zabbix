@@ -8,7 +8,6 @@
 		</td>
 	</tr>
 </script>
-
 <script type="text/x-jquery-tmpl" id="message-templates-row-tmpl">
 	<?= (new CRow([
 			new CCol('#{message_type_name}'),
@@ -34,7 +33,6 @@
 			->toString()
 	?>
 </script>
-
 <script type="text/javascript">
 	var message_templates = <?= CJs::encodeJson(CMediatypeHelper::getAllMessageTemplates()) ?>,
 		message_template_list = {};
@@ -67,8 +65,8 @@
 	/**
 	 * Gets message type name by the specified event source and operation mode.
 	 *
-	 * @param {int|string} eventsource  Event source.
-	 * @param {int|string} recovery     Operation mode.
+	 * @param {number|string} eventsource  Event source.
+	 * @param {number|string} recovery     Operation mode.
 	 *
 	 * @return {string}
 	 */
@@ -90,7 +88,7 @@
 	/**
 	 * Removes a template from the list of message templates.
 	 *
-	 * @param {int|string} index  Template index.
+	 * @param {number|string} index  Template index.
 	 */
 	function removeMessageTemplate(index) {
 		jQuery('tr[data-index=' + index + ']').remove();

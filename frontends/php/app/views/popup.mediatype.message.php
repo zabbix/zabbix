@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $form = (new CForm())
 	->cleanItems()
 	->setId('mediatype_message_form')
@@ -29,8 +30,7 @@ $form = (new CForm())
 	->addVar('content_type', $data['params']['content_type']);
 
 $form_list = (new CFormList())->addRow(_('Message type'),
-	(new CComboBox('message_type', $data['params']['message_type'], null, CMediatypeHelper::getAllMessageTypeNames()))
-		->setAttribute('autofocus', 'autofocus')
+	new CComboBox('message_type', $data['params']['message_type'], null, CMediatypeHelper::getAllMessageTypeNames())
 );
 
 if ($data['params']['type'] != MEDIA_TYPE_SMS) {
