@@ -987,7 +987,11 @@ jQuery(function($) {
 
 			options = $.extend({
 				position: {
-					of: (event.type === 'click' ? event : event.target),
+					/*
+					 * Please note that click event is also triggered by hitting spacebar on the keyboard,
+					 * in which case the number of mouse clicks (stored in event.originalEvent.detail) will be zero.
+					 */
+					of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
 					my: 'left top',
 					at: 'left bottom'
 				}
