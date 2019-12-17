@@ -1363,22 +1363,6 @@ fi
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
-	have_multirow_insert="no"
-
-	dnl Checking for IBM DB2 support
-	AX_LIB_IBM_DB2()
-	if test "x$want_ibm_db2" = "xyes"; then
-		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.])
-		fi
-
-		if test "x$found_ibm_db2" = "xyes"; then
-			have_db="IBM DB2"
-			have_multirow_insert="yes"
-		else
-			AC_MSG_ERROR([IBM DB2 library not found])
-		fi
-	fi
 
 	dnl Checking for MySQL support
 	AX_LIB_MYSQL()
@@ -1477,7 +1461,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AC_MSG_CHECKING(for Zabbix server/proxy database selection)
 	if test "x$have_db" = "xno"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR([No database selected for Zabbix server/proxy. Use --with-ibm-db2 or --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
+		AC_MSG_ERROR([No database selected for Zabbix server/proxy. Use --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
@@ -1490,9 +1474,9 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		AC_MSG_RESULT(no)
 	fi
 
-	DB_CFLAGS="$IBM_DB2_CPPFLAGS $MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
-	DB_LDFLAGS="$IBM_DB2_LDFLAGS $MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
-	DB_LIBS="$IBM_DB2_LIBS $MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
+	DB_CFLAGS="$MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
+	DB_LDFLAGS="$MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
+	DB_LIBS="$MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
 
 	AC_SUBST(DB_CFLAGS)
 	AC_SUBST(DB_LDFLAGS)
@@ -1934,7 +1918,6 @@ m4_ifdef([CONF_TESTS],[CONF_TESTS(ZBXCMOCKA)])
 AC_OUTPUT([
 	Makefile
 	database/Makefile
-	database/ibm_db2/Makefile
 	database/mysql/Makefile
 	database/oracle/Makefile
 	database/postgresql/Makefile
