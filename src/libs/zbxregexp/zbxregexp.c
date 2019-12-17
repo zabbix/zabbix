@@ -1141,3 +1141,91 @@ void	zbx_regexp_escape(char **string)
 	*string = buffer;
 }
 
+/**********************************************************************************
+ *                                                                                *
+ * Function: zbx_wildcard_minimize                                                *
+ *                                                                                *
+ * Purpose: remove repeated wildcard characters from the expression               *
+ *                                                                                *
+ * Parameters: str - [IN/OUT] the string to update                                *
+ *                                                                                *
+ **********************************************************************************/
+void	zbx_wildcard_minimize(char *str)
+{
+	char	*p1, *p2;
+	int	w = 0;
+
+	for(p1 = p2 = str; '\0' != *p2; p2++)
+	{
+		if ('*' == *p2)
+		{
+			if (0 != w)
+				continue;
+
+			w = 1;
+		}
+		else
+			w = 0;
+
+		*p1 = *p2;
+		p1++;
+	}
+
+	*p1 = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_wildcard_match                                               *
+ *                                                                            *
+ * Purpose: Matches string value to specified wildcard.                       *
+ *          Asterisk (*) characters match to any characters of any length.    *
+ *                                                                            *
+ * Parameters: value    - [IN] string to match                                *
+ *             wildcard - [IN] wildcard string expression                     *
+ *                                                                            *
+ * Return value: 1 - value match the wildcard                                 *
+ *               0 - otherwise                                                *
+ *                                                                            *
+ * Author: Andrejs Tumilovics                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_wildcard_match(const char *value, const char *wildcard)
+{
+	const char *s_pivot = value, *w_pivot = wildcard;
+
+	while('\0' != *value && '*' != *wildcard)
+	{
+		if (*value++ != *wildcard++)
+			return 0;
+	}
+
+	while('\0' != *value)
+	{
+		if ('*' == *wildcard)
+		{
+			wildcard++;
+
+			if ('\0' == *wildcard)
+				return 1;
+
+			w_pivot = wildcard;
+			s_pivot = value + 1;
+		}
+		else if (*value == *wildcard)
+		{
+			value++;
+			wildcard++;
+		}
+		else
+		{
+			wildcard = w_pivot;
+			value = s_pivot++;
+		}
+	}
+
+	while('*' == *wildcard)
+		wildcard++;
+
+	return '\0' == *wildcard;
+}

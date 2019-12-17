@@ -2554,6 +2554,10 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
 			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_PROMETHEUS;
 			params_num = 1;
 			break;
+		case ZBX_PREPROC_JSONPATH:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_JSONPATH;
+			params_num = 1;
+			break;
 		default:
 			flags1 = ZBX_MACRO_ANY;
 			params_num = 1;

@@ -58,4 +58,8 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps);
 void	zbx_regexp_escape(char **string);
 
+/* wildcards */
+void	zbx_wildcard_minimize(char *str);
+int	zbx_wildcard_match(const char *value, const char *wildcard);
+
 #endif /* ZABBIX_ZBXREGEXP_H */

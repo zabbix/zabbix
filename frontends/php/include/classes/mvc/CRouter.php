@@ -96,6 +96,8 @@ class CRouter {
 		'image.edit'					=> ['CControllerImageEdit',							'layout.htmlpage',		'administration.image.edit'],
 		'image.list'					=> ['CControllerImageList',							'layout.htmlpage',		'administration.image.list'],
 		'image.update'					=> ['CControllerImageUpdate',						null,					null],
+		'latest.view'					=> ['CControllerLatestView',						'layout.htmlpage',		'monitoring.latest.view'],
+		'latest.view.refresh'			=> ['CControllerLatestViewRefresh',					'layout.json',			'monitoring.latest.view.refresh'],
 		'macros.edit'					=> ['CControllerMacrosEdit',						'layout.htmlpage',		'administration.macros.edit'],
 		'macros.update'					=> ['CControllerMacrosUpdate',						null,					null],
 		'map.view'						=> ['CControllerMapView',							'layout.htmlpage',		'monitoring.map.view'],

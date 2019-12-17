@@ -435,7 +435,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline 
 	}
 
 	if ($trigger['url'] !== '') {
-		$trigger_url = CHtmlUrlValidator::validate($trigger['url'])
+		$trigger_url = CHtmlUrlValidator::validate($trigger['url'], ['allow_user_macro' => false])
 			? $trigger['url']
 			: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'], false, false)).
 				'\');';

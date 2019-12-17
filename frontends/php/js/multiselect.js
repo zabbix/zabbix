@@ -801,7 +801,7 @@ jQuery(function($) {
 		var addNew = false;
 
 		if (ms.options.addNew && ms.values.search.length) {
-			if (data.length || objectLength(ms.values.selected) > 0) {
+			if (data.length || objectSize(ms.values.selected) > 0) {
 				var names = {};
 
 				// Check if value exists among available values.
@@ -816,7 +816,7 @@ jQuery(function($) {
 				}
 
 				// Check if value exists among selected values.
-				if (!addNew && objectLength(ms.values.selected) > 0) {
+				if (!addNew && objectSize(ms.values.selected) > 0) {
 					$.each(ms.values.selected, function(i, item) {
 						if (typeof item.isNew === 'undefined') {
 							names[item.name.toUpperCase()] = true;
@@ -839,7 +839,7 @@ jQuery(function($) {
 		var available_more = false;
 
 		$.each(data, function(i, item) {
-			if (ms.options.limit == 0 || objectLength(ms.values.available) < ms.options.limit) {
+			if (ms.options.limit == 0 || objectSize(ms.values.available) < ms.options.limit) {
 				if (typeof ms.values.available[item.id] === 'undefined'
 						&& typeof ms.values.selected[item.id] === 'undefined'
 						&& ms.options.excludeids.indexOf(item.id) === -1) {
@@ -862,7 +862,7 @@ jQuery(function($) {
 		var found = 0,
 			preselected = '';
 
-		if (objectLength(ms.values.available) == 0) {
+		if (objectSize(ms.values.available) == 0) {
 			var div = $('<div>', {
 					'class': 'multiselect-matches',
 					text: ms.options.labels['No matches found']
@@ -951,7 +951,7 @@ jQuery(function($) {
 				$(window).height() + $(window).scrollTop() - available_top - obj_padding_y - 10
 			));
 
-		if (objectLength(ms.values.available) > 0) {
+		if (objectSize(ms.values.available) > 0) {
 			available_width_min = Math.max(available_width, 300);
 
 			// Prevent less than 15% width difference for the available list and the input field.
@@ -975,7 +975,7 @@ jQuery(function($) {
 
 		$available.scrollTop(0);
 
-		if (objectLength(ms.values.available) != 0) {
+		if (objectSize(ms.values.available) != 0) {
 			// Remove selected item selected state.
 			$('.selected li.selected', $obj).removeClass('selected');
 
@@ -1125,19 +1125,7 @@ jQuery(function($) {
 		var ms = $obj.data('multiSelect');
 
 		return (ms.options.limit != 0)
-			? ms.options.limit + objectLength(ms.values.selected) + ms.options.excludeids.length + 1
+			? ms.options.limit + objectSize(ms.values.selected) + ms.options.excludeids.length + 1
 			: null;
-	}
-
-	function objectLength(obj) {
-		var length = 0;
-
-		for (var key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				length++;
-			}
-		}
-
-		return length;
 	}
 });
