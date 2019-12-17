@@ -159,6 +159,14 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 .........T [ZBX-16737] changed agent.ping type to ZABBIX_PASSIVE in Template Module Zabbix agent (vitaly)
 
 --------------------------------------------------------------------------------
+Changes for 4.4.4rc2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+
 Changes for 4.4.4rc1
 
 New features:
