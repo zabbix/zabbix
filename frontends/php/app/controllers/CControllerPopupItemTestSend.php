@@ -88,7 +88,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'snmpv3_authpassphrase'	=> 'string',
 			'snmpv3_privprotocol'	=> 'string',
 			'snmpv3_privpassphrase'	=> 'string',
-			'steps'					=> 'required|array',
+			'steps'					=> 'array',
 			'ssl_cert_file'			=> 'string',
 			'ssl_key_file'			=> 'string',
 			'ssl_key_password'		=> 'string',
@@ -114,7 +114,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
 			$interface = $this->getInput('interface', []);
-			$steps = $this->getInput('steps');
+			$steps = $this->getInput('steps', []);
 			$prepr_types = zbx_objectValues($steps, 'type');
 			$this->use_prev_value = (count(array_intersect($prepr_types, self::$preproc_steps_using_prev_value)) > 0);
 			$this->show_final_result = ($this->getInput('show_final_result') == 1);
@@ -143,8 +143,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 
 			// Check preprocessing steps.
-			if (($error = $this->preproc_item->validateItemPreprocessingSteps($steps)) !== true) {
+			if ($steps && ($error = $this->preproc_item->validateItemPreprocessingSteps($steps)) !== true) {
 				error($error);
+				$ret = false;
 			}
 
 			// Check previous time.
@@ -205,25 +206,20 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		$test_preprocessing_steps = (bool) $this->getInput('steps');
-		$this->eol = parent::getInput('eol', ZBX_EOL_LF);
-
 		// Define values used to test preprocessing steps.
-		if ($test_preprocessing_steps) {
-			$preproc_test_data = [
-				'value' => $this->getInput('value', ''),
-				'value_type' => $this->getInput('value_type', ITEM_VALUE_TYPE_STR),
-				'steps' => $this->getInput('steps'),
-				'single' => !$this->show_final_result
-			];
+		$preproc_test_data = [
+			'value' => $this->getInput('value', ''),
+			'value_type' => $this->getInput('value_type', ITEM_VALUE_TYPE_STR),
+			'steps' => $this->getInput('steps', []), // Steps can be empty to test value convertation.
+			'single' => !$this->show_final_result
+		];
 
-			// Get previous value and time.
-			if ($this->use_prev_value) {
-				$preproc_test_data['history'] = [
-					'value' => $this->getInput('prev_value', ''),
-					'timestamp' => $this->getInput('prev_time')
-				];
-			}
+		// Get previous value and time.
+		if ($this->use_prev_value) {
+			$preproc_test_data['history'] = [
+				'value' => $this->getInput('prev_value', ''),
+				'timestamp' => $this->getInput('prev_time')
+			];
 		}
 
 		$output = [
@@ -247,7 +243,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 			elseif (is_array($result)) {
 				if (array_key_exists('result', $result)) {
-					if ($test_preprocessing_steps && $this->use_prev_value) {
+					// Move current value to previous value field.
+					if ($this->use_prev_value) {
 						$preproc_test_data['history']['value'] = $preproc_test_data['value'];
 						$preproc_test_data['history']['timestamp'] = $this->getPrevTime();
 
@@ -255,6 +252,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						$output['prev_time'] = $preproc_test_data['history']['timestamp'];
 					}
 
+					// Apply new value to preprocessing test.
 					$preproc_test_data['value'] = $result['result'];
 					$output['value'] = $result['result'];
 				}
@@ -270,34 +268,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		}
 
 		// Test preprocessing steps.
-		if ($test_preprocessing_steps && !array_key_exists('messages', $output)) {
-			// Resolve macros used in parameter fields.
-			$macros_posted = $this->getInput('macros', []);
-			$macros_types = ($this->preproc_item instanceof CItemPrototype)
-				? ['usermacros' => true, 'lldmacros' => true]
-				: ['usermacros' => true];
+		$this->eol = parent::getInput('eol', ZBX_EOL_LF);
 
-			foreach ($preproc_test_data['steps'] as &$step) {
-				/*
-				 * Values received from user input form may be transformed so we must remove redundant "\r" before
-				 * sending data to Zabbix server.
-				 */
-				$step['params'] = str_replace("\r\n", "\n", $step['params']);
-
-				// Resolve macros in parameter fields before send data to Zabbix server.
-				foreach (['params', 'error_handler_params'] as $field) {
-					$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
-
-					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-						$macro_value = array_key_exists($macro, $macros_posted)
-							? $macros_posted[$macro]
-							: '';
-
-						$step[$field] = substr_replace($step[$field], $macro_value, $pos, strlen($macro));
-					}
-				}
-			}
-			unset($step);
+		if (!array_key_exists('messages', $output)) {
+			$preproc_test_data['steps'] = $this->resolvePreprocessingStepMacros($preproc_test_data['steps']);
 
 			// Send test details to Zabbix server.
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
@@ -380,6 +354,45 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		}
 
 		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
+	}
+
+	/**
+	 * Resolve macros used in preprocessing step parameter fields.
+	 *
+	 * @param array $steps  Steps from item test input form.
+	 *
+	 * @return array
+	 */
+	protected function resolvePreprocessingStepMacros(array $steps) {
+		// Resolve macros used in parameter fields.
+		$macros_posted = $this->getInput('macros', []);
+		$macros_types = ($this->preproc_item instanceof CItemPrototype)
+			? ['usermacros' => true, 'lldmacros' => true]
+			: ['usermacros' => true];
+
+		foreach ($steps as &$step) {
+			/*
+			 * Values received from user input form may be transformed so we must remove redundant "\r" before
+			 * sending data to Zabbix server.
+			 */
+			$step['params'] = str_replace("\r\n", "\n", $step['params']);
+
+			// Resolve macros in parameter fields before send data to Zabbix server.
+			foreach (['params', 'error_handler_params'] as $field) {
+				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
+
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					$macro_value = array_key_exists($macro, $macros_posted)
+						? $macros_posted[$macro]
+						: '';
+
+					$step[$field] = substr_replace($step[$field], $macro_value, $pos, strlen($macro));
+				}
+			}
+		}
+		unset($step);
+
+		return $steps;
 	}
 
 	public function getInput($var, $default = null) {

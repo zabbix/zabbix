@@ -210,9 +210,6 @@ function itemCompleteTest() {
 	if (<?= $data['steps_num'] ?> > 0) {
 		step_nums = [...Array(<?= $data['steps_num'] ?>).keys()];
 	}
-	else {
-		step_nums = [0];
-	}
 
 	post_data = jQuery.extend(post_data, {
 		get_value: jQuery('#get_value', $form).is(":checked") ? 1 : 0,
