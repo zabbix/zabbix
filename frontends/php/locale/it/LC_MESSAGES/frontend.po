@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-15 01:46+0200\n"
+"POT-Creation-Date: 2019-12-17 10:33+0200\n"
 "PO-Revision-Date: 2018-09-17 12:18+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1170,8 +1170,8 @@ msgid "At least one maintenance period must be created."
 msgstr "Creare almeno un intervallo di manutenzione."
 
 #: include/classes/setup/CFrontendSetup.php:256
-msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
-msgstr "Almeno un DB tipo MySQL, PostgreSQL, Oracle o IBM DB2 dovrebbe essere supportato."
+msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
+msgstr ""
 
 #: include/views/configuration.correlation.edit.php:145
 msgid "At least one operation must be selected."
@@ -2467,17 +2467,17 @@ msgstr "Impossibile aggiornare massivamente nome visibile del template."
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Impossibile passare ID template duplicati per il collegamento: %s."
 
-#: include/classes/db/DB.php:830
+#: include/classes/db/DB.php:827
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "Impossibile eseguire cancellazione statement nella tabella \"%1$s\" senza condizione where."
 
-#: include/classes/db/DB.php:543
+#: include/classes/db/DB.php:540
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Impossibile eseguire aggiornament statement nella tabella \"%1$s\" senza valori."
 
-#: include/classes/db/DB.php:556
+#: include/classes/db/DB.php:553
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Impossibile eseguire aggiornamento statement nella tabella \"%1$s\" senza condizione where."
@@ -2690,7 +2690,7 @@ msgstr "Impossibile aggiornare \"%1$s\" per un item discoverato \"%2$s\"."
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Impossibile aggiornare \"%1$s\" per un trigger discoverato \"%2$s\"."
 
-#: include/classes/api/services/CImage.php:528
+#: include/classes/api/services/CImage.php:495
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
 msgstr "Impossibile aggiornare \"imagetype\" per l'immagine \"%1$s\"."
@@ -3828,7 +3828,7 @@ msgstr "Regola di Correlazione"
 msgid "Correlation updated"
 msgstr "Correlazione aggiornata"
 
-#: include/classes/api/services/CImage.php:359
+#: include/classes/api/services/CImage.php:326
 msgid "Could not save image!"
 msgstr "Impossibile salvare l'immagine!"
 
@@ -5539,7 +5539,7 @@ msgstr ""
 #: include/classes/api/services/CHostInterface.php:383
 #: include/classes/api/services/CHost.php:1264
 #: include/classes/api/services/CHostPrototype.php:888
-#: include/classes/api/services/CImage.php:456
+#: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CMaintenance.php:512
 #: include/classes/api/services/CMap.php:555
 #: include/classes/api/services/CMap.php:581
@@ -5576,7 +5576,7 @@ msgstr "ID tipo media assente."
 msgid "Empty name."
 msgstr "Nome vuoto."
 
-#: include/classes/api/services/CImage.php:376
+#: include/classes/api/services/CImage.php:343
 msgid "Empty parameters"
 msgstr "Parametri vuoti"
 
@@ -5784,7 +5784,7 @@ msgstr ""
 msgid "Error"
 msgstr "Errore"
 
-#: include/db.inc.php:683
+#: include/db.inc.php:582
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Errore nella richiesta di ricerca per la tabella \"%1$s\"."
@@ -6095,7 +6095,7 @@ msgstr "Febbraio"
 msgid "Field"
 msgstr "Campo"
 
-#: include/classes/db/DB.php:349
+#: include/classes/db/DB.php:346
 #, c-format
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Il campo \"%1$s\" non può essere impostato a NULL."
@@ -6168,7 +6168,7 @@ msgstr "Campo \"host\" è richiesto."
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "File checksum, calcolato da algoritmo UNIX cksum. Restituisce intero"
 
-#: include/classes/api/services/CImage.php:579
+#: include/classes/api/services/CImage.php:546
 msgid "File format is unsupported."
 msgstr "Il formato file non è supportato."
 
@@ -7564,10 +7564,10 @@ msgstr "Se pensi che questo messaggio sia sbagliato, per favore contatta il tuo 
 msgid "Image"
 msgstr "Immagine"
 
-#: include/classes/api/services/CImage.php:476
-#: include/classes/api/services/CImage.php:489
-#: include/classes/api/services/CImage.php:535
-#: include/classes/api/services/CImage.php:553
+#: include/classes/api/services/CImage.php:443
+#: include/classes/api/services/CImage.php:456
+#: include/classes/api/services/CImage.php:502
+#: include/classes/api/services/CImage.php:520
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr "L'immagine \"%1$s\" esiste già."
@@ -7589,7 +7589,7 @@ msgstr "Tipo etichetta immagine"
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr "Errore caricamento immagine [%1$s] in [%2$s]."
 
-#: include/classes/api/services/CImage.php:570
+#: include/classes/api/services/CImage.php:537
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %s."
@@ -8095,7 +8095,7 @@ msgstr "Valore eventobject errato."
 msgid "Incorrect eventsource value."
 msgstr "Valore eventsource errato."
 
-#: include/classes/db/DB.php:563 include/classes/db/DB.php:837
+#: include/classes/db/DB.php:560 include/classes/db/DB.php:834
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Nome o valore errato per il campo \"%1$s\" nello statement where per la tabella \"%2$s\"."
@@ -8186,8 +8186,8 @@ msgstr "Indice immagine errato."
 #: include/classes/api/services/CHost.php:919
 #: include/classes/api/services/CHost.php:1754
 #: include/classes/api/services/CHost.php:1940
-#: include/classes/api/services/CImage.php:468
-#: include/classes/api/services/CImage.php:509
+#: include/classes/api/services/CImage.php:435
+#: include/classes/api/services/CImage.php:476
 #: include/classes/api/services/CProxy.php:619
 #: include/classes/api/services/CProxy.php:683
 #: include/classes/api/services/CProxy.php:727
@@ -8529,17 +8529,17 @@ msgstr "Valore \"%1$s\" errato per il campo \"%2$s\"."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Valore \"%1$s\" errato per il campo \"%2$s\": dev'esser contenuto tra %3$s e %4$s."
 
-#: include/classes/db/DB.php:379
+#: include/classes/db/DB.php:376
 #, c-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr "Valore \"%1$s\" errato per il campo float \"%2$s\"."
 
-#: include/classes/db/DB.php:373
+#: include/classes/db/DB.php:370
 #, c-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr "Valore \"%1$s\" errato per il campo int \"%2$s\"."
 
-#: include/classes/db/DB.php:367
+#: include/classes/db/DB.php:364
 #, c-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "Valore \"%1$s\" errato per il campo int senza segno \"%2$s\"."
@@ -11643,10 +11643,10 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: include/classes/api/services/CHttpTest.php:747
 #: include/classes/api/services/CIconMap.php:278
 #: include/classes/api/services/CIconMap.php:521
-#: include/classes/api/services/CImage.php:380
-#: include/classes/api/services/CImage.php:452
-#: include/classes/api/services/CImage.php:504
-#: include/classes/api/services/CImage.php:522
+#: include/classes/api/services/CImage.php:347
+#: include/classes/api/services/CImage.php:419
+#: include/classes/api/services/CImage.php:471
+#: include/classes/api/services/CImage.php:489
 #: include/classes/api/services/CItemGeneral.php:208
 #: include/classes/api/services/CItemGeneral.php:310
 #: include/classes/api/services/CItemGeneral.php:325
@@ -12569,28 +12569,28 @@ msgstr "Panoramica"
 msgid "Owner"
 msgstr "Proprietario"
 
-#: include/classes/setup/CFrontendSetup.php:574
+#: include/classes/setup/CFrontendSetup.php:568
 msgid "PHP LDAP"
 msgstr "PHP LDAP"
 
-#: include/classes/setup/CFrontendSetup.php:578
+#: include/classes/setup/CFrontendSetup.php:572
 #: include/classes/validators/CLdapAuthValidator.php:69
 msgid "PHP LDAP extension missing."
 msgstr "PHP LDAP estensione assente."
 
-#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:305
 msgid "PHP bcmath"
 msgstr "PHP bcmath"
 
-#: include/classes/setup/CFrontendSetup.php:315
+#: include/classes/setup/CFrontendSetup.php:309
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "Estensione PHP bcmath assente (configurare il paramentro PHP --enable-bcmath)."
 
-#: include/classes/setup/CFrontendSetup.php:601
+#: include/classes/setup/CFrontendSetup.php:595
 msgid "PHP ctype"
 msgstr "PHP ctype"
 
-#: include/classes/setup/CFrontendSetup.php:605
+#: include/classes/setup/CFrontendSetup.php:599
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "Estensione PHP CType mancante (parametro di configurazione di PHP --enable-ctype)."
 
@@ -12598,67 +12598,67 @@ msgstr "Estensione PHP CType mancante (parametro di configurazione di PHP --enab
 msgid "PHP databases support"
 msgstr "Supporto PHP per database"
 
-#: include/classes/setup/CFrontendSetup.php:412
+#: include/classes/setup/CFrontendSetup.php:406
 msgid "PHP gd"
 msgstr "PHP gd"
 
-#: include/classes/setup/CFrontendSetup.php:500
+#: include/classes/setup/CFrontendSetup.php:494
 msgid "PHP gd FreeType support"
 msgstr "Supporto PHP gd FreeType"
 
-#: include/classes/setup/CFrontendSetup.php:504
+#: include/classes/setup/CFrontendSetup.php:498
 msgid "PHP gd FreeType support missing."
 msgstr "Supporto PHP gd FreeType assente."
 
-#: include/classes/setup/CFrontendSetup.php:481
+#: include/classes/setup/CFrontendSetup.php:475
 msgid "PHP gd GIF image support missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:477
+#: include/classes/setup/CFrontendSetup.php:471
 msgid "PHP gd GIF support"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:464
+#: include/classes/setup/CFrontendSetup.php:458
 msgid "PHP gd JPEG image support missing."
 msgstr "Supporto PHP gd JPEG assente."
 
-#: include/classes/setup/CFrontendSetup.php:460
+#: include/classes/setup/CFrontendSetup.php:454
 msgid "PHP gd JPEG support"
 msgstr "Supporto PHP gd JPEG"
 
-#: include/classes/setup/CFrontendSetup.php:439
+#: include/classes/setup/CFrontendSetup.php:433
 msgid "PHP gd PNG image support missing."
 msgstr "Supporto PHP gd PNG assente."
 
-#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:429
 msgid "PHP gd PNG support"
 msgstr "Supporto PHP gd PNG"
 
-#: include/classes/setup/CFrontendSetup.php:416
+#: include/classes/setup/CFrontendSetup.php:410
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
 msgstr "Estensione PHP gd mancante (parametro di configurazione di PHP --with-gd)."
 
-#: include/classes/setup/CFrontendSetup.php:652
+#: include/classes/setup/CFrontendSetup.php:646
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/classes/setup/CFrontendSetup.php:656
+#: include/classes/setup/CFrontendSetup.php:650
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
 msgstr "Estensione PHP gettext mancante (parametro di configurazione di PHP --with-gettext). Le traduzioni non saranno disponibili."
 
-#: include/classes/setup/CFrontendSetup.php:523
+#: include/classes/setup/CFrontendSetup.php:517
 msgid "PHP libxml"
 msgstr "PHP libxml"
 
-#: include/classes/setup/CFrontendSetup.php:527
+#: include/classes/setup/CFrontendSetup.php:521
 msgid "PHP libxml extension missing."
 msgstr "Estensione PHP libxml assente."
 
-#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:322
 msgid "PHP mbstring"
 msgstr "PHP mbstring"
 
-#: include/classes/setup/CFrontendSetup.php:332
+#: include/classes/setup/CFrontendSetup.php:326
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
 msgstr "Estensione PHP mbstring mancante (parametro di configurazione di PHP --enable-mbstring)."
 
@@ -12668,41 +12668,41 @@ msgstr "Estensione PHP mbstring mancante (parametro di configurazione di PHP --e
 #: include/classes/setup/CFrontendSetup.php:191
 #: include/classes/setup/CFrontendSetup.php:212
 #: include/classes/setup/CFrontendSetup.php:229
-#: include/classes/setup/CFrontendSetup.php:349
-#: include/classes/setup/CFrontendSetup.php:370
-#: include/classes/setup/CFrontendSetup.php:635
-#: include/classes/setup/CFrontendSetup.php:669
+#: include/classes/setup/CFrontendSetup.php:343
+#: include/classes/setup/CFrontendSetup.php:364
+#: include/classes/setup/CFrontendSetup.php:629
+#: include/classes/setup/CFrontendSetup.php:663
 #, c-format
 msgid "PHP option \"%1$s\""
 msgstr "PHP opzione \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:374
-#: include/classes/setup/CFrontendSetup.php:673
+#: include/classes/setup/CFrontendSetup.php:368
+#: include/classes/setup/CFrontendSetup.php:667
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
 msgstr "PHP opzione %1$s\" deve essere configurata come \"%2$s\""
 
-#: include/classes/setup/CFrontendSetup.php:618
+#: include/classes/setup/CFrontendSetup.php:612
 msgid "PHP session"
 msgstr "Sessione PHP"
 
-#: include/classes/setup/CFrontendSetup.php:639
+#: include/classes/setup/CFrontendSetup.php:633
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
 msgstr "Sessione PHP avvio automatico deve essere disabilitata (direttiva PHP \"session.auto_start\")."
 
-#: include/classes/setup/CFrontendSetup.php:622
+#: include/classes/setup/CFrontendSetup.php:616
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
 msgstr "Estensione PHP session mancante (parametro di configurazione di PHP --enable-sessione)."
 
-#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:381
 msgid "PHP sockets"
 msgstr "Socket PHP"
 
-#: include/classes/setup/CFrontendSetup.php:391
+#: include/classes/setup/CFrontendSetup.php:385
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
 msgstr "Estensione PHP sockets mancante (parametro di configurazione di PHP --enable-sockets)."
 
-#: include/classes/setup/CFrontendSetup.php:353
+#: include/classes/setup/CFrontendSetup.php:347
 msgid "PHP string function overloading must be disabled."
 msgstr "PHP string function overloading deve essere disabilitata."
 
@@ -12710,19 +12710,19 @@ msgstr "PHP string function overloading deve essere disabilitata."
 msgid "PHP version"
 msgstr "Versione PHP"
 
-#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:551
 msgid "PHP xmlreader"
 msgstr "PHP xmlreader"
 
-#: include/classes/setup/CFrontendSetup.php:561
+#: include/classes/setup/CFrontendSetup.php:555
 msgid "PHP xmlreader extension missing."
 msgstr "Manca estensione PHP XmlReader."
 
-#: include/classes/setup/CFrontendSetup.php:540
+#: include/classes/setup/CFrontendSetup.php:534
 msgid "PHP xmlwriter"
 msgstr "PHP xmlwriter"
 
-#: include/classes/setup/CFrontendSetup.php:544
+#: include/classes/setup/CFrontendSetup.php:538
 msgid "PHP xmlwriter extension missing."
 msgstr "Estensione PHP xmlwriter assente."
 
@@ -14304,13 +14304,13 @@ msgstr "SQL totale: %1$s (selezionati: %2$s | eseguiti: %3$s)"
 msgid "SQL query"
 msgstr "Query SQL"
 
-#: include/classes/db/DB.php:847
+#: include/classes/db/DB.php:844
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "L'esecuzione dello statement SQL è fallita \"%1$s\""
 
-#: include/classes/db/DB.php:468 include/classes/db/DB.php:515
-#: include/classes/db/DB.php:574
+#: include/classes/db/DB.php:465 include/classes/db/DB.php:512
+#: include/classes/db/DB.php:571
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "L'esecuzione dello statement SQL è fallita \"%1$s\"."
@@ -15718,12 +15718,12 @@ msgstr "TOTALE"
 msgid "TRUE"
 msgstr "VERO"
 
-#: include/classes/db/DB.php:221
+#: include/classes/db/DB.php:218
 #, c-format
 msgid "Table \"%1$s\" does not exist."
 msgstr "La tavola \"%1$s\" non esiste."
 
-#: include/classes/db/DB.php:416
+#: include/classes/db/DB.php:413
 #, c-format
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "La tavola \"%1$s\" non contiene un campo chiamato \"%2$s\"."
@@ -16039,7 +16039,6 @@ msgstr "L'applicazione non e' più discoverata e sarà cancellata in %1$s (il %2
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "L'applicazione non e' più discoverata e verrà eliminata al ciclo successivo di discovery."
 
-#: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
 #: include/classes/db/OracleDbBackend.php:36
 #: include/classes/db/PostgresqlDbBackend.php:44
@@ -16069,14 +16068,14 @@ msgstr "L'host non è stato più discoverato e sarà rimosso in %1$s (il %2$s al
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Host non più discoverato, verrà eliminato al successivo ciclo di discovery."
 
-#: include/classes/api/services/CImage.php:399
+#: include/classes/api/services/CImage.php:366
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] "L'immagine è utilizzata nella mappa icone %1$s."
 msgstr[1] "L'immagine è utilizzata nelle mappe icone %1$s."
 
-#: include/classes/api/services/CImage.php:425
+#: include/classes/api/services/CImage.php:392
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -16843,11 +16842,11 @@ msgstr "URLs"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraino (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:155
+#: include/classes/core/CConfigFile.php:154
 msgid "Unable to create the configuration file."
 msgstr "Impossibile creare il file di configurazione."
 
-#: include/classes/core/CConfigFile.php:151
+#: include/classes/core/CConfigFile.php:150
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Impossibile sovrascrivere il file di configurazione esistente."
 
@@ -17758,7 +17757,7 @@ msgstr "Il valore \"%1$s\" non è valido per il parametro \"grid_show\". Le scel
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "Il valore \"%1$s\" non è valido per il parametro \"grid_show\". Le scelte sono: \"%2$s\"."
 
-#: include/classes/db/DB.php:359 include/classes/db/DB.php:388
+#: include/classes/db/DB.php:356 include/classes/db/DB.php:385
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Il valore \"%1$s\" è troppo lungo per il campo \"%2$s\" - %3$d caratteri. La lunghezza consentita è di %4$d caratteri."
@@ -18407,7 +18406,7 @@ msgstr ""
 msgid "You must login to view this page."
 msgstr "Devi esser connesso per visualizzare questa pagina."
 
-#: include/classes/db/DB.php:136
+#: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr ""
 
@@ -19445,45 +19444,45 @@ msgstr "di"
 
 #: app/views/administration.user.edit.php:249
 #: include/classes/setup/CFrontendSetup.php:253
-#: include/classes/setup/CFrontendSetup.php:312
-#: include/classes/setup/CFrontendSetup.php:329
-#: include/classes/setup/CFrontendSetup.php:350
-#: include/classes/setup/CFrontendSetup.php:351
-#: include/classes/setup/CFrontendSetup.php:371
-#: include/classes/setup/CFrontendSetup.php:372
-#: include/classes/setup/CFrontendSetup.php:388
-#: include/classes/setup/CFrontendSetup.php:436
-#: include/classes/setup/CFrontendSetup.php:461
-#: include/classes/setup/CFrontendSetup.php:478
-#: include/classes/setup/CFrontendSetup.php:501
-#: include/classes/setup/CFrontendSetup.php:541
-#: include/classes/setup/CFrontendSetup.php:558
-#: include/classes/setup/CFrontendSetup.php:575
-#: include/classes/setup/CFrontendSetup.php:602
-#: include/classes/setup/CFrontendSetup.php:619
-#: include/classes/setup/CFrontendSetup.php:636
-#: include/classes/setup/CFrontendSetup.php:637
-#: include/classes/setup/CFrontendSetup.php:653
+#: include/classes/setup/CFrontendSetup.php:306
+#: include/classes/setup/CFrontendSetup.php:323
+#: include/classes/setup/CFrontendSetup.php:344
+#: include/classes/setup/CFrontendSetup.php:345
+#: include/classes/setup/CFrontendSetup.php:365
+#: include/classes/setup/CFrontendSetup.php:366
+#: include/classes/setup/CFrontendSetup.php:382
+#: include/classes/setup/CFrontendSetup.php:430
+#: include/classes/setup/CFrontendSetup.php:455
+#: include/classes/setup/CFrontendSetup.php:472
+#: include/classes/setup/CFrontendSetup.php:495
+#: include/classes/setup/CFrontendSetup.php:535
+#: include/classes/setup/CFrontendSetup.php:552
+#: include/classes/setup/CFrontendSetup.php:569
+#: include/classes/setup/CFrontendSetup.php:596
+#: include/classes/setup/CFrontendSetup.php:613
+#: include/classes/setup/CFrontendSetup.php:630
+#: include/classes/setup/CFrontendSetup.php:631
+#: include/classes/setup/CFrontendSetup.php:647
 msgid "off"
 msgstr "off"
 
 #: app/views/administration.user.edit.php:249
-#: include/classes/setup/CFrontendSetup.php:312
-#: include/classes/setup/CFrontendSetup.php:329
-#: include/classes/setup/CFrontendSetup.php:350
-#: include/classes/setup/CFrontendSetup.php:371
-#: include/classes/setup/CFrontendSetup.php:388
-#: include/classes/setup/CFrontendSetup.php:436
-#: include/classes/setup/CFrontendSetup.php:461
-#: include/classes/setup/CFrontendSetup.php:478
-#: include/classes/setup/CFrontendSetup.php:501
-#: include/classes/setup/CFrontendSetup.php:541
-#: include/classes/setup/CFrontendSetup.php:558
-#: include/classes/setup/CFrontendSetup.php:575
-#: include/classes/setup/CFrontendSetup.php:602
-#: include/classes/setup/CFrontendSetup.php:619
-#: include/classes/setup/CFrontendSetup.php:636
-#: include/classes/setup/CFrontendSetup.php:653
+#: include/classes/setup/CFrontendSetup.php:306
+#: include/classes/setup/CFrontendSetup.php:323
+#: include/classes/setup/CFrontendSetup.php:344
+#: include/classes/setup/CFrontendSetup.php:365
+#: include/classes/setup/CFrontendSetup.php:382
+#: include/classes/setup/CFrontendSetup.php:430
+#: include/classes/setup/CFrontendSetup.php:455
+#: include/classes/setup/CFrontendSetup.php:472
+#: include/classes/setup/CFrontendSetup.php:495
+#: include/classes/setup/CFrontendSetup.php:535
+#: include/classes/setup/CFrontendSetup.php:552
+#: include/classes/setup/CFrontendSetup.php:569
+#: include/classes/setup/CFrontendSetup.php:596
+#: include/classes/setup/CFrontendSetup.php:613
+#: include/classes/setup/CFrontendSetup.php:630
+#: include/classes/setup/CFrontendSetup.php:647
 #: include/views/monitoring.hostscreen.php:33
 msgid "on"
 msgstr "il"
@@ -19816,8 +19815,8 @@ msgid "unexpected value \"%1$s\""
 msgstr "Valore non previsto \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:230
-#: include/classes/setup/CFrontendSetup.php:407
-#: include/classes/setup/CFrontendSetup.php:518
+#: include/classes/setup/CFrontendSetup.php:401
+#: include/classes/setup/CFrontendSetup.php:512
 msgid "unknown"
 msgstr "sconosciuto"
 

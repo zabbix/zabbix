@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-15 01:46+0200\n"
+"POT-Creation-Date: 2019-12-17 10:33+0200\n"
 "PO-Revision-Date: 2017-11-10 20:32+0300\n"
 "Last-Translator: Anıl <ozbekanil@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1172,8 +1172,8 @@ msgid "At least one maintenance period must be created."
 msgstr "En azından bir tane bakım periyodu yaratılmalı."
 
 #: include/classes/setup/CFrontendSetup.php:256
-msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
-msgstr "MySQL, PostgreSQL, Oracle veya IBM DB2'den en az biri desteklenmelidir."
+msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
+msgstr ""
 
 #: include/views/configuration.correlation.edit.php:145
 msgid "At least one operation must be selected."
@@ -2470,17 +2470,17 @@ msgstr "Görünür şablon adına toplu güncelleme yapılamıyor."
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Bağlantı %s için yinelenen şablon ID'leri geçilemez."
 
-#: include/classes/db/DB.php:830
+#: include/classes/db/DB.php:827
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "\"%1$s\" tablosunda, where koşulu olmadan delete ifadesi gerçekleştirilemez."
 
-#: include/classes/db/DB.php:543
+#: include/classes/db/DB.php:540
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Değerler olmadan \"%1$s\" tablosunda update ifadesi gerçekleştirilemez."
 
-#: include/classes/db/DB.php:556
+#: include/classes/db/DB.php:553
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "\"%1$s\" tablosunda, where koşulu olmadan update ifadesi gerçekleştirilemez."
@@ -2693,7 +2693,7 @@ msgstr "Keşfedilmiş öğe \"%1$s\" için \"%2$s\" güncellenemiyor."
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Keşfedilmiş tetikleyici \"%1$s\" için \"%2$s\" güncellenemiyor."
 
-#: include/classes/api/services/CImage.php:528
+#: include/classes/api/services/CImage.php:495
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
 msgstr "\"%1$s\" resmi için \"imagetype\" güncellenemiyor."
@@ -3831,7 +3831,7 @@ msgstr "Korelasyon kuralı"
 msgid "Correlation updated"
 msgstr "Korelasyon güncellendi"
 
-#: include/classes/api/services/CImage.php:359
+#: include/classes/api/services/CImage.php:326
 msgid "Could not save image!"
 msgstr "Resim kaydedilemedi!"
 
@@ -5542,7 +5542,7 @@ msgstr ""
 #: include/classes/api/services/CHostInterface.php:383
 #: include/classes/api/services/CHost.php:1264
 #: include/classes/api/services/CHostPrototype.php:888
-#: include/classes/api/services/CImage.php:456
+#: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CMaintenance.php:512
 #: include/classes/api/services/CMap.php:555
 #: include/classes/api/services/CMap.php:581
@@ -5579,7 +5579,7 @@ msgstr "Boş medya türü ID'si."
 msgid "Empty name."
 msgstr "Boş isim."
 
-#: include/classes/api/services/CImage.php:376
+#: include/classes/api/services/CImage.php:343
 msgid "Empty parameters"
 msgstr "Boş parametreler"
 
@@ -5787,7 +5787,7 @@ msgstr ""
 msgid "Error"
 msgstr "Hata"
 
-#: include/db.inc.php:683
+#: include/db.inc.php:582
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "\"%1$s\" tablosu için arama isteği hatası."
@@ -6097,7 +6097,7 @@ msgstr "Şubat"
 msgid "Field"
 msgstr "Alan"
 
-#: include/classes/db/DB.php:349
+#: include/classes/db/DB.php:346
 #, c-format
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "\"%1$s\" alanı NULL olarak ayarlanamıyor."
@@ -6170,7 +6170,7 @@ msgstr "\"Ana makine\" alanı zorunludur."
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Dosya özeti, UNIX cksum algoritmasıyla hesaplanır. Tam sayı döndürür"
 
-#: include/classes/api/services/CImage.php:579
+#: include/classes/api/services/CImage.php:546
 msgid "File format is unsupported."
 msgstr "Dosya biçimi desteklenmiyor."
 
@@ -7566,10 +7566,10 @@ msgstr "Eğer bu mesajın yanlış olduğunu düşünüyorsanız gerekli izinler
 msgid "Image"
 msgstr "Resim"
 
-#: include/classes/api/services/CImage.php:476
-#: include/classes/api/services/CImage.php:489
-#: include/classes/api/services/CImage.php:535
-#: include/classes/api/services/CImage.php:553
+#: include/classes/api/services/CImage.php:443
+#: include/classes/api/services/CImage.php:456
+#: include/classes/api/services/CImage.php:502
+#: include/classes/api/services/CImage.php:520
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr "\"%1$s\" resmi zaten var."
@@ -7591,7 +7591,7 @@ msgstr "Resim etiket türü"
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr "[%2$s] içinde [%1$s] resim yükleme hatası."
 
-#: include/classes/api/services/CImage.php:570
+#: include/classes/api/services/CImage.php:537
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %s."
@@ -8097,7 +8097,7 @@ msgstr "Yanlış eventobject değeri."
 msgid "Incorrect eventsource value."
 msgstr "Yanlış eventsource değeri."
 
-#: include/classes/db/DB.php:563 include/classes/db/DB.php:837
+#: include/classes/db/DB.php:560 include/classes/db/DB.php:834
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "\"%2$s\" tablosu için where komutunda yanlış alan adı \"%1$s\" veya değeri."
@@ -8187,8 +8187,8 @@ msgstr "Yanlış resim indeksi."
 #: include/classes/api/services/CHost.php:919
 #: include/classes/api/services/CHost.php:1754
 #: include/classes/api/services/CHost.php:1940
-#: include/classes/api/services/CImage.php:468
-#: include/classes/api/services/CImage.php:509
+#: include/classes/api/services/CImage.php:435
+#: include/classes/api/services/CImage.php:476
 #: include/classes/api/services/CProxy.php:619
 #: include/classes/api/services/CProxy.php:683
 #: include/classes/api/services/CProxy.php:727
@@ -8530,17 +8530,17 @@ msgstr "\"%2$s\" alanı için yanlış değer \"%1$s\"."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "\"%2$s\" alanı için \"%1$s\" yanlış değeri: %3$s ve %4$s arasında olmalı."
 
-#: include/classes/db/DB.php:379
+#: include/classes/db/DB.php:376
 #, c-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr "\"%2$s\" kayan nokta alanı için yanlış değer \"%1$s\"."
 
-#: include/classes/db/DB.php:373
+#: include/classes/db/DB.php:370
 #, c-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr "\"%2$s\" tamsayı alanı için yanlış değer \"%1$s\"."
 
-#: include/classes/db/DB.php:367
+#: include/classes/db/DB.php:364
 #, c-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "\"%2$s\" işaretsiz tamsayı alanı için yanlış değer \"%1$s\"."
@@ -11644,10 +11644,10 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CHttpTest.php:747
 #: include/classes/api/services/CIconMap.php:278
 #: include/classes/api/services/CIconMap.php:521
-#: include/classes/api/services/CImage.php:380
-#: include/classes/api/services/CImage.php:452
-#: include/classes/api/services/CImage.php:504
-#: include/classes/api/services/CImage.php:522
+#: include/classes/api/services/CImage.php:347
+#: include/classes/api/services/CImage.php:419
+#: include/classes/api/services/CImage.php:471
+#: include/classes/api/services/CImage.php:489
 #: include/classes/api/services/CItemGeneral.php:208
 #: include/classes/api/services/CItemGeneral.php:310
 #: include/classes/api/services/CItemGeneral.php:325
@@ -12569,28 +12569,28 @@ msgstr "Genel bakış"
 msgid "Owner"
 msgstr "Sahibi"
 
-#: include/classes/setup/CFrontendSetup.php:574
+#: include/classes/setup/CFrontendSetup.php:568
 msgid "PHP LDAP"
 msgstr "PHP LDAP"
 
-#: include/classes/setup/CFrontendSetup.php:578
+#: include/classes/setup/CFrontendSetup.php:572
 #: include/classes/validators/CLdapAuthValidator.php:69
 msgid "PHP LDAP extension missing."
 msgstr "PHP LDAP eklentisi eksik."
 
-#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:305
 msgid "PHP bcmath"
 msgstr "PHP bcmath"
 
-#: include/classes/setup/CFrontendSetup.php:315
+#: include/classes/setup/CFrontendSetup.php:309
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "PHP bcmath eklentisi eksik (PHP yapılandırma parametresi --enable-bcmath)."
 
-#: include/classes/setup/CFrontendSetup.php:601
+#: include/classes/setup/CFrontendSetup.php:595
 msgid "PHP ctype"
 msgstr "PHP ctype"
 
-#: include/classes/setup/CFrontendSetup.php:605
+#: include/classes/setup/CFrontendSetup.php:599
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "PHP ctype eklentisi eksik (PHP yapılandırma parametresi --enable-ctype)."
 
@@ -12598,67 +12598,67 @@ msgstr "PHP ctype eklentisi eksik (PHP yapılandırma parametresi --enable-ctype
 msgid "PHP databases support"
 msgstr "PHP veritabanı desteği"
 
-#: include/classes/setup/CFrontendSetup.php:412
+#: include/classes/setup/CFrontendSetup.php:406
 msgid "PHP gd"
 msgstr "PHP gd"
 
-#: include/classes/setup/CFrontendSetup.php:500
+#: include/classes/setup/CFrontendSetup.php:494
 msgid "PHP gd FreeType support"
 msgstr "PHP gd FreeType desteği"
 
-#: include/classes/setup/CFrontendSetup.php:504
+#: include/classes/setup/CFrontendSetup.php:498
 msgid "PHP gd FreeType support missing."
 msgstr "PHP gd FreeType desteği eksik."
 
-#: include/classes/setup/CFrontendSetup.php:481
+#: include/classes/setup/CFrontendSetup.php:475
 msgid "PHP gd GIF image support missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:477
+#: include/classes/setup/CFrontendSetup.php:471
 msgid "PHP gd GIF support"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:464
+#: include/classes/setup/CFrontendSetup.php:458
 msgid "PHP gd JPEG image support missing."
 msgstr "PHP gd JPEG resim desteği eksik."
 
-#: include/classes/setup/CFrontendSetup.php:460
+#: include/classes/setup/CFrontendSetup.php:454
 msgid "PHP gd JPEG support"
 msgstr "PHP gd JPEG desteği"
 
-#: include/classes/setup/CFrontendSetup.php:439
+#: include/classes/setup/CFrontendSetup.php:433
 msgid "PHP gd PNG image support missing."
 msgstr "PHP gd PNG resim desteği eksik."
 
-#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:429
 msgid "PHP gd PNG support"
 msgstr "PHP gd PNG desteği"
 
-#: include/classes/setup/CFrontendSetup.php:416
+#: include/classes/setup/CFrontendSetup.php:410
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
 msgstr "PHP gd eklentisi eksik (PHP yapılandırma parametresi --with-gd)."
 
-#: include/classes/setup/CFrontendSetup.php:652
+#: include/classes/setup/CFrontendSetup.php:646
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/classes/setup/CFrontendSetup.php:656
+#: include/classes/setup/CFrontendSetup.php:650
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
 msgstr "PHP gettext eklentisi eksik (PHP yapılandırma parametresi --with-gettext). Çeviriler kullanılabilir olmayacak."
 
-#: include/classes/setup/CFrontendSetup.php:523
+#: include/classes/setup/CFrontendSetup.php:517
 msgid "PHP libxml"
 msgstr "PHP libxml"
 
-#: include/classes/setup/CFrontendSetup.php:527
+#: include/classes/setup/CFrontendSetup.php:521
 msgid "PHP libxml extension missing."
 msgstr "PHP libxml eklentisi eksik."
 
-#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:322
 msgid "PHP mbstring"
 msgstr "PHP mbstring"
 
-#: include/classes/setup/CFrontendSetup.php:332
+#: include/classes/setup/CFrontendSetup.php:326
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
 msgstr "PHP mbstring eklentisi eksik (PHP yapılandırma parametresi --enable-mbstring)."
 
@@ -12668,41 +12668,41 @@ msgstr "PHP mbstring eklentisi eksik (PHP yapılandırma parametresi --enable-mb
 #: include/classes/setup/CFrontendSetup.php:191
 #: include/classes/setup/CFrontendSetup.php:212
 #: include/classes/setup/CFrontendSetup.php:229
-#: include/classes/setup/CFrontendSetup.php:349
-#: include/classes/setup/CFrontendSetup.php:370
-#: include/classes/setup/CFrontendSetup.php:635
-#: include/classes/setup/CFrontendSetup.php:669
+#: include/classes/setup/CFrontendSetup.php:343
+#: include/classes/setup/CFrontendSetup.php:364
+#: include/classes/setup/CFrontendSetup.php:629
+#: include/classes/setup/CFrontendSetup.php:663
 #, c-format
 msgid "PHP option \"%1$s\""
 msgstr "PHP seçeneği \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:374
-#: include/classes/setup/CFrontendSetup.php:673
+#: include/classes/setup/CFrontendSetup.php:368
+#: include/classes/setup/CFrontendSetup.php:667
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
 msgstr "PHP seçeneği \"%1$s\", \"%2$s\" olarak ayarlanmalıdır."
 
-#: include/classes/setup/CFrontendSetup.php:618
+#: include/classes/setup/CFrontendSetup.php:612
 msgid "PHP session"
 msgstr "PHP session"
 
-#: include/classes/setup/CFrontendSetup.php:639
+#: include/classes/setup/CFrontendSetup.php:633
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
 msgstr "PHP session otomatik başlatma devre dışı bırakılmalı (PHP yönergesi \"session.auto_start\")."
 
-#: include/classes/setup/CFrontendSetup.php:622
+#: include/classes/setup/CFrontendSetup.php:616
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
 msgstr "PHP session eklentisi eksik (PHP yapılandırma parametresi --enable-session)."
 
-#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:381
 msgid "PHP sockets"
 msgstr "PHP sockets"
 
-#: include/classes/setup/CFrontendSetup.php:391
+#: include/classes/setup/CFrontendSetup.php:385
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
 msgstr "PHP sockets eklentisi eksik (PHP yapılandırma parametresi --enable-sockets)."
 
-#: include/classes/setup/CFrontendSetup.php:353
+#: include/classes/setup/CFrontendSetup.php:347
 msgid "PHP string function overloading must be disabled."
 msgstr "PHP string fonksiyonu aşırı yüklemesi devre dışı bırakılmalıdır."
 
@@ -12710,19 +12710,19 @@ msgstr "PHP string fonksiyonu aşırı yüklemesi devre dışı bırakılmalıd�
 msgid "PHP version"
 msgstr "PHP sürümü"
 
-#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:551
 msgid "PHP xmlreader"
 msgstr "PHP xmlreader"
 
-#: include/classes/setup/CFrontendSetup.php:561
+#: include/classes/setup/CFrontendSetup.php:555
 msgid "PHP xmlreader extension missing."
 msgstr "PHP xmlreader eklentisi eksik."
 
-#: include/classes/setup/CFrontendSetup.php:540
+#: include/classes/setup/CFrontendSetup.php:534
 msgid "PHP xmlwriter"
 msgstr "PHP xmlwriter"
 
-#: include/classes/setup/CFrontendSetup.php:544
+#: include/classes/setup/CFrontendSetup.php:538
 msgid "PHP xmlwriter extension missing."
 msgstr "PHP xmlwriter eklentisi eksik."
 
@@ -14304,13 +14304,13 @@ msgstr "SQL sayısı: %1$s (seçer: %2$s | çalıştırır: %3$s)"
 msgid "SQL query"
 msgstr "SQL sorgusu"
 
-#: include/classes/db/DB.php:847
+#: include/classes/db/DB.php:844
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "SQL cümlesi yürütme başarısız oldu \"%1$s\""
 
-#: include/classes/db/DB.php:468 include/classes/db/DB.php:515
-#: include/classes/db/DB.php:574
+#: include/classes/db/DB.php:465 include/classes/db/DB.php:512
+#: include/classes/db/DB.php:571
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "SQL cümlesi yürütme başarısız oldu \"%1$s\"."
@@ -15719,12 +15719,12 @@ msgstr "TOPLAM"
 msgid "TRUE"
 msgstr "DOĞRU"
 
-#: include/classes/db/DB.php:221
+#: include/classes/db/DB.php:218
 #, c-format
 msgid "Table \"%1$s\" does not exist."
 msgstr "\"%1$s\" tablosu mevcut değil."
 
-#: include/classes/db/DB.php:416
+#: include/classes/db/DB.php:413
 #, c-format
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "\"%1$s\" tablosunda \"%2$s\" adlı alan yok."
@@ -16040,7 +16040,6 @@ msgstr "Uygulama artık keşfedilemiyor ve %1$s gün içinde (%2$s günü, %3$s 
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Uygulama artık keşfedilemiyor ve keşif kuralı bir sonraki sefer işlendiğinde silinecek."
 
-#: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
 #: include/classes/db/OracleDbBackend.php:36
 #: include/classes/db/PostgresqlDbBackend.php:44
@@ -16070,14 +16069,14 @@ msgstr "Ana makine artık keşfedilemiyor ve %1$s gün içinde (%2$s günü, %3$
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Ana makine artık keşfedilemiyor ve bir sonraki sefer keşif kuralı işlendiğinde silinecek."
 
-#: include/classes/api/services/CImage.php:399
+#: include/classes/api/services/CImage.php:366
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] "Resim, %1$s simge haritasında kullanılıyor."
 msgstr[1] "Resim, %1$s simge haritalarında kullanılıyor."
 
-#: include/classes/api/services/CImage.php:425
+#: include/classes/api/services/CImage.php:392
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -16844,11 +16843,11 @@ msgstr "URL'ler"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukraynaca (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:155
+#: include/classes/core/CConfigFile.php:154
 msgid "Unable to create the configuration file."
 msgstr "Yapılandırma dosyası oluşturulamadı."
 
-#: include/classes/core/CConfigFile.php:151
+#: include/classes/core/CConfigFile.php:150
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Varolan yapılandırma dosyasının üzerine yazılamadı."
 
@@ -17760,7 +17759,7 @@ msgstr "\"%1$s\" değeri \"grid_show\" parametresi için geçersiz. Seçenekler 
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "\"%1$s\" değeri \"grid_show\" parametresi için geçersiz. Seçenekler şunlardır: \"%2$s\"."
 
-#: include/classes/db/DB.php:359 include/classes/db/DB.php:388
+#: include/classes/db/DB.php:356 include/classes/db/DB.php:385
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "\"%1$s\" değeri %3$d karakter ve \"%2$s\" alanı için çok uzun . İzin verilen uzunluk %4$d karakter."
@@ -18408,7 +18407,7 @@ msgstr "Kaydedilmemiş değişiklikleriniz var."
 msgid "You must login to view this page."
 msgstr "Bu sayfayı görmek için oturup açmak zorundasınız."
 
-#: include/classes/db/DB.php:136
+#: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr "Veritabanınız düzgün çalışmıyor. Lütfen birkaç dakika bekleyin ve bu işlemi tekrarlamayı deneyin. Sorun devam ederse, lütfen sistem yöneticisine başvurun. Soruna, veritabanı yönetim sisteminiz tarafından gerçekleştirilen uzun süren bir işlem veya satır düzeyi kilidi neden olabilir."
 
@@ -19446,45 +19445,45 @@ msgstr "un"
 
 #: app/views/administration.user.edit.php:249
 #: include/classes/setup/CFrontendSetup.php:253
-#: include/classes/setup/CFrontendSetup.php:312
-#: include/classes/setup/CFrontendSetup.php:329
-#: include/classes/setup/CFrontendSetup.php:350
-#: include/classes/setup/CFrontendSetup.php:351
-#: include/classes/setup/CFrontendSetup.php:371
-#: include/classes/setup/CFrontendSetup.php:372
-#: include/classes/setup/CFrontendSetup.php:388
-#: include/classes/setup/CFrontendSetup.php:436
-#: include/classes/setup/CFrontendSetup.php:461
-#: include/classes/setup/CFrontendSetup.php:478
-#: include/classes/setup/CFrontendSetup.php:501
-#: include/classes/setup/CFrontendSetup.php:541
-#: include/classes/setup/CFrontendSetup.php:558
-#: include/classes/setup/CFrontendSetup.php:575
-#: include/classes/setup/CFrontendSetup.php:602
-#: include/classes/setup/CFrontendSetup.php:619
-#: include/classes/setup/CFrontendSetup.php:636
-#: include/classes/setup/CFrontendSetup.php:637
-#: include/classes/setup/CFrontendSetup.php:653
+#: include/classes/setup/CFrontendSetup.php:306
+#: include/classes/setup/CFrontendSetup.php:323
+#: include/classes/setup/CFrontendSetup.php:344
+#: include/classes/setup/CFrontendSetup.php:345
+#: include/classes/setup/CFrontendSetup.php:365
+#: include/classes/setup/CFrontendSetup.php:366
+#: include/classes/setup/CFrontendSetup.php:382
+#: include/classes/setup/CFrontendSetup.php:430
+#: include/classes/setup/CFrontendSetup.php:455
+#: include/classes/setup/CFrontendSetup.php:472
+#: include/classes/setup/CFrontendSetup.php:495
+#: include/classes/setup/CFrontendSetup.php:535
+#: include/classes/setup/CFrontendSetup.php:552
+#: include/classes/setup/CFrontendSetup.php:569
+#: include/classes/setup/CFrontendSetup.php:596
+#: include/classes/setup/CFrontendSetup.php:613
+#: include/classes/setup/CFrontendSetup.php:630
+#: include/classes/setup/CFrontendSetup.php:631
+#: include/classes/setup/CFrontendSetup.php:647
 msgid "off"
 msgstr "kapalı"
 
 #: app/views/administration.user.edit.php:249
-#: include/classes/setup/CFrontendSetup.php:312
-#: include/classes/setup/CFrontendSetup.php:329
-#: include/classes/setup/CFrontendSetup.php:350
-#: include/classes/setup/CFrontendSetup.php:371
-#: include/classes/setup/CFrontendSetup.php:388
-#: include/classes/setup/CFrontendSetup.php:436
-#: include/classes/setup/CFrontendSetup.php:461
-#: include/classes/setup/CFrontendSetup.php:478
-#: include/classes/setup/CFrontendSetup.php:501
-#: include/classes/setup/CFrontendSetup.php:541
-#: include/classes/setup/CFrontendSetup.php:558
-#: include/classes/setup/CFrontendSetup.php:575
-#: include/classes/setup/CFrontendSetup.php:602
-#: include/classes/setup/CFrontendSetup.php:619
-#: include/classes/setup/CFrontendSetup.php:636
-#: include/classes/setup/CFrontendSetup.php:653
+#: include/classes/setup/CFrontendSetup.php:306
+#: include/classes/setup/CFrontendSetup.php:323
+#: include/classes/setup/CFrontendSetup.php:344
+#: include/classes/setup/CFrontendSetup.php:365
+#: include/classes/setup/CFrontendSetup.php:382
+#: include/classes/setup/CFrontendSetup.php:430
+#: include/classes/setup/CFrontendSetup.php:455
+#: include/classes/setup/CFrontendSetup.php:472
+#: include/classes/setup/CFrontendSetup.php:495
+#: include/classes/setup/CFrontendSetup.php:535
+#: include/classes/setup/CFrontendSetup.php:552
+#: include/classes/setup/CFrontendSetup.php:569
+#: include/classes/setup/CFrontendSetup.php:596
+#: include/classes/setup/CFrontendSetup.php:613
+#: include/classes/setup/CFrontendSetup.php:630
+#: include/classes/setup/CFrontendSetup.php:647
 #: include/views/monitoring.hostscreen.php:33
 msgid "on"
 msgstr "de"
@@ -19817,8 +19816,8 @@ msgid "unexpected value \"%1$s\""
 msgstr "beklenmedik değer \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:230
-#: include/classes/setup/CFrontendSetup.php:407
-#: include/classes/setup/CFrontendSetup.php:518
+#: include/classes/setup/CFrontendSetup.php:401
+#: include/classes/setup/CFrontendSetup.php:512
 msgid "unknown"
 msgstr "bilinmiyor"
 
