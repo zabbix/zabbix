@@ -52,7 +52,9 @@
 	req = new CurlHttpRequest(),&#13;
 	fields = {};&#13;
 &#13;
-	req.AddHeader('Content-Type: application/json');&#13;&#13;fields.token= params.token;&#13;
+	req.AddHeader('Content-Type: application/json');&#13;
+&#13;
+	fields.token= params.token;&#13;
 	fields.user = params.user;&#13;
 &#13;
 &#13;
