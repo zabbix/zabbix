@@ -125,6 +125,13 @@ static int	DBpatch_4050011(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4050012(void)
+{
+	const ZBX_FIELD	field = {"passwd", "", NULL, NULL, 60, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -140,5 +147,6 @@ DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
 DBPATCH_ADD(4050010, 0, 1)
 DBPATCH_ADD(4050011, 0, 1)
+DBPATCH_ADD(4050012, 0, 1)
 
 DBPATCH_END()
