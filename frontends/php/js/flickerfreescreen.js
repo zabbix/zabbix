@@ -318,7 +318,7 @@
 				var url = new Curl(screen.data.options.refresh);
 				url.setArgument('curtime', new CDate().getTime());
 
-				jQuery.ajax({
+				$.ajax({
 					'url': url.getUrl()
 				})
 				.fail(function() {
@@ -417,7 +417,7 @@
 					}
 
 					if (zbx_sbox) {
-						img.data('zbx_sbox', jQuery.extend(zbx_sbox, {
+						img.data('zbx_sbox', $.extend(zbx_sbox, {
 							from: screen.timeline.from,
 							from_ts: screen.timeline.from_ts,
 							to: screen.timeline.to,
