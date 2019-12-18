@@ -39,8 +39,6 @@ build/win32/project/MSG00001.bin
 build/win32/project/messages.h
 build/win32/project/messages.rc
 build/win32/project/resource.res
-database/ibm_db2/data.sql
-database/ibm_db2/schema.sql
 database/mysql/data.sql
 database/mysql/schema.sql
 database/oracle/data.sql

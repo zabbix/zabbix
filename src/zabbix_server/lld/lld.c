@@ -148,6 +148,8 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 	DC_ITEM		item;
 	int		errcode, ret = SUCCEED;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
 
 	if (SUCCEED != errcode)
@@ -202,6 +204,8 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
 out:
 	DCconfig_clean_items(&item, &errcode, 1);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

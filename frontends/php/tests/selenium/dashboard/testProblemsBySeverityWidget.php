@@ -915,9 +915,10 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$dashboard->edit();
 		$form = $dashboard->getWidget('Reference widget')->edit();
 		$form->submit();
-		$this->page->waitUntilReady();
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
 
-		$dashboard->getWidget('Reference widget');
+		$widget = $dashboard->getWidget('Reference widget');
+		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
@@ -1044,8 +1045,9 @@ class testProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 		$form->submit();
-		$this->page->waitUntilReady();
-		$dashboard->getWidget($header);
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$widget = $dashboard->getWidget($header);
+		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();
 	}
 

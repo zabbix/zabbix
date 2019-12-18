@@ -47,12 +47,14 @@
             <max_sessions>0</max_sessions>
             <script>try {&#13;
 //	Zabbix.Log(127, 'Pushover webhook script value='+value);&#13;
- &#13;
+&#13;
 	params = JSON.parse(value),&#13;
 	req = new CurlHttpRequest(),&#13;
 	fields = {};&#13;
- &#13;
-	req.AddHeader('Content-Type: application/json');&#13; &#13; fields.token= params.token;&#13;
+&#13;
+	req.AddHeader('Content-Type: application/json');&#13;
+&#13;
+	fields.token= params.token;&#13;
 	fields.user = params.user;&#13;
 &#13;
 &#13;
@@ -70,11 +72,11 @@
 	var resp = req.Post('https://api.pushover.net/1/messages.json',&#13;
 		JSON.stringify(fields)&#13;
 	);&#13;
- &#13;
+&#13;
 	if (req.Status() != 200) {&#13;
 		throw JSON.parse(resp).errors[0];&#13;
 	}&#13;
- &#13;
+&#13;
 	resp = JSON.parse(resp);&#13;
         return &quot;OK&quot;;&#13;
 &#13;
