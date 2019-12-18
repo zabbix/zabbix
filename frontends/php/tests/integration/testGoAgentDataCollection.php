@@ -421,7 +421,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'ListenPort' => PHPUNIT_PORT_PREFIX.'53',
-				'Plugins.SystemRun.EnableRemoteCommands' => '1',
+				'DenyKey' => 'placeholder', // Override default DenyKey=system.run[*] rule
 				'Plugins.Uptime.Capacity' => '10'
 			]
 		];
