@@ -696,7 +696,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results);
 
-void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
+int	perform_item_test(const struct zbx_json_parse *jp_data, char **info)
 {
 	char			tmp[MAX_STRING_LEN + 1], **pvalue, *fieldname, *addr;
 	DC_ITEM			item = {0};
@@ -704,15 +704,10 @@ void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *js
 	struct zbx_json_parse	jp_interface, jp_host;
 	AGENT_RESULT		result;
 	zbx_vector_ptr_t	add_results;
-	int			errcode;
+	int			errcode, ret = FAIL;
 
 	if (NULL == table_items)
 		table_items = DBget_table("items");
-
-	if (SUCCEED == zbx_json_value_by_name(jp_data, ZBX_PROTO_TAG_PROXY_HOSTID, tmp, sizeof(tmp), NULL))
-		ZBX_STR2UINT64(item.host.proxy_hostid, tmp);
-	else
-		item.host.proxy_hostid = 0;
 
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_TYPE, table_items, "type", &item.type);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, table_items, "value_type", &item.value_type);
@@ -846,9 +841,6 @@ void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *js
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK, table_hosts, "tls_psk", item.host.tls_psk,
 			sizeof(item.host.tls_psk));
 #endif
-	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
-	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
-
 	zbx_vector_ptr_create(&add_results);
 
 	prepare_items(&item, &errcode, 1, &result, MACRO_EXPAND_NO);
@@ -858,21 +850,20 @@ void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *js
 	{
 		case SUCCEED:
 			if (NULL == (pvalue = GET_TEXT_RESULT(&result)))
-				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, "no value", ZBX_JSON_TYPE_STRING);
+			{
+				*info = zbx_strdup(NULL, "no value");
+			}
 			else
-				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, *pvalue, ZBX_JSON_TYPE_STRING);
+			{
+				*info = zbx_strdup(NULL, *pvalue);
+				ret = SUCCEED;
+			}
 			break;
 		default:
 			if (NULL == (pvalue = GET_MSG_RESULT(&result)))
-			{
-				char	*error;
-
-				error = zbx_dsprintf(NULL, "unknown error with code %d", errcode);
-				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
-				zbx_free(error);
-			}
+				*info = zbx_dsprintf(NULL, "unknown error with code %d", errcode);
 			else
-				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, *pvalue, ZBX_JSON_TYPE_STRING);
+				*info = zbx_strdup(NULL, *pvalue);
 	}
 
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
@@ -884,6 +875,8 @@ void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *js
 	zbx_free(item.params);
 	zbx_free(item.posts);
 	zbx_free(item.headers);
+
+	return ret;
 }
 
 static void	recv_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
@@ -892,6 +885,10 @@ static void	recv_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
 	struct zbx_json		json;
+	char			tmp[MAX_ID_LEN + 1];
+	zbx_uint64_t		proxy_hostid;
+	int			ret;
+	char			*info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -914,7 +911,20 @@ static void	recv_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zbx_json_init(&json, 1024);
 
-	perform_item_test(&jp_data, &json);
+	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXY_HOSTID, tmp, sizeof(tmp), NULL))
+		ZBX_STR2UINT64(proxy_hostid, tmp);
+	else
+		proxy_hostid = 0;
+
+	if (0 == proxy_hostid)
+		ret = perform_item_test(&jp_data, &info);
+	else
+		ret = zbx_tm_execute_task_data("foo", proxy_hostid, &info);
+
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
+	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
+	zbx_json_addstring(&json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info,
+			ZBX_JSON_TYPE_STRING);
 
 	zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, CONFIG_TIMEOUT);
 

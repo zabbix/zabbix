@@ -1107,21 +1107,20 @@ static zbx_uint64_t	zbx_create_task_data(const char *data, zbx_uint64_t proxy_ho
 	return taskid;
 }
 
-int	zbx_tm_execute_task_data(const char *data, zbx_uint64_t proxy_hostid, char **info, char *error,
-		size_t max_error_len)
+int	zbx_tm_execute_task_data(const char *data, zbx_uint64_t proxy_hostid, char **info)
 {
 	zbx_uint64_t	taskid;
 
 	if (0 == (taskid = zbx_create_task_data(data, proxy_hostid)))
 	{
-		zbx_snprintf(error, max_error_len, "Cannot create task.");
+		*info = zbx_strdup(NULL, "Cannot create task.");
 		return FAIL;
 	}
 
-	return zbx_tm_task_result_wait(taskid, ZBX_TM_TASK_DATA_RESULT, info, error, max_error_len);
+	return zbx_tm_task_result_wait(taskid, ZBX_TM_TASK_DATA_RESULT, info);
 }
 
-int	zbx_tm_task_result_wait(zbx_uint64_t taskid, int type, char **info, char *error, size_t max_error_len)
+int	zbx_tm_task_result_wait(zbx_uint64_t taskid, int type, char **info)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1137,7 +1136,7 @@ int	zbx_tm_task_result_wait(zbx_uint64_t taskid, int type, char **info, char *er
 			table = "task_remote_command_result";
 			break;
 		default:
-			zbx_snprintf(error, max_error_len, "Unknown task: %d", type);
+			*info = zbx_dsprintf(NULL, "Unknown task: %d", type);
 			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;
 	}
@@ -1154,13 +1153,9 @@ int	zbx_tm_task_result_wait(zbx_uint64_t taskid, int type, char **info, char *er
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			if (SUCCEED == (ret = atoi(row[0])))
-				*info = zbx_strdup(*info, row[1]);
-			else
-			{
-				zbx_strlcpy(error, row[1], max_error_len);
+			*info = zbx_strdup(NULL, row[1]);
+			if (SUCCEED != (ret = atoi(row[0])))
 				ret = FAIL;
-			}
 
 			DBfree_result(result);
 			return ret;
@@ -1169,7 +1164,7 @@ int	zbx_tm_task_result_wait(zbx_uint64_t taskid, int type, char **info, char *er
 		DBfree_result(result);
 	}
 
-	zbx_snprintf(error, max_error_len, "Timeout while waiting for result.");
+	*info = zbx_strdup(NULL, "Timeout while waiting for result.");
 
 	return FAIL;
 }
