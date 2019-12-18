@@ -151,7 +151,7 @@ class CPagerHelper {
 				(new CTag('nav', true))
 					->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
 					->setAttribute('role', 'navigation')
-					->setAttribute('aria-label', _('Pager'))
+					->setAttribute('aria-label', _x('Pager', 'page navigation'))
 					->addItem(self::createLinks($page, $num_pages, $url))
 					->addItem(
 						(new CDiv())
