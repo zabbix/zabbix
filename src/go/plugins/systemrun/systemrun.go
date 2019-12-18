@@ -29,10 +29,9 @@ import (
 )
 
 type Options struct {
-	Timeout              int `conf:"optional,range=1:30"`
-	Capacity             int `conf:"optional,range=1:100"`
-	LogRemoteCommands    int `conf:"optional,range=0:1,default=0"`
-	EnableRemoteCommands int `conf:"optional,range=0:1,default=0"`
+	Timeout           int `conf:"optional,range=1:30"`
+	Capacity          int `conf:"optional,range=1:100"`
+	LogRemoteCommands int `conf:"optional,range=0:1,default=0"`
 }
 
 // Plugin -
@@ -59,10 +58,6 @@ func (p *Plugin) Validate(options interface{}) error {
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if p.options.EnableRemoteCommands != 1 {
-		return nil, fmt.Errorf("Remote commands are not enabled.")
-	}
-
 	if len(params) > 2 {
 		return nil, fmt.Errorf("Too many parameters.")
 	}

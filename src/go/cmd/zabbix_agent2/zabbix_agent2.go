@@ -32,6 +32,7 @@ import (
 	_ "zabbix.com/plugins"
 
 	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/remotecontrol"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/agent/serverconnector"
@@ -283,6 +284,13 @@ func main() {
 		// create default configuration for testing options
 		if !argConfig {
 			_ = conf.Unmarshal([]byte{}, &agent.Options)
+		}
+	}
+
+	if len(agent.Options.KeyAccessRules) != 0 {
+		if err := keyaccess.LoadRules(agent.Options.KeyAccessRules); err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to load key access rules: %s\n", err.Error())
+			os.Exit(1)
 		}
 	}
 

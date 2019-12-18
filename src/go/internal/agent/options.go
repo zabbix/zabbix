@@ -28,6 +28,7 @@ import (
 	"strings"
 	"unicode"
 
+	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/tls"
 )
@@ -66,6 +67,8 @@ type AgentOptions struct {
 	TLSKeyFile           string   `conf:"optional"`
 	TLSServerCertIssuer  string   `conf:"optional"`
 	TLSServerCertSubject string   `conf:"optional"`
+
+	KeyAccessRules []keyaccess.Record `conf:"optional"`
 
 	Plugins map[string]interface{} `conf:"optional"`
 }

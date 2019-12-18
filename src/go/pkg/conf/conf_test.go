@@ -414,7 +414,6 @@ func TestInterface(t *testing.T) {
 		LogLevel = 3
 		Timeout = 10
 		Plugins.Log.MaxLinesPerSecond = 25
-		Plugins.SystemRun.EnableRemoteCommands = 1
 		Plugins.Redis.Enable = 1
 		Plugins.Redis.Sessions.Server1.Address = 127.0.0.1
 		Plugins.Redis.Sessions.Server2.Address = 127.0.0.2
@@ -443,4 +442,22 @@ func TestInterface(t *testing.T) {
 	if !reflect.DeepEqual(expectedOpts, returnedOpts) {
 		t.Errorf("Expected %+v while got %+v", expectedOpts, returnedOpts)
 	}
+}
+
+func TestKeyAccessRules(t *testing.T) {
+	type KeyAccessRule struct {
+		Pattern string
+		Deny    bool
+	}
+	type Options struct {
+		KeyAccessRules []KeyAccessRule `conf:"optional"`
+	}
+	input := `
+		AllowKey=system.localtime
+		AllowKey=vfs.*[*]
+		DenyKey=*`
+
+	var options Options
+	var expected Options = Options{[]KeyAccessRule{{"system.localtime", false}, {"vfs.*[*]", false}, {"*", true}}}
+	checkUnmarshal(t, []byte(input), &expected, &options)
 }

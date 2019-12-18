@@ -398,6 +398,7 @@ func loadInclude(root *Node, path string) (err error) {
 func parseConfig(root *Node, data []byte) (err error) {
 	const maxStringLen = 2048
 	var line []byte
+	var keyAccessRule int = 0
 
 	root.level++
 
@@ -432,6 +433,17 @@ func parseConfig(root *Node, data []byte) (err error) {
 			if err = loadInclude(root, string(value)); err != nil {
 				return
 			}
+		} else if string(key) == "AllowKey" || string(key) == "DenyKey" {
+			var ruleType []byte
+
+			if string(key) == "DenyKey" {
+				ruleType = []byte("true")
+			} else {
+				ruleType = []byte("false")
+			}
+			root.add([]byte(fmt.Sprintf("KeyAccessRules.%d.Pattern", keyAccessRule)), value, num)
+			root.add([]byte(fmt.Sprintf("KeyAccessRules.%d.Deny", keyAccessRule)), []byte(ruleType), num)
+			keyAccessRule++
 		} else {
 			root.add(key, value, num)
 		}
@@ -444,7 +456,7 @@ func parseConfig(root *Node, data []byte) (err error) {
 // a byte array ([]byte) with configuration file or interface{} either returned by Marshal
 // or a configuration file Unmarshaled into interface{} variable before.
 // The third is optional 'strict' parameter that forces strict validation of configuration
-// and structure fields (enabled by efault). When disabled it will unmarshal part of
+// and structure fields (enabled by default). When disabled it will unmarshal part of
 // configuration into incomplete target structures.
 func Unmarshal(data interface{}, v interface{}, args ...interface{}) (err error) {
 	rv := reflect.ValueOf(v)
