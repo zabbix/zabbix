@@ -443,7 +443,7 @@ elseif (hasRequest('filter_hostid')) {
 		(new CFilter(new CUrl('report2.php')))
 			->setProfile($data['filter']['timeline']['profileIdx'])
 			->setActiveTab($data['filter']['active_tab'])
-			->addFormItem((new CVar('config', $availabilityReportMode))->removeId())
+			->addFormItem((new CVar('mode', $availabilityReportMode))->removeId())
 			->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], true,
 				ZBX_DATE_TIME)
 			->addFilterTab(_('Filter'), [$filter_column])

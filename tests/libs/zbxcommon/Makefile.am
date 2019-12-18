@@ -18,7 +18,8 @@ SERVER_tests = \
 	zbx_str_extract \
 	convert_to_utf8 \
 	zbx_truncate_itemkey \
-	zbx_truncate_value
+	zbx_truncate_value \
+	zbx_dyn_escape_string
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -355,5 +356,19 @@ zbx_truncate_value_LDADD += @SERVER_LIBS@
 zbx_truncate_value_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_truncate_value_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_dyn_escape_string_SOURCES = \
+	zbx_dyn_escape_string.c \
+	$(COMMON_SRC_FILES)
+
+zbx_dyn_escape_string_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_dyn_escape_string_LDADD += @SERVER_LIBS@
+
+zbx_dyn_escape_string_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_dyn_escape_string_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

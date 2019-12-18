@@ -814,6 +814,10 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"AllowKey",			load_key_access_rule,			TYPE_CUSTOM,
+			PARM_OPT,	0,			0},
+		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -837,6 +841,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		zbx_set_data_destination_hosts(active_hosts, add_serveractive_host_cb);
 
 	zbx_free(active_hosts);
+	finalize_key_access_rules_configuration();
 
 	if (ZBX_CFG_FILE_REQUIRED == requirement)
 	{

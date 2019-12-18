@@ -31,7 +31,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Test create with all fields',
-					'select_tag' => 'New event tag',
+					'select_tag' => 'New event tag name',
 					'tag' => 'Test tag',
 					'description' => 'Event correlation with description',
 					'operation' => [
@@ -42,7 +42,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Test create with minimum fields',
-					'select_tag' => 'Old event tag',
+					'select_tag' => 'Old event tag name',
 					'tag' => 'Test tag',
 					'operation' => [
 						'Close old event'
@@ -52,7 +52,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Test create with both operations selected',
-					'select_tag' => 'Old event tag',
+					'select_tag' => 'Old event tag name',
 					'tag' => 'Test tag',
 					'operation' => [
 						'Close old event',
@@ -378,7 +378,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Test empty New event tag',
-					'select_tag' => 'New event tag',
+					'select_tag' => 'New event tag name',
 					'error_message' => 'Incorrect value for field "tag": cannot be empty.'
 				]
 			],
@@ -460,8 +460,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Test create with calculation And/Or',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1'],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
 					]
 				]
 			],
@@ -469,8 +469,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Test create with calculation And',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1'],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2']
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					],
 					'calculation' => 'And'
 				]
@@ -479,8 +479,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Test create with calculation OR',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1'],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
 					],
 					'calculation' => 'Or'
 				]
@@ -489,9 +489,9 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Test create with calculation Custom',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1'],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2'],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag3'],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag3'],
 
 					],
 				'calculation' => 'Custom expression',
@@ -548,8 +548,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Test create with empty expression',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
 					],
 					'formula'=> '',
 					'error_message' => 'Incorrect custom expression "" for correlation "Test create with empty expression": expression is empty.'
@@ -559,8 +559,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Test create with missing argument',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
 						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> 'A or B',
@@ -571,8 +571,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Test create with extra argument',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
 						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> '(A or B) and (C or D)',
@@ -583,8 +583,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Test create with wrong formula',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
 						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> 'Wrong formula',
@@ -595,8 +595,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Check case sensitive of operator in formula',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
 					],
 					'formula'=> 'A and Not B',
 					'error_message' => 'Incorrect custom expression "A and Not B" for correlation "Check case sensitive of operator in formula": check expression starting from "Not B".'
@@ -606,8 +606,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Check case sensitive of first operator in formula',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
 					],
 					'formula'=> 'NOT A and not B',
 					'error_message' => 'Incorrect custom expression "NOT A and not B" for correlation "Check case sensitive of first operator in formula": check expression starting from " A and not B".'
@@ -617,8 +617,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 				[
 					'name' => 'Test create with only NOT in formula',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
 					],
 					'formula'=> 'not A not B',
 					'error_message' => 'Incorrect custom expression "not A not B" for correlation "Test create with only NOT in formula": check expression starting from " not B".'
@@ -724,7 +724,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition_type'));
-		$this->zbxTestDropdownSelectWait('condition_type', 'New event tag');
+		$this->zbxTestDropdownSelectWait('condition_type', 'New event tag name');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 		$this->zbxTestInputTypeOverwrite('tag', 'New update tag');
 		$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-footer']//button[text()='Add']");

@@ -175,7 +175,7 @@ class CDashboardWidgetMap extends CDiv {
 		}
 
 		if ($this->sysmap_data && $this->error === null) {
-			$this->sysmap_data['container'] = "#map_{$this->uniqueid}";
+			$this->sysmap_data['container'] = '#map_'.$this->uniqueid;
 
 			$script_run .= 'jQuery(function($) {'.
 				'$("#'.$this->getId().'").zbx_mapwidget({'.

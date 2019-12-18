@@ -414,6 +414,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::COMPONENT_AGENT,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'DenyKey' => 'placeholder', // Override default DenyKey=system.run[*] rule
 				'EnableRemoteCommands' => '1'
 			],
 			self::COMPONENT_AGENT2 => [

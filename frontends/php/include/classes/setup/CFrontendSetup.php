@@ -253,7 +253,7 @@ class CFrontendSetup {
 			'current' => empty($current) ? _('off') : new CSpan($current),
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _('At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported.')
+			'error' => _('At least one of MySQL, PostgreSQL or Oracle should be supported.')
 		];
 	}
 
@@ -279,12 +279,6 @@ class CFrontendSetup {
 				'oci_fetch_assoc', 'oci_field_type', 'oci_free_statement', 'oci_new_descriptor', 'oci_parse',
 				'oci_rollback'])) {
 			$allowed_db[ZBX_DB_ORACLE] = 'Oracle';
-		}
-
-		if (zbx_is_callable(['db2_autocommit', 'db2_bind_param', 'db2_close', 'db2_commit', 'db2_conn_errormsg',
-				'db2_connect', 'db2_escape_string', 'db2_execute', 'db2_fetch_assoc', 'db2_free_result', 'db2_prepare',
-				'db2_rollback', 'db2_set_option', 'db2_stmt_errormsg'])) {
-			$allowed_db[ZBX_DB_DB2] = 'IBM DB2';
 		}
 
 		return $allowed_db;

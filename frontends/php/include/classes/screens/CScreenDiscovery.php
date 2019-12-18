@@ -153,7 +153,7 @@ class CScreenDiscovery extends CScreenBase {
 					$hostName = '';
 
 					$host = reset($dservices[$dservice['dserviceid']]['hosts']);
-					if (!is_null($host)) {
+					if ($host) {
 						$hostName = $host['name'];
 					}
 
