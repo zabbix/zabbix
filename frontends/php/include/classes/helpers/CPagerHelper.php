@@ -148,8 +148,10 @@ class CPagerHelper {
 		return (new CDiv())
 			->addClass(ZBX_STYLE_TABLE_PAGING)
 			->addItem(
-				(new CDiv())
+				(new CTag('nav', true))
 					->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+					->setAttribute('role', 'navigation')
+					->setAttribute('aria-label', _('Pager'))
 					->addItem(self::createLinks($page, $num_pages, $url))
 					->addItem(
 						(new CDiv())
@@ -177,7 +179,8 @@ class CPagerHelper {
 
 			if ($start_page > 1) {
 				$url->removeArgument('page');
-				$tags[] = new CLink(_x('First', 'page navigation'), $url->getUrl());
+				$tags[] = (new CLink(_x('First', 'page navigation'), $url->getUrl()))
+					->setAttribute('aria-label', _('Go to first page'));
 			}
 
 			if ($page > 1) {
@@ -187,7 +190,8 @@ class CPagerHelper {
 				else {
 					$url->setArgument('page', $page - 1);
 				}
-				$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl());
+				$tags[] = (new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl()))
+					->setAttribute('aria-label', _s('Go to previous page, %1$s', $page - 1));
 			}
 
 			for ($i = $start_page; $i <= $end_page; $i++) {
@@ -200,7 +204,13 @@ class CPagerHelper {
 
 				$link = new CLink($i, $url->getUrl());
 				if ($i == $page) {
-					$link->addClass(ZBX_STYLE_PAGING_SELECTED);
+					$link
+						->addClass(ZBX_STYLE_PAGING_SELECTED)
+						->setAttribute('aria-label', _s('Go to page %1$s, current page', $i))
+						->setAttribute('aria-current', 'true');
+				}
+				else {
+					$link->setAttribute('aria-label', _s('Go to page %1$s', $i));
 				}
 
 				$tags[] = $link;
@@ -208,12 +218,14 @@ class CPagerHelper {
 
 			if ($page < $num_pages) {
 				$url->setArgument('page', $page + 1);
-				$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl());
+				$tags[] = (new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl()))
+					->setAttribute('aria-label', _s('Go to next page, %1$s', $page + 1));
 			}
 
 			if ($end_page < $num_pages) {
 				$url->setArgument('page', $num_pages);
-				$tags[] = new CLink(_x('Last', 'page navigation'), $url->getUrl());
+				$tags[] = (new CLink(_x('Last', 'page navigation'), $url->getUrl()))
+					->setAttribute('aria-label', _s('Go to last page, %1$s', $num_pages));
 			}
 		}
 
