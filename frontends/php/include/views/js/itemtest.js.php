@@ -122,7 +122,7 @@
 			case <?= ITEM_TYPE_DB_MONITOR ?>:
 				properties = {
 					key: form_data['key'],
-					params: form_data['params_ap'],
+					params_ap: form_data['params_ap'],
 					username: form_data['username'],
 					password: form_data['password']
 				};
@@ -171,7 +171,7 @@
 				properties = {
 					key: form_data['key'],
 					authtype: form_data['authtype'],
-					params: form_data['params_es'],
+					params_es: form_data['params_es'],
 					interfaceid: form_data['interfaceid'],
 					username: form_data['username'],
 					password: form_data['password']
@@ -188,7 +188,7 @@
 			case <?= ITEM_TYPE_TELNET ?>:
 				properties = {
 					key: form_data['key'],
-					params: form_data['params_es'],
+					params_es: form_data['params_es'],
 					username: form_data['username'],
 					password: form_data['password'],
 					interfaceid: form_data['interfaceid']
@@ -207,7 +207,7 @@
 			case <?= ITEM_TYPE_CALCULATED ?>:
 				properties = {
 					key: form_data['key'],
-					params: form_data['params_f'],
+					params_f: form_data['params_f'],
 				};
 				break;
 

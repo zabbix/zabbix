@@ -292,7 +292,7 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_DB_MONITOR:
 				$data += [
 					'key' => $this->getInput('key'),
-					'params' => $this->getInput('params'),
+					'params_ap' => $this->getInput('params_ap'),
 					'username' => $this->getInput('username'),
 					'password' => $this->getInput('password')
 				];
@@ -350,7 +350,7 @@ abstract class CControllerPopupItemTest extends CController {
 				$data += [
 					'key' => $this->getInput('key'),
 					'authtype' => $this->getInput('authtype', ITEM_AUTHTYPE_PASSWORD),
-					'params' => $this->getInput('params', ''),
+					'params_es' => $this->getInput('params_es', ''),
 					'interface' => $this->getItemTestInterface($interface_input),
 					'username' => $this->getInput('username', ''),
 					'password' => $this->getInput('password', '')
@@ -369,7 +369,7 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_TELNET:
 				$data += [
 					'key' => $this->getInput('key'),
-					'params' => $this->getInput('params', ''),
+					'params_es' => $this->getInput('params_es', ''),
 					'publickey' => $this->getInput('publickey', ''),
 					'privatekey' => $this->getInput('privatekey', ''),
 					'interface' => $this->getItemTestInterface($interface_input)
@@ -390,7 +390,7 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_CALCULATED:
 				$data += [
 					'key' => $this->getInput('key'),
-					'params' => $this->getInput('params', ''),
+					'params_f' => $this->getInput('params_f', ''),
 					'value_type' => $this->getInput('value_type'),
 					'host' => [
 						'host' => $this->host['host']

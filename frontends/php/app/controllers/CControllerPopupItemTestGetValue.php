@@ -37,7 +37,9 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'item_type'				=> 'required|in '.implode(',', self::$testable_item_types),
 			'jmx_endpoint'			=> 'string',
 			'output_format'			=>	'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
-			'params'				=> 'string',
+			'params_ap'				=> 'string',
+			'params_es'				=> 'string',
+			'params_f'				=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
@@ -125,6 +127,12 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 		$data = $this->getItemTestProperties($this->getInputAll());
 		$data = $this->unsetEmptyValues($data);
+
+		$data = CArrayHelper::renameKeys($data, [
+			'params_ap' => 'params',
+			'params_es' => 'params',
+			'params_f' => 'params'
+		]);
 
 		$output = [
 			'user' => [

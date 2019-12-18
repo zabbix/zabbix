@@ -67,7 +67,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'jmx_endpoint'			=> 'string',
 			'macros'				=> 'array',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
-			'params'				=> 'string',
+			'params_ap'				=> 'string',
+			'params_es'				=> 'string',
+			'params_f'				=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
@@ -130,7 +132,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 
 			// Test interface properties.
-			if ($this->get_value_from_host) {
+			if ($this->get_value_from_host && in_array($this->item_type, $this->items_require_interface)) {
 				if (!array_key_exists('address', $interface) || $interface['address'] === '') {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
 					$ret = false;
@@ -233,6 +235,12 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		if ($this->get_value_from_host) {
 			$item_test_data = $this->getItemTestProperties($this->getInputAll());
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
+
+			$item_test_data = CArrayHelper::renameKeys($item_test_data, [
+				'params_ap' => 'params',
+				'params_es' => 'params',
+				'params_f' => 'params'
+			]);
 
 			// Send test to be executed on Zabbix server.
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
