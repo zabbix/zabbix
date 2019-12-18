@@ -401,12 +401,12 @@ else {
 		$page_num = 1;
 	}
 	else {
-		$page_num = CPagerHelper::fetch($page['file']);
+		$page_num = CPagerHelper::loadPage($page['file']);
 	}
 
-	CPagerHelper::store($page['file'], $page_num);
+	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['drules'], $sortOrder, new CUrl('discoveryconf.php'));
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['drules'], $sortOrder, new CUrl('discoveryconf.php'));
 
 	// render view
 	$discoveryView = new CView('configuration.discovery.list', $data);

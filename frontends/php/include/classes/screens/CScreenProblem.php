@@ -790,7 +790,7 @@ class CScreenProblem extends CScreenBase {
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
 
 		if ($this->data['action'] === 'problem.view') {
-			$paging = CPagerHelper::paginateRows($this->data['page'], $data['problems'], ZBX_SORT_UP, $url);
+			$paging = CPagerHelper::paginate($this->page, $data['problems'], ZBX_SORT_UP, $url);
 		}
 
 		$data = self::makeData($data, $this->data['filter'], true);

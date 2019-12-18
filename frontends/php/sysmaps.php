@@ -426,12 +426,12 @@ else {
 		$data['page'] = 1;
 	}
 	else {
-		$data['page'] = CPagerHelper::fetch($page['file']);
+		$data['page'] = CPagerHelper::loadPage($page['file']);
 	}
 
-	CPagerHelper::store($page['file'], $data['page']);
+	CPagerHelper::savePage($page['file'], $data['page']);
 
-	$data['paging'] = CPagerHelper::paginateRows($data['page'], $data['maps'], $sortOrder, new CUrl('sysmaps.php'));
+	$data['paging'] = CPagerHelper::paginate($data['page'], $data['maps'], $sortOrder, new CUrl('sysmaps.php'));
 
 	if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 		$editable_maps = API::Map()->get([

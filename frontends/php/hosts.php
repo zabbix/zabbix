@@ -1336,14 +1336,13 @@ else {
 		$page_num = 1;
 	}
 	else {
-		$page_num = CPagerHelper::fetch($page['file']);
+		$page_num = CPagerHelper::loadPage($page['file']);
 	}
 
-	CPagerHelper::store($page['file'], $page_num);
+	CPagerHelper::savePage($page['file'], $page_num);
 
-	$pagingLine = CPagerHelper::paginateRows($page_num, $hosts, $sortOrder,
-		(new CUrl('hosts.php'))
-			->setArgument('groupid', $pageFilter->groupid)
+	$pagingLine = CPagerHelper::paginate($page_num, $hosts, $sortOrder,
+		(new CUrl('hosts.php'))->setArgument('groupid', $pageFilter->groupid)
 	);
 
 	$hosts = API::Host()->get([

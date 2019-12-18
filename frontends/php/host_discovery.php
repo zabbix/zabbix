@@ -791,14 +791,13 @@ else {
 		$page_num = 1;
 	}
 	else {
-		$page_num = CPagerHelper::fetch($page['file']);
+		$page_num = CPagerHelper::loadPage($page['file']);
 	}
 
-	CPagerHelper::store($page['file'], $page_num);
+	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['discoveries'], $sortOrder,
-		(new CUrl('host_discovery.php'))
-			->setArgument('hostid', $data['hostid'])
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sortOrder,
+		(new CUrl('host_discovery.php'))->setArgument('hostid', $data['hostid'])
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);

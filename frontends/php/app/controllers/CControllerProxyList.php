@@ -103,8 +103,8 @@ class CControllerProxyList extends CController {
 		order_result($data['proxies'], $sortField, $sortOrder);
 
 		$page_num = getRequest('page', 1);
-		CPagerHelper::store('proxy.list', $page_num);
-		$data['paging'] = CPagerHelper::paginateRows($page_num, $data['proxies'], $sortOrder,
+		CPagerHelper::savePage('proxy.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['proxies'], $sortOrder,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 

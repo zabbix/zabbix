@@ -28,7 +28,6 @@ $options = [
 		'action' => $data['action'],
 		'sort' => $data['sort'],
 		'sortorder' => $data['sortorder'],
-		'page' => $data['page'],
 		'filter' => [
 			'show' => $data['filter']['show'],
 			'groupids' => $data['filter']['groupids'],

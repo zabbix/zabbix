@@ -87,7 +87,7 @@ class CScreenHttpTest extends CScreenBase {
 
 			order_result($httptests, $sort_field, $sort_order);
 
-			$paging = CPagerHelper::paginateRows($this->page, $httptests, $sort_order,
+			$paging = CPagerHelper::paginate($this->page, $httptests, $sort_order,
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'web.view')
 					->setArgument('groupid', $this->data['groupid'])

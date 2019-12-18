@@ -59,7 +59,7 @@ class CControllerValuemapDelete extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'valuemap.list')
-			->setArgument('page', CPagerHelper::fetch('valuemap.list', null))
+			->setArgument('page', CPagerHelper::loadPage('valuemap.list', null))
 		);
 
 		if ($result) {

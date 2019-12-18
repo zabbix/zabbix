@@ -74,22 +74,21 @@ if (!empty($this->data['graphid'])) {
 	// append chart to widget
 
 	if ($data['action'] === HISTORY_VALUES) {
-		$url = (new CUrl('charts.php'))
-			->setArgument('groupid', $data['groupid'])
-			->setArgument('hostid', $data['hostid'])
-			->setArgument('graphid', $data['graphid'])
-			->setArgument('action', $data['action'])
-			->getUrl();
-
 		$screen = CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_HISTORY,
 			'action' => HISTORY_VALUES,
 			'graphid' => $data['graphid'],
-			'pageFile' => $url,
+			'pageFile' => (new CUrl('charts.php'))
+				->setArgument('groupid', $data['groupid'])
+				->setArgument('hostid', $data['hostid'])
+				->setArgument('graphid', $data['graphid'])
+				->setArgument('action', $data['action'])
+				->getUrl(),
 			'profileIdx' => $data['timeline']['profileIdx'],
 			'profileIdx2' => $data['timeline']['profileIdx2'],
 			'from' => $data['timeline']['from'],
-			'to' => $data['timeline']['to']
+			'to' => $data['timeline']['to'],
+			'page' => $data['page']
 		]);
 	}
 	else {

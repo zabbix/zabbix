@@ -485,12 +485,12 @@ else {
 		$page_num = 1;
 	}
 	else {
-		$page_num = CPagerHelper::fetch($page['file']);
+		$page_num = CPagerHelper::loadPage($page['file']);
 	}
 
-	CPagerHelper::store($page['file'], $page_num);
+	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['correlations'], $sortOrder, new CUrl('correlation.php'));
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['correlations'], $sortOrder, new CUrl('correlation.php'));
 
 	// Render view.
 	$correlationView = new CView('configuration.correlation.list', $data);

@@ -44,6 +44,7 @@ $fields = [
 	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	// other
 	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
@@ -306,12 +307,12 @@ else {
 		$page_num = 1;
 	}
 	else {
-		$page_num = CPagerHelper::fetch($page['file']);
+		$page_num = CPagerHelper::loadPage($page['file']);
 	}
 
-	CPagerHelper::store($page['file'], $page_num);
+	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginateRows($page_num, $groups, $sortOrder, new CUrl('hostgroups.php'));
+	$data['paging'] = CPagerHelper::paginate($page_num, $groups, $sortOrder, new CUrl('hostgroups.php'));
 
 	$groupIds = zbx_objectValues($groups, 'groupid');
 

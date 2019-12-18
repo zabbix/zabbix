@@ -48,7 +48,9 @@ $scriptsForm = (new CForm())
 	->setName('scriptsForm')
 	->setId('scripts');
 
-$url = (new CUrl('zabbix.php'))->setArgument('action', 'script.list')->getUrl();
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'script.list')
+	->getUrl();
 
 $scriptsTable = (new CTableInfo())
 	->setHeader([

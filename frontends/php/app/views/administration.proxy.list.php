@@ -62,7 +62,9 @@ $proxyTable = (new CTableInfo())
 				->onClick("checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder'],
-			(new CUrl('zabbix.php'))->setArgument('action', 'proxy.list')->getUrl()
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'proxy.list')
+				->getUrl()
 		),
 		_('Mode'),
 		_('Encryption'),

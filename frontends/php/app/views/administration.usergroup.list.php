@@ -62,7 +62,9 @@ $table = (new CTableInfo())
 			'checkAll(\'%s\',\'all_groups\',\'usrgrpids\');', $form->getName()
 		))))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
-			(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')->getUrl()
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'usergroup.list')
+				->getUrl()
 		),
 		'#',
 		_('Members'),

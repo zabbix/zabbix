@@ -87,7 +87,7 @@ $tab_view = (new CTabView())->addTab('valuemap_tab', _('Value mapping'), $form_l
 // append buttons
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'valuemap.list')
-	->setArgument('page', CPagerHelper::fetch('valuemap.list', null))
+	->setArgument('page', CPagerHelper::loadPage('valuemap.list', null))
 ))->setId('cancel');
 
 if ($data['valuemapid'] != 0) {

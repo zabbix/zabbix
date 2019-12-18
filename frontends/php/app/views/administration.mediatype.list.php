@@ -56,7 +56,9 @@ $widget = (new CWidget())
 $mediaTypeForm = (new CForm())->setName('mediaTypesForm');
 
 // create table
-$url = (new CUrl('zabbix.php'))->setArgument('action', 'mediatype.list')->getUrl();
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'mediatype.list')
+	->getUrl();
 
 $mediaTypeTable = (new CTableInfo())
 	->setHeader([
@@ -159,6 +161,7 @@ $mediaTypeForm->addItem([
 				->setArgument('action', 'export.mediatypes.xml')
 				->setArgument('backurl', (new CUrl('zabbix.php'))
 					->setArgument('action', 'mediatype.list')
+					->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 					->getUrl())
 				->getUrl()
 		],

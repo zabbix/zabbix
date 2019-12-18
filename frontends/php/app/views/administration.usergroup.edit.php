@@ -208,7 +208,7 @@ if (!$data['form_refresh']) {
 
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'usergroup.list')
-	->setArgument('page', CPagerHelper::fetch('usergroup.list', null))
+	->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
 ))->setId('cancel');
 
 if ($data['usrgrpid'] != 0) {

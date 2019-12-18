@@ -94,7 +94,7 @@ class CControllerScriptUpdate extends CController {
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'script.list')
-				->setArgument('page', CPagerHelper::fetch('script.list', null))
+				->setArgument('page', CPagerHelper::loadPage('script.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Script updated'));

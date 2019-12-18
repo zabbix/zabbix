@@ -165,7 +165,7 @@ class CControllerMediatypeUpdate extends CController {
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'mediatype.list')
-				->setArgument('page', CPagerHelper::fetch('mediatype.list', null))
+				->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Media type updated'));

@@ -58,7 +58,7 @@ class CControllerProxyDelete extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'proxy.list')
-			->setArgument('page', CPagerHelper::fetch('proxy.list', null))
+			->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
 		);
 
 		if ($result) {

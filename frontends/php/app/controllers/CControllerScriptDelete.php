@@ -58,7 +58,7 @@ class CControllerScriptDelete extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'script.list')
-			->setArgument('page', CPagerHelper::fetch('script.list', null))
+			->setArgument('page', CPagerHelper::loadPage('script.list', null))
 		);
 
 		if ($result) {

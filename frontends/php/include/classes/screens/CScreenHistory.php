@@ -82,13 +82,6 @@ class CScreenHistory extends CScreenBase {
 	public $page_file;
 
 	/**
-	 * Current page number.
-	 *
-	 * @var int
-	 */
-	public $page;
-
-	/**
 	 * Init screen data.
 	 *
 	 * @param array		$options
@@ -115,8 +108,6 @@ class CScreenHistory extends CScreenBase {
 		$this->itemids = array_key_exists('itemids', $options) ?  $options['itemids'] : [];
 		$this->plaintext = isset($options['plaintext']) ? $options['plaintext'] : false;
 		$this->page_file = array_key_exists('pageFile', $options) ? $options['pageFile'] : null;
-
-		$this->page = getRequest('page', 1);
 
 		if (!$this->itemids && array_key_exists('graphid', $options)) {
 			$itemids = API::Item()->get([
@@ -450,7 +441,7 @@ class CScreenHistory extends CScreenBase {
 				}
 
 				// Array $history_data will be modified according page and rows on page.
-				$pagination = CPagerHelper::paginateRows($this->page, $history_data, ZBX_SORT_UP,
+				$pagination = CPagerHelper::paginate($this->page, $history_data, ZBX_SORT_UP,
 					new CUrl($this->page_file)
 				);
 

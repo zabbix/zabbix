@@ -126,7 +126,7 @@
 
 			// timeline params
 			// SCREEN_RESOURCE_HTTPTEST_DETAILS, SCREEN_RESOURCE_DISCOVERY, SCREEN_RESOURCE_HTTPTEST
-			if (jQuery.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
+			if ($.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
 				ajax_url.setArgument('from', screen.timeline.from);
 				ajax_url.setArgument('to', screen.timeline.to);
 			}
@@ -185,7 +185,6 @@
 							'filter': screen.data.filter,
 							'filter_task': screen.data.filterTask,
 							'mark_color': screen.data.markColor,
-							'page': screen.data.page,
 							'action': screen.data.action
 						}, function (ajax_key, value) {
 							if (!empty(value)) {
@@ -232,26 +231,16 @@
 				var screen = this.screens[id];
 
 				if (!empty(screen.id) && typeof screen.timeline !== 'undefined') {
-					screen.timeline = jQuery.extend(screen.timeline, {
+					screen.timeline = $.extend(screen.timeline, {
 						from: time_object.from,
 						to: time_object.to,
 						from_ts: time_object.from_ts,
 						to_ts: time_object.to_ts
 					});
 
-					// Reset pager on time range update.
-					switch (parseInt(screen.resourcetype)) {
-						// SCREEN_RESOURCE_HISTORY
-						case 17:
-							if (typeof screen.data.page !== 'undefined') {
-								screen.data.page = 1;
-							}
-							break;
-
-						// SCREEN_RESOURCE_PROBLEM
-						case 24:
-							screen.data.page = 1;
-							break;
+					// Reset pager on time range update (SCREEN_RESOURCE_HISTORY, SCREEN_RESOURCE_PROBLEM).
+					if ($.inArray(screen.resourcetype, [17, 24]) !== -1) {
+						screen.page = 1;
 					}
 
 					// restart refresh execution starting from Now

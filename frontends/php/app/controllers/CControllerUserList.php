@@ -129,8 +129,8 @@ class CControllerUserList extends CController {
 		CArrayHelper::sort($data['users'], [['field' => $sortfield, 'order' => $sortorder]]);
 
 		$page_num = getRequest('page', 1);
-		CPagerHelper::store('user.list', $page_num);
-		$data['paging'] = CPagerHelper::paginateRows($page_num, $data['users'], $sortorder,
+		CPagerHelper::savePage('user.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['users'], $sortorder,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 

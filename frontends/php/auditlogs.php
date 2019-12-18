@@ -166,7 +166,7 @@ if (!empty($data['actions'])) {
 }
 
 // get paging
-$data['paging'] = CPagerHelper::paginateRows(getRequest('page', 1), $data['actions'], ZBX_SORT_UP,
+$data['paging'] = CPagerHelper::paginate(getRequest('page', 1), $data['actions'], ZBX_SORT_UP,
 	new CUrl('auditlogs.php')
 );
 

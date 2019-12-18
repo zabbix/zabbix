@@ -172,20 +172,19 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 
 // create history screen
 if ($data['itemids']) {
-	$url = (new CUrl('history.php'))
-		->setArgument('action', $data['action'])
-		->setArgument('itemids', $data['itemids'])
-		->getUrl();
-
 	$screen = CScreenBuilder::getScreen([
 		'resourcetype' => SCREEN_RESOURCE_HISTORY,
 		'action' => $data['action'],
 		'itemids' => $data['itemids'],
-		'pageFile' => $url,
+		'pageFile' => (new CUrl('history.php'))
+			->setArgument('action', $data['action'])
+			->setArgument('itemids', $data['itemids'])
+			->getUrl(),
 		'profileIdx' => $data['profileIdx'],
 		'profileIdx2' => $data['profileIdx2'],
 		'from' => $data['from'],
 		'to' => $data['to'],
+		'page' => $data['page'],
 		'filter' => getRequest('filter'),
 		'filter_task' => getRequest('filter_task'),
 		'mark_color' => getRequest('mark_color'),

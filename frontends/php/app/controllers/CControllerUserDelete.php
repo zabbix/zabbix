@@ -48,7 +48,7 @@ class CControllerUserDelete extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'user.list')
-			->setArgument('page', CPagerHelper::fetch('user.list', null))
+			->setArgument('page', CPagerHelper::loadPage('user.list', null))
 		);
 
 		if ($result) {

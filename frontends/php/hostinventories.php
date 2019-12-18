@@ -267,14 +267,13 @@ else {
 		$page_num = 1;
 	}
 	else {
-		$page_num = CPagerHelper::fetch($page['file']);
+		$page_num = CPagerHelper::loadPage($page['file']);
 	}
 
-	CPagerHelper::store($page['file'], $page_num);
+	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginateRows($page_num, $data['hosts'], $sortOrder,
-		(new CUrl('hostinventories.php'))
-			->setArgument('groupid', $data['pageFilter']->groupid)
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['hosts'], $sortOrder,
+		(new CUrl('hostinventories.php'))->setArgument('groupid', $data['pageFilter']->groupid)
 	);
 
 	$hostinventoriesView = new CView('inventory.host.list', $data);

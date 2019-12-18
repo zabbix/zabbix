@@ -100,7 +100,7 @@ if (isset($_REQUEST['favobj'])) {
 
 				if ($result !== false) {
 					$url = (new CUrl('sysmaps.php'))
-						->setArgument('page', CPagerHelper::fetch('sysmaps.php', null))
+						->setArgument('page', CPagerHelper::loadPage('sysmaps.php', null))
 						->getUrl();
 
 					echo 'if (confirm('.CJs::encodeJson(_('Map is updated! Return?')).')) { location.href = "'.$url.'"; }';

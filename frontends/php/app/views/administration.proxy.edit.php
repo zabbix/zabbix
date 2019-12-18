@@ -121,7 +121,7 @@ $tabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 // append buttons to form
 $cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'proxy.list')
-	->setArgument('page', CPagerHelper::fetch('proxy.list', null))
+	->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
 ))->setId('cancel');
 
 if ($data['proxyid'] == 0) {

@@ -286,7 +286,7 @@ $form->addItem([
 					->setArgument('action', 'export.templates.xml')
 					->setArgument('backurl', (new CUrl('templates.php'))
 						->setArgument('groupid', $data['pageFilter']->groupid)
-						->setArgument('page', $data['page'])
+						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 						->getUrl())
 					->getUrl()
 			],

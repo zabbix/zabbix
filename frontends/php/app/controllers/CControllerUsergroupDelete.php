@@ -48,7 +48,7 @@ class CControllerUsergroupDelete extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'usergroup.list')
-			->setArgument('page', CPagerHelper::fetch('usergroup.list', null))
+			->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
 		);
 
 		if ($result) {

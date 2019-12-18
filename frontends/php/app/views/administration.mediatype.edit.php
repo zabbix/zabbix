@@ -308,7 +308,7 @@ $tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm);
 // append buttons to form
 $cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'mediatype.list')
-	->setArgument('page', CPagerHelper::fetch('mediatype.list', null))
+	->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
 ))->setId('cancel');
 
 if ($data['mediatypeid'] == 0) {

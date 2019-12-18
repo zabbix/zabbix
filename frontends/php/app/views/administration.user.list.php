@@ -75,7 +75,9 @@ $form = (new CForm())
 	->setId('users');
 
 // create users table
-$url = (new CUrl('zabbix.php'))->setArgument('action', 'user.list')->getUrl();
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'user.list')
+	->getUrl();
 
 $table = (new CTableInfo())
 	->setHeader([

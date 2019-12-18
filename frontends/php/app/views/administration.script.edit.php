@@ -117,7 +117,7 @@ $scriptView = (new CTabView())->addTab('scripts', _('Script'), $scriptFormList);
 // footer
 $cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'script.list')
-	->setArgument('page', CPagerHelper::fetch('script.list', null))
+	->setArgument('page', CPagerHelper::loadPage('script.list', null))
 ))->setId('cancel');
 
 if ($data['scriptid'] == 0) {

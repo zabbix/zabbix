@@ -30,24 +30,7 @@ class CPagerHelper {
 	const RANGE = 11;
 
 	/**
-	 * Create pagination line based on number of rows.
-	 *
-	 * @param int   $page      page to display
-	 * @param int   $num_rows  number of rows to paginate
-	 * @param CUrl  $url       data list URL
-	 *
-	 * @return CTag  paging line
-	 */
-	public static function paginate($page, $num_rows, CUrl $url) {
-		$data = self::prepareData($page, $num_rows);
-
-		return self::createPaging($data['page'], $data['num_rows'], $data['num_pages'], clone $url,
-			$data['limit_exceeded'], $data['rows_per_page']
-		);
-	}
-
-	/**
-	 * Create pagination line based on data rows and trim data rows accordingly.
+	 * Create paging line based on count of data rows and trim data rows accordingly.
 	 *
 	 * @param int     $page        page to display
 	 * @param array   $rows        data rows
@@ -56,10 +39,10 @@ class CPagerHelper {
 	 *
 	 * @return CTag  paging line
 	 */
-	public static function paginateRows($page, &$rows, $sort_order, CUrl $url) {
+	public static function paginate($page, &$rows, $sort_order, CUrl $url) {
 		$data = self::prepareData($page, count($rows));
 
-		$paging = self::createPaging($data['page'], $data['num_rows'], $data['num_pages'], clone $url,
+		$paging = self::render($data['page'], $data['num_rows'], $data['num_pages'], clone $url,
 			$data['limit_exceeded'], $data['rows_per_page']
 		);
 
@@ -76,32 +59,32 @@ class CPagerHelper {
 	}
 
 	/**
-	 * Store page number for given entity.
+	 * Save page number for given entity.
 	 *
 	 * @param string  $entity
 	 * @param int     $page
 	 */
-	public static function store($entity, $page) {
+	public static function savePage($entity, $page) {
 		CProfile::update('web.pager.entity', $entity, PROFILE_TYPE_STR);
 		CProfile::update('web.pager.page', $page, PROFILE_TYPE_INT);
 	}
 
 	/**
-	 * Fetch stored page number for given entity.
+	 * Load stored page number for given entity.
 	 *
 	 * @param string  $entity
 	 * @param mixed   $first_page  substitute return value for the first page
 	 *
 	 * @return mixed  page number (or the $first_page if wasn't stored or first page was stored)
 	 */
-	public static function fetch($entity, $first_page = 1) {
+	public static function loadPage($entity, $first_page = 1) {
 		if ($entity !== CProfile::get('web.pager.entity')) {
 			return $first_page;
 		}
 
 		$page = CProfile::get('web.pager.page', 1);
 
-		return ($page == 1 ? $first_page : $page);
+		return ($page == 1) ? $first_page : $page;
 	}
 
 	/**
@@ -112,7 +95,7 @@ class CPagerHelper {
 	 *
 	 * @return array
 	 */
-	private static function prepareData($page, $num_rows) {
+	protected static function prepareData($page, $num_rows) {
 		$rows_per_page = (int) CWebUser::$data['rows_per_page'];
 		$config = select_config();
 
@@ -139,7 +122,7 @@ class CPagerHelper {
 	}
 
 	/**
-	 * Create paging line.
+	 * Render paging line.
 	 *
 	 * @param int   $page            page number
 	 * @param int   $num_rows        number of rows
@@ -150,9 +133,7 @@ class CPagerHelper {
 	 *
 	 * @return CTag
 	 */
-	private static function createPaging($page, $num_rows, $num_pages, CUrl $url, $limit_exceeded, $rows_per_page) {
-		$tags = self::createPagingTags($page, $num_rows, $num_pages, $url);
-
+	protected static function render($page, $num_rows, $num_pages, CUrl $url, $limit_exceeded, $rows_per_page) {
 		$total = $limit_exceeded ? $num_rows.'+' : $num_rows;
 		$start = ($page - 1) * $rows_per_page;
 		$end = min($num_rows, $start + $rows_per_page);
@@ -169,7 +150,7 @@ class CPagerHelper {
 			->addItem(
 				(new CDiv())
 					->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-					->addItem($tags)
+					->addItem(self::createLinks($page, $num_pages, $url))
 					->addItem(
 						(new CDiv())
 							->addClass(ZBX_STYLE_TABLE_STATS)
@@ -182,13 +163,12 @@ class CPagerHelper {
 	 * Create paging tags for paging line.
 	 *
 	 * @param int   $page       page number
-	 * @param int   $num_rows   number of rows
 	 * @param int   $num_pages  number of pages
 	 * @param CUrl  $url        data list URL
 	 *
 	 * @return array
 	 */
-	private static function createPagingTags($page, $num_rows, $num_pages, CUrl $url) {
+	protected static function createLinks($page, $num_pages, CUrl $url) {
 		$tags = [];
 
 		if ($num_pages > 1) {
@@ -231,7 +211,7 @@ class CPagerHelper {
 				$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl());
 			}
 
-			if ($i < $num_pages) {
+			if ($end_page < $num_pages) {
 				$url->setArgument('page', $num_pages);
 				$tags[] = new CLink(_x('Last', 'page navigation'), $url->getUrl());
 			}

@@ -51,7 +51,7 @@ class CControllerDashboardDelete extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'dashboard.list')
-			->setArgument('page', CPagerHelper::fetch('dashboard.list', null))
+			->setArgument('page', CPagerHelper::loadPage('dashboard.list', null))
 		);
 
 		if ($result) {

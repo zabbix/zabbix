@@ -102,6 +102,7 @@ $data = [
 		HISTORY_VALUES => _('Values')
 	],
 	'timeline' => getTimeSelectorPeriod($timeselector_options),
+	'page' => getRequest('page', 1),
 	'active_tab' => CProfile::get('web.graphs.filter.active', 1)
 ];
 

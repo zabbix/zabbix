@@ -897,12 +897,12 @@ else {
 		$page_num = 1;
 	}
 	else {
-		$page_num = CPagerHelper::fetch($page['file']);
+		$page_num = CPagerHelper::loadPage($page['file']);
 	}
 
-	CPagerHelper::store($page['file'], $page_num);
+	CPagerHelper::savePage($page['file'], $page_num);
 
-	$paging = CPagerHelper::paginateRows($page_num, $templates, $sortOrder,
+	$paging = CPagerHelper::paginate($page_num, $templates, $sortOrder,
 		(new CUrl('templates.php'))->setArgument('groupid', getRequest('groupid', 0))
 	);
 

@@ -444,12 +444,12 @@ else {
 		$data['page'] = 1;
 	}
 	else {
-		$data['page'] = CPagerHelper::fetch($page['file']);
+		$data['page'] = CPagerHelper::loadPage($page['file']);
 	}
 
-	CPagerHelper::store($page['file'], $data['page']);
+	CPagerHelper::savePage($page['file'], $data['page']);
 
-	$data['paging'] = CPagerHelper::paginateRows($data['page'], $data['screens'], $sortOrder, new CUrl('screenconf.php'));
+	$data['paging'] = CPagerHelper::paginate($data['page'], $data['screens'], $sortOrder, new CUrl('screenconf.php'));
 
 	// render view
 	$screenView = new CView('monitoring.screen.list', $data);
