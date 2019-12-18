@@ -26,6 +26,7 @@
 #define ZBX_TASK_UPDATE_FREQUENCY	1
 
 #define ZBX_REMOTE_COMMAND_TTL		(SEC_PER_MIN * 10)
+#define ZBX_DATA_TTL			SEC_PER_MIN
 
 /* task manager task types */
 #define ZBX_TM_TASK_UNDEFINED				0
@@ -35,12 +36,17 @@
 #define ZBX_TM_TASK_ACKNOWLEDGE				4
 #define ZBX_TM_TASK_UPDATE_EVENTNAMES			5
 #define ZBX_TM_TASK_CHECK_NOW				6
+#define ZBX_TM_TASK_DATA				7
+#define ZBX_TM_TASK_DATA_RESULT				8
 
 /* task manager task states */
 #define ZBX_TM_STATUS_NEW			1
 #define ZBX_TM_STATUS_INPROGRESS		2
 #define ZBX_TM_STATUS_DONE			3
 #define ZBX_TM_STATUS_EXPIRED			4
+
+/* task data type */
+#define ZBX_TM_DATA_TYPE_TEST_ITEM		0
 
 /* the time period after which finished (done/expired) tasks are removed */
 #define ZBX_TM_CLEANUP_TASK_AGE			SEC_PER_DAY
@@ -64,11 +70,27 @@ zbx_tm_remote_command_t;
 
 typedef struct
 {
+	zbx_uint64_t	parent_taskid;
+	char		*data;
+	int		type;
+}
+zbx_tm_data_t;
+
+typedef struct
+{
 	int		status;
 	char		*info;
 	zbx_uint64_t	parent_taskid;
 }
 zbx_tm_remote_command_result_t;
+
+typedef struct
+{
+	int		status;
+	char		*info;
+	zbx_uint64_t	parent_taskid;
+}
+zbx_tm_data_result_t;
 
 typedef struct
 {

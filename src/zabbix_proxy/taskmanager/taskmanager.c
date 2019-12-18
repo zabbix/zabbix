@@ -194,6 +194,56 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	return processed_num;
 }
 
+static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_tm_task_t	*task = NULL;
+	int		ret = FAIL;
+	char		*info = NULL;
+	zbx_uint64_t	parent_taskid;
+
+	result = DBselect("select parent_taskid,data"
+				" from task_data"
+				" where taskid=" ZBX_FS_UI64,
+				taskid);
+
+	if (NULL == (row = DBfetch(result)))
+		goto finish;
+
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
+	ZBX_STR2UINT64(parent_taskid, row[0]);
+
+	if (1 || 0 != ttl && clock + ttl < now)
+	{
+		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "The task has been expired.");
+		goto finish;
+	}
+/*
+	if (SUCCEED != (ret = zbx_script_execute(&script, &host, &info, error, sizeof(error))))
+		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
+	else
+		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
+*/
+	zbx_free(info);
+finish:
+	DBfree_result(result);
+
+	DBbegin();
+
+	if (NULL != task)
+	{
+		zbx_tm_save_task(task);
+		zbx_tm_task_free(task);
+	}
+
+	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+
+	DBcommit();
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: tm_process_tasks                                                 *
@@ -217,9 +267,9 @@ static int	tm_process_tasks(int now)
 	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
 				" where status=%d"
-					" and type in (%d, %d)"
+					" and type in (%d, %d, %d)"
 				" order by taskid",
-			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_TASK_CHECK_NOW);
+			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_TASK_CHECK_NOW, ZBX_TM_TASK_DATA);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -236,6 +286,10 @@ static int	tm_process_tasks(int now)
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
 				zbx_vector_uint64_append(&check_now_taskids, taskid);
+				break;
+			case ZBX_TM_TASK_DATA:
+				if (SUCCEED == tm_execute_data(taskid, clock, ttl, now))
+					processed_num++;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;

@@ -58,6 +58,16 @@ static void	tm_remote_command_result_clear(zbx_tm_remote_command_result_t *data)
 	zbx_free(data->info);
 }
 
+static void	tm_data_result_clear(zbx_tm_data_result_t *data)
+{
+	zbx_free(data->info);
+}
+
+static void	tm_data_clear(zbx_tm_data_t *data)
+{
+	zbx_free(data->data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tm_task_clear                                                *
@@ -81,6 +91,12 @@ void	zbx_tm_task_clear(zbx_tm_task_t *task)
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
 				/* nothing to clear */
+				break;
+			case ZBX_TM_TASK_DATA:
+				tm_data_clear((zbx_tm_data_t *)task->data);
+				break;
+			case ZBX_TM_TASK_DATA_RESULT:
+				tm_data_result_clear((zbx_tm_data_result_t *)task->data);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -194,6 +210,30 @@ zbx_tm_check_now_t	*zbx_tm_check_now_create(zbx_uint64_t itemid)
 
 	data = (zbx_tm_check_now_t *)zbx_malloc(NULL, sizeof(zbx_tm_check_now_t));
 	data->itemid = itemid;
+
+	return data;
+}
+
+zbx_tm_data_t	*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, int type)
+{
+	zbx_tm_data_t	*data;
+
+	data = (zbx_tm_data_t *)zbx_malloc(NULL, sizeof(zbx_tm_data_t));
+	data->data = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(str));
+	data->parent_taskid = parent_taskid;
+	data->type = type;
+
+	return data;
+}
+
+zbx_tm_data_result_t	*zbx_tm_data_result_create(zbx_uint64_t parent_taskid, int status, const char *info)
+{
+	zbx_tm_data_result_t	*data;
+
+	data = (zbx_tm_data_result_t *)zbx_malloc(NULL, sizeof(zbx_tm_data_result_t));
+	data->status = status;
+	data->parent_taskid = parent_taskid;
+	data->info = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(info));
 
 	return data;
 }
@@ -362,6 +402,60 @@ static int	tm_save_check_now_tasks(zbx_tm_task_t **tasks, int tasks_num)
 	return ret;
 }
 
+static int	tm_save_data_tasks(zbx_tm_task_t **tasks, int tasks_num)
+{
+	int		i, ret;
+	zbx_db_insert_t	db_insert;
+	zbx_tm_data_t	*data;
+
+	zbx_db_insert_prepare(&db_insert, "task_data", "taskid", "type", "data", "parent_taskid", NULL);
+
+	for (i = 0; i < tasks_num; i++)
+	{
+		zbx_tm_task_t	*task = tasks[i];
+
+		switch (task->type)
+		{
+			case ZBX_TM_TASK_DATA:
+				data = (zbx_tm_data_t *)task->data;
+				zbx_db_insert_add_values(&db_insert, task->taskid, data->type, data->data,
+						data->parent_taskid);
+		}
+	}
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	tm_save_data_result_tasks(zbx_tm_task_t **tasks, int tasks_num)
+{
+	int			i, ret;
+	zbx_db_insert_t		db_insert;
+	zbx_tm_data_result_t	*data;
+
+	zbx_db_insert_prepare(&db_insert, "task_result", "taskid", "status", "parent_taskid", "info", NULL);
+
+	for (i = 0; i < tasks_num; i++)
+	{
+		zbx_tm_task_t	*task = tasks[i];
+
+		switch (task->type)
+		{
+			case ZBX_TM_TASK_DATA_RESULT:
+				data = (zbx_tm_data_result_t *)task->data;
+				zbx_db_insert_add_values(&db_insert, task->taskid, data->status, data->parent_taskid,
+						data->info);
+		}
+	}
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: tm_save_tasks                                                    *
@@ -377,7 +471,8 @@ static int	tm_save_check_now_tasks(zbx_tm_task_t **tasks, int tasks_num)
  ******************************************************************************/
 static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 {
-	int		i, ret, remote_command_num = 0, remote_command_result_num = 0, check_now_num = 0, ids_num = 0;
+	int		i, ret, remote_command_num = 0, remote_command_result_num = 0, check_now_num = 0, ids_num = 0,
+			data_num = 0, data_result_num = 0;
 	zbx_uint64_t	taskid;
 	zbx_db_insert_t	db_insert;
 
@@ -402,6 +497,12 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
 				check_now_num++;
+				break;
+			case ZBX_TM_TASK_DATA:
+				data_num++;
+				break;
+			case ZBX_TM_TASK_DATA_RESULT:
+				data_result_num++;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -434,6 +535,12 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 
 	if (SUCCEED == ret && 0 != check_now_num)
 		ret = tm_save_check_now_tasks(tasks, tasks_num);
+
+	if (SUCCEED == ret && 0 != data_num)
+		ret = tm_save_data_tasks(tasks, tasks_num);
+
+	if (SUCCEED == ret && 0 != data_result_num)
+		ret = tm_save_data_result_tasks(tasks, tasks_num);
 
 	return ret;
 }
@@ -596,6 +703,20 @@ static void	tm_json_serialize_check_now(struct zbx_json *json, const zbx_tm_chec
 	zbx_json_addint64(json, ZBX_PROTO_TAG_ITEMID, data->itemid);
 }
 
+static void	tm_json_serialize_data(struct zbx_json *json, const zbx_tm_data_t *data)
+{
+	zbx_json_adduint64(json, ZBX_PROTO_TAG_TYPE, data->type);
+	zbx_json_adduint64(json, ZBX_PROTO_TAG_PARENT_TASKID, data->parent_taskid);
+	zbx_json_addstring(json, ZBX_PROTO_TAG_DATA, data->data, ZBX_JSON_TYPE_STRING);
+}
+
+static void	tm_json_serialize_data_result(struct zbx_json *json, const zbx_tm_data_result_t *data)
+{
+	zbx_json_addint64(json, ZBX_PROTO_TAG_STATUS, data->status);
+	zbx_json_addstring(json, ZBX_PROTO_TAG_INFO, data->info, ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(json, ZBX_PROTO_TAG_PARENT_TASKID, data->parent_taskid);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tm_json_serialize_tasks                                      *
@@ -629,6 +750,12 @@ void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
 				tm_json_serialize_check_now(json, (zbx_tm_check_now_t *)task->data);
+				break;
+			case ZBX_TM_TASK_DATA:
+				tm_json_serialize_data(json, (zbx_tm_data_t *)task->data);
+				break;
+			case ZBX_TM_TASK_DATA_RESULT:
+				tm_json_serialize_data_result(json, (zbx_tm_data_result_t *)task->data);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -797,6 +924,66 @@ static zbx_tm_check_now_t	*tm_json_deserialize_check_now(const struct zbx_json_p
 	return zbx_tm_check_now_create(itemid);
 }
 
+static zbx_tm_data_t	*tm_json_deserialize_data(const struct zbx_json_parse *jp)
+{
+	char		*str = NULL, value[MAX_ID_LEN + 1];
+	size_t		str_alloc = 0;
+	zbx_tm_data_t	*data = NULL;
+	zbx_uint64_t	parent_taskid;
+	int		type;
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_DATA, &str, &str_alloc, NULL))
+		goto out;
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value), NULL) ||
+			SUCCEED != is_uint64(value, &parent_taskid))
+	{
+		goto out;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, value, sizeof(value), NULL))
+	{
+		goto out;
+	}
+	type = atoi(value);
+
+	data = zbx_tm_data_create(parent_taskid, str, type);
+out:
+	zbx_free(str);
+
+	return data;
+}
+
+static zbx_tm_data_result_t	*tm_json_deserialize_data_result(const struct zbx_json_parse *jp)
+{
+	char				value[MAX_STRING_LEN];
+	int				status;
+	zbx_uint64_t			parent_taskid;
+	char				*info = NULL;
+	size_t				info_alloc = 0;
+	zbx_tm_data_result_t		*data = NULL;
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_STATUS, value, sizeof(value), NULL))
+		goto out;
+
+	status = atoi(value);
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value), NULL) ||
+			SUCCEED != is_uint64(value, &parent_taskid))
+	{
+		goto out;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc, NULL))
+		goto out;
+
+	data = zbx_tm_data_result_create(parent_taskid, status, info);
+out:
+	zbx_free(info);
+
+	return data;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: tm_json_deserialize_task                                         *
@@ -875,6 +1062,12 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 			case ZBX_TM_TASK_CHECK_NOW:
 				task->data = tm_json_deserialize_check_now(&jp_task);
 				break;
+			case ZBX_TM_TASK_DATA:
+				task->data = tm_json_deserialize_data(&jp_task);
+				break;
+			case ZBX_TM_TASK_DATA_RESULT:
+				task->data = tm_json_deserialize_data_result(&jp_task);
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;
@@ -890,3 +1083,94 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 		zbx_vector_ptr_append(tasks, task);
 	}
 }
+
+static zbx_uint64_t	zbx_create_task_data(const char *data, zbx_uint64_t proxy_hostid)
+{
+	zbx_tm_task_t	*task;
+	zbx_uint64_t	taskid;
+
+	taskid = DBget_maxid("task");
+
+	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), ZBX_DATA_TTL, proxy_hostid);
+
+	task->data = zbx_tm_data_create(task->taskid, data, ZBX_TM_DATA_TYPE_TEST_ITEM);
+
+	DBbegin();
+
+	if (FAIL == zbx_tm_save_task(task))
+		taskid = 0;
+
+	DBcommit();
+
+	zbx_tm_task_free(task);
+
+	return taskid;
+}
+
+int	zbx_tm_execute_task_data(const char *data, zbx_uint64_t proxy_hostid, char **info, char *error,
+		size_t max_error_len)
+{
+	zbx_uint64_t	taskid;
+
+	if (0 == (taskid = zbx_create_task_data(data, proxy_hostid)))
+	{
+		zbx_snprintf(error, max_error_len, "Cannot create task.");
+		return FAIL;
+	}
+
+	return zbx_tm_task_result_wait(taskid, ZBX_TM_TASK_DATA_RESULT, info, error, max_error_len);
+}
+
+int	zbx_tm_task_result_wait(zbx_uint64_t taskid, int type, char **info, char *error, size_t max_error_len)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret, time_start;
+	const char	*table;
+
+	switch (type)
+	{
+		case ZBX_TM_TASK_DATA_RESULT:
+			table = "task_result";
+			break;
+		case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
+			table = "task_remote_command_result";
+			break;
+		default:
+			zbx_snprintf(error, max_error_len, "Unknown task: %d", type);
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	for (time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
+	{
+		result = DBselect(
+				"select tr.status,tr.info"
+				" from task t"
+				" join %s tr"
+					" on tr.taskid=t.taskid"
+				" where tr.parent_taskid=" ZBX_FS_UI64,
+				table, taskid);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			if (SUCCEED == (ret = atoi(row[0])))
+				*info = zbx_strdup(*info, row[1]);
+			else
+			{
+				zbx_strlcpy(error, row[1], max_error_len);
+				ret = FAIL;
+			}
+
+			DBfree_result(result);
+			return ret;
+		}
+
+		DBfree_result(result);
+	}
+
+	zbx_snprintf(error, max_error_len, "Timeout while waiting for result.");
+
+	return FAIL;
+}
+

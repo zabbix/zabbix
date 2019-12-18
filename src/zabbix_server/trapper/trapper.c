@@ -694,7 +694,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results);
 
-static void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
+void	perform_item_test(const struct zbx_json_parse *jp_data, struct zbx_json *json)
 {
 	char			tmp[MAX_STRING_LEN + 1], **pvalue, *fieldname, *addr;
 	DC_ITEM			item = {0};
