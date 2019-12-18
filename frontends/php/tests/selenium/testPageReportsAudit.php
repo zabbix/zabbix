@@ -19,8 +19,11 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/MacrosTrait.php';
 
 class testPageReportsAudit extends CLegacyWebTest {
+
+	use MacrosTrait;
 
 	private $actions = [
 		-1 => 'All',
@@ -180,4 +183,45 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Audit log');
 	}
 
+	/**
+	* @backup-once globalmacro
+	*/
+	public function testPageReportsAudit_UpdateMacroDescription() {
+		// Update Macro description.
+		$this->page->login()->open('adm.macros.php');
+		$form = $this->query('name:macrosForm')->asForm()->one();
+
+		$macros = [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'Description' => 'New Updated Description'
+			]
+		];
+
+		$this->fillMacros($macros);
+		$form->submit();
+		$message = CMessageElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($message->isGood());
+		$this->assertEquals('Macros updated', $message->getTitle());
+
+		// Check Audit record about global macro update.
+		$this->page->open('auditlogs.php');
+		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
+		// Get first row data.
+		$row = $rows->get(0);
+
+		$audit = [
+			'User' => 'Admin',
+			'Resource' => 'Macro',
+			'Action' => 'Updated',
+			'ID' => 11,
+			'Details' => "globalmacro.description: Test description 1 => New Updated Description"
+		];
+
+		foreach ($audit as $column => $value) {
+			$text = $row->getColumnData($column, $value);
+			$this->assertEquals($value, $text);
+		}
+	}
 }

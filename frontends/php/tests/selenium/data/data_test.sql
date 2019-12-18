@@ -395,13 +395,13 @@ INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv
 
 -- Global macros
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (6,'{$DEFAULT_DELAY}','30','');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (7,'{$LOCALIP}','127.0.0.1','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (7,'{$LOCALIP}','127.0.0.1','Test description 2');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (8,'{$DEFAULT_LINUX_IF}','eth0','');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (9,'{$0123456789012345678901234567890123456789012345678901234567890}','012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234','');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (10,'{$A}','Some text','');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (11,'{$1}','Numeric macro','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (11,'{$1}','Numeric macro','Test description 1');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (12,'{$_}','Underscore','');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$WORKING_HOURS}','1-5,09:00-18:00','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$WORKING_HOURS}','1-5,09:00-18:00','Test description 3');
 
 -- Adding records into Auditlog
 
@@ -2232,6 +2232,22 @@ INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VA
 INSERT INTO hosts (hostid, host, name, status, available, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from) VALUES (99135, 'Available host in maintenance', 'Available host in maintenance', 0, 1,'Available host in maintenance for Host availability widget', 5, 1, 0, 1534971600);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99055, 99135, 50016);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55045, 99135, 1, '127.0.0.1', '', '1', '10050', '1');
+
+-- testHostMacros
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1180, 20006, '{$MACRO1}', '', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1181, 20006, '{$MACRO2}', '', '');
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (30010, 'Host for macros remove', 'Host for macros remove', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90900, 30010, 4);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 30010, 20030);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1174, 30010, '{$MACRO_FOR_REMOVE1}', '', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1175, 30010, '{$MACRO_FOR_REMOVE2}', '', '');
+
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1176, 40000, '{$TEMPLATE_MACRO1}', '', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1177, 40000, '{$TEMPLATE_MACRO2}', '', '');
+
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1178, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE1}', '', '');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1179, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE2}', '', '');
 
 -- testPageTriggerUrl
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (102, 'Dashboard for Trigger overview widget', 1, 1);

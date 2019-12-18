@@ -1,5 +1,4 @@
 <?php
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -11,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -20,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/MacrosTrait.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  * @backup hosts
  */
 class testInheritanceHostPrototype extends CLegacyWebTest {
+
+	use MacrosTrait;
 
 	public static function getLayoutData() {
 		return [
@@ -96,29 +98,35 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
 		$this->zbxTestWaitForPageToLoad();
 
-		$macros = CDBHelper::getAll('SELECT * FROM globalmacro');
-		foreach ($macros as $macro) {
-			// Macro check and row selection.
-			$element = $this->webDriver->findElement(WebDriverBy::xpath('//textarea[@class="textarea-flexible macro"][@readonly][text()="'.
-					$macro['macro'].'"]/../..')
-			);
-			// Effective value.
-			$this->assertEquals($macro['value'], $element->findElement(
-					WebDriverBy::xpath('./td[3]/textarea[@readonly]')
-			)->getAttribute('value'));
+		// Create two macros arrays: from DB and from Frontend form.
+		$macros = [
+			'database' => CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+			'frontend' => []
+		];
 
-			// Template value.
-			$this->assertEquals('', $element->findElement(WebDriverBy::xpath('./td[5]/div'))->getText());
-			// Global value.
-			$this->assertEquals('"'.$macro['value'].'"', $element->findElement(
-					WebDriverBy::xpath('./td[7]/div')
-			)->getText());
+		// Write macros rows from Frontend to array.
+		$table = $this->query('id:tbl_macros')->asTable()->one();
+		$count = $table->getRows()->count() - 1;
+		for ($i = 0; $i < $count; $i += 2) {
+			$macro = [];
+			$row = $table->getRow($i);
+			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
+			$macro['value'] = $row->query('xpath:./td[3]/textarea')->one()->getValue();
+			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
+
+			$macros['frontend'][] = $macro;
 		}
 
-		// Total macro count.
-		$this->assertEquals(count($macros), count($this->webDriver->findElements(
-				WebDriverBy::xpath('//textarea[@class="textarea-flexible macro"]')
-		)));
+		// Sort arrays by Macros.
+		foreach ($macros as &$array) {
+			usort($array, function ($a, $b) {
+				return strcmp($a['macro'], $b['macro']);
+			});
+		}
+		unset($array);
+
+		// Compare macros from DB with macros from Frontend.
+		$this->assertEquals($macros['database'], $macros['frontend']);
 
 		// Check layout at Host Inventory tab.
 		$this->zbxTestTabSwitch('Inventory');
