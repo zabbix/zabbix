@@ -788,7 +788,8 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
  *                                                                            *
  * Function: ipmi_manager_serialize_request                                   *
  *                                                                            *
- * Purpose: serializes IPMI poll request (ZBX_IPC_IPMI_VALUE_REQUEST)         *
+ * Purpose: serializes IPMI poll requests (ZBX_IPC_IPMI_VALUE_REQUEST)        *
+ *          or (ZBX_IPC_IPMI_DISCOVERY_REQUEST)                               *
  *                                                                            *
  * Parameters: item      - [IN] the item to poll                              *
  *             command   - [IN] the command to execute                        *

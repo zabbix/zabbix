@@ -54,6 +54,9 @@
 
 #define MAX_SENSOR_STATES	15
 
+#define ZBX_IPMI_THRESHOLD_STATUS_DISABLED	0
+#define ZBX_IPMI_THRESHOLD_STATUS_ENABLED	1
+
 #include "log.h"
 
 #include <OpenIPMI/ipmiif.h>
@@ -77,19 +80,26 @@ zbx_ipmi_sensor_value_t;
 
 typedef struct
 {
-	ipmi_sensor_t		*sensor;
-	char			id[IPMI_SENSOR_ID_SZ];
-	enum ipmi_str_type_e	id_type;	/* For sensors IPMI specifications mention Unicode, BCD plus, */
+	unsigned int status; /* Is this threshold enabled? */
+	double       val;
+}
+zbx_ipmi_sensor_threshold;
+
+typedef struct
+{
+	ipmi_sensor_t			*sensor;
+	char				id[IPMI_SENSOR_ID_SZ];
+	enum ipmi_str_type_e		id_type;	/* For sensors IPMI specifications mention Unicode, BCD plus, */
 						/* 6-bit ASCII packed, 8-bit ASCII+Latin1.  */
-	int			id_sz;		/* "id" value length in bytes */
-	zbx_ipmi_sensor_value_t	value;
-	int			reading_type;	/* "Event/Reading Type Code", e.g. Threshold, */
-						/* Discrete, 'digital' Discrete. */
-	int			type;		/* "Sensor Type Code", e.g. Temperature, Voltage, */
-						/* Current, Fan, Physical Security (Chassis Intrusion), etc. */
-	char			*full_name;
-	int			state;
-	double			thresholds[IPMI_THRESHOLDS_NUM];
+	int				id_sz;		/* "id" value length in bytes */
+	zbx_ipmi_sensor_value_t		value;
+	int				reading_type;	/* "Event/Reading Type Code", e.g. Threshold, */
+	/* Discrete, 'digital' Discrete. */
+	int				type;		/* "Sensor Type Code", e.g. Temperature, Voltage, */
+							/* Current, Fan, Physical Security (Chassis Intrusion), etc. */
+	char				*full_name;
+	int				state;
+	zbx_ipmi_sensor_threshold	thresholds[IPMI_THRESHOLDS_NUM];
 }
 zbx_ipmi_sensor_t;
 
@@ -386,7 +396,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	ipmi_sensor_get_name(s->sensor, full_name, sizeof(full_name));
 	s->full_name = zbx_strdup(NULL, full_name + get_domain_offset(h, full_name));
 	for (i = IPMI_LOWER_NON_CRITICAL; i <= IPMI_UPPER_NON_RECOVERABLE; i++)
-		s->thresholds[i] = -1;
+		s->thresholds[i].status = ZBX_IPMI_THRESHOLD_STATUS_DISABLED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s:%d' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
 			"('%s') type:0x%x ('%s') domain:'%u' name:'%s'", h->ip, h->port, (int)s->id_type, s->id_sz,
@@ -578,9 +588,10 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' err %d th %p", __func__, h->ip, h->port, err, (void *)th);
 
-	if (0 != err) {
+	if (0 != err)
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() fail: %s", __func__, zbx_strerror(err));
 
 		h->err = zbx_dsprintf(h->err, "error 0x%x while getting thresholds for sensor", (unsigned int)err);
@@ -588,12 +599,21 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 		goto out;
 	}
 
-	s = zbx_get_ipmi_sensor(h, sensor);
-
-	if (NULL == s)
+	if (NULL == (s = zbx_get_ipmi_sensor(h, sensor)))
 	{
+		char	id[IPMI_SENSOR_ID_SZ];
+		char	id_str[2 * IPMI_SENSOR_ID_SZ + 1];
+		int	id_sz;
+		int	id_type;
+
+		id_sz = ipmi_sensor_get_id_length(sensor);
+		memset(id, 0, sizeof(id));
+		ipmi_sensor_get_id(sensor, id, sizeof(id));
+		id_type = ipmi_sensor_get_id_type(sensor);
+
 		THIS_SHOULD_NEVER_HAPPEN;
-		h->err = zbx_strdup(h->err, "fatal error");
+		h->err = zbx_dsprintf(h->err, "fatal error: host:'[%s]:%d' sensor %s", h->ip, h->port,
+				zbx_sensor_id_to_str(id_str, sizeof(id_str), id, id_type, id_sz));
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
@@ -602,17 +622,19 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 	{
 		double	thr;
 
+		s->thresholds[i].status = ZBX_IPMI_THRESHOLD_STATUS_DISABLED;
 		ret = ipmi_sensor_threshold_readable(sensor, i, &val);
 		if (0 != ret || 0 == val)
 			continue;
 
-		ret = ipmi_threshold_get(th, i, &thr);
-		if (0 == ret)
-			s->thresholds[i] = thr;
+		if (0 == ipmi_threshold_get(th, i, &thr))
+		{
+			s->thresholds[i].status = ZBX_IPMI_THRESHOLD_STATUS_ENABLED;
+			s->thresholds[i].val = thr;
+		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Threshold %s could not be fetched",ipmi_get_threshold_string(i));
 	}
-
 out:
 	h->done = 1;
 
@@ -626,7 +648,6 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
 	zbx_ipmi_sensor_t	*s;
-	int			i;
 
 	ZBX_UNUSED(raw_value);
 
@@ -709,12 +730,13 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 			s->state = 0;
 			if (IPMI_THRESHOLD_ACCESS_SUPPORT_NONE != ipmi_sensor_get_threshold_access(sensor))
 			{
-				int val, ret;
+				int value, ret;
+				int i;
 
 				for (i = IPMI_LOWER_NON_CRITICAL; i <= IPMI_UPPER_NON_RECOVERABLE; i++)
 				{
-					ret = ipmi_sensor_threshold_reading_supported(sensor, i, &val);
-					if (0 != ret || 0 == val)
+					ret = ipmi_sensor_threshold_reading_supported(sensor, i, &value);
+					if (0 != ret || 0 == value)
 						continue;
 					if (0 != ipmi_is_threshold_out_of_range(states, i))
 						s->state |= 1 << i;
@@ -966,7 +988,7 @@ static void	zbx_read_ipmi_thresholds(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t
 {
 	char	id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int 	ret;
-	int thresh_sup;
+	int	thr_access;
 
 	/* copy sensor details at start - it can go away and we won't be able to make an error message */
 	zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz);
@@ -975,19 +997,17 @@ static void	zbx_read_ipmi_thresholds(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t
 
 	h->done = 0;
 
-	thresh_sup = ipmi_sensor_get_threshold_access(s->sensor);
-	if (thresh_sup == IPMI_THRESHOLD_ACCESS_SUPPORT_NONE ||	thresh_sup == IPMI_THRESHOLD_ACCESS_SUPPORT_FIXED)
+	thr_access = ipmi_sensor_get_threshold_access(s->sensor);
+	if (thr_access == IPMI_THRESHOLD_ACCESS_SUPPORT_NONE || thr_access == IPMI_THRESHOLD_ACCESS_SUPPORT_FIXED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot access thresholds");
 		goto out;
 	}
 
-	if (0 != (ret = ipmi_sensor_get_thresholds(s->sensor,
-			zbx_got_thresholds_cb, h)))
+	if (0 != (ret = ipmi_sensor_get_thresholds(s->sensor, zbx_got_thresholds_cb, h)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot read thresholds for sensor \"%s\"."
-				" ipmi_sensor_get_thresholds() return error: 0x%x", id_str,
-				(unsigned int)ret);
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot read thresholds for sensor \"%s\". ipmi_sensor_get_thresholds()"
+				" return error: 0x%x", id_str, (unsigned int)ret);
 		goto out;
 	}
 
@@ -1747,10 +1767,10 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	return h->ret;
 }
 
-static void add_threshold_ipmi(struct zbx_json *json, char *tag, double threshold)
+static void add_threshold_ipmi(struct zbx_json *json, char *tag, zbx_ipmi_sensor_threshold *threshold)
 {
-	if ( 0.0 <= threshold)
-		zbx_json_addfloat(json, tag, threshold);
+	if (ZBX_IPMI_THRESHOLD_STATUS_ENABLED == threshold->status)
+		zbx_json_addfloat(json, tag, threshold->val);
 	else
 		zbx_json_addstring(json, tag, "", ZBX_JSON_TYPE_STRING);
 }
@@ -1820,20 +1840,16 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		zbx_json_addobject(&json, ZBX_IPMI_TAG_SENSOR);
 		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)h->sensors[i].type);
 		p = ipmi_sensor_get_sensor_type_string(h->sensors[i].sensor);
-		if (0 == strcmp(p, "invalid") || 0 == strcmp(p, "unspecified") )
-			p = "unknown";
 		zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, p,	ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
 		zbx_json_addobject(&json, ZBX_IPMI_TAG_READING);
 		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)h->sensors[i].reading_type);
 		p = ipmi_sensor_get_event_reading_type_string(h->sensors[i].sensor);
-		if (0 == strcmp(p, "invalid") || 0 == strcmp(p, "unspecified") )
-			p = "unknown";
 		zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, p,	ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
-		if (IPMI_EVENT_READING_TYPE_THRESHOLD != h->sensors[i].reading_type) /* discrette */
+		if (IPMI_EVENT_READING_TYPE_THRESHOLD != h->sensors[i].reading_type) /* discrete */
 		{
 			state = h->sensors[i].value.discrete;
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_STATE);
@@ -1855,7 +1871,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, state_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&json);
 		}
-		else /*threshold*/
+		else /* threshold */
 		{
 			state = (zbx_uint64_t)h->sensors[i].state;
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_STATE);
@@ -1887,22 +1903,22 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_LOW);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
-					h->sensors[i].thresholds[IPMI_LOWER_NON_CRITICAL]);
+					&h->sensors[i].thresholds[IPMI_LOWER_NON_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_CRIT,
-					h->sensors[i].thresholds[IPMI_LOWER_CRITICAL]);
+					&h->sensors[i].thresholds[IPMI_LOWER_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_RECOVER,
-					h->sensors[i].thresholds[IPMI_LOWER_NON_RECOVERABLE]);
+					&h->sensors[i].thresholds[IPMI_LOWER_NON_RECOVERABLE]);
 
 			zbx_json_close(&json);
 
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_UP);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
-					h->sensors[i].thresholds[IPMI_UPPER_NON_CRITICAL]);
+					&h->sensors[i].thresholds[IPMI_UPPER_NON_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_CRIT,
-					h->sensors[i].thresholds[IPMI_UPPER_CRITICAL]);
+					&h->sensors[i].thresholds[IPMI_UPPER_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_RECOVER,
-					h->sensors[i].thresholds[IPMI_UPPER_NON_RECOVERABLE]);
+					&h->sensors[i].thresholds[IPMI_UPPER_NON_RECOVERABLE]);
 
 			zbx_json_close(&json);
 			zbx_json_close(&json);
@@ -1912,9 +1928,11 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 	}
 	zbx_json_close(&json);
 
-	*value = zbx_dsprintf(*value, "%s", json.buffer);
+	*value = zbx_strdup(*value, json.buffer);
 
 	zbx_json_free(&json);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:%s", __func__, ZBX_NULL2EMPTY_STR(*value));
 
 	return SUCCEED;
 }
