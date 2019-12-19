@@ -800,7 +800,6 @@ int	perform_item_test(const struct zbx_json_parse *jp_data, char **info)
 	addr = item.interface.addr = db_string_from_json_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, fieldname);
 	db_string_from_json(&jp_interface, ZBX_PROTO_TAG_PORT, table_interface, "port", item.interface.port_orig,
 			sizeof(item.interface.port_orig));
-	ZBX_STR2USHORT(item.interface.port, item.interface.port_orig);
 
 	if (NULL == table_hosts)
 		table_hosts = DBget_table("hosts");
@@ -846,20 +845,30 @@ int	perform_item_test(const struct zbx_json_parse *jp_data, char **info)
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK, table_hosts, "tls_psk", item.host.tls_psk,
 			sizeof(item.host.tls_psk));
 #endif
+
 	if (ITEM_TYPE_IPMI == item.type)
 	{
 		init_result(&result);
-#ifdef HAVE_OPENIPMI
-		if (0 == CONFIG_IPMIPOLLER_FORKS)
+
+		if (FAIL == is_ushort(item.interface.port_orig, &item.interface.port))
 		{
-			*info = zbx_strdup(NULL, "Cannot perform IPMI request: configuration parameter"
-					" \"StartIPMIPollers\" is 0.");
+			*info = zbx_dsprintf(NULL, "Invalid port number [%s]", item.interface.port_orig);
 		}
 		else
-			ret = zbx_ipmi_test_item(&item, info);
+		{
+#ifdef HAVE_OPENIPMI
+			if (0 == CONFIG_IPMIPOLLER_FORKS)
+			{
+				*info = zbx_strdup(NULL, "Cannot perform IPMI request: configuration parameter"
+						" \"StartIPMIPollers\" is 0.");
+			}
+			else
+				ret = zbx_ipmi_test_item(&item, info);
 #else
-		*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
+			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
 #endif
+		}
+
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
 	}

@@ -70,6 +70,20 @@ zbx_tm_remote_command_t;
 
 typedef struct
 {
+	int		status;
+	char		*info;
+	zbx_uint64_t	parent_taskid;
+}
+zbx_tm_remote_command_result_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+}
+zbx_tm_check_now_t;
+
+typedef struct
+{
 	zbx_uint64_t	parent_taskid;
 	char		*data;
 	int		type;
@@ -82,21 +96,7 @@ typedef struct
 	char		*info;
 	zbx_uint64_t	parent_taskid;
 }
-zbx_tm_remote_command_result_t;
-
-typedef struct
-{
-	int		status;
-	char		*info;
-	zbx_uint64_t	parent_taskid;
-}
 zbx_tm_data_result_t;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-}
-zbx_tm_check_now_t;
 
 typedef struct
 {
