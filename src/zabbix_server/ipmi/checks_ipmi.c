@@ -376,12 +376,11 @@ static size_t	get_domain_offset(const zbx_ipmi_host_t *h, const char *full_name)
 static char *zbx_get_sensor_id(ipmi_sensor_t *sensor, char *id, int sz, int *id_sz, enum ipmi_str_type_e *id_type,
 		char *id_str, int id_str_sz )
 {
+	*id_sz = ipmi_sensor_get_id_length(sensor);
 	memset(id, 0, sz);
 	ipmi_sensor_get_id(sensor, id, sz);
-	*id_sz = ipmi_sensor_get_id_length(sensor);
 	*id_type = ipmi_sensor_get_id_type(sensor);
-
-	return zbx_sensor_id_to_str(id_str, id_str_len, id, *id_type, *id_sz);
+	return zbx_sensor_id_to_str(id_str, id_str_sz, id, *id_type, *id_sz);
 }
 
 static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
@@ -395,9 +394,8 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	char			full_name[IPMI_SENSOR_NAME_LEN];
 	int 			i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __func__,
-			zbx_get_sensor_id(sensor, id, sizeof(id), &id_sz, &id_type,  id_str, sizeof(id_str)), h->ip,
-			h->port);
+	zbx_get_sensor_id(sensor, id, sizeof(id), &id_sz, &id_type, id_str, sizeof(id_str));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __func__, id_str, h->ip, h->port);
 
 	h->sensor_count++;
 	sz = (size_t)h->sensor_count * sizeof(zbx_ipmi_sensor_t);
