@@ -23,10 +23,17 @@ $form = (new CForm())
 	->cleanItems()
 	->setId('mediatype_message_form')
 	->setName('mediatype_message_form')
-	->addVar('action', 'popup.mediatype.message')
-	->addVar('type', $data['params']['type'])
-	->addVar('content_type', $data['params']['content_type'])
-	->addVar('old_message_type', $data['params']['old_message_type']);
+	->addVar('action', 'popup.mediatype.message');
+
+if ($data['params']['old_message_type'] !== null) {
+	$form->addVar('old_message_type', $data['params']['old_message_type']);
+
+	foreach ($data['params']['message_types'] as $idx => $message_type) {
+		if ($message_type == $data['params']['old_message_type']) {
+			unset($data['params']['message_types'][$idx]);
+		}
+	}
+}
 
 $form_list = (new CFormList())->addRow(_('Message type'),
 	(new CComboBox('message_type', $data['params']['old_message_type']))
@@ -76,7 +83,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => $data['params']['old_message_type'] ? _('Update') : _('Add'),
+			'title' => ($data['params']['old_message_type'] !== null) ? _('Update') : _('Add'),
 			'class' => 'dialogue-widget-save',
 			'keepOpen' => true,
 			'isSubmit' => true,

@@ -70,42 +70,33 @@ class CControllerPopupMediatypeMessage extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'type' => $this->getInput('type'),
-			'content_type' => $this->getInput('content_type'),
-			'message_types' => $this->getInput('message_types')
-		];
+		$data = [];
+
+		// Prepare data for popup.
+		if (!$this->hasInput('message_type')) {
+			$data['type'] = $this->getInput('type');
+			$data['content_type'] = $this->getInput('content_type');
+			$data['message_types'] = $this->getInput('message_types', []);
+		}
 
 		// Update an existing message template.
 		if ($this->hasInput('old_message_type')) {
-			// from popup
-			if ($this->hasInput('message_type')) {
-				$data['message_type'] = $this->getInput('message_type');
-			}
-
 			$data['old_message_type'] = $this->getInput('old_message_type');
-			$data['subject'] = $this->getInput('subject');
+			$data['subject'] = $this->getInput('subject', '');
 			$data['message'] = $this->getInput('message');
 
-
-			foreach ($data['message_types'] as $idx => $message_type) {
-				if ($message_type == $data['old_message_type']) {
-					unset($data['message_types'][$idx]);
-				}
+			if ($this->hasInput('message_type')) {
+				$data['message_type'] = $this->getInput('message_type');
 			}
 		}
 		else {
 			// Add a new message template.
 
-			// from popup
-			if ($this->hasInput('message_type')) {
-				$data['message_type'] = $this->getInput('message_type');
-				$data['subject'] = $this->getInput('subject');
-				$data['message'] = $this->getInput('message');
-			}
-			else {
+			// Prepare data for popup.
+			if (!$this->hasInput('message_type')) {
 				$diff = array_diff($this->message_types, $data['message_types']);
 				$diff = reset($diff);
+				$data['old_message_type'] = null;
 				$data['message_type'] = $diff ? $diff : CMediatypeHelper::MSG_TYPE_PROBLEM;
 				$message_template = CMediatypeHelper::getMessageTemplate($data['type'], $data['message_type'],
 					$data['content_type']
@@ -113,10 +104,14 @@ class CControllerPopupMediatypeMessage extends CController {
 				$data['subject'] = $message_template['subject'];
 				$data['message'] = $message_template['message'];
 			}
+			else {
+				$data['message_type'] = $this->getInput('message_type');
+				$data['subject'] = $this->getInput('subject', '');
+				$data['message'] = $this->getInput('message');
+			}
 		}
 
-		// from popup
-		if (!$this->getInput('eventsource') && !$this->getInput('recovery')) {
+		if ($this->hasInput('message_type') && !$this->hasInput('eventsource') && !$this->hasInput('recovery')) {
 			$from = CMediatypeHelper::transformFromMessageType($data['message_type']);
 			$data['eventsource'] = $from['eventsource'];
 			$data['recovery'] = $from['recovery'];
