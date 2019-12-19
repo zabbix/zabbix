@@ -39,7 +39,10 @@
 #include "zbxcrypto.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "zbxipcservice.h"
+
+#ifdef HAVE_OPENIPMI
 #include "../ipmi/ipmi.h"
+#endif
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -846,7 +849,12 @@ int	perform_item_test(const struct zbx_json_parse *jp_data, char **info)
 	if (ITEM_TYPE_IPMI == item.type)
 	{
 		init_result(&result);
+#ifdef HAVE_OPENIPMI
 		ret = zbx_ipmi_test_item(&item, info);
+#else
+		*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
+		ret = FAIL;
+#endif
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
