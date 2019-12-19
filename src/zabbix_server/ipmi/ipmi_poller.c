@@ -91,7 +91,7 @@ static void	ipmi_poller_send_result(zbx_ipc_async_socket_t *socket, zbx_uint32_t
  *             message - [IN] the value request message                       *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zbx_ipc_message_t *message)
+static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zbx_ipc_message_t *message, int code)
 {
 	zbx_uint64_t	itemid;
 	char		*addr, *username, *password, *sensor, *value = NULL;
@@ -110,7 +110,7 @@ static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zb
 			username, sensor);
 
 	errcode = get_value_ipmi(itemid, addr, port, authtype, privilege, username, password, sensor, &value);
-	ipmi_poller_send_result(socket, ZBX_IPC_IPMI_VALUE_RESULT, errcode, value);
+	ipmi_poller_send_result(socket, code, errcode, value);
 
 	zbx_free(value);
 	zbx_free(addr);
@@ -248,7 +248,11 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 		switch (message->code)
 		{
 			case ZBX_IPC_IPMI_VALUE_REQUEST:
-				ipmi_poller_process_value_request(&ipmi_socket, message);
+				ipmi_poller_process_value_request(&ipmi_socket, message, ZBX_IPC_IPMI_VALUE_RESULT);
+				polled_num++;
+				break;
+			case ZBX_IPC_IPMI_TEST_REQUEST:
+				ipmi_poller_process_value_request(&ipmi_socket, message, ZBX_IPC_IPMI_TEST_RESULT);
 				polled_num++;
 				break;
 			case ZBX_IPC_IPMI_COMMAND_REQUEST:

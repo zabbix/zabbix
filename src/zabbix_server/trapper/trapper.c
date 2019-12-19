@@ -39,6 +39,7 @@
 #include "zbxcrypto.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "zbxipcservice.h"
+#include "../ipmi/ipmi.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -703,8 +704,9 @@ int	perform_item_test(const struct zbx_json_parse *jp_data, char **info)
 	static const ZBX_TABLE	*table_items, *table_interface, *table_hosts;
 	struct zbx_json_parse	jp_interface, jp_host;
 	AGENT_RESULT		result;
-	zbx_vector_ptr_t	add_results;
 	int			errcode, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == table_items)
 		table_items = DBget_table("items");
@@ -841,40 +843,58 @@ int	perform_item_test(const struct zbx_json_parse *jp_data, char **info)
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK, table_hosts, "tls_psk", item.host.tls_psk,
 			sizeof(item.host.tls_psk));
 #endif
-	zbx_vector_ptr_create(&add_results);
-
-	prepare_items(&item, &errcode, 1, &result, MACRO_EXPAND_NO);
-	check_items(&item, &errcode, 1, &result, &add_results);
-
-	switch (errcode)
+	if (ITEM_TYPE_IPMI == item.type)
 	{
-		case SUCCEED:
-			if (NULL == (pvalue = GET_TEXT_RESULT(&result)))
-			{
-				*info = zbx_strdup(NULL, "no value");
-			}
-			else
-			{
-				*info = zbx_strdup(NULL, *pvalue);
-				ret = SUCCEED;
-			}
-			break;
-		default:
-			if (NULL == (pvalue = GET_MSG_RESULT(&result)))
-				*info = zbx_dsprintf(NULL, "unknown error with code %d", errcode);
-			else
-				*info = zbx_strdup(NULL, *pvalue);
+		init_result(&result);
+		ret = zbx_ipmi_test_item(&item, info);
+
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+			dump_item(&item);
+	}
+	else
+	{
+		zbx_vector_ptr_t	add_results;
+
+		zbx_vector_ptr_create(&add_results);
+
+		prepare_items(&item, &errcode, 1, &result, MACRO_EXPAND_NO);
+
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+			dump_item(&item);
+
+		check_items(&item, &errcode, 1, &result, &add_results);
+
+		switch (errcode)
+		{
+			case SUCCEED:
+				if (NULL == (pvalue = GET_TEXT_RESULT(&result)))
+				{
+					*info = zbx_strdup(NULL, "no value");
+				}
+				else
+				{
+					*info = zbx_strdup(NULL, *pvalue);
+					ret = SUCCEED;
+				}
+				break;
+			default:
+				if (NULL == (pvalue = GET_MSG_RESULT(&result)))
+					*info = zbx_dsprintf(NULL, "unknown error with code %d", errcode);
+				else
+					*info = zbx_strdup(NULL, *pvalue);
+		}
+
+		zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
+		zbx_vector_ptr_destroy(&add_results);
 	}
 
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
-	zbx_vector_ptr_destroy(&add_results);
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-		dump_item(&item);
 	clean_items(&item, 1, &result);
 	zbx_free(addr);
 	zbx_free(item.params);
 	zbx_free(item.posts);
 	zbx_free(item.headers);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

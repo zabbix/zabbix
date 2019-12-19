@@ -164,6 +164,8 @@ static int	ipmi_request_priority(const zbx_ipmi_request_t *request)
 			return 1;
 		case ZBX_IPC_IPMI_SCRIPT_REQUEST:
 			return 0;
+		case ZBX_IPC_IPMI_TEST_REQUEST:
+			return 0;
 		default:
 			return INT_MAX;
 	}
@@ -570,6 +572,7 @@ static void	ipmi_manager_process_poller_queue(zbx_ipmi_manager_t *manager, zbx_i
 		switch (request->message.code)
 		{
 			case ZBX_IPC_IPMI_COMMAND_REQUEST:
+			case ZBX_IPC_IPMI_TEST_REQUEST:
 			case ZBX_IPC_IPMI_CLEANUP_REQUEST:
 				break;
 			case ZBX_IPC_IPMI_VALUE_REQUEST:
@@ -883,7 +886,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_process_script_request                              *
+ * Function: ipmi_manager_process_client_request                              *
  *                                                                            *
  * Purpose: forwards IPMI script request to the poller managing the specified *
  *          host                                                              *
@@ -894,8 +897,8 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
  *             now     - [IN] the current time                                *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_process_script_request(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
-		zbx_ipc_message_t *message, int now)
+static void	ipmi_manager_process_client_request(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
+		zbx_ipc_message_t *message, int now, int code)
 {
 	zbx_ipmi_request_t	*request;
 	zbx_uint64_t		hostid;
@@ -907,14 +910,14 @@ static void	ipmi_manager_process_script_request(zbx_ipmi_manager_t *manager, zbx
 	request = ipmi_request_create(0);
 	request->client = client;
 	zbx_ipc_message_copy(&request->message, message);
-	request->message.code = ZBX_IPC_IPMI_COMMAND_REQUEST;
+	request->message.code = code;
 
 	ipmi_manager_schedule_request(manager, hostid, request, now);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_process_command_result                              *
+ * Function: ipmi_manager_process_client_result                               *
  *                                                                            *
  * Purpose: forwards command result as script result to the client that       *
  *          requested IPMI script execution                                   *
@@ -925,8 +928,8 @@ static void	ipmi_manager_process_script_request(zbx_ipmi_manager_t *manager, zbx
  *             now     - [IN] the current time                                *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_process_command_result(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
-		zbx_ipc_message_t *message, int now)
+static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
+		zbx_ipc_message_t *message, int now, int code)
 {
 	zbx_ipmi_poller_t	*poller;
 
@@ -938,7 +941,7 @@ static void	ipmi_manager_process_command_result(zbx_ipmi_manager_t *manager, zbx
 
 	if (SUCCEED == zbx_ipc_client_connected(poller->request->client))
 	{
-		zbx_ipc_client_send(poller->request->client, ZBX_IPC_IPMI_SCRIPT_RESULT, message->data, message->size);
+		zbx_ipc_client_send(poller->request->client, code, message->data, message->size);
 		zbx_ipc_client_release(poller->request->client);
 	}
 
@@ -1039,11 +1042,21 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 					ipmi_manager_process_value_result(&ipmi_manager, client, message, now);
 					polled_num++;
 					break;
+				case ZBX_IPC_IPMI_TEST_ITEM_REQUEST:
+					ipmi_manager_process_client_request(&ipmi_manager, client, message, now,
+							ZBX_IPC_IPMI_TEST_REQUEST);
+					break;
 				case ZBX_IPC_IPMI_SCRIPT_REQUEST:
-					ipmi_manager_process_script_request(&ipmi_manager, client, message, now);
+					ipmi_manager_process_client_request(&ipmi_manager, client, message, now,
+							ZBX_IPC_IPMI_COMMAND_REQUEST);
+					break;
+				case ZBX_IPC_IPMI_TEST_RESULT:
+					ipmi_manager_process_client_result(&ipmi_manager, client, message, now,
+							ZBX_IPC_IPMI_TEST_ITEM_RESULT);
 					break;
 				case ZBX_IPC_IPMI_COMMAND_RESULT:
-					ipmi_manager_process_command_result(&ipmi_manager, client, message, now);
+					ipmi_manager_process_client_result(&ipmi_manager, client, message, now,
+							ZBX_IPC_IPMI_SCRIPT_RESULT);
 			}
 
 			zbx_ipc_message_free(message);
