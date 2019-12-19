@@ -24,13 +24,33 @@ $form = (new CForm())
 	->setId('mediatype_message_form')
 	->setName('mediatype_message_form')
 	->addVar('action', 'popup.mediatype.message')
-	->addVar('update', $data['update'])
-	->addVar('index', $data['params']['index'])
 	->addVar('type', $data['params']['type'])
-	->addVar('content_type', $data['params']['content_type']);
+	->addVar('content_type', $data['params']['content_type'])
+	->addVar('old_message_type', $data['params']['old_message_type']);
 
 $form_list = (new CFormList())->addRow(_('Message type'),
-	new CComboBox('message_type', $data['params']['message_type'], null, CMediatypeHelper::getAllMessageTypeNames())
+	(new CComboBox('message_type', $data['params']['old_message_type']))
+		->addItem(CMediatypeHelper::MSG_TYPE_PROBLEM, _('Problem'), null,
+			!in_array(CMediatypeHelper::MSG_TYPE_PROBLEM, $data['params']['message_types'])
+		)
+		->addItem(CMediatypeHelper::MSG_TYPE_RECOVERY, _('Problem recovery'), null,
+			!in_array(CMediatypeHelper::MSG_TYPE_RECOVERY, $data['params']['message_types'])
+		)
+		->addItem(CMediatypeHelper::MSG_TYPE_UPDATE, _('Problem update'), null,
+			!in_array(CMediatypeHelper::MSG_TYPE_UPDATE, $data['params']['message_types'])
+		)
+		->addItem(CMediatypeHelper::MSG_TYPE_DISCOVERY, _('Discovery'), null,
+			!in_array(CMediatypeHelper::MSG_TYPE_DISCOVERY, $data['params']['message_types'])
+		)
+		->addItem(CMediatypeHelper::MSG_TYPE_AUTOREG, _('Autoregistration'), null,
+			!in_array(CMediatypeHelper::MSG_TYPE_AUTOREG, $data['params']['message_types'])
+		)
+		->addItem(CMediatypeHelper::MSG_TYPE_INTERNAL, _('Internal problem'), null,
+			!in_array(CMediatypeHelper::MSG_TYPE_INTERNAL, $data['params']['message_types'])
+		)
+		->addItem(CMediatypeHelper::MSG_TYPE_INTERNAL_RECOVERY, _('Internal problem recovery'), null,
+			!in_array(CMediatypeHelper::MSG_TYPE_INTERNAL_RECOVERY, $data['params']['message_types'])
+		)
 );
 
 if ($data['params']['type'] != MEDIA_TYPE_SMS) {
@@ -56,7 +76,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => $data['update'] ? _('Update') : _('Add'),
+			'title' => $data['params']['old_message_type'] ? _('Update') : _('Add'),
 			'class' => 'dialogue-widget-save',
 			'keepOpen' => true,
 			'isSubmit' => true,

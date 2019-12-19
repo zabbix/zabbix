@@ -24,21 +24,28 @@
  */
 class CControllerPopupMediatypeMessage extends CController {
 
+	/**
+	 * @var array  An array with all message template types.
+	 */
+	protected $message_types = [];
+
 	protected function init() {
 		$this->disableSIDvalidation();
+
+		$this->message_types = CMediatypeHelper::getAllMessageTypes();
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'update' =>			'in 0,1',
-			'index' =>			'string',
-			'type' =>			'in '.implode(',', array_keys(media_type2str())),
-			'content_type' =>	'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_type' =>	'in '.implode(',', CMediatypeHelper::getAllMessageTypes()),
-			'eventsource' =>	'db media_type_message.eventsource|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL]),
-			'recovery' =>		'db media_type_message.recovery|in '.implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_ACKNOWLEDGE_OPERATION]),
-			'subject' =>		'db media_type_message.subject',
-			'message' =>		'db media_type_message.message'
+			'type' =>				'in '.implode(',', array_keys(media_type2str())),
+			'content_type' =>		'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
+			'message_type' =>		'in '.implode(',', $this->message_types),
+			'old_message_type' =>	'in '.implode(',', $this->message_types),
+			'message_types' =>		'array',
+			'eventsource' =>		'db media_type_message.eventsource|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL]),
+			'recovery' =>			'db media_type_message.recovery|in '.implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_ACKNOWLEDGE_OPERATION]),
+			'subject' =>			'db media_type_message.subject',
+			'message' =>			'db media_type_message.message'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -66,31 +73,58 @@ class CControllerPopupMediatypeMessage extends CController {
 		$data = [
 			'type' => $this->getInput('type'),
 			'content_type' => $this->getInput('content_type'),
-			'index' => $this->getInput('index')
+			'message_types' => $this->getInput('message_types')
 		];
 
-		if ($this->hasInput('eventsource') && $this->hasInput('recovery')) {
-			$data['eventsource'] = $this->getInput('eventsource');
-			$data['recovery'] = $this->getInput('recovery');
-			$data['message_type'] = CMediatypeHelper::transformToMessageType($data['eventsource'], $data['recovery']);
+		// Update an existing message template.
+		if ($this->hasInput('old_message_type')) {
+			// from popup
+			if ($this->hasInput('message_type')) {
+				$data['message_type'] = $this->getInput('message_type');
+			}
+
+			$data['old_message_type'] = $this->getInput('old_message_type');
+			$data['subject'] = $this->getInput('subject');
+			$data['message'] = $this->getInput('message');
+
+
+			foreach ($data['message_types'] as $idx => $message_type) {
+				if ($message_type == $data['old_message_type']) {
+					unset($data['message_types'][$idx]);
+				}
+			}
 		}
 		else {
-			$data['message_type'] = $this->getInput('message_type', CMediatypeHelper::MSG_TYPE_PROBLEM);
+			// Add a new message template.
+
+			// from popup
+			if ($this->hasInput('message_type')) {
+				$data['message_type'] = $this->getInput('message_type');
+				$data['subject'] = $this->getInput('subject');
+				$data['message'] = $this->getInput('message');
+			}
+			else {
+				$diff = array_diff($this->message_types, $data['message_types']);
+				$diff = reset($diff);
+				$data['message_type'] = $diff ? $diff : CMediatypeHelper::MSG_TYPE_PROBLEM;
+				$message_template = CMediatypeHelper::getMessageTemplate($data['type'], $data['message_type'],
+					$data['content_type']
+				);
+				$data['subject'] = $message_template['subject'];
+				$data['message'] = $message_template['message'];
+			}
+		}
+
+		// from popup
+		if (!$this->getInput('eventsource') && !$this->getInput('recovery')) {
 			$from = CMediatypeHelper::transformFromMessageType($data['message_type']);
 			$data['eventsource'] = $from['eventsource'];
 			$data['recovery'] = $from['recovery'];
 		}
 
-		$message_template = CMediatypeHelper::getMessageTemplate($data['type'], $data['message_type'],
-			$data['content_type']
-		);
-		$data['subject'] = $this->getInput('subject', $message_template['subject']);
-		$data['message'] = $this->getInput('message', $message_template['message']);
-
 		$output = [
 			'title' => _('Message template'),
 			'params' => $data,
-			'update' => $this->getInput('update', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

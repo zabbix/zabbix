@@ -22,13 +22,13 @@
 ob_start(); ?>
 
 /**
- * Returns a message template object with message subject and body.
+ * Returns a default message template with message subject and body.
  *
- * @param {number|string} message_type  Message type.
+ * @param {number} message_type  Message type.
  *
  * @return {object}
  */
-function getMessageTemplate(message_type) {
+function getDefaultMessageTemplate(message_type) {
 	var media_type = jQuery('#type').val(),
 		message_format = jQuery('input[name="content_type"]:checked').val();
 
@@ -52,63 +52,31 @@ function getMessageTemplate(message_type) {
 }
 
 /**
- * Check whether a message template of the same type is already present in the list of message templates.
- *
- * @param {object} template  Message template.
- *
- * @return {boolean}
- */
-function isDuplicateMessageTemplate(template) {
-	for (var i in message_template_list) {
-		if (!message_template_list.hasOwnProperty(i)) {
-			continue;
-		}
-
-		if (template.index != i && template.eventsource == message_template_list[i].eventsource
-				&& template.recovery == message_template_list[i].recovery) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-/**
  * Sends message template form data to the server for validation before adding it to the main form.
  */
 function submitMessageTemplate() {
 	var $form = jQuery(document.forms['mediatype_message_form']);
 
-	return sendAjaxData('zabbix.php', {
+	sendAjaxData('zabbix.php', {
 		data: $form.serialize(),
 		dataType: 'json',
-		method: 'POST'
-	}).done(function(response) {
-		$form.parent().find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+		method: 'POST',
+		success: function(response) {
+			$form.parent().find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-		if (typeof response.errors !== 'undefined') {
-			return jQuery(response.errors).insertBefore($form);
-		}
-		else {
-			var template = response.params;
-
-			if (isDuplicateMessageTemplate(template)) {
-				jQuery(makeMessageBox('bad', <?= CJs::encodeJson(_('Message template already exists.')) ?>, null, true,
-					false
-				)).insertBefore($form);
-
-				return false;
+			if ('errors' in response) {
+				jQuery(response.errors).insertBefore($form);
 			}
-
-			populateMessageTemplates([template]);
-
-			overlayDialogueDestroy($form.closest('[data-dialogueid]').data('dialogueid'));
+			else {
+				populateMessageTemplates([response.params]);
+				overlayDialogueDestroy($form.closest('[data-dialogueid]').data('dialogueid'));
+			}
 		}
 	});
 }
 
 jQuery('#message_type').on('change', function() {
-	var message_template = getMessageTemplate(jQuery(this).val());
+	var message_template = getDefaultMessageTemplate(jQuery(this).val());
 
 	jQuery('#subject').val(message_template.subject);
 	jQuery('#message').val(message_template.message);

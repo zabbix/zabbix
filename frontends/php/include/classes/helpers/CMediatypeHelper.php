@@ -169,20 +169,9 @@ class CMediatypeHelper {
 	}
 
 	/**
-	 * Returns an array of all message type names.
-	 *
-	 * @return array
-	 */
-	public static function getAllMessageTypeNames() {
-		return array_map(function($message_type) {
-			return $message_type['name'];
-		}, self::messageTemplates());
-	}
-
-	/**
 	 * Gets an array of event source and operation mode from the specified message type.
 	 *
-	 * @param int|string $message_type  Message type.
+	 * @param int $message_type  Message type.
 	 *
 	 * @return array|bool
 	 */
@@ -195,8 +184,8 @@ class CMediatypeHelper {
 	/**
 	 * Gets message type form the specified event source and operation mode.
 	 *
-	 * @param int|string $eventsource  Event source.
-	 * @param int|string $recovery     Operation mode.
+	 * @param int $eventsource  Event source.
+	 * @param int $recovery     Operation mode.
 	 *
 	 * @return int|bool
 	 */
@@ -213,9 +202,9 @@ class CMediatypeHelper {
 	/**
 	 * Returns a message template array with message subject and body.
 	 *
-	 * @param int|string $media_type      Media type.
-	 * @param int|string $message_type    Message type.
-	 * @param int        $message_format  Message format. Used by Email media type.
+	 * @param int $media_type      Media type.
+	 * @param int $message_type    Message type.
+	 * @param int $message_format  Message format. Used by Email media type.
 	 *
 	 * @return array
 	 */
