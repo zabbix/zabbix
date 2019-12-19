@@ -232,7 +232,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	else
 		ret = perform_item_test(&jp_data, &info);
 
-	task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
+	task->data = zbx_tm_data_result_create(parent_taskid, ret, info);
 
 	zbx_free(info);
 finish:

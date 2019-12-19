@@ -241,7 +241,7 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 
 		if (0 == steps.values_num)
 		{
-			zbx_variant_t		value;
+			zbx_variant_t	value;
 
 			result = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t));
 

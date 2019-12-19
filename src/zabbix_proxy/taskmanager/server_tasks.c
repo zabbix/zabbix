@@ -96,12 +96,9 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
-
-
 		zbx_vector_ptr_append(tasks, task);
 	}
 
 	DBfree_result(result);
 }
-
 
