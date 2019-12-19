@@ -1868,7 +1868,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, p,	ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
-		if (IPMI_EVENT_READING_TYPE_THRESHOLD != h->sensors[i].reading_type) /* discrete */
+		if (IPMI_EVENT_READING_TYPE_THRESHOLD != h->sensors[i].reading_type)	/* discrete */
 		{
 			state = h->sensors[i].value.discrete;
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_STATE);
@@ -1890,7 +1890,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, state_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&json);
 		}
-		else /* threshold */
+		else	/* threshold */
 		{
 			state = (zbx_uint64_t)h->sensors[i].state;
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_STATE);
