@@ -204,7 +204,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	zbx_uint64_t		parent_taskid;
 	struct zbx_json_parse	jp_data;
 
-	result = DBselect("select parent_taskid,data"
+	result = DBselect("select parent_taskid,data,type"
 				" from task_data"
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
@@ -218,6 +218,12 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	if (0 != ttl && clock + ttl < now)
 	{
 		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "The task has been expired.");
+		goto finish;
+	}
+
+	if (ZBX_TM_DATA_TYPE_TEST_ITEM != atoi(row[2]))
+	{
+		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task");
 		goto finish;
 	}
 

@@ -707,7 +707,7 @@ static void	tm_json_serialize_check_now(struct zbx_json *json, const zbx_tm_chec
 
 static void	tm_json_serialize_data(struct zbx_json *json, const zbx_tm_data_t *data)
 {
-	zbx_json_adduint64(json, ZBX_PROTO_TAG_TYPE, data->type);
+	zbx_json_adduint64(json, ZBX_PROTO_TAG_DATA_TYPE, data->type);
 	zbx_json_adduint64(json, ZBX_PROTO_TAG_PARENT_TASKID, data->parent_taskid);
 	zbx_json_addstring(json, ZBX_PROTO_TAG_DATA, data->data, ZBX_JSON_TYPE_STRING);
 }
@@ -943,7 +943,7 @@ static zbx_tm_data_t	*tm_json_deserialize_data(const struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, value, sizeof(value), NULL))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_DATA_TYPE, value, sizeof(value), NULL))
 	{
 		goto out;
 	}
