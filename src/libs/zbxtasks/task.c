@@ -214,12 +214,14 @@ zbx_tm_check_now_t	*zbx_tm_check_now_create(zbx_uint64_t itemid)
 	return data;
 }
 
-zbx_tm_data_t	*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, int type)
+zbx_tm_data_t	*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, int len, int type)
 {
 	zbx_tm_data_t	*data;
 
 	data = (zbx_tm_data_t *)zbx_malloc(NULL, sizeof(zbx_tm_data_t));
-	data->data = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(str));
+	data->data = zbx_malloc(NULL, len + 1);
+	memcpy(data->data, str, len);
+	data->data[len] = '\0';
 	data->parent_taskid = parent_taskid;
 	data->type = type;
 
@@ -947,7 +949,7 @@ static zbx_tm_data_t	*tm_json_deserialize_data(const struct zbx_json_parse *jp)
 	}
 	type = atoi(value);
 
-	data = zbx_tm_data_create(parent_taskid, str, type);
+	data = zbx_tm_data_create(parent_taskid, str, strlen(str), type);
 out:
 	zbx_free(str);
 
@@ -1084,7 +1086,7 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 	}
 }
 
-static zbx_uint64_t	zbx_create_task_data(const char *data, zbx_uint64_t proxy_hostid)
+static zbx_uint64_t	zbx_create_task_data(const char *data, int len, zbx_uint64_t proxy_hostid)
 {
 	zbx_tm_task_t	*task;
 	zbx_uint64_t	taskid;
@@ -1093,7 +1095,7 @@ static zbx_uint64_t	zbx_create_task_data(const char *data, zbx_uint64_t proxy_ho
 
 	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), ZBX_DATA_TTL, proxy_hostid);
 
-	task->data = zbx_tm_data_create(task->taskid, data, ZBX_TM_DATA_TYPE_TEST_ITEM);
+	task->data = zbx_tm_data_create(task->taskid, data, len, ZBX_TM_DATA_TYPE_TEST_ITEM);
 
 	DBbegin();
 
@@ -1107,11 +1109,11 @@ static zbx_uint64_t	zbx_create_task_data(const char *data, zbx_uint64_t proxy_ho
 	return taskid;
 }
 
-int	zbx_tm_execute_task_data(const char *data, zbx_uint64_t proxy_hostid, char **info)
+int	zbx_tm_execute_task_data(const char *data, int len, zbx_uint64_t proxy_hostid, char **info)
 {
 	zbx_uint64_t	taskid;
 
-	if (0 == (taskid = zbx_create_task_data(data, proxy_hostid)))
+	if (0 == (taskid = zbx_create_task_data(data, len, proxy_hostid)))
 	{
 		*info = zbx_strdup(NULL, "Cannot create task.");
 		return FAIL;

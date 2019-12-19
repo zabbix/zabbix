@@ -895,7 +895,7 @@ static void	recv_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
-		zbx_send_response(sock, FAIL,  "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
 		return;
 	}
 
@@ -919,15 +919,15 @@ static void	recv_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	if (0 == proxy_hostid)
 		ret = perform_item_test(&jp_data, &info);
 	else
-		ret = zbx_tm_execute_task_data("foo", proxy_hostid, &info);
+		ret = zbx_tm_execute_task_data(jp_data.start, jp_data.end - jp_data.start + 1, proxy_hostid, &info);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 	zbx_json_addstring(&json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info,
 			ZBX_JSON_TYPE_STRING);
-
 	zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, CONFIG_TIMEOUT);
 
+	zbx_free(info);
 	zbx_json_free(&json);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
