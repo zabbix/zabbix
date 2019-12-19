@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 10:33+0200\n"
+"POT-Creation-Date: 2019-12-19 10:39+0200\n"
 "PO-Revision-Date: 2019-12-09 09:53+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -338,8 +338,8 @@ msgstr "Truy cập bị từ chối"
 msgid "Access denied!"
 msgstr "Truy cập bị từ chối!"
 
-#: include/classes/api/services/CUser.php:1181
-#: include/classes/api/services/CUser.php:1223
+#: include/classes/api/services/CUser.php:1183
+#: include/classes/api/services/CUser.php:1225
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -1231,7 +1231,7 @@ msgstr "Xác thực"
 msgid "Authentication algorithm"
 msgstr "Thuật toán xác thực"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "Xác thực lỗi: %1$s."
@@ -1293,7 +1293,7 @@ msgstr ""
 msgid "Auto-login"
 msgstr "Tự động đăng nhập"
 
-#: include/classes/api/services/CUser.php:765
+#: include/classes/api/services/CUser.php:767
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "Tùy chọn đăng nhập tự động hoặc đăng xuất tự động không thể bật cùng một lúc."
 
@@ -1888,7 +1888,7 @@ msgstr "Không thể tạo tập tin cấu hình."
 msgid "Cannot create widget: %1$s."
 msgstr "Không thể tạo ô điều khiển: %1$s."
 
-#: include/classes/api/services/CUser.php:991
+#: include/classes/api/services/CUser.php:993
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Không thể xóa người dùng zabbix nội bộ \"%1$s\", thử vô hiệu hóa người dùng nào đó."
@@ -2399,7 +2399,7 @@ msgstr "Không thể liên kết template"
 msgid "Cannot link template."
 msgstr "Không thể kết nối mẫu"
 
-#: include/classes/api/services/CUser.php:1130
+#: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
 msgstr "Không thể đăng xuất."
 
@@ -2459,7 +2459,7 @@ msgstr "Không thể đọc XML: %1$s."
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Không thể đọc các câu trả lời, kiểm tra kết nối với zabbix server \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:430
+#: include/classes/api/services/CUser.php:432
 msgid "Cannot rename guest user."
 msgstr "Không thể đổi tên người dùng khách."
 
@@ -8214,7 +8214,7 @@ msgid "Incorrect media type ID."
 msgstr "ID loại phương tiện không chính xác."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1251
+#: include/classes/api/services/CUser.php:1277
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "Phương pháp \"%1$s.%2$s\" không chính xác."
@@ -8697,7 +8697,7 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:825
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
+#: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:118
 #: include/classes/graphdraw/CLineGraphDraw.php:246
 #: include/classes/graphdraw/CLineGraphDraw.php:256
@@ -8991,7 +8991,7 @@ msgstr "Hiển thị không hợp lệ của các trigger OK :%1$s."
 msgid "Invalid email address \"%1$s\"."
 msgstr "Địa chỉ email không hợp lệ \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:687
+#: include/classes/api/services/CUser.php:689
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Địa chỉ email không hợp lệ cho loại phương tiện với ID \"%1$s\"."
@@ -9104,8 +9104,8 @@ msgstr "Số đối số không hợp lệ của các tham số."
 #: include/classes/api/services/CItemGeneral.php:2320
 #: include/classes/api/services/CItemGeneral.php:2330
 #: include/classes/api/services/CItemGeneral.php:2359
-#: include/classes/api/services/CUser.php:661
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:663
+#: include/classes/api/services/CUser.php:674
 #: include/classes/validators/CApiInputValidator.php:254
 #: include/classes/validators/CApiInputValidator.php:259
 #: include/classes/validators/CApiInputValidator.php:264
@@ -9771,7 +9771,7 @@ msgstr "Vị trí nhãn"
 msgid "Language"
 msgstr "Ngôn ngữ"
 
-#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:551
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -10124,12 +10124,12 @@ msgstr "Log không khớp với SNMP traps"
 msgid "Login"
 msgstr "Đăng nhập"
 
-#: include/classes/api/services/CUser.php:1217
+#: include/classes/api/services/CUser.php:1219
 msgid "Login failed."
 msgstr "Đăng nhập thất bại."
 
-#: include/classes/api/services/CUser.php:1194
-#: include/classes/api/services/CUser.php:1542
+#: include/classes/api/services/CUser.php:1196
+#: include/classes/api/services/CUser.php:1563
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:84
 msgid "Login name or password is incorrect."
 msgstr "Tên đăng nhập hoặc mật khẩu không chính xác."
@@ -10520,7 +10520,7 @@ msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] "Chu kỳ thời gian tối đa để hiển thị là %1$s ngày."
 
-#: include/classes/api/services/CUser.php:694
+#: include/classes/api/services/CUser.php:696
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "Tổng chiều dài tối đa của địa chỉ email vượt quá đối với loại phương tiện có ID \"%1$s\"."
@@ -10590,7 +10590,7 @@ msgstr ""
 msgid "Media type updated"
 msgstr "Loại phương tiện đã được cập nhật"
 
-#: include/classes/api/services/CUser.php:618
+#: include/classes/api/services/CUser.php:620
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Kiểu phương tiện với ID \"%1$s\" là không sẵn sàng."
@@ -11471,8 +11471,8 @@ msgstr "Không khớp với kết quả nào "
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "Không có loại hoạt động nào được đưa ra cho liên kết \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:1199
-#: include/classes/api/services/CUser.php:1554
+#: include/classes/api/services/CUser.php:1201
+#: include/classes/api/services/CUser.php:1575
 msgid "No permissions for system access."
 msgstr "Không có quyền truy cập hệ thống."
 
@@ -11625,8 +11625,8 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CUserMacro.php:375
 #: include/classes/api/services/CUserMacro.php:462
 #: include/classes/api/services/CUserMacro.php:768
-#: include/classes/api/services/CUser.php:422
-#: include/classes/api/services/CUser.php:979
+#: include/classes/api/services/CUser.php:424
+#: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
 #: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:82
@@ -11761,7 +11761,7 @@ msgstr "Không báo nhận"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Không phải tất cả template đều được kết nối đến \"%s\"."
 
-#: include/classes/api/services/CUser.php:440
+#: include/classes/api/services/CUser.php:442
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Không được phép đặt lại mật khẩu cho người dùng \"guest\"."
 
@@ -14806,9 +14806,9 @@ msgstr "Các dịch vụ"
 msgid "Services form a circular dependency."
 msgstr "Các dịch vụ tạo thành một quan hệ phụ thuộc vòng tròn."
 
-#: include/classes/api/services/CUser.php:1304
-#: include/classes/api/services/CUser.php:1317
-#: include/classes/api/services/CUser.php:1343
+#: include/classes/api/services/CUser.php:1327
+#: include/classes/api/services/CUser.php:1340
+#: include/classes/api/services/CUser.php:1366
 msgid "Session terminated, re-login, please."
 msgstr "Kết thúc phiên làm việc, hãy đăng nhập lại."
 
@@ -17135,27 +17135,27 @@ msgstr "Người dùng"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "Người dùng \"%1$s\" không thể không có nhóm người dùng."
 
-#: include/classes/api/services/CUser.php:1064
+#: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr "Người dùng \"%1$s\" là chủ sở hữu bảng điều khiển \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1021
+#: include/classes/api/services/CUser.php:1023
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "Người dùng \"%1$s\" là sở hữu sơ đồ \"%2$s\""
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1036
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "Người dùng \"%1$s\" là chủ sở hữu screen \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1049
+#: include/classes/api/services/CUser.php:1051
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "Người dùng \"%1$s\" là chủ sở hữu slide show \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1007
+#: include/classes/api/services/CUser.php:1009
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "Người dùng \"%1$s\" được sử dụng trong hoạt động \"%2$s\"."
@@ -17177,11 +17177,11 @@ msgid "User can't change type for himself"
 msgstr "Người dùng không thể thay đổi kiểu cho chính mình"
 
 #: include/classes/api/services/CUserGroup.php:535
-#: include/classes/api/services/CUser.php:732
+#: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Người dùng không thể thêm chính mình vào một nhóm đã bị vô hiệu hóa hoặc một nhóm tiếp cận với giao diện người dùng."
 
-#: include/classes/api/services/CUser.php:719
+#: include/classes/api/services/CUser.php:721
 msgid "User cannot change their user type."
 msgstr "Người dùng không thể thay đổi quyền của người dùng."
 
@@ -17256,7 +17256,7 @@ msgstr[0] ""
 
 #: include/classes/api/services/CDashboard.php:531
 #: include/classes/api/services/CScript.php:418
-#: include/classes/api/services/CUser.php:515
+#: include/classes/api/services/CUser.php:517
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "Nhóm người dùng với ID \"%1$s\" không sẵn sàng."
@@ -17271,7 +17271,7 @@ msgstr "Nhóm người dùng với ID \"%1$s\" không sẵn sàng."
 msgid "User groups"
 msgstr "Các nhóm người dùng"
 
-#: include/classes/api/services/CUser.php:986
+#: include/classes/api/services/CUser.php:988
 msgid "User is not allowed to delete himself."
 msgstr "Người dùng không được phép xóa chính mình."
 
@@ -17352,7 +17352,7 @@ msgstr "Người dùng được cập nhật"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "Người dùng có ID \"%1$s\" không khả dụng."
 
-#: include/classes/api/services/CUser.php:474
+#: include/classes/api/services/CUser.php:476
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Người dùng với bí danh \"%s\" đã tồn tại."
@@ -18444,7 +18444,7 @@ msgstr "Một boolean được mong đợi "
 
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CUser.php:661
+#: include/classes/api/services/CUser.php:663
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:254
@@ -18734,8 +18734,8 @@ msgstr "Không thể thay đổi"
 #: include/classes/api/services/CTriggerGeneral.php:801
 #: include/classes/api/services/CTriggerGeneral.php:819
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:535
+#: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:760
 #: include/classes/import/CConfigurationImport.php:971
 #: include/classes/import/CConfigurationImport.php:1089
@@ -19546,7 +19546,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr "tổng() - Tổng giá trị của một khoảng thời gian T"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 msgid "supplied credentials are not unique"
 msgstr "thông tin được cung cấp không phải là duy nhất"
 

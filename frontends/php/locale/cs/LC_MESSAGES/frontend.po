@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 10:33+0200\n"
+"POT-Creation-Date: 2019-12-19 10:39+0200\n"
 "PO-Revision-Date: 2019-05-06 14:01+0300\n"
 "Last-Translator: martinds <kotyk@datasys.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -368,8 +368,8 @@ msgstr "Přístup odmítnut"
 msgid "Access denied!"
 msgstr "Přístup odepřen!"
 
-#: include/classes/api/services/CUser.php:1181
-#: include/classes/api/services/CUser.php:1223
+#: include/classes/api/services/CUser.php:1183
+#: include/classes/api/services/CUser.php:1225
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -1269,7 +1269,7 @@ msgstr "Autentizace"
 msgid "Authentication algorithm"
 msgstr "Autentizační algoritmus"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "Ověření selhalo: %1$s."
@@ -1331,7 +1331,7 @@ msgstr ""
 msgid "Auto-login"
 msgstr "Automatické přihlášení"
 
-#: include/classes/api/services/CUser.php:765
+#: include/classes/api/services/CUser.php:767
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "Možnosti automatického přihlášení a automatického odhlášení nelze provozovat simultánně."
 
@@ -1932,7 +1932,7 @@ msgstr "Není možné vytvořit konfigurační soubor."
 msgid "Cannot create widget: %1$s."
 msgstr "Nelze vytvořit widget: %1$s."
 
-#: include/classes/api/services/CUser.php:991
+#: include/classes/api/services/CUser.php:993
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Není možné smazat interního Zabbix uživatele \"%1$s\", zkuste ho vypnout."
@@ -2497,7 +2497,7 @@ msgstr "Není možné nalinkovat šablonu"
 msgid "Cannot link template."
 msgstr "Není možné nalinkovat šablonu."
 
-#: include/classes/api/services/CUser.php:1130
+#: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
 msgstr "Odhlášení není možné."
 
@@ -2557,7 +2557,7 @@ msgstr "Nelze číst XML: %1$s."
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Není možné číst odpověď, zkontrolujte spojení se Zabbix serverem \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:430
+#: include/classes/api/services/CUser.php:432
 msgid "Cannot rename guest user."
 msgstr "Není možné přejmenovat uživatele guest."
 
@@ -8350,7 +8350,7 @@ msgid "Incorrect media type ID."
 msgstr "Neplatné ID typu média."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1251
+#: include/classes/api/services/CUser.php:1277
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "Neplatná metoda \"%1$s.%2$s\"."
@@ -8833,7 +8833,7 @@ msgstr "Nesprávná hodnota pro pole \"%1$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:825
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
+#: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:118
 #: include/classes/graphdraw/CLineGraphDraw.php:246
 #: include/classes/graphdraw/CLineGraphDraw.php:256
@@ -9127,7 +9127,7 @@ msgstr "Neplatné zobrazení OK pro spouštěče: %1$s."
 msgid "Invalid email address \"%1$s\"."
 msgstr "Neplatná emailová adresa \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:687
+#: include/classes/api/services/CUser.php:689
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Neplatná emailová adresa pro typ médií s ID \"%1$s\"."
@@ -9240,8 +9240,8 @@ msgstr "Neplatný počet parametrů."
 #: include/classes/api/services/CItemGeneral.php:2320
 #: include/classes/api/services/CItemGeneral.php:2330
 #: include/classes/api/services/CItemGeneral.php:2359
-#: include/classes/api/services/CUser.php:661
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:663
+#: include/classes/api/services/CUser.php:674
 #: include/classes/validators/CApiInputValidator.php:254
 #: include/classes/validators/CApiInputValidator.php:259
 #: include/classes/validators/CApiInputValidator.php:264
@@ -9915,7 +9915,7 @@ msgstr "Umístění popisku"
 msgid "Language"
 msgstr "Jazyk"
 
-#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:551
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -10280,12 +10280,12 @@ msgstr "Logovat i nenastavené SNMP trapy"
 msgid "Login"
 msgstr "Přihlásit"
 
-#: include/classes/api/services/CUser.php:1217
+#: include/classes/api/services/CUser.php:1219
 msgid "Login failed."
 msgstr "Přihlášení selhalo."
 
-#: include/classes/api/services/CUser.php:1194
-#: include/classes/api/services/CUser.php:1542
+#: include/classes/api/services/CUser.php:1196
+#: include/classes/api/services/CUser.php:1563
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:84
 msgid "Login name or password is incorrect."
 msgstr "Nesprávné přihlašovací jméno nebo heslo."
@@ -10678,7 +10678,7 @@ msgstr[0] "Maximální časová perioda na zobrazení je %1$s den."
 msgstr[1] "Maximální časová perioda na zobrazení je %1$s dní."
 msgstr[2] "Maximální časová perioda na zobrazení je %1$s dní."
 
-#: include/classes/api/services/CUser.php:694
+#: include/classes/api/services/CUser.php:696
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "Překročena maximální celková délka emailové adresy pro typ médií s ID \"%1$s\"."
@@ -10754,7 +10754,7 @@ msgstr "Test typu média byl úspěšný."
 msgid "Media type updated"
 msgstr "Typ média byl aktualizován"
 
-#: include/classes/api/services/CUser.php:618
+#: include/classes/api/services/CUser.php:620
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Typ media s ID \"%1$s\" není dostupný."
@@ -11637,8 +11637,8 @@ msgstr "Žádné výběry nenalezené"
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "Žádný typ operace vzhledem ke korelaci \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:1199
-#: include/classes/api/services/CUser.php:1554
+#: include/classes/api/services/CUser.php:1201
+#: include/classes/api/services/CUser.php:1575
 msgid "No permissions for system access."
 msgstr "Žádné oprávnění pro přístup do systému."
 
@@ -11791,8 +11791,8 @@ msgstr "Žádné oprávnění pro přístup do systému."
 #: include/classes/api/services/CUserMacro.php:375
 #: include/classes/api/services/CUserMacro.php:462
 #: include/classes/api/services/CUserMacro.php:768
-#: include/classes/api/services/CUser.php:422
-#: include/classes/api/services/CUser.php:979
+#: include/classes/api/services/CUser.php:424
+#: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
 #: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:82
@@ -11927,7 +11927,7 @@ msgstr "Nepotvrzeno"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Né všechny šablony jsou připojené k \"%s\"."
 
-#: include/classes/api/services/CUser.php:440
+#: include/classes/api/services/CUser.php:442
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Není povolené nastavení hesla pro uživatele \"guest\"."
 
@@ -14980,9 +14980,9 @@ msgstr "Služby"
 msgid "Services form a circular dependency."
 msgstr "Služby tvoří kruhovou závislost."
 
-#: include/classes/api/services/CUser.php:1304
-#: include/classes/api/services/CUser.php:1317
-#: include/classes/api/services/CUser.php:1343
+#: include/classes/api/services/CUser.php:1327
+#: include/classes/api/services/CUser.php:1340
+#: include/classes/api/services/CUser.php:1366
 msgid "Session terminated, re-login, please."
 msgstr "Sezení ukončené, prosím přihlaste se znovu."
 
@@ -17321,27 +17321,27 @@ msgstr "Uživatel"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "User \"%1$s\" nemůže být bez skupiny uživatelů."
 
-#: include/classes/api/services/CUser.php:1064
+#: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr "Uživatel \"%1$s\" je majitel obrazovky \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1021
+#: include/classes/api/services/CUser.php:1023
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "Uživatel \"%1$s\" je vlastníkem mapy \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1036
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "Uživatel \"%1$s\" je vlastník obrazovky \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1049
+#: include/classes/api/services/CUser.php:1051
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "Uživatel \"%1$s\" je vlastníkem prezentace \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1007
+#: include/classes/api/services/CUser.php:1009
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "Uživatel \"%1$s\" je použit v akci \"%2$s\"."
@@ -17363,11 +17363,11 @@ msgid "User can't change type for himself"
 msgstr "Uživatel si nemůže sám sobě změnit typ"
 
 #: include/classes/api/services/CUserGroup.php:535
-#: include/classes/api/services/CUser.php:732
+#: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Uživatel nemůže sám sebe přidat do vypnuté skupiny nebo do skupiny s vypnutým GUI přístupem."
 
-#: include/classes/api/services/CUser.php:719
+#: include/classes/api/services/CUser.php:721
 msgid "User cannot change their user type."
 msgstr "Uživatel nemůže změnit svůj uživatelský typ."
 
@@ -17448,7 +17448,7 @@ msgstr[2] ""
 
 #: include/classes/api/services/CDashboard.php:531
 #: include/classes/api/services/CScript.php:418
-#: include/classes/api/services/CUser.php:515
+#: include/classes/api/services/CUser.php:517
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "Skupina uživatelů ID \"%1$s\" není dostupná."
@@ -17463,7 +17463,7 @@ msgstr "Skupina uživatelů ID \"%1$s\" není dostupná."
 msgid "User groups"
 msgstr "Skupiny uživatelů"
 
-#: include/classes/api/services/CUser.php:986
+#: include/classes/api/services/CUser.php:988
 msgid "User is not allowed to delete himself."
 msgstr "Uživatel nemá dovolené smazat sám sebe."
 
@@ -17546,7 +17546,7 @@ msgstr "Uživatel byl aktualizován"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "Uživatel s ID \"%1$s\" není dostupný."
 
-#: include/classes/api/services/CUser.php:474
+#: include/classes/api/services/CUser.php:476
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Uživatel s aliasem \"%s\" již existuje."
@@ -18644,7 +18644,7 @@ msgstr "boolean je očekávám"
 
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CUser.php:661
+#: include/classes/api/services/CUser.php:663
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:254
@@ -18934,8 +18934,8 @@ msgstr "nemůže být změněno"
 #: include/classes/api/services/CTriggerGeneral.php:801
 #: include/classes/api/services/CTriggerGeneral.php:819
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:535
+#: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:760
 #: include/classes/import/CConfigurationImport.php:971
 #: include/classes/import/CConfigurationImport.php:1089
@@ -19746,7 +19746,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - Souhrn hodnot za periodu T"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 msgid "supplied credentials are not unique"
 msgstr "zadaná pověření nejsou jedinečná"
 

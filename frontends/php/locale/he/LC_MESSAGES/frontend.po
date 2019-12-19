@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 10:33+0200\n"
+"POT-Creation-Date: 2019-12-19 10:39+0200\n"
 "PO-Revision-Date: 2019-09-30 14:06+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -352,8 +352,8 @@ msgstr "הגישה נדחתה"
 msgid "Access denied!"
 msgstr "הגישה נדחתה!"
 
-#: include/classes/api/services/CUser.php:1181
-#: include/classes/api/services/CUser.php:1223
+#: include/classes/api/services/CUser.php:1183
+#: include/classes/api/services/CUser.php:1225
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -1247,7 +1247,7 @@ msgstr "אימות"
 msgid "Authentication algorithm"
 msgstr "אלגוריתם אימות"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "האימות נכשל: %1$s."
@@ -1309,7 +1309,7 @@ msgstr ""
 msgid "Auto-login"
 msgstr "כניסה אוטומטית"
 
-#: include/classes/api/services/CUser.php:765
+#: include/classes/api/services/CUser.php:767
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "לא ניתן להפעיל את האפשרויות לכניסה וליציאה באופן אוטומטי יחדיו."
 
@@ -1907,7 +1907,7 @@ msgstr "לא ניתן ליצור קובץ תצורה."
 msgid "Cannot create widget: %1$s."
 msgstr "לא ניתן ליצור וידג׳ט: %1$s."
 
-#: include/classes/api/services/CUser.php:991
+#: include/classes/api/services/CUser.php:993
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "לא ניתן למחוק את המשתמש הפנימי של Zabbix בשם „%1$s”, יש לנסות להשבית את המשתמש הזה."
@@ -2443,7 +2443,7 @@ msgstr "לא ניתן לקשר תבנית"
 msgid "Cannot link template."
 msgstr "לא ניתן לקשר תבנית."
 
-#: include/classes/api/services/CUser.php:1130
+#: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
 msgstr "לא ניתן לצאת."
 
@@ -2503,7 +2503,7 @@ msgstr "לא ניתן לקרוא XML:‏ %1$s."
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "לא ניתן לקרוא את התגובה, יש לבדוק את החיבור לשרת ה־Zabbix‏ „%1$s”."
 
-#: include/classes/api/services/CUser.php:430
+#: include/classes/api/services/CUser.php:432
 msgid "Cannot rename guest user."
 msgstr "לא ניתן לשנות את שם משתמש האורח."
 
@@ -8277,7 +8277,7 @@ msgid "Incorrect media type ID."
 msgstr "מזהה סוג מדיה שגוי."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1251
+#: include/classes/api/services/CUser.php:1277
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "שיטה שגויה „%1$s.%2$s”."
@@ -8760,7 +8760,7 @@ msgstr "ערך שגוי לשדה „%1$s”."
 #: include/classes/api/services/CTriggerGeneral.php:825
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
+#: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:118
 #: include/classes/graphdraw/CLineGraphDraw.php:246
 #: include/classes/graphdraw/CLineGraphDraw.php:256
@@ -9054,7 +9054,7 @@ msgstr "הצגה שגויה של הקפצות תקינות: %1$s."
 msgid "Invalid email address \"%1$s\"."
 msgstr "כתובת דוא״ל שגויה „%1$s”."
 
-#: include/classes/api/services/CUser.php:687
+#: include/classes/api/services/CUser.php:689
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "כתובת דוא״ל שגויה עבור סוג המדיה עם המזהה „%1$s”."
@@ -9167,8 +9167,8 @@ msgstr "מספר הפרמטרים שגוי."
 #: include/classes/api/services/CItemGeneral.php:2320
 #: include/classes/api/services/CItemGeneral.php:2330
 #: include/classes/api/services/CItemGeneral.php:2359
-#: include/classes/api/services/CUser.php:661
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:663
+#: include/classes/api/services/CUser.php:674
 #: include/classes/validators/CApiInputValidator.php:254
 #: include/classes/validators/CApiInputValidator.php:259
 #: include/classes/validators/CApiInputValidator.php:264
@@ -9838,7 +9838,7 @@ msgstr "מיקום התווית"
 msgid "Language"
 msgstr "שפה"
 
-#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:551
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -10197,12 +10197,12 @@ msgstr "תיעוד מלכודות SNMP שאינן תואמות"
 msgid "Login"
 msgstr "כניסה"
 
-#: include/classes/api/services/CUser.php:1217
+#: include/classes/api/services/CUser.php:1219
 msgid "Login failed."
 msgstr "הכניסה נכשלה."
 
-#: include/classes/api/services/CUser.php:1194
-#: include/classes/api/services/CUser.php:1542
+#: include/classes/api/services/CUser.php:1196
+#: include/classes/api/services/CUser.php:1563
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:84
 msgid "Login name or password is incorrect."
 msgstr "שם הכניסה או הססמה שגויים."
@@ -10594,7 +10594,7 @@ msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] "תקופת הזמן המרבית להצגה היא יום %1$s."
 msgstr[1] "תקופת הזמן המרבית להצגה היא %1$s ימים."
 
-#: include/classes/api/services/CUser.php:694
+#: include/classes/api/services/CUser.php:696
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "חרגת מהאורך הכללי המרבי המותר לכתובת דוא״ל עבור סוג המדיה עם המזהה „%1$s”."
@@ -10667,7 +10667,7 @@ msgstr "בדיקת סוג מדיה מושבת הצליחה."
 msgid "Media type updated"
 msgstr "סוג המדיה עודכן"
 
-#: include/classes/api/services/CUser.php:618
+#: include/classes/api/services/CUser.php:620
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "סוג המדיה עם המזהה „%1$s” אינו זמין."
@@ -11549,8 +11549,8 @@ msgstr "לא נמצאו התאמות"
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "לא צוין סוג משימה ליחס „%1$s”."
 
-#: include/classes/api/services/CUser.php:1199
-#: include/classes/api/services/CUser.php:1554
+#: include/classes/api/services/CUser.php:1201
+#: include/classes/api/services/CUser.php:1575
 msgid "No permissions for system access."
 msgstr "אין הרשאות לגישה למערכת."
 
@@ -11703,8 +11703,8 @@ msgstr "אין הרשאות לגישה למערכת."
 #: include/classes/api/services/CUserMacro.php:375
 #: include/classes/api/services/CUserMacro.php:462
 #: include/classes/api/services/CUserMacro.php:768
-#: include/classes/api/services/CUser.php:422
-#: include/classes/api/services/CUser.php:979
+#: include/classes/api/services/CUser.php:424
+#: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
 #: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:82
@@ -11839,7 +11839,7 @@ msgstr "לא מוכר"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "לא כל התבניות מקושרות אל „%s”."
 
-#: include/classes/api/services/CUser.php:440
+#: include/classes/api/services/CUser.php:442
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "אין הרשאה להגדיר את הססמה למשתמש „guest” (אורח)."
 
@@ -14888,9 +14888,9 @@ msgstr "שירותים"
 msgid "Services form a circular dependency."
 msgstr "שירותים מתלות מעגלית."
 
-#: include/classes/api/services/CUser.php:1304
-#: include/classes/api/services/CUser.php:1317
-#: include/classes/api/services/CUser.php:1343
+#: include/classes/api/services/CUser.php:1327
+#: include/classes/api/services/CUser.php:1340
+#: include/classes/api/services/CUser.php:1366
 msgid "Session terminated, re-login, please."
 msgstr "ההפעלה נפסקה, נא להיכנס שוב, בבקשה."
 
@@ -17223,27 +17223,27 @@ msgstr "משתמש"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "המשתמש „%1$s” לא יכול להיות ללא קבוצת משתמשים."
 
-#: include/classes/api/services/CUser.php:1064
+#: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr "המשתמש „%1$s” הוא הבעלים של לוח המחוונים „%2$s”."
 
-#: include/classes/api/services/CUser.php:1021
+#: include/classes/api/services/CUser.php:1023
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "המשתמש „%1$s” הוא הבעלים של המפה „%2$s”."
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1036
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "המשתמש „%1$s” הוא הבעלים של המסך „%2$s”."
 
-#: include/classes/api/services/CUser.php:1049
+#: include/classes/api/services/CUser.php:1051
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "המשתמש „%1$s” הוא הבעלים של המצגת „%2$s”."
 
-#: include/classes/api/services/CUser.php:1007
+#: include/classes/api/services/CUser.php:1009
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "נעשה שימוש במשתמש „%1$s” בפעולה „%2$s”."
@@ -17265,11 +17265,11 @@ msgid "User can't change type for himself"
 msgstr "המשתמש לא יכול לשנות את הסוג לעצמו"
 
 #: include/classes/api/services/CUserGroup.php:535
-#: include/classes/api/services/CUser.php:732
+#: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "המשתמש לא יכול להוסיף את עצמו לקבוצת משתמשים מושבתת או לקבוצה שהגישה שלה למנשק המשתמש הושבתה."
 
-#: include/classes/api/services/CUser.php:719
+#: include/classes/api/services/CUser.php:721
 msgid "User cannot change their user type."
 msgstr "למשתמש אין אפשרות לשנות את סוג המשתמש של עצמו."
 
@@ -17347,7 +17347,7 @@ msgstr[1] ""
 
 #: include/classes/api/services/CDashboard.php:531
 #: include/classes/api/services/CScript.php:418
-#: include/classes/api/services/CUser.php:515
+#: include/classes/api/services/CUser.php:517
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "קבוצת משתמשים עם המזהה „%1$s” אינה זמינה."
@@ -17362,7 +17362,7 @@ msgstr "קבוצת משתמשים עם המזהה „%1$s” אינה זמינה
 msgid "User groups"
 msgstr "קבוצות משתמשים"
 
-#: include/classes/api/services/CUser.php:986
+#: include/classes/api/services/CUser.php:988
 msgid "User is not allowed to delete himself."
 msgstr "למשתמש אין הרשאה למחוק את עצמו."
 
@@ -17444,7 +17444,7 @@ msgstr "משתמש עודכן"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "המשתמש עם המזהה „%1$s” לא זמין."
 
-#: include/classes/api/services/CUser.php:474
+#: include/classes/api/services/CUser.php:476
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "משתמש עם הכינוי „%s” כבר קיים."
@@ -18539,7 +18539,7 @@ msgstr "אמור להיות בוליאני"
 
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CUser.php:661
+#: include/classes/api/services/CUser.php:663
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:254
@@ -18829,8 +18829,8 @@ msgstr "לא ניתן לשנות"
 #: include/classes/api/services/CTriggerGeneral.php:801
 #: include/classes/api/services/CTriggerGeneral.php:819
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:535
+#: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:760
 #: include/classes/import/CConfigurationImport.php:971
 #: include/classes/import/CConfigurationImport.php:1089
@@ -19641,7 +19641,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr "sum()‎ - סכום הערכים במשך T"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 msgid "supplied credentials are not unique"
 msgstr "פרטי הגישה שסופקו אינם יחודיים"
 

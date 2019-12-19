@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 10:33+0200\n"
+"POT-Creation-Date: 2019-12-19 10:39+0200\n"
 "PO-Revision-Date: 2018-09-17 12:18+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -353,8 +353,8 @@ msgstr "Accesso negato"
 msgid "Access denied!"
 msgstr "Accesso negato!"
 
-#: include/classes/api/services/CUser.php:1181
-#: include/classes/api/services/CUser.php:1223
+#: include/classes/api/services/CUser.php:1183
+#: include/classes/api/services/CUser.php:1225
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -1246,7 +1246,7 @@ msgstr "Autenticazione"
 msgid "Authentication algorithm"
 msgstr "Algoritmo di autenticazione"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr ""
@@ -1308,7 +1308,7 @@ msgstr ""
 msgid "Auto-login"
 msgstr "Auto-login"
 
-#: include/classes/api/services/CUser.php:765
+#: include/classes/api/services/CUser.php:767
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "Le opzioni Auto-login e auto-logout non possono essere abilitate insieme."
 
@@ -1906,7 +1906,7 @@ msgstr "Impossibile creare il file di configurazione."
 msgid "Cannot create widget: %1$s."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:991
+#: include/classes/api/services/CUser.php:993
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Impossibile rimuovere utente interno Zabbix \"%1$s\", prova a disabilitare quell'utente."
@@ -2442,7 +2442,7 @@ msgstr "Impossibile collegare template"
 msgid "Cannot link template."
 msgstr "Impossibile collegare template."
 
-#: include/classes/api/services/CUser.php:1130
+#: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
 msgstr "Impossibile disconnettersi."
 
@@ -2502,7 +2502,7 @@ msgstr "Impossibile leggere XML: %1$s."
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Impossibile leggere risposta, controlla connessione al server Zabbix \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:430
+#: include/classes/api/services/CUser.php:432
 msgid "Cannot rename guest user."
 msgstr "Impossibile rinominare utente guest."
 
@@ -8278,7 +8278,7 @@ msgid "Incorrect media type ID."
 msgstr "ID tipo media errato."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1251
+#: include/classes/api/services/CUser.php:1277
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "Metodo non corretto \"%1$s.%2$s\"."
@@ -8761,7 +8761,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:825
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
+#: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:118
 #: include/classes/graphdraw/CLineGraphDraw.php:246
 #: include/classes/graphdraw/CLineGraphDraw.php:256
@@ -9055,7 +9055,7 @@ msgstr "Visualizzazione non valida di trigger OK: %1$s."
 msgid "Invalid email address \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:687
+#: include/classes/api/services/CUser.php:689
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr ""
@@ -9168,8 +9168,8 @@ msgstr "Numero di parametri non valido."
 #: include/classes/api/services/CItemGeneral.php:2320
 #: include/classes/api/services/CItemGeneral.php:2330
 #: include/classes/api/services/CItemGeneral.php:2359
-#: include/classes/api/services/CUser.php:661
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:663
+#: include/classes/api/services/CUser.php:674
 #: include/classes/validators/CApiInputValidator.php:254
 #: include/classes/validators/CApiInputValidator.php:259
 #: include/classes/validators/CApiInputValidator.php:264
@@ -9839,7 +9839,7 @@ msgstr "Posizione etichetta"
 msgid "Language"
 msgstr "Lingua"
 
-#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:551
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -10198,12 +10198,12 @@ msgstr "Registrare trap SNMP sconosciute"
 msgid "Login"
 msgstr "Accesso"
 
-#: include/classes/api/services/CUser.php:1217
+#: include/classes/api/services/CUser.php:1219
 msgid "Login failed."
 msgstr "Login fallito."
 
-#: include/classes/api/services/CUser.php:1194
-#: include/classes/api/services/CUser.php:1542
+#: include/classes/api/services/CUser.php:1196
+#: include/classes/api/services/CUser.php:1563
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:84
 msgid "Login name or password is incorrect."
 msgstr "Nome o password login errati."
@@ -10595,7 +10595,7 @@ msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] "Il periodo di tempo massimo da visualizzare è \"%1$s\" giorno."
 msgstr[1] "Il periodo di tempo massimo da visualizzare è \"%1$s\" giorni."
 
-#: include/classes/api/services/CUser.php:694
+#: include/classes/api/services/CUser.php:696
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr ""
@@ -10668,7 +10668,7 @@ msgstr ""
 msgid "Media type updated"
 msgstr "Tipo di supporto aggiornato"
 
-#: include/classes/api/services/CUser.php:618
+#: include/classes/api/services/CUser.php:620
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Tipo Media con ID \"%1$s\" non e' valido."
@@ -11550,8 +11550,8 @@ msgstr "Nessuna corrispondenza trovata"
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "Nessun tipo operazione fornita per la correlazione \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:1199
-#: include/classes/api/services/CUser.php:1554
+#: include/classes/api/services/CUser.php:1201
+#: include/classes/api/services/CUser.php:1575
 msgid "No permissions for system access."
 msgstr "Nessun permesso per l'accesso al sistema."
 
@@ -11704,8 +11704,8 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: include/classes/api/services/CUserMacro.php:375
 #: include/classes/api/services/CUserMacro.php:462
 #: include/classes/api/services/CUserMacro.php:768
-#: include/classes/api/services/CUser.php:422
-#: include/classes/api/services/CUser.php:979
+#: include/classes/api/services/CUser.php:424
+#: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
 #: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:82
@@ -11840,7 +11840,7 @@ msgstr "Senza Ack"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Non tutti i template sono collegati a \"%s\"."
 
-#: include/classes/api/services/CUser.php:440
+#: include/classes/api/services/CUser.php:442
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Non autorizzato ad impostare la password per l'utente \"guest\"."
 
@@ -14890,9 +14890,9 @@ msgstr "Servizi"
 msgid "Services form a circular dependency."
 msgstr "I servizi formano una dipendenza circolare."
 
-#: include/classes/api/services/CUser.php:1304
-#: include/classes/api/services/CUser.php:1317
-#: include/classes/api/services/CUser.php:1343
+#: include/classes/api/services/CUser.php:1327
+#: include/classes/api/services/CUser.php:1340
+#: include/classes/api/services/CUser.php:1366
 msgid "Session terminated, re-login, please."
 msgstr "Sessione terminata, rieffettua il login, per favore."
 
@@ -17225,27 +17225,27 @@ msgstr "Utente"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "L'utente \"%1$s\" non può esistere senza un gruppo utenti"
 
-#: include/classes/api/services/CUser.php:1064
+#: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1021
+#: include/classes/api/services/CUser.php:1023
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "Utente \"%1$s\" e' il proprietario della mappa \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1036
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "Utente \"%1$s\" e' il proprietario della screen \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1049
+#: include/classes/api/services/CUser.php:1051
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "Utente \"%1$s\" e' proprietario della Slide Show \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1007
+#: include/classes/api/services/CUser.php:1009
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "Utente \"%1$s\" e' utilizzato nell'azione \"%2$s\"."
@@ -17267,11 +17267,11 @@ msgid "User can't change type for himself"
 msgstr "L'utente non può cambiare tipo per se stesso"
 
 #: include/classes/api/services/CUserGroup.php:535
-#: include/classes/api/services/CUser.php:732
+#: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "L'utente non può aggiungere se stesso ad un gruppo disabilitato o ad un gruppo con accesso alla GUI disabilitato.L'utente non può aggiungere se stesso ad un gruppo disabilitato o ad un gruppo con accesso alla GUI disabilitato."
 
-#: include/classes/api/services/CUser.php:719
+#: include/classes/api/services/CUser.php:721
 msgid "User cannot change their user type."
 msgstr "L'utente non può modificare il proprio tipo di utente."
 
@@ -17349,7 +17349,7 @@ msgstr[1] ""
 
 #: include/classes/api/services/CDashboard.php:531
 #: include/classes/api/services/CScript.php:418
-#: include/classes/api/services/CUser.php:515
+#: include/classes/api/services/CUser.php:517
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "Gruppo utenti con ID \"%1$s\" non è disponibile."
@@ -17364,7 +17364,7 @@ msgstr "Gruppo utenti con ID \"%1$s\" non è disponibile."
 msgid "User groups"
 msgstr "Gruppi utenti"
 
-#: include/classes/api/services/CUser.php:986
+#: include/classes/api/services/CUser.php:988
 msgid "User is not allowed to delete himself."
 msgstr "L'utente non ha i permessi per cancellare se stesso."
 
@@ -17446,7 +17446,7 @@ msgstr "Utente aggiornato"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "L'utente con ID \"%1$s\" non è disponibile."
 
-#: include/classes/api/services/CUser.php:474
+#: include/classes/api/services/CUser.php:476
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "L'utente con alias \"%s\" esiste già."
@@ -18542,7 +18542,7 @@ msgstr "è previsto un booleano"
 
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CUser.php:661
+#: include/classes/api/services/CUser.php:663
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:254
@@ -18832,8 +18832,8 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:801
 #: include/classes/api/services/CTriggerGeneral.php:819
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:535
+#: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:760
 #: include/classes/import/CConfigurationImport.php:971
 #: include/classes/import/CConfigurationImport.php:1089
@@ -19644,7 +19644,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 msgid "supplied credentials are not unique"
 msgstr ""
 

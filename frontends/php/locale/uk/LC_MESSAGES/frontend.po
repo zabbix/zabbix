@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 10:33+0200\n"
+"POT-Creation-Date: 2019-12-19 10:39+0200\n"
 "PO-Revision-Date: 2019-10-10 13:52+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -368,8 +368,8 @@ msgstr "Доступ заборонено"
 msgid "Access denied!"
 msgstr "Доступ заборонено!"
 
-#: include/classes/api/services/CUser.php:1181
-#: include/classes/api/services/CUser.php:1223
+#: include/classes/api/services/CUser.php:1183
+#: include/classes/api/services/CUser.php:1225
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -1269,7 +1269,7 @@ msgstr "Аутентифікація"
 msgid "Authentication algorithm"
 msgstr "Алгоритм аутентифікації"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "Невдала аутентийікація: %1$s."
@@ -1331,7 +1331,7 @@ msgstr ""
 msgid "Auto-login"
 msgstr "Авто-вхід"
 
-#: include/classes/api/services/CUser.php:765
+#: include/classes/api/services/CUser.php:767
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "Опції авто-вхід та авто-вихід неможливо активувати разом."
 
@@ -1932,7 +1932,7 @@ msgstr "Не вдалося створити конфігураційний фа
 msgid "Cannot create widget: %1$s."
 msgstr "Не вдалося створити віджет: %1$s."
 
-#: include/classes/api/services/CUser.php:991
+#: include/classes/api/services/CUser.php:993
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Не вдалося видалити внутрішнього користувача Zabbix \"%1$s\", спробуйте відключити цього користувача."
@@ -2497,7 +2497,7 @@ msgstr "Не вдалося приєднати шаблон"
 msgid "Cannot link template."
 msgstr "Не вдалося приєднати шаблон."
 
-#: include/classes/api/services/CUser.php:1130
+#: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
 msgstr "Не вдалося виконати вихід."
 
@@ -2557,7 +2557,7 @@ msgstr "Не вдалося прочитати XML: %1$s."
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Не вдалося прочитати відповідь, перевірте з'єднання з Zabbix сервером \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:430
+#: include/classes/api/services/CUser.php:432
 msgid "Cannot rename guest user."
 msgstr "Не вдалось перейменувати гостьового користувача."
 
@@ -8350,7 +8350,7 @@ msgid "Incorrect media type ID."
 msgstr "Некоректний ID методу повідомлень."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1251
+#: include/classes/api/services/CUser.php:1277
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "Некоректний метод \"%1$s.%2$s\"."
@@ -8833,7 +8833,7 @@ msgstr "Некоректне значення для поля \"%1$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:825
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
+#: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:118
 #: include/classes/graphdraw/CLineGraphDraw.php:246
 #: include/classes/graphdraw/CLineGraphDraw.php:256
@@ -9127,7 +9127,7 @@ msgstr "Неправильне відображення тригерів в ст
 msgid "Invalid email address \"%1$s\"."
 msgstr "Помилкова адреса email \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:687
+#: include/classes/api/services/CUser.php:689
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Помилкова адреса email у методу повідомлень з ID \"%1$s\"."
@@ -9240,8 +9240,8 @@ msgstr "Неправильна кількість параметрів."
 #: include/classes/api/services/CItemGeneral.php:2320
 #: include/classes/api/services/CItemGeneral.php:2330
 #: include/classes/api/services/CItemGeneral.php:2359
-#: include/classes/api/services/CUser.php:661
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:663
+#: include/classes/api/services/CUser.php:674
 #: include/classes/validators/CApiInputValidator.php:254
 #: include/classes/validators/CApiInputValidator.php:259
 #: include/classes/validators/CApiInputValidator.php:264
@@ -9915,7 +9915,7 @@ msgstr "Розміщення ярлика"
 msgid "Language"
 msgstr "Мова"
 
-#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:551
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -10280,12 +10280,12 @@ msgstr "Записувати не співпадаючі SNMP трапи"
 msgid "Login"
 msgstr "Вхід в систему"
 
-#: include/classes/api/services/CUser.php:1217
+#: include/classes/api/services/CUser.php:1219
 msgid "Login failed."
 msgstr "Невдала спроба входу."
 
-#: include/classes/api/services/CUser.php:1194
-#: include/classes/api/services/CUser.php:1542
+#: include/classes/api/services/CUser.php:1196
+#: include/classes/api/services/CUser.php:1563
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:84
 msgid "Login name or password is incorrect."
 msgstr "Некоректне ім'я користувача або пароль."
@@ -10678,7 +10678,7 @@ msgstr[0] "Максимальний період часу відображенн
 msgstr[1] "Максимальний період часу відображення %1$s дні."
 msgstr[2] "Максимальний період часу відображення %1$s днів."
 
-#: include/classes/api/services/CUser.php:694
+#: include/classes/api/services/CUser.php:696
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "Перевищено максимальну довжину email адреси у методу повідомлень з ID \"%1$s\"."
@@ -10754,7 +10754,7 @@ msgstr "Тест медіа типу успішний."
 msgid "Media type updated"
 msgstr "Метод повідомлень оновлено"
 
-#: include/classes/api/services/CUser.php:618
+#: include/classes/api/services/CUser.php:620
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Метод повідомлень з ID \"%1$s\" недоступний."
@@ -11637,8 +11637,8 @@ msgstr "Відповідностей не знайдено"
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "Тип операції не задано для кореляції \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:1199
-#: include/classes/api/services/CUser.php:1554
+#: include/classes/api/services/CUser.php:1201
+#: include/classes/api/services/CUser.php:1575
 msgid "No permissions for system access."
 msgstr "Немає прав доступу до системи."
 
@@ -11791,8 +11791,8 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CUserMacro.php:375
 #: include/classes/api/services/CUserMacro.php:462
 #: include/classes/api/services/CUserMacro.php:768
-#: include/classes/api/services/CUser.php:422
-#: include/classes/api/services/CUser.php:979
+#: include/classes/api/services/CUser.php:424
+#: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
 #: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:82
@@ -11927,7 +11927,7 @@ msgstr "Не підтверджено"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Не всі шаблони приєднані до \"%s\"."
 
-#: include/classes/api/services/CUser.php:440
+#: include/classes/api/services/CUser.php:442
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Забороняється встановлювати пароль для користувача \"гість\"."
 
@@ -14980,9 +14980,9 @@ msgstr "Послуги"
 msgid "Services form a circular dependency."
 msgstr "Послуги утворюють кільцеву залежність."
 
-#: include/classes/api/services/CUser.php:1304
-#: include/classes/api/services/CUser.php:1317
-#: include/classes/api/services/CUser.php:1343
+#: include/classes/api/services/CUser.php:1327
+#: include/classes/api/services/CUser.php:1340
+#: include/classes/api/services/CUser.php:1366
 msgid "Session terminated, re-login, please."
 msgstr "Сесія завершилась, будь-ласка повторно увійдіть в систему."
 
@@ -17321,27 +17321,27 @@ msgstr "Користувач"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "Користувач \"%1$s\" не може бути без групи користувачів."
 
-#: include/classes/api/services/CUser.php:1064
+#: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr "Користувач \"%1$s\" власник панелі \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1021
+#: include/classes/api/services/CUser.php:1023
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "Користувач \"%1$s\" є власником карти мережі \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1036
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "Користувач \"%1$s\" є власником комплексного екрану \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1049
+#: include/classes/api/services/CUser.php:1051
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "Користувач \"%1$s\" є власником слайд шоу \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1007
+#: include/classes/api/services/CUser.php:1009
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "Користувач \"%1$s\" використовується в дії \"%2$s\"."
@@ -17363,11 +17363,11 @@ msgid "User can't change type for himself"
 msgstr "Користувач не може змінювати тип сам собі"
 
 #: include/classes/api/services/CUserGroup.php:535
-#: include/classes/api/services/CUser.php:732
+#: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Користувач не може додати сам себе у відключену групу або в групу з відключеним доступом до Веб-інтерфейсу."
 
-#: include/classes/api/services/CUser.php:719
+#: include/classes/api/services/CUser.php:721
 msgid "User cannot change their user type."
 msgstr "Користувач не може змінювати собі тип користувача."
 
@@ -17448,7 +17448,7 @@ msgstr[2] ""
 
 #: include/classes/api/services/CDashboard.php:531
 #: include/classes/api/services/CScript.php:418
-#: include/classes/api/services/CUser.php:515
+#: include/classes/api/services/CUser.php:517
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "Група користувачів з ID \"%1$s\" недоступна."
@@ -17463,7 +17463,7 @@ msgstr "Група користувачів з ID \"%1$s\" недоступна.
 msgid "User groups"
 msgstr "Групи користувачів"
 
-#: include/classes/api/services/CUser.php:986
+#: include/classes/api/services/CUser.php:988
 msgid "User is not allowed to delete himself."
 msgstr "Користувачу не дозволено видалити самого себе."
 
@@ -17546,7 +17546,7 @@ msgstr "Дані користувача оновлено"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "Користувач з ID \"%1$s\" недоступний."
 
-#: include/classes/api/services/CUser.php:474
+#: include/classes/api/services/CUser.php:476
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Користувач з псевдонімом \"%s\" вже існує."
@@ -18644,7 +18644,7 @@ msgstr "очікується логічне значення"
 
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CUser.php:661
+#: include/classes/api/services/CUser.php:663
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:254
@@ -18934,8 +18934,8 @@ msgstr "неможливо змінити"
 #: include/classes/api/services/CTriggerGeneral.php:801
 #: include/classes/api/services/CTriggerGeneral.php:819
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:535
+#: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:760
 #: include/classes/import/CConfigurationImport.php:971
 #: include/classes/import/CConfigurationImport.php:1089
@@ -19746,7 +19746,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - Сума значень за період Т"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 msgid "supplied credentials are not unique"
 msgstr "наданий обліковий запис не унікальний"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 10:33+0200\n"
+"POT-Creation-Date: 2019-12-19 10:39+0200\n"
 "PO-Revision-Date: 2016-07-23 10:02+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -369,8 +369,8 @@ msgstr "Prístup zamietnutý"
 msgid "Access denied!"
 msgstr "Prístup zamietnutý!"
 
-#: include/classes/api/services/CUser.php:1181
-#: include/classes/api/services/CUser.php:1223
+#: include/classes/api/services/CUser.php:1183
+#: include/classes/api/services/CUser.php:1225
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -1266,7 +1266,7 @@ msgstr "Autentifikácia"
 msgid "Authentication algorithm"
 msgstr "Autentifikačný algoritmus"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr ""
@@ -1328,7 +1328,7 @@ msgstr ""
 msgid "Auto-login"
 msgstr "Automatické prihlásenie"
 
-#: include/classes/api/services/CUser.php:765
+#: include/classes/api/services/CUser.php:767
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr ""
 
@@ -1929,7 +1929,7 @@ msgstr "Nie je možné vytvoriť konfiguračný súbor."
 msgid "Cannot create widget: %1$s."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:991
+#: include/classes/api/services/CUser.php:993
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Nie je možné zmazať interného Zabbix používateľa \"%1$s\", skúste ho vypnúť."
@@ -2494,7 +2494,7 @@ msgstr "Nie je možné nalinkovať šablónu"
 msgid "Cannot link template."
 msgstr "Nie je možné nalinkovať šablónu."
 
-#: include/classes/api/services/CUser.php:1130
+#: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
 msgstr "Odhlásenie nie je možné."
 
@@ -2554,7 +2554,7 @@ msgstr "Nie je možné čítať XML: %1$s."
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Nie je možné čítať odpoveď, skontrolujte spojenie so Zabbix serverom \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:430
+#: include/classes/api/services/CUser.php:432
 msgid "Cannot rename guest user."
 msgstr "Nie je možné premenovať používateľa guest."
 
@@ -8351,7 +8351,7 @@ msgid "Incorrect media type ID."
 msgstr "Nesprávny typ média ID."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1251
+#: include/classes/api/services/CUser.php:1277
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "Neplatná metóda \"%1$s.%2$s\"."
@@ -8834,7 +8834,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:825
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
+#: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:118
 #: include/classes/graphdraw/CLineGraphDraw.php:246
 #: include/classes/graphdraw/CLineGraphDraw.php:256
@@ -9128,7 +9128,7 @@ msgstr ""
 msgid "Invalid email address \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:687
+#: include/classes/api/services/CUser.php:689
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr ""
@@ -9241,8 +9241,8 @@ msgstr "Neplatný počet parametrov."
 #: include/classes/api/services/CItemGeneral.php:2320
 #: include/classes/api/services/CItemGeneral.php:2330
 #: include/classes/api/services/CItemGeneral.php:2359
-#: include/classes/api/services/CUser.php:661
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:663
+#: include/classes/api/services/CUser.php:674
 #: include/classes/validators/CApiInputValidator.php:254
 #: include/classes/validators/CApiInputValidator.php:259
 #: include/classes/validators/CApiInputValidator.php:264
@@ -9917,7 +9917,7 @@ msgstr "Umiestnenie popisku"
 msgid "Language"
 msgstr "Jazyk"
 
-#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:551
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -10282,12 +10282,12 @@ msgstr "Logovať aj nenastavené SNMP trapy"
 msgid "Login"
 msgstr "Prihlásenie"
 
-#: include/classes/api/services/CUser.php:1217
+#: include/classes/api/services/CUser.php:1219
 msgid "Login failed."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1194
-#: include/classes/api/services/CUser.php:1542
+#: include/classes/api/services/CUser.php:1196
+#: include/classes/api/services/CUser.php:1563
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:84
 msgid "Login name or password is incorrect."
 msgstr "Nesprávne prihlasovacie meno alebo heslo."
@@ -10680,7 +10680,7 @@ msgstr[0] "Maximálna časová perióda na zobrazenie je %1$s deň."
 msgstr[1] "Maximálna časová perióda na zobrazenie je %1$s dni."
 msgstr[2] "Maximálna časová perióda na zobrazenie je %1$s dní."
 
-#: include/classes/api/services/CUser.php:694
+#: include/classes/api/services/CUser.php:696
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr ""
@@ -10756,7 +10756,7 @@ msgstr ""
 msgid "Media type updated"
 msgstr "Typ média aktualizovaný"
 
-#: include/classes/api/services/CUser.php:618
+#: include/classes/api/services/CUser.php:620
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr ""
@@ -11639,8 +11639,8 @@ msgstr "Žiadne výbery nenájdené"
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1199
-#: include/classes/api/services/CUser.php:1554
+#: include/classes/api/services/CUser.php:1201
+#: include/classes/api/services/CUser.php:1575
 msgid "No permissions for system access."
 msgstr "Žiadne oprávnenia pre prístup do systému."
 
@@ -11793,8 +11793,8 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CUserMacro.php:375
 #: include/classes/api/services/CUserMacro.php:462
 #: include/classes/api/services/CUserMacro.php:768
-#: include/classes/api/services/CUser.php:422
-#: include/classes/api/services/CUser.php:979
+#: include/classes/api/services/CUser.php:424
+#: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
 #: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:82
@@ -11929,7 +11929,7 @@ msgstr "Nepotvrdené"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Nie všetky šablóny sú pripojené k \"%s\"."
 
-#: include/classes/api/services/CUser.php:440
+#: include/classes/api/services/CUser.php:442
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Nie je povolené nastavenie hesla pre používateľa \"guest\"."
 
@@ -14982,9 +14982,9 @@ msgstr "Služby"
 msgid "Services form a circular dependency."
 msgstr "Služby tvoria kruhovú závislosť."
 
-#: include/classes/api/services/CUser.php:1304
-#: include/classes/api/services/CUser.php:1317
-#: include/classes/api/services/CUser.php:1343
+#: include/classes/api/services/CUser.php:1327
+#: include/classes/api/services/CUser.php:1340
+#: include/classes/api/services/CUser.php:1366
 msgid "Session terminated, re-login, please."
 msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 
@@ -17324,27 +17324,27 @@ msgstr "Používateľ"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1064
+#: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1021
+#: include/classes/api/services/CUser.php:1023
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "Používateľ \"%1$s\" je vlastníkom mapy \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1036
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "Používateľ \"%1$s\" je vlastníkom obrazovky \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1049
+#: include/classes/api/services/CUser.php:1051
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "Používateľ \"%1$s\" je vlastníkom prezentácie \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1007
+#: include/classes/api/services/CUser.php:1009
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr ""
@@ -17366,11 +17366,11 @@ msgid "User can't change type for himself"
 msgstr "Používateľ si nemôže sám sebe zmeniť typ"
 
 #: include/classes/api/services/CUserGroup.php:535
-#: include/classes/api/services/CUser.php:732
+#: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Používateľ nemôže sám seba pridať do vypnutej skupiny alebo do skupiny s vypnutým GUI prístupom."
 
-#: include/classes/api/services/CUser.php:719
+#: include/classes/api/services/CUser.php:721
 msgid "User cannot change their user type."
 msgstr ""
 
@@ -17451,7 +17451,7 @@ msgstr[2] ""
 
 #: include/classes/api/services/CDashboard.php:531
 #: include/classes/api/services/CScript.php:418
-#: include/classes/api/services/CUser.php:515
+#: include/classes/api/services/CUser.php:517
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr ""
@@ -17466,7 +17466,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Používateľské skupiny"
 
-#: include/classes/api/services/CUser.php:986
+#: include/classes/api/services/CUser.php:988
 msgid "User is not allowed to delete himself."
 msgstr "Používateľ nemá dovolené zmazať sám seba."
 
@@ -17549,7 +17549,7 @@ msgstr "Používateľ aktualizovaný"
 msgid "User with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:474
+#: include/classes/api/services/CUser.php:476
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Používateľ s aliasom \"%s\" už existuje."
@@ -18647,7 +18647,7 @@ msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CUser.php:661
+#: include/classes/api/services/CUser.php:663
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:254
@@ -18937,8 +18937,8 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:801
 #: include/classes/api/services/CTriggerGeneral.php:819
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:535
+#: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:760
 #: include/classes/import/CConfigurationImport.php:971
 #: include/classes/import/CConfigurationImport.php:1089
@@ -19749,7 +19749,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 msgid "supplied credentials are not unique"
 msgstr ""
 

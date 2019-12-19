@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 10:33+0200\n"
+"POT-Creation-Date: 2019-12-19 10:39+0200\n"
 "PO-Revision-Date: 2018-12-04 06:16+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -338,8 +338,8 @@ msgstr "엑세스가 거부되었습니다"
 msgid "Access denied!"
 msgstr "엑세스가 거부되었습니다!"
 
-#: include/classes/api/services/CUser.php:1181
-#: include/classes/api/services/CUser.php:1223
+#: include/classes/api/services/CUser.php:1183
+#: include/classes/api/services/CUser.php:1225
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -1227,7 +1227,7 @@ msgstr "인증"
 msgid "Authentication algorithm"
 msgstr "인증 알고리즘"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "인증에 실패하였습니다 : %1$s"
@@ -1289,7 +1289,7 @@ msgstr ""
 msgid "Auto-login"
 msgstr "자동 로그인 (1개월)"
 
-#: include/classes/api/services/CUser.php:765
+#: include/classes/api/services/CUser.php:767
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "자동 로그인과 자동 로그아웃을 동시에 활성화 할 수는 없습니다."
 
@@ -1884,7 +1884,7 @@ msgstr "설정 파일을 작성할 수 없습니다."
 msgid "Cannot create widget: %1$s."
 msgstr "위젯을 작성할 수 없습니다 : %1$s。"
 
-#: include/classes/api/services/CUser.php:991
+#: include/classes/api/services/CUser.php:993
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Zabbix 유저 \"%1$s\"를 삭제할 수 없습니다. 유저를 비활성으로 설정해 주십시오."
@@ -2391,7 +2391,7 @@ msgstr "템플릿을 링크할 수 없습니다"
 msgid "Cannot link template."
 msgstr "템플릿을 링크할 수 없습니다."
 
-#: include/classes/api/services/CUser.php:1130
+#: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
 msgstr "로그아웃 할 수 없습니다."
 
@@ -2451,7 +2451,7 @@ msgstr "XML: %1$s 을 읽을 수 없습니다."
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "응답을 받을 수 없습니다. Zabbix서버 \"%1$s\"의 접속을 확인해 주십시오."
 
-#: include/classes/api/services/CUser.php:430
+#: include/classes/api/services/CUser.php:432
 msgid "Cannot rename guest user."
 msgstr "게스트 사용자의 이름을 변경할 수 없습니다"
 
@@ -8207,7 +8207,7 @@ msgid "Incorrect media type ID."
 msgstr "미디어 타입 ID가 올바르지 않습니다."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1251
+#: include/classes/api/services/CUser.php:1277
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "메소트 \"%1$s.%2$s\"가 올바르지 않습니다."
@@ -8690,7 +8690,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:825
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
+#: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:118
 #: include/classes/graphdraw/CLineGraphDraw.php:246
 #: include/classes/graphdraw/CLineGraphDraw.php:256
@@ -8984,7 +8984,7 @@ msgstr "복귀 트리거의 표시기간이 올바르지 않습니다 : %1$s."
 msgid "Invalid email address \"%1$s\"."
 msgstr "메일 주소 \"%1$s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CUser.php:687
+#: include/classes/api/services/CUser.php:689
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"의 미디어 타입의 메일 주소가 올바르지 않습니다."
@@ -9097,8 +9097,8 @@ msgstr "파라미터의 수가 올바르지 않습니다."
 #: include/classes/api/services/CItemGeneral.php:2320
 #: include/classes/api/services/CItemGeneral.php:2330
 #: include/classes/api/services/CItemGeneral.php:2359
-#: include/classes/api/services/CUser.php:661
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:663
+#: include/classes/api/services/CUser.php:674
 #: include/classes/validators/CApiInputValidator.php:254
 #: include/classes/validators/CApiInputValidator.php:259
 #: include/classes/validators/CApiInputValidator.php:264
@@ -9764,7 +9764,7 @@ msgstr "라벨 위치"
 msgid "Language"
 msgstr "언어"
 
-#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:551
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -10117,12 +10117,12 @@ msgstr "매치하지 않은 SNMP트랩을 로그에 기록"
 msgid "Login"
 msgstr "로그인"
 
-#: include/classes/api/services/CUser.php:1217
+#: include/classes/api/services/CUser.php:1219
 msgid "Login failed."
 msgstr "로그인 실패."
 
-#: include/classes/api/services/CUser.php:1194
-#: include/classes/api/services/CUser.php:1542
+#: include/classes/api/services/CUser.php:1196
+#: include/classes/api/services/CUser.php:1563
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:84
 msgid "Login name or password is incorrect."
 msgstr "로그인 이름이나 패스워드가 잘못되어 있습니다."
@@ -10513,7 +10513,7 @@ msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] "표시 가능한 최대 기간은 %1$s일 입니다."
 
-#: include/classes/api/services/CUser.php:694
+#: include/classes/api/services/CUser.php:696
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"의 미디어 타입의 메일주소가 최대 길이를 넘었습니다."
@@ -10583,7 +10583,7 @@ msgstr ""
 msgid "Media type updated"
 msgstr "연락 방법을 갱신하였습니다"
 
-#: include/classes/api/services/CUser.php:618
+#: include/classes/api/services/CUser.php:620
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 미디어 타입은 사용할 수 없습니다."
@@ -11464,8 +11464,8 @@ msgstr "조건에 일치하는 데이터가 없습니다"
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "상관관계 \"%1$s\"에 실행내용 타입이 정의되어 있지 않습니다."
 
-#: include/classes/api/services/CUser.php:1199
-#: include/classes/api/services/CUser.php:1554
+#: include/classes/api/services/CUser.php:1201
+#: include/classes/api/services/CUser.php:1575
 msgid "No permissions for system access."
 msgstr "시스템 액세스 권한이 없습니다."
 
@@ -11618,8 +11618,8 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CUserMacro.php:375
 #: include/classes/api/services/CUserMacro.php:462
 #: include/classes/api/services/CUserMacro.php:768
-#: include/classes/api/services/CUser.php:422
-#: include/classes/api/services/CUser.php:979
+#: include/classes/api/services/CUser.php:424
+#: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
 #: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:82
@@ -11754,7 +11754,7 @@ msgstr "코멘트없음"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "모든 템플릿은 \"%s\"에 링크되어 있지 않습니다."
 
-#: include/classes/api/services/CUser.php:440
+#: include/classes/api/services/CUser.php:442
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "\"손님\" 사용자는 패스워드를 설정할 수 없습니다."
 
@@ -14799,9 +14799,9 @@ msgstr "서비스"
 msgid "Services form a circular dependency."
 msgstr "서비스의 의존관계가 모순되어있습니다."
 
-#: include/classes/api/services/CUser.php:1304
-#: include/classes/api/services/CUser.php:1317
-#: include/classes/api/services/CUser.php:1343
+#: include/classes/api/services/CUser.php:1327
+#: include/classes/api/services/CUser.php:1340
+#: include/classes/api/services/CUser.php:1366
 msgid "Session terminated, re-login, please."
 msgstr "세션이 끊겼습니다. 다시 로그인하여 주십시오."
 
@@ -17128,27 +17128,27 @@ msgstr "유저"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "유저 \"%1$s\"에 유저 그룹을 설정해주세요."
 
-#: include/classes/api/services/CUser.php:1064
+#: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr "유저 \"%1$s\"는 대시보드 \"%2$s\"의 소유자입니다."
 
-#: include/classes/api/services/CUser.php:1021
+#: include/classes/api/services/CUser.php:1023
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "유저 \"%1$s\"는 맵 \"%2$s\"의 소유자입니다."
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1036
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "유저 \"%1$s\"는 스크린 \"%2$s\"의 소유자입니다."
 
-#: include/classes/api/services/CUser.php:1049
+#: include/classes/api/services/CUser.php:1051
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "유저 \"%1$s\" 는 슬라이드쇼 \"%2$s\"의 소유자입니다."
 
-#: include/classes/api/services/CUser.php:1007
+#: include/classes/api/services/CUser.php:1009
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "유저 \"%1$s\"는 \"%2$s\" 액션 내에서 이용되고 있습니다."
@@ -17170,11 +17170,11 @@ msgid "User can't change type for himself"
 msgstr "사용자는 자신의 사용자타입을 변경할 수 없습니다"
 
 #: include/classes/api/services/CUserGroup.php:535
-#: include/classes/api/services/CUser.php:732
+#: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "사용자는 비활성의 그룹이나 GUI액세스가 비활성인 그룹에 자기자신을 추가할 수 없습니다."
 
-#: include/classes/api/services/CUser.php:719
+#: include/classes/api/services/CUser.php:721
 msgid "User cannot change their user type."
 msgstr "유저는 유저의 종류를 변경할 수 없습니다."
 
@@ -17249,7 +17249,7 @@ msgstr[0] ""
 
 #: include/classes/api/services/CDashboard.php:531
 #: include/classes/api/services/CScript.php:418
-#: include/classes/api/services/CUser.php:515
+#: include/classes/api/services/CUser.php:517
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 유저 그룹은 사용할 수 없습니다."
@@ -17264,7 +17264,7 @@ msgstr "ID \"%1$s\"의 유저 그룹은 사용할 수 없습니다."
 msgid "User groups"
 msgstr "유저 그룹"
 
-#: include/classes/api/services/CUser.php:986
+#: include/classes/api/services/CUser.php:988
 msgid "User is not allowed to delete himself."
 msgstr "자신의 사용자는 삭제할 수 없습니다."
 
@@ -17345,7 +17345,7 @@ msgstr "사용자를 갱신하였습니다"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 유저는 사용할 수 없습니다."
 
-#: include/classes/api/services/CUser.php:474
+#: include/classes/api/services/CUser.php:476
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "ID 명\"%s\"를 지닌 사용자가 이미 존재합니다."
@@ -18437,7 +18437,7 @@ msgstr "boolean을 지정해주세요"
 
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CUser.php:661
+#: include/classes/api/services/CUser.php:663
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:254
@@ -18727,8 +18727,8 @@ msgstr "변경할 수 없습니다"
 #: include/classes/api/services/CTriggerGeneral.php:801
 #: include/classes/api/services/CTriggerGeneral.php:819
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:533
-#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:535
+#: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:760
 #: include/classes/import/CConfigurationImport.php:971
 #: include/classes/import/CConfigurationImport.php:1089
@@ -19540,7 +19540,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - 기간 T안의 합계치"
 
-#: include/classes/api/services/CUser.php:1546
+#: include/classes/api/services/CUser.php:1567
 msgid "supplied credentials are not unique"
 msgstr "지정된 자격 정보는 유니크 값이 아닙니다."
 
