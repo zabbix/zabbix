@@ -185,24 +185,47 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function getItemTestProperties(array $input) {
 		$data = [
-			'value_type' => $this->getInput('value_type')
+			'value_type' => $input['value_type']
 		];
 
 		if (!$this->is_item_testable) {
 			return $data;
 		}
 
-		$data += [
-			'proxy_hostid' => $this->host['proxy_hostid'],
-			'type' => $this->item_type
+		$data['type'] = $this->item_type;
+
+		$interface_input = [
+			'interfaceid' => array_key_exists('interfaceid', $input) ? $input['interfaceid'] : 0
 		];
 
-		$interface_input = array_key_exists('interface', $input) ? $input['interface'] : [];
+		if (array_key_exists('useip', $input)) {
+			$interface_input['useip'] = $input['useip'];
+		}
+
+		if (array_key_exists('data', $input) && array_key_exists('port', $input['data'])) {
+			$interface_input['port'] = $input['data']['port'];
+		}
+		elseif (array_key_exists('interface', $input) && array_key_exists('port', $input['interface'])) {
+			$interface_input['port'] = $input['interface']['port'];
+		}
+		elseif (array_key_exists('port', $input)) {
+			$interface_input['port'] = $input['port'];
+		}
+
+		if (array_key_exists('data', $input) && array_key_exists('address', $input['data'])) {
+			$interface_input['address'] = $input['data']['address'];
+		}
+		elseif (array_key_exists('interface', $input) && array_key_exists('address', $input['interface'])) {
+			$interface_input['address'] = $input['interface']['address'];
+		}
+		elseif (array_key_exists('address', $input)) {
+			$interface_input['address'] = $input['address'];
+		}
 
 		switch ($this->item_type) {
 			case ITEM_TYPE_ZABBIX:
 				$data += [
-					'key' => $this->getInput('key'),
+					'key' => array_key_exists('key', $input) ? $input['key'] : null,
 					'host' => [
 						'tls_subject' => $this->host['tls_subject'],
 						'tls_psk_identity' => $this->host['tls_psk_identity'],
@@ -234,8 +257,8 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 
 				$data += [
-					'snmp_oid' => $this->getInput('snmp_oid'),
-					'snmp_community' => $this->getInput('snmp_community'),
+					'snmp_oid' => array_key_exists('snmp_oid', $input) ? $input['snmp_oid'] : null,
+					'snmp_community' => array_key_exists('snmp_community', $input) ? $input['snmp_community'] : null,
 					'flags' => $item_flag,
 					'host' => [
 						'host' => $this->host['host']
@@ -245,17 +268,31 @@ abstract class CControllerPopupItemTest extends CController {
 
 				if ($this->item_type == ITEM_TYPE_SNMPV3) {
 					$data += [
-						'snmpv3_securityname' => $this->getInput('snmpv3_securityname', ''),
-						'snmpv3_contextname' => $this->getInput('snmpv3_contextname', ''),
-						'snmpv3_securitylevel' => $this->getInput('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
+						'snmpv3_securityname' => array_key_exists('snmpv3_securityname', $input)
+							? $input['snmpv3_securityname']
+							: null,
+						'snmpv3_contextname' => array_key_exists('snmpv3_contextname', $input)
+							? $input['snmpv3_contextname']
+							: null,
+						'snmpv3_securitylevel' => array_key_exists('snmpv3_securitylevel', $input)
+							? $input['snmpv3_securitylevel']
+							: ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV
 					];
 
 					if ($data['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 						$data += [
-							'snmpv3_authprotocol' => $this->getInput('snmpv3_authprotocol', ''),
-							'snmpv3_authpassphrase' => $this->getInput('snmpv3_authpassphrase', ''),
-							'snmpv3_privprotocol' => $this->getInput('snmpv3_privprotocol', ''),
-							'snmpv3_privpassphrase' => $this->getInput('snmpv3_privpassphrase', '')
+							'snmpv3_authprotocol' => array_key_exists('snmpv3_authprotocol', $input)
+								? $input['snmpv3_authprotocol']
+								: null,
+							'snmpv3_authpassphrase' => array_key_exists('snmpv3_authpassphrase', $input)
+								? $input['snmpv3_authpassphrase']
+								: null,
+							'snmpv3_privprotocol' => array_key_exists('snmpv3_privprotocol', $input)
+								? $input['snmpv3_privprotocol']
+								: null,
+							'snmpv3_privpassphrase' => array_key_exists('snmpv3_privpassphrase', $input)
+								? $input['snmpv3_privpassphrase']
+								: null
 						];
 					}
 				}
@@ -263,7 +300,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_INTERNAL:
 				$data += [
-					'key' => $this->getInput('key'),
+					'key' => $input['key'],
 					'host' => [
 						'hostid' => $this->host['hostid'],
 						'available' => $this->host['available'],
@@ -278,61 +315,68 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_AGGREGATE:
 				$data += [
-					'key' => $this->getInput('key'),
-					'value_type' => $this->getInput('value_type')
+					'key' => $input['key']
 				];
 				break;
 
 			case ITEM_TYPE_EXTERNAL:
 				$data += [
-					'key' => $this->getInput('key')
+					'key' => $input['key']
 				];
 				break;
 
 			case ITEM_TYPE_DB_MONITOR:
 				$data += [
-					'key' => $this->getInput('key'),
-					'params_ap' => $this->getInput('params_ap'),
-					'username' => $this->getInput('username'),
-					'password' => $this->getInput('password')
+					'key' => $input['key'],
+					'params_ap' => array_key_exists('params_ap', $input) ? $input['params_ap'] : null,
+					'username' => array_key_exists('username', $input) ? $input['username'] : null,
+					'password' => array_key_exists('password', $input) ? $input['password'] : null
 				];
 				break;
 
 			case ITEM_TYPE_HTTPAGENT:
 				$data += [
-					'key' => $this->getInput('key'),
-					'authtype' => $this->getInput('authtype', HTTPTEST_AUTH_NONE),
-					'follow_redirects' => $this->getInput('follow_redirects', 0),
-					'headers' => $this->getInput('headers', []),
-					'http_proxy' => $this->getInput('http_proxy'),
-					'output_format' => $this->getInput('output_format', 0),
-					'posts' => $this->getInput('posts', ''),
-					'post_type' => $this->getInput('post_type', ZBX_POSTTYPE_RAW),
-					'query_fields' => $this->getInput('query_fields', []),
-					'request_method' => $this->getInput('request_method', HTTPCHECK_REQUEST_GET),
-					'retrieve_mode' => $this->getInput('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT),
-					'ssl_cert_file' => $this->getInput('ssl_cert_file', ''),
-					'ssl_key_file' => $this->getInput('ssl_key_file', ''),
-					'ssl_key_password' => $this->getInput('ssl_key_password', ''),
-					'status_codes' => $this->getInput('status_codes', ''),
-					'timeout' => $this->getInput('timeout', ''),
-					'url' => $this->getInput('url', ''),
-					'verify_host' => $this->getInput('verify_host', 0),
-					'verify_peer' => $this->getInput('verify_peer', '')
+					'key' => $input['key'],
+					'http_authtype' => array_key_exists('http_authtype', $input)
+						? $input['http_authtype']
+						: HTTPTEST_AUTH_NONE,
+					'follow_redirects' => array_key_exists('follow_redirects', $input) ? $input['follow_redirects'] : 0,
+					'headers' => array_key_exists('headers', $input) ? $input['headers'] : [],
+					'http_proxy' => array_key_exists('http_proxy', $input) ? $input['http_proxy'] : null,
+					'output_format' => array_key_exists('output_format', $input) ? $input['output_format'] : 0,
+					'posts' => array_key_exists('posts', $input) ? $input['posts'] : null,
+					'post_type' => array_key_exists('post_type', $input) ? $input['post_type'] : ZBX_POSTTYPE_RAW,
+					'query_fields' => array_key_exists('query_fields', $input) ? $input['query_fields'] : [],
+					'request_method' => array_key_exists('request_method', $input)
+						? $input['request_method']
+						: HTTPCHECK_REQUEST_GET,
+					'retrieve_mode' => array_key_exists('retrieve_mode', $input)
+						? $input['retrieve_mode']
+						: HTTPTEST_STEP_RETRIEVE_MODE_CONTENT,
+					'ssl_cert_file' => array_key_exists('ssl_cert_file', $input) ? $input['ssl_cert_file'] : null,
+					'ssl_key_file' => array_key_exists('ssl_key_file', $input) ? $input['ssl_key_file'] : null,
+					'ssl_key_password' => array_key_exists('ssl_key_password', $input)
+						? $input['ssl_key_password']
+						: null,
+					'status_codes' => array_key_exists('status_codes', $input) ? $input['status_codes'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
+					'url' => array_key_exists('url', $input) ? $input['url'] : null,
+					'verify_host' => array_key_exists('verify_host', $input) ? $input['verify_host'] : 0,
+					'verify_peer' => array_key_exists('verify_peer', $input) ? $input['verify_peer'] : 0
 				];
 
-				if ($data['authtype'] != HTTPTEST_AUTH_NONE) {
+				if ($data['http_authtype'] != HTTPTEST_AUTH_NONE) {
 					$data += [
-						'username' => $this->getInput('http_username', ''),
-						'password' => $this->getInput('http_password', '')
+						'http_username' => array_key_exists('http_username', $input) ? $input['http_username'] : null,
+						'http_password' => array_key_exists('http_password', $input) ? $input['http_password'] : null
 					];
 				}
 				break;
 
 			case ITEM_TYPE_IPMI:
 				$data += [
-					'key' => $this->getInput('key'),
-					'ipmi_sensor' => $this->getInput('ipmi_sensor', ''),
+					'key' => $input['key'],
+					'ipmi_sensor' => array_key_exists('ipmi_sensor', $input) ? $input['ipmi_sensor'] : null,
 					'interface' => $this->getItemTestInterface($interface_input),
 					'host' => [
 						'hostid' => $this->host['hostid'],
@@ -348,18 +392,18 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_SSH:
 				$data += [
-					'key' => $this->getInput('key'),
-					'authtype' => $this->getInput('authtype', ITEM_AUTHTYPE_PASSWORD),
-					'params_es' => $this->getInput('params_es', ''),
+					'key' => $input['key'],
+					'authtype' => array_key_exists('authtype', $input) ? $input['authtype'] : ITEM_AUTHTYPE_PASSWORD,
+					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : ITEM_AUTHTYPE_PASSWORD,
 					'interface' => $this->getItemTestInterface($interface_input),
-					'username' => $this->getInput('username', ''),
-					'password' => $this->getInput('password', '')
+					'username' => array_key_exists('username', $input) ? $input['username'] : null,
+					'password' => array_key_exists('password', $input) ? $input['password'] : null
 				];
 
 				if ($data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
 					$data += [
-						'publickey' => $this->getInput('publickey', ''),
-						'privatekey' => $this->getInput('privatekey', '')
+						'publickey' => array_key_exists('publickey', $input) ? $input['publickey'] : null,
+						'privatekey' => array_key_exists('privatekey', $input) ? $input['privatekey'] : null
 					];
 				}
 
@@ -368,10 +412,10 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_TELNET:
 				$data += [
-					'key' => $this->getInput('key'),
-					'params_es' => $this->getInput('params_es', ''),
-					'publickey' => $this->getInput('publickey', ''),
-					'privatekey' => $this->getInput('privatekey', ''),
+					'key' => $input['key'],
+					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : null,
+					'publickey' => array_key_exists('publickey', $input) ? $input['publickey'] : null,
+					'privatekey' => array_key_exists('privatekey', $input) ? $input['privatekey'] : null,
 					'interface' => $this->getItemTestInterface($interface_input)
 				];
 
@@ -380,18 +424,17 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_JMX:
 				$data += [
-					'key' => $this->getInput('key'),
-					'jmx_endpoint' => $this->getInput('jmx_endpoint', ''),
-					'username' => $this->getInput('username', ''),
-					'password' => $this->getInput('password', '')
+					'key' => $input['key'],
+					'jmx_endpoint' => array_key_exists('jmx_endpoint', $input) ? $input['jmx_endpoint'] : null,
+					'username' => array_key_exists('username', $input) ? $input['username'] : null,
+					'password' => array_key_exists('password', $input) ? $input['password'] : null
 				];
 				break;
 
 			case ITEM_TYPE_CALCULATED:
 				$data += [
-					'key' => $this->getInput('key'),
-					'params_f' => $this->getInput('params_f', ''),
-					'value_type' => $this->getInput('value_type'),
+					'key' => $input['key'],
+					'params_f' => array_key_exists('params_f', $input) ? $input['params_f'] : null,
 					'host' => [
 						'host' => $this->host['host']
 					]
@@ -400,10 +443,10 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_SIMPLE:
 				$data += [
-					'key' => $this->getInput('key'),
+					'key' => $input['key'],
 					'interface' => $this->getItemTestInterface($interface_input),
-					'username' => $this->getInput('username', ''),
-					'password' => $this->getInput('password', '')
+					'username' => array_key_exists('username', $input) ? $input['username'] : null,
+					'password' => array_key_exists('password', $input) ? $input['password'] : null
 				];
 
 				unset($data['interface']['useip'], $data['interface']['interfaceid'],  $data['interface']['port']);
@@ -429,11 +472,12 @@ abstract class CControllerPopupItemTest extends CController {
 		];
 
 		if (($this->host['status'] == HOST_STATUS_MONITORED || $this->host['status'] == HOST_STATUS_NOT_MONITORED)
+				&& array_key_exists('interfaceid', $inputs)
 				&& in_array($this->item_type, $this->items_require_interface)) {
-			$interface = $this->getInput('interfaceid', 0)
+			$interface = array_key_exists('interfaceid', $inputs)
 				? API::HostInterface()->get([
 					'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip'],
-					'interfaceids' => $this->getInput('interfaceid'),
+					'interfaceids' => $inputs['interfaceid'],
 					'hostids' => $this->host['hostid']
 				])
 				: null;
@@ -493,7 +537,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function unsetEmptyValues(array $data) {
 		foreach ($data as $key => $value) {
-			if ($key === 'host') {
+			if ($key === 'host' && is_array($value)) {
 				$data[$key] = $this->unsetEmptyValues($value);
 
 				if (!$data[$key]) {

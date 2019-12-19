@@ -63,7 +63,8 @@ function disableItemTestForm() {
 	<?php endif ?>
 
 	<?php if ($data['proxies_enabled']): ?>
-		jQuery('#host_proxy').prop('disabled', true);
+		console.log(jQuery('#proxy_hostid'));
+		jQuery('#proxy_hostid').prop('disabled', true);
 	<?php endif ?>
 
 	<?php if ($data['show_prev']): ?>
@@ -91,7 +92,7 @@ function enableItemTestForm() {
 	<?php endif ?>
 
 	<?php if ($data['proxies_enabled']): ?>
-		jQuery('#host_proxy').prop('disabled', false);
+		jQuery('#proxy_hostid').prop('disabled', false);
 	<?php endif ?>
 
 	<?php if ($data['show_prev']): ?>
@@ -140,7 +141,7 @@ function itemGetValueTest() {
 			address: jQuery('#interface_address', $form).val(),
 			port: jQuery('#interface_port', $form).val()
 		},
-		host_proxy: jQuery('#host_proxy', $form).val(),
+		proxy_hostid: jQuery('#proxy_hostid', $form).val(),
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
 		value: jQuery('#value', $form).multilineInput('value')
@@ -218,7 +219,7 @@ function itemCompleteTest() {
 			address: jQuery('#interface_address', $form).val(),
 			port: jQuery('#interface_port', $form).val()
 		},
-		host_proxy: jQuery('#host_proxy', $form).val(),
+		proxy_hostid: jQuery('#proxy_hostid', $form).val(),
 		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
@@ -367,12 +368,10 @@ function saveItemTestInputs() {
 	<?php if ($data['is_item_testable']): ?>
 		input_values = jQuery.extend(input_values, {
 			get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
-			host_proxy: jQuery('#host_proxy', $form).val(),
-			interface: {
-				interfaceid: <?= $data['interfaceid'] ?>,
-				address: jQuery('#interface_address', $form).val(),
-				port: jQuery('#interface_port', $form).val()
-			}
+			proxy_hostid: jQuery('#proxy_hostid', $form).val(),
+			interfaceid: <?= $data['interfaceid'] ?>,
+			address: jQuery('#interface_address', $form).val(),
+			port: jQuery('#interface_port', $form).val()
 		});
 	<?php endif ?>
 
@@ -430,10 +429,10 @@ jQuery(document).ready(function($) {
 
 	<?php if ($data['is_item_testable']): ?>
 		$('#get_value').on('change', function() {
-			$rows = $('#host_address_row, #host_proxy_row, #get_value_row');
+			$rows = $('#host_address_row, #proxy_hostid_row, #get_value_row');
 			if ($(this).is(':checked')) {
 				<?php if ($data['proxies_enabled']): ?>
-					$('#host_proxy').prop('disabled', false);
+					$('#proxy_hostid').prop('disabled', false);
 				<?php endif ?>
 
 				<?php if ($data['interface_enabled']): ?>
@@ -444,7 +443,7 @@ jQuery(document).ready(function($) {
 			}
 			else {
 				<?php if ($data['proxies_enabled']): ?>
-					$('#host_proxy').prop('disabled', true);
+					$('#proxy_hostid').prop('disabled', true);
 				<?php endif ?>
 
 				<?php if ($data['interface_enabled']): ?>
