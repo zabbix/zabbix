@@ -188,7 +188,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	*/
 	public function testPageReportsAudit_UpdateMacroDescription() {
 		// Update Macro description.
-		$this->page->login()->open('adm.macros.php');
+		$this->page->login()->open('zabbix.php?action=macros.edit');
 		$form = $this->query('name:macrosForm')->asForm()->one();
 
 		$macros = [

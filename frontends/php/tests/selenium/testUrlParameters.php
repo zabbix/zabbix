@@ -603,28 +603,31 @@ class testUrlParameters extends CLegacyWebTest {
 					[
 						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=abc&filter_hostids[]=abc',
 						'text_not_present' => 'Latest data',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupids" is not integer.',
-							'Field "hostids" is not integer.'
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_groupids" field.',
+							'Incorrect value for "filter_hostids" field.'
 						]
 					],
 					[
 						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=&filter_hostids[]=',
 						'text_not_present' => 'Latest data',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupids" is not integer.',
-							'Field "hostids" is not integer.'
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_groupids" field.',
+							'Incorrect value for "filter_hostids" field.'
 						]
 					],
 					[
 						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=-1&filter_hostids[]=-1',
 						'text_not_present' => 'Latest data',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value for "groupids" field.',
-							'Incorrect value for "hostids" field.'
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_groupids" field.',
+							'Incorrect value for "filter_hostids" field.'
 						]
 					],
 					[
@@ -1123,7 +1126,12 @@ class testUrlParameters extends CLegacyWebTest {
 	public function testUrlParameters_UrlLoad($title, $check_server_name, $server_name_on_page, $test_cases) {
 		foreach ($test_cases as $test_case) {
 			$this->zbxTestLogin($test_case['url'], $server_name_on_page);
-			$this->zbxTestCheckTitle($title, $check_server_name);
+			if (array_key_exists('fatal_error', $test_case)) {
+				$this->zbxTestCheckTitle('Fatal error, please report to the Zabbix team', false);
+			}
+			else {
+				$this->zbxTestCheckTitle($title, $check_server_name);
+			}
 			$this->zbxTestTextPresent($test_case['text_present']);
 			if (isset($test_case['text_not_present'])) {
 				$this->zbxTestHeaderNotPresent($test_case['text_not_present']);
