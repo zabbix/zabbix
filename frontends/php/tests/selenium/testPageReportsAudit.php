@@ -195,7 +195,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 			[
 				'action' => USER_ACTION_UPDATE,
 				'index' => 0,
-				'Description' => 'New Updated Description'
+				'description' => 'New Updated Description'
 			]
 		];
 
