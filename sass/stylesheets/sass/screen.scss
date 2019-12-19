@@ -39,23 +39,23 @@ a {
 	&:hover {
 		outline: 0;
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		border-bottom: 1px solid rgba($link-hover-color, .5);
 	}
 
 	&:focus {
 		color: $link-hover-color;
 		outline: none;
-		border-bottom: 2px solid rgba($link-hover-color, 0.5)
+		border-bottom: 2px solid rgba($link-hover-color, .5);
 	}
 
 	&:active {
 		outline: 0;
 		color: $link-active-color;
-		border-bottom: 1px solid rgba($link-active-color, 0.5);
+		border-bottom: 1px solid rgba($link-active-color, .5);
 	}
 
 	img {
-		border: none;
+		border: 0;
 		vertical-align: top;
 	}
 }
@@ -68,7 +68,8 @@ svg a {
 		fill: $link-visited-color;
 	}
 
-	&:hover, &:focus {
+	&:hover,
+	&:focus {
 		fill: $link-hover-color;
 		text-decoration: underline;
 	}
@@ -91,7 +92,7 @@ svg a {
 	&:hover {
 		@extend %link-action-style;
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.35);
+		border-bottom: 1px solid rgba($link-hover-color, .35);
 	}
 
 	&:active {
@@ -100,7 +101,7 @@ svg a {
 
 	&:focus {
 		outline: none;
-		border-bottom: 2px solid rgba($link-hover-color, 0.35);
+		border-bottom: 2px solid rgba($link-hover-color, .35);
 	}
 }
 
@@ -114,27 +115,27 @@ svg a {
 	cursor: pointer;
 
 	&:link {
-		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
+		border-bottom: 1px solid rgba($link-alt-underline-color, .35);
 	}
 
 	&:visited {
-		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
+		border-bottom: 1px solid rgba($link-alt-underline-color, .35);
 	}
 
 	&:hover {
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		border-bottom: 1px solid rgba($link-hover-color, .5);
 	}
 
 	&:focus {
 		color: $link-hover-color;
 		outline: none;
-		border-bottom: 2px solid rgba($link-hover-color, 0.35);
+		border-bottom: 2px solid rgba($link-hover-color, .35);
 	}
 
 	&:active {
 		color: $link-active-color;
-		border-bottom: 1px solid rgba($link-active-color, 0.5);
+		border-bottom: 1px solid rgba($link-active-color, .5);
 	}
 }
 
@@ -152,7 +153,7 @@ h3 {
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	color: $font-alt-color;
-	letter-spacing: 0.0688em;
+	letter-spacing: .0688em;
 	text-rendering: optimizeLegibility;
 }
 
@@ -184,12 +185,12 @@ ol {
 	list-style-position: inside;
 
 	li {
-		padding: 0 0 0.7em 0;
+		padding: 0 0 .7em;
 	}
 }
 
 p {
-	margin: 0 0 0.7em 0;
+	margin: 0 0 .7em;
 }
 
 pre {
@@ -215,6 +216,23 @@ pre {
 .disabled {
 	cursor: default !important;
 	opacity: .35;
+	background-color: transparent;
+
+	.subfilter-enabled {
+		color: darken($ui-bg-selected-color, 35%);
+	}
+
+	.subfilter-disable-btn {
+		cursor: default;
+		color: darken($ui-bg-selected-color, 25%);
+		background-color: $ui-bg-selected-color;
+
+		&:hover,
+		&:focus,
+		&:active {
+			color: darken($ui-bg-selected-color, 25%);
+		}
+	}
 
 	.disabled,
 	[disabled] {
@@ -248,7 +266,7 @@ pre {
 	&:hover,
 	&:link,
 	&:visited {
-		border: none;
+		border: 0;
 	}
 }
 
@@ -265,7 +283,7 @@ pre {
 			position: relative;
 
 			&::after {
-				content:'';
+				content: '';
 				position: absolute;
 				bottom: -1px;
 				left: 0;
@@ -280,7 +298,8 @@ pre {
 				border-bottom: 9px solid $main-subnav-bg-color;
 			}
 
-			a, a:hover {
+			a,
+			a:hover {
 				color: $link-main-nav-active-color;
 			}
 		}
@@ -331,7 +350,7 @@ ul.top-nav-icons {
 
 			li {
 				float: none;
-				padding: 0.4em 5px;
+				padding: .4em 5px;
 
 				a {
 					opacity: inherit;
@@ -341,7 +360,8 @@ ul.top-nav-icons {
 		}
 	}
 
-	a, span.top-nav-guest {
+	a,
+	span.top-nav-guest {
 		display: block;
 		width: 24px;
 		height: 45px;
@@ -383,7 +403,6 @@ ul.top-nav-icons {
 		background: url(../img/icon-sprite.svg) no-repeat -9px -68px;
 		width: auto;
 		padding: 0 6px 0 17px;
-		-webkit-transform-style: preserve-3d;
 	}
 
 	.top-nav-support {
@@ -403,23 +422,20 @@ ul.top-nav-icons {
 		margin: 6px 3px 0 0;
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
-		opacity: 1;
 
 		@media (max-width: 1050px) {
 			width: 130px;
 		}
 
-		transition: width 0.5s;
-		-webkit-transition: width 0.5s;
+		transition: width .5s ease-out;
 
 		&:focus {
 			background-color: $form-bg-color;
 			border: 1px solid $form-border-color;
-			opacity: 1;
-		}
 
-		&:focus + .btn-search {
-			opacity: 1;
+			+ .btn-search {
+				opacity: 1;
+			}
 		}
 	}
 }
@@ -443,47 +459,47 @@ ul.top-nav-icons {
 		padding: 0 10px;
 
 		&:last-child {
-			box-shadow: 25px 0 10px -10px $main-subnav-bg-color
+			box-shadow: 25px 0 10px -10px $main-subnav-bg-color;
 		}
 	}
-}
 
-.top-subnav a {
-	padding: 8px 0;
+	a {
+		padding: 8px 0;
 
-	&:link {
-		color: $link-main-subnav-color;
-	}
+		&:link {
+			color: $link-main-subnav-color;
+		}
 
-	&:visited {
-		color: $link-main-subnav-visited-color;
-	}
+		&:visited {
+			color: $link-main-subnav-visited-color;
+		}
 
-	&:hover {
-		color: $link-main-subnav-hover-color;
-	}
+		&:hover {
+			color: $link-main-subnav-hover-color;
+		}
 
-	&:active {
-		color: $link-main-subnav-active-color;
-	}
+		&:active {
+			color: $link-main-subnav-active-color;
+		}
 
-	&:focus {
-		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
-		color: $link-main-subnav-active-color;
-		outline: none;
-		padding-bottom: 4px;
-	}
+		&:focus {
+			border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
+			color: $link-main-subnav-active-color;
+			outline: none;
+			padding-bottom: 4px;
+		}
 
-	&.selected {
-		border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
-		color: $link-main-subnav-active-color;
-		padding-bottom: 4px;
+		&.selected {
+			border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
+			color: $link-main-subnav-active-color;
+			padding-bottom: 4px;
+		}
 	}
 }
 
 .arrow-up {
 	@extend %arrow;
-	border: none;
+	border: 0;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
 	border-bottom: 6px solid $font-color;
@@ -491,7 +507,7 @@ ul.top-nav-icons {
 
 .arrow-down {
 	@extend %arrow;
-	border: none;
+	border: 0;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
 	border-top: 6px solid $font-color;
@@ -536,7 +552,7 @@ ul.top-nav-icons {
 	padding: 10px 0 6px;
 	border-bottom: 1px solid $ui-border-color;
 
-	& > div {
+	> div {
 		overflow: hidden;
 
 		&:last-child {
@@ -616,7 +632,7 @@ ul.top-nav-icons {
 		position: relative;
 
 		&::after {
-			content: "";
+			content: '';
 			position: absolute;
 			min-height: 24px;
 			z-index: -1;
@@ -645,7 +661,7 @@ ul.top-nav-icons {
 
 // Article
 article {
-	padding: 10px 10px 0 10px;
+	padding: 10px 10px 0;
 }
 
 // Object Group Navigation
@@ -661,11 +677,12 @@ article {
 			padding: 0 7px;
 		}
 
-		.status-container, .rel-container {
+		.status-container,
+		.rel-container {
 			margin: 0 5px 0 0;
 
 			span {
-				padding: 2px 3px 1px 3px;
+				padding: 2px 3px 1px;
 			}
 		}
 
@@ -749,6 +766,12 @@ article {
 
 	> li {
 		padding: 1px 0;
+		line-height: 22px;
+		white-space: nowrap;
+
+		.status-container {
+			line-height: 14px;
+		}
 
 		> span {
 
@@ -756,15 +779,6 @@ article {
 				margin-top: 1px;
 				line-height: 13px;
 			}
-		}
-	}
-
-	> li {
-		line-height: 22px;
-		white-space: nowrap;
-
-		.status-container {
-			line-height: 14px;
 		}
 	}
 
@@ -843,13 +857,18 @@ output {
 						td {
 							color: $font-color;
 
-							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
+							sup,
+							a,
+							.problem-unack-fg,
+							.problem-ack-fg,
+							.ok-unack-fg,
+							.ok-ack-fg {
 								color: $font-color;
-								border-bottom-color: rgba($font-color, 0.5);
+								border-bottom-color: rgba($font-color, .5);
 							}
 
 							.tag {
-								background-color: rgba($font-color, 0.5);
+								background-color: rgba($font-color, .5);
 							}
 
 							.icon-wzrd-action {
@@ -857,7 +876,7 @@ output {
 							}
 
 							button:focus {
-								box-shadow: 0 0 0 2px rgba($font-color, 0.5);
+								box-shadow: 0 0 0 2px rgba($font-color, .5);
 							}
 						}
 					}
@@ -867,11 +886,16 @@ output {
 
 					&:not(.row-selected):not(:hover) {
 						td {
-							color: black;
+							color: #000000;
 
-							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
-								color: black;
-								border-bottom-color: rgba(black, 0.5);
+							sup,
+							a,
+							.problem-unack-fg,
+							.problem-ack-fg,
+							.ok-unack-fg,
+							.ok-ack-fg {
+								color: #000000;
+								border-bottom-color: rgba(0, 0, 0, .5);
 							}
 
 							.icon-wzrd-action {
@@ -879,7 +903,7 @@ output {
 							}
 
 							button:focus {
-								box-shadow: 0 0 0 2px rgba(black, 0.5);
+								box-shadow: 0 0 0 2px rgba(0, 0, 0, .5);
 							}
 						}
 					}
@@ -931,10 +955,10 @@ output {
 		}
 
 		td {
-			padding-top: 0px;
-			padding-bottom: 0px;
-			border-bottom: none;
-			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
+			padding-top: 0;
+			padding-bottom: 0;
+			border-bottom: 0;
+			box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
 			color: $font-color;
 			height: 22px;
 			line-height: 1;
@@ -1123,7 +1147,7 @@ output {
 			position: relative;
 			margin: -1em;
 			padding: 1em;
-			border: none;
+			border: 0;
 			transition: background-color .2s ease-out;
 
 			&:hover,
@@ -1149,7 +1173,7 @@ output {
 			}
 
 			.timeline-td {
-				background-color: $ui-bg-color!important;
+				background-color: $ui-bg-color !important;
 			}
 		}
 
@@ -1173,8 +1197,9 @@ output {
 			@extend %nothing-to-show;
 		}
 
-		&:last-child th, &:last-child td {
-			border-bottom: none;
+		&:last-child th,
+		&:last-child td {
+			border-bottom: 0;
 		}
 
 		&.hover-nobg {
@@ -1201,7 +1226,7 @@ output {
 	}
 
 	.list-table-footer {
-		border-bottom: none;
+		border-bottom: 0;
 		color: $font-alt-color;
 		text-align: right;
 	}
@@ -1365,7 +1390,7 @@ output {
 	margin: 0 2px 0 0;
 	cursor: auto;
 	text-align: center;
-	border: none;
+	border: 0;
 	background-color: $transparent;
 
 	.arrow-right {
@@ -1373,11 +1398,12 @@ output {
 	}
 
 	.arrow-down {
-		margin: 0 0 2px 0;
+		margin: 0 0 2px;
 		border-top-color: $font-alt-color;
 	}
 
-	&:hover, &:focus {
+	&:hover,
+	&:focus {
 		background-color: $transparent;
 
 		.arrow-right {
@@ -1405,7 +1431,7 @@ output {
 	&:last-child {
 
 		.dashbrd-widget {
-			margin: 0 0 10px 0;
+			margin: 0 0 10px;
 		}
 	}
 }
@@ -1525,7 +1551,7 @@ output {
 .filter-container {
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	margin: 0 0 10px 0;
+	margin: 0 0 10px;
 	padding: 10px 0;
 	position: relative;
 
@@ -1543,13 +1569,13 @@ output {
 
 	.list-table {
 		margin-bottom: -10px;
-		border: none;
+		border: 0;
 
 		thead {
 
 			th {
 				color: initial;
-				padding: 8px 5px 5px 5px;
+				padding: 8px 5px 5px;
 				border-bottom-width: 1px;
 			}
 		}
@@ -1579,37 +1605,17 @@ output {
 
 		&:focus {
 			color: $font-selected-color;
-			border-bottom: 2px solid rgba($font-selected-color, 0.7);
+			border-bottom: 2px solid rgba($font-selected-color, .7);
 		}
 
 		&:hover {
 			color: $font-selected-color;
-			border-bottom: 1px solid rgba($font-selected-color, 0.7);
+			border-bottom: 1px solid rgba($font-selected-color, .7);
 		}
 	}
 
 	sup {
 		color: lighten($ui-bg-selected-color, 25%);
-	}
-}
-
-.disabled {
-	background-color: transparent;
-
-	.subfilter-enabled {
-		color: darken($ui-bg-selected-color, 35%);
-	}
-
-	.subfilter-disable-btn {
-		cursor: default;
-		color: darken($ui-bg-selected-color, 25%);
-		background-color: $ui-bg-selected-color;
-
-		&:hover,
-		&:focus,
-		&:active {
-			color: darken($ui-bg-selected-color, 25%);
-		}
 	}
 }
 
@@ -1621,7 +1627,7 @@ output {
 
 	.cell {
 		text-align: left;
-		padding: 0 20px 5px 20px;
+		padding: 0 20px 5px;
 
 		&:first-child {
 			padding-left: 0;
@@ -1629,7 +1635,7 @@ output {
 
 		&:last-child {
 			padding-right: 0;
-			border-right: none;
+			border-right: 0;
 		}
 
 		button {
@@ -1638,7 +1644,7 @@ output {
 	}
 
 	button {
-		margin: 10px 5px 0 5px;
+		margin: 10px 5px 0;
 	}
 
 	select {
@@ -1678,7 +1684,7 @@ output {
 	}
 
 	input[type="text"] {
-		border: none;
+		border: 0;
 		background: none;
 		box-sizing: border-box;
 		width: 100%;
@@ -1717,12 +1723,12 @@ output {
 				padding: 0 3px 0 4px;
 				line-height: 18px;
 
-				& > span:first-child {
+				> span:first-child {
 					overflow: hidden;
 					text-overflow: ellipsis;
 				}
 
-				& > .subfilter-disable-btn {
+				> .subfilter-disable-btn {
 					position: relative;
 					left: 3px;
 					flex-shrink: 0;
@@ -1777,7 +1783,7 @@ output {
 		height: inherit;
 		line-height: normal;
 		color: $font-color;
-		padding: 0.4em 5px;
+		padding: .4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
 		overflow: hidden;
@@ -1791,7 +1797,7 @@ output {
 }
 
 .multiselect-matches {
-	padding: 0.4em 5px;
+	padding: .4em 5px;
 	color: $font-color;
 	font-weight: bold;
 	@extend .multiselect-suggest;
@@ -1821,21 +1827,21 @@ output {
 
 // Forms
 .table-forms-container {
-	margin: 0 0 10px 0;
+	margin: 0 0 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 	padding: 10px;
 	text-align: left;
 
 	> .ui-tabs-nav {
-		margin: -10px -10px 10px -10px;
+		margin: -10px -10px 10px;
 	}
 }
 
 .form-btns {
 
 	button {
-		margin: 10px 6px 5px 6px;
+		margin: 10px 6px 5px;
 	}
 }
 
@@ -1903,7 +1909,7 @@ output {
 		position: relative;
 
 		&.has-before {
-			padding-top: 0px;
+			padding-top: 0;
 		}
 
 		td {
@@ -1978,7 +1984,7 @@ output {
 
 .margin-top {
 	display: block;
-	margin: 4px 0 0 0;
+	margin: 4px 0 0;
 }
 
 .form-new-group {
@@ -1997,7 +2003,7 @@ output {
 
 	&.hor-list li {
 		margin-right: 15px;
-		padding: .3em 0 0 0;
+		padding: .3em 0 0;
 
 		&:last-child {
 			margin-right: 0;
@@ -2044,7 +2050,7 @@ output {
 		display: inline-block;
 		margin: 0 -1px 0 0;
 
-		&:first-child{
+		&:first-child {
 			border-radius: 3px 0 0 3px;
 
 			label {
@@ -2099,12 +2105,12 @@ output {
 			}
 		}
 
-			&:focus + label {
-				border-color: $form-border-focus-color;
-				background-color: $btn-form-hover-color;
-				position: relative;
-				z-index: 2;
-			}
+		&:focus + label {
+			border-color: $form-border-focus-color;
+			background-color: $btn-form-hover-color;
+			position: relative;
+			z-index: 2;
+		}
 
 		&:checked + label {
 			color: $white;
@@ -2138,12 +2144,10 @@ label {
 			color: $form-label-asterisk-color;
 			display: inline-block;
 			content: '*';
-			margin-right: 0.3em;
+			margin-right: .3em;
 		}
 	}
-}
 
-label {
 	input[type="checkbox"] {
 		margin-right: 3px;
 	}
@@ -2228,7 +2232,7 @@ textarea {
 	}
 
 	&[readonly] {
-		color: $font-color!important;
+		color: $font-color !important;
 		@extend %form-disabled;
 
 		&:focus {
@@ -2294,14 +2298,15 @@ select {
 	}
 
 	&[readonly] {
-		&, + label {
+		&,
+		+ label {
 			pointer-events: none;
-		}
-	}
 
-	&[readonly] + label span {
-		transition: none;
-		@extend %form-disabled;
+			span {
+				transition: none;
+				@extend %form-disabled;
+			}
+		}
 	}
 
 	&[type="checkbox"] {
@@ -2313,7 +2318,7 @@ select {
 		&:checked + label span {
 
 			&::after {
-				content:'';
+				content: '';
 				position: absolute;
 				display: block;
 				width: 7px;
@@ -2558,7 +2563,7 @@ button {
 .btn-link {
 	position: relative;
 	background-color: $transparent;
-	border: none;
+	border: 0;
 	border-bottom: 1px dotted $link-color;
 	border-radius: 0;
 	color: $link-color;
@@ -2574,10 +2579,8 @@ button {
 		@extend .btn-link;
 		outline: none;
 		margin-bottom: -2px !important;
-		border-bottom: 2px solid rgba($link-hover-color, 0.5);
-		-webkit-box-shadow: 0 0 0 0px !important;
-		-moz-box-shadow: 0 0 0 0px !important;
-		box-shadow: 0 0 0 0px !important;
+		border-bottom: 2px solid rgba($link-hover-color, .5);
+		box-shadow: 0 0 0 0 !important;
 	}
 
 	&:active {
@@ -2596,7 +2599,7 @@ button {
 .btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
 	position: absolute;
-	border: none;
+	border: 0;
 	top: 11px;
 	right: 4px;
 	width: 24px;
@@ -2665,6 +2668,51 @@ $icon-widget-btn: (
 // TIME SELECTION
 
 .ui-tabs-nav {
+	height: 30px;
+	line-height: 30px;
+	border-bottom: 1px solid $table-border-color;
+
+	li {
+		display: inline-block;
+
+		a {
+			border: 0;
+			padding: 8px 10px;
+			transition: background-color .2s ease-out;
+
+			&:hover,
+			&:focus,
+			&:active {
+				background-color: $ui-hover-color;
+			}
+		}
+
+		&.ui-tabs-active:first-child {
+			border-left: 0;
+		}
+
+		&.ui-tabs-active {
+
+			a {
+				padding: 8px 10px 6px;
+				background-color: $transparent;
+				color: $font-color;
+				text-decoration: none;
+				cursor: default;
+				border-bottom: 3px solid $ui-tab-bg-selected-color;
+			}
+		}
+
+		&.ui-state-disabled {
+
+			a {
+				cursor: default;
+				color: $btn-disabled-font-color;
+				background-color: $transparent;
+				border: 0;
+			}
+		}
+	}
 
 	.btn-time,
 	.filter-trigger {
@@ -2722,6 +2770,14 @@ $icon-widget-btn: (
 			box-shadow: 0 0 0 2px rgba($blue, .35);
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
+
+		&.ui-tabs-active {
+
+			.btn-time,
+			.filter-trigger {
+				box-shadow: 0 0 0 2px rgba($blue, .35);
+			}
+		}
 	}
 
 	.ui-tabs-active {
@@ -2731,7 +2787,7 @@ $icon-widget-btn: (
 			color: $font-color;
 			background-color: $ui-bg-color;
 			border: 1px solid $ui-border-color;
-			border-bottom: none;
+			border-bottom: 0;
 			border-radius: 2px 2px 0 0;
 			margin: -1px 0 0 6px;
 			padding: 1px 34px 7px 10px;
@@ -2754,19 +2810,8 @@ $icon-widget-btn: (
 	.ui-state-hover {
 		&.ui-tabs-active {
 			.btn-time,
-			.filter-trigger  {
-				background-color: $action-hover-color;
-			}
-		}
-	}
-
-	.ui-state-focus {
-
-		&.ui-tabs-active {
-
-			.btn-time,
 			.filter-trigger {
-				box-shadow: 0 0 0 2px rgba($blue, .35);
+				background-color: $action-hover-color;
 			}
 		}
 	}
@@ -2791,7 +2836,7 @@ $icon-widget-btn: (
 
 	.ui-tabs-nav {
 		height: 29px;
-		border-bottom: none;
+		border-bottom: 0;
 
 		a {
 			display: inline-block;
@@ -2806,8 +2851,8 @@ $icon-widget-btn: (
 .btn-time-left,
 .btn-time-right {
 	background: url(../img/icon-sprite.svg) no-repeat;
-	content: "";
-	border: none;
+	content: '';
+	border: 0;
 	height: 24px;
 	width: 24px;
 	vertical-align: top;
@@ -2819,8 +2864,8 @@ $icon-widget-btn: (
 	}
 
 	&:disabled {
-		border: none;
-		opacity: 0.4;
+		border: 0;
+		opacity: .4;
 	}
 }
 
@@ -2862,7 +2907,7 @@ $icon-widget-btn: (
 	&:disabled {
 		background: transparent !important;
 		border-color: transparent !important;
-		opacity: 0.8;
+		opacity: .8;
 	}
 }
 
@@ -2926,7 +2971,7 @@ $icon-widget-btn: (
 		}
 
 		ul {
-			padding: 0 0 10px 0;
+			padding: 0 0 10px;
 		}
 
 		li {
@@ -2951,7 +2996,7 @@ $icon-widget-btn: (
 			display: inline-flex;
 			vertical-align: top;
 			text-align: left;
-			margin: 0 10px 0 10px;
+			margin: 0 10px;
 		}
 
 		.time-quick-selected {
@@ -2977,7 +3022,7 @@ $icon-widget-btn: (
 	top: 5px;
 	opacity: 1;
 	z-index: 1010;
-	transition: opacity 1s;
+	transition: opacity 1s ease-out;
 
 	&.hidden {
 		opacity: 0;
@@ -2998,10 +3043,9 @@ $icon-widget-btn: (
 }
 
 %btn-widget-defaults {
-	border: none;
+	border: 0;
 	min-height: 0;
 	padding: 0;
-	-webkit-transform-style: preserve-3d;
 	opacity: .5;
 	transition: opacity .2s ease-out;
 
@@ -3031,7 +3075,7 @@ $icon-widget-btn: (
 	cursor: default;
 
 	&.icon-cal {
-		opacity: 0.3;
+		opacity: .3;
 		background-color: transparent;
 	}
 }
@@ -3071,7 +3115,7 @@ button[disabled] {
 }
 
 .action-buttons {
-	margin: 10px 0 0 0;
+	margin: 10px 0 0;
 	color: $font-alt-color;
 
 	button {
@@ -3082,54 +3126,6 @@ button[disabled] {
 .selected-item-count {
 	display: inline-block;
 	margin: 0 14px 0 0;
-}
-
-.ui-tabs-nav {
-	height: 30px;
-	line-height: 30px;
-	border-bottom: 1px solid $table-border-color;
-
-	li {
-		display: inline-block;
-
-		a {
-			border: none;
-			padding: 8px 10px;
-			transition: background-color .2s ease-out;
-
-			&:hover,
-			&:focus,
-			&:active {
-				background-color: $ui-hover-color;
-			}
-		}
-
-		&.ui-tabs-active:first-child {
-			border-left: 0;
-		}
-
-		&.ui-tabs-active {
-
-			a {
-				padding: 8px 10px 6px 10px;
-				background-color: $transparent;
-				color: $font-color;
-				text-decoration: none;
-				cursor: default;
-				border-bottom: 3px solid $ui-tab-bg-selected-color;
-			}
-		}
-
-		&.ui-state-disabled {
-
-			a {
-				cursor: default;
-				color: $btn-disabled-font-color;
-				background-color: $transparent;
-				border: none;
-			}
-		}
-	}
 }
 
 $var-icons: (
@@ -3193,7 +3189,7 @@ $form-icon-btn: (
 }
 
 %form-icon-btn {
-	border: none;
+	border: 0;
 	cursor: pointer;
 	position: absolute;
 	@extend %button-icon-size;
@@ -3245,7 +3241,7 @@ $form-icon-btn: (
 	width: 8px;
 	height: 11px;
 	cursor: pointer;
-	margin: -12px 0 -4px 0;
+	margin: -12px 0 -4px;
 
 	&::before {
 		content: '';
@@ -3261,7 +3257,7 @@ $form-icon-btn: (
 
 // Sign in, Installation
 
-.setup-container  {
+.setup-container {
 	background-color: $ui-bg-color;
 	width: 766px;
 	height: 420px;
@@ -3273,13 +3269,13 @@ $form-icon-btn: (
 	border: 1px solid $ui-border-color;
 
 	h1 {
-		border: none;
-		margin: 3px 0 11px 0;
+		border: 0;
+		margin: 3px 0 11px;
 		padding: 0;
 	}
 
 	.signin-logo {
-		margin: 0 0 37px 0;
+		margin: 0 0 37px;
 	}
 }
 
@@ -3314,7 +3310,7 @@ $form-icon-btn: (
 	overflow-y: auto;
 
 	.list-table {
-		border: none;
+		border: 0;
 	}
 
 	.table-forms-td-left {
@@ -3327,7 +3323,7 @@ $form-icon-btn: (
 	}
 
 	h1 {
-		margin: 25% 0 0.4em 0;
+		margin: 25% 0 .4em;
 	}
 
 	@extend %webkit-scrollbar;
@@ -3372,17 +3368,17 @@ $form-icon-btn: (
 	width: 280px;
 	margin: 0 auto;
 	margin-top: 5%;
-	padding: 42px 42px 39px 42px;
+	padding: 42px 42px 39px;
 	border: 1px solid $ui-border-color;
 
 	h1 {
-		border: none;
-		margin: 0 0 17px 0;
+		border: 0;
+		margin: 0 0 17px;
 		padding: 0;
 	}
 
 	ul li {
-		padding: 16px 0 0 0;
+		padding: 16px 0 0;
 		font-size: $font-top-nav-size;
 
 		&.sign-in-txt {
@@ -3392,7 +3388,7 @@ $form-icon-btn: (
 
 	label {
 		display: inline-block;
-		margin: 0 0 2px 0;
+		margin: 0 0 2px;
 	}
 
 	input {
@@ -3427,7 +3423,7 @@ $form-icon-btn: (
 	width: 100%;
 	text-align: center;
 	color: $font-alt-color;
-	margin: 11px 0 0 0;
+	margin: 11px 0 0;
 }
 
 %signin-input {
@@ -3536,10 +3532,6 @@ $form-icon-btn: (
 	}
 }
 
-.dashbrd-grid-widget {
-	position: absolute;
-}
-
 .dashbrd-grid-widget-container {
 	position: absolute;
 	top: 0;
@@ -3614,7 +3606,7 @@ $form-icon-btn: (
 	@extend %webkit-scrollbar;
 
 	.list-table {
-		border: none;
+		border: 0;
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -3625,18 +3617,19 @@ $form-icon-btn: (
 		}
 
 		tbody tr {
-			&:last-child th, &:last-child td {
+			&:last-child th,
+			&:last-child td {
 				border-bottom: 1px solid $table-border-color;
 
 				&.list-table-footer {
-					border-bottom: none;
+					border-bottom: 0;
 				}
 			}
 		}
 	}
 
 	.debug-output {
-		margin: 10px 10px 0 10px;
+		margin: 10px 10px 0;
 		max-height: 300px;
 		border-color: $table-border-color;
 	}
@@ -3658,6 +3651,8 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget {
+	position: absolute;
+
 	&.dashbrd-grid-widget-hidden-header {
 		.dashbrd-grid-widget-head {
 			height: 0;
@@ -3703,10 +3698,6 @@ $form-icon-btn: (
 	}
 }
 
-.dashbrd-grid-iterator {
-	position: absolute;
-}
-
 .dashbrd-grid-iterator-container {
 	position: absolute;
 	top: 0;
@@ -3733,7 +3724,7 @@ $form-icon-btn: (
 	opacity: 0;
 
 	// Transition for opacity is set for best border disappearance on different themes.
-	transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
+	transition: margin-top .3s ease-out, height .3s ease-out, opacity .15s .15s ease-out, box-shadow .3s ease-out;
 
 	// Not to loose hovered header while widget underneath is updating.
 	z-index: 3;
@@ -3786,14 +3777,14 @@ $form-icon-btn: (
 	// To allow overflowing of the floating headers of child widgets.
 	overflow: visible;
 
-	transition: margin-top .3s;
+	transition: margin-top .3s ease-out;
 }
 
 .dashbrd-grid-iterator-placeholder {
 	position: absolute;
 	display: flex;
 
-	& > div {
+	> div {
 		margin: .25rem;
 		display: flex;
 		flex-grow: 1;
@@ -3816,7 +3807,7 @@ $form-icon-btn: (
 	border: 1px solid $ui-border-color;
 	background-color: $ui-bg-color;
 
-	& > div {
+	> div {
 		padding: 0 10px;
 		text-align: center;
 		color: $font-alt-color;
@@ -3833,6 +3824,8 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-iterator {
+	position: absolute;
+
 	&.iterator-too-small {
 		.dashbrd-grid-iterator-too-small {
 			display: flex;
@@ -3851,7 +3844,7 @@ $form-icon-btn: (
 			opacity: 1;
 
 			// Not inheriting opacity transition here.
-			transition: margin-top .3s, height .3s, box-shadow .3s;
+			transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out;
 		}
 
 		&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
@@ -3886,11 +3879,11 @@ $form-icon-btn: (
 			border: 1px solid $ui-border-color;
 			background-color: $ui-bg-color;
 
-			& > div {
+			> div {
 				padding-top: 8px;
 
 				.list-table {
-					border: none;
+					border: 0;
 
 					th {
 						@extend %dashbrd-widget-td;
@@ -3901,17 +3894,19 @@ $form-icon-btn: (
 					}
 
 					tbody tr {
-						&:last-child th, &:last-child td {
+						&:last-child th,
+						&:last-child td {
 							border-bottom: 1px solid $table-border-color;
 
 							&.list-table-footer {
-								border-bottom: none;
+								border-bottom: 0;
 							}
 						}
 					}
 				}
 
-				.msg-good, .msg-bad {
+				.msg-good,
+				.msg-bad {
 					margin: 0 10px;
 				}
 			}
@@ -3983,12 +3978,13 @@ $form-icon-btn: (
 					margin-top: -2rem;
 					height: 2rem;
 					box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
-					opacity: 0.5;
+					opacity: .5;
 				}
 			}
 		}
 
-		&.ui-resizable-resizing, &.ui-draggable-dragging {
+		&.ui-resizable-resizing,
+		&.ui-draggable-dragging {
 			z-index: 1000;
 
 			&::before {
@@ -4040,7 +4036,7 @@ $form-icon-btn: (
 				margin-top: -2rem;
 				height: 2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
-				opacity: 0.5;
+				opacity: .5;
 			}
 
 			&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
@@ -4051,7 +4047,8 @@ $form-icon-btn: (
 			}
 		}
 
-		&.ui-resizable-resizing, &.ui-draggable-dragging {
+		&.ui-resizable-resizing,
+		&.ui-draggable-dragging {
 			z-index: 1000;
 
 			&::before {
@@ -4097,7 +4094,7 @@ $form-icon-btn: (
 		position: absolute;
 		z-index: 999;
 
-		& > div {
+		> div {
 			position: absolute;
 			top: .25rem;
 			left: .25rem;
@@ -4108,36 +4105,19 @@ $form-icon-btn: (
 	}
 }
 
-@-webkit-keyframes zoom-in-out {
-	0% {transform: scale(1);}
-	50% {transform: scale(1.05);}
-	100% {transform: scale(1);}
-}
-@-moz-keyframes zoom-in-out {
-	0% {transform: scale(1);}
-	50% {transform: scale(1.05);}
-	100% {transform: scale(1);}
-}
-@-o-keyframes zoom-in-out{
-	0% {transform: scale(1);}
-	50% {transform: scale(1.05);}
-	100% {transform: scale(1);}
-}
 @keyframes zoom-in-out {
-	0% {transform: scale(1);}
-	50% {transform: scale(1.05);}
-	100% {transform: scale(1);}
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.05);
+	}
+	100% {
+		transform: scale(1);
+	}
 }
-@keyframes zoom-in-out {
-	0% {transform: scale(1);}
-	50% {transform: scale(1.05);}
-	100% {transform: scale(1);}
-}
+
 .new-widget {
-	-webkit-animation: zoom-in-out .2s linear;
-	-moz-animation: zoom-in-out .2s linear;
-	-ms-animation: zoom-in-out .2s linear;
-	-o-animation: zoom-in-out .2s linear;
 	animation: zoom-in-out .2s linear;
 }
 
@@ -4335,7 +4315,7 @@ $form-icon-btn: (
 	border: 1px solid $ui-border-color;
 
 	.list-table {
-		border: none;
+		border: 0;
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -4354,7 +4334,7 @@ $form-icon-btn: (
 	}
 
 	.debug-output {
-		margin: 10px 10px 0 10px;
+		margin: 10px 10px 0;
 		max-height: 300px;
 		border-color: $table-border-color;
 	}
@@ -4424,7 +4404,7 @@ $form-icon-btn: (
 
 	li {
 		display: inline-block;
-		padding: 8px 0 8px 13px
+		padding: 8px 0 8px 13px;
 	}
 }
 
@@ -4432,7 +4412,7 @@ $form-icon-btn: (
 	display: block;
 
 	&:link {
-		border: none;
+		border: 0;
 	}
 }
 
@@ -4468,7 +4448,7 @@ $form-icon-btn: (
 		cursor: pointer;
 		color: $font-color;
 		text-decoration: none;
-		border: none;
+		border: 0;
 		outline: 0;
 		padding: 0 15px 0 25px;
 		margin: 0 -15px 0 -25px;
@@ -4513,7 +4493,7 @@ $form-icon-btn: (
 		height: 24px;
 		line-height: 24px;
 		color: $font-alt-color;
-		border: none;
+		border: 0;
 		cursor: default;
 	}
 
@@ -4545,7 +4525,7 @@ $form-icon-btn: (
 	color: $font-alt-color;
 	background-color: $form-bg-color;
 	border: 1px solid $action-border-color;
-	border-top: none;
+	border-top: 0;
 	box-shadow: 0 6px 10px 0 $action-shadow-color;
 
 	li {
@@ -4553,7 +4533,7 @@ $form-icon-btn: (
 		height: inherit;
 		line-height: normal;
 		color: $font-color;
-		padding: 0.4em 5px;
+		padding: .4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
 		transition: background-color .2s ease-out;
@@ -4568,7 +4548,7 @@ $form-icon-btn: (
 	display: table;
 	position: absolute;
 	z-index: 1000;
-	padding: 15px 10px 10px 10px;
+	padding: 15px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
@@ -4584,7 +4564,7 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
-			margin: 0 -10px 10px -10px;
+			margin: 0 -10px 10px;
 			padding: 0 10px;
 			@extend %webkit-scrollbar;
 
@@ -4599,16 +4579,18 @@ $form-icon-btn: (
 				}
 			}
 		}
+
 		.overlay-dialogue-controls {
 			text-align: right;
-			padding: 0px 0px 10px 0px;
+			padding: 0 0 10px;
 
 			li {
 				display: inline;
 				padding-left: 10px;
 			}
 		}
-		& > .overlay-close-btn {
+
+		> .overlay-close-btn {
 			position: relative;
 			float: right;
 			top: -13px;
@@ -4655,7 +4637,7 @@ $form-icon-btn: (
 
 	.list-table {
 		white-space: normal;
-		border: none;
+		border: 0;
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -4667,7 +4649,7 @@ $form-icon-btn: (
 	}
 
 	.table-paging {
-		border: none;
+		border: 0;
 		border-top: 1px solid $table-border-color;
 	}
 
@@ -4683,7 +4665,7 @@ $form-icon-btn: (
 	}
 
 	.dashbrd-widget-head {
-		margin: -10px -10px 6px -10px;
+		margin: -10px -10px 6px;
 	}
 
 	.maps-container {
@@ -4709,7 +4691,7 @@ $form-icon-btn: (
 		cursor: pointer;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-		border-right: none;
+		border-right: 0;
 		width: 100%;
 
 		&[readonly] {
@@ -4726,10 +4708,6 @@ $form-icon-btn: (
 	&.editable {
 		background-color: $form-bg-color !important;
 		border-color: $form-disabled-font-color;
-	}
-
-	&:-ms-input-placeholder {
-		color: $input-placeholder-color !important;
 	}
 
 	button {
@@ -4920,7 +4898,7 @@ $form-icon-btn: (
 }
 
 .overlay-dialogue-body {
-	margin: 0 0 25px 0;
+	margin: 0 0 25px;
 	white-space: nowrap;
 }
 
@@ -5009,7 +4987,7 @@ $form-icon-btn: (
 	text-align: center;
 
 	.btn-grey {
-		border: none;
+		border: 0;
 		background-color: $transparent;
 	}
 }
@@ -5047,7 +5025,7 @@ $form-icon-btn: (
 }
 
 .calendar-footer {
-	margin: 26px 0 0 0;
+	margin: 26px 0 0;
 	text-align: right;
 
 	.btn-grey {
@@ -5086,12 +5064,12 @@ $form-icon-btn: (
 	h4 {
 		display: block;
 		max-width: 250px;
-		padding-bottom: 0.083em;
+		padding-bottom: .083em;
 		@extend %overflow-ellipsis;
 	}
 
 	p {
-		margin: 0.25em 0 0 0;
+		margin: .25em 0 0;
 	}
 
 	li {
@@ -5123,7 +5101,7 @@ $form-icon-btn: (
 .notif-indic-container {
 	border-top: 1px solid $table-border-color;
 	margin: 0 0 0 -19px;
-	padding: 14px 0 0 0;
+	padding: 14px 0 0;
 
 	.notif-indic {
 		float: none;
@@ -5146,19 +5124,19 @@ $form-icon-btn: (
 	}
 
 	.list-table {
-		border: none;
+		border: 0;
 
 		td {
 			text-align: left;
 			padding: 6px 5px;
-			border: none;
+			border: 0;
 			border-bottom: 1px solid $table-border-color;
 		}
 	}
 
 	.dashbrd-widget {
 		margin: 0;
-		border: none;
+		border: 0;
 
 		th {
 			padding: 6px 5px;
@@ -5225,27 +5203,27 @@ $form-icon-btn: (
 	position: absolute;
 	z-index: 98;
 	overflow: hidden;
-	background-color: rgba($yellow,0.35);
-	border: 1px solid rgba($dark-yellow,0.6);
-	border-top: none;
-	border-bottom: none;
+	background-color: rgba($yellow, .35);
+	border: 1px solid rgba($dark-yellow, .6);
+	border-top: 0;
+	border-bottom: 0;
 }
 .svg-graph-selection {
-	fill: rgba($yellow,0.35);
-	stroke: rgba($dark-yellow,0.6);
+	fill: rgba($yellow, .35);
+	stroke: rgba($dark-yellow, .6);
 	stroke-width: 1px;
 }
 .svg-graph-selection-text {
 	fill: $font-color;
 }
 .svg-helper {
-	stroke-opacity: 0.35;
+	stroke-opacity: .35;
 	stroke: $red;
 	stroke-width: 2px;
 }
 .svg-point-highlight {
 	fill: $font-color !important;
-	fill-opacity: 0.5 !important;
+	fill-opacity: .5 !important;
 }
 
 .svg-graph-preview {
@@ -5322,8 +5300,8 @@ $form-icon-btn: (
 
 	.table-paging {
 		min-height: 18px;
-		padding: 0px 0px 2px;
-		border: none;
+		padding: 0 0 2px;
+		border: 0;
 		top: 2px;
 
 		.paging-btn-container {
@@ -5356,14 +5334,14 @@ $form-icon-btn: (
 .ui-selectable-helper {
 	position: absolute;
 	z-index: 100;
-	background-color: rgba($yellow,0.35);
-	border: 1px solid rgba($dark-yellow,0.6);
+	background-color: rgba($yellow, .35);
+	border: 1px solid rgba($dark-yellow, .6);
 }
 
 #map-area {
 
 	.map-element-area-bg {
-		background-color: rgba($action-hover-color,0.35);
+		background-color: rgba($action-hover-color, .35);
 	}
 }
 
@@ -5378,7 +5356,7 @@ $form-icon-btn: (
 	max-height: 600px;
 	overflow-y: auto;
 	padding: 11px;
-	margin: 10px 13px 0 13px;
+	margin: 10px 13px 0;
 	background-color: $lighter-yellow !important;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
@@ -5417,11 +5395,11 @@ $form-icon-btn: (
 		linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
 		// Shadows
 		radial-gradient(50% 0, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
-		radial-gradient(50% 100%,farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
+		radial-gradient(50% 100%, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background:
 		// Shadow covers
 		linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
-		linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
+		linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
 		// Shadows
 		radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
 		radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
@@ -5438,9 +5416,11 @@ $form-icon-btn: (
 
 a.green {
 	@extend .green;
-		&:hover, &:focus {
-			color: $link-hover-color;
-		}
+
+	&:hover,
+	&:focus {
+		color: $link-hover-color;
+	}
 }
 
 .red {
@@ -5449,9 +5429,11 @@ a.green {
 
 a.red {
 	@extend .red;
-		&:hover, &:focus {
-			color: $link-hover-color;
-		}
+
+	&:hover,
+	&:focus {
+		color: $link-hover-color;
+	}
 }
 
 select.red {
@@ -5471,9 +5453,11 @@ select {
 
 a.orange {
 	@extend .orange;
-		&:hover, &:focus {
-			color: $link-hover-color;
-		}
+
+	&:hover,
+	&:focus {
+		color: $link-hover-color;
+	}
 }
 
 .yellow {
@@ -5482,9 +5466,11 @@ a.orange {
 
 a.yellow {
 	@extend .yellow;
-		&:hover, &:focus {
-			color: $link-hover-color;
-		}
+
+	&:hover,
+	&:focus {
+		color: $link-hover-color;
+	}
 }
 
 .grey {
@@ -5493,9 +5479,11 @@ a.yellow {
 
 a.grey {
 	@extend .grey;
-		&:hover, &:focus {
-			color: $link-hover-color;
-		}
+
+	&:hover,
+	&:focus {
+		color: $link-hover-color;
+	}
 }
 
 .blue {
@@ -5504,9 +5492,11 @@ a.grey {
 
 a.blue {
 	@extend .blue;
-		&:hover, &:focus {
-			color: $link-hover-color;
-		}
+
+	&:hover,
+	&:focus {
+		color: $link-hover-color;
+	}
 }
 
 .teal {
@@ -5515,9 +5505,11 @@ a.blue {
 
 a.teal {
 	@extend .teal;
-		&:hover, &:focus {
-			color: $link-hover-color;
-		}
+
+	&:hover,
+	&:focus {
+		color: $link-hover-color;
+	}
 }
 
 a.link-action {
@@ -5545,7 +5537,7 @@ a.link-action {
 
 	&:hover {
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		border-bottom: 1px solid rgba($link-hover-color, .5);
 	}
 
 	&:focus {
@@ -5561,7 +5553,8 @@ a.link-action {
 	a {
 		border: none !important;
 
-		&:hover, &:focus {
+		&:hover,
+		&:focus {
 			.progress-bar-label {
 				display: block;
 			}
@@ -5570,7 +5563,7 @@ a.link-action {
 }
 
 .progress-bar-bg {
-	padding: 3px 0 2px 0;
+	padding: 3px 0 2px;
 	font-size: $font-h3-size;
 	line-height: 1em;
 	display: inline-block;
@@ -5662,7 +5655,12 @@ a.link-action {
 	@extend %status;
 }
 
-.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+.status-na-bg,
+.status-info-bg,
+.status-warning-bg,
+.status-average-bg,
+.status-high-bg,
+.status-disaster-bg {
 	border: 1px solid rgba($font-color, .2);
 	@extend %status;
 }
@@ -5692,7 +5690,7 @@ a.link-action {
 }
 
 %status {
-	padding: 2px 3px 1px 3px;
+	padding: 2px 3px 1px;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
@@ -5702,7 +5700,7 @@ a.link-action {
 	border-radius: 2px;
 
 	&:not(:last-of-type) {
-		border-right: none;
+		border-right: 0;
 	}
 }
 
@@ -5867,7 +5865,7 @@ td.inactive-bg {
 	}
 
 	&::before {
-		content: "";
+		content: '';
 		width: 61px;
 		position: absolute;
 		left: 0;
@@ -5876,7 +5874,7 @@ td.inactive-bg {
 	}
 
 	&::after {
-		content: "";
+		content: '';
 		background: url(../img/icon-sprite.svg) no-repeat;
 		margin-top: 2px;
 		margin-left: 16px;
@@ -6021,17 +6019,17 @@ td.inactive-bg {
 		}
 
 		&.msg-details-border {
-			margin: 8px 0 0 0;
+			margin: 8px 0 0;
 			border-top-width: 1px;
 			border-top-style: dashed;
-			padding-top: 0.5em;
+			padding-top: .5em;
 		}
 	}
 }
 
 .msg-buttons {
 	text-align: right;
-	margin: 10px 0 0 0;
+	margin: 10px 0 0;
 
 	button {
 		margin: 0 0 0 10px;
@@ -6045,7 +6043,7 @@ td.inactive-bg {
 	right: 0;
 	left: 0;
 	bottom: 0;
-	margin: 0 10px 0 10px;
+	margin: 0 10px;
 }
 
 .msg-global {
@@ -6069,7 +6067,7 @@ td.inactive-bg {
 	position: relative;
 
 	&::after {
-		content: "";
+		content: '';
 		width: 8px;
 		height: 2px;
 		top: 3px;
@@ -6096,7 +6094,7 @@ td.inactive-bg {
 	transition: opacity .2s ease-out;
 
 	&::before {
-		content:"\00d7";
+		content: '\00d7';
 	}
 
 	&:hover,
@@ -6113,7 +6111,7 @@ td.inactive-bg {
 	top: 5px;
 	right: 5px;
 	min-height: auto;
-	border: none;
+	border: 0;
 	background-color: $transparent !important;
 	@extend %close-icon;
 	border-radius: 2px;
@@ -6129,7 +6127,7 @@ td.inactive-bg {
 	top: 1px;
 	right: 1px;
 	min-height: auto;
-	border: none;
+	border: 0;
 	background-color: $transparent !important;
 	@extend %close-icon;
 	border-radius: 2px;
@@ -6221,7 +6219,9 @@ a.overlay-close-btn {
 // Preloader
 
 @keyframes is-loading-kf {
-	to { transform: rotate(360deg); }
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 .is-loading {
@@ -6254,7 +6254,7 @@ a.overlay-close-btn {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		animation: is-loading-kf 0.6s infinite linear;
+		animation: is-loading-kf .6s infinite linear;
 		z-index: 1;
 		content: '';
 	}
@@ -6263,12 +6263,12 @@ a.overlay-close-btn {
 
 		&::before {
 			opacity: 0;
-			animation: fadein 2s ease-in 0.5s normal forwards;
+			animation: fadein 2s ease-in .5s normal forwards;
 		}
 
 		&::after {
 			opacity: 0;
-			animation: fadein 2s ease-in 0.5s normal forwards, is-loading-kf 0.6s infinite linear;
+			animation: fadein 2s ease-in .5s normal forwards, is-loading-kf .6s infinite linear;
 		}
 
 		.delayed-15s {
@@ -6335,7 +6335,7 @@ button {
 
 $browser-logos: (
 	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
-	ff: url(../img/browser-sprite.png) no-repeat -66px 0px,
+	ff: url(../img/browser-sprite.png) no-repeat -66px 0,
 	ie: url(../img/browser-sprite.png) no-repeat 0 -66px,
 	opera: url(../img/browser-sprite.png) no-repeat -66px -66px,
 	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
@@ -6367,7 +6367,7 @@ $browser-logos: (
 	margin-right: auto;
 	width: 766px;
 	text-align: center;
-	padding: 28px 28px 10px 28px;
+	padding: 28px 28px 10px;
 	@extend .table-forms-container;
 
 	h2 {
@@ -6375,7 +6375,7 @@ $browser-logos: (
 	}
 
 	p {
-		margin: 0.7em 0;
+		margin: .7em 0;
 		text-align: left;
 	}
 
@@ -6387,8 +6387,8 @@ $browser-logos: (
 
 .browser-warning-footer {
 	border-top: 1px solid $table-border-color;
-	margin: 25px 0 0 0;
-	padding: 10px 0 0 0;
+	margin: 25px 0 0;
+	padding: 10px 0 0;
 	text-align: center;
 }
 
@@ -6536,12 +6536,12 @@ tr.cursor-move {
 }
 
 .time-zone {
-	margin: 0 0 .5em 0;
+	margin: 0 0 .5em;
 	white-space: nowrap;
 }
 
 .local-clock {
-	margin: .5em 0 0 0;
+	margin: .5em 0 0;
 	white-space: nowrap;
 }
 
@@ -6608,13 +6608,6 @@ svg {
 	}
 }
 
-@supports (-ms-ime-align:auto) {
-	.navtree .problems {
-		margin-left: 10px;
-		left: -15px;
-	}
-}
-
 .overrides-list {
 	display: table;
 	width: 90%;
@@ -6624,7 +6617,7 @@ svg {
 	.overrides-list-item {
 		display: table-row;
 
-		& .remove-btn {
+		.remove-btn {
 			position: relative;
 			right: -73px;
 			top: 3px;
@@ -6634,7 +6627,7 @@ svg {
 
 .overrides-options-list {
 	white-space: normal;
-	padding: 5px 0 8px 0;
+	padding: 5px 0 8px;
 	margin-bottom: 10px;
 	border-bottom: 1px solid $table-border-color;
 
@@ -6664,8 +6657,8 @@ svg {
 
 			> .subfilter-disable-btn {
 				position: absolute;
-				right: 0px;
-				top: 0px;
+				right: 0;
+				top: 0;
 				border: 0;
 
 				&:focus,
@@ -6678,7 +6671,7 @@ svg {
 }
 
 .list-accordion-foot {
-	& > div {
+	> div {
 		display: table-cell;
 		padding-top: 10px;
 	}
@@ -6690,8 +6683,8 @@ svg {
 	float: left;
 	margin-right: 10px;
 	cursor: pointer;
-	border: none;
-	border-radius: 0px;
+	border: 0;
+	border-radius: 0;
 }
 
 .list-vertical-accordion {
@@ -6702,7 +6695,7 @@ svg {
 	.list-accordion-item {
 		display: table-row;
 
-		& .remove-btn {
+		.remove-btn {
 			position: relative;
 			right: -10px;
 			top: 3px;
@@ -6760,18 +6753,14 @@ svg {
 		flex-wrap: nowrap;
 	}
 
-	[class^=column-] {
-		-webkit-box-flex: 0;
-	}
-
 	// Dynamically generated classes for the columns count:
 	//  .columns-2
 	//  .columns-3
 	@each $count in $column-count {
 		&.columns-#{$count} > {
-			div, li {
+			div,
+			li {
 				display: block;
-				-ms-flex: 0 0 (100% / $count);
 				flex: 0 0 (100% / $count);
 				max-width: (100% / $count);
 			}
@@ -6792,7 +6781,6 @@ svg {
 	//  .column-95
 	@each $class, $width in $column-size {
 		.column-#{$class} {
-			-ms-flex: 0 0 $width;
 			flex: 0 0 $width;
 			max-width: $width;
 		}
@@ -6831,7 +6819,7 @@ svg {
 	}
 
 	.list-numbered-item::before {
-		content: counter(line) ":";
+		content: counter(line) ':';
 		flex: 0 0 15px;
 		max-width: 15px;
 		line-height: 24px;
@@ -6900,7 +6888,7 @@ svg {
 		padding-right: $on-fail-width + $action-width + 5px;
 		margin-bottom: 5px;
 
-		& > label {
+		> label {
 			padding-left: 30px;
 		}
 
@@ -6930,11 +6918,11 @@ svg {
 
 		.step-action {
 			height: 24px;
-		}
 
-		.step-action + .step-action:last-child {
-			margin-left: auto;
-			justify-self: flex-end;
+			+ .step-action:last-child {
+				margin-left: auto;
+				justify-self: flex-end;
+			}
 		}
 	}
 }
@@ -6943,24 +6931,12 @@ svg {
 	$max_depth: 10;
 
 	@keyframes fadein {
-		from {opacity: 0;}
-		to   {opacity: 1;}
-	}
-	@-moz-keyframes fadein {
-		from {opacity: 0;}
-		to   {opacity: 1;}
-	}
-	@-webkit-keyframes fadein {
-		from {opacity: 0;}
-		to   {opacity: 1;}
-	}
-	@-ms-keyframes fadein {
-		from {opacity: 0;}
-		to   {opacity: 1;}
-	}
-	@-o-keyframes fadein {
-		from {opacity: 0;}
-		to   {opacity: 1;}
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
 	}
 
 	.tree {
@@ -6969,45 +6945,45 @@ svg {
 
 		.tree-list {
 			list-style: none;
-		}
 
-		.tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
-			flex: 0 0 15px;
-		}
-
-		.tree-list > .tree-item.ui-sortable-helper .content {
-			padding-left: 5px;
-		}
-
-		@for $i from 0 through $max_depth {
-			.tree-list[data-depth="#{$i}"] > .tree-item {
-				&> .tree-row > .content > .margin-lvl {
-					flex: 0 0 ($i * 15px + 10px);
-				}
-				&.ui-sortable-helper {
-					margin-left: ($i * 15px + 10px);
-
-					& > .tree-row > .content > .margin-lvl {
-						display: none;
-					}
-				}
-			}
-		}
-
-		.tree-list[data-depth] .ui-sortable-helper {
-			> .tree-row > .content > .margin-lvl {
+			&.root > .tree-item > .tree-row > .content > .margin-lvl {
 				flex: 0 0 15px;
 			}
 
-			@for $i from 1 through $max_depth - 1 {
-				$class_tree_list: '.tree-list';
-				@for $j from 1 through $i {
-					@if $j != 1 {
-						$class_tree_list: $class_tree_list + ' .tree-list';
+			> .tree-item.ui-sortable-helper .content {
+				padding-left: 5px;
+			}
+
+			@for $i from 0 through $max_depth {
+				&[data-depth="#{$i}"] > .tree-item {
+					> .tree-row > .content > .margin-lvl {
+						flex: 0 0 ($i * 15px + 10px);
+					}
+					&.ui-sortable-helper {
+						margin-left: ($i * 15px + 10px);
+
+						> .tree-row > .content > .margin-lvl {
+							display: none;
+						}
 					}
 				}
-				#{$class_tree_list} > li > .tree-row > .content > .margin-lvl {
-					flex: 0 0 ($i * 15px + 15px);
+			}
+
+			&[data-depth] .ui-sortable-helper {
+				> .tree-row > .content > .margin-lvl {
+					flex: 0 0 15px;
+				}
+
+				@for $i from 1 through $max_depth - 1 {
+					$class_tree_list: '.tree-list';
+					@for $j from 1 through $i {
+						@if $j != 1 {
+							$class_tree_list: $class_tree_list + ' .tree-list';
+						}
+					}
+					#{$class_tree_list} > li > .tree-row > .content > .margin-lvl {
+						flex: 0 0 ($i * 15px + 15px);
+					}
 				}
 			}
 		}
@@ -7026,28 +7002,27 @@ svg {
 				> .problems {
 					float: right;
 					position: relative;
-					padding-left:10px;
+					padding-left: 10px;
 					margin-right: 10px;
 					background: inherit;
 					display: flex;
 
 					.problems-per-item {
 						flex: 0 0 7px;
-						-ms-flex: 0 0 auto;
-						background: gray;
+						background: #808080;
 						color: $white;
 						padding: 3px 4px 2px;
 						font-size: 12px;
 						line-height: 1;
 						border-radius: 3px;
-						margin: 0px 5px 0px 0px;
+						margin: 0 5px 0 0;
 					}
 				}
 
 				> .tools {
 					float: right;
 					position: relative;
-					padding-left:10px;
+					padding-left: 10px;
 					margin-right: 10px;
 					display: flex;
 					width: 85px;
@@ -7058,8 +7033,8 @@ svg {
 					.add-child-btn {
 						margin-left: 5px;
 						cursor: pointer;
-						border: 0px none;
-						opacity: 0.5;
+						border: 0;
+						opacity: .5;
 						float: left;
 
 						&::-moz-focus-inner {
@@ -7100,7 +7075,7 @@ svg {
 					.remove-btn {
 						position: relative;
 						margin-left: 10px;
-						top: 0px;
+						top: 0;
 					}
 				}
 
@@ -7111,7 +7086,7 @@ svg {
 					> .arrow {
 						flex: 0 0 15px;
 						text-align: center;
-						margin: 2px 2px 0px -5px;
+						margin: 2px 2px 0 -5px;
 
 						> .treeview {
 							display: none;
@@ -7134,7 +7109,7 @@ svg {
 			}
 
 			&.is-parent {
-				> .tree-row{
+				> .tree-row {
 					> .content {
 						> .arrow {
 							> .treeview {
@@ -7187,7 +7162,7 @@ svg {
 
 			.sortable-error {
 				border-color: transparent;
-				background: rgba($red, 0.2);
+				background: rgba($red, .2);
 			}
 		}
 
@@ -7197,34 +7172,9 @@ svg {
 
 		.placeholder {
 			background-color: $ui-placeholder-background-color;
-			-webkit-animation: fadein .5s;
-			-moz-animation: fadein .5s;
-			-ms-animation: fadein .5s;
-			-o-animation: fadein .5s;
 			animation: fadein .5s;
 		}
 	}
-}
-
-::-webkit-input-placeholder {
-	color: $input-placeholder-color;
-}
-
-:-ms-input-placeholder {
-	color: $input-placeholder-color !important;
-}
-
-::-ms-input-placeholder {
-	color: $input-placeholder-color;
-}
-
-::-moz-placeholder {
-	color: $input-placeholder-color;
-	opacity: 1;
-}
-
-:-moz-placeholder {
-	color: $input-placeholder-color;
 }
 
 :placeholder-shown {
@@ -7252,8 +7202,8 @@ svg {
 	height: 18px;
 	width: 18px;
 	margin: 0 5px 0 0;
-	top:0;
-	bottom:0;
+	top: 0;
+	bottom: 0;
 	vertical-align: bottom;
 
 	&::before {
@@ -7276,7 +7226,7 @@ svg {
 	text-align: center;
 	margin-top: -2px;
 	font-size: 9px;
-	letter-spacing: -0.25px;
+	letter-spacing: -.25px;
 	width: 18px;
 }
 
@@ -7362,7 +7312,7 @@ svg {
 }
 
 // RANGE CONTROL
-$range-track-color: silver;
+$range-track-color: #c0c0c0;
 $range-progress-color: $link-color;
 $range-thumb-color: $link-color;
 $range-thumb-color-focus: $link-active-color;
@@ -7379,11 +7329,12 @@ $range-input-width: 31px;
 	input[type=range] {
 		cursor: pointer;
 		-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+		-moz-appearance: none; /* Hides the slider so that custom slider can be made */
 		width: calc(100% + 10px);
 		opacity: 0;
 		vertical-align: middle;
 		margin: 0 -5px;
-		padding: 0px;
+		padding: 0;
 		height: 20px;
 
 		&:focus {
@@ -7420,7 +7371,7 @@ $range-input-width: 31px;
 	.range-control-progress {
 		position: absolute;
 		top: 50%;
-		margin-top: -$range-track-height/2;
+		margin-top: -$range-track-height / 2;
 		left: 0;
 		height: $range-track-height;
 		cursor: pointer;
@@ -7438,8 +7389,8 @@ $range-input-width: 31px;
 	.range-control-thumb {
 		position: absolute;
 		top: 50%;
-		margin-top: -$range-thumb-size/2;
-		margin-left: -$range-thumb-size/2;
+		margin-top: -$range-thumb-size / 2;
+		margin-left: -$range-thumb-size / 2;
 		width: $range-thumb-size;
 		height: $range-thumb-size;
 		border-radius: 50%;
@@ -7448,8 +7399,8 @@ $range-input-width: 31px;
 
 	&.range-control-focus {
 		.range-control-thumb {
-			margin-top: -$range-thumb-size/1.5;
-			margin-left: -$range-thumb-size/1.5;
+			margin-top: -$range-thumb-size / 1.5;
+			margin-left: -$range-thumb-size / 1.5;
 			background: $range-thumb-color-focus;
 			border: 2px solid lighten($btn-bg-color, 10%);
 		}
@@ -7467,7 +7418,7 @@ $range-input-width: 31px;
 		}
 		.range-control-progress,
 		.range-control-thumb {
-			background: silver;
+			background: #c0c0c0;
 		}
 	}
 
@@ -7476,12 +7427,12 @@ $range-input-width: 31px;
 		display: flex;
 		width: 100%;
 		top: 50%;
-		margin-top: -$range-track-height/2;
+		margin-top: -$range-track-height / 2;
 
 		option {
 			padding: 0;
 			font-size: 0;
-			flex: 1 0 0px;
+			flex: 1 0 0;
 			height: $range-track-height;
 			border-left: 1px solid $body-bg-color;
 		}
@@ -7496,7 +7447,7 @@ $range-input-width: 31px;
 }
 
 .graph-widget-config-tabs {
-	padding: 10px 0px;
+	padding: 10px 0;
 
 	> .tabs-nav {
 		padding-left: calc(15% + 10px);
@@ -7565,7 +7516,7 @@ table.preprocessing-test-results {
 			flex-direction: column;
 			justify-content: center;
 			min-width: 55px;
-			text-align: center
+			text-align: center;
 		}
 	}
 
