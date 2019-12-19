@@ -222,6 +222,16 @@ abstract class CControllerPopupItemTest extends CController {
 			$interface_input['address'] = $input['address'];
 		}
 
+		// Set proxy.
+		if (in_array($this->item_type, $this->items_support_proxy)) {
+			if (array_key_exists('data', $input) && array_key_exists('proxy_hostid', $input['data'])) {
+				$data['proxy_hostid'] = $input['data']['proxy_hostid'];
+			}
+			elseif (array_key_exists('proxy_hostid', $input)) {
+				$data['proxy_hostid'] = $input['proxy_hostid'];
+			}
+		}
+
 		switch ($this->item_type) {
 			case ITEM_TYPE_ZABBIX:
 				$data += [
