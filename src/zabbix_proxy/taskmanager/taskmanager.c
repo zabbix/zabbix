@@ -196,12 +196,13 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
-	zbx_tm_task_t	*task = NULL;
-	int		ret = FAIL;
-	char		*info = NULL;
-	zbx_uint64_t	parent_taskid;
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_tm_task_t		*task = NULL;
+	int			ret = FAIL;
+	char			*info = NULL;
+	zbx_uint64_t		parent_taskid;
+	struct zbx_json_parse	jp_data;
 
 	result = DBselect("select parent_taskid,data"
 				" from task_data"
@@ -214,17 +215,19 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
 	ZBX_STR2UINT64(parent_taskid, row[0]);
 
-	if (1 || 0 != ttl && clock + ttl < now)
+	if (0 != ttl && clock + ttl < now)
 	{
 		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "The task has been expired.");
 		goto finish;
 	}
-/*
-	if (SUCCEED != (ret = zbx_script_execute(&script, &host, &info, error, sizeof(error))))
-		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
+
+	if (SUCCEED != (ret = zbx_json_brackets_open(row[1], &jp_data)))
+		info = zbx_strdup(NULL, zbx_json_strerror());
 	else
-		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
-*/
+		ret = perform_item_test(&jp_data, &info);
+
+	task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
+
 	zbx_free(info);
 finish:
 	DBfree_result(result);
