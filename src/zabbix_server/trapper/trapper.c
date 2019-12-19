@@ -850,12 +850,16 @@ int	perform_item_test(const struct zbx_json_parse *jp_data, char **info)
 	{
 		init_result(&result);
 #ifdef HAVE_OPENIPMI
-		ret = zbx_ipmi_test_item(&item, info);
+		if (0 == CONFIG_IPMIPOLLER_FORKS)
+		{
+			*info = zbx_strdup(NULL, "Cannot perform IPMI request: configuration parameter"
+					" \"StartIPMIPollers\" is 0.");
+		}
+		else
+			ret = zbx_ipmi_test_item(&item, info);
 #else
 		*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
-		ret = FAIL;
 #endif
-
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
 	}
