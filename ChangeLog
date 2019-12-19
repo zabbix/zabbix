@@ -31,6 +31,7 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
+..F....... [ZBX-17101] fixed url validation before output (miks)
 ...G...... [ZBX-17070] fixed agent2 plugin configuration not being called if no plugin specific parameters are set (wiper)
 ........S. [ZBX-17062] fixed LLD macro substitution when PostgrSQL is used (viktors)
 .......PS. [ZBX-16929] fixed function signature (mabele)
@@ -178,6 +179,7 @@ A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported templ
 .........T [ZBXNEXT-5572] added windows services template, updated windows template objects descriptions, added missing user macro (vitaly)
 
 Bug fixes:
+..F....... [ZBX-17101] fixed url validation before output (miks)
 ...G...... [ZBX-17070] fixed agent2 plugin configuration not being called if no plugin specific parameters are set (wiper)
 ........S. [ZBX-17062] fixed LLD macro substitution when PostgrSQL is used (viktors)
 .......PS. [ZBX-16929] fixed function signature (mabele)
@@ -1137,6 +1139,7 @@ A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported templ
 .........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 
 Bug fixes:
+..F....... [ZBX-17101] fixed url validation before output (miks)
 .......PS. [ZBX-16929] fixed detection of invalid sender data request (mabele)
 ..F....... [ZBX-16804] added missing get parameters in availability report (rlataria)
 ..F....... [ZBX-16286] fixed graph widget dimensions errors on high DPI screens (agriscenko)
@@ -3857,9 +3860,8 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.29rc1
 
-New features:
-
 Bug fixes:
+..F....... [ZBX-17101] fixed url validation before output (miks)
 ...G...PS. [ZBX-16750] fixed broken validation of peer certificate issuer and subject strings in TLS connect, fixed logging (Andris)
 ....I..... [ZBX-16178] fixed distributive can contain untracked backup file include/config.h.in~ (akozlovs)
 
