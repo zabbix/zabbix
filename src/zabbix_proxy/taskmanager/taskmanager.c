@@ -28,6 +28,7 @@
 
 #include "../../zabbix_server/scripts/scripts.h"
 #include "taskmanager.h"
+#include "../../zabbix_server/trapper/trapper_item_test.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -230,7 +231,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	if (SUCCEED != (ret = zbx_json_brackets_open(row[1], &jp_data)))
 		info = zbx_strdup(NULL, zbx_json_strerror());
 	else
-		ret = perform_item_test(&jp_data, &info);
+		ret = zbx_trapper_item_test_run(&jp_data, &info);
 
 	task->data = zbx_tm_data_result_create(parent_taskid, ret, info);
 
