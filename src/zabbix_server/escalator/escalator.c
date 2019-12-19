@@ -433,15 +433,17 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 		p->userid = userid;
 		p->mediatypeid = mediatypeid;
 		p->err = err_type;
-		p->subject = zbx_strdup(NULL, subject);
-		p->message = zbx_strdup(NULL, message);
+		p->subject = subject;
+		p->message = message;
 		p->next = *user_msg;
 
 		*user_msg = p;
 	}
-
-	zbx_free(subject);
-	zbx_free(message);
+	else
+	{
+		zbx_free(subject);
+		zbx_free(message);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -451,89 +453,84 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 		const DB_ACKNOWLEDGE *ack, int macro_t, unsigned char evt_src, unsigned char op_mode,
 		const char *cancel_err)
 {
-	DB_RESULT	custom_msg = NULL, default_msg = NULL;
+	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	mtid = mediatypeid;
-	char		*sql_q, *tmp = NULL;
+	zbx_uint64_t	mtid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 != operationid)
 	{
-		custom_msg = DBselect(
+		result = DBselect(
 				"select mediatypeid,default_msg,subject,message"
 				" from opmessage where operationid=" ZBX_FS_UI64, operationid);
 
-		if (NULL != (row = DBfetch(custom_msg)))
+		if (NULL != (row = DBfetch(result)))
 		{
-			if (0 == mtid)
+			if (0 == mediatypeid)
 			{
-				ZBX_DBROW2UINT64(mtid, row[0]);
+				ZBX_DBROW2UINT64(mediatypeid, row[0]);
 			}
 
 			if (atoi(row[1]) != 1)
 			{
-				add_user_msg(userid, mtid, user_msg, row[2], row[3], actionid, event, r_event,
+				add_user_msg(userid, mediatypeid, user_msg, row[2], row[3], actionid, event, r_event,
 						ack, macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE);
 				goto out;
 			}
+
+			DBfree_result(result);
 		}
 		else
 			goto out;
 	}
 
-	if (0 != mtid)
-		tmp = zbx_dsprintf(tmp, " mediatypeid=" ZBX_FS_UI64 " and", mtid);
+	mtid = mediatypeid;
 
-	sql_q = zbx_dsprintf(NULL, "select null from media_type_message"
-			" where%s eventsource=%d and recovery=%d", ZBX_NULL2EMPTY_STR(tmp), evt_src, op_mode);
-	default_msg = DBselectN(sql_q, 1);
-	zbx_free(tmp);
-	zbx_free(sql_q);
-
-	if (NULL == DBfetch(default_msg))
+	if (0 != mediatypeid)
 	{
-		add_user_msg(userid, mtid, user_msg, "", "", actionid, event, r_event, ack, macro_t, cancel_err,
-				ZBX_ALERT_MESSAGE_ERR_MSG);
-		goto out;
-	}
-	DBfree_result(default_msg);
+		result = DBselect("select subject,message,mediatypeid from media_type_message"
+				" where eventsource=%d and recovery=%d and mediatypeid=" ZBX_FS_UI64,
+				evt_src, op_mode, mediatypeid);
 
-	if (0 == mtid)
-	{
-		default_msg = DBselect(
-				"select distinct mt.mediatypeid,mt.subject,mt.message"
-				" from media_type_message mt"
-				" join media m on mt.mediatypeid=m.mediatypeid"
-				" where m.userid=" ZBX_FS_UI64 " and mt.eventsource=%d and mt.recovery=%d",
-				userid, evt_src, op_mode);
+		mediatypeid = 0;
 	}
 	else
 	{
-		default_msg = DBselect(
-				"select mediatypeid,subject,message"
-				" from media_type_message"
-				" where mediatypeid=" ZBX_FS_UI64 " and eventsource=%d and recovery=%d",
-				mtid, evt_src, op_mode);
+		result = DBselect(
+				"select mtm.subject,mtm.message,mt.mediatypeid from media_type mt"
+				" left join (select mediatypeid,subject,message from media_type_message"
+				" where eventsource=%d and recovery=%d) as mtm"
+				" on mt.mediatypeid=mtm.mediatypeid"
+				" join (select distinct mediatypeid from media where userid=" ZBX_FS_UI64 ") as m"
+				" on mt.mediatypeid=m.mediatypeid",
+				evt_src, op_mode, userid);
 	}
-	mtid = 0;
 
-	while (NULL != (row = DBfetch(default_msg)))
+	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(mtid, row[0]);
-		add_user_msg(userid, mtid, user_msg, row[1], row[2], actionid, event, r_event, ack, macro_t,
-				cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE);
+		ZBX_STR2UINT64(mediatypeid, row[2]);
+
+		if (FAIL == DBis_null(row[0]))
+		{
+			add_user_msg(userid, mediatypeid, user_msg, row[0], row[1], actionid, event, r_event, ack,
+					macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE);
+		}
+		else
+		{
+			add_user_msg(userid, mediatypeid, user_msg, "", "", actionid, event, r_event, ack, macro_t,
+					cancel_err, ZBX_ALERT_MESSAGE_ERR_MSG);
+		}
 	}
 
-	if (0 == mtid)
+	if (0 == mediatypeid)
 	{
 		add_user_msg(userid, mtid, user_msg, "", "", actionid, event, r_event, ack, macro_t, cancel_err,
-				ZBX_ALERT_MESSAGE_ERR_USR);
+				0 == mtid ? ZBX_ALERT_MESSAGE_ERR_USR : ZBX_ALERT_MESSAGE_ERR_MSG);
 	}
 
 out:
-	DBfree_result(custom_msg);
-	DBfree_result(default_msg);
+	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1227,7 +1224,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	now = time(NULL);
 	ackid = (NULL == ack ? 0 : ack->acknowledgeid);
 
-	if (ZBX_ALERT_MESSAGE_ERR_NONE != err_type)
+	if (ZBX_ALERT_MESSAGE_ERR_USR == err_type)
 		goto err_alert;
 
 	if (0 == mediatypeid)
@@ -1290,15 +1287,20 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (period)");
 			continue;
 		}
-		else if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
-		{
-			status = ALERT_STATUS_NEW;
-			perror = "";
-		}
-		else
+		else if (MEDIA_TYPE_STATUS_DISABLED == atoi(row[4]))
 		{
 			status = ALERT_STATUS_FAILED;
 			perror = "Media type disabled.";
+		}
+		else if (ZBX_ALERT_MESSAGE_ERR_MSG == err_type)
+		{
+			status = ALERT_STATUS_FAILED;
+			perror = "No message defined for media type.";
+		}
+		else
+		{
+			status = ALERT_STATUS_NEW;
+			perror = "";
 		}
 
 		if (0 == have_alerts)
@@ -1336,11 +1338,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	{
 err_alert:
 		have_alerts = 1;
-
-		if (ZBX_ALERT_MESSAGE_ERR_MSG == err_type)
-			error = "No message defined for media type.";
-		else
-			error = "No media defined for user.";
+		error = "No media defined for user.";
 
 		zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid", "clock",
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype",
