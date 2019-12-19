@@ -30,7 +30,17 @@ if ($data['show_prev']) {
 }
 
 foreach ($data['inputs'] as $name => $value) {
-	if (in_array($name, ['interface'])) {
+	if ($name === 'interface') {
+		// SNMPv3 additional details about interface.
+		if (array_key_exists('useip', $value)) {
+			$form->addVar('useip', $value['useip']);
+		}
+		if (array_key_exists('interfaceid', $value)) {
+			$form->addVar('interfaceid', $value['interfaceid']);
+		}
+		continue;
+	}
+	elseif (in_array($name, ['proxy_hostid'])) {
 		continue;
 	}
 
@@ -87,13 +97,14 @@ if ($data['is_item_testable']) {
 			'host_address_row'
 		)
 		->addRow(
-			new CLabel(_('Proxy'), 'host_proxy'),
+			new CLabel(_('Proxy'), 'proxy_hostid'),
 			$data['proxies_enabled']
-				? (new CComboBox('host_proxy', $data['inputs']['proxy_hostid'], null, [0 => _('(no proxy)')] + $data['proxies']))
-				: (new CComboBox('host_proxy'))
+				? (new CComboBox('proxy_hostid', $data['inputs']['proxy_hostid'], null,
+						[0 => _('(no proxy)')] + $data['proxies']))
+				: (new CComboBox('proxy_hostid'))
 					->addItem(0, _('(no proxy)'))
 					->setEnabled(false),
-			'host_proxy_row'
+			'proxy_hostid_row'
 		)
 		->addRow(
 			null,

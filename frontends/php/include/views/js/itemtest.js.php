@@ -90,6 +90,7 @@
 				properties = {
 					snmp_oid: form_data['snmp_oid'],
 					snmp_community: form_data['snmp_community'],
+					useip: form_data['useip'],
 					interfaceid: form_data['interfaceid']
 				};
 
@@ -131,7 +132,7 @@
 			case <?= ITEM_TYPE_HTTPAGENT ?>:
 				properties = {
 					key: form_data['key'],
-					authtype: form_data['http_authtype'],
+					http_authtype: form_data['http_authtype'],
 					follow_redirects: form_data['follow_redirects'] || 0,
 					headers: form_data['headers'],
 					http_proxy: form_data['http_proxy'],
@@ -153,8 +154,8 @@
 
 				if (properties.authtype != <?= HTTPTEST_AUTH_NONE ?>) {
 					properties = jQuery.extend(properties, {
-						username: form_data['http_username'],
-						password: form_data['http_password']
+						http_username: form_data['http_username'],
+						http_password: form_data['http_password']
 					});
 				}
 				break;

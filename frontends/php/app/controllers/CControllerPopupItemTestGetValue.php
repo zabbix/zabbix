@@ -28,11 +28,15 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$fields = [
 			'authtype'				=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'headers'				=> 'array',
-			'host_proxy'			=> 'db hosts.proxy_hostid',
+			'proxy_hostid'			=> 'id',
+			'http_authtype'			=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'http_password'			=> 'string',
 			'http_proxy'			=> 'string',
+			'http_username'			=> 'string',
 			'follow_redirects'		=> 'in 0,1',
 			'key'					=> 'string',
 			'interface'				=> 'array',
+			'interfaceid'			=> 'id',
 			'ipmi_sensor'			=> 'string',
 			'item_type'				=> 'required|in '.implode(',', self::$testable_item_types),
 			'jmx_endpoint'			=> 'string',
@@ -64,6 +68,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
 			'time_change'			=> 'int32',
 			'timeout'				=> 'string',
+			'useip'					=> 'in 0,1',
 			'username'				=> 'string',
 			'url'					=> 'string',
 			'value'					=> 'string',
@@ -128,10 +133,14 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$data = $this->getItemTestProperties($this->getInputAll());
 		$data = $this->unsetEmptyValues($data);
 
+		unset($data['value_type']);
+
 		$data = CArrayHelper::renameKeys($data, [
 			'params_ap' => 'params',
 			'params_es' => 'params',
-			'params_f' => 'params'
+			'params_f' => 'params',
+			'http_username' => 'username',
+			'http_password' => 'password'
 		]);
 
 		$output = [

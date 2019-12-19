@@ -26,12 +26,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 	protected function checkInput() {
 		$fields = [
-			'authtype'				=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),			'data' => 'array',
+			'authtype'				=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'data'					=> 'array',
 			'delay'					=> 'string',
 			'get_value'				=> 'in 0,1',
 			'headers'				=> 'array',
 			'hostid'				=> 'db hosts.hostid',
+			'http_authtype'			=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'http_password'			=> 'string',
 			'http_proxy'			=> 'string',
+			'http_username'			=> 'string',
 			'follow_redirects'		=> 'in 0,1',
 			'key'					=> 'string',
 			'interfaceid'			=> 'db interface.interfaceid',
@@ -121,7 +125,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 	protected function doAction() {
 		// Get item and host properties and values from cache.
 		$data = $this->getInput('data', []);
-		$inputs = $this->getItemTestProperties($data);
+		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
 		$preprocessing_steps = $this->getInput('steps', []);

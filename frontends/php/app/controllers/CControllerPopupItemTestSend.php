@@ -57,7 +57,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'get_value'				=> 'in 0,1',
 			'eol'					=> 'in '.implode(',', [ZBX_EOL_LF, ZBX_EOL_CRLF]),
 			'headers'				=> 'array',
-			'host_proxy'			=> 'db hosts.proxy_hostid',
+			'proxy_hostid'			=> 'id',
 			'http_proxy'			=> 'string',
 			'follow_redirects'		=> 'in 0,1',
 			'key'					=> 'string',
