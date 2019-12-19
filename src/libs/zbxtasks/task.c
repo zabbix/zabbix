@@ -1109,53 +1109,23 @@ static zbx_uint64_t	zbx_create_task_data(const char *data, int len, zbx_uint64_t
 	return taskid;
 }
 
-int	zbx_tm_execute_task_data(const char *data, int len, zbx_uint64_t proxy_hostid, char **info)
-{
-	zbx_uint64_t	taskid;
-
-	if (0 == (taskid = zbx_create_task_data(data, len, proxy_hostid)))
-	{
-		*info = zbx_strdup(NULL, "Cannot create task.");
-		return FAIL;
-	}
-
-	return zbx_tm_task_result_wait(taskid, ZBX_TM_TASK_DATA_RESULT, info);
-}
-
-int	zbx_tm_task_result_wait(zbx_uint64_t taskid, int type, char **info)
+static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret, time_start;
-	const char	*table;
-
-	switch (type)
-	{
-		case ZBX_TM_TASK_DATA_RESULT:
-			table = "task_result";
-			break;
-		case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
-			table = "task_remote_command_result";
-			break;
-		default:
-			*info = zbx_dsprintf(NULL, "Unknown task: %d", type);
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-	}
 
 	for (time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
 	{
-		result = DBselect(
-				"select tr.status,tr.info"
-				" from task t"
-				" join %s tr"
-					" on tr.taskid=t.taskid"
-				" where tr.parent_taskid=" ZBX_FS_UI64,
-				table, taskid);
+		result = DBselect("select status,info"
+				" from task_result"
+				" where parent_taskid=" ZBX_FS_UI64,
+				taskid);
 
 		if (NULL != (row = DBfetch(result)))
 		{
 			*info = zbx_strdup(NULL, row[1]);
+
 			if (SUCCEED != (ret = atoi(row[0])))
 				ret = FAIL;
 
@@ -1169,5 +1139,18 @@ int	zbx_tm_task_result_wait(zbx_uint64_t taskid, int type, char **info)
 	*info = zbx_strdup(NULL, "Timeout while waiting for result.");
 
 	return FAIL;
+}
+
+int	zbx_tm_execute_task_data(const char *data, int len, zbx_uint64_t proxy_hostid, char **info)
+{
+	zbx_uint64_t	taskid;
+
+	if (0 == (taskid = zbx_create_task_data(data, len, proxy_hostid)))
+	{
+		*info = zbx_strdup(NULL, "Cannot create task.");
+		return FAIL;
+	}
+
+	return zbx_tm_task_result_wait(taskid, info);
 }
 

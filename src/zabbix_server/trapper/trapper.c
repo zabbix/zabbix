@@ -43,6 +43,7 @@
 #ifdef HAVE_OPENIPMI
 #include "../ipmi/ipmi.h"
 #endif
+#include "zbxtasks.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
