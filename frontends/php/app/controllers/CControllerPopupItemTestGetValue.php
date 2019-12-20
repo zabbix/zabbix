@@ -144,6 +144,14 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'http_password' => 'password'
 		]);
 
+		if (array_key_exists('headers', $data)) {
+			$data['headers'] = $this->transformHeaderFields($data['headers']);
+		}
+
+		if (array_key_exists('query_fields', $data)) {
+			$data['query_fields'] = $this->transformQueryFields($data['query_fields']);
+		}
+
 		$output = [
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
