@@ -63,7 +63,6 @@ function disableItemTestForm() {
 	<?php endif ?>
 
 	<?php if ($data['proxies_enabled']): ?>
-		console.log(jQuery('#proxy_hostid'));
 		jQuery('#proxy_hostid').prop('disabled', true);
 	<?php endif ?>
 

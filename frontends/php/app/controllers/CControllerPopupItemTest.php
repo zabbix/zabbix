@@ -564,4 +564,50 @@ abstract class CControllerPopupItemTest extends CController {
 
 		return $data;
 	}
+
+	/**
+	 * Transform front-end familiar array of http query fields to the form server is capable to handle.
+	 *
+	 * @param array $data
+	 * @param array $data[name]   Indexed array of names.
+	 * @param array $data[value]  Indexed array of values.
+	 *
+	 * @return string
+	 */
+	protected function transformQueryFields(array $data) {
+		$result = [];
+
+		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
+			foreach (array_keys($data['name']) as $num) {
+				if (array_key_exists($num, $data['value'])) {
+					$result[] = [$data['name'][$num] => $data['value'][$num]];
+				}
+			}
+		}
+
+		return CJs::encodeJson($result);
+	}
+
+	/**
+	 * Transform front-end familiar array of http header fields to the form server is capable to handle.
+	 *
+	 * @param array $data
+	 * @param array $data[name]   Indexed array of names.
+	 * @param array $data[value]  Indexed array of values.
+	 *
+	 * @return string
+	 */
+	protected function transformHeaderFields(array $data) {
+		$result = [];
+
+		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
+			foreach (array_keys($data['name']) as $num) {
+				if (array_key_exists($num, $data['value'])) {
+					$result[] = $data['name'][$num].': '.$data['value'][$num];
+				}
+			}
+		}
+
+		return implode("\r\n", $result);
+	}
 }
