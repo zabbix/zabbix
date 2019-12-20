@@ -40,6 +40,10 @@ foreach ($data['inputs'] as $name => $value) {
 		}
 		continue;
 	}
+	elseif ($name === 'host' && array_key_exists('hostid', $value)) {
+		$form->addVar('hostid', $value['hostid']);
+		continue;
+	}
 	elseif (in_array($name, ['proxy_hostid'])) {
 		continue;
 	}
