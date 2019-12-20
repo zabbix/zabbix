@@ -26,7 +26,7 @@
 #define ZBX_TASK_UPDATE_FREQUENCY	1
 
 #define ZBX_REMOTE_COMMAND_TTL		(SEC_PER_MIN * 10)
-#define ZBX_DATA_TTL			SEC_PER_MIN
+#define ZBX_DATA_TTL			30
 
 /* task manager task types */
 #define ZBX_TM_TASK_UNDEFINED				0
