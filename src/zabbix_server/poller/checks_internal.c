@@ -166,7 +166,7 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
