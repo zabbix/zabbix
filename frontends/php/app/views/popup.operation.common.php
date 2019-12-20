@@ -118,6 +118,10 @@ if (in_array($data['operationtype'], [
 	if (!array_key_exists('default_msg', $opr_data['opmessage'])) {
 		$opr_data['opmessage']['default_msg'] = 1;
 	}
+
+	if (!array_key_exists('mediatypeid', $opr_data['opmessage'])) {
+		$opr_data['opmessage']['mediatypeid'] = 0;
+	}
 }
 
 switch ($data['operationtype']) {
