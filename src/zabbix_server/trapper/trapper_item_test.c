@@ -222,13 +222,13 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 
 	if (1 == item.interface.useip)
 	{
-		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_hosts, "ip", item.interface.ip_orig,
+		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, "ip", item.interface.ip_orig,
 				sizeof(item.interface.ip_orig));
 		item.interface.addr = item.interface.ip_orig;
 	}
 	else
 	{
-		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_hosts, "dns", item.interface.dns_orig,
+		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, "dns", item.interface.dns_orig,
 				sizeof(item.interface.dns_orig));
 		item.interface.addr = item.interface.dns_orig;
 	}
@@ -402,6 +402,8 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	zbx_json_addstring(&json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info,
 			ZBX_JSON_TYPE_STRING);
 	zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, CONFIG_TIMEOUT);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
 
 	zbx_free(info);
 	zbx_json_free(&json);
