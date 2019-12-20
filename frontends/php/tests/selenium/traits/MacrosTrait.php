@@ -93,7 +93,7 @@ trait MacrosTrait {
 	/**
 	 * Remove macros rows.
 	 *
-	 * @return array
+	 * @return $this
 	 */
 	public function removeMacros() {
 		return $this->getMacrosTable()->clear();

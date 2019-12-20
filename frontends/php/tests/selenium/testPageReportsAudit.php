@@ -207,6 +207,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 		// Check Audit record about global macro update.
 		$this->page->open('auditlogs.php');
+		$this->query('button:Reset')->waitUntilVisible()->one()->click();
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
 		// Get first row data.
 		$row = $rows->get(0);
