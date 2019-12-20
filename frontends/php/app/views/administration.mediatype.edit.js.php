@@ -52,7 +52,7 @@
 			template.message_type = message_template.message_type;
 			template.message_type_name = message_template.name;
 
-			if ('old_message_type' in template) {
+			if ('old_message_type' in template && template.old_message_type != -1) {
 				jQuery('tr[data-message-type=' + template.old_message_type + ']')
 					.replaceWith(row_template.evaluate(template));
 				delete template.old_message_type;
@@ -93,8 +93,8 @@
 	}
 
 	/**
-	* Toggles the "Add" button state and changes its text depending on message template count.
-	*/
+	 * Toggles the "Add" button state and changes its text depending on message template count.
+	 */
 	function toggleAddButton() {
 		var limit_reached = (Object.keys(message_template_list).length == Object.keys(message_templates).length);
 
@@ -138,7 +138,8 @@
 				case 'edit':
 					var $row = $btn.closest('tr');
 
-					params.old_message_type = $row.data('message-type');
+					params.message_type = $row.data('message-type');
+					params.old_message_type = params.message_type;
 
 					$row.find('input[type="hidden"]').each(function() {
 						var $input = $(this),
