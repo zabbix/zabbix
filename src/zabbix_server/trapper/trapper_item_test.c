@@ -126,7 +126,7 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 {
-	char			tmp[MAX_STRING_LEN + 1], **pvalue, *fieldname, *addr;
+	char			tmp[MAX_STRING_LEN + 1], **pvalue;
 	DC_ITEM			item = {0};
 	static const ZBX_TABLE	*table_items, *table_interface, *table_hosts;
 	struct zbx_json_parse	jp_interface, jp_host;
@@ -220,8 +220,19 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 
 	db_uchar_from_json(&jp_interface, ZBX_PROTO_TAG_USEIP, table_interface, "useip", &item.interface.useip);
 
-	fieldname = 1 == item.interface.useip ? "ip" : "dns";
-	addr = item.interface.addr = db_string_from_json_dyn(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, fieldname);
+	if (1 == item.interface.useip)
+	{
+		db_string_from_json(&jp_host, ZBX_PROTO_TAG_ADDRESS, table_hosts, "ip", item.interface.ip_orig,
+				sizeof(item.interface.ip_orig));
+		item.interface.addr = item.interface.ip_orig;
+	}
+	else
+	{
+		db_string_from_json(&jp_host, ZBX_PROTO_TAG_ADDRESS, table_hosts, "dns", item.interface.dns_orig,
+				sizeof(item.interface.dns_orig));
+		item.interface.addr = item.interface.dns_orig;
+	}
+
 	db_string_from_json(&jp_interface, ZBX_PROTO_TAG_PORT, table_interface, "port", item.interface.port_orig,
 			sizeof(item.interface.port_orig));
 
@@ -334,7 +345,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 	}
 
 	clean_items(&item, 1, &result);
-	zbx_free(addr);
+
 	zbx_free(item.params);
 	zbx_free(item.posts);
 	zbx_free(item.headers);
