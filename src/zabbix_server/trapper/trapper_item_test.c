@@ -222,13 +222,13 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 
 	if (1 == item.interface.useip)
 	{
-		db_string_from_json(&jp_host, ZBX_PROTO_TAG_ADDRESS, table_hosts, "ip", item.interface.ip_orig,
+		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_hosts, "ip", item.interface.ip_orig,
 				sizeof(item.interface.ip_orig));
 		item.interface.addr = item.interface.ip_orig;
 	}
 	else
 	{
-		db_string_from_json(&jp_host, ZBX_PROTO_TAG_ADDRESS, table_hosts, "dns", item.interface.dns_orig,
+		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_hosts, "dns", item.interface.dns_orig,
 				sizeof(item.interface.dns_orig));
 		item.interface.addr = item.interface.dns_orig;
 	}
