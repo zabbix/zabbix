@@ -845,7 +845,7 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 					break;
 			}
 			break;
-		case EVENT_SOURCE_AUTO_REGISTRATION:
+		case EVENT_SOURCE_AUTOREGISTRATION:
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" from autoreg_host a,hosts h"
 					" where " ZBX_SQL_NULLCMP("a.proxy_hostid", "h.proxy_hostid")
@@ -2482,7 +2482,7 @@ out:
  * Return value: the count of deleted escalations                             *
  *                                                                            *
  * Comments: actions.c:process_actions() creates pseudo-escalations also for  *
- *           EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION events,   *
+ *           EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION events,    *
  *           this function handles message and command operations for these   *
  *           events while host, group, template operations are handled        *
  *           in process_actions().                                            *
