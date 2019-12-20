@@ -1115,7 +1115,7 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 	DB_ROW		row;
 	int		ret, time_start;
 
-	for (time_start = time(NULL); ZBX_DATA_TTL > time(NULL) - time_start; sleep(1))
+	for (time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
 	{
 		result = DBselect("select status,info"
 				" from task_result"
@@ -1136,7 +1136,7 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 		DBfree_result(result);
 	}
 
-	*info = zbx_strdup(NULL, "Timeout while waiting for result.");
+	*info = zbx_strdup(NULL, "Timeout while waiting for result, check connection with the Zabbix proxy.");
 
 	return FAIL;
 }
