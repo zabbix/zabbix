@@ -168,6 +168,7 @@
 #define ZBX_PROTO_TAG_IPMI_USERNAME		"ipmi_username"
 #define ZBX_PROTO_TAG_IPMI_PASSWORD		"ipmi_password"
 #define ZBX_PROTO_TAG_JMX_AVAILABLE		"jmx_available"
+#define ZBX_PROTO_TAG_DATA_TYPE			"datatype"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

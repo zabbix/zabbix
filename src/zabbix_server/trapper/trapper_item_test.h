@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_IPMI_H
-#define ZABBIX_IPMI_H
+#ifndef ZABBIX_TRAPPER_ITEM_TEST_H
+#define ZABBIX_TRAPPER_ITEM_TEST_H
 
-#include "checks_ipmi.h"
+#include "comms.h"
+#include "zbxjson.h"
 
-int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsigned short *port, char **error);
-int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *error, size_t max_error_len);
-int	zbx_ipmi_test_item(const DC_ITEM *item, char **info);
+void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp);
+int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info);
 
 #endif

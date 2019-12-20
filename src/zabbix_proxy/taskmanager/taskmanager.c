@@ -28,6 +28,7 @@
 
 #include "../../zabbix_server/scripts/scripts.h"
 #include "taskmanager.h"
+#include "../../zabbix_server/trapper/trapper_item_test.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -204,7 +205,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	zbx_uint64_t		parent_taskid;
 	struct zbx_json_parse	jp_data;
 
-	result = DBselect("select parent_taskid,data"
+	result = DBselect("select parent_taskid,data,type"
 				" from task_data"
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
@@ -221,12 +222,18 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 		goto finish;
 	}
 
+	if (ZBX_TM_DATA_TYPE_TEST_ITEM != atoi(row[2]))
+	{
+		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task");
+		goto finish;
+	}
+
 	if (SUCCEED != (ret = zbx_json_brackets_open(row[1], &jp_data)))
 		info = zbx_strdup(NULL, zbx_json_strerror());
 	else
-		ret = perform_item_test(&jp_data, &info);
+		ret = zbx_trapper_item_test_run(&jp_data, &info);
 
-	task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
+	task->data = zbx_tm_data_result_create(parent_taskid, ret, info);
 
 	zbx_free(info);
 finish:

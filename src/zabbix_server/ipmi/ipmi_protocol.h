@@ -30,17 +30,21 @@
 #define ZBX_IPC_IPMI_REGISTER		1
 #define ZBX_IPC_IPMI_VALUE_RESULT	2
 #define ZBX_IPC_IPMI_COMMAND_RESULT	3
+#define ZBX_IPC_IPMI_TEST_RESULT	4
 
 /* manager -> poller */
 #define ZBX_IPC_IPMI_VALUE_REQUEST	101
 #define ZBX_IPC_IPMI_COMMAND_REQUEST	102
 #define ZBX_IPC_IPMI_CLEANUP_REQUEST	103
+#define ZBX_IPC_IPMI_TEST_REQUEST	104
 
 /* client -> manager */
 #define ZBX_IPC_IPMI_SCRIPT_REQUEST	201
+#define ZBX_IPC_IPMI_TEST_ITEM_REQUEST	202
 
 /* manager -> client */
 #define ZBX_IPC_IPMI_SCRIPT_RESULT	301
+#define ZBX_IPC_IPMI_TEST_ITEM_RESULT	302
 
 
 zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objectid, const char *addr,

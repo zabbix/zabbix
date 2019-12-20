@@ -263,7 +263,7 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	parent_taskid = 0;
-	char		*error, *sql = NULL;
+	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
@@ -290,7 +290,7 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
 
 	DBcommit();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
