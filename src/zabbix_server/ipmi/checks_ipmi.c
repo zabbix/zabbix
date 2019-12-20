@@ -52,8 +52,6 @@
 #define ZBX_IPMI_TAG_CRIT			"crit"
 #define ZBX_IPMI_TAG_NON_RECOVER		"non_recover"
 
-#define MAX_SENSOR_STATES	15
-
 #define ZBX_IPMI_THRESHOLD_STATUS_DISABLED	0
 #define ZBX_IPMI_THRESHOLD_STATUS_ENABLED	1
 
@@ -80,26 +78,26 @@ zbx_ipmi_sensor_value_t;
 
 typedef struct
 {
-	unsigned int status; /* Is this threshold enabled? */
-	double       val;
+	int	status;	/* Is this threshold enabled? */
+	double	val;
 }
-zbx_ipmi_sensor_threshold;
+zbx_ipmi_sensor_threshold_t;
 
 typedef struct
 {
 	ipmi_sensor_t			*sensor;
 	char				id[IPMI_SENSOR_ID_SZ];
 	enum ipmi_str_type_e		id_type;	/* For sensors IPMI specifications mention Unicode, BCD plus, */
-						/* 6-bit ASCII packed, 8-bit ASCII+Latin1.  */
+							/* 6-bit ASCII packed, 8-bit ASCII+Latin1.  */
 	int				id_sz;		/* "id" value length in bytes */
 	zbx_ipmi_sensor_value_t		value;
 	int				reading_type;	/* "Event/Reading Type Code", e.g. Threshold, */
-	/* Discrete, 'digital' Discrete. */
+							/* Discrete, 'digital' Discrete. */
 	int				type;		/* "Sensor Type Code", e.g. Temperature, Voltage, */
 							/* Current, Fan, Physical Security (Chassis Intrusion), etc. */
 	char				*full_name;
 	int				state;
-	zbx_ipmi_sensor_threshold	thresholds[IPMI_THRESHOLDS_NUM];
+	zbx_ipmi_sensor_threshold_t	thresholds[IPMI_THRESHOLDS_NUM];
 }
 zbx_ipmi_sensor_t;
 
@@ -370,7 +368,7 @@ static size_t	get_domain_offset(const zbx_ipmi_host_t *h, const char *full_name)
  *             id_str    - [OUT] sensor id string                             *
  *             id_str_sz - [IN] sensor id string buffer length                *
  *                                                                            *
- * Return value: 0 or offset for skipping the domain name                     *
+ * Return value: pointer to sensor id string                                  *
  *                                                                            *
  ******************************************************************************/
 static char *zbx_get_sensor_id(ipmi_sensor_t *sensor, char *id, int sz, int *id_sz, enum ipmi_str_type_e *id_type,
@@ -609,7 +607,7 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' err %d th %p", __func__, h->ip, h->port, err, (void *)th);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' err:%d th:%p", __func__, h->ip, h->port, err, (void *)th);
 
 	if (0 != err)
 	{
@@ -635,7 +633,7 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 		goto out;
 	}
 
-	for (i=IPMI_LOWER_NON_CRITICAL; i<=IPMI_UPPER_NON_RECOVERABLE; i++)
+	for (i = IPMI_LOWER_NON_CRITICAL; i <= IPMI_UPPER_NON_RECOVERABLE; i++)
 	{
 		double	thr;
 
@@ -650,7 +648,7 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 			s->thresholds[i].val = thr;
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Threshold %s could not be fetched",ipmi_get_threshold_string(i));
+			zabbix_log(LOG_LEVEL_DEBUG, "Threshold %s could not be fetched", ipmi_get_threshold_string(i));
 	}
 out:
 	h->done = 1;
@@ -747,8 +745,8 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 			s->state = 0;
 			if (IPMI_THRESHOLD_ACCESS_SUPPORT_NONE != ipmi_sensor_get_threshold_access(sensor))
 			{
-				int value, ret;
-				int i;
+				int	value, ret;
+				int	i;
 
 				for (i = IPMI_LOWER_NON_CRITICAL; i <= IPMI_UPPER_NON_RECOVERABLE; i++)
 				{
@@ -1784,7 +1782,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	return h->ret;
 }
 
-static void add_threshold_ipmi(struct zbx_json *json, char *tag, zbx_ipmi_sensor_threshold *threshold)
+static void add_threshold_ipmi(struct zbx_json *json, const char *tag, zbx_ipmi_sensor_threshold_t *threshold)
 {
 	if (ZBX_IPMI_THRESHOLD_STATUS_ENABLED == threshold->status)
 		zbx_json_addfloat(json, tag, threshold->val);
