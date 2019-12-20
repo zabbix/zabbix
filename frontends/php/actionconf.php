@@ -547,17 +547,13 @@ if (hasRequest('form')) {
 	}
 
 	if ($data['new_ack_operation'] && !is_array($data['new_ack_operation'])) {
-		$data['new_ack_operation'] = [
-			'operationtype' => OPERATION_TYPE_MESSAGE,
-			'ack_short' => '',
-			'ack_long' => '',
-		];
+		$data['new_ack_operation'] = ['operationtype' => OPERATION_TYPE_MESSAGE];
 	}
 	if ($data['new_ack_operation'] && !array_key_exists('opmessage', $data['new_ack_operation'])
 			&& $data['new_ack_operation']['operationtype'] != OPERATION_TYPE_COMMAND) {
 		$data['new_ack_operation']['opmessage'] = [
-			'default_msg'	=> 0,
-			'mediatypeid'	=> 0,
+			'default_msg' => 1,
+			'mediatypeid' => 0,
 			'subject' => '',
 			'message' => ''
 		];

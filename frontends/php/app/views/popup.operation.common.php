@@ -66,7 +66,7 @@ else {
 	$operation_type_combobox = new CComboBox(
 		'operationtype',
 		$data['operationtype'],
-		"reloadPopup(this.form, '".$data['action']."');"
+		"resetOpmessage(); reloadPopup(this.form, '".$data['action']."');"
 	);
 	foreach ($data['allowed_operations'][$data['type']] as $operation) {
 		$operation_type_combobox->addItem($operation, operation_type2str($operation));
