@@ -207,7 +207,13 @@ static int	DBpatch_4050014(void)
 						"Original problem ID: {EVENT.ID}\n"
 						"{TRIGGER.URL}"
 						,
-						"placeholder-trigger-normal-html"
+						"<b>Problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br>"
+						"<b>Problem name:</b> {EVENT.NAME}<br>"
+						"<b>Host:</b> {HOST.NAME}<br>"
+						"<b>Severity:</b> {EVENT.SEVERITY}<br>"
+						"<b>Operational data:</b> {EVENT.OPDATA}<br>"
+						"<b>Original problem ID:</b> {EVENT.ID}<br>"
+						"{TRIGGER.URL}"
 						,
 						"{EVENT.SEVERITY}: {EVENT.NAME}\n"
 						"Host: {HOST.NAME}\n"
@@ -225,7 +231,13 @@ static int	DBpatch_4050014(void)
 						"Original problem ID: {EVENT.ID}\n"
 						"{TRIGGER.URL}"
 						,
-						"placeholder-trigger-rec-html"
+						"<b>Problem has been resolved</b> at {EVENT.RECOVERY.TIME} on "
+						"{EVENT.RECOVERY.DATE}<br>"
+						"<b>Problem name:</b> {EVENT.NAME}<br>"
+						"<b>Host:</b> {HOST.NAME}<br>"
+						"<b>Severity:</b> {EVENT.SEVERITY}<br>"
+						"<br><b>Original problem ID:</b> {EVENT.ID}<br>"
+						"{TRIGGER.URL}"
 						,
 						"RESOLVED: {EVENT.NAME}\n"
 						"Host: {HOST.NAME}\n"
@@ -241,7 +253,12 @@ static int	DBpatch_4050014(void)
 						"Current problem status is {EVENT.STATUS}, acknowledged: "
 						"{EVENT.ACK.STATUS}."
 						,
-						"placeholder-trigger-ack-html"
+						"<b>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem</b> at "
+						"{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br>"
+						"{EVENT.UPDATE.MESSAGE}<br>"
+						"<br>"
+						"<b>Current problem status:</b> {EVENT.STATUS}<br>"
+						"<b>Acknowledged:</b> {EVENT.ACK.STATUS}."
 						,
 						"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at "
 						"{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}"
@@ -263,7 +280,17 @@ static int	DBpatch_4050014(void)
 						"Device service status: {DISCOVERY.SERVICE.STATUS}\n"
 						"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
 						,
-						"placeholder-discovery-normal-html"
+						"<b>Discovery rule:</b> {DISCOVERY.RULE.NAME}<br>"
+						"<br>"
+						"<b>Device IP:</b> {DISCOVERY.DEVICE.IPADDRESS}<br>"
+						"<b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>"
+						"<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br>"
+						"<b>Device uptime:</b> {DISCOVERY.DEVICE.UPTIME}<br>"
+						"<br>"
+						"<b>Device service name:</b> {DISCOVERY.SERVICE.NAME}<br>"
+						"<b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br>"
+						"<b>Device service status:</b> {DISCOVERY.SERVICE.STATUS}<br>"
+						"<b>Device service uptime:</b> {DISCOVERY.SERVICE.UPTIME}"
 						,
 						"Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
 						,
@@ -278,7 +305,9 @@ static int	DBpatch_4050014(void)
 						"Host IP: {HOST.IP}\n"
 						"Agent port: {HOST.PORT}"
 						,
-						"placeholder-registration-normal-html"
+						"<b>Host name:</b> {HOST.HOST}<br>"
+						"<b>Host IP:</b> {HOST.IP}<br>"
+						"<b>Agent port:</b> {HOST.PORT}"
 						,
 						"Autoregistration: {HOST.HOST}\n"
 						"Host IP: {HOST.IP}\n"
