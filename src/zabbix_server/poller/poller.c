@@ -709,10 +709,9 @@ void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 {
 	if (SUCCEED == is_snmp_type(items[0].type))
 	{
-#ifdef HAVE_NETSNMP
-		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num);
-#else
+#ifndef HAVE_NETSNMP
+		int	i;
+
 		for (i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
@@ -721,6 +720,9 @@ void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
 			errcodes[i] = CONFIG_ERROR;
 		}
+#else
+		/* SNMP checks use their own timeouts */
+		get_values_snmp(items, results, errcodes, num);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
