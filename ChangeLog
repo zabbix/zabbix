@@ -8,7 +8,6 @@ New features:
 ...G...... [ZBXNEXT-5609] added agent2 Windows build support (wiper)
 A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported template linkages (miks)
 .........T [ZBXNEXT-5600] updated templates to internal version v0.34 (vitaly)
-.........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 ..F....... [ZBXNEXT-4700] reworked new action operation form as popup (rlataria)
 A.F....... [ZBXNEXT-5412] reworked new condition forms as popup (rlataria)
 .........T [ZBXNEXT-5572] added windows services template, updated windows template objects descriptions, added missing user macro (vitaly)
@@ -180,7 +179,6 @@ New features:
 ...G...... [ZBXNEXT-5609] added agent2 Windows build support (wiper)
 A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported template linkages (miks)
 .........T [ZBXNEXT-5600] updated templates to internal version v0.34 (vitaly)
-.........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 .........T [ZBXNEXT-5572] added windows services template, updated windows template objects descriptions, added missing user macro (vitaly)
 
 Bug fixes:
@@ -216,6 +214,7 @@ A.F....... [ZBX-16111] removed templateid from screen API output (vasilijs)
 .......PS. [ZBX-16915] fixed memory leak (mabele)
 ........S. [ZBX-17008] improved Zabbix server performance when using maintenance (vso)
 ........S. [ZBX-16779] fixed infinite loop when writing export to file fails (mabele)
+.........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 ..F....... [ZBX-16852] fixed graph widget multiselect collapse (ashubin, rlataria)
 ..F....... [ZBX-16649] fixed flexible textarea behavior (averza, vasilijs)
 
@@ -1146,7 +1145,6 @@ Changes for 4.0.16rc1
 
 New features:
 A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported template linkages (miks)
-.........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 
 Bug fixes:
 ..F....... [ZBX-17101] fixed url validation before output (miks)
@@ -1171,6 +1169,7 @@ A.F....... [ZBX-16111] removed templateid from screen API output (vasilijs)
 .......PS. [ZBX-16915] fixed memory leak (mabele)
 ........S. [ZBX-17008] improved Zabbix server performance when using maintenance (vso)
 ........S. [ZBX-16779] fixed infinite loop when writing export to file fails (mabele)
+.........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.15
