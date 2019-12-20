@@ -39,7 +39,7 @@
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST		request;
 	const char		*dsn;
