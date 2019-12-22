@@ -1,6 +1,8 @@
 Changes for 5.0.0alpha1
 
 New features:
+A......... [ZBXNEXT-1898] implemented strong cryptography for encoding frontend passwords (vasilijs)
+A.F.I..PS. [ZBXNEXT-5592] dropped IBM DB2 database support for Zabbix server (talbergs, viktors)
 .........T [ZBXNEXT-5623] added Pushover webhook integration (vitaly)
 ...G...PS. [ZBXNEXT-1085] added available agent check restriction parameters (atumilovics)
 .........T [ZBXNEXT-5591] added media "Mattermost" (afayantsev)
