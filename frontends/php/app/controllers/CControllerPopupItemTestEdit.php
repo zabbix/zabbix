@@ -210,7 +210,6 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Test item'),
 			'steps' => $preprocessing_steps,
-			'steps_num' => count($preprocessing_steps),
 			'value' => array_key_exists('value', $data) ? $data['value'] : '',
 			'eol' => array_key_exists('eol', $data) ? (int) $data['eol'] : ZBX_EOL_LF,
 			'prev_value' => ($show_prev && array_key_exists('prev_value', $data)) ? $data['prev_value'] : '',

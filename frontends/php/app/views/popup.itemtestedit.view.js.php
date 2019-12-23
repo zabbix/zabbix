@@ -206,18 +206,13 @@ function itemCompleteTest() {
 		form_data = $form.serializeJSON(),
 		post_data = getItemTestProperties('#preprocessing-test-form'),
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
-		url = new Curl('zabbix.php'),
-		step_nums = [];
+		url = new Curl('zabbix.php');
 
 	url.setArgument('action', 'popup.itemtest.send');
 
-	if (<?= $data['steps_num'] ?> > 0) {
-		step_nums = [...Array(<?= $data['steps_num'] ?>).keys()];
-	}
-
 	post_data = jQuery.extend(post_data, {
 		get_value: form_data['get_value'] || 0,
-		steps: getPreprocessingSteps(step_nums),
+		steps: form_data['steps'],
 		interface: {
 			address: interface ? interface['address'] : '',
 			port: interface ? interface['port'] : ''
