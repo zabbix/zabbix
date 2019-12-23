@@ -42,7 +42,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'item_type'				=> 'required|in '.implode(',', self::$testable_item_types),
 			'jmx_endpoint'			=> 'string',
 			'macros'				=> 'array',
-			'output_format'			=>	'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
+			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
 			'params_es'				=> 'string',
 			'params_f'				=> 'string',
