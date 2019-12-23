@@ -56,8 +56,17 @@ function makeStepResult(step) {
 function disableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', true);
 
-	<?php if ($data['is_item_testable'] && $data['interface_enabled']): ?>
-		jQuery('#get_value, #interface_address, #interface_port, #get_value_btn').prop('disabled', true);
+	<?php if ($data['is_item_testable']): ?>
+		jQuery('#get_value, #get_value_btn').prop('disabled', true);
+
+		<?php if ($data['interface_address_enabled']): ?>
+			jQuery('#interface_address').prop('disabled', true);
+		<?php endif ?>
+
+		<?php if ($data['interface_port_enabled']): ?>
+			jQuery('#interface_port').prop('disabled', true);
+		<?php endif ?>
+
 	<?php else: ?>
 		jQuery('#get_value, #get_value_btn').prop('disabled', true);
 	<?php endif ?>
@@ -84,8 +93,17 @@ function disableItemTestForm() {
 function enableItemTestForm() {
 	jQuery('#value, #time, [name^=macros]').prop('disabled', false);
 
-	<?php if ($data['is_item_testable'] && $data['interface_enabled']): ?>
-		jQuery('#get_value, #interface_address, #interface_port, #get_value_btn').prop('disabled', false);
+	<?php if ($data['is_item_testable']): ?>
+		jQuery('#get_value, #get_value_btn').prop('disabled', false);
+
+		<?php if ($data['interface_address_enabled']): ?>
+			jQuery('#interface_address').prop('disabled', false);
+		<?php endif ?>
+
+		<?php if ($data['interface_port_enabled']): ?>
+			jQuery('#interface_port').prop('disabled', false);
+		<?php endif ?>
+
 	<?php else: ?>
 		jQuery('#get_value, #get_value_btn').prop('disabled', false);
 	<?php endif ?>
@@ -434,8 +452,12 @@ jQuery(document).ready(function($) {
 					$('#proxy_hostid').prop('disabled', false);
 				<?php endif ?>
 
-				<?php if ($data['interface_enabled']): ?>
-					$('#interface_address, #interface_port').prop('disabled', false);
+				<?php if ($data['interface_address_enabled']): ?>
+					$('#interface_address').prop('disabled', false);
+				<?php endif ?>
+
+				<?php if ($data['interface_port_enabled']): ?>
+					$('#interface_port').prop('disabled', false);
 				<?php endif ?>
 
 				$rows.show();
@@ -445,8 +467,12 @@ jQuery(document).ready(function($) {
 					$('#proxy_hostid').prop('disabled', true);
 				<?php endif ?>
 
-				<?php if ($data['interface_enabled']): ?>
-					$('#interface_address, #interface_port').prop('disabled', false);
+				<?php if ($data['interface_address_enabled']): ?>
+					$('#interface_address').prop('disabled', false);
+				<?php endif ?>
+
+				<?php if ($data['interface_port_enabled']): ?>
+					$('#interface_port').prop('disabled', false);
 				<?php endif ?>
 
 				$rows.hide();
