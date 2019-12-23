@@ -170,7 +170,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'delay' => $show_prev ? $this->getInput('delay', ZBX_ITEM_DELAY_DEFAULT) : '',
 			'property_texts' => $item_texts,
 			'property_macros' => $item_macros,
-			'macros_values' => $this->getSupportedMacros($inputs)
+			'macros_values' => $this->getSupportedMacros($inputs + ['interfaceid' => $this->getInput('interfaceid', 0)])
 		], $support_lldmacros);
 
 		// Set resolved macros to previously specified values.

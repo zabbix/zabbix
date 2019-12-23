@@ -94,7 +94,7 @@ abstract class CControllerPopupItemTest extends CController {
 		],
 		'jmx_endpoint' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}']
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}']
 		],
 		'url' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
@@ -664,7 +664,8 @@ abstract class CControllerPopupItemTest extends CController {
 				'{HOST.IP}' => $interface['ip'],
 				'{IPADDRESS}' => $interface['ip'],
 				'{HOST.DNS}' => $interface['dns'],
-				'{HOST.CONN}' => $interface['address']
+				'{HOST.CONN}' => $interface['address'],
+				'{HOST.PORT}' => $interface['port']
 			],
 			'item' => [
 				'{ITEM.ID}' => array_key_exists('itemid', $inputs) ? $inputs['itemid'] : '{ITEM.ID}',

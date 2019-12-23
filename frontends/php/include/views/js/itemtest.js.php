@@ -70,15 +70,13 @@
 		switch (+form_data['type']) {
 			case <?= ITEM_TYPE_ZABBIX ?>:
 				properties = {
-					key: form_data['key'],
-					interfaceid: form_data['interfaceid']
+					key: form_data['key']
 				};
 				break;
 
 			case <?= ITEM_TYPE_SIMPLE ?>:
 				properties = {
 					key: form_data['key'],
-					interfaceid: form_data['interfaceid'],
 					username: form_data['username'],
 					password: form_data['password']
 				};
@@ -90,8 +88,7 @@
 				properties = {
 					snmp_oid: form_data['snmp_oid'],
 					snmp_community: form_data['snmp_community'],
-					useip: form_data['useip'],
-					interfaceid: form_data['interfaceid']
+					useip: form_data['useip']
 				};
 
 				if (+form_data['type'] == <?= ITEM_TYPE_SNMPV3 ?>) {
@@ -163,8 +160,7 @@
 			case <?= ITEM_TYPE_IPMI ?>:
 				properties = {
 					key: form_data['key'],
-					ipmi_sensor: form_data['ipmi_sensor'],
-					interfaceid: form_data['interfaceid']
+					ipmi_sensor: form_data['ipmi_sensor']
 				};
 				break;
 
@@ -173,7 +169,6 @@
 					key: form_data['key'],
 					authtype: form_data['authtype'],
 					params_es: form_data['params_es'],
-					interfaceid: form_data['interfaceid'],
 					username: form_data['username'],
 					password: form_data['password']
 				};
@@ -191,8 +186,7 @@
 					key: form_data['key'],
 					params_es: form_data['params_es'],
 					username: form_data['username'],
-					password: form_data['password'],
-					interfaceid: form_data['interfaceid']
+					password: form_data['password']
 				};
 				break;
 
@@ -215,7 +209,6 @@
 			case <?= ITEM_TYPE_SIMPLE ?>:
 				properties = {
 					key: form_data['key'],
-					interfaceid: form_data['interfaceid'],
 					username: form_data['username'],
 					password: form_data['password'],
 				};
@@ -228,7 +221,8 @@
 			value_type: form_data['value_type'] || <?= CControllerPopupItemTest::ZBX_DEFAULT_VALUE_TYPE ?>,
 			item_type: form_data['type'],
 			itemid: <?= (int) $data['itemid'] ?>,
-			valuemapid: form_data['valuemapid']
+			valuemapid: form_data['valuemapid'],
+			interfaceid: form_data['interfaceid']
 		});
 
 		return properties;
