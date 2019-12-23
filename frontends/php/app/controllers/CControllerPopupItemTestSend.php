@@ -241,7 +241,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$item_test_data = CArrayHelper::renameKeys($item_test_data, [
 				'params_ap' => 'params',
 				'params_es' => 'params',
-				'params_f' => 'params'
+				'params_f' => 'params',
+				'http_username' => 'username',
+				'http_password' => 'password',
+				'item_type' => 'type'
 			]);
 
 			// Send test to be executed on Zabbix server.

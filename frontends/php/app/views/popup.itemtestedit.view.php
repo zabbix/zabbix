@@ -103,7 +103,8 @@ if ($data['is_item_testable']) {
 		->addRow(
 			new CLabel(_('Proxy'), 'proxy_hostid'),
 			$data['proxies_enabled']
-				? (new CComboBox('proxy_hostid', $data['inputs']['proxy_hostid'], null,
+				? (new CComboBox('proxy_hostid',
+						array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
 						[0 => _('(no proxy)')] + $data['proxies']))
 				: (new CComboBox('proxy_hostid'))
 					->addItem(0, _('(no proxy)'))

@@ -88,7 +88,8 @@
 				properties = {
 					snmp_oid: form_data['snmp_oid'],
 					snmp_community: form_data['snmp_community'],
-					useip: form_data['useip']
+					useip: form_data['useip'],
+					port: form_data['port']
 				};
 
 				if (+form_data['type'] == <?= ITEM_TYPE_SNMPV3 ?>) {

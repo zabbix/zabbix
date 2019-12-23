@@ -149,7 +149,8 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'params_es' => 'params',
 			'params_f' => 'params',
 			'http_username' => 'username',
-			'http_password' => 'password'
+			'http_password' => 'password',
+			'item_type' => 'type'
 		]);
 
 		if (array_key_exists('headers', $data)) {
