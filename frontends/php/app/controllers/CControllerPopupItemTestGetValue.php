@@ -41,6 +41,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'ipmi_sensor'			=> 'string',
 			'item_type'				=> 'required|in '.implode(',', self::$testable_item_types),
 			'jmx_endpoint'			=> 'string',
+			'macros'				=> 'array',
 			'output_format'			=>	'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
 			'params_es'				=> 'string',
@@ -131,11 +132,18 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$this->item_type = $this->getInput('item_type');
 		$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
+		// Get post data for particular item type.
 		$data = $this->getItemTestProperties($this->getInputAll());
+
+		// Apply efective macros values to properties.
+		$data = $this->resolveItemPropertyMacros($data);
+
+		// Only non-empty fields need to be sent to server.
 		$data = $this->unsetEmptyValues($data);
 
 		unset($data['value_type']);
 
+		// Rename fields according protocol.
 		$data = CArrayHelper::renameKeys($data, [
 			'params_ap' => 'params',
 			'params_es' => 'params',
@@ -162,6 +170,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
 		$result = $server->testItem($data, CWebUser::getSessionCookie());
 
+		// Handle the response.
 		if ($result === false) {
 			error($server->getError());
 		}
@@ -170,6 +179,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 				$output['prev_value'] = $this->getInput('value', '');
 				$output['prev_time'] = $this->getPrevTime();
 				$output['value'] = $result['result'];
+				$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
 			}
 
 			if (array_key_exists('error', $result) && $result['error'] !== '') {

@@ -75,6 +75,65 @@ abstract class CControllerPopupItemTest extends CController {
 	];
 
 	/**
+	 * Item properties where macros are supported.
+	 *
+	 * @var array
+	 */
+	protected $macros_by_item_props = [
+		'key' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}']
+		],
+		'params_es' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}']
+		],
+		'params_ap' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}']
+		],
+		'jmx_endpoint' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}']
+		],
+		'url' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+		],
+		'posts' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+		],
+		'http_proxy' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+		],
+		'ssl_cert_file' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+		],
+		'ssl_key_file' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+		],
+		'query_fields' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+		],
+		'headers' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+		]
+	];
+
+	/**
 	 * Tested item type.
 	 *
 	 * @var int
@@ -106,6 +165,11 @@ abstract class CControllerPopupItemTest extends CController {
 	protected static $preproc_steps_using_prev_value = [ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED,
 		ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE
 	];
+
+	/**
+	 * @var int
+	 */
+	protected $eol;
 
 	protected function checkPermissions() {
 		$ret = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
@@ -243,10 +307,12 @@ abstract class CControllerPopupItemTest extends CController {
 						'tls_issuer' => $this->host['tls_issuer'],
 						'tls_connect' => $this->host['tls_connect']
 					],
-					'interface' => $this->getItemTestInterface($interface_input)
+					'interface' => $this->getHostInterface($interface_input)
 				];
 
-				unset($data['interface']['useip'], $data['interface']['interfaceid']);
+				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
+					$data['interface']['dns']
+				);
 				break;
 
 			case ITEM_TYPE_SNMPV1:
@@ -273,8 +339,10 @@ abstract class CControllerPopupItemTest extends CController {
 					'host' => [
 						'host' => $this->host['host']
 					],
-					'interface' => $this->getItemTestInterface($interface_input)
+					'interface' => $this->getHostInterface($interface_input)
 				];
+
+				unset($data['interface']['ip'], $data['interface']['dns']);
 
 				if ($this->item_type == ITEM_TYPE_SNMPV3) {
 					$data += [
@@ -387,7 +455,7 @@ abstract class CControllerPopupItemTest extends CController {
 				$data += [
 					'key' => $input['key'],
 					'ipmi_sensor' => array_key_exists('ipmi_sensor', $input) ? $input['ipmi_sensor'] : null,
-					'interface' => $this->getItemTestInterface($interface_input),
+					'interface' => $this->getHostInterface($interface_input),
 					'host' => [
 						'hostid' => $this->host['hostid'],
 						'ipmi_authtype' => $this->host['ipmi_authtype'],
@@ -397,7 +465,9 @@ abstract class CControllerPopupItemTest extends CController {
 					]
 				];
 
-				unset($data['interface']['useip'], $data['interface']['interfaceid']);
+				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
+					$data['interface']['dns']
+				);
 				break;
 
 			case ITEM_TYPE_SSH:
@@ -405,7 +475,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'key' => $input['key'],
 					'authtype' => array_key_exists('authtype', $input) ? $input['authtype'] : ITEM_AUTHTYPE_PASSWORD,
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : ITEM_AUTHTYPE_PASSWORD,
-					'interface' => $this->getItemTestInterface($interface_input),
+					'interface' => $this->getHostInterface($interface_input),
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
 					'password' => array_key_exists('password', $input) ? $input['password'] : null
 				];
@@ -417,7 +487,9 @@ abstract class CControllerPopupItemTest extends CController {
 					];
 				}
 
-				unset($data['interface']['interfaceid'], $data['interface']['useip']);
+				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
+					$data['interface']['dns']
+				);
 				break;
 
 			case ITEM_TYPE_TELNET:
@@ -426,10 +498,12 @@ abstract class CControllerPopupItemTest extends CController {
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : null,
 					'publickey' => array_key_exists('publickey', $input) ? $input['publickey'] : null,
 					'privatekey' => array_key_exists('privatekey', $input) ? $input['privatekey'] : null,
-					'interface' => $this->getItemTestInterface($interface_input)
+					'interface' => $this->getHostInterface($interface_input)
 				];
 
-				unset($data['interface']['interfaceid'], $data['interface']['useip']);
+				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
+					$data['interface']['dns']
+				);
 				break;
 
 			case ITEM_TYPE_JMX:
@@ -454,12 +528,14 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SIMPLE:
 				$data += [
 					'key' => $input['key'],
-					'interface' => $this->getItemTestInterface($interface_input),
+					'interface' => $this->getHostInterface($interface_input),
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
 					'password' => array_key_exists('password', $input) ? $input['password'] : null
 				];
 
-				unset($data['interface']['useip'], $data['interface']['interfaceid'],  $data['interface']['port']);
+				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
+					$data['interface']['dns'],  $data['interface']['port']
+				);
 				break;
 		}
 
@@ -473,17 +549,19 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @param array $interface_data
 	 */
-	protected function getItemTestInterface(array $inputs) {
+	protected function getHostInterface(array $inputs) {
 		$interface_data = [
 			'address' => '',
 			'port' => '',
 			'interfaceid' => 0,
+			'ip' => '',
+			'dns' => '',
 			'useip' => INTERFACE_USE_DNS
 		];
 
+		// Get values from database; resolve macros.
 		if (($this->host['status'] == HOST_STATUS_MONITORED || $this->host['status'] == HOST_STATUS_NOT_MONITORED)
-				&& array_key_exists('interfaceid', $inputs)
-				&& in_array($this->item_type, $this->items_require_interface)) {
+				&& array_key_exists('interfaceid', $inputs)) {
 			$interface = array_key_exists('interfaceid', $inputs)
 				? API::HostInterface()->get([
 					'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip'],
@@ -501,11 +579,14 @@ abstract class CControllerPopupItemTest extends CController {
 						: $interface[0]['dns'],
 					'port' => $interface[0]['port'],
 					'useip' => $interface[0]['useip'],
+					'ip' => $interface[0]['ip'],
+					'dns' => $interface[0]['dns'],
 					'interfaceid' => $interface[0]['interfaceid']
 				];
 			}
 		}
 
+		// Apply client side cache.
 		foreach ($inputs as $key => $value) {
 			$interface_data[$key] = $value;
 		}
@@ -566,6 +647,35 @@ abstract class CControllerPopupItemTest extends CController {
 	}
 
 	/**
+	 * Function returns array containing values for each of supported macros.
+	 *
+	 * @return array
+	 */
+	protected function getSupportedMacros(array $inputs) {
+		$interface = $this->getHostInterface(['interfaceid' => $inputs['interfaceid']]);
+
+		$macros = [
+			'host' => [
+				'{HOSTNAME}' => $this->host['host'],
+				'{HOST.HOST}' => $this->host['host'],
+				'{HOST.NAME}' => $this->host['name']
+			],
+			'interface' => [
+				'{HOST.IP}' => $interface['ip'],
+				'{IPADDRESS}' => $interface['ip'],
+				'{HOST.DNS}' => $interface['dns'],
+				'{HOST.CONN}' => $interface['address']
+			],
+			'item' => [
+				'{ITEM.ID}' => array_key_exists('itemid', $inputs) ? $inputs['itemid'] : '{ITEM.ID}',
+				'{ITEM.KEY}' => array_key_exists('key_', $inputs) ? $inputs['key_'] : '{ITEM.KEY}'
+			]
+		];
+
+		return $macros;
+	}
+
+	/**
 	 * Transform front-end familiar array of http query fields to the form server is capable to handle.
 	 *
 	 * @param array $data
@@ -609,5 +719,127 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return implode("\r\n", $result);
+	}
+
+	/**
+	 * Resolve macros used in preprocessing step parameter fields.
+	 *
+	 * @param array $steps  Steps from item test input form.
+	 *
+	 * @return array
+	 */
+	protected function resolvePreprocessingStepMacros(array $steps) {
+		// Resolve macros used in parameter fields.
+		$macros_posted = $this->getInput('macros', []);
+		$macros_types = ($this->preproc_item instanceof CItemPrototype)
+			? ['usermacros' => true, 'lldmacros' => true]
+			: ['usermacros' => true];
+
+		foreach ($steps as &$step) {
+			/*
+			 * Values received from user input form may be transformed so we must remove redundant "\r" before
+			 * sending data to Zabbix server.
+			 */
+			$step['params'] = str_replace("\r\n", "\n", $step['params']);
+
+			// Resolve macros in parameter fields before send data to Zabbix server.
+			foreach (['params', 'error_handler_params'] as $field) {
+				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
+
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					$macro_value = array_key_exists($macro, $macros_posted)
+						? $macros_posted[$macro]
+						: '';
+
+					$step[$field] = substr_replace($step[$field], $macro_value, $pos, strlen($macro));
+				}
+			}
+		}
+		unset($step);
+
+		return $steps;
+	}
+
+	/**
+	 * Resolve macros used in item property fields.
+	 *
+	 * @param array $inputs  Item fields potentially having supported macros.
+	 *
+	 * @return array
+	 */
+	protected function resolveItemPropertyMacros(array $inputs) {
+		// Resolve macros used in parameter fields.
+		$macros_posted = $this->getInput('macros', []);
+
+		foreach (array_keys($this->macros_by_item_props) as $field) {
+			if (!array_key_exists($field, $inputs)) {
+				continue;
+			}
+
+			// Construct array of supported macros.
+			$types = [
+				'usermacros' => false,
+				'macros_n' => []
+			];
+
+			foreach (['host', 'interface', 'item'] as $type) {
+				if (array_key_exists($type, $this->macros_by_item_props[$field])) {
+					$types['macros_n'] = array_merge($types['macros_n'], $this->macros_by_item_props[$field][$type]);
+				}
+			}
+
+			// Get strings to resolve and types of supported macros.
+			if ($field === 'query_fields' || $field === 'headers') {
+				foreach (['name', 'value'] as $key) {
+					foreach (array_keys($inputs[$field][$key]) as $nr) {
+						$str = &$inputs[$field][$key][$nr];
+						if (strstr($str, '{') !== false) {
+							$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($str, $types);
+
+							foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+								$macro_value = array_key_exists($macro, $macros_posted)
+									? $macros_posted[$macro]
+									: '';
+
+								$str = substr_replace($str, $macro_value, $pos, strlen($macro));
+							}
+						}
+
+						unset($str);
+					}
+				}
+			}
+			elseif (strstr($inputs[$field], '{') !== false) {
+				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($inputs[$field], $types);
+
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					$macro_value = array_key_exists($macro, $macros_posted)
+						? $macros_posted[$macro]
+						: '';
+
+					$inputs[$field] = substr_replace($inputs[$field], $macro_value, $pos, strlen($macro));
+				}
+			}
+		}
+
+		return $inputs;
+	}
+
+	/**
+	 * Get single input parameter. Converts value fields to specified newline.
+	 *
+	 * @return var
+	 */
+	public function getInput($var, $default = null) {
+		$value = parent::getInput($var, $default);
+		if ($var === 'value' || $var === 'prev_value') {
+			$value = str_replace("\r\n", "\n", $value);
+
+			if ($this->eol == ZBX_EOL_CRLF) {
+				$value = str_replace("\n", "\r\n", $value);
+			}
+		}
+
+		return $value;
 	}
 }

@@ -227,6 +227,7 @@
 			delay: form_data['delay'] || '',
 			value_type: form_data['value_type'] || <?= CControllerPopupItemTest::ZBX_DEFAULT_VALUE_TYPE ?>,
 			item_type: form_data['type'],
+			itemid: <?= (int) $data['itemid'] ?>,
 			valuemapid: form_data['valuemapid']
 		});
 

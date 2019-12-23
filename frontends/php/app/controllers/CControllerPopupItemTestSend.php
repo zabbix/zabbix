@@ -40,11 +40,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 	protected $get_value_from_host;
 
 	/**
-	 * @var int
-	 */
-	protected $eol;
-
-	/**
 	 * Time suffixes supported by Zabbix server.
 	 *
 	 * @var array
@@ -233,9 +228,16 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 		// Get value from host.
 		if ($this->get_value_from_host) {
+			// Get post data for particular item type.
 			$item_test_data = $this->getItemTestProperties($this->getInputAll());
+
+			// Apply efective macros values to properties.
+			$item_test_data = $this->resolveItemPropertyMacros($item_test_data);
+
+			// Only non-empty fields need to be sent to server.
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
 
+			// Rename fields according protocol.
 			$item_test_data = CArrayHelper::renameKeys($item_test_data, [
 				'params_ap' => 'params',
 				'params_es' => 'params',
@@ -246,6 +248,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
 			$result = $server->testItem($item_test_data, get_cookie('zbx_sessionid'));
 
+			// Handle the response.
 			if ($result === false) {
 				error($server->getError());
 			}
@@ -263,6 +266,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					// Apply new value to preprocessing test.
 					$preproc_test_data['value'] = $result['result'];
 					$output['value'] = $result['result'];
+					$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
 				}
 
 				if (array_key_exists('error', $result) && $result['error'] !== '') {
@@ -362,57 +366,5 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		}
 
 		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
-	}
-
-	/**
-	 * Resolve macros used in preprocessing step parameter fields.
-	 *
-	 * @param array $steps  Steps from item test input form.
-	 *
-	 * @return array
-	 */
-	protected function resolvePreprocessingStepMacros(array $steps) {
-		// Resolve macros used in parameter fields.
-		$macros_posted = $this->getInput('macros', []);
-		$macros_types = ($this->preproc_item instanceof CItemPrototype)
-			? ['usermacros' => true, 'lldmacros' => true]
-			: ['usermacros' => true];
-
-		foreach ($steps as &$step) {
-			/*
-			 * Values received from user input form may be transformed so we must remove redundant "\r" before
-			 * sending data to Zabbix server.
-			 */
-			$step['params'] = str_replace("\r\n", "\n", $step['params']);
-
-			// Resolve macros in parameter fields before send data to Zabbix server.
-			foreach (['params', 'error_handler_params'] as $field) {
-				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
-
-				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					$macro_value = array_key_exists($macro, $macros_posted)
-						? $macros_posted[$macro]
-						: '';
-
-					$step[$field] = substr_replace($step[$field], $macro_value, $pos, strlen($macro));
-				}
-			}
-		}
-		unset($step);
-
-		return $steps;
-	}
-
-	public function getInput($var, $default = null) {
-		$value = parent::getInput($var, $default);
-		if ($var === 'value' || $var === 'prev_value') {
-			$value = str_replace("\r\n", "\n", $value);
-
-			if ($this->eol == ZBX_EOL_CRLF) {
-				$value = str_replace("\n", "\r\n", $value);
-			}
-		}
-
-		return $value;
 	}
 }

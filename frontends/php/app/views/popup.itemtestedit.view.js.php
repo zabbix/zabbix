@@ -130,26 +130,29 @@ function cleanPreviousTestResults() {
  */
 function itemGetValueTest() {
 	var $form = jQuery('#preprocessing-test-form'),
+		form_data = $form.serializeJSON(),
 		post_data = getItemTestProperties('#preprocessing-test-form'),
+		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		url = new Curl('zabbix.php');
 
 	url.setArgument('action', 'popup.itemtest.getvalue');
 
 	post_data = jQuery.extend(post_data, {
 		interface: {
-			address: jQuery('#interface_address', $form).val(),
-			port: jQuery('#interface_port', $form).val()
+			address: interface ? interface['address'] : '',
+			port: interface ? interface['port'] : ''
 		},
-		proxy_hostid: jQuery('#proxy_hostid', $form).val(),
+		macros: form_data['macros'],
+		proxy_hostid: form_data['proxy_hostid'],
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
-		value: jQuery('#value', $form).multilineInput('value')
+		value: form_data['value']
 	});
 
 	<?php if ($data['show_prev']): ?>
-		post_data['time_change'] = (jQuery('#upd_prev').val() !== '')
-			? parseInt(jQuery('#upd_last').val()) - parseInt(jQuery('#upd_prev').val())
-			: Math.ceil(+new Date()/1000) - parseInt(jQuery('#upd_last').val());
+		post_data['time_change'] = (form_data['upd_prev'] !== '')
+			? parseInt(form_data['upd_last']) - parseInt(form_data['upd_prev'])
+			: Math.ceil(+new Date()/1000) - parseInt(form_data['upd_last']);
 	<?php endif ?>
 
 	delete post_data.interfaceid;
@@ -174,7 +177,7 @@ function itemGetValueTest() {
 						jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
 						jQuery('#prev_time', $form).val(ret.prev_time);
 
-						jQuery('#upd_prev', $form).val(jQuery('#upd_last', $form).val());
+						jQuery('#upd_prev', $form).val(form_data['upd_last']);
 						jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
 					}
 				<?php endif ?>
@@ -200,9 +203,10 @@ function itemGetValueTest() {
  */
 function itemCompleteTest() {
 	var $form = jQuery('#preprocessing-test-form'),
-		url = new Curl('zabbix.php'),
-		is_prev_enabled = <?= $data['show_prev'] ? 'true' : 'false' ?>,
+		form_data = $form.serializeJSON(),
 		post_data = getItemTestProperties('#preprocessing-test-form'),
+		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
+		url = new Curl('zabbix.php'),
 		step_nums = [];
 
 	url.setArgument('action', 'popup.itemtest.send');
@@ -212,30 +216,31 @@ function itemCompleteTest() {
 	}
 
 	post_data = jQuery.extend(post_data, {
-		get_value: jQuery('#get_value', $form).is(":checked") ? 1 : 0,
+		get_value: form_data['get_value'] || 0,
 		steps: getPreprocessingSteps(step_nums),
 		interface: {
-			address: jQuery('#interface_address', $form).val(),
-			port: jQuery('#interface_port', $form).val()
+			address: interface ? interface['address'] : '',
+			port: interface ? interface['port'] : ''
 		},
-		proxy_hostid: jQuery('#proxy_hostid', $form).val(),
+		macros: form_data['macros'],
+		proxy_hostid: form_data['proxy_hostid'],
 		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
 		valuemapid: <?= $data['valuemapid'] ?>,
-		value: jQuery('#value', $form).multilineInput('value')
+		value: form_data['value']
 	});
 
 	<?php if ($data['show_prev']): ?>
 		if (post_data.get_value) {
-			post_data['time_change'] = (jQuery('#upd_prev').val() !== '')
-				? parseInt(jQuery('#upd_last').val()) - parseInt(jQuery('#upd_prev').val())
-				: Math.ceil(+new Date()/1000) - parseInt(jQuery('#upd_last').val());
+			post_data['time_change'] = (form_data['upd_prev'] !== '')
+				? parseInt(form_data['upd_last']) - parseInt(form_data['upd_prev'])
+				: Math.ceil(+new Date()/1000) - parseInt(form_data['upd_last']);
 		}
 
 		post_data = jQuery.extend(post_data, {
-			prev_time: jQuery('#prev_time', $form).val(),
-			prev_value: jQuery('#prev_value', $form).multilineInput('value')
+			prev_time: form_data['prev_time'],
+			prev_value: form_data['prev_value']
 		});
 	<?php endif ?>
 
@@ -260,7 +265,7 @@ function itemCompleteTest() {
 					jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
 					jQuery('#prev_time', $form).val(ret.prev_time);
 
-					jQuery('#upd_prev', $form).val(jQuery('#upd_last', $form).val());
+					jQuery('#upd_prev', $form).val(post_data['upd_last']);
 					jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
 				}
 			<?php endif ?>

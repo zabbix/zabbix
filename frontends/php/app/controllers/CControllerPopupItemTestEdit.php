@@ -40,6 +40,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'key'					=> 'string',
 			'interfaceid'			=> 'db interface.interfaceid',
 			'ipmi_sensor'			=> 'string',
+			'itemid'				=> 'id',
 			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT]),
 			'jmx_endpoint'			=> 'string',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
@@ -134,11 +135,42 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$support_lldmacros = ($this->preproc_item instanceof CItemPrototype);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
 
-		// Extract macros and get effective values.
-		$usermacros = CMacrosResolverHelper::extractMacrosFromPreprocessingSteps([
+		// Collect item texts and macros to later check their usage.
+		$item_texts = [];
+		$item_macros = [];
+		foreach (array_keys(array_intersect_key($inputs, $this->macros_by_item_props)) as $field) {
+			if ($field === 'query_fields' || $field === 'headers') {
+				foreach (['name', 'value'] as $key) {
+					$has_macros = array_filter($inputs[$field][$key], function($str) {
+						return (strstr($str, '{') !== false);
+					});
+
+					if ($has_macros) {
+						$item_macros = array_merge_recursive($item_macros, $this->macros_by_item_props[$field]);
+						$item_texts = array_merge($item_texts, $has_macros);
+					}
+				}
+			}
+			elseif (strstr($inputs[$field], '{') !== false) {
+				$item_macros = array_merge_recursive($item_macros, $this->macros_by_item_props[$field]);
+				$item_texts[] = $inputs[$field];
+			}
+		}
+
+		// Unset duplicate macros.
+		foreach ($item_macros as &$item_macros_type) {
+			$item_macros_type = array_unique($item_macros_type);
+		}
+		unset($item_macros_type);
+
+		// Extract macros and apply effective values for each of them.
+		$usermacros = CMacrosResolverHelper::extractItemTestMacros([
 			'steps' => $preprocessing_steps,
 			'hostid' => $this->host ? $this->host['hostid'] : 0,
-			'delay' => $show_prev ? $this->getInput('delay', ZBX_ITEM_DELAY_DEFAULT) : ''
+			'delay' => $show_prev ? $this->getInput('delay', ZBX_ITEM_DELAY_DEFAULT) : '',
+			'property_texts' => $item_texts,
+			'property_macros' => $item_macros,
+			'macros_values' => $this->getSupportedMacros($inputs)
 		], $support_lldmacros);
 
 		// Set resolved macros to previously specified values.

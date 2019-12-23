@@ -624,15 +624,17 @@ class CMacrosResolverHelper {
 	 * @param string $data['steps'][]['params']                  Preprocessing step parameters.
 	 * @param string $data['steps'][]['error_handler_params]     Preprocessing steps error handle parameters.
 	 * @param string $data['delay']                              Update interval value.
+	 * @param array  $data['properties']                         Item properties.
+	 * @param array  $data['macros_values']                      Array of values for supported macros.
 	 * @param string $data['hostids']                            Hostid for which tested item belongs to.
 	 * @param bool   $support_lldmacros                          Enable or disable LLD macro selection.
 	 *
 	 * @return array
 	 */
-	public static function extractMacrosFromPreprocessingSteps(array $data, $support_lldmacros) {
+	public static function extractItemTestMacros(array $data, $support_lldmacros) {
 		self::init();
 
-		return self::$macrosResolver->extractMacrosFromPreprocessingSteps($data, $support_lldmacros);
+		return self::$macrosResolver->extractItemTestMacros($data, $support_lldmacros);
 	}
 
 	/**
