@@ -1136,7 +1136,7 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 		DBfree_result(result);
 	}
 
-	*info = zbx_strdup(NULL, "Timeout while waiting for result.");
+	*info = zbx_strdup(NULL, "Timeout while waiting for result, check connection with the Zabbix proxy.");
 
 	return FAIL;
 }
