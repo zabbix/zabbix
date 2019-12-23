@@ -182,7 +182,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if ($ret && $hostid) {
 			$host = API::Host()->get([
-				'output' => ['hostid', 'host', 'status', 'available', 'flags', 'proxy_hostid', 'tls_subject',
+				'output' => ['hostid', 'host', 'name', 'status', 'available', 'flags', 'proxy_hostid', 'tls_subject',
 					'ipmi_available', 'jmx_available', 'snmp_available', 'maintenance_status', 'maintenance_type',
 					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_psk_identity', 'tls_psk',
 					'tls_issuer', 'tls_connect'
