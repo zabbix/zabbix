@@ -133,7 +133,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					$ret = false;
 				}
 
-				if (!array_key_exists('port', $interface) || $interface['port'] === '') {
+				if ($this->item_type != ITEM_TYPE_SIMPLE
+						&& (!array_key_exists('port', $interface) || $interface['port'] === '')) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
 					$ret = false;
 				}
@@ -244,6 +245,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				'params_f' => 'params',
 				'http_username' => 'username',
 				'http_password' => 'password',
+				'http_authtype' => 'authtype',
 				'item_type' => 'type'
 			]);
 

@@ -84,14 +84,14 @@ if ($data['is_item_testable']) {
 		->addRow(
 			new CLabel(_('Host address'), 'host_address'),
 			(new CDiv([
-				$data['interface_enabled']
+				$data['interface_address_enabled']
 					? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					: (new CTextBox('interface[address]'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setEnabled(false),
 				new CLabel(_('Port'), 'port'),
-				$data['interface_enabled']
+				$data['interface_port_enabled']
 					? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					: (new CTextBox('interface[port]'))

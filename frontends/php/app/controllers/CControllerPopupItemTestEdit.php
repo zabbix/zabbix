@@ -230,7 +230,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'inputs' => $inputs,
 			'proxies' => in_array($this->item_type, $this->items_support_proxy) ? $this->getHostProxies() : [],
 			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy),
-			'interface_enabled' => in_array($this->item_type, $this->items_require_interface),
+			'interface_address_enabled' => in_array($this->item_type, $this->items_require_interface),
+			'interface_port_enabled' => (in_array($this->item_type, $this->items_require_interface)
+				&& $this->item_type != ITEM_TYPE_SIMPLE
+			),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

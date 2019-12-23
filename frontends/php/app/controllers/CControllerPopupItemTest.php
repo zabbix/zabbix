@@ -499,8 +499,8 @@ abstract class CControllerPopupItemTest extends CController {
 				$data += [
 					'key' => $input['key'],
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : null,
-					'publickey' => array_key_exists('publickey', $input) ? $input['publickey'] : null,
-					'privatekey' => array_key_exists('privatekey', $input) ? $input['privatekey'] : null,
+					'username' => array_key_exists('username', $input) ? $input['username'] : null,
+					'password' => array_key_exists('password', $input) ? $input['password'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 
@@ -693,7 +693,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
 			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value'])) {
+				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
 					$result[] = [$data['name'][$num] => $data['value'][$num]];
 				}
 			}
@@ -716,7 +716,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
 			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value'])) {
+				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
 					$result[] = $data['name'][$num].': '.$data['value'][$num];
 				}
 			}

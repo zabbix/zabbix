@@ -102,7 +102,8 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 					$ret = false;
 				}
 
-				if (!array_key_exists('port', $interface) || $interface['port'] === '') {
+				if ($this->item_type != ITEM_TYPE_SIMPLE
+						&& (!array_key_exists('port', $interface) || $interface['port'] === '')) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
 					$ret = false;
 				}
@@ -138,10 +139,9 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		// Apply efective macros values to properties.
 		$data = $this->resolveItemPropertyMacros($data);
 
-		// Only non-empty fields need to be sent to server.
-		$data = $this->unsetEmptyValues($data);
-
-		unset($data['value_type']);
+		if ($this->item_type != ITEM_TYPE_AGGREGATE && $this->item_type != ITEM_TYPE_CALCULATED) {
+			unset($data['value_type']);
+		}
 
 		// Rename fields according protocol.
 		$data = CArrayHelper::renameKeys($data, [
@@ -150,6 +150,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'params_f' => 'params',
 			'http_username' => 'username',
 			'http_password' => 'password',
+			'http_authtype' => 'authtype',
 			'item_type' => 'type'
 		]);
 
@@ -160,6 +161,9 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		if (array_key_exists('query_fields', $data)) {
 			$data['query_fields'] = $this->transformQueryFields($data['query_fields']);
 		}
+
+		// Only non-empty fields need to be sent to server.
+		$data = $this->unsetEmptyValues($data);
 
 		$output = [
 			'user' => [
