@@ -88,8 +88,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return;
 		}
 		elseif ($this->dashboard === null) {
-			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
-			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
+			$this->setResponse(new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.list')
+				->setArgument('page', CPagerHelper::loadPage('dashboard.list', null))
+			));
 
 			return;
 		}
