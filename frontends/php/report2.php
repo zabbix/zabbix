@@ -167,10 +167,12 @@ if ($triggerData) {
 
 	$reportWidget->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))
+			->addItem(new CLink($triggerData['hostname'], (new CUrl('report2.php'))
+				->setArgument('page', CPagerHelper::loadPage('report2.php'))
+				->getUrl()
+			))
 			->addItem($triggerData['description'])
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 	$table = (new CTableInfo())
@@ -458,7 +460,9 @@ elseif (hasRequest('filter_hostid')) {
 	CArrayHelper::sort($triggers, ['host_name', 'description']);
 
 	// pager
-	$paging = CPagerHelper::paginate(getRequest('page', 1), $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
+	$page_num = getRequest('page', 1);
+	CPagerHelper::savePage($page['file'], $page_num);
+	$paging = CPagerHelper::paginate($page_num, $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 
 	foreach ($triggers as $trigger) {
 		$availability = calculateAvailability($trigger['triggerid'], $data['filter']['timeline']['from_ts'],
