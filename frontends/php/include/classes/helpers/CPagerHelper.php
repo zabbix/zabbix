@@ -59,6 +59,14 @@ class CPagerHelper {
 	}
 
 	/**
+	 * Reset page number.
+	 */
+	public static function resetPage() {
+		CProfile::delete('web.pager.entity');
+		CProfile::delete('web.pager.page');
+	}
+
+	/**
 	 * Save page number for given entity.
 	 *
 	 * @param string  $entity

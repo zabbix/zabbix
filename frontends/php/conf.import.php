@@ -25,25 +25,15 @@ $page['file'] = 'conf.import.php';
 $page['title'] = _('Configuration import');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-ob_start();
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $fields = [
 	'rules' => [T_ZBX_STR, O_OPT, null, null, null],
 	'import' => [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null],
 	'rules_preset' => [T_ZBX_STR, O_OPT, null, null, null],
-	'backurl' => [T_ZBX_STR, O_OPT, null, null, null],
-	'cancel' => [T_ZBX_STR, O_OPT, P_SYS, null, null]
+	'backurl' => [T_ZBX_STR, O_OPT, null, null, null]
 ];
 check_fields($fields);
-
-
-if (isset($_REQUEST['cancel'])) {
-	ob_end_clean();
-	redirect(CWebUser::$data['last_page']['url']);
-}
-ob_end_flush();
 
 $data = [
 	'rules' => [
@@ -63,79 +53,55 @@ $data = [
 		'images' => ['updateExisting' => false, 'createMissing' => false],
 		'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
-	],
-	'backurl' => getRequest('backurl', '')
+	]
 ];
 
-if (!CHtmlUrlValidator::validate($data['backurl'], ['allow_user_macro' => false, 'validate_uri_schemes' => true])) {
-	$data['backurl'] = 'zabbix.php?action=dashboard.view';
-}
+// Adjust defaults for given rule preset, if specified.
+switch (getRequest('rules_preset')) {
+	case 'host':
+		$data['rules']['groups'] = ['createMissing' => true];
+		$data['rules']['hosts'] = ['updateExisting' => true, 'createMissing' => true];
+		$data['rules']['applications'] = ['createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
+			'deleteMissing' => false
+		];
+		$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 
-// rules presets
-if (hasRequest('rules_preset') && !hasRequest('rules')) {
-	switch (getRequest('rules_preset')) {
-		case 'host':
-			$data['rules']['groups'] = ['createMissing' => true];
-			$data['rules']['hosts'] = ['updateExisting' => true, 'createMissing' => true];
-			$data['rules']['applications'] = ['createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
-				'deleteMissing' => false
-			];
-			$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
+		break;
 
-			$data['backurl'] = 'hosts.php';
-			break;
+	case 'template':
+		$data['rules']['groups'] = ['createMissing' => true];
+		$data['rules']['templates'] = ['updateExisting' => true, 'createMissing' => true];
+		$data['rules']['templateScreens'] = ['updateExisting' => true, 'createMissing' => true,
+			'deleteMissing' => false
+		];
+		$data['rules']['applications'] = ['createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
+			'deleteMissing' => false
+		];
+		$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
+		$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 
-		case 'template':
-			$data['rules']['groups'] = ['createMissing' => true];
-			$data['rules']['templates'] = ['updateExisting' => true, 'createMissing' => true];
-			$data['rules']['templateScreens'] = ['updateExisting' => true, 'createMissing' => true,
-				'deleteMissing' => false
-			];
-			$data['rules']['applications'] = ['createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
-				'deleteMissing' => false
-			];
-			$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-			$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
+		break;
 
-			$data['backurl'] = 'templates.php';
-			break;
+	case 'mediatype':
+		$data['rules']['mediaTypes'] = ['updateExisting' => false, 'createMissing' => true];
 
-		case 'map':
-			$data['rules']['maps'] = ['updateExisting' => true, 'createMissing' => true];
+		break;
 
-			$data['backurl'] = 'sysmaps.php';
-			break;
+	case 'valuemap':
+		$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 
-		case 'mediatype':
-			$data['rules']['mediaTypes'] = ['updateExisting' => false, 'createMissing' => true];
-
-			$data['backurl'] = 'zabbix.php?action=mediatype.list';
-			break;
-
-		case 'screen':
-			$data['rules']['screens'] = ['updateExisting' => true, 'createMissing' => true];
-
-			$data['backurl'] = 'screenconf.php';
-			break;
-
-		case 'valuemap':
-			$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
-
-			$data['backurl'] = (new CUrl('zabbix.php'))->setArgument('action', 'valuemap.list')->getUrl();
-			break;
-
-	}
+		break;
 }
 
 if (hasRequest('rules')) {
@@ -172,12 +138,56 @@ if (isset($_FILES['import_file'])) {
 			'source' => $file->getContent(),
 			'rules' => $data['rules']
 		]);
+
+		if ($result) {
+			CPagerHelper::resetPage();
+		}
 	}
 	catch (Exception $e) {
 		error($e->getMessage());
 	}
 
 	show_messages($result, _('Imported successfully'), _('Import failed'));
+}
+
+switch (getRequest('rules_preset')) {
+	case 'host':
+		$data['backurl'] = (new CUrl('hosts.php'))
+			->setArgument('page', CPagerHelper::loadPage('hosts.php', null))
+			->getUrl();
+
+		break;
+
+	case 'template':
+		$data['backurl'] = (new CUrl('templates.php'))
+			->setArgument('page', CPagerHelper::loadPage('templates.php', null))
+			->getUrl();
+
+		break;
+
+	case 'mediatype':
+		$data['backurl'] = (new CUrl('zabbix.php'))
+			->setArgument('action', 'mediatype.list')
+			->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
+			->getUrl();
+
+		break;
+
+	case 'valuemap':
+		$data['backurl'] = (new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.list')
+			->setArgument('page', CPagerHelper::loadPage('valuemap.list', null))
+			->getUrl();
+
+		break;
+
+	default:
+		$data['backurl'] = getRequest('backurl', (new CUrl('zabbix.php'))
+			->setArgument('action', 'dashboard.view')
+			->getUrl()
+		);
+
+		break;
 }
 
 $view = new CView('conf.import', $data);
