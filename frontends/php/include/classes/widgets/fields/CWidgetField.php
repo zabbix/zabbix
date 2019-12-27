@@ -208,7 +208,10 @@ class CWidgetField {
 		$value = ($this->value === null) ? $this->default : $this->value;
 		$label = ($this->label === null) ? $this->name : $this->label;
 
-		if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
+		if (CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
+			$this->setValue($value);
+		}
+		else {
 			$this->setValue($this->default);
 			$errors[] = $error;
 		}

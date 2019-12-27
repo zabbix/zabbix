@@ -41,9 +41,22 @@ if ($field->getValue() === '') {
 }
 
 // Register dynamically created item fields. Only for map.name.#, map.parent.#, map.order.#, mapid.#
-foreach ($fields as $field) {
-	if ($field instanceof CWidgetFieldHidden) {
-		$form->addVar($field->getName(), $field->getValue());
+$field = $fields['navtree'];
+
+$navtree_items = $field->getValue();
+$field_name = $field->getName();
+
+$f= [];
+foreach ($navtree_items as $i => $navtree_item) {
+	$form->addVar($field_name.'['.$i.'][name]', $navtree_item['name']);
+	$form->addVar($field_name.'['.$i.'][order]', $navtree_item['order']);
+	$form->addVar($field_name.'['.$i.'][parent]', $navtree_item['parent']);
+	$f[$field_name.'['.$i.'][name]'] = $navtree_item['name'];
+	$f[$field_name.'['.$i.'][order]'] = $navtree_item['order'];
+	$f[$field_name.'['.$i.'][parent]'] = $navtree_item['parent'];
+	if (array_key_exists('sysmapid', $navtree_item)) {
+		$f[$field_name.'['.$i.'][sysmapid]'] = $navtree_item['sysmapid'];
+		$form->addVar($field_name.'['.$i.'][sysmapid]', $navtree_item['sysmapid']);
 	}
 }
 
