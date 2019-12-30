@@ -4400,8 +4400,8 @@ button.is-loading {
 span.is-loading {
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 40px; }
+  min-width: 40px;
+  min-height: 40px; }
 
 .dashbrd-grid-widget-content.is-loading:before,
 .dashbrd-grid-iterator-content.is-loading:before {
