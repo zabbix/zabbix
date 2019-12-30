@@ -168,7 +168,7 @@ if ($triggerData) {
 	$reportWidget->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CLink($triggerData['hostname'], (new CUrl('report2.php'))
-				->setArgument('page', CPagerHelper::loadPage('report2.php'))
+				->setArgument('page', CPagerHelper::loadPage('report2.php', null))
 				->getUrl()
 			))
 			->addItem($triggerData['description'])
