@@ -1,0 +1,57 @@
+---
+test case: 'Valid expression "1 and not(0 or 1)"'
+in:
+  expression: '1 and not(0 or 1)'
+out:
+  value: '0'
+  return: 'SUCCEED'
+---
+test case: 'Unknown comparison'
+in:
+  expression: 'ZBX_UNKNOWN0 = ZBX_UNKNOWN0'
+out:
+  value: 'ZBX_UNKNOWN'
+  return: 'SUCCEED'
+---
+test case: 'Unknown comparison'
+in:
+  expression: 'ZBX_UNKNOWN0 = ZBX_UNKNOWN1'
+out:
+  value: 'ZBX_UNKNOWN'
+  return: 'SUCCEED'
+---
+test case: 'Expression with unknown element "1 or ZBX_UNKNOWN0"'
+in:
+  expression: '1 or ZBX_UNKNOWN0'
+out:
+  value: '1'
+  return: 'SUCCEED'
+---
+test case: 'Expression with unknown element "1 or not(ZBX_UNKNOWN0)"'
+in:
+  expression: '1 or not(ZBX_UNKNOWN0)'
+out:
+  value: '1'
+  return: 'SUCCEED'
+---
+test case: 'Expression with unknown result "1 and not(ZBX_UNKNOWN0)"'
+in:
+  expression: '1 and not(ZBX_UNKNOWN0)'
+out:
+  value: 'ZBX_UNKNOWN'
+  return: 'SUCCEED'
+---
+test case: 'Expression with unknown result "1 > ZBX_UNKNOWN0"'
+in:
+  expression: '1 > ZBX_UNKNOWN0'
+out:
+  value: 'ZBX_UNKNOWN'
+  return: 'SUCCEED'
+---
+test case: 'Expression with unknown result "1 - ZBX_UNKNOWN0"'
+in:
+  expression: '1 - ZBX_UNKNOWN0'
+out:
+  value: 'ZBX_UNKNOWN'
+  return: 'SUCCEED'
+...

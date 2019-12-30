@@ -33,6 +33,7 @@ AC_DEFUN([LIBEVENT_CHECK_CONFIG],
 If you want to specify libevent installation directories:
 AC_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base install directory (DIR), default is to search through a number of common places for the libevent files.])],
 		[
+			test "x$withval" = "xyes" && withval=/usr
 			LIBEVENT_CFLAGS="-I$withval/include"
 			LIBEVENT_LDFLAGS="-L$withval/lib"
 			_libevent_dir_set="yes"

@@ -75,6 +75,7 @@ AC_DEFUN([LIBPTHREAD_CHECK_CONFIG],
 If you want to specify pthread installation directories:
 AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base install directory (DIR), default is to search through a number of common places for the libpthread files.])],
 		[
+			test "x$withval" = "xyes" && withval=/usr
 			LIBPTHREAD_CFLAGS="-I$withval/include"
 			LIBPTHREAD_LDFLAGS="-L$withval/lib"
 			_libpthread_dir_set="yes"
@@ -101,11 +102,10 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 		]
 	)
 
+	AC_CHECK_HEADER([pthread.h],[found_libpthread=yes])
+	LIBPTHREAD_LIBS="-lpthread"
 	AC_MSG_CHECKING(for process shared libpthread support)
 
-	LIBPTHREAD_LIBS="-lpthread"
-
-	AC_CHECK_HEADER([pthread.h],[found_libpthread=yes])
 	if test -n "$_libpthread_dir_set" -o "x$found_libpthread" = xyes; then
 		found_libpthread="yes"
 	elif test -f /usr/local/include/pthread.h; then

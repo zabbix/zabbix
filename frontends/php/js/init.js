@@ -245,8 +245,9 @@ jQuery(function($) {
 				};
 
 			default:
+				// Should match the default algorithm used in $.menuPopup().
 				return {
-					of: event,
+					of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
 					my: 'left top',
 					at: 'left bottom'
 				};

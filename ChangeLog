@@ -1,6 +1,15 @@
 Changes for 5.0.0alpha1
 
 New features:
+A......... [ZBXNEXT-1898] implemented strong cryptography for encoding frontend passwords (vasilijs)
+A.F.I..PS. [ZBXNEXT-5592] dropped IBM DB2 database support for Zabbix server (talbergs, viktors)
+.........T [ZBXNEXT-5623] added Pushover webhook integration (vitaly)
+...G...PS. [ZBXNEXT-1085] added available agent check restriction parameters (atumilovics)
+.........T [ZBXNEXT-5591] added media "Mattermost" (afayantsev)
+.........T [ZBXNEXT-5586] added media "Opsgenie" (mchudinov)
+...G...... [ZBXNEXT-5609] added agent2 Windows build support (wiper)
+A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported template linkages (miks)
+.........T [ZBXNEXT-5600] updated templates to internal version v0.34 (vitaly)
 ..F....... [ZBXNEXT-4700] reworked new action operation form as popup (rlataria)
 A.F....... [ZBXNEXT-5412] reworked new condition forms as popup (rlataria)
 .........T [ZBXNEXT-5572] added windows services template, updated windows template objects descriptions, added missing user macro (vitaly)
@@ -23,6 +32,39 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
+..F....... [ZBX-17101] fixed url validation before output (miks)
+...G...... [ZBX-17070] fixed agent2 plugin configuration not being called if no plugin specific parameters are set (wiper)
+........S. [ZBX-17062] fixed LLD macro substitution when PostgrSQL is used (viktors)
+.......PS. [ZBX-16929] fixed function signature (mabele)
+..F....... [ZBX-402] fixed latest data reloading to updating asynchronously (averza)
+..F....... [ZBX-16804] added missing get parameters in availability report (rlataria)
+..F....... [ZBX-16286] fixed graph widget dimensions errors on high DPI screens (agriscenko)
+..F....... [ZBX-16848] fixed fatal error occurring in user profile and user edit forms when PHP FileInfo extension does not exist (Ivo)
+..F....... [ZBX-16684] fixed incorrect double quotes in history plain text view (Ivo)
+..F....... [ZBX-16918] fixed widget saving with slow internet connection (rlataria)
+A......... [ZBX-16903] fixed validation of "interfaceid" field for HTTP agent items with large IDs (Ivo)
+..F....... [ZBX-16751] fixed support for php 7.4 (talbergs)
+..F....... [ZBX-16879] changed condition description message for tag value in actions and event correlations (vasilijs)
+........S. [ZBX-16459] fixed context-aware LLD macro expansion in JsonPath preprocessing (atumilovics)
+..F....... [ZBX-16911] fixed multiselect searching suggests in template mass update (rlataria)
+.......PS. [ZBX-9084] fixed high memory usage during startup (vso)
+...G...... [ZBX-17058] fixed agent2 passive check timemouts exhausting plugin capacity (wiper)
+...G...... [ZBX-16932] fixed build fail on netBSD (mabele)
+A.F....... [ZBX-16111] removed templateid from screen API output (vasilijs)
+..F....... [ZBX-15041] fixed request not being cancelled along with popup window in widgets (talbergs)
+..F....... [ZBX-16919] fixed server check warning width in chrome (ashubin, rlataria)
+..F....... [ZBX-16954] fixed graph widget scroll disappear (rlataria)
+..F....... [ZBX-16995] fixed widget vertically stretch (averza, rlataria)
+..F....... [ZBX-16978] fixed undefined offset in problem by severity widget (rlataria)
+..F....... [ZBX-16944] fixed "Type of information" field in item form being marked as required when it is read-only (Ivo)
+..F....... [ZBX-16912] fixed image map elements having a hand cursor when there is no context menu available (Ivo)
+..F....... [ZBX-1977] fixed axis labels calculation (ashubin, rlataria)
+..F....... [ZBX-16877] fixed long SNMP OID value goes beyond fields block (rlataria)
+..F....... [ZBX-17034] updated Zabbix website links (averza)
+..F....... [ZBX-16874] fixed map-type widget clipping in Internet Explorer (averza)
+.......PS. [ZBX-16915] fixed memory leak (mabele)
+........S. [ZBX-17008] improved Zabbix server performance when using maintenance (vso)
+........S. [ZBX-16779] fixed infinite loop when writing export to file fails (mabele)
 ..F....... [ZBX-16852] fixed graph widget multiselect collapse (ashubin, rlataria)
 ...G...PS. [ZBX-16988] fixed agent memory leak (atumilovics)
 ..F....... [ZBX-16649] fixed flexible textarea behavior (averza, vasilijs)
@@ -87,7 +129,7 @@ A......... [ZBX-16562] fixed configuration.export method in API improperly forma
 .......PS. [ZBX-16746] fixed support of libcurl version less than 7.38 for Kerberos authentification (akozlovs)
 .......... [ZBX-16481] fixed spelling issues in the code (arimdjonoks)
 ....I..... [ZBX-11764] fixed automake scripts; thanks to Tomasz Kłoczko for the patch (akozlovs)
-........S. [ZBX-16650] fgixed empty transaction to database in LLD worker (akozlovs)
+........S. [ZBX-16650] fixed empty transaction to database in LLD worker (akozlovs)
 .......PS. [ZBX-16368] fixed fping double call (akozlovs)
 ...G...PS. [ZBX-16750] fixed broken validation of peer certificate issuer and subject strings in TLS connect, fixed logging (Andris)
 ...G...PS. [ZBX-16317] fixed log.h is not self-sufficient (akozlovs)
@@ -119,11 +161,69 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 .........T [ZBX-16737] changed agent.ping type to ZABBIX_PASSIVE in Template Module Zabbix agent (vitaly)
 
 --------------------------------------------------------------------------------
-Changes for 4.4.4rc1
+Changes for 4.4.5rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.4.4
+
+4.4.4rc2 was released as 4.4.4 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.4.4rc2
+
+Bug fixes:
+....I....T [ZBXNEXT-5386] added missing webhook parameters to default database data (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.4rc1
+
+New features:
+.........T [ZBXNEXT-5623] added Pushover webhook integration (vitaly)
+.........T [ZBXNEXT-5591] added media "Mattermost" (afayantsev)
+.........T [ZBXNEXT-5586] added media "Opsgenie" (mchudinov)
+...G...... [ZBXNEXT-5609] added agent2 Windows build support (wiper)
+A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported template linkages (miks)
+.........T [ZBXNEXT-5600] updated templates to internal version v0.34 (vitaly)
+.........T [ZBXNEXT-5572] added windows services template, updated windows template objects descriptions, added missing user macro (vitaly)
+
+Bug fixes:
+..F....... [ZBX-17101] fixed url validation before output (miks)
+...G...... [ZBX-17070] fixed agent2 plugin configuration not being called if no plugin specific parameters are set (wiper)
+........S. [ZBX-17062] fixed LLD macro substitution when PostgrSQL is used (viktors)
+.......PS. [ZBX-16929] fixed function signature (mabele)
+..F....... [ZBX-16804] added missing get parameters in availability report (rlataria)
+..F....... [ZBX-16286] fixed graph widget dimensions errors on high DPI screens (agriscenko)
+..F....... [ZBX-16848] fixed fatal error occurring in user profile and user edit forms when PHP FileInfo extension does not exist (Ivo)
+..F....... [ZBX-16684] fixed incorrect double quotes in history plain text view (Ivo)
+..F....... [ZBX-16918] fixed widget saving with slow internet connection (rlataria)
+A......... [ZBX-16903] fixed validation of "interfaceid" field for HTTP agent items with large IDs (Ivo)
+..F....... [ZBX-16751] fixed support for php 7.4 (talbergs)
+..F....... [ZBX-16879] changed condition description message for tag value in actions and event correlations (vasilijs)
+........S. [ZBX-16459] fixed context-aware LLD macro expansion in JsonPath preprocessing (atumilovics)
+..F....... [ZBX-16911] fixed multiselect searching suggests in template mass update (rlataria)
+.......PS. [ZBX-9084] fixed high memory usage during startup (vso)
+...G...... [ZBX-17058] fixed agent2 passive check timemouts exhausting plugin capacity (wiper)
+...G...... [ZBX-16932] fixed build fail on netBSD (mabele)
+..F....... [ZBX-15041] fixed request not being cancelled along with popup window in widgets (talbergs)
+A.F....... [ZBX-16111] removed templateid from screen API output (vasilijs)
+..F....... [ZBX-16919] fixed server check warning width in chrome (ashubin, rlataria)
+..F....... [ZBX-16954] fixed graph widget scroll disappear (rlataria)
+..F....... [ZBX-16995] fixed widget vertically stretch (averza, rlataria)
+..F....... [ZBX-16978] fixed undefined offset in problem by severity widget (rlataria)
+..F....... [ZBX-16944] fixed "Type of information" field in item form being marked as required when it is read-only (Ivo)
+..F....... [ZBX-16912] fixed image map elements having a hand cursor when there is no context menu available (Ivo)
+..F....... [ZBX-1977] fixed axis labels calculation (ashubin, rlataria)
+..F....... [ZBX-16877] fixed long SNMP OID value goes beyond fields block (rlataria)
+..F....... [ZBX-17034] updated Zabbix website links (averza)
+..F....... [ZBX-16874] fixed map-type widget clipping in Internet Explorer (averza)
+.......PS. [ZBX-16915] fixed memory leak (mabele)
+........S. [ZBX-17008] improved Zabbix server performance when using maintenance (vso)
+........S. [ZBX-16779] fixed infinite loop when writing export to file fails (mabele)
+.........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 ..F....... [ZBX-16852] fixed graph widget multiselect collapse (ashubin, rlataria)
 ..F....... [ZBX-16649] fixed flexible textarea behavior (averza, vasilijs)
 
@@ -232,7 +332,7 @@ A......... [ZBX-16562] fixed configuration.export method in API improperly forma
 .........T [ZBX-16770] fixed value mapping in Template Net HP Comware HH3C SNMP (vitaly)
 .......... [ZBX-16481] fixed spelling issues in the code (arimdjonoks)
 .......PS. [ZBX-16746] fixed support of libcurl version less than 7.38 for Kerberos authentification (akozlovs)
-........S. [ZBX-16650] fgixed empty transaction to database in LLD worker (akozlovs)
+........S. [ZBX-16650] fixed empty transaction to database in LLD worker (akozlovs)
 .......PS. [ZBX-16368] fixed fping double call (akozlovs)
 ...G...PS. [ZBX-16317] fixed log.h is not self-sufficient (akozlovs)
 ...G...PS. [ZBX-16750] fixed broken validation of peer certificate issuer and subject strings in TLS connect, fixed logging (Andris)
@@ -450,7 +550,7 @@ A......... [ZBX-16562] fixed configuration.export method in API improperly forma
 ...G...... [ZBX-15675] added support for more than 64 CPUs in Windows agent (kalimulin)
 .......... [ZBX-16481] fixed spelling issues in the code (arimdjonoks)
 .........T [ZBX-16770] fixed value mapping in Template Net HP Comware HH3C SNMP (vitaly)
-........S. [ZBX-16650] fgixed empty transaction to database in LLD worker (akozlovs)
+........S. [ZBX-16650] fixed empty transaction to database in LLD worker (akozlovs)
 ...G...PS. [ZBX-16534] fixed stdout and stderr redirection after external log rotation (akozlovs)
 .......PS. [ZBX-16368] fixed fping double call (akozlovs)
 ...G...PS. [ZBX-16317] fixed log.h is not self-sufficient (akozlovs)
@@ -1045,11 +1145,47 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.16rc1
+Changes for 4.0.17rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.16
+
+4.0.16rc1 was released as 4.0.16 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.16rc1
+
+New features:
+A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported template linkages (miks)
+
+Bug fixes:
+..F....... [ZBX-17101] fixed url validation before output (miks)
+.......PS. [ZBX-16929] fixed detection of invalid sender data request (mabele)
+..F....... [ZBX-16804] added missing get parameters in availability report (rlataria)
+..F....... [ZBX-16286] fixed graph widget dimensions errors on high DPI screens (agriscenko)
+..F....... [ZBX-16848] fixed fatal error occurring in user profile and user edit forms when PHP FileInfo extension does not exist (Ivo)
+..F....... [ZBX-16684] fixed incorrect double quotes in history plain text view (Ivo)
+A......... [ZBX-16903] fixed validation of "interfaceid" field for HTTP agent items with large IDs (Ivo)
+..F....... [ZBX-16751] fixed support for php 7.4 (talbergs)
+..F....... [ZBX-16879] changed condition description message for tag value in actions and event correlations (vasilijs)
+.......PS. [ZBX-9084] fixed high memory usage during startup (vso)
+...G...... [ZBX-16932] fixed build fail on netBSD (mabele)
+A.F....... [ZBX-16111] removed templateid from screen API output (vasilijs)
+..F....... [ZBX-16919] fixed server check warning width in chrome (ashubin, rlataria)
+..F....... [ZBX-16944] fixed "Type of information" field in item form being marked as required when it is read-only (Ivo)
+..F....... [ZBX-16912] fixed image map elements having a hand cursor when there is no context menu available (Ivo)
+..F....... [ZBX-15041] fixed request not being cancelled along with popup window in widgets (talbergs)
+..F....... [ZBX-1977] fixed axis labels calculation (ashubin, rlataria)
+..F....... [ZBX-17034] updated Zabbix website links (averza)
+..F....... [ZBX-16874] fixed map-type widget clipping in Internet Explorer (averza)
+.......PS. [ZBX-16915] fixed memory leak (mabele)
+........S. [ZBX-17008] improved Zabbix server performance when using maintenance (vso)
+........S. [ZBX-16779] fixed infinite loop when writing export to file fails (mabele)
+.........T [ZBX-16540] splitted host_resources templates into 3 subtemplates: for CPU, memory and storage (vitaly)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.15
@@ -3747,11 +3883,22 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.29rc1
+Changes for 3.0.30rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.0.29
+
+3.0.29rc1 was released as 3.0.29 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.29rc1
+
+Bug fixes:
+..F....... [ZBX-17101] fixed url validation before output (miks)
 ...G...PS. [ZBX-16750] fixed broken validation of peer certificate issuer and subject strings in TLS connect, fixed logging (Andris)
 ....I..... [ZBX-16178] fixed distributive can contain untracked backup file include/config.h.in~ (akozlovs)
 

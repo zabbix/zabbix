@@ -41,21 +41,6 @@ class zbx_dbcast_2bigintTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider provider
 	 */
-	public function test_ibmdb2($field) {
-		global $DB;
-
-		$oldDB = $DB;
-
-		$DB['TYPE'] = ZBX_DB_DB2;
-
-		$this->assertEquals('CAST('.$field.' AS BIGINT)', zbx_dbcast_2bigint($field));
-
-		$DB = $oldDB;
-	}
-
-	/**
-	 * @dataProvider provider
-	 */
 	public function test_mysql($field) {
 		global $DB;
 

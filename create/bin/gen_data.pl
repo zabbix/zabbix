@@ -22,13 +22,6 @@ use File::Basename;
 
 my (%output, $insert_into, $fields);
 
-my %ibm_db2 = (
-	"database"	=>	"ibm_db2",
-	"before"	=>	"",
-	"after"		=>	"",
-	"exec_cmd"	=>	";\n"
-);
-
 my %mysql = (
 	"database"	=>	"mysql",
 	"before"	=>	"START TRANSACTION;\n",
@@ -192,7 +185,7 @@ sub process_row
 
 sub usage
 {
-	print "Usage: $0 [ibm_db2|mysql|oracle|postgresql|sqlite3]\n";
+	print "Usage: $0 [mysql|oracle|postgresql|sqlite3]\n";
 	print "The script generates Zabbix SQL data files for different database engines.\n";
 	exit;
 }
@@ -216,8 +209,7 @@ sub main
 	push(@lines, <INFO>);
 	close(INFO);
 
-	if ($ARGV[0] eq 'ibm_db2')		{ %output = %ibm_db2; }
-	elsif ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
+	if ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
 	elsif ($ARGV[0] eq 'oracle')		{ %output = %oracle; }
 	elsif ($ARGV[0] eq 'postgresql')	{ %output = %postgresql; }
 	elsif ($ARGV[0] eq 'sqlite3')		{ %output = %sqlite3; }

@@ -192,9 +192,23 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 #define PROCESS_MODULE_COMMAND	0x2
 #define PROCESS_WITH_ALIAS	0x4
 
+typedef enum
+{
+	ZBX_KEY_ACCESS_ALLOW,
+	ZBX_KEY_ACCESS_DENY
+}
+zbx_key_access_rule_type_t;
+
 void	init_metrics(void);
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	free_metrics(void);
+
+void	init_key_access_rules(void);
+void	finalize_key_access_rules_configuration(void);
+int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type);
+int	check_key_access_rules(const char *metric);
+int	check_request_access_rules(AGENT_REQUEST *request);
+void	free_key_access_rules(void);
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 

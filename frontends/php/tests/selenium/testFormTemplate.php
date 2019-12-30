@@ -215,32 +215,6 @@ class testFormTemplate extends CLegacyWebTest {
 		}
 	}
 
-	/**
-	 * Adds two macros to an existing host.
-	 */
-	public function testFormTemplate_AddMacros() {
-		$template = CDBHelper::getRow('select hostid from hosts where host='.zbx_dbstr($this->template));
-
-		$this->zbxTestLogin('templates.php?page=1');
-		$this->zbxTestClickLinkTextWait($this->template);
-		$this->zbxTestTabSwitch('Macros');
-		$this->zbxTestInputTypeWait('macros_0_macro', '{$TEST_MACRO}');
-		$this->zbxTestInputType('macros_0_value', '1');
-		$this->zbxTestClick('macro_add');
-		$this->zbxTestInputTypeWait('macros_1_macro', '{$TEST_MACRO2}');
-		$this->zbxTestInputType('macros_1_value', '2');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template updated');
-
-		$this->zbxTestClickLinkTextWait($this->template);
-		$this->zbxTestTabSwitch('Macros');
-		$this->zbxTestAssertElementValue('macros_0_macro', '{$TEST_MACRO}');
-		$this->zbxTestAssertElementValue('macros_0_value', '1');
-		$this->zbxTestAssertElementValue('macros_1_macro', '{$TEST_MACRO2}');
-		$this->zbxTestAssertElementValue('macros_1_value', '2');
-		$this->assertEquals(2, CDBHelper::getCount("SELECT * FROM hostmacro WHERE hostid='".$template['hostid']."'"));
-	}
-
 	public function testFormTemplate_UpdateTemplateName() {
 		$new_template_name = 'Changed template name';
 

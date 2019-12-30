@@ -39,7 +39,6 @@ $fields = [
 	'status' =>		        	[T_ZBX_INT, O_OPT, null,		IN([HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED]), null],
 	'inventory_mode' =>			[T_ZBX_INT, O_OPT, null, IN([HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]), null],
 	'templates' =>		    	[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
-	'add_template' =>			[T_ZBX_STR, O_OPT, null,		null,	null],
 	'add_templates' =>		    [T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
 	'group_links' =>			[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
 	'group_prototypes' =>		[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
@@ -102,14 +101,7 @@ else {
 /*
  * Actions
  */
-// add templates to the list
-if (getRequest('add_template')) {
-	foreach (getRequest('add_templates', []) as $templateId) {
-		$_REQUEST['templates'][$templateId] = $templateId;
-	}
-}
-// unlink templates
-elseif (getRequest('unlink')) {
+if (getRequest('unlink')) {
 	foreach (getRequest('unlink') as $templateId => $value) {
 		unset($_REQUEST['templates'][$templateId]);
 	}
@@ -145,7 +137,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
-		'templates' => getRequest('templates', [])
+		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', []))
 	];
 
 	if (hasRequest('inventory_mode')) {
@@ -281,19 +273,39 @@ if (hasRequest('form')) {
 			'name' => getRequest('name'),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 			'templates' => [],
+			'add_templates' => [],
 			'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
 			'groupPrototypes' => getRequest('group_prototypes', [])
 		],
-		'groups' => [],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
+		'readonly' => true,
+		'groups' => [],
+		// Parent discovery rules.
 		'templates' => []
 	];
 
-	// add already linked and new templates
-	$data['host_prototype']['templates'] = API::Template()->get([
-		'output' => ['templateid', 'name'],
-		'templateids' => getRequest('templates', [])
-	]);
+	// Add already linked and new templates.
+	$templates = [];
+	$request_templates = getRequest('templates', []);
+	$request_add_templates = getRequest('add_templates', []);
+
+	if ($request_templates || $request_add_templates) {
+		$templates = API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => array_merge($request_templates, $request_add_templates),
+			'preservekeys' => true
+		]);
+
+		$data['host_prototype']['templates'] = array_intersect_key($templates, array_flip($request_templates));
+		CArrayHelper::sort($data['host_prototype']['templates'], ['name']);
+
+		$data['host_prototype']['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
+
+		foreach ($data['host_prototype']['add_templates'] as &$template) {
+			$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
+		}
+		unset($template);
+	}
 
 	// add parent host
 	$parentHost = API::Host()->get([
@@ -373,8 +385,20 @@ if (hasRequest('form')) {
 		]);
 	}
 
-	// order linked templates
-	CArrayHelper::sort($data['host_prototype']['templates'], ['name']);
+	// Add inherited macros to host macros.
+	$data['macros'] = $data['parent_host']['macros'];
+	if ($data['show_inherited_macros']) {
+		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(array_keys($templates)));
+	}
+
+	// Sort only after inherited macros are added. Otherwise the list will look chaotic.
+	$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
+
+	// This data is used in common.template.edit.js.php.
+	$data['macros_tab'] = [
+		'linked_templates' => array_map('strval', $templateids),
+		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))
+	];
 
 	// render view
 	$itemView = new CView('configuration.host.prototype.edit', $data);
