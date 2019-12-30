@@ -279,7 +279,7 @@
 
 			$container
 				.empty()
-				.addClass('is-loading is-loading-inline');
+				.append($('<span>', {class: 'is-loading'}));
 
 			$.ajax(url.getUrl(), {
 				data: {
@@ -319,7 +319,7 @@
 					}
 				})
 				.always(function() {
-					$container.removeClass('is-loading is-loading-inline');
+					$('.is-loading', $container).remove();
 				});
 		});
 	});

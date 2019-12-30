@@ -6276,16 +6276,6 @@ a.overlay-close-btn {
 		content: '';
 	}
 
-	&.is-loading-inline:after {
-		position: static;
-		display: block;
-		margin: 10px;
-		top: auto;
-		bottom: auto;
-		left: auto;
-		right: auto;
-	}
-
 	&.is-loading-fadein {
 
 		&:before {
@@ -6308,24 +6298,28 @@ a.overlay-close-btn {
 	}
 }
 
-button {
+button.is-loading {
+	position: relative;
 
-	&.is-loading {
-		position: relative;
-
-		&:before {
-			background: none;
-		}
-
-		&:after {
-			box-shadow: none;
-			background: none;
-			border: 1px solid $preloader-disabled-color;
-			border-bottom-color: $preloader-accent-color;
-			width: 12px;
-			height: 12px;
-		}
+	&:before {
+		background: none;
 	}
+
+	&:after {
+		box-shadow: none;
+		background: none;
+		border: 1px solid $preloader-disabled-color;
+		border-bottom-color: $preloader-accent-color;
+		width: 12px;
+		height: 12px;
+	}
+}
+
+span.is-loading {
+	position: relative;
+	display: inline-block;
+	width: 40px;
+	height: 40px;
 }
 
 .dashbrd-grid-widget-content,
