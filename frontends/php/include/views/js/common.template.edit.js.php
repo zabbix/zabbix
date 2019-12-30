@@ -279,14 +279,7 @@
 
 			$container
 				.empty()
-				.append($('<span></span>')
-					.addClass('is-loading')
-					.css({
-						'display': 'inline-block',
-						'position': 'relative',
-						'margin': '20px'
-					})
-				);
+				.addClass('is-loading is-loading-inline');
 
 			$.ajax(url.getUrl(), {
 				data: {
@@ -326,7 +319,7 @@
 					}
 				})
 				.always(function() {
-					$container.find('.is-loading').remove();
+					$container.removeClass('is-loading is-loading-inline');
 				});
 		});
 	});

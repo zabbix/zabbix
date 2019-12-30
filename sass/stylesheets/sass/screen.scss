@@ -6276,6 +6276,16 @@ a.overlay-close-btn {
 		content: '';
 	}
 
+	&.is-loading-inline:after {
+		position: static;
+		display: block;
+		margin: 10px;
+		top: auto;
+		bottom: auto;
+		left: auto;
+		right: auto;
+	}
+
 	&.is-loading-fadein {
 
 		&:before {

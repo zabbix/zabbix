@@ -4376,6 +4376,14 @@ td[class] + td.disaster-bg {
     animation: is-loading-kf 0.6s infinite linear;
     z-index: 1;
     content: ''; }
+  .is-loading.is-loading-inline:after {
+    position: static;
+    display: block;
+    margin: 10px;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto; }
   .is-loading.is-loading-fadein:before {
     opacity: 0;
     animation: fadein 2s ease-in 0.5s normal forwards; }
