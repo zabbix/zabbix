@@ -324,7 +324,7 @@ $tranStrings = [
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel')
-	],
+	]
 ];
 
 $js = '';

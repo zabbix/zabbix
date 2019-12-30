@@ -4398,6 +4398,12 @@ button.is-loading {
     width: 12px;
     height: 12px; }
 
+span.is-loading {
+  position: relative;
+  display: inline-block;
+  min-width: 40px;
+  min-height: 40px; }
+
 .dashbrd-grid-widget-content.is-loading:before,
 .dashbrd-grid-iterator-content.is-loading:before {
   margin: calc(.25rem + 1px); }
