@@ -140,6 +140,7 @@ class CControllerPopupMaintenancePeriod extends CController {
 
 	protected function doAction() {
 		$data = [
+			'timeperiodid' =>		0,
 			'update' =>				0,
 			'timeperiod_type' => 	TIMEPERIOD_TYPE_ONETIME,
 			'every' =>				1,
@@ -147,7 +148,10 @@ class CControllerPopupMaintenancePeriod extends CController {
 			'dayofweek' =>			0,
 			'start_date' =>			date(ZBX_DATE_TIME),
 			'period' =>				SEC_PER_HOUR,
-			'start_time' =>			12 * SEC_PER_HOUR
+			'start_time' =>			12 * SEC_PER_HOUR,
+			'month_date_type' =>	0,
+			'hour' =>				0,
+			'minute' =>				0
 		];
 		$fields = [
 			TIMEPERIOD_TYPE_ONETIME =>	['start_date'],
