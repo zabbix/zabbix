@@ -819,11 +819,10 @@ class CWidgetHelper {
 	 * Return javascript necessary to initialize CWidgetFieldGraphOverride field.
 	 *
 	 * @param CWidgetFieldGraphOverride $field
-	 * @param string                    $form_name  Form name in which override field is located.
 	 *
 	 * @return string
 	 */
-	public static function getGraphOverrideJavascript($field, $form_name) {
+	public static function getGraphOverrideJavascript($field) {
 		$scripts = [
 			// Define it as function to avoid redundancy.
 			'function initializeOverrides() {'.
