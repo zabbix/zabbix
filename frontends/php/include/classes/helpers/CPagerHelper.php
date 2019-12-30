@@ -48,9 +48,7 @@ class CPagerHelper {
 
 		$start = ($data['page'] - 1) * $data['rows_per_page'];
 		$end = $start + $data['rows_per_page'];
-		$offset = ($sort_order == ZBX_SORT_DOWN)
-			? $data['offset_down']
-			: $data['offset_up'];
+		$offset = ($sort_order == ZBX_SORT_DOWN) ? $data['offset_down'] : $data['offset_up'];
 
 		// Trim given rows for the current page.
 		$rows = array_slice($rows, $start + $offset, $end - $start, true);
