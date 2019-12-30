@@ -53,53 +53,53 @@ $data = [
 		'images' => ['updateExisting' => false, 'createMissing' => false],
 		'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
-	]
+	],
+	'rules_preset' => getRequest('rules_preset')
 ];
 
-if (hasRequest('rules')) {
-	$requestRules = getRequest('rules', []);
-	// if form was submitted with some checkboxes unchecked, those values are not submitted
-	// so that we set missing values to false, existing to true
-	foreach ($data['rules'] as $ruleName => $rule) {
-		if (!array_key_exists($ruleName, $requestRules)) {
-			$requestRules[$ruleName] = [];
+if (hasRequest('import')) {
+	$request_rules = getRequest('rules', []);
+
+	foreach ($data['rules'] as $rule_name => $rule) {
+		if (!array_key_exists($rule_name, $request_rules)) {
+			$request_rules[$rule_name] = [];
 		}
 
 		foreach (['updateExisting', 'createMissing', 'deleteMissing'] as $option) {
-			if (array_key_exists($option, $requestRules[$ruleName])) {
-				$requestRules[$ruleName][$option] = true;
+			if (array_key_exists($option, $request_rules[$rule_name])) {
+				$request_rules[$rule_name][$option] = true;
 			}
 			elseif (array_key_exists($option, $rule)) {
-				$requestRules[$ruleName][$option] = false;
+				$request_rules[$rule_name][$option] = false;
 			}
 		}
 	}
 
-	$data['rules'] = $requestRules;
-}
+	$data['rules'] = $request_rules;
 
-if (isset($_FILES['import_file'])) {
-	$result = false;
+	if (isset($_FILES['import_file'])) {
+		$result = false;
 
-	// CUploadFile throws exceptions, so we need to catch them
-	try {
-		$file = new CUploadFile($_FILES['import_file']);
+		// CUploadFile throws exceptions, so we need to catch them
+		try {
+			$file = new CUploadFile($_FILES['import_file']);
 
-		$result = API::Configuration()->import([
-			'format' => CImportReaderFactory::fileExt2ImportFormat($file->getExtension()),
-			'source' => $file->getContent(),
-			'rules' => $data['rules']
-		]);
+			$result = API::Configuration()->import([
+				'format' => CImportReaderFactory::fileExt2ImportFormat($file->getExtension()),
+				'source' => $file->getContent(),
+				'rules' => $data['rules']
+			]);
 
-		if ($result) {
-			CPagerHelper::resetPage();
+			if ($result) {
+				CPagerHelper::resetPage();
+			}
 		}
-	}
-	catch (Exception $e) {
-		error($e->getMessage());
-	}
+		catch (Exception $e) {
+			error($e->getMessage());
+		}
 
-	show_messages($result, _('Imported successfully'), _('Import failed'));
+		show_messages($result, _('Imported successfully'), _('Import failed'));
+	}
 }
 
 $data['backurl'] = (new CUrl('screenconf.php'))
