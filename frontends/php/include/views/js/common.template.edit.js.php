@@ -277,10 +277,16 @@
 
 			url.setArgument('action', 'hostmacros.list');
 
-			// DEV-1276 replace with this: $container.addClass('is-loading');
-			$container.empty().append(
-				$('<span></span>').addClass('preloader').css({'display': 'inline-block'})
-			);
+			$container
+				.empty()
+				.append($('<span></span>')
+					.addClass('is-loading')
+					.css({
+						'display': 'inline-block',
+						'position': 'relative',
+						'margin': '20px'
+					})
+				);
 
 			$.ajax(url.getUrl(), {
 				data: {
@@ -320,8 +326,7 @@
 					}
 				})
 				.always(function() {
-					// DEV-1276 replace with this: $container.removeClass('is-loading');
-					$container.find('.preloader').remove();
+					$container.find('.is-loading').remove();
 				});
 		});
 	});
