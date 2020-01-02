@@ -21,8 +21,6 @@
 
 class CControllerPopupMediatypeTestSend extends CController {
 
-	private $metiatype;
-
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',
