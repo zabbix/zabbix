@@ -332,6 +332,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			dialogue_class = generic_actions.indexOf(action) !== -1 ? ' modal-popup-generic' : '';
 
 		overlay = overlayDialogue({
+			'dialogueid': dialogueid,
 			'title': '',
 			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
 			'class': 'modal-popup' + dialogue_class,
@@ -344,7 +345,6 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 	overlay
 		.load(action, options)
 		.then(function(resp) {
-			var ovelay_properties = {};
 			if (typeof resp.errors !== 'undefined') {
 				overlay.setProperties({
 					content: resp.errors
