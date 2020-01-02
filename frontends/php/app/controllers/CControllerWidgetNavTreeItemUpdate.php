@@ -31,7 +31,7 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 			'name' => 'required|string|not_empty',
 			'sysmapid' => 'db sysmaps.sysmapid',
 			'add_submaps' => 'in 0,1',
-			'depth' => 'ge 0|le '.WIDGET_NAVIGATION_TREE_MAX_DEPTH
+			'depth' => 'ge 1|le '.WIDGET_NAVIGATION_TREE_MAX_DEPTH
 		];
 
 		$ret = $this->validateInput($fields);
@@ -56,7 +56,7 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 	protected function doAction() {
 		$sysmapid = $this->getInput('sysmapid', 0);
 		$add_submaps = (int) $this->getInput('add_submaps', 0);
-		$depth = (int) $this->getInput('depth', 0);
+		$depth = (int) $this->getInput('depth', 1);
 
 		if ($sysmapid != 0) {
 			$sysmaps = API::Map()->get([
