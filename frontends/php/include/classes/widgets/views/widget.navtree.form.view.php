@@ -40,22 +40,16 @@ if ($field->getValue() === '') {
 	$scripts[] = $field->getJavascript('#'.$form->getAttribute('id'));
 }
 
-// Register dynamically created item fields. Only for map.name.#, map.parent.#, map.order.#, mapid.#
+// Add dynamically created fields navtree.name.<N>, navtree.parent.<N>, navtree.order.<N> and navtree.sysmapid.<N>.
 $field = $fields['navtree'];
-
 $navtree_items = $field->getValue();
 $field_name = $field->getName();
 
-$f= [];
 foreach ($navtree_items as $i => $navtree_item) {
 	$form->addVar($field_name.'['.$i.'][name]', $navtree_item['name']);
 	$form->addVar($field_name.'['.$i.'][order]', $navtree_item['order']);
 	$form->addVar($field_name.'['.$i.'][parent]', $navtree_item['parent']);
-	$f[$field_name.'['.$i.'][name]'] = $navtree_item['name'];
-	$f[$field_name.'['.$i.'][order]'] = $navtree_item['order'];
-	$f[$field_name.'['.$i.'][parent]'] = $navtree_item['parent'];
 	if (array_key_exists('sysmapid', $navtree_item)) {
-		$f[$field_name.'['.$i.'][sysmapid]'] = $navtree_item['sysmapid'];
 		$form->addVar($field_name.'['.$i.'][sysmapid]', $navtree_item['sysmapid']);
 	}
 }

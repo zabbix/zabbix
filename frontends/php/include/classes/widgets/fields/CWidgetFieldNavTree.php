@@ -33,7 +33,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => [
 			'name'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
-			'order'		=> ['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 1],
+			'order'		=> ['type' => API_INT32, 'in' => '1:'.ZBX_MAX_INT32, 'default' => 1],
 			'parent'	=> ['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 0],
 			'sysmapid'	=> ['type' => API_ID, 'default' => '0']
 		]]);

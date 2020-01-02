@@ -607,7 +607,7 @@ jQuery(function($) {
 											dataType: 'json',
 											success: function(resp) {
 												var new_item,
-													root;
+													$root;
 
 												$('.msg-bad', form).remove();
 
@@ -618,7 +618,7 @@ jQuery(function($) {
 												}
 												else {
 													if (item_edit) {
-														var	row = $('[data-id=' + id + ']', $obj)
+														var	row = $('[data-id=' + id + ']', $obj);
 
 														$('[name="navtree.name.' + id + '"]', row).val(resp['name']);
 														$('[name="navtree.sysmapid.' + id + '"]', row)
@@ -631,9 +631,9 @@ jQuery(function($) {
 													}
 													else {
 														id = getNextId($obj),
-														root = $('.tree-item[data-id=' + parent + ']>ul.tree-list',
-																$obj
-															).get(0),
+														$root = $('.tree-item[data-id=' + parent + ']>ul.tree-list',
+															$obj
+														),
 														new_item = {
 															id: id,
 															name: resp['name'],
@@ -641,9 +641,9 @@ jQuery(function($) {
 															parent: +parent
 														};
 
-														root.appendChild(createTreeItem($obj, new_item, 1, true, true));
+														$root.append(createTreeItem($obj, new_item, 1, true, true));
 
-														$(root).closest('.tree-item')
+														$root.closest('.tree-item')
 															.removeClass('closed')
 															.addClass('opened is-parent');
 													}
@@ -652,9 +652,9 @@ jQuery(function($) {
 														var add_child_level = function($obj, sysmapid, itemid, depth) {
 															if (typeof resp.hierarchy[sysmapid] !== 'undefined'
 																	&& depth <= widget_data.max_depth) {
-																var root = $('.tree-item[data-id=' + itemid +
+																var $root = $('.tree-item[data-id=' + itemid +
 																		']>ul.tree-list', $obj
-																	).get(0);
+																	);
 
 																$.each(resp.hierarchy[sysmapid], function(i, submapid) {
 																	if (typeof resp.submaps[submapid] !== 'undefined') {
@@ -667,8 +667,8 @@ jQuery(function($) {
 																				parent: +itemid
 																			};
 
-																		root.appendChild(createTreeItem($obj, new_item,
-																			1, true, true
+																		$root.append(createTreeItem($obj, new_item, 1,
+																			true, true
 																		));
 																		add_child_level($obj, submapid, submap_itemid,
 																			depth + 1
@@ -680,7 +680,7 @@ jQuery(function($) {
 
 														add_child_level($obj, resp['sysmapid'], id, depth + 1);
 
-														$(root).closest('.tree-item')
+														$root.closest('.tree-item')
 															.addClass('is-parent opened')
 															.removeClass('closed');
 													}
@@ -714,7 +714,7 @@ jQuery(function($) {
 			 * @param {object}  item
 			 * @param {numeric} depth
 			 * @param {bool}    editable     Eeither item in edit-mode will be editable. Root item is not editable.
-			 * @param {booln}   isEditMode   Indicates either dashboard is in edit mode.
+			 * @param {bool}    isEditMode   Indicates either dashboard is in edit mode.
 			 *
 			 * @returns {object}
 			 */
@@ -872,7 +872,7 @@ jQuery(function($) {
 						}
 
 						addPopupValues = function(data) {
-							var root = $('.tree-item[data-id=' + id + ']>ul.tree-list', $obj).get(0),
+							var $root = $('.tree-item[data-id=' + id + ']>ul.tree-list', $obj),
 								new_item;
 
 							$.each(data.values, function() {
@@ -883,10 +883,10 @@ jQuery(function($) {
 									parent: id
 								};
 
-								root.appendChild(createTreeItem($obj, new_item, 1, true, isEditMode));
+								$root.append(createTreeItem($obj, new_item, 1, true, isEditMode));
 							});
 
-							$(root)
+							$root
 								.closest('.tree-item')
 								.removeClass('closed')
 								.addClass('opened');
@@ -905,7 +905,8 @@ jQuery(function($) {
 							srcfld2: 'name',
 							multiselect: '1'
 						}, null, event.target);
-						});
+					});
+
 					tools.appendChild(btn2);
 
 					if (editable) {
@@ -1035,8 +1036,7 @@ jQuery(function($) {
 			};
 
 			var setTreeHandlers = function($obj) {
-				var widget_data = $obj.data('widgetData'),
-					tree_list_depth;
+				var widget_data = $obj.data('widgetData');
 
 				// Add .is-parent class for branches with sub-items.
 				$('.tree-list', $obj).not('.ui-sortable, .root').each(function() {
@@ -1050,8 +1050,7 @@ jQuery(function($) {
 
 				// Set [data-depth] for list and each sublist.
 				$('.tree-list', $obj).each(function() {
-					tree_list_depth = $(this).parents('.tree-list').length;
-					$(this).attr('data-depth', tree_list_depth);
+					$(this).attr('data-depth', $(this).parents('.tree-list').length);
 				}).not('.root').promise().done(function() {
 					// Show/hide 'add new items' buttons.
 					$('.tree-list', $obj).filter(function() {
@@ -1128,7 +1127,7 @@ jQuery(function($) {
 						order: item.order,
 						parent: item.parent,
 						sysmapid: item.sysmapid
-					}
+					};
 
 					if (tree_item['id'] > widget_data.lastId) {
 						widget_data.lastId = tree_item['id'];
@@ -1144,7 +1143,7 @@ jQuery(function($) {
 						tree_item['item_active'] = (tree_item['sysmapid'] == 0
 								|| widget_data['maps_accessible'].indexOf(tree_item['sysmapid']) !== -1
 							);
-						tree_item['item_visible'] = widget_data.show_unavailable || tree_item['item_active'];
+						tree_item['item_visible'] = (widget_data.show_unavailable || tree_item['item_active']);
 
 						tree.push(tree_item);
 					}
@@ -1159,9 +1158,7 @@ jQuery(function($) {
 
 			// Remove item from tree.
 			var removeItem = function($obj, id) {
-				var item = $('[data-id=' + id + ']', $obj);
-
-				$(item).remove();
+				$('[data-id=' + id + ']', $obj).remove();
 				setTreeHandlers($obj);
 			};
 
