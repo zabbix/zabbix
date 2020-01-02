@@ -332,13 +332,13 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	free_result_ptr(AGENT_RESULT *result)
+void	zbx_free_result_ptr(AGENT_RESULT *result)
 {
 	free_result(result);
 	zbx_free(result);
 }
 
-int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	int	res = FAIL;
 
@@ -487,7 +487,7 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields, unsigned
 	return SUCCEED;
 }
 
-void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros)
+void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros)
 {
 	int	i;
 	char	*port = NULL, error[ITEM_ERROR_LEN_MAX];
@@ -704,7 +704,7 @@ void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results
 	zbx_free(port);
 }
 
-void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
+void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results)
 {
 	if (SUCCEED == is_snmp_type(items[0].type))
@@ -740,7 +740,7 @@ void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 		THIS_SHOULD_NEVER_HAPPEN;
 }
 
-void	clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
+void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
 {
 	int	i;
 
@@ -831,8 +831,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zbx_vector_ptr_create(&add_results);
 
-	prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
-	check_items(items, errcodes, num, results, &add_results);
+	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
+	zbx_check_items(items, errcodes, num, results, &add_results);
 
 	zbx_timespec(&timespec);
 
@@ -922,9 +922,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	}
 
 	zbx_preprocessor_flush();
-	clean_items(items, num, results);
+	zbx_clean_items(items, num, results);
 	DCconfig_clean_items(items, NULL, num);
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
+	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);

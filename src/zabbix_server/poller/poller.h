@@ -31,11 +31,10 @@ ZBX_THREAD_ENTRY(poller_thread, args);
 
 void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts);
 void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error);
-void	free_result_ptr(AGENT_RESULT *result);
-int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
-void	prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros);
-void	check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
+void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros);
+void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results);
-void	clean_items(DC_ITEM *items, int num, AGENT_RESULT *results);
+void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results);
+void	zbx_free_result_ptr(AGENT_RESULT *result);
 
 #endif

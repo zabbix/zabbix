@@ -180,13 +180,13 @@ int	zbx_ipmi_test_item(const DC_ITEM *item, char **info)
 			item->host.ipmi_authtype, item->host.ipmi_privilege, item->host.ipmi_username,
 			item->host.ipmi_password, item->ipmi_sensor, 0);
 
+	zbx_ipc_message_init(&message);
+
 	if (FAIL == zbx_ipc_socket_write(&ipmi_socket, ZBX_IPC_IPMI_TEST_ITEM_REQUEST, data, data_len))
 	{
 		*info = zbx_strdup(NULL, "cannot send script request message to IPMI service");
 		goto cleanup;
 	}
-
-	zbx_ipc_message_init(&message);
 
 	if (FAIL == zbx_ipc_socket_read(&ipmi_socket, &message))
 	{

@@ -313,12 +313,12 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 
 		zbx_vector_ptr_create(&add_results);
 
-		prepare_items(&item, &errcode, 1, &result, MACRO_EXPAND_NO);
+		zbx_prepare_items(&item, &errcode, 1, &result, MACRO_EXPAND_NO);
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
 
-		check_items(&item, &errcode, 1, &result, &add_results);
+		zbx_check_items(&item, &errcode, 1, &result, &add_results);
 
 		switch (errcode)
 		{
@@ -340,11 +340,11 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 					*info = zbx_strdup(NULL, *pvalue);
 		}
 
-		zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
+		zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
 		zbx_vector_ptr_destroy(&add_results);
 	}
 
-	clean_items(&item, 1, &result);
+	zbx_clean_items(&item, 1, &result);
 
 	zbx_free(item.params);
 	zbx_free(item.posts);
