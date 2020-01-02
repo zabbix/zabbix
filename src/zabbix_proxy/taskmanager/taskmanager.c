@@ -195,6 +195,16 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	return processed_num;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_execute_data                                                  *
+ *                                                                            *
+ * Purpose: process data task                                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the data task was executed                         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 {
 	DB_ROW			row;
@@ -224,7 +234,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 
 	if (ZBX_TM_DATA_TYPE_TEST_ITEM != atoi(row[2]))
 	{
-		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task");
+		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task.");
 		goto finish;
 	}
 

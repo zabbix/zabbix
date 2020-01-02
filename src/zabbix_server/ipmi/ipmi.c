@@ -158,6 +158,19 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ipmi_test_item                                               *
+ *                                                                            *
+ * Purpose: test IPMI item                                                    *
+ *                                                                            *
+ * Parameters: item - [IN] IPMI item                                          *
+ *             info - [OUT] result or error reason                            *
+ *                                                                            *
+ * Return value: SUCCEED - the test executed without errors                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_ipmi_test_item(const DC_ITEM *item, char **info)
 {
 	zbx_ipc_socket_t	ipmi_socket;

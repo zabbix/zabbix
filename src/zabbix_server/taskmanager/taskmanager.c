@@ -171,6 +171,13 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_expire_data                                                   *
+ *                                                                            *
+ * Purpose: process expired data task                                         *
+ *                                                                            *
+ ******************************************************************************/
 static void	tm_expire_data(zbx_uint64_t taskid)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
@@ -258,6 +265,13 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_process_data_result                                           *
+ *                                                                            *
+ * Purpose: process data task result                                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	tm_process_data_result(zbx_uint64_t taskid)
 {
 	DB_ROW		row;

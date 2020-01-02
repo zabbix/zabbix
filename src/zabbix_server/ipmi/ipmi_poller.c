@@ -89,6 +89,7 @@ static void	ipmi_poller_send_result(zbx_ipc_async_socket_t *socket, zbx_uint32_t
  *                                                                            *
  * Parameters: socket  - [IN] the connections socket                          *
  *             message - [IN] the value request message                       *
+ *             code    - [IN] the result message code                         *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zbx_ipc_message_t *message, int code)

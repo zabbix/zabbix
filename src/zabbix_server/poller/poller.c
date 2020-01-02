@@ -704,8 +704,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 	zbx_free(port);
 }
 
-void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results,
-		zbx_vector_ptr_t *add_results)
+void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results)
 {
 	if (SUCCEED == is_snmp_type(items[0].type))
 	{

@@ -888,13 +888,13 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
  *                                                                            *
  * Function: ipmi_manager_process_client_request                              *
  *                                                                            *
- * Purpose: forwards IPMI script request to the poller managing the specified *
- *          host                                                              *
+ * Purpose: forwards IPMI request to the poller managing the specified host   *
  *                                                                            *
  * Parameters: manager - [IN] the IPMI manager                                *
- *             client  - [IN] the client asking to execute IPMI script        *
- *             message - [IN] the script request message                      *
+ *             client  - [IN] the client asking to execute IPMI request       *
+ *             message - [IN] the request message                             *
  *             now     - [IN] the current time                                *
+ *             code    - [IN] the request message code                        *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_manager_process_client_request(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
@@ -919,13 +919,13 @@ static void	ipmi_manager_process_client_request(zbx_ipmi_manager_t *manager, zbx
  *                                                                            *
  * Function: ipmi_manager_process_client_result                               *
  *                                                                            *
- * Purpose: forwards command result as script result to the client that       *
- *          requested IPMI script execution                                   *
+ * Purpose: forwards result of request to the client                          *
  *                                                                            *
  * Parameters: manager - [IN] the IPMI manager                                *
  *             client  - [IN] the IPMI poller client                          *
  *             message - [IN] the command result message                      *
  *             now     - [IN] the current time                                *
+ *             code    - [IN] the result message code                         *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
