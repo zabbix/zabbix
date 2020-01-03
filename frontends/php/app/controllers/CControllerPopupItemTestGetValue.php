@@ -82,7 +82,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
+			$this->item_type = $this->hasInput('item_type');
 
 			/*
 			 * Check if key is not empty if 'get value from host' is checked and test is made for item with mandatory
@@ -90,6 +90,14 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			 */
 			if ($this->getInput('key', '') === '' && in_array($this->item_type, $this->item_types_has_key_mandatory)) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', _('cannot be empty')));
+				$ret = false;
+			}
+
+			/*
+			 * VMware simple checks are not supported.
+			 * This normally cannot be achieved from UI so no need for error message.
+			 */
+			if ($this->item_type == ITEM_TYPE_SIMPLE && substr($this->getInput('key', ''), 0, 7) === 'vmware.') {
 				$ret = false;
 			}
 
@@ -129,9 +137,6 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-		$this->item_type = $this->getInput('item_type');
-		$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
 		// Get post data for particular item type.
 		$data = $this->getItemTestProperties($this->getInputAll());

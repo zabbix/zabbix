@@ -129,6 +129,11 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$data = $this->getInput('data', []);
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
+		// VMware simple checks are not supported.
+		if ($this->item_type == ITEM_TYPE_SIMPLE && substr($this->getInput('key', ''), 0, 7) === 'vmware.') {
+			$this->is_item_testable = false;
+		}
+
 		// Work with preprocessing steps.
 		$preprocessing_steps = $this->getInput('steps', []);
 		$preprocessing_types = zbx_objectValues($preprocessing_steps, 'type');

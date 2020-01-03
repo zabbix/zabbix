@@ -230,6 +230,19 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		}
 	}
 
+	function updateItemTestBtn() {
+		var testable_item_types = <?= CJs::encodeJson(CControllerPopupItemTest::$testable_item_types) ?>,
+			type = parseInt(jQuery('#type').val()),
+			key = jQuery('#key').val();
+
+		if (type == <?= ITEM_TYPE_SIMPLE ?> && key.substr(0, 7) === 'vmware.') {
+			jQuery('#test_item').prop('disabled', true);
+		}
+		else {
+			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
+		}
+	}
+
 	jQuery(document).ready(function($) {
 		<?php
 		if (!empty($this->data['authTypeVisibility'])) { ?>
@@ -260,15 +273,14 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			], true) ?>);
 		}
 
+		$("#key").on('keyup change', updateItemTestBtn);
+
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?= CJs::encodeJson(itemTypeInterface()) ?>,
-					testable_item_types = <?= CJs::encodeJson(CControllerPopupItemTest::$testable_item_types) ?>,
-					type = parseInt($('#type').val());
+				var itemInterfaceTypes = <?= CJs::encodeJson(itemTypeInterface()) ?>;
 
-				$('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
-
+				updateItemTestBtn();
 				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())]);
 
 				setAuthTypeLabel();

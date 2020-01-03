@@ -108,7 +108,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$this->get_value_from_host = (bool) $this->getInput('get_value');
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
-			$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
 			$interface = $this->getInput('interface', []);
 			$steps = $this->getInput('steps', []);
@@ -123,6 +122,15 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			if ($this->get_value_from_host && $this->getInput('key', '') === ''
 					&& in_array($this->item_type, $this->item_types_has_key_mandatory)) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', _('cannot be empty')));
+				$ret = false;
+			}
+			/*
+			 * VMware simple checks are not supported.
+			 * This normally cannot be achieved from UI so no need for error message.
+			 */
+			elseif ($this->get_value_from_host && $this->item_type == ITEM_TYPE_SIMPLE
+					&& substr($this->getInput('key'), 0, 7) === 'vmware.') {
+				$this->get_value_from_host = false;
 				$ret = false;
 			}
 

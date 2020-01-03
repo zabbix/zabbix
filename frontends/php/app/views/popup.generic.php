@@ -358,6 +358,7 @@ switch ($data['popup_type']) {
 	case 'help_items':
 		foreach ($data['table_records'] as $item) {
 			$action = get_window_opener($options['dstfrm'], $options['dstfld1'], $item[$options['srcfld1']]);
+			$action .= 'updateItemTestBtn();';
 			$action .= $options['srcfld2']
 				? get_window_opener($options['dstfrm'], $options['dstfld2'], $item[$options['srcfld2']])
 				: '';
