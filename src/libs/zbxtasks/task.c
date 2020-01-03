@@ -1207,9 +1207,9 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tm_data_create                                               *
+ * Function: zbx_create_task_data                                             *
  *                                                                            *
- * Purpose: insert task and it's data in database                             *
+ * Purpose: insert task and its data in database                              *
  *                                                                            *
  * Parameters: data         - [IN] task data                                  *
  *             len          - [IN] length of data                             *
