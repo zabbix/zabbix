@@ -140,7 +140,6 @@ class CControllerPopupMaintenancePeriod extends CController {
 
 	protected function doAction() {
 		$data = [
-			'timeperiodid' =>		0,
 			'update' =>				0,
 			'timeperiod_type' => 	TIMEPERIOD_TYPE_ONETIME,
 			'every' =>				1,
