@@ -297,6 +297,9 @@ abstract class CControllerPopupItemTest extends CController {
 			elseif (array_key_exists('proxy_hostid', $input)) {
 				$data['proxy_hostid'] = $input['proxy_hostid'];
 			}
+			else {
+				$data['proxy_hostid'] = $this->host['proxy_hostid'];
+			}
 		}
 
 		switch ($this->item_type) {
