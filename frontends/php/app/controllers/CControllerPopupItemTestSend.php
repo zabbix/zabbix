@@ -219,7 +219,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		// Define values used to test preprocessing steps.
 		$preproc_test_data = [
 			'value' => $this->getInput('value', ''),
-			'value_type' => $this->getInput('value_type', ITEM_VALUE_TYPE_STR),
 			'steps' => $this->getInput('steps', []), // Steps can be empty to test value convertation.
 			'single' => !$this->show_final_result
 		];
@@ -261,6 +260,18 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				'item_type' => 'type'
 			]);
 
+			if (array_key_exists('headers', $item_test_data)) {
+				$item_test_data['headers'] = $this->transformHeaderFields($item_test_data['headers']);
+			}
+
+			if (array_key_exists('query_fields', $item_test_data)) {
+				$item_test_data['query_fields'] = $this->transformQueryFields($item_test_data['query_fields']);
+			}
+
+			if ($this->item_type != ITEM_TYPE_AGGREGATE && $this->item_type != ITEM_TYPE_CALCULATED) {
+				unset($item_test_data['value_type']);
+			}
+
 			// Send test to be executed on Zabbix server.
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
 			$result = $server->testItem($item_test_data, get_cookie('zbx_sessionid'));
@@ -300,6 +311,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		$this->eol = parent::getInput('eol', ZBX_EOL_LF);
 
 		if (!array_key_exists('messages', $output)) {
+			$preproc_test_data['value_type'] = $this->getInput('value_type', ITEM_VALUE_TYPE_STR);
+
 			$preproc_test_data['steps'] = $this->resolvePreprocessingStepMacros($preproc_test_data['steps']);
 
 			// Send test details to Zabbix server.
