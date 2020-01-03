@@ -214,6 +214,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
+		$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
+
 		// Define values used to test preprocessing steps.
 		$preproc_test_data = [
 			'value' => $this->getInput('value', ''),

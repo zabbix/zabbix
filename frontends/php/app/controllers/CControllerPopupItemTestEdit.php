@@ -125,16 +125,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 	}
 
 	protected function doAction() {
-		// Get item and host properties and values from cache.
-		$data = $this->getInput('data', []);
-		$inputs = $this->getItemTestProperties($this->getInputAll());
-
 		// VMware and icmpping simple checks are not supported.
 		$key = $this->getInput('key');
 		if ($this->item_type == ITEM_TYPE_SIMPLE
 				&& (substr($key, 0, 7) === 'vmware.' || substr($key, 0, 8) === 'icmpping')) {
 			$this->is_item_testable = false;
 		}
+
+		// Get item and host properties and values from cache.
+		$data = $this->getInput('data', []);
+		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
 		$preprocessing_steps = $this->getInput('steps', []);

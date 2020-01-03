@@ -140,6 +140,9 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
+		// Used by getItemTestProperties.
+		$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
+
 		// Get post data for particular item type.
 		$data = $this->getItemTestProperties($this->getInputAll());
 
