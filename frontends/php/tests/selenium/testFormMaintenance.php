@@ -76,7 +76,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->assertRegexp('/Monday/', $text);
 		$this->assertRegexp('/Sunday/', $text);
 
-		// Add "Monthly" maintenace period with "January" and "November".
+		// Add "Monthly" maintenance period with "January" and "November".
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Monthly');

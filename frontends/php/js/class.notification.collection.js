@@ -117,7 +117,7 @@ ZBX_NotificationCollection.prototype.consumeList = function(list) {
 };
 
 /**
- * Creates detatched DOM nodes.
+ * Creates detached DOM nodes.
  */
 ZBX_NotificationCollection.prototype.makeNodes = function() {
 	var header = document.createElement('div'),

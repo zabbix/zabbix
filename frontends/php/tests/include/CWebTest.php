@@ -43,9 +43,9 @@ class CWebTest extends CTest {
 
 	// Shared page instance.
 	private static $shared_page = null;
-	// Enable supressing of browser errors on test case level.
+	// Enable suppressing of browser errors on test case level.
 	private $supress_case_errors = false;
-	// Enable supressing of browser errors on test suite level.
+	// Enable suppressing of browser errors on test suite level.
 	private static $supress_suite_errors = false;
 
 	// Instance of web page.
@@ -133,7 +133,7 @@ class CWebTest extends CTest {
 		// Test suite level annotations.
 		$class_annotations = $this->getAnnotationsByType($this->annotations, 'class');
 
-		// Supress browser error on a test case level.
+		// Suppress browser error on a test case level.
 		$supress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignore-browser-errors');
 		self::$supress_suite_errors = ($supress_suite_errors !== null);
 	}
@@ -156,12 +156,12 @@ class CWebTest extends CTest {
 		// Test case level annotations.
 		$method_annotations = $this->getAnnotationsByType($this->annotations, 'method');
 		if ($method_annotations !== null) {
-			// Supress browser error on a test case level.
+			// Suppress browser error on a test case level.
 			$supress_case_errors = $this->getAnnotationsByType($method_annotations, 'ignore-browser-errors');
 			$this->supress_case_errors = ($supress_case_errors !== null);
 		}
 
-		// Errors on a test case level should be supressed if suite level error supression is enabled.
+		// Errors on a test case level should be suppressed if suite level error suppression is enabled.
 		if (self::$supress_suite_errors) {
 			$this->supress_case_errors = self::$supress_suite_errors;
 		}

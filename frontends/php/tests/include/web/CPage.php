@@ -99,7 +99,7 @@ class CPage {
 		$this->driver->manage()->deleteAllCookies();
 		try {
 			$this->driver->executeScript('sessionStorage.clear();');
-		} catch (Exception $exeption) {
+		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
 

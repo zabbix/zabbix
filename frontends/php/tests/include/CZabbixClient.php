@@ -35,7 +35,7 @@ class CZabbixClient extends CZabbixServer {
 	 * @inheritdoc
 	 */
 	protected function normalizeResponse(array &$response) {
-		// Responces for item data requests contain success status without data.
+		// Response for item data requests contain success status without data.
 		if (array_key_exists('response', $response) && $response['response'] === self::RESPONSE_SUCCESS
 				&& !array_key_exists('data', $response) && array_key_exists('info', $response)) {
 			$response['data'] = $response['info'];

@@ -1199,7 +1199,7 @@ class testWebScenario extends CAPITest {
 				'httptest' => ['15003', '15003'],
 				'expected_error' => 'Invalid parameter "/2": value (15003) already exists.'
 			],
-			// Try to delet templated web scenario.
+			// Try to delete templated web scenario.
 			[
 				'httptest' => ['15007'],
 				'expected_error' => 'Cannot delete templated web scenario "Api templated web scenario".'

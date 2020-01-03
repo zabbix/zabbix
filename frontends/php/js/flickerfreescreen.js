@@ -425,7 +425,7 @@
 		},
 
 		/**
-		 * Getting shadow box height of graph image, asynchronious. Only for line graphs on dashboard.
+		 * Getting shadow box height of graph image, asynchronous. Only for line graphs on dashboard.
 		 * Will return xhr request for line graphs.
 		 *
 		 * @param {Curl}     url  Curl object for image request.

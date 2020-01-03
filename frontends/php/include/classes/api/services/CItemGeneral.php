@@ -2041,7 +2041,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate depth and ammount of elements in the tree of the dependent items.
+	 * Validate depth and amount of elements in the tree of the dependent items.
 	 *
 	 * @param array  $dependent_items
 	 * @param string $dependent_items[<master_itemid>][]  List if the dependent item IDs ("false" for new items)
