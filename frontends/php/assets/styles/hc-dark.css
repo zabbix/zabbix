@@ -3159,7 +3159,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
-    z-index: 1000; }
+    z-index: 2; }
   .overlay-dialogue .list-table {
     white-space: normal;
     border: none; }
@@ -4303,7 +4303,7 @@ a.link-action {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 2; }
+    z-index: 3; }
   .is-loading:after {
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;

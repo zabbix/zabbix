@@ -4654,7 +4654,7 @@ $form-icon-btn: (
 		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
-		z-index: 1000;
+		z-index: 2;
 	}
 
 	.list-table {
@@ -6254,8 +6254,7 @@ a.overlay-close-btn {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		// z-index is increased up till value used in ".radio-list-control". There focused outline is brought in front.
-		z-index: 2;
+		z-index: 3;
 	}
 
 	&:after {
