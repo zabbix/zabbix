@@ -125,11 +125,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				$ret = false;
 			}
 			/*
-			 * VMware simple checks are not supported.
+			 * VMware and icmpping simple checks are not supported.
 			 * This normally cannot be achieved from UI so no need for error message.
 			 */
 			elseif ($this->get_value_from_host && $this->item_type == ITEM_TYPE_SIMPLE
-					&& substr($this->getInput('key'), 0, 7) === 'vmware.') {
+					&& (substr($this->getInput('key'), 0, 7) === 'vmware.'
+						|| substr($this->getInput('key'), 0, 8) === 'icmpping')
+					) {
 				$this->get_value_from_host = false;
 				$ret = false;
 			}

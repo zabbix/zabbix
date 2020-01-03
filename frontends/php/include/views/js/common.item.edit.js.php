@@ -235,7 +235,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			type = parseInt(jQuery('#type').val()),
 			key = jQuery('#key').val();
 
-		if (type == <?= ITEM_TYPE_SIMPLE ?> && key.substr(0, 7) === 'vmware.') {
+		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
 			jQuery('#test_item').prop('disabled', true);
 		}
 		else {

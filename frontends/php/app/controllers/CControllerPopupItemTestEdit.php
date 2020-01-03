@@ -129,8 +129,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$data = $this->getInput('data', []);
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
-		// VMware simple checks are not supported.
-		if ($this->item_type == ITEM_TYPE_SIMPLE && substr($this->getInput('key', ''), 0, 7) === 'vmware.') {
+		// VMware and icmpping simple checks are not supported.
+		$key = $this->getInput('key');
+		if ($this->item_type == ITEM_TYPE_SIMPLE
+				&& (substr($key, 0, 7) === 'vmware.' || substr($key, 0, 8) === 'icmpping')) {
 			$this->is_item_testable = false;
 		}
 

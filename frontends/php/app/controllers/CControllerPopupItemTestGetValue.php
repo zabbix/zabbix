@@ -94,10 +94,12 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			}
 
 			/*
-			 * VMware simple checks are not supported.
+			 * VMware and icmpping simple checks are not supported.
 			 * This normally cannot be achieved from UI so no need for error message.
 			 */
-			if ($this->item_type == ITEM_TYPE_SIMPLE && substr($this->getInput('key', ''), 0, 7) === 'vmware.') {
+			$key = $this->getInput('key');
+			if ($this->item_type == ITEM_TYPE_SIMPLE
+					&& (substr($key, 0, 7) === 'vmware.' || substr($key, 0, 8) === 'icmpping')) {
 				$ret = false;
 			}
 
