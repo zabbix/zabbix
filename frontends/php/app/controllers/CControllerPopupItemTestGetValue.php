@@ -82,7 +82,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$this->item_type = $this->hasInput('item_type');
+			$this->item_type = $this->getInput('item_type');
 
 			/*
 			 * Check if key is not empty if 'get value from host' is checked and test is made for item with mandatory
