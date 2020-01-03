@@ -50,7 +50,11 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_dashboards'))
 				->onClick("checkAll('".$form->getName()."', 'all_dashboards', 'dashboardids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'])
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.list')
+				->getUrl()
+		)
 	]);
 
 $url = (new CUrl('zabbix.php'))
