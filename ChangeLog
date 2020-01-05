@@ -163,8 +163,14 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 Changes for 4.4.5rc1
 
 New features:
+..F....... [ZBXNEXT-5473] reworked template linking with Multiselect and loading macro list with AJAX (averza, Ivo, vmurzins)
 
 Bug fixes:
+..F....... [ZBX-16481] fixed spelling issues in the code (miks)
+.......... [ZBX-1977] reverted fix for axis labels calculation (rlataria)
+..F....... [ZBX-16894] fixed dynamic rows losing old input at form error (talbergs)
+..F....... [ZBX-17019] fixed aria-live message partially visible beneath multiselect controls (averza)
+........S. [ZBX-16966] fixed not operator in correlation function expression (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.4
