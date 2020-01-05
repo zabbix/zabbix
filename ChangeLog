@@ -1149,6 +1149,10 @@ Changes for 4.0.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-16481] fixed spelling issues in the code (miks)
+.......... [ZBX-1977] reverted fix for axis labels calculation (rlataria)
+..F....... [ZBX-16894] fixed dynamic rows losing old input at form error (talbergs)
+........S. [ZBX-16966] fixed not operator in correlation function expression (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.16
