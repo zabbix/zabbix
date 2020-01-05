@@ -1,6 +1,7 @@
 Changes for 5.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-5473] reworked template linking with Multiselect and loading macro list with AJAX (averza, Ivo, vmurzins)
 A......... [ZBXNEXT-1898] implemented strong cryptography for encoding frontend passwords (vasilijs)
 A.F.I..PS. [ZBXNEXT-5592] dropped IBM DB2 database support for Zabbix server (talbergs, viktors)
 .........T [ZBXNEXT-5623] added Pushover webhook integration (vitaly)
@@ -32,6 +33,11 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
+..F....... [ZBX-16481] fixed spelling issues in the code (miks)
+..F....... [ZBX-16894] fixed dynamic rows losing old input at form error (talbergs)
+..F....... [ZBX-17066] fixed wrongly positioned context menu when launched by keyboard (averza)
+..F....... [ZBX-17019] fixed aria-live message partially visible beneath multiselect controls (averza)
+........S. [ZBX-16966] fixed not operator in correlation function expression (atumilovics)
 ..F....... [ZBX-17101] fixed url validation before output (miks)
 ...G...... [ZBX-17070] fixed agent2 plugin configuration not being called if no plugin specific parameters are set (wiper)
 ........S. [ZBX-17062] fixed LLD macro substitution when PostgrSQL is used (viktors)
