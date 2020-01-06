@@ -327,7 +327,8 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var overlay = overlays_stack.getById(dialogueid);
 	if (!overlay) {
 		var generic_actions = ['popup.generic', 'popup.scriptexec', 'dashboard.share.edit', 'dashboard.properties.edit',
-				'popup.services', 'popup.media'
+				'popup.services', 'popup.media', 'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep',
+				'popup.testtriggerexpr', 'popup.triggerwizard'
 			],
 			dialogue_class = generic_actions.indexOf(action) !== -1 ? ' modal-popup-generic' : '';
 

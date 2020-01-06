@@ -4347,7 +4347,7 @@ td[class] + td.disaster-bg {
     border: 2px solid #ccd5d9;
     border-bottom-color: #0275b8;
     animation: is-loading-kf 0.6s infinite linear;
-    z-index: 2;
+    z-index: 3;
     content: ''; }
   .is-loading.is-loading-fadein:before {
     opacity: 0;

@@ -6272,7 +6272,7 @@ a.overlay-close-btn {
 		border: 2px solid $preloader-color;
 		border-bottom-color: $preloader-accent-color;
 		animation: is-loading-kf 0.6s infinite linear;
-		z-index: 2;
+		z-index: 3;
 		content: '';
 	}
 
