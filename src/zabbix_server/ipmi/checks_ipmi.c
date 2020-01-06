@@ -1877,11 +1877,16 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			{
 				if (0 != (state & (1 << j)))
 				{
-					if (0 < offset)
-						offset += zbx_snprintf(state_name + offset,
-								sizeof(state_name) - offset,", ");
-					offset += zbx_snprintf(state_name + offset, sizeof(state_name) - offset,"%s",
-							ipmi_sensor_reading_name_string(h->sensors[i].sensor, j));
+					const char *p;
+
+					if (NULL != (p = ipmi_sensor_reading_name_string(h->sensors[i].sensor, j)))
+					{
+						if (0 < offset)
+							offset += zbx_snprintf(state_name + offset,
+									sizeof(state_name) - offset,", ");
+						offset += zbx_snprintf(state_name + offset, sizeof(state_name) - offset,
+								"%s", p);
+					}
 				}
 			}
 
