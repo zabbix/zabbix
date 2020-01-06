@@ -53,57 +53,26 @@ class testItemState extends CIntegrationTest {
 	private static $scenarios = [
 		[
 			'name' => 'zbx_psv_01',
-			'delay_s' => 7,
-			'refresh_unsupported' => 10,
+			'delay_s' => 5,
+			'refresh_unsupported' => 8,
 			'after_sync' => false
 		],
 		[
 			'name' => 'zbx_psv_01',
-			'delay_s' => 17,
-			'refresh_unsupported' => 10,
+			'delay_s' => 8,
+			'refresh_unsupported' => 5,
 			'after_sync' => false
 		],
 		[
 			'name' => 'zbx_psv_01',
-			'delay_s' => 7,
-			'refresh_unsupported' => 10,
-			'after_sync' => true
-		],
-		[
-			'name' => 'zbx_psv_01',
-			'delay_s' => 17,
-			'refresh_unsupported' => 10,
+			'delay_s' => 5,
+			'refresh_unsupported' => 8,
 			'after_sync' => true
 		],
 		[
 			'name' => 'zbx_act_01',
-			'delay_s' => 10,
-			'refresh_unsupported' => 90
-		],
-		[
-			'name' => 'zbx_act_01',
-			'delay_s' => 90,
-			'refresh_unsupported' => 10
-		],
-		[
-			'name' => 'zbx_act_01',
-			'delay_s' => 10,
-			'refresh_unsupported' => 20
-		],
-		[
-			'name' => 'zbx_act_01',
-			'delay_s' => 10,
-			'refresh_unsupported' => 50
-		],
-		[
-			'name' => 'zbx_act_01',
-			'delay_s' => 40,
-			'refresh_unsupported' => 20
-		],
-		[
-			'name' => 'zbx_act_01',
-			'delay_s' => 40,
-			'refresh_unsupported' => 60
+			'delay_s' => 5,
+			'refresh_unsupported' => 65
 		]
 	];
 
