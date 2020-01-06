@@ -7177,6 +7177,14 @@ svg {
 	}
 }
 
+:-ms-input-placeholder {
+	color: $input-placeholder-color !important;
+}
+
+::-ms-input-placeholder {
+	color: $input-placeholder-color;
+}
+
 :placeholder-shown {
 	color: $input-placeholder-color;
 }
@@ -7233,68 +7241,91 @@ svg {
 .icon-action-command::before {
 	background-position: -249px -245px;
 }
+
 .icon-action-close::before {
 	background-position: -224px -245px;
 }
+
 .icon-action-msg::before {
 	background-position: -299px -245px;
 }
+
 .icon-action-severity-up::before {
 	background-position: -349px -245px;
 }
+
 .icon-action-severity-down::before {
 	background-position: -374px -245px;
 }
+
 .icon-action-severity-changed::before {
 	background-position: -399px -245px;
 }
+
 .icon-action-message::before {
 	background-position: -199px -245px;
 }
+
 .icon-action-ack::before {
 	background-position: -323px -245px;
 }
+
 .icon-invisible::before {
 	background-position: -89px -803px;
 }
+
 .icon-problem-generated::before {
 	background-position: -449px -245px;
 }
+
 .icon-problem-recovery::before {
 	background-position: -424px -245px;
 }
+
 .icon-action-msgs {
+
 	&[data-count]::after {
 		color: $ui-bg-color;
 	}
+
 	&::before {
 		background-position: -474px -245px;
 	}
 }
+
 .icon-actions-number-gray {
+
 	&[data-count]::after {
 		color: $font-color;
 	}
+
 	&::before {
 		background-position: -499px -245px;
 	}
 }
+
 .icon-actions-number-yellow {
+
 	&[data-count]::after {
 		color: $font-color;
 	}
+
 	&::before {
 		background-position: -549px -245px;
 	}
 }
+
 .icon-actions-number-red {
+
 	&[data-count]::after {
 		color: $font-color;
 	}
+
 	&::before {
 		background-position: -524px -245px;
 	}
 }
+
 .icon-description {
 	margin: 0 0 0 5px;
 
@@ -7302,6 +7333,7 @@ svg {
 		content: '?';
 		color: $ui-bg-color;
 	}
+
 	&::before {
 		background-position: -474px -245px;
 	}
