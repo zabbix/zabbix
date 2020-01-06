@@ -126,4 +126,4 @@ if ($data['source'] === 'trigger' || $data['source'] === 'trigger_prototype') {
 
 $tags_form_list->addRow(null, $table);
 
-return $tags_form_list;
+$tags_form_list->show();

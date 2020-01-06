@@ -20,7 +20,7 @@
 
 
 $output = [
-	'body' => (new CView('hostmacros.list.html', $data))->getOutput()
+	'body' => (new CPartial('hostmacros.list.html', $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -28,7 +28,10 @@ if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	CProfiler::getInstance()->show();
-	makeDebugButton()->show();
+
+	(new CButton(null))
+		->addClass(ZBX_STYLE_BTN_DEBUG)
+		->show();
 }
 
 insertPagePostJs();

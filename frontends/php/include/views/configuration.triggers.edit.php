@@ -555,16 +555,15 @@ if (!$data['form_refresh']) {
 }
 $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
 
-/*
- * Tags tab
- */
-$tags_view = new CView('configuration.tags.tab', [
-	'source' => 'trigger',
-	'tags' => $data['tags'],
-	'show_inherited_tags' => $data['show_inherited_tags'],
-	'readonly' => $discovered_trigger
-]);
-$triggersTab->addTab('tags-tab', _('Tags'), $tags_view->render());
+// tags
+$triggersTab->addTab('tags-tab', _('Tags'), new CObject(
+	(new CPartial('configuration.tags.tab', [
+		'source' => 'trigger',
+		'tags' => $data['tags'],
+		'show_inherited_tags' => $data['show_inherited_tags'],
+		'readonly' => $discovered_trigger
+	]))->getOutput()
+));
 
 /*
  * Dependencies tab

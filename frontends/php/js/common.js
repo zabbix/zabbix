@@ -777,23 +777,6 @@ function showHideVisible(obj) {
 	}
 }
 
-function showHideByName(name, style) {
-	if (typeof(style) == 'undefined') {
-		style = 'none';
-	}
-
-	var objs = $$('[name=' + name + ']');
-
-	if (empty(objs)) {
-		throw 'showHideByName(): Object not found.';
-	}
-
-	for (var i = 0; i < objs.length; i++) {
-		var obj = objs[i];
-		obj.style.display = style;
-	}
-}
-
 /**
  * Switch element classes and return final class.
  *

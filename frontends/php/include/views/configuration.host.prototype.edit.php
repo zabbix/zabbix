@@ -347,7 +347,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 				->addValue(_('Inherited and host macros'), 1)
 				->setModern(true)
 			)
-			->addRow(null, new CObject((new CView('hostmacros.list.html', [
+			->addRow(null, new CObject((new CPartial('hostmacros.list.html', [
 				'macros' => $data['macros'],
 				'show_inherited_macros' => $data['show_inherited_macros'],
 				'readonly' => $data['readonly']

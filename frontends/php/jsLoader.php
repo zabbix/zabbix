@@ -300,6 +300,10 @@ $tranStrings = [
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
 		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
 	],
+	'init.js' => [
+		'Debug' => _('Debug'),
+		'Hide debug' => _('Hide debug')
+	],
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found')

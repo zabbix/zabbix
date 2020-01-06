@@ -211,4 +211,4 @@ else {
 	}
 }
 
-echo $table;
+$table->show();

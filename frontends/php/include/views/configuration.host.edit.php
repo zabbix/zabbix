@@ -686,21 +686,18 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 		)
 );
 
-/*
- * Tags
- */
+// tags
 if (!$data['readonly']) {
-	$tags_view = new CView('configuration.tags.tab', [
-		'source' => 'host',
-		'tags' => $data['tags'],
-		'readonly' => false
-	]);
-	$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
+	$divTabs->addTab('tags-tab', _('Tags'), new CObject(
+		(new CPartial('configuration.tags.tab', [
+			'source' => 'host',
+			'tags' => $data['tags'],
+			'readonly' => false
+		]))->getOutput()
+	));
 }
 
-/*
- * Macros
- */
+// macros
 $divTabs->addTab('macroTab', _('Macros'),
 	(new CFormList('macrosFormList'))
 		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
@@ -708,7 +705,7 @@ $divTabs->addTab('macroTab', _('Macros'),
 			->addValue(_('Inherited and host macros'), 1)
 			->setModern(true)
 		)
-		->addRow(null, new CObject((new CView('hostmacros.list.html', [
+		->addRow(null, new CObject((new CPartial('hostmacros.list.html', [
 			'macros' => $data['macros'],
 			'show_inherited_macros' => $data['show_inherited_macros'],
 			'readonly' => $data['readonly']

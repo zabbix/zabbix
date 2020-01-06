@@ -124,28 +124,26 @@ $widget = (new CWidget())
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	// filter
-	$filter = $data['filter'];
-	$filterFormView = new CView('common.filter.trigger', [
-		'filter' => [
-			'showTriggers' => $filter['showTriggers'],
-			'ackStatus' => $filter['ackStatus'],
-			'showSeverity' => $filter['showSeverity'],
-			'statusChange' => $filter['statusChange'],
-			'statusChangeDays' => $filter['statusChangeDays'],
-			'txtSelect' => $filter['txtSelect'],
-			'application' => $filter['application'],
-			'inventory' => $filter['inventory'],
-			'show_suppressed' => $filter['show_suppressed'],
-			'hostId' => $data['hostid'],
-			'groupId' => $data['groupid']
-		],
-		'config' => $data['config'],
-		'profileIdx' => $data['profileIdx'],
-		'active_tab' => $data['active_tab']
-	]);
-	$filterForm = $filterFormView->render();
-
-	$widget->addItem($filterForm);
+	$widget->addItem(new CObject(
+		(new CPartial('common.filter.trigger', [
+			'filter' => [
+				'showTriggers' => $data['filter']['showTriggers'],
+				'ackStatus' => $data['filter']['ackStatus'],
+				'showSeverity' => $data['filter']['showSeverity'],
+				'statusChange' => $data['filter']['statusChange'],
+				'statusChangeDays' => $data['filter']['statusChangeDays'],
+				'txtSelect' => $data['filter']['txtSelect'],
+				'application' => $data['filter']['application'],
+				'inventory' => $data['filter']['inventory'],
+				'show_suppressed' => $data['filter']['show_suppressed'],
+				'hostId' => $data['hostid'],
+				'groupId' => $data['groupid']
+			],
+			'config' => $data['config'],
+			'profileIdx' => $data['profileIdx'],
+			'active_tab' => $data['active_tab']
+		]))->getOutput()
+	));
 }
 
 // data table

@@ -251,7 +251,7 @@ if ($page['type'] == PAGE_TYPE_HTML && (CSession::keyExists('messageOk') || CSes
 }
 
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
-	$pageMenu = new CView('layout.htmlpage.menu', [
+	$page_menu = new CPartial('layout.htmlpage.menu', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 		'menu' => [
 			'main_menu' => $main_menu,
@@ -266,7 +266,7 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORM
 		],
 		'support_url' => getSupportUrl(CWebUser::getLang())
 	]);
-	echo $pageMenu->getOutput();
+	echo $page_menu->getOutput();
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {

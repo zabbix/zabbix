@@ -2483,8 +2483,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .dashbrd-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: none; }
   .dashbrd-grid-widget-content .debug-output {
-    margin: 10px 10px 0 10px;
-    max-height: 300px;
+    max-height: none;
     border-color: #888; }
   .dashbrd-grid-widget-content .msg-bad,
   .dashbrd-grid-widget-content .msg-good,
@@ -2946,7 +2945,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .dashbrd-widget .list-table tbody tr:last-child td {
       border-bottom: 1px solid #888; }
   .dashbrd-widget .debug-output {
-    margin: 10px 10px 0 10px;
     max-height: 300px;
     border-color: #888; }
   .dashbrd-widget .msg-bad,
@@ -3642,22 +3640,35 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: none;
   max-height: 600px;
   overflow-y: auto;
-  padding: 11px;
-  margin: 10px 13px 0 13px;
-  background-color: #f4f4f4 !important;
+  padding: 10px;
+  margin: 10px;
+  background-color: #f4f4f4;
   border: 1px solid #9f9f9f; }
 
 .btn-debug {
   position: fixed;
-  bottom: 13px;
-  right: 13px;
+  bottom: 10px;
+  right: 15px;
   z-index: 15000;
-  padding: 4px 11px;
-  border: 1px solid #9f9f9f;
-  background-color: rgba(255, 255, 255, 0.8);
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px; }
+  color: #333;
+  background-color: #fff;
+  border-color: #888;
+  opacity: 0;
+  transition: opacity .2s ease-out; }
+  .btn-debug.visible {
+    opacity: 0.75; }
+  .btn-debug:hover {
+    color: #333;
+    background-color: #f4f4f4;
+    border-color: #888; }
+  .btn-debug:focus {
+    color: #333;
+    background-color: #f4f4f4;
+    border-color: #000; }
+  .btn-debug:active {
+    color: #333;
+    background-color: #f4f4f4;
+    border-color: #000; }
 
 .overlay-descr {
   max-height: 150px;
