@@ -165,6 +165,23 @@ Overlay.prototype.containFocus = function() {
 };
 
 /**
+ * Sets dialogue in loading sate.
+ */
+Overlay.prototype.setLoading = function() {
+	this.$dialogue.$body.addClass('is-loading');
+	this.$dialogue.$controls.find('select').prop('disabled', true);
+	this.$btn_submit && this.$btn_submit.prop('disabled', true);
+}
+
+/**
+ * Sets dialogue in idle sate.
+ */
+Overlay.prototype.unsetLoading = function() {
+		this.$dialogue.$body.removeClass('is-loading');
+		this.$btn_submit && this.$btn_submit.prop('disabled', false);
+}
+
+/**
  * @param {string} action
  * @param {array|object} options (optional)
  *
@@ -178,10 +195,7 @@ Overlay.prototype.load = function(action, options) {
 		this.xhr.abort();
 	}
 
-	this.$dialogue.$body.addClass('is-loading');
-	this.$dialogue.$controls.find('select').prop('disabled', true);
-	this.$btn_submit && this.$btn_submit.prop('disabled', true);
-
+	this.setLoading();
 	this.xhr = jQuery.ajax({
 		url: url.getUrl(),
 		type: 'post',
@@ -190,8 +204,7 @@ Overlay.prototype.load = function(action, options) {
 	});
 
 	this.xhr.always(function() {
-		this.$dialogue.$body.removeClass('is-loading');
-		this.$btn_submit && this.$btn_submit.prop('disabled', false);
+		this.unsetLoading();
 	}.bind(this));
 
 	return this.xhr;
@@ -242,7 +255,7 @@ Overlay.prototype.makeButton = function(obj) {
 	});
 
 	$button.on('click', function(e) {
-		if (obj.action && obj.action() !== false) {
+		if (obj.action && obj.action(this) !== false) {
 			this.cancel_action = null;
 
 			if (!obj.keepOpen) {
@@ -277,7 +290,7 @@ Overlay.prototype.makeButtons = function(arr) {
 
 	arr.forEach(function(obj) {
 		if (typeof obj.action === 'string') {
-			obj.action = new Function(obj.action);
+			obj.action = new Function('overlay', obj.action);
 		}
 
 		var $button = this.makeButton(obj);

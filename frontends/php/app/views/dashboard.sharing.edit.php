@@ -99,7 +99,7 @@ $output = [
 		[
 			'title' => _('Update'),
 			'isSubmit' => true,
-			'action' => 'return dashbrdConfirmSharing();'
+			'action' => 'return dashbrdConfirmSharing(overlay);'
 		]
 	]
 ];

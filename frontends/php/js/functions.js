@@ -509,7 +509,7 @@ function overlayDialogueDestroy(dialogueid) {
  * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
  * @param {object} trigger_elmnt                (optional)  UI element which triggered opening of overlay dialogue.
  *
- * @return {bool}
+ * @return {Overlay}
  */
 function overlayDialogue(params, trigger_elmnt) {
 	params.element = params.element || trigger_elmnt;

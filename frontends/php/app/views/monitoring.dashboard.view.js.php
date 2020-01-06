@@ -104,17 +104,24 @@
 		});
 	}
 
-	function dashbrdConfirmSharing() {
-		var form = jQuery('[name=dashboard_sharing_form]'),
+	/**
+	 * @param {Overlay} overlay
+	 */
+	function dashbrdConfirmSharing(overlay) {
+		var form = overlay.$dialogue.find('form'),
 			url = new Curl('zabbix.php', false);
 
 		url.setArgument('action', 'dashboard.share.update');
 
-		jQuery.ajax({
+		overlay.setLoading();
+		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
 			data: form.serializeJSON(),
 			dataType: 'json',
 			method: 'POST',
+			complete: function() {
+				overlay.unsetLoading(overlay)
+			},
 			success: function (response) {
 				var errors = [],
 					messages = [];
