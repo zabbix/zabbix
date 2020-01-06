@@ -227,7 +227,6 @@ static int	DBpatch_4050014(void)
 						"Problem name: {EVENT.NAME}\n"
 						"Host: {HOST.NAME}\n"
 						"Severity: {EVENT.SEVERITY}\n"
-						"\n"
 						"Original problem ID: {EVENT.ID}\n"
 						"{TRIGGER.URL}"
 						,
@@ -236,7 +235,7 @@ static int	DBpatch_4050014(void)
 						"<b>Problem name:</b> {EVENT.NAME}<br>"
 						"<b>Host:</b> {HOST.NAME}<br>"
 						"<b>Severity:</b> {EVENT.SEVERITY}<br>"
-						"<br><b>Original problem ID:</b> {EVENT.ID}<br>"
+						"<b>Original problem ID:</b> {EVENT.ID}<br>"
 						"{TRIGGER.URL}"
 						,
 						"RESOLVED: {EVENT.NAME}\n"
