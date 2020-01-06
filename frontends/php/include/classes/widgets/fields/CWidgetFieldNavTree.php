@@ -107,22 +107,21 @@ class CWidgetFieldNavTree extends CWidgetField {
 		unset($navtree_item);
 
 		// Find and fix circular dependencies.
-		foreach ($navtree_items as $fieldid => &$navtree_item) {
+		foreach ($navtree_items as $fieldid => $navtree_item) {
 			$parentid = $navtree_item['parent'];
+			$parentids = [$parentid => true];
 
 			while ($parentid != 0) {
-				if ($parentid == $fieldid) {
+				if (array_key_exists($navtree_items[$parentid]['parent'], $parentids)) {
 					$errors[] = _s('Incorrect value for field "%1$s": %2$s.',
-						'navtree.parent.'.$fieldid, _('circular dependency is not allowed')
+						'navtree.parent.'.$parentid, _('circular dependency is not allowed')
 					);
-					$navtree_item['parent'] = 0;
-					break;
+					$navtree_items[$parentid]['parent'] = 0;
 				}
 
 				$parentid = $navtree_items[$parentid]['parent'];
 			}
 		}
-		unset($navtree_item);
 
 		return $navtree_items;
 	}
