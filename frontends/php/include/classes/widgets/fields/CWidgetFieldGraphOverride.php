@@ -51,6 +51,21 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	}
 
 	/**
+	 * Set field values for the overrides.
+	 *
+	 * @return $this
+	 */
+	public function setValue($value) {
+		$overrides = [];
+
+		foreach ((array) $value as $override) {
+			$overrides[] = $override + self::getDefaults();
+		}
+
+		return parent::setValue($overrides);
+	}
+
+	/**
 	 * Set additional flags, which can be used in configuration form.
 	 *
 	 * @param int $flags
