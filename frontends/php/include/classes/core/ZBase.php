@@ -53,16 +53,17 @@ class ZBase {
 	/**
 	 * @var CComponentRegistry
 	 */
-	protected static $component_registry;
+	private $component_registry;
 
 	/**
-	 * Getter for component registry instance.
-	 *
-	 * @return CComponentRegistry
+	 * @var CModuleManager
 	 */
-	public static function Component() {
-		return self::$component_registry;
-	}
+	private $module_manager;
+
+	/**
+	 * @var CModule
+	 */
+	private $action_module;
 
 	/**
 	 * Returns the current instance of APP.
@@ -80,6 +81,24 @@ class ZBase {
 	}
 
 	/**
+	 * Getter for component registry instance.
+	 *
+	 * @return CComponentRegistry
+	 */
+	public static function Component() {
+		return self::getInstance()->component_registry;
+	}
+
+	/**
+	 * Getter for component registry instance.
+	 *
+	 * @return CModuleManager
+	 */
+	public static function ModuleManager() {
+		return self::getInstance()->module_manager;
+	}
+
+	/**
 	 * Init modules required to run frontend.
 	 */
 	protected function init() {
@@ -90,7 +109,7 @@ class ZBase {
 		$autoloader->addNamespace('', $this->getIncludePaths());
 		$autoloader->register();
 		$this->autoloader = $autoloader;
-		static::$component_registry = new CComponentRegistry;
+		$this->component_registry = new CComponentRegistry;
 
 		// initialize API classes
 		$apiServiceFactory = new CApiServiceFactory();
@@ -140,6 +159,10 @@ class ZBase {
 
 	/**
 	 * Initializes the application.
+	 *
+	 * @param string $mode  Application initialization mode.
+	 *
+	 * @throws DBException
 	 */
 	public function run($mode) {
 		$this->init();
@@ -154,8 +177,10 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
-				$this->initMenu();
-				$this->initModules();
+
+				$this->initMainMenu();
+				$this->initModuleManager();
+
 				array_map('error', $this->module_manager->getErrors());
 
 				$file = basename($_SERVER['SCRIPT_NAME']);
@@ -163,10 +188,11 @@ class ZBase {
 				$router = new CRouter;
 				$router->addActions($this->module_manager->getRoutes());
 				$router->setAction($action);
-				$this->module = $this->module_manager->getModuleByAction($router->getAction());
-				static::Component()->get('menu.main')->setSelected($action);
+				$this->action_module = $this->module_manager->getModuleByAction($router->getAction());
 
-				$view_paths = array_reduce($this->module_manager->getRegisteredNamespaces(), 'array_merge', []);
+				$this->component_registry->get('menu.main')->setSelected($action);
+
+				$view_paths = array_reduce($this->module_manager->getNamespaces(), 'array_merge', []);
 				CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
 
 				if ($router->getController() !== null) {
@@ -205,8 +231,8 @@ class ZBase {
 	public static function stop() {
 		$app = static::getInstance();
 
-		if ($app->module instanceof CModule && $app->action instanceof CController) {
-			$app->module->beforeTerminate($app->action);
+		if ($app->action_module instanceof CModule && $app->action instanceof CController) {
+			$app->action_module->beforeTerminate($app->action);
 		}
 
 		exit;
@@ -424,7 +450,9 @@ class ZBase {
 	/**
 	 * Process request and generate response. Main entry for all processing.
 	 *
-	 * @param CRouter $rourer
+	 * @param CRouter $router
+	 *
+	 * @throws Exception
 	 */
 	private function processRequest(CRouter $router) {
 		$controller = $router->getController();
@@ -451,10 +479,9 @@ class ZBase {
 			]);
 		}
 		else {
-			if ($this->module instanceof CModule) {
-				$moduleid = $this->module->getManifest()['id'];
-				array_unshift(CView::$viewsDir, $this->module_manager->getModuleRootDir($moduleid));
-				$this->module->beforeAction($this->action);
+			if ($this->action_module instanceof CModule) {
+				array_unshift(CView::$viewsDir, $this->action_module->getRootDir());
+				$this->action_module->beforeAction($this->action);
 			}
 
 			$this->action->setAction($router->getAction());
@@ -540,43 +567,26 @@ class ZBase {
 	}
 
 	/**
-	 * Initialize module manager, load enabled modules and register module namespaces for autoloader. Also call init
-	 * for enabled modules.
+	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
 	 */
-	protected function initModules() {
-		$manager = new CModuleManager($this->rootDir);
-		$modules = DB::select('module', [
-			'output' => ['relative_path', 'id', 'config'],
-			'filter' => ['status' => 1]
-		]);
-
-		if ($modules) {
-			foreach ($modules as $module) {
-				$manager->loadModule($module['relative_path']);
-
-				if (!array_key_exists($module['id'], $manager->getErrors())) {
-					$manager->enable($module['id']);
-				}
-			}
-
-			foreach ($manager->getRegisteredNamespaces() as $namespace => $paths) {
-				$this->autoloader->addNamespace($namespace, $paths);
-			}
-
-			foreach ($modules as $module) {
-				$manager->initModule($module['id'], json_decode($module['config'], true));
-			}
-		}
-
-		$this->module_manager = $manager;
+	private function initMainMenu() {
+		$menu = new CMenu('menu.main', []);
+		$this->component_registry->register('menu.main', $menu);
+		include 'include/menu.inc.php';
 	}
 
 	/**
-	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
+	 * Register and initialize module manager, load enabled modules and register module namespaces for autoloader. Also call init
+	 * for enabled modules.
 	 */
-	protected function initMenu() {
-		$menu = new CMenu('menu.main', []);
-		static::Component()->register('menu.main', $menu);
-		include 'include/menu.inc.php';
+	private function initModuleManager()
+	{
+		$this->module_manager = new CModuleManager($this->rootDir);
+
+		foreach ($this->module_manager->getNamespaces() as $namespace => $paths) {
+			$this->autoloader->addNamespace($namespace, $paths);
+		}
+
+		$this->module_manager->loadModules();
 	}
 }

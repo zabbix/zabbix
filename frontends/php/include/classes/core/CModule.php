@@ -23,14 +23,12 @@ use CController as CAction;
 
 class CModule {
 
-	protected $manifest = null;
+	private $enabled = true;
+
+	private $manifest = null;
 
 	public function __construct(array $manifest) {
 		$this->manifest = $manifest;
-	}
-
-	final public function getManifest() {
-		return $this->manifest;
 	}
 
 	/**
@@ -51,6 +49,61 @@ class CModule {
 	 * @param array $config  Database stored config settings.
 	 */
 	public function init(array $config) {
+	}
+
+	final public function getId() {
+		return $this->manifest['id'];
+	}
+
+	final public function getActions() {
+		return $this->manifest['actions'];
+	}
+
+	final public function getManifest() {
+		return $this->manifest;
+	}
+
+	final public function getNamespace() {
+		return $this->manifest['namespace'];
+	}
+
+	/**
+	 * Get module directory path.
+	 *
+	 * @param bool $relative  Return relative or absolute path to module directory.
+	 *
+	 * @return string
+	 */
+	final public function getRootDir($relative = false) {
+		$path = $this->manifest['path'];
+
+		if ($relative && $path) {
+			$path = substr($path, strlen($this->modules_dir) + 1);
+		}
+
+		return $path;
+	}
+
+	/**
+	 * Get module runtime status.
+	 * 
+	 * @return bool
+	 */
+	public function isEnabled() {
+		return $this->enabled;
+	}
+
+	/**
+	 * Set module runtime enabled/disabled status.
+	 *
+	 * @param $enabled
+	 *
+	 * @return CModule
+	 */
+	public function setEnabled($enabled) {
+		$this->enabled = $enabled;
+
+		return $this;
 	}
 
 	/**

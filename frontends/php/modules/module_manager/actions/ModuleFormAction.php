@@ -52,11 +52,19 @@ class ModuleFormAction extends CController {
 	}
 
 	protected function doAction() {
-		$manager = new CModuleManager(App::getRootDir());
-		$manager->loadModule($this->module['relative_path']);
-		$manager->initModule($this->module['id'], $this->module['config']);
-		$manifest = $manager->getModuleManifest($this->module['id']);
-		$data = $this->module + ($manifest ? $manifest : []);
+//		$manager = new CModuleManager(App::getRootDir());
+//		$manager->loadModule($this->module['relative_path']);
+//		$manager->initModule($this->module['id'], $this->module['config']);
+//		$manifest = $manager->getManifest($this->module['id']);
+
+		// TODO: Example
+		$manifest = APP::ModuleManager()->loadManifest($this->module['relative_path']);
+		if ($manifest == null) {
+			// TODO: Manifest loading error
+			throw new Exception();
+		}
+
+		$data = $this->module + $manifest;
 
 		if ($this->hasInput('form_refresh')) {
 			$data['status'] = $this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED;

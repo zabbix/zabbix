@@ -129,7 +129,9 @@ class ModuleUpdateAction extends CController {
 			$manager->loadModule($module['relative_path']);
 
 			if (!array_key_exists($module['id'], $manager->getErrors())) {
-				$manager->enable($module['id']);
+//				$manager->enable($module['id']);
+				// TODO: when $this->modules will be as array of CModule instances
+//				$module->setEnabled(true);
 			}
 		}
 

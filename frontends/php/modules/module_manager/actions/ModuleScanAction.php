@@ -47,7 +47,9 @@ class ModuleScanAction extends CController {
 				$manager->loadModule($module['relative_path']);
 
 				if ($module['status'] == MODULE_STATUS_ENABLED) {
-					$manager->enable($module['id']);
+//					$manager->enable($module['id']);
+					// TODO: when $this->modules will be as array of CModule instances
+//					$module->setEnabled(true);
 				}
 			}
 			else {

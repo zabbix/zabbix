@@ -82,7 +82,7 @@ class ModuleListAction extends CController {
 
 		foreach ($dbmodules as $moduleid => $module) {
 			$manager->loadModule($module['relative_path']);
-			$manifest = $manager->getModuleManifest($module['id']);
+			$manifest = $manager->getManifest($module['id']);
 
 			if ($manifest) {
 				$modules[$moduleid] = $module + $manifest;

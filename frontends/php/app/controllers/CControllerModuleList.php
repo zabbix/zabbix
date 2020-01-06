@@ -79,7 +79,8 @@ class CControllerModuleList extends CController {
 		$modules = [];
 
 		$config = select_config();
-		$manager = new CModuleManager(APP::getRootDir());
+//		$manager = new CModuleManager(APP::getRootDir());
+		$manager = APP::ModuleManager();
 
 		$db_modules = API::ModuleDetails()->get([
 			'output' => ['relative_path', 'status'],
