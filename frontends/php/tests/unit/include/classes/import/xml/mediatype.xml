@@ -31,7 +31,6 @@ Original problem ID: {EVENT.ID}
 Problem name: {EVENT.NAME}
 Host: {HOST.NAME}
 Severity: {EVENT.SEVERITY}
-
 Original problem ID: {EVENT.ID}
 {TRIGGER.URL}</body>
                 </message_template>
