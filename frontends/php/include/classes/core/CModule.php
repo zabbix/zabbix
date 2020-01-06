@@ -86,7 +86,7 @@ class CModule {
 
 	/**
 	 * Get module runtime status.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function isEnabled() {
