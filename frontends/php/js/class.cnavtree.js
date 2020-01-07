@@ -618,16 +618,17 @@ jQuery(function($) {
 												}
 												else {
 													if (item_edit) {
-														var	row = $('[data-id=' + id + ']', $obj);
+														var	$row = $('[data-id=' + id + ']', $obj);
+														$root = $('>ul.tree-list', $row);
 
-														$('[name="navtree.name.' + id + '"]', row).val(resp['name']);
-														$('[name="navtree.sysmapid.' + id + '"]', row)
+														$('[name="navtree.name.' + id + '"]', $row).val(resp['name']);
+														$('[name="navtree.sysmapid.' + id + '"]', $row)
 															.val(resp['sysmapid']);
-														$('> .tree-row > .content > .item-name', row)
+														$('> .tree-row > .content > .item-name', $row)
 															.empty()
 															.attr('title', resp['name'])
 															.append($('<span/>').text(resp['name']));
-														row.toggleClass('no-map', +resp['sysmapid'] == 0);
+														$row.toggleClass('no-map', +resp['sysmapid'] == 0);
 													}
 													else {
 														id = getNextId($obj),
@@ -642,13 +643,10 @@ jQuery(function($) {
 														};
 
 														$root.append(createTreeItem($obj, new_item, 1, true, true));
-
-														$root.closest('.tree-item')
-															.removeClass('closed')
-															.addClass('opened is-parent');
 													}
 
-													if (resp.hierarchy.length != 0) {
+													if (resp.hierarchy.constructor === Object
+															&& Object.keys(resp.hierarchy).length != 0) {
 														var add_child_level = function($obj, sysmapid, itemid, depth) {
 															if (typeof resp.hierarchy[sysmapid] !== 'undefined'
 																	&& depth <= widget_data.max_depth) {
