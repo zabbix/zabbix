@@ -194,7 +194,6 @@ function itemGetValueTest() {
 					if (typeof ret.prev_value !== 'undefined') {
 						jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
 						jQuery('#prev_time', $form).val(ret.prev_time);
-
 						jQuery('#upd_prev', $form).val(form_data['upd_last']);
 						jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
 					}
@@ -203,7 +202,7 @@ function itemGetValueTest() {
 				jQuery('#value', $form).multilineInput('value', ret.value);
 
 				if (typeof ret.eol !== 'undefined') {
-					jQuery("input[value="+ret.eol+"]", jQuery("#eol")).prop("checked", "checked");
+					jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 				}
 			}
 
@@ -277,7 +276,6 @@ function itemCompleteTest() {
 				if (typeof ret.prev_value !== 'undefined') {
 					jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
 					jQuery('#prev_time', $form).val(ret.prev_time);
-
 					jQuery('#upd_prev', $form).val(post_data['upd_last']);
 					jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
 				}

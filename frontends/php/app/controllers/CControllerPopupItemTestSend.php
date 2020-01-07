@@ -130,8 +130,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			 */
 			elseif ($this->get_value_from_host && $this->item_type == ITEM_TYPE_SIMPLE
 					&& (substr($this->getInput('key'), 0, 7) === 'vmware.'
-						|| substr($this->getInput('key'), 0, 8) === 'icmpping')
-					) {
+						|| substr($this->getInput('key'), 0, 8) === 'icmpping')) {
 				$this->get_value_from_host = false;
 				$ret = false;
 			}
@@ -216,10 +215,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 		$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
-		// Define values used to test preprocessing steps.
+		/*
+		 * Define values used to test preprocessing steps.
+		 * Steps array can be empty if only value convertation is tested.
+		 */
 		$preproc_test_data = [
 			'value' => $this->getInput('value', ''),
-			'steps' => $this->getInput('steps', []), // Steps can be empty to test value convertation.
+			'steps' => $this->getInput('steps', []),
 			'single' => !$this->show_final_result
 		];
 
@@ -325,6 +327,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			elseif (is_array($result)) {
 				$test_failed = false;
 				$test_outcome = null;
+
 				foreach ($preproc_test_data['steps'] as $i => &$step) {
 					if ($test_failed) {
 						// If test is failed, proceesing steps are skipped from results.
@@ -343,10 +346,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						}
 					}
 
-					unset($step['type']);
-					unset($step['params']);
-					unset($step['error_handler']);
-					unset($step['error_handler_params']);
+					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params']);
 
 					// Latest executed step due to the error or end of preprocessing.
 					$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
@@ -360,7 +360,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					if (array_key_exists('result', $result)) {
 						$output['final'] = [
 							'action' => _s('Result converted to %1$s',
-								itemValueTypeString($preproc_test_data['value_type'])),
+								itemValueTypeString($preproc_test_data['value_type'])
+							),
 							'result' => $result['result']
 						];
 

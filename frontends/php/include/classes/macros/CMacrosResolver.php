@@ -1419,7 +1419,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	public function resolveItemKeys(array $items) {//...
+	public function resolveItemKeys(array $items) {
 		foreach ($items as &$item) {
 			$item['key_expanded'] = $item['key_'];
 		}
