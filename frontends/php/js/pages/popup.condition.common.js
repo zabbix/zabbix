@@ -22,8 +22,9 @@
  * Add popup inputs to main form and submit.
  *
  * @param {object} response
+ * @param {Overlay} overlay
  */
-function submitConditionPopup(response) {
+function submitConditionPopup(response, overlay) {
 	var form_name = response.form.name,
 		form_param = response.form.param,
 		input_name = response.form.input_name,
@@ -67,31 +68,34 @@ function submitConditionPopup(response) {
 /**
  * Validate popup form.
  *
- * @return {object} jQuery
+ * @param {Overlay} overlay
  */
-function validateConditionPopup() {
-	var $form = jQuery(document.forms['popup.condition']),
+function validateConditionPopup(overlay) {
+	var $form = overlay.$dialogue.find('form'),
 		url = new Curl($form.attr('action'));
 
 	url.setArgument('validate', 1);
 
-	return jQuery
-		.ajax({
-			url: url.getUrl(),
-			data: $form.serialize(),
-			dataType: 'json',
-			method: 'POST'
+	overlay.setLoading();
+	overlay.xhr = jQuery.ajax({
+		url: url.getUrl(),
+		data: $form.serialize(),
+		dataType: 'json',
+		method: 'POST'
+	});
+
+	overlay.xhr
+		.always(function() {
+			overlay.unsetLoading();
 		})
 		.done(function(response) {
-			$form
-				.parent()
-				.find('.msg-bad')
-				.remove();
+			overlay.$dialogue.find('.msg-bad').remove();
 
 			if (typeof response.errors !== 'undefined') {
-				return jQuery(response.errors).insertBefore($form);
+				jQuery(response.errors).insertBefore($form);
 			}
-
-			return submitConditionPopup(response);
+			else {
+				submitConditionPopup(response, overlay);
+			}
 		});
 }

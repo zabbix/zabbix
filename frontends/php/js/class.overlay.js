@@ -385,6 +385,7 @@ Overlay.prototype.setProperties = function(obj) {
 				break;
 
 			case 'script_inline':
+				this.unsetProperty(key);
 				this.$dialogue.$script.html(obj[key]);
 				this.$dialogue.$footer.prepend(this.$dialogue.$script);
 				break;

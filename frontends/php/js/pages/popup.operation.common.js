@@ -94,25 +94,29 @@ function submitOperationPopup(response) {
 
 /**
  * Validate popup form.
+ *
+ * @param {Overlay} overlay
  */
-function validateOperationPopup() {
-	var $form = jQuery(document.forms['popup.operation']),
+function validateOperationPopup(overlay) {
+	var $form = overlay.$dialogue.find('form'),
 		url = new Curl($form.attr('action'));
 
 	url.setArgument('validate', 1);
 
-	return jQuery
-		.ajax({
-			url: url.getUrl(),
-			data:  $form.serialize(),
-			dataType: 'json',
-			method: 'POST'
+	overlay.setLoading();
+	overlay.xhr = jQuery.ajax({
+		url: url.getUrl(),
+		data:  $form.serialize(),
+		dataType: 'json',
+		method: 'POST'
+	});
+
+	overlay.xhr
+		.always(function() {
+			overlay.unsetLoading();
 		})
 		.done(function(response) {
-			$form
-				.parent()
-				.find('.msg-bad')
-				.remove();
+			overlay.$dialogue.find('.msg-bad').remove();
 
 			if (typeof response.errors !== 'undefined') {
 				return jQuery(response.errors).insertBefore($form);
