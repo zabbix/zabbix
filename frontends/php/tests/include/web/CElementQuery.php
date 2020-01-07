@@ -382,7 +382,7 @@ class CElementQuery implements IWaitable {
 		$driver = static::getDriver();
 
 		return function () use ($driver) {
-			return $driver->executeScript('return document.readyState;') == 'complete';
+			return $driver->executeScript('return document.readyState === \'complete\' && (window.jQuery||{active:0}).active === 0;');
 		};
 	}
 
