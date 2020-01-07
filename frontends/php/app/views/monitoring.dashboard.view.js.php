@@ -81,7 +81,7 @@
 			dataType: 'json',
 			method: 'POST',
 			complete: function() {
-				overlay.unsetLoading(overlay)
+				overlay.unsetLoading(overlay);
 			},
 			success: function (response) {
 				var errors = [];
@@ -105,7 +105,7 @@
 					jQuery('#<?= ZBX_STYLE_PAGE_TITLE ?>').text(form_data['name']);
 					jQuery('#dashboard-direct-link').text(form_data['name']);
 
-					overlayDialogueDestroy('dashboard_properties');
+					overlayDialogueDestroy(overlay.dialogueid);
 				}
 			}
 		});
@@ -113,6 +113,8 @@
 
 	/**
 	 * @param {Overlay} overlay
+	 *
+	 * @return {bool}
 	 */
 	function dashbrdConfirmSharing(overlay) {
 		var form = overlay.$dialogue.find('form'),
@@ -127,7 +129,7 @@
 			dataType: 'json',
 			method: 'POST',
 			complete: function() {
-				overlay.unsetLoading(overlay)
+				overlay.unsetLoading(overlay);
 			},
 			success: function (response) {
 				var errors = [],
@@ -153,7 +155,7 @@
 					if (messages.length) {
 						jQuery('main').prepend(messages);
 					}
-					overlayDialogueDestroy('dashboard_share');
+					overlayDialogueDestroy(overlay.dialogueid);
 				}
 			}
 		});

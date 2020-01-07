@@ -139,7 +139,7 @@ $output['buttons'] = [[
 	'class' => '',
 	'keepOpen' => true,
 	'isSubmit' => true,
-	'action' => 'return validateTriggerWizard(overlay)'
+	'action' => 'return validateTriggerWizard(overlay);'
 ]];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

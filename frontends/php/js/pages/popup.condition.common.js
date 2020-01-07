@@ -22,9 +22,8 @@
  * Add popup inputs to main form and submit.
  *
  * @param {object} response
- * @param {Overlay} overlay
  */
-function submitConditionPopup(response, overlay) {
+function submitConditionPopup(response) {
 	var form_name = response.form.name,
 		form_param = response.form.param,
 		input_name = response.form.input_name,
@@ -95,7 +94,7 @@ function validateConditionPopup(overlay) {
 				jQuery(response.errors).insertBefore($form);
 			}
 			else {
-				submitConditionPopup(response, overlay);
+				submitConditionPopup(response);
 			}
 		});
 }
