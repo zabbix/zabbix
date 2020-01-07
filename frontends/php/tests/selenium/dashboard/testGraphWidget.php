@@ -2215,8 +2215,8 @@ class testGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// If test fails and widget isn't canceled, need to wait until widget appears on the dashboard.
 		sleep(2);
-		$this->assertTrue($dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false) === null);
+		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
+				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -2241,7 +2241,7 @@ class testGraphWidget extends CWebTest {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertTrue($dashboard->getWidget($name, false) === null);
+		$this->assertTrue(!$dashboard->getWidget($name, false)->isValid());
 		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 				' WHERE w.name='.zbx_dbstr($name);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
