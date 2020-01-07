@@ -2241,6 +2241,8 @@
 			overlay = overlays_stack.getById('widgetConfg');
 
 		$save_btn.prop('disabled', true);
+
+		overlay.setLoading();
 		overlay.xhr = $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -2412,6 +2414,7 @@
 			.always(function() {
 				$save_btn.prop('disabled', false);
 				delete data['options']['updating_config'];
+				overlay.unsetLoading();
 			});
 	}
 
