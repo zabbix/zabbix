@@ -2481,6 +2481,7 @@
 					'title': (edit_mode ? t('Apply') : t('Add')),
 					'class': 'dialogue-widget-save',
 					'keepOpen': true,
+					'isSubmit': true,
 					'action': function() {
 						updateWidgetConfig($obj, data, widget);
 					}
