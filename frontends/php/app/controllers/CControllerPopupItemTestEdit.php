@@ -88,9 +88,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
 			$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
+			$key = $this->hasInput('key') ? $this->getInput('key') : '';
 
 			// Check if key is not empty for item types it's mandatory.
-			if (in_array($this->item_type, $this->item_types_has_key_mandatory) && $this->getInput('key', '') === '') {
+			if (in_array($this->item_type, $this->item_types_has_key_mandatory) && $key === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', _('cannot be empty')));
 				$ret = false;
 			}
@@ -126,7 +127,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 	protected function doAction() {
 		// VMware and icmpping simple checks are not supported.
-		$key = $this->getInput('key');
+		$key = $this->hasInput('key') ? $this->getInput('key') : '';
 		if ($this->item_type == ITEM_TYPE_SIMPLE
 				&& (substr($key, 0, 7) === 'vmware.' || substr($key, 0, 8) === 'icmpping')) {
 			$this->is_item_testable = false;
