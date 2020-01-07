@@ -633,7 +633,8 @@ jQuery(function($) {
 								{
 									'title': item_edit ? t('Apply') : t('Add'),
 									'class': 'dialogue-widget-save',
-									'action': function() {
+									'isSubmit': true,
+									'action': function(overlay) {
 										var form = $('#widget_dialogue_form'),
 											url = new Curl('zabbix.php'),
 											ajax_data = {
@@ -646,11 +647,15 @@ jQuery(function($) {
 
 										url.setArgument('action', 'widget.navtree.item.update');
 
-										jQuery.ajax({
+										overlay.setLoading();
+										overlay.xhr = jQuery.ajax({
 											url: url.getUrl(),
 											method: 'POST',
 											data: ajax_data,
 											dataType: 'json',
+											complete: function() {
+												overlay.unsetLoading();
+											},
 											success: function(resp) {
 												var new_item,
 													root;
@@ -726,7 +731,7 @@ jQuery(function($) {
 															.removeClass('closed');
 													}
 
-													overlayDialogueDestroy('navtreeitem');
+													overlayDialogueDestroy(overlay.dialogueid);
 													setTreeHandlers($obj);
 												}
 											}
