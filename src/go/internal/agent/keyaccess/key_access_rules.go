@@ -166,7 +166,7 @@ func LoadRules(records []Record) (err error) {
 	return nil
 }
 
-// CheckRules checks if specified key and parameters are not restricterd by defined rules
+// CheckRules checks if specified key and parameters are not restricted by defined rules
 func CheckRules(key string, params []string) (result bool) {
 	result = true
 
