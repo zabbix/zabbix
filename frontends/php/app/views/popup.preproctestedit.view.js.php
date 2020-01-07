@@ -73,8 +73,6 @@ function itemPreprocessingTest(overlay) {
 				jQuery('#prev_value, #prev_time').prop('disabled', true);
 			}
 
-			jQuery('.submit-test-btn').prop('disabled', true).addClass('is-loading').blur();
-
 			// Clean previous results.
 			jQuery('[id^="preproc-test-step-"][id$="-result"]').empty();
 			jQuery('[id^="preproc-test-step-"][id$="-name"] > div').remove();
@@ -109,8 +107,6 @@ function itemPreprocessingTest(overlay) {
 			if (is_prev_enabled) {
 				jQuery('#prev_value, #prev_time').prop('disabled', false);
 			}
-
-			jQuery('.submit-test-btn').prop('disabled', false).removeClass('is-loading');
 		},
 		dataType: 'json',
 		type: 'post'

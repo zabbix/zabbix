@@ -93,7 +93,7 @@ $output = [
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'enabled' => $data['enabled'],
-			'action' => 'mediatypeTestSend("'.$form->getName().'");'
+			'action' => 'return mediatypeTestSend(overlay);'
 		]
 	]
 ];
