@@ -49,17 +49,24 @@ jQuery('#timeperiod_type').change(function() {
 	jQuery(window).trigger('resize');
 }).trigger('change');
 
-function submitMaintenancePeriod(selector) {
-	var $container = jQuery(selector),
+/**
+ * @param {Overlay} overlay
+ */
+function submitMaintenancePeriod(overlay) {
+	var $container = overlay.$dialogue.find('form'),
 		elements;
 
 	$container.trimValues(['#start_date']);
 	elements = jQuery('input:visible,select:visible,input[type=hidden]', $container).serialize();
 
-	sendAjaxData('zabbix.php', {
+	overlay.setLoading();
+	overlay.xhr = sendAjaxData('zabbix.php', {
 		data: elements,
 		dataType: 'json',
 		type: 'post',
+		complete: function() {
+			overlay.unsetLoading();
+		},
 		success: function(response) {
 			if ('errors' in response) {
 				$container.parent().find('.msg-bad').remove();
