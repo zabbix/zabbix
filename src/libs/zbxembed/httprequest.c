@@ -344,7 +344,7 @@ static const duk_function_list_entry	httprequest_methods[] = {
 	{"Post", es_httprequest_post, 2},
 	{"Delete", es_httprequest_delete, 2},
 	{"Status", es_httprequest_status, 0},
-	{"SetProxy", es_httprequest_set_proxy,1},
+	{"SetProxy", es_httprequest_set_proxy, 1},
 	{NULL, NULL, 0}
 };
 
