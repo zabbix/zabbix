@@ -35,12 +35,9 @@ function mediatypeTestSend(overlay) {
 	$form_fields.prop('disabled', true);
 
 	overlay.setLoading();
-	jQuery.ajax({
+	overlay.xhr = jQuery.ajax({
 		url: url.getUrl(),
 		data: data,
-		complete: function() {
-			overlay.unsetLoading();
-		},
 		success: function(ret) {
 			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
@@ -53,15 +50,22 @@ function mediatypeTestSend(overlay) {
 				jQuery('#webhook_response_value', $form).val(ret.response.value);
 				jQuery('#webhook_response_type', $form).text(ret.response.type);
 			}
+
+			overlay.unsetLoading();
+			$form_fields.prop('disabled', false);
 		},
 		error: function(request, status, error) {
 			if (request.status == 200) {
+				overlay.unsetLoading();
+				$form_fields.prop('disabled', false);
 				alert(error);
 			}
-			else if (window.document.forms[formname]) {
+			else if (window.document.forms['mediatypetest_form']) {
 				var request = this,
 					retry = function() {
-						jQuery.ajax(request);
+						if (window.document.forms['mediatypetest_form']) {
+							overlay.xhr = jQuery.ajax(request);
+						}
 					};
 
 				// Retry with 2s interval.
