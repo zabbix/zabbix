@@ -177,7 +177,7 @@ $output['buttons'] = [
 		'class' => '',
 		'keepOpen' => true,
 		'isSubmit' => true,
-		'action' => 'return httpconf.steps.edit_form.validate();'
+		'action' => 'return httpconf.steps.edit_form.validate(overlay);'
 	]
 ];
 
