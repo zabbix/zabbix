@@ -213,10 +213,8 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'exec_path', 'gsm_modem',
 			'smtp_username', 'passwd', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'maxsessionsType',
 			'form_refresh', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
-			'event_menu_name', 'description', 'message_templates'
+			'event_menu_name', 'description'
 		]);
-
-		CArrayHelper::sort($data['message_templates'], ['eventsource', 'recovery']);
 
 		if ($this->hasInput('form_refresh')) {
 			$data['parameters'] = [];
@@ -229,7 +227,11 @@ class CControllerMediatypeEdit extends CController {
 				$name = next($parameters['name']);
 				$value = next($parameters['value']);
 			}
+
+			$data['message_templates'] = $this->getInput('message_templates', []);
 		}
+
+		CArrayHelper::sort($data['message_templates'], ['eventsource', 'recovery']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));
