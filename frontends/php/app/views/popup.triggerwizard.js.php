@@ -144,34 +144,36 @@ ob_start(); ?>
 /**
  * Submit trigger wizard form to save.
  *
- * @param {string} formname		Form name that is sent to server.
- * @param {string} dialogueid	(optional) id of overlay dialogue.
+ * @param {Overlay} overlay
  */
-function validateTriggerWizard(formname, dialogueid) {
-	var form = window.document.forms[formname],
-		url = new Curl(jQuery(form).attr('action')),
-		dialogueid = dialogueid || null;
+function validateTriggerWizard(overlay) {
+	var $form = overlay.$dialogue.find('form'),
+		url = new Curl($form.attr('action'));
 
-	jQuery(form).trimValues(['#description', '#logexpr']);
+	$form.trimValues(['#description', '#logexpr']);
 
 	url.setArgument('save', 1);
 
-	jQuery.ajax({
+	overlay.setLoading();
+	overlay.xhr = jQuery.ajax({
 		url: url.getUrl(),
-		data: jQuery(form).serialize(),
+		data: $form.serialize(),
+		complete: function() {
+			overlay.unsetLoading();
+		},
 		success: function(ret) {
-			jQuery(form).parent().find('.<?= ZBX_STYLE_MSG_BAD ?>, .<?= ZBX_STYLE_MSG_GOOD ?>').remove();
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>, .<?= ZBX_STYLE_MSG_GOOD ?>').remove();
 
 			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(form));
+				jQuery(ret.errors).insertBefore($form);
 			}
-			else if (dialogueid) {
-				overlayDialogueDestroy(dialogueid);
+			else {
+				overlayDialogueDestroy(overlay.dialogueid);
 				window.location.replace(window.location.href);
 			}
 		},
 		dataType: 'json',
-		type: 'post'
+		type: 'POST'
 	});
 }
 
