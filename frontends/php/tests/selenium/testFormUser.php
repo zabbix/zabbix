@@ -405,7 +405,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
-			// Internal URL without extention.
+			// Internal URL without extension.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -496,7 +496,7 @@ class testFormUser extends CWebTest {
 					'check_user' => true
 				]
 			],
-			// Verification that field password is not mandatory for users with LDAP authentification.
+			// Verification that field password is not mandatory for users with LDAP authentication.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -866,7 +866,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
-			// Internal URL without extention.
+			// Internal URL without extension.
 			[
 				[
 					'expected' => TEST_BAD,

@@ -1,6 +1,7 @@
 if SERVER
 SERVER_tests = \
 	evaluate \
+	evaluate_unknown \
 	queue
 endif
 
@@ -87,6 +88,20 @@ evaluate_LDADD += @SERVER_LIBS@
 evaluate_LDFLAGS = @SERVER_LDFLAGS@
 
 evaluate_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+evaluate_unknown_SOURCES = \
+	evaluate_unknown.c \
+	$(COMMON_SRC_FILES)
+
+evaluate_unknown_LDADD = \
+	$(COMMON_LIB_FILES)
+
+evaluate_unknown_LDADD += @SERVER_LIBS@
+
+evaluate_unknown_LDFLAGS = @SERVER_LDFLAGS@
+
+evaluate_unknown_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
 queue_SOURCES = \

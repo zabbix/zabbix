@@ -25,7 +25,7 @@
 class C20ImportConverter extends CConverter {
 
 	/**
-	 * Item key convertation.
+	 * Item key converter.
 	 *
 	 * @var C20ItemKeyConverter
 	 */

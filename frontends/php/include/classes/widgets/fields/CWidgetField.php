@@ -26,6 +26,7 @@ class CWidgetField {
 	const FLAG_DISABLED = 0x08;
 
 	protected	$name;
+	protected	$full_name;
 	protected	$label;
 	protected	$value;
 	protected	$default;
@@ -145,6 +146,20 @@ class CWidgetField {
 		return $this->name;
 	}
 
+	/**
+	 * Set field full name which will appear in case of error messages. For example:
+	 * Invalid parameter "<FULL NAME>": too many decimal places.
+	 *
+	 * @param string $name
+	 *
+	 * @return CWidgetField
+	 */
+	public function setFullName($name) {
+		$this->full_name = $name;
+
+		return $this;
+	}
+
 	public function getAction() {
 		return $this->action;
 	}
@@ -207,8 +222,9 @@ class CWidgetField {
 		$validation_rules += $this->ex_validation_rules;
 		$value = ($this->value === null) ? $this->default : $this->value;
 		$label = ($this->label === null) ? $this->name : $this->label;
+		$name = ($this->full_name === null) ? $label : $this->full_name;
 
-		if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
+		if (!CApiInputValidator::validate($validation_rules, $value, $name, $error)) {
 			$this->setValue($this->default);
 			$errors[] = $error;
 		}

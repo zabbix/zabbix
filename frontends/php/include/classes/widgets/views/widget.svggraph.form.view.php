@@ -260,7 +260,7 @@ $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 $tab_overrides = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['or']), CWidgetHelper::getGraphOverride($fields['or'], $form_name));
 
-$scripts[] = CWidgetHelper::getGraphOverrideJavascript($fields['or'], $form_name);
+$scripts[] = CWidgetHelper::getGraphOverrideJavascript($fields['or']);
 $jq_templates['overrides-row'] = CWidgetHelper::getGraphOverrideTemplate($fields['or'], $form_name);
 
 // Create CTabView.

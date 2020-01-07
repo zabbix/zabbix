@@ -294,7 +294,7 @@ function zbx_date2str($format, $value = null) {
 }
 
 /**
- * Calculates and converts timestamp to string represenation.
+ * Calculates and converts timestamp to string representation.
  *
  * @param int|string $start_date  Start date timestamp.
  * @param int|string $end_date    End date timestamp.
@@ -998,7 +998,7 @@ function zbx_is_int($var) {
 
 /**
  * Look for two arrays field value and create 3 array lists, one with arrays where field value exists only in first array
- * second with arrays where field values are only in second array and both where fiel values are in both arrays.
+ * second with arrays where field values are only in second array and both where field values are in both arrays.
  *
  * @param array  $primary
  * @param array  $secondary
@@ -1348,7 +1348,7 @@ function zbx_toObject($value, $field, $preserve_keys = false) {
  * Converts the given value to a numeric array:
  * - a scalar value will be converted to an array and added as the only element;
  * - an array with first element key containing only numeric characters will be converted to plain zero-based numeric array.
- * This is used for reseting nonsequential numeric arrays;
+ * This is used for resetting nonsequential numeric arrays;
  * - an associative array will be returned in an array as the only element, except if first element key contains only numeric characters.
  *
  * @param mixed $value

@@ -758,7 +758,7 @@ class CHttpTest extends CApiService {
 
 	/**
 	 * Validate http response code range.
-	 * Range can be empty string or list of comma separated numeric strings or user macroses.
+	 * Range can be empty string or list of comma separated numeric strings or user macros.
 	 *
 	 * Examples: '100-199, 301, 404, 500-550, {$MACRO}-200, {$MACRO}-{$MACRO}'
 	 *
