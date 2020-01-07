@@ -19,7 +19,7 @@
 **/
 
 
-use CController as CAction;
+use CController as Action;
 
 class CModule {
 
@@ -109,17 +109,17 @@ class CModule {
 	/**
 	 * Module before action event.
 	 *
-	 * @param CAction $action  Action instance responsible for current request
+	 * @param Action $action  Action instance responsible for current request
 	 */
-	public function beforeAction(CAction $action) {
+	public function beforeAction(Action $action) {
 	}
 
 	/**
 	 * Module method to be called before application will exit and send response to browser. Will be called only for
 	 * module responsible for current request.
 	 *
-	 * @param CAction $action  Action instance responsible for current request.
+	 * @param Action $action  Action instance responsible for current request.
 	 */
-	public function beforeTerminate(CAction $action) {
+	public function beforeTerminate(Action $action) {
 	}
 }

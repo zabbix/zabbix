@@ -61,6 +61,11 @@ class ZBase {
 	private $module_manager;
 
 	/**
+	 * @var CController
+	 */
+	private $action;
+
+	/**
 	 * @var CModule
 	 */
 	private $action_module;
@@ -188,7 +193,7 @@ class ZBase {
 				$router = new CRouter;
 				$router->addActions($this->module_manager->getRoutes());
 				$router->setAction($action);
-				$this->action_module = $this->module_manager->getModuleByAction($router->getAction());
+				$this->action_module = $this->module_manager->getModuleByActionName($router->getAction());
 
 				$this->component_registry->get('menu.main')->setSelected($action);
 
@@ -232,7 +237,7 @@ class ZBase {
 		$app = static::getInstance();
 
 		if ($app->action_module instanceof CModule && $app->action instanceof CController) {
-			$app->action_module->beforeTerminate($app->action);
+			$app->module_manager->beforeTerminate($app->action);
 		}
 
 		exit;
@@ -479,12 +484,13 @@ class ZBase {
 			]);
 		}
 		else {
+			$this->action->setAction($router->getAction());
+
 			if ($this->action_module instanceof CModule) {
 				array_unshift(CView::$viewsDir, $this->action_module->getRootDir());
-				$this->action_module->beforeAction($this->action);
+				$this->module_manager->beforeAction($this->action);
 			}
 
-			$this->action->setAction($router->getAction());
 			$response = $this->action->run();
 		}
 

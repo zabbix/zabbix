@@ -19,6 +19,8 @@
 **/
 
 
+use CController as Action;
+
 class CModuleManager {
 
 	const MANIFEST_VERSION = 1;
@@ -36,13 +38,20 @@ class CModuleManager {
 
 	/**
 	 * Contains array of CModule instances.
+	 *
+	 * @var CModule[]
 	 */
 	private $modules = [];
 
+	/**
+	 * Contains array of modules errors.
+	 *
+	 * @var array
+	 */
 	private $errors = [];
 
 	/**
-	 * Create class object instance
+	 * Create class object instance.
 	 *
 	 * @param string $root_dir  Absolute path to frontend root directory.
 	 */
@@ -75,7 +84,8 @@ class CModuleManager {
 	 *
 	 * @return CModule|null
 	 */
-	public function getModuleByAction($action) {
+	public function getModuleByActionName($action) {
+		/** @var CModule $module */
 		foreach ($this->modules as $module) {
 			if (array_key_exists($action, $module->getActions())) {
 				return $module;
@@ -164,7 +174,7 @@ class CModuleManager {
 	 *
 	 * @param $relative_path
 	 *
-	 * @return array|mixed|null
+	 * @return array|null
 	 */
 	public function loadManifest($relative_path) {
 		$module_path = $this->modules_dir.DIRECTORY_SEPARATOR.trim($relative_path, DIRECTORY_SEPARATOR);
@@ -211,9 +221,6 @@ class CModuleManager {
 		return $manifest;
 	}
 
-	/**
-	 * @return $this
-	 */
 	public function loadModules() {
 		foreach ($this->loaded_manifests as $manifest) {
 			$main_class = '\\CModule';
@@ -230,6 +237,10 @@ class CModuleManager {
 					throw new Exception(_s('%s class must extend %s class.', $module_class, $main_class));
 				}
 
+				if ($this->errors[$manifest['id']]) {
+					$instance->setEnabled(false);
+				}
+
 				$this->modules[$manifest['id']] = $instance;
 			} catch (Exception $e) {
 				$this->errors[$manifest['id']][] = $e;
@@ -237,11 +248,11 @@ class CModuleManager {
 
 			unset($this->loaded_manifests[$manifest['relative_path']]);
 		}
-
-		return $this;
 	}
 
 	/**
+	 * Check conflicts between modules.
+	 * 
 	 * @param $manifest
 	 * @param $manifests
 	 *
@@ -285,5 +296,33 @@ class CModuleManager {
 	 */
 	public function getErrors() {
 		return $this->errors;
+	}
+
+	/**
+	 * Call modules before action event.
+	 *
+	 * @param Action $action  Action instance responsible for current request
+	 */
+	public function beforeAction(Action $action) {
+		$this->invokeEventHandler($action, 'beforeAction');
+	}
+
+	/**
+	 * Modules method to be called before application will exit and send response to browser.
+	 *
+	 * @param Action $action  Action instance responsible for current request.
+	 */
+	public function beforeTerminate(Action $action) {
+		$this->invokeEventHandler($action, 'beforeTerminate');
+	}
+
+	private function invokeEventHandler(Action $action, $event) {
+		foreach ($this->modules as $module) {
+			if ($module->isEnabled() && !array_key_exists($action->getAction(), $module->getActions())) {
+				$module->$event($action);
+			}
+		}
+
+		$this->getModuleByActionName($action->getAction())->$event($action);
 	}
 }
