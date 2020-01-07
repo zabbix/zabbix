@@ -178,7 +178,7 @@ Overlay.prototype.setLoading = function() {
  */
 Overlay.prototype.unsetLoading = function() {
 		this.$dialogue.$body.removeClass('is-loading');
-		this.$btn_submit && this.$btn_submit.prop('disabled', false);
+		this.$btn_submit && this.$btn_submit.removeClass('is-loading').prop('disabled', false);
 }
 
 /**
@@ -255,6 +255,10 @@ Overlay.prototype.makeButton = function(obj) {
 	});
 
 	$button.on('click', function(e) {
+		if (obj.isSubmit && this.$btn_submit) {
+			this.$btn_submit.blur().addClass('is-loading');
+		}
+
 		if (obj.action && obj.action(this) !== false) {
 			this.cancel_action = null;
 
