@@ -55,7 +55,10 @@
 			if ('old_message_type' in template && template.old_message_type != -1) {
 				jQuery('tr[data-message-type=' + template.old_message_type + ']')
 					.replaceWith(row_template.evaluate(template));
-				delete template.old_message_type;
+
+				if (template.message_type != template.old_message_type) {
+					delete message_template_list[template.old_message_type];
+				}
 			}
 			else {
 				jQuery('#message-templates-footer').before(row_template.evaluate(template));
