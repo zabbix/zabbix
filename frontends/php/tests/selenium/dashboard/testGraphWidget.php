@@ -91,6 +91,30 @@ class testGraphWidget extends CWebTest {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 	}
 
+	/*
+	 * Check screenshots of graph widget form.
+	 */
+	public function testGraphWidget_FormLayout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$overlay = $dashboard->addWidget();
+		$form = $overlay->asForm();
+		$element = $overlay->query('id:svg-graph-preview')->one();
+
+		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
+		foreach ($tabs as $tab) {
+			$form->selectTab($tab);
+			if ($tab === 'Overrides') {
+				$button = $form->query('button:Add new override')->one()->click();
+				// Remove border radius from button element.
+				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
+			}
+
+			$this->page->removeFocus();
+			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
+		}
+	}
+
 	/**
 	 * Check validation of graph widget fields.
 	 */
@@ -229,6 +253,62 @@ class testGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Data set/1/timeshift": a number is too large.'
 				]
 			],
+			// Aggregation interval validation.
+			[
+				[
+					'Data set' => [
+						[
+							'Aggregation function' => 'min',
+							'Aggregation interval' => 'abc'
+						]
+					],
+					'error' => 'Invalid parameter "Data set/1/aggregate_interval": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'Data set' => [
+						[
+							'Aggregation function' => 'max',
+							'Aggregation interval' =>  '5.2'
+						]
+					],
+					'error' => 'Invalid parameter "Data set/1/aggregate_interval": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'Data set' => [
+						[
+							'Aggregation function' => 'avg',
+							'Aggregation interval' => '0'
+						]
+					],
+					'error' => 'Invalid parameter "Data set/1/aggregate_interval": value must be one of 1-788400000.'
+				]
+			],
+			[
+				[
+					'Data set' => [
+						[
+							'Aggregation function' => 'count',
+							'Aggregation interval' => '10000d'
+						]
+					],
+					'error' => 'Invalid parameter "Data set/1/aggregate_interval": value must be one of 1-788400000.'
+				]
+			],
+			[
+				[
+					'Data set' => [
+						[
+							'Aggregation function' => 'sum',
+							'Aggregation interval' => '999999999999999999999999999'
+						]
+					],
+					'error' => 'Invalid parameter "Data set/1/aggregate_interval": a number is too large.'
+				]
+			],
 			// Validation of second data set.
 			[
 				[
@@ -289,6 +369,20 @@ class testGraphWidget extends CWebTest {
 						]
 					],
 					'error' => 'Invalid parameter "Data set/2/timeshift": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'Data set' => [
+						[],
+						[
+							'host' => '*',
+							'item' => '*',
+							'Aggregation function' => 'first',
+							'Aggregation interval' => 'abc'
+						]
+					],
+					'error' => 'Invalid parameter "Data set/2/aggregate_interval": a time unit is expected.'
 				]
 			]
 		];
@@ -1178,6 +1272,59 @@ class testGraphWidget extends CWebTest {
 					'Overrides' => []
 				]
 			],
+			// Comma in host and item name.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Comma in host/item names'
+					],
+					'Data set' => [
+						[
+							'host' => 'Zabbix,Server',
+							'item' => 'Agent, Ping',
+							'Aggregation function' => 'min',
+							'Aggregate' => 'Data set'
+						],
+						[
+							'host' => ',Zabbix Server',
+							'item' => ',Agentp ping',
+							'Draw' => 'Bar',
+							'Aggregation function' => 'max'
+						],
+						[
+							'host' => ',Zabbix, Server,',
+							'item' => 'Zabbix configuration cache, % used',
+							'Aggregation function' => 'count',
+							'Aggregation interval' => '24h',
+						]
+					],
+					'Overrides' => [
+						[
+							'host' => 'Zabbix,Server',
+							'item' => 'Agent,Ping',
+							'options' => [
+								['Draw', 'Bar'],
+								['Missing data', 'Treat as 0']
+							]
+						],
+						[
+							'host' => ',Zabbix Server',
+							'item' => ', Agent ping',
+							'options' => [
+								['Draw', 'Bar']
+							]
+						],
+						[
+							'host' => ',,Zabbix Server,,',
+							'item' => ', Agent, ping,',
+							'options' => [
+								['Draw', 'Bar']
+							]
+						],
+					],
+					'check_form' => true
+				]
+			],
 			/* Add Width, Fill and Missing data fields in overrides, which are disabled in data set tab.
 			 * Fill enabled right Y-axis fields.
 			 */
@@ -1190,7 +1337,7 @@ class testGraphWidget extends CWebTest {
 					'Data set' => [
 						'host' => ['Zabbix*', 'one', 'two'],
 						'item' => ['Agent*', 'one', 'two'],
-						'Draw' => 'Points',
+						'Draw' => 'Bar',
 						'Y-axis' => 'Right'
 					],
 					'Time period' => [
@@ -1243,7 +1390,9 @@ class testGraphWidget extends CWebTest {
 							'Transparency' => '10',
 							'Fill' => '10',
 							'Missing data' => 'Connected',
-							'Time shift' => '788400000'
+							'Time shift' => '788400000',
+							'Aggregation function' => 'sum',
+							'Aggregation interval' => '788400000'
 						]
 					],
 					'Displaying options' => [
@@ -1297,7 +1446,10 @@ class testGraphWidget extends CWebTest {
 							'Transparency' => '10',
 							'Fill' => '10',
 							'Missing data' => 'Connected',
-							'Time shift' => '0'
+							'Time shift' => '0',
+							'Aggregation function' => 'last',
+							'Aggregation interval' => '1',
+							'Aggregate' => 'Data set'
 						],
 						[
 							'host' => 'Two host',
@@ -1475,7 +1627,9 @@ class testGraphWidget extends CWebTest {
 							'Transparency' => '0',
 							'Fill' => '0',
 							'Missing data' => 'Treat as 0',
-							'Time shift' => '-788400000'
+							'Time shift' => '-788400000',
+							'Aggregation function' => 'avg',
+							'Aggregation interval' => '788400000',
 						],
 						[
 							'host' => 'Two host',
@@ -1512,6 +1666,56 @@ class testGraphWidget extends CWebTest {
 					'check_form' => true
 				]
 			],
+			// Comma in host and item name.
+			[
+				[
+					'Data set' => [
+						[
+							'host' => 'Zabbix,Server',
+							'item' => 'Agent, Ping',
+							'Aggregation function' => 'min',
+							'Aggregate' => 'Data set'
+						],
+						[
+							'host' => ',Zabbix Server',
+							'item' => ',Agentp ping',
+							'Draw' => 'Bar',
+							'Aggregation function' => 'max'
+						],
+						[
+							'host' => ',Zabbix, Server,',
+							'item' => 'Zabbix configuration cache, % used',
+							'Aggregation function' => 'count',
+							'Aggregation interval' => '24h',
+						]
+					],
+					'Overrides' => [
+						[
+							'host' => 'Zabbix,Server',
+							'item' => 'Agent,Ping',
+							'options' => [
+								['Point size', '5'],
+							]
+						],
+						[
+							'host' => ',Zabbix Server',
+							'item' => ', Agent ping',
+							'options' => [
+								['Point size', '5'],
+								['Draw', 'Bar']
+							]
+						],
+						[
+							'host' => ',,Zabbix Server,,',
+							'item' => ', Agent, ping,',
+							'options' => [
+								['Draw', 'Bar']
+							]
+						],
+					],
+					'check_form' => true
+				]
+			],
 			// All posible fields.
 			[
 				[
@@ -1537,10 +1741,13 @@ class testGraphWidget extends CWebTest {
 							'item' => 'Two item',
 							'Base colour' => '000000',
 							'Y-axis' => 'Right',
-							'Draw' => 'Points',
-							'Point size' => '1',
+							'Draw' => 'Bar',
+							'Transparency' => '10',
 							'Transparency' => '0',
-							'Time shift' => '-1s'
+							'Time shift' => '-1s',
+							'Aggregation function' => 'avg',
+							'Aggregation interval' => '5h',
+							'Aggregate' => 'Data set'
 						]
 					],
 					'Displaying options' => [
@@ -1607,7 +1814,7 @@ class testGraphWidget extends CWebTest {
 							'options' => [
 								'Base colour',
 								['Width', '1'],
-								['Draw', 'Points'],
+								['Draw', 'Bar'],
 								['Transparency', '2'],
 								['Fill', '3'],
 								['Point size', '4'],
@@ -1627,6 +1834,7 @@ class testGraphWidget extends CWebTest {
 	 * Check graph widget successful update.
 	 *
 	 * @dataProvider getUpdateData
+	 * @backup widget
 	 */
 	public function testGraphWidget_Update($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
@@ -2046,7 +2254,7 @@ class testGraphWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidgetConfiguration();
 
-		foreach (['Line', 'Points', 'Staircase'] as $option) {
+		foreach (['Line', 'Points', 'Staircase', 'Bar'] as $option) {
 			$form->fill(['Draw' => $option]);
 
 			// Check the disabled fields depending on selected Draw option.
@@ -2059,10 +2267,19 @@ class testGraphWidget extends CWebTest {
 				case 'Points':
 					$fields = ['Width', 'Fill', 'Missing data'];
 					break;
+
+				case 'Bar':
+					$fields = ['Width', 'Fill', 'Point size', 'Missing data'];
+					break;
 			}
 
 			$this->assertEnabledFields($fields, false);
 		}
+
+		$fields = ['Aggregation interval', 'Aggregate'];
+		$this->assertEnabledFields($fields, false);
+		$form->fill(['Aggregation function' => 'min']);
+		$this->assertEnabledFields($fields, true);
 	}
 
 	/*
