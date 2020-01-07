@@ -61,9 +61,12 @@
 		PopUp('dashboard.properties.edit', options, 'dashboard_properties', this);
 	};
 
-	function dashbrdApplyProperties() {
+	/**
+	 * @param {Overlay} overlay
+	 */
+	function dashbrdApplyProperties(overlay) {
 		var dashboard = jQuery('.dashbrd-grid-container'),
-			form = jQuery('[name=dashboard_properties_form]'),
+			form = overlay.$dialogue.find('form'),
 			url = new Curl('zabbix.php', false),
 			form_data = {};
 
@@ -71,11 +74,15 @@
 		form_data = form.serializeJSON();
 		url.setArgument('action', 'dashboard.properties.check');
 
-		jQuery.ajax({
+		overlay.setLoading();
+		overlay.xhr = jQuery.ajax({
 			data: form_data,
 			url: url.getUrl(),
 			dataType: 'json',
 			method: 'POST',
+			complete: function() {
+				overlay.unsetLoading(overlay)
+			},
 			success: function (response) {
 				var errors = [];
 				form.parent().find('>.msg-good, >.msg-bad').remove();
