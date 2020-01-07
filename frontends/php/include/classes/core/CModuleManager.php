@@ -252,7 +252,7 @@ class CModuleManager {
 
 	/**
 	 * Check conflicts between modules.
-	 * 
+	 *
 	 * @param $manifest
 	 * @param $manifests
 	 *
