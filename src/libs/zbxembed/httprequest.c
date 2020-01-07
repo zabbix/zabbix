@@ -297,6 +297,21 @@ static duk_ret_t	es_httprequest_delete(duk_context *ctx)
 	return es_httprequest_query(ctx, "DELETE");
 }
 
+static duk_ret_t	es_httprequest_set_proxy(duk_context *ctx)
+{
+	zbx_es_httprequest_t	*request;
+	const char		*proxy;
+	CURLcode		err;
+
+	proxy = duk_to_string(ctx, 0);
+	if (NULL == (request = es_httprequest(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, proxy, err);
+
+	return 1;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: es_httprequest_status                                            *
@@ -329,6 +344,7 @@ static const duk_function_list_entry	httprequest_methods[] = {
 	{"Post", es_httprequest_post, 2},
 	{"Delete", es_httprequest_delete, 2},
 	{"Status", es_httprequest_status, 0},
+	{"SetProxy", es_httprequest_set_proxy,1},
 	{NULL, NULL, 0}
 };
 
