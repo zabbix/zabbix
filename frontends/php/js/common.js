@@ -637,24 +637,26 @@ function add_media(formname, media, mediatypeid, sendto, period, active, severit
 /**
  * Send trigger expression form data to server for validation before adding it to trigger expression field.
  *
- * @param {string} formname		form name that is sent to server for validation
- * @param {string} dialogueid	(optional) id of overlay dialogue.
+ * @param {Overlay} overlay
  */
-function validate_trigger_expression(formname, dialogueid) {
-	var form = window.document.forms[formname],
-		url = new Curl(jQuery(form).attr('action')),
-		dialogueid = dialogueid || null;
+function validate_trigger_expression(overlay) {
+	var $form = overlay.$dialogue.find('form'),
+		url = new Curl($form.attr('action'));
 
 	url.setArgument('add', 1);
 
-	jQuery.ajax({
+	overlay.setLoading();
+	overlay.xhr = jQuery.ajax({
 		url: url.getUrl(),
-		data: jQuery(form).serialize(),
+		data: $form.serialize(),
+		complete: function() {
+			overlay.unsetLoading();
+		},
 		success: function(ret) {
-			jQuery(window.document.forms[formname]).parent().find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(window.document.forms[formname]));
+				jQuery(ret.errors).insertBefore($form);
 			}
 			else {
 				var form = window.document.forms[ret.dstfrm];
@@ -669,13 +671,11 @@ function validate_trigger_expression(formname, dialogueid) {
 					jQuery(obj).val(ret.expression);
 				}
 
-				if (dialogueid) {
-					overlayDialogueDestroy(dialogueid);
-				}
+				overlayDialogueDestroy(overlay.dialogueid);
 			}
 		},
 		dataType: 'json',
-		type: 'post'
+		type: 'POST'
 	});
 }
 
