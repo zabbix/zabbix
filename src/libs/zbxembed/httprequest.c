@@ -297,6 +297,13 @@ static duk_ret_t	es_httprequest_delete(duk_context *ctx)
 	return es_httprequest_query(ctx, "DELETE");
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_set_proxy                                         *
+ *                                                                            *
+ * Purpose: CurlHttpRequest.SetProxy method                                   *
+ *                                                                            *
+ ******************************************************************************/
 static duk_ret_t	es_httprequest_set_proxy(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
