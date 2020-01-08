@@ -24,18 +24,34 @@ package keyaccess
 import (
 	"testing"
 
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/itemutil"
 )
 
-type Scenario struct {
+type accessRules struct {
+	allowRecords conf.Node
+	denyRecords  conf.Node
+}
+
+type scenario struct {
 	metric string
 	result bool
 }
 
-func RunScenarios(t *testing.T, scenarios []Scenario, records []Record, numRules int) {
+func (r *accessRules) addRule(pattern string, ruleType RuleType) {
+	var n int = len(r.allowRecords.Nodes) + len(r.denyRecords.Nodes) + 1
+
+	if ruleType == ALLOW {
+		r.allowRecords.Nodes = append(r.allowRecords.Nodes, &conf.Value{Value: []byte(pattern), Line: n})
+	} else {
+		r.denyRecords.Nodes = append(r.denyRecords.Nodes, &conf.Value{Value: []byte(pattern), Line: n})
+	}
+}
+
+func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRules int) {
 	var err error
 
-	if err := LoadRules(records); err != nil {
+	if err := LoadRules(&rules.allowRecords, &rules.denyRecords); err != nil {
 		t.Errorf("Failed to load rules: %s", err.Error())
 	}
 
@@ -57,9 +73,9 @@ func RunScenarios(t *testing.T, scenarios []Scenario, records []Record, numRules
 }
 
 func TestNoRules(t *testing.T) {
-	var records = []Record{}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[]", result: true},
 	}
 
@@ -67,11 +83,11 @@ func TestNoRules(t *testing.T) {
 }
 
 func TestDenyAll(t *testing.T) {
-	var records = []Record{
-		{Pattern: "*", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("*", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
 		{metric: "system.run[echo 1]", result: false},
 		{metric: "system.localtime[utc]", result: false},
@@ -81,11 +97,11 @@ func TestDenyAll(t *testing.T) {
 }
 
 func TestNoParameters(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents", result: false},
 		{metric: "vfs.file.contents[]", result: true},
 		{metric: "vfs.file.contents[/etc/passwd]", result: true},
@@ -95,11 +111,11 @@ func TestNoParameters(t *testing.T) {
 }
 
 func TestEmptyParameters(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[]", result: false},
 		{metric: "vfs.file.contents[\"\"]", result: false},
 		{metric: "vfs.file.contents", result: true},
@@ -110,11 +126,11 @@ func TestEmptyParameters(t *testing.T) {
 }
 
 func TestAnyParameters(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[*]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[]", result: false},
 		{metric: "vfs.file.contents[/path/to/file]", result: false},
 		{metric: "vfs.file.contents", result: true},
@@ -124,11 +140,11 @@ func TestAnyParameters(t *testing.T) {
 }
 
 func TestAnyParametersDoubleAsterisk(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[**]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[**]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[]", result: false},
 		{metric: "vfs.file.contents[/path/to/file]", result: false},
 		{metric: "vfs.file.contents[/path/to/file,UTF8]", result: false},
@@ -139,11 +155,11 @@ func TestAnyParametersDoubleAsterisk(t *testing.T) {
 }
 
 func TestSpecificFirstParameter(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[/etc/passwd,*]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[/etc/passwd,*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd,]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd,utf8]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
@@ -155,11 +171,11 @@ func TestSpecificFirstParameter(t *testing.T) {
 }
 
 func TestFirstParameterPattern(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[*passwd*]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[*passwd*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd,]", result: true},
 		{metric: "vfs.file.contents[/etc/passwd,utf8]", result: true},
@@ -169,11 +185,11 @@ func TestFirstParameterPattern(t *testing.T) {
 }
 
 func TestAnySecondParameter(t *testing.T) {
-	var records = []Record{
-		{Pattern: "test[a,*]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("test[a,*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "test[a]", result: false},
 		{metric: "test[a,]", result: false},
 		{metric: "test[a,anything]", result: false},
@@ -184,11 +200,11 @@ func TestAnySecondParameter(t *testing.T) {
 }
 
 func TestFirstParameterPatternAndAnyFollowing(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[*passwd*,*]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[*passwd*,*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd,]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd,utf8]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
@@ -199,11 +215,11 @@ func TestFirstParameterPatternAndAnyFollowing(t *testing.T) {
 }
 
 func TestAnyFirstParameter(t *testing.T) {
-	var records = []Record{
-		{Pattern: "test[*,b]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("test[*,b]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "test[anything,c]", result: true},
 		{metric: "test[anything,b]", result: false},
 		{metric: "test[anything,b,c]", result: true},
@@ -214,11 +230,11 @@ func TestAnyFirstParameter(t *testing.T) {
 }
 
 func TestEmptySecondParameterValue(t *testing.T) {
-	var records = []Record{
-		{Pattern: "test[a,,c]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("test[a,,c]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "test[a,,c]", result: false},
 		{metric: "test[a,b,c]", result: true},
 	}
@@ -227,11 +243,11 @@ func TestEmptySecondParameterValue(t *testing.T) {
 }
 
 func TestAnySecondParameterValue(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[/var/log/zabbix_server.log,*,abc]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[/var/log/zabbix_server.log,*,abc]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log,,abc]", result: false},
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log,utf8,abc]", result: false},
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log,,abc,def]", result: true},
@@ -241,11 +257,11 @@ func TestAnySecondParameterValue(t *testing.T) {
 }
 
 func TestSpecificParameters(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[/etc/passwd,utf8]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[/etc/passwd,utf8]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd,utf8]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd,]", result: true},
 		{metric: "vfs.file.contents[/etc/passwd,utf16]", result: true},
@@ -255,12 +271,12 @@ func TestSpecificParameters(t *testing.T) {
 }
 
 func TestQuotedParameters(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[/etc/passwd,utf8]", Deny: true},
-		{Pattern: "system.run[*]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[/etc/passwd,utf8]", DENY)
+	records.addRule("system.run[*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[\"/etc/passwd\",\"utf8\"]", result: false},
 		{metric: "vfs.file.contents[\"/etc/passwd\",\"\"]", result: true},
 		{metric: "vfs.file.contents[\"/etc/passwd\",\"utf16\"]", result: true},
@@ -271,11 +287,11 @@ func TestQuotedParameters(t *testing.T) {
 }
 
 func TestKeyPatternWithoutParameters(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.*", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.*", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents", result: false},
 		{metric: "vfs.file.size", result: false},
 		{metric: "vfs.file.contents[]", result: true},
@@ -286,12 +302,12 @@ func TestKeyPatternWithoutParameters(t *testing.T) {
 }
 
 func TestKeyPatternWithAnyParameters(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.*[*]", Deny: true},
-		{Pattern: "vfs.*.contents", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.*[*]", DENY)
+	records.addRule("vfs.*.contents", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.size.bytes[]", result: false},
 		{metric: "vfs.file.size[/var/log/zabbix_server.log, utf8]", result: false},
 		{metric: "vfs.file.size.bytes", result: true},
@@ -304,13 +320,13 @@ func TestKeyPatternWithAnyParameters(t *testing.T) {
 }
 
 func TestWhitelist(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.*[/var/log/*]", Deny: false},
-		{Pattern: "system.localtime[*]", Deny: false},
-		{Pattern: "*", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.*[/var/log/*]", ALLOW)
+	records.addRule("system.localtime[*]", ALLOW)
+	records.addRule("system.localtime[*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.size[/var/log/zabbix_server.log]", result: true},
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log]", result: true},
 		{metric: "system.localtime[]", result: true},
@@ -322,12 +338,12 @@ func TestWhitelist(t *testing.T) {
 }
 
 func TestBlacklist(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.contents[/etc/passwd,*]", Deny: true},
-		{Pattern: "system.run[*]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.contents[/etc/passwd,*]", DENY)
+	records.addRule("system.run[*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd,]", result: false},
 		{metric: "system.run[]", result: false},
@@ -340,11 +356,11 @@ func TestBlacklist(t *testing.T) {
 }
 
 func TestCombinedWildcardInKey(t *testing.T) {
-	var records = []Record{
-		{Pattern: "t*t*[a]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("t*t*[a]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "test1[a]", result: false},
 		{metric: "test_best2[a]", result: false},
 		{metric: "tests[a]", result: false},
@@ -356,32 +372,32 @@ func TestCombinedWildcardInKey(t *testing.T) {
 }
 
 func TestDuplicateRules(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.*", Deny: true},
-		{Pattern: "vfs.file.*", Deny: true},
-		{Pattern: "vfs.file.contents", Deny: true},
-		{Pattern: "vfs.file.contents[]", Deny: true},
-		{Pattern: "vfs.file.contents[/etc/passwd]", Deny: true},
-		{Pattern: "vfs.file.contents[/etc/passwd,*]", Deny: true},
-		{Pattern: "vfs.file.*", Deny: false},
-		{Pattern: "vfs.file.contents", Deny: false},
-		{Pattern: "vfs.file.contents[]", Deny: false},
-		{Pattern: "vfs.file.contents[/etc/passwd]", Deny: false},
-		{Pattern: "vfs.file.contents[/etc/passwd,*]", Deny: false},
-		{Pattern: "net.*.in", Deny: false},
-		{Pattern: "net.*.in", Deny: false},
-		{Pattern: "net.*.in[]", Deny: false},
-		{Pattern: "net.*.in[eth0]", Deny: false},
-		{Pattern: "net.*.in[eth0,*]", Deny: false},
-		{Pattern: "net.*.in", Deny: true},
-		{Pattern: "net.*.in[]", Deny: true},
-		{Pattern: "net.*.in[eth0]", Deny: true},
-		{Pattern: "net.*.in[eth0,*]", Deny: true},
-		{Pattern: "net.*.in[eth0,bytes]", Deny: true},
-		{Pattern: "*", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.*", DENY)
+	records.addRule("vfs.file.*", DENY)
+	records.addRule("vfs.file.contents", DENY)
+	records.addRule("vfs.file.contents[]", DENY)
+	records.addRule("vfs.file.contents[/etc/passwd]", DENY)
+	records.addRule("vfs.file.contents[/etc/passwd,*]", DENY)
+	records.addRule("vfs.file.*", ALLOW)
+	records.addRule("vfs.file.contents", ALLOW)
+	records.addRule("vfs.file.contents[]", ALLOW)
+	records.addRule("vfs.file.contents[/etc/passwd]", ALLOW)
+	records.addRule("vfs.file.contents[/etc/passwd,*]", ALLOW)
+	records.addRule("net.*.in", ALLOW)
+	records.addRule("net.*.in", ALLOW)
+	records.addRule("net.*.in[]", ALLOW)
+	records.addRule("net.*.in[eth0]", ALLOW)
+	records.addRule("net.*.in[eth0,*]", ALLOW)
+	records.addRule("net.*.in", DENY)
+	records.addRule("net.*.in[]", DENY)
+	records.addRule("net.*.in[eth0]", DENY)
+	records.addRule("net.*.in[eth0,*]", DENY)
+	records.addRule("net.*.in[eth0,bytes]", DENY)
+	records.addRule("*", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.size", result: false},
 		{metric: "vfs.file.contents", result: false},
 		{metric: "vfs.file.contents[]", result: false},
@@ -400,13 +416,13 @@ func TestDuplicateRules(t *testing.T) {
 }
 
 func TestNoRulesAfterAllowAll(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.*[*]", Deny: true},
-		{Pattern: "*", Deny: false},
-		{Pattern: "system.run[*]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.*[*]", DENY)
+	records.addRule("*", ALLOW)
+	records.addRule("system.run[*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
 		{metric: "vfs.file.size[/etc/systemd.conf]", result: false},
 		{metric: "system.run[echo 1]", result: true},
@@ -416,13 +432,13 @@ func TestNoRulesAfterAllowAll(t *testing.T) {
 }
 
 func TestNoRulesAfterDenyAll(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.*[*]", Deny: false},
-		{Pattern: "*", Deny: true},
-		{Pattern: "system.run[*]", Deny: false},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.*[*]", ALLOW)
+	records.addRule("*", DENY)
+	records.addRule("system.run[*]", ALLOW)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: true},
 		{metric: "vfs.file.size[/etc/systemd.conf]", result: true},
 		{metric: "system.run[echo 1]", result: false},
@@ -433,12 +449,12 @@ func TestNoRulesAfterDenyAll(t *testing.T) {
 }
 
 func TestIncompleteWhitelist(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.*[/var/log/*]", Deny: false},
-		{Pattern: "system.localtime[*]", Deny: false},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.*[/var/log/*]", ALLOW)
+	records.addRule("system.localtime[*]", ALLOW)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.size[/var/log/zabbix_server.log]", result: true},
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log]", result: true},
 		{metric: "system.localtime[]", result: true},
@@ -450,13 +466,13 @@ func TestIncompleteWhitelist(t *testing.T) {
 }
 
 func TestNoTrailingAllowRules(t *testing.T) {
-	var records = []Record{
-		{Pattern: "vfs.file.*[*]", Deny: true},
-		{Pattern: "system.run[*]", Deny: false},
-		{Pattern: "*", Deny: false},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("vfs.file.*[*]", DENY)
+	records.addRule("system.run[*]", ALLOW)
+	records.addRule("*", ALLOW)
+
+	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
 		{metric: "vfs.file.size[/etc/systemd.conf]", result: false},
 		{metric: "system.run[echo 1]", result: true},
@@ -467,11 +483,11 @@ func TestNoTrailingAllowRules(t *testing.T) {
 }
 
 func TestEmptyParametersMatch(t *testing.T) {
-	var records = []Record{
-		{Pattern: "web.page.get[localhost,*,*]", Deny: true},
-	}
+	var records accessRules
 
-	var scenarios = []Scenario{
+	records.addRule("web.page.get[localhost,*,*]", DENY)
+
+	var scenarios = []scenario{
 		{metric: "web.page.get[localhost]", result: false},
 		{metric: "web.page.get[localhost,]", result: false},
 		{metric: "web.page.get[localhost,/,80]", result: false},

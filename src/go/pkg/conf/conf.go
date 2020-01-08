@@ -211,27 +211,35 @@ func setStructValue(value reflect.Value, node *Node) (err error) {
 
 func setMapValue(value reflect.Value, node *Node) (err error) {
 	m := reflect.MakeMap(reflect.MapOf(value.Type().Key(), value.Type().Elem()))
-	for _, child := range node.nodes {
-		k := reflect.New(value.Type().Key())
-		if err = setBasicValue(k.Elem(), nil, &child.name); err != nil {
-			return
+	for _, v := range node.Nodes {
+		if child, ok := v.(*Node); ok {
+			k := reflect.New(value.Type().Key())
+			if err = setBasicValue(k.Elem(), nil, &child.Name); err != nil {
+				return
+			}
+			v := reflect.New(value.Type().Elem())
+			if err = setValue(v.Elem(), nil, child); err != nil {
+				return
+			}
+			m.SetMapIndex(k.Elem(), v.Elem())
 		}
-		v := reflect.New(value.Type().Elem())
-		if err = setValue(v.Elem(), nil, child); err != nil {
-			return
-		}
-		m.SetMapIndex(k.Elem(), v.Elem())
 	}
 	value.Set(m)
 	return
 }
 
 func setSliceValue(value reflect.Value, node *Node) (err error) {
-	size := len(node.values)
+	tmpValues := make([][]byte, 0)
+	for _, v := range node.Nodes {
+		if val, ok := v.(*Value); ok {
+			tmpValues = append(tmpValues, val.Value)
+		}
+	}
+	size := len(tmpValues)
 	values := reflect.MakeSlice(reflect.SliceOf(value.Type().Elem()), 0, size)
 
-	if len(node.values) > 0 {
-		for _, data := range node.values {
+	if len(tmpValues) > 0 {
+		for _, data := range tmpValues {
 			v := reflect.New(value.Type().Elem())
 			str := string(data)
 			if err = setBasicValue(v.Elem(), nil, &str); err != nil {
@@ -240,12 +248,14 @@ func setSliceValue(value reflect.Value, node *Node) (err error) {
 			values = reflect.Append(values, v.Elem())
 		}
 	} else {
-		for _, child := range node.nodes {
-			v := reflect.New(value.Type().Elem())
-			if err = setValue(v.Elem(), nil, child); err != nil {
-				return
+		for _, n := range node.Nodes {
+			if child, ok := n.(*Node); ok {
+				v := reflect.New(value.Type().Elem())
+				if err = setValue(v.Elem(), nil, child); err != nil {
+					return
+				}
+				values = reflect.Append(values, v.Elem())
 			}
-			values = reflect.Append(values, v.Elem())
 		}
 	}
 	value.Set(values)
@@ -398,7 +408,6 @@ func loadInclude(root *Node, path string) (err error) {
 func parseConfig(root *Node, data []byte) (err error) {
 	const maxStringLen = 2048
 	var line []byte
-	var keyAccessRule int = 0
 
 	root.level++
 
@@ -433,17 +442,6 @@ func parseConfig(root *Node, data []byte) (err error) {
 			if err = loadInclude(root, string(value)); err != nil {
 				return
 			}
-		} else if string(key) == "AllowKey" || string(key) == "DenyKey" {
-			var ruleType []byte
-
-			if string(key) == "DenyKey" {
-				ruleType = []byte("true")
-			} else {
-				ruleType = []byte("false")
-			}
-			root.add([]byte(fmt.Sprintf("KeyAccessRules.%d.Pattern", keyAccessRule)), value, num)
-			root.add([]byte(fmt.Sprintf("KeyAccessRules.%d.Deny", keyAccessRule)), []byte(ruleType), num)
-			keyAccessRule++
 		} else {
 			root.add(key, value, num)
 		}
@@ -476,20 +474,18 @@ func Unmarshal(data interface{}, v interface{}, args ...interface{}) (err error)
 	switch u := data.(type) {
 	case nil:
 		root = &Node{
-			name:   "",
+			Name:   "",
 			used:   false,
-			values: make([][]byte, 0),
-			nodes:  make([]*Node, 0),
+			Nodes:  make([]interface{}, 0),
 			parent: nil,
-			line:   0}
+			Line:   0}
 	case []byte:
 		root = &Node{
-			name:   "",
+			Name:   "",
 			used:   false,
-			values: make([][]byte, 0),
-			nodes:  make([]*Node, 0),
+			Nodes:  make([]interface{}, 0),
 			parent: nil,
-			line:   0}
+			Line:   0}
 
 		if err = parseConfig(root, u); err != nil {
 			return fmt.Errorf("Cannot read configuration: %s", err.Error())

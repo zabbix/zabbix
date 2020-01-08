@@ -287,11 +287,9 @@ func main() {
 		}
 	}
 
-	if len(agent.Options.KeyAccessRules) != 0 {
-		if err := keyaccess.LoadRules(agent.Options.KeyAccessRules); err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to load key access rules: %s\n", err.Error())
-			os.Exit(1)
-		}
+	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to load key access rules: %s\n", err.Error())
+		os.Exit(1)
 	}
 
 	if argTest || argPrint {

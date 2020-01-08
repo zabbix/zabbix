@@ -23,24 +23,28 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/wildcard"
 )
 
-// Record key access record
-type Record struct {
-	Pattern string
-	Deny    bool
-}
-
-// Access rule permission type
+// RuleType Access rule permission type
 type RuleType int
 
+// Rule access types
 const (
 	ALLOW RuleType = iota
 	DENY  RuleType = iota
 )
+
+// Record key access record
+type Record struct {
+	Pattern    string
+	Permission RuleType
+	Line       int
+}
 
 // Rule key access rule definition
 type Rule struct {
@@ -50,23 +54,24 @@ type Rule struct {
 	EmptyParams bool
 }
 
+// Rules key access rules list
 var Rules []Rule
 var noMoreRules bool = false
 
 func parse(rec Record) (r *Rule, err error) {
 	r = &Rule{}
-	if rec.Deny == true {
-		r.Permission = DENY
-	} else {
-		r.Permission = ALLOW
-	}
+	r.Permission = rec.Permission
+
 	if r.Key, r.Params, err = itemutil.ParseWildcardKey(rec.Pattern); err != nil {
 		return nil, err
 	}
+
 	r.EmptyParams = false
+
 	if len(r.Params) == 1 && len(r.Params) == 0 {
 		r.EmptyParams = true
 	}
+
 	r.Key = wildcard.Minimize(r.Key)
 
 	for i := range r.Params {
@@ -127,9 +132,30 @@ func addRule(rec Record) (err error) {
 }
 
 // LoadRules adds key access records to access rule list
-func LoadRules(records []Record) (err error) {
+func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	Rules = Rules[:0]
 	noMoreRules = false
+
+	var records []Record
+
+	if node, ok := allowRecords.(*conf.Node); ok {
+		for _, v := range node.Nodes {
+			if value, ok := v.(*conf.Value); ok {
+				records = append(records, Record{Pattern: string(value.Value), Permission: ALLOW, Line: value.Line})
+			}
+		}
+	}
+	if node, ok := denyRecords.(*conf.Node); ok {
+		for _, v := range node.Nodes {
+			if value, ok := v.(*conf.Value); ok {
+				records = append(records, Record{Pattern: string(value.Value), Permission: DENY, Line: value.Line})
+			}
+		}
+	}
+
+	sort.SliceStable(records, func(i, j int) bool {
+		return records[i].Line < records[j].Line
+	})
 
 	for _, r := range records {
 		if err = addRule(r); err != nil {
@@ -151,7 +177,11 @@ func LoadRules(records []Record) (err error) {
 	if allowRules > 0 && denyRules == 0 {
 		// if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration
 		fmt.Fprintf(os.Stderr, "adding DenyKey=* rule for proper whitelist configuration\n")
-		addRule(Record{"*", true})
+		r := Record{Pattern: "*", Permission: DENY}
+		if err = addRule(r); err != nil {
+			err = fmt.Errorf("\"%s\" %s", r.Pattern, err.Error())
+			return
+		}
 	} else {
 		// trailing AllowKey rules are meaningless, because AllowKey=* is default behavior
 		for i := len(Rules) - 1; i >= 0; i-- {

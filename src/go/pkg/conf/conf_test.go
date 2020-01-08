@@ -22,7 +22,9 @@
 package conf
 
 import (
+	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 
@@ -444,20 +446,63 @@ func TestInterface(t *testing.T) {
 	}
 }
 
-func TestKeyAccessRules(t *testing.T) {
-	type KeyAccessRule struct {
-		Pattern string
-		Deny    bool
-	}
+func TestRawAccess(t *testing.T) {
 	type Options struct {
-		KeyAccessRules []KeyAccessRule `conf:"optional"`
+		LogFile  string
+		LogLevel int
+		Timeout  int
+		AllowKey interface{} `conf:"optional"`
+		DenyKey  interface{} `conf:"optional"`
 	}
-	input := `
-		AllowKey=system.localtime
-		AllowKey=vfs.*[*]
-		DenyKey=*`
 
-	var options Options
-	var expected Options = Options{[]KeyAccessRule{{"system.localtime", false}, {"vfs.*[*]", false}, {"*", true}}}
-	checkUnmarshal(t, []byte(input), &expected, &options)
+	input := `
+		LogFile = /tmp/log
+		LogLevel = 3
+		Timeout = 10
+		AllowKey=system.localtime
+		DenyKey=*
+		AllowKey=vfs.*[*]
+	`
+	var o Options
+	if err := Unmarshal([]byte(input), &o); err != nil {
+		t.Errorf("Failed unmarshaling options: %s", err)
+	}
+
+	values := make([]*Value, 0)
+	if node, ok := o.AllowKey.(*Node); ok {
+		for _, v := range node.Nodes {
+			if value, ok := v.(*Value); ok {
+				value.Value = []byte(fmt.Sprintf("%s: %s", node.Name, string(value.Value)))
+				values = append(values, value)
+			}
+		}
+	}
+	if node, ok := o.DenyKey.(*Node); ok {
+		for _, v := range node.Nodes {
+			if value, ok := v.(*Value); ok {
+				value.Value = []byte(fmt.Sprintf("%s: %s", node.Name, string(value.Value)))
+				values = append(values, value)
+			}
+		}
+	}
+
+	sort.SliceStable(values, func(i, j int) bool {
+		return values[i].Line < values[j].Line
+	})
+
+	var returnedOpts []string
+
+	for _, value := range values {
+		returnedOpts = append(returnedOpts, string(value.Value))
+	}
+
+	expectedOpts := []string{
+		"AllowKey: system.localtime",
+		"DenyKey: *",
+		"AllowKey: vfs.*[*]",
+	}
+
+	if !reflect.DeepEqual(expectedOpts, returnedOpts) {
+		t.Errorf("Expected '%+v' while got '%+v'", expectedOpts, returnedOpts)
+	}
 }
