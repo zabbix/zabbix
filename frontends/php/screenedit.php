@@ -269,7 +269,7 @@ $data = [
 	'screenid' => getRequest('screenid', 0)
 ];
 
-// getting updated screen, so we wont have to refresh the page to see changes
+// Getting updated screen, so we won't have to refresh the page to see changes.
 $data['screen'] = API::Screen()->get($options);
 if (empty($data['screen'])) {
 	$data['screen'] = API::TemplateScreen()->get($options);

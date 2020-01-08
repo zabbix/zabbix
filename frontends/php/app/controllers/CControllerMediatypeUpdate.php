@@ -163,11 +163,17 @@ class CControllerMediatypeUpdate extends CController {
 		$result = API::Mediatype()->update($mediatype);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.list&uncheck=1');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'mediatype.list')
+				->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
+			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Media type updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'mediatype.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update media type'));
 		}

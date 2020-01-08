@@ -623,7 +623,7 @@ class CHttpTestManager {
 			}
 
 			/*
-			 * Unset $http_tests and (later) put it back with actual httptestid as a key right after creating/updateing
+			 * Unset $http_tests and (later) put it back with actual httptestid as a key right after creating/updating
 			 * it. This is done in such a way because $http_tests array holds items with incremental keys which are not
 			 * a real httptestids.
 			 */

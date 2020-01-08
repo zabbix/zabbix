@@ -478,8 +478,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					$this->assertTrue($this->query('xpath', $xpath)->one()->isVisible());
 				}
 				else {
-					$element = $this->query('xpath', $xpath)->one(false);
-					$this->assertTrue($element === null || $element->isVisible(false));
+					$this->assertTrue($this->query('xpath', $xpath)->one(false)->isVisible(false));
 				}
 
 				$this->query('id:name')->one()->fill($this->getUsernameWithoutDomain($data['user']));

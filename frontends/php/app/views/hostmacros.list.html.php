@@ -19,15 +19,8 @@
 **/
 
 
-if (!$data['readonly']) {
-	require_once dirname(__FILE__).'/js/hostmacros.js.php';
-}
-
-// form list
-$macros_form_list = new CFormList('macrosFormList');
-
 if ($data['readonly'] && !$data['macros']) {
-	$table = _('No macros found.');
+	$table = new CObject(_('No macros found.'));
 }
 else {
 	$table = (new CTable())
@@ -35,6 +28,7 @@ else {
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER);
 
 	$actions_col = $data['readonly'] ? null : '';
+
 	if ($data['show_inherited_macros']) {
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$link = (new CLink(_('configure'), (new CUrl('zabbix.php'))
@@ -217,15 +211,4 @@ else {
 	}
 }
 
-$macros_form_list
-	->addRow(null,
-		(new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
-			->addValue($data['is_template'] ? _('Template macros') : _('Host macros'), 0, null, 'this.form.submit()')
-			->addValue($data['is_template'] ? _('Inherited and template macros') : _('Inherited and host macros'), 1,
-				null, 'this.form.submit()'
-			)
-			->setModern(true)
-	)
-	->addRow(null, $table);
-
-return $macros_form_list;
+echo $table;

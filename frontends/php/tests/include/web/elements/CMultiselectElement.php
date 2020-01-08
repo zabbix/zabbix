@@ -126,7 +126,7 @@ class CMultiselectElement extends CElement {
 
 			foreach ($labels as $label) {
 				$row = $table->findRow('Name', $label);
-				if ($row === null) {
+				if (!$row->isValid()) {
 					throw new Exception('Cannot select row with label "'.$label.'" in multiselect element.');
 				}
 
@@ -309,16 +309,12 @@ class CMultiselectElement extends CElement {
 	 */
 	public function isEnabled($enabled = true) {
 		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one(false);
-		if ($input === null && $enabled) {
-			return false;
-		}
-
-		if ($input !== null && !$input->isEnabled($enabled)) {
+		if (!$input->isEnabled($enabled)) {
 			return false;
 		}
 
 		$multiselect = $this->query('class:multiselect')->one(false);
-		if ($multiselect && ($multiselect->getAttribute('aria-disabled') === 'true') === $enabled) {
+		if ($multiselect->isValid() && ($multiselect->getAttribute('aria-disabled') === 'true') === $enabled) {
 			return false;
 		}
 
