@@ -642,6 +642,10 @@ jQuery(function($) {
 														};
 
 														$root.append(createTreeItem($obj, new_item, 1, true, true));
+
+														$root.closest('.tree-item')
+															.removeClass('closed')
+															.addClass('opened is-parent');
 													}
 
 													if (resp.hierarchy.constructor === Object
