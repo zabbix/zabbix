@@ -97,11 +97,17 @@ class CControllerProxyCreate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'proxy.list')
+				->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
+			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Proxy added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'proxy.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add proxy'));
 		}

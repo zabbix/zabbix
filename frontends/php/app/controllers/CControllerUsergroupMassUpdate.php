@@ -56,7 +56,7 @@ class CControllerUsergroupMassUpdate extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'usergroup.list')
-			->getUrl()
+			->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
 		);
 
 		$updated = count($user_groups);

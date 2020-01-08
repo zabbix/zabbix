@@ -90,13 +90,14 @@ class CControllerScriptList extends CController {
 			'limit' => $config['search_limit'] + 1
 		]);
 
-		// sorting & paging
+		// data sort and pager
 		order_result($data['scripts'], $sortField, $sortOrder);
 
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'script.list');
-
-		$data['paging'] = getPagingLine($data['scripts'], $sortOrder, $url);
+		$page_num = getRequest('page', 1);
+		CPagerHelper::savePage('script.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['scripts'], $sortOrder,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
 
 		// find script host group name and user group name. set to '' if all host/user groups used.
 

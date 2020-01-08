@@ -48,15 +48,20 @@ $scriptsForm = (new CForm())
 	->setName('scriptsForm')
 	->setId('scripts');
 
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'script.list')
+	->getUrl();
+
 $scriptsTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_scripts'))->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
+			(new CCheckBox('all_scripts'))
+				->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Type'),
 		_('Execute on'),
-		make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder'], $url),
 		_('User group'),
 		_('Host group'),
 		_('Host access')
