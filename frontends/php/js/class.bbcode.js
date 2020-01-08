@@ -27,7 +27,7 @@ var BBCode = {
 	RE: {
 		'bbcode': /^\/?(?:b|i|u|pre|code|color|size|noparse|url)$/, // BBcode tags
 		'color': /^(:?#(?:[0-9a-f]{3})?[0-9a-f]{3})$/i, // color names or hex color
-		'uri': /^[-;\/\?:@&=\+\$,_\.!~\*'\(\)%0-9a-z]{1,512}$/i, // reserved, unreserved, escaped and alpha-numeric [RFC2396]
+		'uri': /^[-;\/\?:@&=\+\$,_\.!~\*'\(\)%0-9a-z]{1,512}$/i, // reserved, unreserved, escaped and alphanumeric [RFC2396]
 		'format': /([\r\n])|(?:\[([a-z]{1,16})(?:=([^\x00-\x1F''\(\)<>\[\]]{1,256}))?\])|(?:\[\/([a-z]{1,16})\])/ig // main regular expression: CRLF, [tag=option], [tag] or [/tag]
 	},
 

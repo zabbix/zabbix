@@ -1038,7 +1038,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									}
 
 									/*
-									 * $upd_applicationids now contains new and existing application IDs depeding on
+									 * $upd_applicationids now contains new and existing application IDs depending on
 									 * operation we want to perform.
 									 */
 									$item_prototype['applications'] = array_keys(array_flip($upd_applicationids));

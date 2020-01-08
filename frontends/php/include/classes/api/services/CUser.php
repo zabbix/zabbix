@@ -634,7 +634,7 @@ class CUser extends CApiService {
 	 * @param array|string  $users[]['user_medias'][]['sendto']       Address where to send the alert.
 	 * @param array         $db_mediatypes                            List of available media types.
 	 *
-	 * @throws APIException if e-mail is not valid or exeeds maximum DB field length.
+	 * @throws APIException if e-mail is not valid or exceeds maximum DB field length.
 	 */
 	private function validateMediaRecipients(array $users, array $db_mediatypes) {
 		if ($db_mediatypes) {
@@ -678,7 +678,7 @@ class CUser extends CApiService {
 
 						/*
 						 * If media type is email, validate each given string against email pattern.
-						 * Additionally, total lenght of emails must be checked, because all media type emails are
+						 * Additionally, total length of emails must be checked, because all media type emails are
 						 * separated by newline and stored as a string in single database field. Newline characters
 						 * consumes extra space, so additional validation must be made.
 						 */

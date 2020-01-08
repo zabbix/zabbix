@@ -124,7 +124,7 @@ class CUpdateIntervalParser extends CParser {
 	}
 
 	/**
-	 * Get all intervals or specificly flexible or scheduling intervals.
+	 * Get all intervals or specifically flexible or scheduling intervals.
 	 *
 	 * @param int $type			If null get both types, else either ITEM_DELAY_FLEXIBLE or ITEM_DELAY_SCHEDULING
 	 *

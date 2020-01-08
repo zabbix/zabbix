@@ -1,6 +1,7 @@
 Changes for 5.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-5473] reworked template linking with Multiselect and loading macro list with AJAX (averza, Ivo, vmurzins)
 A......... [ZBXNEXT-1898] implemented strong cryptography for encoding frontend passwords (vasilijs)
 A.F.I..PS. [ZBXNEXT-5592] dropped IBM DB2 database support for Zabbix server (talbergs, viktors)
 .........T [ZBXNEXT-5623] added Pushover webhook integration (vitaly)
@@ -32,6 +33,11 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
+..F....... [ZBX-16481] fixed spelling issues in the code (miks)
+..F....... [ZBX-16894] fixed dynamic rows losing old input at form error (talbergs)
+..F....... [ZBX-17066] fixed wrongly positioned context menu when launched by keyboard (averza)
+..F....... [ZBX-17019] fixed aria-live message partially visible beneath multiselect controls (averza)
+........S. [ZBX-16966] fixed not operator in correlation function expression (atumilovics)
 ..F....... [ZBX-17101] fixed url validation before output (miks)
 ...G...... [ZBX-17070] fixed agent2 plugin configuration not being called if no plugin specific parameters are set (wiper)
 ........S. [ZBX-17062] fixed LLD macro substitution when PostgrSQL is used (viktors)
@@ -58,7 +64,6 @@ A.F....... [ZBX-16111] removed templateid from screen API output (vasilijs)
 ..F....... [ZBX-16978] fixed undefined offset in problem by severity widget (rlataria)
 ..F....... [ZBX-16944] fixed "Type of information" field in item form being marked as required when it is read-only (Ivo)
 ..F....... [ZBX-16912] fixed image map elements having a hand cursor when there is no context menu available (Ivo)
-..F....... [ZBX-1977] fixed axis labels calculation (ashubin, rlataria)
 ..F....... [ZBX-16877] fixed long SNMP OID value goes beyond fields block (rlataria)
 ..F....... [ZBX-17034] updated Zabbix website links (averza)
 ..F....... [ZBX-16874] fixed map-type widget clipping in Internet Explorer (averza)
@@ -164,8 +169,14 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 Changes for 4.4.5rc1
 
 New features:
+..F....... [ZBXNEXT-5473] reworked template linking with Multiselect and loading macro list with AJAX (averza, Ivo, vmurzins)
 
 Bug fixes:
+..F....... [ZBX-16481] fixed spelling issues in the code (miks)
+.......... [ZBX-1977] reverted fix for axis labels calculation (rlataria)
+..F....... [ZBX-16894] fixed dynamic rows losing old input at form error (talbergs)
+..F....... [ZBX-17019] fixed aria-live message partially visible beneath multiselect controls (averza)
+........S. [ZBX-16966] fixed not operator in correlation function expression (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.4
@@ -1150,6 +1161,10 @@ Changes for 4.0.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-16481] fixed spelling issues in the code (miks)
+.......... [ZBX-1977] reverted fix for axis labels calculation (rlataria)
+..F....... [ZBX-16894] fixed dynamic rows losing old input at form error (talbergs)
+........S. [ZBX-16966] fixed not operator in correlation function expression (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.16

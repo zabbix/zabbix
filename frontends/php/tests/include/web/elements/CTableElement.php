@@ -134,18 +134,18 @@ class CTableElement extends CElement {
 	 * @param string $column    column name
 	 * @param string $value     column value
 	 *
-	 * @return CTableRow|null
+	 * @return CTableRow|CNullElement
 	 */
 	public function findRow($column, $value) {
 		$headers = $this->getHeadersText();
 
 		if (is_string($column)) {
-			$column = array_search($column, $headers);
-			if ($column === false) {
-				return null;
+			$index = array_search($column, $headers);
+			if ($index === false) {
+				return new CNullElement(['locator' => '"'.$column.'" (table column name)']);
 			}
 
-			$column++;
+			$column = $index + 1;
 		}
 
 		$suffix = '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
@@ -159,7 +159,7 @@ class CTableElement extends CElement {
 	 *
 	 * @param array $content    column data
 	 *
-	 * @return CTableRow|null
+	 * @return CElementCollection
 	 */
 	public function findRows($content) {
 		$rows = [];

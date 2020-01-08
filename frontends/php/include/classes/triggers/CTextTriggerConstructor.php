@@ -237,7 +237,7 @@ class CTextTriggerConstructor {
 	 * @return array    an array of token arrays grouped by expression
 	 */
 	protected function splitTokensByFirstLevel(array $tokens) {
-		$expresions = [];
+		$expressions = [];
 		$currentExpression = [];
 
 		$level = 0;
@@ -247,7 +247,7 @@ class CTextTriggerConstructor {
 					// look for an "or" or "and" operator on the top parentheses level
 					// if such an expression is found, save all of the tokens before it as a separate expression
 					if ($level == 0 && ($token['value'] === 'or' || $token['value'] === 'and')) {
-						$expresions[] = $currentExpression;
+						$expressions[] = $currentExpression;
 						$currentExpression = [];
 
 						// continue to the next token
@@ -268,9 +268,9 @@ class CTextTriggerConstructor {
 			$currentExpression[] = $token;
 		}
 
-		$expresions[] = $currentExpression;
+		$expressions[] = $currentExpression;
 
-		return $expresions;
+		return $expressions;
 	}
 
 }

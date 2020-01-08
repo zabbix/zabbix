@@ -213,12 +213,14 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (CONFIG_TIMEOUT < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
+			zbx_free(contents);
 			goto err;
 		}
 
 		if (ZBX_MAX_DB_FILE_SIZE < (flen += nbytes))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
+			zbx_free(contents);
 			goto err;
 		}
 

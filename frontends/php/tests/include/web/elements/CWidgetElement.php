@@ -94,7 +94,7 @@ class CWidgetElement extends CElement {
 		$target = $this;
 
 		return function () use ($target) {
-			return ($target->query('xpath:.//div[contains(@class, "is-loading")]')->one(false) === null);
+			return ($target->query('xpath:.//div[contains(@class, "is-loading")]')->one(false)->isValid() === false);
 		};
 	}
 }

@@ -1594,7 +1594,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'itemids' => getRequest('group_itemid', []),
 		'description' => getRequest('description', ''),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'delay_flex' => getRequest('delay_flex', []),
+		'delay_flex' => array_values(getRequest('delay_flex', [])),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', 0),
 		'type' => getRequest('type', 0),
