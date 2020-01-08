@@ -19,8 +19,6 @@
 **/
 
 
-namespace Api\Service;
-
 /**
  * Class containing methods for operations module.
  */
