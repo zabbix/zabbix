@@ -473,10 +473,11 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'uniqueid' => $this->getInput('uniqueid'),
+			'navtree' => $fields['navtree'],
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,
 			'problems' => $this->getNumberOfProblemsBySysmap($navtree_items),
-			'show_unavailable' => array_key_exists('show_unavailable', $fields) ? $fields['show_unavailable'] : 0,
+			'show_unavailable' => $fields['show_unavailable'],
 			'maps_accessible' => array_keys($maps_accessible),
 			'severity_config' => $severity_config,
 			'initial_load' => $this->getInput('initial_load', 0),

@@ -470,8 +470,7 @@ jQuery(function($) {
 				var root = createTreeBranch($obj, 'root', null),
 					widget_data = $obj.data('widgetData'),
 					prefix = widget_data['uniqueid'] + '_',
-					items = getTreeWidgetItems($obj),
-					tree = buildTree($obj, items, 0);
+					tree = buildTree($obj, 0);
 
 				$('.root', $obj).remove();
 				$('.tree', $obj).append(root);
@@ -983,9 +982,8 @@ jQuery(function($) {
 						}
 
 						if (widget_data['widgetid'].length) {
-							updateUserProfile(
-								'web.dashbrd.navtree-' + branch.data('id') + '.toggle',
-								closed_state, [widget_data['widgetid']]
+							updateUserProfile('web.dashbrd.navtree-' + branch.data('id') + '.toggle', closed_state,
+								[widget_data['widgetid']]
 							);
 
 							var index = widget_options['navtree_items_opened'].indexOf(branch.data('id').toString());
@@ -1102,23 +1100,12 @@ jQuery(function($) {
 				return $(".dashbrd-grid-container").dashboardGrid('isEditMode');
 			};
 
-			/*
-			 * Grouping a separate widget fields into objects of items. Each items consists of its name, parent, id etc.
-			 *
-			 * @returns {object} - "navtree" object.
-			 */
-			var getTreeWidgetItems = function($obj) {
-				var widget_data = getWidgetData($obj);
-
-				return widget_data['fields']['navtree'];
-			};
-
 			// Create multi-level array that represents real child-parent dependencies in tree.
-			var buildTree = function($obj, items, parent_id) {
+			var buildTree = function($obj, parent_id) {
 				var widget_data = $obj.data('widgetData'),
 					tree = [];
 
-				$.each(items, function(index, item) {
+				$.each(widget_data['navtree'], function(index, item) {
 					var tree_item = {
 						id: index,
 						name: item.name,
@@ -1132,7 +1119,7 @@ jQuery(function($) {
 					}
 
 					if (tree_item['parent'] == parent_id) {
-						var children = buildTree($obj, items, tree_item['id']);
+						var children = buildTree($obj, tree_item['id']);
 
 						if (children.length) {
 							tree_item['children'] = children;
@@ -1163,11 +1150,16 @@ jQuery(function($) {
 			// Records data from DOM to dashboard widget[fields] array.
 			var updateWidgetFields = function($obj) {
 				var dashboard_widget = getWidgetData($obj),
-					prefix = dashboard_widget['uniqueid'] + '_',
-					navtree = {};
+					prefix = dashboard_widget['uniqueid'] + '_';
 
 				if (!dashboard_widget || !isEditMode()) {
 					return false;
+				}
+
+				for (var name in dashboard_widget['fields']) {
+					if (/^navtree\.(name|order|parent|sysmapid)\.\d+$/.test(name)) {
+						delete dashboard_widget['fields'][name]
+					}
 				}
 
 				$('input[name^="navtree.name."]', dashboard_widget['content_body']).each(function(index, field) {
@@ -1183,16 +1175,18 @@ jQuery(function($) {
 							order++;
 						}
 
-						navtree[id] = {
-							name: field.value,
-							parent: parent || 0,
-							order: order + 1,
-							sysmapid: sysmapid
-						};
+						dashboard_widget['fields']['navtree.name.' + id] = field.value;
+						if (parent != 0) {
+							dashboard_widget['fields']['navtree.parent.' + id] = parent;
+						}
+						if (order != 0) {
+							dashboard_widget['fields']['navtree.order.' + id] = order + 1;
+						}
+						if (sysmapid != 0) {
+							dashboard_widget['fields']['navtree.sysmapid.' + id] = sysmapid;
+						}
 					}
 				});
-
-				dashboard_widget['fields']['navtree'] = navtree;
 			};
 
 			var openBranch = function($obj, id) {
@@ -1282,8 +1276,7 @@ jQuery(function($) {
 					var $this = $(this);
 
 					return this.each(function() {
-						var widget = getWidgetData($this),
-							widget_data = $this.data('widgetData');
+						var widget_data = $this.data('widgetData');
 
 						if (!widget_data.navtree_item_selected
 								|| !$('.tree-item[data-id=' + widget_data.navtree_item_selected + ']').is(':visible')) {
@@ -1307,6 +1300,7 @@ jQuery(function($) {
 						$this.data('widgetData', {
 							uniqueid: options.uniqueid,
 							severity_levels: options.severity_levels || [],
+							navtree: options.navtree,
 							navtree_items_opened: options.navtree_items_opened.toString().split(',') || [],
 							navtree_item_selected: +options.navtree_item_selected || null,
 							maps_accessible: options.maps_accessible || [],
@@ -1316,8 +1310,7 @@ jQuery(function($) {
 							lastId: 0
 						});
 
-						var widget_data = getWidgetData($this),
-							triggers = ['onEditStart', 'beforeDashboardSave','beforeConfigLoad', 'onDashboardReady'];
+						var	triggers = ['onEditStart', 'beforeDashboardSave','beforeConfigLoad', 'onDashboardReady'];
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-container").dashboardGrid("addAction", trigger,
@@ -1335,7 +1328,7 @@ jQuery(function($) {
 						}
 						else {
 							$('.dashbrd-grid-container').dashboardGrid('registerDataExchange', {
-								uniqueid: widget_data['uniqueid'],
+								uniqueid: options.uniqueid,
 								data_name: 'current_sysmapid',
 								callback: function(widget, data) {
 									var item,

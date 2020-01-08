@@ -34,7 +34,7 @@ $scripts = [];
 
 // Map widget reference.
 $field = $fields[CWidgetFieldReference::FIELD_NAME];
-$form->addVar($field->getName(), $field->getValue());
+$form->addItem((new CVar($field->getName(), $field->getValue()))->removeId());
 
 if ($field->getValue() === '') {
 	$scripts[] = $field->getJavascript('#'.$form->getAttribute('id'));
@@ -46,11 +46,15 @@ $navtree_items = $field->getValue();
 $field_name = $field->getName();
 
 foreach ($navtree_items as $i => $navtree_item) {
-	$form->addVar($field_name.'['.$i.'][name]', $navtree_item['name']);
-	$form->addVar($field_name.'['.$i.'][order]', $navtree_item['order']);
-	$form->addVar($field_name.'['.$i.'][parent]', $navtree_item['parent']);
+	$form->addItem((new CVar($field_name.'.name.'.$i, $navtree_item['name']))->removeId());
+	if ($navtree_item['order'] != 1) {
+		$form->addItem((new CVar($field_name.'.order.'.$i, $navtree_item['order']))->removeId());
+	}
+	if ($navtree_item['parent'] != 0) {
+		$form->addItem((new CVar($field_name.'.parent.'.$i, $navtree_item['parent']))->removeId());
+	}
 	if (array_key_exists('sysmapid', $navtree_item)) {
-		$form->addVar($field_name.'['.$i.'][sysmapid]', $navtree_item['sysmapid']);
+		$form->addItem((new CVar($field_name.'.sysmapid.'.$i, $navtree_item['sysmapid']))->removeId());
 	}
 }
 

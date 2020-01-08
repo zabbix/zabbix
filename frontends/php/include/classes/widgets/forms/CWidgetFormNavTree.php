@@ -39,13 +39,13 @@ class CWidgetFormNavTree extends CWidgetForm {
 		$this->fields[$field_reference->getName()] = $field_reference;
 
 		// Elements of the tree.
-		$field_tags = new CWidgetFieldNavTree('navtree', '');
+		$field_navtree = new CWidgetFieldNavTree('navtree', '');
 
 		if (array_key_exists('navtree', $this->data)) {
-			$field_tags->setValue($this->data['navtree']);
+			$field_navtree->setValue($this->data['navtree']);
 		}
 
-		$this->fields[$field_tags->getName()] = $field_tags;
+		$this->fields[$field_navtree->getName()] = $field_navtree;
 
 		// Show unavailable maps.
 		$show_unavailable_maps = (new CWidgetFieldCheckBox('show_unavailable', _('Show unavailable maps')))
