@@ -4351,8 +4351,10 @@ button.is-loading {
   margin: calc(.25rem + 1px); }
 
 .overlay-dialogue.modal .overlay-dialogue-body.is-loading {
-  position: relative;
   overflow: hidden; }
+  .overlay-dialogue.modal .overlay-dialogue-body.is-loading:before {
+    top: 42px;
+    bottom: 42px; }
 
 .menu-popup-preloader {
   -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);

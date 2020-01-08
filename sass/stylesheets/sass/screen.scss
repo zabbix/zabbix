@@ -6329,8 +6329,12 @@ button {
 .overlay-dialogue.modal .overlay-dialogue-body {
 
 	&.is-loading {
-		position: relative;
 		overflow: hidden;
+
+		&:before {
+			top: 42px;
+			bottom: 42px;
+		}
 	}
 }
 
