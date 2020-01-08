@@ -375,10 +375,10 @@ static char *zbx_get_sensor_id(ipmi_sensor_t *sensor, char *id, int sz, int *id_
 		char *id_str, int id_str_sz )
 {
 	*id_sz = ipmi_sensor_get_id_length(sensor);
-	memset(id, 0, sz);
+	memset(id, 0, (size_t)sz);
 	ipmi_sensor_get_id(sensor, id, sz);
 	*id_type = ipmi_sensor_get_id_type(sensor);
-	return zbx_sensor_id_to_str(id_str, id_str_sz, id, *id_type, *id_sz);
+	return zbx_sensor_id_to_str(id_str, (size_t)id_str_sz, id, *id_type, *id_sz);
 }
 
 static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
@@ -1823,15 +1823,15 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 	{
 		const char 	*p;
 		char 		state_name[MAX_STRING_LEN];
-		int		offset = 0;
+		size_t		offset = 0;
 		zbx_uint64_t	state;
 
 		zbx_read_ipmi_sensor(h, &h->sensors[i]);
 		if (SUCCEED != h->ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered",h->sensors[i].id);
 			if (NULL != h->err)
-				zabbix_log(LOG_LEVEL_DEBUG, "%s", h->err);
+				zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered: %s",h->sensors[i].id,
+						h->err);
 
 			continue;
 		}
@@ -1841,9 +1841,9 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			zbx_read_ipmi_thresholds(h, &h->sensors[i]);
 			if (SUCCEED != h->ret)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered",h->sensors[i].id);
 				if (NULL != h->err)
-					zabbix_log(LOG_LEVEL_DEBUG, "%s", h->err);
+					zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered: %s",
+							h->sensors[i].id, h->err);
 
 				continue;
 			}
@@ -1875,10 +1875,8 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			state_name[0] = '\0';
 			for (j = 0; j < MAX_DISCRETE_STATES; j++)
 			{
-				if (0 != (state & (1 << j)))
+				if (0 != (state & (1u << j)))
 				{
-					const char *p;
-
 					if (NULL != (p = ipmi_sensor_reading_name_string(h->sensors[i].sensor, j)))
 					{
 						if (0 < offset)
@@ -1902,7 +1900,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			state_name[0] = '\0';
 			for (j = IPMI_LOWER_NON_CRITICAL; j <= IPMI_UPPER_NON_RECOVERABLE; j++)
 			{
-				if (0 != (state & (1 << j)))
+				if (0 != (state & (1u << j)))
 				{
 					if (0 < offset)
 						offset += zbx_snprintf(state_name + offset,
