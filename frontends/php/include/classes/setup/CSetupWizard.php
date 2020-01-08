@@ -167,7 +167,7 @@ class CSetupWizard extends CForm {
 		$messages = [];
 		$finalResult = CFrontendSetup::CHECK_OK;
 
-		foreach ($this->frontendSetup->checkRequirements() as $req) {
+		foreach ($this->frontendSetup->checkRequirements(true) as $req) {
 			if ($req['result'] == CFrontendSetup::CHECK_OK) {
 				$class = ZBX_STYLE_GREEN;
 				$result = 'OK';
@@ -481,7 +481,7 @@ class CSetupWizard extends CForm {
 		if ($this->getStep() == 1) {
 			if (hasRequest('next') && array_key_exists(1, getRequest('next'))) {
 				$finalResult = CFrontendSetup::CHECK_OK;
-				foreach ($this->frontendSetup->checkRequirements() as $req) {
+				foreach ($this->frontendSetup->checkRequirements(true) as $req) {
 					if ($req['result'] > $finalResult) {
 						$finalResult = $req['result'];
 					}

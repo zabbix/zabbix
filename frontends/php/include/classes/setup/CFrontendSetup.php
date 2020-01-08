@@ -52,10 +52,11 @@ class CFrontendSetup {
 
 	/**
 	 * Perform all requirements checks.
+	 * @param boolean $setup  Is the call follows from the setup.
 	 *
 	 * @return array
 	 */
-	public function checkRequirements() {
+	public function checkRequirements($setup = false) {
 		$result = [];
 
 		$result[] = $this->checkPhpVersion();
@@ -91,6 +92,9 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpSessionAutoStart();
 		$result[] = $this->checkPhpGettext();
 		$result[] = $this->checkPhpArgSeparatorOutput();
+		if (!$setup) {
+			$result[] = $this->checkSslFiles();
+		}
 
 		return $result;
 	}
@@ -667,6 +671,30 @@ class CFrontendSetup {
 			'error' => _s('PHP option "%1$s" must be set to "%2$s"', 'arg_separator.output',
 				self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT
 			)
+		];
+	}
+
+	/**
+	 * Checks for the SSL parameters point to files that are open for writing.
+	 *
+	 * @return array
+	 */
+	public function checkSslFiles() {
+		global $DB;
+		$writeable = [];
+
+		foreach (['KEY_FILE', 'CERT_FILE', 'CA_FILE'] as $key) {
+			if ($DB[$key] !== '' && is_writable($DB[$key])) {
+				$writeable[] = $key;
+			}
+		}
+
+		return [
+			'name' => _('SSL certificate file'),
+			'current' => implode(', ', $writeable),
+			'required' => null,
+			'result' => $writeable ? self::CHECK_FATAL : self::CHECK_OK,
+			'error' => _s('SSL certificate files must be read-only')
 		];
 	}
 }
