@@ -1,1 +1,1 @@
-........S. [ZBX-16997] fixed uninitialized structure padding used in hash calculation (akozlovs)
+........S. [ZBX-16997] fixed duplicate entry errors on 32-bit architecture during item application discovery (akozlovs)
