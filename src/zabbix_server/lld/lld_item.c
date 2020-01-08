@@ -415,10 +415,14 @@ static zbx_hash_t	lld_item_application_hash_func(const void *data)
 	const zbx_lld_item_application_t	*item_application = (zbx_lld_item_application_t *)data;
 	zbx_hash_t				hash;
 
-	hash = ZBX_DEFAULT_HASH_ALGO(&item_application->item_ref, sizeof(item_application->item_ref),
-			ZBX_DEFAULT_HASH_SEED);
-	return ZBX_DEFAULT_HASH_ALGO(&item_application->application_ref, sizeof(item_application->application_ref),
-			hash);
+	hash = ZBX_DEFAULT_HASH_ALGO(&item_application->item_ref.itemid, sizeof(item_application->item_ref.itemid),
+				ZBX_DEFAULT_HASH_SEED);
+	hash = ZBX_DEFAULT_HASH_ALGO(&item_application->item_ref.item, sizeof(item_application->item_ref.item), hash);
+
+	hash = ZBX_DEFAULT_HASH_ALGO(&item_application->application_ref.applicationid,
+			sizeof(item_application->application_ref.applicationid), hash);
+	return ZBX_DEFAULT_HASH_ALGO(&item_application->application_ref.application,
+			sizeof(item_application->application_ref.application), hash);
 }
 
 static int	lld_item_application_compare_func(const void *d1, const void *d2)
