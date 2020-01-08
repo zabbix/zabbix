@@ -2232,7 +2232,7 @@ class testGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->edit()->getWidget($name);
 		$this->assertEquals(true, $widget->isEditable());
-		$widget->delete();
+		$dashboard->deleteWidget($name);
 
 		$dashboard->save();
 		$this->page->waitUntilReady();

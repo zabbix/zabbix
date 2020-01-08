@@ -77,17 +77,6 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
-	 * Delete widget.
-	 *
-	 * @return $this
-	 */
-	public function delete() {
-		$this->query('xpath:.//button[@class="btn-widget-delete"]')->one()->click()->waitUntilNotVisible();
-
-		return $this;
-	}
-
-	/**
 	 * @inheritdoc
 	 */
 	public function getReadyCondition() {

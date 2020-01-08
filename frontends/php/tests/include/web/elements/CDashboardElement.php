@@ -156,4 +156,16 @@ class CDashboardElement extends CElement {
 
 		return $this;
 	}
+
+	/**
+	 * Delete widget with the provided name.
+	 *
+	 * @return boolean
+	 */
+	public function deleteWidget($name) {
+		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()="'.$name.
+				'"]/../../..//button[@title="Delete"]')->one()->click()->waitUntilNotVisible();
+
+		return $this;
+	}
 }
