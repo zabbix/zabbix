@@ -22,8 +22,9 @@
  * Add popup inputs to main form and submit.
  *
  * @param {object} response
+ * @param {Overlay} overlay
  */
-function submitConditionPopup(response) {
+function submitConditionPopup(response, overlay) {
 	var form_name = response.form.name,
 		form_param = response.form.param,
 		input_name = response.form.input_name,
@@ -60,6 +61,8 @@ function submitConditionPopup(response) {
 		PopUp('popup.action.operation', jQuery(document.forms['popup.operation']).serialize(), opr_dialogueid);
 	}
 	else {
+		// XHR has finished, but the state is still considered as loading at form submission.
+		overlay.setLoading();
 		submitFormWithParam(form_name, form_param, '1');
 	}
 }
@@ -94,7 +97,7 @@ function validateConditionPopup(overlay) {
 				jQuery(response.errors).insertBefore($form);
 			}
 			else {
-				submitConditionPopup(response);
+				submitConditionPopup(response, overlay);
 			}
 		});
 }
