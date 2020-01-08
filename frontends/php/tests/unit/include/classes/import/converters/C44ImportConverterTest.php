@@ -22,7 +22,12 @@
 class C44ImportConverterTest extends CImportConverterTest {
 
 	public function testConvertProvider() {
-		return [];
+		return [
+			[
+				[],
+				[]
+			]
+		];
 	}
 
 	/**

@@ -2155,13 +2155,18 @@ class C50XmlValidator {
 	 * Convert tls_accept tag to normal value.
 	 * Used in CXmlValidGeneral.
 	 *
-	 * @param array $data         Import data.
-	 * @param array $parent_data  Data's parent array.
+	 * @param array|string $data         Import data.
+	 * @param array        $parent_data  Data's parent array.
 	 *
 	 * @return string
 	 */
-	public function tlsAcceptConstantPreprocessor(array $data, array $parent_data = null) {
+	public function tlsAcceptConstantPreprocessor($data, array $parent_data = null) {
+		if (is_string($data)) {
+			return $data;
+		}
+
 		$result = 0;
+
 		$rules = [
 			CXmlConstantName::NO_ENCRYPTION => CXmlConstantValue::NO_ENCRYPTION,
 			CXmlConstantName::TLS_PSK => CXmlConstantValue::TLS_PSK,
@@ -2252,13 +2257,26 @@ class C50XmlValidator {
 	 */
 	public function hostTlsAcceptExport(array $data) {
 		$consts = [
-			CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION,
-			CXmlConstantValue::TLS_PSK=> CXmlConstantName::TLS_PSK,
-			3 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_PSK],
-			CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE,
-			5 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_CERTIFICATE],
-			6 => [CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE],
-			7 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE],
+			CXmlConstantValue::NO_ENCRYPTION => [CXmlConstantName::NO_ENCRYPTION],
+			CXmlConstantValue::TLS_PSK => [CXmlConstantName::TLS_PSK],
+			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK => [
+				CXmlConstantName::NO_ENCRYPTION,
+				CXmlConstantName::TLS_PSK
+			],
+			CXmlConstantValue::TLS_CERTIFICATE => [CXmlConstantName::TLS_CERTIFICATE],
+			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_CERTIFICATE => [
+				CXmlConstantName::NO_ENCRYPTION,
+				CXmlConstantName::TLS_CERTIFICATE
+			],
+			CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
+				CXmlConstantName::TLS_PSK,
+				CXmlConstantName::TLS_CERTIFICATE
+			],
+			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
+				CXmlConstantName::NO_ENCRYPTION,
+				CXmlConstantName::TLS_PSK,
+				CXmlConstantName::TLS_CERTIFICATE
+			]
 		];
 
 		if (!array_key_exists($data['tls_accept'], $consts)) {
@@ -2267,7 +2285,7 @@ class C50XmlValidator {
 			));
 		}
 
-		return is_array($consts[$data['tls_accept']]) ? $consts[$data['tls_accept']] : [$consts[$data['tls_accept']]];
+		return $consts[$data['tls_accept']];
 	}
 
 	/**
