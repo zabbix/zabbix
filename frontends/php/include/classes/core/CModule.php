@@ -32,23 +32,9 @@ class CModule {
 	}
 
 	/**
-	 * Module register action, called once module is regsitered in Zabbix. Returned array will be stored as initial
-	 * 'config' data in moduledetails.config field.
-	 *
-	 * @param string $path  Relative path to module code.
-	 *
-	 * @return array
+	 * Module initialization method.
 	 */
-	public function register($path) {
-		return [];
-	}
-
-	/**
-	 * Module initalization method.
-	 *
-	 * @param array $config  Database stored config settings.
-	 */
-	public function init(array $config) {
+	public function init() {
 	}
 
 	final public function getId() {
@@ -57,6 +43,10 @@ class CModule {
 
 	final public function getActions() {
 		return $this->manifest['actions'];
+	}
+
+	final public function getConfig($name) {
+		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : null;
 	}
 
 	final public function getManifest() {

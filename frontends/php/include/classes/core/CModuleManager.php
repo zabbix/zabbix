@@ -164,7 +164,11 @@ class CModuleManager {
 			else {
 				$manifests[$module['relative_path']] = $manifest;
 			}
+
+			$manifest['config'] += json_decode($module['config'], true);
 		}
+
+
 
 		return $manifests;
 	}
@@ -205,7 +209,8 @@ class CModuleManager {
 			'namespace' => static::MODULES_NAMESPACE.$manifest['namespace'],
 			'path' => $module_path,
 			'manifest_version' => 0,
-			'actions' => []
+			'actions' => [],
+			'config' => []
 		];
 
 		if ($manifest['manifest_version'] > static::MANIFEST_VERSION) {
@@ -247,6 +252,14 @@ class CModuleManager {
 			}
 
 			unset($this->loaded_manifests[$manifest['relative_path']]);
+		}
+	}
+
+	public function initModules() {
+		foreach ($this->modules as $module) {
+			if ($module->isEnabled()) {
+				$module->init();
+			}
 		}
 	}
 
@@ -317,12 +330,19 @@ class CModuleManager {
 	}
 
 	private function invokeEventHandler(Action $action, $event) {
+		$action_name = ($action instanceof Action) ? $action->getAction() : null;
+
 		foreach ($this->modules as $module) {
-			if ($module->isEnabled() && !array_key_exists($action->getAction(), $module->getActions())) {
+			if ($module->isEnabled() && !array_key_exists($action_name, $module->getActions())) {
 				$module->$event($action);
 			}
 		}
 
-		$this->getModuleByActionName($action->getAction())->$event($action);
+		if ($action_name != null) {
+			$module = $this->getModuleByActionName($action_name);
+			if ($module instanceof CModule) {
+				$module->$event($action);
+			}
+		}
 	}
 }

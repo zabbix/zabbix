@@ -40,7 +40,7 @@ function zbx_is_callable(array $names) {
 function redirect($url) {
 	$curl = (new CUrl($url))->removeArgument('sid');
 	header('Location: '.$curl->getUrl());
-	APP::stop();
+	APP::terminate();
 }
 
 function jsRedirect($url, $timeout = null) {

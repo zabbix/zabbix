@@ -203,7 +203,7 @@ class ZBase {
 				if ($router->getController() !== null) {
 					CProfiler::getInstance()->start();
 					$this->processRequest($router);
-					static::stop();
+					static::terminate();
 				}
 
 				if (resourceAccessDenied($file)) {
@@ -231,14 +231,10 @@ class ZBase {
 	}
 
 	/**
-	 * Call beforeTerminate event for current module.
+	 * Call beforeTerminate modules event and terminate application.
 	 */
-	public static function stop() {
-		$app = static::getInstance();
-
-		if ($app->action_module instanceof CModule && $app->action instanceof CController) {
-			$app->module_manager->beforeTerminate($app->action);
-		}
+	public static function terminate() {
+		self::ModuleManager()->beforeTerminate(self::getInstance()->action);
 
 		exit;
 	}
@@ -488,9 +484,9 @@ class ZBase {
 
 			if ($this->action_module instanceof CModule) {
 				array_unshift(CView::$viewsDir, $this->action_module->getRootDir());
-				$this->module_manager->beforeAction($this->action);
 			}
 
+			$this->module_manager->beforeAction($this->action);
 			$response = $this->action->run();
 		}
 
@@ -594,5 +590,6 @@ class ZBase {
 		}
 
 		$this->module_manager->loadModules();
+		$this->module_manager->initModules();
 	}
 }
