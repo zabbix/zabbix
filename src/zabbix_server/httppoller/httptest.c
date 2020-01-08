@@ -761,9 +761,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			err_str = zbx_dsprintf(err_str, "timeout \"%s\" is invalid", buffer);
 			goto httpstep_error;
 		}
-		else if (SEC_PER_HOUR < db_httpstep.timeout)
+		else if (db_httpstep.timeout < 1 || SEC_PER_HOUR < db_httpstep.timeout)
 		{
-			err_str = zbx_dsprintf(err_str, "timeout \"%s\" exceeds 1 hour limit", buffer);
+			err_str = zbx_dsprintf(err_str, "timeout \"%s\" is out of 1-3600 seconds bounds", buffer);
 			goto httpstep_error;
 		}
 
