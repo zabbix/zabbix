@@ -181,19 +181,33 @@ abstract class CControllerPopupItemTest extends CController {
 		$hostid = $this->getInput('hostid', false);
 
 		if ($ret && $hostid) {
-			$host = API::Host()->get([
+			$hosts = API::Host()->get([
 				'output' => ['hostid', 'host', 'name', 'status', 'available', 'flags', 'proxy_hostid', 'tls_subject',
 					'ipmi_available', 'jmx_available', 'snmp_available', 'maintenance_status', 'maintenance_type',
 					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_psk_identity', 'tls_psk',
 					'tls_issuer', 'tls_connect'
 				],
 				'hostids' => [$hostid],
-				'templated_hosts' => true,
 				'editable' => true
 			]);
 
-			$this->host = reset($host);
-			$ret = (bool) $this->host;
+			if (!$hosts) {
+				$hosts = API::Template()->get([
+					'output' => ['templateid', 'host', 'name', 'status', 'available', 'flags',  'tls_subject',
+						'ipmi_available', 'jmx_available', 'snmp_available', 'maintenance_status', 'maintenance_type',
+						'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_psk_identity',
+						'tls_psk', 'tls_issuer', 'tls_connect'
+					],
+					'templateids' => [$hostid],
+					'editable' => true
+				]);
+
+				$hosts[0] = CArrayHelper::renameKeys($hosts[0], ['templateid' => 'hostid']);
+			}
+
+			$this->host = reset($hosts);
+
+			return (bool) $this->host;
 		}
 
 		return $ret;
@@ -301,8 +315,11 @@ abstract class CControllerPopupItemTest extends CController {
 			elseif (array_key_exists('proxy_hostid', $input)) {
 				$data['proxy_hostid'] = $input['proxy_hostid'];
 			}
-			else {
+			elseif (array_key_exists('proxy_hostid', $this->host)) {
 				$data['proxy_hostid'] = $this->host['proxy_hostid'];
+			}
+			else {
+				$data['proxy_hostid'] = 0;
 			}
 		}
 
