@@ -193,7 +193,7 @@ class CFormElement extends CElement {
 		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
 		$label = $this->query($prefix.'/label[@for='.CXPathHelper::escapeQuotes($id).']')->one(false);
 
-		if ($label->isValid()) {
+		if ($label->isValid() === false) {
 			$label = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_RIGHT.'//*[@id='.
 					CXPathHelper::escapeQuotes($id).']/ancestor::'.self::TABLE_FORM_RIGHT.'/../'.
 					self::TABLE_FORM_LEFT.'/label')->one(false);

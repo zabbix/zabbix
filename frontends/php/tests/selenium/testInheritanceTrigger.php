@@ -178,7 +178,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$trigger_tags_table = $this->query('id:tags-table')->asTable()->one();
 		// Check trigger tags.
 		$triggers_tags_slice_1 = $trigger_tags_table->getRows()->slice(0, -1); // Remove Add button form cycle.
-		$this ->checkTags($triggers_tags_slice_1, $templated_trigger_tags);
+		$this->checkTags($triggers_tags_slice_1, $templated_trigger_tags);
 
 		// Click on inherited and trigger tags radio.
 		$form->getFieldById('show_inherited_tags')->fill('Inherited and trigger tags');
