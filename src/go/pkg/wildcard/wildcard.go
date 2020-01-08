@@ -19,24 +19,21 @@
 
 package wildcard
 
+import "strings"
+
 // Minimize removes repeated wildcard characters from the expression
 func Minimize(pattern string) string {
-	bytes := []byte(pattern)
-	var res []byte
-	var w bool = false
-	for _, c := range bytes {
-		if c == '*' {
-			if w {
-				continue
-			}
-			w = true
-		} else {
-			w = false
-		}
-		res = append(res, c)
-	}
+	var last rune
+	var res strings.Builder
 
-	return string(res)
+	for _, c := range pattern {
+		if c == '*' && last == '*' {
+			continue
+		}
+		last = c
+		_, _ = res.WriteRune(c)
+	}
+	return res.String()
 }
 
 // Match matches string value to specified wildcard.
