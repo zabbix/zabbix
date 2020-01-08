@@ -154,18 +154,18 @@ class CModuleManager {
 				continue;
 			}
 
+			$manifest['config'] += json_decode($module['config'], true);
+
 			if ($check_conflicts) {
 				$this->errors[$manifest['id']] = $this->checkConflicts($manifest, $manifests);
 
 				if (!$this->errors[$manifest['id']]) {
-					$manifests[$module['relative_path']] = $manifest;
+					$manifests[$manifest['id']] = $manifest;
 				}
 			}
 			else {
-				$manifests[$module['relative_path']] = $manifest;
+				$manifests[$manifest['id']] = $manifest;
 			}
-
-			$manifest['config'] += json_decode($module['config'], true);
 		}
 
 
@@ -251,7 +251,7 @@ class CModuleManager {
 				$this->errors[$manifest['id']][] = $e;
 			}
 
-			unset($this->loaded_manifests[$manifest['relative_path']]);
+			unset($this->loaded_manifests[$manifest['id']]);
 		}
 	}
 
