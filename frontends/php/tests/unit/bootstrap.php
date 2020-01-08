@@ -37,13 +37,13 @@ require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
 $autoloader = new CAutoloader;
 $autoloader->addNamespace('', [
 	'/../../include/classes',
-	'/../../include/classes/core',
-	'/../../include/classes/helpers',
-	'/../../include/classes/db',
 	'/../../include/classes/api',
 	'/../../include/classes/api/clients',
 	'/../../include/classes/api/helpers',
 	'/../../include/classes/api/wrappers',
+	'/../../include/classes/core',
+	'/../../include/classes/helpers',
+	'/../../include/classes/db',
 	'/../../include/classes/parsers',
 	'/../../include/classes/parsers/results',
 	'/../../include/classes/validators',
@@ -70,4 +70,5 @@ $autoloader->addNamespace('', [
 	'/include/classes/parsers',
 	'/include/classes/import/converters'
 ]);
+$autoloader->addNamespace('Core', [$this->rootDir.'/include/classes/core']);
 $autoloader->register();
