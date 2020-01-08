@@ -166,7 +166,9 @@ if (!empty($data['actions'])) {
 }
 
 // get paging
-$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_UP, new CUrl('auditlogs.php'));
+$data['paging'] = CPagerHelper::paginate(getRequest('page', 1), $data['actions'], ZBX_SORT_UP,
+	new CUrl('auditlogs.php')
+);
 
 // render view
 $auditView = new CView('administration.auditlogs.list', $data);

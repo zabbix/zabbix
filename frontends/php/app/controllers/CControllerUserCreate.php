@@ -102,11 +102,17 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		$result = (bool) API::User()->create($user);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('zabbix.php?action=user.list&uncheck=1');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'user.list')
+				->setArgument('page', CPagerHelper::loadPage('user.list', null))
+			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('User added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=user.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'user.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add user'));
 		}

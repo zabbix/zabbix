@@ -38,7 +38,7 @@ function DBconnect(&$error) {
 	$result = true;
 
 	$DB['DB'] = null; // global db handler
-	$DB['TRANSACTIONS'] = 0; // level of a nested transation
+	$DB['TRANSACTIONS'] = 0; // level of a nested transaction
 	$DB['TRANSACTION_NO_FAILED_SQLS'] = true; // true - if no statements failed in transaction, false - there are failed statements
 	$DB['SELECT_COUNT'] = 0; // stats
 	$DB['EXECUTE_COUNT'] = 0;
@@ -129,46 +129,6 @@ function DBconnect(&$error) {
 					$dbBackend = new OracleDbBackend();
 				}
 				break;
-			case ZBX_DB_DB2:
-				$connect = '';
-				$connect .= 'DATABASE='.$DB['DATABASE'].';';
-				$connect .= 'HOSTNAME='.$DB['SERVER'].';';
-				$connect .= 'PORT='.$DB['PORT'].';';
-				$connect .= 'PROTOCOL=TCPIP;';
-				$connect .= 'UID='.$DB['USER'].';';
-				$connect .= 'PWD='.$DB['PASSWORD'].';';
-
-				$unicodeprefixes = ['C', 'en_US', 'en_GB'];
-				foreach ($unicodeprefixes as $prefix) {
-					$result = setlocale(LC_ALL, [$prefix.'.utf8', $prefix.'.UTF-8']);
-					if ($result) {
-						break;
-					}
-				}
-				if ($result) {
-					$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
-					if (!$DB['DB']) {
-						$error = 'Error connecting to database: '.db2_conn_errormsg();
-						$result = false;
-					}
-					else {
-						$options = [
-							'db2_attr_case' => DB2_CASE_LOWER
-						];
-						db2_set_option($DB['DB'], $options, 1);
-						if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
-							DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
-						}
-					}
-				}
-				else {
-					$error = 'Cannot set UTF-8 locale for web server.';
-				}
-
-				if ($result) {
-					$dbBackend = new Db2DbBackend();
-				}
-				break;
 			default:
 				$error = 'Unsupported database';
 				$result = false;
@@ -203,9 +163,6 @@ function DBclose() {
 			case ZBX_DB_ORACLE:
 				$result = oci_close($DB['DB']);
 				break;
-			case ZBX_DB_DB2:
-				$result = db2_close($DB['DB']);
-				break;
 		}
 	}
 	unset($DB['DB']);
@@ -238,9 +195,6 @@ function DBstart() {
 			break;
 		case ZBX_DB_ORACLE:
 			$result = true;
-			break;
-		case ZBX_DB_DB2:
-			$result = db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_OFF);
 			break;
 	}
 	return $result;
@@ -296,12 +250,6 @@ function DBcommit() {
 		case ZBX_DB_ORACLE:
 			$result = oci_commit($DB['DB']);
 			break;
-		case ZBX_DB_DB2:
-			$result = db2_commit($DB['DB']);
-			if ($result) {
-				db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
-			}
-			break;
 	}
 	return $result;
 }
@@ -320,10 +268,6 @@ function DBrollback() {
 			break;
 		case ZBX_DB_ORACLE:
 			$result = oci_rollback($DB['DB']);
-			break;
-		case ZBX_DB_DB2:
-			$result = db2_rollback($DB['DB']);
-			db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 			break;
 	}
 	return $result;
@@ -380,22 +324,6 @@ function DBselect($query, $limit = null, $offset = 0) {
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
 			}
 			break;
-		case ZBX_DB_DB2:
-			$options = [];
-			if ($DB['TRANSACTIONS']) {
-				$options['autocommit'] = DB2_AUTOCOMMIT_OFF;
-			}
-
-			if (!$result = db2_prepare($DB['DB'], $query)) {
-				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']', 'sql');
-			}
-			elseif (true !== @db2_execute($result, $options)) {
-				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']', 'sql');
-				$result = false;
-			}
-			break;
 	}
 
 	// $result is false only if an error occurred
@@ -426,8 +354,8 @@ function DBselect($query, $limit = null, $offset = 0) {
  * PostgreSQL:
  * SELECT a FROM tbl LIMIT 10 OFFSET 5
  *
- * Oracle, DB2:
- * SELECT a FROM tbe WHERE rownum < 15 // ONLY < 15
+ * Oracle:
+ * SELECT a FROM tbl WHERE rownum < 15 // ONLY < 15
  * SELECT * FROM (SELECT * FROM tbl) WHERE rownum BETWEEN 6 AND 15
  *
  * @param $query
@@ -455,7 +383,6 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 				$query .= $offset != 0 ? ' OFFSET '.intval($offset) : '';
 				break;
 			case ZBX_DB_ORACLE:
-			case ZBX_DB_DB2:
 				$till = $offset + $limit;
 				$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 				break;
@@ -496,19 +423,6 @@ function DBexecute($query, $skip_error_messages = 0) {
 			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
-			}
-			else {
-				$result = true; // function must return boolean
-			}
-			break;
-		case ZBX_DB_DB2:
-			if (!$result = db2_prepare($DB['DB'], $query)) {
-				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']', 'sql');
-			}
-			elseif (true !== @db2_execute($result)) {
-				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']', 'sql');
 			}
 			else {
 				$result = true; // function must return boolean
@@ -570,21 +484,6 @@ function DBfetch($cursor, $convertNulls = true) {
 					}
 					$result[strtolower($key)] = $value;
 				}
-			}
-			break;
-		case ZBX_DB_DB2:
-			if (!$result = db2_fetch_assoc($cursor)) {
-				db2_free_result($cursor);
-			}
-			else {
-				// cast all of the values to string to be consistent with other DB drivers: all of them return
-				// only strings.
-				foreach ($result as &$value) {
-					if ($value !== null) {
-						$value = (string) $value;
-					}
-				}
-				unset($value);
 			}
 			break;
 	}
@@ -777,15 +676,18 @@ function check_db_fields($dbFields, &$args) {
  * In some frontend places we can get array with bool as input values parameter. This is fail!
  * Therefore we need check it and return 1=0 as temporary solution to not break the frontend.
  *
- * @param string $fieldName		field name to be used in SQL WHERE condition
- * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
- * @param bool   $notIn			builds inverted condition
- * @param bool   $zero_to_null
+ * @param string $field_name    Field name to be used in SQL WHERE condition
+ * @param array  $values        Array of numerical values sorted in ascending order to be included in WHERE
+ * @param bool   $not_in        Builds inverted condition
+ * @param bool   $zero_to_null  Cast zero to null
  *
  * @return string
  */
-function dbConditionInt($fieldName, array $values, $notIn = false, $zero_to_null = false) {
-	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (<id1>,<id2>,...,<idN>)"
+function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_null = false) {
+	global $DB;
+
+	$MIN_NUM_BETWEEN = 4; // Minimum number of consecutive values for using "BETWEEN <id1> AND <idN>".
+	$MAX_NUM_IN = 950; // Maximum number of values for using "IN (<id1>,<id2>,...,<idN>)".
 
 	if (is_bool(reset($values))) {
 		return '1=0';
@@ -804,46 +706,82 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $zero_to_null
 	natsort($values);
 	$values = array_values($values);
 
-	foreach ($values as $i => $value) {
-		if (!ctype_digit((string) $value) || bccomp($value, ZBX_MAX_UINT64) > 0) {
-			$values[$i] = zbx_dbstr($value);
+	$intervals = [];
+	$singles = [];
+
+	if ($DB['TYPE'] == ZBX_DB_ORACLE) {
+		// For better performance, use "BETWEEN" constructs for sequential integer values, for Oracle database.
+
+		for ($i = 0, $size = count($values); $i < $size; $i++) {
+			if ($i + $MIN_NUM_BETWEEN < $size && bcsub($values[$i + $MIN_NUM_BETWEEN], $values[$i]) == $MIN_NUM_BETWEEN) {
+				$interval_first = $values[$i];
+
+				// Search for the last sequential integer value.
+				for ($i += $MIN_NUM_BETWEEN; $i < $size && bcsub($values[$i], $values[$i - 1]) == 1; $i++);
+				$i--;
+
+				$interval_last = $values[$i];
+
+				// Save the first and last values of the sequential interval.
+				$intervals[] = [dbQuoteInt($interval_first), dbQuoteInt($interval_last)];
+			}
+			else {
+				$singles[] = dbQuoteInt($values[$i]);
+			}
 		}
 	}
+	else {
+		// For better performance, use only "IN" constructs all other databases, except Oracle.
 
-	// concatenate conditions
+		$singles = array_map(function($value) {
+			return dbQuoteInt($value);
+		}, $values);
+	}
+
 	$condition = '';
-	$operatorAnd = $notIn ? ' AND ' : ' OR ';
 
-	$operatorNot = $notIn ? ' NOT' : '';
-	$chunks = array_chunk($values, $MAX_EXPRESSIONS);
-	$chunk_count = (int) $has_zero + count($chunks);
+	// Process intervals.
 
-	foreach ($chunks as $chunk) {
+	foreach ($intervals as $interval) {
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
+		}
+
+		$condition .= ($not_in ? 'NOT ' : '').$field_name.' BETWEEN '.$interval[0].' AND '.$interval[1];
+	}
+
+	// Process individual values.
+
+	$single_chunks = array_chunk($singles, $MAX_NUM_IN);
+
+	foreach ($single_chunks as $chunk) {
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
+		}
+
 		if (count($chunk) == 1) {
-			$operator = $notIn ? '!=' : '=';
-
-			$condition .= ($condition !== '' ? $operatorAnd : '').$fieldName.$operator.$chunk[0];
+			$condition .= $field_name.($not_in ? '!=' : '=').$chunk[0];
 		}
 		else {
-			$chunkIns = '';
-
-			foreach ($chunk as $value) {
-				$chunkIns .= ','.$value;
-			}
-
-			$chunkIns = $fieldName.$operatorNot.' IN ('.substr($chunkIns, 1).')';
-
-			$condition .= ($condition !== '') ? $operatorAnd.$chunkIns : $chunkIns;
+			$condition .= $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
 		}
 	}
 
 	if ($has_zero) {
-		$condition .= ($condition !== '') ? $operatorAnd : '';
-		$condition .= $fieldName;
-		$condition .= $notIn ? ' IS NOT NULL' : ' IS NULL';
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
+		}
+
+		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
 	}
 
-	return (!$notIn && $chunk_count > 1) ? '('.$condition.')' : $condition;
+	if (!$not_in) {
+		if ((int) $has_zero + count($intervals) + count($single_chunks) > 1) {
+			$condition = '('.$condition.')';
+		}
+	}
+
+	return $condition;
 }
 
 /**
@@ -889,6 +827,44 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 	}
 
 	return '('.$fieldName.$in.'('.$condition.'))';
+}
+
+/**
+ * Quote a value if not an integer or out of BC Math bounds.
+ *
+ * @param mixed $value  Either the original or quoted value.
+ */
+function dbQuoteInt($value) {
+	if (!ctype_digit((string) $value) || bccomp($value, ZBX_MAX_UINT64) > 0) {
+		$value = zbx_dbstr($value);
+	}
+
+	return $value;
+}
+
+/**
+ * Return SQL for COALESCE like select. For fields with type NCHAR, NVARCHAR or NTEXT in Oracle NVL should be used
+ * instead of COALESCE because it will not check that all arguments have same type.
+ *
+ * @param string     $field_name       Field name to be used in returned query part.
+ * @param int|string $default_value    Default value to be returned.
+ * @param string     $alias            Alias to be used in 'AS' query part.
+ * @return string
+ */
+function dbConditionCoalesce($field_name, $default_value, $alias = '') {
+	global $DB;
+
+	if (is_string($default_value)) {
+		$default_value = ($default_value == '') ? '\'\'' : zbx_dbstr($default_value);
+	}
+
+	$query = (($DB['TYPE'] == ZBX_DB_ORACLE) ? 'NVL(' : 'COALESCE(').$field_name.','.$default_value.')';
+
+	if ($alias) {
+		$query .= ' AS '.$alias;
+	}
+
+	return $query;
 }
 
 /**
@@ -960,7 +936,7 @@ function pg_connect_escape($string) {
 
 /**
  * Escape string for safe usage in SQL queries.
- * Works for ibmdb2, mysql, oracle, postgresql.
+ * Works for mysql, oracle, postgresql.
  *
  * @param array|string $var
  *
@@ -974,15 +950,6 @@ function zbx_dbstr($var) {
 	}
 
 	switch ($DB['TYPE']) {
-		case ZBX_DB_DB2:
-			if (is_array($var)) {
-				foreach ($var as $vnum => $value) {
-					$var[$vnum] = "'".db2_escape_string($value)."'";
-				}
-				return $var;
-			}
-			return "'".db2_escape_string($var)."'";
-
 		case ZBX_DB_MYSQL:
 			if (is_array($var)) {
 				foreach ($var as $vnum => $value) {
@@ -1017,7 +984,7 @@ function zbx_dbstr($var) {
 
 /**
  * Creates db dependent string with sql expression that casts passed value to bigint.
- * Works for ibmdb2, mysql, oracle, postgresql.
+ * Works for mysql, oracle, postgresql.
  *
  * @param int $field
  *
@@ -1031,7 +998,6 @@ function zbx_dbcast_2bigint($field) {
 	}
 
 	switch ($DB['TYPE']) {
-		case ZBX_DB_DB2:
 		case ZBX_DB_POSTGRESQL:
 			return 'CAST('.$field.' AS BIGINT)';
 

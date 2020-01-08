@@ -53,13 +53,6 @@ class CCheckBox extends CInput {
 	private $value = '';
 
 	/**
-	 * Readonly state of checkbox which means it is disabled, but can have a hidden field.
-	 *
-	 * @var bool
-	 */
-	private $readonly = false;
-
-	/**
 	 * Checked or unchecked state of checkbox.
 	 *
 	 * @var bool
@@ -157,19 +150,6 @@ class CCheckBox extends CInput {
 		return $this;
 	}
 
-	/**
-	 * Set checkbox as read only.
-	 *
-	 * @param bool $readonly  If true, set checkbox as read only, add hidden field depending in "checked" state.
-	 *
-	 * @return CCheckBox
-	 */
-	public function setReadonly($readonly) {
-		$this->readonly = $readonly;
-
-		return $this;
-	}
-
 	public function toString($destroy = true) {
 		$elements = ($this->label_position === self::LABEL_POSITION_LEFT)
 			? [$this->label, new CSpan()]
@@ -178,20 +158,6 @@ class CCheckBox extends CInput {
 		$label = (new CLabel($elements, $this->getId()))
 			->addClass($this->label_position === self::LABEL_POSITION_LEFT ? 'label-pos-left' : null);
 
-		/*
-		 * Create only hidden fields for enabled readonly and checked elements. Once set unchecked value is properly
-		 * implemented, this code will change.
-		 */
-		$hidden = '';
-		if ($this->readonly && $this->enabled && $this->checked) {
-			$hidden = (new CVar($this->getName(), $this->value, $this->getId()))
-				->setEnabled(true)
-				->toString();
-			$this->removeId();
-		}
-
-		$this->setEnabled($this->enabled && !$this->readonly);
-
-		return $hidden.parent::toString($destroy).$label->toString();
+		return parent::toString($destroy).$label->toString();
 	}
 }

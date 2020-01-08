@@ -33,7 +33,7 @@ class testHostAvailabilityWidget extends CWebTest {
 	private $sql;
 
 	/**
-	 * Overriden constructor.
+	 * Overridden constructor.
 	 */
 	public function __construct($name = null, array $data = [], $data_name = '') {
 		parent::__construct($name, $data, $data_name);
@@ -417,7 +417,7 @@ class testHostAvailabilityWidget extends CWebTest {
 			// Select all host esntries that are not templates or proxies and that are not host prototypes.
 			$total_sql = 'SELECT hostid FROM hosts WHERE status IN (0,1) AND flags != 2';
 
-			// Filter out hosts in maintenence if the flag 'Show hosts in maintenance' is not set.
+			// Filter out hosts in maintenance if the flag 'Show hosts in maintenance' is not set.
 			if (CTestArrayHelper::get($data['fields'], 'Show hosts in maintenance', false) === false) {
 				$total_sql = $total_sql.' AND maintenance_status = 0';
 			}

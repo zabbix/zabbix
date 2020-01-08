@@ -350,8 +350,8 @@ class testConfiguration extends CAPITest {
 			]],
 			[[
 				'parameter' => 'templateLinkage',
-				'expected' => ['createMissing'],
-				'unexpected' => ['deleteMissing', 'updateExisting']
+				'expected' => ['createMissing', 'deleteMissing'],
+				'unexpected' => ['updateExisting']
 			]],
 			[[
 				'parameter' => 'templates',

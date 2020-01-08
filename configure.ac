@@ -676,6 +676,22 @@ AC_DEFINE(HAVE_TM_TM_GMTOFF,1,[Define to 1 if 'tm.tm_gmtoff' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+AC_MSG_CHECKING(for linker options --start-group/--end-group)
+saved_LDFLAGS="$LDFLAGS"
+LDFLAGS="-Wl,--start-group -Wl,--end-group"
+AC_TRY_LINK([], [],
+HAVE_START_GROUP="yes"
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no)
+)
+LDFLAGS="$saved_LDFLAGS"
+
+AC_MSG_CHECKING(for '__thread' compiler support)
+AC_TRY_COMPILE([#include <stdio.h>],[static __thread int a = 0;],
+AC_DEFINE(HAVE_THREAD_LOCAL,1,[Define to 1 if compiler keyword '__thread' supported.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no)
+HAVE_THREAD_LOCAL="no")
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
@@ -1241,6 +1257,35 @@ AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static]) ;;
 esac])
 
+AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked binaries with selected libs from default folders],
+[case "${enableval}" in
+  yes)
+    static_linking_libs=yes
+    saved_LIBS="$LIBS"
+    LIBS="${saved_LIBS} -Wl,-bstatic -Wl,-bdynamic"
+    AC_MSG_CHECKING([if libs static linking with "-Wl,-b" is possible])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
+      [AC_MSG_RESULT([yes])
+        static_linking_support="-Wl,-b"],
+      [AC_MSG_RESULT([no])
+        static_linking_support=no])
+        LIBS="$saved_LIBS"
+
+    if test "x$static_linking_support" = "xno"; then
+      LIBS="${saved_LIBS} -Wl,-Bstatic -Wl,-Bdynamic"
+      AC_MSG_CHECKING([if libs static linking with "-Wl,-B" is possible])
+      AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
+        [AC_MSG_RESULT([yes])
+          static_linking_support="-Wl,-B"],
+        [AC_MSG_RESULT([no])
+          static_linking_support=no])
+          LIBS="$saved_LIBS"
+    fi
+    ;;
+  no) ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-static-libs]) ;;
+esac])
+
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
 [case "${enableval}" in
   yes) server=yes ;;
@@ -1273,7 +1318,9 @@ AC_ARG_ENABLE(agent2,[  --enable-agent2         Turn on build of Zabbix agent 2]
   yes) agent2=yes ;;
   no)  agent2=no ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent2]) ;;
-esac],
+esac
+test "x$agent2" = "xyes" -a "x$HAVE_THREAD_LOCAL" = "xno" && AC_MSG_ERROR([C compiler is not compatible with agent2 assembly])
+],
 [agent2=no])
 AM_CONDITIONAL(AGENT2, test "x$agent2" = "xyes")
 
@@ -1316,22 +1363,6 @@ fi
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
-	have_multirow_insert="no"
-
-	dnl Checking for IBM DB2 support
-	AX_LIB_IBM_DB2()
-	if test "x$want_ibm_db2" = "xyes"; then
-		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.])
-		fi
-
-		if test "x$found_ibm_db2" = "xyes"; then
-			have_db="IBM DB2"
-			have_multirow_insert="yes"
-		else
-			AC_MSG_ERROR([IBM DB2 library not found])
-		fi
-	fi
 
 	dnl Checking for MySQL support
 	AX_LIB_MYSQL()
@@ -1430,7 +1461,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AC_MSG_CHECKING(for Zabbix server/proxy database selection)
 	if test "x$have_db" = "xno"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR([No database selected for Zabbix server/proxy. Use --with-ibm-db2 or --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
+		AC_MSG_ERROR([No database selected for Zabbix server/proxy. Use --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
@@ -1443,9 +1474,9 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		AC_MSG_RESULT(no)
 	fi
 
-	DB_CFLAGS="$IBM_DB2_CPPFLAGS $MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
-	DB_LDFLAGS="$IBM_DB2_LDFLAGS $MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
-	DB_LIBS="$IBM_DB2_LIBS $MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
+	DB_CFLAGS="$MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
+	DB_LDFLAGS="$MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
+	DB_LIBS="$MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
 
 	AC_SUBST(DB_CFLAGS)
 	AC_SUBST(DB_LDFLAGS)
@@ -1575,6 +1606,9 @@ ZBXGET_LIBS="$ZBXGET_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 SENDER_LDFLAGS="$SENDER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 
+ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
+ZBXJS_LIBS="$ZBXJS_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
+
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
 AM_CONDITIONAL(HAVE_LIBXML2, test "x$have_libxml2" = "xyes")
 
@@ -1683,9 +1717,12 @@ ZBXGET_LIBS="$ZBXGET_LIBS $TLS_LIBS"
 SENDER_LDFLAGS="$SENDER_LDFLAGS $TLS_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 
+ZBXJS_LDFLAGS="$ZLIB_LDFLAGS $TLS_LDFLAGS"
+ZBXJS_LIBS="$ZBXJS_LIBS $TLS_LIBS"
+
 if test "x$agent2" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
-	if test "x$go" = "xno"; then
+	if test "x$GO" = "xno"; then
 		AC_MSG_ERROR([Unable to find "go" executable in path])
 	fi
 fi
@@ -1745,6 +1782,15 @@ dnl Starting from 2.0 agent can do web monitoring
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
+
+ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
+ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
+
 dnl Check for libpcre, used by Zabbix for regular expressions
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
 	LIBPCRE_CHECK_CONFIG([no])
@@ -1761,8 +1807,6 @@ else
 	LIBS="$LIBS $LIBPCRE_LIBS"
 fi
 
-AC_SUBST(LIBPCRE_CFLAGS)
-
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
 LIBICONV_CHECK_CONFIG([no])
@@ -1771,8 +1815,6 @@ if test "x$found_iconv" != "xyes"; then
 fi
 LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
 LIBS="$LIBS $ICONV_LIBS"
-
-AC_SUBST(ICONV_CFLAGS)
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
@@ -1799,7 +1841,13 @@ AC_SUBST(PROXY_LIBS)
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
-CGO_LDFLAGS="-Wl,--start-group \
+if test "x$HAVE_START_GROUP" = "xyes"; then
+	LD_START_GROUP=-Wl,--start-group
+	LD_END_GROUP=-Wl,--end-group
+fi
+
+CGO_CFLAGS=$TLS_CFLAGS
+CGO_LDFLAGS="$AGENT_LDFLAGS $LD_START_GROUP \
 	\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
@@ -1813,13 +1861,14 @@ CGO_LDFLAGS="-Wl,--start-group \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
-	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
-	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-	$LIBS $AGENT_LIBS \
-	-Wl,--end-group"
+	$LIBS $AGENT_LIBS $LD_END_GROUP"
+
+AC_SUBST(CGO_CFLAGS)
 AC_SUBST(CGO_LDFLAGS)
 
 AC_SUBST(ZBXGET_LDFLAGS)
@@ -1827,6 +1876,9 @@ AC_SUBST(ZBXGET_LIBS)
 
 AC_SUBST(SENDER_LDFLAGS)
 AC_SUBST(SENDER_LIBS)
+
+AC_SUBST(ZBXJS_LDFLAGS)
+AC_SUBST(ZBXJS_LIBS)
 
 AC_SUBST(SERVER_CONFIG_FILE)
 AC_SUBST(PROXY_CONFIG_FILE)
@@ -1842,13 +1894,11 @@ AC_SUBST(CURL_SSL_KEY_LOCATION)
 AC_SUBST(LOAD_MODULE_PATH)
 
 GOBIN=${sbindir}
-GOPATH=$ac_abs_confdir/go
 GOCMD=go
 GOWORKDIR=$ac_abs_confdir/go/src/zabbix
 
 export GOBIN=${GOBIN}
 AC_SUBST(GOBIN)
-AC_SUBST(GOPATH)
 AC_SUBST(GOCMD)
 AC_SUBST(GOWORKDIR)
 
@@ -1886,13 +1936,13 @@ m4_ifdef([CONF_TESTS],[CONF_TESTS(ZBXCMOCKA)])
 AC_OUTPUT([
 	Makefile
 	database/Makefile
-	database/ibm_db2/Makefile
 	database/mysql/Makefile
 	database/oracle/Makefile
 	database/postgresql/Makefile
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
+	src/go/Makefile
 	src/libs/Makefile
 	src/libs/zbxlog/Makefile
 	src/libs/zbxalgo/Makefile
@@ -1940,6 +1990,7 @@ AC_OUTPUT([
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
+	src/zabbix_js/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
 	src/zabbix_server/alerter/Makefile
@@ -1971,53 +2022,6 @@ AC_OUTPUT([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
 	man/Makefile
-	go/Makefile
-	go/src/Makefile
-	go/src/zabbix/Makefile
-	go/src/zabbix/cmd/Makefile
-	go/src/zabbix/cmd/zabbix_agent2/Makefile
-	go/src/zabbix/cmd/mock_server/Makefile
-	go/src/zabbix/pkg/Makefile
-	go/src/zabbix/pkg/conf/Makefile
-	go/src/zabbix/pkg/glexpr/Makefile
-	go/src/zabbix/pkg/itemutil/Makefile
-	go/src/zabbix/pkg/log/Makefile
-	go/src/zabbix/pkg/plugin/Makefile
-	go/src/zabbix/pkg/std/Makefile
-	go/src/zabbix/pkg/tls/Makefile
-	go/src/zabbix/pkg/version/Makefile
-	go/src/zabbix/pkg/watch/Makefile
-	go/src/zabbix/pkg/zbxcomms/Makefile
-	go/src/zabbix/pkg/zbxlib/Makefile
-	go/src/zabbix/pkg/zbxcmd/Makefile
-	go/src/zabbix/internal/Makefile
-	go/src/zabbix/internal/agent/Makefile
-	go/src/zabbix/internal/agent/remotecontrol/Makefile
-	go/src/zabbix/internal/agent/resultcache/Makefile
-	go/src/zabbix/internal/agent/scheduler/Makefile
-	go/src/zabbix/internal/agent/serverconnector/Makefile
-	go/src/zabbix/internal/agent/serverlistener/Makefile
-	go/src/zabbix/internal/agent/statuslistener/Makefile
-	go/src/zabbix/internal/monitor/Makefile
-	go/src/zabbix/plugins/Makefile
-	go/src/zabbix/plugins/log/Makefile
-	go/src/zabbix/plugins/system/Makefile
-	go/src/zabbix/plugins/system/cpucollector/Makefile
-	go/src/zabbix/plugins/system/uptime/Makefile
-	go/src/zabbix/plugins/system/uname/Makefile
-	go/src/zabbix/plugins/systemd/Makefile
-	go/src/zabbix/plugins/systemrun/Makefile
-	go/src/zabbix/plugins/kernel/Makefile
-	go/src/zabbix/plugins/proc/Makefile
-	go/src/zabbix/plugins/vfs/Makefile
-	go/src/zabbix/plugins/vfs/dev/Makefile
-	go/src/zabbix/plugins/vfs/file/Makefile
-	go/src/zabbix/plugins/zabbix/Makefile
-	go/src/zabbix/plugins/zabbix/stats/Makefile
-	go/src/zabbix/plugins/zabbix/sync/Makefile
-	go/src/zabbix/plugins/zabbix/async/Makefile
-	go/src/zabbix/plugins/net/Makefile
-	go/src/zabbix/plugins/net/netif/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

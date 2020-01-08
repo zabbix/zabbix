@@ -789,7 +789,9 @@ class CScreenProblem extends CScreenBase {
 		$data = self::getData($this->data['filter'], $this->config, true);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
 
-		$paging = getPagingLine($data['problems'], ZBX_SORT_UP, clone $url);
+		if ($this->data['action'] === 'problem.view') {
+			$paging = CPagerHelper::paginate($this->page, $data['problems'], ZBX_SORT_UP, $url);
+		}
 
 		$data = self::makeData($data, $this->data['filter'], true);
 
@@ -821,16 +823,16 @@ class CScreenProblem extends CScreenBase {
 			: $this->data['filter']['show_opdata'];
 
 		if ($this->data['action'] === 'problem.view') {
-			$url_form = clone $url;
+			$backurl = clone $url;
+			$backurl = $backurl
+				->setArgument('page', $this->page)
+				->setArgument('uncheck', '1')
+				->getUrl();
 
 			$form = (new CForm('post', 'zabbix.php'))
 				->setName('problem')
 				->cleanItems()
-				->addVar('backurl',
-					$url_form
-						->setArgument('uncheck', '1')
-						->getUrl()
-				);
+				->addVar('backurl', $backurl);
 
 			$header_check_box = (new CColHeader(
 				(new CCheckBox('all_eventids'))
@@ -841,9 +843,7 @@ class CScreenProblem extends CScreenBase {
 				? $header_check_box->addStyle('width: 20px;')
 				: $header_check_box->addClass(ZBX_STYLE_CELL_WIDTH);
 
-			$link = $url
-				->setArgument('page', $this->data['page'])
-				->getUrl();
+			$link = $url->getUrl();
 
 			$show_timeline = ($this->data['sort'] === 'clock' && !$this->data['filter']['compact_view']
 				&& $this->data['filter']['show_timeline']);
@@ -958,7 +958,7 @@ class CScreenProblem extends CScreenBase {
 			// Create link to Problem update page.
 			$problem_update_url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'acknowledge.edit')
-				->setArgument('backurl', $url->setArgument('uncheck', '1')->getUrl());
+				->setArgument('backurl', $backurl);
 
 			// Add problems to table.
 			foreach ($data['problems'] as $eventid => $problem) {
@@ -1096,11 +1096,11 @@ class CScreenProblem extends CScreenBase {
 					$description[] = BR();
 
 					if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-						$description[] = [_('Problem'), ': ', $trigger['expression_html'], BR()];
-						$description[] = [_('Recovery'), ': ', $trigger['recovery_expression_html']];
+						$description[] = [_('Problem'), ': ', (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_WORDWRAP), BR()];
+						$description[] = [_('Recovery'), ': ', (new CDiv($trigger['recovery_expression_html']))->addClass(ZBX_STYLE_WORDWRAP)];
 					}
 					else {
-						$description[] = $trigger['expression_html'];
+						$description[] = (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_WORDWRAP);
 					}
 				}
 
@@ -1167,6 +1167,12 @@ class CScreenProblem extends CScreenBase {
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
+
+		/*
+		 * Search limit performs +1 selection to know if limit was exceeded, this will assure that csv has
+		 * "search_limit" records at most.
+		 */
+		array_splice($data['problems'], $this->config['search_limit']);
 
 		$csv = [];
 

@@ -467,7 +467,10 @@ $item_form_list
 			->setLabel(_('Show value'))
 			->setChecked(isset($data['visible']['valuemapid'])),
 		(new CDiv([$value_maps_combo_box, SPACE,
-			(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')
+			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'valuemap.list')
+				->getUrl()
+			))->setAttribute('target', '_blank')
 		]))->setId('valuemap')
 	)
 	->addRow(
@@ -591,7 +594,9 @@ $item_form_list->addRow(
 	(new CVisibilityBox('visible[description]', 'description', _('Original')))
 		->setLabel(_('Description'))
 		->setChecked(isset($data['visible']['description'])),
-	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextArea('description', $data['description']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setMaxlength(DB::getFieldLength('items', 'description'))
 );
 
 $tabs = (new CTabView())

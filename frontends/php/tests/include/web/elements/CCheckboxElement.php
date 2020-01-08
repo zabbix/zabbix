@@ -44,7 +44,7 @@ class CCheckboxElement extends CElement {
 	 */
 	public function set($checked) {
 		if ($checked !== $this->isSelected()) {
-			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+			$this->click(true);
 		}
 
 		return $this;
@@ -78,7 +78,7 @@ class CCheckboxElement extends CElement {
 	/**
 	 * Get label element.
 	 *
-	 * @return CElement|null
+	 * @return CElement|CNullElement
 	 */
 	public function getLabel() {
 		return $this->query('xpath:../label')->one(false);
@@ -90,7 +90,8 @@ class CCheckboxElement extends CElement {
 	 * @return string|null
 	 */
 	public function getText() {
-		if (($label = $this->getLabel()) !== null) {
+		$label = $this->getLabel();
+		if ($label->isValid()) {
 			return $label->getText();
 		}
 

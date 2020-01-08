@@ -39,8 +39,6 @@ build/win32/project/MSG00001.bin
 build/win32/project/messages.h
 build/win32/project/messages.rc
 build/win32/project/resource.res
-database/ibm_db2/data.sql
-database/ibm_db2/schema.sql
 database/mysql/data.sql
 database/mysql/schema.sql
 database/oracle/data.sql
@@ -96,10 +94,12 @@ src/zabbix_agent/zabbix_agentd
 src/zabbix_get/zabbix_get
 src/zabbix_java/bin/zabbix-java-gateway-*.jar
 src/zabbix_java/class
+src/zabbix_js/zabbix_js
 src/zabbix_proxy/zabbix_proxy
 src/zabbix_sender/zabbix_sender
 src/zabbix_server/zabbix_server
 tests/libs/zbxalgo/evaluate
+tests/libs/zbxalgo/evaluate_unknown
 tests/libs/zbxalgo/queue
 tests/libs/zbxcommon/calculate_item_nextcheck
 tests/libs/zbxcommon/calculate_item_nextcheck_unreachable
@@ -110,12 +110,15 @@ tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_interval_preproc
+tests/libs/zbxcommon/zbx_str_extract
 tests/libs/zbxcommon/zbx_token_find
 tests/libs/zbxcommon/zbx_trim_float
 tests/libs/zbxcommon/zbx_trim_integer
 tests/libs/zbxcommon/zbx_validate_interval
 tests/libs/zbxcommon/zbx_variant_compare
 tests/libs/zbxcommon/zbx_user_macro_parse
+tests/libs/zbxcommon/convert_to_utf8
+tests/libs/zbxcommon/zbx_dyn_escape_string
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext
@@ -128,6 +131,7 @@ tests/libs/zbxdbcache/is_item_processed_by_server
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values
+tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_open_path
@@ -139,6 +143,7 @@ tests/libs/zbxprometheus/prometheus_filter_init
 tests/libs/zbxprometheus/prometheus_parse_row
 tests/libs/zbxprometheus/zbx_prometheus_pattern
 tests/libs/zbxprometheus/zbx_prometheus_to_json
+tests/libs/zbxregexp/wildcard_match
 tests/libs/zbxsysinfo/common/SYSTEM_LOCALTIME
 tests/libs/zbxsysinfo/common/VFS_FILE_EXISTS
 tests/libs/zbxsysinfo/common/WEB_PAGE_GET
@@ -156,7 +161,7 @@ tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
 tests/libs/zbxsysinfo/linux/SYSTEM_HW_CHASSIS
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
-tests/libs/zbxcommon/zbx_user_macro_parse
+tests/libs/zbxsysinfo/check_key_access_rules
 tests/libs/zbxdbcache/is_item_processed_by_server
 tests/zabbix_server/preprocessor/item_preproc_csv_to_json
 tests/zabbix_server/preprocessor/item_preproc_xpath
@@ -164,8 +169,6 @@ tests/zabbix_server/preprocessor/zbx_item_preproc
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
 /zabbix-*.tar.gz
 .vscode
-go/src/zabbix/cmd/zabbix_agent2/zabbix_agent2
-go/src/zabbix/cmd/mock_server/mock_server
 sbin/zabbix_agentd
 sbin/zabbix_proxy
 sbin/zabbix_server
@@ -193,3 +196,5 @@ bin/zabbix_get
 bin/zabbix_sender
 .cproject
 etc/agent.conf
+sbin/zabbix_agent2
+etc/zabbix_agent2.conf

@@ -33,7 +33,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$this->query('link:Administration')->one()->click();
 		$this->query('xpath://nav[@class="top-subnav-container"]//a[text()="General"]')->one()->click();
-		$this->query('id:configDropDown')->asDropdown()->one()->select('Auto registration');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Auto registration');
 
 		// Check elements dafault state.
 		$form = $this->query('id:autoreg-form')->asForm()->one();
@@ -103,7 +103,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 						'Resource' => 'Auto registration',
 						'Action' => 'Updated',
 						'ID' => 1,
-						'Details' => 'config.tls_accept: 2 => 3'
+						'Details' => "config.tls_accept: 2 => 3"
 					]
 				]
 			],
@@ -323,7 +323,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 		if (in_array('No encryption', $data['fields']['Encryption level']) && count($data['fields']['Encryption level']) === 1) {
 			$this->assertFalse($form->query('id:tls_psk_identity')->one()->isDisplayed());
 			$this->assertFalse($form->query('id:tls_psk')->one()->isDisplayed());
-			$this->assertTrue($form->query('button:Change PSK')->one(false) === null);
+			$this->assertFalse($form->query('button:Change PSK')->one(false)->isValid());
 
 			// Check encryption level and empty PSK values in DB.
 			$this->assertEquals(HOST_ENCRYPTION_NONE, CDBHelper::getValue('SELECT autoreg_tls_accept FROM config'));
@@ -334,8 +334,8 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 		// Check the results, if selected PSK.
 		else {
 			$this->assertTrue($form->query('button:Change PSK')->one()->isDisplayed());
-			$this->assertTrue($form->query('id:tls_psk_identity')->one(false) === null);
-			$this->assertTrue($form->query('id:tls_psk')->one(false) === null);
+			$this->assertFalse($form->query('id:tls_psk_identity')->one(false)->isValid());
+			$this->assertFalse($form->query('id:tls_psk')->one(false)->isValid());
 
 			// Check encryption level in DB.
 			if (count($data['fields']['Encryption level']) === 1) {

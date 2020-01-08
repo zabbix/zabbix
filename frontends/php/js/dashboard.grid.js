@@ -882,8 +882,8 @@
 			return box1.current_pos[axis_key] - box2.current_pos[axis_key];
 		});
 
-		/*
-		 * Compact affected widgets removing empty space between them when possible. Additionaly built overlap array
+		/**
+		 * Compact affected widgets removing empty space between them when possible. Additionally build overlap array
 		 * which will contain maximal coordinate occupied by widgets on every opposite axis line.
 		 */
 		affected.each(function(box) {
@@ -1071,7 +1071,7 @@
 
 		/*
 		 * When resize failed to fit affected widgets move them into visible area and decrease size of widget
-		 * which started resize operation, additionaly setting 'overflow' property to widget.
+		 * which started resize operation, additionally setting 'overflow' property to widget.
 		 */
 		if (overlap > 0) {
 			widget.current_pos[size_key] -= overlap;
@@ -1480,15 +1480,6 @@
 					.toggleClass('resizing-top', data['resizing_top'])
 					.toggleClass('resizing-left', data['resizing_left']);
 
-				// Hack for Safari to manually accept parent container height in pixels on widget resize.
-				if (SF) {
-					$.each(data['widgets'], function() {
-						if (this.type === 'clock' || this.type === 'sysmap') {
-							this.content_body.find(':first').height(this.content_body.height());
-						}
-					});
-				}
-
 				/*
 				 * 1. Prevent physically resizing widgets beyond the allowed limits.
 				 * 2. Prevent browser's vertical scrollbar from appearing when resizing right size of the widgets.
@@ -1539,15 +1530,6 @@
 
 				widget['container'].removeAttr('style');
 
-				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
-				if (SF) {
-					$.each(data['widgets'], function() {
-						if (this.type === 'clock' || this.type === 'sysmap') {
-							this.content_body.find(':first').height(this.content_body.height());
-						}
-					});
-				}
-
 				if (widget['iterator']) {
 					alignIteratorContents($obj, data, widget, widget['pos']);
 				}
@@ -1591,32 +1573,27 @@
 	}
 
 	function showPreloader(widget) {
-		if (typeof widget['preloader_div'] === 'undefined') {
-			if (widget['iterator']) {
-				widget['div'].addClass('iterator-loading');
-			}
-
-			widget['preloader_div'] = $('<div>')
-				.addClass('preloader-container')
-				.append($('<div>').addClass('preloader'));
-
-			widget['div'].append(widget['preloader_div']);
+		if (widget['iterator']) {
+			widget['div'].find('.dashbrd-grid-iterator-content').addClass('is-loading');
+		}
+		else {
+			widget['div'].find('.dashbrd-grid-widget-content').addClass('is-loading');
 		}
 	}
 
 	function hidePreloader(widget) {
-		if (typeof widget['preloader_div'] !== 'undefined') {
-			if (widget['iterator']) {
-				widget['div'].removeClass('iterator-loading');
-			}
-
-			widget['preloader_div'].remove();
-			delete widget['preloader_div'];
+		if (widget['iterator']) {
+			widget['div'].find('.dashbrd-grid-iterator-content').removeClass('is-loading');
+		}
+		else {
+			widget['div'].find('.dashbrd-grid-widget-content').removeClass('is-loading');
 		}
 	}
 
-	function startPreloader(widget) {
-		if (typeof widget['preloader_timeoutid'] !== 'undefined' || typeof widget['preloader_div'] !== 'undefined') {
+	function startPreloader(widget, timeout) {
+		timeout = timeout || widget['preloader_timeout'];
+
+		if (typeof widget['preloader_timeoutid'] !== 'undefined' || widget['div'].find('.is-loading').length) {
 			return;
 		}
 
@@ -1624,8 +1601,7 @@
 			delete widget['preloader_timeoutid'];
 
 			showPreloader(widget);
-			widget['content_body'].stop(true, true).fadeTo(widget['preloader_fadespeed'], 0.4);
-		}, widget['preloader_timeout']);
+		}, timeout);
 	}
 
 	function stopPreloader(widget) {
@@ -1635,10 +1611,6 @@
 		}
 
 		hidePreloader(widget);
-
-		// Stop animations and set to visible state.
-		// Do not use .show(), nor .fadeTo(0, 1) here, since these set display: block, which will break css rules.
-		widget['content_body'].stop(true, true).css('opacity', 1);
 	}
 
 	function setUpdateWidgetContentTimer($obj, data, widget, rf_rate) {
@@ -1793,7 +1765,6 @@
 			'header': '',
 			'view_mode': iterator['view_mode'],
 			'preloader_timeout': 10000,	// in milliseconds
-			'preloader_fadespeed': 500,
 			'update_paused': false,
 			'initial_load': true,
 			'ready': false,
@@ -2157,6 +2128,7 @@
 		}
 
 		startPreloader(widget);
+		$('#dashbrd-save').prop('disabled', true);
 
 		widget['updating_content'] = true;
 
@@ -2193,6 +2165,7 @@
 				}
 
 				doAction('onContentUpdated', $obj, data, null);
+				$('#dashbrd-save').prop('disabled', false);
 			})
 			.then(function() {
 				// Separate 'then' section allows to execute scripts added by widgets in previous section first.
@@ -2220,6 +2193,11 @@
 			});
 	}
 
+	/**
+	 * @param {object} $obj
+	 * @param {object} data
+	 * @param {object} widget
+	 */
 	function updateWidgetConfig($obj, data, widget) {
 		if (data['options']['updating_config']) {
 			// Waiting for another AJAX request to either complete of fail.
@@ -2261,25 +2239,29 @@
 			ajax_data['fields'] = JSON.stringify(fields);
 		}
 
-		$.ajax({
+		var $save_btn = data.dialogue.div.find('.dialogue-widget-save'),
+			overlay = overlays_stack.getById('widgetConfg');
+
+		$save_btn.prop('disabled', true);
+		overlay.xhr = $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
 			data: ajax_data
-		})
+		});
+
+		overlay.xhr
 			.then(function(response) {
 				if (typeof(response.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
 
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(response.errors);
+					$save_btn.prop('disabled', false);
 
 					return $.Deferred().reject();
 				}
 				else {
-					// No errors, proceed with update.
-					overlayDialogueDestroy('widgetConfg');
-
 					// Set view mode of a reusable widget early to escape focus flickering.
 					if (widget !== null && widget['type'] === type) {
 						setWidgetViewMode(widget, view_mode);
@@ -2312,6 +2294,8 @@
 				});
 			})
 			.then(function(response) {
+				overlayDialogueDestroy('widgetConfg');
+
 				var configuration = {};
 				if ('configuration' in response) {
 					configuration = response['configuration'];
@@ -2383,6 +2367,9 @@
 					widget['header'] = name;
 					widget['fields'] = fields;
 
+					// Set preloader to widget content after overlayDialogueDestroy as fast as we can.
+					startPreloader(widget, 100);
+
 					// View mode was just set after the overlayDialogueDestroy was called in first 'then' section.
 
 					applyWidgetConfiguration($obj, data, widget, configuration);
@@ -2427,6 +2414,7 @@
 				data['options']['updated'] = true;
 			})
 			.always(function() {
+				$save_btn.prop('disabled', false);
 				delete data['options']['updating_config'];
 			});
 	}
@@ -2982,7 +2970,7 @@
 	function updateWidgetDynamic($obj, data, widget) {
 		// This function may be called for widget that is not in data['widgets'] array yet.
 		if (typeof widget['fields']['dynamic'] !== 'undefined') {
-			if (widget['fields']['dynamic'] === '1' && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
+			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
 					'hostid': data['dashboard']['dynamic']['hostid'],
 					'groupid': data['dashboard']['dynamic']['groupid']
@@ -3281,7 +3269,6 @@
 				},
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
-				'preloader_fadespeed': 500,
 				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
@@ -3471,6 +3458,9 @@
 				if (current_url.getArgument('dashboardid')) {
 					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
 				}
+				else {
+					url.setArgument('cancel', '1');
+				}
 
 				// Redirect to last active dashboard.
 				// (1) In case of New Dashboard from list, it will open list
@@ -3565,22 +3555,34 @@
 					data: ajax_data,
 					dataType: 'json',
 					beforeSend: function() {
+						/*
+						 * Clear the 'sticked-to-top' class before updating the body for it's mutation handler
+						 * to center the popup while the widget form is being loaded.
+						 */
+						jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
+
 						body.empty()
+							.addClass('is-loading')
 							.append($('<div>')
 								// The smallest possible size of configuration dialog.
 								.css({
 									'width': '544px',
 									'height': '68px',
 									'max-width': '100%'
-								})
-								.append($('<div>')
-									.addClass('preloader-container')
-									.append($('<div>').addClass('preloader'))
-								));
+								}))
 					}
 				})
 					.done(function(response) {
 						data.dialogue['widget_type'] = response.type;
+
+						/*
+						 * Set the 'sticked-to-top' class before updating the body for it's mutation handler
+						 * to have actual data for the popup positioning.
+						 */
+						if (response.options.stick_to_top) {
+							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
+						}
+
 						body.empty();
 						body.append(response.body);
 						if (typeof response.debug !== 'undefined') {
@@ -3606,14 +3608,9 @@
 							$('.dialogue-widget-save', footer).prop('disabled', false);
 						}
 
-						if (data.dialogue['widget_type'] === 'svggraph') {
-							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
-						}
-						else {
-							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
-						}
-
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
+
+						body.removeClass('is-loading');
 					});
 			});
 		},

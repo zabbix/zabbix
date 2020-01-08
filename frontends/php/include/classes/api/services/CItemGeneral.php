@@ -2041,7 +2041,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate depth and ammount of elements in the tree of the dependent items.
+	 * Validate depth and amount of elements in the tree of the dependent items.
 	 *
 	 * @param array  $dependent_items
 	 * @param string $dependent_items[<master_itemid>][]  List if the dependent item IDs ("false" for new items)
@@ -2227,7 +2227,7 @@ abstract class CItemGeneral extends CApiService {
 
 		if (array_key_exists('templateid', $data) && $data['templateid']) {
 			$rules['interfaceid'] = [
-				'type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY
+				'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY
 			];
 		}
 

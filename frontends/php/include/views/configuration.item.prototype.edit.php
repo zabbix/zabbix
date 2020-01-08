@@ -68,7 +68,7 @@ else {
 
 // Append key to form list.
 $key_controls = [
-	(new CTextBox('key', $data['key'], $readonly))
+	(new CTextBox('key', $data['key'], $readonly, DB::getFieldLength('item_discovery', 'key_')))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired()
 ];
@@ -710,7 +710,10 @@ else {
 
 $form_list
 	->addRow(_('Show value'), [$valuemapComboBox, SPACE,
-		(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')], 'row_valuemap'
+		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.list')
+			->getUrl()
+		))->setAttribute('target', '_blank')], 'row_valuemap'
 	)
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
@@ -752,7 +755,9 @@ $form_list
 	->addRow(_('Application prototypes'), $application_prototype_listbox)
 	// Append description to form list.
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('items', 'description'))
 	)
 	// Append status to form list.
 	->addRow(_('Create enabled'),

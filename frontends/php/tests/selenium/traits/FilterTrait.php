@@ -25,17 +25,24 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  */
 trait FilterTrait {
 
+	protected $filter_selector = 'id:filter-tags';
+
 	/**
-	 * Select type of tags. Add new tag, select tag operator, name and value.
+	 * Set custom selector for filter table.
 	 *
-	 * @param string  $type        type of tags And/Or, Or
-	 * @param array   $tags        tag operator, name and value
-	 *
-	 * @return CFormElement
+	 * @param string $selector    filter table selector
 	 */
-	public function setTags($type, $tags) {
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $form->getField('Tags')->asMultifieldTable([
+	public function setFilterSelector($selector) {
+		$this->filter_selector = $selector;
+	}
+
+	/**
+	 * Get tag table element with mapping set.
+	 *
+	 * @return CMultifieldTable
+	 */
+	protected function getTagTable() {
+		return $this->query($this->filter_selector)->asMultifieldTable([
 			'mapping' => [
 				[
 					'name' => 'name',
@@ -53,9 +60,18 @@ trait FilterTrait {
 					'class' => 'CElement'
 				]
 			]
-		]);
+		])->one();
+	}
 
-		$table->query('id:filter_evaltype')->asSegmentedRadio()->one()->select($type);
+	/**
+	 * Add new tag, select tag operator, name and value.
+	 *
+	 * @param array   $tags   tag operator, name and value
+	 *
+	 * @return CMultifieldTablelement
+	 */
+	public function setTags($tags) {
+		$table = $this->getTagTable();
 
 		foreach ($tags as $i => $tag) {
 			if ($i === 0) {
@@ -66,6 +82,33 @@ trait FilterTrait {
 			}
 		}
 
-		return $form;
+		return $this;
+	}
+
+	/**
+	 * Get input fields of tags.
+	 *
+	 * @return array
+	 */
+	public function getTags() {
+		return $this->getTagTable()->getValue();
+	}
+
+	/**
+	 * Check if values of tags inputs match data from data provider.
+	 *
+	 * @param array $data    tag element values
+	 */
+	public function assertTags($data) {
+		$rows = [];
+		foreach ($data as $values) {
+			$rows[] = [
+				'name' => CTestArrayHelper::get($values, 'name', ''),
+				'value' => CTestArrayHelper::get($values, 'value', ''),
+				'operator' => CTestArrayHelper::get($values, 'operator', 'Contains')
+			];
+		}
+
+		$this->assertEquals($rows, $this->getTags(), 'Tags on a page does not match tags in data provider.');
 	}
 }

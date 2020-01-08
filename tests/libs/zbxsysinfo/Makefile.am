@@ -7,7 +7,9 @@ SERVER_tests = parse_item_key
 endif
 
 if AGENT
-AGENT_tests = process
+AGENT_tests = \
+	process \
+	check_key_access_rules
 endif
 
 noinst_PROGRAMS = $(SERVER_tests) $(AGENT_tests)
@@ -87,11 +89,7 @@ parse_item_key_CFLAGS = -I@top_srcdir@/tests
 endif
 
 if AGENT
-process_SOURCES = \
-	process.c \
-	../../zbxmocktest.h
-
-process_LDADD = \
+COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
@@ -116,6 +114,12 @@ process_LDADD = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
+process_SOURCES = \
+	process.c \
+	../../zbxmocktest.h
+
+process_LDADD = $(COMMON_LIB_FILES)
+
 process_WRAP_FUNCS = \
 	-Wl,--wrap=SYSTEM_LOCALTIME \
 	-Wl,--wrap=WEB_PAGE_GET \
@@ -139,4 +143,21 @@ process_LDADD += @AGENT_LIBS@
 process_LDFLAGS = @AGENT_LDFLAGS@
 
 process_CFLAGS = $(process_WRAP_FUNCS) -DZABBIX_DAEMON -I@top_srcdir@/tests
+
+# check_key_access_rules
+
+check_key_access_rules_SOURCES = \
+	check_key_access_rules.c \
+	../../zbxmocktest.h
+
+check_key_access_rules_LDADD = $(COMMON_LIB_FILES) \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
+
+check_key_access_rules_LDADD += @AGENT_LIBS@
+
+check_key_access_rules_LDFLAGS = @AGENT_LDFLAGS@
+
+check_key_access_rules_CFLAGS = -I@top_srcdir@/tests
+
 endif

@@ -564,7 +564,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	zbx_vector_ptr_create(&regexps);
 	zbx_vector_str_create(&names);
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", zbx_json_strerror());
 		goto error;
@@ -573,14 +573,14 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
 
 	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_HOST_METADATA,
-			&host_metadata, &host_metadata_alloc))
+			&host_metadata, &host_metadata_alloc, NULL))
 	{
 		*host_metadata = '\0';
 	}
 
 	interface = (char *)zbx_malloc(interface, interface_alloc);
 
-	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INTERFACE, &interface, &interface_alloc))
+	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INTERFACE, &interface, &interface_alloc, NULL))
 	{
 		*interface = '\0';
 	}
@@ -598,7 +598,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip), NULL))
 		strscpy(ip, sock->peer);
 
 	if (FAIL == is_ip(ip))	/* check even if 'ip' came from get_ip_by_socket() - it can return not a valid IP */
@@ -607,7 +607,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp), NULL))
 	{
 		port = ZBX_DEFAULT_AGENT_PORT;
 	}
@@ -620,7 +620,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, error))
 		goto error;
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp)) ||
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL) ||
 			FAIL == (version = zbx_get_component_version(tmp)))
 	{
 		version = ZBX_COMPONENT_VERSION(4, 2);
@@ -755,12 +755,10 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, json.buffer);
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
-	if (SUCCEED != zbx_tcp_send(sock, json.buffer))
+	if (SUCCEED != zbx_tcp_send_ext(sock, json.buffer, json.buffer_size, sock->protocol, CONFIG_TIMEOUT))
 		strscpy(error, zbx_socket_strerror());
 	else
 		ret = SUCCEED;
-	zbx_alarm_off();
 
 	zbx_json_free(&json);
 

@@ -25,13 +25,24 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  */
 trait TagTrait {
 
+	protected $table_selector = 'id:tags-table';
+
+	/**
+	 * Set custom selector for tag table.
+	 *
+	 * @param string $selector    tag table selector
+	 */
+	public function setTableSelector($selector) {
+		$this->table_selector = $selector;
+	}
+
 	/**
 	 * Get tag table element with mapping set.
 	 *
 	 * @return CMultifieldTable
 	 */
 	protected function getTagTable() {
-		return $this->query('id:tags-table')->asMultifieldTable([
+		return $this->query($this->table_selector)->asMultifieldTable([
 			'mapping' => [
 				'Name' => [
 					'name' => 'name',
@@ -79,8 +90,8 @@ trait TagTrait {
 	 */
 	public function assertTags($data) {
 		$rows = [];
-		foreach ($data as $i => $values) {
-			$rows[$i] = [
+		foreach ($data as $values) {
+			$rows[] = [
 				'name' => CTestArrayHelper::get($values, 'name', ''),
 				'value' => CTestArrayHelper::get($values, 'value', ''),
 			];

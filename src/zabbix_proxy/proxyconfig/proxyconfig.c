@@ -26,7 +26,7 @@
 
 #include "proxyconfig.h"
 #include "../servercomms.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
@@ -91,13 +91,13 @@ static void	process_configuration_sync(size_t *data_size)
 
 	/* if the answer is short then most likely it is a negative answer "response":"failed" */
 	if (128 > *data_size &&
-			SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)) &&
+			SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value), NULL) &&
 			0 == strcmp(value, ZBX_PROTO_VALUE_FAILED))
 	{
 		char	*info = NULL;
 		size_t	info_alloc = 0;
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc, NULL))
 			info = zbx_dsprintf(info, "negative response \"%s\"", value);
 
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
@@ -144,7 +144,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
-
+	zbx_set_sigusr_handler(zbx_proxyconfig_sigusr_handler);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
@@ -152,7 +152,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_set_sigusr_handler(zbx_proxyconfig_sigusr_handler);
+	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
+	DCsync_configuration(ZBX_DBSYNC_INIT);
 
 	while (ZBX_IS_RUNNING())
 	{

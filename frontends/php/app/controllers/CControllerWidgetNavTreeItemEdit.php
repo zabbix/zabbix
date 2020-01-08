@@ -129,7 +129,7 @@ class CControllerWidgetNavTreeItemEdit extends CController {
 			$output['messages'] = $messages->toString();
 		}
 
-		if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+		if (CWebUser::getDebugMode() == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();
 			$output['debug'] = CProfiler::getInstance()->make()->toString();
 		}

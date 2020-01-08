@@ -23,7 +23,7 @@
 #include "log.h"
 #include "fatal.h"
 #include "sigcommon.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 int			sig_parent_pid = -1;
 volatile sig_atomic_t	sig_exiting;
@@ -100,6 +100,8 @@ static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	int zbx_log_level_temp;
+
 	if (!SIG_PARENT_PROCESS)
 	{
 		/* the parent process can either politely ask a child process to finish it's work and perform cleanup */
@@ -117,8 +119,11 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		if (0 == sig_exiting)
 		{
 			sig_exiting = 1;
-			zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
-					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
+
+			/* temporary variable is used to avoid compiler warning */
+			zbx_log_level_temp = sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
+					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+			zabbix_log(zbx_log_level_temp,
 					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
 					"reason:%d]. Exiting ...",
 					sig, get_signal_name(sig),

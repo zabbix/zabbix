@@ -17,7 +17,7 @@ https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384765-discussion-thread-for-official-zabbix-template-nginx&#13;
 &#13;
-Template tooling version used: 0.32</description>
+Template tooling version used: 0.34</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -305,7 +305,8 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <retrieve_mode>BOTH</retrieve_mode>
                <triggers>
                   <trigger>
-                     <expression>{str("HTTP/1.1 200")}=0 or {nodata(30m)}=1</expression>
+                     <expression>{str("HTTP/1.1 200")}=0 or&#13;
+ {nodata(30m)}=1</expression>
                      <name>Nginx: Failed to fetch stub status page (or no data for 30m)</name>
                      <priority>WARNING</priority>
                      <description>Zabbix has not received data for items for the last 30 minutes.</description>
@@ -400,7 +401,6 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Nginx: Version has changed (new version: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
                      <description>Nginx version has changed. Ack to close.</description>
@@ -449,7 +449,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                         <name>Nginx: Connections by state</name>
                         <host>Template App Nginx by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -471,7 +471,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                         <name>Nginx: Requests per second</name>
                         <host>Template App Nginx by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -493,7 +493,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                         <name>Nginx: Connections per second</name>
                         <host>Template App Nginx by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>

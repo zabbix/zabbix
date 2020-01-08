@@ -18,19 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $widget = (new CWidget())
 	->setTitle(_('Slide shows'))
+	->setTitleSubmenu([
+		'main_section' => [
+			'items' => [
+				'screens.php' => _('Screens'),
+				'slides.php' => _('Slide shows')
+			]
+		]
+	])
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
 			->addItem(
 				(new CList())
-					->addItem(
-						new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
-							'screens.php' => _('Screens'),
-							'slides.php' => _('Slide shows')
-						])
-					)
 					->addItem(new CSubmit('form', _('Create slide show')))
 			)
 		))
@@ -55,14 +58,16 @@ $widget->addItem(
 $form = (new CForm())->setName('slideForm');
 
 // create table
+$url = (new CUrl('slideconf.php'))->getUrl();
+
 $slidesTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_shows'))->onClick("checkAll('".$form->getName()."', 'all_shows', 'shows');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'], $url),
 		_('Actions')
 	]);
 

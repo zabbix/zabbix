@@ -62,6 +62,7 @@ $filter_column1 = (new CFormList())
 		(new CCheckBoxList('filter_priority'))
 			->setOptions($data['config_priorities'])
 			->setChecked($data['filter_priority'])
+			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
 	)
 	->addRow(_('State'),
@@ -264,7 +265,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	if ($data['show_info_column']) {
 		$info_icons = [];
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
-			$info_icons[] = makeErrorIcon($trigger['error']);
+			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDWRAP));
 		}
 	}
 
@@ -316,7 +317,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$hosts,
 		$description,
 		$trigger['opdata'],
-		$expression,
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 		$status,
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
 		$data['tags'][$triggerid]

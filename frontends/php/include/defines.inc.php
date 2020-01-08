@@ -21,13 +21,16 @@
 define('ZABBIX_VERSION',		'5.0.0alpha1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4040000);
+define('ZABBIX_DB_VERSION',		4050013);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
+
+define('ZBX_BCRYPT_COST',		10);
+define('ZBX_MD5_SIZE',			32);
 
 define('ZBX_SESSION_NAME', 'zbx_sessionid'); // Session cookie name for Zabbix front-end.
 
@@ -48,7 +51,7 @@ define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
-// Date and time format seperators must be synced with setSDateFromOuterObj() in class.calendar.js.
+// Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
 
@@ -121,7 +124,6 @@ define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);
 define('ZBX_AUTH_CASE_SENSITIVE',	1);
 
-define('ZBX_DB_DB2',		'IBM_DB2');
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
@@ -156,10 +158,6 @@ define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
 define('T_ZBX_RANGE_TIME',	3);
-define('T_ZBX_CLR',			5);
-define('T_ZBX_DBL_BIG',		9);
-define('T_ZBX_DBL_STR',		10);
-define('T_ZBX_TP',			11);
 define('T_ZBX_TU',			12);
 define('T_ZBX_ABS_TIME',	13);
 
@@ -1167,7 +1165,7 @@ define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
 		)*? # match \" or any character except "
 	\")
 	|
-	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at begining and any character except , and ] afterwards
+	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at beginning and any character except , and ] afterwards
 	|
 	() # match empty and only empty part
 )');
@@ -1496,6 +1494,11 @@ define('ITEM_NO_STORAGE_VALUE',	0);
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
+// Condition popup types.
+define('ZBX_POPUP_CONDITION_TYPE_EVENT_CORR', 0);
+define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
+define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
+
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
@@ -1546,7 +1549,6 @@ define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
-define('ZBX_STYLE_COLUMNS_3', 'col-3');
 define('ZBX_STYLE_SYSMAP', 'sysmap');
 define('ZBX_STYLE_NAVIGATIONTREE', 'navtree');
 define('ZBX_STYLE_CHECKBOX_LIST', 'checkbox-list');
@@ -1603,6 +1605,7 @@ define('ZBX_STYLE_FLH_NA_BG', 'flh-na-bg');
 define('ZBX_STYLE_FLH_WARNING_BG', 'flh-warning-bg');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
+define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
 define('ZBX_STYLE_GRAPH_WRAPPER', 'graph-wrapper');
 define('ZBX_STYLE_GREEN', 'green');
@@ -1687,8 +1690,8 @@ define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
 define('ZBX_STYLE_PAGING_SELECTED', 'paging-selected');
-define('ZBX_STYLE_PRELOADER', 'preloader');
 define('ZBX_STYLE_PAGE_TITLE', 'page-title-general');
+define('ZBX_STYLE_PAGE_TITLE_SUBMENU', 'page-title-submenu');
 define('ZBX_STYLE_PROGRESS_BAR_BG', 'progress-bar-bg');
 define('ZBX_STYLE_PROGRESS_BAR_CONTAINER', 'progress-bar-container');
 define('ZBX_STYLE_PROGRESS_BAR_LABEL', 'progress-bar-label');
@@ -1761,6 +1764,7 @@ define('ZBX_STYLE_TOP_NAV_CONTAINER', 'top-nav-container');
 define('ZBX_STYLE_TOP_NAV_HELP', 'top-nav-help');
 define('ZBX_STYLE_TOP_NAV_ICONS', 'top-nav-icons');
 define('ZBX_STYLE_TOP_NAV_PROFILE', 'top-nav-profile');
+define('ZBX_STYLE_TOP_NAV_GUEST', 'top-nav-guest');
 define('ZBX_STYLE_TOP_NAV_SIGNOUT', 'top-nav-signout');
 define('ZBX_STYLE_TOP_NAV_SUPPORT', 'top-nav-support');
 define('ZBX_STYLE_TOP_NAV_ZBBSHARE', 'top-nav-zbbshare');
@@ -1774,12 +1778,16 @@ define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');
 define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
+define('ZBX_STYLE_WIDGET_URL', 'widget-url');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
+define('ZBX_STYLE_COLUMNS_NOWRAP', 'columns-nowrap');
+define('ZBX_STYLE_COLUMNS_2', 'columns-2');
+define('ZBX_STYLE_COLUMNS_3', 'columns-3');
 // column occupies x% width of column wrapper
 define('ZBX_STYLE_COLUMN_5', 'column-5');
 define('ZBX_STYLE_COLUMN_10', 'column-10');
@@ -1792,6 +1800,7 @@ define('ZBX_STYLE_COLUMN_50', 'column-50');
 define('ZBX_STYLE_COLUMN_75', 'column-75');
 define('ZBX_STYLE_COLUMN_90', 'column-90');
 define('ZBX_STYLE_COLUMN_95', 'column-95');
+
 // column visual options
 define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
 define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
@@ -1812,17 +1821,6 @@ define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS
 define('ZBX_PROPERTY_INHERITED',	0x01);
 define('ZBX_PROPERTY_OWN',			0x02);
 define('ZBX_PROPERTY_BOTH',			0x03);	// ZBX_PROPERTY_INHERITED | ZBX_PROPERTY_OWN
-
-// if magic quotes on, then get rid of them
-if (get_magic_quotes_gpc()) {
-	function zbx_stripslashes($value) {
-		$value = is_array($value) ? array_map('zbx_stripslashes', $value) : stripslashes($value);
-		return $value;
-	}
-	$_GET = zbx_stripslashes($_GET);
-	$_POST = zbx_stripslashes($_POST);
-	$_COOKIE = zbx_stripslashes($_COOKIE);
-}
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

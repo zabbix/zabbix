@@ -20,6 +20,10 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @on-before removeGuestFromDisabledGroup
+ * @on-after addGuestToDisabledGroup
+ */
 class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 	const LOGIN_GUEST	= 1;
@@ -57,7 +61,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open GUI page due access.
 						[
-							'page' => 'adm.gui.php',
+							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
 							'error' => 'Access denied'
 						],
 						// Login after logout.
@@ -106,7 +110,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open GUI page due access.
 						[
-							'page' => 'adm.gui.php',
+							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
 							'error' => 'Access denied'
 						],
 						// Login after logout.
@@ -172,7 +176,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open GUI page due access.
 						[
-							'page' => 'adm.gui.php',
+							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
 							'error' => 'Access denied'
 						]
 					],
@@ -229,7 +233,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Redirect to HTTP login form and user is signed on GUI page.
 						[
-							'page' => 'adm.gui.php',
+							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
 							'action' => self::LOGIN_HTTP,
 							'target' => 'GUI'
 						]
@@ -474,8 +478,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					$this->assertTrue($this->query('xpath', $xpath)->one()->isVisible());
 				}
 				else {
-					$element = $this->query('xpath', $xpath)->one(false);
-					$this->assertTrue($element === null || $element->isVisible(false));
+					$this->assertTrue($this->query('xpath', $xpath)->one(false)->isVisible(false));
 				}
 
 				$this->query('id:name')->one()->fill($this->getUsernameWithoutDomain($data['user']));
@@ -672,5 +675,16 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 		// Cleanup is required to avoid browser sending Basic auth header.
 		self::closePage();
+	}
+
+	/**
+	 * Guest user needs to be out of "Disabled" group to have access to frontend.
+	 */
+	public static function removeGuestFromDisabledGroup() {
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }

@@ -143,7 +143,7 @@ class testFormApplication extends CLegacyWebTest {
 	public function testFormApplication_Update() {
 		$suffix = ' (updated)';
 
-		// Update is perfomed mutiple times to assure that consequential updates are not broken.
+		// Update performing multiple times to assure that consequential updates are not broken.
 		for ($i = 0; $i < 3; $i++) {
 			$this->updateApplication(self::$application, self::$application.$suffix);
 

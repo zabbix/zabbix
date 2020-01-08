@@ -105,6 +105,7 @@ $data = [
 	'action' => getRequest('action'),
 	'from' => getRequest('from'),
 	'to' => getRequest('to'),
+	'page' => getRequest('page', 1),
 	'plaintext' => hasRequest('plaintext'),
 	'graphtype' => getRequest('graphtype', GRAPH_TYPE_NORMAL),
 	'iv_string' => [ITEM_VALUE_TYPE_LOG => true, ITEM_VALUE_TYPE_TEXT => true],

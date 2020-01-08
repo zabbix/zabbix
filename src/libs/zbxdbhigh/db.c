@@ -500,11 +500,7 @@ static size_t	get_string_field_size(unsigned char type)
  ******************************************************************************/
 char	*DBdyn_escape_string_len(const char *src, size_t length)
 {
-#if HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
-	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
-#else
 	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
-#endif
 }
 
 /******************************************************************************
@@ -533,8 +529,6 @@ static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx
 
 #if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
 	return zbx_db_dyn_escape_string(src, get_string_field_size(field->type), length, flag);
-#elif HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
-	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, flag);
 #else
 	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, flag);
 #endif
@@ -717,7 +711,8 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host"))
+			0 == strcmp(tablename, "autoreg_host") ||
+			0 == strcmp(tablename, "event_suppress"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
@@ -1859,15 +1854,7 @@ int	DBtable_exists(const char *table_name)
 
 	table_name_esc = DBdyn_escape_string(table_name);
 
-#if defined(HAVE_IBM_DB2)
-	/* publib.boulder.ibm.com/infocenter/db2luw/v9r7/topic/com.ibm.db2.luw.admin.cmd.doc/doc/r0001967.html */
-	result = DBselect(
-			"select 1"
-			" from syscat.tables"
-			" where tabschema=user"
-				" and lower(tabname)='%s'",
-			table_name_esc);
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 	result = DBselect("show tables like '%s'", table_name_esc);
 #elif defined(HAVE_ORACLE)
 	result = DBselect(
@@ -1910,10 +1897,7 @@ int	DBtable_exists(const char *table_name)
 int	DBfield_exists(const char *table_name, const char *field_name)
 {
 	DB_RESULT	result;
-#if defined(HAVE_IBM_DB2)
-	char		*table_name_esc, *field_name_esc;
-	int		ret;
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 	char		*field_name_esc;
 	int		ret;
 #elif defined(HAVE_ORACLE)
@@ -1928,25 +1912,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	int		ret = FAIL;
 #endif
 
-#if defined(HAVE_IBM_DB2)
-	table_name_esc = DBdyn_escape_string(table_name);
-	field_name_esc = DBdyn_escape_string(field_name);
-
-	result = DBselect(
-			"select 1"
-			" from syscat.columns"
-			" where tabschema=user"
-				" and lower(tabname)='%s'"
-				" and lower(colname)='%s'",
-			table_name_esc, field_name_esc);
-
-	zbx_free(field_name_esc);
-	zbx_free(table_name_esc);
-
-	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
-
-	DBfree_result(result);
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 	field_name_esc = DBdyn_escape_string(field_name);
 
 	result = DBselect("show columns from %s like '%s'",
@@ -2029,15 +1995,7 @@ int	DBindex_exists(const char *table_name, const char *index_name)
 	table_name_esc = DBdyn_escape_string(table_name);
 	index_name_esc = DBdyn_escape_string(index_name);
 
-#if defined(HAVE_IBM_DB2)
-	result = DBselect(
-			"select 1"
-			" from syscat.indexes"
-			" where tabschema=user"
-				" and lower(tabname)='%s'"
-				" and lower(indname)='%s'",
-			table_name_esc, index_name_esc);
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 	result = DBselect(
 			"show index from %s"
 			" where key_name='%s'",
@@ -3078,9 +3036,6 @@ void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int fiel
 #if defined(HAVE_ORACLE)
 			field->chars_num = field_len;
 			field->bytes_num = 4000;
-#elif defined(HAVE_IBM_DB2)
-			field->chars_num = -1;
-			field->bytes_num = field_len;
 #else
 			field->chars_num = field_len;
 			field->bytes_num = -1;

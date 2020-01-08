@@ -22,7 +22,7 @@
 #include "log.h"
 #include "sysinfo.h"
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "symbols.h"
 #	include "comms.h"	/* ssize_t */
 #endif /* _WINDOWS */
@@ -129,7 +129,7 @@ static int	split_filename(const char *filename, char **directory, char **filenam
 	const char	*separator = NULL;
 	zbx_stat_t	buf;
 	int		ret = FAIL;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	size_t		sz;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s'", __func__, ZBX_NULL2STR(filename));
@@ -140,7 +140,7 @@ static int	split_filename(const char *filename, char **directory, char **filenam
 		goto out;
 	}
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	/* special processing for Windows, since directory name cannot be simply separated from file name regexp */
 	for (sz = strlen(filename) - 1, separator = &filename[sz]; separator >= filename; separator--)
 	{
@@ -292,7 +292,7 @@ static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *fil
 	return SUCCEED;
 }
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 /******************************************************************************
  *                                                                            *
  * Function: file_id                                                          *
@@ -1341,7 +1341,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	(*logfiles)[i].seq = 0;
 	(*logfiles)[i].incomplete = 0;
 	(*logfiles)[i].copy_of = -1;
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
 	(*logfiles)[i].ino_lo = (zbx_uint64_t)st->st_ino;
 	(*logfiles)[i].ino_hi = 0;
@@ -1460,7 +1460,7 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
 static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *re, int *use_ino,
 		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, char **err_msg)
 {
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	int			ret = FAIL;
 	char			*find_path = NULL, *file_name_utf8;
 	wchar_t			*find_wpath = NULL;
@@ -1578,7 +1578,7 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
  * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, int use_ino, char **err_msg)
 #else
 static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, char **err_msg)
@@ -1601,7 +1601,7 @@ static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, cha
 
 		if (SUCCEED != (ret = file_start_md5(f, p->md5size, p->md5buf, p->filename, err_msg)))
 			goto clean;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 		ret = file_id(f, use_ino, &p->dev, &p->ino_lo, &p->ino_hi, p->filename, err_msg);
 #endif	/*_WINDOWS*/
 clean:
@@ -1663,7 +1663,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 		}
 
 		add_logfile(logfiles, logfiles_alloc, logfiles_num, filename, &file_buf);
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 		if (SUCCEED != (ret = set_use_ino_by_fs_type(filename, use_ino, err_msg)))
 			goto clean;
 #else
@@ -1693,7 +1693,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 		{
 			/* do not make logrt[] and logrt.count[] items NOTSUPPORTED if there are no matching log */
 			/* files or they are not accessible (can happen during a rotation), just log the problem */
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 			zabbix_log(LOG_LEVEL_WARNING, "there are no recently modified files matching \"%s\" in \"%s\"",
 					filename_regexp, directory);
 
@@ -1724,7 +1724,7 @@ clean1:
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	ret = fill_file_details(logfiles, *logfiles_num, *use_ino, err_msg);
 #else
 	ret = fill_file_details(logfiles, *logfiles_num, err_msg);
@@ -1924,9 +1924,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 									*mtime_sent = *mtime;
 
 								(*s_count)--;
+								zbx_free(item_value);
 							}
+							else
+							{
+								zbx_free(item_value);
 
-							zbx_free(item_value);
+								/* Sending of buffer failed. */
+								/* Try to resend it in the next check. */
+								ret = SUCCEED;
+								goto out;
+							}
 						}
 					}
 					else	/* log.count[] or logrt.count[] */
@@ -2010,9 +2018,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 									*mtime_sent = *mtime;
 
 								(*s_count)--;
+								zbx_free(item_value);
 							}
+							else
+							{
+								zbx_free(item_value);
 
-							zbx_free(item_value);
+								/* Sending of buffer failed. */
+								/* Try to resend it in the next check. */
+								ret = SUCCEED;
+								goto out;
+							}
 						}
 					}
 					else	/* log.count[] or logrt.count[] */
@@ -3297,7 +3313,7 @@ static int	init_max_lines_per_sec(int is_count_item, const AGENT_REQUEST *reques
 static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float *max_delay, char **error)
 {
 	const char	*max_delay_str;
-	float		max_delay_tmp;
+	double		max_delay_tmp;
 	int		max_delay_par_nr;
 
 	/* <maxdelay> is parameter 6 for log[], logrt[], but parameter 5 for log.count[], logrt.count[] */
@@ -3313,13 +3329,13 @@ static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float
 		return SUCCEED;
 	}
 
-	if (SUCCEED != is_double(max_delay_str) || 0.0f > (max_delay_tmp = (float)atof(max_delay_str)))
+	if (SUCCEED != is_double(max_delay_str, &max_delay_tmp) || 0.0 > max_delay_tmp)
 	{
 		*error = zbx_dsprintf(*error, "Invalid %s parameter.", (5 == max_delay_par_nr) ? "sixth" : "seventh");
 		return FAIL;
 	}
 
-	*max_delay = max_delay_tmp;
+	*max_delay = (float)max_delay_tmp;
 	return SUCCEED;
 }
 

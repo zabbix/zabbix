@@ -87,7 +87,8 @@ function getSystemStatusData(array $filter) {
 			'preservekeys' => true
 		]),
 		'triggers' => [],
-		'actions' => []
+		'actions' => [],
+		'stats' => []
 	];
 
 	CArrayHelper::sort($data['groups'], [['field' => 'name', 'order' => ZBX_SORT_UP]]);
@@ -99,6 +100,8 @@ function getSystemStatusData(array $filter) {
 			$default_stats[$severity] = ['count' => 0, 'problems' => [], 'count_unack' => 0, 'problems_unack' => []];
 		}
 	}
+
+	$data['stats'] = $default_stats;
 
 	foreach ($data['groups'] as &$group) {
 		$group['stats'] = $default_stats;
@@ -183,6 +186,11 @@ function getSystemStatusData(array $filter) {
 
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
+
+			$data['stats'][$problem['severity']]['count']++;
+			if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+				$data['stats'][$problem['severity']]['count_unack']++;
+			}
 
 			// groups
 			foreach ($trigger['groups'] as $trigger_group) {
@@ -426,11 +434,10 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
  * @param array  $data['groups'][]['stats'][]['problems']
  * @param int    $data['groups'][]['stats'][]['count_unack']
  * @param array  $data['groups'][]['stats'][]['problems_unack']
- * @param array  $severity_names
  *
  * @return array
  */
-function getSystemStatusTotals(array $data, array $severity_names) {
+function getSystemStatusTotals(array $data) {
 	$groups_totals = [
 		0 => [
 			'groupid' => 0,
@@ -438,25 +445,22 @@ function getSystemStatusTotals(array $data, array $severity_names) {
 		]
 	];
 
-	foreach (array_reverse($severity_names) as $key => $value) {
-		$i = explode('_', $key)[2];
-		$groups_totals[0]['stats'][$i] = [
-			'count' => 0,
+	foreach ($data['stats'] as $severity => $value) {
+		$groups_totals[0]['stats'][$severity] = [
+			'count' => $value['count'],
 			'problems' => [],
-			'count_unack' => 0,
+			'count_unack' => $value['count_unack'],
 			'problems_unack' => []
 		];
 	}
 
 	foreach ($data['groups'] as $group) {
 		foreach ($group['stats'] as $severity => $stat) {
-			$groups_totals[0]['stats'][$severity]['count'] += $stat['count'];
 			foreach ($stat['problems'] as $problem) {
-				$groups_totals[0]['stats'][$severity]['problems'][] = $problem;
+				$groups_totals[0]['stats'][$severity]['problems'][$problem['eventid']] = $problem;
 			}
-			$groups_totals[0]['stats'][$severity]['count_unack'] += $stat['count_unack'];
 			foreach ($stat['problems_unack'] as $problem) {
-				$groups_totals[0]['stats'][$severity]['problems_unack'][] = $problem;
+				$groups_totals[0]['stats'][$severity]['problems_unack'][$problem['eventid']] = $problem;
 			}
 		}
 	}

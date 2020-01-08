@@ -197,7 +197,7 @@ $triggersFormList->addRow(
 
 // Append expression table to form list.
 if ($data['expression_constructor'] == IM_TREE) {
-	$expressionTable = (new CTable())
+	$expression_table = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([
 			$readonly ? null : _('Target'),
@@ -237,7 +237,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 				unset($obj);
 			}
 
-			$expressionTable->addRow(
+			$expression_table->addRow(
 				new CRow([
 					!$readonly
 						? (new CCheckBox('expr_target_single', $e['id']))
@@ -245,7 +245,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 							->onClick('check_target(this, '.TRIGGER_EXPRESSION.');')
 							->removeId()
 						: null,
-					$e['list'],
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$readonly
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
@@ -287,7 +287,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		(new CDiv([$expressionTable, $testButton]))
+		(new CDiv([$expression_table, $testButton]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
@@ -444,7 +444,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 							->onClick('check_target(this, '.TRIGGER_RECOVERY_EXPRESSION.');')
 							->removeId()
 						: null,
-					$e['list'],
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$readonly
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
@@ -543,6 +543,7 @@ $triggersFormList
 	->addRow(_('Description'),
 		(new CTextArea('comments', $data['comments']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 			->setReadonly($discovered_trigger)
 	)
 	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));

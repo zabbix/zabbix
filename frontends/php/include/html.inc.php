@@ -752,31 +752,77 @@ function makePageFooter($with_version = true) {
 }
 
 /**
- * Renders a drop-down menu for the Administration->General section.
+ * Get drop-down submenu item list for the Administration->General section.
  *
- * @param string $selected
- *
- * @return CComboBox
+ * @return array  Menu definition for CWidget::setTitleSubmenu.
  */
-function makeAdministrationGeneralMenu($selected) {
+function getAdministrationGeneralSubmenu() {
+	$gui_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'gui.edit')
+		->getUrl();
+
 	$autoreg_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'autoreg.edit')
 		->getUrl();
 
-	return new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);', [
-		'adm.gui.php' => _('GUI'),
-		$autoreg_url => _('Auto registration'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]);
+	$housekeeping_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'housekeeping.edit')
+		->getUrl();
+
+	$image_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'image.list')
+		->getUrl();
+
+	$iconmap_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'iconmap.list')
+		->getUrl();
+
+	$regex_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'regex.list')
+		->getUrl();
+
+	$macros_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'macros.edit')
+		->getUrl();
+
+	$valuemap_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'valuemap.list')
+		->getUrl();
+
+	$workingtime_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'workingtime.edit')
+		->getUrl();
+
+	$trigseverity_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'trigseverity.edit')
+		->getUrl();
+
+	$trigdisplay_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'trigdisplay.edit')
+		->getUrl();
+
+	$miscconfig_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'miscconfig.edit')
+		->getUrl();
+
+	return [
+		'main_section' => [
+			'items' => [
+				$gui_url          => _('GUI'),
+				$autoreg_url      => _('Auto registration'),
+				$housekeeping_url => _('Housekeeping'),
+				$image_url        => _('Images'),
+				$iconmap_url      => _('Icon mapping'),
+				$regex_url        => _('Regular expressions'),
+				$macros_url       => _('Macros'),
+				$valuemap_url     => _('Value mapping'),
+				$workingtime_url  => _('Working time'),
+				$trigseverity_url => _('Trigger severities'),
+				$trigdisplay_url  => _('Trigger displaying options'),
+				$miscconfig_url   => _('Other')
+			]
+		]
+	];
 }
 
 /**
@@ -905,7 +951,7 @@ function makeDescriptionIcon($description) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->setHint(zbx_str2links($description), '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
+		->setHint(zbx_str2links($description), 'hintbox-description');
 }
 
 /**

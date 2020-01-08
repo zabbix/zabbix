@@ -7,7 +7,8 @@ libzbxcrypto_a_SOURCES = \
 	md5.c \
 	tls.c \
 	tls.h \
-	tls_tcp_active.h \
-	tls_tcp.h
+	tls_version.c \
+	tls_tcp.h \
+	tls_tcp_active.h
 
 libzbxcrypto_a_CFLAGS = $(TLS_CFLAGS)

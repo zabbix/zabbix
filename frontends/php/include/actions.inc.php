@@ -63,7 +63,7 @@ function condition_type2str($type) {
 		CONDITION_TYPE_PROXY => _('Proxy'),
 		CONDITION_TYPE_EVENT_TYPE => _('Event type'),
 		CONDITION_TYPE_HOST_METADATA => _('Host metadata'),
-		CONDITION_TYPE_EVENT_TAG => _('Tag'),
+		CONDITION_TYPE_EVENT_TAG => _('Tag name'),
 		CONDITION_TYPE_EVENT_TAG_VALUE => _('Tag value')
 	];
 
@@ -88,7 +88,7 @@ function discovery_object2str($object = null) {
  *
  * For action condition types such as: hosts, host groups, templates, proxies, triggers, discovery rules
  * and discovery checks, action condition values contain IDs. All unique IDs are first collected and then queried.
- * For other action condition types values are returned as they are or converted using simple string convertion
+ * For other action condition types values are returned as they are or converted using simple string conversion
  * functions according to action condition type.
  *
  * @param array $actions							array of actions
@@ -319,29 +319,6 @@ function actionConditionValueToString(array $actions, array $config) {
 }
 
 /**
- * Converts numerical action operation condition values to their corresponding string values according to
- * action operation condition type. Since action list does not display operation conditions,
- * so there is only an array of operation conditions for single action which is displayed in operation details.
- *
- * @param array  $conditions					array of actions operation conditions
- * @param string $condition['conditiontype']	operation condition type
- * @param string $condition['value']			operation condition value
- *
- * @return array								returns an array of action operation condition string values
- */
-function actionOperationConditionValueToString(array $conditions) {
-	$result = [];
-
-	foreach ($conditions as $condition) {
-		if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
-			$result[] = $condition['value'] ? _('Ack') : _('Not Ack');
-		}
-	}
-
-	return $result;
-}
-
-/**
  * Returns the HTML representation of an action condition and action operation condition.
  *
  * @param string $condition_type
@@ -353,7 +330,7 @@ function actionOperationConditionValueToString(array $conditions) {
  */
 function getConditionDescription($condition_type, $operator, $value, $value2) {
 	if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
-		$description = [_('Tag')];
+		$description = [_('Value of tag')];
 		$description[] = ' ';
 		$description[] = italic(CHtml::encode($value2));
 		$description[] = ' ';
@@ -362,6 +339,9 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 		return ($operator == CONDITION_OPERATOR_YES)
 			? [_('Problem is suppressed')]
 			: [_('Problem is not suppressed')];
+	}
+	elseif ($condition_type == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
+		return $value ? _('Event is acknowledged') : _('Event is not acknowledged');
 	}
 	else {
 		$description = [condition_type2str($condition_type)];
@@ -440,15 +420,15 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 					case OPERATION_TYPE_GROUP_ADD:
 					case OPERATION_TYPE_GROUP_REMOVE:
-						foreach ($operation['groupids'] as $groupid) {
-							$groupids[$groupid] = true;
+						foreach ($operation['opgroup'] as $groupid) {
+							$groupids[$groupid['groupid']] = true;
 						}
 						break;
 
 					case OPERATION_TYPE_TEMPLATE_ADD:
 					case OPERATION_TYPE_TEMPLATE_REMOVE:
-						foreach ($operation['templateids'] as $templateid) {
-							$templateids[$templateid] = true;
+						foreach ($operation['optemplate'] as $templateid) {
+							$templateids[$templateid['templateid']] = true;
 						}
 						break;
 				}
@@ -563,7 +543,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 		]);
 	}
 
-	// format the HTML ouput
+	// Format the HTML output.
 	foreach ($actions as $i => $action) {
 		if ($type == ACTION_OPERATION) {
 			foreach ($action['operations'] as $j => $operation) {
@@ -673,9 +653,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 					case OPERATION_TYPE_GROUP_REMOVE:
 						$host_group_list = [];
 
-						foreach ($operation['groupids'] as $groupid) {
-							if (array_key_exists($groupid, $host_groups)) {
-								$host_group_list[] = $host_groups[$groupid]['name'];
+						foreach ($operation['opgroup'] as $groupid) {
+							if (array_key_exists($groupid['groupid'], $host_groups)) {
+								$host_group_list[] = $host_groups[$groupid['groupid']]['name'];
 							}
 						}
 
@@ -695,9 +675,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 					case OPERATION_TYPE_TEMPLATE_REMOVE:
 						$template_list = [];
 
-						foreach ($operation['templateids'] as $templateid) {
-							if (array_key_exists($templateid, $templates)) {
-								$template_list[] = $templates[$templateid]['name'];
+						foreach ($operation['optemplate'] as $templateid) {
+							if (array_key_exists($templateid['templateid'], $templates)) {
+								$template_list[] = $templates[$templateid['templateid']]['name'];
 							}
 						}
 

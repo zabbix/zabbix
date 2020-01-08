@@ -78,7 +78,7 @@ function addScreenRow(array $screen, $row_num) {
 		'screenitems' => $screen['screenitems']
 	];
 
-	$result = ($screen['templateid'] != 0)
+	$result = array_key_exists('templateid', $screen)
 		? API::TemplateScreen()->update($options)
 		: API::Screen()->update($options);
 
@@ -111,7 +111,7 @@ function addScreenColumn(array $screen, $col_num) {
 		'screenitems' => $screen['screenitems']
 	];
 
-	$result = ($screen['templateid'] != 0)
+	$result = array_key_exists('templateid', $screen)
 		? API::TemplateScreen()->update($options)
 		: API::Screen()->update($options);
 
@@ -147,7 +147,7 @@ function delScreenRow(array $screen, $row_num) {
 		'screenitems' => $screen['screenitems']
 	];
 
-	$result = ($screen['templateid'] != 0)
+	$result = array_key_exists('templateid', $screen)
 		? API::TemplateScreen()->update($options)
 		: API::Screen()->update($options);
 
@@ -183,7 +183,7 @@ function delScreenColumn(array $screen, $col_num) {
 		'screenitems' => $screen['screenitems']
 	];
 
-	$result = ($screen['templateid'] != 0)
+	$result = array_key_exists('templateid', $screen)
 		? API::TemplateScreen()->update($options)
 		: API::Screen()->update($options);
 

@@ -30,7 +30,7 @@ class CScreenUrl extends CScreenBase {
 		// prevent from resolving macros in configuration page
 		if ($this->mode != SCREEN_MODE_PREVIEW && $this->mode != SCREEN_MODE_SLIDESHOW) {
 			return $this->getOutput(
-				CHtmlUrlValidator::validate($this->screenitem['url'])
+				CHtmlUrlValidator::validate($this->screenitem['url'], ['allow_user_macro' => false])
 					? new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'],
 							'auto')
 					: makeMessageBox(false, [[
@@ -55,7 +55,7 @@ class CScreenUrl extends CScreenBase {
 		$this->screenitem['url'] = $url ? $url : $this->screenitem['url'];
 
 		return $this->getOutput(
-			CHtmlUrlValidator::validate($this->screenitem['url'])
+			CHtmlUrlValidator::validate($this->screenitem['url'], ['allow_user_macro' => false])
 				? new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto')
 				: makeMessageBox(false, [[
 							'type' => 'error',

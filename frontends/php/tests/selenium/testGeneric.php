@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup profiles
+ */
 class testGeneric extends CLegacyWebTest {
 
 	public static function provider() {
@@ -35,7 +38,7 @@ class testGeneric extends CLegacyWebTest {
 			['overview.php?form_refresh=1&groupid=0&type=1&view_style=1',	'Overview [refreshed every 30 sec.]'],
 
 			['zabbix.php?action=web.view',					'Web monitoring'],
-			['latest.php',						'Latest data [refreshed every 30 sec.]'],
+			['zabbix.php?action=latest.view',	'Latest data'],
 
 			['zabbix.php?action=problem.view',	'Problems'],
 
@@ -81,21 +84,21 @@ class testGeneric extends CLegacyWebTest {
 			['services.php',					'Configuration of services'],
 
 			// Administration
-			['adm.gui.php',					'Configuration of GUI'],
-			['adm.housekeeper.php',			'Configuration of housekeeping'],
-			['adm.images.php',					'Configuration of images'],
-			['adm.iconmapping.php',			'Configuration of icon mapping'],
-			['adm.regexps.php',				'Configuration of regular expressions'],
-			['adm.macros.php',					'Configuration of macros'],
-			['adm.valuemapping.php',			'Configuration of value mapping'],
-			['adm.workingtime.php',			'Configuration of working time'],
-			['adm.triggerseverities.php',		'Configuration of trigger severities'],
-			['adm.triggerdisplayoptions.php',	'Configuration of trigger displaying options'],
-			['adm.other.php',					'Other configuration parameters'],
+			['zabbix.php?action=gui.edit&ddreset=1',	'Configuration of GUI'],
+			['zabbix.php?action=housekeeping.edit',		'Configuration of housekeeping'],
+			['zabbix.php?action=image.list',	'Configuration of images'],
+			['zabbix.php?action=iconmap.list',	'Configuration of icon mapping'],
+			['zabbix.php?action=regex.list',	'Configuration of regular expressions'],
+			['zabbix.php?action=macros.edit',	'Configuration of macros'],
+			['zabbix.php?action=valuemap.list',	'Configuration of value mapping'],
+			['zabbix.php?action=workingtime.edit',	'Configuration of working time'],
+			['zabbix.php?action=trigseverity.edit',	'Configuration of trigger severities'],
+			['zabbix.php?action=trigdisplay.edit',	'Configuration of trigger displaying options'],
+			['zabbix.php?action=miscconfig.edit',	'Other configuration parameters'],
 
 			['zabbix.php?action=proxy.list',						'Configuration of proxies'],
 			['zabbix.php?action=authentication.edit',				'Configuration of authentication'],
-			['usergrps.php',					'Configuration of user groups'],
+			['zabbix.php?action=usergroup.list',					'Configuration of user groups'],
 			['zabbix.php?action=user.edit',		'Configuration of users'],
 			['zabbix.php?action=mediatype.list',					'Configuration of media types'],
 			['zabbix.php?action=script.list',						'Configuration of scripts'],

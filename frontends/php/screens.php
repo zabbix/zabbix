@@ -95,7 +95,7 @@ $options = [
 
 if (getRequest('elementid')) {
 	$options['screenids'] = getRequest('elementid');
-	CProfile::update('web.screens.elementid', getRequest('elementid') , PROFILE_TYPE_ID);
+	CProfile::update('web.screens.elementid', getRequest('elementid'), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('screenname')) {
 	$options['filter']['name'] = getRequest('screenname');

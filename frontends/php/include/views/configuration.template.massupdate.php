@@ -81,7 +81,9 @@ $template_form_list
 		(new CVisibilityBox('visible[description]', 'description', _('Original')))
 			->setLabel(_('Description'))
 			->setChecked(array_key_exists('description', $data['visible'])),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	);
 
 /*
@@ -90,10 +92,17 @@ $template_form_list
 $linked_templates_form_list = new CFormList('linked-templates-form-list');
 
 $new_template_table = (new CTable())
+	->addRow(
+		(new CRadioButtonList('mass_action_tpls', (int) $data['mass_action_tpls']))
+			->addValue(_('Link'), ZBX_ACTION_ADD)
+			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+			->addValue(_('Unlink'), ZBX_ACTION_REMOVE)
+			->setModern(true)
+	)
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'linked_templates[]',
-			'object_name' => 'linked_templates',
+			'object_name' => 'templates',
 			'data' => $data['linked_templates'],
 			'popup' => [
 				'parameters' => [
@@ -109,10 +118,6 @@ $new_template_table = (new CTable())
 	->addRow([
 		(new CList())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
-			->addItem((new CCheckBox('mass_replace_tpls'))
-				->setLabel(_('Replace'))
-				->setChecked($data['mass_replace_tpls'] == 1)
-			)
 			->addItem((new CCheckBox('mass_clear_tpls'))
 				->setLabel(_('Clear when unlinking'))
 				->setChecked($data['mass_clear_tpls'] == 1)

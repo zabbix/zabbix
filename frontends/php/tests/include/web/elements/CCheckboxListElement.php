@@ -33,7 +33,7 @@ class CCheckboxListElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getCheckboxes() {
-		return $this->query('xpath://input[@type="checkbox"]')->asCheckbox()->all();
+		return $this->query('xpath:.//input[@type="checkbox"]')->asCheckbox()->all();
 	}
 
 	/**
@@ -61,12 +61,12 @@ class CCheckboxListElement extends CElement {
 		}
 		else {
 			$label = $this->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($labels).']')->one(false);
-			if ($label === null) {
+			if (!$label->isValid()) {
 				throw new Exception('Failed to find checkbox label by name: "'.$labels.'".');
 			}
 
 			$element = $label->query('xpath:../input[@type="checkbox"]')->asCheckbox()->one(false);
-			if ($element === null) {
+			if (!$element->isValid()) {
 				throw new Exception('Failed to find checkbox element by label name: "'.$labels.'".');
 			}
 
@@ -140,11 +140,20 @@ class CCheckboxListElement extends CElement {
 	/**
 	 * @inheritdoc
 	 */
+	public function isEnabled($enabled = true) {
+		$xpath = 'xpath:.//input[@type="checkbox"][not(@disabled)]';
+
+		return (($this->getCheckboxes()->count() === $this->query($xpath)->count()) === $enabled);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getValue() {
 		$value = [];
 
-		foreach ($this->query('xpath://input[@type="checkbox"]')->asCheckbox()->all() as $checkbox) {
-			if ($checkbox->isChecked() && ($label = $checkbox->getLabel()) !== null) {
+		foreach ($this->getCheckboxes() as $checkbox) {
+			if ($checkbox->isChecked() && ($label = $checkbox->getLabel())->isValid()) {
 				$value[] = $label->getText();
 			}
 		}

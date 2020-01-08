@@ -75,15 +75,19 @@ $form = (new CForm())
 	->setId('users');
 
 // create users table
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'user.list')
+	->getUrl();
+
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_users'))->onClick("checkAll('".$form->getName()."', 'all_users', 'userids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Alias'), 'alias', $data['sort'], $data['sortorder']),
-		make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder']),
-		make_sorting_header(_('Surname'), 'surname', $data['sort'], $data['sortorder']),
-		make_sorting_header(_('User type'), 'type', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Alias'), 'alias', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Surname'), 'surname', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('User type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Groups'),
 		_('Is online?'),
 		_('Login'),
@@ -127,8 +131,6 @@ foreach ($data['users'] as $user) {
 	$users_groups = [];
 	$i = 0;
 
-	$url = (new CUrl('usergrps.php'))->setArgument('form', 'update');
-
 	foreach ($user['usrgrps'] as $user_group) {
 		$i++;
 
@@ -144,7 +146,10 @@ foreach ($data['users'] as $user) {
 
 		$users_groups[] = (new CLink(
 			$user_group['name'],
-			$url->setArgument('usrgrpid', $user_group['usrgrpid'])
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'usergroup.edit')
+				->setArgument('usrgrpid', $user_group['usrgrpid'])
+				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass($user_group['gui_access'] == GROUP_GUI_ACCESS_DISABLED

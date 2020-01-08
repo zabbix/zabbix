@@ -47,10 +47,11 @@ class CMapHelper {
 			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'permission'
+				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls', 'permission'
 			],
 			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
-				'permission'],
+				'permission'
+			],
 			'sysmapids' => $sysmapids,
 			'preservekeys' => true
 		]);
@@ -168,7 +169,7 @@ class CMapHelper {
 			]
 		];
 
-		// Apply properties to each sysmap elemenet.
+		// Apply properties to each sysmap element.
 		foreach ($sysmap['selements'] as &$selement) {
 			$prop = $label_properties[$selement['elementtype']];
 			$elmnt_label_type = ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_ON)
@@ -201,7 +202,7 @@ class CMapHelper {
 	 * Resolve map element (selements and links) state.
 	 *
 	 * @param array $sysmap                   Map data.
-	 * @param array $areas                    Areas representing array containing host group element IDs and dimention
+	 * @param array $areas                    Areas representing array containing host group element IDs and dimension
 	 *                                        properties of area.
 	 * @param array $options                  Options used to retrieve actions.
 	 * @param int   $options['severity_min']  Minimum severity.
@@ -252,7 +253,7 @@ class CMapHelper {
 		$labels = getMapLabels($sysmap, $map_info);
 		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
-		$linktrigger_info = getMapLinktriggerInfo($sysmap, $options);
+		$linktrigger_info = getMapLinkTriggerInfo($sysmap, $options);
 
 		$problems_total = 0;
 		$status_problems = [];

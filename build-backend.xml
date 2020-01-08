@@ -13,10 +13,6 @@
 			<property name="with.db" value="--with-oracle"/>
 			<property name="with.oracle" value="true"/>
 		</case>
-		<case value="DB2">
-			<property name="with.db" value="--with-ibm-db2"/>
-			<property name="with.db2" value="true"/>
-		</case>
 		<default>
 			<property name="with.db" value="--with-mysql"/>
 			<property name="with.mysql" value="true"/>
@@ -32,6 +28,10 @@
 		<property name="conf5" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap  --with-libcurl"/>
 		<property name="conf6" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		<property name="conf7" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
+	</target>
+
+	<!-- Additional Zabbix configuration parameters -->
+	<target name="init-conf-options-2">
 		<property name="conf8" value="--enable-agent2"/>
 	</target>
 
@@ -126,7 +126,6 @@
 			<trycatch>
 				<try>
 					<exec executable="make" failonerror="on">
-						<env key="GOPATH" value="$GOPATH:$PWD"/>
 						<arg line="-s"/>
 						<arg line="-j5"/>
 						<arg line="@{target}"/>
@@ -172,15 +171,8 @@
 		</sequential>
 	</target>
 
-	<target name="make-db-db2" unless="${with.db2}">
-		<!-- Build Zabbix with ibm db2 database -->
-		<sequential>
-			<make args="--enable-server --enable-agent --enable-proxy --with-ibm-db2 --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl --with-ibm-db2-include=/opt/ibm/db2/V11.1/include --with-ibm-db2-lib=/opt/ibm/db2/V11.1/lib64"/>
-		</sequential>
-	</target>
-
 	<!-- Build Zabbix with all supported databases  -->
-	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
+	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle"/>
 
 	<macrodef name="make-tests">
 		<!-- Build Zabbix cmocka tests with the specified command line arguments -->
@@ -305,7 +297,7 @@
 		</exec>
 	</target>
 
-	<target name="make-gcc" depends="init-conf-options">
+	<target name="make-gcc" depends="init-conf-options,init-conf-options-2">
 		<!-- Build Zabbix with various configuration parameters -->
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>

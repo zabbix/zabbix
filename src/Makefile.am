@@ -1,13 +1,15 @@
 ## Process this file with automake to produce Makefile.in
 
 DIST_SUBDIRS = \
+	go \
 	libs \
 	zabbix_agent \
 	zabbix_get \
 	zabbix_sender \
 	zabbix_proxy \
 	zabbix_server \
-	zabbix_java
+	zabbix_java \
+	zabbix_js
 
 if AGENT
 COMMON_SUBDIRS = libs
@@ -30,16 +32,20 @@ AGENT_SUBDIRS = \
 	zabbix_agent \
 	zabbix_get \
 	zabbix_sender
-else
-if AGENT2
-AGENT_SUBDIRS = \
-	zabbix_agent
 endif
+
+if AGENT2
+if !AGENT 
+AGENT_SUBDIRS = zabbix_agent
+endif
+AGENT2_SUBDIRS = \
+	go
 endif
 
 if SERVER
 SERVER_SUBDIRS = \
-	zabbix_server
+	zabbix_server \
+	zabbix_js
 endif
 
 if PROXY
@@ -63,7 +69,8 @@ PROXY_SUBDIRS = \
 	zabbix_server/odbc \
 	zabbix_server/scripts \
 	zabbix_server/preprocessor \
-	zabbix_proxy
+	zabbix_proxy \
+	zabbix_js
 	
 endif
 endif
@@ -76,6 +83,7 @@ endif
 SUBDIRS = \
 	$(COMMON_SUBDIRS) \
 	$(AGENT_SUBDIRS) \
+	$(AGENT2_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(PROXY_SUBDIRS) \
 	$(JAVA_SUBDIRS)

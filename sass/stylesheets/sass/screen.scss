@@ -14,7 +14,7 @@ body {
 	line-height: $body-line-height;
 	color: $font-color;
 	background-color: $body-bg-color;
-	margin-bottom: 60px;
+	margin-bottom: 71px;
 	min-width: 1200px;
 
 	font: {
@@ -101,7 +101,6 @@ svg a {
 	&:focus {
 		outline: none;
 		border-bottom: 2px solid rgba($link-hover-color, 0.35);
-
 	}
 }
 
@@ -229,7 +228,9 @@ pre {
 
 %space-pre-wrap {
 	white-space: pre-wrap;
-	word-wrap: break-word;
+	word-break: break-all;  // For the Internet Explorer.
+	word-break: break-word; // Override for the other browsers.
+	overflow-wrap: break-word;
 }
 
 .top-nav-container {
@@ -340,7 +341,7 @@ ul.top-nav-icons {
 		}
 	}
 
-	a {
+	a, span.top-nav-guest {
 		display: block;
 		width: 24px;
 		height: 45px;
@@ -368,6 +369,10 @@ ul.top-nav-icons {
 
 	.top-nav-profile {
 		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
+	}
+
+	.top-nav-guest {
+		background: url(../img/icon-sprite.svg) no-repeat -241px -104px;
 	}
 
 	.top-nav-signout {
@@ -525,24 +530,59 @@ ul.top-nav-icons {
 }
 
 .header-title {
-	border-bottom: 1px solid $ui-border-color;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 	margin: -10px 0 10px;
 	padding: 10px 0 6px;
-	width: 100%;
+	border-bottom: 1px solid $ui-border-color;
 
-	.cell {
+	& > div {
+		overflow: hidden;
 
-		&:first-child {
-			max-width: calc(100vw - 370px);
+		&:last-child {
+			flex-shrink: 0;
 		}
 	}
 
 	h1 {
+		position: relative;
 		line-height: 24px;
 		overflow: hidden;
 		padding-top: 1px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	a.link-action {
+		display: block;
+		box-sizing: border-box;
+		height: 25px;
+
+		h1 {
+			padding-right: 1em;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 50%;
+				right: .15em;
+				margin-top: -.15em;
+				width: .3em;
+				height: .3em;
+				border-right: 2px solid $font-color;
+				border-bottom: 2px solid $font-color;
+				transform: rotate(45deg);
+				@include transition(border-color .2s ease-out);
+			}
+		}
+
+		&:hover,
+		&:focus {
+			h1::after {
+				border-color: $link-hover-color;
+			}
+		}
 	}
 
 	form {
@@ -1464,7 +1504,7 @@ output {
 %timeline-dot {
 	content: '';
 	position: absolute;
-	z-index: 100;
+	z-index: 1;
 	display: block;
 	width: 4px;
 	height: 4px;
@@ -1616,15 +1656,16 @@ output {
 }
 
 .multiselect-control {
+	display: flex;
 	position: relative;
 	vertical-align: top;
-	display: inline-block;
 	white-space: nowrap;
 }
 
 .multiselect {
 	@extend %form-input-style;
-	@extend .multiselect-button;
+	display: flex;
+	flex-direction: column;
 	position: relative;
 	margin-right: 3px;
 	min-height: 24px;
@@ -1659,17 +1700,35 @@ output {
 	}
 
 	.multiselect-list {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
 		padding-left: 2px;
 		padding-bottom: 2px;
 
 		li {
-			display: inline-block;
-			margin: 2px 14px 0 0;
+			display: block; // Override ".table-forms li".
+			margin: 2px 2px 0 0;
+			overflow: hidden;
 			white-space: nowrap;
+			cursor: default;
 
 			.subfilter-enabled {
-				padding: 0 9px 0 4px;
+				display: flex;
+				flex-direction: row;
+				padding: 0 3px 0 4px;
 				line-height: 18px;
+
+				& > span:first-child {
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				& > .subfilter-disable-btn {
+					position: relative;
+					left: 3px;
+					flex-shrink: 0;
+				}
 			}
 
 			&.selected {
@@ -1705,20 +1764,7 @@ output {
 	}
 }
 
-.multiselect-collapsed {
-	&.multiselect-control,
-	.multiselect {
-		overflow: hidden;
-		max-height: 24px;
-
-		input[type="text"] {
-			display: none;
-		}
-	}
-}
-
 .multiselect-button {
-	display: inline-block;
 	vertical-align: top;
 }
 
@@ -1753,13 +1799,10 @@ output {
 	@extend .multiselect-suggest;
 }
 
-.available {
+.multiselect-available {
 	position: absolute;
-	z-index: 1000;
-	margin-top: 1px;
+	z-index: 20000;
 	border: 1px solid $action-border-color;
-	border-top: none;
-	max-height: 400px;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
 	@include box-shadow(0 6px 10px 0 $action-shadow-color);
@@ -1902,6 +1945,12 @@ output {
 			.radio-segmented + .multiselect-wrapper {
 				margin-top: 5px;
 			}
+		}
+	}
+
+	.form-fields-inline {
+		label {
+			margin: 0 8px 0 3px;
 		}
 	}
 
@@ -2237,6 +2286,25 @@ select {
 }
 
 .checkbox-radio {
+
+	&:checked[readonly] + label span {
+		&::after {
+			border-color: $form-border-color !important;
+		}
+		@include transition(none);
+	}
+
+	&[readonly] {
+		&, + label {
+			pointer-events: none;
+		}
+	}
+
+	&[readonly] + label span {
+		@include transition(none);
+		@extend %form-disabled;
+	}
+
 	&[type="checkbox"] {
 		+ label span {
 			@include border-radius(2px);
@@ -3544,6 +3612,8 @@ $form-icon-btn: (
 .dashbrd-grid-widget-content {
 	flex-grow: 1;
 	margin-top: 2rem;
+	box-sizing: border-box;
+	height: calc(100% - 2rem);
 	padding-bottom: 8px;
 	overflow: auto;
 	border: 1px solid $ui-border-color;
@@ -3604,6 +3674,7 @@ $form-icon-btn: (
 
 		.dashbrd-grid-widget-content {
 			margin-top: 0;
+			height: 100%;
 			padding-top: 8px;
 		}
 
@@ -4456,6 +4527,19 @@ $form-icon-btn: (
 		line-height: 24px;
 		@extend %overflow-ellipsis;
 	}
+
+	&.page-title-submenu::before {
+		content: '';
+		position: absolute;
+		top: -7px;
+		left: 10px;
+		width: 12px;
+		height: 12px;
+		background-color: $ui-bg-color;
+		border-top: 1px solid $action-border-color;
+		border-left: 1px solid $action-border-color;
+		transform: rotate(45deg);
+	}
 }
 
 .search-suggest {
@@ -4514,7 +4598,6 @@ $form-icon-btn: (
 			}
 
 			.columns-wrapper {
-				flex-wrap: nowrap;
 
 				.column-50:last-of-type {
 					margin-left: 10px;
@@ -4544,7 +4627,10 @@ $form-icon-btn: (
 
 	&.modal-popup {
 		max-width: 1024px;
-		min-width: 650px;
+
+		&.modal-popup-generic {
+			min-width: 650px;
+		}
 	}
 
 	.hintbox-scrollable {
@@ -4553,6 +4639,13 @@ $form-icon-btn: (
 		max-height: calc(100vh - 190px);
 		max-width: 45vw;
 		white-space: nowrap;
+		@extend %webkit-scrollbar;
+	}
+
+	.hintbox-description {
+		overflow: auto;
+		max-height: 240px;
+		max-width: 800px;
 		@extend %webkit-scrollbar;
 	}
 
@@ -4771,6 +4864,7 @@ $form-icon-btn: (
 	resize: none;
 	word-break: break-all;
 	white-space: normal;
+	height: 24px;
 }
 
 // Map widget back to parent button.
@@ -6064,10 +6158,6 @@ a.overlay-close-btn {
 	width: 18px;
 	height: 18px;
 	line-height: 18px;
-	display: inline-block;
-	position: absolute;
-	top: 0;
-	right: -12px;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
@@ -6088,6 +6178,7 @@ a.overlay-close-btn {
 }
 
 // Color picker
+
 .color-picker {
 	height: 20px;
 	white-space: nowrap;
@@ -6145,103 +6236,123 @@ a.overlay-close-btn {
 	}
 }
 
-.in-progress {
-	position: relative;
+// Preloader
 
-	img {
-		user-select: none;
-		-ms-user-select: none;
-		-moz-user-select: none;
-		-webkit-user-select: none;
-	}
+@keyframes is-loading-kf {
+	to { @include rotate(360); }
+}
+
+.is-loading {
+	pointer-events: none;
 
 	&:before {
-		z-index: 3;
-		content: '';
-		display: block;
+		background-color: rgba($ui-bg-color, .8);
+		content: 'loading'; // For screen-reader
+		text-indent: 200%;  // For screen-reader, for IE 200% instead of 100%
+		overflow: hidden;
 		position: absolute;
 		top: 0;
+		bottom: 0;
 		left: 0;
-		background-color: rgba($ui-bg-color, 0.6);
-		width: 100%;
-		height: 100%;
-		opacity: 0;
-		animation: fadein 2s ease-in 0.5s normal forwards;
-	}
-
-	&.delayed-15s:before {
-		animation-delay: 15s;
+		right: 0;
+		z-index: 1;
 	}
 
 	&:after {
-		z-index: 3;
-		content: '';
-		display: block;
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		margin: -12px 0 0 -12px;
 		@include border-radius(50%);
+		@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
+		background-color: rgba($ui-bg-color, .8);
 		width: 20px;
 		height: 20px;
-		border: 2px solid #ccd5d9;
-		border-bottom: 2px solid #0275b8;
-		opacity: 0;
-		animation: fadein 2s ease-in 0.5s normal forwards,load 0.6s infinite linear;
+		position: absolute;
+		margin: auto;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		border: 2px solid $preloader-color;
+		border-bottom-color: $preloader-accent-color;
+		animation: is-loading-kf 0.6s infinite linear;
+		z-index: 1;
+		content: '';
 	}
 
-	&.delayed-15s:after {
-		animation-delay: 15s;
+	&.is-loading-fadein {
+
+		&:before {
+			opacity: 0;
+			animation: fadein 2s ease-in 0.5s normal forwards;
+		}
+
+		&:after {
+			opacity: 0;
+			animation: fadein 2s ease-in 0.5s normal forwards, is-loading-kf 0.6s infinite linear;
+		}
+
+		.delayed-15s {
+
+			&:before,
+			&:after {
+				animation-delay: 15s;
+			}
+		}
 	}
 }
 
-.preloader-container {
-	z-index: 10;
-	padding: 7px;
+button.is-loading {
+	position: relative;
+
+	&:before {
+		background: none;
+	}
+
+	&:after {
+		box-shadow: none;
+		background: none;
+		border: 1px solid $preloader-disabled-color;
+		border-bottom-color: $preloader-accent-color;
+		width: 12px;
+		height: 12px;
+	}
+}
+
+span.is-loading {
+	position: relative;
 	display: inline-block;
-	width: 24px;
-	height: 24px;
-	top: 50%;
-	left: 0;
-	right: 0;
-	margin: auto;
-	position: absolute;
-	background-color: rgba($ui-bg-color, .8);
-	@include border-radius(50%);
-	@include transform(translateY(-50%));
+	min-width: 40px;
+	min-height: 40px;
+}
 
-	&.menu-popup-preloader {
-		@include border-radius(0);
-		@include box-shadow(0 4px 20px 0 $action-shadow-color);
-		@include transform(none);
-		background: $action-preloader-bg-color;
-		border: 1px solid $action-border-color;
-		height: 120px;
-		width: 120px;
-		position: fixed;
-		right: auto;
-		bottom: auto;
-		display: flex;
-		align-items: center;
-		margin: 0;
-		z-index: 1010;
+.dashbrd-grid-widget-content,
+.dashbrd-grid-iterator-content {
+
+	&.is-loading:before {
+		margin: calc(.25rem + 1px);
 	}
 }
 
-.preloader {
-	@include border-radius(50%);
-	@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
-	background-color: rgba($ui-bg-color, .8);
-	width: 20px;
-	height: 20px;
-	margin: 0 auto;
-	border: 2px solid #ccd5d9;
-	border-bottom: 2px solid #0275b8;
-	animation: load 0.6s infinite linear;
+.overlay-dialogue.modal .overlay-dialogue-body {
+
+	&.is-loading {
+		position: relative;
+		overflow: hidden;
+	}
 }
 
-@keyframes load {
-	to { @include rotate(360); }
+.menu-popup-preloader {
+	@include box-shadow (0 4px 20px 0 $action-shadow-color);
+	background: $preloader-bg-color;
+	border: 1px solid $action-border-color;
+	height: 128px;
+	width: 128px;
+	position: fixed;
+	right: auto;
+	bottom: auto;
+	z-index: 1010;
+
+	&:before {
+		background: $preloader-bg-color;
+	}
 }
 
 $browser-logos: (
@@ -6250,9 +6361,14 @@ $browser-logos: (
 	ie: url(../img/browser-sprite.png) no-repeat 0 -66px,
 	opera: url(../img/browser-sprite.png) no-repeat -66px -66px,
 	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
-
 );
 
+// Dynamically generated classes for the browser logo:
+//  .browser-logo-chrome
+//  .browser-logo-ff
+//  .browser-logo-ie
+//  .browser-logo-opera
+//  .browser-logo-safari
 @each $browser, $bgimage in $browser-logos {
 	.browser-logo-#{$browser} {
 		background: $bgimage;
@@ -6410,24 +6526,35 @@ tr.cursor-move {
 .flickerfreescreen {
 	position: relative;
 	overflow: hidden;
+
+	&.is-loading {
+		min-height: 64px;
+
+		img {
+			opacity: 0;
+		}
+	}
 }
 
 .graph-wrapper {
 	display: inline;
 }
 
+// Dashboard widget: URL
+.widget-url {
+	display: block;
+}
+
 // Analog Clock
 .clock {
+	display: flex;
+	justify-content: center;
 	padding: 0 10px;
-	height: 99%;
-	width: auto;
+	height: 100%;
 }
 
 .clock-svg {
-	max-height: 100%;
-	max-width: 100%;
-	display: block;
-	margin: 0 auto;
+	flex-grow: 1;
 }
 
 .time-zone {
@@ -6496,10 +6623,11 @@ svg {
 .sysmap-widget-container {
 	overflow: hidden;
 	height: 100%;
-	width: 100%;
-	max-height: 100%;
-	max-width: 100%;
 	display: flex;
+
+	svg {
+		flex-grow: 1;
+	}
 }
 
 @supports (-ms-ime-align:auto) {
@@ -6557,9 +6685,10 @@ svg {
 			}
 
 			> .subfilter-disable-btn {
-				border: none !important;
+				position: absolute;
 				right: 0px;
 				top: 0px;
+				border: 0;
 
 				&:focus,
 				&:hover {
@@ -6608,8 +6737,15 @@ svg {
 	}
 
 	.list-accordion-item-closed {
-		@extend .multiselect-collapsed;
-		height: 30px;
+
+		.multiselect {
+			height: 24px;
+			overflow: hidden;
+		}
+
+		.list-accordion-item-head {
+			margin-bottom: 5px;
+		}
 
 		.list-accordion-item-body {
 			display: none;
@@ -6617,33 +6753,15 @@ svg {
 	}
 }
 
-ul.checkbox-list {
-	line-height: 20px;
-	display: flex;
-	flex-wrap: wrap;
-	> li {
-		ms-flex: 0 0 100%;
-		flex: 0 0 100%;
-		max-width: 100%;
-		-webkit-box-flex: 0;
+.checkbox-list {
+	li {
+		margin-top: 4px;
 	}
 }
-
-@each $num, $width in (
-	3: 33.33333%
-) {
-	ul.checkbox-list.col-#{$num} > li {
-		display: inline-block;
-		-ms-flex: 0 0 $width;
-		flex: 0 0 $width;
-		max-width: $width;
-	}
-}
-
 
 .columns-wrapper {
-
-	$columns: (
+	$column-count: (2, 3);
+	$column-size: (
 		5: 5%,
 		10: 10%,
 		15: 15%,
@@ -6660,14 +6778,41 @@ ul.checkbox-list {
 	display: flex;
 	flex-wrap: wrap;
 
+	&.columns-nowrap {
+		flex-wrap: nowrap;
+	}
+
 	[class^=column-] {
 		-webkit-box-flex: 0;
 	}
 
-	/**
-	 * Dynamically generated classes, e.g. .column-50.
-	 */
-	@each $class, $width in $columns {
+	// Dynamically generated classes for the columns count:
+	//  .columns-2
+	//  .columns-3
+	@each $count in $column-count {
+		&.columns-#{$count} > {
+			div, li {
+				display: block;
+				-ms-flex: 0 0 (100% / $count);
+				flex: 0 0 (100% / $count);
+				max-width: (100% / $count);
+			}
+		}
+	}
+
+	// Dynamically generated classes for the column width:
+	//  .column-5
+	//  .column-10
+	//  .column-15
+	//  .column-20
+	//  .column-33
+	//  .column-35
+	//  .column-40
+	//  .column-50
+	//  .column-75
+	//  .column-90
+	//  .column-95
+	@each $class, $width in $column-size {
 		.column-#{$class} {
 			-ms-flex: 0 0 $width;
 			flex: 0 0 $width;
@@ -7485,7 +7630,6 @@ table.preprocessing-test-results {
 		background: $host-avail-total-bg-color;
 	}
 }
-
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 

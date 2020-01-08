@@ -18,17 +18,6 @@
 **/
 
 
-function getIdFromNodeId(id) {
-	if (typeof(id) == 'string') {
-		var reg = /logtr([0-9])/i;
-		id = parseInt(id.replace(reg, '$1'));
-	}
-	if (typeof(id) == 'number') {
-		return id;
-	}
-	return null;
-}
-
 function check_target(e, type) {
 	// If type is expression.
 	if (type == 0) {
@@ -187,45 +176,6 @@ function validateNumericBox(obj, allowempty, allownegative) {
 }
 
 /**
- * Validates and formats input element containing a part of date.
- *
- * @param object {obj}       Input element value of which is being validated.
- * @param int {min}          Minimal allowed value (inclusive).
- * @param int {max}          Maximum allowed value (inclusive).
- * @param int {paddingSize}  Number of zeros used for padding.
- */
-function validateDatePartBox(obj, min, max, paddingSize) {
-	if (obj != null) {
-		min = min ? min : 0;
-		max = max ? max : 59;
-		paddingSize = paddingSize ? paddingSize : 2;
-
-		var paddingZeros = [];
-		for (var i = 0; i != paddingSize; i++) {
-			paddingZeros.push('0');
-		}
-		paddingZeros = paddingZeros.join('');
-
-		var currentValue = obj.value.toString();
-
-		if (/^[0-9]+$/.match(currentValue)) {
-			var intValue = parseInt(currentValue, 10);
-
-			if (intValue < min || intValue > max) {
-				obj.value = paddingZeros;
-			}
-			else if (currentValue.length < paddingSize) {
-				var paddedValue = paddingZeros + obj.value;
-				obj.value = paddedValue.substring(paddedValue.length - paddingSize);
-			}
-		}
-		else {
-			obj.value = paddingZeros;
-		}
-	}
-}
-
-/**
  * Translates the given string.
  *
  * @param {String} str
@@ -249,7 +199,7 @@ function getUniqueId() {
 }
 
 /**
- * Color palette object used for geting different colors from color palette.
+ * Color palette object used for getting different colors from color palette.
  */
 var colorPalette = (function() {
 	'use strict';
@@ -306,6 +256,16 @@ function objectSize(obj) {
 	}
 
 	return size;
+}
+
+function addMessage(html) {
+	var $message_div = jQuery('<div>').attr('id', 'messages');
+	$message_div.append(html);
+	jQuery('main').prepend($message_div);
+}
+
+function removeMessages() {
+	jQuery('#messages', 'main').remove();
 }
 
 /**
@@ -475,12 +435,17 @@ function stripslashes(str) {
  * Function to remove preloader and moves focus to IU element that was clicked to open it.
  *
  * @param string   id			Preloader identifier.
- * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayPreloaderDestroy(id, xhr) {
+function overlayPreloaderDestroy(id) {
 	if (typeof id !== 'undefined') {
-		if (typeof xhr !== 'undefined') {
-			xhr.abort();
+
+		var overlay = overlays_stack.getById(id)
+		if (!overlay) {
+			return;
+		}
+		if (typeof overlay.xhr !== 'undefined') {
+			overlay.xhr.abort();
+			delete overlay.xhr;
 		}
 
 		jQuery('#' + id).remove();
@@ -492,12 +457,16 @@ function overlayPreloaderDestroy(id, xhr) {
  * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
  *
  * @param string   dialogueid	Dialogue identifier to identify dialogue.
- * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayDialogueDestroy(dialogueid, xhr) {
+function overlayDialogueDestroy(dialogueid) {
 	if (typeof dialogueid !== 'undefined') {
-		if (typeof xhr !== 'undefined') {
-			xhr.abort();
+		var overlay = overlays_stack.getById(dialogueid)
+		if (!overlay) {
+			return;
+		}
+		if (typeof overlay.xhr !== 'undefined') {
+			overlay.xhr.abort();
+			delete overlay.xhr;
 		}
 
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
@@ -608,6 +577,18 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	}
 
 	var center_overlay_dialog = function() {
+			var body = jQuery('.overlay-dialogue-body', overlay_dialogue),
+				body_scroll_height = body[0].scrollHeight,
+				body_height = body.height();
+
+			if (body_height != Math.floor(body_height)) {
+				// The body height is often about a half pixel less than the height.
+				body_height = Math.floor(body_height) + 1;
+			}
+
+			// A fix for IE and Edge to stop popup width flickering when having vertical scrollbar.
+			body.css('overflow-y', body_scroll_height > body_height ? 'scroll' : 'hidden');
+
 			overlay_dialogue.css({
 				'left': Math.round((jQuery(window).width() - jQuery(overlay_dialogue).outerWidth()) / 2) + 'px',
 				'top': overlay_dialogue.hasClass('sticked-to-top')
@@ -707,7 +688,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 
 		setTimeout(function() {
 			jQuery(overlay_bg).off('remove'); // Remove to avoid repeated execution.
-			overlayDialogueDestroy(params.dialogueid, xhr);
+			overlayDialogueDestroy(params.dialogueid);
 		});
 
 		return false;
@@ -970,7 +951,7 @@ function parseUrlString(url) {
  * @param {bool}         show_close_box  Show close button.
  * @param {bool}         show_details    Show details on opening.
  *
- * @return {string}
+ * @return {jQuery}
  */
 function makeMessageBox(type, messages, title, show_close_box, show_details) {
 	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
@@ -1057,7 +1038,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 				.attr('title', t('Close'))
 				.click(function() {
 					jQuery(this)
-						.closest('.' + classes[index])
+						.closest('.' + msg_class)
 						.remove();
 				});
 		$msg_box.append($button);

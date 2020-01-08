@@ -223,7 +223,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 							->setChecked($i == 0)
 							->onClick('check_target(this, '.TRIGGER_EXPRESSION.');')
 						: null,
-					$e['list'],
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$data['limited']
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
@@ -514,7 +514,9 @@ else {
 $triggersFormList
 	->addRow(_('URL'), (new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Description'),
-		(new CTextArea('comments', $data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('comments', $data['comments']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 	)
 	->addRow(_('Create enabled'), (new CCheckBox('status'))->setChecked($status));
 

@@ -60,8 +60,7 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro
 	result = DBselect(
 			"select lld_macro,path"
 			" from lld_macro_path"
-			" where itemid=" ZBX_FS_UI64
-			" order by lld_macro",
+			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -85,7 +84,9 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zbx_vector_ptr_sort(lld_macro_paths, zbx_lld_macro_paths_compare);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -125,6 +126,7 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 	zbx_lld_macro_path_t	lld_macro_path_local, *lld_macro_path;
 	int			index;
 	size_t			value_alloc = 0;
+	zbx_json_type_t		type;
 
 	lld_macro_path_local.lld_macro = (char *)macro;
 
@@ -138,7 +140,11 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 
 		return FAIL;
 	}
-	else
-		return zbx_json_value_by_name_dyn(jp_row, macro, value, &value_alloc);
+
+	if (FAIL != (zbx_json_value_by_name_dyn(jp_row, macro, value, &value_alloc, &type)) &&
+			ZBX_JSON_TYPE_NULL != type)
+		return SUCCEED;
+
+	return FAIL;
 }
 

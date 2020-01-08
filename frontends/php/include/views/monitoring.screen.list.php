@@ -20,6 +20,7 @@
 
 
 $widget = (new CWidget())->setTitle(_('Screens'));
+
 $form = (new CForm('get'))->cleanItems();
 
 $content_control = (new CList())->addItem(new CSubmit('form', _('Create screen')));
@@ -29,14 +30,15 @@ if ($data['templateid']) {
 	$widget->addItem(get_header_host_table('screens', $data['templateid']));
 }
 else {
-	$form->addItem((new CList())
-		->addItem(
-			(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
+	$widget->setTitleSubmenu([
+		'main_section' => [
+			'items' => [
 				'screens.php' => _('Screens'),
 				'slides.php' => _('Slide shows')
-			]))->removeId()
-		)
-	);
+			]
+		]
+	]);
+
 	$content_control->addItem(
 		(new CButton('form', _('Import')))
 			->onClick('redirect("screen.import.php?rules_preset=screen")')
@@ -76,7 +78,9 @@ $screenTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_screens'))->onClick("checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
+			(new CUrl('screenconf.php'))->getUrl()
+		),
 		_('Dimension (cols x rows)'),
 		_('Actions')
 	]);
@@ -117,7 +121,7 @@ if (!$data['templateid']) {
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'export.screens.xml')
 			->setArgument('backurl', (new CUrl('screenconf.php'))
-				->setArgument('page', getPageNumber())
+				->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 				->getUrl())
 			->getUrl()
 	];

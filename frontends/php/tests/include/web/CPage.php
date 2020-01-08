@@ -49,6 +49,20 @@ class CPage {
 	protected static $cookie = null;
 
 	/**
+	 * Page height.
+	 *
+	 * @var integer
+	 */
+	protected $height = null;
+
+	/**
+	 * Viewport freeze flag.
+	 *
+	 * @var boolean
+	 */
+	protected $viewportUpdated = false;
+
+	/**
 	 * Web driver and CElementQuery initialization.
 	 */
 	public function __construct() {
@@ -71,6 +85,8 @@ class CPage {
 	 * Close all popup windows, switch to the initial window, remove cookies.
 	 */
 	public function cleanup() {
+		$this->resetViewport();
+
 		if (self::$cookie !== null) {
 			$session_id = $this->driver->manage()->getCookieNamed('zbx_sessionid');
 
@@ -83,7 +99,7 @@ class CPage {
 		$this->driver->manage()->deleteAllCookies();
 		try {
 			$this->driver->executeScript('sessionStorage.clear();');
-		} catch (Exception $exeption) {
+		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
 
@@ -227,35 +243,69 @@ class CPage {
 	}
 
 	/**
-	 * Take screenshot of current page.
-	 *
-	 * @return string
+	 * Setting "frozen" viewport size.
 	 */
-	protected function takePageScreenshot() {
+	public function updateViewport() {
 		try {
 			if (!$this->driver->executeScript('return !!window.chrome;')) {
 				throw new Exception();
 			}
 		} catch (Exception $exception) {
-			return $this->driver->takeScreenshot();
+			return false;
 		}
 
 		try {
 			// Screenshot is 1px smaller to ensure that scroll is still present.
-			$height = (int)$this->driver->executeScript('return document.documentElement.getHeight();') - 1;
+			$this->height = (int)$this->driver->executeScript('return document.documentElement.getHeight();') - 1;
 
-			if ($height > self::DEFAULT_PAGE_HEIGHT) {
-				$this->setViewport(self::DEFAULT_PAGE_WIDTH, $height);
+			if ($this->height > self::DEFAULT_PAGE_HEIGHT) {
+				$this->setViewport(self::DEFAULT_PAGE_WIDTH, $this->height);
+
+				$this->viewportUpdated = true;
 			}
 		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
 
-		$screenshot = $this->driver->takeScreenshot();
+		return true;
+	}
 
-		if (isset($height) && $height > self::DEFAULT_PAGE_HEIGHT) {
-			$this->setViewport(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT);
+	/**
+	 * Resetting viewport size to default.
+	 */
+	public function resetViewport() {
+		if ($this->viewportUpdated === false) {
+			return;
 		}
+
+		if (isset($this->height) && $this->height > self::DEFAULT_PAGE_HEIGHT) {
+			try {
+				CommandExecutor::executeCustom($this->driver, [
+					'cmd' => 'Emulation.clearDeviceMetricsOverride',
+					'params' => ['clear' => true]
+				]);
+			} catch (Exception $exception) {
+				// Code is not missing here.
+			}
+
+			$this->height = self::DEFAULT_PAGE_HEIGHT;
+		}
+
+		$this->viewportUpdated = false;
+	}
+
+	/**
+	 * Take screenshot of current page.
+	 *
+	 * @return string
+	 */
+	protected function takePageScreenshot() {
+		if ($this->viewportUpdated === true || !$this->updateViewport()) {
+			return $this->driver->takeScreenshot();
+		}
+
+		$screenshot = $this->driver->takeScreenshot();
+		$this->resetViewport();
 
 		return $screenshot;
 	}
@@ -377,5 +427,16 @@ class CPage {
 	 */
 	public function getDriver() {
 		return $this->driver;
+	}
+
+	/**
+	 * Remove focus from the element.
+	 */
+	public function removeFocus() {
+		try {
+			$this->driver->executeScript('document.activeElement.blur();');
+		} catch (Exception $ex) {
+			// Code is not missing here.
+		}
 	}
 }

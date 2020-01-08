@@ -450,7 +450,7 @@ class CMacrosResolverHelper {
 
 		$resolvedGraph = reset($graphMap);
 		foreach ($data as &$graph) {
-			if ($graph['graphid'] === $resolvedGraph['graphid']) {
+			if ($resolvedGraph && $graph['graphid'] === $resolvedGraph['graphid']) {
 				$graph['name'] = $resolvedGraph['name'];
 				$resolvedGraph = next($graphMap);
 			}

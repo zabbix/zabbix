@@ -83,7 +83,7 @@ class testPageTemplates extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent($name);
 		// Check if template name present on page, if not, check on second page.
-		if ($this->query('link', $name)->one(false) === null) {
+		if ($this->query('link', $name)->one(false)->isValid() === false) {
 			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
 			$this->zbxTestWaitForPageToLoad();
 		}
@@ -234,7 +234,8 @@ public static function getFilterByTagsData() {
 		// Reset filter from possible previous scenario.
 		$form->query('button:Reset')->one()->click();
 
-		$this->setTags($data['evaluation_type'], $data['tags']);
+		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
+		$this->setTags($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.

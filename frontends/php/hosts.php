@@ -64,7 +64,6 @@ $fields = [
 									null
 								],
 	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'add_template' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	'add_templates' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'templates_rem' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
 	'clear_templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
@@ -89,8 +88,11 @@ $fields = [
 	'flags' =>					[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]), null
 								],
-	'mass_replace_tpls' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
 	'mass_clear_tpls' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
+	'mass_action_tpls' =>		[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
+									null
+								],
 	'inventory_mode' =>			[T_ZBX_INT, O_OPT, null,
 									IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC),
 									null
@@ -245,10 +247,10 @@ foreach ($tags as $key => $tag) {
 	}
 }
 
-// remove inherited macros data (actions: 'add', 'update' and 'form')
+// Remove inherited macros data (actions: 'add', 'update' and 'form').
 $macros = cleanInheritedMacros(getRequest('macros', []));
 
-// remove empty new macro lines
+// Remove empty new macro lines.
 foreach ($macros as $idx => $macro) {
 	if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
 			&& $macro['description'] === '') {
@@ -259,10 +261,6 @@ foreach ($macros as $idx => $macro) {
 /*
  * Actions
  */
-if (hasRequest('add_template') && hasRequest('add_templates')) {
-	$_REQUEST['templates'] = getRequest('templates', []);
-	$_REQUEST['templates'] = array_merge($_REQUEST['templates'], $_REQUEST['add_templates']);
-}
 if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 	$_REQUEST['clear_templates'] = getRequest('clear_templates', []);
 
@@ -352,7 +350,8 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			$options['selectGroups'] = ['groupid'];
 		}
 
-		if (array_key_exists('templates', $visible) && !hasRequest('mass_replace_tpls')) {
+		if (array_key_exists('templates', $visible)
+				&& !(getRequest('mass_action_tpls') == ZBX_ACTION_REPLACE && !hasRequest('mass_clear_tpls'))) {
 			$options['selectParentTemplates'] = ['templateid'];
 		}
 
@@ -424,27 +423,6 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			$new_values['status'] = getRequest('status', HOST_STATUS_NOT_MONITORED);
 		}
 
-		$templateids = [];
-		if (array_key_exists('templates', $visible)) {
-			$templateids = $_REQUEST['templates'];
-
-			if (hasRequest('mass_replace_tpls')) {
-				if (hasRequest('mass_clear_tpls')) {
-					$host_templates = API::Template()->get([
-						'output' => ['templateid'],
-						'hostids' => $hostids
-					]);
-
-					$host_templateids = zbx_objectValues($host_templates, 'templateid');
-					$templates_to_delete = array_diff($host_templateids, $templateids);
-
-					$new_values['templates_clear'] = zbx_toObject($templates_to_delete, 'templateid');
-				}
-
-				$new_values['templates'] = $templateids;
-			}
-		}
-
 		$host_inventory = array_intersect_key(getRequest('host_inventory', []), $visible);
 
 		if (array_key_exists('inventory_mode', $visible)) {
@@ -489,10 +467,32 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 				}
 			}
 
-			if ($templateids && array_key_exists('parentTemplates', $host)) {
-				$host['templates'] = array_unique(
-					array_merge($templateids, zbx_objectValues($host['parentTemplates'], 'templateid'))
-				);
+			if (array_key_exists('templates', $visible)) {
+				$host_templateids = array_key_exists('parentTemplates', $host)
+					? zbx_objectValues($host['parentTemplates'], 'templateid')
+					: [];
+
+				switch (getRequest('mass_action_tpls')) {
+					case ZBX_ACTION_ADD:
+						$host['templates'] = array_unique(array_merge($host_templateids, getRequest('templates', [])));
+						break;
+
+					case ZBX_ACTION_REPLACE:
+						$host['templates'] = getRequest('templates', []);
+						if (getRequest('mass_clear_tpls')) {
+							$host['templates_clear'] = array_unique(
+								array_diff($host_templateids, getRequest('templates', []))
+							);
+						}
+						break;
+
+					case ZBX_ACTION_REMOVE:
+						$host['templates'] = array_unique(array_diff($host_templateids, getRequest('templates', [])));
+						if (getRequest('mass_clear_tpls')) {
+							$host['templates_clear'] = array_unique(getRequest('templates', []));
+						}
+						break;
+				}
 			}
 
 			if (array_key_exists('inventory_mode', $new_values)) {
@@ -598,11 +598,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			];
 		}
 		else {
-			// templates
+			// Linked templates.
 			$templates = [];
 
-			foreach (getRequest('templates', []) as $templateId) {
-				$templates[] = ['templateid' => $templateId];
+			foreach (array_merge(getRequest('templates', []), getRequest('add_templates', [])) as $templateid) {
+				$templates[] = ['templateid' => $templateid];
 			}
 
 			// interfaces
@@ -905,7 +905,7 @@ if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || ha
 	$data = [
 		'hosts' => getRequest('hosts'),
 		'visible' => getRequest('visible', []),
-		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
+		'mass_action_tpls' => getRequest('mass_action_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
 		'tags' => $tags,
@@ -972,6 +972,7 @@ elseif (hasRequest('form')) {
 
 		// Templates
 		'templates' => getRequest('templates', []),
+		'add_templates' => [],
 		'clear_templates' => getRequest('clear_templates', []),
 		'original_templates' => [],
 		'linked_templates' => [],
@@ -1139,6 +1140,8 @@ elseif (hasRequest('form')) {
 		$groups = getRequest('groups', []);
 	}
 
+	$data['readonly'] = ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
+
 	if ($data['hostid'] != 0) {
 		// get items that populate host inventory fields
 		$data['inventory_items'] = API::Item()->get([
@@ -1183,13 +1186,17 @@ elseif (hasRequest('form')) {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
-	// macros
+	// Add inherited macros to host macros.
 	if ($data['show_inherited_macros']) {
-		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros($data['templates']));
+		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(
+			array_merge($data['templates'], getRequest('add_templates', []))
+		));
 	}
+
+	// Sort only after inherited macros are added. Otherwise the list will look chaotic.
 	$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 
-	if (!$data['macros'] && $data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	if (!$data['macros'] && !$data['readonly']) {
 		$macro = ['macro' => '', 'value' => '', 'description' => ''];
 		if ($data['show_inherited_macros']) {
 			$macro['type'] = ZBX_PROPERTY_OWN;
@@ -1247,20 +1254,41 @@ elseif (hasRequest('form')) {
 	}
 	CArrayHelper::sort($data['groups_ms'], ['name']);
 
-	if ($data['templates']) {
-		$data['linked_templates'] = API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $data['templates']
-		]);
-		CArrayHelper::sort($data['linked_templates'], ['name']);
+	// Add already linked and new templates.
+	$request_add_templates = getRequest('add_templates', []);
 
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => $data['templates'],
-			'editable' => true,
+	if ($data['templates'] || $request_add_templates) {
+		$templates = API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => array_merge($data['templates'], $request_add_templates),
 			'preservekeys' => true
 		]);
+
+		$data['linked_templates'] = array_intersect_key($templates, array_flip($data['templates']));
+		CArrayHelper::sort($data['linked_templates'], ['name']);
+
+		$data['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
+
+		foreach ($data['add_templates'] as &$template) {
+			$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
+		}
+		unset($template);
+
+		if ($data['templates']) {
+			$data['writable_templates'] = API::Template()->get([
+				'output' => ['templateid'],
+				'templateids' => $data['templates'],
+				'editable' => true,
+				'preservekeys' => true
+			]);
+		}
 	}
+
+	// This data is used in common.template.edit.js.php.
+	$data['macros_tab'] = [
+		'linked_templates' => array_map('strval', array_keys($data['linked_templates'])),
+		'add_templates' => array_map('strval', array_keys($data['add_templates']))
+	];
 
 	$hostView = new CView('configuration.host.edit', $data);
 }
@@ -1323,10 +1351,22 @@ else {
 	}
 	order_result($hosts, $sortField, $sortOrder);
 
-	$url = (new CUrl('hosts.php'))
-		->setArgument('groupid', $pageFilter->groupid);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$pagingLine = getPagingLine($hosts, $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$pagingLine = CPagerHelper::paginate($page_num, $hosts, $sortOrder,
+		(new CUrl('hosts.php'))->setArgument('groupid', $pageFilter->groupid)
+	);
 
 	$hosts = API::Host()->get([
 		'output' => API_OUTPUT_EXTEND,
@@ -1431,6 +1471,7 @@ else {
 		'pageFilter' => $pageFilter,
 		'hosts' => $hosts,
 		'paging' => $pagingLine,
+		'page' => $page_num,
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,

@@ -62,23 +62,28 @@ if ($zabbixServer->getError()) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
 
+$submenu_source = [
+	QUEUE_OVERVIEW => _('Queue overview'),
+	QUEUE_OVERVIEW_BY_PROXY => _('Queue overview by proxy'),
+	QUEUE_DETAILS => _('Queue details')
+];
+
+$submenu = [];
+foreach ($submenu_source as $value => $label) {
+	$url = (new CUrl('queue.php'))
+		->setArgument('config', $value)
+		->getUrl();
+
+	$submenu[$url] = $label;
+}
+
 $widget = (new CWidget())
-	->setTitle(_('Queue of items to be updated'))
-	->setControls((new CTag('nav', true, [
-		(new CForm('get'))
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(
-					(new CComboBox('config', $config, 'submit();', [
-						QUEUE_OVERVIEW => _('Overview'),
-						QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),
-						QUEUE_DETAILS => _('Details')
-					]))->removeId()
-				)
-			)
-		]))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+	->setTitle(array_key_exists($config, $submenu_source) ? $submenu_source[$config] : null)
+	->setTitleSubmenu([
+		'main_section' => [
+			'items' => $submenu
+		]
+	]);
 
 $table = new CTableInfo();
 

@@ -87,7 +87,7 @@ function getActionsBySysmap(array $sysmap, array $options = []) {
 			? $elem['elements'][0]['hostid']
 			: 0;
 
-		$map = CMenuPopupHelper::getMapElement($sysmap['sysmapid'], $elem['selementid_orig'], $severity_min, $hostid);
+		$map = CMenuPopupHelper::getMapElement($sysmap['sysmapid'], $elem, $severity_min, $hostid);
 
 		$actions[$selementid] = CJs::encodeJson($map);
 	}
@@ -1771,7 +1771,7 @@ function getMapHighligts(array $map, array $map_info) {
  *
  * @return array
  */
-function getMapLinktriggerInfo($sysmap, $options) {
+function getMapLinkTriggerInfo($sysmap, $options) {
 	if (!array_key_exists('severity_min', $options)) {
 		$options['severity_min'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	}
