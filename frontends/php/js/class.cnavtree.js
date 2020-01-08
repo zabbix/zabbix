@@ -605,8 +605,7 @@ jQuery(function($) {
 											},
 											dataType: 'json',
 											success: function(resp) {
-												var new_item,
-													$root;
+												var new_item;
 
 												$('.msg-bad', form).remove();
 
@@ -618,7 +617,6 @@ jQuery(function($) {
 												else {
 													if (item_edit) {
 														var	$row = $('[data-id=' + id + ']', $obj);
-														$root = $('>ul.tree-list', $row);
 
 														$('[name="navtree.name.' + id + '"]', $row).val(resp['name']);
 														$('[name="navtree.sysmapid.' + id + '"]', $row)
@@ -630,10 +628,11 @@ jQuery(function($) {
 														$row.toggleClass('no-map', +resp['sysmapid'] == 0);
 													}
 													else {
-														id = getNextId($obj),
-														$root = $('.tree-item[data-id=' + parent + ']>ul.tree-list',
+														var $root = $('.tree-item[data-id=' + parent + ']>ul.tree-list',
 															$obj
-														),
+														);
+
+														id = getNextId($obj),
 														new_item = {
 															id: id,
 															name: resp['name'],
@@ -676,14 +675,14 @@ jQuery(function($) {
 																		);
 																	}
 																});
+
+																$root.closest('.tree-item')
+																	.addClass('is-parent opened')
+																	.removeClass('closed');
 															}
 														};
 
 														add_child_level($obj, resp['sysmapid'], id, depth + 1);
-
-														$root.closest('.tree-item')
-															.addClass('is-parent opened')
-															.removeClass('closed');
 													}
 
 													overlayDialogueDestroy('navtreeitem');
