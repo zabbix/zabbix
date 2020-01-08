@@ -53,6 +53,14 @@ class CTriggerPrototypeManager {
 
 		$del_triggerids = array_keys($del_triggerids);
 
+		// Lock trigger prototypes before delete to prevent server from adding new LLD elements.
+		DBselect(
+			'SELECT NULL'.
+			' FROM triggers t'.
+			' WHERE '.dbConditionInt('t.triggerid', $del_triggerids).
+			' FOR UPDATE'
+		);
+
 		// Deleting discovered triggers.
 		$del_discovered_triggerids = DBfetchColumn(DBselect(
 			'SELECT td.triggerid'.

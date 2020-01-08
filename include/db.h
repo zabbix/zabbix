@@ -648,7 +648,11 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 #define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
 #define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
 #define DBlock_dcheckid(dcheckid, druleid)	DBlock_record("dchecks", dcheckid, "druleid", druleid)
+#define DBlock_graph(id)			DBlock_record("graphs", id, NULL, 0)
 #define DBlock_hostids(ids)			DBlock_records("hosts", ids)
+#define DBlock_triggerids(ids)			DBlock_records("triggers", ids)
+#define DBlock_itemids(ids)			DBlock_records("items", ids)
+#define DBlock_group_prototypeids(ids)		DBlock_records("group_prototype", ids)
 
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
