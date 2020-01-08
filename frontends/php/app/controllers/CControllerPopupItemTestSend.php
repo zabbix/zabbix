@@ -54,7 +54,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'headers'				=> 'array',
 			'proxy_hostid'			=> 'id',
 			'hostid'				=> 'db hosts.hostid',
+			'http_authtype'			=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'http_password'			=> 'string',
 			'http_proxy'			=> 'string',
+			'http_username'			=> 'string',
 			'follow_redirects'		=> 'in 0,1',
 			'key'					=> 'string',
 			'interface'				=> 'array',
@@ -249,9 +252,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			// Apply efective macros values to properties.
 			$item_test_data = $this->resolveItemPropertyMacros($item_test_data);
 
-			// Only non-empty fields need to be sent to server.
-			$item_test_data = $this->unsetEmptyValues($item_test_data);
-
 			// Rename fields according protocol.
 			$item_test_data = CArrayHelper::renameKeys($item_test_data, [
 				'params_ap' => 'params',
@@ -270,6 +270,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			if (array_key_exists('query_fields', $item_test_data)) {
 				$item_test_data['query_fields'] = $this->transformQueryFields($item_test_data['query_fields']);
 			}
+
+			// Only non-empty fields need to be sent to server.
+			$item_test_data = $this->unsetEmptyValues($item_test_data);
 
 			if ($this->item_type != ITEM_TYPE_AGGREGATE && $this->item_type != ITEM_TYPE_CALCULATED) {
 				unset($item_test_data['value_type']);
