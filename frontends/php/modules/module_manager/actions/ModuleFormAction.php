@@ -42,7 +42,7 @@ class ModuleFormAction extends CController {
 	}
 
 	protected function checkPermissions() {
-		$modules = API::ModuleDetails()->get([
+		$modules = API::Module()->get([
 			'output' => ['relative_path', 'id', 'status', 'config'],
 			'moduleids' => $this->getInput('moduleids')
 		]);

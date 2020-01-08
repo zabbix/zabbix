@@ -70,7 +70,7 @@ class ModuleUpdateAction extends CController {
 			$modules[] = compact('moduleid') + $fields;
 		}
 
-		$result = $moduleids ? API::ModuleDetails()->update($modules) : false;
+		$result = $moduleids ? API::Module()->update($modules) : false;
 		$url = (new CUrl('zabbix.php'))->setArgument('action', 'module.list');
 
 		if ($result) {
@@ -102,7 +102,7 @@ class ModuleUpdateAction extends CController {
 	protected function getAllowedToEnable(array $moduleids) {
 		$manager = new CModuleManager(App::getRootDir());
 		// Initialise already active modules.
-		$enabled = API::ModuleDetails()->get([
+		$enabled = API::Module()->get([
 			'ouput' => ['moduleid', 'id', 'config'],
 			'filter' => ['status' => MODULE_STATUS_ENABLED],
 			'preservekeys' => true
@@ -114,7 +114,7 @@ class ModuleUpdateAction extends CController {
 		}
 
 		// Modules to be enabled.
-		$disabled = API::ModuleDetails()->get([
+		$disabled = API::Module()->get([
 			'ouput' => ['moduleid', 'id', 'config'],
 			'moduleids' => $disabledids
 		]);

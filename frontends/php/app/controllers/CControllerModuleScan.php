@@ -42,7 +42,7 @@ class CControllerModuleScan extends CController {
 		$db_modules_delete = [];
 		$db_modules_delete_names = [];
 
-		$db_modules = API::ModuleDetails()->get([
+		$db_modules = API::Module()->get([
 			'output' => ['id'],
 			'preservekeys' => true
 		]);
@@ -78,7 +78,7 @@ class CControllerModuleScan extends CController {
 		}
 
 		if ($db_modules_create) {
-			$result = API::ModuleDetails()->create($db_modules_create);
+			$result = API::Module()->create($db_modules_create);
 
 			if ($result) {
 				info(_s('Modules added: %s', implode(', ', $db_modules_create_names)));
@@ -89,7 +89,7 @@ class CControllerModuleScan extends CController {
 		}
 
 		if ($db_modules_delete) {
-			$result = API::ModuleDetails()->delete($db_modules_delete);
+			$result = API::Module()->delete($db_modules_delete);
 
 			if ($result) {
 				info(_s('Modules deleted: %s', implode(', ', $db_modules_delete_names)));

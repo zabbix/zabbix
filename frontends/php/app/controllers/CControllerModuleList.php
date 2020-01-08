@@ -82,7 +82,7 @@ class CControllerModuleList extends CController {
 //		$manager = new CModuleManager(APP::getRootDir());
 		$manager = APP::ModuleManager();
 
-		$db_modules = API::ModuleDetails()->get([
+		$db_modules = API::Module()->get([
 			'output' => ['relative_path', 'status'],
 			'search' => [
 				'id' => ($filter['name'] === '') ? null : $filter['name']

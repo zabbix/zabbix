@@ -32,7 +32,7 @@ class ModuleScanAction extends CController {
 				->getUrl()
 		);
 		$manager = new CModuleManager(App::getRootDir());
-		$modules_details = API::ModuleDetails()->get([
+		$modules_details = API::Module()->get([
 			'output' => ['moduleid', 'relative_path', 'id', 'status', 'config']
 		]);
 		$modules = $manager->scanModulesDirectory(zbx_objectValues($modules_details, 'relative_path'));
@@ -84,7 +84,7 @@ class ModuleScanAction extends CController {
 		array_map('error', $manager->getErrors());
 
 		if ($del_modules) {
-			$result = API::ModuleDetails()->delete(['moduleids' => $del_modules]);
+			$result = API::Module()->delete(['moduleids' => $del_modules]);
 
 			if ($result) {
 				$response->setMessageOk(_s('Modules deleted: %s', implode(', ', $removed)));
@@ -95,7 +95,7 @@ class ModuleScanAction extends CController {
 		}
 
 		if ($add_modules) {
-			$result = API::ModuleDetails()->create($add_modules);
+			$result = API::Module()->create($add_modules);
 
 			if ($result) {
 				$response->setMessageOk(_s('Modules added: %s', implode(', ', $added)));

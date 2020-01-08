@@ -24,7 +24,7 @@ class CComponentRegistry {
 	protected $components = [];
 
 	/**
-	 * Return registered component class nstance.
+	 * Return registered component class instance.
 	 *
 	 * @param string $name  Component name.
 	 *
@@ -33,7 +33,7 @@ class CComponentRegistry {
 	 * @throws Exception when component with $name is not found.
 	 */
 	public function get($name) {
-		if (!array_key_exists($name, $this->components)) {
+		if (!$this->has($name)) {
 			throw new Exception(_s('Component %s is not registered.', $name));
 		}
 
@@ -49,7 +49,7 @@ class CComponentRegistry {
 	 * @throws Exception when name is already registered.
 	 */
 	public function register($name, $instance) {
-		if (array_key_exists($name, $this->components)) {
+		if ($this->has($name)) {
 			throw new Exception(_s('Component %s already registered.', $name));
 		}
 
@@ -57,8 +57,18 @@ class CComponentRegistry {
 	}
 
 	/**
-	 * Magic method to allow short syntax:
-	 *    App::Component()->user->type
+	 * Check if а component has been registered.
+	 *
+	 * @param $name  Component name.
+	 *
+	 * @return bool
+	 */
+	public function has($name) {
+		return array_key_exists($name, $this->components);
+	}
+
+	/**
+	 * Magic method to allow short syntax for the component instance get.
 	 *
 	 * @param string $name  Component name.
 	 *
@@ -71,8 +81,7 @@ class CComponentRegistry {
 	}
 
 	/**
-	 * Magic method to allow short syntax:
-	 *    App::Component()->user = new User
+	 * Magic method to allow short syntax for the component registration.
 	 *
 	 * @param string $name      Requested property name.
 	 * @param object $instance  Component class instance.

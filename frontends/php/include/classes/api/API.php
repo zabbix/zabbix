@@ -284,10 +284,10 @@ class API {
 	}
 
 	/**
-	 * @return CModuleDetails
+	 * @return CModule
 	 */
-	public static function ModuleDetails() {
-		return self::getApi('moduledetails');
+	public static function Module() {
+		return self::getApi('module');
 	}
 
 	/**

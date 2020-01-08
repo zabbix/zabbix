@@ -19,10 +19,12 @@
 **/
 
 
+namespace Api\Service;
+
 /**
  * Class containing methods for operations module.
  */
-class CModuleDetails extends CApiService {
+class CModule extends \CApiService {
 
 	protected $tableName = 'module';
 	protected $tableAlias = 'md';

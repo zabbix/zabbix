@@ -19,7 +19,8 @@
 **/
 
 
-use CController as Action;
+use CController as Action,
+	Core\CModule;
 
 class CModuleManager {
 
@@ -105,6 +106,7 @@ class CModuleManager {
 
 		foreach ($this->loaded_manifests as $manifest) {
 			$namespaces[$manifest['namespace']] = [$manifest['path']];
+			$namespaces[self::MODULES_NAMESPACE.$manifest['namespace']] = [$manifest['path']];
 		}
 
 		return $namespaces;
@@ -125,7 +127,7 @@ class CModuleManager {
 		/** @var CModule $module */
 		foreach ($this->modules as $module) {
 			if ($module->isEnabled()) {
-				$namespace = $module->getNamespace().'\\Actions\\';
+				$namespace = self::MODULES_NAMESPACE.$module->getNamespace().'\\Actions\\';
 
 				foreach ($module->getActions() as $action => $data) {
 					$routes[$action] = ['class' => $namespace.$data['class']] + $data + $default;
@@ -168,8 +170,6 @@ class CModuleManager {
 			}
 		}
 
-
-
 		return $manifests;
 	}
 
@@ -206,7 +206,7 @@ class CModuleManager {
 		}
 
 		$manifest += [
-			'namespace' => static::MODULES_NAMESPACE.$manifest['namespace'],
+			'namespace' => '',
 			'path' => $module_path,
 			'manifest_version' => 0,
 			'actions' => [],
@@ -228,8 +228,8 @@ class CModuleManager {
 
 	public function loadModules() {
 		foreach ($this->loaded_manifests as $manifest) {
-			$main_class = '\\CModule';
-			$module_class = $manifest['path'] ? $manifest['namespace'].'\\Module' : $main_class;
+			$main_class = 'CModule';
+			$module_class = $manifest['path'] ? self::MODULES_NAMESPACE.$manifest['namespace'].'\\Module' : $main_class;
 
 			try {
 				if (!class_exists($module_class, true)) {

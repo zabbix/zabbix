@@ -67,7 +67,7 @@ class ModuleListAction extends CController {
 		// data prepare
 		$config = select_config();
 		$modules = [];
-		$dbmodules = API::ModuleDetails()->get([
+		$dbmodules = API::Module()->get([
 			'output' => ['moduleid', 'relative_path', 'id', 'status', 'config'],
 			'search' => [
 				'id' => ($filter['name'] === '') ? null : $filter['name']

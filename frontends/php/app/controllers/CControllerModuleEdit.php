@@ -58,7 +58,7 @@ class CControllerModuleEdit extends CController {
 			return false;
 		}
 
-		$modules = API::ModuleDetails()->get([
+		$modules = API::Module()->get([
 			'output' => ['id', 'relative_path', 'status'],
 			'moduleids' => [$this->getInput('moduleid')]
 		]);

@@ -19,6 +19,8 @@
 **/
 
 
+namespace Core;
+
 use CController as Action;
 
 class CModule {

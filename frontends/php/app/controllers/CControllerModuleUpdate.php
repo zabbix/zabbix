@@ -56,7 +56,7 @@ class CControllerModuleUpdate extends CController {
 
 		$moduleids = $this->getInput('moduleids');
 
-		$this->modules = API::ModuleDetails()->get([
+		$this->modules = API::Module()->get([
 			'output' => ['id', 'status'],
 			'moduleids' => $moduleids,
 			'preservekeys' => true
@@ -76,7 +76,7 @@ class CControllerModuleUpdate extends CController {
 
 		$manager = new CModuleManager(APP::getRootDir());
 
-		$db_modules = API::ModuleDetails()->get([
+		$db_modules = API::Module()->get([
 			'output' => ['id', 'relative_path', 'status'],
 			'preservekeys' => true
 		]);
@@ -109,7 +109,7 @@ class CControllerModuleUpdate extends CController {
 				];
 			}
 
-			$result = API::ModuleDetails()->update($update);
+			$result = API::Module()->update($update);
 		}
 
 		if (!$result && $this->getAction() === 'module.update') {

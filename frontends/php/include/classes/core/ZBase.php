@@ -21,6 +21,8 @@
 
 require_once dirname(__FILE__).'/CAutoloader.php';
 
+use Core\CModule;
+
 class ZBase {
 	const EXEC_MODE_DEFAULT = 'default';
 	const EXEC_MODE_SETUP = 'setup';
@@ -108,12 +110,7 @@ class ZBase {
 	 */
 	protected function init() {
 		$this->rootDir = $this->findRootDir();
-		// Register base directory path for 'include' and 'require' functions.
-		set_include_path(get_include_path().PATH_SEPARATOR.$this->rootDir);
-		$autoloader = new CAutoloader;
-		$autoloader->addNamespace('', $this->getIncludePaths());
-		$autoloader->register();
-		$this->autoloader = $autoloader;
+		$this->initAutoloader();
 		$this->component_registry = new CComponentRegistry;
 
 		// initialize API classes
@@ -264,14 +261,14 @@ class ZBase {
 	 */
 	private function getIncludePaths() {
 		return [
-			$this->rootDir.'/include/classes/core',
-			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/api/services',
 			$this->rootDir.'/include/classes/api/helpers',
 			$this->rootDir.'/include/classes/api/managers',
 			$this->rootDir.'/include/classes/api/clients',
 			$this->rootDir.'/include/classes/api/wrappers',
+			$this->rootDir.'/include/classes/core',
+			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',
 			$this->rootDir.'/include/classes/validators',
@@ -366,6 +363,20 @@ class ZBase {
 		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($configFile);
 		$this->config = $config->load();
+	}
+
+	/**
+	 * Initialize classes autoloader.
+	 */
+	protected function initAutoloader() {
+		// Register base directory path for 'include' and 'require' functions.
+		set_include_path(get_include_path().PATH_SEPARATOR.$this->rootDir);
+		$autoloader = new CAutoloader;
+		$autoloader->addNamespace('', $this->getIncludePaths());
+		$autoloader->addNamespace('Core', [$this->rootDir.'/include/classes/core']);
+		$autoloader->addNamespace('Api\\Service', [$this->rootDir.'/include/classes/api/services']);
+		$autoloader->register();
+		$this->autoloader = $autoloader;
 	}
 
 	/**
