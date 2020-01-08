@@ -258,6 +258,10 @@ abstract class CControllerPopupItemTest extends CController {
 
 		$data['type'] = $this->item_type;
 
+		if (array_key_exists('itemid', $input)) {
+			$data['itemid'] = $input['itemid'];
+		}
+
 		$interface_input = [
 			'interfaceid' => array_key_exists('interfaceid', $input) ? $input['interfaceid'] : 0
 		];
@@ -679,8 +683,10 @@ abstract class CControllerPopupItemTest extends CController {
 				'{HOST.PORT}' => $interface['port']
 			],
 			'item' => [
-				'{ITEM.ID}' => array_key_exists('itemid', $inputs) ? $inputs['itemid'] : '{ITEM.ID}',
-				'{ITEM.KEY}' => array_key_exists('key', $inputs) ? $inputs['key'] : ''
+				'{ITEM.ID}' => (array_key_exists('itemid', $inputs) && $inputs['itemid'])
+					? $inputs['itemid']
+					: _('UNKNOWN'),
+				'{ITEM.KEY}' => array_key_exists('key', $inputs) ? $inputs['key'] : _('UNKNOWN')
 			]
 		];
 
