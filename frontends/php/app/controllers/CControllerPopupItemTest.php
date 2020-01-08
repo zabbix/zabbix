@@ -597,6 +597,14 @@ abstract class CControllerPopupItemTest extends CController {
 				])
 				: null;
 
+			// SNMP items has it's own port field.
+			if (in_array($this->item_type, [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])) {
+				if (array_key_exists('port', $inputs) && $inputs['port'] !== '') {
+					$interface[0]['port'] = $inputs['port'];
+				}
+				unset($inputs['port']);
+			}
+
 			if ($interface) {
 				$interface = CMacrosResolverHelper::resolveHostInterfaces($interface);
 
