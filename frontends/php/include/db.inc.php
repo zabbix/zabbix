@@ -38,7 +38,7 @@ function DBconnect(&$error) {
 	$result = true;
 
 	$DB['DB'] = null; // global db handler
-	$DB['TRANSACTIONS'] = 0; // level of a nested transation
+	$DB['TRANSACTIONS'] = 0; // level of a nested transaction
 	$DB['TRANSACTION_NO_FAILED_SQLS'] = true; // true - if no statements failed in transaction, false - there are failed statements
 	$DB['SELECT_COUNT'] = 0; // stats
 	$DB['EXECUTE_COUNT'] = 0;
@@ -355,7 +355,7 @@ function DBselect($query, $limit = null, $offset = 0) {
  * SELECT a FROM tbl LIMIT 10 OFFSET 5
  *
  * Oracle:
- * SELECT a FROM tbe WHERE rownum < 15 // ONLY < 15
+ * SELECT a FROM tbl WHERE rownum < 15 // ONLY < 15
  * SELECT * FROM (SELECT * FROM tbl) WHERE rownum BETWEEN 6 AND 15
  *
  * @param $query

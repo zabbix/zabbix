@@ -276,7 +276,7 @@ class CScreenBuilder {
 	}
 
 	/**
-	 * Appends boolean option 'isTemplatedScreen' to ouput options.
+	 * Appends boolean option 'isTemplatedScreen' to output options.
 	 *
 	 * @param array $options
 	 *

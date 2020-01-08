@@ -110,6 +110,21 @@ function is_array(obj) {
 	return (obj != null) && (typeof obj == 'object') && ('splice' in obj) && ('join' in obj);
 }
 
+/**
+ * Get elements existing exclusively in one of both arrays.
+ *
+ * @param {Array} arr
+ *
+ * @returns {Array}
+ */
+Array.prototype.xor = function(arr) {
+	var merged_arr = this.concat(arr);
+
+	return merged_arr.filter(function(e) {
+		return (merged_arr.indexOf(e) === merged_arr.lastIndexOf(e));
+	});
+};
+
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
 	element = $(element);

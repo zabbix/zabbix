@@ -1666,6 +1666,7 @@ output {
 	@extend %form-input-style;
 	display: flex;
 	flex-direction: column;
+	position: relative;
 	margin-right: 3px;
 	min-height: 24px;
 	white-space: normal;
@@ -6305,24 +6306,28 @@ a.overlay-close-btn {
 	}
 }
 
-button {
+button.is-loading {
+	position: relative;
 
-	&.is-loading {
-		position: relative;
-
-		&:before {
-			background: none;
-		}
-
-		&:after {
-			box-shadow: none;
-			background: none;
-			border: 1px solid $preloader-disabled-color;
-			border-bottom-color: $preloader-accent-color;
-			width: 12px;
-			height: 12px;
-		}
+	&:before {
+		background: none;
 	}
+
+	&:after {
+		box-shadow: none;
+		background: none;
+		border: 1px solid $preloader-disabled-color;
+		border-bottom-color: $preloader-accent-color;
+		width: 12px;
+		height: 12px;
+	}
+}
+
+span.is-loading {
+	position: relative;
+	display: inline-block;
+	min-width: 40px;
+	min-height: 40px;
 }
 
 .dashbrd-grid-widget-content,

@@ -99,7 +99,7 @@ class CPage {
 		$this->driver->manage()->deleteAllCookies();
 		try {
 			$this->driver->executeScript('sessionStorage.clear();');
-		} catch (Exception $exeption) {
+		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
 
@@ -427,5 +427,16 @@ class CPage {
 	 */
 	public function getDriver() {
 		return $this->driver;
+	}
+
+	/**
+	 * Remove focus from the element.
+	 */
+	public function removeFocus() {
+		try {
+			$this->driver->executeScript('document.activeElement.blur();');
+		} catch (Exception $ex) {
+			// Code is not missing here.
+		}
 	}
 }

@@ -98,7 +98,7 @@ class CSvgTag extends CTag {
 	 * Set axis container position.
 	 *
 	 * @param int $x        Horizontal position of container element.
-	 * @param int $y        Veritical position of container element.
+	 * @param int $y        Vertical position of container element.
 	 *
 	 * @return CSvgTag
 	 */

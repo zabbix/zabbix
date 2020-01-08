@@ -127,6 +127,40 @@ static int	DBpatch_4050011(void)
 
 static int	DBpatch_4050012(void)
 {
+	const ZBX_FIELD	field = {"passwd", "", NULL, NULL, 60, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
+static int	DBpatch_4050013(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
+			"web.usergrps.php.sort", "web.usergroup.sort",
+			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
+			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
+			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
+			"web.latest.php.sort", "web.latest.sort",
+			"web.latest.php.sortorder", "web.latest.sortorder",
+			"web.paging.lastpage", "web.pager.entity",
+			"web.paging.page", "web.pager.page"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050014(void)
+{
 	const ZBX_TABLE table =
 			{"task_data", "taskid", 0,
 				{
@@ -142,14 +176,14 @@ static int	DBpatch_4050012(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050013(void)
+static int	DBpatch_4050015(void)
 {
 	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("task_data", 1, &field);
 }
 
-static int	DBpatch_4050014(void)
+static int	DBpatch_4050016(void)
 {
 	const ZBX_TABLE	table =
 			{"task_result", "taskid", 0,
@@ -166,12 +200,12 @@ static int	DBpatch_4050014(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050015(void)
+static int	DBpatch_4050017(void)
 {
 	return DBcreate_index("task_result", "task_result_1", "parent_taskid", 0);
 }
 
-static int	DBpatch_4050016(void)
+static int	DBpatch_4050018(void)
 {
 	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -198,5 +232,7 @@ DBPATCH_ADD(4050013, 0, 1)
 DBPATCH_ADD(4050014, 0, 1)
 DBPATCH_ADD(4050015, 0, 1)
 DBPATCH_ADD(4050016, 0, 1)
+DBPATCH_ADD(4050017, 0, 1)
+DBPATCH_ADD(4050018, 0, 1)
 
 DBPATCH_END()
