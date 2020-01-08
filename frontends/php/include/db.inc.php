@@ -50,7 +50,37 @@ function DBconnect(&$error) {
 	else {
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
-				$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
+				if ($DB['KEY_FILE'].$DB['CERT_FILE'].$DB['CA_FILE'] !== '') {
+					$DB['DB'] = mysqli_init();
+					mysqli_options($DB['DB'], MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
+					$cipher_list = preg_match('/^[\w\-]$/', $DB['CIPHER_LIST']) ? $DB['CIPHER_LIST'] : null;
+
+					$DB['DB']->ssl_set($DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE'], NULL, $cipher_list);
+
+					if (@mysqli_real_connect($DB['DB'], $DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'],
+							$DB['PORT'], NULL, MYSQLI_CLIENT_SSL)) {
+						$row = DBfetch(DBselect("SHOW STATUS LIKE 'ssl_cipher'"));
+
+						if ($row) {
+							$pattern = '/'. str_replace('*', '.*', $DB['CIPHER_LIST']).'/';
+
+							if ($DB['CIPHER_LIST'] !== '' && !preg_match($pattern, $row['Value'])) {
+								$error = 'Error connecting to database. Invalid cipher.';
+								$result = false;
+							}
+						}
+						else {
+							$DB['DB'] = false;
+						}
+					}
+					else {
+						$DB['DB'] = false;
+					}
+				}
+				else {
+					$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
+				}
+
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database: '.trim(mysqli_connect_error());
 					$result = false;
@@ -68,6 +98,7 @@ function DBconnect(&$error) {
 				}
 				break;
 			case ZBX_DB_POSTGRESQL:
+				$ssl = false;
 				$pg_connection_string =
 					(!empty($DB['SERVER']) ? 'host=\''.pg_connect_escape($DB['SERVER']).'\' ' : '').
 					'dbname=\''.pg_connect_escape($DB['DATABASE']).'\' '.
@@ -75,12 +106,34 @@ function DBconnect(&$error) {
 					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
 					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
+				if ($DB['KEY_FILE'].$DB['CERT_FILE'].$DB['CA_FILE'] !== '') {
+					$ssl = true;
+					$pg_connection_string .= ' sslmode=\'verify-ca\' sslkey=\''.pg_connect_escape($DB['KEY_FILE']).
+						'\' sslcert=\''.pg_connect_escape($DB['CERT_FILE']).'\''.
+						(($DB['CA_FILE'] === '') ? '' : ' sslrootcert=\''.pg_connect_escape($DB['CA_FILE']).'\'');
+				}
+
 				$DB['DB']= @pg_connect($pg_connection_string);
+
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database.';
 					$result = false;
 				}
 				else {
+					if ($ssl && $DB['CIPHER_LIST'] !== '') {
+						$query = sprintf('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl '.
+							'JOIN pg_stat_activity ON pg_stat_ssl.pid = pg_stat_activity.pid and '.
+							'pg_stat_activity.usename = \'%s\';', $DB['USER']);
+
+						$row = DBfetch(DBselect($query));
+
+						$pattern = '/'. str_replace('*', '.*', $DB['CIPHER_LIST']).'/';
+
+						if ($DB['CIPHER_LIST'] !== '' && !preg_match($pattern, $row['cipher'])) {
+							$error = 'Error connecting to database. Invalid cipher.';
+							$result = false;
+						}
+					}
 					$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public'), true);
 
 					if(!$schemaSet) {

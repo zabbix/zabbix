@@ -249,6 +249,22 @@ class CSetupWizard extends CForm {
 			(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
+		$table->addRow(_('SSL key file'),
+			(new CTextBox('key_file', $this->getConfig('DB_KEY_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		);
+
+		$table->addRow(_('SSL certificate file'),
+			(new CTextBox('cert_file', $this->getConfig('DB_CERT_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		);
+
+		$table->addRow(_('SSL certificate authority file'),
+			(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		);
+
+		$table->addRow(_('SSL cipher list'),
+			(new CTextBox('cipher_list', $this->getConfig('DB_CIPHER_LIST')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		);
+
 		if ($this->STEP_FAILED) {
 			global $ZBX_MESSAGES;
 
@@ -314,6 +330,19 @@ class CSetupWizard extends CForm {
 		if ($db_type == ZBX_DB_POSTGRESQL) {
 			$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 		}
+		if ($this->getConfig('DB_KEY_FILE').$this->getConfig('DB_CERT_FILE').$this->getConfig('DB_CA_FILE') !== '') {
+			$table->addRow(null, null);
+			$table->addRow((new CSpan(_('SSL key file')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_KEY_FILE'));
+			$table->addRow((new CSpan(_('SSL certificate file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('DB_CERT_FILE')
+			);
+			$table->addRow((new CSpan(_('SSL certificate authority file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('DB_CA_FILE')
+			);
+			$table->addRow((new CSpan(_('SSL cipher list')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('DB_CIPHER_LIST')
+			);
+		}
 
 		$table->addRow(null, null);
 
@@ -343,7 +372,11 @@ class CSetupWizard extends CForm {
 				'DATABASE' => $this->getConfig('DB_DATABASE'),
 				'USER' => $this->getConfig('DB_USER'),
 				'PASSWORD' => $this->getConfig('DB_PASSWORD'),
-				'SCHEMA' => $this->getConfig('DB_SCHEMA')
+				'SCHEMA' => $this->getConfig('DB_SCHEMA'),
+				'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
+				'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
+				'CA_FILE' => $this->getConfig('DB_CA_FILE'),
+				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
 			],
 			'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 			'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
@@ -410,6 +443,10 @@ class CSetupWizard extends CForm {
 		$DB['USER'] = $this->getConfig('DB_USER', 'root');
 		$DB['PASSWORD'] = $this->getConfig('DB_PASSWORD', '');
 		$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
+		$DB['KEY_FILE'] = $this->getConfig('DB_KEY_FILE', '');
+		$DB['CERT_FILE'] = $this->getConfig('DB_CERT_FILE', '');
+		$DB['CA_FILE'] = $this->getConfig('DB_CA_FILE', '');
+		$DB['CIPHER_LIST'] = $this->getConfig('DB_CIPHER_LIST', '');
 
 		$error = '';
 
@@ -467,6 +504,10 @@ class CSetupWizard extends CForm {
 			$this->setConfig('DB_USER', getRequest('user', $this->getConfig('DB_USER', 'root')));
 			$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
 			$this->setConfig('DB_SCHEMA', getRequest('schema', $this->getConfig('DB_SCHEMA', '')));
+			$this->setConfig('DB_KEY_FILE', getRequest('key_file', $this->getConfig('DB_KEY_FILE', '')));
+			$this->setConfig('DB_CERT_FILE', getRequest('cert_file', $this->getConfig('DB_CERT_FILE', '')));
+			$this->setConfig('DB_CA_FILE', getRequest('ca_file', $this->getConfig('DB_CA_FILE', '')));
+			$this->setConfig('DB_CIPHER_LIST', getRequest('cipher_list', $this->getConfig('DB_CIPHER_LIST', '')));
 
 			if (hasRequest('next') && array_key_exists(2, getRequest('next'))) {
 				if ($this->checkConnection()) {
@@ -506,7 +547,11 @@ class CSetupWizard extends CForm {
 						'DATABASE' => $this->getConfig('DB_DATABASE'),
 						'USER' => $this->getConfig('DB_USER'),
 						'PASSWORD' => $this->getConfig('DB_PASSWORD'),
-						'SCHEMA' => $this->getConfig('DB_SCHEMA')
+						'SCHEMA' => $this->getConfig('DB_SCHEMA'),
+						'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
+						'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
+						'CA_FILE' => $this->getConfig('DB_CA_FILE'),
+						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
 					],
 					'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 					'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
