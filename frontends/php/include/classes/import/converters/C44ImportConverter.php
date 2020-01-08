@@ -27,43 +27,6 @@ class C44ImportConverter extends CConverter {
 	public function convert($data) {
 		$data['zabbix_export']['version'] = '5.0';
 
-		if (array_key_exists('hosts', $data['zabbix_export'])) {
-			$data['zabbix_export']['hosts'] = $this->convertTlsAccept($data['zabbix_export']['hosts']);
-		}
-
 		return $data;
-	}
-
-	/**
-	 * Convert tsl_accept tag.
-	 *
-	 * @param array $hosts
-	 *
-	 * @return array
-	 */
-	protected function convertTlsAccept(array $hosts) {
-		$const = [
-			CXmlConstantValue::NO_ENCRYPTION => [CXmlConstantName::NO_ENCRYPTION],
-			CXmlConstantValue::TLS_PSK => [CXmlConstantName::TLS_PSK],
-			3 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_PSK],
-			CXmlConstantValue::TLS_CERTIFICATE => [CXmlConstantName::TLS_CERTIFICATE],
-			5 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_CERTIFICATE],
-			6 => [CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE],
-			7 => [
-				CXmlConstantName::NO_ENCRYPTION,
-				CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE
-			]
-		];
-
-		foreach ($hosts as &$host) {
-			if (array_key_exists('tls_accept', $host)) {
-				$host['tls_accept'] = ($host['tls_accept'] === '')
-					? $const[CXmlConstantValue::NO_ENCRYPTION]
-					: $const[$host['tls_accept']];
-			}
-		}
-		unset($host);
-
-		return $hosts;
 	}
 }
