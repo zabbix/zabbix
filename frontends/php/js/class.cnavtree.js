@@ -647,43 +647,40 @@ jQuery(function($) {
 															.addClass('opened is-parent');
 													}
 
-													if (resp.hierarchy.constructor === Object
-															&& Object.keys(resp.hierarchy).length != 0) {
-														var add_child_level = function($obj, sysmapid, itemid, depth) {
-															if (typeof resp.hierarchy[sysmapid] !== 'undefined'
-																	&& depth <= widget_data.max_depth) {
-																var $root = $('.tree-item[data-id=' + itemid +
-																		']>ul.tree-list', $obj
+													var add_child_level = function($obj, sysmapid, itemid, depth) {
+														if (typeof resp.hierarchy[sysmapid] !== 'undefined'
+																&& depth <= widget_data.max_depth) {
+															var $root = $('.tree-item[data-id=' + itemid +
+																	']>ul.tree-list', $obj
+																);
+
+															$.each(resp.hierarchy[sysmapid], function(i, submapid) {
+																if (typeof resp.submaps[submapid] !== 'undefined') {
+																	var submap_item = resp.submaps[submapid],
+																		submap_itemid = getNextId($obj),
+																		new_item = {
+																			id: submap_itemid,
+																			name: submap_item['name'],
+																			sysmapid: submap_item['sysmapid'],
+																			parent: +itemid
+																		};
+
+																	$root.append(createTreeItem($obj, new_item, 1,
+																		true, true
+																	));
+																	add_child_level($obj, submapid, submap_itemid,
+																		depth + 1
 																	);
+																}
+															});
 
-																$.each(resp.hierarchy[sysmapid], function(i, submapid) {
-																	if (typeof resp.submaps[submapid] !== 'undefined') {
-																		var submap_item = resp.submaps[submapid],
-																			submap_itemid = getNextId($obj),
-																			new_item = {
-																				id: submap_itemid,
-																				name: submap_item['name'],
-																				sysmapid: submap_item['sysmapid'],
-																				parent: +itemid
-																			};
+															$root.closest('.tree-item')
+																.addClass('is-parent opened')
+																.removeClass('closed');
+														}
+													};
 
-																		$root.append(createTreeItem($obj, new_item, 1,
-																			true, true
-																		));
-																		add_child_level($obj, submapid, submap_itemid,
-																			depth + 1
-																		);
-																	}
-																});
-
-																$root.closest('.tree-item')
-																	.addClass('is-parent opened')
-																	.removeClass('closed');
-															}
-														};
-
-														add_child_level($obj, resp['sysmapid'], id, depth + 1);
-													}
+													add_child_level($obj, resp['sysmapid'], id, depth + 1);
 
 													overlayDialogueDestroy('navtreeitem');
 													setTreeHandlers($obj);

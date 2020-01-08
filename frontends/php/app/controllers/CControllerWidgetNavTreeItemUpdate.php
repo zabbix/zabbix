@@ -110,7 +110,7 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 		}
 
 		// Prepare output.
-		echo (new CJson())->encode([
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
 			'name' => $this->getInput('name'),
 			'sysmapid' => $sysmapid,
 			'hierarchy' => $hierarchy,
@@ -121,6 +121,6 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 					'preservekeys' => true
 				])
 				: []
-		]);
+		])]));
 	}
 }
