@@ -675,7 +675,7 @@ abstract class CControllerPopupItemTest extends CController {
 			],
 			'item' => [
 				'{ITEM.ID}' => array_key_exists('itemid', $inputs) ? $inputs['itemid'] : '{ITEM.ID}',
-				'{ITEM.KEY}' => array_key_exists('key_', $inputs) ? $inputs['key_'] : '{ITEM.KEY}'
+				'{ITEM.KEY}' => array_key_exists('key', $inputs) ? $inputs['key'] : ''
 			]
 		];
 
