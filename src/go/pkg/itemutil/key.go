@@ -64,7 +64,7 @@ func parseQuotedParam(data []byte) (param []byte, left []byte, err error) {
 	return
 }
 
-// parseParams parses item key normal parameter (any combination of any characters except ',' and ']',
+// parseUnquotedParam parses item key normal parameter (any combination of any characters except ',' and ']',
 // including trailing whitespace) and returns the parsed parameter and the data after the parameter.
 func parseUnquotedParam(data []byte) (param []byte, left []byte, err error) {
 	for i, c := range data {
@@ -78,7 +78,7 @@ func parseUnquotedParam(data []byte) (param []byte, left []byte, err error) {
 	return
 }
 
-// parseParams parses item key array parameter [...] and returns.
+// parseArrayParam parses item key array parameter [...] and returns.
 func parseArrayParam(data []byte) (param []byte, left []byte, err error) {
 	var pos int
 	b := data[1:]
@@ -212,7 +212,7 @@ func parseParam(data []byte) (param []byte, left []byte, err error) {
 }
 
 // parseParams parses item key parameters.
-func parseParams(data []byte, wildcard bool) (params []string, left []byte, err error) {
+func parseParams(data []byte) (params []string, left []byte, err error) {
 	if data[0] != '[' {
 		err = fmt.Errorf("key name must be followed by '['")
 		return
@@ -267,7 +267,7 @@ func parseKey(data []byte, wildcard bool) (key string, params []string, left []b
 				left = data[i:]
 				return
 			}
-			if params, left, err = parseParams(data[i:], wildcard); err != nil {
+			if params, left, err = parseParams(data[i:]); err != nil {
 				err = newKeyError()
 				return
 			}

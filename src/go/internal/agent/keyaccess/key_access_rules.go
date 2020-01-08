@@ -20,7 +20,6 @@
 package keyaccess
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -48,14 +47,13 @@ type Record struct {
 
 // Rule key access rule definition
 type Rule struct {
-	Permission  RuleType
-	Key         string
-	Params      []string
-	EmptyParams bool
+	Permission RuleType
+	Key        string
+	Params     []string
 }
 
 // Rules key access rules list
-var Rules []Rule
+var Rules []*Rule
 var noMoreRules bool = false
 
 func parse(rec Record) (r *Rule, err error) {
@@ -64,12 +62,6 @@ func parse(rec Record) (r *Rule, err error) {
 
 	if r.Key, r.Params, err = itemutil.ParseWildcardKey(rec.Pattern); err != nil {
 		return nil, err
-	}
-
-	r.EmptyParams = false
-
-	if len(r.Params) == 1 && len(r.Params) == 0 {
-		r.EmptyParams = true
 	}
 
 	r.Key = wildcard.Minimize(r.Key)
@@ -93,7 +85,7 @@ func parse(rec Record) (r *Rule, err error) {
 
 func findRule(rule *Rule) *Rule {
 	for _, r := range Rules {
-		if rule.EmptyParams != r.EmptyParams || rule.Key != r.Key || len(rule.Params) != len(r.Params) {
+		if rule.Key != r.Key || len(rule.Params) != len(r.Params) {
 			continue
 		}
 		for i, p := range rule.Params {
@@ -101,7 +93,7 @@ func findRule(rule *Rule) *Rule {
 				goto noMatch
 			}
 		}
-		return &r
+		return r
 	noMatch:
 	}
 	return nil
@@ -121,11 +113,11 @@ func addRule(rec Record) (err error) {
 			}
 		} else if len(rule.Params) == 0 && rule.Key == "*" {
 			if rule.Permission == DENY {
-				Rules = append(Rules, *rule)
+				Rules = append(Rules, rule)
 			}
 			noMoreRules = true // any rules after "allow/deny all" are meaningless
 		} else {
-			Rules = append(Rules, *rule)
+			Rules = append(Rules, rule)
 		}
 	}
 	return nil
@@ -159,7 +151,7 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 
 	for _, r := range records {
 		if err = addRule(r); err != nil {
-			err = errors.New(fmt.Sprintf("\"%s\" %s", r.Pattern, err.Error()))
+			err = fmt.Errorf("\"%s\" %s", r.Pattern, err.Error())
 			return
 		}
 	}
@@ -220,7 +212,7 @@ func CheckRules(key string, params []string) (result bool) {
 				if numParams < numParamsRule {
 					continue // too few parameters
 				}
-				if numParams > numParamsRule && !emptyParams {
+				if numParams > numParamsRule {
 					continue // too many params
 				}
 			}
@@ -228,14 +220,6 @@ func CheckRules(key string, params []string) (result bool) {
 
 		if !wildcard.Match(key, r.Key) {
 			continue // key doesn't match
-		}
-
-		// rule expects empty argument list: key[]
-		if r.EmptyParams {
-			if emptyParams {
-				return r.Permission == ALLOW
-			}
-			continue
 		}
 
 		if numParamsRule == 0 {
