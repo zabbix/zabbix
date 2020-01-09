@@ -371,26 +371,32 @@ jQuery(function($) {
 	// Initialize hintBox event handlers.
 	hintBox.bindEvents();
 
-	// ZBX_STYLE_BTN_DEBUG debug button click handler
+	/**
+	 * ZBX_STYLE_BTN_DEBUG debug button click handler
+	 *
+	 * @param {boolean} preserve_state  Preserve current state of the debug button.
+	 *
+	 * @returns {boolean} false
+	 */
 	function debug_click_handler(preserve_state) {
-		var visible = sessionStorage.getItem('debug-info-visible') === '1';
+		var $button = $(this),
+			visible = sessionStorage.getItem('debug-info-visible') === '1';
 
-		// Strict check for true, since can be undefined.
 		if (preserve_state !== true) {
 			visible = !visible;
 
 			sessionStorage.setItem('debug-info-visible', visible ? '1' : '0');
 		}
 
-		$(this).text(visible ? t('Hide debug') : t('Debug'));
+		$button.text(visible ? t('Hide debug') : t('Debug'));
 
-		var style = $(this).data('debug-info-style');
+		var style = $button.data('debug-info-style');
 		if (style) {
 			style.sheet.deleteRule(0);
 		}
 		else {
 			style = document.createElement('style');
-			$(this).data('debug-info-style', style);
+			$button.data('debug-info-style', style);
 			document.head.appendChild(style);
 		}
 
@@ -403,7 +409,7 @@ jQuery(function($) {
 	// Initialize ZBX_STYLE_BTN_DEBUG debug button and debug info state.
 	$('.btn-debug').each(function(index, button) {
 		$(button)
-			.click(debug_click_handler)
+			.on('click', debug_click_handler)
 			.addClass('visible');
 
 		debug_click_handler.call(button, true);
