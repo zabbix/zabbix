@@ -276,7 +276,12 @@ class CPageFilter {
 	private function _getProfiles(array $options) {
 		global $page;
 
-		$profileSection = $this->config['individual'] ? $page['file'] : $page['menu'];
+		if ($page === null) {
+			$profileSection = '';
+		}
+		else {
+			$profileSection = $this->config['individual'] ? $page['file'] : $page['menu'];
+		}
 
 		$this->_profileIdx['groups'] = 'web.'.$profileSection.'.groupid';
 		$this->_profileIdx['hosts'] = 'web.'.$profileSection.'.hostid';

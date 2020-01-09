@@ -1671,6 +1671,7 @@ output {
 	@extend %form-input-style;
 	display: flex;
 	flex-direction: column;
+	position: relative;
 	margin-right: 3px;
 	min-height: 24px;
 	white-space: normal;
@@ -6298,6 +6299,16 @@ button {
 			width: 12px;
 			height: 12px;
 		}
+	}
+}
+
+span {
+
+	&.is-loading {
+		position: relative;
+		display: inline-block;
+		min-width: 40px;
+		min-height: 40px;
 	}
 }
 

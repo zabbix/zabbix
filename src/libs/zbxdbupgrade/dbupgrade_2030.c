@@ -1180,7 +1180,7 @@ static int	DBpatch_2030095(void)
 			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, *p);
 		}
 
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 		if (0 == params_offset || (2048 < params_offset && 2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params)))
 #else
 		if (0 == params_offset ||

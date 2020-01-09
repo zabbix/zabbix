@@ -76,7 +76,38 @@ static int	DBpatch_4050007(void)
 	return DBmodify_field_type("dchecks", &field, NULL);
 }
 
-static int	DBpatch_4050009(void)
+static int	DBpatch_4050011(void)
+{
+#if defined(HAVE_IBM_DB2) || defined(HAVE_POSTGRESQL)
+	const char *cast_value_str = "bigint";
+#elif defined(HAVE_MYSQL)
+	const char *cast_value_str = "unsigned";
+#elif defined(HAVE_ORACLE)
+	const char *cast_value_str = "number(20)";
+#endif
+
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set value_id=CAST(value_str as %s),"
+				" value_str='',"
+				" type=1"	/* PROFILE_TYPE_ID */
+			" where type=3"	/* PROFILE_TYPE_STR */
+				" and (idx='web.latest.filter.groupids' or idx='web.latest.filter.hostids')", cast_value_str))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050012(void)
+{
+	const ZBX_FIELD	field = {"passwd", "", NULL, NULL, 60, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
+static int	DBpatch_4050013(void)
 {
 	int		i;
 	const char	*values[] = {
@@ -84,7 +115,11 @@ static int	DBpatch_4050009(void)
 			"web.usergrps.php.sort", "web.usergroup.sort",
 			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
 			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
-			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort"
+			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
+			"web.latest.php.sort", "web.latest.sort",
+			"web.latest.php.sortorder", "web.latest.sortorder",
+			"web.paging.lastpage", "web.pager.entity",
+			"web.paging.page", "web.pager.page"
 		};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -112,6 +147,8 @@ DBPATCH_ADD(4050004, 0, 1)
 DBPATCH_ADD(4050005, 0, 1)
 DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
-DBPATCH_ADD(4050009, 0, 1)
+DBPATCH_ADD(4050011, 0, 1)
+DBPATCH_ADD(4050012, 0, 1)
+DBPATCH_ADD(4050013, 0, 1)
 
 DBPATCH_END()

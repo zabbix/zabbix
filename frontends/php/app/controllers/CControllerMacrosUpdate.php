@@ -106,7 +106,9 @@ class CControllerMacrosUpdate extends CController {
 		}
 		else {
 			$response->setMessageError(_('Cannot update macros'));
-			$response->setFormData($this->getInputAll());
+			$form_data = $this->getInputAll();
+			$form_data['macros'] = array_values($form_data['macros']);
+			$response->setFormData($form_data);
 		}
 
 		$this->setResponse($response);

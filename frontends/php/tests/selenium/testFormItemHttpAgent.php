@@ -881,7 +881,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data'
 				]
 			],
-			// All posible fields.
+			// All possible fields.
 			[
 				[
 					'fields' => [
@@ -1142,7 +1142,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// All posible fields.
+			// All possible fields.
 			[
 				[
 					'fields' => [

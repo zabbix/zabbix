@@ -403,7 +403,7 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (result string,
 	var lastLogsize uint64
 	var mtime int
 
-	w := make(resultWriter)
+	w := make(resultWriter, 1)
 	m.UpdateTasks(0, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
 
 	select {

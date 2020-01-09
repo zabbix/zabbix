@@ -915,9 +915,10 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$dashboard->edit();
 		$form = $dashboard->getWidget('Reference widget')->edit();
 		$form->submit();
-		$this->page->waitUntilReady();
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
 
-		$dashboard->getWidget('Reference widget');
+		$widget = $dashboard->getWidget('Reference widget');
+		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
@@ -1017,7 +1018,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
 			$dashboard = CDashboardElement::find()->one()->edit();
 			$widget = $dashboard->getWidget($name);
-			$widget->delete();
+			$dashboard->deleteWidget($name);
 			$this->page->waitUntilReady();
 			$dashboard->save();
 			// Check that Dashboard has been saved
@@ -1044,8 +1045,9 @@ class testProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 		$form->submit();
-		$this->page->waitUntilReady();
-		$dashboard->getWidget($header);
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$widget = $dashboard->getWidget($header);
+		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();
 	}
 
@@ -1218,7 +1220,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 			$this->assertEquals('*UNKNOWN*', $row->getColumn('Operational data')->getText());
 		}
 		else {
-			$this->assertEquals(null, $row->getColumn('Operational data'));
+			$this->assertFalse($row->getColumn('Operational data')->isValid());
 		}
 		if (CTestArrayHelper::get($data['fields'], 'Show timeline', true)) {
 			$this->assertEquals($rows_count, $popup->query('xpath:.//td[@class="timeline-date"]')->all()->count());

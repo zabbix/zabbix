@@ -27,7 +27,7 @@ window.ZABBIX = Object.create({
 	 * @param {string} path  Dot separated path. Each segment is used as object key.
 	 * @param {mixed} value  Optional value to be written into path only if path held undefined before.
 	 *
-	 * @return {mixed}  Value underlaying the path is returned.
+	 * @return {mixed}  Value underlying the path is returned.
 	 */
 	namespace: function(path, value) {
 		return path.split('.').reduce(function(obj, pt, idx, src) {
@@ -245,8 +245,9 @@ jQuery(function($) {
 				};
 
 			default:
+				// Should match the default algorithm used in $.menuPopup().
 				return {
-					of: event,
+					of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
 					my: 'left top',
 					at: 'left bottom'
 				};

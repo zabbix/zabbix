@@ -221,4 +221,13 @@ abstract class CBaseElement extends RemoteWebElement {
 	public function isSelected($selected = true) {
 		return (parent::isSelected() === $selected);
 	}
+
+	/**
+	 * Check if element is valid (all non-null elements are considered valid).
+	 *
+	 * @return boolean
+	 */
+	public function isValid() {
+		return true;
+	}
 }

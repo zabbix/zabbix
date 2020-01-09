@@ -222,7 +222,7 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $mediatype['name']));
 			}
 
-			// Check additional fields and values depeding on type.
+			// Check additional fields and values depending on media type.
 			$this->checkRequiredFieldsByType($mediatype);
 
 			switch ($mediatype['type']) {

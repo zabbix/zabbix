@@ -63,7 +63,7 @@ function condition_type2str($type) {
 		CONDITION_TYPE_PROXY => _('Proxy'),
 		CONDITION_TYPE_EVENT_TYPE => _('Event type'),
 		CONDITION_TYPE_HOST_METADATA => _('Host metadata'),
-		CONDITION_TYPE_EVENT_TAG => _('Tag'),
+		CONDITION_TYPE_EVENT_TAG => _('Tag name'),
 		CONDITION_TYPE_EVENT_TAG_VALUE => _('Tag value')
 	];
 
@@ -88,7 +88,7 @@ function discovery_object2str($object = null) {
  *
  * For action condition types such as: hosts, host groups, templates, proxies, triggers, discovery rules
  * and discovery checks, action condition values contain IDs. All unique IDs are first collected and then queried.
- * For other action condition types values are returned as they are or converted using simple string convertion
+ * For other action condition types values are returned as they are or converted using simple string conversion
  * functions according to action condition type.
  *
  * @param array $actions							array of actions
@@ -330,7 +330,7 @@ function actionConditionValueToString(array $actions, array $config) {
  */
 function getConditionDescription($condition_type, $operator, $value, $value2) {
 	if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
-		$description = [_('Tag')];
+		$description = [_('Value of tag')];
 		$description[] = ' ';
 		$description[] = italic(CHtml::encode($value2));
 		$description[] = ' ';
@@ -543,7 +543,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 		]);
 	}
 
-	// format the HTML ouput
+	// Format the HTML output.
 	foreach ($actions as $i => $action) {
 		if ($type == ACTION_OPERATION) {
 			foreach ($action['operations'] as $j => $operation) {
