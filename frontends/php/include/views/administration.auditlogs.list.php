@@ -117,4 +117,4 @@ zbx_add_post_js('timeControl.processObjects();');
 // append form to widget
 $auditWidget->addItem($auditForm);
 
-return $auditWidget;
+$auditWidget->show();

@@ -20,9 +20,9 @@
 
 
 $output = [
-	'body' => (new CView('administration.usergroup.grouprights.html', ['group_rights' => $data['group_rights']]))
-		->render()
-		->toString()
+	'body' => (new CView('administration.usergroup.grouprights.html', [
+		'group_rights' => $data['group_rights']
+	]))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

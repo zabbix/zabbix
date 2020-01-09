@@ -298,4 +298,4 @@ $form->addItem([
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

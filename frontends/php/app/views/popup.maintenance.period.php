@@ -169,7 +169,7 @@ $output = [
 		]
 	],
 	'params' => $data['params'],
-	'script_inline' => require 'app/views/popup.maintenance.period.js.php'
+	'script_inline' => $this->readJsFile('popup.maintenance.period.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

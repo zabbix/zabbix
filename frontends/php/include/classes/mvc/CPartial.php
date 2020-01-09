@@ -20,33 +20,40 @@
 
 
 /**
- * Class for rendering partial-views. Partials are useful for reusing the same partial-views or updating specific parts
- * of the page asynchronously, i.e., partials can be included into a view initially and updated in AJAX manner, later.
+ * Class for rendering partial-views, which are useful for reusing the same partial-views or updating specific parts of
+ * the page asynchronously, i.e., partials can be included into a view initially and updated in AJAX manner, later.
  */
 class CPartial {
 
 	/**
-	 * Partial directory list ordered by searh priority.
+	 * Partial directory list ordered by search priority.
 	 *
 	 * @static
 	 *
 	 * @var array
 	 */
-	protected static $directories = ['local/app/partials', 'app/partials'];
+	private static $directories = ['local/app/partials', 'app/partials'];
 
 	/**
-	 * Partial file path.
+	 * Partial name.
 	 *
-	 * @var mixed
+	 * @var string
 	 */
-	protected $file_path;
+	private $name;
 
 	/**
 	 * Data provided for partial.
 	 *
 	 * @var array
 	 */
-	protected $data;
+	private $data;
+
+	/**
+	 * Directory where the partial file was found.
+	 *
+	 * @var string
+	 */
+	private $directory;
 
 	/**
 	 * Create a partial based on partial name and data.
@@ -59,30 +66,34 @@ class CPartial {
 	 */
 	public function __construct($name, array $data = []) {
 		if (!preg_match('/^[a-z\.]+$/', $name)) {
-			throw new InvalidArgumentException(_s('Invalid partial name: "%s".', $name));
+			throw new InvalidArgumentException(sprintf('Invalid partial name: "%s".', $name));
 		}
 
-		$found = false;
+		$file_path = null;
+
 		foreach (self::$directories as $directory) {
-			$this->file_path = $directory.'/'.$name.'.php';
-			if (file_exists($this->file_path)) {
-				$found = true;
+			$file_path = $directory.'/'.$name.'.php';
+			if (file_exists($file_path) && is_file($file_path)) {
+				$this->directory = $directory;
 				break;
 			}
 		}
 
-		if (!$found || !is_file($this->file_path) || !is_readable($this->file_path)) {
-			throw new RuntimeException(_s('Partial not found or not readable: "%s".', $this->file_path));
+		if ($this->directory === null) {
+			throw new RuntimeException(sprintf('Partial not found: "%s".', $name));
 		}
 
+		if (!is_readable($file_path)) {
+			throw new RuntimeException(sprintf('Partial not readable: "%s".', $file_path));
+		}
+
+		$this->name = $name;
 		$this->data = $data;
 	}
 
 	/**
 	 * Render partial and return the output.
-	 * Notes:
-	 *   - Partial should output textual content, like HTML or scripts. Returning anything will have no effect.
-	 *   - Scripts need to be included in HTML partials by using a standard <script> tag.
+	 * Note: partial should only output textual content like HTML, JSON, scripts or similar.
 	 *
 	 * @throws RuntimeException if partial not found, not readable or returned false.
 	 *
@@ -91,14 +102,54 @@ class CPartial {
 	public function getOutput() {
 		$data = $this->data;
 
+		$file_path = $this->directory.'/'.$this->name.'.php';
+
 		ob_start();
 
-		if ((include $this->file_path) === false) {
+		if ((include $file_path) === false) {
 			ob_end_clean();
 
-			throw new RuntimeException(_s('Partial not found or not readable: "%s".', $this->file_path));
+			throw new RuntimeException(sprintf('Cannot render partial: "%s".', $file_path));
 		}
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * Get the contents of a preprocessed javascript file.
+	 * Note: javascript file will be searched in the "js" subdirectory of the partial file.
+	 *
+	 * @param string $file_name
+	 *
+	 * @throws RuntimeException if the file not found, not readable or returned false.
+	 *
+	 * @return string
+	 */
+	public function readJsFile($file_name) {
+		$data = $this->data;
+
+		$file_path = $this->directory.'/js/'.$file_name;
+
+		ob_start();
+
+		if ((include $file_path) === false) {
+			ob_end_clean();
+
+			throw new RuntimeException(sprintf('Cannot read JS file: "%s".', $file_path));
+		}
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Include a preprocessed javascript file inline.
+	 * Note: javascript file will be searched in the "js" subdirectory of the partial file.
+	 *
+	 * @param string $file_name
+	 *
+	 * @throws RuntimeException if the file not found, not readable or returned false.
+	 */
+	public function includeJsFile($file_name) {
+		echo $this->readJsFile($file_name);
 	}
 }

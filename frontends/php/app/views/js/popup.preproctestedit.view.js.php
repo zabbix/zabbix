@@ -17,9 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
 
-
-ob_start(); ?>
 
 /**
  * Make step result UI element.
@@ -215,5 +214,3 @@ jQuery(document).ready(function($) {
 
 	$('#preprocessing-test-form .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 });
-
-<?php return ob_get_clean(); ?>

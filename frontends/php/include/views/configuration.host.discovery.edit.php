@@ -825,4 +825,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';
 
-return $widget;
+$widget->show();

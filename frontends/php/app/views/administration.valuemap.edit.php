@@ -19,7 +19,7 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.valuemap.edit.js.php');
+$this->includeJsFile('administration.valuemap.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Value mapping'))

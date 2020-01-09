@@ -445,4 +445,4 @@ else {
 $frmHost->addItem($divTabs);
 $widget->addItem($frmHost);
 
-return $widget;
+$widget->show();

@@ -488,4 +488,4 @@ $graphForm->addItem($graphTab);
 // Append form to widget.
 $widget->addItem($graphForm);
 
-return $widget;
+$widget->show();

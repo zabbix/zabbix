@@ -879,4 +879,4 @@ else {
 	));
 }
 
-return $form;
+$form->show();

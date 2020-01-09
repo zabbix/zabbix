@@ -19,7 +19,7 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.proxy.edit.js.php');
+$this->includeJsFile('administration.proxy.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Proxies'));
 

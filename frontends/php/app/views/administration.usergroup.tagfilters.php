@@ -20,9 +20,9 @@
 
 
 $output = [
-	'body' => (new CView('administration.usergroup.tagfilters.html', ['tag_filters' => $data['tag_filters']]))
-		->render()
-		->toString()
+	'body' => (new CView('administration.usergroup.tagfilters.html', [
+		'tag_filters' => $data['tag_filters']
+	]))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

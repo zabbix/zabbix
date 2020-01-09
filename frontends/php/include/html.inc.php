@@ -158,7 +158,7 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'fullscreen':
-			switch (CView::getLayoutMode()) {
+			switch ($params['mode']) {
 				case ZBX_LAYOUT_KIOSKMODE:
 					$icon = (new CButton(null, '&nbsp;'))
 						->setTitle(_('Normal view'))

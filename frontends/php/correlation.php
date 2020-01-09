@@ -425,9 +425,7 @@ if (hasRequest('form')) {
 	$data['correlation']['operations'] = $checked;
 
 	// Render view.
-	$correlationView = new CView('configuration.correlation.edit', $data);
-	$correlationView->render();
-	$correlationView->show();
+	echo (new CView('configuration.correlation.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -480,9 +478,7 @@ else {
 	$data['paging'] = getPagingLine($data['correlations'], $sortOrder, new CUrl('correlation.php'));
 
 	// Render view.
-	$correlationView = new CView('configuration.correlation.list', $data);
-	$correlationView->render();
-	$correlationView->show();
+	echo (new CView('configuration.correlation.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -168,4 +168,4 @@ $graphForm->addItem([
 // append form to widget
 $widget->addItem($graphForm);
 
-return $widget;
+$widget->show();

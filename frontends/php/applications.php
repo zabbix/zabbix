@@ -199,9 +199,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// render view
-	$applicationView = new CView('configuration.application.edit', $data);
-	$applicationView->render();
-	$applicationView->show();
+	echo (new CView('configuration.application.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -304,9 +302,7 @@ else {
 	$data['paging'] = getPagingLine($data['applications'], $sortOrder, $url);
 
 	// render view
-	$applicationView = new CView('configuration.application.list', $data);
-	$applicationView->render();
-	$applicationView->show();
+	echo (new CView('configuration.application.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

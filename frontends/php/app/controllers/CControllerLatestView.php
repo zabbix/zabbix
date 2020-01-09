@@ -131,8 +131,6 @@ class CControllerLatestView extends CControllerLatest {
 			'active_tab' => CProfile::get('web.latest.filter.active', 1)
 		] + $this->prepareData($filter, $sort_field, $sort_order);
 
-		CView::$has_web_layout_mode = true;
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Latest data'));
 		$this->setResponse($response);

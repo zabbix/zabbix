@@ -133,6 +133,7 @@ $form = (new CForm('post', null, 'multipart/form-data'))
 	->addItem($tab_view);
 
 // widget
-return (new CWidget())
+(new CWidget())
 	->setTitle(_('Import'))
-	->addItem($form);
+	->addItem($form)
+	->show();

@@ -22,7 +22,7 @@
 $options = $data['options'];
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.triggerwizard.js.php'
+	'script_inline' => $this->readJsFile('popup.triggerwizard.js.php')
 ];
 
 // SID for this form is added by JS getUrl() and "form_refresh" is not used at all.

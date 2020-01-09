@@ -280,8 +280,6 @@ if (empty($data['screen'])) {
 $data['screen'] = reset($data['screen']);
 
 // render view
-$screenView = new CView('monitoring.screen.constructor.list', $data);
-$screenView->render();
-$screenView->show();
+echo (new CView('monitoring.screen.constructor.list', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -358,9 +358,7 @@ if (hasRequest('form')) {
 	$data['form_refresh'] = getRequest('form_refresh');
 
 	// render view
-	$screenView = new CView('monitoring.screen.edit', $data);
-	$screenView->render();
-	$screenView->show();
+	echo (new CView('monitoring.screen.edit', $data))->getOutput();
 }
 else {
 	CProfile::delete('web.screens.elementid');
@@ -440,9 +438,7 @@ else {
 	$data['paging'] = getPagingLine($data['screens'], $sortOrder, new CUrl('screenconf.php'));
 
 	// render view
-	$screenView = new CView('monitoring.screen.list', $data);
-	$screenView->render();
-	$screenView->show();
+	echo (new CView('monitoring.screen.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

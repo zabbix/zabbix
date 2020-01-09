@@ -104,7 +104,7 @@ $form = (new CForm())
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.media.js.php',
+	'script_inline' => $this->readJsFile('popup.media.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

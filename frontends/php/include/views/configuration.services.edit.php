@@ -368,4 +368,4 @@ $servicesForm->addItem($servicesTab);
 // append form to widget
 $widget->addItem($servicesForm);
 
-return $widget;
+$widget->show();

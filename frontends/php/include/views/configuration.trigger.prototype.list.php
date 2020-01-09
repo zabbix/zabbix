@@ -173,4 +173,4 @@ $triggersForm->addItem([
 // append form to widget
 $widget->addItem($triggersForm);
 
-return $widget;
+$widget->show();

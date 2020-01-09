@@ -22,15 +22,16 @@
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
 
-$this->includeJSfile('app/views/monitoring.latest.view.js.php');
+$this->includeJsFile('monitoring.latest.view.js.php');
 
-$web_layout_mode = CView::getLayoutMode();
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
 
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
-		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen'))))
+		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -112,9 +113,7 @@ $widget->show();
 
 // Initialize page refresh only if the filter is sufficient for data selection.
 if ($data['filter_set']) {
-	$this->addPostJS(
-		'jQuery(function($) {'.
-			'latest_page.start();'.
-		'});'
-	);
+	(new CScriptTag('latest_page.start();'))
+		->setOnDocumentReady()
+		->show();
 }

@@ -318,4 +318,4 @@ $hostView->addItem($hostTab);
 
 $hostWidget->addItem($hostView);
 
-return $hostWidget;
+$hostWidget->show();

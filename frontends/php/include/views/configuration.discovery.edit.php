@@ -151,4 +151,4 @@ $discoveryForm->addItem($discoveryTabs);
 
 $widget->addItem($discoveryForm);
 
-return $widget;
+$widget->show();

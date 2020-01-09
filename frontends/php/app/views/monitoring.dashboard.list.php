@@ -24,7 +24,8 @@ if ($data['uncheck']) {
 }
 $this->addJsFile('layout.mode.js');
 
-$web_layout_mode = CView::getLayoutMode();
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
 
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
@@ -37,7 +38,7 @@ $widget = (new CWidget())
 					->setArgument('new', '1')
 					->getUrl()
 			))
-		->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	);
@@ -69,6 +70,7 @@ foreach ($data['dashboards'] as $dashboard) {
 	]);
 }
 
+CTag::
 $form->addItem([
 	$table,
 	$data['paging'],

@@ -176,4 +176,4 @@ $httpForm->addItem([
 // append form to widget
 $widget->addItem($httpForm);
 
-return $widget;
+$widget->show();

@@ -17,9 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
 
 
-ob_start(); ?>
 new CViewSwitcher('timeperiod_type', 'change', <?= CJs::encodeJson([
 	TIMEPERIOD_TYPE_ONETIME =>	['row_timepreiod_start_date', 'row_timeperiod_period_length'],
 	TIMEPERIOD_TYPE_DAILY =>	['row_timeperiod_every_day', 'row_timeperiod_period_at_hours_minutes',
@@ -79,5 +79,3 @@ function submitMaintenancePeriod(selector) {
 		}
 	});
 };
-
-<?php return ob_get_clean(); ?>

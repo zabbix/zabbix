@@ -17,9 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
 
-
-ob_start(); ?>
 
 (function ($) {
 	var trigger_row_tmpl = new Template($('#tmpl_expressions_list_row').html()),
@@ -174,5 +173,3 @@ function validateTriggerWizard(formname, dialogueid) {
 		type: 'post'
 	});
 }
-
-<?php return ob_get_clean(); ?>

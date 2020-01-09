@@ -59,4 +59,4 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 	$tag_filter_table->addRow([$tag_filter['name'], $tag_value, $action]);
 }
 
-return $tag_filter_table;
+$tag_filter_table->show();

@@ -79,4 +79,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.copy.elements.js.php';
 
-return $widget;
+$widget->show();

@@ -270,4 +270,4 @@ $maintenanceForm->addItem($maintenanceTab);
 
 $widget->addItem($maintenanceForm);
 
-return $widget;
+$widget->show();

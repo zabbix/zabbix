@@ -160,4 +160,4 @@ $hostGroupForm->addItem([
 // append form to widget
 $widget->addItem($hostGroupForm);
 
-return $widget;
+$widget->show();

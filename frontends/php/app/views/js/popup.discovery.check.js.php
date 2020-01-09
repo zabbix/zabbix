@@ -17,9 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
 
-
-ob_start(); ?>
 
 new CViewSwitcher('type', 'change', <?= CJs::encodeJson([
 	SVC_SSH => ['row_dcheck_ports'],
@@ -94,5 +93,3 @@ function clearDCheckForm() {
 	jQuery('#snmpv3_securitylevel').val(<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>);
 	jQuery('#snmpv3_authprotocol_0, #snmpv3_privprotocol_0').prop('checked', true);
 }
-
-<?php return ob_get_clean(); ?>

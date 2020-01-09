@@ -67,4 +67,4 @@ $applicationForm->addItem($applicationTab);
 // append form to widget
 $widget->addItem($applicationForm);
 
-return $widget;
+$widget->show();

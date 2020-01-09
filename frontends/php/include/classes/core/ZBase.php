@@ -400,13 +400,14 @@ class ZBase {
 			}
 			else {
 				$view = new CView($router->getView(), $response->getData());
+
 				$data['page']['title'] = $response->getTitle();
 				$data['page']['file'] = $response->getFileName();
 				$data['controller']['action'] = $router->getAction();
 				$data['main_block'] = $view->getOutput();
-				$data['javascript']['files'] = $view->getAddedJS();
-				$data['javascript']['pre'] = $view->getIncludedJS();
-				$data['javascript']['post'] = $view->getPostJS();
+				$data['javascript']['files'] = $view->getJsFiles();
+				$data['web_layout_mode'] = $view->getLayoutMode();
+
 				$layout = new CView($router->getLayout(), $data);
 				echo $layout->getOutput();
 			}
@@ -459,10 +460,10 @@ class ZBase {
 	 */
 	private function setLayoutModeByUrl() {
 		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
-			CView::setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
+			CViewHelper::saveLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 		}
 		elseif (array_key_exists('fullscreen', $_GET)) {
-			CView::setLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
+			CViewHelper::saveLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
 		}
 
 		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.

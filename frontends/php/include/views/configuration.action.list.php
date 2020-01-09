@@ -151,4 +151,4 @@ $actionForm->addItem([
 // append form to widget
 $widget->addItem($actionForm);
 
-return $widget;
+$widget->show();

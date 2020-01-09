@@ -23,8 +23,8 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		function latestPage() {
-			this.refresh_url = '<?= $this->data['refresh_url'] ?>';
-			this.refresh_interval = <?= $this->data['refresh_interval'] ?>;
+			this.refresh_url = '<?= $data['refresh_url'] ?>';
+			this.refresh_interval = <?= $data['refresh_interval'] ?>;
 			this.running = false;
 			this.timeout = null;
 		}

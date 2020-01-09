@@ -19,7 +19,7 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.regex.edit.js.php');
+$this->includeJsFile('administration.regex.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))

@@ -115,4 +115,6 @@ $scriptsForm->addItem([
 ]);
 
 // append form to widget
-$widget->addItem($scriptsForm)->show();
+$widget
+	->addItem($scriptsForm)
+	->show();

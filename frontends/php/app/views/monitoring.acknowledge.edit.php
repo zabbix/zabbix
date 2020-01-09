@@ -19,7 +19,7 @@
 **/
 
 
-$this->includeJSfile('app/views/monitoring.acknowledge.edit.js.php');
+$this->includeJsFile('monitoring.acknowledge.edit.js.php');
 
 $form_list = (new CFormList())
 	->addRow(

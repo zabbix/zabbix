@@ -169,8 +169,6 @@ if (!empty($data['actions'])) {
 $data['paging'] = getPagingLine($data['actions'], ZBX_SORT_UP, new CUrl('auditlogs.php'));
 
 // render view
-$auditView = new CView('administration.auditlogs.list', $data);
-$auditView->render();
-$auditView->show();
+echo (new CView('administration.auditlogs.list', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

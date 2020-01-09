@@ -184,4 +184,4 @@ $discoveryForm->addItem([
 // append form to widget
 $widget->addItem($discoveryForm);
 
-return $widget;
+$widget->show();

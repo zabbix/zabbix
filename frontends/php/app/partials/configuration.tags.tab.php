@@ -20,7 +20,7 @@
 
 
 if (!$data['readonly']) {
-	require_once dirname(__FILE__).'/js/configuration.tags.tab.js.php';
+	$this->includeJsFile('configuration.tags.tab.js.php');
 }
 
 $show_inherited_tags = (array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags']);

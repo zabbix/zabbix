@@ -103,4 +103,4 @@ $sysmapForm->addItem([
 // append form to widget
 $widget->addItem($sysmapForm);
 
-return $widget;
+$widget->show();

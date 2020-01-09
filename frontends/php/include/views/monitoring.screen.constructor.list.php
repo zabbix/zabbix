@@ -38,4 +38,4 @@ $widget->addItem(
 $screenBuilder->insertInitScreenJs($data['screenid']);
 $screenBuilder->insertProcessObjectsJs();
 
-return $widget;
+$widget->show();

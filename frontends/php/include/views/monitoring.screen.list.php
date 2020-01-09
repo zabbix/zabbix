@@ -137,4 +137,4 @@ $screenForm->addItem([
 // append form to widget
 $widget->addItem($screenForm);
 
-return $widget;
+$widget->show();

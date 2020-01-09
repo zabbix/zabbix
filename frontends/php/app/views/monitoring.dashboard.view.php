@@ -41,7 +41,10 @@ else {
 	$this->addJsFile('class.svg.canvas.js');
 	$this->addJsFile('class.svg.map.js');
 
-	$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
+	$this->includeJsFile('monitoring.dashboard.view.js.php');
+
+	$this->enableLayoutModes();
+	$web_layout_mode = $this->getLayoutMode();
 
 	$breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
@@ -66,8 +69,6 @@ else {
 		);
 	}
 
-	$web_layout_mode = CView::getLayoutMode();
-
 	$widget = (new CWidget())
 		->setTitle($data['dashboard']['name'])
 		->setWebLayoutMode($web_layout_mode)
@@ -87,7 +88,7 @@ else {
 						->setAttribute('aria-haspopup', true)
 						->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid']))
 					)
-					->addItem(get_icon('fullscreen'))
+					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 			]))->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem((new CListItem([
@@ -128,11 +129,10 @@ else {
 		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 		->show();
 
-	/*
-	 * Javascript
-	 */
+	// Javascript
+
 	// Activate blinking.
-	$this->addPostJS('jqBlink.blink();');
+	(new CScriptTag('jqBlink.blink();'))->show();
 
 	$dashboard_data = [
 		// Name is required for new dashboard creation.
@@ -161,23 +161,23 @@ else {
 		$dashboard_options['updated'] = true;
 	}
 
-	// must be done before adding widgets, because it causes dashboard to resize.
+	// Process objects before adding widgets, not to cause dashboard to resize.
 	if ($data['show_timeselector']) {
-		$this->addPostJS(
+		(new CScriptTag(
 			'timeControl.addObject("scrollbar", '.CJs::encodeJson($data['timeline']).', '.
 				CJs::encodeJson($data['timeControlData']).
 			');'.
 			'timeControl.processObjects();'
-		);
+		))->show();
 	}
 
 	// Initialize dashboard grid.
-	$this->addPostJS(
-		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
+	(new CScriptTag(
+		'$(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
 			'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
 			'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
 			'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.
 			'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).
 		');'
-	);
+	))->show();
 }

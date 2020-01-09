@@ -49,7 +49,7 @@
 	function dashbrd_config() {
 		var dashboard = jQuery('.dashbrd-grid-container').data('dashboardGrid'),
 			options = {
-				dashboardid: <?=$this->data['dashboard']['dashboardid'];?>,
+				dashboardid: <?= $data['dashboard']['dashboardid'] ?>,
 				userid: dashboard['dashboard']['userid'],
 				name: dashboard['dashboard']['name']
 			};
@@ -206,11 +206,11 @@
 		// Turn on edit dashboard.
 		$('#dashbrd-edit').click(showEditMode);
 
-		<?php if ($this->data['dashboard']['dashboardid'] == 0) { ?>
-		// When creating new dashboard, open it in edit mode, with opened properties popup.
-		showEditMode();
-		dashbrd_config();
-		<?php } ?>
+		<?php if ($data['dashboard']['dashboardid'] == 0): ?>
+			// When creating new dashboard, open it in edit mode, with opened properties popup.
+			showEditMode();
+			dashbrd_config();
+		<?php endif; ?>
 	});
 
 	function dashboardAddMessages(messages) {

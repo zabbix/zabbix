@@ -19,7 +19,7 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
@@ -94,7 +94,7 @@ $widget->setControls((new CList([
 		)
 		->addItem($favourite_icon)
 		->addItem($refresh_icon)
-		->addItem(get_icon('fullscreen'))
+		->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 	))
 		->setAttribute('aria-label', _('Content controls'))
 ])));
@@ -114,4 +114,4 @@ $widget
 
 require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
 
-return $widget;
+$widget->show();

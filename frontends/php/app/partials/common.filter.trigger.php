@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/common.filter.trigger.js.php';
+$this->includeJsFile('common.filter.trigger.js.php');
 
 $filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))
 	->setProfile($data['profileIdx'])

@@ -555,4 +555,4 @@ $actionForm->addItem($action_tabs);
 // Append form to widget.
 $widget->addItem($actionForm);
 
-return $widget;
+$widget->show();

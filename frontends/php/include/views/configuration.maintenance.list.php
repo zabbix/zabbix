@@ -113,4 +113,4 @@ $maintenanceForm->addItem([
 // append form to widget
 $widget->addItem($maintenanceForm);
 
-return $widget;
+$widget->show();

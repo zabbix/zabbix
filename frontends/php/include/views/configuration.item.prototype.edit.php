@@ -802,4 +802,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.prototype.edit.js.php';
 
-return $widget;
+$widget->show();

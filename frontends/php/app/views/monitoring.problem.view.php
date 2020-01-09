@@ -79,7 +79,11 @@ if ($data['action'] == 'problem.view') {
 	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
 	$this->addJsFile('layout.mode.js');
-	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
+
+	$this->includeJsFile('monitoring.problem.view.js.php');
+
+	$this->enableLayoutModes();
+	$web_layout_mode = $this->getLayoutMode();
 
 	if ($data['uncheck']) {
 		uncheckTableRows('problem');
@@ -341,8 +345,6 @@ if ($data['action'] == 'problem.view') {
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
-	$web_layout_mode = CView::getLayoutMode();
-
 	$widget = (new CWidget())
 		->setTitle(_('Problems'))
 		->setWebLayoutMode($web_layout_mode)
@@ -357,7 +359,7 @@ if ($data['action'] == 'problem.view') {
 							->setArgument('action', 'problem.view.csv')
 							->setArgument('page',  $data['page'])
 					))
-					->addItem(get_icon('fullscreen'))
+					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))
@@ -371,8 +373,8 @@ if ($data['action'] == 'problem.view') {
 		->addItem($screen->get())
 		->show();
 
-	// activating blinking
-	$this->addPostJS('jqBlink.blink();');
+	// Activate blinking.
+	(new CScriptTag('jqBlink.blink();'))->show();
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 		$objData = [
@@ -383,8 +385,10 @@ if ($data['action'] == 'problem.view') {
 			'mainObject' => 1
 		];
 
-		$this->addPostJS('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($screen->timeline).', '.zbx_jsvalue($objData).');');
-		$this->addPostJS('timeControl.processObjects();');
+		(new CScriptTag(
+			'timeControl.addObject("scroll_events_id", '.zbx_jsvalue($screen->timeline).', '.zbx_jsvalue($objData).');'.
+			'timeControl.processObjects();'
+		))->show();
 	}
 }
 else {

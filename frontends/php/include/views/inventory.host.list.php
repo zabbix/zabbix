@@ -97,4 +97,4 @@ foreach ($this->data['hosts'] as $host) {
 $table = [$table, $this->data['paging']];
 $hostInventoryWidget->addItem($table);
 
-return $hostInventoryWidget;
+$hostInventoryWidget->show();

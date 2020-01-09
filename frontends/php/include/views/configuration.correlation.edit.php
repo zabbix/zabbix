@@ -177,4 +177,4 @@ $form->addItem($correlation_tabs);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

@@ -644,4 +644,4 @@ $triggersForm->addItem($triggersTab);
 
 $widget->addItem($triggersForm);
 
-return $widget;
+$widget->show();

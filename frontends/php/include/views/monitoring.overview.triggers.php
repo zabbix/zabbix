@@ -71,7 +71,7 @@ if ($blink_period > 0) {
 }
 
 // header right
-$web_layout_mode = CView::getLayoutMode();
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $submenu_source = [
 	SHOW_TRIGGERS => _('Trigger overview'),
@@ -116,7 +116,7 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -158,4 +158,4 @@ else {
 
 $widget->addItem($dataTable);
 
-return $widget;
+$widget->show();

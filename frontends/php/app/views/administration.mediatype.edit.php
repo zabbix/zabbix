@@ -19,8 +19,9 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 $this->addJsFile('multilineinput.js');
+
+$this->includeJsFile('administration.mediatype.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Media types'));
 

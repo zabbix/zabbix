@@ -86,8 +86,6 @@ class CControllerDiscoveryView extends CController {
 			'active_tab' => CProfile::get('web.discovery.filter.active', 1)
 		];
 
-		CView::$has_web_layout_mode = true;
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Status of discovery'));
 		$this->setResponse($response);

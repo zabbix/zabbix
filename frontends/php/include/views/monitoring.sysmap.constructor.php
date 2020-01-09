@@ -80,7 +80,7 @@ zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.CJs::encodeJson
 	'defaultIconName' => $data['defaultIconName']
 ], true).');');
 
-return (new CWidget())
+(new CWidget())
 	->setTitle(_('Network maps'))
 	->addItem($menu)
 	->addItem(
@@ -89,4 +89,5 @@ return (new CWidget())
 				->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 				->addItem($container)
 		))->addClass('sysmap-scroll-container')
-	);
+	)
+	->show();

@@ -67,4 +67,4 @@ $form->addItem($tab);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

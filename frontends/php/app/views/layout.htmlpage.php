@@ -96,7 +96,12 @@ function local_generateHeader($data) {
 		echo $page_menu->getOutput();
 	}
 
-	echo '<main'.(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' class="'.ZBX_STYLE_LAYOUT_KIOSKMODE.'"' : '').'>';
+	if ($data['web_layout_mode'] === ZBX_LAYOUT_KIOSKMODE) {
+		echo '<main class="'.ZBX_STYLE_LAYOUT_KIOSKMODE.'">';
+	}
+	else {
+		echo '<main>';
+	}
 
 	// if a user logs in after several unsuccessful attempts, display a warning
 	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
@@ -150,13 +155,9 @@ function local_showMessage() {
 	}
 }
 
-$data['web_layout_mode'] = CView::getLayoutMode();
-
 local_generateHeader($data);
 local_showMessage();
-echo $data['javascript']['pre'];
 echo $data['main_block'];
-echo $data['javascript']['post'];
 local_generateFooter($data);
 show_messages();
 

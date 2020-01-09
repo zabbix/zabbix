@@ -180,8 +180,6 @@ if (isset($_FILES['import_file'])) {
 	show_messages($result, _('Imported successfully'), _('Import failed'));
 }
 
-$view = new CView('conf.import', $data);
-$view->render();
-$view->show();
+echo (new CView('conf.import', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -408,4 +408,4 @@ $form->addItem($tabs);
 // Append form to widget.
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

@@ -74,4 +74,4 @@ foreach ($data['group_rights'] as $groupid => $group_right) {
 	$group_rights_table->addRow($row);
 }
 
-return $group_rights_table;
+$group_rights_table->show();

@@ -25,9 +25,12 @@ $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('layout.mode.js');
 
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
+
 (new CWidget())
 	->setTitle(_('Maps'))
-	->setWebLayoutMode(CView::getLayoutMode())
+	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
@@ -54,7 +57,7 @@ $this->addJsFile('layout.mode.js');
 				'elname' => 'sysmapid',
 				'elid' => $data['map']['sysmapid']
 			]))
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]))
