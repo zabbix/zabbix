@@ -105,7 +105,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	);
 }
 
-$widget->addItem((new CView('monitoring.latest.view.html', array_intersect_key($data, array_flip([
+$widget->addItem((new CPartial('monitoring.latest.view.html', array_intersect_key($data, array_flip([
 	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set'
 ]))))->getOutput());
 

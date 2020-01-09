@@ -20,7 +20,7 @@
 
 
 $output = [
-	'body' => (new CView('administration.usergroup.tagfilters.html', [
+	'body' => (new CPartial('administration.usergroup.tagfilters.html', [
 		'tag_filters' => $data['tag_filters']
 	]))->getOutput()
 ];
