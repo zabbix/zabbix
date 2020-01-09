@@ -70,7 +70,6 @@ foreach ($data['dashboards'] as $dashboard) {
 	]);
 }
 
-CTag::
 $form->addItem([
 	$table,
 	$data['paging'],
