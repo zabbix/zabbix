@@ -56,7 +56,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		makePageFooter()->show();
 	}
 	insertPagePostJs();
-	require_once 'app/partials/js/common.init.js.php';
+	require_once 'include/views/js/common.init.js.php';
 
 	if (in_array($page['type'], [PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML])) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])

@@ -36,4 +36,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 
 insertPagePostJs();
 
-$this->includeJsFile('common.init.js.php');
+require_once 'include/views/js/common.init.js.php';
