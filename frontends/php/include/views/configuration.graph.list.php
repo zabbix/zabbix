@@ -78,16 +78,18 @@ if (!empty($this->data['parent_discoveryid'])) {
 }
 
 // create table
+$url = (new CUrl('graphs.php'))->getUrl();
+
 $graphTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_graphs'))->onClick("checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		!empty($this->data['hostid']) ? null : _('Hosts'),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
 		_('Width'),
 		_('Height'),
-		make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'], $url)
 	]);
 
 foreach ($data['graphs'] as $graph) {

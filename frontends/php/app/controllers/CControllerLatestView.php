@@ -102,23 +102,24 @@ class CControllerLatestView extends CControllerLatest {
 		CProfile::update('web.latest.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.latest.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		$view_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'latest.view')
+		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
+
+		$refresh_curl = (new CUrl('zabbix.php'))
+			->setArgument('action', 'latest.view.refresh')
 			->setArgument('filter_groupids', $filter['groupids'])
 			->setArgument('filter_hostids', $filter['hostids'])
 			->setArgument('filter_application', $filter['application'])
 			->setArgument('filter_select', $filter['select'])
 			->setArgument('filter_show_without_data', $filter['show_without_data'] ? 1 : null)
 			->setArgument('filter_show_details', $filter['show_details'] ? 1 : null)
-			->setArgument('filter_set', 1)
 			->setArgument('sort', $sort_field)
-			->setArgument('sortorder', $sort_order);
+			->setArgument('sortorder', $sort_order)
+			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
 
-		$refresh_curl = clone $view_curl;
-		$refresh_curl
-			->setArgument('action', 'latest.view.refresh')
-			->setArgument('page', $this->getInput('page', 1))
-			->removeArgument('filter_set');
+		// data sort and pager
+		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
+
+		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['items'], ZBX_SORT_UP, $view_curl);
 
 		// display
 		$data = [
@@ -128,8 +129,9 @@ class CControllerLatestView extends CControllerLatest {
 			'view_curl' => $view_curl,
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'active_tab' => CProfile::get('web.latest.filter.active', 1)
-		] + $this->prepareData($filter, $sort_field, $sort_order);
+			'active_tab' => CProfile::get('web.latest.filter.active', 1),
+			'paging' => $paging
+		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Latest data'));

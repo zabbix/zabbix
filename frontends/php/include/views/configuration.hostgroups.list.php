@@ -54,7 +54,9 @@ $hostGroupTable = (new CTableInfo())
 			(new CCheckBox('all_groups'))
 				->onClick("checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'],
+			(new CUrl('hostgroups.php'))->getUrl()
+		),
 		_('Hosts'),
 		_('Templates'),
 		_('Members'),

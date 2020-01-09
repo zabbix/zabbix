@@ -91,6 +91,8 @@ updateTimeSelectorPeriod($timeselector_options);
 
 $data = [
 	'pageFilter' => $pageFilter,
+	'groupid' => $pageFilter->groupid,
+	'hostid' => $pageFilter->hostid,
 	'graphid' => $pageFilter->graphid,
 	'action' => getRequest('action', HISTORY_GRAPH),
 	'actions' => [
@@ -98,6 +100,7 @@ $data = [
 		HISTORY_VALUES => _('Values')
 	],
 	'timeline' => getTimeSelectorPeriod($timeselector_options),
+	'page' => getRequest('page', 1),
 	'active_tab' => CProfile::get('web.graphs.filter.active', 1)
 ];
 

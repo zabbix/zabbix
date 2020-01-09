@@ -28,7 +28,7 @@ $form = (new CForm())
 
 $form_list = (new CFormList());
 
-if ($data['timeperiodid']) {
+if (array_key_exists('timeperiodid', $data)) {
 	$form->addVar('timeperiodid', $data['timeperiodid']);
 }
 

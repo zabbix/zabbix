@@ -711,6 +711,8 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
+	$i = 1;
+
 	foreach($data['steps'] as $stepid => $step) {
 		$pairs_grouped = [
 			'query_fields' => [],
@@ -725,6 +727,7 @@ if (isset($_REQUEST['form'])) {
 			}
 			$data['steps'][$stepid]['pairs'] = $pairs_grouped;
 		}
+		$data['steps'][$stepid]['no'] = $i++;
 	}
 
 	// render view
@@ -814,11 +817,24 @@ else {
 
 		order_result($httpTests, $sortField, $sortOrder);
 
-		$url = (new CUrl('httpconf.php'))
-			->setArgument('hostid', $data['hostid'])
-			->setArgument('groupid', $data['pageFilter']->groupid);
+		// pager
+		if (hasRequest('page')) {
+			$page_num = getRequest('page');
+		}
+		elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+			$page_num = 1;
+		}
+		else {
+			$page_num = CPagerHelper::loadPage($page['file']);
+		}
 
-		$data['paging'] = getPagingLine($httpTests, $sortOrder, $url);
+		CPagerHelper::savePage($page['file'], $page_num);
+
+		$data['paging'] = CPagerHelper::paginate($page_num, $httpTests, $sortOrder,
+			(new CUrl('httpconf.php'))
+				->setArgument('hostid', $data['hostid'])
+				->setArgument('groupid', $data['pageFilter']->groupid)
+		);
 
 		if($data['showInfoColumn']) {
 			$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));

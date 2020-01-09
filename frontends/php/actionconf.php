@@ -655,10 +655,20 @@ else {
 		'limit' => $config['search_limit'] + 1
 	]);
 
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	// sorting && paging
-	order_result($data['actions'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['actions'], $sortOrder, new CUrl('actionconf.php'));
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sortOrder, new CUrl('actionconf.php'));
 
 	// render view
 	echo (new CView('configuration.action.list', $data))->getOutput();

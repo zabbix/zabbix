@@ -441,7 +441,7 @@ $form->addItem([
 					->setArgument('action', 'export.hosts.xml')
 					->setArgument('backurl', (new CUrl('hosts.php'))
 						->setArgument('groupid', $data['pageFilter']->groupid)
-						->setArgument('page', getPageNumber())
+						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 						->getUrl())
 					->getUrl()
 			],

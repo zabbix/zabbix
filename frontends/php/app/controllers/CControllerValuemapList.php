@@ -65,9 +65,13 @@ class CControllerValuemapList extends CController {
 			'limit' => $config['search_limit'] + 1
 		]);
 
+		// data sort and pager
 		order_result($data['valuemaps'], $sortfield, $sortorder);
-		$data['paging'] = getPagingLine($data['valuemaps'], $sortorder, (new CUrl('zabbix.php'))
-			->setArgument('action', 'valuemap.list')
+
+		$data['page'] = getRequest('page', 1);
+		CPagerHelper::savePage('valuemap.list', $data['page']);
+		$data['paging'] = CPagerHelper::paginate($data['page'], $data['valuemaps'], $sortorder,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
 		foreach ($data['valuemaps'] as &$valuemap) {

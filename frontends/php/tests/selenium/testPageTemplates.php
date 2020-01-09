@@ -83,7 +83,7 @@ class testPageTemplates extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent($name);
 		// Check if template name present on page, if not, check on second page.
-		if ($this->query('link', $name)->one(false) === null) {
+		if ($this->query('link', $name)->one(false)->isValid() === false) {
 			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
 			$this->zbxTestWaitForPageToLoad();
 		}

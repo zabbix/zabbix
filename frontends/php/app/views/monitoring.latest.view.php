@@ -105,8 +105,14 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	);
 }
 
+<<<<<<< HEAD
 $widget->addItem((new CPartial('monitoring.latest.view.html', array_intersect_key($data, array_flip([
 	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set'
+=======
+$widget->addItem((new CView('monitoring.latest.view.html', array_intersect_key($data, array_flip([
+	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set',
+	'paging'
+>>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
 ]))))->getOutput());
 
 $widget->show();

@@ -127,12 +127,15 @@ $widget = (new CWidget())
 
 $form = (new CForm())->setName('templates');
 
+// create table
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
+			(new CUrl('templates.php'))->getUrl()
+		),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),
@@ -283,7 +286,7 @@ $form->addItem([
 					->setArgument('action', 'export.templates.xml')
 					->setArgument('backurl', (new CUrl('templates.php'))
 						->setArgument('groupid', $data['pageFilter']->groupid)
-						->setArgument('page', getPageNumber())
+						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 						->getUrl())
 					->getUrl()
 			],

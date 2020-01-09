@@ -428,4 +428,15 @@ class CPage {
 	public function getDriver() {
 		return $this->driver;
 	}
+
+	/**
+	 * Remove focus from the element.
+	 */
+	public function removeFocus() {
+		try {
+			$this->driver->executeScript('document.activeElement.blur();');
+		} catch (Exception $ex) {
+			// Code is not missing here.
+		}
+	}
 }
