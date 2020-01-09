@@ -171,7 +171,8 @@ typedef enum
 	ITEM_TYPE_JMX,
 	ITEM_TYPE_SNMPTRAP,
 	ITEM_TYPE_DEPENDENT,
-	ITEM_TYPE_HTTPAGENT	/* 19 */
+	ITEM_TYPE_HTTPAGENT,
+	ITEM_TYPE_SNMP		/* 20 */
 }
 zbx_item_type_t;
 const char	*zbx_agent_type_string(zbx_item_type_t item_type);
@@ -193,6 +194,10 @@ extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
+
+#define ZBX_IF_SNMP_VERSION_1	1
+#define ZBX_IF_SNMP_VERSION_2	2
+#define ZBX_IF_SNMP_VERSION_3	3
 
 #define ZBX_FLAG_DISCOVERY_NORMAL	0x00
 #define ZBX_FLAG_DISCOVERY_RULE		0x01

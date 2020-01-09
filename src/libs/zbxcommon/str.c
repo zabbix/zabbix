@@ -1312,9 +1312,7 @@ const char	*zbx_agent_type_string(zbx_item_type_t item_type)
 	{
 		case ITEM_TYPE_ZABBIX:
 			return "Zabbix agent";
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
+		case ITEM_TYPE_SNMP:
 			return "SNMP agent";
 		case ITEM_TYPE_IPMI:
 			return "IPMI agent";

@@ -211,6 +211,9 @@ int	zbx_mock_str_to_item_type(const char *str)
 	if (0 == strcmp(str, "ITEM_TYPE_HTTPAGENT"))
 		return ITEM_TYPE_HTTPAGENT;
 
+	if (0 == strcmp(str, "ITEM_TYPE_SNMP"))
+		return ITEM_TYPE_SNMP;
+
 	return FAIL;
 }
 

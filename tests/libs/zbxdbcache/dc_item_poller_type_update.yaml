@@ -174,168 +174,168 @@ in:
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 25
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 26
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 27
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 28
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 29
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: 0
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 30
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 31
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 32
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 33
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 34
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 35
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 36
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 37
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 38
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 39
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 40
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 41
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 42
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 43
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 44
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 45
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 46
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 47
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_NORMAL
   - ref: 48
     access: DIRECT
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
@@ -676,174 +676,6 @@ in:
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 97
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 98
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 99
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 100
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 101
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 102
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 103
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 104
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 105
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 106
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 107
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 108
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 109
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 110
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 111
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 112
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 113
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 114
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 115
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 116
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 117
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 118
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 119
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 120
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 121
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
@@ -928,174 +760,6 @@ in:
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 133
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 134
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 135
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 136
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 137
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 138
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 139
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 140
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 141
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 142
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 143
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 144
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 145
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 146
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 147
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 148
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 149
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 150
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 151
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 152
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 153
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 154
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
-  - ref: 155
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
-  - ref: 156
-    access: DIRECT
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
   - ref: 157
     access: DIRECT
     type: ITEM_TYPE_ZABBIX_ACTIVE
@@ -2446,168 +2110,168 @@ in:
     result: ZBX_NO_POLLER
   - ref: 25
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
     result: ZBX_NO_POLLER
   - ref: 26
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_NO_POLLER
   - ref: 27
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 28
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 29
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: 0
     result: ZBX_NO_POLLER
   - ref: 30
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_NO_POLLER
   - ref: 31
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 32
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 33
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
     result: ZBX_NO_POLLER
   - ref: 34
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_NO_POLLER
   - ref: 35
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 36
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 37
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
     result: ZBX_NO_POLLER
   - ref: 38
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_NO_POLLER
   - ref: 39
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 40
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 41
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
     result: ZBX_NO_POLLER
   - ref: 42
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_NO_POLLER
   - ref: 43
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 44
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 45
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
     result: ZBX_NO_POLLER
   - ref: 46
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_NO_POLLER
   - ref: 47
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 48
     access: PROXY
-    type: ITEM_TYPE_SNMPv1
+    type: ITEM_TYPE_SNMP
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
@@ -3116,174 +2780,6 @@ in:
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
-  - ref: 121
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 122
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 123
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 124
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 125
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 126
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 127
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 128
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 129
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 130
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 131
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 132
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 133
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 134
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 135
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 136
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 137
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 138
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 139
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 140
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 141
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 142
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 143
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 144
-    access: PROXY
-    type: ITEM_TYPE_SNMPv2c
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
   - ref: 145
     access: PROXY
     type: ITEM_TYPE_INTERNAL
@@ -3532,174 +3028,6 @@ in:
   - ref: 180
     access: PROXY
     type: ITEM_TYPE_INTERNAL
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 181
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 182
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 183
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 184
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_NO_POLLER
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 185
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 186
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 187
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 188
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 189
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 190
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 191
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 192
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_IPMI
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 193
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 194
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 195
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 196
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_PINGER
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 197
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 198
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 199
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 200
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_JAVA
-    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 201
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: 0
-    result: ZBX_NO_POLLER
-  - ref: 202
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_NO_POLLER
-  - ref: 203
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
-    key: k
-    poller: ZBX_POLLER_TYPE_UNREACHABLE
-    flags: ZBX_ITEM_COLLECTED
-    result: ZBX_NO_POLLER
-  - ref: 204
-    access: PROXY
-    type: ITEM_TYPE_SNMPv3
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED

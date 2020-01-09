@@ -210,9 +210,7 @@ static unsigned char	host_availability_agent_by_item_type(unsigned char type)
 		case ITEM_TYPE_ZABBIX:
 			return ZBX_AGENT_ZABBIX;
 			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
+		case ITEM_TYPE_SNMP:
 			return ZBX_AGENT_SNMP;
 			break;
 		case ITEM_TYPE_IPMI:
@@ -534,9 +532,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 		switch (items[i].type)
 		{
 			case ITEM_TYPE_ZABBIX:
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
-			case ITEM_TYPE_SNMPv3:
+			case ITEM_TYPE_SNMP:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
@@ -553,27 +549,28 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 		switch (items[i].type)
 		{
-			case ITEM_TYPE_SNMPv3:
-				ZBX_STRDUP(items[i].snmpv3_securityname, items[i].snmpv3_securityname_orig);
-				ZBX_STRDUP(items[i].snmpv3_authpassphrase, items[i].snmpv3_authpassphrase_orig);
-				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
-				ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
+			case ITEM_TYPE_SNMP:
+				if (ZBX_IF_SNMP_VERSION_3 == items[i].snmp_version)
+				{
+					ZBX_STRDUP(items[i].snmpv3_securityname, items[i].snmpv3_securityname_orig);
+					ZBX_STRDUP(items[i].snmpv3_authpassphrase, items[i].snmpv3_authpassphrase_orig);
+					ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
+					ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].snmpv3_securityname,
-						MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].snmpv3_authpassphrase,
-						MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].snmpv3_privpassphrase,
-						MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, &items[i].snmpv3_contextname,
-						MACRO_TYPE_COMMON, NULL, 0);
-				ZBX_FALLTHROUGH;
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].snmpv3_securityname,
+							MACRO_TYPE_COMMON, NULL, 0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].snmpv3_authpassphrase,
+							MACRO_TYPE_COMMON, NULL, 0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].snmpv3_privpassphrase,
+							MACRO_TYPE_COMMON, NULL, 0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+							NULL, NULL, NULL, &items[i].snmpv3_contextname,
+							MACRO_TYPE_COMMON, NULL, 0);
+				}
+
 				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
@@ -700,7 +697,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	zbx_vector_ptr_create(&add_results);
 
 	/* retrieve item values */
-	if (SUCCEED == is_snmp_type(items[0].type))
+	if (ITEM_TYPE_SNMP == items[0].type)
 	{
 #ifdef HAVE_NETSNMP
 		/* SNMP checks use their own timeouts */
@@ -820,14 +817,15 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 		switch (items[i].type)
 		{
-			case ITEM_TYPE_SNMPv3:
-				zbx_free(items[i].snmpv3_securityname);
-				zbx_free(items[i].snmpv3_authpassphrase);
-				zbx_free(items[i].snmpv3_privpassphrase);
-				zbx_free(items[i].snmpv3_contextname);
-				ZBX_FALLTHROUGH;
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
+			case ITEM_TYPE_SNMP:
+				if (ZBX_IF_SNMP_VERSION_3 == items[i].snmp_version)
+				{
+					zbx_free(items[i].snmpv3_securityname);
+					zbx_free(items[i].snmpv3_authpassphrase);
+					zbx_free(items[i].snmpv3_privpassphrase);
+					zbx_free(items[i].snmpv3_contextname);
+				}
+
 				zbx_free(items[i].snmp_community);
 				zbx_free(items[i].snmp_oid);
 				break;
