@@ -43,7 +43,10 @@ class CModule extends \CApiService {
 	 * @throws APIException
 	 */
 	public function get(array $options = []) {
-		$this->denyAccessUnlessGranted();
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
 		$result = [];
 
 		$sqlParts = [
@@ -134,7 +137,9 @@ class CModule extends \CApiService {
 	 * @throws APIException
 	 */
 	public function create($modules) {
-		$this->denyAccessUnlessGranted();
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
 
 		$modules = zbx_toArray($modules);
 		$rules = [
@@ -193,7 +198,9 @@ class CModule extends \CApiService {
 	 * @throws APIException
 	 */
 	public function update($modules) {
-		$this->denyAccessUnlessGranted();
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
 
 		$modules = zbx_toArray($modules);
 		$rules = [
@@ -249,7 +256,9 @@ class CModule extends \CApiService {
 	 * @throws APIException
 	 */
 	public function delete(array $moduleids) {
-		$this->denyAccessUnlessGranted();
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
 
 		$db_modules = DB::select($this->tableName, [
 			'output' => [$this->pk, 'id'],
@@ -286,17 +295,6 @@ class CModule extends \CApiService {
 			if (!CApiInputValidator::validate($rules, $module, '', $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
-		}
-	}
-
-	/**
-	 * Check user permission level.
-	 *
-	 * @throws APIException if not enought permission.
-	 */
-	protected function denyAccessUnlessGranted() {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 	}
 }
