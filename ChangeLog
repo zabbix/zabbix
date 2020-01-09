@@ -41,7 +41,6 @@ Bug fixes:
 ..F....... [ZBX-17101] fixed url validation before output (miks)
 ...G...... [ZBX-17070] fixed agent2 plugin configuration not being called if no plugin specific parameters are set (wiper)
 ........S. [ZBX-17062] fixed LLD macro substitution when PostgrSQL is used (viktors)
-.......PS. [ZBX-16929] fixed function signature (mabele)
 ..F....... [ZBX-402] fixed latest data reloading to updating asynchronously (averza)
 ..F....... [ZBX-16804] added missing get parameters in availability report (rlataria)
 ..F....... [ZBX-16286] fixed graph widget dimensions errors on high DPI screens (agriscenko)
@@ -205,7 +204,7 @@ Bug fixes:
 ..F....... [ZBX-17101] fixed url validation before output (miks)
 ...G...... [ZBX-17070] fixed agent2 plugin configuration not being called if no plugin specific parameters are set (wiper)
 ........S. [ZBX-17062] fixed LLD macro substitution when PostgrSQL is used (viktors)
-.......PS. [ZBX-16929] fixed function signature (mabele)
+.......PS. [ZBX-16929] removed redundant code block (mabele)
 ..F....... [ZBX-16804] added missing get parameters in availability report (rlataria)
 ..F....... [ZBX-16286] fixed graph widget dimensions errors on high DPI screens (agriscenko)
 ..F....... [ZBX-16848] fixed fatal error occurring in user profile and user edit forms when PHP FileInfo extension does not exist (Ivo)
@@ -1179,7 +1178,7 @@ A.F....... [ZBXNEXT-5271] implemented 'delete missing' option for imported templ
 
 Bug fixes:
 ..F....... [ZBX-17101] fixed url validation before output (miks)
-.......PS. [ZBX-16929] fixed detection of invalid sender data request (mabele)
+.......PS. [ZBX-16929] fixed history data processing responding with "success", when received only invalid data from proxy/agent/sender (mabele)
 ..F....... [ZBX-16804] added missing get parameters in availability report (rlataria)
 ..F....... [ZBX-16286] fixed graph widget dimensions errors on high DPI screens (agriscenko)
 ..F....... [ZBX-16848] fixed fatal error occurring in user profile and user edit forms when PHP FileInfo extension does not exist (Ivo)
