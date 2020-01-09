@@ -130,7 +130,9 @@ class CView {
 
 	/**
 	 * Get the contents of a preprocessed javascript file.
-	 * Note: javascript file will be searched in the "js" subdirectory of the view file.
+	 * Notes:
+	 *   - Javascript file will be searched in the "js" subdirectory of the view file.
+	 *   - A copy of $data variable will be available for using withing the file.
 	 *
 	 * @param string $file_name
 	 *
@@ -156,7 +158,9 @@ class CView {
 
 	/**
 	 * Include a preprocessed javascript file inline.
-	 * Note: javascript file will be searched in the "js" subdirectory of the view file.
+	 * Notes:
+	 *   - Javascript file will be searched in the "js" subdirectory of the view file.
+	 *   - A copy of $data variable will be available for using withing the file.
 	 *
 	 * @param string $file_name
 	 *
