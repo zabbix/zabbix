@@ -101,16 +101,10 @@ if (hasRequest('import')) {
 	}
 }
 
-<<<<<<< HEAD
-echo (new CView('conf.import', $data))->getOutput();
-=======
 $data['backurl'] = (new CUrl('sysmaps.php'))
 	->setArgument('page', CPagerHelper::loadPage('sysmaps.php', null))
 	->getUrl();
 
-$view = new CView('conf.import', $data);
-$view->render();
-$view->show();
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
+echo (new CView('conf.import', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

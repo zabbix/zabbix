@@ -2316,14 +2316,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .dashbrd-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: 0; }
   .dashbrd-grid-widget-content .debug-output {
-<<<<<<< HEAD
     max-height: none;
-    border-color: #333; }
-=======
-    margin: 10px 10px 0;
-    max-height: 300px;
     border-color: #333333; }
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
   .dashbrd-grid-widget-content .msg-bad,
   .dashbrd-grid-widget-content .msg-good,
   .dashbrd-grid-widget-content .msg-warning {
@@ -2742,10 +2736,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .dashbrd-widget .list-table tbody tr:last-child td {
       border-bottom: 1px solid #333333; }
   .dashbrd-widget .debug-output {
-<<<<<<< HEAD
-=======
-    margin: 10px 10px 0;
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
     max-height: 300px;
     border-color: #333333; }
   .dashbrd-widget .msg-bad,
@@ -3422,27 +3412,19 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: none;
   max-height: 600px;
   overflow-y: auto;
-<<<<<<< HEAD
   padding: 10px;
   margin: 10px;
-  background-color: #222;
-  border: 1px solid #444; }
-=======
-  padding: 11px;
-  margin: 10px 13px 0;
-  background-color: #222222 !important;
+  background-color: #222222;
   border: 1px solid #444444; }
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
 
 .btn-debug {
   position: fixed;
   bottom: 10px;
   right: 15px;
   z-index: 15000;
-<<<<<<< HEAD
   color: #f2f2f2;
   background-color: #383838;
-  border-color: #666;
+  border-color: #666666;
   opacity: 0;
   transition: opacity .2s ease-out; }
   .btn-debug.visible {
@@ -3450,21 +3432,15 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .btn-debug:hover {
     color: #f2f2f2;
     background-color: #414141;
-    border-color: #666; }
+    border-color: #666666; }
   .btn-debug:focus {
     color: #f2f2f2;
     background-color: #414141;
-    border-color: #bbb; }
+    border-color: #bbbbbb; }
   .btn-debug:active {
     color: #f2f2f2;
     background-color: #414141;
-    border-color: #bbb; }
-=======
-  padding: 4px 11px;
-  border: 1px solid #444444;
-  background-color: rgba(17, 17, 17, 0.8);
-  border-radius: 2px; }
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
+    border-color: #bbbbbb; }
 
 .overlay-descr {
   max-height: 150px;

@@ -2361,12 +2361,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .dashbrd-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: 0; }
   .dashbrd-grid-widget-content .debug-output {
-<<<<<<< HEAD
     max-height: none;
-=======
-    margin: 10px 10px 0;
-    max-height: 300px;
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
     border-color: #383838; }
   .dashbrd-grid-widget-content .msg-bad,
   .dashbrd-grid-widget-content .msg-good,
@@ -2786,10 +2781,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .dashbrd-widget .list-table tbody tr:last-child td {
       border-bottom: 1px solid #383838; }
   .dashbrd-widget .debug-output {
-<<<<<<< HEAD
-=======
-    margin: 10px 10px 0;
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
     max-height: 300px;
     border-color: #383838; }
   .dashbrd-widget .msg-bad,
@@ -3466,15 +3457,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: none;
   max-height: 600px;
   overflow-y: auto;
-<<<<<<< HEAD
   padding: 10px;
   margin: 10px;
   background-color: #2f280a;
-=======
-  padding: 11px;
-  margin: 10px 13px 0;
-  background-color: #2f280a !important;
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
   border: 1px solid #303030; }
 
 .btn-debug {
@@ -3482,7 +3467,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   bottom: 10px;
   right: 15px;
   z-index: 15000;
-<<<<<<< HEAD
   color: #f2f2f2;
   background-color: #383838;
   border-color: #4f4f4f;
@@ -3502,12 +3486,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     color: #f2f2f2;
     background-color: #414141;
     border-color: #768d99; }
-=======
-  padding: 4px 11px;
-  border: 1px solid #303030;
-  background-color: rgba(14, 16, 18, 0.8);
-  border-radius: 2px; }
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
 
 .overlay-descr {
   max-height: 150px;

@@ -3630,12 +3630,7 @@ $form-icon-btn: (
 	}
 
 	.debug-output {
-<<<<<<< HEAD
 		max-height: none;
-=======
-		margin: 10px 10px 0;
-		max-height: 300px;
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
 		border-color: $table-border-color;
 	}
 
@@ -4339,10 +4334,6 @@ $form-icon-btn: (
 	}
 
 	.debug-output {
-<<<<<<< HEAD
-=======
-		margin: 10px 10px 0;
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
 		max-height: 300px;
 		border-color: $table-border-color;
 	}
@@ -5363,15 +5354,9 @@ $form-icon-btn: (
 	display: none;
 	max-height: 600px;
 	overflow-y: auto;
-<<<<<<< HEAD
 	padding: 10px;
 	margin: 10px;
 	background-color: $lighter-yellow;
-=======
-	padding: 11px;
-	margin: 10px 13px 0;
-	background-color: $lighter-yellow !important;
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
 }
@@ -5382,7 +5367,6 @@ $form-icon-btn: (
 	bottom: 10px;
 	right: 15px;
 	z-index: 15000;
-<<<<<<< HEAD
 	color: $btn-form-font-color;
 	background-color: $btn-form-bg-color;
 	border-color: $btn-form-border-color;
@@ -5410,12 +5394,6 @@ $form-icon-btn: (
 		background-color: $btn-form-hover-color;
 		border-color: $form-border-focus-color;
 	}
-=======
-	padding: 4px 11px;
-	border: 1px solid $ui-border-color;
-	background-color: rgba($body-bg-color, .8);
-	border-radius: 2px;
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
 }
 
 .overlay-descr {

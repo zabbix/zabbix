@@ -352,15 +352,8 @@ if ($data['action'] == 'problem.view') {
 					->addItem(new CRedirectButton(_('Export to CSV'),
 						(new CUrl('zabbix.php'))->setArgument('action', 'problem.view.csv')
 					))
-<<<<<<< HEAD
 					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
-				)
-			))
-				->setAttribute('aria-label', _('Content controls'))
-=======
-					->addItem(get_icon('fullscreen'))
 			))->setAttribute('aria-label', _('Content controls'))
->>>>>>> 0e79967a5f3537b9b7d19df1824dba9ce8da6789
 		);
 
 	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
