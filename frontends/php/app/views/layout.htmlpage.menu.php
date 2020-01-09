@@ -84,15 +84,14 @@ $user_navigation = (new CList())
 	);
 
 $menu = [];
-$index = 0;
 
-foreach ($data['menu']->getItems() as $item) {
-	$menu[] = (new CListItem(
-		(new CLink($item->getLabel()))
-			->setAttribute('data-main-menu', $index)
-		))
+foreach ($data['menu']->getItems() as $key => $item) {
+	$link = (new CLink($item->getLabel()))
+		->onClick('javascript: MMenu.mouseOver(\''.$item->getUniqueid().'\');')
+		->onKeyup('javascript: MMenu.keyUp(\''.$item->getUniqueid().'\', event);');
+	$menu[] = (new CListItem($link))
+		->setId($item->getUniqueid())
 		->addClass($item->getSelected() ? ZBX_STYLE_SELECTED : null);
-	++$index;
 }
 
 // 1st level menu
@@ -116,11 +115,15 @@ $top_menu = (new CDiv())
 
 $sub_menu_div = (new CTag('nav', true))
 	->setAttribute('aria-label', _('Sub navigation'))
+	->onMouseover('javascript: MMenu.submenu_mouseOver();')
+	->onMouseout('javascript: MMenu.mouseOut();')
 	->addClass(ZBX_STYLE_TOP_SUBNAV_CONTAINER);
 
 // 2nd level menu
 foreach ($data['menu']->getItems() as $item) {
-	$child_menu = (new CList())->addClass(ZBX_STYLE_TOP_SUBNAV);
+	$child_menu = (new CList())
+		->setId('sub_'.$item->getUniqueid())
+		->addClass(ZBX_STYLE_TOP_SUBNAV);
 
 	foreach ($item->getItems() as $child_item) {
 		// TODO: remove if statements, use CUrl instead.
@@ -128,7 +131,14 @@ foreach ($data['menu']->getItems() as $item) {
 		$url = substr($action, -4) === '.php' ? $action : 'zabbix.php?action='.$action;
 		$selected = $child_item->getSelected() ? ZBX_STYLE_SELECTED : null;
 
-		$child_menu->addItem((new CLink($child_item->getLabel(), $url))->addClass($selected));
+		$child_menu->addItem((new CLink($child_item->getLabel(), $url))
+			->addClass($selected)
+			->setId($child_item->getLabel())
+		);
+
+		if ($selected) {
+			insert_js('MMenu.def_label = '.zbx_jsvalue($item->getUniqueid()));
+		}
 	}
 
 	if (!$item->getSelected()) {

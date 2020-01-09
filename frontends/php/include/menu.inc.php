@@ -60,7 +60,8 @@ $menu
 				'action' => 'srv_status.php',
 				'alias' => ['report.services', 'chart5.php']
 			]
-		]
+		],
+		'uniqueid' => 'view'
 	])
 	->add(_('Inventory'), [
 		'alias' => [],
@@ -71,7 +72,8 @@ $menu
 			_('Hosts') => [
 				'action' => 'hostinventories.php'
 			]
-		]
+		],
+		'uniqueid' => 'cm'
 	])
 	->add(_('Reports'), [
 		'alias' => [],
@@ -83,7 +85,8 @@ $menu
 			_('Triggers top 100') => [
 				'action' => 'toptriggers.php'
 			]
-		]
+		],
+		'uniqueid' => 'reports'
 	]);
 
 if ($user_type >= USER_TYPE_ZABBIX_ADMIN) {
@@ -119,7 +122,8 @@ if ($user_type >= USER_TYPE_ZABBIX_ADMIN) {
 			_('Services') => [
 				'action' => 'services.php'
 			]
-		]
+		],
+		'uniqueid' => 'config'
 	]);
 
 }
@@ -181,6 +185,7 @@ if ($user_type == USER_TYPE_SUPER_ADMIN) {
 			_('Queue') => [
 				'action' => 'queue.php'
 			]
-		]
+		],
+		'uniqueid' => 'admin'
 	]);
 }

@@ -33,6 +33,9 @@ class CMenu {
 		$this->action = array_key_exists('action', $item) ? $item['action'] : '';
 		$this->alias = array_key_exists('alias', $item) ? $item['alias'] : [];
 		$this->items = [];
+		$this->uniqueid = array_key_exists('uniqueid', $item)
+			? $item['uniqueid']
+			: 'uid'.base_convert(mt_rand(), 10, 32);
 
 		if (array_key_exists('items', $item)) {
 			foreach ($item['items'] as $child_label => $child_item) {
@@ -65,6 +68,10 @@ class CMenu {
 		return array_reduce($this->items, function($carry, $child) {
 			return $carry || $child->getSelected();
 		}, $this->selected);
+	}
+
+	public function getUniqueid() {
+		return $this->uniqueid;
 	}
 
 	public function setSelected($action) {
