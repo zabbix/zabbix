@@ -163,9 +163,9 @@ var MMenu = {
 
 		if (sub_menu) {
 			top_menu.addClass('selected').siblings().removeClass('selected');
-			sub_menu.show().siblings().hide();
+			sub_menu.show().siblings('.top-subnav').hide();
 
-				if (focus_subitem) {
+			if (focus_subitem) {
 				jQuery('li:first > a', sub_menu).focus();
 			}
 		}
