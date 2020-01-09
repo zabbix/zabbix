@@ -510,6 +510,20 @@ if (hasRequest('form')) {
 		}
 	}
 
+	foreach (['operations', 'recovery_operations', 'ack_operations'] as $operations) {
+		foreach ($data['action'][$operations] as &$operation) {
+			if (($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+					|| $operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE
+					|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE)
+					&& !array_key_exists('default_msg', $operation['opmessage'])) {
+				$operation['opmessage']['default_msg'] = 1;
+				$operation['opmessage']['subject'] = '';
+				$operation['opmessage']['message'] = '';
+			}
+		}
+		unset($operation);
+	}
+
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
 	$data['allowedOperations'] = getAllowedOperations($data['eventsource']);
 
