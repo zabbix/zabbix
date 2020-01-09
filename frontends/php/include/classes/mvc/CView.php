@@ -337,6 +337,7 @@ class CView {
 	 * Find view or view.js file by relative path. Returns absolute path to file.
 	 *
 	 * @param string $filename    File name with extension.
+	 *
 	 * @return string|null
 	 */
 	protected function findFile($filename) {

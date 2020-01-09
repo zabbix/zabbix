@@ -39,22 +39,50 @@ class CModule {
 	public function init() {
 	}
 
+	/**
+	 * Getter for module manifest id.
+	 *
+	 * @return string
+	 */
 	final public function getId() {
 		return $this->manifest['id'];
 	}
 
+	/**
+	 * Getter for module manifest actions.
+	 *
+	 * @return array
+	 */
 	final public function getActions() {
 		return $this->manifest['actions'];
 	}
 
-	final public function getConfig($name) {
-		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : null;
+	/**
+	 * Getter for module config option.
+	 *
+	 * @param string $name     Configuration option name.
+	 * @param mixed  $default  Default value.
+	 *
+	 * @return mixed
+	 */
+	final public function getConfig($name, $default = null) {
+		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : $default;
 	}
 
+	/**
+	 * Getter for module manifest.
+	 *
+	 * @return array
+	 */
 	final public function getManifest() {
 		return $this->manifest;
 	}
 
+	/**
+	 * Getter for module namespace.
+	 *
+	 * @return string
+	 */
 	final public function getNamespace() {
 		return $this->manifest['namespace'];
 	}
@@ -88,7 +116,7 @@ class CModule {
 	/**
 	 * Set module runtime enabled/disabled status.
 	 *
-	 * @param $enabled
+	 * @param bool $enabled    Module enabled status value, true for enable.
 	 *
 	 * @return CModule
 	 */

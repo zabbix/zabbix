@@ -455,9 +455,9 @@ class ZBase {
 	}
 
 	/**
-	 * Process request and generate response. Main entry for all processing.
+	 * Process request and generate response. Main entry for all mvc action processing.
 	 *
-	 * @param CRouter $router
+	 * @param CRouter $router    CRouter class instance.
 	 *
 	 * @throws Exception
 	 */

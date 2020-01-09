@@ -35,7 +35,7 @@ class CAutoloader {
 	/**
 	 * Register supported namespace.
 	 *
-	 * @param string $namespace      Namespace value without trainling '\'.
+	 * @param string $namespace   Namespace value without trainling '\'.
 	 * @param array  $paths       Array of namespace files directory absolute path without trailing '/'.
 	 */
 	public function addNamespace($namespace, array $paths) {

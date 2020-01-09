@@ -139,10 +139,12 @@ class CModuleManager {
 	}
 
 	/**
-	 * Load modules manifests and check conflicts.
+	 * Load modules manifests.
 	 *
-	 * @param $modules
-	 * @param bool $check_conflicts
+	 * @param string $modules[]['id']             Module unique id.
+	 * @param string $modules[]['relative_path']  Relative path to module directory.
+	 * @param string $modules[]['config']         JSON string with module configuration data.
+	 * @param bool   $check_conflicts             Check conflicts between modules.
 	 *
 	 * @return array
 	 */
@@ -176,7 +178,7 @@ class CModuleManager {
 	/**
 	 * Load module manifest.
 	 *
-	 * @param $relative_path
+	 * @param string $relative_path     Relative path to module directory.
 	 *
 	 * @return array|null
 	 */
@@ -226,6 +228,9 @@ class CModuleManager {
 		return $manifest;
 	}
 
+	/**
+	 * Create active modules instances.
+	 */
 	public function loadModules() {
 		foreach ($this->loaded_manifests as $manifest) {
 			$main_class = 'CModule';
@@ -255,6 +260,9 @@ class CModuleManager {
 		}
 	}
 
+	/**
+	 * Initialize enabled modules. Call init method for every module instance.
+	 */
 	public function initModules() {
 		foreach ($this->modules as $module) {
 			if ($module->isEnabled()) {
@@ -264,10 +272,10 @@ class CModuleManager {
 	}
 
 	/**
-	 * Check conflicts between modules.
+	 * Check conflicts between modules in namespace and actions. Return array with errors.
 	 *
-	 * @param $manifest
-	 * @param $manifests
+	 * @param array $manifest    Module manifest to be checked against $manifests
+	 * @param array $manifests   Array of checked and valid modules.
 	 *
 	 * @return array
 	 */
@@ -314,23 +322,30 @@ class CModuleManager {
 	/**
 	 * Call modules before action event.
 	 *
-	 * @param Action $action  Action instance responsible for current request
+	 * @param Action|null $action  Action instance responsible for current request
 	 */
-	public function beforeAction(Action $action) {
+	public function beforeAction(Action $action = null) {
 		$this->invokeEventHandler($action, 'beforeAction');
 	}
 
 	/**
 	 * Modules method to be called before application will exit and send response to browser.
 	 *
-	 * @param Action $action  Action instance responsible for current request.
+	 * @param Action|null $action  Action instance responsible for current request.
 	 */
-	public function beforeTerminate(Action $action) {
+	public function beforeTerminate(Action $action = null) {
 		$this->invokeEventHandler($action, 'beforeTerminate');
 	}
 
-	private function invokeEventHandler(Action $action, $event) {
+	/**
+	 * Invokes event handler for every enabled module, current module event handler will be invoked last.
+	 *
+	 * @param Action|null $action   Current action object.
+	 * @param string      $event    Module event handler name.
+	 */
+	private function invokeEventHandler(Action $action = null, $event) {
 		$action_name = ($action instanceof Action) ? $action->getAction() : null;
+		$current_module = $this->getModuleByActionName($action_name);
 
 		foreach ($this->modules as $module) {
 			if ($module->isEnabled() && !array_key_exists($action_name, $module->getActions())) {
@@ -338,11 +353,8 @@ class CModuleManager {
 			}
 		}
 
-		if ($action_name != null) {
-			$module = $this->getModuleByActionName($action_name);
-			if ($module instanceof CModule) {
-				$module->$event($action);
-			}
+		if ($current_module) {
+			$this->getModuleByActionName($action_name)->$event($action);
 		}
 	}
 }

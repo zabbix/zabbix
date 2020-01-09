@@ -204,7 +204,7 @@ class CRouter {
 	/**
 	 * Set controller, layout and view associated with the specified action.
 	 *
-	 * @param string $action
+	 * @param string $action     Action name.
 	 */
 	public function setAction($action) {
 		$this->action = $action;
