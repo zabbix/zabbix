@@ -20,6 +20,7 @@
 
 
 class CMenu {
+
 	protected $label;
 	protected $items = [];
 	protected $alias = [];
@@ -44,6 +45,14 @@ class CMenu {
 		}
 	}
 
+	public function getAlias() {
+		return $this->alias;
+	}
+
+	public function getAction() {
+		return $this->action;
+	}
+
 	public function getItems() {
 		return $this->items;
 	}
@@ -52,18 +61,10 @@ class CMenu {
 		return $this->label;
 	}
 
-	public function getAction() {
-		return $this->action;
-	}
-
 	public function getSelected() {
 		return array_reduce($this->items, function($carry, $child) {
 			return $carry || $child->getSelected();
 		}, $this->selected);
-	}
-
-	public function getAlias() {
-		return $this->alias;
 	}
 
 	public function setSelected($action) {
@@ -92,28 +93,33 @@ class CMenu {
 	}
 
 	public function find($label) {
-		return array_key_exists($label, $this->items) ? $this->items[$label] : null;
+		return $this->has($label) ? $this->items[$label] : null;
+	}
+
+	public function has($label) {
+		return array_key_exists($label, $this->items);
 	}
 
 	public function insertBefore($before_label, $label, $data) {
-		if (array_key_exists($before_label, $this->items)) {
-			$index = array_search($before_label, array_keys($this->items));
-			$before = $index > 0 ? array_slice($this->items, 0, $index) : [];
-			$after = $index < count($this->items) ? array_slice($this->items, $index) : [];
-			$this->items = $before + [$label => new CMenu($label, $data)] + $after;
-		}
+		$this->insert($before_label, $label, $data, false);
 
 		return $this;
 	}
 
 	public function insertAfter($after_label, $label, $data) {
-		if (array_key_exists($after_label, $this->items)) {
-			$index = array_search($after_label, array_keys($this->items));
-			$before = $index >= 0 ? array_slice($this->items, 0, $index + 1) : [];
-			$after = $index < count($this->items) ? array_slice($this->items, $index + 1) : [];
-			$this->items = $before + [$label => new CMenu($label, $data)] + $after;
-		}
+		$this->insert($after_label, $label, $data);
 
 		return $this;
+	}
+
+	private function insert($target_label, $label, $data, $after = true) {
+		if ($this->has($target_label)) {
+			$index = array_search($target_label, array_keys($this->items));
+			$before = ($index > 0 || ($after && $index == 0))
+				? array_slice($this->items, 0, $index + ($after ? 1 : 0))
+				: [];
+			$after = $index < count($this->items) ? array_slice($this->items, $index + ($after ? 1 : 0)) : [];
+			$this->items = $before + [$label => new CMenu($label, $data)] + $after;
+		}
 	}
 }
