@@ -21,13 +21,13 @@
 
 package netif
 
-import "fmt"
+import "zabbix.com/pkg/plugin"
 
 func getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
-	err = fmt.Errorf("Unsupported metric.")
+	err = plugin.UnsupportedMetricError
 	return
 }
 
 func getDevList() (string, error) {
-	return "", fmt.Errorf("Unsupported metric.")
+	return "", plugin.UnsupportedMetricError
 }

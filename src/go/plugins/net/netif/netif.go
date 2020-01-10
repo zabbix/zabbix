@@ -69,7 +69,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		direction = dirIn | dirOut
 	default:
 		/* SHOULD_NEVER_HAPPEN */
-		return nil, fmt.Errorf("Unsupported metric.")
+		return nil, plugin.UnsupportedMetricError
 	}
 
 	if len(params) < 1 || params[0] == "" {
