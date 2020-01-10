@@ -105,6 +105,7 @@ func TestNoParameters(t *testing.T) {
 		{metric: "vfs.file.contents", result: false},
 		{metric: "vfs.file.contents[]", result: true},
 		{metric: "vfs.file.contents[/etc/passwd]", result: true},
+		{metric: "vfs.file.contents.ext", result: true},
 	}
 
 	RunScenarios(t, scenarios, records, 1)
@@ -117,7 +118,9 @@ func TestEmptyParameters(t *testing.T) {
 
 	var scenarios = []scenario{
 		{metric: "vfs.file.contents[]", result: false},
+		{metric: "vfs.file.contents[ ]", result: false},
 		{metric: "vfs.file.contents[\"\"]", result: false},
+		{metric: "vfs.file.contents[ \"\" ]", result: false},
 		{metric: "vfs.file.contents", result: true},
 		{metric: "vfs.file.contents[/etc/passwd]", result: true},
 	}
@@ -163,6 +166,8 @@ func TestSpecificFirstParameter(t *testing.T) {
 		{metric: "vfs.file.contents[/etc/passwd,]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd,utf8]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
+		{metric: "vfs.file.contents[ /etc/passwd]", result: false},
+		{metric: "vfs.file.contents[/etc/passwd ]", result: true},
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log]", result: true},
 		{metric: "vfs.file.contents[]", result: true},
 	}
@@ -177,6 +182,8 @@ func TestFirstParameterPattern(t *testing.T) {
 
 	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
+		{metric: "vfs.file.contents[ /etc/passwd]", result: false},
+		{metric: "vfs.file.contents[/etc/passwd ]", result: false},
 		{metric: "vfs.file.contents[/etc/passwd,]", result: true},
 		{metric: "vfs.file.contents[/etc/passwd,utf8]", result: true},
 	}
@@ -236,6 +243,7 @@ func TestEmptySecondParameterValue(t *testing.T) {
 
 	var scenarios = []scenario{
 		{metric: "test[a,,c]", result: false},
+		{metric: "test[a, ,c]", result: false},
 		{metric: "test[a,b,c]", result: true},
 	}
 
@@ -263,6 +271,7 @@ func TestSpecificParameters(t *testing.T) {
 
 	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd,utf8]", result: false},
+		{metric: "vfs.file.contents[/etc/sudoers,utf8]", result: true},
 		{metric: "vfs.file.contents[/etc/passwd,]", result: true},
 		{metric: "vfs.file.contents[/etc/passwd,utf16]", result: true},
 	}
@@ -296,6 +305,7 @@ func TestKeyPatternWithoutParameters(t *testing.T) {
 		{metric: "vfs.file.size", result: false},
 		{metric: "vfs.file.contents[]", result: true},
 		{metric: "vfs.file.size[/var/log/zabbix_server.log]", result: true},
+		{metric: "vfs.dev.list", result: true},
 	}
 
 	RunScenarios(t, scenarios, records, 1)
@@ -329,6 +339,7 @@ func TestWhitelist(t *testing.T) {
 	var scenarios = []scenario{
 		{metric: "vfs.file.size[/var/log/zabbix_server.log]", result: true},
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log]", result: true},
+		{metric: "vfs.file.contents[/tmp/zabbix_server.log]", result: false},
 		{metric: "system.localtime[]", result: true},
 		{metric: "system.localtime[utc]", result: true},
 		{metric: "system.localtime", result: false},
@@ -362,6 +373,9 @@ func TestCombinedWildcardInKey(t *testing.T) {
 
 	var scenarios = []scenario{
 		{metric: "test1[a]", result: false},
+		{metric: "tt1[a]", result: false},
+		{metric: "tet[a]", result: false},
+		{metric: "tt[a]", result: false},
 		{metric: "test_best2[a]", result: false},
 		{metric: "tests[a]", result: false},
 		{metric: "test[a]", result: false},
@@ -457,6 +471,8 @@ func TestIncompleteWhitelist(t *testing.T) {
 	var scenarios = []scenario{
 		{metric: "vfs.file.size[/var/log/zabbix_server.log]", result: true},
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log]", result: true},
+		{metric: "vfs.file.time[/var/log/]", result: true},
+		{metric: "vfs.file.time[/var/log]", result: false},
 		{metric: "system.localtime[]", result: true},
 		{metric: "system.localtime[utc]", result: true},
 		{metric: "system.localtime", result: false},
