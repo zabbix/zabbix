@@ -112,9 +112,9 @@ func addRule(rec Record) (err error) {
 				ruleType = "DenyKey"
 			}
 			if r.Permission == rule.Permission {
-				log.Errf("key access rule \"%s=%s\" duplicates another rule defined above", ruleType, rec.Pattern)
+				log.Warningf("key access rule \"%s=%s\" duplicates another rule defined above", ruleType, rec.Pattern)
 			} else {
-				log.Errf("key access rule \"%s=%s\" conflicts with another rule defined above", ruleType, rec.Pattern)
+				log.Warningf("key access rule \"%s=%s\" conflicts with another rule defined above", ruleType, rec.Pattern)
 			}
 		} else if len(rule.Params) == 0 && rule.Key == "*" {
 			if rule.Permission == DENY {
@@ -177,7 +177,7 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	}
 
 	if allowRules > 0 && denyRules == 0 {
-		log.Errf("Only AllowKey rules defined. Have you forgot to add trailing DenyKey=* ?")
+		log.Warningf("Only AllowKey rules defined. Have you forgot to add trailing DenyKey=* ?")
 	} else {
 		// trailing AllowKey rules are meaningless, because AllowKey=* is default behavior
 		for i := len(rules) - 1; i >= 0; i-- {
