@@ -35,7 +35,7 @@ type RuleType int
 // Rule access types
 const (
 	ALLOW RuleType = iota
-	DENY  RuleType = iota
+	DENY
 )
 
 // Record key access record
@@ -52,8 +52,7 @@ type Rule struct {
 	Params     []string
 }
 
-// Rules key access rules list
-var Rules []*Rule
+var rules []*Rule
 var noMoreRules bool = false
 
 func parse(rec Record) (r *Rule, err error) {
@@ -84,7 +83,7 @@ func parse(rec Record) (r *Rule, err error) {
 }
 
 func findRule(rule *Rule) *Rule {
-	for _, r := range Rules {
+	for _, r := range rules {
 		if rule.Key != r.Key || len(rule.Params) != len(r.Params) {
 			continue
 		}
@@ -119,19 +118,24 @@ func addRule(rec Record) (err error) {
 			}
 		} else if len(rule.Params) == 0 && rule.Key == "*" {
 			if rule.Permission == DENY {
-				Rules = append(Rules, rule)
+				rules = append(rules, rule)
 			}
 			noMoreRules = true // any rules after "allow/deny all" are meaningless
 		} else {
-			Rules = append(Rules, rule)
+			rules = append(rules, rule)
 		}
 	}
 	return nil
 }
 
+// GetNumberOfRules returns a number of access rules configured
+func GetNumberOfRules() int {
+	return len(rules)
+}
+
 // LoadRules adds key access records to access rule list
 func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
-	Rules = Rules[:0]
+	rules = rules[:0]
 	noMoreRules = false
 
 	var records []Record
@@ -163,7 +167,7 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	}
 
 	var allowRules, denyRules int = 0, 0
-	for _, r := range Rules {
+	for _, r := range rules {
 		switch r.Permission {
 		case ALLOW:
 			allowRules++
@@ -182,12 +186,12 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 		}
 	} else {
 		// trailing AllowKey rules are meaningless, because AllowKey=* is default behavior
-		for i := len(Rules) - 1; i >= 0; i-- {
-			r := Rules[i]
+		for i := len(rules) - 1; i >= 0; i-- {
+			r := rules[i]
 			if r.Permission == DENY {
 				break
 			}
-			Rules = Rules[:len(Rules)-1]
+			rules = rules[:len(rules)-1]
 		}
 	}
 
@@ -200,7 +204,7 @@ func CheckRules(key string, params []string) (result bool) {
 
 	emptyParams := len(params) == 1 && len(params[0]) == 0
 
-	for _, r := range Rules {
+	for _, r := range rules {
 		numParamsRule := len(r.Params)
 		numParams := len(params)
 

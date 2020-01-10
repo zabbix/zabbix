@@ -55,8 +55,8 @@ func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRule
 		t.Errorf("Failed to load rules: %s", err.Error())
 	}
 
-	if numRules != len(Rules) {
-		t.Errorf("Number of rules does not match: %d; expected: %d", len(Rules), numRules)
+	if numRules != GetNumberOfRules() {
+		t.Errorf("Number of rules does not match: %d; expected: %d", GetNumberOfRules(), numRules)
 	}
 
 	for _, test := range scenarios {
