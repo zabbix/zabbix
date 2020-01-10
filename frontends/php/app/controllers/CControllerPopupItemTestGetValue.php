@@ -37,7 +37,6 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'follow_redirects'		=> 'in 0,1',
 			'key'					=> 'string',
 			'interface'				=> 'array',
-			'interfaceid'			=> 'id',
 			'ipmi_sensor'			=> 'string',
 			'item_type'				=> 'required|in '.implode(',', self::$testable_item_types),
 			'jmx_endpoint'			=> 'string',

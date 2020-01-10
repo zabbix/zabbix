@@ -598,34 +598,33 @@ abstract class CControllerPopupItemTest extends CController {
 		// Get values from database; resolve macros.
 		if (($this->host['status'] == HOST_STATUS_MONITORED || $this->host['status'] == HOST_STATUS_NOT_MONITORED)
 				&& array_key_exists('interfaceid', $inputs)) {
-			$interface = array_key_exists('interfaceid', $inputs)
+			$interfaces = array_key_exists('interfaceid', $inputs)
 				? API::HostInterface()->get([
 					'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip'],
 					'interfaceids' => $inputs['interfaceid'],
 					'hostids' => $this->host['hostid']
 				])
-				: null;
+				: [];
 
-			// SNMP items has it's own port field.
-			if (in_array($this->item_type, [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])) {
-				if (array_key_exists('port', $inputs) && $inputs['port'] !== '') {
-					$interface[0]['port'] = $inputs['port'];
+			if (count($interfaces) > 0) {
+				// SNMP items has it's own port field.
+				if (in_array($this->item_type, [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])
+						&& array_key_exists('port', $inputs) && $inputs['port'] !== '') {
+					$interfaces[0]['port'] = $inputs['port'];
 				}
 				unset($inputs['port']);
-			}
 
-			if ($interface) {
-				$interface = CMacrosResolverHelper::resolveHostInterfaces($interface);
+				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
 
 				$interface_data = [
-					'address' => ($interface[0]['useip'] == INTERFACE_USE_IP)
-						? $interface[0]['ip']
-						: $interface[0]['dns'],
-					'port' => $interface[0]['port'],
-					'useip' => $interface[0]['useip'],
-					'ip' => $interface[0]['ip'],
-					'dns' => $interface[0]['dns'],
-					'interfaceid' => $interface[0]['interfaceid']
+					'address' => ($interfaces[0]['useip'] == INTERFACE_USE_IP)
+						? $interfaces[0]['ip']
+						: $interfaces[0]['dns'],
+					'port' => $interfaces[0]['port'],
+					'useip' => $interfaces[0]['useip'],
+					'ip' => $interfaces[0]['ip'],
+					'dns' => $interfaces[0]['dns'],
+					'interfaceid' => $interfaces[0]['interfaceid']
 				];
 			}
 		}
