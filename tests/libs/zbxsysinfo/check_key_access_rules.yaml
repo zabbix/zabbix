@@ -464,7 +464,7 @@ in:
     - pattern: 'system.localtime[*]'
       type: ZBX_KEY_ACCESS_ALLOW
 out:
-  number_of_rules: 3
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.size[/var/log/zabbix_server.log]'
       result: ZBX_KEY_ACCESS_ALLOW
@@ -475,7 +475,7 @@ out:
     - metric: 'system.localtime[utc]'
       result: ZBX_KEY_ACCESS_ALLOW
     - metric: 'system.localtime'
-      result: ZBX_KEY_ACCESS_DENY
+      result: ZBX_KEY_ACCESS_ALLOW
 ---
 test case: No trailing AllowKey rules
 in:
