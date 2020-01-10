@@ -270,7 +270,7 @@ if (hasRequest('form')) {
 		$data['children'] = [];
 		if ($service['dependencies']) {
 			$child_services = API::Service()->get([
-				'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
+				'serviceids' => array_column($service['dependencies'], 'servicedownid'),
 				'selectTrigger' => ['description'],
 				'output' => ['name', 'triggerid'],
 				'preservekeys' => true,

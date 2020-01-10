@@ -49,7 +49,7 @@ class CControllerNotificationsRead extends CController {
 			'preservekeys' => true
 		]);
 
-		$recovery_eventids = array_filter(zbx_objectValues($events, 'r_eventid'));
+		$recovery_eventids = array_filter(array_column($events, 'r_eventid'));
 		if ($recovery_eventids) {
 			$events += API::Event()->get([
 				'output' => ['clock'],

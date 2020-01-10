@@ -87,7 +87,7 @@ class CTemplateScreenItem extends CApiService {
 		// fill result with real resourceid
 		if ($options['hostids'] && $result) {
 			if (empty($options['screenitemid'])) {
-				$options['screenitemid'] = zbx_objectValues($result, 'screenitemid');
+				$options['screenitemid'] = array_column($result, 'screenitemid');
 			}
 
 			$dbTemplateScreens = API::TemplateScreen()->get([

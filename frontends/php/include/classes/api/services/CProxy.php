@@ -222,7 +222,7 @@ class CProxy extends CApiService {
 			if (!empty($proxy['hosts'])) {
 				$hostUpdate[] = [
 					'values' => ['proxy_hostid' => $proxyids[$key]],
-					'where' => ['hostid' => zbx_objectValues($proxy['hosts'], 'hostid')]
+					'where' => ['hostid' => array_column($proxy['hosts'], 'hostid')]
 				];
 			}
 
@@ -255,7 +255,7 @@ class CProxy extends CApiService {
 
 		$proxies = zbx_toArray($proxies);
 
-		$proxyids = zbx_objectValues($proxies, 'proxyid');
+		$proxyids = array_column($proxies, 'proxyid');
 
 		foreach ($proxies as &$proxy) {
 			if (array_key_exists('proxyid', $proxy)) {
@@ -336,7 +336,7 @@ class CProxy extends CApiService {
 
 				$hostUpdate[] = [
 					'values' => ['proxy_hostid' => $proxy['proxyid']],
-					'where' => ['hostid' => zbx_objectValues($proxy['hosts'], 'hostid')]
+					'where' => ['hostid' => array_column($proxy['hosts'], 'hostid')]
 				];
 			}
 
@@ -347,7 +347,7 @@ class CProxy extends CApiService {
 					'hostids' => $proxy['hostid'],
 					'output' => ['interfaceid']
 				]);
-				$interfaceIds = zbx_objectValues($interfaces, 'interfaceid');
+				$interfaceIds = array_column($interfaces, 'interfaceid');
 
 				if ($interfaceIds) {
 					API::HostInterface()->delete($interfaceIds);
@@ -675,7 +675,7 @@ class CProxy extends CApiService {
 			}
 
 			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {
-				$hostids = array_merge($hostids, zbx_objectValues($proxy['hosts'], 'hostid'));
+				$hostids = array_merge($hostids, array_column($proxy['hosts'], 'hostid'));
 			}
 
 			// Property 'auto_compress' is read-only.
@@ -799,7 +799,7 @@ class CProxy extends CApiService {
 			}
 
 			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {
-				$hostids = array_merge($hostids, zbx_objectValues($proxy['hosts'], 'hostid'));
+				$hostids = array_merge($hostids, array_column($proxy['hosts'], 'hostid'));
 			}
 		}
 

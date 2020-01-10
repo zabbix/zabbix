@@ -201,7 +201,7 @@ class CService extends CApiService {
 			}
 		}
 
-		$this->checkServicePermissions(zbx_objectValues($services, 'serviceid'));
+		$this->checkServicePermissions(array_column($services, 'serviceid'));
 
 		$services = $this->extendObjects($this->tableName(), $services, ['name']);
 		foreach ($services as $service) {
@@ -299,7 +299,7 @@ class CService extends CApiService {
 
 		// replace dependencies
 		if ($deleteParentsForServiceIds) {
-			$this->deleteParentDependencies(zbx_objectValues($services, 'serviceid'));
+			$this->deleteParentDependencies(array_column($services, 'serviceid'));
 		}
 		if ($deleteDependenciesForServiceIds) {
 			$this->deleteDependencies(array_unique($deleteDependenciesForServiceIds));
@@ -318,7 +318,7 @@ class CService extends CApiService {
 
 		updateItServices();
 
-		return ['serviceids' => zbx_objectValues($services, 'serviceid')];
+		return ['serviceids' => array_column($services, 'serviceid')];
 	}
 
 	/**
@@ -372,12 +372,11 @@ class CService extends CApiService {
 			}
 		}
 
-		$serviceIds = array_merge(
-			zbx_objectValues($dependencies, 'serviceid'),
-			zbx_objectValues($dependencies, 'dependsOnServiceid')
-		);
-		$serviceIds = array_unique($serviceIds);
-		$this->checkServicePermissions($serviceIds);
+		$serviceids = array_unique(array_merge(
+			array_column($dependencies, 'serviceid'),
+			array_column($dependencies, 'dependsOnServiceid')
+		));
+		$this->checkServicePermissions($serviceids);
 
 		foreach ($dependencies as $dependency) {
 			$this->checkDependency($dependency);
@@ -415,7 +414,7 @@ class CService extends CApiService {
 		}
 		DB::insert('services_links', $data);
 
-		return ['serviceids' => zbx_objectValues($dependencies, 'serviceid')];
+		return ['serviceids' => array_column($dependencies, 'serviceid')];
 	}
 
 	/**
@@ -467,7 +466,7 @@ class CService extends CApiService {
 			);
 		}
 
-		$this->checkServicePermissions(array_unique(zbx_objectValues($serviceTimes, 'serviceid')));
+		$this->checkServicePermissions(array_unique(array_column($serviceTimes, 'serviceid')));
 	}
 
 	/**
@@ -483,7 +482,7 @@ class CService extends CApiService {
 
 		DB::insert('services_times', $serviceTimes);
 
-		return ['serviceids' => zbx_objectValues($serviceTimes, 'serviceid')];
+		return ['serviceids' => array_column($serviceTimes, 'serviceid')];
 	}
 
 	/**
@@ -1125,7 +1124,7 @@ class CService extends CApiService {
 	 * @param array $dependencies
 	 */
 	protected function checkThatParentsDontHaveTriggers(array $dependencies) {
-		$parentServiceIds = array_unique(zbx_objectValues($dependencies, 'serviceid'));
+		$parentServiceIds = array_unique(array_column($dependencies, 'serviceid'));
 		if ($parentServiceIds) {
 			$query = DBselect(
 				'SELECT s.triggerid,s.name'.
@@ -1213,7 +1212,7 @@ class CService extends CApiService {
 					'output' => ['triggerid'],
 					'triggerids' => $options['filter']['triggerid']
 				]);
-				$options['filter']['triggerid'] = zbx_objectValues($accessibleTriggers, 'triggerid');
+				$options['filter']['triggerid'] = array_column($accessibleTriggers, 'triggerid');
 			}
 			// otherwise return services with either no triggers, or any trigger accessible to the current user
 			else {

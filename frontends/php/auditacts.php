@@ -133,7 +133,7 @@ if (!$data['alias'] || $data['users']) {
 	if (!$data['alias']) {
 		$data['users'] = API::User()->get([
 			'output' => ['userid', 'alias', 'name', 'surname'],
-			'userids' => zbx_objectValues($data['alerts'], 'userid'),
+			'userids' => array_column($data['alerts'], 'userid'),
 			'preservekeys' => true
 		]);
 	}
@@ -143,7 +143,7 @@ if (!$data['alias'] || $data['users']) {
 if ($data['alerts']) {
 	$data['actions'] = API::Action()->get([
 		'output' => ['actionid', 'name'],
-		'actionids' => array_unique(zbx_objectValues($data['alerts'], 'actionid')),
+		'actionids' => array_unique(array_column($data['alerts'], 'actionid')),
 		'preservekeys' => true
 	]);
 }

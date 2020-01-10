@@ -80,7 +80,7 @@ class CSvgGraphHelper {
 		if ($options['problems']['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
 			$options['problems']['itemids'] =
 				($options['problems']['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
-					? array_unique(zbx_objectValues($metrics, 'itemid'))
+					? array_unique(array_column($metrics, 'itemid'))
 					: null;
 
 			$problems = self::getProblems($options['problems'], $options['time_period']);
@@ -495,7 +495,7 @@ class CSvgGraphHelper {
 		if ($events) {
 			$r_events = API::Event()->get([
 				'output' => ['clock'],
-				'eventids' => zbx_objectValues($events, 'r_eventid'),
+				'eventids' => array_column($events, 'r_eventid'),
 				'preservekeys' => true
 			]);
 		}

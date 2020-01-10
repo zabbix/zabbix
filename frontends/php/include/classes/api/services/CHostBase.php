@@ -232,8 +232,8 @@ abstract class CHostBase extends CApiService {
 				'nopermissions' => true,
 			]);
 
-			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
-			$templates = implode(', ', zbx_objectValues($templates, 'host'));
+			$hosts = implode(', ', array_column($hosts, 'host'));
+			$templates = implode(', ', array_column($templates, 'host'));
 
 			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
 		}

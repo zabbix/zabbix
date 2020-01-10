@@ -160,7 +160,7 @@ class CScreenItem extends CApiService {
 
 		$this->validateItemsURL($screenItems);
 
-		$screenIds = array_keys(array_flip(zbx_objectValues($screenItems, 'screenid')));
+		$screenIds = array_keys(array_column($screenItems, 'screenid', 'screenid'));
 
 		$dbScreens = API::Screen()->get([
 			'output' => ['screenid', 'hsize', 'vsize', 'name'],
@@ -339,7 +339,7 @@ class CScreenItem extends CApiService {
 
 		$dbScreenItems = $this->get([
 			'output' => ['screenitemid', 'screenid', 'x', 'y'],
-			'screenids' => zbx_objectValues($screenItems, 'screenid'),
+			'screenids' => array_column($screenItems, 'screenid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);

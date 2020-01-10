@@ -525,7 +525,7 @@ if (hasRequest('action') && hasRequest('group_httptestid') && !$result) {
 		'editable' => true
 	]);
 
-	uncheckTableRows(getRequest('hostid'), zbx_objectValues($httptests, 'httptestid'));
+	uncheckTableRows(getRequest('hostid'), array_column($httptests, 'httptestid'));
 }
 
 show_messages();
@@ -810,7 +810,7 @@ else {
 				' FROM httptest ht'.
 				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
 				' LEFT JOIN applications a ON a.applicationid=ht.applicationid'.
-				' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
+				' WHERE '.dbConditionInt('ht.httptestid', array_column($httpTests, 'httptestid'))
 		);
 		$httpTests = [];
 		while ($dbHttpTest = DBfetch($dbHttpTests)) {
@@ -855,7 +855,7 @@ else {
 		$dbHttpSteps = DBselect(
 			'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
 				' FROM httpstep hs'.
-				' WHERE '.dbConditionInt('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
+				' WHERE '.dbConditionInt('hs.httptestid', array_column($httpTests, 'httptestid')).
 				' GROUP BY hs.httptestid'
 		);
 		while ($dbHttpStep = DBfetch($dbHttpSteps)) {

@@ -304,8 +304,8 @@ class CUser extends CApiService {
 		}
 		unset($user);
 
-		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
-		$this->checkLanguages(zbx_objectValues($users, 'lang'));
+		$this->checkDuplicates(array_column($users, 'alias'));
+		$this->checkLanguages(array_column($users, 'lang'));
 		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -358,7 +358,7 @@ class CUser extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, $users, $db_users);
 
-		return ['userids' => zbx_objectValues($users, 'userid')];
+		return ['userids' => array_column($users, 'userid')];
 	}
 
 	/**
@@ -402,7 +402,7 @@ class CUser extends CApiService {
 
 		$db_users = $this->get([
 			'output' => [],
-			'userids' => zbx_objectValues($users, 'userid'),
+			'userids' => array_column($users, 'userid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -450,7 +450,7 @@ class CUser extends CApiService {
 		if ($aliases) {
 			$this->checkDuplicates($aliases);
 		}
-		$this->checkLanguages(zbx_objectValues($users, 'lang'));
+		$this->checkLanguages(array_column($users, 'lang'));
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -724,7 +724,7 @@ class CUser extends CApiService {
 				if (array_key_exists('usrgrps', $user)) {
 					$db_usrgrps = DB::select('usrgrp', [
 						'output' => ['gui_access', 'users_status'],
-						'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid')
+						'usrgrpids' => array_column($user['usrgrps'], 'usrgrpid')
 					]);
 
 					foreach ($db_usrgrps as $db_usrgrp) {
@@ -1413,7 +1413,7 @@ class CUser extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$userIds = zbx_objectValues($result, 'userid');
+		$userIds = array_column($result, 'userid');
 
 		// adding usergroups
 		if ($options['selectUsrgrps'] !== null && $options['selectUsrgrps'] != API_OUTPUT_COUNT) {
@@ -1442,7 +1442,7 @@ class CUser extends CApiService {
 				$db_email_medias = DB::select('media_type', [
 					'output' => [],
 					'filter' => [
-						'mediatypeid' => zbx_objectValues($db_medias, 'mediatypeid'),
+						'mediatypeid' => array_column($db_medias, 'mediatypeid'),
 						'type' => MEDIA_TYPE_EMAIL
 					],
 					'preservekeys' => true

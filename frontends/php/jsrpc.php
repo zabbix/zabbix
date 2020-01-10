@@ -526,7 +526,7 @@ switch ($data['method']) {
 		];
 
 		if ($db_result) {
-			$db_result = array_flip(zbx_objectValues($db_result, 'name'));
+			$db_result = array_column($db_result, 'name', 'name');
 
 			if (array_key_exists($search, $db_result)) {
 				unset($db_result[$search]);

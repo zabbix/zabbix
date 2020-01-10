@@ -86,7 +86,7 @@ foreach ($this->data['triggers'] as $trigger) {
 			$depTrigger = $data['dependencyTriggers'][$dependency['triggerid']];
 
 			$depTriggerDescription = CHtml::encode(
-				implode(', ', zbx_objectValues($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description']
+				implode(', ', array_column($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description']
 			);
 
 			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {

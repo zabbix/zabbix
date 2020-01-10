@@ -106,7 +106,7 @@ abstract class CTriggerGeneral extends CApiService {
 		unset($trigger['triggerid']);
 
 		if (array_key_exists('dependencies', $trigger)) {
-			$deps = zbx_objectValues($trigger['dependencies'], 'triggerid');
+			$deps = array_column($trigger['dependencies'], 'triggerid');
 			$trigger['dependencies'] = replace_template_dependencies($deps, $host['hostid']);
 		}
 
@@ -690,7 +690,7 @@ abstract class CTriggerGeneral extends CApiService {
 				'manual_close', 'opdata'
 			],
 			'selectDependencies' => ['triggerid'],
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+			'triggerids' => array_column($triggers, 'triggerid'),
 			'editable' => true,
 			'preservekeys' => true
 		];
@@ -1576,8 +1576,8 @@ abstract class CTriggerGeneral extends CApiService {
 
 		foreach ($templates as &$template) {
 			$template = array_merge(
-				zbx_objectValues($template['hosts'], 'hostid'),
-				zbx_objectValues($template['templates'], 'templateid')
+				array_column($template['hosts'], 'hostid'),
+				array_column($template['templates'], 'templateid')
 			);
 		}
 		unset($template);

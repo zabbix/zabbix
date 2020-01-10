@@ -545,7 +545,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
-		return ['triggerids' => zbx_objectValues($triggers, 'triggerid')];
+		return ['triggerids' => array_column($triggers, 'triggerid')];
 	}
 
 	/**
@@ -573,7 +573,7 @@ class CTrigger extends CTriggerGeneral {
 			if ($expressions_changed && $db_trigger['dependencies'] && !array_key_exists('dependencies', $trigger)) {
 				$validate_dependencies[] = [
 					'triggerid' => $trigger['triggerid'],
-					'dependencies' => zbx_objectValues($db_trigger['dependencies'], 'triggerid')
+					'dependencies' => array_column($db_trigger['dependencies'], 'triggerid')
 				];
 			}
 		}
@@ -605,7 +605,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
-		return ['triggerids' => zbx_objectValues($triggers, 'triggerid')];
+		return ['triggerids' => array_column($triggers, 'triggerid')];
 	}
 
 	/**
@@ -678,7 +678,7 @@ class CTrigger extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$triggerids = array_unique(zbx_objectValues($triggersData, 'triggerid'));
+		$triggerids = array_unique(array_column($triggersData, 'triggerid'));
 
 		$permission_check = $inherited
 			? ['nopermissions' => true]
@@ -786,7 +786,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
-		return ['triggerids' => array_unique(zbx_objectValues($triggersData, 'triggerid'))];
+		return ['triggerids' => array_unique(array_column($triggersData, 'triggerid'))];
 	}
 
 	/**
@@ -802,7 +802,7 @@ class CTrigger extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$triggerids = array_unique(zbx_objectValues($triggers, 'triggerid'));
+		$triggerids = array_unique(array_column($triggers, 'triggerid'));
 
 		$permission_check = $inherited
 			? ['nopermissions' => true]
@@ -845,7 +845,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$this->validateDeleteDependencies($triggers, $inherited);
 
-		$triggerids = zbx_objectValues($triggers, 'triggerid');
+		$triggerids = array_column($triggers, 'triggerid');
 
 		try {
 			// delete the dependencies from the child triggers
@@ -1006,10 +1006,10 @@ class CTrigger extends CTriggerGeneral {
 				'triggerids' => $trigger['dependencies'],
 				'nopermissions' => true,
 			]);
-			$depTemplateIds = zbx_toHash(zbx_objectValues($triggerDependencyTemplates, 'templateid'));
+			$depTemplateIds = zbx_toHash(array_column($triggerDependencyTemplates, 'templateid'));
 
 			// run the check only if a templated trigger has dependencies on other templates
-			$triggerTemplateIds = zbx_toHash(zbx_objectValues($triggerTemplates, 'templateid'));
+			$triggerTemplateIds = zbx_toHash(array_column($triggerTemplates, 'templateid'));
 			$tdiff = array_diff($depTemplateIds, $triggerTemplateIds);
 			if (!empty($triggerTemplateIds) && !empty($depTemplateIds) && !empty($tdiff)) {
 				$affectedTemplateIds = zbx_array_merge($triggerTemplateIds, $depTemplateIds);
@@ -1345,7 +1345,7 @@ class CTrigger extends CTriggerGeneral {
 		// unset triggers which depend on at least one problem trigger upstream into dependency tree
 		if ($options['skipDependent'] !== null) {
 			// Result trigger IDs of all triggers in results.
-			$resultTriggerIds = zbx_objectValues($triggers, 'triggerid');
+			$resultTriggerIds = array_column($triggers, 'triggerid');
 
 			// Will contain IDs of all triggers on which some other trigger depends.
 			$allUpTriggerIds = [];
@@ -1470,7 +1470,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// withLastEventUnacknowledged
 		if ($options['withLastEventUnacknowledged'] !== null) {
-			$triggerIds = zbx_objectValues($triggers, 'triggerid');
+			$triggerIds = array_column($triggers, 'triggerid');
 			$eventIds = [];
 			$eventsDb = DBselect(
 				'SELECT MAX(e.eventid) AS eventid,e.objectid'.

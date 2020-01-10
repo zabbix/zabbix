@@ -541,7 +541,7 @@ class CHostGroup extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groups, $db_groups);
 
-		return ['groupids' => zbx_objectValues($groups, 'groupid')];
+		return ['groupids' => array_column($groups, 'groupid')];
 	}
 
 	/**
@@ -702,7 +702,7 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(zbx_objectValues($groups, 'name'));
+		$this->checkDuplicates(array_column($groups, 'name'));
 	}
 
 	/**
@@ -828,7 +828,7 @@ class CHostGroup extends CApiService {
 		// permissions
 		$db_groups = $this->get([
 			'output' => ['groupid', 'name', 'flags'],
-			'groupids' => zbx_objectValues($groups, 'groupid'),
+			'groupids' => array_column($groups, 'groupid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -877,9 +877,9 @@ class CHostGroup extends CApiService {
 
 		$this->validateMassAdd($data);
 
-		$groupIds = zbx_objectValues($data['groups'], 'groupid');
-		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
-		$templateIds = zbx_objectValues($data['templates'], 'templateid');
+		$groupIds = array_column($data['groups'], 'groupid');
+		$hostIds = array_column($data['hosts'], 'hostid');
+		$templateIds = array_column($data['templates'], 'templateid');
 
 		$objectIds = array_merge($hostIds, $templateIds);
 		$objectIds = array_keys(array_flip($objectIds));
@@ -960,9 +960,9 @@ class CHostGroup extends CApiService {
 
 		$this->validateMassUpdate($data);
 
-		$groupIds = zbx_objectValues($data['groups'], 'groupid');
-		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
-		$templateIds = zbx_objectValues($data['templates'], 'templateid');
+		$groupIds = array_column($data['groups'], 'groupid');
+		$hostIds = array_column($data['hosts'], 'hostid');
+		$templateIds = array_column($data['templates'], 'templateid');
 
 		$objectIds = zbx_toHash(array_merge($hostIds, $templateIds));
 
@@ -995,7 +995,7 @@ class CHostGroup extends CApiService {
 			}
 
 			// find records for create
-			$groupHostIds = zbx_toHash(zbx_objectValues($groupRecords, 'hostid'));
+			$groupHostIds = zbx_toHash(array_column($groupRecords, 'hostid'));
 
 			$newHostIds = array_diff($objectIds, $groupHostIds);
 			foreach ($newHostIds as $newHostId) {
@@ -1022,9 +1022,9 @@ class CHostGroup extends CApiService {
 	 * @throws APIException		if user has no write permissions to any of the given host groups
 	 */
 	protected function validateMassAdd(array $data) {
-		$groupIds = zbx_objectValues($data['groups'], 'groupid');
-		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
-		$templateIds = zbx_objectValues($data['templates'], 'templateid');
+		$groupIds = array_column($data['groups'], 'groupid');
+		$hostIds = array_column($data['hosts'], 'hostid');
+		$templateIds = array_column($data['templates'], 'templateid');
 
 		$groupIdsToAdd = [];
 
@@ -1044,7 +1044,7 @@ class CHostGroup extends CApiService {
 			]));
 
 			foreach ($dbHosts as $dbHost) {
-				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
+				$oldGroupIds = array_column($dbHost['groups'], 'groupid');
 
 				foreach (array_diff($groupIds, $oldGroupIds) as $groupId) {
 					$groupIdsToAdd[$groupId] = $groupId;
@@ -1064,7 +1064,7 @@ class CHostGroup extends CApiService {
 			$this->validateHostsPermissions($templateIds, $dbTemplates);
 
 			foreach ($dbTemplates as $dbTemplate) {
-				$oldGroupIds = zbx_objectValues($dbTemplate['groups'], 'groupid');
+				$oldGroupIds = array_column($dbTemplate['groups'], 'groupid');
 
 				foreach (array_diff($groupIds, $oldGroupIds) as $groupId) {
 					$groupIdsToAdd[$groupId] = $groupId;
@@ -1100,9 +1100,9 @@ class CHostGroup extends CApiService {
 	 *							templates is left without a host group
 	 */
 	protected function validateMassUpdate(array $data) {
-		$groupIds = zbx_objectValues($data['groups'], 'groupid');
-		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
-		$templateIds = zbx_objectValues($data['templates'], 'templateid');
+		$groupIds = array_column($data['groups'], 'groupid');
+		$hostIds = array_column($data['hosts'], 'hostid');
+		$templateIds = array_column($data['templates'], 'templateid');
 
 		$dbGroups = $this->get([
 			'output' => ['groupid'],
@@ -1148,7 +1148,7 @@ class CHostGroup extends CApiService {
 			]));
 
 			foreach ($dbHosts as $dbHost) {
-				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
+				$oldGroupIds = array_column($dbHost['groups'], 'groupid');
 
 				// Validate groups that are added for current host.
 				foreach (array_diff($groupIds, $oldGroupIds) as $groupId) {
@@ -1182,7 +1182,7 @@ class CHostGroup extends CApiService {
 			$this->validateHostsPermissions($templateIds, $dbTemplates);
 
 			foreach ($dbTemplates as $dbTemplate) {
-				$oldGroupIds = zbx_objectValues($dbTemplate['groups'], 'groupid');
+				$oldGroupIds = array_column($dbTemplate['groups'], 'groupid');
 
 				// Validate groups that are added for current template.
 				foreach (array_diff($groupIds, $oldGroupIds) as $groupId) {
@@ -1284,7 +1284,7 @@ class CHostGroup extends CApiService {
 			]));
 
 			foreach ($dbHosts as $dbHost) {
-				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
+				$oldGroupIds = array_column($dbHost['groups'], 'groupid');
 
 				// check if host belongs to the removable host group
 				$hostGroupIdsToRemove = array_intersect($data['groupids'], $oldGroupIds);
@@ -1311,7 +1311,7 @@ class CHostGroup extends CApiService {
 			$this->validateHostsPermissions($templateIds, $dbTemplates);
 
 			foreach ($dbTemplates as $dbTemplate) {
-				$oldGroupIds = zbx_objectValues($dbTemplate['groups'], 'groupid');
+				$oldGroupIds = array_column($dbTemplate['groups'], 'groupid');
 
 				// check if template belongs to the removable host group
 				$templateGroupIdsToRemove = array_intersect($data['groupids'], $oldGroupIds);

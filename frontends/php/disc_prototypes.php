@@ -633,7 +633,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$item = CArrayHelper::unsetEqualValues($item, $db_item);
 			$item['itemid'] = $itemId;
 
-			$db_item['applications'] = zbx_objectValues($db_item['applications'], 'applicationid');
+			$db_item['applications'] = array_column($db_item['applications'], 'applicationid');
 
 			// compare applications
 			natsort($db_item['applications']);
@@ -644,10 +644,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			// compare application prototypes
-			$db_application_prototype_names = zbx_objectValues($db_item['applicationPrototypes'], 'name');
+			$db_application_prototype_names = array_column($db_item['applicationPrototypes'], 'name');
 			natsort($db_application_prototype_names);
 
-			$application_prototype_names = zbx_objectValues($application_prototypes, 'name');
+			$application_prototype_names = array_column($application_prototypes, 'name');
 			natsort($application_prototype_names);
 
 			if (array_values($db_application_prototype_names) !== array_values($application_prototype_names)) {
@@ -1018,7 +1018,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							if (array_key_exists('applications', $visible)) {
 								if ($applicationids) {
 									// If there are existing applications submitted.
-									$db_applicationids = zbx_objectValues(
+									$db_applicationids = array_column(
 										$item_prototypes[$item_prototypeid]['applications'],
 										'applicationid'
 									);
@@ -1059,7 +1059,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							if (array_key_exists('applicationPrototypes', $visible)) {
 								$ex_application_prototypes
 									= $item_prototypes[$item_prototypeid]['applicationPrototypes'];
-								$ex_application_prototypeids = zbx_objectValues($ex_application_prototypes,
+								$ex_application_prototypeids = array_column($ex_application_prototypes,
 									'application_prototypeid'
 								);
 								$upd_application_prototypeids = [];
@@ -1078,7 +1078,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 										if ($new_application_prototypes) {
 											foreach ($new_application_prototypes as $new_application_prototype) {
 												if (!in_array($new_application_prototype['name'],
-														zbx_objectValues($application_prototypes, 'name'))) {
+														array_column($application_prototypes, 'name'))) {
 													$application_prototypes[] = $new_application_prototype;
 												}
 											}
@@ -1101,7 +1101,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 										if ($new_application_prototypes) {
 											foreach ($new_application_prototypes as $new_application_prototype) {
 												if (!in_array($new_application_prototype['name'],
-														zbx_objectValues($application_prototypes, 'name'))) {
+														array_column($application_prototypes, 'name'))) {
 													$application_prototypes[] = $new_application_prototype;
 												}
 											}
@@ -1134,8 +1134,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									// Append those application prototypes to update list.
 									foreach ($db_application_prototypes as $db_application_prototype) {
 										if (!in_array($db_application_prototype['application_prototypeid'],
-												zbx_objectValues($application_prototypes,
-													'application_prototypeid'))) {
+												array_column($application_prototypes, 'application_prototypeid'))) {
 											$application_prototypes[] = $db_application_prototype;
 										}
 									}
@@ -1196,7 +1195,7 @@ if (hasRequest('action') && getRequest('action') !== 'itemprototype.massupdatefo
 		'output' => [],
 		'editable' => true
 	]);
-	uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($item_prototypes, 'itemid'));
+	uncheckTableRows(getRequest('parent_discoveryid'), array_column($item_prototypes, 'itemid'));
 }
 
 /*

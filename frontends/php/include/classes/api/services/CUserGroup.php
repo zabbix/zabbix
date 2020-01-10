@@ -225,7 +225,7 @@ class CUserGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(zbx_objectValues($usrgrps, 'name'));
+		$this->checkDuplicates(array_column($usrgrps, 'name'));
 		$this->checkUsers($usrgrps);
 		$this->checkHimself($usrgrps, __FUNCTION__);
 		$this->checkHostGroups($usrgrps);
@@ -278,7 +278,7 @@ class CUserGroup extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 
-		return ['usrgrpids'=> zbx_objectValues($usrgrps, 'usrgrpid')];
+		return ['usrgrpids'=> array_column($usrgrps, 'usrgrpid')];
 	}
 
 	/**
@@ -316,7 +316,7 @@ class CUserGroup extends CApiService {
 		// Check user group names.
 		$db_usrgrps = DB::select('usrgrp', [
 			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
-			'usrgrpids' => zbx_objectValues($usrgrps, 'usrgrpid'),
+			'usrgrpids' => array_column($usrgrps, 'usrgrpid'),
 			'preservekeys' => true
 		]);
 

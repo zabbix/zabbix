@@ -326,7 +326,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 	protected function inherit($graph, $hostids = null) {
 		$graphTemplates = API::Template()->get([
-			'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+			'itemids' => array_column($graph['gitems'], 'itemid'),
 			'output' => ['templateid'],
 			'nopermissions' => true
 		]);
@@ -447,7 +447,7 @@ class CGraphPrototype extends CGraphGeneral {
 					foreach([API::Item(), API::ItemPrototype()] as $api) {
 						$chdGraphItemItems += $api->get([
 							'output' => ['key_', 'hostid', 'itemid'],
-							'itemids' => zbx_objectValues($chdGraph['gitems'], 'itemid'),
+							'itemids' => array_column($chdGraph['gitems'], 'itemid'),
 							'preservekeys' => true
 						]);
 					}
@@ -727,7 +727,7 @@ class CGraphPrototype extends CGraphGeneral {
 		foreach ($allowedItems as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
 				foreach ($dbGraphs as $dbGraph) {
-					$itemIdsInGraphItems = zbx_objectValues($dbGraph['gitems'], 'itemid');
+					$itemIdsInGraphItems = array_column($dbGraph['gitems'], 'itemid');
 					if (in_array($item['itemid'], $itemIdsInGraphItems)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".',

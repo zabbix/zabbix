@@ -209,7 +209,7 @@ elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdel
 			'output' => [],
 			'editable' => true
 		]);
-		uncheckTableRows(null, zbx_objectValues($maintenances, 'maintenanceid'));
+		uncheckTableRows(null, array_column($maintenances, 'maintenanceid'));
 	}
 
 	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));

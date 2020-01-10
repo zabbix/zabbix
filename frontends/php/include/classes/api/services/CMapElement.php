@@ -37,7 +37,7 @@ abstract class CMapElement extends CApiService {
 		$elementtype_validator = new CLimitedSetValidator(['values' => $element_types]);
 
 		if ($update) {
-			$db_selements = $this->fetchSelementsByIds(zbx_objectValues($selements, 'selementid'));
+			$db_selements = $this->fetchSelementsByIds(array_column($selements, 'selementid'));
 			$selements = $this->extendFromObjects(zbx_toHash($selements, 'selementid'), $db_selements, ['elementtype', 'elements']);
 		}
 
@@ -292,7 +292,7 @@ abstract class CMapElement extends CApiService {
 			$linkDbFields = ['linkid' => null];
 
 			$dbLinks = API::getApiService()->select('sysmap_element_url', [
-				'filter' => ['selementid' => zbx_objectValues($links, 'linkid')],
+				'filter' => ['selementid' => array_column($links, 'linkid')],
 				'output' => ['linkid'],
 				'preservekeys' => true
 			]);
@@ -523,7 +523,7 @@ abstract class CMapElement extends CApiService {
 			}
 
 			// delete url
-			$urlsToDelete = array_merge($urlsToDelete, zbx_objectValues($diffUrls['second'], 'sysmapelementurlid'));
+			$urlsToDelete = array_merge($urlsToDelete, array_column($diffUrls['second'], 'sysmapelementurlid'));
 		}
 		unset($selement);
 
@@ -593,7 +593,7 @@ abstract class CMapElement extends CApiService {
 	 */
 	protected function deleteSelements(array $selements) {
 		$selements = zbx_toArray($selements);
-		$selementIds = zbx_objectValues($selements, 'selementid');
+		$selementIds = array_column($selements, 'selementid');
 
 		DB::delete('sysmaps_elements', ['selementid' => $selementIds]);
 
@@ -646,7 +646,7 @@ abstract class CMapElement extends CApiService {
 	 */
 	protected function deleteShapes(array $shapes) {
 		$shapes = zbx_toArray($shapes);
-		$shapeids = zbx_objectValues($shapes, 'sysmap_shapeid');
+		$shapeids = array_column($shapes, 'sysmap_shapeid');
 
 		DB::delete('sysmap_shape', ['sysmap_shapeid' => $shapeids]);
 	}
@@ -685,7 +685,7 @@ abstract class CMapElement extends CApiService {
 
 		DB::update('sysmaps_links', $udpateLinks);
 
-		return ['linkids' => zbx_objectValues($links, 'linkid')];
+		return ['linkids' => array_column($links, 'linkid')];
 	}
 
 	/**
@@ -698,7 +698,7 @@ abstract class CMapElement extends CApiService {
 	 */
 	protected function deleteLinks($links) {
 		zbx_value2array($links);
-		$linkIds = zbx_objectValues($links, 'linkid');
+		$linkIds = array_column($links, 'linkid');
 
 		$this->checkLinkInput($links, __FUNCTION__);
 
@@ -748,7 +748,7 @@ abstract class CMapElement extends CApiService {
 		$linkTriggers = zbx_toArray($linkTriggers);
 		$this->validateUpdateLinkTriggers($linkTriggers);
 
-		$linkTriggerIds = zbx_objectValues($linkTriggers, 'linktriggerid');
+		$linkTriggerIds = array_column($linkTriggers, 'linktriggerid');
 
 		$updateLinkTriggers = [];
 		foreach ($linkTriggers as $linkTrigger) {
@@ -783,7 +783,7 @@ abstract class CMapElement extends CApiService {
 		$linkTriggers = zbx_toArray($linkTriggers);
 		$this->validateDeleteLinkTriggers($linkTriggers);
 
-		$linkTriggerIds = zbx_objectValues($linkTriggers, 'linktriggerid');
+		$linkTriggerIds = array_column($linkTriggers, 'linktriggerid');
 
 		DB::delete('sysmaps_link_triggers', ['linktriggerid' => $linkTriggerIds]);
 

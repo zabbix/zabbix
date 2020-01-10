@@ -126,7 +126,7 @@ class CHttpTestManager {
 	 * @return array
 	 */
 	public function update(array $httptests) {
-		$httptestids = zbx_objectValues($httptests, 'httptestid');
+		$httptestids = array_column($httptests, 'httptestid');
 
 		$db_httptests = API::HttpTest()->get([
 			'output' => ['httptestid', 'name', 'applicationid', 'delay', 'status', 'agent', 'authentication',
@@ -250,7 +250,7 @@ class CHttpTestManager {
 						'SELECT i.itemid'.
 						' FROM items i'.
 							' INNER JOIN httpstepitem hi ON hi.itemid=i.itemid'.
-						' WHERE '.dbConditionInt('hi.httpstepid', zbx_objectValues($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid')))
+						' WHERE '.dbConditionInt('hi.httpstepid', array_column($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid')))
 						, 'itemid'
 					);
 					$this->updateItemsApplications($dbStepIds, $httptest['applicationid']);
@@ -343,7 +343,7 @@ class CHttpTestManager {
 		$dbCursor = DBselect(
 			'SELECT ht.templateid,ht.hostid'.
 			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionInt('ht.templateid', zbx_objectValues($httpTests, 'hostid')).
+			' WHERE '.dbConditionInt('ht.templateid', array_column($httpTests, 'hostid')).
 				$sqlWhere
 		);
 		while ($dbHost = DBfetch($dbCursor)) {
@@ -1102,7 +1102,7 @@ class CHttpTestManager {
 		$item_key_parser = new CItemKey();
 
 		// get all used keys
-		$webstepids = zbx_objectValues($websteps, 'httpstepid');
+		$webstepids = array_column($websteps, 'httpstepid');
 		$dbKeys = DBfetchArrayAssoc(DBselect(
 			'SELECT i.key_'.
 			' FROM items i,httpstepitem hi'.

@@ -272,7 +272,7 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 		foreach ($templates as &$template) {
 			if (array_key_exists('groups', $visible)) {
 				if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
-					$current_groupids = zbx_objectValues($template['groups'], 'groupid');
+					$current_groupids = array_column($template['groups'], 'groupid');
 					$template['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
 						'groupid'
 					);
@@ -281,14 +281,14 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 					$template['groups'] = zbx_toObject($new_groupids, 'groupid');
 				}
 				elseif ($remove_groupids) {
-					$current_groupids = zbx_objectValues($template['groups'], 'groupid');
+					$current_groupids = array_column($template['groups'], 'groupid');
 					$template['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
 				}
 			}
 
 			if (array_key_exists('linked_templates', $visible)) {
 				$parent_templateids = array_key_exists('parentTemplates', $template)
-					? zbx_objectValues($template['parentTemplates'], 'templateid')
+					? array_column($template['parentTemplates'], 'templateid')
 					: [];
 
 				switch (getRequest('mass_action_tpls')) {
@@ -483,7 +483,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			if ($dbTriggers) {
-				$result &= copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'),
+				$result &= copyTriggersToHosts(array_column($dbTriggers, 'triggerid'),
 						$templateId, $cloneTemplateId);
 
 				if (!$result) {
@@ -511,7 +511,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($dbDiscoveryRules) {
 				$result &= API::DiscoveryRule()->copy([
-					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
+					'discoveryids' => array_column($dbDiscoveryRules, 'itemid'),
 					'hostids' => [$templateId]
 				]);
 
@@ -530,7 +530,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($dbTemplateScreens) {
 				$result &= API::TemplateScreen()->copy([
-					'screenIds' => zbx_objectValues($dbTemplateScreens, 'screenid'),
+					'screenIds' => array_column($dbTemplateScreens, 'screenid'),
 					'templateIds' => $templateId
 				]);
 
@@ -620,7 +620,7 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
 			'templateids' => $templates,
 			'editable' => true
 		]);
-		uncheckTableRows(null, zbx_objectValues($templateids, 'templateid'));
+		uncheckTableRows(null, array_column($templateids, 'templateid'));
 	}
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
@@ -767,7 +767,7 @@ elseif (hasRequest('form')) {
 
 	if (!hasRequest('form_refresh')) {
 		if ($data['templateid'] != 0) {
-			$groups = zbx_objectValues($data['dbTemplate']['groups'], 'groupid');
+			$groups = array_column($data['dbTemplate']['groups'], 'groupid');
 		}
 		elseif (getRequest('groupid', 0) != 0) {
 			$groups[] = getRequest('groupid');
@@ -948,7 +948,7 @@ else {
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectTags' => ['tag', 'value'],
-		'templateids' => zbx_objectValues($templates, 'templateid'),
+		'templateids' => array_column($templates, 'templateid'),
 		'editable' => true,
 		'preservekeys' => true
 	]);
@@ -963,15 +963,12 @@ else {
 	foreach ($templates as $template) {
 		$linked_template_ids = array_merge(
 			$linked_template_ids,
-			zbx_objectValues($template['parentTemplates'], 'templateid'),
-			zbx_objectValues($template['templates'], 'templateid'),
-			zbx_objectValues($template['hosts'], 'hostid')
+			array_column($template['parentTemplates'], 'templateid'),
+			array_column($template['templates'], 'templateid'),
+			array_column($template['hosts'], 'hostid')
 		);
 
-		$linked_hosts_ids = array_merge(
-			$linked_hosts_ids,
-			zbx_objectValues($template['hosts'], 'hostid')
-		);
+		$linked_hosts_ids = array_merge($linked_hosts_ids, array_column($template['hosts'], 'hostid'));
 	}
 	if ($linked_template_ids) {
 		$linked_template_ids = array_unique($linked_template_ids);

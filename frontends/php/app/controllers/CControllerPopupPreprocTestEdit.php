@@ -60,7 +60,7 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 
 	protected function doAction() {
 		$preprocessing_steps = $this->getInput('steps');
-		$preprocessing_types = zbx_objectValues($preprocessing_steps, 'type');
+		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
 		$support_lldmacros = ($this->preproc_item instanceof CItemPrototype);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);

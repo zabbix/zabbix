@@ -153,7 +153,7 @@ class CControllerAcknowledgeCreate extends CController {
 		if ($events) {
 			$related_problems = API::Problem()->get([
 				'output' => [],
-				'objectids' => array_keys(array_flip(zbx_objectValues($events, 'objectid'))),
+				'objectids' => array_keys(array_column($events, 'objectid', 'objectid')),
 				'preservekeys' => true
 			]);
 
@@ -187,7 +187,7 @@ class CControllerAcknowledgeCreate extends CController {
 		$editable_triggers = ($events && ($this->change_severity || $this->close_problems))
 			? API::Trigger()->get([
 				'output' => ['manual_close'],
-				'triggerids' => zbx_objectValues($events, 'objectid'),
+				'triggerids' => array_column($events, 'objectid'),
 				'editable' => true,
 				'preservekeys' => true
 			])

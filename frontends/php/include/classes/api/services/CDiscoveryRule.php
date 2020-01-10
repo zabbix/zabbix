@@ -358,7 +358,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// Get only hosts not templates from items
 		$hosts = API::Host()->get([
 			'output' => [],
-			'hostids' => zbx_objectValues($items, 'hostid'),
+			'hostids' => array_column($items, 'hostid'),
 			'preservekeys' => true
 		]);
 		foreach ($items as &$item) {
@@ -373,7 +373,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->createReal($items);
 		$this->inherit($items);
 
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		return ['itemids' => array_column($items, 'itemid')];
 	}
 
 	/**
@@ -389,7 +389,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$db_items = $this->get([
 			'output' => ['itemid', 'name', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
-			'itemids' => zbx_objectValues($items, 'itemid'),
+			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
 		]);
 
@@ -494,7 +494,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->updateReal($items);
 		$this->inherit($items);
 
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		return ['itemids' => array_column($items, 'itemid')];
 	}
 
 	/**
@@ -989,7 +989,7 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function updateReal(array $items) {
 		CArrayHelper::sort($items, ['itemid']);
 
-		$ruleIds = zbx_objectValues($items, 'itemid');
+		$ruleIds = array_column($items, 'itemid');
 
 		$data = [];
 		foreach ($items as $item) {
@@ -1162,7 +1162,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// After all data has been collected, proceed with record update in DB.
-		$lld_macro_pathids_to_delete = zbx_objectValues($db_lld_macro_paths, 'lld_macro_pathid');
+		$lld_macro_pathids_to_delete = array_column($db_lld_macro_paths, 'lld_macro_pathid');
 
 		if ($lld_macro_pathids_to_delete) {
 			DB::delete('lld_macro_path', ['lld_macro_pathid' => $lld_macro_pathids_to_delete]);
@@ -1790,7 +1790,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 				// add new applications
 				$item_prototype['applications'] = get_same_applications_for_host(
-					zbx_objectValues($item_prototype['applications'], 'applicationid'),
+					array_column($item_prototype['applications'], 'applicationid'),
 					$dstHost['hostid']
 				);
 

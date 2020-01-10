@@ -40,7 +40,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 
 		$actions = API::Action()->get([
 			'output' => ['actionid', 'name'],
-			'actionids' => array_unique(zbx_objectValues($alerts, 'actionid')),
+			'actionids' => array_unique(array_column($alerts, 'actionid')),
 			'preservekeys' => true
 		]);
 

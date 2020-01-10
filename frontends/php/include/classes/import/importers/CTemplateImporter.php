@@ -109,19 +109,19 @@ class CTemplateImporter extends CImporter {
 					$db_template_links = API::Template()->get([
 						'output' => ['templateid'],
 						'selectParentTemplates' => ['templateid'],
-						'templateids' => zbx_objectValues($templatesToUpdate, 'templateid'),
+						'templateids' => array_column($templatesToUpdate, 'templateid'),
 						'preservekeys' => true
 					]);
 
 					foreach ($db_template_links as &$db_template_link) {
-						$db_template_link = zbx_objectValues($db_template_link['parentTemplates'], 'templateid');
+						$db_template_link = array_column($db_template_link['parentTemplates'], 'templateid');
 					}
 					unset($db_template_link);
 
 					foreach ($templatesToUpdate as $tmpl) {
 						if (array_key_exists($tmpl['host'], $templateLinkage)) {
 							$tmpls_to_clear[$tmpl['templateid']] = array_diff($db_template_links[$tmpl['templateid']],
-								zbx_objectValues($templateLinkage[$tmpl['host']], 'templateid')
+								array_column($templateLinkage[$tmpl['host']], 'templateid')
 							);
 						}
 						else {
@@ -265,7 +265,7 @@ class CTemplateImporter extends CImporter {
 			}
 		}
 
-		return zbx_objectValues($templates, 'host');
+		return array_column($templates, 'host');
 	}
 
 	/**

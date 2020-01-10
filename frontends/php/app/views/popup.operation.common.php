@@ -171,7 +171,7 @@ switch ($data['operationtype']) {
 		);
 
 		$user_groupids = array_key_exists('opmessage_grp', $opr_data)
-			? zbx_objectValues($opr_data['opmessage_grp'], 'usrgrpid')
+			? array_column($opr_data['opmessage_grp'], 'usrgrpid')
 			: [];
 
 		$user_groups = API::UserGroup()->get([
@@ -212,7 +212,7 @@ switch ($data['operationtype']) {
 		$user_list->addRow((new CRow((new CCol($user_add_btn))->setColSpan(2)))->setId('opmsgUserListFooter'));
 
 		$userids = array_key_exists('opmessage_usr', $opr_data)
-			? zbx_objectValues($opr_data['opmessage_usr'], 'userid')
+			? array_column($opr_data['opmessage_usr'], 'userid')
 			: [];
 
 		$users = API::User()->get([
@@ -348,7 +348,7 @@ switch ($data['operationtype']) {
 		}
 
 		$hosts = API::Host()->get([
-			'hostids' => zbx_objectValues($opr_data['opcommand_hst'], 'hostid'),
+			'hostids' => array_column($opr_data['opcommand_hst'], 'hostid'),
 			'output' => ['name'],
 			'preservekeys' => true,
 			'editable' => true
@@ -364,7 +364,7 @@ switch ($data['operationtype']) {
 		order_result($opr_data['opcommand_hst'], 'name');
 
 		$groups = API::HostGroup()->get([
-			'groupids' => zbx_objectValues($opr_data['opcommand_grp'], 'groupid'),
+			'groupids' => array_column($opr_data['opcommand_grp'], 'groupid'),
 			'output' => ['groupid', 'name'],
 			'preservekeys' => true,
 			'editable' => true
@@ -580,7 +580,7 @@ switch ($data['operationtype']) {
 		}
 
 		$groups = API::HostGroup()->get([
-			'groupids' => zbx_objectValues($opr_data['opgroup'], 'groupid'),
+			'groupids' => array_column($opr_data['opgroup'], 'groupid'),
 			'output' => ['groupid', 'name'],
 			'editable' => true,
 			'preservekeys' => true
@@ -620,7 +620,7 @@ switch ($data['operationtype']) {
 		}
 
 		$templates = API::Template()->get([
-			'templateids' => zbx_objectValues($opr_data['optemplate'], 'templateid'),
+			'templateids' => array_column($opr_data['optemplate'], 'templateid'),
 			'output' => ['templateid', 'name'],
 			'editable' => true,
 			'preservekeys' => true

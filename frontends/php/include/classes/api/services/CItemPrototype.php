@@ -403,7 +403,7 @@ class CItemPrototype extends CItemGeneral {
 		$this->createReal($items);
 		$this->inherit($items);
 
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		return ['itemids' => array_column($items, 'itemid')];
 	}
 
 	protected function createReal(&$items) {
@@ -453,10 +453,10 @@ class CItemPrototype extends CItemGeneral {
 					'SELECT ap.application_prototypeid,ap.name'.
 					' FROM application_prototype ap'.
 					' WHERE ap.itemid='.zbx_dbstr($item['ruleid']).
-						' AND '.dbConditionString('ap.name', zbx_objectValues($item['applicationPrototypes'], 'name'))
+						' AND '.dbConditionString('ap.name', array_column($item['applicationPrototypes'], 'name'))
 				));
 
-				$names = zbx_objectValues($db_application_prototypes, 'name');
+				$names = array_column($db_application_prototypes, 'name');
 
 				$application_prototypes_to_create = [];
 
@@ -479,7 +479,7 @@ class CItemPrototype extends CItemGeneral {
 					$new_ids = DB::insertBatch('application_prototype', $application_prototypes_to_create);
 				}
 
-				$ids = array_merge($new_ids, zbx_objectValues($db_application_prototypes, 'application_prototypeid'));
+				$ids = array_merge($new_ids, array_column($db_application_prototypes, 'application_prototypeid'));
 
 				foreach ($ids as $id) {
 					$item_application_prototypes[] = [
@@ -742,7 +742,7 @@ class CItemPrototype extends CItemGeneral {
 
 		$db_items = $this->get([
 			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
-			'itemids' => zbx_objectValues($items, 'itemid'),
+			'itemids' => array_column($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -836,7 +836,7 @@ class CItemPrototype extends CItemGeneral {
 		$this->updateReal($items);
 		$this->inherit($items);
 
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		return ['itemids' => array_column($items, 'itemid')];
 	}
 
 	/**
@@ -915,7 +915,7 @@ class CItemPrototype extends CItemGeneral {
 		$json = new CJson();
 
 		foreach ($tpl_items as &$tpl_item) {
-			$tpl_item['applications'] = zbx_objectValues($tpl_item['applications'], 'applicationid');
+			$tpl_item['applications'] = array_column($tpl_item['applications'], 'applicationid');
 
 			if ($tpl_item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $tpl_item) && is_array($tpl_item['query_fields'])) {

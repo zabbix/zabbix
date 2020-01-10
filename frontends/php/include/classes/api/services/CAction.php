@@ -1429,7 +1429,7 @@ class CAction extends CApiService {
 
 						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'hostid');
 						$opCommandHstsToInsert = array_merge($opCommandHstsToInsert, $diff['first']);
-						$opCommandHostIds = zbx_objectValues($diff['second'], 'opcommand_hstid');
+						$opCommandHostIds = array_column($diff['second'], 'opcommand_hstid');
 						if ($opCommandHostIds) {
 							DB::delete('opcommand_hst', [
 								'opcommand_hstid' => $opCommandHostIds
@@ -1527,7 +1527,7 @@ class CAction extends CApiService {
 			$diff = zbx_array_diff($operation['opconditions'], $db_opconditions, 'opconditionid');
 			$opConditionsToInsert = array_merge($opConditionsToInsert, $diff['first']);
 
-			$opConditionsIdsToDelete = zbx_objectValues($diff['second'], 'opconditionid');
+			$opConditionsIdsToDelete = array_column($diff['second'], 'opconditionid');
 			if (!empty($opConditionsIdsToDelete)) {
 				DB::delete('opconditions', ['opconditionid' => $opConditionsIdsToDelete]);
 			}
@@ -1759,11 +1759,11 @@ class CAction extends CApiService {
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
 					$userids = array_key_exists('opmessage_usr', $operation)
-						? zbx_objectValues($operation['opmessage_usr'], 'userid')
+						? array_column($operation['opmessage_usr'], 'userid')
 						: [];
 
 					$usrgrpids = array_key_exists('opmessage_grp', $operation)
-						? zbx_objectValues($operation['opmessage_grp'], 'usrgrpid')
+						? array_column($operation['opmessage_grp'], 'usrgrpid')
 						: [];
 
 					if (!$userids && !$usrgrpids) {
@@ -1909,7 +1909,7 @@ class CAction extends CApiService {
 
 					$groupids = [];
 					if (array_key_exists('opcommand_grp', $operation)) {
-						$groupids = zbx_objectValues($operation['opcommand_grp'], 'groupid');
+						$groupids = array_column($operation['opcommand_grp'], 'groupid');
 					}
 
 					$hostids = [];
@@ -1952,7 +1952,7 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
 					$groupids = array_key_exists('opgroup', $operation)
-						? zbx_objectValues($operation['opgroup'], 'groupid')
+						? array_column($operation['opgroup'], 'groupid')
 						: [];
 
 					if (!$groupids) {
@@ -1964,7 +1964,7 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					$templateids = isset($operation['optemplate'])
-						? zbx_objectValues($operation['optemplate'], 'templateid')
+						? array_column($operation['optemplate'], 'templateid')
 						: [];
 
 					if (!$templateids) {

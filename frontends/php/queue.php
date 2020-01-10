@@ -237,12 +237,10 @@ elseif ($config == QUEUE_DETAILS) {
 	$items = CMacrosResolverHelper::resolveItemNames($items);
 
 	// get hosts for queue items
-	$hostIds = zbx_objectValues($items, 'hostid');
-	$hostIds = array_keys(array_flip($hostIds));
-
+	$hostids = array_keys(array_column($items, 'hostid', 'hostid'));
 	$hosts = API::Host()->get([
 		'output' => ['hostid', 'proxy_hostid'],
-		'hostids' => $hostIds,
+		'hostids' => $hostids,
 		'preservekeys' => true
 	]);
 

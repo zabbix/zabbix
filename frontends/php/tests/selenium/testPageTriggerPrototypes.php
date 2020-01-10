@@ -117,7 +117,7 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 				' FROM item_discovery id, items i'.
 				' WHERE parent_itemid='.$druleid.' AND i.itemid = id.itemid'
 		);
-		$triggerids = zbx_objectValues($triggerids, 'itemid');
+		$triggerids = array_column($triggerids, 'itemid');
 
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid);
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');

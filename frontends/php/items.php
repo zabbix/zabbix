@@ -886,7 +886,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['jmx_endpoint'] !== getRequest('jmx_endpoint', '')) {
 					$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
 				}
-				$db_applications = zbx_objectValues($db_item['applications'], 'applicationid');
+				$db_applications = array_column($db_item['applications'], 'applicationid');
 				natsort($db_applications);
 				natsort($applications);
 				if (array_values($db_applications) !== array_values($applications)) {
@@ -1248,7 +1248,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							if ($item) {
 								if (array_key_exists('applications', $visible)) {
 									if ($applicationids) {
-										$db_applicationids = zbx_objectValues($items[$itemid]['applications'],
+										$db_applicationids = array_column($items[$itemid]['applications'],
 											'applicationid'
 										);
 
@@ -1453,7 +1453,7 @@ if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
 		'itemids' => getRequest('group_itemid'),
 		'editable' => true
 	]);
-	uncheckTableRows(getRequest('checkbox_hash'), zbx_objectValues($itemids, 'itemid'));
+	uncheckTableRows(getRequest('checkbox_hash'), array_column($itemids, 'itemid'));
 }
 
 /*
@@ -1970,7 +1970,7 @@ else {
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 		foreach ($data['items'] as &$item) {
-			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
+			$item['hostids'] = array_column($item['hosts'], 'hostid');
 
 			if ($data['hostid'] == 0) {
 				$host = reset($item['hosts']);
@@ -2133,7 +2133,7 @@ else {
 
 	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {
-		$itemTriggerIds = array_merge($itemTriggerIds, zbx_objectValues($item['triggers'], 'triggerid'));
+		$itemTriggerIds = array_merge($itemTriggerIds, array_column($item['triggers'], 'triggerid'));
 	}
 	$data['itemTriggers'] = API::Trigger()->get([
 		'triggerids' => $itemTriggerIds,

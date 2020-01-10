@@ -978,7 +978,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 		$critical_problem = [];
 		$trigger_order = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-			? zbx_objectValues($selement['elements'], 'triggerid')
+			? array_column($selement['elements'], 'triggerid')
 			: [];
 		$lately_changed = 0;
 

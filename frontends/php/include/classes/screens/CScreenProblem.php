@@ -447,7 +447,7 @@ class CScreenProblem extends CScreenBase {
 			case 'host':
 				$triggers_hosts_list = [];
 				foreach (getTriggersHostsList($data['triggers']) as $triggerid => $trigger_hosts) {
-					$triggers_hosts_list[$triggerid] = implode(', ', zbx_objectValues($trigger_hosts, 'name'));
+					$triggers_hosts_list[$triggerid] = implode(', ', array_column($trigger_hosts, 'name'));
 				}
 
 				foreach ($data['problems'] as &$problem) {

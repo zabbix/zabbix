@@ -114,7 +114,7 @@ class CScreenHistory extends CScreenBase {
 				'output' => ['itemid'],
 				'graphids' => [$options['graphid']]
 			]);
-			$this->itemids = zbx_objectValues($itemids, 'itemid');
+			$this->itemids = array_column($itemids, 'itemid');
 			$this->graphid = $options['graphid'];
 		}
 	}

@@ -103,7 +103,7 @@ elseif ($items = getRequest('items', [])) {
 	CArrayHelper::sort($items, ['sortorder']);
 
 	$dbItems = API::Item()->get([
-		'itemids' => zbx_objectValues($items, 'itemid'),
+		'itemids' => array_column($items, 'itemid'),
 		'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
 			'value_type', 'key_'
 		],

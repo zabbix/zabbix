@@ -198,7 +198,7 @@ class CHostInterface extends CApiService {
 			$interfaceDBfields = ['interfaceid' => null];
 			$dbInterfaces = $this->get([
 				'output' => API_OUTPUT_EXTEND,
-				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
+				'interfaceids' => array_column($interfaces, 'interfaceid'),
 				'editable' => true,
 				'preservekeys' => true
 			]);
@@ -216,14 +216,14 @@ class CHostInterface extends CApiService {
 
 		$dbHosts = API::Host()->get([
 			'output' => ['host'],
-			'hostids' => zbx_objectValues($interfaces, 'hostid'),
+			'hostids' => array_column($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$dbProxies = API::Proxy()->get([
 			'output' => ['host'],
-			'proxyids' => zbx_objectValues($interfaces, 'hostid'),
+			'proxyids' => array_column($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -321,7 +321,7 @@ class CHostInterface extends CApiService {
 				$this->checkIfInterfaceHasItems($check_have_items);
 			}
 		}
-		$this->checkValidator(zbx_objectValues($interfaces, 'hostid'), new CHostNormalValidator([
+		$this->checkValidator(array_column($interfaces, 'hostid'), new CHostNormalValidator([
 			'message' => _('Cannot update interface for discovered host "%1$s".')
 		]));
 	}
@@ -366,7 +366,7 @@ class CHostInterface extends CApiService {
 		}
 		DB::update('interface', $data);
 
-		return ['interfaceids' => zbx_objectValues($interfaces, 'interfaceid')];
+		return ['interfaceids' => array_column($interfaces, 'interfaceid')];
 	}
 
 	/**
@@ -448,7 +448,7 @@ class CHostInterface extends CApiService {
 				]
 			]);
 			if ($interfacesToRemove) {
-				$this->checkMainInterfacesOnDelete(zbx_objectValues($interfacesToRemove, 'interfaceid'));
+				$this->checkMainInterfacesOnDelete(array_column($interfacesToRemove, 'interfaceid'));
 			}
 		}
 	}
@@ -556,10 +556,10 @@ class CHostInterface extends CApiService {
 			}
 
 			if ($interfacesToDelete) {
-				$this->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
+				$this->delete(array_column($interfacesToDelete, 'interfaceid'));
 			}
 
-			return ['interfaceids' => zbx_objectValues($host['interfaces'], 'interfaceid')];
+			return ['interfaceids' => array_column($host['interfaces'], 'interfaceid')];
 		}
 
 		return ['interfaceids' => []];
@@ -730,7 +730,7 @@ class CHostInterface extends CApiService {
 	 * @throws APIException
 	 */
 	private function checkMainInterfacesOnUpdate(array $interfaces) {
-		$hostids = array_keys(array_flip(zbx_objectValues($interfaces, 'hostid')));
+		$hostids = array_keys(array_column($interfaces, 'hostid', 'hostid'));
 
 		$dbInterfaces = API::HostInterface()->get([
 			'hostids' => $hostids,

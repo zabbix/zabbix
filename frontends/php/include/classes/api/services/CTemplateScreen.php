@@ -281,7 +281,7 @@ class CTemplateScreen extends CScreen {
 					'output' => ['graphid', 'name'],
 					'selectHosts' => ['hostid'],
 					'hostids' => $options['hostids'],
-					'filter' => ['name' => zbx_objectValues($tplGraphs, 'name')],
+					'filter' => ['name' => array_column($tplGraphs, 'name')],
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);
@@ -310,7 +310,7 @@ class CTemplateScreen extends CScreen {
 					'output' => ['graphid', 'name'],
 					'selectHosts' => ['hostid'],
 					'hostids' => $options['hostids'],
-					'filter' => ['name' => zbx_objectValues($tpl_graph_prototypes, 'name')],
+					'filter' => ['name' => array_column($tpl_graph_prototypes, 'name')],
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);
@@ -339,7 +339,7 @@ class CTemplateScreen extends CScreen {
 				$dbItems = API::Item()->get([
 					'output' => ['itemid', 'key_', 'hostid'],
 					'hostids' => $options['hostids'],
-					'filter' => ['key_' => zbx_objectValues($tplItems, 'key_')],
+					'filter' => ['key_' => array_column($tplItems, 'key_')],
 					'webitems' => true,
 					'nopermissions' => true,
 					'preservekeys' => true
@@ -367,7 +367,7 @@ class CTemplateScreen extends CScreen {
 				$db_item_prototypes = API::ItemPrototype()->get([
 					'output' => ['itemid', 'key_', 'hostid'],
 					'hostids' => $options['hostids'],
-					'filter' => ['key_' => zbx_objectValues($tpl_item_prototypes, 'key_')],
+					'filter' => ['key_' => array_column($tpl_item_prototypes, 'key_')],
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);
@@ -608,11 +608,11 @@ class CTemplateScreen extends CScreen {
 			}
 		}
 
-		$templateIds = zbx_objectValues($screens, 'templateid');
+		$templateIds = array_column($screens, 'templateid');
 
 		$dbScreens = $this->get([
 			'filter' => [
-				'name' => zbx_objectValues($screens, 'name'),
+				'name' => array_column($screens, 'name'),
 				'templateid' => $templateIds
 			],
 			'output' => ['name', 'templateid'],
@@ -664,7 +664,7 @@ class CTemplateScreen extends CScreen {
 		$db_screens = $this->get([
 			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid'],
 			'selectScreenItems' => ['screenitemid', 'x', 'y', 'colspan', 'rowspan'],
-			'screenids' => zbx_objectValues($screens, 'screenid'),
+			'screenids' => array_column($screens, 'screenid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -673,7 +673,7 @@ class CTemplateScreen extends CScreen {
 		$this->updateReal($screens, $db_screens);
 		$this->truncateScreenItems($screens, $db_screens);
 
-		return ['screenids' => zbx_objectValues($screens, 'screenid')];
+		return ['screenids' => array_column($screens, 'screenid')];
 	}
 
 	protected function validateUpdate(array $screens, array $dbScreens) {
@@ -759,7 +759,7 @@ class CTemplateScreen extends CScreen {
 		// check if screen with same name exists
 		$dbExistingScreens = $this->get([
 			'filter' => [
-				'name' => zbx_objectValues($dbScreens, 'name'),
+				'name' => array_column($dbScreens, 'name'),
 				'templateid' => $templateIds
 			],
 			'output' => ['name', 'templateid'],

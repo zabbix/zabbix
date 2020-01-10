@@ -127,7 +127,7 @@ class CControllerMediatypeUpdate extends CController {
 				$mediatype['exec_params'] = '';
 
 				if ($this->hasInput('exec_params')) {
-					$exec_params = zbx_objectValues($this->getInput('exec_params'), 'exec_param');
+					$exec_params = array_column($this->getInput('exec_params'), 'exec_param');
 
 					foreach ($exec_params as $exec_param) {
 						$mediatype['exec_params'] .= $exec_param."\n";

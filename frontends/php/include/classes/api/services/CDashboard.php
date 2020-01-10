@@ -233,7 +233,7 @@ class CDashboard extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(zbx_objectValues($dashboards, 'name'));
+		$this->checkDuplicates(array_column($dashboards, 'name'));
 		$this->checkUsers($dashboards);
 		$this->checkUserGroups($dashboards);
 		$this->checkWidgets($dashboards);
@@ -288,7 +288,7 @@ class CDashboard extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_DASHBOARD, $dashboards, $db_dashboards);
 
-		return ['dashboardids' => zbx_objectValues($dashboards, 'dashboardid')];
+		return ['dashboardids' => array_column($dashboards, 'dashboardid')];
 	}
 
 	/**
@@ -346,7 +346,7 @@ class CDashboard extends CApiService {
 		// Check dashboard names.
 		$db_dashboards = $this->get([
 			'output' => ['dashboardid', 'name', 'userid', 'private'],
-			'dashboardids' => zbx_objectValues($dashboards, 'dashboardid'),
+			'dashboardids' => array_column($dashboards, 'dashboardid'),
 			'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height'],
 			'editable' => true,
 			'preservekeys' => true
@@ -1238,7 +1238,7 @@ class CDashboard extends CApiService {
 				);
 			}
 
-			$widgetids = array_merge($widgetids, zbx_objectValues($db_dashboards[$dashboardid]['widgets'], 'widgetid'));
+			$widgetids = array_merge($widgetids, array_column($db_dashboards[$dashboardid]['widgets'], 'widgetid'));
 		}
 
 		if ($widgetids) {

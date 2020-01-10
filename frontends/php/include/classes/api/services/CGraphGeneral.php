@@ -39,7 +39,7 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	public function update(array $graphs) {
 		$graphs = zbx_toArray($graphs);
-		$graphIds = zbx_objectValues($graphs, 'graphid');
+		$graphIds = array_column($graphs, 'graphid');
 
 		$graphs = $this->extendObjects($this->tableName(), $graphs,
 			['name', 'graphtype', 'ymin_type', 'ymin_itemid', 'ymax_type', 'ymax_itemid', 'yaxismin', 'yaxismax']
@@ -205,7 +205,7 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	protected function updateReal(array $graph, array $dbGraph) {
 		$dbGitems = zbx_toHash($dbGraph['gitems'], 'gitemid');
-		$dbGitemIds = zbx_toHash(zbx_objectValues($dbGitems, 'gitemid'));
+		$dbGitemIds = zbx_toHash(array_column($dbGitems, 'gitemid'));
 
 		// update the graph if it's modified
 		if (DB::recordModified('graphs', $dbGraph, $graph)) {
@@ -503,7 +503,7 @@ abstract class CGraphGeneral extends CApiService {
 			if (isset($graph['gitems'])) {
 				// check if new items are from same templated host
 				$graphHosts = API::Host()->get([
-					'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+					'itemids' => array_column($graph['gitems'], 'itemid'),
 					'output' => ['hostid', 'status'],
 					'editable' => true,
 					'templated_hosts' => true
@@ -666,7 +666,7 @@ abstract class CGraphGeneral extends CApiService {
 						]);
 
 						// only one host is allowed and it has to be the current. other templated hosts are allowed
-						$itemHosts = array_unique(zbx_objectValues($itemHosts, 'hostid'));
+						$itemHosts = array_unique(array_column($itemHosts, 'hostid'));
 
 						if (count($itemHosts) > 1 || !in_array($host['hostid'], $itemHosts)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -703,7 +703,7 @@ abstract class CGraphGeneral extends CApiService {
 		foreach ($graphs as $graph) {
 			// check if the host has any graphs in DB with the same name within host
 			$hostsAndTemplates = API::Host()->get([
-				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'itemids' => array_column($graph['gitems'], 'itemid'),
 				'output' => ['hostid'],
 				'nopermissions' => true,
 				'preservekeys' => true,

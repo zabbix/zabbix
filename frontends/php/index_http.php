@@ -86,7 +86,7 @@ else {
 
 (new CView('general.warning', [
 	'header' => _('You are not logged in'),
-	'messages' => zbx_objectValues(clear_messages(), 'message'),
+	'messages' => array_column(clear_messages(), 'message'),
 	'buttons' => [
 		(new CButton('login', _('Login')))->onClick('document.location = '.
 			CJs::encodeJson($redirect_to->getUrl()).';')

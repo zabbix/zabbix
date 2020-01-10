@@ -484,7 +484,7 @@ class CItem extends CItemGeneral {
 		// Get only hosts not templates from items
 		$hosts = API::Host()->get([
 			'output' => [],
-			'hostids' => zbx_objectValues($items, 'hostid'),
+			'hostids' => array_column($items, 'hostid'),
 			'preservekeys' => true
 		]);
 		foreach ($items as &$item) {
@@ -497,7 +497,7 @@ class CItem extends CItemGeneral {
 		$this->createReal($items);
 		$this->inherit($items);
 
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		return ['itemids' => array_column($items, 'itemid')];
 	}
 
 	/**
@@ -610,7 +610,7 @@ class CItem extends CItemGeneral {
 
 		$db_items = $this->get([
 			'output' => ['flags', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
-			'itemids' => zbx_objectValues($items, 'itemid'),
+			'itemids' => array_column($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -704,7 +704,7 @@ class CItem extends CItemGeneral {
 		$this->updateReal($items);
 		$this->inherit($items);
 
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		return ['itemids' => array_column($items, 'itemid')];
 	}
 
 	/**
@@ -783,7 +783,7 @@ class CItem extends CItemGeneral {
 		$json = new CJson();
 
 		foreach ($tpl_items as &$tpl_item) {
-			$tpl_item['applications'] = zbx_objectValues($tpl_item['applications'], 'applicationid');
+			$tpl_item['applications'] = array_column($tpl_item['applications'], 'applicationid');
 
 			if ($tpl_item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $tpl_item) && is_array($tpl_item['query_fields'])) {
@@ -907,7 +907,7 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		$hostids = zbx_objectValues($items, 'hostid');
+		$hostids = array_column($items, 'hostid');
 
 		// getting all inventory links on every affected host
 		$itemsOnHostsInfo = API::Item()->get([

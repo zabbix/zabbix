@@ -420,7 +420,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 				foreach ($usermacros as $triggerid => &$usermacros_data) {
 					if (array_key_exists($triggerid, $db_triggers)) {
-						$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
+						$usermacros_data['hostids'] = array_column($db_triggers[$triggerid]['hosts'], 'hostid');
 					}
 				}
 				unset($usermacros_data);
@@ -559,7 +559,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($usermacros as $triggerid => &$usermacros_data) {
 				if (array_key_exists($triggerid, $db_triggers)) {
-					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
+					$usermacros_data['hostids'] = array_column($db_triggers[$triggerid]['hosts'], 'hostid');
 				}
 			}
 			unset($usermacros_data);
@@ -724,7 +724,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($usermacros as $triggerid => &$usermacros_data) {
 				if (array_key_exists($triggerid, $db_triggers)) {
-					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
+					$usermacros_data['hostids'] = array_column($db_triggers[$triggerid]['hosts'], 'hostid');
 				}
 			}
 			unset($usermacros_data);
@@ -1040,7 +1040,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($usermacros as $triggerid => &$usermacros_data) {
 				if (array_key_exists($triggerid, $db_triggers)) {
-					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
+					$usermacros_data['hostids'] = array_column($db_triggers[$triggerid]['hosts'], 'hostid');
 				}
 			}
 			unset($usermacros_data);

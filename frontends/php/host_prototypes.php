@@ -255,7 +255,7 @@ if (hasRequest('action') && hasRequest('group_hostid') && !$result) {
 		'hostids' => getRequest('group_hostid'),
 		'editable' => true
 	]);
-	uncheckTableRows($discoveryRule['itemid'], zbx_objectValues($host_prototypes, 'hostid'));
+	uncheckTableRows($discoveryRule['itemid'], array_column($host_prototypes, 'hostid'));
 }
 
 $config = select_config();
@@ -343,7 +343,7 @@ if (hasRequest('form')) {
 			// When opening existing host prototype, display all values from database.
 			$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
 
-			$groupids = zbx_objectValues($data['host_prototype']['groupLinks'], 'groupid');
+			$groupids = array_column($data['host_prototype']['groupLinks'], 'groupid');
 			$data['groups'] = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $groupids,
@@ -373,7 +373,7 @@ if (hasRequest('form')) {
 	);
 
 	// Select writable templates
-	$templateids = zbx_objectValues($data['host_prototype']['templates'], 'templateid');
+	$templateids = array_column($data['host_prototype']['templates'], 'templateid');
 	$data['host_prototype']['writable_templates'] = [];
 
 	if ($templateids) {
@@ -454,7 +454,7 @@ else {
 	// Fetch templates linked to the prototypes.
 	$templateids = [];
 	foreach ($data['hostPrototypes'] as $hostPrototype) {
-		$templateids = array_merge($templateids, zbx_objectValues($hostPrototype['templates'], 'templateid'));
+		$templateids = array_merge($templateids, array_column($hostPrototype['templates'], 'templateid'));
 	}
 	$templateids = array_keys(array_flip($templateids));
 

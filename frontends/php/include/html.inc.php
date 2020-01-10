@@ -884,10 +884,10 @@ function makeMaintenanceIcon($type, $name, $description) {
  * @return CSpan
  */
 function makeSuppressedProblemIcon(array $icon_data) {
-	$suppress_until = max(zbx_objectValues($icon_data, 'suppress_until'));
+	$suppress_until = max(array_column($icon_data, 'suppress_until'));
 
 	CArrayHelper::sort($icon_data, ['maintenance_name']);
-	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
+	$maintenance_names = implode(', ', array_column($icon_data, 'maintenance_name'));
 
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INVISIBLE)

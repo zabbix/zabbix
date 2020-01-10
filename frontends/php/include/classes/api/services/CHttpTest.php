@@ -260,7 +260,7 @@ class CHttpTest extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCENARIO, $httptests);
 
-		return ['httptestids' => zbx_objectValues($httptests, 'httptestid')];
+		return ['httptestids' => array_column($httptests, 'httptestid')];
 	}
 
 	/**
@@ -353,7 +353,7 @@ class CHttpTest extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, $httptests, $db_httptests);
 
-		return ['httptestids' => zbx_objectValues($httptests, 'httptestid')];
+		return ['httptestids' => array_column($httptests, 'httptestid')];
 	}
 
 	/**
@@ -426,7 +426,7 @@ class CHttpTest extends CApiService {
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
 				'status_codes', 'follow_redirects', 'retrieve_mode', 'post_type'
 			],
-			'httptestids' => zbx_objectValues($httptests, 'httptestid'),
+			'httptestids' => array_column($httptests, 'httptestid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);

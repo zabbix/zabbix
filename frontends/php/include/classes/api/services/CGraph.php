@@ -324,7 +324,7 @@ class CGraph extends CGraphGeneral {
 
 	protected function inherit($graph, $hostids = null) {
 		$graphTemplates = API::Template()->get([
-			'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+			'itemids' => array_column($graph['gitems'], 'itemid'),
 			'output' => ['templateid'],
 			'nopermissions' => true
 		]);
@@ -434,7 +434,7 @@ class CGraph extends CGraphGeneral {
 
 					$chdGraphItemItems = API::Item()->get([
 						'output' => ['itemid', 'key_', 'hostid'],
-						'itemids' => zbx_objectValues($chdGraph['gitems'], 'itemid'),
+						'itemids' => array_column($chdGraph['gitems'], 'itemid'),
 						'preservekeys' => true
 					]);
 

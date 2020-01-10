@@ -329,7 +329,7 @@ class CApplication extends CApiService {
 		// permissions
 		$db_applications = $this->get([
 			'output' => ['applicationid', 'hostid', 'name', 'flags'],
-			'applicationids' => zbx_objectValues($applications, 'applicationid'),
+			'applicationids' => array_column($applications, 'applicationid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -342,7 +342,7 @@ class CApplication extends CApiService {
 			}
 		}
 
-		if ($this->hasTemplatedApplications(zbx_objectValues($applications, 'applicationid'))) {
+		if ($this->hasTemplatedApplications(array_column($applications, 'applicationid'))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications.'));
 		}
 
@@ -423,7 +423,7 @@ class CApplication extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_APPLICATION, $applications, $db_applications);
 
-		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
+		return ['applicationids' => array_column($applications, 'applicationid')];
 	}
 
 	/**
@@ -510,9 +510,9 @@ class CApplication extends CApiService {
 		}
 
 		$applications = zbx_toArray($data['applications']);
-		$applicationIds = zbx_objectValues($applications, 'applicationid');
+		$applicationIds = array_column($applications, 'applicationid');
 		$items = zbx_toArray($data['items']);
-		$itemIds = zbx_objectValues($items, 'itemid');
+		$itemIds = array_column($items, 'itemid');
 
 		// validate permissions
 		$allowedApplications = $this->get([
