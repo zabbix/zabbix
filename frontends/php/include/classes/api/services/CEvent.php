@@ -919,9 +919,10 @@ class CEvent extends CApiService {
 			), 'eventid');
 
 			foreach ($result as $eventid => $event) {
-				$result[$eventid]['opdata'] = ($events[$eventid]['opdata'] !== '')
-					? CMacrosResolverHelper::resolveTriggerOpdata($events[$eventid], ['events' => true])
-					: '';
+				$result[$eventid]['opdata'] =
+					(array_key_exists($eventid, $events) && $events[$eventid]['opdata'] !== '')
+						? CMacrosResolverHelper::resolveTriggerOpdata($events[$eventid], ['events' => true])
+						: '';
 			}
 		}
 
