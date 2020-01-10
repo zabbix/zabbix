@@ -1829,9 +1829,8 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		zbx_read_ipmi_sensor(h, &h->sensors[i]);
 		if (SUCCEED != h->ret)
 		{
-			if (NULL != h->err)
-				zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered: %s",h->sensors[i].id,
-						h->err);
+			zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered. Error: %s",h->sensors[i].id,
+					ZBX_NULL2EMPTY_STR(h->err));
 
 			continue;
 		}
@@ -1841,9 +1840,8 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			zbx_read_ipmi_thresholds(h, &h->sensors[i]);
 			if (SUCCEED != h->ret)
 			{
-				if (NULL != h->err)
-					zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered: %s",
-							h->sensors[i].id, h->err);
+				zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered. Error: %s",
+						h->sensors[i].id, ZBX_NULL2EMPTY_STR(h->err));
 
 				continue;
 			}
