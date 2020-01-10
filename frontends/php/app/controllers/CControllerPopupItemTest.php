@@ -193,11 +193,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 			if (!$hosts) {
 				$hosts = API::Template()->get([
-					'output' => ['templateid', 'host', 'name', 'status', 'available', 'flags',  'tls_subject',
-						'ipmi_available', 'jmx_available', 'snmp_available', 'maintenance_status', 'maintenance_type',
-						'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_psk_identity',
-						'tls_psk', 'tls_issuer', 'tls_connect'
-					],
+					'output' => ['templateid', 'host', 'name', 'status', 'available', 'flags', 'jmx_available'],
 					'templateids' => [$hostid],
 					'editable' => true
 				]);
@@ -327,15 +323,18 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_ZABBIX:
 				$data += [
 					'key' => array_key_exists('key', $input) ? $input['key'] : null,
-					'host' => [
-						'tls_subject' => $this->host['tls_subject'],
+					'interface' => $this->getHostInterface($interface_input)
+				];
+
+				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
+					$data['host'] = [
 						'tls_psk_identity' => $this->host['tls_psk_identity'],
 						'tls_psk' => $this->host['tls_psk'],
 						'tls_issuer' => $this->host['tls_issuer'],
-						'tls_connect' => $this->host['tls_connect']
-					],
-					'interface' => $this->getHostInterface($interface_input)
-				];
+						'tls_connect' => $this->host['tls_connect'],
+						'tls_subject' => $this->host['tls_subject']
+					];
+				}
 
 				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
 					$data['interface']['dns']
@@ -409,13 +408,18 @@ abstract class CControllerPopupItemTest extends CController {
 					'host' => [
 						'hostid' => $this->host['hostid'],
 						'available' => $this->host['available'],
-						'ipmi_available' => $this->host['ipmi_available'],
-						'jmx_available' => $this->host['jmx_available'],
-						'snmp_available' => $this->host['snmp_available'],
-						'maintenance_status' => $this->host['maintenance_status'],
-						'maintenance_type' => $this->host['maintenance_type']
+						'jmx_available' => $this->host['jmx_available']
 					]
 				];
+
+				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
+					$data['host'] += [
+						'maintenance_status' => $this->host['maintenance_status'],
+						'ipmi_available' => $this->host['ipmi_available'],
+						'snmp_available' => $this->host['snmp_available'],
+						'maintenance_type' => $this->host['maintenance_type']
+					];
+				}
 				break;
 
 			case ITEM_TYPE_AGGREGATE:
@@ -484,13 +488,18 @@ abstract class CControllerPopupItemTest extends CController {
 					'ipmi_sensor' => array_key_exists('ipmi_sensor', $input) ? $input['ipmi_sensor'] : null,
 					'interface' => $this->getHostInterface($interface_input),
 					'host' => [
-						'hostid' => $this->host['hostid'],
+						'hostid' => $this->host['hostid']
+					]
+				];
+
+				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
+					$data['host'] += [
 						'ipmi_authtype' => $this->host['ipmi_authtype'],
 						'ipmi_privilege' => $this->host['ipmi_privilege'],
 						'ipmi_username' => $this->host['ipmi_username'],
 						'ipmi_password' => $this->host['ipmi_password']
-					]
-				];
+					];
+				}
 
 				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
 					$data['interface']['dns']
@@ -572,9 +581,9 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Check if item belongs to host and select and resolve interface properties. Leave fields empty otherwise.
 	 *
-	 * @var array $inputs  Stored user input used to overwrite values retrieved from database.
+	 * @param array $inputs  Stored user input used to overwrite values retrieved from database.
 	 *
-	 * @param array $interface_data
+	 * @return array $interface_data
 	 */
 	protected function getHostInterface(array $inputs) {
 		$interface_data = [
