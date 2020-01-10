@@ -135,11 +135,10 @@ class CModule {
 	}
 
 	/**
-	 * Module method to be called before application will exit and send response to browser. Will be called only for
-	 * module responsible for current request.
+	 * Module method to be called before application will exit and send response to browser.
 	 *
 	 * @param Action $action  Action instance responsible for current request.
 	 */
-	public function beforeTerminate(Action $action) {
+	public function afterAction(Action $action) {
 	}
 }

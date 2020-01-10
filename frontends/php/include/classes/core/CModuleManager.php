@@ -322,29 +322,29 @@ class CModuleManager {
 	/**
 	 * Call modules before action event.
 	 *
-	 * @param Action|null $action  Action instance responsible for current request
+	 * @param Action $action  Action instance responsible for current request
 	 */
-	public function beforeAction(Action $action = null) {
+	public function beforeAction(Action $action) {
 		$this->invokeEventHandler($action, 'beforeAction');
 	}
 
 	/**
 	 * Modules method to be called before application will exit and send response to browser.
 	 *
-	 * @param Action|null $action  Action instance responsible for current request.
+	 * @param Action $action  Action instance responsible for current request.
 	 */
-	public function beforeTerminate(Action $action = null) {
-		$this->invokeEventHandler($action, 'beforeTerminate');
+	public function afterAction(Action $action) {
+		$this->invokeEventHandler($action, 'afterAction');
 	}
 
 	/**
 	 * Invokes event handler for every enabled module, current module event handler will be invoked last.
 	 *
-	 * @param Action|null $action   Current action object.
-	 * @param string      $event    Module event handler name.
+	 * @param Action $action   Current action object.
+	 * @param string $event    Module event handler name.
 	 */
-	private function invokeEventHandler(Action $action = null, $event) {
-		$action_name = ($action instanceof Action) ? $action->getAction() : null;
+	private function invokeEventHandler(Action $action, $event) {
+		$action_name = $action->getAction();
 		$current_module = $this->getModuleByActionName($action_name);
 
 		foreach ($this->modules as $module) {
@@ -353,8 +353,8 @@ class CModuleManager {
 			}
 		}
 
-		if ($current_module) {
-			$this->getModuleByActionName($action_name)->$event($action);
+		if ($current_module instanceof CModule) {
+			$current_module->$event($action);
 		}
 	}
 }

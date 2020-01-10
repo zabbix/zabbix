@@ -179,7 +179,6 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
-
 				$this->initMainMenu();
 				$this->initModuleManager();
 
@@ -192,16 +191,9 @@ class ZBase {
 				$router->setAction($action);
 				$this->action_module = $this->module_manager->getModuleByActionName($router->getAction());
 				$this->component_registry->get('menu.main')->setSelected($action);
+				CProfiler::getInstance()->start();
+				$this->processRequest($router);
 
-				if ($router->getController() !== null) {
-					CProfiler::getInstance()->start();
-					$this->processRequest($router);
-					static::terminate();
-				}
-
-				if (resourceAccessDenied($file)) {
-					access_deny(ACCESS_DENY_PAGE);
-				}
 				break;
 
 			case self::EXEC_MODE_API:
@@ -227,7 +219,7 @@ class ZBase {
 	 * Call beforeTerminate modules event and terminate application.
 	 */
 	public static function terminate() {
-		self::ModuleManager()->beforeTerminate(self::getInstance()->action);
+		self::ModuleManager()->afterAction(self::getInstance()->action);
 
 		exit;
 	}
@@ -496,6 +488,12 @@ class ZBase {
 			$response = $this->action->run();
 		}
 
+		if ($this->action instanceof CFakeAction) {
+			register_shutdown_function(['APP', 'terminate']);
+
+			return;
+		}
+
 		// Controller returned data
 		if ($response instanceof CControllerResponseData) {
 			// if no view defined we pass data directly to layout
@@ -557,6 +555,8 @@ class ZBase {
 
 			redirect('zabbix.php?action=system.warning');
 		}
+
+		static::terminate();
 	}
 
 	/**

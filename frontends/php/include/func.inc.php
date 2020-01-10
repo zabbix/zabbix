@@ -2728,35 +2728,3 @@ function relativeDateToText($from, $to) {
 
 	return $from.' – '.$to;
 }
-
-/**
- * Return true if user requested resource is denied.
- *
- * @param string $resource  non-MVC file name to check.
- *
- * @return bool
- */
-function resourceAccessDenied($resource) {
-	$user_type = CWebUser::getType();
-	$denied = [];
-
-	if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
-		$denied = [
-			'hostgroups.php', 'templates.php', 'hosts.php', 'items.php', 'triggers.php', 'graphs.php',
-			'applications.php', 'host_discovery.php', 'disc_prototypes.php', 'trigger_prototypes.php',
-			'host_prototypes.php', 'httpconf.php', 'maintenance.php', 'actionconf.php', 'discoveryconf.php',
-			'services.php'
-		];
-	}
-
-	if ($user_type != USER_TYPE_SUPER_ADMIN) {
-		$denied = array_merge($denied, [
-			'auditlogs.php', 'auditacts.php', 'report4.php', 'correlation.php', 'adm.gui.php', 'adm.housekeeper.php',
-			'adm.images.php', 'adm.iconmapping.php', 'adm.regexps.php', 'adm.macros.php', 'adm.valuemapping.php',
-			'adm.workingtime.php', 'adm.triggerseverities.php', 'adm.triggerdisplayoptions.php', 'adm.other.php',
-			'autoreg.edit', 'module.list', 'module.edit', 'usergrps.php', 'queue.php'
-		]);
-	}
-
-	return in_array($resource, $denied);
-}
