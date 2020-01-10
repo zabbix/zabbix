@@ -177,13 +177,7 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	}
 
 	if allowRules > 0 && denyRules == 0 {
-		// if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration
-		log.Errf("adding DenyKey=* rule for proper whitelist configuration")
-		r := Record{Pattern: "*", Permission: DENY}
-		if err = addRule(r); err != nil {
-			err = fmt.Errorf("\"%s\" %s", r.Pattern, err.Error())
-			return
-		}
+		log.Errf("Only AllowKey rules defined. Have you forgot to add trailing DenyKey=* ?")
 	} else {
 		// trailing AllowKey rules are meaningless, because AllowKey=* is default behavior
 		for i := len(rules) - 1; i >= 0; i-- {

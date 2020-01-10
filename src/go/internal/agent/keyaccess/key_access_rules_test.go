@@ -334,7 +334,8 @@ func TestWhitelist(t *testing.T) {
 
 	records.addRule("vfs.file.*[/var/log/*]", ALLOW)
 	records.addRule("system.localtime[*]", ALLOW)
-	records.addRule("system.localtime[*]", DENY)
+	records.addRule("system.localtime[*]", DENY) // Will not be added
+	records.addRule("*", DENY)
 
 	var scenarios = []scenario{
 		{metric: "vfs.file.size[/var/log/zabbix_server.log]", result: true},
@@ -389,25 +390,25 @@ func TestDuplicateRules(t *testing.T) {
 	var records accessRules
 
 	records.addRule("vfs.file.*", DENY)
-	records.addRule("vfs.file.*", DENY)
+	records.addRule("vfs.file.*", DENY) // Will not be added
 	records.addRule("vfs.file.contents", DENY)
 	records.addRule("vfs.file.contents[]", DENY)
 	records.addRule("vfs.file.contents[/etc/passwd]", DENY)
 	records.addRule("vfs.file.contents[/etc/passwd,*]", DENY)
-	records.addRule("vfs.file.*", ALLOW)
-	records.addRule("vfs.file.contents", ALLOW)
-	records.addRule("vfs.file.contents[]", ALLOW)
-	records.addRule("vfs.file.contents[/etc/passwd]", ALLOW)
-	records.addRule("vfs.file.contents[/etc/passwd,*]", ALLOW)
+	records.addRule("vfs.file.*", ALLOW)                       // Will not be added
+	records.addRule("vfs.file.contents", ALLOW)                // Will not be added
+	records.addRule("vfs.file.contents[]", ALLOW)              // Will not be added
+	records.addRule("vfs.file.contents[/etc/passwd]", ALLOW)   // Will not be added
+	records.addRule("vfs.file.contents[/etc/passwd,*]", ALLOW) // Will not be added
 	records.addRule("net.*.in", ALLOW)
-	records.addRule("net.*.in", ALLOW)
+	records.addRule("net.*.in", ALLOW) // Will not be added
 	records.addRule("net.*.in[]", ALLOW)
 	records.addRule("net.*.in[eth0]", ALLOW)
 	records.addRule("net.*.in[eth0,*]", ALLOW)
-	records.addRule("net.*.in", DENY)
-	records.addRule("net.*.in[]", DENY)
-	records.addRule("net.*.in[eth0]", DENY)
-	records.addRule("net.*.in[eth0,*]", DENY)
+	records.addRule("net.*.in", DENY)         // Will not be added
+	records.addRule("net.*.in[]", DENY)       // Will not be added
+	records.addRule("net.*.in[eth0]", DENY)   // Will not be added
+	records.addRule("net.*.in[eth0,*]", DENY) // Will not be added
 	records.addRule("net.*.in[eth0,bytes]", DENY)
 	records.addRule("*", DENY)
 
@@ -433,8 +434,8 @@ func TestNoRulesAfterAllowAll(t *testing.T) {
 	var records accessRules
 
 	records.addRule("vfs.file.*[*]", DENY)
-	records.addRule("*", ALLOW)
-	records.addRule("system.run[*]", DENY)
+	records.addRule("*", ALLOW)            // Will not be added
+	records.addRule("system.run[*]", DENY) // Will not be added
 
 	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
@@ -450,7 +451,7 @@ func TestNoRulesAfterDenyAll(t *testing.T) {
 
 	records.addRule("vfs.file.*[*]", ALLOW)
 	records.addRule("*", DENY)
-	records.addRule("system.run[*]", ALLOW)
+	records.addRule("system.run[*]", ALLOW) // Will not be added
 
 	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: true},
@@ -467,26 +468,27 @@ func TestIncompleteWhitelist(t *testing.T) {
 
 	records.addRule("vfs.file.*[/var/log/*]", ALLOW)
 	records.addRule("system.localtime[*]", ALLOW)
+	// Trailing DenyKey=* is missing
 
 	var scenarios = []scenario{
 		{metric: "vfs.file.size[/var/log/zabbix_server.log]", result: true},
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log]", result: true},
 		{metric: "vfs.file.time[/var/log/]", result: true},
-		{metric: "vfs.file.time[/var/log]", result: false},
+		{metric: "vfs.file.time[/var/log]", result: true},
 		{metric: "system.localtime[]", result: true},
 		{metric: "system.localtime[utc]", result: true},
-		{metric: "system.localtime", result: false},
+		{metric: "system.localtime", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 3)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestNoTrailingAllowRules(t *testing.T) {
 	var records accessRules
 
 	records.addRule("vfs.file.*[*]", DENY)
-	records.addRule("system.run[*]", ALLOW)
-	records.addRule("*", ALLOW)
+	records.addRule("system.run[*]", ALLOW) // Will not be added
+	records.addRule("*", ALLOW)             // Will not be added
 
 	var scenarios = []scenario{
 		{metric: "vfs.file.contents[/etc/passwd]", result: false},
