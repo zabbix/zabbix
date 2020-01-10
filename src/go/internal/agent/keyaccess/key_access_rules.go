@@ -21,11 +21,11 @@ package keyaccess
 
 import (
 	"fmt"
-	"os"
 	"sort"
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/itemutil"
+	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/wildcard"
 )
 
@@ -106,10 +106,16 @@ func addRule(rec Record) (err error) {
 		return
 	} else if !noMoreRules {
 		if r := findRule(rule); r != nil {
-			if r.Permission == rule.Permission {
-				fmt.Fprintf(os.Stderr, "key access rule \"%s\" duplicates another rule defined above\n", rec.Pattern)
+			var ruleType string
+			if rule.Permission == ALLOW {
+				ruleType = "AllowKey"
 			} else {
-				fmt.Fprintf(os.Stderr, "key access rule \"%s\" conflicts with another rule defined above\n", rec.Pattern)
+				ruleType = "DenyKey"
+			}
+			if r.Permission == rule.Permission {
+				log.Errf("key access rule \"%s=%s\" duplicates another rule defined above", ruleType, rec.Pattern)
+			} else {
+				log.Errf("key access rule \"%s=%s\" conflicts with another rule defined above", ruleType, rec.Pattern)
 			}
 		} else if len(rule.Params) == 0 && rule.Key == "*" {
 			if rule.Permission == DENY {
@@ -168,7 +174,7 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 
 	if allowRules > 0 && denyRules == 0 {
 		// if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration
-		fmt.Fprintf(os.Stderr, "adding DenyKey=* rule for proper whitelist configuration\n")
+		log.Errf("adding DenyKey=* rule for proper whitelist configuration")
 		r := Record{Pattern: "*", Permission: DENY}
 		if err = addRule(r); err != nil {
 			err = fmt.Errorf("\"%s\" %s", r.Pattern, err.Error())

@@ -287,14 +287,14 @@ func main() {
 		}
 	}
 
-	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to load key access rules: %s\n", err.Error())
-		os.Exit(1)
-	}
-
 	if argTest || argPrint {
 		if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
+			os.Exit(1)
+		}
+
+		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+			log.Errf("Failed to load key access rules: %s", err.Error())
 			os.Exit(1)
 		}
 
@@ -387,6 +387,11 @@ func main() {
 	}
 
 	log.Infof("using configuration file: %s", confFlag)
+
+	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+		log.Errf("Failed to load key access rules: %s", err.Error())
+		os.Exit(1)
+	}
 
 	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
 		log.Critf("cannot initialize user parameters: %s", err)
