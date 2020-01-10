@@ -178,7 +178,7 @@ class CRouter {
 		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
 		'search'						=> ['CControllerSearch',							'layout.htmlpage',		'search'],
-		// fake actions
+		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
 		'adm.gui.php'					=> ['CLegacyAction', null, null],
 		'adm.housekeeper.php'			=> ['CLegacyAction', null, null],

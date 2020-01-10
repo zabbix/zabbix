@@ -38,7 +38,7 @@ class CLegacyAction extends Action {
 	 * @return bool
 	 */
 	public function checkPermissions() {
-		$user_type = CWebUser::getType();
+		$user_type = $this->getUserType();
 		$denied = [];
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
@@ -63,7 +63,6 @@ class CLegacyAction extends Action {
 	}
 
 	public function doAction() {
-
 	}
 
 	/**
