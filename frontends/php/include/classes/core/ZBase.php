@@ -488,7 +488,7 @@ class ZBase {
 			$response = $this->action->run();
 		}
 
-		if ($this->action instanceof CFakeAction) {
+		if ($this->action instanceof CLegacyAction) {
 			register_shutdown_function(['APP', 'terminate']);
 
 			return;

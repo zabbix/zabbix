@@ -21,7 +21,7 @@
 
 use CController as Action;
 
-class CFakeAction extends Action {
+class CLegacyAction extends Action {
 
 	/**
 	 * Check user input.
