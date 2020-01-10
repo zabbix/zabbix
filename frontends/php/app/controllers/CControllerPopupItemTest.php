@@ -719,8 +719,8 @@ abstract class CControllerPopupItemTest extends CController {
 			'item' => [
 				'{ITEM.ID}' => (array_key_exists('itemid', $inputs) && $inputs['itemid'])
 					? $inputs['itemid']
-					: _('UNKNOWN'),
-				'{ITEM.KEY}' => array_key_exists('key', $inputs) ? $inputs['key'] : _('UNKNOWN')
+					: UNRESOLVED_MACRO_STRING,
+				'{ITEM.KEY}' => array_key_exists('key', $inputs) ? $inputs['key'] : UNRESOLVED_MACRO_STRING
 			]
 		];
 
