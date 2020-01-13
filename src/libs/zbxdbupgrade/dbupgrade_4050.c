@@ -348,7 +348,7 @@ static void	DBpatch_4050016_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs
 	result = DBselect(
 			"select h.interfaceid,h.bulk"
 			" from interface h"
-			" where type=3 and h.interfaceid not in ("
+			" where type=2 and h.interfaceid not in ("
 				"select interfaceid "
 				" from items i"
 				" where i.interfaceid is not null"
