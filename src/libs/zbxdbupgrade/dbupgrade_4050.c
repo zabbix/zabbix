@@ -283,7 +283,7 @@ static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zb
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		dbu_interface	interface;
+		dbu_interface		interface;
 		dbu_snmp_if_t		snmp;
 		int			item_type;
 		const char 		*if_port;
@@ -336,6 +336,42 @@ static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zb
 			interface.port = zbx_strdup(NULL, if_port);
 
 		zbx_vector_dbu_interface_append(interfaces, interface);
+	}
+	DBfree_result(result);
+}
+
+static void	DBpatch_4050016_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+
+	result = DBselect(
+			"select h.interfaceid,h.bulk"
+			" from interface h"
+			" where type=3 and h.interfaceid not in ("
+				"select interfaceid "
+				" from items i"
+				" where i.interfaceid is not null"
+					" and  i.type IN (1,4,6));");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		dbu_snmp_if_t		snmp;
+
+		ZBX_DBROW2UINT64(snmp.interfaceid, row[0]);
+		ZBX_STR2UCHAR(snmp.bulk, row[1]);
+		snmp.version = ZBX_IF_SNMP_VERSION_2;
+		snmp.community = zbx_strdup(NULL, "{$SNMP_COMMUNITY}");
+		snmp.securityname = zbx_strdup(NULL, "");
+		snmp.securitylevel = 0;
+		snmp.authpassphrase = zbx_strdup(NULL, "");
+		snmp.privpassphrase = zbx_strdup(NULL, "");
+		snmp.authprotocol = 0;
+		snmp.privprotocol = 0;
+		snmp.contextname = zbx_strdup(NULL, "");
+		snmp.item_port = zbx_strdup(NULL, "");
+
+		zbx_vector_dbu_snmp_if_append(snmp_def_ifs, snmp);
 	}
 	DBfree_result(result);
 }
@@ -444,14 +480,16 @@ static int	DBpatch_4050016_items_type_update(void)
 static int	DBpatch_4050016(void)
 {
 	zbx_vector_dbu_interface_t	interfaces;
-	zbx_vector_dbu_snmp_if_t	snmp_ifs, snmp_new_ifs;
+	zbx_vector_dbu_snmp_if_t	snmp_ifs, snmp_new_ifs, snmp_def_ifs;
 	int				ret = FAIL;
 
 	zbx_vector_dbu_snmp_if_create(&snmp_ifs);
 	zbx_vector_dbu_snmp_if_create(&snmp_new_ifs);
+	zbx_vector_dbu_snmp_if_create(&snmp_def_ifs);
 	zbx_vector_dbu_interface_create(&interfaces);
 
 	DBpatch_4050016_load_data(&interfaces, &snmp_ifs, &snmp_new_ifs);
+	DBpatch_4050016_load_empty_if(&snmp_def_ifs);
 
 	while(1)
 	{
@@ -462,6 +500,9 @@ static int	DBpatch_4050016(void)
 			break;
 
 		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_4050016_snmp_if_save(&snmp_new_ifs))
+			break;
+
+		if (0 < snmp_def_ifs.values_num && SUCCEED != DBpatch_4050016_snmp_if_save(&snmp_def_ifs))
 			break;
 
 		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_4050016_items_update(&snmp_new_ifs))
@@ -480,6 +521,8 @@ static int	DBpatch_4050016(void)
 	zbx_vector_dbu_snmp_if_destroy(&snmp_ifs);
 	zbx_vector_dbu_snmp_if_clear_ext(&snmp_new_ifs, db_snmpinterface_free);
 	zbx_vector_dbu_snmp_if_destroy(&snmp_new_ifs);
+	zbx_vector_dbu_snmp_if_clear_ext(&snmp_def_ifs, db_snmpinterface_free);
+	zbx_vector_dbu_snmp_if_destroy(&snmp_def_ifs);
 
 	return ret;
 }
