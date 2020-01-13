@@ -528,6 +528,7 @@ static void am_remove_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 	zbx_free(mediatype->passwd);
 	zbx_free(mediatype->script);
 	zbx_free(mediatype->script_bin);
+	zbx_free(mediatype->error);
 
 	zbx_binary_heap_destroy(&mediatype->queue);
 	zbx_hashset_remove_direct(&manager->mediatypes, mediatype);
