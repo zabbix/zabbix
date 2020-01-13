@@ -121,7 +121,8 @@ function validateOperationPopup(overlay) {
 			if (typeof response.errors !== 'undefined') {
 				jQuery(response.errors).insertBefore($form);
 			}
-
-			submitOperationPopup(response);
+			else {
+				submitOperationPopup(response);
+			}
 		});
 }

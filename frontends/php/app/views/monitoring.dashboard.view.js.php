@@ -81,7 +81,7 @@
 			dataType: 'json',
 			method: 'POST',
 			complete: function() {
-				overlay.unsetLoading(overlay);
+				overlay.unsetLoading();
 			},
 			success: function(response) {
 				var errors = [];
@@ -129,7 +129,7 @@
 			dataType: 'json',
 			method: 'POST',
 			complete: function() {
-				overlay.unsetLoading(overlay);
+				overlay.unsetLoading();
 			},
 			success: function(response) {
 				var errors = [],
