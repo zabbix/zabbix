@@ -301,8 +301,8 @@ void finalize_key_access_rules_configuration(void)
 		/* if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration */
 		if (0 < allow_rules && 0 == deny_rules)
 		{
-			zabbix_log(LOG_LEVEL_WARNING,
-					"Only AllowKey rules defined. Have you forgot to add trailing DenyKey=* ?");
+			zabbix_log(LOG_LEVEL_CRIT, "\"AllowKey\" without \"DenyKey\" rules are meaningless");
+			exit(EXIT_FAILURE);
 		}
 		else
 		{
