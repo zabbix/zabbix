@@ -182,7 +182,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if ($ret && $hostid) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'host', 'name', 'status', 'available', 'flags', 'proxy_hostid', 'tls_subject',
+				'output' => ['hostid', 'host', 'name', 'status', 'available', 'proxy_hostid', 'tls_subject',
 					'ipmi_available', 'jmx_available', 'snmp_available', 'maintenance_status', 'maintenance_type',
 					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_psk_identity', 'tls_psk',
 					'tls_issuer', 'tls_connect'
@@ -193,7 +193,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 			if (!$hosts) {
 				$hosts = API::Template()->get([
-					'output' => ['templateid', 'host', 'name', 'status', 'available', 'flags', 'jmx_available'],
+					'output' => ['templateid', 'host', 'name', 'status', 'available', 'jmx_available'],
 					'templateids' => [$hostid],
 					'editable' => true
 				]);
@@ -272,11 +272,20 @@ abstract class CControllerPopupItemTest extends CController {
 			$data['itemid'] = $input['itemid'];
 		}
 
-		$interface_input = [
-			'interfaceid' => array_key_exists('interfaceid', $input) ? $input['interfaceid'] : 0
-		];
+		if (array_key_exists('interface', $input) && array_key_exists('interfaceid', $input['interface'])) {
+			$interface_input['interfaceid'] = $input['interface']['interfaceid'];
+		}
+		elseif (array_key_exists('interfaceid', $input)) {
+			$interface_input['interfaceid'] = $input['interfaceid'];
+		}
+		else {
+			$interface_input['interfaceid'] = 0;
+		}
 
-		if (array_key_exists('useip', $input)) {
+		if (array_key_exists('interface', $input) && array_key_exists('useip', $input['interface'])) {
+			$interface_input['useip'] = $input['interface']['useip'];
+		}
+		elseif (array_key_exists('useip', $input)) {
 			$interface_input['useip'] = $input['useip'];
 		}
 

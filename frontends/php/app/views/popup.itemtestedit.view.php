@@ -33,10 +33,10 @@ foreach ($data['inputs'] as $name => $value) {
 	if ($name === 'interface') {
 		// SNMPv3 additional details about interface.
 		if (array_key_exists('useip', $value)) {
-			$form->addVar('useip', $value['useip']);
+			$form->addVar('interface[useip]', $value['useip']);
 		}
 		if (array_key_exists('interfaceid', $value)) {
-			$form->addVar('interfaceid', $value['interfaceid']);
+			$form->addVar('interface[interfaceid]', $value['interfaceid']);
 		}
 		continue;
 	}

@@ -69,7 +69,6 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
 			'time_change'			=> 'int32',
 			'timeout'				=> 'string',
-			'useip'					=> 'in 0,1',
 			'username'				=> 'string',
 			'url'					=> 'string',
 			'value'					=> 'string',
