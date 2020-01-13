@@ -155,8 +155,8 @@ class testItemState extends CIntegrationTest {
 				'LogFileSize' => 20
 			],
 			self::COMPONENT_AGENT => [
-				'Hostname'  => 'test_host',
-				'ServerActive'  => '127.0.0.1',
+				'Hostname' => 'test_host',
+				'ServerActive' => '127.0.0.1'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'RefreshActiveChecks' => self::REFRESH_ACT_CHKS_INTERVAL,
 				'BufferSend' => 1
 			]
