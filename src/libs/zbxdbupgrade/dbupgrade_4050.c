@@ -76,31 +76,6 @@ static int	DBpatch_4050007(void)
 	return DBmodify_field_type("dchecks", &field, NULL);
 }
 
-static int	DBpatch_4050010(void)
-{
-	int		i;
-	const char	*values[] = {
-			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
-			"web.usergrps.php.sort", "web.usergroup.sort",
-			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
-			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
-			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
-			"web.latest.php.sort", "web.latest.sort",
-			"web.latest.php.sortorder", "web.latest.sortorder"
-		};
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	for (i = 0; i < (int)ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static int	DBpatch_4050011(void)
 {
 #if defined(HAVE_IBM_DB2) || defined(HAVE_POSTGRESQL)
@@ -132,6 +107,33 @@ static int	DBpatch_4050012(void)
 	return DBmodify_field_type("users", &field, NULL);
 }
 
+static int	DBpatch_4050013(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
+			"web.usergrps.php.sort", "web.usergroup.sort",
+			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
+			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
+			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
+			"web.latest.php.sort", "web.latest.sort",
+			"web.latest.php.sortorder", "web.latest.sortorder",
+			"web.paging.lastpage", "web.pager.entity",
+			"web.paging.page", "web.pager.page"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -145,8 +147,8 @@ DBPATCH_ADD(4050004, 0, 1)
 DBPATCH_ADD(4050005, 0, 1)
 DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
-DBPATCH_ADD(4050010, 0, 1)
 DBPATCH_ADD(4050011, 0, 1)
 DBPATCH_ADD(4050012, 0, 1)
+DBPATCH_ADD(4050013, 0, 1)
 
 DBPATCH_END()

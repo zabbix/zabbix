@@ -1,5 +1,3 @@
-// +build !linux
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -19,15 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package netif
+package zabbixasync
 
-import "fmt"
-
-func getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
-	err = fmt.Errorf("Unsupported metric.")
-	return
-}
-
-func getDevList() (string, error) {
-	return "", fmt.Errorf("Unsupported metric.")
+func getMetrics() []string {
+	return []string{
+		"system.localtime", "Returns system local time.",
+	}
 }

@@ -273,7 +273,7 @@ $form_tabs = (new CTabView())
 	->addTab('problems',  _('Problems'), $tab_problems)
 	->addTab('overrides',  _('Overrides'), $tab_overrides)
 	->addClass('graph-widget-config-tabs') // Add special style used for graph widget tabs only.
-	->onTabChange('jQuery.colorpicker("hide");')
+	->onTabChange('jQuery.colorpicker("hide");jQuery(window).trigger("resize");')
 	->setSelected(0);
 
 // Add CTabView to form.

@@ -78,7 +78,10 @@ if (!$data['screen']) {
 	else {
 		// Redirect to slide show list.
 		ob_end_clean();
-		redirect('slideconf.php');
+		redirect((new CUrl('slideconf.php'))
+			->setArgument('page', CPagerHelper::loadPage('slideconf.php', null))
+			->getUrl()
+		);
 	}
 }
 

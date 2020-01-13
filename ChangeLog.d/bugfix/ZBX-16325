@@ -1,0 +1,1 @@
+..F....... [ZBX-16325] fixed httpstepid validation when its value exceeds int32 (miks, vasilijs)

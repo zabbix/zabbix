@@ -31,8 +31,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$fields = [
 			'change_password' =>	'in 1',
-			'password1' =>			'db users.passwd',
-			'password2' =>			'db users.passwd',
+			'password1' =>			'string',
+			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',

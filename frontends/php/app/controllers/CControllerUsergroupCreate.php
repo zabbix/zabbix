@@ -88,7 +88,7 @@ class CControllerUsergroupCreate extends CController {
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.list')
-				->getUrl()
+				->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('User group added'));
@@ -96,7 +96,6 @@ class CControllerUsergroupCreate extends CController {
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.edit')
-				->getUrl()
 			);
 			$response->setMessageError(_('Cannot add user group'));
 			$response->setFormData($this->getInputAll());

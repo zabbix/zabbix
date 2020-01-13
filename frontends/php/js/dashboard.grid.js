@@ -3458,6 +3458,9 @@
 				if (current_url.getArgument('dashboardid')) {
 					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
 				}
+				else {
+					url.setArgument('cancel', '1');
+				}
 
 				// Redirect to last active dashboard.
 				// (1) In case of New Dashboard from list, it will open list

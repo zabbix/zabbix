@@ -918,10 +918,22 @@ else {
 	}
 	order_result($templates, $sortField, $sortOrder);
 
-	$url = (new CUrl('templates.php'))
-		->setArgument('groupid', getRequest('groupid', 0));
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$paging = getPagingLine($templates, $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$paging = CPagerHelper::paginate($page_num, $templates, $sortOrder,
+		(new CUrl('templates.php'))->setArgument('groupid', getRequest('groupid', 0))
+	);
 
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
@@ -984,6 +996,7 @@ else {
 		'pageFilter' => $pageFilter,
 		'templates' => $templates,
 		'paging' => $paging,
+		'page' => $page_num,
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,

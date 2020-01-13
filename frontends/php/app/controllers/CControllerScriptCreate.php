@@ -82,11 +82,17 @@ class CControllerScriptCreate extends CController {
 		$result = (bool) API::Script()->create($script);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('zabbix.php?action=script.list&uncheck=1');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'script.list')
+				->setArgument('page', CPagerHelper::loadPage('script.list', null))
+			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Script added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=script.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'script.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add script'));
 		}
