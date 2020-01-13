@@ -161,7 +161,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 
 			// Check previous time.
-			if ($this->use_prev_value) {
+			if ($this->use_prev_value && $this->getInput('prev_value', '') !== '') {
 				$prev_time = $this->getInput('prev_time', '');
 
 				$relative_time_parser = new CRelativeTimeParser();
@@ -233,10 +233,15 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 		// Get previous value and time.
 		if ($this->use_prev_value) {
-			$preproc_test_data['history'] = [
-				'value' => $this->getInput('prev_value', ''),
-				'timestamp' => $this->getInput('prev_time')
-			];
+			$prev_value = $this->getInput('prev_value', '');
+			$prev_time = $this->getInput('prev_time', '');
+
+			if ($prev_value !== '' || $prev_time !== '') {
+				$preproc_test_data['history'] = [
+					'value' => $prev_value,
+					'timestamp' => $prev_time
+				];
+			}
 		}
 
 		$output = [
@@ -295,7 +300,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			elseif (is_array($result)) {
 				if (array_key_exists('result', $result)) {
 					// Move current value to previous value field.
-					if ($this->use_prev_value) {
+					if ($this->use_prev_value && $preproc_test_data['value'] !== '') {
 						$preproc_test_data['history']['value'] = $preproc_test_data['value'];
 						$preproc_test_data['history']['timestamp'] = $this->getPrevTime();
 
@@ -363,8 +368,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				}
 				unset($step);
 
-				if (array_key_exists('previous', $result) && $result['previous'] === true) {
-					error(_s('Incorrect value for "%1$s" field.', _('Previous value')));
+				if (array_key_exists('error', $result)) {
+					error($result['error']);
 				}
 				elseif ($this->show_final_result) {
 					if (array_key_exists('result', $result)) {
