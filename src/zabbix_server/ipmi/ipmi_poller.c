@@ -91,7 +91,7 @@ static void	ipmi_poller_send_result(zbx_ipc_async_socket_t *socket, zbx_uint32_t
  *             message - [IN] the value request message                         *
  *                                                                              *
  ********************************************************************************/
-static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zbx_ipc_message_t *message)
+static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, const zbx_ipc_message_t *message)
 {
 	zbx_uint64_t	itemid;
 	char		*addr, *username, *password, *sensor, *value = NULL;
@@ -104,7 +104,6 @@ static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zb
 
 	zbx_ipmi_deserialize_request(message->data, &itemid, &addr, &port, &authtype,
 			&privilege, &username, &password, &sensor, &command);
-
 
 	if (ZBX_IPC_IPMI_DISCOVERY_REQUEST != message->code)
 	{
