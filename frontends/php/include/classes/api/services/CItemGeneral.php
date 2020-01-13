@@ -548,8 +548,8 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// Prevent IPMI sensor field being empty if item key is not "ipmi.get".
-			if ($item['type'] == ITEM_TYPE_IPMI && $item['key_'] !== 'ipmi.get'
-					&& (!array_key_exists('ipmi_sensor', $item) || $item['ipmi_sensor'] === '')) {
+			if ($fullItem['type'] == ITEM_TYPE_IPMI && $fullItem['key_'] !== 'ipmi.get'
+					&& (!array_key_exists('ipmi_sensor', $fullItem) || $fullItem['ipmi_sensor'] === '')) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 					'ipmi_sensor', _('cannot be empty')
 				));
