@@ -22,8 +22,7 @@
 /**
  * Convert PHP variable to string version of JavaScript style
  *
- * @deprecated use CJs::encodeJson() instead
- * @see CJs::encodeJson()
+ * @deprecated use json_encode instead
  *
  * @param mixed $value
  * @param bool  $as_object return string containing javascript object
