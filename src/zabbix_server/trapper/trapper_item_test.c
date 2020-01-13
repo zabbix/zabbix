@@ -78,6 +78,7 @@ static void	dump_item(const DC_ITEM *item)
 	zabbix_log(LOG_LEVEL_TRACE, "  maintenance_status: %u", item->host.maintenance_status);
 	zabbix_log(LOG_LEVEL_TRACE, "  maintenance_type: %u", item->host.maintenance_type);
 	zabbix_log(LOG_LEVEL_TRACE, "  snmp_available: %u", item->host.snmp_available);
+	zabbix_log(LOG_LEVEL_TRACE, "  available: %u", item->host.available);
 	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_available: %u", item->host.ipmi_available);
 	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_authtype: %d", item->host.ipmi_authtype);
 	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_privilege: %u", item->host.ipmi_privilege);
@@ -253,6 +254,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 			&item.host.maintenance_status);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
 			&item.host.maintenance_type);
+	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_AVAILABLE, table_hosts, "available", &item.host.available);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_SNMP_AVAILABLE, table_hosts, "snmp_available",
 			&item.host.snmp_available);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_AVAILABLE, table_hosts, "ipmi_available",
