@@ -357,18 +357,33 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
 			case ITEM_TYPE_SNMPV3:
-				switch ($this->getInput('test_type')) {
-					case self::ZBX_TEST_TYPE_LLD:
-						$item_flag = ZBX_FLAG_DISCOVERY_RULE;
-						break;
+				if (array_key_exists('flags', $input)) {
+					$item_flag = $input['flags'];
+				}
+				elseif (array_key_exists('itemid', $input)) {
+					$items = API::Item()->get([
+						'output' => ['flags'],
+						'itemids' => $input['itemid']
+					]);
 
-					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
-						$item_flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-						break;
+					if ($items) {
+						$item_flag = $items[0]['flags'];
+					}
+					else {
+						switch ($this->getInput('test_type')) {
+							case self::ZBX_TEST_TYPE_LLD:
+								$item_flag = ZBX_FLAG_DISCOVERY_RULE;
+								break;
 
-					default:
-						$item_flag = ZBX_FLAG_DISCOVERY_NORMAL;
-						break;
+							case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
+								$item_flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+								break;
+
+							default:
+								$item_flag = ZBX_FLAG_DISCOVERY_NORMAL;
+								break;
+						}
+					}
 				}
 
 				$data += [

@@ -111,7 +111,8 @@
 					snmp_oid: form_data['snmp_oid'],
 					snmp_community: form_data['snmp_community'],
 					useip: form_data['useip'],
-					port: form_data['port']
+					port: form_data['port'],
+					flags: form_data['flags']
 				};
 
 				if (+form_data['type'] == <?= ITEM_TYPE_SNMPV3 ?>) {
