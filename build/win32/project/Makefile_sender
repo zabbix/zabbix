@@ -53,7 +53,7 @@ OBJS = \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
 	..\..\..\src\zabbix_sender\zabbix_sender.o
 
-LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib user32.lib
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib user32.lib $(LIBS)
 
 !INCLUDE Makefile_pcre.inc
 !INCLUDE Makefile_tls.inc
