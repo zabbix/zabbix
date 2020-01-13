@@ -1,3 +1,5 @@
+// +build !linux,!windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -23,28 +25,9 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
-const (
-	errorInvalidSecondParam   = "Invalid second parameter."
-	errorEmptyIfName          = "Network interface name cannot be empty."
-	errorTooManyParams        = "Too many parameters."
-	errorUnsupportedMetric    = "Unsupported metric."
-	errorParametersNotAllowed = "Item does not allow parameters."
-)
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
 }
 
-var impl Plugin
-
-type dirFlag uint8
-
-const (
-	dirIn dirFlag = 1 << iota
-	dirOut
-)
-
-type msgIfDiscovery struct {
-	Ifname string `json:"{#IFNAME}"`
+func init() {
 }

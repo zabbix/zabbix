@@ -1,3 +1,5 @@
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -17,34 +19,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package netif
+package win32
 
-import (
-	"zabbix.com/pkg/plugin"
-)
+import "syscall"
 
-const (
-	errorInvalidSecondParam   = "Invalid second parameter."
-	errorEmptyIfName          = "Network interface name cannot be empty."
-	errorTooManyParams        = "Too many parameters."
-	errorUnsupportedMetric    = "Unsupported metric."
-	errorParametersNotAllowed = "Item does not allow parameters."
-)
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
+func mustLoadLibrary(name string) Hlib {
+	if handle, err := syscall.LoadLibrary(name); err != nil {
+		panic(err.Error())
+	} else {
+		return Hlib(handle)
+	}
 }
 
-var impl Plugin
+func (h Hlib) mustGetProcAddress(name string) uintptr {
+	if addr, err := syscall.GetProcAddress(syscall.Handle(h), name); err != nil {
+		panic(err.Error())
+	} else {
+		return addr
+	}
+}
 
-type dirFlag uint8
+func bool2uintptr(value bool) uintptr {
+	if value {
+		return 1
+	}
+	return 0
+}
 
-const (
-	dirIn dirFlag = 1 << iota
-	dirOut
-)
-
-type msgIfDiscovery struct {
-	Ifname string `json:"{#IFNAME}"`
+func init() {
 }

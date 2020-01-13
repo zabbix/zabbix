@@ -17,34 +17,4 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package netif
-
-import (
-	"zabbix.com/pkg/plugin"
-)
-
-const (
-	errorInvalidSecondParam   = "Invalid second parameter."
-	errorEmptyIfName          = "Network interface name cannot be empty."
-	errorTooManyParams        = "Too many parameters."
-	errorUnsupportedMetric    = "Unsupported metric."
-	errorParametersNotAllowed = "Item does not allow parameters."
-)
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-var impl Plugin
-
-type dirFlag uint8
-
-const (
-	dirIn dirFlag = 1 << iota
-	dirOut
-)
-
-type msgIfDiscovery struct {
-	Ifname string `json:"{#IFNAME}"`
-}
+package win32

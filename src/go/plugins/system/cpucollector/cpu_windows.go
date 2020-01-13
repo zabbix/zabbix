@@ -1,5 +1,3 @@
-// +build !linux
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -19,15 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package netif
+package cpucollector
 
-import "zabbix.com/pkg/plugin"
 
-func getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
-	err = plugin.UnsupportedMetricError
-	return
+import (
+	"errors"
+)
+
+func (p *Plugin) collect() (err error) {
+	return errors.New("Not implemented")
 }
 
-func getDevList() (string, error) {
-	return "", plugin.UnsupportedMetricError
+func (p *Plugin) numCPU() int {
+	// TODO: implementation
+	return 0
+}
+
+func (p *Plugin) getStateIndex(state string) (index int, err error) {
+	switch state {
+	case "", "system":
+		index = stateSystem
+	default:
+		err = errors.New("unsupported state")
+	}
+	return 0, errors.New("Not implemented")
 }
