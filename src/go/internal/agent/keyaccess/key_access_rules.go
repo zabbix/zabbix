@@ -177,7 +177,8 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	}
 
 	if allowRules > 0 && denyRules == 0 {
-		log.Warningf("Only AllowKey rules defined. Have you forgot to add trailing DenyKey=* ?")
+		err = fmt.Errorf("\"AllowKey\" without \"DenyKey\" rules are meaningless")
+		return
 	} else {
 		// trailing AllowKey rules are meaningless, because AllowKey=* is default behavior
 		for i := len(rules) - 1; i >= 0; i-- {

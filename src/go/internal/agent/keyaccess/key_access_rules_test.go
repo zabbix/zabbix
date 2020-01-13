@@ -470,17 +470,11 @@ func TestIncompleteWhitelist(t *testing.T) {
 	records.addRule("system.localtime[*]", ALLOW)
 	// Trailing DenyKey=* is missing
 
-	var scenarios = []scenario{
-		{metric: "vfs.file.size[/var/log/zabbix_server.log]", result: true},
-		{metric: "vfs.file.contents[/var/log/zabbix_server.log]", result: true},
-		{metric: "vfs.file.time[/var/log/]", result: true},
-		{metric: "vfs.file.time[/var/log]", result: true},
-		{metric: "system.localtime[]", result: true},
-		{metric: "system.localtime[utc]", result: true},
-		{metric: "system.localtime", result: true},
-	}
+	var err error = LoadRules(&records.allowRecords, &records.denyRecords);
 
-	RunScenarios(t, scenarios, records, 2)
+	if err == nil || err.Error() != "\"AllowKey\" without \"DenyKey\" rules are meaningless" {
+		t.Errorf("Failure expected while loading incomplete whitelist")
+	}
 }
 
 func TestNoTrailingAllowRules(t *testing.T) {
