@@ -111,7 +111,7 @@
 					snmp_oid: form_data['snmp_oid'],
 					snmp_community: form_data['snmp_community'],
 					useip: form_data['useip'],
-					port: form_data['port'],
+					custom_port: form_data['port'],
 					flags: form_data['flags']
 				};
 
