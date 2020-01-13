@@ -357,14 +357,13 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
 			case ITEM_TYPE_SNMPV3:
-				if (array_key_exists('flags', $input)) {
-					$item_flag = $input['flags'];
-				}
-				elseif (array_key_exists('itemid', $input)) {
-					$items = API::Item()->get([
-						'output' => ['flags'],
-						'itemids' => $input['itemid']
-					]);
+				if (!array_key_exists('flags', $input)) {
+					$items = (array_key_exists('itemid', $input))
+						? API::Item()->get([
+							'output' => ['flags'],
+							'itemids' => $input['itemid']
+						])
+						: [];
 
 					if ($items) {
 						$item_flag = $items[0]['flags'];
@@ -384,6 +383,9 @@ abstract class CControllerPopupItemTest extends CController {
 								break;
 						}
 					}
+				}
+				else {
+					$item_flag = $input['flags'];
 				}
 
 				$data += [
