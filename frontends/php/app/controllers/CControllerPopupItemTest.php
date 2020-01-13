@@ -842,6 +842,10 @@ abstract class CControllerPopupItemTest extends CController {
 				'macros_n' => []
 			];
 
+			if ($this->preproc_item instanceof CItemPrototype) {
+				$types += ['lldmacros' => true];
+			}
+
 			foreach (['host', 'interface', 'item'] as $type) {
 				if (array_key_exists($type, $this->macros_by_item_props[$field])) {
 					$types['macros_n'] = array_merge($types['macros_n'], $this->macros_by_item_props[$field][$type]);

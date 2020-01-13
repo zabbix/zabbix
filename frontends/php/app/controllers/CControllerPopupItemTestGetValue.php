@@ -81,6 +81,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 		if ($ret) {
 			$this->item_type = $this->getInput('item_type');
+			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
 
 			/*
 			 * Check if key is not empty if 'get value from host' is checked and test is made for item with mandatory
