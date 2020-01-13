@@ -3546,9 +3546,10 @@
 					ajax_data['fields'] = JSON.stringify(fields);
 				}
 
-				body.addClass('is-loading');
-
 				var overlay = overlays_stack.getById('widgetConfg');
+
+				overlay.setLoading();
+
 				if (overlay.xhr) {
 					overlay.xhr.abort();
 				}
@@ -3594,7 +3595,7 @@
 						Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});
 						Overlay.prototype.containFocus.call({'$dialogue': $overlay});
 
-						body.removeClass('is-loading');
+						overlay.unsetLoading();
 					});
 			});
 		},

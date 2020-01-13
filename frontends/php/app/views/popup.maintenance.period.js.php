@@ -69,7 +69,7 @@ function submitMaintenancePeriod(overlay) {
 		},
 		success: function(response) {
 			if ('errors' in response) {
-				$container.parent().find('.msg-bad').remove();
+				overlay.$dialogue.find('.msg-bad').remove();
 
 				jQuery(response.errors).insertBefore($container);
 			}

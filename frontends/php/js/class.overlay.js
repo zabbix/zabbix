@@ -171,15 +171,15 @@ Overlay.prototype.setLoading = function() {
 	this.$dialogue.$body.addClass('is-loading');
 	this.$dialogue.$controls.find('select').prop('disabled', true);
 	this.$btn_submit && this.$btn_submit.prop('disabled', true);
-}
+};
 
 /**
  * Sets dialogue in idle sate.
  */
 Overlay.prototype.unsetLoading = function() {
-		this.$dialogue.$body.removeClass('is-loading');
-		this.$btn_submit && this.$btn_submit.removeClass('is-loading').prop('disabled', false);
-}
+	this.$dialogue.$body.removeClass('is-loading');
+	this.$btn_submit && this.$btn_submit.removeClass('is-loading').prop('disabled', false);
+};
 
 /**
  * @param {string} action

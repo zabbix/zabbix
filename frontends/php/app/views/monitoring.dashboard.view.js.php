@@ -66,12 +66,12 @@
 	 */
 	function dashbrdApplyProperties(overlay) {
 		var dashboard = jQuery('.dashbrd-grid-container'),
-			form = overlay.$dialogue.find('form'),
+			$form = overlay.$dialogue.find('form'),
 			url = new Curl('zabbix.php', false),
 			form_data = {};
 
-		form.trimValues(['#name']);
-		form_data = form.serializeJSON();
+		$form.trimValues(['#name']);
+		form_data = $form.serializeJSON();
 		url.setArgument('action', 'dashboard.properties.check');
 
 		overlay.setLoading();
@@ -83,9 +83,9 @@
 			complete: function() {
 				overlay.unsetLoading(overlay);
 			},
-			success: function (response) {
+			success: function(response) {
 				var errors = [];
-				form.parent().find('>.msg-good, >.msg-bad').remove();
+				overlay.$dialogue.find('>.msg-good, >.msg-bad').remove();
 
 				if (typeof response === 'object') {
 					if ('errors' in response) {
@@ -94,7 +94,7 @@
 				}
 
 				if (errors.length) {
-					jQuery(errors).insertBefore(form);
+					jQuery(errors).insertBefore($form);
 				}
 				else {
 					dashboard.dashboardGrid('setDashboardData', {
@@ -117,7 +117,7 @@
 	 * @return {bool}
 	 */
 	function dashbrdConfirmSharing(overlay) {
-		var form = overlay.$dialogue.find('form'),
+		var $form = overlay.$dialogue.find('form'),
 			url = new Curl('zabbix.php', false);
 
 		url.setArgument('action', 'dashboard.share.update');
@@ -125,17 +125,17 @@
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: form.serializeJSON(),
+			data: $form.serializeJSON(),
 			dataType: 'json',
 			method: 'POST',
 			complete: function() {
 				overlay.unsetLoading(overlay);
 			},
-			success: function (response) {
+			success: function(response) {
 				var errors = [],
 					messages = [];
 
-				form.parent().find('>.msg-good, >.msg-bad').remove();
+				overlay.$dialogue.find('>.msg-good, >.msg-bad').remove();
 
 				if (typeof response === 'object') {
 					if ('errors' in response) {
@@ -147,7 +147,7 @@
 				}
 
 				if (errors.length) {
-					jQuery(errors).insertBefore(form);
+					jQuery(errors).insertBefore($form);
 				}
 				else {
 					jQuery('main').find('> .msg-bad, > .msg-good').remove();

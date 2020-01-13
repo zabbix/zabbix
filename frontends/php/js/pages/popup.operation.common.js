@@ -119,9 +119,9 @@ function validateOperationPopup(overlay) {
 			overlay.$dialogue.find('.msg-bad').remove();
 
 			if (typeof response.errors !== 'undefined') {
-				return jQuery(response.errors).insertBefore($form);
+				jQuery(response.errors).insertBefore($form);
 			}
 
-			return submitOperationPopup(response);
+			submitOperationPopup(response);
 		});
 }
