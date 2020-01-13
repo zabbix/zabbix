@@ -43,14 +43,6 @@ function redirect($url) {
 	exit;
 }
 
-function jsRedirect($url, $timeout = null) {
-	$script = is_numeric($timeout)
-		? 'setTimeout(\'window.location="'.$url.'"\', '.($timeout * 1000).')'
-		: 'window.location.replace("'.$url.'");';
-
-	insert_js($script);
-}
-
 /**
  * Check the HTTP request method.
  *
