@@ -17,8 +17,8 @@
 
 			$('#expression_row').find('label').text(
 				(recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>)
-					? <?= CJs::encodeJson(_('Problem expression')) ?>
-					: <?= CJs::encodeJson(_('Expression')) ?>
+					? <?= json_encode(_('Problem expression')) ?>
+					: <?= json_encode(_('Expression')) ?>
 			);
 			$('.recovery_expression_constructor_row')
 				.toggle(recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>);
@@ -56,7 +56,7 @@
 			}
 
 			// return to the same form after it has been submitted
-			jQuery('#action').val(<?php echo CJs::encodeJson(getRequest('action')) ?>);
+			jQuery('#action').val(<?php echo json_encode(getRequest('action')) ?>);
 
 			create_var('triggersForm', 'add_dependency', 1, true);
 		}

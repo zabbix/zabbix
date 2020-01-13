@@ -32,7 +32,7 @@ class CControllerDashboardWidgetRfRate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode('')]));
 		}
 
 		return $ret;
@@ -47,6 +47,6 @@ class CControllerDashboardWidgetRfRate extends CController {
 			$this->getInput('widgetid')
 		);
 
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode('')]));
 	}
 }

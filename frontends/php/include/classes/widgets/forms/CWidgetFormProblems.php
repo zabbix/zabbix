@@ -209,7 +209,7 @@ class CWidgetFormProblems extends CWidgetForm {
 			->setAction(
 				'jQuery(":checkbox[name=show_timeline]")'.
 					'.filter(":disabled").prop("checked", true).end()'.
-					'.prop("disabled", !'.CJs::encodeJson($sort_with_enabled_show_timeline).'[this.value])'.
+					'.prop("disabled", !'.json_encode($sort_with_enabled_show_timeline).'[this.value])'.
 					'.filter(":disabled").prop("checked", false)'
 			);
 

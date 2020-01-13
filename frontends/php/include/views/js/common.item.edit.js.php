@@ -221,12 +221,12 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 ?>
 <script type="text/javascript">
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == <?php echo CJs::encodeJson(ITEM_AUTHTYPE_PUBLICKEY); ?>
-				&& jQuery('#type').val() == <?php echo CJs::encodeJson(ITEM_TYPE_SSH); ?>) {
-			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Key passphrase')); ?>);
+		if (jQuery('#authtype').val() == <?php echo json_encode(ITEM_AUTHTYPE_PUBLICKEY); ?>
+				&& jQuery('#type').val() == <?php echo json_encode(ITEM_TYPE_SSH); ?>) {
+			jQuery('#row_password label').html(<?php echo json_encode(_('Key passphrase')); ?>);
 		}
 		else {
-			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Password')); ?>);
+			jQuery('#row_password label').html(<?php echo json_encode(_('Password')); ?>);
 		}
 	}
 
@@ -263,7 +263,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
+				var itemInterfaceTypes = <?php echo json_encode(itemTypeInterface()); ?>;
 				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())]);
 
 				setAuthTypeLabel();
@@ -297,13 +297,13 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			}
 			else {
 				overlayDialogue({
-					'title': <?= CJs::encodeJson(_('Error')); ?>,
+					'title': <?= json_encode(_('Error')); ?>,
 					'content': $('<span>').html(<?=
-						CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
+						json_encode(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
 					?>),
 					'buttons': [
 						{
-							title: <?= CJs::encodeJson(_('Ok')); ?>,
+							title: <?= json_encode(_('Ok')); ?>,
 							class: 'btn-alt',
 							focused: true,
 							action: function() {}

@@ -44,7 +44,7 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 				$output['errors'][] = $messages->toString();
 			}
 
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 
 		return $ret;
@@ -145,6 +145,6 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 			'submaps' => $submaps
 		];
 
-		echo (new CJson())->encode($output);
+		echo json_encode($output);
 	}
 }

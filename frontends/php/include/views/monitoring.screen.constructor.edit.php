@@ -298,7 +298,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 		$selectButton = (new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'item_prototypes',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -315,7 +315,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 		$selectButton = (new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'item_prototypes',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -373,7 +373,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'sysmaps',
 					'srcfld1' => 'sysmapid',
 					'srcfld2' => 'name',
@@ -634,7 +634,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 		(new CButton('application_select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic", '.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'applications',
 					'srcfld1' => 'name',
 					'dstfrm' => $form->getName(),

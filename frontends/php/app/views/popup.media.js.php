@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
 	// Show/hide multiple "Send to" inputs and single "Send to" input and populate hidden "type" field.
 	$('#mediatypeid')
 		.on('change', function() {
-			var mediatypes_by_type = <?= (new CJson())->encode($data['mediatypes']) ?>,
+			var mediatypes_by_type = <?= json_encode($data['mediatypes']) ?>,
 				mediatypeid = $(this).val();
 
 			if (mediatypes_by_type[mediatypeid] == <?= MEDIA_TYPE_EMAIL ?>) {

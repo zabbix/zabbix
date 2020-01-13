@@ -27,4 +27,4 @@ if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

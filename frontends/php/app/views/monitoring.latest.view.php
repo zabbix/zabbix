@@ -80,7 +80,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					(new CButton('application_name', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->onClick('return PopUp("popup.generic",'.
-							CJs::encodeJson([
+							json_encode([
 								'srctbl' => 'applications',
 								'srcfld1' => 'name',
 								'dstfrm' => 'zbx_filter',

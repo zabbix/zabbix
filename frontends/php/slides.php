@@ -146,7 +146,7 @@ if (hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) {
 		$delay = timeUnitToSeconds(($screen['delay'] === '0') ? $data['screen']['delay'] : $screen['delay']);
 
 		$js = 'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.
-				CJs::encodeJson($delay * $widgetRefreshRate).
+				json_encode($delay * $widgetRefreshRate).
 			');'.
 			"\n".
 			'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].restartDoll();';

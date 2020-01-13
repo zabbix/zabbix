@@ -340,7 +340,7 @@ class CFilter extends CDiv {
 	private function getJS() {
 		$id = '#'.$this->getId();
 
-		$js = 'jQuery("'.$id.'").tabs('.CJs::encodeJson($this->tabs_options).').show();';
+		$js = 'jQuery("'.$id.'").tabs('.json_encode($this->tabs_options).').show();';
 
 		if ($this->idx !== null && $this->idx !== '') {
 			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {'.

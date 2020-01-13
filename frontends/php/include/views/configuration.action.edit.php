@@ -125,7 +125,7 @@ $action_tab->addRow(_('Type of calculation'), [
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.condition.actions",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.condition.actions",'.json_encode([
 			'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
 			'source' => $data['eventsource']
 		]).', null, this);')
@@ -250,7 +250,7 @@ if ($data['action']['operations']) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('return PopUp("popup.action.operation",'.CJs::encodeJson([
+							->onClick('return PopUp("popup.action.operation",'.json_encode([
 								'type' => ACTION_OPERATION,
 								'source' => $data['eventsource'],
 								'actionid' => $data['actionid'],
@@ -276,7 +276,7 @@ if ($data['action']['operations']) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('return PopUp("popup.action.operation",'.CJs::encodeJson([
+							->onClick('return PopUp("popup.action.operation",'.json_encode([
 								'type' => ACTION_OPERATION,
 								'source' => $data['eventsource'],
 								'actionid' => $data['actionid'],
@@ -302,7 +302,7 @@ if ($data['action']['operations']) {
 
 $operations_table->addRow(
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.action.operation",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.action.operation",'.json_encode([
 			'type' => ACTION_OPERATION,
 			'source' => $data['eventsource'],
 		]).', null, this);')
@@ -376,7 +376,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('return PopUp("popup.action.recovery",'.CJs::encodeJson([
+							->onClick('return PopUp("popup.action.recovery",'.json_encode([
 								'type' => ACTION_RECOVERY_OPERATION,
 								'source' => $data['eventsource'],
 								'actionid' => $data['actionid'],
@@ -402,7 +402,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 	$operations_table->addRow(
 		(new CSimpleButton(_('Add')))
-			->onClick('return PopUp("popup.action.recovery",'.CJs::encodeJson([
+			->onClick('return PopUp("popup.action.recovery",'.json_encode([
 				'type' => ACTION_RECOVERY_OPERATION,
 				'source' => $data['eventsource'],
 				'actionid' => getRequest('actionid'),
@@ -472,7 +472,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('return PopUp("popup.action.acknowledge",'.CJs::encodeJson([
+							->onClick('return PopUp("popup.action.acknowledge",'.json_encode([
 								'type' => ACTION_ACKNOWLEDGE_OPERATION,
 								'source' => $data['eventsource'],
 								'actionid' => $data['actionid'],
@@ -498,7 +498,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 
 	$operations_table->addRow(
 		(new CSimpleButton(_('Add')))
-			->onClick('return PopUp("popup.action.acknowledge",'.CJs::encodeJson([
+			->onClick('return PopUp("popup.action.acknowledge",'.json_encode([
 				'type' => ACTION_ACKNOWLEDGE_OPERATION,
 				'source' => $data['eventsource'],
 				'actionid' => getRequest('actionid'),

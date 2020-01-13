@@ -126,7 +126,7 @@ if (!array_key_exists('templateid', $data['screen'])) {
 
 	$add_user_group_btn = ([(new CButton(null, _('Add')))
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'usrgrp',
 				'srcfld1' => 'usrgrpid',
 				'srcfld2' => 'name',
@@ -162,7 +162,7 @@ if (!array_key_exists('templateid', $data['screen'])) {
 
 	$add_user_btn = ([(new CButton(null, _('Add')))
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'users',
 				'srcfld1' => 'userid',
 				'srcfld2' => 'fullname',

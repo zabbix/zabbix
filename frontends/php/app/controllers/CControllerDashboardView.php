@@ -440,7 +440,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 						: $fields['rf_rate']
 					: CWidgetConfig::getDefaultRfRate($widget['type']);
 
-				$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($fields));
+				$widget_form = CWidgetConfig::getForm($widget['type'], json_encode($fields));
 				// Transforms corrupted data to default values.
 				$widget_form->validate();
 				$fields = $widget_form->getFieldsData();

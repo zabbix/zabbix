@@ -109,7 +109,7 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 		if (($messages = getMessages()) !== null) {
 			$this->setResponse(
 				(new CControllerResponseData([
-					'main_block' => CJs::encodeJson([
+					'main_block' => json_encode([
 						'messages' => $messages->toString(),
 						'steps' => [],
 						'user' => [
@@ -258,7 +258,7 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 			$output['messages'] = $messages->toString();
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 
 	public function getInput($var, $default = null) {

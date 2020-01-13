@@ -21,7 +21,7 @@
 
 ob_start(); ?>
 
-new CViewSwitcher('type', 'change', <?= CJs::encodeJson([
+new CViewSwitcher('type', 'change', <?= json_encode([
 	SVC_SSH => ['row_dcheck_ports'],
 	SVC_LDAP => ['row_dcheck_ports'],
 	SVC_SMTP => ['row_dcheck_ports'],
@@ -50,7 +50,7 @@ $type.on('change', function() {
 	$snmpv3_securitylevel.off('change');
 
 	if (jQuery(this).val() == <?= SVC_SNMPv3 ?>) {
-		new CViewSwitcher('snmpv3_securitylevel', 'change', <?= CJs::encodeJson([
+		new CViewSwitcher('snmpv3_securitylevel', 'change', <?= json_encode([
 			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => [],
 			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => ['row_dcheck_snmpv3_authprotocol',
 				'row_dcheck_snmpv3_authpassphrase'

@@ -155,7 +155,7 @@ switch ($data['operationtype']) {
 
 		$user_group_add_btn = (new CButton(null, _('Add')))
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'usrgrp',
 					'srcfld1' => 'usrgrpid',
 					'srcfld2' => 'name',
@@ -198,7 +198,7 @@ switch ($data['operationtype']) {
 
 		$user_add_btn = (new CButton(null, _('Add')))
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'users',
 					'srcfld1' => 'userid',
 					'srcfld2' => 'fullname',
@@ -744,7 +744,7 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 
 	$opcondition_table->addRow([
 		(new CSimpleButton(_('Add')))
-			->onClick('return PopUp("popup.condition.operations",'.CJs::encodeJson([
+			->onClick('return PopUp("popup.condition.operations",'.json_encode([
 				'type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 				'source' => $data['source']
 			]).', null, this);')
@@ -782,4 +782,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

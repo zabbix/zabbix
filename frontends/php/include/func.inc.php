@@ -2184,8 +2184,7 @@ function imageOut(&$image, $format = null) {
 			echo $imageSource;
 			break;
 		case PAGE_TYPE_JSON:
-			$json = new CJson();
-			echo $json->encode(['result' => $imageId]);
+			echo json_encode(['result' => $imageId]);
 			break;
 		case PAGE_TYPE_TEXT:
 		default:
@@ -2227,7 +2226,7 @@ function uncheckTableRows($parentid = null, $keepids = []) {
 		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		$keepids = array_combine($keepids, $keepids);
 
-		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.CJs::encodeJson($keepids).'))');
+		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.json_encode($keepids).'))');
 	}
 	else {
 		insert_js('sessionStorage.removeItem("'.$key.'")');

@@ -54,7 +54,7 @@ class CControllerNotificationsGet extends CController {
 		if (!$ret) {
 			return $this->setResponse(
 				new CControllerResponseData([
-					'main_block' => CJs::encodeJson(['error' => true])
+					'main_block' => json_encode(['error' => true])
 				])
 			);
 		}
@@ -222,7 +222,7 @@ class CControllerNotificationsGet extends CController {
 		}
 		unset($notification);
 
-		return CJs::encodeJson([
+		return json_encode([
 			'notifications' => $this->notifications,
 			'settings' => [
 				'enabled' => (bool) $this->settings['enabled'],

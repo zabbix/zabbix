@@ -37,7 +37,7 @@ class CControllerWidgetNavTreeItemEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode('')]));
 		}
 
 		return $ret;
@@ -97,7 +97,7 @@ class CControllerWidgetNavTreeItemEdit extends CController {
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
+					json_encode([
 						'srctbl' => 'sysmaps',
 						'srcfld1' => 'sysmapid',
 						'srcfld2' => 'name',
@@ -134,6 +134,6 @@ class CControllerWidgetNavTreeItemEdit extends CController {
 			$output['debug'] = CProfiler::getInstance()->make()->toString();
 		}
 
-		echo (new CJson())->encode($output);
+		echo json_encode($output);
 	}
 }

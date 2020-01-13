@@ -44,7 +44,7 @@ abstract class CControllerPopupConditionCommon extends CController {
 			}
 
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
 			);
 		}
 
@@ -59,7 +59,7 @@ abstract class CControllerPopupConditionCommon extends CController {
 		if ($this->hasInput('validate')) {
 			return $this->setResponse(
 				(new CControllerResponseData(
-					['main_block' => CJs::encodeJson($this->getManuallyValidatedFields())]
+					['main_block' => json_encode($this->getManuallyValidatedFields())]
 				))->disableView()
 			);
 		}

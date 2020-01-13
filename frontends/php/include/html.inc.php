@@ -1007,7 +1007,7 @@ function makeDebugButton() {
 			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
 				"this.state = (this.state == 'none' ? 'block' : 'none');".
 				"jQuery(this)".
-					".text(this.state == 'none' ? ".CJs::encodeJson(_('Debug'))." : ".CJs::encodeJson(_('Hide debug')).")".
+					".text(this.state == 'none' ? ".json_encode(_('Debug'))." : ".json_encode(_('Hide debug')).")".
 					".blur();".
 				"showHideByName('zbx_debug_info', this.state);"
 			)

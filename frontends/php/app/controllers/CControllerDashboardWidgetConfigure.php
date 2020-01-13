@@ -47,7 +47,7 @@ class CControllerDashboardWidgetConfigure extends CController {
 		// Transforms corrupted data to default values.
 		$form->validate();
 
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([
 			'configuration' => CWidgetConfig::getConfiguration(
 				$type, $form->getFieldsData(), $this->getInput('view_mode')
 			)

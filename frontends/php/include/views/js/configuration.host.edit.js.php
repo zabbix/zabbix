@@ -198,7 +198,7 @@
 				.hover(
 					function (event) {
 						hintBox.showHint(event, this,
-							<?= CJs::encodeJson(_('Interface is used by items that require this type of the interface.')) ?>
+							<?= json_encode(_('Interface is used by items that require this type of the interface.')) ?>
 						);
 					},
 					function () {
@@ -423,7 +423,7 @@
 						});
 
 						bulkLabel.append(jQuery('<span>'));
-						bulkLabel.append(<?= CJs::encodeJson(_('Use bulk requests')) ?>);
+						bulkLabel.append(<?= json_encode(_('Use bulk requests')) ?>);
 
 						bulkItem.append(bulkLabel);
 						bulkList.append(bulkItem);

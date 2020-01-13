@@ -42,11 +42,11 @@ class CNavigationTree extends CDiv {
 		return ($this->error === null)
 			? 'jQuery(function($) {'.
 				'$("#'.$this->getId().'").zbx_navtree({'.
-					'problems: '.CJs::encodeJson($this->data['problems']).','.
-					'severity_levels: '.CJs::encodeJson($this->data['severity_config']).','.
+					'problems: '.json_encode($this->data['problems']).','.
+					'severity_levels: '.json_encode($this->data['severity_config']).','.
 					'navtree_items_opened: "'.implode(',', $this->data['navtree_items_opened']).'",'.
 					'navtree_item_selected: '.intval($this->data['navtree_item_selected']).','.
-					'maps_accessible: '.CJs::encodeJson(array_map('strval', $this->data['maps_accessible'])).','.
+					'maps_accessible: '.json_encode(array_map('strval', $this->data['maps_accessible'])).','.
 					'show_unavailable: '.$this->data['show_unavailable'].','.
 					'initial_load: '.$this->data['initial_load'].','.
 					'uniqueid: "'.$this->data['uniqueid'].'",'.

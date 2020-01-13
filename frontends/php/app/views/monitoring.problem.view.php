@@ -130,7 +130,7 @@ if ($data['action'] == 'problem.view') {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('filter_application_select', _('Select')))
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
+					json_encode([
 						'srctbl' => 'applications',
 						'srcfld1' => 'name',
 						'dstfrm' => 'zbx_filter',

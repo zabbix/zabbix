@@ -20,7 +20,7 @@
 
 
 ob_start(); ?>
-new CViewSwitcher('timeperiod_type', 'change', <?= CJs::encodeJson([
+new CViewSwitcher('timeperiod_type', 'change', <?= json_encode([
 	TIMEPERIOD_TYPE_ONETIME =>	['row_timepreiod_start_date', 'row_timeperiod_period_length'],
 	TIMEPERIOD_TYPE_DAILY =>	['row_timeperiod_every_day', 'row_timeperiod_period_at_hours_minutes',
 		'row_timeperiod_period_length'

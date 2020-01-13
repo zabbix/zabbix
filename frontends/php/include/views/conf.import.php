@@ -63,12 +63,12 @@ foreach ($titles as $key => $title) {
 		}
 
 		if ($key === 'images') {
-			$cbExist->onClick('updateWarning(this, '.CJs::encodeJson(_('Images for all maps will be updated!')).')');
+			$cbExist->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).')');
 		}
 
 		if ($key === 'valueMaps') {
 			$cbExist->onClick(
-				'updateWarning(this, '.CJs::encodeJson(_('Value mappings for value maps will be updated!')).')'
+				'updateWarning(this, '.json_encode(_('Value mappings for value maps will be updated!')).')'
 			);
 		}
 	}
@@ -94,7 +94,7 @@ foreach ($titles as $key => $title) {
 		}
 
 		if ($key === 'templateLinkage') {
-			$cbDeleted->onClick('updateWarning(this, '.CJs::encodeJson(
+			$cbDeleted->onClick('updateWarning(this, '.json_encode(
 				_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
 			).')');
 		}

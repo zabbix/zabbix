@@ -64,7 +64,7 @@ try {
 }
 catch (Exception $e) {
 	// decode input json request to get request's id
-	$jsonData = CJs::decodeJson($data);
+	$jsonData = json_decode($data, true);
 
 	$response = [
 		'jsonrpc' => '2.0',
@@ -76,5 +76,5 @@ catch (Exception $e) {
 		'id' => (isset($jsonData['id']) ? $jsonData['id'] : null)
 	];
 
-	echo CJs::encodeJson($response);
+	echo json_encode($response);
 }

@@ -52,7 +52,7 @@ foreach ($data['expressions'] as $expr) {
 	];
 }
 
-$output['script_inline'] = 'jQuery("#'.$expression_table->getId().'").data("rows", '.CJs::encodeJson($expressions).');'
+$output['script_inline'] = 'jQuery("#'.$expression_table->getId().'").data("rows", '.json_encode($expressions).');'
 	.$output['script_inline'];
 
 $ms_itemid = (new CMultiSelect([
@@ -151,4 +151,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

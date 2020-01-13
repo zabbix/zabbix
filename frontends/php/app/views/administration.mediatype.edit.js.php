@@ -57,7 +57,7 @@
 			$('#mediatypeid, #delete, #clone').remove();
 			$('#chPass_btn').hide();
 			$('#passwd').prop('disabled', false).show();
-			$('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
+			$('#update').text(<?= json_encode(_('Add')) ?>);
 			$('#update').val('mediatype.create').attr({id: 'add'});
 			$('#name').focus();
 		});
