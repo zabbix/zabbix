@@ -133,7 +133,8 @@ abstract class CControllerPopupItemTest extends CController {
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
 		],
-		'snmp_community' => []
+		'snmp_community' => [],
+		'snmp_oid' => []
 	];
 
 	/**
