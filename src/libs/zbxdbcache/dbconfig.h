@@ -141,24 +141,6 @@ ZBX_DC_NUMITEM;
 
 typedef struct
 {
-	zbx_uint64_t	interfaceid;
-	const char	*community;
-	const char	*securityname;
-	const char	*authpassphrase;
-	const char	*privpassphrase;
-	const char	*contextname;
-	unsigned char	securitylevel;
-	unsigned char	authprotocol;
-	unsigned char	privprotocol;
-	unsigned char	version;
-	unsigned char	bulk;
-	unsigned char	max_succeed;
-	unsigned char	min_fail;
-}
-ZBX_DC_SNMPINTERFACE;
-
-typedef struct
-{
 	zbx_uint64_t	itemid;
 	const char	*snmp_oid;
 	unsigned char	snmp_oid_type;
@@ -467,6 +449,24 @@ typedef struct
 	unsigned char	useip;
 }
 ZBX_DC_INTERFACE;
+
+typedef struct
+{
+	zbx_uint64_t	interfaceid;
+	const char	*community;
+	const char	*securityname;
+	const char	*authpassphrase;
+	const char	*privpassphrase;
+	const char	*contextname;
+	unsigned char	securitylevel;
+	unsigned char	authprotocol;
+	unsigned char	privprotocol;
+	unsigned char	version;
+	unsigned char	bulk;
+	unsigned char	max_succeed;
+	unsigned char	min_fail;
+}
+ZBX_DC_SNMPINTERFACE;
 
 typedef struct
 {

@@ -20,6 +20,9 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
+#include "zbxalgo.h"
+#include "../zbxalgo/vectorimpl.h"
 
 /*
  * 5.0 development database patches
@@ -165,6 +168,371 @@ static int	DBpatch_4050015(void)
 	return DBadd_foreign_key("interface_snmp", 1, &field);
 }
 
+typedef struct
+{
+	zbx_uint64_t	interfaceid;
+	char		*community;
+	char		*securityname;
+	char		*authpassphrase;
+	char		*privpassphrase;
+	char		*contextname;
+	unsigned char	securitylevel;
+	unsigned char	authprotocol;
+	unsigned char	privprotocol;
+	unsigned char	version;
+	unsigned char	bulk;
+	zbx_uint64_t	item_interfaceid;
+	char		*item_port;
+}
+zbx_snmp_if_t;
+
+typedef struct
+{
+	zbx_uint64_t	interfaceid;
+	zbx_uint64_t	hostid;
+	char		*ip;
+	char		*dns;
+	char		*port;
+	unsigned char	type;
+	unsigned char	main;
+	unsigned char	useip;
+}
+ZBX_DB_INTERFACE;
+
+ZBX_PTR_VECTOR_DECL(dc_interface, ZBX_DB_INTERFACE);
+ZBX_PTR_VECTOR_IMPL(dc_interface, ZBX_DB_INTERFACE);
+ZBX_PTR_VECTOR_DECL(dc_snmp_if, zbx_snmp_if_t);
+ZBX_PTR_VECTOR_IMPL(dc_snmp_if, zbx_snmp_if_t);
+
+static void	dc_interface_free(ZBX_DB_INTERFACE interface)
+{
+	zbx_free(interface.ip);
+	zbx_free(interface.dns);
+	zbx_free(interface.port);
+}
+
+static void	dc_snmpinterface_free(zbx_snmp_if_t snmp)
+{
+	zbx_free(snmp.community);
+	zbx_free(snmp.securityname);
+	zbx_free(snmp.authpassphrase);
+	zbx_free(snmp.privpassphrase);
+	zbx_free(snmp.contextname);
+	zbx_free(snmp.item_port);
+}
+
+static void	DBpatch_4050016_load_data(zbx_vector_dc_interface_t *interfaces, zbx_vector_dc_snmp_if_t *snmp_ifs,
+		zbx_vector_dc_snmp_if_t *snmp_new_ifs)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+
+	result = DBselect(
+			"SELECT s.interfaceid,"
+				"s.type,"
+				"s.bulk,"
+				"s.snmp_community,"
+				"s.snmpv3_securityname,"
+				"s.snmpv3_securitylevel,"
+				"s.snmpv3_authpassphrase,"
+				"s.snmpv3_privpassphrase,"
+				"s.snmpv3_authprotocol,"
+				"s.snmpv3_privprotocol,"
+				"s.snmpv3_contextname,"
+				"s.port,"
+				"s.hostid,"
+				"n.main,"
+				"n.type,"
+				"n.useip,"
+				"n.ip,"
+				"n.dns,"
+				"n.port"
+			" FROM (SELECT i.interfaceid,"
+					"i.type,"
+					"f.bulk,"
+					"i.snmp_community,"
+					"i.snmpv3_securityname,"
+					"i.snmpv3_securitylevel,"
+					"i.snmpv3_authpassphrase,"
+					"i.snmpv3_privpassphrase,"
+					"i.snmpv3_authprotocol,"
+					"i.snmpv3_privprotocol,"
+					"i.snmpv3_contextname,"
+					"i.port,"
+					"i.hostid"
+				" FROM items i"
+					" LEFT JOIN hosts h ON i.hostid=h.hostid"
+					" LEFT JOIN interface f ON i.interfaceid=f.interfaceid"
+				" WHERE  i.type IN (1,4,6)"
+					" AND h.status <> 3"
+				" GROUP BY i.interfaceid,"
+					"i.type,"
+					"f.bulk,"
+					"i.snmp_community,"
+					"i.snmpv3_securityname,"
+					"i.snmpv3_securitylevel,"
+					"i.snmpv3_authpassphrase,"
+					"i.snmpv3_privpassphrase,"
+					"i.snmpv3_authprotocol,"
+					"i.snmpv3_privprotocol,"
+					"i.snmpv3_contextname,"
+					"i.port,"
+					"i.hostid) s"
+				" LEFT JOIN interface n ON s.interfaceid=n.interfaceid"
+				" ORDER BY s.interfaceid ASC");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DB_INTERFACE	interface;
+		zbx_snmp_if_t		snmp;
+		int			item_type;
+		const char 		*if_port;
+
+		ZBX_DBROW2UINT64(snmp.item_interfaceid, row[0]);
+		ZBX_STR2UCHAR(item_type, row[1]);
+		ZBX_STR2UCHAR(snmp.bulk, row[2]);
+		snmp.community = zbx_strdup(NULL, row[3]);
+		snmp.securityname = zbx_strdup(NULL, row[4]);
+		ZBX_STR2UCHAR(snmp.securitylevel, row[5]);
+		snmp.authpassphrase = zbx_strdup(NULL, row[6]);
+		snmp.privpassphrase = zbx_strdup(NULL, row[7]);
+		ZBX_STR2UCHAR(snmp.authprotocol, row[8]);
+		ZBX_STR2UCHAR(snmp.privprotocol, row[9]);
+		snmp.contextname = zbx_strdup(NULL, row[10]);
+		snmp.item_port = zbx_strdup(NULL, row[11]);
+		if_port = row[18];
+
+		if (ITEM_TYPE_SNMPv1 == item_type)
+			snmp.version = ZBX_IF_SNMP_VERSION_1;
+		else if (ITEM_TYPE_SNMPv2c == item_type)
+			snmp.version = ZBX_IF_SNMP_VERSION_2;
+		else
+			snmp.version = ZBX_IF_SNMP_VERSION_3;
+
+		snmp.interfaceid = snmp.item_interfaceid;
+
+		if ((0 == strlen(snmp.item_port) || 0 == strcmp(snmp.item_port, if_port)) &&
+				FAIL == zbx_vector_dc_snmp_if_bsearch(snmp_ifs, snmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			zbx_vector_dc_snmp_if_append(snmp_ifs, snmp);
+			continue;
+		}
+
+		snmp.interfaceid = DBget_maxid("interface");
+
+		zbx_vector_dc_snmp_if_append(snmp_new_ifs, snmp);
+
+		interface.interfaceid = snmp.interfaceid;
+		ZBX_DBROW2UINT64(interface.hostid, row[12]);
+		ZBX_STR2UCHAR(interface.main, row[13]);
+		ZBX_STR2UCHAR(interface.type, row[14]);
+		ZBX_STR2UCHAR(interface.useip, row[15]);
+		interface.ip = zbx_strdup(NULL, row[16]);
+		interface.dns = zbx_strdup(NULL, row[17]);
+
+		if (0 < strlen(snmp.item_port))
+			interface.port = zbx_strdup(NULL, snmp.item_port);
+		else
+			interface.port = zbx_strdup(NULL, if_port);
+
+		zbx_vector_dc_interface_append(interfaces, interface);
+	}
+	DBfree_result(result);
+}
+
+static int	DBpatch_4050016_snmp_if_save(zbx_vector_dc_snmp_if_t *snmp_ifs)
+{
+	zbx_db_insert_t	db_insert_snmp_if;
+	int		i, ret;
+
+	zbx_db_insert_prepare(&db_insert_snmp_if, "interface_snmp", "interfaceid", "version", "bulk", "community",
+			"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
+			"privprotocol", "contextname", NULL);
+
+	for (i = 0; i < snmp_ifs->values_num; i++)
+	{
+		zbx_snmp_if_t *s = &snmp_ifs->values[i];
+
+		zbx_db_insert_add_values(&db_insert_snmp_if, s->interfaceid, s->version, s->bulk, s->community,
+				s->securityname, s->securitylevel, s->authpassphrase, s->privpassphrase, s->authprotocol,
+				s->privprotocol, s->contextname);
+	}
+
+	ret = zbx_db_insert_execute(&db_insert_snmp_if);
+	zbx_db_insert_clean(&db_insert_snmp_if);
+
+	return ret;
+}
+
+static int	DBpatch_4050016_interface_create(zbx_vector_dc_interface_t *interfaces)
+{
+	zbx_db_insert_t		db_insert_interfaces;
+	int			i, ret;
+
+	zbx_db_insert_prepare(&db_insert_interfaces, "interfaces", "interfaceid", "hostid", "main", "type", "useip",
+			"ip", "dns", "port", NULL);
+
+	for (i = 0; i < interfaces->values_num; i++)
+	{
+		ZBX_DB_INTERFACE	*interface = &interfaces->values[i];
+
+		zbx_db_insert_add_values(&db_insert_interfaces, interface->interfaceid,
+				interface->hostid, interface->main, interface->type, interface->useip, interface->ip,
+				interface->dns, interface->port);
+	}
+
+	ret = zbx_db_insert_execute(&db_insert_interfaces);
+	zbx_db_insert_clean(&db_insert_interfaces);
+
+	return ret;
+}
+
+static int	DBpatch_4050016_items_update(zbx_vector_dc_snmp_if_t *snmp_ifs)
+{
+	int	i, ret = SUCCEED;
+	char	*sql;
+	size_t	sql_alloc = snmp_ifs->values_num * ZBX_KIBIBYTE / 3 , sql_offset = 0;
+
+	sql = (char *)zbx_malloc(NULL, sql_alloc);
+
+	for (i = 0; i < snmp_ifs->values_num; i++)
+	{
+		zbx_snmp_if_t *s = &snmp_ifs->values[i];
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update items set type=%d, interfaceid=" ZBX_FS_UI64
+					" where type IN (1,4,6) AND h.status <> 3 AND"
+					" interfaceid=" ZBX_FS_UI64 " AND "
+					" snmp_community='%s' AND"
+					" snmpv3_securityname='%s' AND"
+					" snmpv3_securitylevel=%d AND"
+					" snmpv3_authpassphrase='%s' AND"
+					" snmpv3_privpassphrase='%s' AND"
+					" snmpv3_authprotocol=%d AND"
+					" snmpv3_privprotocol=%d AND"
+					" snmpv3_contextname='%s' AND"
+					" port='%s';\n",
+				ITEM_TYPE_SNMP, s->interfaceid,
+				s->item_interfaceid, s->community, s->securityname, (int)s->securitylevel,
+				s->authpassphrase, s->privpassphrase, (int)s->authprotocol, (int)s->privprotocol,
+				s->contextname, s->item_port);
+	}
+
+	ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_4050016_items_type_update(void)
+{
+	int	ret;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set type=%d"
+			" where type IN (1,4,6) AND h.status <> 3;\n", ITEM_TYPE_SNMP);
+
+	ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_4050016(void)
+{
+	zbx_vector_dc_interface_t	interfaces;
+	zbx_vector_dc_snmp_if_t		snmp_ifs, snmp_new_ifs;
+	int				ret = FAIL;
+
+	zbx_vector_dc_snmp_if_create(&snmp_ifs);
+	zbx_vector_dc_snmp_if_create(&snmp_new_ifs);
+	zbx_vector_dc_interface_create(&interfaces);
+
+	DBpatch_4050016_load_data(&interfaces, &snmp_ifs, &snmp_new_ifs);
+
+	while(1)
+	{
+		if (0 < snmp_ifs.values_num && SUCCEED != DBpatch_4050016_snmp_if_save(&snmp_ifs))
+			break;
+
+		if (0 < interfaces.values_num && SUCCEED != DBpatch_4050016_interface_create(&interfaces))
+			break;
+
+		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_4050016_snmp_if_save(&snmp_new_ifs))
+			break;
+
+		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_4050016_items_update(&snmp_new_ifs))
+			break;
+
+		if (SUCCEED != DBpatch_4050016_items_type_update())
+			break;
+
+		ret = SUCCEED;
+		break;
+	}
+
+	zbx_vector_dc_interface_clear_ext(&interfaces, dc_interface_free);
+	zbx_vector_dc_interface_destroy(&interfaces);
+	zbx_vector_dc_snmp_if_clear_ext(&snmp_ifs, dc_snmpinterface_free);
+	zbx_vector_dc_snmp_if_destroy(&snmp_ifs);
+	zbx_vector_dc_snmp_if_clear_ext(&snmp_new_ifs, dc_snmpinterface_free);
+	zbx_vector_dc_snmp_if_destroy(&snmp_new_ifs);
+
+	return ret;
+}
+
+static int	DBpatch_4050017(void)
+{
+	return DBdrop_field("interface", "bulk");
+}
+
+static int	DBpatch_4050018(void)
+{
+	return DBdrop_field("items", "snmp_community");
+}
+
+static int	DBpatch_4050019(void)
+{
+	return DBdrop_field("items", "snmpv3_securityname");
+}
+
+static int	DBpatch_4050020(void)
+{
+	return DBdrop_field("items", "snmpv3_securitylevel");
+}
+
+static int	DBpatch_4050021(void)
+{
+	return DBdrop_field("items", "snmpv3_authpassphrase");
+}
+
+static int	DBpatch_4050022(void)
+{
+	return DBdrop_field("items", "snmpv3_privpassphrase");
+}
+
+static int	DBpatch_4050023(void)
+{
+	return DBdrop_field("items", "snmpv3_authprotocol");
+}
+
+static int	DBpatch_4050024(void)
+{
+	return DBdrop_field("items", "snmpv3_privprotocol");
+}
+
+static int	DBpatch_4050025(void)
+{
+	return DBdrop_field("items", "snmpv3_contextname");
+}
+
+static int	DBpatch_4050026(void)
+{
+	return DBdrop_field("items", "port");
+}
 
 #endif
 
@@ -184,6 +552,16 @@ DBPATCH_ADD(4050012, 0, 1)
 DBPATCH_ADD(4050013, 0, 1)
 DBPATCH_ADD(4050014, 0, 1)
 DBPATCH_ADD(4050015, 0, 1)
-
+DBPATCH_ADD(4050016, 0, 1)
+DBPATCH_ADD(4050017, 0, 1)
+DBPATCH_ADD(4050018, 0, 1)
+DBPATCH_ADD(4050019, 0, 1)
+DBPATCH_ADD(4050020, 0, 1)
+DBPATCH_ADD(4050021, 0, 1)
+DBPATCH_ADD(4050022, 0, 1)
+DBPATCH_ADD(4050023, 0, 1)
+DBPATCH_ADD(4050024, 0, 1)
+DBPATCH_ADD(4050025, 0, 1)
+DBPATCH_ADD(4050026, 0, 1)
 
 DBPATCH_END()
