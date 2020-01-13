@@ -137,7 +137,7 @@ return JSON.stringify(result);&#13;
 Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;
 Add dedicated user with media type &quot;Opsgenie&quot;.&#13;
 Change the values of the variables url (https://api.opsgenie.com/v2/alerts or https://api.eu.opsgenie.com/v2/alerts) , &#13;
-web (for example, https://myzabbix.app.opsgenie.com), token.
+web (for example, https://myzabbix.app.opsgenie.com), token.&#13;
 </description>
         </media_type>
     </media_types>

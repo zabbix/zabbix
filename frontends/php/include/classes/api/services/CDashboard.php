@@ -111,7 +111,6 @@ class CDashboard extends CApiService {
 
 		// dashboardids
 		if ($options['dashboardids'] !== null) {
-			zbx_value2array($options['dashboardids']);
 			$sql_parts['where'][] = dbConditionInt('d.dashboardid', $options['dashboardids']);
 		}
 

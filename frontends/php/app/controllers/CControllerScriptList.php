@@ -80,9 +80,7 @@ class CControllerScriptList extends CController {
 
 		// list of scripts
 		$data['scripts'] = API::Script()->get([
-			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type',
-				'execute_on'
-			],
+			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],

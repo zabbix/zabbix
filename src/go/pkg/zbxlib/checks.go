@@ -69,7 +69,6 @@ import "C"
 
 import (
 	"errors"
-	"fmt"
 	"unsafe"
 
 	"zabbix.com/pkg/itemutil"
@@ -79,7 +78,7 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 	cfunc := resolveMetric(key)
 
 	if cfunc == nil {
-		return nil, fmt.Errorf("Unsupported metric %s", key)
+		return nil, errors.New("Unsupported item key.")
 	}
 
 	var cvalue, cerrmsg *C.char

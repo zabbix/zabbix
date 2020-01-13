@@ -882,7 +882,8 @@ ZBX_NotificationsAlarm.prototype.produce = function() {
 		muted: this.muted,
 		severity: this.severity,
 		seek: this.player.getSeek(),
-		timeout: this.player.getTimeout()
+		timeout: this.player.getTimeout(),
+		supported: !! this.player.audio
 	};
 };
 

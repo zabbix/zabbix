@@ -17,33 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package file
+package cpucollector
+
 
 import (
 	"errors"
-	"fmt"
-	"syscall"
 )
 
-// Export -
-func (p *Plugin) exportTime(params []string) (result interface{}, err error) {
-	if len(params) > 2 || len(params) == 0 {
-		return nil, errors.New("Invalid number of parameters.")
+func (p *Plugin) collect() (err error) {
+	return errors.New("Not implemented")
+}
+
+func (p *Plugin) numCPU() int {
+	// TODO: implementation
+	return 0
+}
+
+func (p *Plugin) getStateIndex(state string) (index int, err error) {
+	switch state {
+	case "", "system":
+		index = stateSystem
+	default:
+		err = errors.New("unsupported state")
 	}
-	if "" == params[0] {
-		return nil, errors.New("Invalid first parameter.")
-	}
-	if f, err := stdOs.Stat(params[0]); err != nil {
-		return nil, fmt.Errorf("Cannot obtain file information: %s", err)
-	} else {
-		if len(params) == 1 || params[1] == "" || params[1] == "modify" {
-			return f.ModTime().Unix(), nil
-		} else if params[1] == "access" {
-			return f.Sys().(*syscall.Stat_t).Atim.Sec, nil
-		} else if params[1] == "change" {
-			return f.Sys().(*syscall.Stat_t).Ctim.Sec, nil
-		} else {
-			return nil, errors.New("Invalid second parameter.")
-		}
-	}
+	return 0, errors.New("Not implemented")
 }

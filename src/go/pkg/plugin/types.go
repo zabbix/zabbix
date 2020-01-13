@@ -20,6 +20,7 @@
 package plugin
 
 import (
+	"errors"
 	"sync/atomic"
 	"time"
 )
@@ -27,6 +28,8 @@ import (
 const (
 	DefaultCapacity = 100
 )
+
+var UnsupportedMetricError error
 
 // Collector - interface for periodical metric collection
 type Collector interface {
@@ -134,4 +137,8 @@ type Request struct {
 type GlobalOptions struct {
 	Timeout  int
 	SourceIP string
+}
+
+func init() {
+	UnsupportedMetricError = errors.New("Unsupported item key.")
 }
