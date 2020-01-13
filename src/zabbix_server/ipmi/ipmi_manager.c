@@ -806,7 +806,12 @@ static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, zbx
 
 	init_request(&request);
 
-	if (SUCCEED == parse_item_key(item->key_orig, &request) && 0 == strcmp(request.key, "ipmi.get"))
+	if (SUCCEED != parse_item_key(item->key_orig, &request))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+	if (0 == strcmp(request.key, "ipmi.get"))
 		message->code = ZBX_IPC_IPMI_DISCOVERY_REQUEST;
 	else
 		message->code = ZBX_IPC_IPMI_VALUE_REQUEST;
