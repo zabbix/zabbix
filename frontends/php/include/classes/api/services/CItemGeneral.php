@@ -547,6 +547,14 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			// Prevent IPMI sensor field being empty if item key is not "ipmi.get".
+			if ($fullItem['type'] == ITEM_TYPE_IPMI && $fullItem['key_'] !== 'ipmi.get'
+					&& (!array_key_exists('ipmi_sensor', $fullItem) || $fullItem['ipmi_sensor'] === '')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'ipmi_sensor', _('cannot be empty')
+				));
+			}
+
 			// snmp trap
 			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
 					&& $fullItem['key_'] !== 'snmptrap.fallback' && $item_key_parser->getKey() !== 'snmptrap') {

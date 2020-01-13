@@ -1090,7 +1090,7 @@ class CHelpItems {
 			ITEM_TYPE_IPMI => [
 				[
 					'key' => 'ipmi.get',
-					'description' => _('IPMI sensors IDs and other sensor related parameters. Returns JSON.')
+					'description' => _('IPMI sensor IDs and other sensor-related parameters. Returns JSON.')
 				]
 			]
 		];
