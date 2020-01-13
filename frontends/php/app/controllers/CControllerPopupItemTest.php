@@ -77,6 +77,8 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Item properties where macros are supported.
 	 *
+	 * If field supports user macros and LLD macros only, just leave the array empty.
+	 *
 	 * @var array
 	 */
 	protected $macros_by_item_props = [
@@ -130,7 +132,8 @@ abstract class CControllerPopupItemTest extends CController {
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
-		]
+		],
+		'snmp_community' => []
 	];
 
 	/**
@@ -838,7 +841,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 			// Construct array of supported macros.
 			$types = [
-				'usermacros' => false,
+				'usermacros' => true,
 				'macros_n' => []
 			];
 
