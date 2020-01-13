@@ -191,18 +191,22 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			}
 		}
 
-		// Get previous value time.
-		if ($show_prev && array_key_exists('prev_time', $data)) {
-			$prev_time = $data['prev_time'];
-		}
-		elseif ($show_prev) {
-			$delay = timeUnitToSeconds($usermacros['delay']);
-			$prev_time = ($delay !== null && $delay > 0)
-				? 'now-'.$usermacros['delay']
-				: 'now';
-		}
-		else {
-			$prev_time = '';
+		// Get previous value and time.
+		$prev_value = '';
+		$prev_time = '';
+		if ($show_prev && array_key_exists('prev_value', $data) && $data['prev_value'] !== '') {
+			$prev_value = $data['prev_value'];
+
+			// Get previous value time.
+			if (array_key_exists('prev_time', $data)) {
+				$prev_time = $data['prev_time'];
+			}
+			else {
+				$delay = timeUnitToSeconds($usermacros['delay']);
+				$prev_time = ($delay !== null && $delay > 0)
+					? 'now-'.$usermacros['delay']
+					: 'now';
+			}
 		}
 
 		// Sort macros.
@@ -221,9 +225,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'steps' => $preprocessing_steps,
 			'value' => array_key_exists('value', $data) ? $data['value'] : '',
 			'eol' => array_key_exists('eol', $data) ? (int) $data['eol'] : ZBX_EOL_LF,
-			'prev_value' => ($show_prev && array_key_exists('prev_value', $data)) ? $data['prev_value'] : '',
 			'macros' => $usermacros['macros'],
 			'show_prev' => $show_prev,
+			'prev_value' => $prev_value,
 			'prev_time' => $prev_time,
 			'hostid' => $this->getInput('hostid'),
 			'interfaceid' => $this->getInput('interfaceid', 0),

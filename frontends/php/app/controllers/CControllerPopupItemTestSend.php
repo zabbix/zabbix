@@ -169,6 +169,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
 						_('a relative time is expected')
 					));
+					$ret = false;
 				}
 				else {
 					$tokens = $relative_time_parser->getTokens();
