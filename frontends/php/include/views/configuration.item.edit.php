@@ -421,6 +421,7 @@ if ($data['interfaces']) {
 			$data['interfaces'] = zbx_toHash($data['interfaces'], 'interfaceid');
 			$interface = $data['interfaces'][$data['interfaceid']];
 
+			$form->addVar('selectedInterfaceId', $data['interfaceid']);
 			$form_list->addRow((new CLabel(_('Host interface'), 'interface'))->setAsteriskMark(),
 				(new CTextBox('interface',
 					$interface['useip']

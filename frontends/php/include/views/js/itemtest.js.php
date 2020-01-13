@@ -246,7 +246,7 @@
 			item_type: form_data['type'],
 			itemid: <?= (int) $data['itemid'] ?>,
 			valuemapid: form_data['valuemapid'],
-			interfaceid: form_data['interfaceid']
+			interfaceid: form_data['interfaceid'] || form_data['selectedInterfaceId']
 		});
 
 		return properties;
