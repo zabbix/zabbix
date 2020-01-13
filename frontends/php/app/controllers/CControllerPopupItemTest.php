@@ -641,8 +641,8 @@ abstract class CControllerPopupItemTest extends CController {
 				if (in_array($this->item_type, [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])
 						&& array_key_exists('port', $inputs) && $inputs['port'] !== '') {
 					$interfaces[0]['port'] = $inputs['port'];
+					unset($inputs['port']);
 				}
-				unset($inputs['port']);
 
 				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
 

@@ -269,13 +269,10 @@
 			item_properties = getItemTestProperties('form[name="itemForm"]'),
 			cached_values = $row.data('test-data') || [];
 
-		if (typeof item_properties.interfaceid !== 'undefined' && typeof cached_values.interface !== 'undefined') {
-			if (cached_values.interface.interfaceid != item_properties.interfaceid) {
-				delete cached_values.interface;
-			}
-			else {
-				delete cached_values.interface.interfaceid2;
-			}
+		if (cached_values.interfaceid != item_properties.interfaceid) {
+			delete cached_values.interfaceid;
+			delete cached_values.address;
+			delete cached_values.port;
 		}
 
 		PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
