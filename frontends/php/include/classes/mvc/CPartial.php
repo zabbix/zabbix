@@ -73,7 +73,7 @@ class CPartial {
 
 		foreach (self::$directories as $directory) {
 			$file_path = $directory.'/'.$name.'.php';
-			if (file_exists($file_path) && is_file($file_path)) {
+			if (is_file($file_path)) {
 				$this->directory = $directory;
 				break;
 			}
