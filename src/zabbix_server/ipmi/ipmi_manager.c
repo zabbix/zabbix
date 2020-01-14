@@ -792,11 +792,12 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
  *                                                                            *
  * Parameters: item      - [IN] the item to poll                              *
  *             command   - [IN] the command to execute                        *
- *             key       - [IN] parsed item key
+ *             key       - [IN] a valid item key                              *
  *             message   - [OUT] the message                                  *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, char *key, zbx_ipc_message_t *message)
+static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, const char *key,
+		zbx_ipc_message_t *message)
 {
 	zbx_uint32_t	size;
 
@@ -804,13 +805,12 @@ static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, cha
 			item->interface.port, item->host.ipmi_authtype, item->host.ipmi_privilege,
 			item->host.ipmi_username, item->host.ipmi_password, item->ipmi_sensor, command);
 
-
 	if (0 == strcmp(key, "ipmi.get"))
 		message->code = ZBX_IPC_IPMI_DISCOVERY_REQUEST;
 	else
 		message->code = ZBX_IPC_IPMI_VALUE_REQUEST;
-	message->size = size;
 
+	message->size = size;
 }
 
 /******************************************************************************
