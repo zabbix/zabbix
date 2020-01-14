@@ -17,13 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package redis
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"github.com/mediocregopher/radix/v3"
 )
+
+const (
+	pingFailed = 0
+	pingOk     = 1
+)
+
+// pingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
+func (p *Plugin) pingHandler(conn redisClient, params []string) (interface{}, error) {
+	var res string
+
+	if _ = conn.Query(radix.Cmd(&res, "PING")); res != "PONG" {
+		return pingFailed, nil
+	}
+
+	return pingOk, nil
+}
