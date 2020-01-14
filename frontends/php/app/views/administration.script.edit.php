@@ -115,7 +115,10 @@ $scriptFormList->addRow(new CLabel(_('Confirmation text'), 'confirmation'), [
 $scriptView = (new CTabView())->addTab('scripts', _('Script'), $scriptFormList);
 
 // footer
-$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list'))->setId('cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'script.list')
+	->setArgument('page', CPagerHelper::loadPage('script.list', null))
+))->setId('cancel');
 
 if ($data['scriptid'] == 0) {
 	$addButton = (new CSubmitButton(_('Add'), 'action', 'script.create'))->setId('add');

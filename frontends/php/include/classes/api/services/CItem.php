@@ -1214,7 +1214,7 @@ class CItem extends CItemGeneral {
 			}
 			if ($this->outputIsRequested('error', $options['output'])) {
 				/*
-				 * SQL func COALESCE use for template items because they dont have record
+				 * SQL func COALESCE use for template items because they don't have record
 				 * in item_rtdata table and DBFetch convert null to '0'
 				 */
 				$sqlParts = $this->addQuerySelect(dbConditionCoalesce('ir.error', '', 'error'), $sqlParts);

@@ -151,10 +151,10 @@ class CMultifieldTableElement extends CTableElement {
 			else {
 				$control = (!is_array($this->mapping) || array_key_exists($label, $this->mapping))
 						? CElementQuery::getInputElement($column, '.', CTestArrayHelper::get($mapping, 'class'))
-						: null;
+						: new CNullElement();
 			}
 
-			if ($control === null) {
+			if (!$control->isValid()) {
 				continue;
 			}
 

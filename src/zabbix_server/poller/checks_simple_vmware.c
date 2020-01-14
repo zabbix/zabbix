@@ -693,6 +693,8 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 
 			zbx_vector_ptr_append(add_results, add_result);
 		}
+		else
+			zbx_free(add_result);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __func__, add_results->values_num);

@@ -77,24 +77,13 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
-	 * Delete widget.
-	 *
-	 * @return $this
-	 */
-	public function delete() {
-		$this->query('xpath:.//button[@class="btn-widget-delete"]')->one()->click()->waitUntilNotVisible();
-
-		return $this;
-	}
-
-	/**
 	 * @inheritdoc
 	 */
 	public function getReadyCondition() {
 		$target = $this;
 
 		return function () use ($target) {
-			return ($target->query('xpath:.//div[@class="preloader-container"]')->one(false) === null);
+			return ($target->query('xpath:.//div[contains(@class, "is-loading")]')->one(false)->isValid() === false);
 		};
 	}
 }

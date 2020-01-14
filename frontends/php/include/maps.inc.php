@@ -87,7 +87,7 @@ function getActionsBySysmap(array $sysmap, array $options = []) {
 			? $elem['elements'][0]['hostid']
 			: 0;
 
-		$map = CMenuPopupHelper::getMapElement($sysmap['sysmapid'], $elem['selementid_orig'], $severity_min, $hostid);
+		$map = CMenuPopupHelper::getMapElement($sysmap['sysmapid'], $elem, $severity_min, $hostid);
 
 		$actions[$selementid] = CJs::encodeJson($map);
 	}

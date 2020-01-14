@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>4.4</version>
+   <date>2015-12-30T14:41:30Z</date>
+   <groups>
+      <group>
+         <name>Templates/Modules</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Module Zabbix agent</template>
+         <name>Template Module Zabbix agent</name>
+         <description>Use this template for agents reachable from Zabbix server/proxy (passive mode).&#13;
+&#13;
+Template tooling version used: 0.34</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Monitoring agent</name>
+            </application>
+            <application>
+               <name>Status</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Host name of Zabbix agent running</name>
+               <key>agent.hostname</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Zabbix agent ping</name>
+               <key>agent.ping</key>
+               <history>7d</history>
+               <description>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</description>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Zabbix agent ping status</name>
+               </valuemap>
+            </item>
+            <item>
+               <name>Version of Zabbix agent running</name>
+               <key>agent.version</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Version of Zabbix agent running</name>
+               <key>agent.version</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Zabbix agent availability</name>
+               <type>INTERNAL</type>
+               <key>zabbix[host,agent,available]</key>
+               <history>7d</history>
+               <description>Monitoring agent availability status</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>zabbix.host.available</name>
+               </valuemap>
+               <triggers>
+                  <trigger>
+                     <expression>{max({$AGENT.TIMEOUT})}=0</expression>
+                     <name>Zabbix agent is not available (for {$AGENT.TIMEOUT})</name>
+                     <priority>AVERAGE</priority>
+                     <description>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <macros>
+            <macro>
+               <macro>{$AGENT.TIMEOUT}</macro>
+               <value>3m</value>
+               <description>Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).</description>
+            </macro>
+         </macros>
+      </template>
+      <template>
+         <template>Template Module Zabbix agent active</template>
+         <name>Template Module Zabbix agent active</name>
+         <description>Use this template instead of 'Template Module Zabbix agent' for agents running in active mode only.&#13;
+&#13;
+Template tooling version used: 0.34</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Monitoring agent</name>
+            </application>
+            <application>
+               <name>Status</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Host name of Zabbix agent running</name>
+               <type>ZABBIX_ACTIVE</type>
+               <key>agent.hostname</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Zabbix agent ping</name>
+               <type>ZABBIX_ACTIVE</type>
+               <key>agent.ping</key>
+               <history>7d</history>
+               <description>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Zabbix agent ping status</name>
+               </valuemap>
+               <triggers>
+                  <trigger>
+                     <expression>{nodata({$AGENT.NODATA_TIMEOUT})}=1</expression>
+                     <name>Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})</name>
+                     <priority>AVERAGE</priority>
+                     <description>For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Version of Zabbix agent running</name>
+               <type>ZABBIX_ACTIVE</type>
+               <key>agent.version</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Version of Zabbix agent running</name>
+               <type>ZABBIX_ACTIVE</type>
+               <key>agent.version</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+         </items>
+         <macros>
+            <macro>
+               <macro>{$AGENT.NODATA_TIMEOUT}</macro>
+               <value>30m</value>
+               <description>No data timeout for active agents. Consider to keep it relatively high.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>Zabbix agent ping status</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>zabbix.host.available</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>not available</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>available</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

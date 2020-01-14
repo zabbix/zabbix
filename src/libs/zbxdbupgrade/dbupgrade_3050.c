@@ -778,114 +778,65 @@ static int	DBpatch_3050069(void)
 
 	return SUCCEED;
 }
-/* remove references to table that is about to be renamed, this is required on IBM DB2 */
 
 static int	DBpatch_3050070(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("group_prototype", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050071(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("group_discovery", 1);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050072(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("scripts", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050073(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("opcommand_grp", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050074(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("opgroup", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050075(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("config", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050076(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("hosts_groups", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050077(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("rights", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050078(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("maintenances_groups", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050079(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("tag_filter", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050080(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("corr_condition_group", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050081(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("widget_field", 2);
-#else
 	return SUCCEED;
-#endif
 }
 
 /* groups is reserved keyword since MySQL 8.0 */
@@ -900,159 +851,77 @@ static int	DBpatch_3050083(void)
 	return DBrename_index("hstgrp", "groups_1", "hstgrp_1", "name", 0);
 }
 
-/* restore references after renaming table on IBM DB2 */
-
 static int	DBpatch_3050084(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
-
-	return DBadd_foreign_key("group_prototype", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050085(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("group_discovery", 1, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050086(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
-
-	return DBadd_foreign_key("scripts", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050087(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
-
-	return DBadd_foreign_key("opcommand_grp", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050088(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
-
-	return DBadd_foreign_key("opgroup", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050089(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"discovery_groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
-
-	return DBadd_foreign_key("config", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050090(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("hosts_groups", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050091(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"id",	NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("rights", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050092(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("maintenances_groups", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050093(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("tag_filter", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050094(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
-
-	return DBadd_foreign_key("corr_condition_group", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050095(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"value_groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("widget_field", 2, &field);
-#else
 	return SUCCEED;
-#endif
 }
-
-/* function is reserved keyword since MySQL 8.0 */
 
 static int	DBpatch_3050096(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_foreign_key("functions", 1);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050097(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_index("functions", "functions_2");
-#else
 	return SUCCEED;
-#endif
 }
+
+/* function is reserved keyword since MySQL 8.0 */
 
 static int	DBpatch_3050098(void)
 {
@@ -1063,22 +932,12 @@ static int	DBpatch_3050098(void)
 
 static int	DBpatch_3050099(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBcreate_index("functions", "functions_2", "itemid,name,parameter", 0);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050100(void)
 {
-#ifdef HAVE_IBM_DB2
-	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("functions", 1, &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_3050101(void)

@@ -306,7 +306,10 @@ $mediaOptionsForm = (new CFormList('options'))
 $tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm);
 
 // append buttons to form
-$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list'))->setId('cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'mediatype.list')
+	->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
+))->setId('cancel');
 
 if ($data['mediatypeid'] == 0) {
 	$addButton = (new CSubmitButton(_('Add'), 'action', 'mediatype.create'))->setId('add');

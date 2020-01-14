@@ -971,9 +971,10 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	DBbegin();
 
-	if (SUCCEED != (ret = DBlock_hostid(hostid)))
+	if (SUCCEED != (ret = DBlock_hostid(hostid)) ||
+			SUCCEED != (ret = DBlock_graph(parent_graphid)))
 	{
-		/* the host was removed while processing lld rule */
+		/* the host or graph prototype was removed while processing lld rule */
 		DBrollback();
 		goto out;
 	}

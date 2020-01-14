@@ -20,6 +20,7 @@
 package plugin
 
 import (
+	"errors"
 	"sync/atomic"
 	"time"
 )
@@ -27,6 +28,8 @@ import (
 const (
 	DefaultCapacity = 100
 )
+
+var UnsupportedMetricError error
 
 // Collector - interface for periodical metric collection
 type Collector interface {
@@ -104,8 +107,15 @@ type ContextProvider interface {
 }
 
 type Result struct {
-	Itemid      uint64
-	Value       *string
+	Itemid uint64
+	Value  *string
+
+	// additional windows eventlog fields
+	EventSource    *string
+	EventID        *int
+	EventTimestamp *int
+	EventSeverity  *int
+
 	Ts          time.Time
 	Error       error
 	LastLogsize *uint64
@@ -127,4 +137,8 @@ type Request struct {
 type GlobalOptions struct {
 	Timeout  int
 	SourceIP string
+}
+
+func init() {
+	UnsupportedMetricError = errors.New("Unsupported item key.")
 }

@@ -297,7 +297,12 @@ class CIntegrationTest extends CAPITest {
 			}
 		}
 
-		self::setHostStatus(self::$suite_hosts, HOST_STATUS_NOT_MONITORED);
+		if (self::$suite_hosts) {
+			global $DB;
+			DBconnect($error);
+			self::setHostStatus(self::$suite_hosts, HOST_STATUS_NOT_MONITORED);
+			DBclose();
+		}
 
 		parent::onAfterTestSuite();
 	}
@@ -769,7 +774,7 @@ class CIntegrationTest extends CAPITest {
 			throw $exception;
 		}
 
-		$this->fail('Data requested from '.$method.' API is not present withing specified interval. Params used:'.
+		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
 				"\n".json_encode($params)
 		);
 	}

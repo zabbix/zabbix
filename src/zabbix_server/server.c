@@ -66,7 +66,7 @@
 #include "events.h"
 #include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
-#include "../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "zbxipcservice.h"
 #include "zbxhistory.h"
 #include "postinit.h"
@@ -303,6 +303,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	}
 	else if (local_server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
+		/* make initial configuration sync before worker processes are forked */
 		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		*local_process_num = local_server_num - server_count + CONFIG_CONFSYNCER_FORKS;
 	}
@@ -1070,25 +1071,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	/* make initial configuration sync before worker processes are forked */
-	DCsync_configuration(ZBX_DBSYNC_INIT);
-
-	if (SUCCEED != zbx_check_postinit_tasks(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
-	/* update maintenance states */
-	zbx_dc_update_maintenances();
-
-	DBclose();
-
-	zbx_vc_enable();
-
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
@@ -1133,6 +1115,24 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
+				DCconfig_wait_sync();
+
+				DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+				if (SUCCEED != zbx_check_postinit_tasks(&error))
+				{
+					zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s",
+							error);
+					zbx_free(error);
+					exit(EXIT_FAILURE);
+				}
+
+				/* update maintenance states */
+				zbx_dc_update_maintenances();
+
+				DBclose();
+
+				zbx_vc_enable();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_type = ZBX_POLLER_TYPE_NORMAL;

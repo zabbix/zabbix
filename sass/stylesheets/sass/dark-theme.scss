@@ -29,7 +29,7 @@ $font-color: #f2f2f2;
 $font-selected-color: #f2f2f2;
 $font-alt-color: #737373;
 $body-bg-color: #0e1012;
-$overlay-bg-color: #000;
+$overlay-bg-color: #000000;
 
 // UI
 $ui-bg-color: #2b2b2b;
@@ -43,7 +43,7 @@ $ui-sortable-helper-border-color: $ui-border-color;
 
 $action-hover-color: #454545;
 $action-border-color: #383838;
-$action-shadow-color: rgba(#000, 0.5);
+$action-shadow-color: rgba(0, 0, 0, .5);
 
 $table-border-color: #383838;
 
@@ -86,8 +86,8 @@ $btn-disabled-font-color: #525252;
 $btn-disabled-bg-color: transparent;
 $btn-disabled-border-color: #3d3d3d;
 
-$btn-back-map-background-color: rgba(0, 0, 0, 0.8);
-$btn-back-text-color: white;
+$btn-back-map-background-color: rgba(0, 0, 0, .8);
+$btn-back-text-color: #ffffff;
 $btn-back-background-hover: #768d99;
 
 // LINKS
@@ -96,15 +96,15 @@ $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
 $link-visited-color: #4796c4;
 
-$link-main-nav-color: rgba(#fff, 0.8);
-$link-main-nav-hover-color: rgba(#fff, 1);
-$link-main-nav-active-color: rgba(#fff, 1);
-$link-main-nav-visited-color: rgba(#fff, 0.8);
+$link-main-nav-color: rgba(#ffffff, .8);
+$link-main-nav-hover-color: #ffffff;
+$link-main-nav-active-color: #ffffff;
+$link-main-nav-visited-color: rgba(#ffffff, .8);
 
-$link-main-subnav-color: rgba(#fff, 0.8);
-$link-main-subnav-hover-color: rgba(#fff, 1);
-$link-main-subnav-active-color: rgba(#fff, 1);
-$link-main-subnav-visited-color: rgba(#fff, 0.8);
+$link-main-subnav-color: rgba(#ffffff, .8);
+$link-main-subnav-hover-color: #ffffff;
+$link-main-subnav-active-color: #ffffff;
+$link-main-subnav-visited-color: rgba(#ffffff, .8);
 
 // ANALOG CLOCK
 $clock-face-color: #383838;
@@ -121,7 +121,12 @@ $ok-ack-fg-color: #00ff00;
 // MULTISELECT
 $multiselect-selected-bg-color: #696969;
 
-.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+.status-na-bg,
+.status-info-bg,
+.status-warning-bg,
+.status-average-bg,
+.status-high-bg,
+.status-disaster-bg {
 	border-color: rgba($ui-bg-color, .2) !important;
 }
 
@@ -159,13 +164,6 @@ $multiselect-selected-bg-color: #696969;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
-.list-table {
-
-	thead th {
-		border-color: lighten($table-border-color, 3%);
-	}
-}
-
 .top-subnav a {
 	&:focus {
 		border-bottom: 4px solid lighten($main-nav-bg-color, 30%) !important;
@@ -175,39 +173,50 @@ $multiselect-selected-bg-color: #696969;
 
 // TABLES
 .list-table {
+	thead th {
+		border-color: lighten($table-border-color, 3%);
+	}
+
 	&.compact-view {
 		tr {
 			&:hover {
 				td {
-					&.na-bg, &.info-bg, &.warning-bg, &.average-bg, &.high-bg, &.disaster-bg {
-						color: black;
+					&.na-bg,
+					&.info-bg,
+					&.warning-bg,
+					&.average-bg,
+					&.high-bg,
+					&.disaster-bg {
+						color: #000000;
 					}
 				}
 			}
 
 			&[class*='flh-'] {
 				td {
-					box-shadow: inset 0 -1px 0 0 rgba(black, 0.1);
+					box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, .1);
 				}
 			}
 		}
 
 		td {
-			&.na-bg, &.info-bg, &.warning-bg, &.average-bg, &.high-bg, &.disaster-bg {
-				color: black;
-				box-shadow: inset 0 -1px 0 0 rgba(black, 0.1);
+			&.na-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				color: #000000;
+				box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, .1);
 			}
 		}
 	}
 }
 
-/*
- * Dashboard, widgets and iterators.
- *
- * To maintain code clarity:
- *   - Do not mix rules for dashboard view mode and dashboard edit mode.
- *   - Do not mix rules for widgets and iterators.
- */
+// Dashboard, widgets and iterators.
+// To maintain code clarity:
+//   - Do not mix rules for dashboard view mode and dashboard edit mode.
+//   - Do not mix rules for widgets and iterators.
 
 .dashbrd-grid-widget {
 	&.dashbrd-grid-widget-hidden-header {
@@ -237,7 +246,8 @@ $multiselect-selected-bg-color: #696969;
 			}
 		}
 
-		&.ui-resizable-resizing, &.ui-draggable-dragging {
+		&.ui-resizable-resizing,
+		&.ui-draggable-dragging {
 			&::before {
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
 			}
@@ -259,7 +269,8 @@ $multiselect-selected-bg-color: #696969;
 			}
 		}
 
-		&.ui-resizable-resizing, &.ui-draggable-dragging {
+		&.ui-resizable-resizing,
+		&.ui-draggable-dragging {
 			&::before {
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
 			}
@@ -285,7 +296,7 @@ $multiselect-selected-bg-color: #696969;
 			}
 
 			.dashbrd-grid-iterator-mask {
-				border: none;
+				border: 0;
 			}
 		}
 	}
@@ -308,13 +319,13 @@ $multiselect-selected-bg-color: #696969;
 .ui-tabs-nav {
 	.ui-tabs-active {
 		.btn-time {
-			&:after {
+			&::after {
 				background-position: -87px -583px;
 			}
 		}
 
 		.filter-trigger {
-			&:after {
+			&::after {
 				background-position: -87px -547px;
 			}
 		}
@@ -346,6 +357,7 @@ $multiselect-selected-bg-color: #696969;
 }
 
 .icon-actions-number-gray {
+
 	&[data-count]::after {
 		color: $font-selected-color;
 	}

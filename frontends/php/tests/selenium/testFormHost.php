@@ -86,24 +86,6 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->host);
 	}
 
-	/**
-	 * Adds two macros to an existing host.
-	 */
-	public function testFormHost_AddMacros() {
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestTabSwitch('Macros');
-		$this->zbxTestInputTypeWait('macros_0_macro', '{$TEST_MACRO}');
-		$this->zbxTestInputType('macros_0_value', '1');
-		$this->zbxTestClick('macro_add');
-		$this->zbxTestAssertElementPresentId('macros_1_macro');
-		$this->zbxTestInputTypeWait('macros_1_macro', '{$TEST_MACRO2}');
-		$this->zbxTestInputType('macros_1_value', '2');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
-		$this->zbxTestTextPresent($this->host);
-	}
-
 	public function testFormHost_CreateHostNoGroups() {
 		$host = 'Test host without groups';
 
@@ -260,7 +242,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
+		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux by Zabbix agent');
@@ -324,7 +306,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
+		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux by Zabbix agent');

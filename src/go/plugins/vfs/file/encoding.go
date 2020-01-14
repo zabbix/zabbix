@@ -24,6 +24,8 @@ package file
 //size_t call_iconv(iconv_t cd, char *inbuf, size_t *inbytesleft, char *outbuf, size_t *outbytesleft) {
 //   return iconv(cd, &inbuf, inbytesleft, &outbuf, outbytesleft);
 // }
+//
+// #cgo windows LDFLAGS: -liconv
 import "C"
 
 import (

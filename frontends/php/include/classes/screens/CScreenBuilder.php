@@ -276,7 +276,7 @@ class CScreenBuilder {
 	}
 
 	/**
-	 * Appends boolean option 'isTemplatedScreen' to ouput options.
+	 * Appends boolean option 'isTemplatedScreen' to output options.
 	 *
 	 * @param array $options
 	 *
@@ -284,7 +284,7 @@ class CScreenBuilder {
 	 */
 	protected static function appendTemplatedScreenOption(array $options) {
 		if (array_key_exists('screen', $options)) {
-			$options['isTemplatedScreen'] = (bool) $options['screen']['templateid'];
+			$options['isTemplatedScreen'] = (bool) array_key_exists('templateid', $options['screen']);
 		}
 		elseif (array_key_exists('screenid', $options) && $options['screenid'] > 0) {
 			$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get([

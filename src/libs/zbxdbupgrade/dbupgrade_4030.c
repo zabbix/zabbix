@@ -434,11 +434,7 @@ out:
 
 static int	DBpatch_4030028(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBdrop_index("media_type", "media_type_1");
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_4030029(void)
@@ -450,11 +446,7 @@ static int	DBpatch_4030029(void)
 
 static int	DBpatch_4030030(void)
 {
-#ifdef HAVE_IBM_DB2
-	return DBcreate_index("media_type", "media_type_1", "name", 1);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_4030031(void)

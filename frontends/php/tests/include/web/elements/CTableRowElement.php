@@ -69,10 +69,12 @@ class CTableRowElement extends CElement {
 		$headers = $this->parent->getHeadersText();
 
 		if (is_string($column)) {
-			$column = array_search($column, $headers);
-			if ($column === false) {
-				return null;
+			$index = array_search($column, $headers);
+			if ($index === false) {
+				return new CNullElement(['locator' => '"'.$column.'" (table column name)']);
 			}
+
+			$column = $index;
 		}
 
 		return $this->query('xpath:./td['.((int)$column + 1).']')->one();

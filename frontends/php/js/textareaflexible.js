@@ -48,8 +48,10 @@
 			$textarea.val(new_value);
 		}
 
-		$textarea.height(0).innerHeight($textarea[0].scrollHeight);
-		$(window).scrollTop(scroll_pos);
+		if (new_value !== '') {
+			$textarea.height(0).innerHeight($textarea[0].scrollHeight);
+			$(window).scrollTop(scroll_pos);
+		}
 	}
 
 	var methods = {
@@ -63,6 +65,15 @@
 					.off('input keydown paste', update)
 					.on('input keydown paste', update)
 					.trigger('input');
+			});
+		},
+		clean: function() {
+			return this.each(function() {
+				var $textarea = $(this);
+
+				$textarea
+					.val('')
+					.css('height', '');
 			});
 		}
 	};
