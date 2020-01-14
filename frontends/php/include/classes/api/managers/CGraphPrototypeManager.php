@@ -51,6 +51,14 @@ class CGraphPrototypeManager {
 
 		$del_graphids = array_keys($del_graphids);
 
+		// Lock graph prototypes before delete to prevent server from adding new LLD elements.
+		DBselect(
+			'SELECT NULL'.
+			' FROM graphs g'.
+			' WHERE '.dbConditionInt('g.graphid', $del_graphids).
+			' FOR UPDATE'
+		);
+
 		// Deleting discovered graphs.
 		$del_discovered_graphids = DBfetchColumn(DBselect(
 			'SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $del_graphids)

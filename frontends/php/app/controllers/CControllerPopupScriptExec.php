@@ -65,8 +65,8 @@ class CControllerPopupScriptExec extends CController {
 		];
 
 		$scripts = API::Script()->get([
-			'scriptids' => $scriptid,
-			'output' => ['name', 'command']
+			'output' => ['name', 'command'],
+			'scriptids' => $scriptid
 		]);
 
 		if ($scripts) {

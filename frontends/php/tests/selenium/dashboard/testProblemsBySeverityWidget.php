@@ -1018,7 +1018,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
 			$dashboard = CDashboardElement::find()->one()->edit();
 			$widget = $dashboard->getWidget($name);
-			$widget->delete();
+			$dashboard->deleteWidget($name);
 			$this->page->waitUntilReady();
 			$dashboard->save();
 			// Check that Dashboard has been saved

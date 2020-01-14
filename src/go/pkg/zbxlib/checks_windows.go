@@ -22,7 +22,7 @@ package zbxlib
 /* cspell:disable */
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../../../../../include
+#cgo CFLAGS: -I${SRCDIR}/../../../../../include -I${SRCDIR}/../../../../build/win32/include
 
 #include "common.h"
 #include "sysinfo.h"
@@ -55,7 +55,6 @@ int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -75,8 +74,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
 	case "system.localtime":
 		cfunc = unsafe.Pointer(C.SYSTEM_LOCALTIME)
-	case "system.users.num":
-		cfunc = unsafe.Pointer(C.SYSTEM_USERS_NUM)
 	}
 	return
 }

@@ -200,7 +200,7 @@ class CRouter {
 		'widget.graphprototype.view'	=> ['CControllerWidgetIteratorGraphPrototypeView',	'layout.json',			null],
 		'widget.hostavail.view'			=> ['CControllerWidgetHostAvailView',				'layout.widget',		'monitoring.widget.hostavail.view'],
 		'widget.map.view'				=> ['CControllerWidgetMapView',						'layout.widget',		'monitoring.widget.map.view'],
-		'widget.navtree.item.edit'		=> ['CControllerWidgetNavTreeItemEdit',				'layout.json',			null],
+		'widget.navtree.item.edit'		=> ['CControllerWidgetNavTreeItemEdit',				'layout.json',			'monitoring.widget.navtreeitem.edit'],
 		'widget.navtree.item.update'	=> ['CControllerWidgetNavTreeItemUpdate',			'layout.json',			null],
 		'widget.navtree.view'			=> ['CControllerWidgetNavTreeView',					'layout.widget',		'monitoring.widget.navtree.view'],
 		'widget.plaintext.view'			=> ['CControllerWidgetPlainTextView',				'layout.widget',		'monitoring.widget.plaintext.view'],

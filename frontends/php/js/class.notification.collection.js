@@ -260,7 +260,14 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
  */
 ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state) {
 	this.btn_snooze.renderState(alarm_state.isSnoozed(this.getRawList()));
-	this.btn_mute.renderState(alarm_state.muted);
+	if (alarm_state.supported) {
+		this.btn_mute.renderState(alarm_state.muted);
+	}
+	else {
+		this.btn_mute.renderState(true);
+		this.btn_mute.disabled = true;
+		this.btn_mute.title = locale['S_CANNOT_SUPPORT_NOTIFICATION_AUDIO'];
+	}
 
 	var list_node = this.list_node,
 		prev_notif_node = null;

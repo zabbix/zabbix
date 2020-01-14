@@ -221,10 +221,18 @@ class CWidgetField {
 			: $this->validation_rules;
 		$validation_rules += $this->ex_validation_rules;
 		$value = ($this->value === null) ? $this->default : $this->value;
-		$label = ($this->label === null) ? $this->name : $this->label;
-		$name = ($this->full_name === null) ? $label : $this->full_name;
 
-		if (!CApiInputValidator::validate($validation_rules, $value, $name, $error)) {
+		if ($this->full_name !== null) {
+			$label = $this->full_name;
+		}
+		else {
+			$label = ($this->label === null) ? $this->name : $this->label;
+		}
+
+		if (CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
+			$this->setValue($value);
+		}
+		else {
 			$this->setValue($this->default);
 			$errors[] = $error;
 		}
