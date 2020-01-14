@@ -134,6 +134,61 @@ static int	DBpatch_4050013(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4050014(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL, *name = NULL, *name_esc;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select wf.widget_fieldid,wf.name"
+			" from widget_field wf,widget w"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='navtree'"
+				" and wf.name like 'map.%%' or wf.name like 'mapid.%%'"
+			);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 == strncmp(row[1], "map.", 4))
+		{
+			name = zbx_dsprintf(name, "navtree.%s", row[1] + 4);
+		}
+		else
+		{
+			name = zbx_dsprintf(name, "navtree.sys%s", row[1]);
+		}
+
+		name_esc = DBdyn_escape_string_len(name, 255);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"update widget_field set name='%s' where widget_fieldid=%s;\n", name_esc, row[0]);
+
+		zbx_free(name_esc);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+	zbx_free(name);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -150,5 +205,6 @@ DBPATCH_ADD(4050007, 0, 1)
 DBPATCH_ADD(4050011, 0, 1)
 DBPATCH_ADD(4050012, 0, 1)
 DBPATCH_ADD(4050013, 0, 1)
+DBPATCH_ADD(4050014, 0, 1)
 
 DBPATCH_END()
