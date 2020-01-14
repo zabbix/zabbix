@@ -297,7 +297,12 @@ class CIntegrationTest extends CAPITest {
 			}
 		}
 
-		self::setHostStatus(self::$suite_hosts, HOST_STATUS_NOT_MONITORED);
+		if (self::$suite_hosts) {
+			global $DB;
+			DBconnect($error);
+			self::setHostStatus(self::$suite_hosts, HOST_STATUS_NOT_MONITORED);
+			DBclose();
+		}
 
 		parent::onAfterTestSuite();
 	}
