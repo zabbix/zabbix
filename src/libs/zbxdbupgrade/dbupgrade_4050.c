@@ -405,7 +405,7 @@ static int	DBpatch_4050016_interface_create(zbx_vector_dbu_interface_t *interfac
 	zbx_db_insert_t		db_insert_interfaces;
 	int			i, ret;
 
-	zbx_db_insert_prepare(&db_insert_interfaces, "interfaces", "interfaceid", "hostid", "main", "type", "useip",
+	zbx_db_insert_prepare(&db_insert_interfaces, "interface", "interfaceid", "hostid", "main", "type", "useip",
 			"ip", "dns", "port", NULL);
 
 	for (i = 0; i < interfaces->values_num; i++)
@@ -437,8 +437,9 @@ static int	DBpatch_4050016_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 		dbu_snmp_if_t *s = &snmp_ifs->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update items set type=%d, interfaceid=" ZBX_FS_UI64
-				" where type IN (1,4,6) AND h.status <> 3 AND"
+				"UPDATE items i, hosts h SET i.type=%d, i.interfaceid=" ZBX_FS_UI64
+				" WHERE i.hostid=h.hostid AND"
+					" type IN (1,4,6) AND h.status <> 3 AND"
 					" interfaceid=" ZBX_FS_UI64 " AND "
 					" snmp_community='%s' AND"
 					" snmpv3_securityname='%s' AND"
