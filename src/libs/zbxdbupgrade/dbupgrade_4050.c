@@ -463,18 +463,10 @@ static int	DBpatch_4050016_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 static int	DBpatch_4050016_items_type_update(void)
 {
-	int	ret;
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
+	if (ZBX_DB_OK > DBexecute("update items set type=%d where type IN (1,4,6)", ITEM_TYPE_SNMP))
+		return FAIL;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set type=%d"
-			" where type IN (1,4,6);\n", ITEM_TYPE_SNMP);
-
-	ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-
-	zbx_free(sql);
-
-	return ret;
+	return SUCCEED;
 }
 
 static int	DBpatch_4050016(void)
