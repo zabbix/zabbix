@@ -56,7 +56,7 @@ This guide describes how to integrate your Zabbix 4.4 installation with Slack us
 The **Send to** field can contain several variants of values:
 
 - Channel name in **#channel\_name** format
-- Channel name in **@user\_name** format for direct messages
+- User name in **@slack\_user** format for direct messages
 - Identifier (for example: **GQMNQ5G5R**)
 
 6\. You must add your bot to the target channel
