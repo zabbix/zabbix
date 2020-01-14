@@ -5292,7 +5292,7 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 	{
 		DBexecute("insert into interface_snmp"
 				" (interfaceid,version,bulk,community,securityname,securitylevel,authpassphrase,"
-				" privpassphrase,authprotocol,privprotocol,snmpv3_contextname)"
+				" privpassphrase,authprotocol,privprotocol,contextname)"
 			" values"
 				" (" ZBX_FS_UI64 ",%d,%d,'%s','%s',%d,'%s','%s',%d,%d,'%s')",
 			interfaceid, (int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
