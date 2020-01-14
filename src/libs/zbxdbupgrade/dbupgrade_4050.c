@@ -468,7 +468,7 @@ static int	DBpatch_4050016_items_type_update(void)
 	size_t	sql_alloc = 0, sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set type=%d"
-			" where type IN (1,4,6) AND h.status <> 3;\n", ITEM_TYPE_SNMP);
+			" where type IN (1,4,6);\n", ITEM_TYPE_SNMP);
 
 	ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
