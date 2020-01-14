@@ -451,7 +451,7 @@ class testItemState extends CIntegrationTest {
 
 		// Wait for the refresh active checks
 		$refresh_active = $this->getLogLineTimestamp(self::COMPONENT_SERVER,
-				['trapper got \'{"request":"active checks","host":"test_host"\''],
+				['trapper got \'{"request":"active checks","host":"test_host"'],
 				self::REFRESH_ACT_CHKS_INTERVAL + self::LOG_LINE_WAIT_TIME
 		);
 
