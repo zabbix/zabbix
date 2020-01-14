@@ -75,7 +75,7 @@ class CModuleManager {
 	 * @return CModule|null
 	 */
 	public function getModuleById($id) {
-		return array_keys($id, $this->modules) ? $this->modules[$id] : null;
+		return array_key_exists($id, $this->modules) ? $this->modules[$id] : null;
 	}
 
 	/**
@@ -252,7 +252,8 @@ class CModuleManager {
 				}
 
 				$this->modules[$manifest['id']] = $instance;
-			} catch (Exception $e) {
+			}
+			catch (Exception $e) {
 				$this->errors[$manifest['id']][] = $e;
 			}
 
@@ -344,11 +345,10 @@ class CModuleManager {
 	 * @param string $event    Module event handler name.
 	 */
 	private function invokeEventHandler(Action $action, $event) {
-		$action_name = $action->getAction();
-		$current_module = $this->getModuleByActionName($action_name);
+		$current_module = $this->getModuleByActionName($action->getAction());
 
 		foreach ($this->modules as $module) {
-			if ($module->isEnabled() && !array_key_exists($action_name, $module->getActions())) {
+			if ($module->isEnabled() && $module != $current_module) {
 				$module->$event($action);
 			}
 		}

@@ -458,7 +458,7 @@ class ZBase {
 		$this->action = class_exists($controller, true) ? new $controller : null;
 
 		if ($this->action instanceof CController == false) {
-			$message = is_null($this->action)
+			$message = ($this->action === null)
 				? _s('%s action class is not found.', $controller)
 				: _s('%s must extend CController class', $controller);
 
