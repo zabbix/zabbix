@@ -782,7 +782,7 @@ class CSvgGraph extends CSvg {
 
 			$path_num = 0;
 			foreach ($this->points[$index] as $clock => $point) {
-				// If missing data function is SVG_GRAPH_MISSING_DATA_NONE, path should be splitted in multiple svg shapes.
+				// If missing data function is SVG_GRAPH_MISSING_DATA_NONE, path should be split in multiple svg shapes.
 				if ($point === null) {
 					$path_num++;
 					continue;
@@ -1077,7 +1077,7 @@ class CSvgGraph extends CSvg {
 			// At least 3 pixels expected to be occupied to show the range. Show simple anotation otherwise.
 			$draw_type = ($x2 - $x1) > 2 ? CSvgGraphAnnotation::TYPE_RANGE : CSvgGraphAnnotation::TYPE_SIMPLE;
 
-			// Draw border lines. Make them dashed if beginning or ending of highligted zone is visible in graph.
+			// Draw border lines. Make them dashed if beginning or ending of highlighted zone is visible in graph.
 			if ($problem['clock'] > $this->time_from) {
 				$draw_type |= CSvgGraphAnnotation::DASH_LINE_START;
 			}

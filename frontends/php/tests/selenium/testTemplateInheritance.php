@@ -53,7 +53,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 
 		$this->zbxTestTabSwitch('Templates');
 
-		$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
+		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickLinkTextWait('Template Module Zabbix agent');

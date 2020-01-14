@@ -200,7 +200,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
 		$suite->addTestSuite('testProblemsBySeverityWidget');
-//		$suite->addTestSuite('testHostAvailabilityWidget');
+		$suite->addTestSuite('testHostAvailabilityWidget');
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
 		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');

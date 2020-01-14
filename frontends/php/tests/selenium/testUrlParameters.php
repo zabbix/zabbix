@@ -586,7 +586,7 @@ class testUrlParameters extends CLegacyWebTest {
 			[
 				'title' => 'Latest data',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
 						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=4&filter_hostids[]=50009',

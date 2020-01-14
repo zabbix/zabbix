@@ -141,6 +141,7 @@ class CControllerMediatypeEdit extends CController {
 			'event_menu_name' => $db_defaults['event_menu_name'],
 			'parameters' => [
 				['name' => 'URL', 'value'=> ''],
+				['name' => 'HTTPProxy', 'value'=> ''],
 				['name' => 'To', 'value' => '{ALERT.SENDTO}'],
 				['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
 				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
@@ -211,6 +212,7 @@ class CControllerMediatypeEdit extends CController {
 			'form_refresh', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 			'event_menu_name', 'description'
 		]);
+		$data['exec_params'] = array_values($data['exec_params']);
 
 		if ($this->hasInput('form_refresh')) {
 			$data['parameters'] = [];

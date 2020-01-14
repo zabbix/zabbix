@@ -65,7 +65,9 @@ class CControllerValuemapCreate extends CController {
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
+				->setArgument('page', CPagerHelper::loadPage('valuemap.list', null))
 			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Value map added'));
 		}
 		else {

@@ -1,0 +1,1 @@
+A......... [ZBX-16901] fixed 'opdata' property in event.get and problem.get for events without triggers (vmurzins)

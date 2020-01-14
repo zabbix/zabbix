@@ -36,6 +36,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'groupid' =>			'db hstgrp.groupid',
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
+			'cancel' =>				'in 1',
 			'from' =>				'range_time',
 			'to' =>					'range_time'
 		];
@@ -88,8 +89,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return;
 		}
 		elseif ($this->dashboard === null) {
-			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
-			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
+			$this->setResponse(new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.list')
+				->setArgument('page', $this->hasInput('cancel') ? CPagerHelper::loadPage('dashboard.list', null) : null)
+			));
 
 			return;
 		}

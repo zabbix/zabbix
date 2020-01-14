@@ -105,7 +105,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		];
 
 		// Write macros rows from Frontend to array.
-		$table = $this->query('id:tbl_macros')->asTable()->one();
+		$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
 		$count = $table->getRows()->count() - 1;
 		for ($i = 0; $i < $count; $i += 2) {
 			$macro = [];
@@ -167,10 +167,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait($data['group']);
 		$this->zbxTestTabSwitch('Templates');
+		$this->zbxTestClickButtonMultiselect('add_templates_');
+		$this->zbxTestLaunchOverlayDialog('Templates');
 
 		foreach ($data['templates'] as $template) {
-			$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
-			$this->zbxTestLaunchOverlayDialog('Templates');
 			$this->zbxTestDropdownSelectWait('groupid', $template['group']);
 			$this->zbxTestClickLinkTextWait($template['name']);
 			$this->zbxTestWaitForPageToLoad();
@@ -336,7 +336,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Templates');
 		if (array_key_exists('templates', $data)) {
 			foreach ($data['templates'] as $template) {
-				$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
+				$this->zbxTestClickButtonMultiselect('add_templates_');
 				$this->zbxTestLaunchOverlayDialog('Templates');
 				$this->zbxTestDropdownSelectWait('groupid', $template['group']);
 				$this->zbxTestClickLinkTextWait($template['name']);
@@ -456,7 +456,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Change template.
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestTabSwitch('Templates');
-			$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
+			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);

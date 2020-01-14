@@ -206,8 +206,10 @@ if (!$data['form_refresh']) {
 	$tabs->setSelected(0);
 }
 
-$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')))
-	->setId('cancel');
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'usergroup.list')
+	->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
+))->setId('cancel');
 
 if ($data['usrgrpid'] != 0) {
 	$tabs->setFooter(makeFormFooter(

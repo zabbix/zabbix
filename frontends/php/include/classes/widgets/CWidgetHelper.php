@@ -819,11 +819,10 @@ class CWidgetHelper {
 	 * Return javascript necessary to initialize CWidgetFieldGraphOverride field.
 	 *
 	 * @param CWidgetFieldGraphOverride $field
-	 * @param string                    $form_name  Form name in which override field is located.
 	 *
 	 * @return string
 	 */
-	public static function getGraphOverrideJavascript($field, $form_name) {
+	public static function getGraphOverrideJavascript($field) {
 		$scripts = [
 			// Define it as function to avoid redundancy.
 			'function initializeOverrides() {'.
@@ -1235,8 +1234,8 @@ class CWidgetHelper {
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.
 						'data.color = function(num) {'.
-							'var palete = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETE.';'.
-							'return palete[num % palete.length];'.
+							'var palette = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE.';'.
+							'return palette[num % palette.length];'.
 						'} (data.rowNum);'.
 						'return data;'.
 					'}'.
@@ -1276,7 +1275,7 @@ class CWidgetHelper {
 					'}'.
 				'});',
 
-			// Intialize vertical accordion.
+			// Initialize vertical accordion.
 			'jQuery("#data_sets")'.
 				'.on("focus", ".'.CMultiSelect::ZBX_STYLE_CLASS.' input.input", function() {'.
 					'jQuery("#data_sets").zbx_vertical_accordion("expandNth",'.

@@ -271,7 +271,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "system.cpu.util":
 		return p.getCpuUtil(params)
 	default:
-		return nil, errors.New("Unsupported metric.")
+		return nil, plugin.UnsupportedMetricError
 	}
 }
 

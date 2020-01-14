@@ -323,7 +323,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 		if (in_array('No encryption', $data['fields']['Encryption level']) && count($data['fields']['Encryption level']) === 1) {
 			$this->assertFalse($form->query('id:tls_psk_identity')->one()->isDisplayed());
 			$this->assertFalse($form->query('id:tls_psk')->one()->isDisplayed());
-			$this->assertTrue($form->query('button:Change PSK')->one(false) === null);
+			$this->assertFalse($form->query('button:Change PSK')->one(false)->isValid());
 
 			// Check encryption level and empty PSK values in DB.
 			$this->assertEquals(HOST_ENCRYPTION_NONE, CDBHelper::getValue('SELECT autoreg_tls_accept FROM config'));
@@ -334,8 +334,8 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 		// Check the results, if selected PSK.
 		else {
 			$this->assertTrue($form->query('button:Change PSK')->one()->isDisplayed());
-			$this->assertTrue($form->query('id:tls_psk_identity')->one(false) === null);
-			$this->assertTrue($form->query('id:tls_psk')->one(false) === null);
+			$this->assertFalse($form->query('id:tls_psk_identity')->one(false)->isValid());
+			$this->assertFalse($form->query('id:tls_psk')->one(false)->isValid());
 
 			// Check encryption level in DB.
 			if (count($data['fields']['Encryption level']) === 1) {

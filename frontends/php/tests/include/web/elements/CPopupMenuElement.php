@@ -97,7 +97,7 @@ class CPopupMenuElement extends CElement {
 
 		$name = array_shift($items);
 		$element = $this->query('xpath', './li/a[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
-		if ($element === null) {
+		if (!$element->isValid()) {
 			throw new Exception('Failed to find menu item by name: "'.$name.'".');
 		}
 

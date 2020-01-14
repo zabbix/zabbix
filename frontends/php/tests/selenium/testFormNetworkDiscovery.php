@@ -326,10 +326,10 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestTextPresent($data['name']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM drules WHERE name='.zbx_dbstr($data['name'])));
-		$cheks = 'SELECT NULL FROM dchecks WHERE druleid IN ('.
+		$checks = 'SELECT NULL FROM dchecks WHERE druleid IN ('.
 				'SELECT druleid FROM drules WHERE name='.zbx_dbstr($data['name']).
 				')';
-		$this->assertEquals(count($data['checks']), CDBHelper::getCount($cheks));
+		$this->assertEquals(count($data['checks']), CDBHelper::getCount($checks));
 	}
 
 	public function getUpdateValidationData() {
