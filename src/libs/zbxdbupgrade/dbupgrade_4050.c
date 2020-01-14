@@ -430,8 +430,9 @@ static int	DBpatch_4050016_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	size_t	sql_alloc = snmp_ifs->values_num * ZBX_KIBIBYTE / 3 , sql_offset = 0;
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < snmp_ifs->values_num; i++)
+	for (i = 0; i < snmp_ifs->values_num && SUCCEED == ret; i++)
 	{
 		dbu_snmp_if_t *s = &snmp_ifs->values[i];
 
@@ -452,9 +453,17 @@ static int	DBpatch_4050016_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 				s->item_interfaceid, s->community, s->securityname, (int)s->securitylevel,
 				s->authpassphrase, s->privpassphrase, (int)s->authprotocol, (int)s->privprotocol,
 				s->contextname, s->item_port);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	if (SUCCEED == ret)
+	{
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
 
 	zbx_free(sql);
 
