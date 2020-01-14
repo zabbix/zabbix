@@ -861,13 +861,13 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 	for (i = 0; i < num; i++)
 	{
 		AGENT_REQUEST	key_req;
+		zbx_timespec_t	ts;
+		unsigned char	state = ITEM_STATE_NOTSUPPORTED;
+		int		errcode = CONFIG_ERROR;
 
 		if (FAIL == zbx_ipmi_port_expand_macros(items[i].host.hostid, items[i].interface.port_orig,
 				&items[i].interface.port, &error))
 		{
-			zbx_timespec_t	ts;
-			unsigned char	state = ITEM_STATE_NOTSUPPORTED;
-			int		errcode = CONFIG_ERROR;
 
 			zbx_timespec(&ts);
 			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, 0, NULL, &ts, state, error);
@@ -875,6 +875,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 			zbx_free(error);
 			continue;
 		}
+
 		init_request(&key_req);
 		if (SUCCEED == parse_item_key(items[i].key_orig, &key_req))
 		{
@@ -885,8 +886,11 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 			ipmi_manager_schedule_request(manager, items[i].host.hostid, request, now);
 		}
 		else
-			zabbix_log(LOG_LEVEL_INFORMATION,"Item key %s cannot be parsed", items[i].key_orig);
-
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Item key %s cannot be parsed", items[i].key_orig);
+			zbx_timespec(&ts);
+			DCrequeue_items(&items[i].itemid, &state, &ts.sec, &errcode, 1);
+		}
 		free_request(&key_req);
 	}
 
