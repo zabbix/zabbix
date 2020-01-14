@@ -792,32 +792,25 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
  *                                                                            *
  * Parameters: item      - [IN] the item to poll                              *
  *             command   - [IN] the command to execute                        *
+ *             key       - [IN] parsed item key
  *             message   - [OUT] the message                                  *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, zbx_ipc_message_t *message)
+static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, char *key, zbx_ipc_message_t *message)
 {
 	zbx_uint32_t	size;
-	AGENT_REQUEST	request;
 
 	size = zbx_ipmi_serialize_request(&message->data, item->itemid, item->interface.addr,
 			item->interface.port, item->host.ipmi_authtype, item->host.ipmi_privilege,
 			item->host.ipmi_username, item->host.ipmi_password, item->ipmi_sensor, command);
 
-	init_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key_orig, &request))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-	if (0 == strcmp(request.key, "ipmi.get"))
+	if (0 == strcmp(key, "ipmi.get"))
 		message->code = ZBX_IPC_IPMI_DISCOVERY_REQUEST;
 	else
 		message->code = ZBX_IPC_IPMI_VALUE_REQUEST;
 	message->size = size;
 
-	free_request(&request);
 }
 
 /******************************************************************************
@@ -867,6 +860,8 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 
 	for (i = 0; i < num; i++)
 	{
+		AGENT_REQUEST	key_req;
+
 		if (FAIL == zbx_ipmi_port_expand_macros(items[i].host.hostid, items[i].interface.port_orig,
 				&items[i].interface.port, &error))
 		{
@@ -880,12 +875,19 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 			zbx_free(error);
 			continue;
 		}
+		init_request(&key_req);
+		if (SUCCEED == parse_item_key(items[i].key_orig, &key_req))
+		{
+			request = ipmi_request_create(items[i].host.hostid);
+			request->itemid = items[i].itemid;
+			request->item_state = items[i].state;
+			ipmi_manager_serialize_request(&items[i], 0, key_req.key, &request->message);
+			ipmi_manager_schedule_request(manager, items[i].host.hostid, request, now);
+		}
+		else
+			zabbix_log(LOG_LEVEL_INFORMATION,"Item key %s cannot be parsed", items[i].key_orig);
 
-		request = ipmi_request_create(items[i].host.hostid);
-		request->itemid = items[i].itemid;
-		request->item_state = items[i].state;
-		ipmi_manager_serialize_request(&items[i], 0, &request->message);
-		ipmi_manager_schedule_request(manager, items[i].host.hostid, request, now);
+		free_request(&key_req);
 	}
 
 	zbx_preprocessor_flush();
