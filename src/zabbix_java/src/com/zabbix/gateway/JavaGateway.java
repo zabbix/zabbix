@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class JavaGateway
 {
 	private static final Logger logger = LoggerFactory.getLogger(JavaGateway.class);
-	public static final Map<String, Long> iterativeObjects = Collections.synchronizedMap(new HashMap<>());
+	public static final Map<String, Long> iterativeObjects = Collections.synchronizedMap(new HashMap<String, Long>());
 
 	public static void main(String[] args)
 	{
