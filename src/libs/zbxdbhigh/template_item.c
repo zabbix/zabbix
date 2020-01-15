@@ -164,7 +164,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select ti.itemid,ti.name,ti.key_,ti.type,ti.value_type,ti.delay,"
 				"ti.history,ti.trends,ti.status,ti.trapper_hosts,ti.units,"
-				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.authtype,"
+				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_oid,ti.authtype,"
 				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.description,"
 				"ti.inventory_link,ti.lifetime,hi.itemid,ti.evaltype,"
 				"ti.jmx_endpoint,ti.master_itemid,ti.timeout,ti.url,ti.query_fields,ti.posts,"
@@ -192,7 +192,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->authtype, row[17]);
 		ZBX_STR2UCHAR(item->flags, row[22]);
 		ZBX_STR2UCHAR(item->inventory_link, row[24]);
-		ZBX_STR2UCHAR(item->evaltype, row[28]);
+		ZBX_STR2UCHAR(item->evaltype, row[27]);
 
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
@@ -259,7 +259,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->ssl_key_password = zbx_strdup(NULL, row[44]);
 		ZBX_STR2UCHAR(item->verify_peer, row[45]);
 		ZBX_STR2UCHAR(item->verify_host, row[46]);
-		ZBX_STR2UCHAR(item->allow_traps, row[67]);
+		ZBX_STR2UCHAR(item->allow_traps, row[47]);
 		zbx_vector_ptr_create(&item->dependent_items);
 		zbx_vector_ptr_append(items, item);
 	}
