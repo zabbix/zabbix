@@ -333,7 +333,18 @@ static int	DBpatch_4050014(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_DBROW2UINT64(mediatypeid, row[0]);
-		content_type = MEDIA_TYPE_SMS == (zbx_media_type_t)atoi(row[1]) ? 2 : atoi(row[2]);
+
+		switch (atoi(row[1]))
+		{
+			case MEDIA_TYPE_SMS:
+				content_type = 2;
+				break;
+			case MEDIA_TYPE_EMAIL:
+				content_type = atoi(row[2]);
+				break;
+			default:
+				content_type = 0;
+		}
 
 		for (i = 0; 2 >= i; i++)
 		{
