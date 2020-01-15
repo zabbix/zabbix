@@ -88,7 +88,7 @@ class MysqlDbBackend extends DbBackend {
 		else {
 			DBexecute('SET NAMES utf8');
 		}
-		
+
 		if (!$this->ssl) {
 			return true;
 		}
