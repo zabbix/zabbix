@@ -466,6 +466,11 @@ define('ITEM_TYPE_JMX',				16);
 define('ITEM_TYPE_SNMPTRAP',		17);
 define('ITEM_TYPE_DEPENDENT',		18);
 define('ITEM_TYPE_HTTPAGENT',		19);
+define('ITEM_TYPE_SNMP',			20);
+
+define('SNMP_V1', 1);
+define('SNMP_V2C', 2);
+define('SNMP_V3', 3);
 
 define('ZBX_DEPENDENT_ITEM_MAX_LEVELS',	3);
 define('ZBX_DEPENDENT_ITEM_MAX_COUNT',	29999);
