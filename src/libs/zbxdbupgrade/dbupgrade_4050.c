@@ -381,6 +381,7 @@ static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zb
 		}
 		else if (FAIL != index && 0 == db_snmp_if_newid_cmp(&snmp_ifs->values[index], &snmp))
 		{
+			db_snmpinterface_free(snmp);
 			continue;
 		}
 		else if (0 < snmp_new_ifs->values_num &&
