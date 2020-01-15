@@ -176,9 +176,9 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 != zbx_stat(filename, &stat_buf))
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
@@ -188,15 +188,15 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)
+	if (0 != zbx_fstat(f, &stat_buf))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
-	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
 		goto err;
 	}
 

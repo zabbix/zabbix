@@ -2065,7 +2065,7 @@
 		clearUpdateWidgetContentTimer(widget);
 
 		if (widget['updating_content']) {
-			// Waiting for another AJAX request to either complete of fail.
+			// Waiting for another AJAX request to either complete or fail.
 			return;
 		}
 

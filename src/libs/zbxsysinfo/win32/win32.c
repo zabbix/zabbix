@@ -27,6 +27,7 @@ ZBX_METRIC	parameters_specific[] =
 {
 	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"c:,free"},
 	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
+	{"vfs.fs.get",		0,		VFS_FS_GET,		NULL},
 
 	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
 
