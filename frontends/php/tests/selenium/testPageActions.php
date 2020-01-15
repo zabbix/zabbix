@@ -59,8 +59,8 @@ class testPageActions extends CLegacyWebTest {
 	];
 
 	private function calculateHash($actionid) {
-		$this->sqlHashAction = 'SELECT actionid,name,eventsource,evaltype,status,def_shortdata,def_longdata,r_shortdata,'
-				. 'r_longdata,formula,pause_suppressed 	 FROM actions WHERE actionid='.$actionid;
+		$this->sqlHashAction = 'SELECT actionid,name,eventsource,evaltype,status,formula,pause_suppressed FROM actions '
+				. 'WHERE actionid='.$actionid;
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 		$this->sqlHashConditions = 'SELECT * FROM conditions WHERE actionid='.$actionid.' AND actionid>2  ORDER BY conditionid';
 		$this->oldHashConditions = CDBHelper::getHash($this->sqlHashConditions);
