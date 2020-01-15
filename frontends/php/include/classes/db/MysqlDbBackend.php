@@ -39,4 +39,73 @@ class MysqlDbBackend extends DbBackend {
 		return true;
 	}
 
+	/**
+	 * Creates database connection.
+	 *
+	 * @param string $host         Host name.
+	 * @param string $user         User name.
+	 * @param string $password     Password.
+	 * @param string $database     Database name.
+	 * @param string $port         Port.
+	 * @param string $key_file     Path name to the key file.
+	 * @param string $cert_file    Path name to the certificate file.
+	 * @param string $ca_file      Path name to the certificate authority file.
+	 * @param string $cipher_list  List of allowable ciphers to use for SSL encryption.
+	 *
+	 * @return resource|bool
+	 */
+	public function connect($host, $user, $password, $database, $port, $key_file, $cert_file, $ca_file, $cipher_list) {
+		$this->connect = mysqli_init();
+
+		if ($key_file.$cert_file.$ca_file !== '') {
+			$this->ssl = true;
+			$this->connect->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
+			$cipher_suit = preg_match('/^[\w\-]$/', $cipher_list) ? $cipher_list : null;
+			$this->connect->ssl_set($key_file, $cert_file, $ca_file, NULL, $cipher_suit);
+		}
+
+		if ($this->connect->real_connect($host, $user, $password, $database, $port, NULL, MYSQLI_CLIENT_SSL)) {
+			return $this->connect;
+		}
+		else {
+			$this->setError('Error connecting to database: '.trim($this->connect->error));
+			return false;
+		}
+	}
+
+	/**
+	 * Initialize database connection.
+	 *
+	 * @param string $cipher_list  A list of allowable ciphers to use for SSL encryption.
+	 *
+	 * @return bool
+	 */
+	public function init($cipher_list) {
+		if ($this->connect->autocommit(true) === false) {
+			$this->setError('Error setting auto commit.');
+			return false;
+		}
+		else {
+			DBexecute('SET NAMES utf8');
+		}
+		
+		if (!$this->ssl) {
+			return true;
+		}
+
+		$row = DBfetch(DBselect("SHOW STATUS LIKE 'ssl_cipher'"));
+
+		if ($row) {
+			$pattern = '/'. str_replace('*', '.*', $cipher_list).'/';
+
+			if ($cipher_list === '' || preg_match($pattern, $row['Value'])) {
+				return true;
+			}
+		}
+
+		$DB['DB'] = false;
+		$this->setError('Error connecting to database. Invalid cipher.');
+
+		return false;
+	}
 }

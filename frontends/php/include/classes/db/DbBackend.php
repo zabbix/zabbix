@@ -23,6 +23,19 @@
  * Abstract database backend class.
  */
 abstract class DbBackend {
+	/**
+	 * Connection resource.
+	 *
+	 * @var resource
+	 */
+	protected $connect;
+
+	/**
+	 * SSL connection flag.
+	 *
+	 * @var bool
+	 */
+	protected $ssl;
 
 	protected $error;
 
