@@ -20,9 +20,9 @@
 
 
 /**
- * Validate import data from Zabbix 4.4.x.
+ * Validate import data from Zabbix 5.0.x.
  */
-class C44XmlValidator {
+class C50XmlValidator {
 
 	private $PREPROCESSING_STEP_TYPE = [
 		CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER,
@@ -308,7 +308,7 @@ class C44XmlValidator {
 					'name' =>					['type' => XML_STRING, 'default' => ''],
 					'description' =>			['type' => XML_STRING, 'default' => ''],
 					'proxy' =>					['type' => XML_ARRAY, 'rules' => [
-						'name' =>					['type' => XML_STRING | XML_REQUIRED]
+						'name' =>					['type' => XML_STRING]
 					]],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'ipmi_authtype' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::XML_DEFAULT, 'in' => [CXmlConstantValue::XML_DEFAULT => CXmlConstantName::XML_DEFAULT, CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::MD2 => CXmlConstantName::MD2, CXmlConstantValue::MD5 => CXmlConstantName::MD5, CXmlConstantValue::STRAIGHT => CXmlConstantName::STRAIGHT, CXmlConstantValue::OEM => CXmlConstantName::OEM, CXmlConstantValue::RMCP_PLUS => CXmlConstantName::RMCP_PLUS]],

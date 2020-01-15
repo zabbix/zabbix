@@ -86,6 +86,11 @@ class CConfigurationExportBuilder {
 					continue;
 				}
 
+				if (array_key_exists('export', $val)) {
+					$store[$tag] = call_user_func($val['export'], $row);
+					continue;
+				}
+
 				if (($is_indexed_array || $is_array) && $has_data) {
 					$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
 					if ($is_required || $temp_store) {
@@ -94,22 +99,17 @@ class CConfigurationExportBuilder {
 					continue;
 				}
 
-				if (array_key_exists('export', $val)) {
-					$store[$tag] = call_user_func($val['export'], $row);
+				if (array_key_exists('in', $val)) {
+					if (!array_key_exists($value, $val['in'])) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
+							_s('unexpected constant value "%1$s"', $value)
+						));
+					}
+
+					$store[$tag] = $val['in'][$value];
 				}
 				else {
-					if (array_key_exists('in', $val)) {
-						if (!array_key_exists($value, $val['in'])) {
-							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
-								_s('unexpected constant value "%1$s"', $value)
-							));
-						}
-
-						$store[$tag] = $val['in'][$value];
-					}
-					else {
-						$store[$tag] = $value;
-					}
+					$store[$tag] = $value;
 				}
 			}
 
