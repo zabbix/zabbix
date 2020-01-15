@@ -183,6 +183,7 @@ typedef struct
 	unsigned char	bulk;
 	zbx_uint64_t	item_interfaceid;
 	char		*item_port;
+	unsigned char	skip;
 }
 dbu_snmp_if_t;
 
@@ -197,14 +198,14 @@ typedef struct
 	unsigned char	main;
 	unsigned char	useip;
 }
-dbu_interface;
+dbu_interface_t;
 
-ZBX_PTR_VECTOR_DECL(dbu_interface, dbu_interface);
-ZBX_PTR_VECTOR_IMPL(dbu_interface, dbu_interface);
+ZBX_PTR_VECTOR_DECL(dbu_interface, dbu_interface_t);
+ZBX_PTR_VECTOR_IMPL(dbu_interface, dbu_interface_t);
 ZBX_PTR_VECTOR_DECL(dbu_snmp_if, dbu_snmp_if_t);
 ZBX_PTR_VECTOR_IMPL(dbu_snmp_if, dbu_snmp_if_t);
 
-static void	db_interface_free(dbu_interface interface)
+static void	db_interface_free(dbu_interface_t interface)
 {
 	zbx_free(interface.ip);
 	zbx_free(interface.dns);
@@ -221,11 +222,69 @@ static void	db_snmpinterface_free(dbu_snmp_if_t snmp)
 	zbx_free(snmp.item_port);
 }
 
+static int	db_snmp_if_cmp(const dbu_snmp_if_t *snmp1, const dbu_snmp_if_t *snmp2)
+{
+#define ZBX_RETURN_IF_NOT_EQUAL_STR(s1, s2)	\
+	if (0 != (ret = strcmp(s1, s2)))	\
+		return ret;
+
+	int ret;
+
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->securitylevel, snmp2->securitylevel);
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->authprotocol, snmp2->authprotocol);
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->privprotocol, snmp2->privprotocol);
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->version, snmp1->version);
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->bulk, snmp1->bulk);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->community,snmp2->community);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->securityname,snmp2->securityname);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->authpassphrase,snmp2->authpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->privpassphrase,snmp2->privpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->contextname,snmp2->contextname);
+
+	return 0;
+}
+
+static int	db_snmp_if_newid_cmp(const dbu_snmp_if_t *snmp1, const dbu_snmp_if_t *snmp2)
+{
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->interfaceid, snmp2->interfaceid);
+
+	return db_snmp_if_cmp(snmp1,snmp2);
+}
+
+static int	db_snmp_new_if_find(const dbu_snmp_if_t *snmp, const zbx_vector_dbu_snmp_if_t *snmp_new_ifs,
+		const zbx_vector_dbu_interface_t *interfaces, const char *if_port)
+{
+	int		i, index;
+	dbu_interface_t	id, *interface;
+
+	for (i = snmp_new_ifs->values_num - 1; i >= 0 &&
+			snmp->item_interfaceid == snmp_new_ifs->values[i].item_interfaceid; i--)
+	{
+		if (0 != db_snmp_if_cmp(snmp, &snmp_new_ifs->values[i]))
+			continue;
+
+		if (0 != strlen(snmp->item_port) && 0 != strcmp(snmp->item_port, snmp_new_ifs->values[i].item_port))
+			continue;
+
+		id.interfaceid = snmp_new_ifs->values[i].interfaceid;
+		index = zbx_vector_dbu_interface_bsearch(interfaces, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		interface = &interfaces->values[index];
+
+		if (0 == strlen(snmp->item_port) && 0 != strcmp(if_port, interface->port))
+			continue;
+
+		return i;
+	}
+
+	return FAIL;
+}
+
 static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector_dbu_snmp_if_t *snmp_ifs,
 		zbx_vector_dbu_snmp_if_t *snmp_new_ifs)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
+	int			index;
 
 	result = DBselect(
 			"SELECT s.interfaceid,"
@@ -283,7 +342,7 @@ static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zb
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		dbu_interface		interface;
+		dbu_interface_t		interface;
 		dbu_snmp_if_t		snmp;
 		int			item_type;
 		const char 		*if_port;
@@ -300,6 +359,7 @@ static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zb
 		ZBX_STR2UCHAR(snmp.privprotocol, row[9]);
 		snmp.contextname = zbx_strdup(NULL, row[10]);
 		snmp.item_port = zbx_strdup(NULL, row[11]);
+		snmp.skip = 0;
 		if_port = row[18];
 
 		if (ITEM_TYPE_SNMPv1 == item_type)
@@ -310,11 +370,26 @@ static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zb
 			snmp.version = ZBX_IF_SNMP_VERSION_3;
 
 		snmp.interfaceid = snmp.item_interfaceid;
+		index = FAIL;
 
 		if ((0 == strlen(snmp.item_port) || 0 == strcmp(snmp.item_port, if_port)) &&
-				FAIL == zbx_vector_dbu_snmp_if_bsearch(snmp_ifs, snmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				FAIL == (index = zbx_vector_dbu_snmp_if_bsearch(snmp_ifs, snmp,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
 			zbx_vector_dbu_snmp_if_append(snmp_ifs, snmp);
+			continue;
+		}
+		else if (FAIL != index && 0 == db_snmp_if_newid_cmp(&snmp_ifs->values[index], &snmp))
+		{
+			db_snmpinterface_free(snmp);
+			continue;
+		}
+		else if (0 < snmp_new_ifs->values_num &&
+				FAIL != (index = db_snmp_new_if_find(&snmp, snmp_new_ifs, interfaces, if_port)))
+		{
+			snmp.skip = 1;
+			snmp.interfaceid = snmp_new_ifs->values[index].interfaceid;
+			zbx_vector_dbu_snmp_if_append(snmp_new_ifs, snmp);
 			continue;
 		}
 
@@ -370,6 +445,7 @@ static void	DBpatch_4050016_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs
 		snmp.privprotocol = 0;
 		snmp.contextname = zbx_strdup(NULL, "");
 		snmp.item_port = zbx_strdup(NULL, "");
+		snmp.skip = 0;
 
 		zbx_vector_dbu_snmp_if_append(snmp_def_ifs, snmp);
 	}
@@ -389,6 +465,9 @@ static int	DBpatch_4050016_snmp_if_save(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	{
 		dbu_snmp_if_t *s = &snmp_ifs->values[i];
 
+		if (0 != s->skip)
+			continue;
+
 		zbx_db_insert_add_values(&db_insert_snmp_if, s->interfaceid, s->version, s->bulk, s->community,
 				s->securityname, s->securitylevel, s->authpassphrase, s->privpassphrase, s->authprotocol,
 				s->privprotocol, s->contextname);
@@ -405,12 +484,12 @@ static int	DBpatch_4050016_interface_create(zbx_vector_dbu_interface_t *interfac
 	zbx_db_insert_t		db_insert_interfaces;
 	int			i, ret;
 
-	zbx_db_insert_prepare(&db_insert_interfaces, "interfaces", "interfaceid", "hostid", "main", "type", "useip",
+	zbx_db_insert_prepare(&db_insert_interfaces, "interface", "interfaceid", "hostid", "main", "type", "useip",
 			"ip", "dns", "port", NULL);
 
 	for (i = 0; i < interfaces->values_num; i++)
 	{
-		dbu_interface	*interface = &interfaces->values[i];
+		dbu_interface_t	*interface = &interfaces->values[i];
 
 		zbx_db_insert_add_values(&db_insert_interfaces, interface->interfaceid,
 				interface->hostid, interface->main, interface->type, interface->useip, interface->ip,
@@ -437,8 +516,9 @@ static int	DBpatch_4050016_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 		dbu_snmp_if_t *s = &snmp_ifs->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update items set type=%d, interfaceid=" ZBX_FS_UI64
-				" where type IN (1,4,6) AND h.status <> 3 AND"
+				"UPDATE items i, hosts h SET i.type=%d, i.interfaceid=" ZBX_FS_UI64
+				" WHERE i.hostid=h.hostid AND"
+					" type IN (1,4,6) AND h.status <> 3 AND"
 					" interfaceid=" ZBX_FS_UI64 " AND "
 					" snmp_community='%s' AND"
 					" snmpv3_securityname='%s' AND"
