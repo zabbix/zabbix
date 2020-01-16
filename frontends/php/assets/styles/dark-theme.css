@@ -4789,7 +4789,7 @@ svg {
 ::-ms-input-placeholder {
   color: #9d9d9d; }
 
-:placeholder-shown {
+::placeholder {
   color: #9d9d9d; }
 
 .icon-action-command,
