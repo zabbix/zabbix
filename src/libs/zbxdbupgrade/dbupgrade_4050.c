@@ -137,7 +137,7 @@ static int	DBpatch_4050013(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4050014(void)
+static int	DBpatch_4050015(void)
 {
 	const ZBX_TABLE table =
 		{"interface_snmp", "interfaceid", 0,
@@ -161,7 +161,7 @@ static int	DBpatch_4050014(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050015(void)
+static int	DBpatch_4050016(void)
 {
 	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -279,7 +279,7 @@ static int	db_snmp_new_if_find(const dbu_snmp_if_t *snmp, const zbx_vector_dbu_s
 	return FAIL;
 }
 
-static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector_dbu_snmp_if_t *snmp_ifs,
+static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector_dbu_snmp_if_t *snmp_ifs,
 		zbx_vector_dbu_snmp_if_t *snmp_new_ifs)
 {
 	DB_RESULT		result;
@@ -415,7 +415,7 @@ static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zb
 	DBfree_result(result);
 }
 
-static void	DBpatch_4050016_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
+static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -452,7 +452,7 @@ static void	DBpatch_4050016_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs
 	DBfree_result(result);
 }
 
-static int	DBpatch_4050016_snmp_if_save(zbx_vector_dbu_snmp_if_t *snmp_ifs)
+static int	DBpatch_snmp_if_save(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 {
 	zbx_db_insert_t	db_insert_snmp_if;
 	int		i, ret;
@@ -479,7 +479,7 @@ static int	DBpatch_4050016_snmp_if_save(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	return ret;
 }
 
-static int	DBpatch_4050016_interface_create(zbx_vector_dbu_interface_t *interfaces)
+static int	DBpatch_interface_create(zbx_vector_dbu_interface_t *interfaces)
 {
 	zbx_db_insert_t		db_insert_interfaces;
 	int			i, ret;
@@ -502,7 +502,7 @@ static int	DBpatch_4050016_interface_create(zbx_vector_dbu_interface_t *interfac
 	return ret;
 }
 
-static int	DBpatch_4050016_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
+static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 {
 	int	i, ret = SUCCEED;
 	char	*sql;
@@ -550,7 +550,7 @@ static int	DBpatch_4050016_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	return ret;
 }
 
-static int	DBpatch_4050016_items_type_update(void)
+static int	DBpatch_items_type_update(void)
 {
 	if (ZBX_DB_OK > DBexecute("update items set type=%d where type IN (1,4,6)", ITEM_TYPE_SNMP))
 		return FAIL;
@@ -558,7 +558,7 @@ static int	DBpatch_4050016_items_type_update(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4050016(void)
+static int	DBpatch_4050017(void)
 {
 	zbx_vector_dbu_interface_t	interfaces;
 	zbx_vector_dbu_snmp_if_t	snmp_ifs, snmp_new_ifs, snmp_def_ifs;
@@ -569,27 +569,27 @@ static int	DBpatch_4050016(void)
 	zbx_vector_dbu_snmp_if_create(&snmp_def_ifs);
 	zbx_vector_dbu_interface_create(&interfaces);
 
-	DBpatch_4050016_load_data(&interfaces, &snmp_ifs, &snmp_new_ifs);
-	DBpatch_4050016_load_empty_if(&snmp_def_ifs);
+	DBpatch_load_data(&interfaces, &snmp_ifs, &snmp_new_ifs);
+	DBpatch_load_empty_if(&snmp_def_ifs);
 
 	while(1)
 	{
-		if (0 < snmp_ifs.values_num && SUCCEED != DBpatch_4050016_snmp_if_save(&snmp_ifs))
+		if (0 < snmp_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_ifs))
 			break;
 
-		if (0 < interfaces.values_num && SUCCEED != DBpatch_4050016_interface_create(&interfaces))
+		if (0 < interfaces.values_num && SUCCEED != DBpatch_interface_create(&interfaces))
 			break;
 
-		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_4050016_snmp_if_save(&snmp_new_ifs))
+		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_new_ifs))
 			break;
 
-		if (0 < snmp_def_ifs.values_num && SUCCEED != DBpatch_4050016_snmp_if_save(&snmp_def_ifs))
+		if (0 < snmp_def_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_def_ifs))
 			break;
 
-		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_4050016_items_update(&snmp_new_ifs))
+		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_items_update(&snmp_new_ifs))
 			break;
 
-		if (SUCCEED != DBpatch_4050016_items_type_update())
+		if (SUCCEED != DBpatch_items_type_update())
 			break;
 
 		ret = SUCCEED;
@@ -608,52 +608,52 @@ static int	DBpatch_4050016(void)
 	return ret;
 }
 
-static int	DBpatch_4050017(void)
+static int	DBpatch_4050018(void)
 {
 	return DBdrop_field("interface", "bulk");
 }
 
-static int	DBpatch_4050018(void)
+static int	DBpatch_4050019(void)
 {
 	return DBdrop_field("items", "snmp_community");
 }
 
-static int	DBpatch_4050019(void)
+static int	DBpatch_4050020(void)
 {
 	return DBdrop_field("items", "snmpv3_securityname");
 }
 
-static int	DBpatch_4050020(void)
+static int	DBpatch_4050021(void)
 {
 	return DBdrop_field("items", "snmpv3_securitylevel");
 }
 
-static int	DBpatch_4050021(void)
+static int	DBpatch_4050022(void)
 {
 	return DBdrop_field("items", "snmpv3_authpassphrase");
 }
 
-static int	DBpatch_4050022(void)
+static int	DBpatch_4050023(void)
 {
 	return DBdrop_field("items", "snmpv3_privpassphrase");
 }
 
-static int	DBpatch_4050023(void)
+static int	DBpatch_4050024(void)
 {
 	return DBdrop_field("items", "snmpv3_authprotocol");
 }
 
-static int	DBpatch_4050024(void)
+static int	DBpatch_4050025(void)
 {
 	return DBdrop_field("items", "snmpv3_privprotocol");
 }
 
-static int	DBpatch_4050025(void)
+static int	DBpatch_4050026(void)
 {
 	return DBdrop_field("items", "snmpv3_contextname");
 }
 
-static int	DBpatch_4050026(void)
+static int	DBpatch_4050027(void)
 {
 	return DBdrop_field("items", "port");
 }
@@ -674,7 +674,7 @@ DBPATCH_ADD(4050007, 0, 1)
 DBPATCH_ADD(4050011, 0, 1)
 DBPATCH_ADD(4050012, 0, 1)
 DBPATCH_ADD(4050013, 0, 1)
-DBPATCH_ADD(4050014, 0, 1)
+
 DBPATCH_ADD(4050015, 0, 1)
 DBPATCH_ADD(4050016, 0, 1)
 DBPATCH_ADD(4050017, 0, 1)
@@ -687,5 +687,6 @@ DBPATCH_ADD(4050023, 0, 1)
 DBPATCH_ADD(4050024, 0, 1)
 DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
+DBPATCH_ADD(4050027, 0, 1)
 
 DBPATCH_END()
