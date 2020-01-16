@@ -49,7 +49,7 @@ class CDashboardElement extends CElement {
 	 * @return boolean
 	 */
 	public function isEmpty() {
-		return ($this->query('xpath:.//div[@class="dashbrd-grid-new-widget-placeholder"]')->one(false) !== null);
+		return ($this->query('xpath:.//div[@class="dashbrd-grid-new-widget-placeholder"]')->one(false)->isValid());
 	}
 
 	/**
@@ -67,7 +67,7 @@ class CDashboardElement extends CElement {
 	 * @param string  $name            widget name
 	 * @param boolean $should_exist    if method is allowed to return null as a result
 	 *
-	 * @return CWidgetElement|null
+	 * @return CWidgetElement|CNullElement
 	 */
 	public function getWidget($name, $should_exist = true) {
 		$query = $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
@@ -77,8 +77,9 @@ class CDashboardElement extends CElement {
 			$query->waitUntilPresent();
 		}
 
-		if (($widget = $query->asWidget()->one($should_exist)) !== null && $should_exist) {
-			$widget->waitUntilReady();
+		$widget = $query->asWidget()->one($should_exist);
+		if ($widget->isValid() && $should_exist) {
+				$widget->waitUntilReady();
 		}
 
 		return $widget;
@@ -152,6 +153,18 @@ class CDashboardElement extends CElement {
 			$controls->query('id:dashbrd-save')->one()->waitUntilClickable()->click(true);
 			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Delete widget with the provided name.
+	 *
+	 * @return boolean
+	 */
+	public function deleteWidget($name) {
+		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()="'.$name.
+				'"]/../../..//button[@title="Delete"]')->one()->click()->waitUntilNotVisible();
 
 		return $this;
 	}

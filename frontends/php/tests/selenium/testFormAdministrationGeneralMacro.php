@@ -24,23 +24,26 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  * @backup globalmacro
  */
 class testFormAdministrationGeneralMacro extends CLegacyWebTest {
-	private $macroSize = 20;
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';
 	private $macroClass = 'textarea-flexible macro initialized-field';
 
-	private $valueSize = 20;
 	private $valueMaxLength = 255;
 	private $valuePlaceholder = 'value';
 
+	private $descriptionMaxLength = 65535;
+	private $descriptionPlaceholder = 'description';
+
 	private $newMacro = '{$NEW_MACRO}';
 	private $newValue = 'Value of the new macro';
+	private $newDescription = 'New test description';
 
 	private $newEmptyMacro = '{$NEW_EMPTY_MACRO}';
 
 	private $oldGlobalMacroId = 7;
 	private $updMacro = '{$UPD_MACRO}';
 	private $updValue = 'Value of the updated macro';
+	private $updDescription = 'Description of the updated macro';
 
 	private $sqlHashGlobalMacros = '';
 	private $oldHashGlobalMacros = '';
@@ -52,13 +55,13 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of macros');
 		$this->zbxTestCheckHeader('Macros');
 		$this->zbxTestTextPresent('Macros');
-		$this->zbxTestTextPresent(['Macro', 'Value']);
+		$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
 	}
 
 	private function checkGlobalMacrosOrder($skip_index = -1) {
 		$globalMacros = [];
 
-		$result = DBselect('select globalmacroid,macro,value from globalmacro');
+		$result = DBselect('select globalmacroid,macro,value,description from globalmacro');
 		while ($row = DBfetch($result)) {
 			$globalMacros[] = $row;
 		}
@@ -78,6 +81,8 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 					$globalMacros[$i]['macro']);
 			$this->zbxTestAssertElementValue('macros_'.$i.'_value',
 					$globalMacros[$i]['value']);
+			$this->zbxTestAssertElementValue('macros_'.$i.'_description',
+					$globalMacros[$i]['description']);
 		}
 	}
 
@@ -88,7 +93,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		}
 			$this->zbxTestCheckHeader('Macros');
 			$this->zbxTestTextPresent('Macros');
-			$this->zbxTestTextPresent(['Macro', 'Value']);
+			$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
 	}
 
 	private function calculateHash($conditions = null) {
@@ -149,6 +154,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 			$this->zbxTestAssertElementPresentId('macros_'.$i.'_macro');
 			$this->zbxTestAssertElementPresentId('macros_'.$i.'_value');
+			$this->zbxTestAssertElementPresentId('macros_'.$i.'_description');
 			$this->zbxTestAssertElementPresentId('macros_'.$i.'_remove');
 
 			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_macro']", "maxlength", $this->macroMaxLength);
@@ -157,6 +163,9 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_value']", "maxlength", $this->valueMaxLength);
 			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_value']", "placeholder", $this->valuePlaceholder);
+
+			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_description']", "maxlength", $this->descriptionMaxLength);
+			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_description']", "placeholder", $this->descriptionPlaceholder);
 		}
 	}
 
@@ -190,6 +199,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementNotPresentId('macros_'.$countGlobalMacros.'_macro');
 		$this->zbxTestAssertElementNotPresentId('macros_'.$countGlobalMacros.'_value');
+		$this->zbxTestAssertElementNotPresentId('macros_'.$countGlobalMacros.'_description');
 		$this->zbxTestAssertElementNotPresentId('macros_'.$countGlobalMacros.'_remove');
 
 		$this->verifyHash();
@@ -210,6 +220,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', $macro);
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', $this->newValue);
+		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', $this->newDescription);
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
@@ -217,6 +228,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', $this->newValue);
+		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_description', $this->newDescription);
 
 		$this->checkGlobalMacrosOrder();
 
@@ -235,6 +247,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', '');
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', $this->newValue);
+		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', $this->newDescription);
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
@@ -242,6 +255,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', '');
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', $this->newValue);
+		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_description', $this->newDescription);
 
 		$this->checkGlobalMacrosOrder();
 
@@ -262,6 +276,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro',  $this->newMacro);
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', $this->newValue);
+		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', $this->newDescription);
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Macros updated');
@@ -273,7 +288,8 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$count = CDBHelper::getCount(
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE macro='.zbx_dbstr($this->newMacro).
-				' AND value='.zbx_dbstr($this->newValue)
+				' AND value='.zbx_dbstr($this->newValue).
+					' AND description='.zbx_dbstr($this->newDescription)
 		);
 		$this->assertEquals(1, $count, 'Chuck Norris: Macro has not been created in the DB.');
 	}
@@ -292,6 +308,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro',  $this->newEmptyMacro);
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', '');
+		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', '');
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Macros updated');
@@ -303,7 +320,8 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$count = CDBHelper::getCount(
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE macro='.zbx_dbstr($this->newEmptyMacro).
-				' AND value='.zbx_dbstr('')
+				' AND value='.zbx_dbstr('').
+					' AND description='.zbx_dbstr('')
 		);
 		$this->assertEquals(1, $count, 'Chuck Norris: Macro has not been created in the DB.');
 	}
@@ -320,6 +338,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro',  $this->newMacro);
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', $this->newValue);
+		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', $this->newDescription);
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
@@ -327,6 +346,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', $this->newMacro);
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', $this->newValue);
+		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_description', $this->newDescription);
 
 		$this->checkGlobalMacrosOrder();
 
@@ -343,6 +363,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_0_macro', $macro);
 		$this->zbxTestInputType('macros_0_value', $this->updValue);
+		$this->zbxTestInputType('macros_0_description', $this->updDescription);
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
@@ -350,6 +371,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementValue('macros_0_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_0_value', $this->updValue);
+		$this->zbxTestAssertElementValue('macros_0_description', $this->updDescription);
 
 		$this->checkGlobalMacrosOrder(0);
 
@@ -363,13 +385,14 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_0_macro', '');
 		$this->zbxTestInputType('macros_0_value', $this->updValue);
+		$this->zbxTestInputType('macros_0_description', $this->updDescription);
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
 		$this->zbxTestTextPresent('Invalid parameter "/1/macro": cannot be empty.');
 
 		$this->zbxTestAssertElementValue('macros_0_macro', '');
-		$this->zbxTestAssertElementValue('macros_0_value', $this->updValue);
+		$this->zbxTestAssertElementValue('macros_0_description', $this->updDescription);
 
 		$this->checkGlobalMacrosOrder(0);
 
@@ -383,6 +406,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_0_macro', '');
 		$this->zbxTestInputType('macros_0_value', '');
+		$this->zbxTestInputType('macros_0_description', '');
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
@@ -390,6 +414,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementValue('macros_0_macro', '');
 		$this->zbxTestAssertElementValue('macros_0_value', '');
+		$this->zbxTestAssertElementValue('macros_0_description', '');
 
 		$this->checkGlobalMacrosOrder(0);
 
@@ -412,6 +437,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_'.$i.'_macro', $this->updMacro);
 		$this->zbxTestInputType('macros_'.$i.'_value', $this->updValue);
+		$this->zbxTestInputType('macros_'.$i.'_description', $this->updDescription);
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Macros updated');
@@ -421,8 +447,9 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$count = CDBHelper::getCount(
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE globalmacroid='.$this->oldGlobalMacroId.
-				' AND macro='.zbx_dbstr($this->updMacro).
-				' AND value='.zbx_dbstr($this->updValue)
+			' AND macro='.zbx_dbstr($this->updMacro).
+			' AND value='.zbx_dbstr($this->updValue).
+			' AND description='.zbx_dbstr($this->updDescription)
 		);
 		$this->assertEquals(1, $count,
 				'Chuck Norris: Value of the macro has not been updated in the DB.'.
@@ -431,7 +458,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_UpdateEmptyValue() {
+	public function testFormAdministrationGeneralMacros_UpdateEmptyValueAndDescription() {
 		$this->calculateHash('globalmacroid<>'.$this->oldGlobalMacroId);
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -447,6 +474,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_'.$i.'_macro', $this->updMacro);
 		$this->zbxTestInputType('macros_'.$i.'_value', '');
+		$this->zbxTestInputType('macros_'.$i.'_description', '');
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Macros updated');
@@ -457,7 +485,8 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE globalmacroid='.$this->oldGlobalMacroId.
 				' AND macro='.zbx_dbstr($this->updMacro).
-				' AND value='.zbx_dbstr('')
+					' AND value='.zbx_dbstr('').
+						' AND description='.zbx_dbstr('')
 		);
 		$this->assertEquals(1, $count,
 				'Chuck Norris: Value of the macro has not been updated in the DB.'.
@@ -482,6 +511,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestInputType('macros_'.$i.'_macro', $this->newMacro);
 		$this->zbxTestInputType('macros_'.$i.'_value', $this->newValue);
+		$this->zbxTestInputType('macros_'.$i.'_description', $this->newDescription);
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
@@ -489,6 +519,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementValue('macros_'.$i.'_macro', $this->newMacro);
 		$this->zbxTestAssertElementValue('macros_'.$i.'_value', $this->newValue);
+		$this->zbxTestAssertElementValue('macros_'.$i.'_description', $this->newDescription);
 
 		$this->checkGlobalMacrosOrder($i);
 
@@ -515,6 +546,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementNotPresentId('macros_'.$i.'_macro');
 		$this->zbxTestAssertElementNotPresentId('macros_'.$i.'_value');
+		$this->zbxTestAssertElementNotPresentId('macros_'.$i.'_description');
 		$this->zbxTestAssertElementNotPresentId('macros_'.$i.'_remove');
 		$this->zbxTestAssertElementNotPresentId('macros_'.$i.'_globalmacroid');
 

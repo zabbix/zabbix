@@ -90,8 +90,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'latest.php',
-				'title' =>	'Latest data [refreshed every 30 sec.]',
+				'url' => 'zabbix.php?action=latest.view',
+				'title' =>	'Latest data',
 				'header' =>	'Latest data',
 				'users' => [
 					'guest' => true,

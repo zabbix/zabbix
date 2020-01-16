@@ -2,7 +2,7 @@
 	<?= (new CRow([
 			'',
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
-			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
+			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),
 			'#{timeout}',
 			(new CSpan('#{url_short}'))->setHint('#{url}', '', true, 'word-break: break-all;')
 				->setAttribute('data-hintbox', '#{enabled_hint}'),
@@ -17,7 +17,7 @@
 	<?= (new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
-			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
+			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),
 			'#{timeout}',
 			(new CSpan('#{url_short}'))->setHint('#{url}', '', true, 'word-break: break-all;')
 				->setAttribute('data-hintbox', '#{enabled_hint}'),
@@ -549,9 +549,9 @@
 		this.new_stepid = 0;
 		this.sort_index = [];
 
-		steps.forEach(function(step) {
-			this.data[step.httpstepid] = new Step(step);
-			this.sort_index.push(step.httpstepid);
+		steps.forEach(function(step, no) {
+			this.data[no + 1] = new Step(step);
+			this.sort_index.push(no + 1);
 		}.bind(this));
 
 		this.$container = jQuery('.httpconf-steps-dynamic-row', $tab);
@@ -564,10 +564,8 @@
 
 		this.steps_dynamic_rows = new DynamicRows(this.$container, {
 			add_before: this.$container.find('.element-table-add').closest('tr')[0],
-			template: httpconf.step_row_template,
-			data_index: 'httpstepid'
+			template: httpconf.step_row_template
 		});
-
 
 		if (!httpconf.templated) {
 			this.$container.sortable(sortableOpts());
@@ -668,19 +666,6 @@
 	};
 
 	/**
-	 * Adds or updates newly created step data with Steps object.
-	 *
-	 * @param {object} data  Step data, that holds accurate httpstepid filed.
-	 */
-	Steps.prototype.addStep = function(data) {
-		if (this.sort_index.indexOf(data.httpstepid) == -1) {
-			this.sort_index.push(data.httpstepid);
-		}
-
-		this.steps[data.httpstepid] = new Step(data);
-	};
-
-	/**
 	 * Used to validate step names with server, on PopUp form validate event.
 	 *
 	 * @return {array}  Array of strings.
@@ -688,8 +673,8 @@
 	Steps.prototype.getStepNames = function() {
 		var names = [];
 
-		for (var httpstepid in this.data) {
-			names.push(this.data[httpstepid].data.name);
+		for (var no in this.data) {
+			names.push(this.data[no].data.name);
 		}
 
 		return names;
@@ -698,10 +683,10 @@
 	/**
 	 * This method hydrates the parsed html PopUp form with data from specific step.
 	 *
-	 * @param {integer} httpstepid
+	 * @param {int} no  Step index.
 	 */
-	Steps.prototype.onStepOverlayReadyCb = function(httpstepid) {
-		var step_ref = this.data[httpstepid] ? this.data[httpstepid] : this.new_step;
+	Steps.prototype.onStepOverlayReadyCb = function(no) {
+		var step_ref = this.data[no] ? this.data[no] : this.new_step;
 		this.edit_form = new StepEditForm(jQuery('#http_step'), step_ref);
 	};
 
@@ -711,8 +696,8 @@
 	Steps.prototype.openNew = function() {
 		this.new_stepid -= 1;
 
-		this.new_step = new Step({httpstepid: this.new_stepid});
-		this.new_step.open(this.$container.find('.element-table-add'));
+		this.new_step = new Step({httpstepid: 0, no: this.new_stepid});
+		this.new_step.open(this.new_stepid, this.$container.find('.element-table-add'));
 	};
 
 	/**
@@ -720,7 +705,7 @@
 	 */
 	Steps.prototype.renderData = function() {
 		this.sort_index.forEach(function(data_index) {
-			this.steps_dynamic_rows.addRow(this.data[data_index].data);
+			this.steps_dynamic_rows.addRow(this.data[data_index].data, data_index);
 		}.bind(this));
 
 		this.onSortOrderChange();
@@ -729,11 +714,11 @@
 	/**
 	 * Opens popup for a step.
 	 *
-	 * @param {integer} httpstepid
+	 * @param {integer} no
 	 */
-	Steps.prototype.open = function(httpstepid) {
-		this.data[httpstepid]
-			.open(this.$container.find('[data-index="' + httpstepid + '"] a'));
+	Steps.prototype.open = function(no) {
+		this.data[no]
+			.open(no, this.$container.find('[data-index="' + no + '"] a'));
 	};
 
 	/**
@@ -764,10 +749,12 @@
 	 * Opens step popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
+	 * @param {int}  no       Step index.
 	 * @param {Node} refocus  A node to set focus to, when popup is closed.
 	 */
-	Step.prototype.open = function(refocus) {
+	Step.prototype.open = function(no, refocus) {
 		return PopUp('popup.httpstep', {
+			no:               no,
 			httpstepid:       this.data.httpstepid,
 			templated:        httpconf.templated,
 			name:             this.data.name,
@@ -1071,13 +1058,13 @@
 				return jQuery(ret.errors).insertBefore(this.$form);
 			}
 
-			if (!httpconf.steps.data[ret.params.httpstepid]) {
-				httpconf.steps.sort_index.push(ret.params.httpstepid);
-				httpconf.steps.data[ret.params.httpstepid] = this.step;
+			if (!httpconf.steps.data[ret.params.no]) {
+				httpconf.steps.sort_index.push(ret.params.no);
+				httpconf.steps.data[ret.params.no] = this.step;
 			}
 
 			ret.params.pairs = curr_pairs;
-			httpconf.steps.data[ret.params.httpstepid].update(ret.params);
+			httpconf.steps.data[ret.params.no].update(ret.params);
 			httpconf.steps.renderData();
 
 			overlayDialogueDestroy(dialogueid);

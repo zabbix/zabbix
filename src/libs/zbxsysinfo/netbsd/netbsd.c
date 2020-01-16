@@ -29,6 +29,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/"},
 	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
 	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
+	{"vfs.fs.get",		0,		VFS_FS_GET,		NULL},
 
 	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo0,bytes"},

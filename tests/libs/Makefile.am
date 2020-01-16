@@ -10,5 +10,6 @@ SUBDIRS = \
 	zbxcommon \
 	zbxalgo \
 	zbxprometheus \
-	zbxcomms
+	zbxcomms \
+	zbxregexp
 

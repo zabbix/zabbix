@@ -55,29 +55,8 @@
 <script type="text/javascript">
 	var ZBX_CHECKLIST = {};
 
-	/**
-	 * @see init.js add.popup event
-	 */
-	function addPopupValues(list) {
-		var ZBX_SVC = {
-				ssh: <?= SVC_SSH ?>,
-				ldap: <?= SVC_LDAP ?>,
-				smtp: <?= SVC_SMTP ?>,
-				ftp: <?= SVC_FTP ?>,
-				http: <?= SVC_HTTP ?>,
-				pop: <?= SVC_POP ?>,
-				nntp: <?= SVC_NNTP ?>,
-				imap: <?= SVC_IMAP ?>,
-				tcp: <?= SVC_TCP ?>,
-				agent: <?= SVC_AGENT ?>,
-				snmpv1: <?= SVC_SNMPv1 ?>,
-				snmpv2: <?= SVC_SNMPv2c ?>,
-				snmpv3: <?= SVC_SNMPv3 ?>,
-				icmp: <?= SVC_ICMPPING ?>,
-				https: <?= SVC_HTTPS ?>,
-				telnet: <?= SVC_TELNET ?>
-			},
-			available_device_types = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3];
+	function addDCheck(list) {
+		var available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
 		var addNewValue = function(value) {
 			ZBX_CHECKLIST[value.dcheckid] = value;
@@ -213,7 +192,7 @@
 	}
 
 	jQuery(function() {
-		addPopupValues(<?= CJs::encodeJson(array_values($data['drule']['dchecks'])) ?>);
+		addDCheck(<?= CJs::encodeJson(array_values($data['drule']['dchecks'])) ?>);
 
 		jQuery('input:radio[name="uniqueness_criteria"][value=<?= CJs::encodeJson($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
 		jQuery('input:radio[name="host_source"][value=<?= CJs::encodeJson($data['drule']['host_source']) ?>]').attr('checked', 'checked');
@@ -249,19 +228,14 @@
 
 			switch ($btn.data('action')) {
 				case 'add':
-					params = {
-						index: $rows.length
-					};
-
-					PopUp('popup.discovery.check', params, null, $btn);
+					PopUp('popup.discovery.check', {}, null, $btn);
 					break;
 
 				case 'edit':
 					var $row = $btn.closest('tr');
 
 					params = {
-						update: 1,
-						index: $rows.index($row)
+						update: 1
 					};
 
 					$row.find('input[type="hidden"]').each(function() {
@@ -374,7 +348,7 @@
 					return false;
 				}
 
-				addPopupValues([dcheck]);
+				addDCheck([dcheck]);
 				overlayDialogueDestroy(dialogueid);
 			}
 		});

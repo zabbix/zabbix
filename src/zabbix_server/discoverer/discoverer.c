@@ -31,7 +31,7 @@
 #include "discoverer.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
-#include "../../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, program_type;

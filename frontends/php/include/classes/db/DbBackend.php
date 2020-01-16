@@ -68,7 +68,7 @@ abstract class DbBackend {
 	}
 
 	/**
-	 * Create INSERT SQL query for MySQL, PostgreSQL and IBM DB2.
+	 * Create INSERT SQL query for MySQL, PostgreSQL.
 	 * Creation example:
 	 *	INSERT INTO applications (name,hostid,templateid,applicationid)
 	 *	VALUES ('CPU','10113','13','868'),('Filesystems','10113','5','869'),('General','10113','21','870');

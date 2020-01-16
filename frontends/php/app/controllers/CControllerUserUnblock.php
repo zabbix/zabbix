@@ -65,13 +65,13 @@ class CControllerUserUnblock extends CController {
 
 		$unblocked = count($userids);
 
-		$url = (new CUrl('zabbix.php'))
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'user.list')
-			->setArgument('uncheck', '1');
-
-		$response = new CControllerResponseRedirect($url->getUrl());
+			->setArgument('page', CPagerHelper::loadPage('user.list', null))
+		);
 
 		if ($result) {
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_n('User unblocked', 'Users unblocked', $unblocked));
 		}
 		else {

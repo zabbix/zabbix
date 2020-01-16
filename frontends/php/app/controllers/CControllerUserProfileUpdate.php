@@ -31,8 +31,8 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 		$fields = [
 			'userid' =>			'fatal|required|db users.userid',
-			'password1' =>		'db users.passwd',
-			'password2' =>		'db users.passwd',
+			'password1' =>		'string',
+			'password2' =>		'string',
 			'user_medias' =>	'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),

@@ -221,7 +221,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	}
 
 	// handle configurator interface for inactive plugins
-	if _, ok := p.impl.(plugin.Configurator); ok && agent.Options.Plugins != nil {
+	if _, ok := p.impl.(plugin.Configurator); ok {
 		if p.refcount == 0 {
 			task := &configuratorTask{
 				taskBase: taskBase{plugin: p, active: true},

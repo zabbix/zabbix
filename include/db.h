@@ -74,7 +74,7 @@ struct	_DC_TRIGGER;
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 #	define TRIGGER_COMMENTS_LEN	2048
 #else
 #	define TRIGGER_COMMENTS_LEN	65535
@@ -157,7 +157,7 @@ struct	_DC_TRIGGER;
 #define ITEM_SSL_CERT_FILE_LEN_MAX	(ITEM_SSL_CERT_FILE_LEN + 1)
 #define ITEM_SSL_KEY_FILE_LEN		255
 #define ITEM_SSL_KEY_FILE_LEN_MAX	(ITEM_SSL_KEY_FILE_LEN + 1)
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 #	define ITEM_PARAM_LEN		2048
 #	define ITEM_DESCRIPTION_LEN	2048
 #	define ITEM_POSTS_LEN		2048
@@ -170,13 +170,8 @@ struct	_DC_TRIGGER;
 #endif
 
 #define HISTORY_STR_VALUE_LEN		255
-#ifdef HAVE_IBM_DB2
-#	define HISTORY_TEXT_VALUE_LEN	2048
-#	define HISTORY_LOG_VALUE_LEN	2048
-#else
-#	define HISTORY_TEXT_VALUE_LEN	65535
-#	define HISTORY_LOG_VALUE_LEN	65535
-#endif
+#define HISTORY_TEXT_VALUE_LEN		65535
+#define HISTORY_LOG_VALUE_LEN		65535
 
 #define HISTORY_LOG_SOURCE_LEN		64
 #define HISTORY_LOG_SOURCE_LEN_MAX	(HISTORY_LOG_SOURCE_LEN + 1)
@@ -647,7 +642,11 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 #define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
 #define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
 #define DBlock_dcheckid(dcheckid, druleid)	DBlock_record("dchecks", dcheckid, "druleid", druleid)
+#define DBlock_graph(id)			DBlock_record("graphs", id, NULL, 0)
 #define DBlock_hostids(ids)			DBlock_records("hosts", ids)
+#define DBlock_triggerids(ids)			DBlock_records("triggers", ids)
+#define DBlock_itemids(ids)			DBlock_records("items", ids)
+#define DBlock_group_prototypeids(ids)		DBlock_records("group_prototype", ids)
 
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 

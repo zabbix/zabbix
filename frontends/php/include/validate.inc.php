@@ -335,7 +335,7 @@ function invalid_url($msg = null) {
 
 	require_once dirname(__FILE__).'/page_header.php';
 
-	// rollback reseted messages
+	// Rollback reset messages.
 	$ZBX_MESSAGES = $temp;
 
 	unset_all();

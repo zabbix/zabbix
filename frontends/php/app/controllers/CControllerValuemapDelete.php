@@ -57,7 +57,11 @@ class CControllerValuemapDelete extends CController {
 		$valuemapids = $this->getInput('valuemapids');
 		$result = (bool) API::ValueMap()->delete($valuemapids);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'valuemap.list'));
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.list')
+			->setArgument('page', CPagerHelper::loadPage('valuemap.list', null))
+		);
+
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_n('Value map deleted', 'Value maps deleted', count($valuemapids)));

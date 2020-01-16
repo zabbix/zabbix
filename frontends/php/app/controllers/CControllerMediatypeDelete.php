@@ -56,9 +56,13 @@ class CControllerMediatypeDelete extends CController {
 
 		$deleted = count($mediatypeids);
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.list&uncheck=1');
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'mediatype.list')
+			->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
+		);
 
 		if ($result) {
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_n('Media type deleted', 'Media types deleted', $deleted));
 		}
 		else {

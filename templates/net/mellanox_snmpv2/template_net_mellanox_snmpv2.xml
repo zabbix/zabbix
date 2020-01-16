@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>4.4</version>
+   <date>2015-12-30T14:41:30Z</date>
+   <groups>
+      <group>
+         <name>Templates/Network devices</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Net Mellanox SNMPv2</template>
+         <name>Template Net Mellanox SNMPv2</name>
+         <description>Template Net Mellanox&#13;
+&#13;
+MIBs used:&#13;
+ENTITY-SENSORS-MIB&#13;
+ENTITY-STATE-MIB&#13;
+ENTITY-MIB&#13;
+&#13;
+Template tooling version used: 0.34</description>
+         <templates>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module HOST-RESOURCES-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Interfaces SNMPv2</name>
+            </template>
+         </templates>
+         <groups>
+            <group>
+               <name>Templates/Network devices</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Fans</name>
+            </application>
+            <application>
+               <name>Inventory</name>
+            </application>
+            <application>
+               <name>Power supply</name>
+            </application>
+            <application>
+               <name>Temperature</name>
+            </application>
+         </applications>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Entity Discovery</name>
+               <type>SNMPV2</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]</snmp_oid>
+               <key>entity.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND_OR</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>3</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#ENT_NAME}: Hardware model name</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.13.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.model[entPhysicalModelName.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ENTITY-MIB</description>
+                     <applications>
+                        <application>
+                           <name>Inventory</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#ENT_NAME}: Hardware serial number</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ENTITY-MIB</description>
+                     <applications>
+                        <application>
+                           <name>Inventory</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>{#ENT_NAME}: Device has been replaced (new serial number received)</name>
+                           <priority>INFO</priority>
+                           <description>Device serial number has changed. Ack to close</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Fan Discovery</name>
+               <type>SNMPV2</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2]</snmp_oid>
+               <key>fan.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>OR</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>10</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SENSOR_INFO}: Fan speed</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}]</key>
+                     <units>rpm</units>
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
+The most recent measurement obtained by the agent for this sensor.&#13;
+To correctly interpret the value of this object, the associated entPhySensorType,&#13;
+entPhySensorScale, and entPhySensorPrecision objects must also be examined.</description>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#SENSOR_INFO}: Fan status</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
+The operational status of the sensor {#SENSOR_INFO}</description>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>ENTITY-SENSORS-MIB::EntitySensorStatus</name>
+                     </valuemap>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <name>{#SENSOR_INFO}: Fan is in critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the fan unit</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <name>PSU Discovery</name>
+               <type>SNMPV2</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]</snmp_oid>
+               <key>psu.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND_OR</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>6</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#ENT_NAME}: Power supply status</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.131.1.1.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.psu.status[entStateOper.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <description>MIB: ENTITY-STATE-MIB</description>
+                     <applications>
+                        <application>
+                           <name>Power supply</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>ENTITY-STATE-MIB::EntityOperState</name>
+                     </valuemap>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <name>{#ENT_NAME}: Power supply is in critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the power supply unit for errors</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature Discovery</name>
+               <type>SNMPV2</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SENSOR_TYPE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3]</snmp_oid>
+               <key>temp.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_TYPE}</macro>
+                        <value>8</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SENSOR_PRECISION}</macro>
+                        <value>1</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SENSOR_INFO}: Temperature status</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
+The operational status of the sensor {#SENSOR_INFO}</description>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>ENTITY-SENSORS-MIB::EntitySensorStatus</name>
+                     </valuemap>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#SENSOR_INFO}: Temperature</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <value_type>FLOAT</value_type>
+                     <units>°C</units>
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
+The most recent measurement obtained by the agent for this sensor.&#13;
+To correctly interpret the value of this object, the associated entPhySensorType,&#13;
+entPhySensorScale, and entPhySensorPrecision objects must also be examined.</description>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Net Mellanox SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+or&#13;
+{Template Net Mellanox SNMPv2:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                     <recovery_expression>{Template Net Mellanox SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                     <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <expression>{Template Net Mellanox SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net Mellanox SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger_prototype>
+               </trigger_prototypes>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_CRIT_STATUS}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>ENTITY-STATE-MIB::EntityOperState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>disabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>enabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>testing</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>ENTITY-SENSORS-MIB::EntitySensorStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unavailable</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>nonoperational</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

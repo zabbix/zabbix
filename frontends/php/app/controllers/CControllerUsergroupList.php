@@ -94,10 +94,13 @@ class CControllerUsergroupList extends CController {
 			])
 		];
 
-		// sorting & paging
+		// data sort and pager
 		CArrayHelper::sort($data['usergroups'], [['field' => $sort_field, 'order' => $sort_order]]);
-		$data['paging'] = getPagingLine($data['usergroups'], $sort_order,
-			(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')
+
+		$page_num = getRequest('page', 1);
+		CPagerHelper::savePage('usergroup.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['usergroups'], $sort_order,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
 		foreach ($data['usergroups'] as &$usergroup) {

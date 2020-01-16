@@ -24,7 +24,7 @@
 #include "cfg.h"
 #include "log.h"
 #include "zbxgetopt.h"
-#include "../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"

@@ -504,7 +504,7 @@ func Load(filename string, v interface{}) (err error) {
 	var file std.File
 
 	if file, err = stdOs.Open(filename); err != nil {
-		return fmt.Errorf("Cannot load configuration: %s", err.Error())
+		return fmt.Errorf(`Cannot open configuration file: %s`, err.Error())
 	}
 	defer file.Close()
 

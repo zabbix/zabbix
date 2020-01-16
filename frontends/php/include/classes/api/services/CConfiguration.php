@@ -120,7 +120,8 @@ class CConfiguration extends CApiService {
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
 				'templateLinkage' =>	['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
 				'templates' =>			['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],

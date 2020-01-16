@@ -70,7 +70,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 	protected static $instances = 0;
 
 	/**
-	 * Overriden constructor for collecting data on data sets from dataProvider annotations.
+	 * Overridden constructor for collecting data on data sets from dataProvider annotations.
 	 *
 	 * @param string $name
 	 * @param array  $data
@@ -223,7 +223,9 @@ class CTest extends PHPUnit_Framework_TestCase {
 		self::$warnings = [];
 
 		// Clear contents of error log.
-		@file_put_contents(PHPUNIT_ERROR_LOG, '');
+		if (defined('PHPUNIT_ERROR_LOG') && file_exists(PHPUNIT_ERROR_LOG)) {
+			@file_put_contents(PHPUNIT_ERROR_LOG, '');
+		}
 
 		if (!isset($DB['DB'])) {
 			DBconnect($error);

@@ -38,7 +38,7 @@ catch (Exception $e) {
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'type' =>				[T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'"'), null],
+	'type' =>				[T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'"'), null],
 	'server' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
 	'port' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')],
 	'database' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database name')],
@@ -111,7 +111,7 @@ if (!CWebUser::$data) {
 /*
  * Displaying
  */
-$link = (new CLink('GPL v2', 'http://www.zabbix.com/license.php'))
+$link = (new CLink('GPL v2', 'https://www.zabbix.com/license'))
 	->setTarget('_blank')
 	->addClass(ZBX_STYLE_GREY)
 	->addClass(ZBX_STYLE_LINK_ALT);

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2019-12-10T08:23:13Z</date>
+    <media_types>
+        <media_type>
+            <name>Pushover</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>token</name>
+                    <value>&lt;PUSHOVER TOKEN HERE&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>user</name>
+                    <value>{ALERT.SENDTO}</value>
+                </parameter>
+                <parameter>
+                    <name>message</name>
+                    <value>{ALERT.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>title</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>url</name>
+                    <value>{$ZABBIX.URL}</value>
+                </parameter>
+                <parameter>
+                    <name>url_title</name>
+                    <value>Zabbix</value>
+                </parameter>
+                <parameter>
+                    <name>priority</name>
+                    <value>0</value>
+                </parameter>
+                <parameter>
+                    <name>eventid</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>triggerid</name>
+                    <value>{TRIGGER.ID}</value>
+                </parameter>
+            </parameters>
+            <max_sessions>0</max_sessions>
+            <script>try {&#13;
+//	Zabbix.Log(127, 'Pushover webhook script value='+value);&#13;
+&#13;
+	params = JSON.parse(value),&#13;
+	req = new CurlHttpRequest(),&#13;
+	fields = {};&#13;
+&#13;
+	req.AddHeader('Content-Type: application/json');&#13;
+&#13;
+	fields.token= params.token;&#13;
+	fields.user = params.user;&#13;
+&#13;
+&#13;
+       /*&#13;
+       If a device name is not specified for a user, or the specified device name is no longer enabled/valid,&#13;
+       notifications will be sent to all active devices for that user to avoid losing messages.&#13;
+       Messages may be addressed to multiple specific devices by joining them with a comma (such as device=iphone,nexus5).&#13;
+       fields.device = params.device;&#13;
+       */&#13;
+	fields.title =  params.title;&#13;
+	fields.message =  params.message;&#13;
+        fields.url = params.url+&quot;/tr_events.php?triggerid=&quot;+params.triggerid+&quot;&amp;eventid=&quot;+params.eventid;&#13;
+        fields.url_title = params.url_title;&#13;
+        fields.priority = params.priority;&#13;
+	var resp = req.Post('https://api.pushover.net/1/messages.json',&#13;
+		JSON.stringify(fields)&#13;
+	);&#13;
+&#13;
+	if (req.Status() != 200) {&#13;
+		throw JSON.parse(resp).errors[0];&#13;
+	}&#13;
+&#13;
+	resp = JSON.parse(resp);&#13;
+        return &quot;OK&quot;;&#13;
+&#13;
+} catch (error) {&#13;
+	Zabbix.Log(127, 'Pushover notification failed : '+error);&#13;
+        throw 'Pushover notification failed : '+error;&#13;
+}</script>
+            <show_event_menu>NO</show_event_menu>
+            <description>Please refer to setup guide here: https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/pushover&#13;
+&#13;
+Set token parameter with to your Pushover application key.&#13;
+When assigning Pushover media to the Zabbix user - add user key into send to field.</description>
+        </media_type>
+    </media_types>
+</zabbix_export>

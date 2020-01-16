@@ -28,6 +28,7 @@
 
 #include "zbxhistory.h"
 #include "housekeeper.h"
+#include "../../libs/zbxdbcache/valuecache.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -772,7 +773,7 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 	}
 	else
 	{
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 		return DBexecute(
 				"delete from %s"
 				" where %s"
@@ -1197,6 +1198,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		DBclose();
 
 		zbx_dc_cleanup_data_sessions();
+		zbx_vc_housekeeping_value_cache();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
 				" %d audit items, %d records in " ZBX_FS_DBL " sec, %s]",

@@ -230,7 +230,7 @@ class CControllerDashboardUpdate extends CController {
 				'type' => $widget['type'],
 				'name' => $widget['name'],
 				'view_mode' => $widget['view_mode'],
-				'fields' => $widget['form']->fieldsToApi(),
+				'fields' => $widget['form']->fieldsToApi()
 			];
 
 			$dashboard['widgets'][] = $upd_widget;

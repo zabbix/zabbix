@@ -65,7 +65,7 @@ class CPopupButtonElement extends CElement {
 		$query = $this->query('xpath://ul[contains(@class, "menu-popup-top")]')->asPopupMenu();
 
 		$menu = $query->one(false);
-		if ($menu !== null) {
+		if ($menu->isValid()) {
 			return $menu;
 		}
 

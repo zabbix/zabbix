@@ -1421,7 +1421,7 @@ class testFormAction extends CLegacyWebTest {
 						'value' => 'application',
 					],
 					[
-						'type' => 'Tag',
+						'type' => 'Tag name',
 						'operator' => 'does not contain',
 						'value' => 'Does not contain Tag',
 					],
@@ -1578,7 +1578,7 @@ class testFormAction extends CLegacyWebTest {
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
-					case 'Tag':
+					case 'Tag name':
 						if (array_key_exists('operator', $condition)) {
 							$this->zbxTestClickXpathWait('//label[text()="'.$condition['operator'].'"]');
 						}
@@ -1778,6 +1778,8 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestInputType('operation_opcommand_command', 'command');
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->page->waitUntilReady();
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
@@ -1799,6 +1801,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestInputType('operation_opcommand_port', '123');
 		$this->zbxTestInputType('operation_opcommand_command', 'command ssh');
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+		$this->page->waitUntilReady();
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");

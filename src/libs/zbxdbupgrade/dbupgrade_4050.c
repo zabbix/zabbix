@@ -29,27 +29,6 @@
 
 extern unsigned char	program_type;
 
-static int	DBpatch_4050000(void)
-{
-	int		i;
-	const char	*values[] = {
-			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
-			"web.usergrps.php.sort", "web.usergroup.sort",
-			"web.usergrps.php.sortorder", "web.usergroup.sortorder"
-		};
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	for (i = 0; i < (int)ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static int	DBpatch_4050001(void)
 {
 	return DBdrop_foreign_key("items", 1);
@@ -97,23 +76,120 @@ static int	DBpatch_4050007(void)
 	return DBmodify_field_type("dchecks", &field, NULL);
 }
 
-static int	DBpatch_4050008(void)
+static int	DBpatch_4050011(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
+#if defined(HAVE_IBM_DB2) || defined(HAVE_POSTGRESQL)
+	const char *cast_value_str = "bigint";
+#elif defined(HAVE_MYSQL)
+	const char *cast_value_str = "unsigned";
+#elif defined(HAVE_ORACLE)
+	const char *cast_value_str = "number(20)";
+#endif
 
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.valuemap.list.sortorder'"
-				" where idx='web.adm.valuemapping.php.sortorder'"))
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set value_id=CAST(value_str as %s),"
+				" value_str='',"
+				" type=1"	/* PROFILE_TYPE_ID */
+			" where type=3"	/* PROFILE_TYPE_STR */
+				" and (idx='web.latest.filter.groupids' or idx='web.latest.filter.hostids')", cast_value_str))
+	{
 		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.valuemap.list.sort'"
-				" where idx='web.adm.valuemapping.php.sort'"))
-		return FAIL;
+	}
 
 	return SUCCEED;
 }
 
-static int	DBpatch_4050009(void)
+static int	DBpatch_4050012(void)
+{
+	const ZBX_FIELD	field = {"passwd", "", NULL, NULL, 60, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
+static int	DBpatch_4050013(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
+			"web.usergrps.php.sort", "web.usergroup.sort",
+			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
+			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
+			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
+			"web.latest.php.sort", "web.latest.sort",
+			"web.latest.php.sortorder", "web.latest.sortorder",
+			"web.paging.lastpage", "web.pager.entity",
+			"web.paging.page", "web.pager.page"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050014(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL, *name = NULL, *name_esc;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select wf.widget_fieldid,wf.name"
+			" from widget_field wf,widget w"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='navtree'"
+				" and wf.name like 'map.%%' or wf.name like 'mapid.%%'"
+			);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 == strncmp(row[1], "map.", 4))
+		{
+			name = zbx_dsprintf(name, "navtree.%s", row[1] + 4);
+		}
+		else
+		{
+			name = zbx_dsprintf(name, "navtree.sys%s", row[1]);
+		}
+
+		name_esc = DBdyn_escape_string_len(name, 255);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"update widget_field set name='%s' where widget_fieldid=%s;\n", name_esc, row[0]);
+
+		zbx_free(name_esc);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+	zbx_free(name);
+
+	return ret;
+}
+
+static int	DBpatch_4050015(void)
 {
 	const ZBX_TABLE	table =
 			{"media_type_message", "mediatype_messageid", 0,
@@ -132,26 +208,26 @@ static int	DBpatch_4050009(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050010(void)
+static int	DBpatch_4050016(void)
 {
 	const ZBX_FIELD	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("media_type_message", 1, &field);
 }
 
-static int	DBpatch_4050011(void)
+static int	DBpatch_4050017(void)
 {
 	return DBcreate_index("media_type_message", "media_type_message_1", "mediatypeid,eventsource,recovery", 1);
 }
 
-static int	DBpatch_4050012(void)
+static int	DBpatch_4050018(void)
 {
 	const ZBX_FIELD	field = {"default_msg", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("opmessage", &field);
 }
 
-static int	DBpatch_4050013(void)
+static int	DBpatch_4050019(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -193,7 +269,7 @@ static int	DBpatch_4050013(void)
 	return ret;
 }
 
-static int	DBpatch_4050014(void)
+static int	DBpatch_4050020(void)
 {
 	char	*messages[3][3][4] =
 			{
@@ -381,32 +457,32 @@ out:
 	return ret;
 }
 
-static int	DBpatch_4050015(void)
+static int	DBpatch_4050021(void)
 {
 	return DBdrop_field("actions", "def_shortdata");
 }
 
-static int	DBpatch_4050016(void)
+static int	DBpatch_4050022(void)
 {
 	return DBdrop_field("actions", "def_longdata");
 }
 
-static int	DBpatch_4050017(void)
+static int	DBpatch_4050023(void)
 {
 	return DBdrop_field("actions", "r_shortdata");
 }
 
-static int	DBpatch_4050018(void)
+static int	DBpatch_4050024(void)
 {
 	return DBdrop_field("actions", "r_longdata");
 }
 
-static int	DBpatch_4050019(void)
+static int	DBpatch_4050025(void)
 {
 	return DBdrop_field("actions", "ack_shortdata");
 }
 
-static int	DBpatch_4050020(void)
+static int	DBpatch_4050026(void)
 {
 	return DBdrop_field("actions", "ack_longdata");
 }
@@ -417,7 +493,6 @@ DBPATCH_START(4050)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(4050000, 0, 1)
 DBPATCH_ADD(4050001, 0, 1)
 DBPATCH_ADD(4050002, 0, 1)
 DBPATCH_ADD(4050003, 0, 1)
@@ -425,9 +500,6 @@ DBPATCH_ADD(4050004, 0, 1)
 DBPATCH_ADD(4050005, 0, 1)
 DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
-DBPATCH_ADD(4050008, 0, 1)
-DBPATCH_ADD(4050009, 0, 1)
-DBPATCH_ADD(4050010, 0, 1)
 DBPATCH_ADD(4050011, 0, 1)
 DBPATCH_ADD(4050012, 0, 1)
 DBPATCH_ADD(4050013, 0, 1)
@@ -438,5 +510,11 @@ DBPATCH_ADD(4050017, 0, 1)
 DBPATCH_ADD(4050018, 0, 1)
 DBPATCH_ADD(4050019, 0, 1)
 DBPATCH_ADD(4050020, 0, 1)
+DBPATCH_ADD(4050021, 0, 1)
+DBPATCH_ADD(4050022, 0, 1)
+DBPATCH_ADD(4050023, 0, 1)
+DBPATCH_ADD(4050024, 0, 1)
+DBPATCH_ADD(4050025, 0, 1)
+DBPATCH_ADD(4050026, 0, 1)
 
 DBPATCH_END()
