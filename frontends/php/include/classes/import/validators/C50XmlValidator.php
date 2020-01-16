@@ -1736,7 +1736,7 @@ class C50XmlValidator {
 							'event_source' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => $this->EVENT_SOURCE],
 							'operation_mode' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => $this->OPERATION_MODE],
 							'subject' =>				['type' => XML_STRING, 'default' => ''],
-							'body' =>					['type' => XML_STRING, 'default' => '']
+							'message' =>				['type' => XML_STRING, 'default' => '']
 						]]
 					]]
 				]]

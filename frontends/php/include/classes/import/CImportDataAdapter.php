@@ -444,8 +444,7 @@ class CImportDataAdapter {
 
 			$message_template_keys = [
 				'event_source' => 'eventsource',
-				'operation_mode' => 'recovery',
-				'body' => 'message'
+				'operation_mode' => 'recovery'
 			];
 
 			foreach ($this->data['media_types'] as $media_type) {

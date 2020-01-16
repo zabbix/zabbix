@@ -425,7 +425,7 @@ class CConfigurationExportBuilder {
 					'event_source' => $message_template['eventsource'],
 					'operation_mode' => $message_template['recovery'],
 					'subject' => $message_template['subject'],
-					'body' => $message_template['message']
+					'message' => $message_template['message']
 				];
 			}
 
