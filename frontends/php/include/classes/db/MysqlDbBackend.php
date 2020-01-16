@@ -49,12 +49,12 @@ class MysqlDbBackend extends DbBackend {
 		$pattern = '/'.str_replace('*', '.*', $this->ssl_cipher_list).'/';
 
 		if (!$row || ($this->ssl_cipher_list === '' && !$row['Value'])) {
-			$this->setError('Empty cipher.');
+			$this->setError('Error connecting to database. Empty cipher.');
 			return false;
 		}
 
 		if ($row && !preg_match($pattern, $row['Value'])) {
-			$this->setError('Invalid cipher.');
+			$this->setError('Error connecting to database. Invalid cipher.');
 			return false;
 		}
 
@@ -93,7 +93,7 @@ class MysqlDbBackend extends DbBackend {
 		}
 
 		if ($resource->errno) {
-			$this->setError('Database error: '.$resource->errno);
+			$this->setError('Database error code '.$resource->errno);
 			return null;
 		}
 
