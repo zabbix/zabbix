@@ -478,11 +478,9 @@ static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
 	result = DBselect(
 			"select h.interfaceid,h.bulk"
 			" from interface h"
-			" where type=2 and h.interfaceid not in ("
-				"select interfaceid "
-				" from items i"
-				" where i.interfaceid is not null"
-					" and  i.type IN (1,4,6));");
+			" where h.type=2 and h.interfaceid not in ("
+				"select interfaceid"
+				" from interface_snmp)");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -625,7 +623,6 @@ static int	DBpatch_4050017(void)
 	zbx_vector_dbu_interface_create(&interfaces);
 
 	DBpatch_load_data(&interfaces, &snmp_ifs, &snmp_new_ifs);
-	DBpatch_load_empty_if(&snmp_def_ifs);
 
 	while(1)
 	{
@@ -637,6 +634,8 @@ static int	DBpatch_4050017(void)
 
 		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_new_ifs))
 			break;
+
+		DBpatch_load_empty_if(&snmp_def_ifs);
 
 		if (0 < snmp_def_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_def_ifs))
 			break;
