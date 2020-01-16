@@ -4978,11 +4978,9 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 	result = DBselect(
 			"select i.itemid,i.name,i.key_,i.type,i.value_type,i.delay,"
 				"i.history,i.trends,i.status,i.trapper_hosts,i.units,i.formula,"
-				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_community,i.snmp_oid,"
-				"i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,"
-				"i.snmpv3_authpassphrase,i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.authtype,"
+				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_oid,i.authtype,"
 				"i.username,i.password,i.publickey,i.privatekey,i.description,i.interfaceid,"
-				"i.snmpv3_contextname,i.jmx_endpoint,i.master_itemid,i.timeout,i.url,i.query_fields,"
+				"i.jmx_endpoint,i.master_itemid,i.timeout,i.url,i.query_fields,"
 				"i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,"
 				"i.retrieve_mode,i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,"
 				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps"
@@ -5011,35 +5009,35 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		ZBX_DBROW2UINT64(item_prototype->valuemapid, row[13]);
 		item_prototype->params = zbx_strdup(NULL, row[14]);
 		item_prototype->ipmi_sensor = zbx_strdup(NULL, row[15]);
-		item_prototype->snmp_oid = zbx_strdup(NULL, row[17]);
-		ZBX_STR2UCHAR(item_prototype->authtype, row[25]);
-		item_prototype->username = zbx_strdup(NULL, row[26]);
-		item_prototype->password = zbx_strdup(NULL, row[27]);
-		item_prototype->publickey = zbx_strdup(NULL, row[28]);
-		item_prototype->privatekey = zbx_strdup(NULL, row[29]);
-		item_prototype->description = zbx_strdup(NULL, row[30]);
-		ZBX_DBROW2UINT64(item_prototype->interfaceid, row[31]);
-		item_prototype->jmx_endpoint = zbx_strdup(NULL, row[33]);
-		ZBX_DBROW2UINT64(item_prototype->master_itemid, row[34]);
+		item_prototype->snmp_oid = zbx_strdup(NULL, row[16]);
+		ZBX_STR2UCHAR(item_prototype->authtype, row[17]);
+		item_prototype->username = zbx_strdup(NULL, row[18]);
+		item_prototype->password = zbx_strdup(NULL, row[19]);
+		item_prototype->publickey = zbx_strdup(NULL, row[20]);
+		item_prototype->privatekey = zbx_strdup(NULL, row[21]);
+		item_prototype->description = zbx_strdup(NULL, row[22]);
+		ZBX_DBROW2UINT64(item_prototype->interfaceid, row[23]);
+		item_prototype->jmx_endpoint = zbx_strdup(NULL, row[24]);
+		ZBX_DBROW2UINT64(item_prototype->master_itemid, row[25]);
 
-		item_prototype->timeout = zbx_strdup(NULL, row[35]);
-		item_prototype->url = zbx_strdup(NULL, row[36]);
-		item_prototype->query_fields = zbx_strdup(NULL, row[37]);
-		item_prototype->posts = zbx_strdup(NULL, row[38]);
-		item_prototype->status_codes = zbx_strdup(NULL, row[39]);
-		ZBX_STR2UCHAR(item_prototype->follow_redirects, row[40]);
-		ZBX_STR2UCHAR(item_prototype->post_type, row[41]);
-		item_prototype->http_proxy = zbx_strdup(NULL, row[42]);
-		item_prototype->headers = zbx_strdup(NULL, row[43]);
-		ZBX_STR2UCHAR(item_prototype->retrieve_mode, row[44]);
-		ZBX_STR2UCHAR(item_prototype->request_method, row[45]);
-		ZBX_STR2UCHAR(item_prototype->output_format, row[46]);
-		item_prototype->ssl_cert_file = zbx_strdup(NULL, row[47]);
-		item_prototype->ssl_key_file = zbx_strdup(NULL, row[48]);
-		item_prototype->ssl_key_password = zbx_strdup(NULL, row[49]);
-		ZBX_STR2UCHAR(item_prototype->verify_peer, row[50]);
-		ZBX_STR2UCHAR(item_prototype->verify_host, row[51]);
-		ZBX_STR2UCHAR(item_prototype->allow_traps, row[52]);
+		item_prototype->timeout = zbx_strdup(NULL, row[26]);
+		item_prototype->url = zbx_strdup(NULL, row[27]);
+		item_prototype->query_fields = zbx_strdup(NULL, row[28]);
+		item_prototype->posts = zbx_strdup(NULL, row[29]);
+		item_prototype->status_codes = zbx_strdup(NULL, row[30]);
+		ZBX_STR2UCHAR(item_prototype->follow_redirects, row[31]);
+		ZBX_STR2UCHAR(item_prototype->post_type, row[32]);
+		item_prototype->http_proxy = zbx_strdup(NULL, row[33]);
+		item_prototype->headers = zbx_strdup(NULL, row[34]);
+		ZBX_STR2UCHAR(item_prototype->retrieve_mode, row[35]);
+		ZBX_STR2UCHAR(item_prototype->request_method, row[36]);
+		ZBX_STR2UCHAR(item_prototype->output_format, row[37]);
+		item_prototype->ssl_cert_file = zbx_strdup(NULL, row[38]);
+		item_prototype->ssl_key_file = zbx_strdup(NULL, row[39]);
+		item_prototype->ssl_key_password = zbx_strdup(NULL, row[40]);
+		ZBX_STR2UCHAR(item_prototype->verify_peer, row[41]);
+		ZBX_STR2UCHAR(item_prototype->verify_host, row[42]);
+		ZBX_STR2UCHAR(item_prototype->allow_traps, row[43]);
 
 		zbx_vector_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_ptr_create(&item_prototype->applications);
