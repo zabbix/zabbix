@@ -61,12 +61,12 @@ class CCheckboxListElement extends CElement {
 		}
 		else {
 			$label = $this->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($labels).']')->one(false);
-			if ($label === null) {
+			if (!$label->isValid()) {
 				throw new Exception('Failed to find checkbox label by name: "'.$labels.'".');
 			}
 
 			$element = $label->query('xpath:../input[@type="checkbox"]')->asCheckbox()->one(false);
-			if ($element === null) {
+			if (!$element->isValid()) {
 				throw new Exception('Failed to find checkbox element by label name: "'.$labels.'".');
 			}
 
@@ -153,7 +153,7 @@ class CCheckboxListElement extends CElement {
 		$value = [];
 
 		foreach ($this->getCheckboxes() as $checkbox) {
-			if ($checkbox->isChecked() && ($label = $checkbox->getLabel()) !== null) {
+			if ($checkbox->isChecked() && ($label = $checkbox->getLabel())->isValid()) {
 				$value[] = $label->getText();
 			}
 		}

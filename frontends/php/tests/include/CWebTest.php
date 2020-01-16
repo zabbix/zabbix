@@ -33,6 +33,13 @@ define('TEST_ERROR', 2);
  * Base class for Selenium tests.
  */
 class CWebTest extends CTest {
+
+	// Network throttling emulation modes.
+	const NETWORK_THROTTLING_NONE		= 'none';
+	const NETWORK_THROTTLING_OFFLINE		= 'offline';
+	const NETWORK_THROTTLING_SLOW		= 'slow';
+	const NETWORK_THROTTLING_FAST		= 'fast';
+
 	// Screenshot capture on error.
 	private $capture_screenshot = true;
 
@@ -43,9 +50,9 @@ class CWebTest extends CTest {
 
 	// Shared page instance.
 	private static $shared_page = null;
-	// Enable supressing of browser errors on test case level.
+	// Enable suppressing of browser errors on test case level.
 	private $supress_case_errors = false;
-	// Enable supressing of browser errors on test suite level.
+	// Enable suppressing of browser errors on test suite level.
 	private static $supress_suite_errors = false;
 
 	// Instance of web page.
@@ -133,7 +140,7 @@ class CWebTest extends CTest {
 		// Test suite level annotations.
 		$class_annotations = $this->getAnnotationsByType($this->annotations, 'class');
 
-		// Supress browser error on a test case level.
+		// Suppress browser error on a test case level.
 		$supress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignore-browser-errors');
 		self::$supress_suite_errors = ($supress_suite_errors !== null);
 	}
@@ -156,12 +163,12 @@ class CWebTest extends CTest {
 		// Test case level annotations.
 		$method_annotations = $this->getAnnotationsByType($this->annotations, 'method');
 		if ($method_annotations !== null) {
-			// Supress browser error on a test case level.
+			// Suppress browser error on a test case level.
 			$supress_case_errors = $this->getAnnotationsByType($method_annotations, 'ignore-browser-errors');
 			$this->supress_case_errors = ($supress_case_errors !== null);
 		}
 
-		// Errors on a test case level should be supressed if suite level error supression is enabled.
+		// Errors on a test case level should be suppressed if suite level error suppression is enabled.
 		if (self::$supress_suite_errors) {
 			$this->supress_case_errors = self::$supress_suite_errors;
 		}
@@ -437,6 +444,116 @@ class CWebTest extends CTest {
 			else {
 				echo 'Failed to save screenshot data report.'."\n";
 			}
+		}
+	}
+
+	/**
+	 * Set network throttling mode.
+	 *
+	 * @param string $mode    one of the NETWORK_THROTTLING_* constants
+	 *
+	 * @return boolean
+	 *
+	 * @throws Exception on invalid throttling mode
+	 */
+	public function setNetworkThrottlingMode($mode) {
+		$modes = [
+			self::NETWORK_THROTTLING_NONE => [
+				'emulation' => false,
+				'cache' => true,
+				'offline' => false,
+				'latency' => 0,
+				'downloadThroughput' => -1,
+				'uploadThroughput' => -1
+			],
+			self::NETWORK_THROTTLING_OFFLINE => [
+				'emulation' => true,
+				'cache' => false,
+				'offline' => true,
+				'latency' => 0,
+				'downloadThroughput' => -1,
+				'uploadThroughput' => -1
+			],
+			self::NETWORK_THROTTLING_SLOW => [
+				'emulation' => true,
+				'cache' => false,
+				'offline' => false,
+				'latency' => 200,
+				'downloadThroughput' => 32 * 1024,
+				'uploadThroughput' => 4 * 1024
+			],
+			self::NETWORK_THROTTLING_FAST => [
+				'emulation' => true,
+				'cache' => true,
+				'offline' => false,
+				'latency' => 50,
+				'downloadThroughput' => 128 * 1024,
+				'uploadThroughput' => 32 * 1024
+			]
+		];
+
+		if (!array_key_exists($mode, $modes)) {
+			throw new Exception('Unknown network throttling mode.');
+		}
+
+		$options = $modes[$mode];
+
+		try {
+			CommandExecutor::executeCustom($this->page->getDriver(), [
+				'cmd' => 'Network.'.($options['emulation'] ? 'enable' : 'disable'),
+				'params' => [
+					'enable' => $options['emulation']
+				]
+			]);
+
+			CommandExecutor::executeCustom($this->page->getDriver(), [
+				'cmd' => 'Network.setCacheDisabled',
+				'params' => [
+					'cacheDisabled'	=> !$options['cache']
+				]
+			]);
+
+			CommandExecutor::executeCustom($this->page->getDriver(), [
+				'cmd' => 'Network.emulateNetworkConditions',
+				'params' => [
+					'offline' => $options['offline'],
+					'latency' => $options['latency'],
+					'downloadThroughput' => $options['downloadThroughput'],
+					'uploadThroughput' => $options['uploadThroughput']
+				]
+			]);
+
+			return true;
+		} catch (Exception $exception) {
+			return false;
+		}
+	}
+
+	/**
+	 * Set CPU throttling rate.
+	 *
+	 * @param integer $rate    throttling rate as a slowdown factor (1 is no throttle, 2 is 2x slowdown, etc).
+	 *
+	 * @return boolean
+	 *
+	 * @throws Exception on invalid throttling mode
+	 */
+	public function setCPUThrottlingRate($rate) {
+		if (!is_int($rate) || $rate < 1) {
+			throw new Exception('CPU throttling rate should be a positive integer starting from 1.');
+		}
+
+		try {
+			CommandExecutor::executeCustom($this->page->getDriver(), [
+				'cmd' => 'Emulation.setCPUThrottlingRate',
+				'params' => [
+					'rate'	=> $rate
+				]
+			]);
+
+			return true;
+		} catch (Exception $exception) {
+			return false;
 		}
 	}
 }

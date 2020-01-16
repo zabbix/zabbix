@@ -1594,7 +1594,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'itemids' => getRequest('group_itemid', []),
 		'description' => getRequest('description', ''),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'delay_flex' => getRequest('delay_flex', []),
+		'delay_flex' => array_values(getRequest('delay_flex', [])),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', 0),
 		'type' => getRequest('type', 0),
@@ -2114,7 +2114,21 @@ else {
 			order_result($data['items'], $sortField, $sortOrder);
 	}
 
-	$data['paging'] = getPagingLine($data['items'], $sortOrder, new CUrl('items.php'));
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sortOrder, new CUrl('items.php'));
+
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	$itemTriggerIds = [];

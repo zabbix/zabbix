@@ -773,23 +773,18 @@ class CHostGroup extends CApiService {
 
 		$this->verifyHostsAndTemplatesAreUnlinkable($hosts_to_unlink, $templates_to_unlink, $groupids);
 
-		$db_scripts = API::Script()->get([
+		$db_scripts = DB::select('scripts', [
+			'output' => ['groupid'],
 			'filter' => ['groupid' => $groupids],
-			'output' => ['scriptid', 'groupid'],
-			'nopermissions' => true
+			'limit' => 1
 		]);
 
-		if (!empty($db_scripts)) {
-			foreach ($db_scripts as $script) {
-				if ($script['groupid'] == 0) {
-					continue;
-				}
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host group "%1$s" cannot be deleted, because it is used in a global script.',
-						$db_groups[$script['groupid']]['name']
-					)
-				);
-			}
+		if ($db_scripts) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Host group "%1$s" cannot be deleted, because it is used in a global script.',
+					$db_groups[$db_scripts[0]['groupid']]['name']
+				)
+			);
 		}
 
 		$corr_condition_group = DBFetch(DBselect(

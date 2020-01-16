@@ -21,7 +21,12 @@
 
 class CControllerPopupMediatypeTestSend extends CController {
 
-	private $metiatype;
+	/**
+	 * Mediatype object.
+	 *
+	 * @var array
+	 */
+	private $mediatype;
 
 	protected function checkInput() {
 		$fields = [

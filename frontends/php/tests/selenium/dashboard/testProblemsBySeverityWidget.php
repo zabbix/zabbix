@@ -1018,7 +1018,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
 			$dashboard = CDashboardElement::find()->one()->edit();
 			$widget = $dashboard->getWidget($name);
-			$widget->delete();
+			$dashboard->deleteWidget($name);
 			$this->page->waitUntilReady();
 			$dashboard->save();
 			// Check that Dashboard has been saved
@@ -1220,7 +1220,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 			$this->assertEquals('*UNKNOWN*', $row->getColumn('Operational data')->getText());
 		}
 		else {
-			$this->assertEquals(null, $row->getColumn('Operational data'));
+			$this->assertFalse($row->getColumn('Operational data')->isValid());
 		}
 		if (CTestArrayHelper::get($data['fields'], 'Show timeline', true)) {
 			$this->assertEquals($rows_count, $popup->query('xpath:.//td[@class="timeline-date"]')->all()->count());

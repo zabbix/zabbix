@@ -92,7 +92,7 @@ class CControllerUsergroupUpdate extends CController {
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.list')
-				->getUrl()
+				->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('User group updated'));
@@ -101,7 +101,6 @@ class CControllerUsergroupUpdate extends CController {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.edit')
 				->setArgument('usrgrpid', $this->getInput('usrgrpid'))
-				->getUrl()
 			);
 			$response->setMessageError(_('Cannot update user group'));
 			$response->setFormData($this->getInputAll());

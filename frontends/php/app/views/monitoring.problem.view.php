@@ -28,7 +28,6 @@ $options = [
 		'action' => $data['action'],
 		'sort' => $data['sort'],
 		'sortorder' => $data['sortorder'],
-		'page' => $data['page'],
 		'filter' => [
 			'show' => $data['filter']['show'],
 			'groupids' => $data['filter']['groupids'],
@@ -332,8 +331,7 @@ if ($data['action'] == 'problem.view') {
 	$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'problem.view')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
-		->addFormItem((new CVar('action', 'problem.view'))->removeId())
-		->addFormItem((new CVar('page', $data['page']))->removeId());
+		->addFormItem((new CVar('action', 'problem.view'))->removeId());
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 		$filter->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
@@ -346,21 +344,14 @@ if ($data['action'] == 'problem.view') {
 	$widget = (new CWidget())
 		->setTitle(_('Problems'))
 		->setWebLayoutMode($web_layout_mode)
-		->setControls((new CTag('nav', true,
-			(new CForm('get'))
-				->cleanItems()
-				->addVar('action', 'problem.view')
-				->addVar('page', $data['page'])
-				->addItem((new CList())
+		->setControls(
+			(new CTag('nav', true,
+				(new CList())
 					->addItem(new CRedirectButton(_('Export to CSV'),
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'problem.view.csv')
-							->setArgument('page',  $data['page'])
+						(new CUrl('zabbix.php'))->setArgument('action', 'problem.view.csv')
 					))
 					->addItem(get_icon('fullscreen'))
-				)
-			))
-				->setAttribute('aria-label', _('Content controls'))
+			))->setAttribute('aria-label', _('Content controls'))
 		);
 
 	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {

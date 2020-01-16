@@ -28,6 +28,7 @@ $options = $data['options'];
 $http_popup_form = (new CForm())
 	->cleanItems()
 	->setId('http_step')
+	->addVar('no', $options['no'])
 	->addVar('httpstepid', $options['httpstepid'])
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
@@ -185,7 +186,7 @@ $http_popup_form->addItem($http_popup_form_list);
 
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();
-$output['script_inline'] = 'httpconf.steps.onStepOverlayReadyCb('.$options['httpstepid'].');';
+$output['script_inline'] = 'httpconf.steps.onStepOverlayReadyCb('.$options['no'].');';
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();

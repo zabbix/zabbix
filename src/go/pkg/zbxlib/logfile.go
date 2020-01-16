@@ -189,7 +189,6 @@ import "C"
 
 import (
 	"errors"
-	"fmt"
 	"time"
 	"unsafe"
 
@@ -237,7 +236,7 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 	case "eventlog":
 		flags |= MetricFlagLogEventlog
 	default:
-		return nil, fmt.Errorf("Unsupported item key: %s", key)
+		return nil, errors.New("Unsupported item key.")
 	}
 	ckey := C.CString(itemutil.MakeKey(key, params))
 	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil

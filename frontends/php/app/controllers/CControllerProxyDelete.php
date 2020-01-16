@@ -56,9 +56,13 @@ class CControllerProxyDelete extends CController {
 
 		$deleted = count($proxyids);
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'proxy.list')
+			->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
+		);
 
 		if ($result) {
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_n('Proxy deleted', 'Proxies deleted', $deleted));
 		}
 		else {

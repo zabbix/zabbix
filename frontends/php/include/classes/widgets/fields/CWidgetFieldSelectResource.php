@@ -52,7 +52,7 @@ class CWidgetFieldSelectResource extends CWidgetField {
 
 		$this->dstfld1 = $name;
 		$this->dstfld2 = $this->name.'_caption';
-		$this->setDefault(0);
+		$this->setDefault('0');
 	}
 
 	/**

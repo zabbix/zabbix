@@ -73,6 +73,14 @@ class CItemPrototypeManager {
 
 		$del_itemids = array_keys($del_itemids);
 
+		// Lock item prototypes before delete to prevent server from adding new LLD elements.
+		DBselect(
+			'SELECT NULL'.
+			' FROM items i'.
+			' WHERE '.dbConditionInt('i.itemid', $del_itemids).
+			' FOR UPDATE'
+		);
+
 		// Deleting graph prototypes, which will remain without item prototypes.
 		$db_graphs = DBselect(
 			'SELECT DISTINCT gi.graphid'.

@@ -126,7 +126,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "vfs.dev.discovery":
 		return p.getDiscovery()
 	default:
-		return nil, errors.New("Unsupported metric.")
+		return nil, plugin.UnsupportedMetricError
 	}
 
 	statType := statTypeSPS

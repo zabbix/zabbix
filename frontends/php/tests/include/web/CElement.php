@@ -658,4 +658,15 @@ class CElement extends CBaseElement implements IWaitable {
 
 		return ($expected == $value);
 	}
+
+	/**
+	 * Remove focus from the element.
+	 *
+	 * @return $this
+	 */
+	public function removeFocus() {
+		CElementQuery::getDriver()->executeScript('arguments[0].blur();', [$this]);
+
+		return $this;
+	}
 }

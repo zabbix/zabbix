@@ -991,7 +991,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'scripts':
 				$options = [
-					'output' => API_OUTPUT_EXTEND,
+					'output' => ['scriptid', 'name', 'type', 'execute_on', 'command'],
 					'preservekeys' => true
 				];
 				if ($hostid === null) {

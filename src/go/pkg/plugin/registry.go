@@ -20,7 +20,6 @@
 package plugin
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -117,7 +116,7 @@ func Get(key string) (acc Accessor, err error) {
 	if m, ok := Metrics[key]; ok {
 		return m.Plugin, nil
 	}
-	return nil, errors.New("Unsupported item key.")
+	return nil, UnsupportedMetricError
 }
 
 func ClearRegistry() {

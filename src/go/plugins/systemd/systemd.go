@@ -21,7 +21,6 @@ package systemd
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"path/filepath"
 	"reflect"
@@ -221,7 +220,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		return value, nil
 	default:
-		return nil, errors.New("Unsupported metric.")
+		return nil, plugin.UnsupportedMetricError
 	}
 }
 

@@ -320,7 +320,7 @@ class CFilter extends CDiv {
 	/**
 	 * Add tab.
 	 *
-	 * @param string|CTag $header    Tab header title string or CTag contaier.
+	 * @param string|CTag $header    Tab header title string or CTag container.
 	 * @param array       $body      Array of body elements.
 	 *
 	 * @return CFilter

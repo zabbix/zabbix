@@ -299,7 +299,7 @@ func main() {
 		}
 
 		if argTest {
-			if err := agent.CheckMetric(testFlag); err != nil {
+			if err := agent.CheckMetric(testFlag, false); err != nil {
 				os.Exit(1)
 			}
 		} else {
