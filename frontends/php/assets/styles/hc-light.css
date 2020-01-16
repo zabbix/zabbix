@@ -4735,7 +4735,7 @@ svg {
 ::-ms-input-placeholder {
   color: #777777; }
 
-:placeholder-shown {
+::placeholder {
   color: #777777; }
 
 .icon-action-command,

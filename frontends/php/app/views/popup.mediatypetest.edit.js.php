@@ -56,10 +56,13 @@ function mediatypeTestSend(formname) {
 				jQuery('#webhook_response_value', form).val(ret.response.value);
 				jQuery('#webhook_response_type', form).text(ret.response.type);
 			}
+
+			$form_fields.prop('disabled', false);
 		},
 		error: function(request, status, error) {
 			if (request.status == 200) {
 				$submit_btn.prop('disabled', false).removeClass('is-loading');
+				$form_fields.prop('disabled', false);
 				alert(error);
 			}
 			else if (window.document.forms[formname]) {

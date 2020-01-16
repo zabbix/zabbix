@@ -141,6 +141,7 @@ class CControllerMediatypeEdit extends CController {
 			'event_menu_name' => $db_defaults['event_menu_name'],
 			'parameters' => [
 				['name' => 'URL', 'value'=> ''],
+				['name' => 'HTTPProxy', 'value'=> ''],
 				['name' => 'To', 'value' => '{ALERT.SENDTO}'],
 				['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
 				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']

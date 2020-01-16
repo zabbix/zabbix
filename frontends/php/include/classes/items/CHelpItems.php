@@ -317,6 +317,10 @@ class CHelpItems {
 					'description' => _('Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
+					'key' => 'vfs.fs.get',
+					'description' => _('File systems and their spaces in bytes and percentage from total. Returns JSON')
+				],
+				[
 					'key' => 'vm.memory.size[<mode>]',
 					'description' => _('Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
@@ -625,6 +629,10 @@ class CHelpItems {
 				[
 					'key' => 'vfs.fs.inode[fs,<mode>]',
 					'description' => _('Number or percentage of inodes. Returns integer for number; float for percentage')
+				],
+				[
+					'key' => 'vfs.fs.get',
+					'description' => _('File systems and their spaces in bytes and percentage from total. Returns JSON')
 				],
 				[
 					'key' => 'vfs.fs.size[fs,<mode>]',
