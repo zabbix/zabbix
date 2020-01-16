@@ -2866,12 +2866,12 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 	zbx_lld_interface_t	*interface;
 
 	result = DBselect(
-			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,is.version,is.bulk,"
-			"is.community,is.securityname,is.securitylevel,is.authpassphrase,is.privpassphrase,"
-			"is.authprotocol,is.privprotocol,is.contextname"
-			" from interface hi,items i"
-				" left join interface_snmp is"
-					" on hi.interfaceid=is.interfaceid"
+			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,"
+			"s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
+			"s.authprotocol,s.privprotocol,s.contextname"
+			" from (interface hi,items i)"
+				" left join interface_snmp s"
+					" on hi.interfaceid=s.interfaceid"
 			" where hi.hostid=i.hostid"
 				" and i.itemid=" ZBX_FS_UI64,
 			lld_ruleid);
@@ -3101,14 +3101,13 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hi.hostid,id.parent_interfaceid,hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,"
-					"hi.dns,hi.port,is.version,is.bulk,is.community,is.securityname,is.securitylevel,"
-					"is.authpassphrase,is.privpassphrase,is.authprotocol,is.privprotocol,"
-					"is.contextname"
+					"hi.dns,hi.port,s.version,s.bulk,s.community,s.securityname,s.securitylevel,"
+					"s.authpassphrase,s.privpassphrase,s.authprotocol,s.privprotocol,s.contextname"
 				" from interface hi"
 					" left join interface_discovery id"
 						" on hi.interfaceid=id.interfaceid"
-					" left join interface_snmp is"
-						" on hi.interfaceid=is.interfaceid"
+					" left join interface_snmp s"
+						" on hi.interfaceid=s.interfaceid"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.hostid", hostids.values, hostids.values_num);
 
