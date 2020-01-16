@@ -2888,7 +2888,7 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
 
-		if (ITEM_TYPE_SNMP == interface->type)
+		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
 			zbx_lld_interface_snmp_t *snmp;
 
@@ -3066,7 +3066,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			new_interface->port = zbx_strdup(NULL, interface->port);
 			new_interface->flags = 0x00;
 
-			if (ITEM_TYPE_SNMP == interface->type)
+			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
 				zbx_lld_interface_snmp_t *snmp;
 
