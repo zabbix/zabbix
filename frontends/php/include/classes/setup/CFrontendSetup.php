@@ -56,7 +56,7 @@ class CFrontendSetup {
 	 *
 	 * @return array
 	 */
-	public function checkRequirements($setup = false) {
+	public function checkRequirements() {
 		$result = [];
 
 		$result[] = $this->checkPhpVersion();
@@ -92,9 +92,6 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpSessionAutoStart();
 		$result[] = $this->checkPhpGettext();
 		$result[] = $this->checkPhpArgSeparatorOutput();
-		if (!$setup) {
-			$result[] = $this->checkSslFiles();
-		}
 
 		return $result;
 	}

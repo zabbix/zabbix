@@ -24,20 +24,54 @@
  */
 abstract class DbBackend {
 	/**
-	 * Connection resource.
+	 * Error message.
 	 *
-	 * @var resource
+	 * @var string
 	 */
-	protected $connect;
+	protected $error;
 
 	/**
-	 * SSL connection flag.
+	 * Path to SSL key file.
 	 *
-	 * @var bool
+	 * @var string
 	 */
-	protected $ssl;
+	protected $ssl_key_file = '';
 
-	protected $error;
+	/**
+	 * Path to SSL cert file.
+	 *
+	 * @var string
+	 */
+	protected $ssl_cert_file = '';
+
+	/**
+	 * Path to SSL ca file.
+	 *
+	 * @var string
+	 */
+	protected $ssl_ca_file = '';
+
+	/**
+	 * Connection required cipher pattern.
+	 *
+	 * @var string
+	 */
+	protected $ssl_cipher_list = '';
+
+	/**
+	 * Set SSL specific options for db conection.
+	 *
+	 * @param string $key_file       Path to SSL key file.
+	 * @param string $cert_file      Path to SSL cert file.
+	 * @param string $ca_file        Path to SSL ca file.
+	 * @param string $cipher_list    Connection required cipher pattern.
+	 */
+	public function setConnectionSecurity($key_file, $cert_file, $ca_file, $cipher_list) {
+		$this->ssl_key_file = $key_file;
+		$this->ssl_cert_file = $cert_file;
+		$this->ssl_ca_file = $ca_file;
+		$this->ssl_cipher_list = $cipher_list;
+	}
 
 	/**
 	 * Check if 'dbversion' table exists.
@@ -45,6 +79,20 @@ abstract class DbBackend {
 	 * @return boolean
 	 */
 	abstract protected function checkDbVersionTable();
+
+	/**
+	 * Create connection to database server.
+	 *
+	 * @param string $host         Host name.
+	 * @param string $port         Port.
+	 * @param string $user         User name.
+	 * @param string $password     Password.
+	 * @param string $dbname       Database name.
+	 * @param string $schema       DB schema.
+	 *
+	 * @return resource|null
+	 */
+	abstract public function connect($host, $port, $user, $password, $dbname, $schema);
 
 	/**
 	 * Check if connected database version matches with frontend version.

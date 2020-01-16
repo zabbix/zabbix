@@ -41,6 +41,61 @@ class OracleDbBackend extends DbBackend {
 	}
 
 	/**
+	 * Check is current connection contain requested cipher list.
+	 *
+	 * @return bool
+	 */
+	public function isConnectionSecure() {
+		return false;
+	}
+
+	/**
+	 * Create connection to database server.
+	 *
+	 * @param string $host         Host name.
+	 * @param string $port         Port.
+	 * @param string $user         User name.
+	 * @param string $password     Password.
+	 * @param string $dbname       Database name.
+	 * @param string $schema       DB schema.
+	 *
+	 * @param
+	 * @return resource|null
+	 */
+	public function connect($host, $port, $user, $password, $dbname, $schema) {
+		$connect = '';
+		if ($host !== '') {
+			$connect = '//'.$host;
+
+			if ($port != '0') {
+				$connect .= ':'.$port;
+			}
+			if ($dbname) {
+				$connect .= '/'.$dbname;
+			}
+		}
+
+		$resource = @oci_connect($user, $password, $connect, 'UTF8');
+
+		if (!$resource) {
+			$ociError = oci_error();
+			$error = 'Error connecting to database: '.$ociError['message'];
+			return null;
+		}
+
+		return $resource;
+	}
+
+	/**
+	 * Initialize connection.
+	 *
+	 * @return bool
+	 */
+	public function init() {
+		DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
+	}
+
+	/**
 	 * Create INSERT SQL query.
 	 * Creation example:
 	 *	BEGIN

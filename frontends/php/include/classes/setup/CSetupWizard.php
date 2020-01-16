@@ -167,7 +167,7 @@ class CSetupWizard extends CForm {
 		$messages = [];
 		$finalResult = CFrontendSetup::CHECK_OK;
 
-		foreach ($this->frontendSetup->checkRequirements(true) as $req) {
+		foreach ($this->frontendSetup->checkRequirements() as $req) {
 			if ($req['result'] == CFrontendSetup::CHECK_OK) {
 				$class = ZBX_STYLE_GREEN;
 				$result = 'OK';

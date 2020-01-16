@@ -40,72 +40,77 @@ class MysqlDbBackend extends DbBackend {
 	}
 
 	/**
-	 * Creates database connection.
-	 *
-	 * @param string $host         Host name.
-	 * @param string $user         User name.
-	 * @param string $password     Password.
-	 * @param string $database     Database name.
-	 * @param string $port         Port.
-	 * @param string $key_file     Path name to the key file.
-	 * @param string $cert_file    Path name to the certificate file.
-	 * @param string $ca_file      Path name to the certificate authority file.
-	 * @param string $cipher_list  List of allowable ciphers to use for SSL encryption.
-	 *
-	 * @return resource|bool
-	 */
-	public function connect($host, $user, $password, $database, $port, $key_file, $cert_file, $ca_file, $cipher_list) {
-		$this->connect = mysqli_init();
-
-		if ($key_file.$cert_file.$ca_file !== '') {
-			$this->ssl = true;
-			$this->connect->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
-			$cipher_suit = preg_match('/^[\w\-]$/', $cipher_list) ? $cipher_list : null;
-			$this->connect->ssl_set($key_file, $cert_file, $ca_file, NULL, $cipher_suit);
-		}
-
-		if ($this->connect->real_connect($host, $user, $password, $database, $port, NULL, MYSQLI_CLIENT_SSL)) {
-			return $this->connect;
-		}
-		else {
-			$this->setError('Error connecting to database: '.trim($this->connect->error));
-			return false;
-		}
-	}
-
-	/**
-	 * Initialize database connection.
-	 *
-	 * @param string $cipher_list  A list of allowable ciphers to use for SSL encryption.
+	 * Check is current connection contain requested cipher list.
 	 *
 	 * @return bool
 	 */
-	public function init($cipher_list) {
-		if ($this->connect->autocommit(true) === false) {
-			$this->setError('Error setting auto commit.');
+	public function isConnectionSecure() {
+		$row = DBfetch(DBselect("SHOW STATUS LIKE 'ssl_cipher'"));
+		$pattern = '/'.str_replace('*', '.*', $this->ssl_cipher_list).'/';
+
+		if (!$row || ($this->ssl_cipher_list === '' && !$row['Value'])) {
+			$this->setError('Empty cipher.');
 			return false;
 		}
-		else {
-			DBexecute('SET NAMES utf8');
+
+		if ($row && !preg_match($pattern, $row['Value'])) {
+			$this->setError('Invalid cipher.');
+			return false;
 		}
 
-		if (!$this->ssl) {
-			return true;
+		return true;
+	}
+
+	/**
+	 * Create connection to database server.
+	 *
+	 * @param string $host         Host name.
+	 * @param string $port         Port.
+	 * @param string $user         User name.
+	 * @param string $password     Password.
+	 * @param string $dbname       Database name.
+	 * @param string $schema       DB schema.
+	 *
+	 * @param
+	 * @return resource|null
+	 */
+	public function connect($host, $port, $user, $password, $dbname, $schema) {
+		$resource = mysqli_init();
+
+		if ($this->ssl_key_file || $this->ssl_cert_file || $this->ssl_ca_file) {
+			$resource->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
+			$cipher_suit = ($this->ssl_cipher_list && strpos($this->ssl_cipher_list, '*') === false)
+				? $this->ssl_cipher_list
+				: null;
+			$resource->ssl_set($this->ssl_key_file, $this->ssl_cert_file, $this->ssl_ca_file, null, $cipher_suit);
 		}
 
-		$row = DBfetch(DBselect("SHOW STATUS LIKE 'ssl_cipher'"));
+		$resource->real_connect($host, $user, $password, $dbname, $port, null, MYSQLI_CLIENT_SSL);
 
-		if ($row) {
-			$pattern = '/'. str_replace('*', '.*', $cipher_list).'/';
-
-			if ($cipher_list === '' || preg_match($pattern, $row['Value'])) {
-				return true;
-			}
+		if ($resource->error) {
+			$this->setError($resource->error);
+			return null;
 		}
 
-		$DB['DB'] = false;
-		$this->setError('Error connecting to database. Invalid cipher.');
+		if ($resource->errno) {
+			$this->setError('Database error: '.$resource->errno);
+			return null;
+		}
 
-		return false;
+		if ($resource->autocommit(true) === false) {
+			$this->setError('Error setting auto commit.');
+			return null;
+		}
+
+		return $resource;
+	}
+
+	/**
+	 * Initialize connection.
+	 *
+	 * @return bool
+	 */
+	public function init() {
+		DBexecute('SET NAMES utf8');
 	}
 }

@@ -23,6 +23,26 @@
  * Database backend class for PostgreSQL.
  */
 class PostgresqlDbBackend extends DbBackend {
+	/**
+	 * Database name.
+	 *
+	 * @var string
+	 */
+	protected $dbname = '';
+
+	/**
+	 * DB schema.
+	 *
+	 * @var string
+	 */
+	protected $schema = '';
+
+	/**
+	 * User name.
+	 *
+	 * @var string
+	 */
+	protected $user = '';
 
 	/**
 	 * Check if 'dbversion' table exists.
@@ -30,12 +50,10 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDbVersionTable() {
-		global $DB;
-
-		$schema = zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public');
+		$schema = zbx_dbstr($this->schema ? $this->schema : 'public');
 
 		$tableExists = DBfetch(DBselect('SELECT 1 FROM information_schema.tables'.
-			' WHERE table_catalog='.zbx_dbstr($DB['DATABASE']).
+			' WHERE table_catalog='.zbx_dbstr($this->dbname).
 				' AND table_schema='.$schema.
 				" AND table_name='dbversion'"
 		));
@@ -49,70 +67,75 @@ class PostgresqlDbBackend extends DbBackend {
 	}
 
 	/**
-	 * Creates database connection.
+	 * Check is current connection contain requested cipher list.
+	 *
+	 * @return bool
+	 */
+	public function isConnectionSecure() {
+		$query = sprintf('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl '.
+			'JOIN pg_stat_activity ON pg_stat_ssl.pid = pg_stat_activity.pid and '.
+			'pg_stat_activity.usename = \'%s\';', $this->user);
+
+		$row = DBfetch(DBselect($query));
+
+		$pattern = '/'. str_replace('*', '.*', $this->ssl_cipher_list).'/';
+
+		if (!$row || ($this->ssl_cipher_list !== '' && !preg_match($pattern, $row['cipher']))) {
+			$this->setError('Error connecting to database. Invalid cipher.');
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Create connection to database server.
 	 *
 	 * @param string $host         Host name.
+	 * @param string $port         Port.
 	 * @param string $user         User name.
 	 * @param string $password     Password.
-	 * @param string $database     Database name.
-	 * @param string $port         Port.
-	 * @param string $key_file     Path name to the key file.
-	 * @param string $cert_file    Path name to the certificate file.
-	 * @param string $ca_file      Path name to the certificate authority file.
+	 * @param string $dbname       Database name.
+	 * @param string $schema       DB schema.
 	 *
-	 * @return resource|bool
+	 * @param
+	 * @return resource|null
 	 */
-	public function connect($host, $user, $password, $database, $port, $key_file, $cert_file, $ca_file) {
-		$pg_connection_string =
-			(($host !== '') ? 'host=\''.pg_connect_escape($host).'\' ' : '').
-			'dbname=\''.pg_connect_escape($database).'\' '.
-			(($user !== '') ? 'user=\''.pg_connect_escape($user).'\' ' : '').
-			(($password !== '') ? 'password=\''.pg_connect_escape($password).'\' ' : '').
-			(($port !== '') ? 'port='.pg_connect_escape($port) : '');
+	public function connect($host, $port, $user, $password, $dbname, $schema) {
+		$conn_string = '';
 
-		if ($key_file.$cert_file.$ca_file !== '') {
-			$this->ssl = true;
-			$pg_connection_string .= ' sslmode=\'verify-ca\' sslkey=\''.pg_connect_escape($key_file).
-				'\' sslcert=\''.pg_connect_escape($cert_file).'\''.
-				(($ca_file === '') ? '' : ' sslrootcert=\''.pg_connect_escape($ca_file).'\'');
+		foreach (compact(['host', 'port', 'user', 'password', 'dbname']) as $key => $param) {
+			$conn_string .= ((bool) $param) ? $key.'=\''.pg_connect_escape($param).'\' ' : '';
 		}
 
-		$this->connect = @pg_connect($pg_connection_string);
+		foreach (compact(['user', 'dbname', 'schema']) as $key => $property) {
+			$this->{$key} = $property;
+		}
 
-		if (!$this->connect) {
+		if ($this->ssl_key_file || $this->ssl_cert_file || $this->ssl_ca_file) {
+			$conn_string .= ' sslmode=\'verify-ca\' sslkey=\''.pg_connect_escape($this->ssl_key_file).
+				'\' sslcert=\''.pg_connect_escape($this->ssl_cert_file).'\''.
+				(($this->ssl_ca_file === '') ? '' : ' sslrootcert=\''.pg_connect_escape($this->ssl_ca_file).'\'');
+		}
+
+		$resource = pg_connect($conn_string);
+
+		if (!$resource) {
 			$this->setError('Error connecting to database.');
+			return null;
 		}
 
-		return $this->connect;
+		return $resource;
 	}
 
 	/**
 	 * Initialize database connection.
 	 *
-	 * @param string $cipher_list  A list of allowable ciphers to use for SSL encryption.
-	 * @param string $user         User name.
-	 * @param string $schema       DB schema.
-	 *
 	 * @return bool
 	 */
-	public function init($cipher_list, $user, $schema) {
-		if ($this->ssl) {
-			$query = sprintf('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl '.
-				'JOIN pg_stat_activity ON pg_stat_ssl.pid = pg_stat_activity.pid and '.
-				'pg_stat_activity.usename = \'%s\';', $user);
-
-			$row = DBfetch(DBselect($query));
-
-			$pattern = '/'. str_replace('*', '.*', $cipher_list).'/';
-
-			if (!$row || ($cipher_list !== '' && !preg_match($pattern, $row['cipher']))) {
-				$this->setError('Error connecting to database. Invalid cipher.');
-
-				return false;
-			}
-		}
-
-		$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($schema ? $schema : 'public'), true);
+	public function init() {
+		$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($this->schema ? $this->schema : 'public'), true);
 
 		if(!$schemaSet) {
 			clear_messages();

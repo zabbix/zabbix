@@ -42,90 +42,43 @@ function DBconnect(&$error) {
 	$DB['TRANSACTION_NO_FAILED_SQLS'] = true; // true - if no statements failed in transaction, false - there are failed statements
 	$DB['SELECT_COUNT'] = 0; // stats
 	$DB['EXECUTE_COUNT'] = 0;
+	$DB['DB'] = null;
 
 	if (!isset($DB['TYPE'])) {
 		$error = 'Unknown database type.';
-		$result = false;
-	}
-	else {
-		switch ($DB['TYPE']) {
-			case ZBX_DB_MYSQL:
-				$dbBackend = new MysqlDbBackend();
-
-				$DB['DB'] = $dbBackend->connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'],
-					$DB['PORT'], $DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE'], $DB['CIPHER_LIST']
-				);
-
-				if ($DB['DB']) {
-					$result = $dbBackend->init($DB['CIPHER_LIST']);
-				}
-				if (!$DB['DB'] || !$result) {
-					$error = $dbBackend->getError();
-					$result = false;
-				}
-
-				break;
-
-			case ZBX_DB_POSTGRESQL:
-				$dbBackend = new PostgresqlDbBackend();
-
-				$DB['DB'] = $dbBackend->connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'],
-					$DB['PORT'], $DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE']
-				);
-
-				if ($DB['DB']) {
-					$result = $dbBackend->init($DB['CIPHER_LIST'], $DB['USER'], $DB['SCHEMA']);
-				}
-				if (!$DB['DB'] || !$result) {
-					$error = $dbBackend->getError();
-					$result = false;
-				}
-
-				break;
-
-			case ZBX_DB_ORACLE:
-				$connect = '';
-				if (!empty($DB['SERVER'])) {
-					$connect = '//'.$DB['SERVER'];
-
-					if ($DB['PORT'] != '0') {
-						$connect .= ':'.$DB['PORT'];
-					}
-					if ($DB['DATABASE']) {
-						$connect .= '/'.$DB['DATABASE'];
-					}
-				}
-
-				$DB['DB'] = @oci_connect($DB['USER'], $DB['PASSWORD'], $connect, 'UTF8');
-				if ($DB['DB']) {
-					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
-				}
-				else {
-					$ociError = oci_error();
-					$error = 'Error connecting to database: '.$ociError['message'];
-					$result = false;
-				}
-
-				if ($result) {
-					$dbBackend = new OracleDbBackend();
-				}
-				break;
-			default:
-				$error = 'Unsupported database';
-				$result = false;
-		}
+		return false;
 	}
 
-	if ($result && (!$dbBackend->checkDbVersion() || !$dbBackend->checkConfig())) {
-		$error = $dbBackend->getError();
-		$result = false;
+	$db_types = [
+		ZBX_DB_MYSQL => 'MysqlDbBackend',
+		ZBX_DB_POSTGRESQL => 'PostgresqlDbBackend'
+	];
+
+	if (!array_key_exists($DB['TYPE'], $db_types)) {
+		$error = 'Unsupported database';
+		return false;
 	}
 
-	if (false == $result) {
-		$DB['DB'] = null;
+	$db = new $db_types[$DB['TYPE']];
+	$require_ssl = (bool) ($DB['KEY_FILE'] || $DB['CERT_FILE'] || $DB['CA_FILE'] || $DB['CIPHER_LIST']);
+
+	if ($require_ssl) {
+		$db->setConnectionSecurity($DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE'], $DB['CIPHER_LIST']);
 	}
 
-	return $result;
+	$DB['DB'] = $db->connect($DB['SERVER'], $DB['PORT'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['SCHEMA']);
+
+	if ($DB['DB']) {
+		$db->init();
+	}
+
+	if ($db->getError() || ($require_ssl && !$db->isConnectionSecure()) || !$db->checkDbVersion()
+			|| !$db->checkConfig()) {
+		$error = $db->getError();
+		return false;
+	}
+
+	return true;
 }
 
 function DBclose() {
