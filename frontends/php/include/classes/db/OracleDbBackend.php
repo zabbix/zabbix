@@ -46,6 +46,7 @@ class OracleDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function isConnectionSecure() {
+		$this->setError('Secure connection for Oracle is not supported.');
 		return false;
 	}
 
@@ -64,22 +65,16 @@ class OracleDbBackend extends DbBackend {
 	 */
 	public function connect($host, $port, $user, $password, $dbname, $schema) {
 		$connect = '';
-		if ($host !== '') {
-			$connect = '//'.$host;
 
-			if ($port != '0') {
-				$connect .= ':'.$port;
-			}
-			if ($dbname) {
-				$connect .= '/'.$dbname;
-			}
+		if ($host) {
+			$connect = '//'.$host.(($port) ? ':'.$port : '').(($dbname) ? '/'.$dbname : '');
 		}
 
 		$resource = @oci_connect($user, $password, $connect, 'UTF8');
 
 		if (!$resource) {
 			$ociError = oci_error();
-			$error = 'Error connecting to database: '.$ociError['message'];
+			$this->setError('Error connecting to database: '.$ociError['message']);
 			return null;
 		}
 

@@ -50,12 +50,10 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDbVersionTable() {
-		$schema = zbx_dbstr($this->schema ? $this->schema : 'public');
-
 		$tableExists = DBfetch(DBselect('SELECT 1 FROM information_schema.tables'.
 			' WHERE table_catalog='.zbx_dbstr($this->dbname).
-				' AND table_schema='.$schema.
-				" AND table_name='dbversion'"
+				' AND table_schema='.zbx_dbstr($this->schema).
+				' AND table_name='.zbx_dbstr('dbversion')
 		));
 
 		if (!$tableExists) {
@@ -72,11 +70,9 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function isConnectionSecure() {
-		$query = sprintf('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl '.
-			'JOIN pg_stat_activity ON pg_stat_ssl.pid = pg_stat_activity.pid and '.
-			'pg_stat_activity.usename = \'%s\';', $this->user);
-
-		$row = DBfetch(DBselect($query));
+		$row = DBfetch(DBselect('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl'.
+			' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
+				' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
 
 		$pattern = '/'. str_replace('*', '.*', $this->ssl_cipher_list).'/';
 
@@ -103,20 +99,24 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return resource|null
 	 */
 	public function connect($host, $port, $user, $password, $dbname, $schema) {
-		$conn_string = '';
-
-		foreach (compact(['host', 'port', 'user', 'password', 'dbname']) as $key => $param) {
-			$conn_string .= ((bool) $param) ? $key.'=\''.pg_connect_escape($param).'\' ' : '';
-		}
-
-		foreach (compact(['user', 'dbname', 'schema']) as $key => $property) {
-			$this->{$key} = $property;
-		}
+		$this->user = $user;
+		$this->dbname = $dbname;
+		$this->schema = ($schema) ? $schema : 'public';
+		$params = compact(['host', 'port', 'user', 'password', 'dbname']);
 
 		if ($this->ssl_key_file || $this->ssl_cert_file || $this->ssl_ca_file) {
-			$conn_string .= ' sslmode=\'verify-ca\' sslkey=\''.pg_connect_escape($this->ssl_key_file).
-				'\' sslcert=\''.pg_connect_escape($this->ssl_cert_file).'\''.
-				(($this->ssl_ca_file === '') ? '' : ' sslrootcert=\''.pg_connect_escape($this->ssl_ca_file).'\'');
+			$params += [
+				'sslmode' => 'verify-ca',
+				'sslkey' => $this->ssl_key_file,
+				'sslcert' => $this->ssl_cert_file,
+				'sslrootcert' => $this->ssl_ca_file
+			];
+		}
+
+		$conn_string = '';
+
+		foreach ($params as $key => $param) {
+			$conn_string .= ((bool) $param) ? $key.'=\''.pg_connect_escape($param).'\' ' : '';
 		}
 
 		$resource = pg_connect($conn_string);
@@ -135,20 +135,18 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function init() {
-		$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($this->schema ? $this->schema : 'public'), true);
+		$schema_set = DBexecute('SET search_path='.zbx_dbstr($this->schema), true);
 
-		if(!$schemaSet) {
-			clear_messages();
+		if(!$schema_set) {
 			$this->setError(pg_last_error());
 			return false;
 		}
-		else {
-			if (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
-				if ((int) $pgsql_version >= 9) {
-					// change the output format for values of type bytea from hex (the default) to escape
-					DBexecute('SET bytea_output = escape');
-				}
-			}
+
+		$pgsql_version = pg_parameter_status('server_version');
+
+		if ($pgsql_version !== false && (int) $pgsql_version >= 9) {
+			// change the output format for values of type bytea from hex (the default) to escape
+			DBexecute('SET bytea_output=escape');
 		}
 
 		return true;

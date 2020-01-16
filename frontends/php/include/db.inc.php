@@ -50,8 +50,9 @@ function DBconnect(&$error) {
 	}
 
 	$db_types = [
-		ZBX_DB_MYSQL => 'MysqlDbBackend',
-		ZBX_DB_POSTGRESQL => 'PostgresqlDbBackend'
+		ZBX_DB_MYSQL => MysqlDbBackend::class,
+		ZBX_DB_POSTGRESQL => PostgresqlDbBackend::class,
+		ZBX_DB_ORACLE => OracleDbBackend::class
 	];
 
 	if (!array_key_exists($DB['TYPE'], $db_types)) {
