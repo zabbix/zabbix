@@ -355,7 +355,6 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 				"s.snmpv3_contextname,"
 				"s.port,"
 				"s.hostid,"
-				"n.main,"
 				"n.type,"
 				"n.useip,"
 				"n.ip,"
@@ -415,7 +414,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 		snmp.contextname = zbx_strdup(NULL, row[10]);
 		snmp.item_port = zbx_strdup(NULL, row[11]);
 		snmp.skip = 0;
-		if_port = row[18];
+		if_port = row[17];
 
 		if (ITEM_TYPE_SNMPv1 == item_type)
 			snmp.version = ZBX_IF_SNMP_VERSION_1;
@@ -454,11 +453,11 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 
 		interface.interfaceid = snmp.interfaceid;
 		ZBX_DBROW2UINT64(interface.hostid, row[12]);
-		ZBX_STR2UCHAR(interface.main, row[13]);
-		ZBX_STR2UCHAR(interface.type, row[14]);
-		ZBX_STR2UCHAR(interface.useip, row[15]);
-		interface.ip = zbx_strdup(NULL, row[16]);
-		interface.dns = zbx_strdup(NULL, row[17]);
+		interface.main = 0;
+		ZBX_STR2UCHAR(interface.type, row[13]);
+		ZBX_STR2UCHAR(interface.useip, row[14]);
+		interface.ip = zbx_strdup(NULL, row[15]);
+		interface.dns = zbx_strdup(NULL, row[16]);
 
 		if ('\0' != *snmp.item_port)
 			interface.port = zbx_strdup(NULL, snmp.item_port);
