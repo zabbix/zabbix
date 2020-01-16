@@ -4420,7 +4420,7 @@ $form-icon-btn: (
 // Action Menus, Pop-up Menus
 .menu-popup {
 	position: absolute;
-	z-index: 1000;
+	z-index: 999;
 	padding: 5px 15px 5px 25px;
 	min-width: 166px;
 	max-width: 250px;
@@ -7611,5 +7611,108 @@ table.preprocessing-test-results {
 		td {
 			height: 100%;
 		}
+	}
+}
+
+.interface__container {
+	border-bottom: 1px solid #cecece;
+	margin-bottom: 5px;
+	padding: 0;
+	width: 751px;
+
+	&.interface__container-header {
+		margin: 0;
+		border: 0;
+	}
+
+	&:empty {
+		display: none;
+	}
+
+	.interface__row {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: start;
+		align-items: stretch;
+		margin-bottom: 5px;
+		width: 751px;
+
+		&.interface__row-header {
+			margin: 0;
+		}
+
+		&[data-type] .interface__cell-details {
+			display: none;
+		}
+
+		.interface__cell {
+			margin: 5px 5px 5px 0;
+			flex: 0 1 auto;
+			align-self: center;
+
+			.interface__btn-toggle {
+				@extend .btn-link;
+			}
+
+			&.interface__cell-header {
+				color: #768d99;
+				text-align: left;
+			}
+
+			&.interface__cell-drag {
+				width: 15px;
+			}
+			&.interface__cell-icon {
+				width: 26px;
+			}
+			&.interface__cell-type {
+				width: 36px;
+			}
+			&.interface__cell-ip {
+				width: 225px;
+			}
+			&.interface__cell-useip {
+				width: 83px;
+			}
+			&.interface__cell-dns {
+				width: 175px;
+			}
+			&.interface__cell-port {
+				width: 100px;
+			}
+
+			.table-forms-td-left,
+			.table-forms-td-right {
+				padding-bottom: 0;
+			}
+		}
+	}
+}
+
+// Host interface accordion for SNMP specific styles.
+.interface__row.list-accordion-item[data-type="2"] {
+	&.list-accordion-item-closed {
+		.interface__btn-toggle {
+			@extend .btn-widget-expand;
+		}
+
+		.list-accordion-item-body {
+			display: none;
+		}
+	}
+
+	&.list-accordion-item-opened {
+		.interface__btn-toggle {
+			@extend .btn-widget-collapse;
+		}
+
+		.list-accordion-item-body {
+			display: block;
+		}
+	}
+
+	.interface__btn-toggle {
+		@extend %btn-widget;
 	}
 }

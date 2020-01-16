@@ -1403,3 +1403,34 @@ function isWritableHostTemplates(array $hostids) {
 
 	return ($count == count($hostids));
 }
+
+function getAddNewInterfaceSubmenu() {
+	return [
+		'main_section' => [
+			'items' => [
+				"javascript:hostInterfaceManager.addAgent();" => _('Agent'),
+				"javascript:hostInterfaceManager.addSnmp();" => _('SNMP'),
+				"javascript:hostInterfaceManager.addJmx();" => _('JMX'),
+				"javascript:hostInterfaceManager.addIpmi();" => _('IPMI')
+			]
+		]
+	];
+}
+
+function renderInterfaceHeaders() {
+	return (new CDiv())
+		->addClass('interface__container interface__container-header')
+		->addItem(
+			(new CDiv())
+				->addClass('interface__row interface__row-header')
+				->addItem([
+					(new CDiv())->addClass('interface__cell interface__cell-icon'),
+					(new CDiv(_('Type')))->addClass('interface__cell interface__cell-header interface__cell-type'),
+					(new CDiv(_('IP address')))->addClass('interface__cell interface__cell-header interface__cell-ip'),
+					(new CDiv(_('DNS name')))->addClass('interface__cell interface__cell-header interface__cell-dns'),
+					(new CDiv(_('Connect to')))->addClass('interface__cell interface__cell-header interface__cell-useip'),
+					(new CDiv(_('Port')))->addClass('interface__cell interface__cell-header interface__cell-port'),
+					(new CDiv(_('Default')))->addClass('interface__cell interface__cell-header'),
+				])
+		);
+}

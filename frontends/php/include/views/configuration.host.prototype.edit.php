@@ -75,85 +75,64 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
 
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
-	zbx_add_post_js('hostInterfacesManager.disable();');
+	zbx_add_post_js('hostInterfaceManager.render('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
+	zbx_add_post_js('hostInterfaceManager.disableEdit();');
 
-	// Zabbix agent interfaces
-	$ifTab = (new CTable())
+	$interface_header = renderInterfaceHeaders();
+
+	$agent_interfaces = (new CDiv())
 		->setId('agentInterfaces')
-		->setHeader([
-			'',
-			_('IP address'),
-			_('DNS name'),
-			_('Connect to'),
-			_('Port'),
-			(new CColHeader(_('Default')))->setColSpan(2)
-		]);
+		->addClass('interface__container')
+		->setAttribute('data-type', 'agent');
 
-	$row = (new CRow())->setId('agentInterfacesFooter');
 	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(6));
+		$agent_interfaces
+			->addItem((new CDiv(
+				(new CDiv(_('No agent interfaces found.')))->addClass('interface__cell')
+			))->addClass('interface__row'));
 	}
-	$ifTab->addRow($row);
 
-	$hostList->addRow(_('Agent interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'agent')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
+	$snmp_interfaces = (new CDiv())
+		->setId('SNMPInterfaces')
+		->addClass('interface__container list-vertical-accordion')
+		->setAttribute('data-type', 'snmp');
 
-	// SNMP interfaces
-	$ifTab = (new CTable())->setId('SNMPInterfaces');
-
-	$row = (new CRow())->setId('SNMPInterfacesFooter');
 	if (!array_key_exists(INTERFACE_TYPE_SNMP, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(6));
+		$snmp_interfaces
+			->addItem((new CDiv(
+				(new CDiv(_('No SNMP interfaces found.')))->addClass('interface__cell')
+			))->addClass('interface__row'));
 	}
-	$ifTab->addRow($row);
 
-	$hostList->addRow(_('SNMP interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'snmp')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
+	$jmx_interfaces = (new CDiv())
+		->setId('JMXInterfaces')
+		->addClass('interface__container')
+		->setAttribute('data-type', 'jmx');
 
-	// JMX interfaces
-	$ifTab = (new CTable())->setId('JMXInterfaces');
-
-	$row = (new CRow())->setId('JMXInterfacesFooter');
 	if (!array_key_exists(INTERFACE_TYPE_JMX, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(6));
+		$jmx_interfaces
+			->addItem((new CDiv(
+				(new CDiv(_('No JMX interfaces found.')))->addClass('interface__cell')
+			))->addClass('interface__row'));
 	}
-	$ifTab->addRow($row);
 
-	$hostList->addRow(_('JMX interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'jmx')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
+	$ipmi_interfaces = (new CDiv())
+		->setId('IPMIInterfaces')
+		->addClass('interface__container')
+		->setAttribute('data-type', 'ipmi');
 
-	// IPMI interfaces
-	$ifTab = (new CTable())->setId('IPMIInterfaces');
-
-	$row = (new CRow())->setId('IPMIInterfacesFooter');
 	if (!array_key_exists(INTERFACE_TYPE_IPMI, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(6));
+		$ipmi_interfaces
+			->addItem((new CDiv(
+				(new CDiv(_('No IPMI interfaces found.')))->addClass('interface__cell')
+			))->addClass('interface__row'));
 	}
-	$ifTab->addRow($row);
 
-	$hostList->addRow(
-		_('IPMI interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'ipmi')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
+	$hostList->addRow(new CLabel(_('Interfaces')),
+		[
+			(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
+				->addClass('interface__wrapper')
+		]
 	);
 
 	// proxy
