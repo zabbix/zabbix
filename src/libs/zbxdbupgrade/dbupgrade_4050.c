@@ -263,14 +263,14 @@ static int	db_snmp_new_if_find(const dbu_snmp_if_t *snmp, const zbx_vector_dbu_s
 		if (0 != db_snmp_if_cmp(snmp, &snmp_new_ifs->values[i]))
 			continue;
 
-		if (0 != strlen(snmp->item_port) && 0 != strcmp(snmp->item_port, snmp_new_ifs->values[i].item_port))
+		if ('\0' != *snmp->item_port && 0 != strcmp(snmp->item_port, snmp_new_ifs->values[i].item_port))
 			continue;
 
 		id.interfaceid = snmp_new_ifs->values[i].interfaceid;
 		index = zbx_vector_dbu_interface_bsearch(interfaces, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		interface = &interfaces->values[index];
 
-		if (0 == strlen(snmp->item_port) && 0 != strcmp(if_port, interface->port))
+		if ('\0' == *snmp->item_port && 0 != strcmp(if_port, interface->port))
 			continue;
 
 		return i;
@@ -372,7 +372,7 @@ static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zb
 		snmp.interfaceid = snmp.item_interfaceid;
 		index = FAIL;
 
-		if ((0 == strlen(snmp.item_port) || 0 == strcmp(snmp.item_port, if_port)) &&
+		if (('\0' == *snmp.item_port || 0 == strcmp(snmp.item_port, if_port)) &&
 				FAIL == (index = zbx_vector_dbu_snmp_if_bsearch(snmp_ifs, snmp,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
@@ -405,7 +405,7 @@ static void	DBpatch_4050016_load_data(zbx_vector_dbu_interface_t *interfaces, zb
 		interface.ip = zbx_strdup(NULL, row[16]);
 		interface.dns = zbx_strdup(NULL, row[17]);
 
-		if (0 < strlen(snmp.item_port))
+		if ('\0' != *snmp.item_port)
 			interface.port = zbx_strdup(NULL, snmp.item_port);
 		else
 			interface.port = zbx_strdup(NULL, if_port);
