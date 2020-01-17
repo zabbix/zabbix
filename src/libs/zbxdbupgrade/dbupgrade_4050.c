@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 /*
  * 5.0 development database patches
@@ -189,6 +190,46 @@ out:
 	return ret;
 }
 
+static int	DBpatch_4050015(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		time_period_id, every;
+	int			invalidate = 0;
+	const ZBX_TABLE		*timeperiods;
+	const ZBX_FIELD		*field;
+
+	if (NULL != (timeperiods = DBget_table("timeperiods")) &&
+			NULL != (field = DBget_field(timeperiods, "every")))
+	{
+		ZBX_STR2UINT64(every, field->default_value);
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	result = DBselect("select timeperiodid from timeperiods where every=0");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(time_period_id, row[0]);
+
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid maintenance time period found: "ZBX_FS_UI64
+				", changing \"every\" to "ZBX_FS_UI64, time_period_id, every);
+		invalidate = 1;
+	}
+
+	DBfree_result(result);
+
+	if (0 != invalidate &&
+			ZBX_DB_OK > DBexecute("update timeperiods set every=1 where timeperiodid!=0 and every=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -206,5 +247,6 @@ DBPATCH_ADD(4050011, 0, 1)
 DBPATCH_ADD(4050012, 0, 1)
 DBPATCH_ADD(4050013, 0, 1)
 DBPATCH_ADD(4050014, 0, 1)
+DBPATCH_ADD(4050015, 0, 1)
 
 DBPATCH_END()

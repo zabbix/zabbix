@@ -382,6 +382,13 @@ class CMaintenance extends CApiService {
 				];
 				check_db_fields($dbFields, $timeperiod);
 
+				if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for unsigned int field "%2$s".',
+							$timeperiod['every'], 'every')
+						);
+				}
+
 				if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
 					$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
 				}
@@ -640,6 +647,13 @@ class CMaintenance extends CApiService {
 						if ($timeperiod_type === null) {
 							$timeperiod_type = $db_timeperiods[$timeperiodid]['timeperiod_type'];
 						}
+					}
+
+					if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value "%1$s" for unsigned int field "%2$s".',
+								$timeperiod['every'], 'every')
+							);
 					}
 
 					// Without "timeperiod_type" it resolves to default TIMEPERIOD_TYPE_ONETIME. But will it be forever?
