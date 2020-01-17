@@ -7614,13 +7614,13 @@ table.preprocessing-test-results {
 	}
 }
 
-.interface__container {
+.interface-container {
 	border-bottom: 1px solid #cecece;
 	margin-bottom: 5px;
 	padding: 0;
 	width: 751px;
 
-	&.interface__container-header {
+	&.interface-container-header {
 		margin: 0;
 		border: 0;
 	}
@@ -7629,7 +7629,7 @@ table.preprocessing-test-results {
 		display: none;
 	}
 
-	.interface__row {
+	.interface-row {
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
@@ -7638,47 +7638,44 @@ table.preprocessing-test-results {
 		margin-bottom: 5px;
 		width: 751px;
 
-		&.interface__row-header {
+		&.interface-row-header {
 			margin: 0;
 		}
 
-		&[data-type] .interface__cell-details {
+		&[data-type] .interface-cell-details {
 			display: none;
 		}
 
-		.interface__cell {
+		.interface-cell {
 			margin: 5px 5px 5px 0;
 			flex: 0 1 auto;
 			align-self: center;
 
-			.interface__btn-toggle {
+			.interface-btn-toggle {
 				@extend .btn-link;
 			}
 
-			&.interface__cell-header {
+			&.interface-cell-header {
 				color: #768d99;
 				text-align: left;
 			}
 
-			&.interface__cell-drag {
-				width: 15px;
-			}
-			&.interface__cell-icon {
+			&.interface-cell-icon {
 				width: 26px;
 			}
-			&.interface__cell-type {
+			&.interface-cell-type {
 				width: 36px;
 			}
-			&.interface__cell-ip {
+			&.interface-cell-ip {
 				width: 225px;
 			}
-			&.interface__cell-useip {
+			&.interface-cell-useip {
 				width: 83px;
 			}
-			&.interface__cell-dns {
+			&.interface-cell-dns {
 				width: 175px;
 			}
-			&.interface__cell-port {
+			&.interface-cell-port {
 				width: 100px;
 			}
 
@@ -7691,9 +7688,9 @@ table.preprocessing-test-results {
 }
 
 // Host interface accordion for SNMP specific styles.
-.interface__row.list-accordion-item[data-type="2"] {
+.interface-row.list-accordion-item[data-type="2"] {
 	&.list-accordion-item-closed {
-		.interface__btn-toggle {
+		.interface-btn-toggle {
 			@extend .btn-widget-expand;
 		}
 
@@ -7703,7 +7700,7 @@ table.preprocessing-test-results {
 	}
 
 	&.list-accordion-item-opened {
-		.interface__btn-toggle {
+		.interface-btn-toggle {
 			@extend .btn-widget-collapse;
 		}
 
@@ -7712,7 +7709,7 @@ table.preprocessing-test-results {
 		}
 	}
 
-	.interface__btn-toggle {
+	.interface-btn-toggle {
 		@extend %btn-widget;
 	}
 }

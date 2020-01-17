@@ -108,29 +108,28 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$agent_interfaces = (new CDiv())
 		->setId('agentInterfaces')
-		->addClass('interface__container')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'agent');
 
 	$snmp_interfaces = (new CDiv())
 		->setId('SNMPInterfaces')
-		->addClass('interface__container list-vertical-accordion')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
 		->setAttribute('data-type', 'snmp');
 
 	$jmx_interfaces = (new CDiv())
 		->setId('JMXInterfaces')
-		->addClass('interface__container')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'jmx');
 
 	$ipmi_interfaces = (new CDiv())
 		->setId('IPMIInterfaces')
-		->addClass('interface__container')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'ipmi');
 
 	$hostList->addRow((new CLabel(_('Interfaces')))->setAsteriskMark(),
 		[
-			(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
-				->addClass('interface__wrapper'),
-			(new CDiv(
+			new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]),
+			new CDiv(
 				(new CButton('', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->setMenuPopup([
@@ -139,8 +138,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 							'submenu' => getAddNewInterfaceSubmenu()
 						]
 					])
-					->setAttribute('aria-label', _('Content controls: header'))
-			))
+					->setAttribute('aria-label', _('Add new interface'))
+			)
 		]
 	);
 }
@@ -159,57 +158,58 @@ else {
 
 	$agent_interfaces = (new CDiv())
 		->setId('agentInterfaces')
-		->addClass('interface__container')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'agent');
 
 	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
-		$agent_interfaces
-			->addItem((new CDiv(
-				(new CDiv(_('No agent interfaces found.')))->addClass('interface__cell')
-			))->addClass('interface__row'));
+		$agent_interfaces->addItem(
+			(new CDiv(
+				(new CDiv(_('No agent interfaces found.')))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			))->addClass(ZBX_STYLE_HOST_INTERFACE_ROW)
+		);
 	}
 
 	$snmp_interfaces = (new CDiv())
 		->setId('SNMPInterfaces')
-		->addClass('interface__container list-vertical-accordion')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
 		->setAttribute('data-type', 'snmp');
 
 	if (!array_key_exists(INTERFACE_TYPE_SNMP, $existingInterfaceTypes)) {
-		$snmp_interfaces
-			->addItem((new CDiv(
-				(new CDiv(_('No SNMP interfaces found.')))->addClass('interface__cell')
-			))->addClass('interface__row'));
+		$snmp_interfaces->addItem(
+			(new CDiv(
+				(new CDiv(_('No SNMP interfaces found.')))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			))->addClass(ZBX_STYLE_HOST_INTERFACE_ROW)
+		);
 	}
 
 	$jmx_interfaces = (new CDiv())
 		->setId('JMXInterfaces')
-		->addClass('interface__container')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'jmx');
 
 	if (!array_key_exists(INTERFACE_TYPE_JMX, $existingInterfaceTypes)) {
-		$jmx_interfaces
-			->addItem((new CDiv(
-				(new CDiv(_('No JMX interfaces found.')))->addClass('interface__cell')
-			))->addClass('interface__row'));
+		$jmx_interfaces->addItem(
+			(new CDiv(
+				(new CDiv(_('No JMX interfaces found.')))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			))->addClass(ZBX_STYLE_HOST_INTERFACE_ROW)
+		);
 	}
 
 	$ipmi_interfaces = (new CDiv())
 		->setId('IPMIInterfaces')
-		->addClass('interface__container')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'ipmi');
 
 	if (!array_key_exists(INTERFACE_TYPE_IPMI, $existingInterfaceTypes)) {
-		$ipmi_interfaces
-			->addItem((new CDiv(
-				(new CDiv(_('No IPMI interfaces found.')))->addClass('interface__cell')
-			))->addClass('interface__row'));
+		$ipmi_interfaces->addItem(
+			(new CDiv(
+				(new CDiv(_('No IPMI interfaces found.')))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
+			))->addClass(ZBX_STYLE_HOST_INTERFACE_ROW)
+		);
 	}
 
 	$hostList->addRow(new CLabel(_('Interfaces')),
-		[
-			(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
-				->addClass('interface__wrapper')
-		]
+		[new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces])]
 	);
 }
 

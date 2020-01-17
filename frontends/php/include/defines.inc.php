@@ -1821,6 +1821,25 @@ define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 // Widget "Problems by severity" styles.
 define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
 
+// Host interface styles.
+define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');
+define('ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER', 'interface-container-header');
+define('ZBX_STYLE_HOST_INTERFACE_ROW', 'interface-row');
+define('ZBX_STYLE_HOST_INTERFACE_ROW_HEADER', 'interface-row-header');
+define('ZBX_STYLE_HOST_INTERFACE_CELL', 'interface-cell');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS', 'interface-cell-details');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_HEADER', 'interface-cell-header');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_ICON', 'interface-cell-icon');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_TYPE', 'interface-cell-type');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_IP', 'interface-cell-ip');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_DNS', 'interface-cell-dns');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_USEIP', 'interface-cell-useip');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_PORT', 'interface-cell-port');
+define('ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE', 'interface-btn-toggle');
+define('ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE', 'interface-btn-remove');
+define('ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE', 'interface-btn-main-interface');
+define('ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND', 'interface-input-expand');
+
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
 

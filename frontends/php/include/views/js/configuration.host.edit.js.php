@@ -21,54 +21,54 @@
 
 ?>
 <script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
-<div class="interface__row interfaceRow list-accordion-item list-accordion-item-closed" id="hostInterfaceRow_#{iface.interfaceid}" data-type="#{iface.type}" data-interfaceid="#{iface.interfaceid}">
+<div class="<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?>" id="hostInterfaceRow_#{iface.interfaceid}" data-type="#{iface.type}" data-interfaceid="#{iface.interfaceid}">
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][items]" value="#{iface.items}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][locked]" value="#{iface.locked}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}">
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}">
 	<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
 
-	<div class="interface__cell interface__cell-icon">
-		<button type="button" class="interface__btn-toggle"></button>
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_ICON ?>">
+		<button type="button" class="<?= ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE ?>"></button>
 	</div>
-	<div class="interface__cell interface__cell-type">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_TYPE ?>">
 		#{iface.type_name}
 	</div>
-	<div class="interface__cell">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
 		<?= (new CTextBox('interfaces[#{iface.interfaceid}][ip]', '#{iface.ip}', false, DB::getFieldLength('interface', 'ip')))
-				->addClass('interface__input-expand')
+				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
 		?>
 	</div>
-	<div class="interface__cell">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
 		<?= (new CTextBox('interfaces[#{iface.interfaceid}][dns]', '#{iface.dns}', false, DB::getFieldLength('interface', 'dns')))
-				->addClass('interface__input-expand')
+				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
 		?>
 	</div>
-	<div class="interface__cell">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
 		<?= (new CRadioButtonList('interfaces[#{iface.interfaceid}][useip]', null))
 				->addValue(_('IP'), INTERFACE_USE_IP, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_IP.']')
 				->addValue(_('DNS'), INTERFACE_USE_DNS, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']')
-				->addClass('interface__cell-useIp interface__input-expand')
+				->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_USEIP.' '.ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setModern(true)
 		?>
 	</div>
-	<div class="interface__cell">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
 		<?= (new CTextBox('interfaces[#{iface.interfaceid}][port]', '#{iface.port}', false, DB::getFieldLength('interface', 'port')))
 				->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
-				->addClass('interface__input-expand')
+				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setAriaRequired()
 		?>
 	</div>
-	<div class="interface__cell">
-		<input type="radio" class="mainInterface <?= ZBX_STYLE_CHECKBOX_RADIO ?> interface__btn-mainInterface interface__input-expand" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
+		<input type="radio" class="<?= ZBX_STYLE_CHECKBOX_RADIO ?> <?= ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE ?> <?= ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND ?>" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"><span></span></label>
 	</div>
-	<div class="interface__cell">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> interface__btn-remove"><?= _('Remove') ?></button>
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> <?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>"><?= _('Remove') ?></button>
 	</div>
-	<div class="interface__cell interface__cell-details list-accordion-item-body">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_BODY ?>">
 		<?= (new CFormList('snmp_details_#{iface.interfaceid}'))
 				->cleanItems()
 				->addRow((new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]'))->setAsteriskMark(),
@@ -194,7 +194,7 @@
 			},
 			setSnmpFields: function(elem, iface) {
 				if (iface.type != '<?= INTERFACE_TYPE_SNMP ?>') {
-					$('.interface__cell-details', elem).remove()
+					$('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?>', elem).remove()
 					return false;
 				}
 
@@ -337,19 +337,19 @@
 			$('#interfaces_' + iface.interfaceid + '_useip_' + iface.useip).prop('checked', true);
 
 			if (disabled) {
-				$('.interface__btn-remove', elem).attr('disabled', 'disabled');
+				$('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>', elem).attr('disabled', 'disabled');
 			}
 
 			helper.setSnmpFields(elem, iface);
 
 			// Set onclick actions.
-			$('.interface__btn-remove', elem).on('click', function() {
+			$('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>', elem).on('click', function() {
 				return remove(iface.interfaceid);
 			});
-			$('.interface__btn-mainInterface', elem).on('click', function() {
+			$('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE ?>', elem).on('click', function() {
 				return setMainInterface(iface.interfaceid);
 			});
-			$('.interface__cell-useIp input', elem).on('click', function() {
+			$('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_USEIP ?> input', elem).on('click', function() {
 				return setUseIp(elem, $(this).val());
 			});
 
@@ -382,7 +382,7 @@
 
 			if (new_data.type == <?= INTERFACE_TYPE_SNMP ?>) {
 				var index = $('#hostInterfaceRow_' + new_data.interfaceid).index();
-				$("#SNMPInterfaces").zbx_vertical_accordion("expandNth", index);
+				$(SNMP_CONTAINER_ID).zbx_vertical_accordion('expandNth', index);
 			}
 
 			return true;
@@ -477,24 +477,24 @@
 				}
 
 				// Add accordion functionality to SNMP interfaces.
-				$('#SNMPInterfaces').zbx_vertical_accordion({handler: ".interface__btn-toggle"});
+				$(SNMP_CONTAINER_ID).zbx_vertical_accordion({handler: ".<?= ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE ?>"});
 				// Expend first SNMP interface.
-				$("#SNMPInterfaces").zbx_vertical_accordion("expandNth", 0);
+				$(SNMP_CONTAINER_ID).zbx_vertical_accordion("expandNth", 0);
 				// Add event to expand SNMP interface accordion if focused or clicked on inputs.
-				$("#SNMPInterfaces").on("focus", ".list-accordion-item:not(.list-accordion-item-opened) .interface__input-expand", function() {
-					var index = $(this).closest(".list-accordion-item").index();
+				$(SNMP_CONTAINER_ID).on("focus", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>:not(.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>) .<?= ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND ?>", function() {
+					var index = $(this).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').index();
 
-					$("#SNMPInterfaces").zbx_vertical_accordion("expandNth", index);
+					$(SNMP_CONTAINER_ID).zbx_vertical_accordion("expandNth", index);
 				});
 			},
 			disableEdit: function() {
-				$('.interface__row')
+				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>')
 					.find('input, select')
 					.removeAttr('id')
 					.removeAttr('name');
-				$('.interface__row').find('input[type="text"]').prop('readonly', true);
-				$('.interface__row').find('input[type="radio"], input[type="checkbox"], select').prop('disabled', true);
-				$('.interface__row').find('.interface__btn-remove').remove();
+				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('input[type="text"]').prop('readonly', true);
+				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('input[type="radio"], input[type="checkbox"], select').prop('disabled', true);
+				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>').remove();
 			}
 		}
 	})(jQuery);

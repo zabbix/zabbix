@@ -944,7 +944,7 @@ class CHostInterface extends CApiService {
 	protected function checkSnmpCommunity(array $interface) {
 		if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
 				&& (!array_key_exists('community', $interface['details']) || $interface['details']['community'] == '')) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Interface for SNMP v1 or v2 cannot have empty community name.')); // FIXME: fix message
+			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
 		}
 	}
 
