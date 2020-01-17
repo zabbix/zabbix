@@ -19,126 +19,138 @@
 **/
 
 
+declare(strict_types = 1);
+
 namespace Core;
 
-use CController as Action;
+use \CController as CAction;
 
 class CModule {
 
-	private $enabled = true;
+	/**
+	 * Module directory path.
+	 *
+	 * @var string
+	 */
+	private $path;
 
-	private $manifest = null;
+	/**
+	 * Module manifest.
+	 *
+	 * @var array
+	 */
+	private $manifest;
 
-	public function __construct(array $manifest) {
+	/**
+	 * @param string $path      Module directory path.
+	 * @param array  $manifest  Module manifest.
+	 */
+	public function __construct(string $path, array $manifest) {
+		$this->path = $path;
 		$this->manifest = $manifest;
 	}
 
 	/**
-	 * Module initialization method.
+	 * Initialize module.
 	 */
-	public function init() {
-	}
-
-	/**
-	 * Getter for module manifest id.
-	 *
-	 * @return string
-	 */
-	final public function getId() {
-		return $this->manifest['id'];
-	}
-
-	/**
-	 * Getter for module manifest actions.
-	 *
-	 * @return array
-	 */
-	final public function getActions() {
-		return $this->manifest['actions'];
-	}
-
-	/**
-	 * Getter for module config option.
-	 *
-	 * @param string $name     Configuration option name.
-	 * @param mixed  $default  Default value.
-	 *
-	 * @return mixed
-	 */
-	final public function getConfig($name, $default = null) {
-		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : $default;
-	}
-
-	/**
-	 * Getter for module manifest.
-	 *
-	 * @return array
-	 */
-	final public function getManifest() {
-		return $this->manifest;
-	}
-
-	/**
-	 * Getter for module namespace.
-	 *
-	 * @return string
-	 */
-	final public function getNamespace() {
-		return $this->manifest['namespace'];
+	public function init(): void {
 	}
 
 	/**
 	 * Get module directory path.
 	 *
-	 * @param bool $relative  Return relative or absolute path to module directory.
+	 * @return string
+	 */
+	final public function getPath(): string {
+		return $this->path;
+	}
+
+	/**
+	 * Get module manifest.
+	 *
+	 * @return array
+	 */
+	final public function getManifest(): array {
+		return $this->manifest;
+	}
+
+	/**
+	 * Get module id.
 	 *
 	 * @return string
 	 */
-	final public function getRootDir($relative = false) {
-		$path = $this->manifest['path'];
+	final public function getId(): string {
+		return $this->manifest['id'];
+	}
 
-		if ($relative && $path) {
-			$path = substr($path, strlen($this->modules_dir) + 1);
+	/**
+	 * Get module namespace.
+	 *
+	 * @return string
+	 */
+	final public function getNamespace(): string {
+		return $this->manifest['namespace'];
+	}
+
+	/**
+	 * Get module version.
+	 *
+	 * @return string
+	 */
+	final public function getVersion(): string {
+		return $this->manifest['version'];
+	}
+
+	/**
+	 * Get module actions.
+	 *
+	 * @return array
+	 */
+	final public function getActions(): array {
+		return $this->manifest['actions'];
+	}
+
+	/**
+	 * Get module configuration options.
+	 *
+	 * @param mixed $name     (optional) Option name.
+	 * @param mixed $default  Default value.
+	 *
+	 * @return mixed  Either whole configuration or option specified.
+	 */
+	final public function getConfig($name = null, $default = null) {
+		if ($name === null) {
+			return $this->manifest['config'];
 		}
-
-		return $path;
+		elseif (array_key_exists($name, $this->manifest['config'])) {
+			return $this->manifest['config'][$name];
+		}
+		else {
+			return $default;
+		}
 	}
 
 	/**
-	 * Get module runtime status.
+	 * Event handler, triggered before executing the action.
 	 *
-	 * @return bool
+	 * @param CAction $action  Action instance responsible for current request.
 	 */
-	public function isEnabled() {
-		return $this->enabled;
+	public function onBeforeAction(CAction $action): void {
 	}
 
 	/**
-	 * Set module runtime enabled/disabled status.
+	 * Event handler, triggered after executing the action, before rendering the view.
 	 *
-	 * @param bool $enabled    Module enabled status value, true for enable.
-	 *
-	 * @return CModule
+	 * @param CAction $action  Action instance responsible for current request.
 	 */
-	public function setEnabled($enabled) {
-		$this->enabled = $enabled;
-
-		return $this;
+	public function onAfterAction(CAction $action): void {
 	}
 
 	/**
-	 * Module before action event.
+	 * Event handler, triggered on application exit.
 	 *
-	 * @param Action $action  Action instance responsible for current request
+	 * @param CAction $action  Action instance responsible for current request.
 	 */
-	public function beforeAction(Action $action) {
-	}
-
-	/**
-	 * Module method to be called before application will exit and send response to browser.
-	 *
-	 * @param Action $action  Action instance responsible for current request.
-	 */
-	public function afterAction(Action $action) {
+	public function onTerminate(CAction $action): void {
 	}
 }

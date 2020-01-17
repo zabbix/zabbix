@@ -19,9 +19,9 @@
 **/
 
 
-use CController as Action;
+use CController as CAction;
 
-class CLegacyAction extends Action {
+class CLegacyAction extends CAction {
 
 	/**
 	 * Check user input.

@@ -155,13 +155,13 @@ class CModule extends \CApiService {
 					'flags' => API_REQUIRED | API_NOT_EMPTY,
 					'length' => DB::getFieldLength($this->tableName, 'relative_path')
 				],
-				'status' => ['type' => API_INT32, 'in' => '0,1']
+				'status' => ['type' => API_INT32, 'in' => MODULE_STATUS_DISABLED.','.MODULE_STATUS_ENABLED]
 			]
 		];
 		$this->validate($rules, $modules);
 
 		$defaults = [
-			'status' => 0,
+			'status' => MODULE_STATUS_DISABLED,
 			'config' => []
 		];
 
@@ -207,7 +207,7 @@ class CModule extends \CApiService {
 			'type' => API_OBJECT,
 			'fields' => [
 				'moduleid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'status' => ['type' => API_INT32, 'in' => '0,1']
+				'status' => ['type' => API_INT32, 'in' => MODULE_STATUS_DISABLED.','.MODULE_STATUS_ENABLED]
 			]
 		];
 		$this->validate($rules, $modules);

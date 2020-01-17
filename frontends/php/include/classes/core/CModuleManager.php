@@ -19,342 +19,338 @@
 **/
 
 
-use CController as Action,
-	Core\CModule;
+declare(strict_types = 1);
 
-class CModuleManager {
+use CController as CAction;
 
-	const MANIFEST_VERSION = 1;
-	const MODULES_NAMESPACE = 'Modules\\';
+/**
+ * Module manager class for testing and loading user modules.
+ */
+final class CModuleManager {
 
 	/**
-	 * Modules directory absolute path.
+	 * Highest supported manifest version.
 	 */
-	private $modules_dir;
+	const MAX_MANIFEST_VERSION = 1;
 
 	/**
-	 * Contains array of modules information.
-	 */
-	private $loaded_manifests;
-
-	/**
-	 * Contains array of CModule instances.
+	 * Home path of modules.
 	 *
-	 * @var CModule[]
+	 * @var string
+	 */
+	private $home_path;
+
+	/**
+	 * Manifest data of added modules.
+	 *
+	 * @var array
+	 */
+	private $manifests = [];
+
+	/**
+	 * List of instantiated, initialized modules.
+	 *
+	 * @var array
 	 */
 	private $modules = [];
 
 	/**
-	 * Contains array of modules errors.
+	 * List of errors caused by module initialization.
 	 *
 	 * @var array
 	 */
 	private $errors = [];
 
 	/**
-	 * Create class object instance.
-	 *
-	 * @param string $root_dir  Absolute path to frontend root directory.
+	 * @param string $home_path  Home path of modules.
 	 */
-	public function __construct($root_dir) {
-		$this->modules_dir = $root_dir.'/modules';
-
-		$db_modules = DB::select('module', [
-			'output' => ['id', 'relative_path', 'config'],
-			'filter' => ['status' => MODULE_STATUS_ENABLED]
-		]);
-
-		$this->loaded_manifests = $this->loadManifests($db_modules);
+	public function __construct(string $home_path) {
+		$this->home_path = $home_path;
 	}
 
 	/**
-	 * Get module class instance.
+	 * Add module and prepare it's basic data.
 	 *
-	 * @param string $id  Module manifest id.
+	 * @param string $relative_path  Relative path to the module.
+	 * @param string $id             Stored module ID to optionally check the manifest module ID against.
+	 * @param array  $config         Override configuration to use instead of one stored in the manifest file.
 	 *
-	 * @return CModule|null
+	 * @return bool  Either true if module was added or false if manifest file had errors or IDs didn't match.
 	 */
-	public function getModuleById($id) {
-		return array_key_exists($id, $this->modules) ? $this->modules[$id] : null;
-	}
+	public function addModule(string $relative_path, string $id = null, array $config = []): bool {
+		$manifest = $this->loadManifest($relative_path);
 
-	/**
-	 * Get module by action.
-	 *
-	 * @param string $action  Action of module.
-	 *
-	 * @return CModule|null
-	 */
-	public function getModuleByActionName($action) {
-		/** @var CModule $module */
-		foreach ($this->modules as $module) {
-			if (array_key_exists($action, $module->getActions())) {
-				return $module;
-			}
+		// Ignore module without a valid manifest.
+		if ($manifest === null) {
+			return false;
 		}
 
-		return null;
+		// Ignore module with an unexpected id.
+		if ($id !== null && $manifest['id'] !== $id) {
+			return false;
+		}
+
+		// Use override configuration, if supplied.
+		if ($config) {
+			$manifest['config'] = $config;
+		}
+
+		$this->manifests[$relative_path] = $manifest;
+
+		// Maintain sorted manifests.
+		ksort($this->manifests);
+
+		return true;
 	}
 
 	/**
-	 * Get enabled modules namespaces as array where key is module full namespace and value is array of absolutes paths.
+	 * Load and parse module manifest file.
+	 *
+	 * @param string $relative_path  Relative path to the module.
+	 *
+	 * @return array|null  Either manifest data or null if manifest file had errors.
+	 */
+	private function loadManifest(string $relative_path): ?array {
+		$module_path = implode([$this->home_path, $relative_path], DIRECTORY_SEPARATOR);
+		$manifest_filename = implode([$module_path, 'manifest.json'], DIRECTORY_SEPARATOR);
+
+		if (!is_file($manifest_filename) || !is_readable($manifest_filename)) {
+			return null;
+		}
+
+		$manifest = file_get_contents($manifest_filename);
+
+		if ($manifest === false) {
+			return null;
+		}
+
+		$manifest = json_decode($manifest, true);
+
+		if (!is_array($manifest)) {
+			return null;
+		}
+
+		// Check required keys in manifest.
+		if (array_diff_key(array_flip(['manifest_version', 'id', 'name', 'namespace', 'version']), $manifest)) {
+			return null;
+		}
+
+		// Check manifest version.
+		if ($manifest['manifest_version'] > self::MAX_MANIFEST_VERSION) {
+			return null;
+		}
+
+		// Check manifest namespace syntax.
+		if (!preg_match('/^[a-z_]+$/i', $manifest['namespace'])) {
+			return null;
+		}
+
+		// Ensure empty defaults.
+		$manifest += [
+			'name' => null,
+			'author' => null,
+			'url' => null,
+			'description' => null,
+			'actions' => [],
+			'config' => []
+		];
+
+		return $manifest;
+	}
+
+	/**
+	 * Get namespaces of all added modules.
 	 *
 	 * @return array
 	 */
-	public function getNamespaces() {
+	public function getNamespaces(): array {
 		$namespaces = [];
 
-		foreach ($this->loaded_manifests as $manifest) {
-			$namespaces[$manifest['namespace']] = [$manifest['path']];
-			$namespaces[self::MODULES_NAMESPACE.$manifest['namespace']] = [$manifest['path']];
+		foreach ($this->manifests as $relative_path => $manifest) {
+			$module_path = $this->home_path.DIRECTORY_SEPARATOR.$relative_path;
+			$namespaces['Modules\\'.$manifest['namespace']] = [$module_path];
+			$namespaces['Modules\\'.$manifest['namespace'].'\\Actions'] = [$module_path.DIRECTORY_SEPARATOR.'actions'];
 		}
 
 		return $namespaces;
 	}
 
 	/**
-	 * Return actions only for modules with enabled status.
+	 * Get actions of all added modules.
 	 *
 	 * @return array
 	 */
-	public function getRoutes() {
-		$routes = [];
-		$default = [
-			'layout' => 'layout.htmlpage',
-			'view' => null
-		];
+	public function getActions(): array {
+		$actions = [];
 
-		/** @var CModule $module */
-		foreach ($this->modules as $module) {
-			if ($module->isEnabled()) {
-				$namespace = self::MODULES_NAMESPACE.$module->getNamespace().'\\Actions\\';
-
-				foreach ($module->getActions() as $action => $data) {
-					$routes[$action] = ['class' => $namespace.$data['class']] + $data + $default;
-				}
+		foreach ($this->manifests as $relative_path => $manifest) {
+			foreach ($manifest['actions'] as $name => $data) {
+				$actions[$name] = [
+					'class' => implode('\\', ['Modules', $manifest['namespace'], 'Actions',
+						str_replace('/', '\\', $data['class'])
+					]),
+					'layout' => array_key_exists('layout', $data) ? $data['layout'] : 'layout.htmlpage',
+					'view' => array_key_exists('view', $data) ? $data['view'] : null
+				];
 			}
 		}
 
-		return $routes;
+		return $actions;
 	}
 
 	/**
-	 * Load modules manifests.
+	 * Check added modules for conflicts and remove conflicting modules.
 	 *
-	 * @param string $modules[]['id']             Module unique id.
-	 * @param string $modules[]['relative_path']  Relative path to module directory.
-	 * @param string $modules[]['config']         JSON string with module configuration data.
-	 * @param bool   $check_conflicts             Check conflicts between modules.
-	 *
-	 * @return array
+	 * @return array  List of conflicts or an empty array.
 	 */
-	public function loadManifests($modules, $check_conflicts = true) {
-		$manifests = [];
+	public function resolveConflicts(): array {
+		$ids = [];
+		$namespaces = [];
+		$actions = [];
 
-		foreach ($modules as $module) {
-			$manifest = $this->loadManifest($module['relative_path']);
-
-			if ($manifest == null) {
-				continue;
+		foreach ($this->manifests as $relative_path => $manifest) {
+			$ids[$manifest['id']][] = $relative_path;
+			$namespaces[$manifest['namespace']][] = $relative_path;
+			foreach (array_keys($manifest['actions']) as $action) {
+				$actions[$action][] = $relative_path;
 			}
+		}
 
-			$manifest['config'] += json_decode($module['config'], true);
+		foreach (['ids', 'namespaces', 'actions'] as $var) {
+			$$var = array_filter($$var, function($list) {
+				return count($list) > 1;
+			});
+		}
 
-			if ($check_conflicts) {
-				$this->errors[$manifest['id']] = $this->checkConflicts($manifest, $manifests);
+		$conflicts = [];
+		$conflicting_modules = [];
 
-				if (!$this->errors[$manifest['id']]) {
-					$manifests[$manifest['id']] = $manifest;
+		foreach ($ids as $id => $relative_paths) {
+			$conflicts[] = _s('Identical ID (%s) is used by modules located at %s.', $id,
+				implode(', ', $relative_paths)
+			);
+			$conflicting_modules = array_merge($conflicting_modules, $relative_paths);
+		}
+
+		foreach ($namespaces as $namespace => $relative_paths) {
+			$conflicts[] = _s('Identical namespace (%s) is used by modules located at %s.', $namespace,
+				implode(', ', $relative_paths)
+			);
+			$conflicting_modules = array_merge($conflicting_modules, $relative_paths);
+		}
+
+		$relative_paths = array_unique(array_reduce($actions, function($carry, $item) {
+			return array_merge($carry, $item);
+		}, []));
+
+		if ($relative_paths) {
+			$conflicts[] = _s('Identical actions are used by modules located at %s.', implode(', ', $relative_paths));
+			$conflicting_modules = array_merge($conflicting_modules, $relative_paths);
+		}
+
+		$this->manifests = array_diff_key($this->manifests, array_flip($conflicting_modules));
+
+		return $conflicts;
+	}
+
+	/**
+	 * Check, instantiate and initialize all added modules.
+	 *
+	 * @return array  List of initalized modules.
+	 */
+	public function initModules(): array {
+		$this->errors = $this->resolveConflicts();
+
+		foreach ($this->manifests as $relative_path => $manifest) {
+			$path = $this->home_path.DIRECTORY_SEPARATOR.$relative_path;
+
+			if (is_file($path.DIRECTORY_SEPARATOR.'Module.php')) {
+				$module_class = implode('\\', ['Modules', $manifest['namespace'], 'Module']);
+
+				if (!class_exists($module_class, true)) {
+					$this->errors[] = _s('Wrong Module.php class name for module located at %s.', $relative_path);
+
+					continue;
 				}
 			}
 			else {
-				$manifests[$manifest['id']] = $manifest;
+				$module_class = 'Core\\CModule';
 			}
-		}
-
-		return $manifests;
-	}
-
-	/**
-	 * Load module manifest.
-	 *
-	 * @param string $relative_path     Relative path to module directory.
-	 *
-	 * @return array|null
-	 */
-	public function loadManifest($relative_path) {
-		$module_path = $this->modules_dir.DIRECTORY_SEPARATOR.trim($relative_path, DIRECTORY_SEPARATOR);
-		$manifest_filename = $module_path.DIRECTORY_SEPARATOR.'manifest.json';
-
-		if (!file_exists($manifest_filename)) {
-			return null;
-		}
-
-		$manifest_file = file_get_contents($manifest_filename);
-
-		if (!$manifest_file) {
-			return null;
-		}
-
-		$manifest = json_decode($manifest_file, true);
-
-		if (!is_array($manifest)) {
-			return null;
-		}
-
-		if (!array_key_exists('id', $manifest)) {
-			// Required id does not exists.
-			return null;
-		}
-
-		$manifest += [
-			'namespace' => '',
-			'path' => $module_path,
-			'manifest_version' => 0,
-			'actions' => [],
-			'config' => []
-		];
-
-		if ($manifest['manifest_version'] > static::MANIFEST_VERSION) {
-			// Unknown manifest version.
-			return null;
-		}
-
-		if ($manifest['namespace'] === '' || !preg_match('/^[a-z_]+$/i', $manifest['namespace'])) {
-			// Wrong namespace.
-			return null;
-		}
-
-		return $manifest;
-	}
-
-	/**
-	 * Create active modules instances.
-	 */
-	public function loadModules() {
-		foreach ($this->loaded_manifests as $manifest) {
-			$main_class = 'CModule';
-			$module_class = $manifest['path'] ? self::MODULES_NAMESPACE.$manifest['namespace'].'\\Module' : $main_class;
 
 			try {
-				if (!class_exists($module_class, true)) {
-					throw new Exception(_s('Module %s class %s not found.', $manifest['id'], $module_class));
+				$instance = new $module_class($path, $manifest);
+
+				if (is_a($instance, 'Core\\CModule')) {
+					$instance->init();
+
+					$this->modules[$instance->getId()] = $instance;
 				}
-
-				$instance = new $module_class($manifest);
-
-				if (!($instance instanceof CModule) || !is_subclass_of($instance, CModule::class)) {
-					throw new Exception(_s('%s class must extend %s class.', $module_class, $main_class));
+				else {
+					$this->errors[] = _s('Module.php class must extend %s for module located at %s.', 'Core\\CModule',
+						$relative_path
+					);
 				}
-
-				if ($this->errors[$manifest['id']]) {
-					$instance->setEnabled(false);
-				}
-
-				$this->modules[$manifest['id']] = $instance;
 			}
 			catch (Exception $e) {
-				$this->errors[$manifest['id']][] = $e;
+				$this->errors[] = _s('%s - thrown by module located at %s.', $e->getMessage(), $relative_path);
 			}
-
-			unset($this->loaded_manifests[$manifest['id']]);
 		}
+
+		return $this->modules;
 	}
 
 	/**
-	 * Initialize enabled modules. Call init method for every module instance.
-	 */
-	public function initModules() {
-		foreach ($this->modules as $module) {
-			if ($module->isEnabled()) {
-				$module->init();
-			}
-		}
-	}
-
-	/**
-	 * Check conflicts between modules in namespace and actions. Return array with errors.
-	 *
-	 * @param array $manifest    Module manifest to be checked against $manifests
-	 * @param array $manifests   Array of checked and valid modules.
+	 * Get add initialized modules.
 	 *
 	 * @return array
 	 */
-	private function checkConflicts($manifest, $manifests) {
-		$errors = [];
-
-		foreach ($manifests as $stored_manifest) {
-			$checked_modules = implode(', ', [$manifest['id'], $stored_manifest['id']]);
-
-			if ($manifest['id'] == $stored_manifest['id']) {
-				$this->errors[$manifest['id']][] = new Exception(
-					_s('Conflict for module %s id.', $manifest['id'])
-				);
-			}
-
-			if ($manifest['namespace'] == $stored_manifest['namespace']) {
-				$this->errors[$manifest['id']][] = new Exception(
-					_s('Modules %s use same namespace %s.', $checked_modules, $manifest['namespace'])
-				);
-			}
-
-			$conflicted_actions = array_intersect_key($manifest['actions'], $stored_manifest['actions']);
-
-			if ($conflicted_actions) {
-				$this->errors[$manifest['id']][] = new Exception(
-					_n('Modules %s use same action %s.', 'Modules %s use same actions %s.', $conflicted_actions,
-						implode(', ', array_keys($conflicted_actions)), count($conflicted_actions))
-				);
-			}
-		}
-
-		return $errors;
+	public function getModules(): array {
+		return $this->modules;
 	}
 
 	/**
-	 * Get module init errors. Return array where key is module id and value is array of error string messages.
+	 * Get errors encountered while module initialization.
 	 *
 	 * @return array
 	 */
-	public function getErrors() {
+	public function getErrors(): array {
 		return $this->errors;
 	}
 
 	/**
-	 * Call modules before action event.
+	 * Publish an event to all loaded modules. The module of the responsible action will be served last.
 	 *
-	 * @param Action $action  Action instance responsible for current request
+	 * @param CAction $action  Action responsible for the current request.
+	 * @param string  $event   Event to publish.
 	 */
-	public function beforeAction(Action $action) {
-		$this->invokeEventHandler($action, 'beforeAction');
-	}
-
-	/**
-	 * Modules method to be called before application will exit and send response to browser.
-	 *
-	 * @param Action $action  Action instance responsible for current request.
-	 */
-	public function afterAction(Action $action) {
-		$this->invokeEventHandler($action, 'afterAction');
-	}
-
-	/**
-	 * Invokes event handler for every enabled module, current module event handler will be invoked last.
-	 *
-	 * @param Action $action   Current action object.
-	 * @param string $event    Module event handler name.
-	 */
-	private function invokeEventHandler(Action $action, $event) {
-		$current_module = $this->getModuleByActionName($action->getAction());
+	public function publishEvent(CAction $action, string $event): void {
+		$action_module = $this->getModuleByActionName($action->getAction());
 
 		foreach ($this->modules as $module) {
-			if ($module->isEnabled() && $module != $current_module) {
+			if ($module != $action_module) {
 				$module->$event($action);
 			}
 		}
 
-		if ($current_module instanceof CModule) {
-			$current_module->$event($action);
+		if ($action_module) {
+			$action_module->$event($action);
 		}
+	}
+
+	/**
+	 * Get loaded module instance associated with given action name.
+	 *
+	 * @param string $action_name
+	 *
+	 * @return Core\CModule|null
+	 */
+	public function getModuleByActionName(string $action_name): ?Core\CModule {
+		foreach ($this->modules as $module) {
+			if (array_key_exists($action_name, $module->getActions())) {
+				return $module;
+			}
+		}
+
+		return null;
 	}
 }

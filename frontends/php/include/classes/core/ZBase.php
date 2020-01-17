@@ -21,8 +21,6 @@
 
 require_once dirname(__FILE__).'/CAutoloader.php';
 
-use Core\CModule;
-
 class ZBase {
 	const EXEC_MODE_DEFAULT = 'default';
 	const EXEC_MODE_SETUP = 'setup';
@@ -61,16 +59,6 @@ class ZBase {
 	 * @var CModuleManager
 	 */
 	private $module_manager;
-
-	/**
-	 * @var CController
-	 */
-	private $action;
-
-	/**
-	 * @var CModule
-	 */
-	private $action_module;
 
 	/**
 	 * Returns the current instance of APP.
@@ -185,13 +173,16 @@ class ZBase {
 				array_map('error', $this->module_manager->getErrors());
 
 				$file = basename($_SERVER['SCRIPT_NAME']);
-				$action = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
-				$router = new CRouter;
-				$router->addActions($this->module_manager->getRoutes());
-				$router->setAction($action);
-				$this->action_module = $this->module_manager->getModuleByActionName($router->getAction());
-				$this->component_registry->get('menu.main')->setSelected($action);
+				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
+
+				$router = new CRouter();
+				$router->addActions($this->module_manager->getActions());
+				$router->setAction($action_name);
+
+				$this->component_registry->get('menu.main')->setSelected($action_name);
+
 				CProfiler::getInstance()->start();
+
 				$this->processRequest($router);
 
 				break;
@@ -213,15 +204,6 @@ class ZBase {
 				catch (ConfigFileException $e) {}
 				break;
 		}
-	}
-
-	/**
-	 * Call beforeTerminate modules event and terminate application.
-	 */
-	public static function terminate() {
-		self::ModuleManager()->afterAction(self::getInstance()->action);
-
-		exit;
 	}
 
 	/**
@@ -454,68 +436,97 @@ class ZBase {
 	 * @throws Exception
 	 */
 	private function processRequest(CRouter $router) {
-		$controller = $router->getController();
-		$this->action = class_exists($controller, true) ? new $controller : null;
+		$action_name = $router->getAction();
+		$action_class = $router->getController();
 
-		if ($this->action instanceof CController == false) {
-			$message = ($this->action === null)
-				? _s('%s action class is not found.', $controller)
-				: _s('%s must extend CController class', $controller);
-
-			error($message);
-
-			$response = new CControllerResponseData([
-				'controller' => [
-					'action' => $router->getAction()
-				],
-				'main_block' => '',
-				'page' => 0,
-				'javascript' => [
-					'files' => [],
-					'pre' => '',
-					'post' => ''
-				]
-			]);
-		}
-		else {
-			$this->action->setAction($router->getAction());
-
-			if ($this->action_module instanceof CModule) {
-				array_unshift(CView::$viewsDir, $this->action_module->getRootDir());
+		try {
+			if (!class_exists($action_class, true)) {
+				throw new Exception(_s('Class %s not found for action %s.', $action_class, $action_name));
 			}
 
-			$this->module_manager->beforeAction($this->action);
-			$response = $this->action->run();
+			$action = new $action_class();
+
+			if (!is_subclass_of($action, 'CController')) {
+				throw new Exception(_s('Action class %s must extend %s class.', $action_class, 'CController'));
+			}
+
+			$action->setAction($action_name);
+
+			$modules = $this->module_manager->getModules();
+
+			$action_module = $this->module_manager->getModuleByActionName($action_name);
+
+			if ($action_module) {
+				$modules = array_replace([$action_module->getId() => $action_module], $modules);
+			}
+
+			foreach (array_reverse($modules) as $module) {
+				if (is_subclass_of($module, 'Core\CModule')) {
+					array_unshift(CView::$viewsDir, $module->getPath().DIRECTORY_SEPARATOR.'views');
+				}
+			}
+
+			register_shutdown_function(function() use ($action) {
+				$this->module_manager->publishEvent($action, 'onTerminate');
+			});
+
+			$this->module_manager->publishEvent($action, 'onBeforeAction');
+
+			$action->run();
+
+			$this->module_manager->publishEvent($action, 'onAfterAction');
+
+			if (!is_a($action, 'CLegacyAction')) {
+				$response = $action->getResponse();
+
+				if (!is_subclass_of($response, 'CControllerResponse')) {
+					throw new Exception(_s('Unexpected response for action %s.', $action_name));
+				}
+
+				$this->processResponseFinal($router, $response);
+			}
 		}
+		catch (Exception $e) {
+			echo (new CView('general.warning', [
+				'header' => $e->getMessage(),
+				'messages' => [],
+				'theme' => ZBX_DEFAULT_THEME
+			]))->getOutput();
 
-		if ($this->action instanceof CLegacyAction) {
-			register_shutdown_function(['APP', 'terminate']);
-
-			return;
+			exit;
 		}
+	}
 
-		// Controller returned data
+	private function processResponseFinal(CRouter $router, CControllerResponse $response) {
+		// Controller returned data?
 		if ($response instanceof CControllerResponseData) {
-			// if no view defined we pass data directly to layout
-			if ($router->getView() === null || !$response->isViewEnabled()) {
-				$layout = new CView($router->getLayout(), $response->getData());
-				echo $layout->getOutput();
+			if ($router->getView() !== null && $response->isViewEnabled()) {
+				$view = new CView($router->getView(), $response->getData());
+
+				$data = [
+					'page' => [
+						'title' => $response->getTitle(),
+						'file' => $response->getFileName()
+					],
+					'controller' => [
+						'action' => $router->getAction()
+					],
+					'main_block' => $view->getOutput(),
+					'javascript' => [
+						'files' => $view->getAddedJS(),
+						'pre' => $view->getIncludedJS(),
+						'post' => $view->getPostJS()
+					]
+				];
+
+				echo (new CView($router->getLayout(), $data))->getOutput();
 			}
 			else {
-				$view = new CView($router->getView(), $response->getData());
-				$data['page']['title'] = $response->getTitle();
-				$data['page']['file'] = $response->getFileName();
-				$data['controller']['action'] = $router->getAction();
-				$data['main_block'] = $view->getOutput();
-				$data['javascript']['files'] = $view->getAddedJS();
-				$data['javascript']['pre'] = $view->getIncludedJS();
-				$data['javascript']['post'] = $view->getPostJS();
-				$layout = new CView($router->getLayout(), $data);
-				echo $layout->getOutput();
+				echo (new CView($router->getLayout(), $response->getData()))->getOutput();
 			}
 		}
-		// Controller returned redirect to another page
-		else if ($response instanceof CControllerResponseRedirect) {
+		// Controller returned redirect to another page?
+		elseif ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
 			if ($response->getMessageOk() !== null) {
 				CSession::setValue('messageOk', $response->getMessageOk());
@@ -533,8 +544,8 @@ class ZBase {
 
 			redirect($response->getLocation());
 		}
-		// Controller returned fatal error
-		else if ($response instanceof CControllerResponseFatal) {
+		// Controller returned fatal error?
+		elseif ($response instanceof CControllerResponseFatal) {
 			header('Content-Type: text/html; charset=UTF-8');
 
 			global $ZBX_MESSAGES;
@@ -556,7 +567,7 @@ class ZBase {
 			redirect('zabbix.php?action=system.warning');
 		}
 
-		static::terminate();
+		exit;
 	}
 
 	/**
@@ -584,21 +595,24 @@ class ZBase {
 	}
 
 	/**
-	 * Register and initialize module manager, load enabled modules and register module namespaces for autoloader. Also call init
-	 * for enabled modules.
+	 * Initialize module manager and load all enabled modules.
 	 */
-	private function initModuleManager()
-	{
-		$this->module_manager = new CModuleManager($this->rootDir);
-		$view_paths = [];
+	private function initModuleManager() {
+		$this->module_manager = new CModuleManager($this->rootDir.'/modules');
+
+		$db_modules = API::Module()->get([
+			'output' => ['id', 'relative_path', 'config'],
+			'filter' => ['status' => MODULE_STATUS_ENABLED]
+		]);
+
+		foreach ($db_modules as $db_module) {
+			$this->module_manager->addModule($db_module['relative_path'], $db_module['id'], $db_module['config']);
+		}
 
 		foreach ($this->module_manager->getNamespaces() as $namespace => $paths) {
 			$this->autoloader->addNamespace($namespace, $paths);
-			$view_paths = array_merge($view_paths, $paths);
 		}
 
-		CView::$viewsDir = array_merge($view_paths, CView::$viewsDir);
-		$this->module_manager->loadModules();
 		$this->module_manager->initModules();
 	}
 }

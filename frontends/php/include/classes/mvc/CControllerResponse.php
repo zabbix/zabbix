@@ -19,5 +19,5 @@
 **/
 
 
-class CControllerResponse {
+abstract class CControllerResponse {
 }
