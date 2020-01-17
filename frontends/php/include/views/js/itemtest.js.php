@@ -89,21 +89,29 @@
 			form_data,
 			properties = {};
 
-		$form.trimValues(['#key']);
+		// Form must be enabled at moment when values are collected.
+		if (jQuery('#key').is(':disabled')) {
+			$form = $form.clone();
+			jQuery(':disabled', $form).removeAttr('disabled');
 
-		form_data = $form.serializeJSON();
+			form_data = $form.serializeJSON();
+		}
+		else {
+			form_data = $form.serializeJSON();
+		}
+		delete $form;
 
 		// Item type specific properties.
 		switch (+form_data['type']) {
 			case <?= ITEM_TYPE_ZABBIX ?>:
 				properties = {
-					key: form_data['key']
+					key: form_data['key'].trim()
 				};
 				break;
 
 			case <?= ITEM_TYPE_SIMPLE ?>:
 				properties = {
-					key: form_data['key'],
+					key: form_data['key'].trim(),
 					username: form_data['username'],
 					password: form_data['password']
 				};
@@ -142,13 +150,13 @@
 			case <?= ITEM_TYPE_AGGREGATE ?>:
 			case <?= ITEM_TYPE_EXTERNAL ?>:
 				properties = {
-					key: form_data['key']
+					key: form_data['key'].trim()
 				};
 				break;
 
 			case <?= ITEM_TYPE_DB_MONITOR ?>:
 				properties = {
-					key: form_data['key'],
+					key: form_data['key'].trim(),
 					params_ap: form_data['params_ap'],
 					username: form_data['username'],
 					password: form_data['password']
@@ -157,7 +165,7 @@
 
 			case <?= ITEM_TYPE_HTTPAGENT ?>:
 				properties = {
-					key: form_data['key'],
+					key: form_data['key'].trim(),
 					http_authtype: form_data['http_authtype'],
 					follow_redirects: form_data['follow_redirects'] || 0,
 					headers: form_data['headers'],
@@ -188,14 +196,14 @@
 
 			case <?= ITEM_TYPE_IPMI ?>:
 				properties = {
-					key: form_data['key'],
+					key: form_data['key'].trim(),
 					ipmi_sensor: form_data['ipmi_sensor']
 				};
 				break;
 
 			case <?= ITEM_TYPE_SSH ?>:
 				properties = {
-					key: form_data['key'],
+					key: form_data['key'].trim(),
 					authtype: form_data['authtype'],
 					params_es: form_data['params_es'],
 					username: form_data['username'],
@@ -212,7 +220,7 @@
 
 			case <?= ITEM_TYPE_TELNET ?>:
 				properties = {
-					key: form_data['key'],
+					key: form_data['key'].trim(),
 					params_es: form_data['params_es'],
 					username: form_data['username'],
 					password: form_data['password']
@@ -221,7 +229,7 @@
 
 			case <?= ITEM_TYPE_JMX ?>:
 				properties = {
-					key: form_data['key'],
+					key: form_data['key'].trim(),
 					jmx_endpoint: form_data['jmx_endpoint'],
 					username: form_data['username'],
 					password: form_data['password']
@@ -230,14 +238,14 @@
 
 			case <?= ITEM_TYPE_CALCULATED ?>:
 				properties = {
-					key: form_data['key'],
+					key: form_data['key'].trim(),
 					params_f: form_data['params_f'],
 				};
 				break;
 
 			case <?= ITEM_TYPE_SIMPLE ?>:
 				properties = {
-					key: form_data['key'],
+					key: form_data['key'].trim(),
 					username: form_data['username'],
 					password: form_data['password'],
 				};
