@@ -90,15 +90,12 @@
 			properties = {};
 
 		// Form must be enabled at moment when values are collected.
-		if (jQuery('#key').is(':disabled')) {
+		if (jQuery('#key').prop('readonly')) {
 			$form = $form.clone();
 			jQuery(':disabled', $form).removeAttr('disabled');
+		}
 
-			form_data = $form.serializeJSON();
-		}
-		else {
-			form_data = $form.serializeJSON();
-		}
+		form_data = $form.serializeJSON();
 		delete $form;
 
 		// Item type specific properties.
