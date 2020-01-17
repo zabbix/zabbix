@@ -180,8 +180,14 @@ final class CModuleManager {
 
 		foreach ($this->manifests as $relative_path => $manifest) {
 			$module_path = $this->home_path.DIRECTORY_SEPARATOR.$relative_path;
+
 			$namespaces['Modules\\'.$manifest['namespace']] = [$module_path];
-			$namespaces['Modules\\'.$manifest['namespace'].'\\Actions'] = [$module_path.DIRECTORY_SEPARATOR.'actions'];
+
+			if ($manifest['actions']) {
+				$namespaces['Modules\\'.$manifest['namespace'].'\\Actions'] = [
+					$module_path.DIRECTORY_SEPARATOR.'actions'
+				];
+			}
 		}
 
 		return $namespaces;
