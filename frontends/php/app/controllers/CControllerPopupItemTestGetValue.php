@@ -84,23 +84,26 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			$this->item_type = $this->getInput('item_type');
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
 
-			/*
-			 * Check if key is not empty if 'get value from host' is checked and test is made for item with mandatory
-			 * key.
-			 */
-			if ($this->getInput('key', '') === '' && in_array($this->item_type, $this->item_types_has_key_mandatory)) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', _('cannot be empty')));
-				$ret = false;
-			}
+			// Check if key is valid for item types it's mandatory.
+			if (in_array($this->item_type, $this->item_types_has_key_mandatory)) {
+				$key = $this->getInput('key', '');
 
-			/*
-			 * VMware and icmpping simple checks are not supported.
-			 * This normally cannot be achieved from UI so no need for error message.
-			 */
-			$key = $this->hasInput('key') ? $this->getInput('key') : '';
-			if ($this->item_type == ITEM_TYPE_SIMPLE
-					&& (substr($key, 0, 7) === 'vmware.' || substr($key, 0, 8) === 'icmpping')) {
-				$ret = false;
+				/*
+				 * VMware and icmpping simple checks are not supported.
+				 * This normally cannot be achieved from UI so no need for error message.
+				 */
+				if ($this->item_type == ITEM_TYPE_SIMPLE
+						&& (substr($key, 0, 7) === 'vmware.' || substr($key, 0, 8) === 'icmpping')) {
+					$ret = false;
+				}
+				else {
+					$item_key_parser = new CItemKey();
+
+					if ($item_key_parser->parse($key) != CParser::PARSE_SUCCESS) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError()));
+						$ret = false;
+					}
+				}
 			}
 
 			// Test interface options.

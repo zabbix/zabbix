@@ -88,12 +88,15 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
 			$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
-			$key = $this->hasInput('key') ? $this->getInput('key') : '';
 
-			// Check if key is not empty for item types it's mandatory.
-			if (in_array($this->item_type, $this->item_types_has_key_mandatory) && $key === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', _('cannot be empty')));
-				$ret = false;
+			// Check if key is valid for item types it's mandatory.
+			if (in_array($this->item_type, $this->item_types_has_key_mandatory)) {
+				$item_key_parser = new CItemKey();
+
+				if ($item_key_parser->parse($this->getInput('key', '')) != CParser::PARSE_SUCCESS) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError()));
+					$ret = false;
+				}
 			}
 
 			/*
