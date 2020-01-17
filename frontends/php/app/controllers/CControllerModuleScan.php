@@ -43,48 +43,62 @@ class CControllerModuleScan extends CController {
 		$db_modules_delete_names = [];
 
 		$db_modules = API::Module()->get([
-			'output' => ['id'],
+			'output' => ['relative_path'],
 			'preservekeys' => true
 		]);
 
 		$db_moduleids = [];
-		$db_moduleids_loaded = [];
+		$healthy_modules = [];
 
 		foreach ($db_modules as $moduleid => $db_module) {
-			$db_moduleids[$db_module['id']] = $moduleid;
+			$db_moduleids[$db_module['relative_path']] = $moduleid;
 		}
 
-		$manager = new CModuleManager(APP::getRootDir());
+		$module_manager = new CModuleManager(APP::ModuleManager()->getHomePath());
 
-		foreach ($manager->scanModulesDirectory() as $module) {
-			if ($loaded_module = $manager->loadModule($module['relative_path'])) {
-				if (array_key_exists($module['id'], $db_moduleids)) {
-					$db_moduleids_loaded[$module['id']] = $db_moduleids[$module['id']];
-				}
-				else {
-					$db_modules_create[] = [
-						'config' => $manager->registerModule($module['id'])
-					] + $module;
-					$db_modules_create_names[] = array_key_exists('name', $loaded_module['manifest'])
-						? $loaded_module['manifest']['name']
-						: $module['id'];
-				}
+		foreach (new DirectoryIterator($module_manager->getHomePath()) as $item) {
+			if (!$item->isDir() || $item->isDot()) {
+				continue;
+			}
+
+			$relative_path = $item->getFilename();
+
+			$manifest = $module_manager->addModule($relative_path);
+
+			if (!$manifest) {
+				continue;
+			}
+
+			$healthy_modules[] = $relative_path;
+
+			if (!array_key_exists($relative_path, $db_moduleids)) {
+				$db_modules_create[] = [
+					'id' => $manifest['id'],
+					'relative_path' => $relative_path,
+					'status' => MODULE_STATUS_DISABLED,
+					'config' => []
+				];
+				$db_modules_create_names[] = ($manifest['name'] !== '') ? $manifest['name'] : $manifest['id'];
 			}
 		}
 
-		foreach (array_diff_key($db_moduleids, $db_moduleids_loaded) as $id => $moduleid) {
+		foreach (array_diff_key($db_moduleids, array_flip($healthy_modules)) as $relative_path => $moduleid) {
 			$db_modules_delete[] = $moduleid;
-			$db_modules_delete_names[] = $id;
+			$db_modules_delete_names[] = $relative_path;
 		}
 
 		if ($db_modules_create) {
 			$result = API::Module()->create($db_modules_create);
 
 			if ($result) {
-				info(_s('Modules added: %s', implode(', ', $db_modules_create_names)));
+				info(_n('Module added: %s.', 'Modules added: %s.', implode(', ', $db_modules_create_names),
+					count($db_modules_create)
+				));
 			}
 			else {
-				error(_s('Cannot add modules: %s', implode(', ', $db_modules_create_names)));
+				error(_n('Cannot add module: %s.', 'Cannot add modules: %s.', implode(', ', $db_modules_create_names),
+					count($db_modules_create)
+				));
 			}
 		}
 
@@ -92,17 +106,21 @@ class CControllerModuleScan extends CController {
 			$result = API::Module()->delete($db_modules_delete);
 
 			if ($result) {
-				info(_s('Modules deleted: %s', implode(', ', $db_modules_delete_names)));
+				info(_n('Module deleted: %s.', 'Modules deleted: %s.', implode(', ', $db_modules_delete_names),
+					count($db_modules_delete)
+				));
 			}
 			else {
-				error(_s('Cannot delete modules: %s', implode(', ', $db_modules_delete_names)));
+				error(_n('Cannot delete module: %s.', 'Cannot delete modules: %s.',
+					implode(', ', $db_modules_delete_names), count($db_modules_delete)
+				));
 			}
 		}
 
-		array_map('error', $manager->getErrors());
-
 		$response = new CControllerResponseRedirect(
-			(new CUrl('zabbix.php'))->setArgument('action', 'module.list')->getUrl()
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'module.list')
+				->getUrl()
 		);
 
 		$message = ($db_modules_create || $db_modules_delete)

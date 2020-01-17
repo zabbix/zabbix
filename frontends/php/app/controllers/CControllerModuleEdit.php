@@ -73,15 +73,15 @@ class CControllerModuleEdit extends CController {
 	}
 
 	protected function doAction() {
-		$manager = new CModuleManager(APP::getRootDir());
+		$module_manager = new CModuleManager(APP::ModuleManager()->getHomePath());
 
-		if ($loaded_module = $manager->loadModule($this->module['relative_path'])) {
-			$manifest = $loaded_module['manifest'];
+		$manifest = $module_manager->addModule($this->module['relative_path']);
 
+		if ($manifest) {
 			$data = [
 				'moduleid' => $this->getInput('moduleid'),
-				'name' => array_key_exists('name', $manifest) ? $manifest['name'] : null,
-				'version' => array_key_exists('version', $manifest) ? $manifest['version'] : null,
+				'name' => $manifest['name'],
+				'version' => $manifest['version'],
 				'author' => array_key_exists('author', $manifest) ? $manifest['author'] : null,
 				'description' => array_key_exists('description', $manifest) ? $manifest['description'] : null,
 				'relative_path' => $this->module['relative_path'],
@@ -104,7 +104,7 @@ class CControllerModuleEdit extends CController {
 					->setArgument('action', 'module.list')
 					->getUrl()
 			);
-			$response->setMessageError(_s('Cannot load module: %s', $this->module['id']));
+			$response->setMessageError(_s('Cannot load module at: %s.', $this->module['relative_path']));
 			$this->setResponse($response);
 		}
 	}

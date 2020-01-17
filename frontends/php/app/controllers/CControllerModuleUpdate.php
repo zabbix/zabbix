@@ -57,7 +57,7 @@ class CControllerModuleUpdate extends CController {
 		$moduleids = $this->getInput('moduleids');
 
 		$this->modules = API::Module()->get([
-			'output' => ['id', 'status'],
+			'output' => [],
 			'moduleids' => $moduleids,
 			'preservekeys' => true
 		]);
@@ -74,32 +74,38 @@ class CControllerModuleUpdate extends CController {
 				? MODULE_STATUS_ENABLED
 				: MODULE_STATUS_DISABLED;
 
-		$manager = new CModuleManager(APP::getRootDir());
+		$db_modules_update_names = [];
 
 		$db_modules = API::Module()->get([
-			'output' => ['id', 'relative_path', 'status'],
+			'output' => ['relative_path', 'status'],
 			'preservekeys' => true
 		]);
 
+		$module_manager = new CModuleManager(APP::ModuleManager()->getHomePath());
+		$module_manager_enabled = new CModuleManager(APP::ModuleManager()->getHomePath());
+
 		foreach ($db_modules as $moduleid => $db_module) {
-			$new_status = array_key_exists($moduleid, $this->modules)
-				? $set_status
-				: $db_module['status'];
+			$new_status = array_key_exists($moduleid, $this->modules) ? $set_status : $db_module['status'];
 
 			if ($new_status == MODULE_STATUS_ENABLED) {
-				if ($manager->loadModule($db_module['relative_path'])) {
-					$manager->initModule($db_module['id'], $manager->registerModule($db_module['id']));
-				}
+				$manifest = $module_manager_enabled->addModule($db_module['relative_path']);
+			}
+			else {
+				$manifest = $module_manager->addModule($db_module['relative_path']);
+			}
+
+			if (array_key_exists($moduleid, $this->modules)) {
+				$db_modules_update_names[] = ($manifest['name'] !== '') ? $manifest['name'] : $manifest['id'];
 			}
 		}
 
-		$manager_errors = $manager->getErrors();
+		$errors = $module_manager_enabled->resolveConflicts();
 
-		array_map('error', $manager_errors);
+		array_map('error', $errors);
 
 		$result = false;
 
-		if (!$manager_errors) {
+		if (!$errors) {
 			$update = [];
 
 			foreach (array_keys($this->modules) as $moduleid) {
@@ -130,10 +136,28 @@ class CControllerModuleUpdate extends CController {
 		}
 
 		if ($result) {
-			$response->setMessageOk(_n('Module updated', 'Modules updated', count($this->modules)));
+			if ($set_status == MODULE_STATUS_ENABLED) {
+				$response->setMessageOk(_n('Module enabled: %s.', 'Modules enabled: %s.',
+					implode(', ', $db_modules_update_names), count($this->modules)
+				));
+			}
+			else {
+				$response->setMessageOk(_n('Module disabled: %s.', 'Modules disabled: %s.',
+					implode(', ', $db_modules_update_names), count($this->modules)
+				));
+			}
 		}
 		else {
-			$response->setMessageError(_n('Cannot update module', 'Cannot update modules', count($this->modules)));
+			if ($set_status == MODULE_STATUS_ENABLED) {
+				$response->setMessageError(_n('Cannot enable module: %s.', 'Cannot enable modules: %s.',
+					implode(', ', $db_modules_update_names), count($this->modules)
+				));
+			}
+			else {
+				$response->setMessageError(_n('Cannot disable module: %s.', 'Cannot disable modules: %s.',
+					implode(', ', $db_modules_update_names), count($this->modules)
+				));
+			}
 		}
 
 		$this->setResponse($response);

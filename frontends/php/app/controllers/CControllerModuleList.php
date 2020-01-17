@@ -76,14 +76,10 @@ class CControllerModuleList extends CController {
 		];
 
 		// data prepare
-		$modules = [];
-
 		$config = select_config();
-//		$manager = new CModuleManager(APP::getRootDir());
-		$manager = APP::ModuleManager();
 
 		$db_modules = API::Module()->get([
-			'output' => ['relative_path', 'status'],
+			'output' => ['id', 'relative_path', 'status'],
 			'search' => [
 				'id' => ($filter['name'] === '') ? null : $filter['name']
 			],
@@ -94,12 +90,25 @@ class CControllerModuleList extends CController {
 			'preservekeys' => true
 		]);
 
-		foreach ($db_modules as $moduleid => $db_module) {
-			$module_loaded = $manager->loadModule($db_module['relative_path']);
+		$module_manager = new CModuleManager(APP::ModuleManager()->getHomePath());
+		$modules = [];
+		$modules_missing = [];
 
-			if ($module_loaded) {
-				$modules[$moduleid] = $db_module + $module_loaded['manifest'];
+		foreach ($db_modules as $moduleid => $db_module) {
+			$manifest = $module_manager->addModule($db_module['relative_path']);
+
+			if ($manifest !== null) {
+				$modules[$moduleid] = $db_module + $manifest;
 			}
+			else {
+				$modules_missing[] = $db_module['relative_path'];
+			}
+		}
+
+		if ($modules_missing && !hasErrorMesssages()) {
+			error(_n('Cannot load module at: %s.', 'Cannot load modules at: %s.', implode(', ', $modules_missing),
+				count($modules_missing)
+			));
 		}
 
 		$paging = getPagingLine($modules, $sort_order,
@@ -119,6 +128,7 @@ class CControllerModuleList extends CController {
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Modules'));
+
 		$this->setResponse($response);
 	}
 }
