@@ -29,7 +29,7 @@
                 </parameter>
                 <parameter>
                     <name>severity</name>
-                    <value>{EVENT.NSEVERITY} </value>
+                    <value>{EVENT.NSEVERITY}</value>
                 </parameter>
                 <parameter>
                     <name>triggerdesc</name>
@@ -57,7 +57,7 @@
                 </parameter>
                 <parameter>
                     <name>eventseverity</name>
-                    <value>{EVENT.SEVERITY} ​ ​</value>
+                    <value>{EVENT.SEVERITY}​</value>
                 </parameter>
                 <parameter>
                     <name>eventack</name>
