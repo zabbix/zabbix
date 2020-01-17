@@ -51,7 +51,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @var array
 	 */
 	protected $items_require_interface = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3,
-		ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE
+		ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE
 	];
 
 	/**
