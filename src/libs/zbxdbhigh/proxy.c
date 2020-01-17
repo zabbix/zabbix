@@ -944,6 +944,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"globalmacro",
 		"hosts",
 		"interface",
+		"interface_snmp",
 		"hosts_templates",
 		"hostmacro",
 		"items",
