@@ -32,6 +32,7 @@ import (
 	_ "zabbix.com/plugins"
 
 	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/remotecontrol"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/agent/serverconnector"
@@ -286,14 +287,19 @@ func main() {
 		}
 	}
 
+	if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
+		fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
+		os.Exit(1)
+	}
+
 	if argTest || argPrint {
-		if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
-			fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
+		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+			log.Errf("Failed to load key access rules: %s", err.Error())
 			os.Exit(1)
 		}
 
 		if argTest {
-			if err := agent.CheckMetric(testFlag); err != nil {
+			if err := agent.CheckMetric(testFlag, false); err != nil {
 				os.Exit(1)
 			}
 		} else {
@@ -305,14 +311,14 @@ func main() {
 
 	if remoteCommand != "" {
 		if agent.Options.ControlSocket == "" {
-			fmt.Fprintf(os.Stderr, "Cannot send remote command: ControlSocket configuration parameter is not defined\n")
+			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
 			os.Exit(0)
 		}
 
 		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand); err != nil {
-			fmt.Fprintf(os.Stderr, "Cannot send remote command: %s\n", err)
+			log.Errf("Cannot send remote command: %s", err)
 		} else {
-			fmt.Fprintf(os.Stdout, "%s\n", reply)
+			log.Infof(reply)
 		}
 		os.Exit(0)
 	}
@@ -381,6 +387,11 @@ func main() {
 	}
 
 	log.Infof("using configuration file: %s", confFlag)
+
+	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+		log.Errf("Failed to load key access rules: %s", err.Error())
+		os.Exit(1)
+	}
 
 	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
 		log.Critf("cannot initialize user parameters: %s", err)
