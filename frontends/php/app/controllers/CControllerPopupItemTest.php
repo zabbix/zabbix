@@ -538,7 +538,6 @@ abstract class CControllerPopupItemTest extends CController {
 					'key' => $input['key'],
 					'authtype' => array_key_exists('authtype', $input) ? $input['authtype'] : ITEM_AUTHTYPE_PASSWORD,
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : ITEM_AUTHTYPE_PASSWORD,
-					'interface' => $this->getHostInterface($interface_input),
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
 					'password' => array_key_exists('password', $input) ? $input['password'] : null
 				];
@@ -549,10 +548,6 @@ abstract class CControllerPopupItemTest extends CController {
 						'privatekey' => array_key_exists('privatekey', $input) ? $input['privatekey'] : null
 					];
 				}
-
-				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
-					$data['interface']['dns']
-				);
 				break;
 
 			case ITEM_TYPE_TELNET:
@@ -560,13 +555,8 @@ abstract class CControllerPopupItemTest extends CController {
 					'key' => $input['key'],
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : null,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
-					'password' => array_key_exists('password', $input) ? $input['password'] : null,
-					'interface' => $this->getHostInterface($interface_input)
+					'password' => array_key_exists('password', $input) ? $input['password'] : null
 				];
-
-				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
-					$data['interface']['dns']
-				);
 				break;
 
 			case ITEM_TYPE_JMX:
