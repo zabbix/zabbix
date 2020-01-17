@@ -76,7 +76,7 @@ class ZBase {
 	}
 
 	/**
-	 * Getter for component registry instance.
+	 * Get component registry.
 	 *
 	 * @return CComponentRegistry
 	 */
@@ -85,7 +85,7 @@ class ZBase {
 	}
 
 	/**
-	 * Getter for component registry instance.
+	 * Get module manager.
 	 *
 	 * @return CModuleManager
 	 */

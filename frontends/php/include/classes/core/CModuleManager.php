@@ -69,25 +69,34 @@ final class CModuleManager {
 	}
 
 	/**
-	 * Add module and prepare it's basic data.
+	 * Get home path of modules.
+	 *
+	 * @return string
+	 */
+	public function getHomePath(): string {
+		return $this->home_path;
+	}
+
+	/**
+	 * Add module and prepare it's manifest data.
 	 *
 	 * @param string $relative_path  Relative path to the module.
 	 * @param string $id             Stored module ID to optionally check the manifest module ID against.
 	 * @param array  $config         Override configuration to use instead of one stored in the manifest file.
 	 *
-	 * @return bool  Either true if module was added or false if manifest file had errors or IDs didn't match.
+	 * @return array|null  Either manifest data or null if manifest file had errors or IDs didn't match.
 	 */
-	public function addModule(string $relative_path, string $id = null, array $config = []): bool {
+	public function addModule(string $relative_path, string $id = null, array $config = []): ?array {
 		$manifest = $this->loadManifest($relative_path);
 
 		// Ignore module without a valid manifest.
 		if ($manifest === null) {
-			return false;
+			return null;
 		}
 
 		// Ignore module with an unexpected id.
 		if ($id !== null && $manifest['id'] !== $id) {
-			return false;
+			return null;
 		}
 
 		// Use override configuration, if supplied.
@@ -100,7 +109,7 @@ final class CModuleManager {
 		// Maintain sorted manifests.
 		ksort($this->manifests);
 
-		return true;
+		return $manifest;
 	}
 
 	/**
@@ -147,15 +156,19 @@ final class CModuleManager {
 
 		// Ensure empty defaults.
 		$manifest += [
-			'name' => null,
-			'author' => null,
-			'url' => null,
-			'description' => null,
+			'name' => '',
+			'author' => '',
+			'url' => '',
+			'description' => '',
 			'actions' => [],
 			'config' => []
 		];
 
 		return $manifest;
+	}
+
+	public function getManifests(): array {
+		return $this->manifests;
 	}
 
 	/**
