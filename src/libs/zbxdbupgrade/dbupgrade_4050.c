@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -194,6 +194,46 @@ out:
 
 static int	DBpatch_4050015(void)
 {
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		time_period_id, every;
+	int			invalidate = 0;
+	const ZBX_TABLE		*timeperiods;
+	const ZBX_FIELD		*field;
+
+	if (NULL != (timeperiods = DBget_table("timeperiods")) &&
+			NULL != (field = DBget_field(timeperiods, "every")))
+	{
+		ZBX_STR2UINT64(every, field->default_value);
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	result = DBselect("select timeperiodid from timeperiods where every=0");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(time_period_id, row[0]);
+
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid maintenance time period found: "ZBX_FS_UI64
+				", changing \"every\" to "ZBX_FS_UI64, time_period_id, every);
+		invalidate = 1;
+	}
+
+	DBfree_result(result);
+
+	if (0 != invalidate &&
+			ZBX_DB_OK > DBexecute("update timeperiods set every=1 where timeperiodid!=0 and every=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050016(void)
+{
 	const ZBX_TABLE table =
 		{"interface_snmp", "interfaceid", 0,
 			{
@@ -216,7 +256,7 @@ static int	DBpatch_4050015(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050016(void)
+static int	DBpatch_4050017(void)
 {
 	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -610,7 +650,7 @@ static int	DBpatch_items_type_update(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4050017(void)
+static int	DBpatch_4050018(void)
 {
 	zbx_vector_dbu_interface_t	interfaces;
 	zbx_vector_dbu_snmp_if_t	snmp_ifs, snmp_new_ifs, snmp_def_ifs;
@@ -661,52 +701,52 @@ static int	DBpatch_4050017(void)
 	return ret;
 }
 
-static int	DBpatch_4050018(void)
+static int	DBpatch_4050019(void)
 {
 	return DBdrop_field("interface", "bulk");
 }
 
-static int	DBpatch_4050019(void)
+static int	DBpatch_4050020(void)
 {
 	return DBdrop_field("items", "snmp_community");
 }
 
-static int	DBpatch_4050020(void)
+static int	DBpatch_4050021(void)
 {
 	return DBdrop_field("items", "snmpv3_securityname");
 }
 
-static int	DBpatch_4050021(void)
+static int	DBpatch_4050022(void)
 {
 	return DBdrop_field("items", "snmpv3_securitylevel");
 }
 
-static int	DBpatch_4050022(void)
+static int	DBpatch_4050023(void)
 {
 	return DBdrop_field("items", "snmpv3_authpassphrase");
 }
 
-static int	DBpatch_4050023(void)
+static int	DBpatch_4050024(void)
 {
 	return DBdrop_field("items", "snmpv3_privpassphrase");
 }
 
-static int	DBpatch_4050024(void)
+static int	DBpatch_4050025(void)
 {
 	return DBdrop_field("items", "snmpv3_authprotocol");
 }
 
-static int	DBpatch_4050025(void)
+static int	DBpatch_4050026(void)
 {
 	return DBdrop_field("items", "snmpv3_privprotocol");
 }
 
-static int	DBpatch_4050026(void)
+static int	DBpatch_4050027(void)
 {
 	return DBdrop_field("items", "snmpv3_contextname");
 }
 
-static int	DBpatch_4050027(void)
+static int	DBpatch_4050028(void)
 {
 	return DBdrop_field("items", "port");
 }
@@ -741,5 +781,6 @@ DBPATCH_ADD(4050024, 0, 1)
 DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
+DBPATCH_ADD(4050028, 0, 1)
 
 DBPATCH_END()

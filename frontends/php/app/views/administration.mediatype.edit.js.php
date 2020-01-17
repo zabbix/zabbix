@@ -81,7 +81,8 @@
 
 			$(this).trimValues([
 				'#name', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
-				'#smtp_username', '#maxsessions'
+				'#smtp_username', '#maxsessions', 'input[name^="parameters"]', 'input[name="script"]',
+				'#event_menu_name', '#event_menu_url'
 			]);
 		});
 
