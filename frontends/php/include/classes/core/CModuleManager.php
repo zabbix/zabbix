@@ -156,7 +156,6 @@ final class CModuleManager {
 
 		// Ensure empty defaults.
 		$manifest += [
-			'name' => '',
 			'author' => '',
 			'url' => '',
 			'description' => '',
