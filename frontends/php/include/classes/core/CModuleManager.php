@@ -166,10 +166,6 @@ final class CModuleManager {
 		return $manifest;
 	}
 
-	public function getManifests(): array {
-		return $this->manifests;
-	}
-
 	/**
 	 * Get namespaces of all added modules.
 	 *
