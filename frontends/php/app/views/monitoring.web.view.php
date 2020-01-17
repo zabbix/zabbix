@@ -43,7 +43,7 @@ $this->addJsFile('layout.mode.js');
 					$data['pageFilter']->getHostsCB()
 				])
 			),
-		(new CTag('nav', true, get_icon('fullscreen')))
+		(new CTag('nav', true, get_icon('kioskmode')))
 			->setAttribute('aria-label', _('Content controls'))
 		])))
 	->addItem(

@@ -455,17 +455,14 @@ class ZBase {
 	}
 
 	/**
-	 * Set layout to fullscreen or kiosk mode if URL contains 'fullscreen' and/or 'kiosk' arguments.
+	 * Set layout to kiosk mode if URL contains 'kiosk' arguments.
 	 */
 	private function setLayoutModeByUrl() {
 		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
 			CView::setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 		}
-		elseif (array_key_exists('fullscreen', $_GET)) {
-			CView::setLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
-		}
 
-		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
-		unset($_GET['fullscreen'], $_GET['kiosk']);
+		// Remove $_GET arguments to prevent CUrl from generating URL with 'kiosk' arguments.
+		unset($_GET['kiosk']);
 	}
 }

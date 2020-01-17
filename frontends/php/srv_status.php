@@ -172,7 +172,7 @@ else {
 							$period_combo
 						])
 					),
-				(new CTag('nav', true, get_icon('fullscreen')))->setAttribute('aria-label', _('Content controls'))
+				(new CTag('nav', true, get_icon('kioskmode')))->setAttribute('aria-label', _('Content controls'))
 			]))
 			->addItem($tree->getHTML())
 			->show();

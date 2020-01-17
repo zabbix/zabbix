@@ -32,7 +32,7 @@ if (!array_key_exists('web_layout_mode', $page)) {
 	$page['web_layout_mode'] = ZBX_LAYOUT_NORMAL;
 }
 
-if (!defined('ZBX_PAGE_NO_MENU') && in_array($page['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE])) {
+if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE) {
 	define('ZBX_PAGE_NO_MENU', true);
 }
 
@@ -160,8 +160,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	}
 
 	$pageHeader = new CPageHeader($pageTitle);
-	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU')
-		|| in_array($page['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE]));
+	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU') || $page['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE);
 
 	$theme = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {

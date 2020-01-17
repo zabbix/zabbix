@@ -54,7 +54,7 @@ $this->addJsFile('layout.mode.js');
 				'elname' => 'sysmapid',
 				'elid' => $data['map']['sysmapid']
 			]))
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('kioskmode'))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]))

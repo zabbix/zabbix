@@ -94,7 +94,7 @@ if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	]));
 }
 
-$action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_icon('fullscreen')]);
+$action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_icon('kioskmode')]);
 
 $header['right']->addItem($action_list);
 

@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.0.0alpha1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4050014);
+define('ZABBIX_DB_VERSION',		4050015);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -1324,8 +1324,7 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
-define('ZBX_LAYOUT_FULLSCREEN', 1);
-define('ZBX_LAYOUT_KIOSKMODE',  2);
+define('ZBX_LAYOUT_KIOSKMODE',  1);
 define('ZBX_LAYOUT_MODE', 'layout-mode');
 
 // input fields
@@ -1524,7 +1523,6 @@ define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
 define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
-define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
 define('ZBX_STYLE_BTN_SEARCH', 'btn-search');

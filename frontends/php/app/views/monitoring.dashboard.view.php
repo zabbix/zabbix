@@ -87,7 +87,7 @@ else {
 						->setAttribute('aria-haspopup', true)
 						->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid']))
 					)
-					->addItem(get_icon('fullscreen'))
+					->addItem(get_icon('kioskmode'))
 			]))->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem((new CListItem([

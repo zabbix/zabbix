@@ -33,7 +33,7 @@ class CWidget {
 	protected $body = [];
 
 	/**
-	 * Layout mode (ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_FULLSCREEN|ZBX_LAYOUT_KIOSKMODE).
+	 * Layout mode (ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_KIOSKMODE).
 	 *
 	 * @var integer
 	 */
@@ -72,7 +72,7 @@ class CWidget {
 	}
 
 	public function setBreadcrumbs($breadcrumbs = null) {
-		if ($breadcrumbs !== null && in_array($this->web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+		if ($breadcrumbs !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL) {
 			$this->body[] = $breadcrumbs;
 		}
 
@@ -97,7 +97,7 @@ class CWidget {
 		$widget = [];
 
 		if ($this->web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-			$this->addItem(get_icon('fullscreen')->setAttribute('aria-label', _('Content controls')));
+			$this->addItem(get_icon('kioskmode')->setAttribute('aria-label', _('Content controls')));
 		}
 		elseif ($this->title !== null || $this->controls !== null) {
 			$widget[] = $this->createTopHeader();

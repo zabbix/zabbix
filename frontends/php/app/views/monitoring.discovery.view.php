@@ -27,10 +27,8 @@ $this->addJsFile('multiselect.js');
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))
 	->setWebLayoutMode(CView::getLayoutMode())
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(get_icon('fullscreen'))
-		))
+	->setControls(
+		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode'))))
 			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'discovery.view')))

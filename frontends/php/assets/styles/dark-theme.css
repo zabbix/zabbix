@@ -1659,9 +1659,6 @@ button {
 .btn-kiosk {
   background: #69808d url(../img/icon-sprite.svg) no-repeat -79px -259px; }
 
-.btn-max {
-  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -223px; }
-
 .btn-min {
   background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -259px; }
 
@@ -1963,7 +1960,7 @@ button {
   opacity: .5;
   transition: opacity .2s ease-out; }
 
-.btn-conf, .btn-kiosk, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
+.btn-conf, .btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
   height: auto;
   padding: 0; }

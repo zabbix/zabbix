@@ -30,11 +30,11 @@ $widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
-		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen'))))
+		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode'))))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$widget->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'latest.view')))
 		->setProfile('web.latest.filter')
 		->setActiveTab($data['active_tab'])

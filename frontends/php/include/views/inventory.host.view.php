@@ -221,7 +221,7 @@ $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel(url_param
 return (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setWebLayoutMode(CView::getLayoutMode())
-	->setControls((new CList())->addItem(get_icon('fullscreen')))
+	->setControls((new CList())->addItem(get_icon('kioskmode')))
 	->addItem((new CForm())
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem($hostInventoriesTab)

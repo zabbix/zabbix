@@ -37,7 +37,7 @@ $widget = (new CWidget())
 					->setArgument('new', '1')
 					->getUrl()
 			))
-		->addItem(get_icon('fullscreen'))
+		->addItem(get_icon('kioskmode'))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	);
