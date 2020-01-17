@@ -190,15 +190,15 @@ class CHostInterface extends CApiService {
 		if ($this->outputIsRequested('details', $options['output'])) {
 			foreach ($result as &$value) {
 				$snmp = [
-					'version' => '2',
-					'bulk' => '1',
+					'version' => (string) SNMP_V2C,
+					'bulk' => (string) SNMP_BULK_ENABLED,
 					'community' => '',
 					'securityname' => '',
-					'securitylevel' => '0',
+					'securitylevel' => (string) ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 					'authpassphrase' => '',
 					'privpassphrase' => '',
-					'authprotocol' => '0',
-					'privprotocol' => '0',
+					'authprotocol' => (string) ITEM_AUTHPROTOCOL_MD5,
+					'privprotocol' => (string) ITEM_PRIVPROTOCOL_DES,
 					'contextname' => ''
 				];
 
@@ -649,33 +649,10 @@ class CHostInterface extends CApiService {
 
 			if ($interfacesToUpdate) {
 				$this->update($interfacesToUpdate);
-
-				/* $this->checkInput($interfacesToUpdate, 'update');
-				$this->checkSnmpInput($interfacesToUpdate);
-
-				$data = [];
-				$snmp_data = [];
-				foreach ($interfacesToUpdate as $interface) {
-					$data[] = [
-						'values' => $interface,
-						'where' => ['interfaceid' => $interface['interfaceid']]
-					];
-
-					if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-						$snmp_data[] = [
-							'intefaceid' => $interface['interfaceid'],
-							'details' => $interface['details']
-						];
-					}
-				}
-				DB::update('interface', $data); */
 			}
 
 			if ($interfacesToAdd) {
 				$interfaceids = $this->create($interfacesToAdd);
-
-				// $this->checkInput($interfacesToAdd, 'create');
-				// $interfaceids = DB::insert('interface', $interfacesToAdd);
 
 				foreach ($host['interfaces'] as &$interface) {
 					if (!array_key_exists('interfaceid', $interface)) {
