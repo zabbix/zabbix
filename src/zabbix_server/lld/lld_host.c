@@ -119,7 +119,7 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 	zbx_free(interface->dns);
 	zbx_free(interface->ip);
 
-	if (INTERFACE_TYPE_SNMP != interface->type)
+	if (INTERFACE_TYPE_SNMP == interface->type)
 	{
 		zbx_free(interface->data.snmp->community);
 		zbx_free(interface->data.snmp->securityname);
@@ -2869,11 +2869,12 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,"
 			"s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
 			"s.authprotocol,s.privprotocol,s.contextname"
-			" from (interface hi,items i)"
-				" left join interface_snmp s"
-					" on hi.interfaceid=s.interfaceid"
-			" where hi.hostid=i.hostid"
-				" and i.itemid=" ZBX_FS_UI64,
+			" from interface hi"
+			" inner join items i"
+				" on hi.hostid=i.hostid "
+			" left join interface_snmp s"
+				" on hi.interfaceid=s.interfaceid"
+			" where i.itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
