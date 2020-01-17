@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 /*
  * 5.0 development database patches
@@ -191,6 +192,46 @@ out:
 
 static int	DBpatch_4050015(void)
 {
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		time_period_id, every;
+	int			invalidate = 0;
+	const ZBX_TABLE		*timeperiods;
+	const ZBX_FIELD		*field;
+
+	if (NULL != (timeperiods = DBget_table("timeperiods")) &&
+			NULL != (field = DBget_field(timeperiods, "every")))
+	{
+		ZBX_STR2UINT64(every, field->default_value);
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	result = DBselect("select timeperiodid from timeperiods where every=0");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(time_period_id, row[0]);
+
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid maintenance time period found: "ZBX_FS_UI64
+				", changing \"every\" to "ZBX_FS_UI64, time_period_id, every);
+		invalidate = 1;
+	}
+
+	DBfree_result(result);
+
+	if (0 != invalidate &&
+			ZBX_DB_OK > DBexecute("update timeperiods set every=1 where timeperiodid!=0 and every=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050016(void)
+{
 	const ZBX_TABLE	table =
 			{"media_type_message", "mediatype_messageid", 0,
 				{
@@ -208,26 +249,26 @@ static int	DBpatch_4050015(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050016(void)
+static int	DBpatch_4050017(void)
 {
 	const ZBX_FIELD	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("media_type_message", 1, &field);
 }
 
-static int	DBpatch_4050017(void)
+static int	DBpatch_4050018(void)
 {
 	return DBcreate_index("media_type_message", "media_type_message_1", "mediatypeid,eventsource,recovery", 1);
 }
 
-static int	DBpatch_4050018(void)
+static int	DBpatch_4050019(void)
 {
 	const ZBX_FIELD	field = {"default_msg", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("opmessage", &field);
 }
 
-static int	DBpatch_4050019(void)
+static int	DBpatch_4050020(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -269,7 +310,7 @@ static int	DBpatch_4050019(void)
 	return ret;
 }
 
-static int	DBpatch_4050020(void)
+static int	DBpatch_4050021(void)
 {
 	char	*messages[3][3][4] =
 			{
@@ -457,32 +498,32 @@ out:
 	return ret;
 }
 
-static int	DBpatch_4050021(void)
+static int	DBpatch_4050022(void)
 {
 	return DBdrop_field("actions", "def_shortdata");
 }
 
-static int	DBpatch_4050022(void)
+static int	DBpatch_4050023(void)
 {
 	return DBdrop_field("actions", "def_longdata");
 }
 
-static int	DBpatch_4050023(void)
+static int	DBpatch_4050024(void)
 {
 	return DBdrop_field("actions", "r_shortdata");
 }
 
-static int	DBpatch_4050024(void)
+static int	DBpatch_4050025(void)
 {
 	return DBdrop_field("actions", "r_longdata");
 }
 
-static int	DBpatch_4050025(void)
+static int	DBpatch_4050026(void)
 {
 	return DBdrop_field("actions", "ack_shortdata");
 }
 
-static int	DBpatch_4050026(void)
+static int	DBpatch_4050027(void)
 {
 	return DBdrop_field("actions", "ack_longdata");
 }
@@ -516,5 +557,6 @@ DBPATCH_ADD(4050023, 0, 1)
 DBPATCH_ADD(4050024, 0, 1)
 DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
+DBPATCH_ADD(4050027, 0, 1)
 
 DBPATCH_END()
