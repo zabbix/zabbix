@@ -172,7 +172,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private function getDefaultInterfaceArray(array $interface) {
+	protected function getDefaultInterfaceArray(array $interface) {
 		return $interface + [
 			'default' => CXmlConstantName::YES,
 			'type' => CXmlConstantName::SNMP,
@@ -191,7 +191,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private function createHelperArray(array $data, $type) {
+	protected function createHelperArray(array $data, $type) {
 		return [
 			'from' => $type,
 			'name' => $data['name'],
@@ -232,7 +232,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return string
 	 */
-	private function getInterfaceKey(array $data) {
+	protected function getInterfaceKey(array $data) {
 		// Check zero element.
 		if (!array_key_exists('interface', $data['interfaces'])) {
 			return 'interface';
