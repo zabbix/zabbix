@@ -229,8 +229,8 @@ final class CModuleManager {
 		foreach ($this->manifests as $relative_path => $manifest) {
 			$ids[$manifest['id']][] = $relative_path;
 			$namespaces[$manifest['namespace']][] = $relative_path;
-			foreach (array_keys($manifest['actions']) as $action) {
-				$actions[$action][] = $relative_path;
+			foreach (array_keys($manifest['actions']) as $action_name) {
+				$actions[$action_name][] = $relative_path;
 			}
 		}
 
