@@ -85,8 +85,13 @@
 	 * @return object
 	 */
 	function getItemTestProperties(form_selector) {
-		var form_data = jQuery(form_selector).serializeJSON(),
+		var $form = jQuery(form_selector),
+			form_data,
 			properties = {};
+
+		$form.trimValues(['#key']);
+
+		form_data = $form.serializeJSON();
 
 		// Item type specific properties.
 		switch (+form_data['type']) {
