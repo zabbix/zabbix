@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -454,8 +454,8 @@ class CAction extends CApiService {
 			}
 
 			$allowedScripts = API::Script()->get([
-				'scriptids' => $scriptIds,
 				'output' => ['scriptid'],
+				'scriptids' => $scriptIds,
 				'preservekeys' => true
 			]);
 			foreach ($scriptIds as $scriptId) {
@@ -1874,7 +1874,7 @@ class CAction extends CApiService {
 								);
 							}
 							$scripts = API::Script()->get([
-								'output' => ['scriptid','name'],
+								'output' => ['scriptid', 'name'],
 								'scriptids' => $operation['opcommand']['scriptid'],
 								'preservekeys' => true
 							]);

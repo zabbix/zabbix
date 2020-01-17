@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 /*
  * 5.0 development database patches
@@ -134,6 +135,101 @@ static int	DBpatch_4050013(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4050014(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL, *name = NULL, *name_esc;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select wf.widget_fieldid,wf.name"
+			" from widget_field wf,widget w"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='navtree'"
+				" and wf.name like 'map.%%' or wf.name like 'mapid.%%'"
+			);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 == strncmp(row[1], "map.", 4))
+		{
+			name = zbx_dsprintf(name, "navtree.%s", row[1] + 4);
+		}
+		else
+		{
+			name = zbx_dsprintf(name, "navtree.sys%s", row[1]);
+		}
+
+		name_esc = DBdyn_escape_string_len(name, 255);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"update widget_field set name='%s' where widget_fieldid=%s;\n", name_esc, row[0]);
+
+		zbx_free(name_esc);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+	zbx_free(name);
+
+	return ret;
+}
+
+static int	DBpatch_4050015(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		time_period_id, every;
+	int			invalidate = 0;
+	const ZBX_TABLE		*timeperiods;
+	const ZBX_FIELD		*field;
+
+	if (NULL != (timeperiods = DBget_table("timeperiods")) &&
+			NULL != (field = DBget_field(timeperiods, "every")))
+	{
+		ZBX_STR2UINT64(every, field->default_value);
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	result = DBselect("select timeperiodid from timeperiods where every=0");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(time_period_id, row[0]);
+
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid maintenance time period found: "ZBX_FS_UI64
+				", changing \"every\" to "ZBX_FS_UI64, time_period_id, every);
+		invalidate = 1;
+	}
+
+	DBfree_result(result);
+
+	if (0 != invalidate &&
+			ZBX_DB_OK > DBexecute("update timeperiods set every=1 where timeperiodid!=0 and every=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -150,5 +246,7 @@ DBPATCH_ADD(4050007, 0, 1)
 DBPATCH_ADD(4050011, 0, 1)
 DBPATCH_ADD(4050012, 0, 1)
 DBPATCH_ADD(4050013, 0, 1)
+DBPATCH_ADD(4050014, 0, 1)
+DBPATCH_ADD(4050015, 0, 1)
 
 DBPATCH_END()

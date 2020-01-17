@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -214,6 +214,7 @@ $tranStrings = [
 		'S_PROBLEM_ON' => _('Problem on'),
 		'S_RESOLVED' => _('Resolved'),
 		'S_MUTE' => _('Mute'),
+		'S_CANNOT_SUPPORT_NOTIFICATION_AUDIO' => _('Cannot support notification audio for this device.'),
 		'S_UNMUTE' => _('Unmute'),
 		'S_CLEAR' => _('Clear'),
 		'S_SNOOZE' => _('Snooze')

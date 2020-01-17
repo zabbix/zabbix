@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@
 define('ZABBIX_VERSION',		'5.0.0alpha1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4050013);
+define('ZABBIX_DB_VERSION',		4050015);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2019');
+define('ZABBIX_COPYRIGHT_TO',	'2020');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -1288,6 +1288,7 @@ define('API_ALLOW_LLD_MACRO',			0x0080);
 define('API_REQUIRED_LLD_MACRO',		0x0100);
 define('API_TIME_UNIT_WITH_YEAR',		0x0200);
 define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
+define('API_PRESERVE_KEYS',				0x0800);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,6 +141,7 @@ class CControllerMediatypeEdit extends CController {
 			'event_menu_name' => $db_defaults['event_menu_name'],
 			'parameters' => [
 				['name' => 'URL', 'value'=> ''],
+				['name' => 'HTTPProxy', 'value'=> ''],
 				['name' => 'To', 'value' => '{ALERT.SENDTO}'],
 				['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
 				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
