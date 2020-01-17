@@ -95,7 +95,7 @@ class CControllerModuleUpdate extends CController {
 			}
 
 			if (array_key_exists($moduleid, $this->modules)) {
-				$db_modules_update_names[] = ($manifest['name'] !== '') ? $manifest['name'] : $manifest['id'];
+				$db_modules_update_names[] = $manifest['name'];
 			}
 		}
 

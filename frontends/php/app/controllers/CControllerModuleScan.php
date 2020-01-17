@@ -78,7 +78,7 @@ class CControllerModuleScan extends CController {
 					'status' => MODULE_STATUS_DISABLED,
 					'config' => []
 				];
-				$db_modules_create_names[] = ($manifest['name'] !== '') ? $manifest['name'] : $manifest['id'];
+				$db_modules_create_names[] = $manifest['name'];
 			}
 		}
 

@@ -105,7 +105,7 @@ class CControllerModuleList extends CController {
 			}
 		}
 
-		if ($modules_missing && !hasErrorMesssages()) {
+		if ($modules_missing) {
 			error(_n('Cannot load module at: %s.', 'Cannot load modules at: %s.', implode(', ', $modules_missing),
 				count($modules_missing)
 			));
