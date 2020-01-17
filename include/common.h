@@ -1229,6 +1229,15 @@ int	__zbx_open(const char *pathname, int flags);
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
 
+typedef struct
+{
+	zbx_fs_time_t	modification_time;	/* time of last modification */
+	zbx_fs_time_t	access_time;		/* time of last access */
+	zbx_fs_time_t	change_time;		/* time of last status change */
+}
+zbx_file_time_t;
+
+int	zbx_get_file_time(const char *path, zbx_file_time_t *time);
 void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
