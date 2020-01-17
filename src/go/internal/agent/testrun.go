@@ -23,16 +23,17 @@ import (
 	"errors"
 	"fmt"
 
+	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/plugin"
 )
 
-func CheckMetric(metric string) (err error) {
+func CheckMetric(metric string, suppressPrinting bool) (err error) {
 	var key string
 	var params []string
 
 	defer func() {
-		if err != nil {
+		if !suppressPrinting && err != nil {
 			fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
 		}
 	}()
@@ -41,13 +42,17 @@ func CheckMetric(metric string) (err error) {
 		return
 	}
 
+	var ok bool
+	if ok = keyaccess.CheckRules(key, params); !ok {
+		return errors.New("Unsupported item key.")
+	}
+
 	var acc plugin.Accessor
 	if acc, err = plugin.Get(key); err != nil {
 		return
 	}
 
 	var exporter plugin.Exporter
-	var ok bool
 	if exporter, ok = acc.(plugin.Exporter); !ok {
 		return errors.New("not an exporter plugin")
 	}
