@@ -1727,7 +1727,7 @@ class C50XmlValidator {
 					'script' => 				['type' => XML_STRING, 'default' => ''],
 					'timeout' => 				['type' => XML_STRING, 'default' => '30s'],
 					'process_tags' => 			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					'show_event_menu' => 		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'show_event_menu' => 		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'event_menu_url' => 		['type' => XML_STRING, 'default' => ''],
 					'event_menu_name' => 		['type' => XML_STRING, 'default' => ''],
 					'description' => 			['type' => XML_STRING, 'default' => ''],
