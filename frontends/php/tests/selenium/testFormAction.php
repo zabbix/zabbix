@@ -812,7 +812,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
-				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'value', '1h');
 
 				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
 				$this->assertTrue($form->getField('Pause operations for suppressed problems')->getValue());
@@ -822,11 +821,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->assertEquals($update_field->getHeadersText(), ['Details', 'Action']);
 				break;
 			case 'Discovery':
-				$this->zbxTestTextNotPresent(['Default operation step duration', 'Pause operations for suppressed problems',
-					'Recovery operations', 'Update operations']);
-				$this->zbxTestAssertElementNotPresentId('esc_period');
-				$this->zbxTestAssertElementNotPresentId('pause_suppressed');
-				break;
 			case 'Autoregistration':
 				$this->zbxTestTextNotPresent(['Default operation step duration', 'Pause operations for suppressed problems',
 					'Recovery operations', 'Update operations']);
@@ -838,7 +832,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
-				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'value', '1h');
 
 				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
 				$recovery_field = $form->getField('Recovery operations')->asTable();
@@ -895,7 +888,7 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['new_operation_opmessage_custom_msg'])) {
 			$new_operation_opmessage_custom_msg = $data['new_operation_opmessage_custom_msg'];
-			$this->assertTrue($this->query('id:operation_opmessage_default_msg')->asCheckbox()->one()->isChecked(false));
+			$this->assertFalse($this->zbxTestCheckboxSelected('operation_opmessage_default_msg'));
 		}
 		elseif ($new_operation_operationtype == 'Send message') {
 			$new_operation_opmessage_custom_msg = 'checked';
@@ -934,7 +927,7 @@ class testFormAction extends CLegacyWebTest {
 					$this->zbxTestAssertVisibleId('operation_esc_period');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'maxlength', 255);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'size', 20);
-					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'value', '0');
+					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'value', 0);
 					break;
 				}
 			}
@@ -1318,29 +1311,11 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if (CTestArrayHelper::get($data, 'recovery_msg', false)) {
-			$recovery_field->query('button:Add')->one()->click();
-			COverlayDialogElement::find()->one()->waitUntilReady();
-			switch ($eventsource) {
-				case 'Triggers':
-					$this->zbxTestTextPresent ('Operation type');
-					$this->zbxTestAssertVisibleXpath('//select[@id=\'operationtype\']');
-					$this->zbxTestDropdownHasOptions('operationtype', ['Send message', 'Remote command', 'Notify all involved']);
-					break;
-				case 'Internal':
-					$this->zbxTestDropdownHasOptions('operationtype', ['Send message', 'Notify all involved']);
-					break;
-			}
-			COverlayDialogElement::find()->one()->close();
+			$this->checkRecoveryUpdateOperations($recovery_field, $eventsource);
 		}
 
 		if (CTestArrayHelper::get($data, 'acknowledge_msg', false)) {
-			$update_field->query('button:Add')->one()->click();
-			COverlayDialogElement::find()->one()->waitUntilReady();
-			$this->zbxTestTextPresent ('Operation type');
-			$this->zbxTestAssertVisibleXpath('//select[@id=\'operationtype\']');
-			$this->zbxTestDropdownHasOptions('operationtype', ['Send message', 'Remote command', 'Notify all involved']);
-
-			COverlayDialogElement::find()->one()->close();
+			$this->checkRecoveryUpdateOperations($update_field, $eventsource);
 		}
 
 		$this->zbxTestAssertVisibleId('add');
@@ -1349,6 +1324,27 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('cancel');
 		$this->zbxTestAssertAttribute('//button[@id=\'cancel\']', 'name', 'cancel');
 	}
+
+	// Function that checks possible operation types and custom message related fields for recovery and update operations.
+	private function checkRecoveryUpdateOperations($operation_field, $eventsource) {
+		$operation_field->query('button:Add')->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$operation_details = $this->query('name:popup.operation')->asForm()->one();
+		// Check available operation types depending on event source and the selected operation type.
+		$message_types = ($eventsource === 'Triggers') ? ['Send message', 'Remote command', 'Notify all involved'] :
+				['Send message', 'Notify all involved'];
+		$this->zbxTestDropdownHasOptions('operationtype', $message_types);
+		$this->assertEquals('Send message', $operation_details->getField('Operation type')->getValue());
+		// Make sure that Custom message is unchecked and that message related fields are not visible.
+		$this->assertFalse($operation_details->getField('Custom message')->getValue());
+		$this->zbxTestTextNotVisibleOnPage('Subject','Message');
+		// Set the Custom message option and check Subject and Message fields.
+		$operation_details->getField('Custom message')->set(true);
+		$this->assertEquals(255, $operation_details->getField('Subject')->waitUntilVisible()->getAttribute('maxlength'));
+		$this->assertFalse($operation_details->getField('Message')->isAttributePresent('maxlength'));
+		COverlayDialogElement::find()->one()->close();
+	}
+
 
 	public static function update() {
 		return CDBHelper::getDataProvider('SELECT name, eventsource FROM actions');
