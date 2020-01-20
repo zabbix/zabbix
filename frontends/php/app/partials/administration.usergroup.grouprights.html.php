@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 $group_rights_table = (new CTable())
 	->setId('group-right-table')
 	->setAttribute('style', 'width: 100%;')

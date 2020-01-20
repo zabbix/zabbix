@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
 }
@@ -45,8 +49,6 @@ else {
 
 	$this->enableLayoutModes();
 	$web_layout_mode = $this->getLayoutMode();
-
-	$breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
 	$main_filter_form = null;
 
@@ -110,7 +112,9 @@ else {
 		->setBreadcrumbs((new CList())
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addItem($breadcrumbs)
+			->addItem(new CPartial('monitoring.dashboard.breadcrumbs', [
+				'dashboard' => $data['dashboard']
+			]))
 			->addClass(ZBX_STYLE_OBJECT_GROUP)
 			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		);

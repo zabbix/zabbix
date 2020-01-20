@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 $user_navigation = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->includeJsFile('administration.user.edit.common.js.php');
 $this->includeJsFile(($data['action'] === 'user.edit')
 	? 'administration.user.edit.js.php'

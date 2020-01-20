@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $discovery_ckeck_types = discovery_check_type2str();
 order_result($discovery_ckeck_types);
 

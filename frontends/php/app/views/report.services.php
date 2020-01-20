@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('layout.mode.js');
 
 $this->enableLayoutModes();

@@ -18,6 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
+
 if ($data['clock']['critical_error'] !== null) {
 	$item = (new CTableInfo())->setNoDataMessage($data['clock']['critical_error']);
 

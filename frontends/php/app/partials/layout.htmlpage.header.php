@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
 
 $page_title = $data['page']['title'];

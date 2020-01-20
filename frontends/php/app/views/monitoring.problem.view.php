@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $options = [
 	'resourcetype' => SCREEN_RESOURCE_PROBLEM,
 	'mode' => SCREEN_MODE_JS,

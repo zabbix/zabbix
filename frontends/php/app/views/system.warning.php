@@ -18,6 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
+
 $pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team')))
 	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
 	->display();

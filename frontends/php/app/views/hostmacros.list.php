@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
 	'body' => (new CPartial('hostmacros.list.html', $data))->getOutput()
 ];

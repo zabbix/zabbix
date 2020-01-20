@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $table = (new CTableInfo())->setNoDataMessage(_('No maps added.'));
 
 foreach ($data['maps'] as $map) {

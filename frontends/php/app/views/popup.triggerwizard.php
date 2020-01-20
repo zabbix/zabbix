@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $options = $data['options'];
 $output = [
 	'header' => $data['title'],

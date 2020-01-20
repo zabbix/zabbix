@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->includeJsFile('administration.usergroup.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('User groups'));

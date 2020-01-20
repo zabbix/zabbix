@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm())
 	->cleanItems()
 	->addVar('action', 'popup.preproctest.send')

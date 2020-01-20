@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 if ($data['readonly'] && !$data['macros']) {
 	$table = new CObject(_('No macros found.'));
 }

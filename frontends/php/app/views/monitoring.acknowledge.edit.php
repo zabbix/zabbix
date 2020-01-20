@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->includeJsFile('monitoring.acknowledge.edit.js.php');
 
 $form_list = (new CFormList())

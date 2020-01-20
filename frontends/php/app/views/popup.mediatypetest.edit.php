@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form_list = (new CFormList());
 
 if ($data['type'] == MEDIA_TYPE_WEBHOOK) {

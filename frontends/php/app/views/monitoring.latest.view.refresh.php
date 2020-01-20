@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
 	'body' => (new CPartial('monitoring.latest.view.html', $data))->getOutput()
 ];

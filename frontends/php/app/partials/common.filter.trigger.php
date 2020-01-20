@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 $this->includeJsFile('common.filter.trigger.js.php');
 
 $filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))

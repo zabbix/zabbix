@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $page_url = (new CUrl('zabbix.php'))->setArgument('action', 'image.list');
 $widget = (new CWidget())
 	->setTitle(_('Images'))

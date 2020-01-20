@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');
 }

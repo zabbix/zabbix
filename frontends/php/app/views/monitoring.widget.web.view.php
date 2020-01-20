@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 // indicator of sort field
 $sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
 

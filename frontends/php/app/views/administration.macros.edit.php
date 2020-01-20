@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('textareaflexible.js');
 
 $this->includeJsFile('administration.macros.edit.js.php');

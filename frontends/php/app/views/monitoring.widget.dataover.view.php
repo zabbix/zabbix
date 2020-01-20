@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $table = getItemsDataOverview($data['groupids'], $data['application'], $data['style'], $data['show_suppressed']);
 
 $output = [

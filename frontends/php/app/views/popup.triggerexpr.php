@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 // Create form.
 $expression_form = (new CForm())
 	->cleanItems()

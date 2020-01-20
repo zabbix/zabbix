@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->includeJsFile('administration.iconmap.edit.js.php');
 
 $widget = (new CWidget())

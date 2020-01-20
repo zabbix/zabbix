@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 $tag_filter_table = (new CTable())
 	->setId('tag-filter-table')
 	->setAttribute('style', 'width: 100%;')

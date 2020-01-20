@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 show_messages();
 
 if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {

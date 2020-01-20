@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('multiselect.js');
 
 $this->includeJsFile('administration.script.edit.js.php');

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once 'include/menu.inc.php';
 
 function local_generateHeader($data) {

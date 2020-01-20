@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if ($data['error'] !== null) {
 	$table = (new CTableInfo())->setNoDataMessage($data['error']);
 }

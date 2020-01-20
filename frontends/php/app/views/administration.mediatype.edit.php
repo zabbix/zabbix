@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('administration.mediatype.edit.js.php');

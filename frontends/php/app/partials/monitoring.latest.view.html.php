@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 $form = (new CForm('GET', 'history.php'))
 	->cleanItems()
 	->setName('items')

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('colorpicker.js');
 
 $this->includeJsFile('administration.trigdisplay.edit.js.php');

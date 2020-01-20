@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $options = $data['options'];
 $severity_row = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 

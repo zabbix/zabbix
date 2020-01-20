@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 // Authentication general fields and HTTP authentication fields.

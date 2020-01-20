@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
 	'body' => (new CPartial('administration.usergroup.tagfilters.html', [
 		'tag_filters' => $data['tag_filters']
