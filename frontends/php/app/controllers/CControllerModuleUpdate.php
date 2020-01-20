@@ -94,7 +94,7 @@ class CControllerModuleUpdate extends CController {
 				$manifest = $module_manager->addModule($db_module['relative_path']);
 			}
 
-			if (array_key_exists($moduleid, $this->modules)) {
+			if (array_key_exists($moduleid, $this->modules) && $manifest) {
 				$db_modules_update_names[] = $manifest['name'];
 			}
 		}

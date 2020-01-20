@@ -97,7 +97,7 @@ class CControllerModuleList extends CController {
 		foreach ($db_modules as $moduleid => $db_module) {
 			$manifest = $module_manager->addModule($db_module['relative_path']);
 
-			if ($manifest !== null) {
+			if ($manifest) {
 				$modules[$moduleid] = $db_module + $manifest;
 			}
 			else {
