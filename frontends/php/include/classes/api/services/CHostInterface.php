@@ -207,6 +207,10 @@ class CHostInterface extends CApiService {
 						unset($value[$field]);
 					}
 
+					if (!$this->outputIsRequested('type', $options['output'])) {
+						unset($value['type']);
+					}
+
 					$value['details'] = [];
 					continue;
 				}
@@ -970,12 +974,15 @@ class CHostInterface extends CApiService {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($this->outputIsRequested('details', $options['output'])) {
+			// Select interface type to check show details array or not.
+			$sqlParts = $this->addQuerySelect('hi.type', $sqlParts);
+
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.version', SNMP_V2C, 'version'), $sqlParts);
-			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.bulk', '1', 'bulk'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.bulk', SNMP_BULK_ENABLED, 'bulk'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.community', '', 'community'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.securityname', '', 'securityname'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(
-				dbConditionCoalesce('his.securitylevel', '0', 'securitylevel'),
+				dbConditionCoalesce('his.securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'securitylevel'),
 				$sqlParts
 			);
 			$sqlParts = $this->addQuerySelect(
@@ -986,8 +993,8 @@ class CHostInterface extends CApiService {
 				dbConditionCoalesce('his.privpassphrase', '', 'privpassphrase'),
 				$sqlParts
 			);
-			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.authprotocol', '0', 'authprotocol'), $sqlParts);
-			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.privprotocol', '0', 'privprotocol'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.authprotocol', ITEM_AUTHPROTOCOL_MD5, 'authprotocol'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.privprotocol', ITEM_PRIVPROTOCOL_DES, 'privprotocol'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.contextname', '', 'contextname'), $sqlParts);
 		}
 
