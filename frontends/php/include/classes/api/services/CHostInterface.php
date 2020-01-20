@@ -993,8 +993,14 @@ class CHostInterface extends CApiService {
 				dbConditionCoalesce('his.privpassphrase', '', 'privpassphrase'),
 				$sqlParts
 			);
-			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.authprotocol', ITEM_AUTHPROTOCOL_MD5, 'authprotocol'), $sqlParts);
-			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.privprotocol', ITEM_PRIVPROTOCOL_DES, 'privprotocol'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(
+				dbConditionCoalesce('his.authprotocol', ITEM_AUTHPROTOCOL_MD5, 'authprotocol'),
+				$sqlParts
+			);
+			$sqlParts = $this->addQuerySelect(
+				dbConditionCoalesce('his.privprotocol', ITEM_PRIVPROTOCOL_DES, 'privprotocol'),
+				$sqlParts
+			);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.contextname', '', 'contextname'), $sqlParts);
 		}
 
