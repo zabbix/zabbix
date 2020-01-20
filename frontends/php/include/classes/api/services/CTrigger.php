@@ -1006,10 +1006,10 @@ class CTrigger extends CTriggerGeneral {
 				'triggerids' => $trigger['dependencies'],
 				'nopermissions' => true,
 			]);
-			$depTemplateIds = zbx_toHash(array_column($triggerDependencyTemplates, 'templateid'));
+			$depTemplateIds = array_column($triggerDependencyTemplates, 'templateid', 'templateid');
 
 			// run the check only if a templated trigger has dependencies on other templates
-			$triggerTemplateIds = zbx_toHash(array_column($triggerTemplates, 'templateid'));
+			$triggerTemplateIds = array_column($triggerTemplates, 'templateid', 'templateid');
 			$tdiff = array_diff($depTemplateIds, $triggerTemplateIds);
 			if (!empty($triggerTemplateIds) && !empty($depTemplateIds) && !empty($tdiff)) {
 				$affectedTemplateIds = zbx_array_merge($triggerTemplateIds, $depTemplateIds);

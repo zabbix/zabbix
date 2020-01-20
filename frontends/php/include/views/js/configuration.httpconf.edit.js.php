@@ -87,7 +87,7 @@
 		).html());
 
 		window.httpconf.pair_row_template = new Template(jQuery('#scenario-pair-row').html());
-		window.httpconf.scenario = new Scenario($('#scenarioTab'), <?= json_encode($data['scenario_tab_data']) ?>);
+		window.httpconf.scenario = new Scenario($('#scenarioTab'), <?= json_encode($this->data['scenario_tab_data']) ?>);
 		window.httpconf.steps = new Steps($('#stepTab'), <?= json_encode(array_values($data['steps'])) ?>);
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 

@@ -105,7 +105,7 @@ function getSupportUrl($language = null) {
  * @return array A list of possible locale names.
  */
 function zbx_locale_variants($language) {
-	if (stripos(PHP_OS_FAMILY, 'WIN') === 0) {
+	if (stripos(PHP_OS, 'WIN') === 0) {
 		return zbx_locale_variants_win($language);
 	}
 

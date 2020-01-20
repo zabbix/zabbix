@@ -56,7 +56,7 @@
 			}
 
 			// return to the same form after it has been submitted
-			jQuery('#action').val(<?php echo json_encode(getRequest('action')) ?>);
+			jQuery('#action').val(<?= json_encode(getRequest('action')) ?>);
 
 			create_var('triggersForm', 'add_dependency', 1, true);
 		}

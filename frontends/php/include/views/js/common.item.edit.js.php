@@ -221,12 +221,12 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 ?>
 <script type="text/javascript">
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == <?php echo json_encode(ITEM_AUTHTYPE_PUBLICKEY); ?>
-				&& jQuery('#type').val() == <?php echo json_encode(ITEM_TYPE_SSH); ?>) {
-			jQuery('#row_password label').html(<?php echo json_encode(_('Key passphrase')); ?>);
+		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
+				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
+			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
 		}
 		else {
-			jQuery('#row_password label').html(<?php echo json_encode(_('Password')); ?>);
+			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
 		}
 	}
 
@@ -263,7 +263,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?php echo json_encode(itemTypeInterface()); ?>;
+				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
 				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())]);
 
 				setAuthTypeLabel();

@@ -200,7 +200,7 @@
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
-				.text(json_encode(_('Add')) ?>)
+				.text(<?= json_encode(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#form').val('clone');
