@@ -116,9 +116,9 @@ class CPartial {
 	}
 
 	/**
-	 * Get the contents of a PHP-preprocessed javascript file.
+	 * Get the contents of a PHP-preprocessed JavaScript file.
 	 * Notes:
-	 *   - Javascript file will be searched in the "js" subdirectory of the partial file.
+	 *   - JavaScript file will be searched in the "js" subdirectory of the partial file.
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
 	 * @param string $file_name
@@ -144,9 +144,9 @@ class CPartial {
 	}
 
 	/**
-	 * Include a PHP-preprocessed javascript file inline.
+	 * Include a PHP-preprocessed JavaScript file inline.
 	 * Notes:
-	 *   - Javascript file will be searched in the "js" subdirectory of the partial file.
+	 *   - JavaScript file will be searched in the "js" subdirectory of the partial file.
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
 	 * @param string $file_name

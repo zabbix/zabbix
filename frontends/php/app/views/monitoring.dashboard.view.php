@@ -133,7 +133,7 @@ else {
 		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 		->show();
 
-	// Javascript
+	// JavaScript
 
 	// Activate blinking.
 	(new CScriptTag('jqBlink.blink();'))->show();

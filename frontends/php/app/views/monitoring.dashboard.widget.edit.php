@@ -19,10 +19,6 @@
 **/
 
 
-/**
- * @var CView $this
- */
-
 $widget_view = include('include/classes/widgets/views/widget.'.$data['dialogue']['type'].'.form.view.php');
 
 $form = $widget_view['form'];

@@ -62,7 +62,7 @@ class CView {
 	private $directory;
 
 	/**
-	 * List of javascript files for inclusion into a HTML page using <script src="...">.
+	 * List of JavaScript files for inclusion into a HTML page using <script src="...">.
 	 *
 	 * @var array
 	 */
@@ -129,9 +129,9 @@ class CView {
 	}
 
 	/**
-	 * Get the contents of a PHP-preprocessed javascript file.
+	 * Get the contents of a PHP-preprocessed JavaScript file.
 	 * Notes:
-	 *   - Javascript file will be searched in the "js" subdirectory of the view file.
+	 *   - JavaScript file will be searched in the "js" subdirectory of the view file.
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
 	 * @param string $file_name
@@ -157,9 +157,9 @@ class CView {
 	}
 
 	/**
-	 * Include a PHP-preprocessed javascript file inline.
+	 * Include a PHP-preprocessed JavaScript file inline.
 	 * Notes:
-	 *   - Javascript file will be searched in the "js" subdirectory of the view file.
+	 *   - JavaScript file will be searched in the "js" subdirectory of the view file.
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
 	 * @param string $file_name
@@ -171,7 +171,7 @@ class CView {
 	}
 
 	/**
-	 * Add a native javascript file to this view.
+	 * Add a native JavaScript file to this view.
 	 *
 	 * @param string $src
 	 */
@@ -180,7 +180,7 @@ class CView {
 	}
 
 	/**
-	 * Get list of native javascript files added to this view.
+	 * Get list of native JavaScript files added to this view.
 	 *
 	 * @return array
 	 */

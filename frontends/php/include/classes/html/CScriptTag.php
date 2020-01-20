@@ -34,18 +34,27 @@ class CScriptTag extends CTag {
 	/**
 	 * Create a <script> tag.
 	 *
-	 * @param string $script  javascript code
+	 * @param string $script  JavaScript code
 	 */
 	public function __construct($script = null) {
 		parent::__construct('script', true, $script);
 	}
 
 	public function addItem($value) {
-		return parent::addItem(new CObject($value));
+		if (is_array($value)) {
+			foreach ($value as $item) {
+				$this->addItem($item);
+			}
+		}
+		else {
+			parent::addItem(new CObject($value));
+		}
+
+		return $this;
 	}
 
 	protected function bodyToString() {
-		$script = parent::bodyToString();
+		$script = implode("\n", $this->items);
 
 		if ($this->on_document_ready) {
 			$script = self::wrapOnDocumentReady($script);
@@ -60,10 +69,12 @@ class CScriptTag extends CTag {
 	/**
 	 * Make scripts run as soon as the document is ready.
 	 *
+	 * @param bool $state
+	 *
 	 * @return CScriptTag
 	 */
-	public function setOnDocumentReady() {
-		$this->on_document_ready = true;
+	public function setOnDocumentReady($state = true) {
+		$this->on_document_ready = $state;
 
 		return $this;
 	}
