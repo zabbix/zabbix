@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-01-19 01:53+0200\n"
-"PO-Revision-Date: 2020-01-14 07:22+0300\n"
+"PO-Revision-Date: 2020-01-20 04:14+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1578979339.000000\n"
+"X-POOTLE-MTIME: 1579486495.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -6129,7 +6129,7 @@ msgstr "バイト単位のファイルサイズ。整数値を返す。"
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:635
 msgid "File systems and their spaces in bytes and percentage from total. Returns JSON"
-msgstr ""
+msgstr "ファイルシステムとその領域のバイト数とトータルからのパーセンテージ。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:627
@@ -18860,7 +18860,7 @@ msgstr "\"%1$s\"から始まる条件式を確認してください"
 
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:117
 msgid "circular dependency is not allowed"
-msgstr ""
+msgstr "循環する依存関係は許可されていません"
 
 #: include/classes/api/services/CItemGeneral.php:1980
 #: include/classes/import/CConfigurationImport.php:2749
@@ -19491,7 +19491,7 @@ msgstr "障害パターン"
 
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:102
 msgid "reference to a non-existent tree element"
-msgstr ""
+msgstr "存在しないツリー要素への参照です"
 
 #: include/page_header.php:159 include/views/general.warning.php:21
 #, c-format
