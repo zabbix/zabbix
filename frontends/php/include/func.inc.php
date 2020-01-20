@@ -2377,6 +2377,8 @@ function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 
 	// Don't show the call to this handler function.
 	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
+
+	return false;
 }
 
 /**
