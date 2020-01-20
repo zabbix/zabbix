@@ -177,10 +177,10 @@ var CViewSwitcher = Class.create({
 		switch (obj.tagName.toLowerCase()) {
 			case 'th':
 			case 'td':
-				obj.style.display = IE ? '' : 'table-cell';
+				obj.style.display = 'table-cell';
 				break;
 			case 'tr':
-				obj.style.display = IE ? '' : 'table-row';
+				obj.style.display = 'table-row';
 				break;
 			case 'img':
 			case 'div':

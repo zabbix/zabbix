@@ -167,11 +167,6 @@ function cancelEvent(e) {
 	e.stopPropagation();
 	e.preventDefault();
 
-	if (IE) {
-		e.cancelBubble = true;
-		e.returnValue = false;
-	}
-
 	return false;
 }
 
@@ -309,10 +304,6 @@ function getPosition(obj) {
 				obj = obj.offsetParent;
 				pos.left += obj.offsetLeft;
 				pos.top += obj.offsetTop;
-
-				if (IE && obj.offsetParent.toString() == 'unknown') {
-					break;
-				}
 			}
 		} catch(e) {
 		}

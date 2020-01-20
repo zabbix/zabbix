@@ -277,7 +277,7 @@
 			items: 'li.sortable',
 			axis: 'y',
 			containment: 'parent',
-			cursor: IE ? 'move' : 'grabbing',
+			cursor: 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6

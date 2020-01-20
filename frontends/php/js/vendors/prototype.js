@@ -223,12 +223,7 @@ var Class = (function() {
   }
 
   function isArray(object) {
-	if(IE)
-		if(_toString.call(object) == "[object Array]") return true;
-		else if(is_array(object)) return true;
-		else return false;
-	else
-		return _toString.call(object) == "[object Array]";
+	return _toString.call(object) == "[object Array]";
   }
 
 

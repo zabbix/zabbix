@@ -52,12 +52,7 @@ Cscreen.prototype = {
 		jQuery('.draggable').draggable({
 			revert: 'invalid',
 			zIndex: 999,
-			start: function() {
-				if (IE) {
-					Event.observe(document.body, 'drag', wedge, false);
-					Event.observe(document.body, 'selectstart', wedge, false);
-				}
-			}
+			start: function() {}
 		});
 
 		jQuery('.screenitem').droppable({

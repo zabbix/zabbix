@@ -1377,7 +1377,7 @@
 
 	function makeDraggable($obj, data, widget) {
 		widget['div'].draggable({
-			cursor: IE ? 'move' : 'grabbing',
+			cursor: 'grabbing',
 			handle: widget['content_header'],
 			scroll: true,
 			scrollSensitivity: data.options['widget-height'],

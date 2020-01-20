@@ -66,7 +66,7 @@ ob_start(); ?>
 		disabled: data.length < 2,
 		items: 'tbody tr.sortable',
 		axis: 'y',
-		cursor: IE ? 'move' : 'grabbing',
+		cursor: 'grabbing',
 		handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 		containment: '#expressions_list tbody',
 		tolerance: 'pointer',
