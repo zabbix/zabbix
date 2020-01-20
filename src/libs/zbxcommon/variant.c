@@ -354,7 +354,7 @@ int	zbx_validate_value_dbl(double value)
 	const double	pg_min_numeric = -1e+308;
 	const double	pg_max_numeric = 1e+308;
 
-	if (value <= pg_min_numeric || value >= pg_max_numeric)
+	if (value < pg_min_numeric || value > pg_max_numeric)
 		return FAIL;
 
 	return SUCCEED;

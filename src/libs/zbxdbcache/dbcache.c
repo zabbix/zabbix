@@ -493,13 +493,13 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, siz
 	trend->num += num;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-			"update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg="
-			ZBX_FS_DBL ",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64
+			"update trends set num=%d,value_min=%.*g,value_avg="
+			"%.*g,value_max=%.*g where itemid=" ZBX_FS_UI64
 			" and clock=%d;\n",
 			trend->num,
-			trend->value_min.dbl,
-			trend->value_avg.dbl,
-			trend->value_max.dbl,
+			DECIMAL_DIG, trend->value_min.dbl,
+			DECIMAL_DIG, trend->value_avg.dbl,
+			DECIMAL_DIG, trend->value_max.dbl,
 			trend->itemid,
 			trend->clock);
 }
