@@ -372,8 +372,6 @@ jQuery(function($) {
 	hintBox.bindEvents();
 
 	/**
-	 * ZBX_STYLE_BTN_DEBUG debug button click handler
-	 *
 	 * @param {boolean} preserve_state  Preserve current state of the debug button.
 	 *
 	 * @returns {boolean} false
