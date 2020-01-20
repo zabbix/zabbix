@@ -19,7 +19,7 @@
 **/
 
 
-include('include/views/js/configuration.services.edit.js.php');
+$this->includeJsFile('configuration.services.edit.js.php');
 
 $service = $this->data['service'];
 
