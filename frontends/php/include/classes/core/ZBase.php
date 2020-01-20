@@ -429,11 +429,9 @@ class ZBase {
 	}
 
 	/**
-	 * Process request and generate response. Main entry for all mvc action processing.
+	 * Process request and generate response.
 	 *
-	 * @param CRouter $router    CRouter class instance.
-	 *
-	 * @throws Exception
+	 * @param CRouter $router  CRouter class instance.
 	 */
 	private function processRequest(CRouter $router) {
 		$action_name = $router->getAction();
