@@ -688,13 +688,11 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 
 // tags
 if (!$data['readonly']) {
-	$divTabs->addTab('tags-tab', _('Tags'), new CObject(
-		(new CPartial('configuration.tags.tab', [
-			'source' => 'host',
-			'tags' => $data['tags'],
-			'readonly' => false
-		]))->getOutput()
-	));
+	$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+		'source' => 'host',
+		'tags' => $data['tags'],
+		'readonly' => false
+	]));
 }
 
 // macros
@@ -705,11 +703,11 @@ $divTabs->addTab('macroTab', _('Macros'),
 			->addValue(_('Inherited and host macros'), 1)
 			->setModern(true)
 		)
-		->addRow(null, new CObject((new CPartial('hostmacros.list.html', [
+		->addRow(null, new CPartial('hostmacros.list.html', [
 			'macros' => $data['macros'],
 			'show_inherited_macros' => $data['show_inherited_macros'],
 			'readonly' => $data['readonly']
-		]))->getOutput()), 'macros_container')
+		]), 'macros_container')
 );
 
 $inventoryFormList = new CFormList('inventorylist');

@@ -96,11 +96,9 @@ $form_list->addRow(_('Debug mode'),
 
 $permissions_form_list = new CFormList('permissions_form_list');
 $permissions_form_list->addRow(_('Permissions'),
-	(new CDiv(new CObject(
-		(new CPartial('administration.usergroup.grouprights.html', [
-			'group_rights' => $data['group_rights']
-		]))->getOutput()
-	)))
+	(new CDiv(new CPartial('administration.usergroup.grouprights.html', [
+		'group_rights' => $data['group_rights']
+	])))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
@@ -149,9 +147,7 @@ $permissions_form_list->addRow(null,
 $tag_filter_form_list = new CFormList('tagFilterFormList');
 
 $tag_filter_form_list->addRow(_('Permissions'),
-	(new CDiv(new CObject(
-		(new CPartial('administration.usergroup.tagfilters.html', ['tag_filters' => $data['tag_filters']]))->getOutput()
-	)))
+	(new CDiv(new CPartial('administration.usergroup.tagfilters.html', ['tag_filters' => $data['tag_filters']])))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );

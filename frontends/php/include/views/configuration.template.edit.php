@@ -410,13 +410,11 @@ $tmplList
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 
 // tags
-$divTabs->addTab('tags-tab', _('Tags'), new CObject(
-	(new CPartial('configuration.tags.tab', [
-		'source' => 'template',
-		'tags' => $data['tags'],
-		'readonly' => $data['readonly']
-	]))->getOutput()
-));
+$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+	'source' => 'template',
+	'tags' => $data['tags'],
+	'readonly' => $data['readonly']
+]));
 
 // macros
 $divTabs->addTab('macroTab', _('Macros'),
@@ -426,11 +424,11 @@ $divTabs->addTab('macroTab', _('Macros'),
 			->addValue(_('Inherited and template macros'), 1)
 			->setModern(true)
 		)
-		->addRow(null, new CObject((new CPartial('hostmacros.list.html', [
+		->addRow(null, new CPartial('hostmacros.list.html', [
 			'macros' => $data['macros'],
 			'show_inherited_macros' => $data['show_inherited_macros'],
 			'readonly' => $data['readonly']
-		]))->getOutput()), 'macros_container')
+		]), 'macros_container')
 );
 
 // footer
