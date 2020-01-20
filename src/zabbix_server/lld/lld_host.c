@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 	zbx_free(interface->dns);
 	zbx_free(interface->ip);
 
-	if (INTERFACE_TYPE_SNMP != interface->type)
+	if (INTERFACE_TYPE_SNMP == interface->type)
 	{
 		zbx_free(interface->data.snmp->community);
 		zbx_free(interface->data.snmp->securityname);
@@ -2866,14 +2866,15 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 	zbx_lld_interface_t	*interface;
 
 	result = DBselect(
-			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,is.version,is.bulk,"
-			"is.community,is.securityname,is.securitylevel,is.authpassphrase,is.privpassphrase,"
-			"is.authprotocol,is.privprotocol,is.contextname"
-			" from interface hi,items i"
-				" left join interface_snmp is"
-					" on hi.interfaceid=is.interfaceid"
-			" where hi.hostid=i.hostid"
-				" and i.itemid=" ZBX_FS_UI64,
+			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,"
+			"s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
+			"s.authprotocol,s.privprotocol,s.contextname"
+			" from interface hi"
+			" inner join items i"
+				" on hi.hostid=i.hostid "
+			" left join interface_snmp s"
+				" on hi.interfaceid=s.interfaceid"
+			" where i.itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -2888,7 +2889,7 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
 
-		if (ITEM_TYPE_SNMP == interface->type)
+		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
 			zbx_lld_interface_snmp_t *snmp;
 
@@ -3066,7 +3067,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			new_interface->port = zbx_strdup(NULL, interface->port);
 			new_interface->flags = 0x00;
 
-			if (ITEM_TYPE_SNMP == interface->type)
+			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
 				zbx_lld_interface_snmp_t *snmp;
 
@@ -3101,14 +3102,13 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hi.hostid,id.parent_interfaceid,hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,"
-					"hi.dns,hi.port,is.version,is.bulk,is.community,is.securityname,is.securitylevel,"
-					"is.authpassphrase,is.privpassphrase,is.authprotocol,is.privprotocol,"
-					"is.contextname"
+					"hi.dns,hi.port,s.version,s.bulk,s.community,s.securityname,s.securitylevel,"
+					"s.authpassphrase,s.privpassphrase,s.authprotocol,s.privprotocol,s.contextname"
 				" from interface hi"
 					" left join interface_discovery id"
 						" on hi.interfaceid=id.interfaceid"
-					" left join interface_snmp is"
-						" on hi.interfaceid=is.interfaceid"
+					" left join interface_snmp s"
+						" on hi.interfaceid=s.interfaceid"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.hostid", hostids.values, hostids.values_num);
 

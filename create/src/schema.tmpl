@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2019 Zabbix SIA
+-- Copyright (C) 2001-2020 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -1693,7 +1693,7 @@ FIELD		|tls_psk	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|tls_psk_identity
 
 TABLE|interface_snmp|interfaceid|ZBX_TEMPLATE
-FIELD		|interfaceid	|t_id		|	|NOT NULL	|			|1|interface
+FIELD		|interfaceid	|t_id		|	|NOT NULL	|0			|1|interface
 FIELD		|version	|t_integer	|'2'	|NOT NULL	|ZBX_PROXY
 FIELD		|bulk		|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 FIELD		|community	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
@@ -1709,4 +1709,4 @@ UNIQUE		|1		|interfaceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4050026	|4050026
+ROW		|4050028	|4050028
