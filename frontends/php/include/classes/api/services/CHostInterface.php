@@ -151,7 +151,10 @@ class CHostInterface extends CApiService {
 		}
 
 		if ($this->outputIsRequested('details', $options['output'])) {
-			$sqlParts['left_join'] = ['interface_snmp' => ['from' => 'interface_snmp his', 'on' => 'his.interfaceid=hi.interfaceid']];
+			$sqlParts['left_join'] = ['interface_snmp' => ['from' => 'interface_snmp his',
+					'on' => 'his.interfaceid=hi.interfaceid'
+				]
+			];
 			$sqlParts['left_table'] = 'interface';
 		}
 
@@ -947,7 +950,8 @@ class CHostInterface extends CApiService {
 	 */
 	protected function checkSnmpCommunity(array $interface) {
 		if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
-				&& (!array_key_exists('community', $interface['details']) || $interface['details']['community'] == '')) {
+				&& (!array_key_exists('community', $interface['details'])
+					|| $interface['details']['community'] == '')) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
 		}
 	}
