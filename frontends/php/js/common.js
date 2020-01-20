@@ -996,3 +996,4 @@ Template.prototype = {
 		return result;
 	}
 };
+
