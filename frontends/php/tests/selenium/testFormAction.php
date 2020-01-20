@@ -1325,7 +1325,9 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute('//button[@id=\'cancel\']', 'name', 'cancel');
 	}
 
-	// Function that checks possible operation types and custom message related fields for recovery and update operations.
+	/*
+	 * Function that checks possible operation types and custom message related fields for recovery and update operations.
+	 */
 	private function checkRecoveryUpdateOperations($operation_field, $eventsource) {
 		$operation_field->query('button:Add')->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady();
@@ -1344,7 +1346,6 @@ class testFormAction extends CLegacyWebTest {
 		$this->assertFalse($operation_details->getField('Message')->isAttributePresent('maxlength'));
 		COverlayDialogElement::find()->one()->close();
 	}
-
 
 	public static function update() {
 		return CDBHelper::getDataProvider('SELECT name, eventsource FROM actions');
