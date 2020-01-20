@@ -1158,8 +1158,26 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.17rc1
 
 New features:
+...G...... [ZBXNEXT-5490] added new key vfs.fs.get to collect mounted filesystems information and relevant metrics into json (akozlovs)
+........S. [ZBXNEXT-5239] added housekeeping of unused/deleted items values in value cache (vso)
+A......... [ZBX-3783] added strict validation of input parameters in script.get() method (Sasha)
 
 Bug fixes:
+A.......S. [ZBX-10240] fixed maintenance time period update every field validation (atumilovics)
+...G...... [ZBX-17164] fixed file change time in vfs.file.time on Windows (atumilovics)
+...G...... [ZBX-17036] fixed memory leak and wrong type cast; thanks to Yudai Hashimoto for the patch (mabele)
+A.......S. [ZBX-16811] fixed SQL error during prototype removal by adding select for update locks (atumilovics)
+.....J.... [ZBX-17002] added bulk gathering of attributes for Zabbix Java gateway when using attribute discovery (viktors)
+...G...PS. [ZBX-16960,ZBX-16961,ZBX-16964] fixed time of check - time of use issues reported by coverity (atumilovics)
+..F....... [ZBX-16902] fixed providing notifications for devices without audio support (talbergs)
+........S. [ZBX-17127] fixed crash on jsonpath function processing (atumilovics)
+........S. [ZBX-17080] fixed deadlock on maintenance table when using Oracle database (vso)
+A.F....... [ZBX-17078] fixed web scenario step allowing to use 0 timeout (mabele, talbergs)
+.......PS. [ZBX-16907] fixed icmppingloss counting all after first 400 ping responses as lost (mabele)
+..F....... [ZBX-16325] fixed httpstepid validation when its value exceeds int32 (miks, vasilijs)
+........S. [ZBX-16997] fixed duplicate entry errors on 32-bit architecture during item application discovery (akozlovs)
+..F....... [ZBX-17102] fixed scroll bar visibility in svg graph widget configuration form (gcalenko)
+A......... [ZBX-17049] fixed non well formed numeric value encountered in maintenance (gcalenko)
 ..F....... [ZBX-16481] fixed spelling issues in the code (miks)
 .......... [ZBX-1977] reverted fix for axis labels calculation (rlataria)
 ..F....... [ZBX-16894] fixed dynamic rows losing old input at form error (talbergs)
