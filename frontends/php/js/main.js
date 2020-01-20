@@ -158,11 +158,11 @@ var MMenu = {
 	},
 
 	showSubMenu: function(show_label, focus_subitem) {
-		var sub_menu = $('sub_' + show_label),
+		var sub_menu = jQuery('#sub_' + show_label),
 			focus_subitem = focus_subitem || false;
 
-		if (sub_menu !== null) {
-			$(show_label).className = 'selected';
+		if (sub_menu.length) {
+			jQuery('#' + show_label)[0].className = 'selected';
 			sub_menu.show();
 
 			if (focus_subitem) {
@@ -174,14 +174,14 @@ var MMenu = {
 					continue;
 				}
 
-				var menu_cell = $(key);
-				if (menu_cell !== null) {
-					menu_cell.className = '';
+				var menu_cell = jQuery('#' + key);
+				if (menu_cell.length) {
+					menu_cell[0].className = '';
 					jQuery('a', menu_cell).blur();
 				}
 
-				var sub_menu_cell = $('sub_' + key);
-				if (sub_menu_cell !== null) {
+				var sub_menu_cell = jQuery('#sub_' + key);
+				if (sub_menu_cell.length) {
 					sub_menu_cell.hide();
 				}
 			}

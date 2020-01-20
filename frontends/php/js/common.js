@@ -18,8 +18,6 @@
 **/
 
 
-jQuery.noConflict();
-
 /**
  * jQuery based publish/subscribe handler.
  *
@@ -127,7 +125,7 @@ Array.prototype.xor = function(arr) {
 
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
-	element = $(element);
+	element = $(element)[0];
 
 	if (element.addEventListener) {
 		element.addEventListener(eventname, expression, bubbling);
@@ -255,8 +253,6 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 }
 
 function getDimensions(obj) {
-	obj = $(obj);
-
 	var dim = {
 		left:		0,
 		top:		0,
@@ -297,7 +293,6 @@ function getDimensions(obj) {
 }
 
 function getPosition(obj) {
-	obj = $(obj);
 	var pos = {top: 0, left: 0};
 
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
@@ -584,14 +579,14 @@ function addValues(frame, values, submit_parent) {
  * @param {string} parentid		parent id
  */
 function addSelectedValues(form, object, parentid) {
-	form = $(form);
+	form = document.getElementById(form);
 
 	if (typeof parentid === 'undefined') {
 		var parentid = null;
 	}
 
 	var data = {object: object, values: [], parentId: parentid};
-	var chk_boxes = form.getInputs('checkbox');
+	var chk_boxes = jQuery(form).find('input[type="checkbox"]');
 
 	for (var i = 0; i < chk_boxes.length; i++) {
 		if (chk_boxes[i].checked && (chk_boxes[i].name.indexOf('all_') < 0)) {
@@ -782,9 +777,9 @@ function showHideByName(name, style) {
 		style = 'none';
 	}
 
-	var objs = $$('[name=' + name + ']');
+	var objs = jQuery('[name=' + name + ']');
 
-	if (empty(objs)) {
+	if (objs.length === 0) {
 		throw 'showHideByName(): Object not found.';
 	}
 
@@ -905,3 +900,99 @@ function submitFormWithParam(form_name, input_name, input_value) {
 	document.forms[form_name].appendChild(input);
 	jQuery(document.forms[form_name]).trigger('submit');
 }
+
+if (typeof Element.prototype.remove === 'undefined') {
+	Element.prototype.remove = function() {
+		this.parentNode.removeChild(this);
+		return this;
+	};
+}
+
+/**
+ * TODO: some additional comment for prototype related code block?
+ */
+Function.prototype.bind = function (context) {
+	if (arguments.length < 2 && typeof(arguments[0]) === 'undefined') {
+		return this;
+	}
+
+	var method = this, args = Array.prototype.slice.call(arguments, 1);
+
+	return function() {
+		return method.apply(context, args.concat(Array.prototype.slice.call(arguments, 0)));
+	};
+};
+
+Function.prototype.bindAsEventListener = function (context) {
+	var method = this, args = Array.prototype.slice.call(arguments, 1);
+
+	return function(event) {
+		return method.apply(context, [event || window.event].concat(args));
+	};
+};
+
+var Template = function(template) {
+	this.template = template.toString();
+};
+
+Template.prototype = {
+	onMatch: function (match, object) {
+		if (object == null) {
+			return match[1] + '';
+		}
+
+		var before = match[1] || '';
+		if (before == '\\') {
+			return match[2];
+		}
+
+		var ctx = object, expr = match[3], notEscHTML = (expr.substring(0, 1) === '*');
+		if(notEscHTML) {
+			expr = expr.substring(1);
+		}
+
+		var pattern = /^([^.[]+|\[((?:.*?[^\\])?)\])(\.|\[|$)/;
+		match = pattern.exec(expr);
+		if (match == null) {
+			return before;
+		}
+
+		while (match != null) {
+			var comp = match[1].substring(0, 1) === '[' ? match[2].replace(/\\\\]/g, ']') : match[1];
+
+			ctx = ctx[comp];
+			if (null == ctx || '' == match[3]) {
+				break;
+			}
+
+			expr = expr.substring('[' == match[3] ? match[1].length : match[0].length);
+			match = pattern.exec(expr);
+		}
+
+		ctx = '' + (((typeof ctx === 'undefined') || (ctx === null)) ? '' : ctx);
+		return before + (notEscHTML ? ctx : ctx.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+				.replace(/\"/g,'&quot;').replace(/\'/g,'&apos;'));
+	},
+
+	evaluate: function(object) {
+		if (object && typeof object.toTemplateReplacements === 'function') {
+			object = object.toTemplateReplacements();
+		}
+
+		var result = '', source = this.template;
+		while (source.length > 0) {
+			var match = source.match(/(^|.|\r|\n)(#\{(.*?)\})/);
+			if (match) {
+				result += source.substring(0, match.index);
+				result += this.onMatch(match, object);
+				source = source.substring(match.index + match[0].length);
+			}
+			else {
+				result += source;
+				break;
+			}
+		}
+
+		return result;
+	}
+};

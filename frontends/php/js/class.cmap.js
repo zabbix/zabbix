@@ -256,7 +256,7 @@ ZABBIX.apps.map = (function($) {
 						favobj: 'sysmap',
 						action: 'update',
 						sysmapid: this.sysmapid,
-						sysmap: Object.toJSON(this.data) // TODO: remove prototype method
+						sysmap: JSON.stringify(this.data)
 					},
 					error: function() {
 						throw new Error('Cannot update map.');
@@ -312,7 +312,7 @@ ZABBIX.apps.map = (function($) {
 							favobj: 'sysmap',
 							action: 'expand',
 							sysmapid: this.sysmapid,
-							source: Object.toJSON(post)
+							source: JSON.stringify(post)
 						},
 						success: function(data) {
 							try {
@@ -2814,7 +2814,7 @@ ZABBIX.apps.map = (function($) {
 				triggers = triggers.concat(selected_triggers);
 
 				if (triggers) {
-					triggers.each(function(trigger) {
+					triggers.forEach(function(trigger) {
 						if ($('input[name^="element_id[' + trigger.id + ']"]').length == 0) {
 							triggerids.push(trigger.id);
 							triggers_to_insert[trigger.id] = {
@@ -2840,8 +2840,8 @@ ZABBIX.apps.map = (function($) {
 							},
 							success: function(data) {
 								data = JSON.parse(data);
-								triggers.each(function(sorted_trigger) {
-									data.result.each(function(trigger) {
+								triggers.forEach(function(sorted_trigger) {
+									data.result.forEach(function(trigger) {
 										if (sorted_trigger.id == trigger.triggerid) {
 											if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
 												trigger.name = triggers_to_insert[trigger.triggerid].name;
@@ -3102,7 +3102,7 @@ ZABBIX.apps.map = (function($) {
 					});
 
 					$('#triggerContainer tbody').html('');
-					triggers.each(function(trigger) {
+					triggers.forEach(function(trigger) {
 						$('#triggerContainer tbody').append(trigger.html);
 					});
 				}

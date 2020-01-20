@@ -176,7 +176,7 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Age less than'), [
 			(new CCheckBox('filter_age_state'))
 				->setChecked($data['filter']['age_state'] == 1)
-				->onClick('javascript: this.checked ? $("filter_age").enable() : $("filter_age").disable()'),
+				->onClick('javascript: jQuery("#filter_age").prop("disabled", !this.checked)'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$filter_age,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

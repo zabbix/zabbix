@@ -65,7 +65,6 @@ $availableJScripts = [
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
 	// vendors
-	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
 	// classes
@@ -332,7 +331,6 @@ $js = '';
 if (empty($_GET['files'])) {
 
 	$files = [
-		'prototype.js',
 		'jquery.js',
 		'jquery-ui.js',
 		'common.js',
@@ -387,19 +385,6 @@ foreach ($files as $file) {
 	}
 }
 
-if (in_array('prototype.js', $files)) {
-	// This takes care of the Array toJSON incompatibility with JSON.stringify.
-	$js .=
-		'var _json_stringify = JSON.stringify;'.
-		'JSON.stringify = function(value) {'.
-			'var _array_tojson = Array.prototype.toJSON,'.
-				'ret;'.
-			'delete Array.prototype.toJSON;'.
-			'ret = _json_stringify(value);'.
-			'Array.prototype.toJSON = _array_tojson;'.
-			'return ret;'.
-		'};';
-}
 
 $etag = md5($js);
 /**

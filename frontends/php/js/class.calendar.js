@@ -21,7 +21,16 @@
 
 
 var CLNDR = null,
-	calendar = Class.create();
+	calendar = function (timeobject, trigger_elmnt, date_time_format) {
+		if (!this.checkOuterObj(timeobject)) {
+			throw 'Calendar: constructor expects second parameter to be input form field DOM node.';
+		}
+
+		this.id = jQuery(trigger_elmnt).attr('id');
+		this.trigger_elmnt = trigger_elmnt;
+		this.date_time_format = date_time_format;
+		this.sdt = new CDate();
+	};
 
 function toggleCalendar(trigger_elmnt, time_input, date_time_format) {
 	if (CLNDR && jQuery(trigger_elmnt).is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
@@ -68,17 +77,6 @@ calendar.prototype = {
 	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date'),
 	date_time_format: PHP_ZBX_FULL_DATE_TIME,
 	trigger_elmnt: null,		// Calendar visibility trigger element.
-
-	initialize: function(timeobject, trigger_elmnt, date_time_format) {
-		if (!this.checkOuterObj(timeobject)) {
-			throw 'Calendar: constructor expects second parameter to be input form field DOM node.';
-		}
-
-		this.id = jQuery(trigger_elmnt).attr('id');
-		this.trigger_elmnt = trigger_elmnt;
-		this.date_time_format = date_time_format;
-		this.sdt = new CDate();
-	},
 
 	ondateselected: function() {
 		this.setDateToOuterObj();
@@ -327,9 +325,9 @@ calendar.prototype = {
 			return false;
 		}
 
-		this.timeobject = $(timeobject);
+		this.timeobject = document.getElementById(timeobject);
 
-		if (empty(this.timeobject) || this.timeobject.tagName.toLowerCase() !== 'input') {
+		if (this.timeobject === null || this.timeobject.tagName.toLowerCase() !== 'input') {
 			return false;
 		}
 

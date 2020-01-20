@@ -125,7 +125,7 @@ jQuery(function ($) {
 
 							item.clickCallback = function(e) {
 								var args = [$obj];
-								$(this).data('args').each(function(a) {args.push(a)});
+								$(this).data('args').forEach(function(a) {args.push(a)});
 								methods[$(this).data('callback')].apply($obj, args);
 
 								// Remove menu only after .data() has been read from <a>.
