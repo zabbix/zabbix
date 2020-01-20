@@ -351,9 +351,8 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value)
 
 int	zbx_validate_value_dbl(double value)
 {
-	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
-	const double	pg_min_numeric = -1e12;
-	const double	pg_max_numeric = 1e12;
+	const double	pg_min_numeric = -1e+308;
+	const double	pg_max_numeric = 1e+308;
 
 	if (value <= pg_min_numeric || value >= pg_max_numeric)
 		return FAIL;

@@ -424,4 +424,8 @@
 #	include <stddef.h>
 #endif
 
+#ifdef HAVE_FLOAT_H
+#	include <float.h>
+#endif
+
 #endif

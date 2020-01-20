@@ -2604,8 +2604,7 @@ retry_oracle:
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d", value->i32);
 					break;
 				case ZBX_TYPE_FLOAT:
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_DBL,
-							value->dbl);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%.*g", DBL_DIG, value->dbl);
 					break;
 				case ZBX_TYPE_UINT:
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_UI64,
