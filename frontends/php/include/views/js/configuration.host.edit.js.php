@@ -21,7 +21,7 @@
 
 ?>
 <script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
-<div class="<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?>" id="hostInterfaceRow_#{iface.interfaceid}" data-type="#{iface.type}" data-interfaceid="#{iface.interfaceid}">
+<div class="<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?>" id="interface_row_#{iface.interfaceid}" data-type="#{iface.type}" data-interfaceid="#{iface.interfaceid}">
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][items]" value="#{iface.items}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][locked]" value="#{iface.locked}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}">
@@ -331,7 +331,7 @@
 			 */
 			$(container).append(TEMPLATE.evaluate({iface: iface}).trim());
 
-			var elem = document.querySelector('#hostInterfaceRow_' + iface.interfaceid);
+			var elem = document.querySelector('#interface_row_' + iface.interfaceid);
 
 			// Select proper use ip radio element.
 			$('#interfaces_' + iface.interfaceid + '_useip_' + iface.useip).prop('checked', true);
@@ -359,7 +359,7 @@
 		}
 
 		function remove(id) {
-			var elem = document.querySelector('#hostInterfaceRow_' + id);
+			var elem = document.querySelector('#interface_row_' + id);
 			if (!elem) {
 				return false;
 			}
@@ -381,7 +381,7 @@
 			render(new_data);
 
 			if (new_data.type == <?= INTERFACE_TYPE_SNMP ?>) {
-				var index = $('#hostInterfaceRow_' + new_data.interfaceid).index();
+				var index = $('#interface_row_' + new_data.interfaceid).index();
 				$(SNMP_CONTAINER_ID).zbx_vertical_accordion('expandNth', index);
 			}
 
