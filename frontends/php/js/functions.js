@@ -577,7 +577,8 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	}
 
 	var center_overlay_dialog = function() {
-			var body = jQuery('.overlay-dialogue-body', overlay_dialogue),
+			var $ = jQuery;
+				body = $('.overlay-dialogue-body', overlay_dialogue),
 				body_scroll_height = body[0].scrollHeight,
 				body_height = body.height();
 
@@ -590,10 +591,10 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 			body.css('overflow-y', body_scroll_height > body_height ? 'scroll' : 'hidden');
 
 			overlay_dialogue.css({
-				'left': Math.round((jQuery(window).width() - jQuery(overlay_dialogue).outerWidth()) / 2) + 'px',
+				'left': Math.max(0, Math.trunc(($(window).width() - $(overlay_dialogue).outerWidth()) / 2)) + 'px',
 				'top': overlay_dialogue.hasClass('sticked-to-top')
 					? ''
-					: Math.round((jQuery(window).height() - jQuery(overlay_dialogue).outerHeight()) / 2) + 'px'
+					: Math.max(0, Math.trunc(($(window).height() - $(overlay_dialogue).outerHeight()) / 2)) + 'px'
 			});
 		},
 		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
@@ -670,6 +671,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 				class: 'overlay-dialogue-body'
 			})
 				.append(params.content)
+				.append(typeof params.debug !== 'undefined' ? params.debug : null)
 				.each(function() {
 					body_mutation_observer.observe(this, {childList: true, subtree: true});
 				})
@@ -677,11 +679,15 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 					.attr('aria-labeledby', headerid)
 				.end()
 		)
-		.append(overlay_dialogue_footer)
-		.append(typeof params.debug !== 'undefined' ? params.debug : null);
+		.append(overlay_dialogue_footer);
+
+	jQuery.subscribe('debug.click', center_overlay_dialog);
 
 	jQuery(overlay_bg).on('remove', function(event) {
 		body_mutation_observer.disconnect();
+
+		jQuery.unsubscribe('debug.click', center_overlay_dialog);
+
 		if (cancel_action !== null) {
 			cancel_action();
 		}

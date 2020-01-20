@@ -401,6 +401,12 @@ jQuery(function($) {
 		// ZBX_STYLE_DEBUG_OUTPUT
 		style.sheet.insertRule('.debug-output { display: ' + (visible ? 'block' : 'none') + '; }', 0);
 
+		if (preserve_state !== true) {
+			$.publish('debug.click', {
+				visible: visible
+			});
+		}
+
 		return false;
 	}
 
