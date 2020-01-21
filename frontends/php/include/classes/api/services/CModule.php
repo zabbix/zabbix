@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -22,7 +22,7 @@
 /**
  * Class containing methods for operations module.
  */
-class CModule extends \CApiService {
+class CModule extends CApiService {
 
 	protected $tableName = 'module';
 	protected $tableAlias = 'md';
@@ -37,13 +37,14 @@ class CModule extends \CApiService {
 	 * @param string $options['relative_path']  Relative path to module directory.
 	 * @param bool   $options['status']         Module status.
 	 * @param array  $options['config']         Module configuration data.
+	 * @param bool   $api_call                  Check is method called via API call or from local php file.
 	 *
-	 * @return array
+	 * @return array|int
 	 *
 	 * @throws APIException
 	 */
-	public function get(array $options = []) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+	public function get(array $options = [], $api_call = true) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $api_call) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
@@ -136,7 +137,7 @@ class CModule extends \CApiService {
 	 *
 	 * @throws APIException
 	 */
-	public function create($modules) {
+	public function create(array $modules): array {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -197,7 +198,7 @@ class CModule extends \CApiService {
 	 *
 	 * @throws APIException
 	 */
-	public function update($modules) {
+	public function update(array $modules): array {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -255,7 +256,7 @@ class CModule extends \CApiService {
 	 *
 	 * @throws APIException
 	 */
-	public function delete(array $moduleids) {
+	public function delete(array $moduleids): array {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -283,7 +284,7 @@ class CModule extends \CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function validate($rules, $modules) {
+	protected function validate(array $rules, array $modules): void {
 		foreach ($modules as $module) {
 			if (array_key_exists('config', $module) && !is_array($module['config'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,

@@ -602,7 +602,7 @@ class ZBase {
 		$db_modules = API::Module()->get([
 			'output' => ['id', 'relative_path', 'config'],
 			'filter' => ['status' => MODULE_STATUS_ENABLED]
-		]);
+		], false);
 
 		foreach ($db_modules as $db_module) {
 			$this->module_manager->addModule($db_module['relative_path'], $db_module['id'], $db_module['config']);
