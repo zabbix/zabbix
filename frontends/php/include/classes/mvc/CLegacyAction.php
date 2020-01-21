@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -24,11 +24,21 @@ use CController as CAction;
 class CLegacyAction extends CAction {
 
 	/**
+	 * Disable SID validation for legacy actions.
+	 */
+	protected function init(): void {
+		$this->disableSIDvalidation();
+	}
+
+	public function doAction(): void {
+	}
+
+	/**
 	 * Check user input.
 	 *
 	 * @return bool
 	 */
-	public function checkInput() {
+	public function checkInput(): bool {
 		return true;
 	}
 
@@ -37,7 +47,7 @@ class CLegacyAction extends CAction {
 	 *
 	 * @return bool
 	 */
-	public function checkPermissions() {
+	public function checkPermissions(): bool {
 		$user_type = $this->getUserType();
 		$denied = [];
 
@@ -60,17 +70,5 @@ class CLegacyAction extends CAction {
 		}
 
 		return !in_array($this->getAction(), $denied);
-	}
-
-	public function doAction() {
-	}
-
-	/**
-	 * Check session id.
-	 *
-	 * @return bool
-	 */
-	protected function checkSID() {
-		return true;
 	}
 }
