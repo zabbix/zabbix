@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -17,22 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
 
-import (
-	_ "zabbix.com/plugins/kernel"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/net/netif"
-	_ "zabbix.com/plugins/proc"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/system/cpucollector"
-	_ "zabbix.com/plugins/system/uname"
-	_ "zabbix.com/plugins/system/uptime"
-	_ "zabbix.com/plugins/systemd"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/vfs/dev"
-	_ "zabbix.com/plugins/vfs/file"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
-)
+/**
+ * Converter for converting import data from 4.4 to 5.0.
+ */
+class C44ImportConverter extends CConverter {
+
+	public function convert($data) {
+		$data['zabbix_export']['version'] = '5.0';
+
+		return $data;
+	}
+}

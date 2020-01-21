@@ -259,6 +259,33 @@ $mediatype_formlist
 	);
 $tabs->addTab('mediaTab', _('Media type'), $mediatype_formlist);
 
+// Message templates tab.
+$message_templates_formlist = (new CFormList('messageTemplatesFormlist'))
+	->addRow(null,
+		(new CDiv(
+			(new CTable())
+				->addStyle('width: 100%;')
+				->setHeader([
+					_('Message type'),
+					_('Template'),
+					_('Actions')
+				])
+				->setFooter(
+					(new CRow(
+						(new CCol(
+							(new CSimpleButton(_('Add')))
+								->setAttribute('data-action', 'add')
+								->addClass(ZBX_STYLE_BTN_LINK)
+						))->setColSpan(3)
+					))->setId('message-templates-footer')
+				)
+		))
+			->setId('message-templates')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
+$tabs->addTab('messageTemplatesTab', _('Message templates'), $message_templates_formlist);
+
 // media options tab
 $max_sessions = ($data['maxsessions'] > 1) ? $data['maxsessions'] : 0;
 if ($data['type'] == MEDIA_TYPE_SMS) {

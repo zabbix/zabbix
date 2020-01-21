@@ -809,7 +809,7 @@ function getAdministrationGeneralSubmenu() {
 		'main_section' => [
 			'items' => [
 				$gui_url          => _('GUI'),
-				$autoreg_url      => _('Auto registration'),
+				$autoreg_url      => _('Autoregistration'),
 				$housekeeping_url => _('Housekeeping'),
 				$image_url        => _('Images'),
 				$iconmap_url      => _('Icon mapping'),
