@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -19,9 +19,9 @@
 **/
 
 
-class CComponentRegistry {
+final class CComponentRegistry {
 
-	protected $components = [];
+	private $components = [];
 
 	/**
 	 * Return registered component class instance.
@@ -32,7 +32,7 @@ class CComponentRegistry {
 	 *
 	 * @throws Exception when component with $name is not found.
 	 */
-	public function get($name) {
+	final public function get(string $name): object {
 		if (!$this->has($name)) {
 			throw new Exception(_s('Component %s is not registered.', $name));
 		}
@@ -48,7 +48,7 @@ class CComponentRegistry {
 	 *
 	 * @throws Exception when name is already registered.
 	 */
-	public function register($name, $instance) {
+	final public function register(string $name, object $instance): void {
 		if ($this->has($name)) {
 			throw new Exception(_s('Component %s already registered.', $name));
 		}
@@ -59,11 +59,11 @@ class CComponentRegistry {
 	/**
 	 * Check if а component has been registered.
 	 *
-	 * @param $name  Component name.
+	 * @param string $name  Component name.
 	 *
 	 * @return bool
 	 */
-	public function has($name) {
+	final public function has(string $name): bool {
 		return array_key_exists($name, $this->components);
 	}
 
@@ -76,7 +76,7 @@ class CComponentRegistry {
 	 *
 	 * @throws Exception when component with $name is not found.
 	 */
-	public function __get($name) {
+	final public function __get(string $name): object {
 		return $this->get($name);
 	}
 
@@ -88,7 +88,7 @@ class CComponentRegistry {
 	 *
 	 * @throws Exception when name is already registered.
 	 */
-	public function __set($name, $instance) {
+	final public function __set(string $name, object $instance): void {
 		$this->register($name, $instance);
 	}
 }
