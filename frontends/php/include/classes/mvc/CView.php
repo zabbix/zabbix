@@ -85,7 +85,7 @@ class CView {
 		$file_path = null;
 
 		foreach (self::$directories as $directory) {
-			$file_path = $directory.DIRECTORY_SEPARATOR.$name.'.php';
+			$file_path = $directory.'/'.$name.'.php';
 			if (is_file($file_path)) {
 				$this->directory = $directory;
 				break;
@@ -115,7 +115,7 @@ class CView {
 	public function getOutput() {
 		$data = $this->data;
 
-		$file_path = $this->directory.DIRECTORY_SEPARATOR.$this->name.'.php';
+		$file_path = $this->directory.'/'.$this->name.'.php';
 
 		ob_start();
 
