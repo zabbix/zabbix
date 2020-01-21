@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -260,7 +260,7 @@ class CRouter {
 	 * @param string $actions['action_name']['layout']  Optional layout of the 'action_name' action.
 	 * @param string $actions['action_name']['view']    Optional view of the 'action_name' action.
 	 */
-	public function addActions(array $actions) {
+	public function addActions(array $actions): void {
 		foreach ($actions as $action => $route) {
 			if (is_array($route) && array_key_exists('class', $route)) {
 				$this->routes[$action] = [
@@ -275,13 +275,13 @@ class CRouter {
 	/**
 	 * Set controller, layout and view associated with the specified action.
 	 *
-	 * @param string $action     Action name.
+	 * @param string $action  Action name.
 	 */
-	public function setAction($action) {
+	public function setAction(string $action): void {
 		$this->action = $action;
 
 		if (array_key_exists($action, $this->routes)) {
-			list($this->controller, $this->layout, $this->view) = $this->routes[$action];
+			[$this->controller, $this->layout, $this->view] = $this->routes[$action];
 		}
 		else {
 			$this->controller = null;
@@ -293,36 +293,36 @@ class CRouter {
 	/**
 	 * Returns layout name.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getLayout() {
+	public function getLayout(): ?string {
 		return $this->layout;
 	}
 
 	/**
 	 * Returns controller name.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getController() {
+	public function getController(): ?string {
 		return $this->controller;
 	}
 
 	/**
 	 * Returns view name.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getView() {
+	public function getView(): ?string {
 		return $this->view;
 	}
 
 	/**
 	 * Returns action name.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getAction() {
+	public function getAction(): ?string {
 		return $this->action;
 	}
 }

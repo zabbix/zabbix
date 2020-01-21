@@ -213,6 +213,7 @@ final class CModuleManager {
 			}
 
 			try {
+				/** @var CModule $instance */
 				$instance = new $module_class($path, $manifest);
 
 				if ($instance instanceof CModule) {
