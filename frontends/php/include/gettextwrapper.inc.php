@@ -20,6 +20,40 @@
 
 
 /**
+ * In case gettext functions do not exist, just replacing them with our own,
+ * so user can see at least English translation.
+ */
+if (!function_exists('_')) {
+	/**
+	 * Stub gettext function in case gettext is not available.
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	function _($string) {
+		return $string;
+	}
+}
+
+if (!function_exists('ngettext')) {
+	/**
+	 * Stub gettext function in case gettext is not available. Do not use directly, use _n() instead.
+	 *
+	 * @see _n
+	 *
+	 * @param string $string1
+	 * @param string $string2
+	 * @param string $n
+	 *
+	 * @return string
+	 */
+	function ngettext($string1, $string2, $n) {
+		return ($n == 1) ? $string1 : $string2;
+	}
+}
+
+/**
  * Translates the string with respect to the given context.
  *
  * @see _x
