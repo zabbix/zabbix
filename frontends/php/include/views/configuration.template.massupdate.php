@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.template.massupdate.js.php';
 
 $widget = (new CWidget())->setTitle(_('Templates'));

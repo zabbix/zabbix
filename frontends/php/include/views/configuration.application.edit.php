@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Applications'))
 	->addItem(get_header_host_table('applications', $this->data['hostid']));

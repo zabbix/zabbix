@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $submenu_source = [
 	EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
 	EVENT_SOURCE_DISCOVERY => _('Discovery actions'),

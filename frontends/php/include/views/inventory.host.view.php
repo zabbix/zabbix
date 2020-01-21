@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 // Overview tab.
 $overviewFormList = new CFormList();
 

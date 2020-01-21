@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 (new CWidget())
 	->setTitle(_('Services'))
 	->addItem($this->data['tree']->getHTML())

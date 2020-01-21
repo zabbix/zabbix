@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Actions'));

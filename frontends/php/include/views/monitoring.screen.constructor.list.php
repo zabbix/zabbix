@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Screens').': '.$data['screen']['name']);
 
 if (array_key_exists('templateid', $data['screen'])) {

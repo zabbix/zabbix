@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $filterForm = new CFilter(new CUrl('toptriggers.php'));
 
 $severities = [];

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 // hint table
 $help_hint = (new CList())
 	->addClass(ZBX_STYLE_NOTIF_BODY)

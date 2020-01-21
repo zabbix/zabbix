@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $web_layout_mode = CViewHelper::loadLayoutMode();
 
 $screen_widget = (new CWidget())->setWebLayoutMode($web_layout_mode);

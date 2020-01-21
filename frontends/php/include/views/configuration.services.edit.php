@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->includeJsFile('configuration.services.edit.js.php');
 
 $service = $this->data['service'];

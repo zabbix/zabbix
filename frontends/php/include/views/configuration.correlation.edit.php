@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.correlation.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Event correlation rules'));

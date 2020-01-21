@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = new CWidget();
 
 if ($data['parent_discoveryid'] === null) {

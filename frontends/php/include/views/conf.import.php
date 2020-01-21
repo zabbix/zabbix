@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 include dirname(__FILE__).'/js/conf.import.js.php';
 
 $rulesTable = (new CTable())

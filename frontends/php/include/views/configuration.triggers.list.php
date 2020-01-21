@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
 
 $filter_column1 = (new CFormList())

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 include dirname(__FILE__).'/js/monitoring.sysmaps.js.php';
 
 // create menu

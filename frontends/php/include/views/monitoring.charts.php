@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $web_layout_mode = CViewHelper::loadLayoutMode();
 
 $controls = (new CForm('get'))

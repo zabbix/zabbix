@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 zbx_add_post_js('jqBlink.blink();');
 
 // hint table
