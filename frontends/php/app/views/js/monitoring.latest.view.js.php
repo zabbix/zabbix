@@ -19,7 +19,11 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		function latestPage() {

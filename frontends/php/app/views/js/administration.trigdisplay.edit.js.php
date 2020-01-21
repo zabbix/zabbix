@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $schema = DB::getSchema('config');
 ?>
 
