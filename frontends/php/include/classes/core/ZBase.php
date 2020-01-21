@@ -19,7 +19,8 @@
 **/
 
 
-use Core\CModule;
+use Core\CModule,
+	CController as CAction;
 
 require_once dirname(__FILE__).'/CAutoloader.php';
 
@@ -446,8 +447,8 @@ class ZBase {
 
 			$action = new $action_class();
 
-			if (!is_subclass_of($action, 'CController')) {
-				throw new Exception(_s('Action class %s must extend %s class.', $action_class, 'CController'));
+			if (!is_subclass_of($action, CAction::class)) {
+				throw new Exception(_s('Action class %s must extend %s class.', $action_class, CAction::class));
 			}
 
 			$action->setAction($action_name);
@@ -477,7 +478,7 @@ class ZBase {
 			if (!is_a($action, CLegacyAction::class)) {
 				$response = $action->getResponse();
 
-				if (!is_subclass_of($response, 'CControllerResponse')) {
+				if (!is_subclass_of($response, CControllerResponse::class)) {
 					throw new Exception(_s('Unexpected response for action %s.', $action_name));
 				}
 
