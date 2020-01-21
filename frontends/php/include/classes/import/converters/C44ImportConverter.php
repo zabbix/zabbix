@@ -20,20 +20,13 @@
 
 
 /**
- * Factory for creating import conversions.
+ * Converter for converting import data from 4.4 to 5.0.
  */
-class CImportConverterFactory extends CRegistryFactory {
+class C44ImportConverter extends CConverter {
 
-	public function __construct() {
-		parent::__construct([
-			'1.0' => 'C10ImportConverter',
-			'2.0' => 'C20ImportConverter',
-			'3.0' => 'C30ImportConverter',
-			'3.2' => 'C32ImportConverter',
-			'3.4' => 'C34ImportConverter',
-			'4.0' => 'C40ImportConverter',
-			'4.2' => 'C42ImportConverter',
-			'4.4' => 'C44ImportConverter'
-		]);
+	public function convert($data) {
+		$data['zabbix_export']['version'] = '5.0';
+
+		return $data;
 	}
 }

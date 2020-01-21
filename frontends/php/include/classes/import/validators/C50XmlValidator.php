@@ -20,9 +20,9 @@
 
 
 /**
- * Validate import data from Zabbix 4.4.x.
+ * Validate import data from Zabbix 5.0.x.
  */
-class C44XmlValidator {
+class C50XmlValidator {
 
 	private $PREPROCESSING_STEP_TYPE = [
 		CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER,
@@ -272,6 +272,31 @@ class C44XmlValidator {
 		CXmlConstantValue::TRIGGER_EXPRESSION => CXmlConstantName::EXPRESSION,
 		CXmlConstantValue::TRIGGER_RECOVERY_EXPRESSION => CXmlConstantName::RECOVERY_EXPRESSION,
 		CXmlConstantValue::TRIGGER_NONE => CXmlConstantName::NONE
+	];
+
+	private $MEDIA_TYPE = [
+		CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL,
+		CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
+		CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS,
+		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK
+	];
+
+	private $SMTP_AUTHENTICATION = [
+		CXmlConstantValue::SMTP_AUTHENTICATION_NONE => CXmlConstantName::SMTP_AUTHENTICATION_NONE,
+		CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD
+	];
+
+	private $EVENT_SOURCE = [
+		CXmlConstantValue::EVENT_SOURCE_TRIGGERS => CXmlConstantName::TRIGGERS,
+		CXmlConstantValue::EVENT_SOURCE_DISCOVERY => CXmlConstantName::DISCOVERY,
+		CXmlConstantValue::EVENT_SOURCE_AUTOREGISTRATION => CXmlConstantName::AUTOREGISTRATION,
+		CXmlConstantValue::EVENT_SOURCE_INTERNAL => CXmlConstantName::INTERNAL
+	];
+
+	private $OPERATION_MODE = [
+		CXmlConstantValue::OPERATION_MODE_PROBLEM => CXmlConstantName::PROBLEM,
+		CXmlConstantValue::OPERATION_MODE_RECOVERY => CXmlConstantName::RECOVERY,
+		CXmlConstantValue::OPERATION_MODE_UPDATE => CXmlConstantName::UPDATE
 	];
 
 	/**
@@ -1680,7 +1705,7 @@ class C44XmlValidator {
 			'media_types' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'media_type', 'rules' => [
 				'media_type' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => [CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL, CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS, CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK]],
+					'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->MEDIA_TYPE],
 					'smtp_server' =>			['type' => XML_STRING, 'default' => ''],
 					'smtp_port' =>				['type' => XML_STRING, 'default' => '25'],
 					'smtp_helo' =>				['type' => XML_STRING, 'default' => ''],
@@ -1688,7 +1713,7 @@ class C44XmlValidator {
 					'smtp_security' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::STARTTLS => CXmlConstantName::STARTTLS, CXmlConstantValue::SSL_OR_TLS => CXmlConstantName::SSL_OR_TLS]],
 					'smtp_verify_host' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'smtp_verify_peer' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => [CXmlConstantValue::SMTP_AUTHENTICATION_NONE => CXmlConstantName::SMTP_AUTHENTICATION_NONE, CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD]],
+					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => $this->SMTP_AUTHENTICATION],
 					'username' =>				['type' => XML_STRING, 'default' => ''],
 					'password' =>				['type' => XML_STRING, 'default' => ''],
 					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
@@ -1705,7 +1730,15 @@ class C44XmlValidator {
 					'show_event_menu' => 		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'event_menu_url' => 		['type' => XML_STRING, 'default' => ''],
 					'event_menu_name' => 		['type' => XML_STRING, 'default' => ''],
-					'description' => 			['type' => XML_STRING, 'default' => '']
+					'description' => 			['type' => XML_STRING, 'default' => ''],
+					'message_templates' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'message_template', 'rules' => [
+						'message_template' =>		['type' => XML_ARRAY, 'rules' => [
+							'event_source' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => $this->EVENT_SOURCE],
+							'operation_mode' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => $this->OPERATION_MODE],
+							'subject' =>				['type' => XML_STRING, 'default' => ''],
+							'message' =>				['type' => XML_STRING, 'default' => '']
+						]]
+					]]
 				]]
 			]],
 			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
@@ -2134,13 +2167,18 @@ class C44XmlValidator {
 	 * Convert tls_accept tag to normal value.
 	 * Used in CXmlValidGeneral.
 	 *
-	 * @param array $data         Import data.
-	 * @param array $parent_data  Data's parent array.
+	 * @param array|string $data         Import data.
+	 * @param array        $parent_data  Data's parent array.
 	 *
 	 * @return string
 	 */
-	public function tlsAcceptConstantPreprocessor(array $data, array $parent_data = null) {
+	public function tlsAcceptConstantPreprocessor($data, array $parent_data = null) {
+		if (is_string($data)) {
+			return $data;
+		}
+
 		$result = 0;
+
 		$rules = [
 			CXmlConstantName::NO_ENCRYPTION => CXmlConstantValue::NO_ENCRYPTION,
 			CXmlConstantName::TLS_PSK => CXmlConstantValue::TLS_PSK,

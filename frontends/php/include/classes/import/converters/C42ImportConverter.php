@@ -70,24 +70,34 @@ class C42ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertTlsAccept(array $hosts) {
-		$const = [
+		$consts = [
 			CXmlConstantValue::NO_ENCRYPTION => [CXmlConstantName::NO_ENCRYPTION],
 			CXmlConstantValue::TLS_PSK => [CXmlConstantName::TLS_PSK],
-			3 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_PSK],
-			CXmlConstantValue::TLS_CERTIFICATE => [CXmlConstantName::TLS_CERTIFICATE],
-			5 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_CERTIFICATE],
-			6 => [CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE],
-			7 => [
+			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK => [
 				CXmlConstantName::NO_ENCRYPTION,
-				CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE
+				CXmlConstantName::TLS_PSK
+			],
+			CXmlConstantValue::TLS_CERTIFICATE => [CXmlConstantName::TLS_CERTIFICATE],
+			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_CERTIFICATE => [
+				CXmlConstantName::NO_ENCRYPTION,
+				CXmlConstantName::TLS_CERTIFICATE
+			],
+			CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
+				CXmlConstantName::TLS_PSK,
+				CXmlConstantName::TLS_CERTIFICATE
+			],
+			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
+				CXmlConstantName::NO_ENCRYPTION,
+				CXmlConstantName::TLS_PSK,
+				CXmlConstantName::TLS_CERTIFICATE
 			]
 		];
 
 		foreach ($hosts as &$host) {
 			if (array_key_exists('tls_accept', $host)) {
 				$host['tls_accept'] = ($host['tls_accept'] === '')
-					? $const[CXmlConstantValue::NO_ENCRYPTION]
-					: $const[$host['tls_accept']];
+					? $consts[CXmlConstantValue::NO_ENCRYPTION]
+					: $consts[$host['tls_accept']];
 			}
 		}
 		unset($host);
