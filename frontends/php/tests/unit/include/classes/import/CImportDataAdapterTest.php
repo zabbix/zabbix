@@ -2073,7 +2073,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 	public function testGetMediaTypes() {
 		$adapter = $this->getAdapter($this->getMediaTypeXml());
 
-		$defaults = DB::getDefaults('media_type');
+		$defaults = DB::getDefaults('media_type') + ['message_templates' => []];
 		unset($defaults['exec_params']);
 
 		$this->assertEquals($adapter->getMediaTypes(), [
