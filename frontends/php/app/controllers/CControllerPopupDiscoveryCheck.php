@@ -88,16 +88,6 @@ class CControllerPopupDiscoveryCheck extends CController {
 
 	protected function doAction() {
 		$data = array_merge([
-			'dcheckid' => '',
-			'key_' => '',
-			'snmp_community' => '',
-			'snmpv3_contextname' => '',
-			'snmpv3_securityname' => '',
-			'snmpv3_securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
-			'snmpv3_authprotocol' => ITEM_AUTHPROTOCOL_MD5,
-			'snmpv3_authpassphrase' => '',
-			'snmpv3_privprotocol' => ITEM_PRIVPROTOCOL_DES,
-			'snmpv3_privpassphrase' => '',
 			'type' => self::DEFAULT_TYPE,
 			'ports' => svc_default_port(self::DEFAULT_TYPE)
 		], $this->getInputAll());
