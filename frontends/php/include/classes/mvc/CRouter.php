@@ -247,8 +247,7 @@ class CRouter {
 		'tr_events.php'					=> ['CLegacyAction', null, null],
 		'trigger_prototypes.php'		=> ['CLegacyAction', null, null],
 		'triggers.php'					=> ['CLegacyAction', null, null],
-		'usergrps.php'					=> ['CLegacyAction', null, null],
-		'jsrpc.php'						=> ['CLegacyAction', null, null]
+		'usergrps.php'					=> ['CLegacyAction', null, null]
 	];
 
 	/**
