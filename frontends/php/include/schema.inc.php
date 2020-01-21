@@ -1954,8 +1954,7 @@ return [
 			],
 			'message' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -2202,7 +2201,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			],
 			'subject' => [
 				'null' => false,
