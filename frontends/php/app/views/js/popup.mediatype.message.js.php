@@ -19,7 +19,10 @@
 **/
 
 
-ob_start(); ?>
+/**
+ * @var CView $this
+ */
+?>
 
 /**
  * Returns a default message template with message subject and body.
@@ -81,5 +84,3 @@ jQuery('#message_type').on('change', function() {
 	jQuery('#subject').val(message_template.subject);
 	jQuery('#message').val(message_template.message);
 });
-
-<?php return ob_get_clean(); ?>

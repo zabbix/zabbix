@@ -19,13 +19,10 @@
 **/
 
 
-<<<<<<< HEAD
 /**
  * @var CView $this
  */
 
-=======
->>>>>>> 610b3746156a65d90eae355bed9f0a2192f05181
 $item = new CNavigationTree([
 	'problems' => $data['problems'],
 	'severity_config' => $data['severity_config'],

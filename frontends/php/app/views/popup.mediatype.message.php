@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm())
 	->cleanItems()
 	->setId('mediatype_message_form')
@@ -93,7 +97,7 @@ $output = [
 		]
 	],
 	'params' => $data['params'],
-	'script_inline' => require 'app/views/popup.mediatype.message.js.php'
+	'script_inline' => $this->readJsFile('popup.mediatype.message.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
