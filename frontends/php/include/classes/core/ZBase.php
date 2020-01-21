@@ -463,7 +463,7 @@ class ZBase {
 
 			foreach (array_reverse($modules) as $module) {
 				if (is_subclass_of($module, CModule::class)) {
-					array_unshift(CView::$viewsDir, $module->getDir().DIRECTORY_SEPARATOR.'views');
+					array_unshift(CView::$viewsDir, $module->getDir().'/views');
 				}
 			}
 

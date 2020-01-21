@@ -120,7 +120,7 @@ final class CModuleManager {
 		$namespaces = [];
 
 		foreach ($this->manifests as $relative_path => $manifest) {
-			$module_path = $this->modules_dir.DIRECTORY_SEPARATOR.$relative_path;
+			$module_path = $this->modules_dir.'/'.$relative_path;
 			$namespaces['Modules\\'.$manifest['namespace']] = [$module_path];
 		}
 
@@ -197,9 +197,9 @@ final class CModuleManager {
 		$non_conflicting_manifests = array_diff_key($this->manifests, array_flip($conflicting_manifests));
 
 		foreach ($non_conflicting_manifests as $relative_path => $manifest) {
-			$path = $this->modules_dir.DIRECTORY_SEPARATOR.$relative_path;
+			$path = $this->modules_dir.'/'.$relative_path;
 
-			if (is_file($path.DIRECTORY_SEPARATOR.'Module.php')) {
+			if (is_file($path.'/Module.php')) {
 				$module_class = implode('\\', ['Modules', $manifest['namespace'], 'Module']);
 
 				if (!class_exists($module_class, true)) {
@@ -321,14 +321,14 @@ final class CModuleManager {
 	 * @return array|null  Either manifest data or null if manifest file had errors.
 	 */
 	private function loadManifest(string $relative_path): ?array {
-		$module_path = implode([$this->modules_dir, $relative_path], DIRECTORY_SEPARATOR);
-		$manifest_filename = implode([$module_path, 'manifest.json'], DIRECTORY_SEPARATOR);
+		$module_path = $this->modules_dir.'/'.$relative_path;
+		$manifest_file_name = $module_path.'/manifest.json';
 
-		if (!is_file($manifest_filename) || !is_readable($manifest_filename)) {
+		if (!is_file($manifest_file_name) || !is_readable($manifest_file_name)) {
 			return null;
 		}
 
-		$manifest = file_get_contents($manifest_filename);
+		$manifest = file_get_contents($manifest_file_name);
 
 		if ($manifest === false) {
 			return null;
