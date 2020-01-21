@@ -209,7 +209,7 @@ final class CModuleManager {
 				}
 			}
 			else {
-				$module_class = 'CModule';
+				$module_class = CModule::class;
 			}
 
 			try {
@@ -221,7 +221,7 @@ final class CModuleManager {
 					$this->modules[$instance->getId()] = $instance;
 				}
 				else {
-					$this->errors[] = _s('Module.php class must extend %s for module located at %s.', 'CModule',
+					$this->errors[] = _s('Module.php class must extend %s for module located at %s.', CModule::class,
 						$relative_path
 					);
 				}
