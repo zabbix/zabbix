@@ -462,9 +462,7 @@ class CScreenBuilder {
 						&& (isset($_REQUEST['form']) && $_REQUEST['form'] == 'update')
 						&& ((isset($_REQUEST['x']) && $_REQUEST['x'] == $c && isset($_REQUEST['y']) && $_REQUEST['y'] == $r)
 								|| (isset($_REQUEST['screenitemid']) && bccomp($_REQUEST['screenitemid'], $screenitem['screenitemid']) == 0))) {
-					$item = new CObject(
-						(new CView('monitoring.screen.constructor.edit', ['screen' => $this->screen]))->getOutput()
-					);
+					$item = new CView('monitoring.screen.constructor.edit', ['screen' => $this->screen]);
 					$isEditForm = true;
 				}
 				// screen cell
