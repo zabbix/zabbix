@@ -215,7 +215,7 @@ final class CModuleManager {
 			try {
 				$instance = new $module_class($path, $manifest);
 
-				if (is_a($instance, CModule::class)) {
+				if ($instance instanceof CModule) {
 					$instance->init();
 
 					$this->modules[$instance->getId()] = $instance;

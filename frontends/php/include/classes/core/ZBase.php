@@ -475,7 +475,7 @@ class ZBase {
 
 			$action->run();
 
-			if (!is_a($action, CLegacyAction::class)) {
+			if (!($action instanceof CLegacyAction)) {
 				$response = $action->getResponse();
 
 				if (!is_subclass_of($response, CControllerResponse::class)) {
