@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -19,9 +19,8 @@
 **/
 
 
-declare(strict_types = 1);
-
-use CController as CAction;
+use Core\CModule,
+	CController as CAction;
 
 /**
  * Module manager class for testing and loading user modules.
@@ -38,7 +37,7 @@ final class CModuleManager {
 	 *
 	 * @var string
 	 */
-	private $home_path;
+	private $modules_dir;
 
 	/**
 	 * Manifest data of added modules.
@@ -62,10 +61,10 @@ final class CModuleManager {
 	private $errors = [];
 
 	/**
-	 * @param string $home_path  Home path of modules.
+	 * @param string $modules_dir  Home path of modules.
 	 */
-	public function __construct(string $home_path) {
-		$this->home_path = $home_path;
+	public function __construct(string $modules_dir) {
+		$this->modules_dir = $modules_dir;
 	}
 
 	/**
@@ -73,8 +72,8 @@ final class CModuleManager {
 	 *
 	 * @return string
 	 */
-	public function getHomePath(): string {
-		return $this->home_path;
+	public function getModulesDir(): string {
+		return $this->modules_dir;
 	}
 
 	/**
@@ -113,6 +112,207 @@ final class CModuleManager {
 	}
 
 	/**
+	 * Get namespaces of all added modules.
+	 *
+	 * @return array
+	 */
+	public function getNamespaces(): array {
+		$namespaces = [];
+
+		foreach ($this->manifests as $relative_path => $manifest) {
+			$module_path = $this->modules_dir.DIRECTORY_SEPARATOR.$relative_path;
+			$namespaces['Modules\\'.$manifest['namespace']] = [$module_path];
+		}
+
+		return $namespaces;
+	}
+
+	/**
+	 * Check added modules for conflicts.
+	 *
+	 * @return array  Lists of conflicts and conflicting modules.
+	 */
+	public function checkConflicts(): array {
+		$ids = [];
+		$namespaces = [];
+		$actions = [];
+
+		foreach ($this->manifests as $relative_path => $manifest) {
+			$ids[$manifest['id']][] = $relative_path;
+			$namespaces[$manifest['namespace']][] = $relative_path;
+			foreach (array_keys($manifest['actions']) as $action_name) {
+				$actions[$action_name][] = $relative_path;
+			}
+		}
+
+		foreach (['ids', 'namespaces', 'actions'] as $var) {
+			$$var = array_filter($$var, function($list) {
+				return count($list) > 1;
+			});
+		}
+
+		$conflicts = [];
+		$conflicting_manifests = [];
+
+		foreach ($ids as $id => $relative_paths) {
+			$conflicts[] = _s('Identical ID (%s) is used by modules located at %s.', $id,
+				implode(', ', $relative_paths)
+			);
+			$conflicting_manifests = array_merge($conflicting_manifests, $relative_paths);
+		}
+
+		foreach ($namespaces as $namespace => $relative_paths) {
+			$conflicts[] = _s('Identical namespace (%s) is used by modules located at %s.', $namespace,
+				implode(', ', $relative_paths)
+			);
+			$conflicting_manifests = array_merge($conflicting_manifests, $relative_paths);
+		}
+
+		$relative_paths = array_unique(array_reduce($actions, function($carry, $item) {
+			return array_merge($carry, $item);
+		}, []));
+
+		if ($relative_paths) {
+			$conflicts[] = _s('Identical actions are used by modules located at %s.', implode(', ', $relative_paths));
+			$conflicting_manifests = array_merge($conflicting_manifests, $relative_paths);
+		}
+
+		return [
+			'conflicts' => $conflicts,
+			'conflicting_manifests' => array_unique($conflicting_manifests)
+		];
+	}
+
+	/**
+	 * Check, instantiate and initialize all added modules.
+	 *
+	 * @return array  List of initalized modules.
+	 */
+	public function initModules(): array {
+		[
+			'conflicts' => $this->errors,
+			'conflicting_manifests' => $conflicting_manifests
+		] = $this->checkConflicts();
+
+		$non_conflicting_manifests = array_diff_key($this->manifests, array_flip($conflicting_manifests));
+
+		foreach ($non_conflicting_manifests as $relative_path => $manifest) {
+			$path = $this->modules_dir.DIRECTORY_SEPARATOR.$relative_path;
+
+			if (is_file($path.DIRECTORY_SEPARATOR.'Module.php')) {
+				$module_class = implode('\\', ['Modules', $manifest['namespace'], 'Module']);
+
+				if (!class_exists($module_class, true)) {
+					$this->errors[] = _s('Wrong Module.php class name for module located at %s.', $relative_path);
+
+					continue;
+				}
+			}
+			else {
+				$module_class = 'CModule';
+			}
+
+			try {
+				$instance = new $module_class($path, $manifest);
+
+				if (is_a($instance, CModule::class)) {
+					$instance->init();
+
+					$this->modules[$instance->getId()] = $instance;
+				}
+				else {
+					$this->errors[] = _s('Module.php class must extend %s for module located at %s.', 'CModule',
+						$relative_path
+					);
+				}
+			}
+			catch (Exception $e) {
+				$this->errors[] = _s('%s - thrown by module located at %s.', $e->getMessage(), $relative_path);
+			}
+		}
+
+		return $this->modules;
+	}
+
+	/**
+	 * Get add initialized modules.
+	 *
+	 * @return array
+	 */
+	public function getModules(): array {
+		return $this->modules;
+	}
+
+	/**
+	 * Get loaded module instance associated with given action name.
+	 *
+	 * @param string $action_name
+	 *
+	 * @return CModule|null
+	 */
+	public function getModuleByActionName(string $action_name): ?CModule {
+		foreach ($this->modules as $module) {
+			if (array_key_exists($action_name, $module->getActions())) {
+				return $module;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get actions of all initialized modules.
+	 *
+	 * @return array
+	 */
+	public function getActions(): array {
+		$actions = [];
+
+		foreach ($this->modules as $module) {
+			foreach ($module->getActions() as $name => $data) {
+				$actions[$name] = [
+					'class' => implode('\\', ['Modules', $module->getNamespace(), 'Actions',
+						str_replace('/', '\\', $data['class'])
+					]),
+					'layout' => array_key_exists('layout', $data) ? $data['layout'] : 'layout.htmlpage',
+					'view' => array_key_exists('view', $data) ? $data['view'] : null
+				];
+			}
+		}
+
+		return $actions;
+	}
+
+	/**
+	 * Publish an event to all loaded modules. The module of the responsible action will be served last.
+	 *
+	 * @param CAction $action  Action responsible for the current request.
+	 * @param string  $event   Event to publish.
+	 */
+	public function publishEvent(CAction $action, string $event): void {
+		$action_module = $this->getModuleByActionName($action->getAction());
+
+		foreach ($this->modules as $module) {
+			if ($module != $action_module) {
+				$module->$event($action);
+			}
+		}
+
+		if ($action_module) {
+			$action_module->$event($action);
+		}
+	}
+
+	/**
+	 * Get errors encountered while module initialization.
+	 *
+	 * @return array
+	 */
+	public function getErrors(): array {
+		return $this->errors;
+	}
+
+	/**
 	 * Load and parse module manifest file.
 	 *
 	 * @param string $relative_path  Relative path to the module.
@@ -120,7 +320,7 @@ final class CModuleManager {
 	 * @return array|null  Either manifest data or null if manifest file had errors.
 	 */
 	private function loadManifest(string $relative_path): ?array {
-		$module_path = implode([$this->home_path, $relative_path], DIRECTORY_SEPARATOR);
+		$module_path = implode([$this->modules_dir, $relative_path], DIRECTORY_SEPARATOR);
 		$manifest_filename = implode([$module_path, 'manifest.json'], DIRECTORY_SEPARATOR);
 
 		if (!is_file($manifest_filename) || !is_readable($manifest_filename)) {
@@ -164,207 +364,5 @@ final class CModuleManager {
 		];
 
 		return $manifest;
-	}
-
-	/**
-	 * Get namespaces of all added modules.
-	 *
-	 * @return array
-	 */
-	public function getNamespaces(): array {
-		$namespaces = [];
-
-		foreach ($this->manifests as $relative_path => $manifest) {
-			$module_path = $this->home_path.DIRECTORY_SEPARATOR.$relative_path;
-
-			$namespaces['Modules\\'.$manifest['namespace']] = [$module_path];
-
-			if ($manifest['actions']) {
-				$namespaces['Modules\\'.$manifest['namespace'].'\\Actions'] = [
-					$module_path.DIRECTORY_SEPARATOR.'actions'
-				];
-			}
-		}
-
-		return $namespaces;
-	}
-
-	/**
-	 * Get actions of all added modules.
-	 *
-	 * @return array
-	 */
-	public function getActions(): array {
-		$actions = [];
-
-		foreach ($this->manifests as $relative_path => $manifest) {
-			foreach ($manifest['actions'] as $name => $data) {
-				$actions[$name] = [
-					'class' => implode('\\', ['Modules', $manifest['namespace'], 'Actions',
-						str_replace('/', '\\', $data['class'])
-					]),
-					'layout' => array_key_exists('layout', $data) ? $data['layout'] : 'layout.htmlpage',
-					'view' => array_key_exists('view', $data) ? $data['view'] : null
-				];
-			}
-		}
-
-		return $actions;
-	}
-
-	/**
-	 * Check added modules for conflicts and remove conflicting modules.
-	 *
-	 * @return array  List of conflicts or an empty array.
-	 */
-	public function resolveConflicts(): array {
-		$ids = [];
-		$namespaces = [];
-		$actions = [];
-
-		foreach ($this->manifests as $relative_path => $manifest) {
-			$ids[$manifest['id']][] = $relative_path;
-			$namespaces[$manifest['namespace']][] = $relative_path;
-			foreach (array_keys($manifest['actions']) as $action_name) {
-				$actions[$action_name][] = $relative_path;
-			}
-		}
-
-		foreach (['ids', 'namespaces', 'actions'] as $var) {
-			$$var = array_filter($$var, function($list) {
-				return count($list) > 1;
-			});
-		}
-
-		$conflicts = [];
-		$conflicting_modules = [];
-
-		foreach ($ids as $id => $relative_paths) {
-			$conflicts[] = _s('Identical ID (%s) is used by modules located at %s.', $id,
-				implode(', ', $relative_paths)
-			);
-			$conflicting_modules = array_merge($conflicting_modules, $relative_paths);
-		}
-
-		foreach ($namespaces as $namespace => $relative_paths) {
-			$conflicts[] = _s('Identical namespace (%s) is used by modules located at %s.', $namespace,
-				implode(', ', $relative_paths)
-			);
-			$conflicting_modules = array_merge($conflicting_modules, $relative_paths);
-		}
-
-		$relative_paths = array_unique(array_reduce($actions, function($carry, $item) {
-			return array_merge($carry, $item);
-		}, []));
-
-		if ($relative_paths) {
-			$conflicts[] = _s('Identical actions are used by modules located at %s.', implode(', ', $relative_paths));
-			$conflicting_modules = array_merge($conflicting_modules, $relative_paths);
-		}
-
-		$this->manifests = array_diff_key($this->manifests, array_flip($conflicting_modules));
-
-		return $conflicts;
-	}
-
-	/**
-	 * Check, instantiate and initialize all added modules.
-	 *
-	 * @return array  List of initalized modules.
-	 */
-	public function initModules(): array {
-		$this->errors = $this->resolveConflicts();
-
-		foreach ($this->manifests as $relative_path => $manifest) {
-			$path = $this->home_path.DIRECTORY_SEPARATOR.$relative_path;
-
-			if (is_file($path.DIRECTORY_SEPARATOR.'Module.php')) {
-				$module_class = implode('\\', ['Modules', $manifest['namespace'], 'Module']);
-
-				if (!class_exists($module_class, true)) {
-					$this->errors[] = _s('Wrong Module.php class name for module located at %s.', $relative_path);
-
-					continue;
-				}
-			}
-			else {
-				$module_class = 'Core\\CModule';
-			}
-
-			try {
-				$instance = new $module_class($path, $manifest);
-
-				if (is_a($instance, 'Core\\CModule')) {
-					$instance->init();
-
-					$this->modules[$instance->getId()] = $instance;
-				}
-				else {
-					$this->errors[] = _s('Module.php class must extend %s for module located at %s.', 'Core\\CModule',
-						$relative_path
-					);
-				}
-			}
-			catch (Exception $e) {
-				$this->errors[] = _s('%s - thrown by module located at %s.', $e->getMessage(), $relative_path);
-			}
-		}
-
-		return $this->modules;
-	}
-
-	/**
-	 * Get add initialized modules.
-	 *
-	 * @return array
-	 */
-	public function getModules(): array {
-		return $this->modules;
-	}
-
-	/**
-	 * Get errors encountered while module initialization.
-	 *
-	 * @return array
-	 */
-	public function getErrors(): array {
-		return $this->errors;
-	}
-
-	/**
-	 * Publish an event to all loaded modules. The module of the responsible action will be served last.
-	 *
-	 * @param CAction $action  Action responsible for the current request.
-	 * @param string  $event   Event to publish.
-	 */
-	public function publishEvent(CAction $action, string $event): void {
-		$action_module = $this->getModuleByActionName($action->getAction());
-
-		foreach ($this->modules as $module) {
-			if ($module != $action_module) {
-				$module->$event($action);
-			}
-		}
-
-		if ($action_module) {
-			$action_module->$event($action);
-		}
-	}
-
-	/**
-	 * Get loaded module instance associated with given action name.
-	 *
-	 * @param string $action_name
-	 *
-	 * @return Core\CModule|null
-	 */
-	public function getModuleByActionName(string $action_name): ?Core\CModule {
-		foreach ($this->modules as $module) {
-			if (array_key_exists($action_name, $module->getActions())) {
-				return $module;
-			}
-		}
-
-		return null;
 	}
 }

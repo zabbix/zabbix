@@ -90,7 +90,7 @@ class CControllerModuleList extends CController {
 			'preservekeys' => true
 		]);
 
-		$module_manager = new CModuleManager(APP::ModuleManager()->getHomePath());
+		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
 		$modules = [];
 		$modules_missing = [];
 

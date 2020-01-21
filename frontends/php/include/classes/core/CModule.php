@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -19,12 +19,13 @@
 **/
 
 
-declare(strict_types = 1);
-
 namespace Core;
 
-use \CController as CAction;
+use CController as CAction;
 
+/**
+ * Base class for user modules. If Module.php is not provided by user module, this class will be instantiated instead.
+ */
 class CModule {
 
 	/**
@@ -32,7 +33,7 @@ class CModule {
 	 *
 	 * @var string
 	 */
-	private $path;
+	private $dir;
 
 	/**
 	 * Module manifest.
@@ -42,11 +43,11 @@ class CModule {
 	private $manifest;
 
 	/**
-	 * @param string $path      Module directory path.
+	 * @param string $dir       Module directory path.
 	 * @param array  $manifest  Module manifest.
 	 */
-	public function __construct(string $path, array $manifest) {
-		$this->path = $path;
+	public function __construct(string $dir, array $manifest) {
+		$this->dir = $dir;
 		$this->manifest = $manifest;
 	}
 
@@ -61,8 +62,8 @@ class CModule {
 	 *
 	 * @return string
 	 */
-	final public function getPath(): string {
-		return $this->path;
+	final public function getDir(): string {
+		return $this->dir;
 	}
 
 	/**
@@ -111,23 +112,24 @@ class CModule {
 	}
 
 	/**
-	 * Get module configuration options.
+	 * Get module configuration.
 	 *
-	 * @param mixed $name     (optional) Option name.
-	 * @param mixed $default  Default value.
-	 *
-	 * @return mixed  Either whole configuration or option specified.
+	 * @return array
 	 */
-	final public function getConfig($name = null, $default = null) {
-		if ($name === null) {
-			return $this->manifest['config'];
-		}
-		elseif (array_key_exists($name, $this->manifest['config'])) {
-			return $this->manifest['config'][$name];
-		}
-		else {
-			return $default;
-		}
+	final public function getConfig() {
+		return $this->manifest['config'];
+	}
+
+	/**
+	 * Get module configuration option.
+	 *
+	 * @param string $name     Option name.
+	 * @param mixed  $default  Default value.
+	 *
+	 * @return mixed  Configuration option (if exists) or the $default value.
+	 */
+	final public function getOption(string $name = null, $default = null) {
+		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : $default;
 	}
 
 	/**
@@ -136,14 +138,6 @@ class CModule {
 	 * @param CAction $action  Action instance responsible for current request.
 	 */
 	public function onBeforeAction(CAction $action): void {
-	}
-
-	/**
-	 * Event handler, triggered after executing the action, before rendering the view.
-	 *
-	 * @param CAction $action  Action instance responsible for current request.
-	 */
-	public function onAfterAction(CAction $action): void {
 	}
 
 	/**

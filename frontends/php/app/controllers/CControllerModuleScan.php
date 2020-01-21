@@ -54,9 +54,9 @@ class CControllerModuleScan extends CController {
 			$db_moduleids[$db_module['relative_path']] = $moduleid;
 		}
 
-		$module_manager = new CModuleManager(APP::ModuleManager()->getHomePath());
+		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
 
-		foreach (new DirectoryIterator($module_manager->getHomePath()) as $item) {
+		foreach (new DirectoryIterator($module_manager->getModulesDir()) as $item) {
 			if (!$item->isDir() || $item->isDot()) {
 				continue;
 			}

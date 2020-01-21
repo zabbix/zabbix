@@ -19,6 +19,8 @@
 **/
 
 
+use Core\CModule;
+
 require_once dirname(__FILE__).'/CAutoloader.php';
 
 class ZBase {
@@ -459,8 +461,8 @@ class ZBase {
 			}
 
 			foreach (array_reverse($modules) as $module) {
-				if (is_subclass_of($module, 'Core\\CModule')) {
-					array_unshift(CView::$viewsDir, $module->getPath().DIRECTORY_SEPARATOR.'views');
+				if (is_subclass_of($module, CModule::class)) {
+					array_unshift(CView::$viewsDir, $module->getDir().DIRECTORY_SEPARATOR.'views');
 				}
 			}
 
@@ -472,9 +474,7 @@ class ZBase {
 
 			$action->run();
 
-			$this->module_manager->publishEvent($action, 'onAfterAction');
-
-			if (!is_a($action, 'CLegacyAction')) {
+			if (!is_a($action, CLegacyAction::class)) {
 				$response = $action->getResponse();
 
 				if (!is_subclass_of($response, 'CControllerResponse')) {
