@@ -421,7 +421,7 @@ FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0			|1|media_type
 FIELD		|eventsource	|t_integer	|	|NOT NULL	|0
 FIELD		|recovery	|t_integer	|	|NOT NULL	|0
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|message	|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|message	|t_shorttext	|''	|NOT NULL	|0
 UNIQUE		|1		|mediatypeid,eventsource,recovery
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
@@ -479,7 +479,7 @@ INDEX		|1		|actionid
 
 TABLE|opmessage|operationid|ZBX_DATA
 FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
-FIELD		|default_msg	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|default_msg	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|message	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|mediatypeid	|t_id		|	|NULL		|0			|2|media_type	|		|RESTRICT
