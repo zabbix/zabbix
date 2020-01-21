@@ -116,7 +116,7 @@ class CModule {
 	 *
 	 * @return array
 	 */
-	final public function getConfig() {
+	final public function getConfig(): array {
 		return $this->manifest['config'];
 	}
 
