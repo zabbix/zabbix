@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2693,7 +2693,7 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	/*   3) we have gathered more than half of the maximum packet size      */
 	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
 	{
-		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_AUTO_REGISTRATION, &areg, lastid, &id, &records_num,
+		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_AUTOREGISTRATION, &areg, lastid, &id, &records_num,
 				more);
 
 		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
@@ -4190,11 +4190,11 @@ json_parse_return:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_auto_registration_contents                               *
+ * Function: process_autoregistration_contents                                *
  *                                                                            *
- * Purpose: parse auto registration data contents and process it              *
+ * Purpose: parse autoregistration data contents and process it               *
  *                                                                            *
- * Parameters: jp_data         - [IN] JSON with auto registration data        *
+ * Parameters: jp_data         - [IN] JSON with autoregistration data         *
  *             proxy_hostid    - [IN] proxy identifier from database          *
  *             error           - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
@@ -4203,7 +4203,7 @@ json_parse_return:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid,
+static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid,
 		char **error)
 {
 	struct zbx_json_parse	jp_row;
@@ -4341,9 +4341,9 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 
 /******************************************************************************
  *                                                                            *
- * Function: process_auto_registration                                        *
+ * Function: process_autoregistration                                         *
  *                                                                            *
- * Purpose: update auto registration data, received from proxy                *
+ * Purpose: update autoregistration data, received from proxy                 *
  *                                                                            *
  * Parameters: jp           - [IN] JSON with historical data                  *
  *             proxy_hostid - [IN] proxy identifier from database             *
@@ -4356,7 +4356,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts,
+int	process_autoregistration(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts,
 		char **error)
 {
 	struct zbx_json_parse	jp_data;
@@ -4372,7 +4372,7 @@ int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_host
 		goto out;
 	}
 
-	ret = process_auto_registration_contents(&jp_data, proxy_hostid, error);
+	ret = process_autoregistration_contents(&jp_data, proxy_hostid, error);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -4549,9 +4549,9 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 
-	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTO_REGISTRATION, &jp_data))
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTOREGISTRATION, &jp_data))
 	{
-		if (SUCCEED != (ret = process_auto_registration_contents(&jp_data, proxy->hostid, &error_step)))
+		if (SUCCEED != (ret = process_autoregistration_contents(&jp_data, proxy->hostid, &error_step)))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 

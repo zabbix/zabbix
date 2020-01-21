@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,8 +65,8 @@ class CControllerPopupScriptExec extends CController {
 		];
 
 		$scripts = API::Script()->get([
-			'scriptids' => $scriptid,
-			'output' => ['name', 'command']
+			'output' => ['name', 'command'],
+			'scriptids' => $scriptid
 		]);
 
 		if ($scripts) {

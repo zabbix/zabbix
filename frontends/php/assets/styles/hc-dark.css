@@ -3099,6 +3099,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .overlay-dialogue-body {
   margin: 0 0 25px;
   white-space: nowrap; }
+  .overlay-dialogue-body textarea {
+    white-space: pre-wrap; }
 
 .overlay-dialogue-footer {
   text-align: right; }
@@ -4748,7 +4750,7 @@ svg {
 ::-ms-input-placeholder {
   color: #bbbbbb; }
 
-:placeholder-shown {
+::placeholder {
   color: #bbbbbb; }
 
 .icon-action-command,

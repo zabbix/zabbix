@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,16 +19,20 @@
 **/
 
 
+<<<<<<< HEAD
 /**
  * @var CView $this
  */
 
+=======
+>>>>>>> 610b3746156a65d90eae355bed9f0a2192f05181
 $item = new CNavigationTree([
 	'problems' => $data['problems'],
 	'severity_config' => $data['severity_config'],
 	'initial_load' => $data['initial_load'],
 	'uniqueid' => $data['uniqueid'],
 	'maps_accessible' => $data['maps_accessible'],
+	'navtree' => $data['navtree'],
 	'navtree_item_selected' => $data['navtree_item_selected'],
 	'navtree_items_opened' => $data['navtree_items_opened'],
 	'show_unavailable' => $data['show_unavailable']

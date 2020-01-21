@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,6 +126,7 @@ class CRouter {
 		'popup.httpstep'				=> ['CControllerPopupHttpStep',						'layout.json',			'popup.httpstep'],
 		'popup.maintenance.period'		=> ['CControllerPopupMaintenancePeriod',			'layout.json',			'popup.maintenance.period'],
 		'popup.media'					=> ['CControllerPopupMedia',						'layout.json',			'popup.media'],
+		'popup.mediatype.message'		=> ['CControllerPopupMediatypeMessage',				'layout.json',			'popup.mediatype.message'],
 		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
 		'popup.preproctest.edit'		=> ['CControllerPopupPreprocTestEdit',				'layout.json',			'popup.preproctestedit.view'],
@@ -200,7 +201,7 @@ class CRouter {
 		'widget.graphprototype.view'	=> ['CControllerWidgetIteratorGraphPrototypeView',	'layout.json',			null],
 		'widget.hostavail.view'			=> ['CControllerWidgetHostAvailView',				'layout.widget',		'monitoring.widget.hostavail.view'],
 		'widget.map.view'				=> ['CControllerWidgetMapView',						'layout.widget',		'monitoring.widget.map.view'],
-		'widget.navtree.item.edit'		=> ['CControllerWidgetNavTreeItemEdit',				'layout.json',			null],
+		'widget.navtree.item.edit'		=> ['CControllerWidgetNavTreeItemEdit',				'layout.json',			'monitoring.widget.navtreeitem.edit'],
 		'widget.navtree.item.update'	=> ['CControllerWidgetNavTreeItemUpdate',			'layout.json',			null],
 		'widget.navtree.view'			=> ['CControllerWidgetNavTreeView',					'layout.widget',		'monitoring.widget.navtree.view'],
 		'widget.plaintext.view'			=> ['CControllerWidgetPlainTextView',				'layout.widget',		'monitoring.widget.plaintext.view'],

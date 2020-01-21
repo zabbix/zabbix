@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -882,7 +882,8 @@ ZBX_NotificationsAlarm.prototype.produce = function() {
 		muted: this.muted,
 		severity: this.severity,
 		seek: this.player.getSeek(),
-		timeout: this.player.getTimeout()
+		timeout: this.player.getTimeout(),
+		supported: !! this.player.audio
 	};
 };
 

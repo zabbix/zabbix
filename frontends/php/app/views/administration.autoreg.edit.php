@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 $this->includeJsFile('administration.autoreg.edit.js.php');
 
 $widget = (new CWidget())
-	->setTitle(_('Auto registration'))
+	->setTitle(_('Autoregistration'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $autoreg_form = (new CForm())
@@ -86,7 +86,7 @@ else {
 }
 
 $autoreg_view = (new CTabView())
-	->addTab('autoreg', _('Auto registration'), $autoreg_tab)
+	->addTab('autoreg', _('Autoregistration'), $autoreg_tab)
 	->setFooter(makeFormFooter((new CSubmitButton(_('Update'), 'action', 'autoreg.update'))->setId('update')));
 
 $autoreg_form->addItem($autoreg_view);

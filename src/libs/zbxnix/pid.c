@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,15 +37,9 @@ int	create_pid_file(const char *pidfile)
 	fl.l_pid = getpid();
 
 	/* check if pid file already exists */
-	if (0 == zbx_stat(pidfile, &buf))
+	if (-1 != (fd = open(pidfile, O_WRONLY | O_APPEND)))
 	{
-		if (-1 == (fd = open(pidfile, O_WRONLY | O_APPEND)))
-		{
-			zbx_error("cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
-			return FAIL;
-		}
-
-		if (-1 == fcntl(fd, F_SETLK, &fl))
+		if (0 == zbx_fstat(fd, &buf) && -1 == fcntl(fd, F_SETLK, &fl))
 		{
 			close(fd);
 			zbx_error("Is this process already running? Could not lock PID file [%s]: %s",

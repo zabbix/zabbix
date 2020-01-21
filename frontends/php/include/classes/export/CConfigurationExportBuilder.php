@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -418,6 +418,17 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($media_types, ['name']);
 
 		foreach ($media_types as $media_type) {
+			$message_templates = [];
+
+			foreach ($media_type['message_templates'] as $message_template) {
+				$message_templates[] = [
+					'event_source' => $message_template['eventsource'],
+					'operation_mode' => $message_template['recovery'],
+					'subject' => $message_template['subject'],
+					'message' => $message_template['message']
+				];
+			}
+
 			$result[] = [
 				'name' => $media_type['name'],
 				'type' => $media_type['type'],
@@ -447,7 +458,8 @@ class CConfigurationExportBuilder {
 				'show_event_menu' => $media_type['show_event_menu'],
 				'event_menu_url' => $media_type['event_menu_url'],
 				'event_menu_name' => $media_type['event_menu_name'],
-				'description' => $media_type['description']
+				'description' => $media_type['description'],
+				'message_templates' => $message_templates
 			];
 		}
 
