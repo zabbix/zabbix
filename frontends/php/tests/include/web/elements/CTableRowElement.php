@@ -52,7 +52,7 @@ class CTableRowElement extends CElement {
 		$columns = [];
 
 		foreach ($this->query('xpath:./td')->all() as $i => $column) {
-			$columns[$headers[$i]] = $column;
+			$columns[CTestArrayHelper::get($headers, $i, $i)] = $column;
 		}
 
 		return new CElementCollection($columns);

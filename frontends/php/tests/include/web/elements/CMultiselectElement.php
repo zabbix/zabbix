@@ -223,11 +223,14 @@ class CMultiselectElement extends CElement {
 			}
 
 			$content = CXPathHelper::escapeQuotes($value);
+
 			try {
 				$element = $this->query('xpath', implode('|', [
 					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
+					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@data-label,'.$content.')]'.
+							'/span[contains(@class, "suggest-found") and text()='.$content.']',
 					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]'.
-					'/span[text()='.$content.']'
+							'/span[text()='.$content.']'
 				]))->waitUntilPresent();
 			}
 			catch (NoSuchElementException $exception) {

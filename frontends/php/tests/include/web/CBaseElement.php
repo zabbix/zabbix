@@ -70,6 +70,9 @@ abstract class CBaseElement extends RemoteWebElement {
 		catch (StaleElementReferenceException $exception) {
 			return true;
 		}
+		catch (Exception $exception) {
+			// Code is not missing here.
+		}
 
 		return false;
 	}
