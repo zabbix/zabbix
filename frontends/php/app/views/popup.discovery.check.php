@@ -85,7 +85,9 @@ $form_list = (new CFormList())
 		'row_dcheck_snmpv3_securityname'
 	)
 	->addRow(new CLabel(_('Security level'), 'snmpv3_securitylevel'),
-		new CComboBox('snmpv3_securitylevel', (int)$data['params']['snmpv3_securitylevel'], null, [
+		new CComboBox('snmpv3_securitylevel',
+			array_key_exists('snmpv3_securitylevel', $data['params']) ? $data['params']['snmpv3_securitylevel'] : '',
+			null, [
 				ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
 				ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
 				ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
@@ -94,7 +96,9 @@ $form_list = (new CFormList())
 		'row_dcheck_snmpv3_securitylevel'
 	)
 	->addRow(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'),
-		(new CRadioButtonList('snmpv3_authprotocol', (int) $data['params']['snmpv3_authprotocol']))
+		(new CRadioButtonList('snmpv3_authprotocol',
+			array_key_exists('snmpv3_authprotocol', $data['params']) ? $data['params']['snmpv3_authprotocol'] : ''
+		))
 			->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
 			->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 			->setModern(true),
@@ -109,7 +113,9 @@ $form_list = (new CFormList())
 		'row_dcheck_snmpv3_authpassphrase'
 	)
 	->addRow(new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol'),
-		(new CRadioButtonList('snmpv3_privprotocol', (int) $data['params']['snmpv3_privprotocol']))
+		(new CRadioButtonList('snmpv3_privprotocol',
+			array_key_exists('snmpv3_privprotocol', $data['params']) ? $data['params']['snmpv3_privprotocol'] : ''
+		))
 			->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
 			->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 			->setModern(true),
