@@ -117,7 +117,7 @@ jQuery(function ($) {
 
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
-			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
+			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0', graph.parent());
 			data.isHintBoxFrozen = true;
 			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
 			overlayDialogueOnLoad(true, graph.hintBoxItem);
@@ -423,8 +423,8 @@ jQuery(function ($) {
 			mouse_distance = 15,
 			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + mouse_distance)
 				? e.clientX + mouse_distance - offset.left
-				: e.clientX - mouse_distance - hbox.outerWidth() - offset.left,
-			t = e.pageY - offset.top - graph.parent().scrollTop(),
+				: e.clientX - mouse_distance - hbox.outerWidth(true) - offset.left,
+			t = e.pageY - offset.top,
 			t = page_bottom >= t + offset.top + hbox.outerHeight() + mouse_distance
 				? t + mouse_distance
 				: t - mouse_distance - hbox.outerHeight();
