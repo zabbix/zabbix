@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,9 @@ class CControllerMacrosUpdate extends CController {
 		}
 		else {
 			$response->setMessageError(_('Cannot update macros'));
-			$response->setFormData($this->getInputAll());
+			$form_data = $this->getInputAll();
+			$form_data['macros'] = array_values($form_data['macros']);
+			$response->setFormData($form_data);
 		}
 
 		$this->setResponse($response);

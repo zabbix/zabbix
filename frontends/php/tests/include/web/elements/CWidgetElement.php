@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,24 +77,13 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
-	 * Delete widget.
-	 *
-	 * @return $this
-	 */
-	public function delete() {
-		$this->query('xpath:.//button[@class="btn-widget-delete"]')->one()->click()->waitUntilNotVisible();
-
-		return $this;
-	}
-
-	/**
 	 * @inheritdoc
 	 */
 	public function getReadyCondition() {
 		$target = $this;
 
 		return function () use ($target) {
-			return ($target->query('xpath:.//div[contains(@class, "is-loading")]')->one(false) === null);
+			return ($target->query('xpath:.//div[contains(@class, "is-loading")]')->one(false)->isValid() === false);
 		};
 	}
 }

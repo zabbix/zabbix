@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class CScreenUrl extends CScreenBase {
 		// prevent from resolving macros in configuration page
 		if ($this->mode != SCREEN_MODE_PREVIEW && $this->mode != SCREEN_MODE_SLIDESHOW) {
 			return $this->getOutput(
-				CHtmlUrlValidator::validate($this->screenitem['url'])
+				CHtmlUrlValidator::validate($this->screenitem['url'], ['allow_user_macro' => false])
 					? new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'],
 							'auto')
 					: makeMessageBox(false, [[
@@ -55,7 +55,7 @@ class CScreenUrl extends CScreenBase {
 		$this->screenitem['url'] = $url ? $url : $this->screenitem['url'];
 
 		return $this->getOutput(
-			CHtmlUrlValidator::validate($this->screenitem['url'])
+			CHtmlUrlValidator::validate($this->screenitem['url'], ['allow_user_macro' => false])
 				? new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto')
 				: makeMessageBox(false, [[
 							'type' => 'error',

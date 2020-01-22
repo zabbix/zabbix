@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -657,11 +657,24 @@ else {
 		order_result($data['graphs'], $sortField, $sortOrder);
 	}
 
-	$url = (new CUrl('graphs.php'))
-		->setArgument('groupid', $pageFilter->groupid)
-		->setArgument('hostid', $data['hostid']);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$data['paging'] = getPagingLine($data['graphs'], $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['graphs'], $sortOrder,
+		(new CUrl('graphs.php'))
+			->setArgument('groupid', $pageFilter->groupid)
+			->setArgument('hostid', $data['hostid'])
+	);
 
 	if ($data['pageFilter']->hostsSelected) {
 		// Get graphs after paging.

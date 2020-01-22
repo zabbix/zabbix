@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,6 @@ class CPage {
 		);
 
 		CElementQuery::setPage($this);
-		$this->setViewport(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT);
 	}
 
 	/**
@@ -100,7 +99,7 @@ class CPage {
 		$this->driver->manage()->deleteAllCookies();
 		try {
 			$this->driver->executeScript('sessionStorage.clear();');
-		} catch (Exception $exeption) {
+		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
 
@@ -280,9 +279,14 @@ class CPage {
 		}
 
 		if (isset($this->height) && $this->height > self::DEFAULT_PAGE_HEIGHT) {
-			$this->setViewport(self::DEFAULT_PAGE_WIDTH,
-				self::DEFAULT_PAGE_HEIGHT
-			);
+			try {
+				CommandExecutor::executeCustom($this->driver, [
+					'cmd' => 'Emulation.clearDeviceMetricsOverride',
+					'params' => ['clear' => true]
+				]);
+			} catch (Exception $exception) {
+				// Code is not missing here.
+			}
 
 			$this->height = self::DEFAULT_PAGE_HEIGHT;
 		}
@@ -423,5 +427,16 @@ class CPage {
 	 */
 	public function getDriver() {
 		return $this->driver;
+	}
+
+	/**
+	 * Remove focus from the element.
+	 */
+	public function removeFocus() {
+		try {
+			$this->driver->executeScript('document.activeElement.blur();');
+		} catch (Exception $ex) {
+			// Code is not missing here.
+		}
 	}
 }

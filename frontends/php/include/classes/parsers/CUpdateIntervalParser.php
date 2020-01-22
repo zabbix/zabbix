@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ class CUpdateIntervalParser extends CParser {
 	}
 
 	/**
-	 * Get all intervals or specificly flexible or scheduling intervals.
+	 * Get all intervals or specifically flexible or scheduling intervals.
 	 *
 	 * @param int $type			If null get both types, else either ITEM_DELAY_FLEXIBLE or ITEM_DELAY_SCHEDULING
 	 *

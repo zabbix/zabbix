@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -221,7 +221,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	}
 
 	// handle configurator interface for inactive plugins
-	if _, ok := p.impl.(plugin.Configurator); ok && agent.Options.Plugins != nil {
+	if _, ok := p.impl.(plugin.Configurator); ok {
 		if p.refcount == 0 {
 			task := &configuratorTask{
 				taskBase: taskBase{plugin: p, active: true},

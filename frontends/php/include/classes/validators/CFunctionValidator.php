@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ class CFunctionValidator extends CValidator {
 
 	public function __construct(array $options = []) {
 		/*
-		 * CValidator is an abstract class, so no specific functionallity should be bound to it. Thus putting
+		 * CValidator is an abstract class, so no specific functionality should be bound to it. Thus putting
 		 * an option "lldmacros" (or class variable $lldmacros) in it, is not preferred. Without it, class
 		 * initialization would fail due to __set(). So instead we create a local variable in this extended class
 		 * and remove the option "lldmacros" before calling the parent constructor.

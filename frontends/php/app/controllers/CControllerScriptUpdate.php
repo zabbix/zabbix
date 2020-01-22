@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,11 +92,18 @@ class CControllerScriptUpdate extends CController {
 		$result = (bool) API::Script()->update($script);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('zabbix.php?action=script.list&uncheck=1');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'script.list')
+				->setArgument('page', CPagerHelper::loadPage('script.list', null))
+			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Script updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=script.edit&scriptid='.$this->getInput('scriptid'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'script.edit')
+				->setArgument('scriptid', $this->getInput('scriptid'))
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update script'));
 		}

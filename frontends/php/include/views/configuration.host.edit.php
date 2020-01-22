@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('', $data['hostid']));
 
 $divTabs = new CTabView();
+
 if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
@@ -51,7 +52,7 @@ if ($data['clone_hostid'] != 0) {
 $hostList = new CFormList('hostlist');
 
 // LLD rule link
-if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+if ($data['readonly']) {
 	$hostList->addRow(_('Discovered by'), $data['discoveryRule']
 		? new CLink($data['discoveryRule']['name'],
 			(new CUrl('host_prototypes.php'))
@@ -66,20 +67,20 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 $hostList
 	->addRow(
 		(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
-		(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+		(new CTextBox('host', $data['host'], $data['readonly'], 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Visible name'),
-		(new CTextBox('visiblename', $data['visiblename'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+		(new CTextBox('visiblename', $data['visiblename'], $data['readonly'], 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow((new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'groups[]',
 			'object_name' => 'hostGroup',
-			'disabled' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
+			'disabled' => $data['readonly'],
 			'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 			'data' => $data['groups_ms'],
 			'popup' => [
@@ -96,89 +97,8 @@ $hostList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// interfaces for normal hosts
-if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	zbx_add_post_js($data['interfaces']
-		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
-		: 'hostInterfacesManager.addNew("agent");');
-
-	$hostList->addRow('',
-		(new CLabel(_('At least one interface must exist.')))->setAsteriskMark()
-	);
-	// Zabbix agent interfaces
-	$ifTab = (new CTable())
-		->setId('agentInterfaces')
-		->setHeader([
-			new CColHeader(),
-			new CColHeader(_('IP address')),
-			new CColHeader(_('DNS name')),
-			new CColHeader(_('Connect to')),
-			new CColHeader(_('Port')),
-			(new CColHeader(_('Default')))->setColSpan(2)
-		])
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton('addAgentInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(7)
-		]))->setId('agentInterfacesFooter'));
-
-	$hostList->addRow(_('Agent interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'agent')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
-
-	// SNMP interfaces
-	$ifTab = (new CTable())
-		->setId('SNMPInterfaces')
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton('addSNMPInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(7)
-		]))->setId('SNMPInterfacesFooter'));
-
-	$hostList->addRow(_('SNMP interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'snmp')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
-
-	// JMX interfaces
-	$ifTab = (new CTable())
-		->setId('JMXInterfaces')
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton('addJMXInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(7)
-		]))->setId('JMXInterfacesFooter'));
-
-	$hostList->addRow(_('JMX interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'jmx')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
-
-	// IPMI interfaces
-	$ifTab = (new CTable())
-		->setId('IPMIInterfaces')
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton('addIPMIInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(7)
-		]))->setId('IPMIInterfacesFooter'));
-
-	$hostList->addRow(_('IPMI interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'ipmi')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
-}
-// interfaces for discovered hosts
-else {
+// Interfaces for discovered hosts.
+if ($data['readonly']) {
 	$existingInterfaceTypes = [];
 	foreach ($data['interfaces'] as $interface) {
 		$existingInterfaceTypes[$interface['type']] = true;
@@ -188,7 +108,7 @@ else {
 
 	$hostList->addVar('interfaces', $data['interfaces']);
 
-	// Zabbix agent interfaces
+	// Zabbix agent interfaces.
 	$ifTab = (new CTable())
 		->setId('agentInterfaces')
 		->setHeader([
@@ -214,7 +134,7 @@ else {
 			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
-	// SNMP interfaces
+	// SNMP interfaces.
 	$ifTab = (new CTable())->setId('SNMPInterfaces');
 
 	$row = (new CRow())->setId('SNMPInterfacesFooter');
@@ -231,7 +151,7 @@ else {
 			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
-	// JMX interfaces
+	// JMX interfaces.
 	$ifTab = (new CTable())->setId('JMXInterfaces');
 
 	$row = (new CRow())->setId('JMXInterfacesFooter');
@@ -248,7 +168,7 @@ else {
 			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
-	// IPMI interfaces
+	// IPMI interfaces.
 	$ifTab = (new CTable())->setId('IPMIInterfaces');
 
 	$row = (new CRow())->setId('IPMIInterfacesFooter');
@@ -265,6 +185,87 @@ else {
 			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 }
+// Interfaces for normal hosts.
+else {
+	zbx_add_post_js($data['interfaces']
+		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
+		: 'hostInterfacesManager.addNew("agent");');
+
+	$hostList->addRow('',
+		(new CLabel(_('At least one interface must exist.')))->setAsteriskMark()
+	);
+	// Zabbix agent interfaces.
+	$ifTab = (new CTable())
+		->setId('agentInterfaces')
+		->setHeader([
+			new CColHeader(),
+			new CColHeader(_('IP address')),
+			new CColHeader(_('DNS name')),
+			new CColHeader(_('Connect to')),
+			new CColHeader(_('Port')),
+			(new CColHeader(_('Default')))->setColSpan(2)
+		])
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton('addAgentInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(7)
+		]))->setId('agentInterfacesFooter'));
+
+	$hostList->addRow(_('Agent interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'agent')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
+	);
+
+	// SNMP interfaces.
+	$ifTab = (new CTable())
+		->setId('SNMPInterfaces')
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton('addSNMPInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(7)
+		]))->setId('SNMPInterfacesFooter'));
+
+	$hostList->addRow(_('SNMP interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'snmp')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
+	);
+
+	// JMX interfaces.
+	$ifTab = (new CTable())
+		->setId('JMXInterfaces')
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton('addJMXInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(7)
+		]))->setId('JMXInterfacesFooter'));
+
+	$hostList->addRow(_('JMX interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'jmx')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
+	);
+
+	// IPMI interfaces.
+	$ifTab = (new CTable())
+		->setId('IPMIInterfaces')
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton('addIPMIInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(7)
+		]))->setId('IPMIInterfacesFooter'));
+
+	$hostList->addRow(_('IPMI interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'ipmi')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
+	);
+}
 
 $hostList->addRow(_('Description'),
 	(new CTextArea('description', $data['description']))
@@ -273,15 +274,17 @@ $hostList->addRow(_('Description'),
 );
 
 // Proxy
-if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$proxy = new CComboBox('proxy_hostid', $data['proxy_hostid'], null, [0 => _('(no proxy)')] + $data['proxies']);
-	$proxy->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
-}
-else {
-	$proxy = (new CTextBox(null, $data['proxy_hostid'] != 0 ? $data['proxies'][$data['proxy_hostid']] : _('(no proxy)'), true))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+if ($data['readonly']) {
+	$proxy = (new CTextBox(null,
+		($data['proxy_hostid'] == 0) ? _('(no proxy)') : $data['proxies'][$data['proxy_hostid']], true)
+	)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	$hostList->addVar('proxy_hostid', $data['proxy_hostid']);
 }
+else {
+	$proxy = new CComboBox('proxy_hostid', $data['proxy_hostid'], null, [0 => _('(no proxy)')] + $data['proxies']);
+	$proxy->setEnabled(true);
+}
+
 $hostList->addRow(_('Monitored by proxy'), $proxy);
 
 $hostList->addRow(_('Enabled'),
@@ -544,17 +547,45 @@ $divTabs->addTab('hostTab', _('Host'), $hostList);
 // templates
 $tmplList = new CFormList();
 
-// templates for normal hosts
-if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+// Templates for discovered hosts.
+if ($data['readonly']) {
+	$linkedTemplateTable = (new CTable())
+		->setHeader([_('Name')])
+		->addStyle('width: 100%;');
+
+	foreach ($data['linked_templates'] as $template) {
+		$tmplList->addVar('templates[]', $template['templateid']);
+
+		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+			$template_link = (new CLink($template['name'],
+				(new CUrl('templates.php'))
+					->setArgument('form','update')
+					->setArgument('templateid', $template['templateid'])
+			))->setTarget('_blank');
+		}
+		else {
+			$template_link = new CSpan($template['name']);
+		}
+
+		$linkedTemplateTable->addRow($template_link, null, 'conditions_'.$template['templateid']);
+	}
+
+	$tmplList->addRow(_('Linked templates'),
+		(new CDiv($linkedTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
+}
+// Templates for normal hosts.
+else {
 	$disableids = [];
 
 	$linkedTemplateTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
-	$n = 0;
 	foreach ($data['linked_templates'] as $template) {
-		$tmplList->addVar('templates['.$n++.']', $template['templateid']);
+		$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
 		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
@@ -588,55 +619,35 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		$disableids[] = $template['templateid'];
 	}
 
-	$linkedTemplateTable->addRow([
-		(new CSimpleButton(_('Add')))
-			->onClick('return PopUp("popup.generic",'.CJs::encodeJson([
-				'dstfrm' => $frmHost->getName(),
-				'dstfld1' => $frmHost->getName(),
+	$add_templates_ms = (new CMultiSelect([
+		'name' => 'add_templates[]',
+		'object_name' => 'templates',
+		'data' => $data['add_templates'],
+		'popup' => [
+			'parameters' => [
 				'srctbl' => 'templates',
 				'srcfld1' => 'hostid',
-				'templated_hosts' => '1',
-				'popup_type' => 'templates',
-				'multiselect' => 1,
+				'srcfld2' => 'host',
+				'dstfrm' => $frmHost->getName(),
+				'dstfld1' => 'add_templates_',
 				'disableids' => $disableids
-			]).', null, this);')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
+			]
+		]
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
-}
-// templates for discovered hosts
-else {
-	$linkedTemplateTable = (new CTable())
-		->setHeader([_('Name')])
-		->addStyle('width: 100%;');
-
-	foreach ($data['linked_templates'] as $template) {
-		$tmplList->addVar('templates[]', $template['templateid']);
-
-		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
-			$template_link = (new CLink($template['name'],
-				(new CUrl('templates.php'))
-					->setArgument('form','update')
-					->setArgument('templateid', $template['templateid'])
-			))->setTarget('_blank');
-		}
-		else {
-			$template_link = new CSpan($template['name']);
-		}
-
-		$linkedTemplateTable->addRow($template_link, null, 'conditions_'.$template['templateid']);
-	}
-
-	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
+	$tmplList
+		->addRow(_('Linked templates'),
+			(new CDiv($linkedTemplateTable))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+		->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
+			(new CDiv(
+				(new CTable())->addRow([$add_templates_ms])
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		);
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
@@ -644,11 +655,7 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 /*
  * IPMI
  */
-if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$cmbIPMIAuthtype = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
-	$cmbIPMIPrivilege = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
-}
-else {
+if ($data['readonly']) {
 	$cmbIPMIAuthtype = [
 		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['ipmi_authtype']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
@@ -660,17 +667,21 @@ else {
 		new CVar('ipmi_privilege', $data['ipmi_privilege'])
 	];
 }
+else {
+	$cmbIPMIAuthtype = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
+	$cmbIPMIPrivilege = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
+}
 
 $divTabs->addTab('ipmiTab', _('IPMI'),
 	(new CFormList())
 		->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype)
 		->addRow(_('Privilege level'), $cmbIPMIPrivilege)
 		->addRow(_('Username'),
-			(new CTextBox('ipmi_username', $data['ipmi_username'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)))
+			(new CTextBox('ipmi_username', $data['ipmi_username'], $data['readonly']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		)
 		->addRow(_('Password'),
-			(new CTextBox('ipmi_password', $data['ipmi_password'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)))
+			(new CTextBox('ipmi_password', $data['ipmi_password'], $data['readonly']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		)
 );
@@ -678,7 +689,7 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 /*
  * Tags
  */
-if ($data['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+if (!$data['readonly']) {
 	$tags_view = new CView('configuration.tags.tab', [
 		'source' => 'host',
 		'tags' => $data['tags'],
@@ -690,13 +701,19 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 /*
  * Macros
  */
-$macrosView = new CView('hostmacros', [
-	'macros' => $data['macros'],
-	'show_inherited_macros' => $data['show_inherited_macros'],
-	'is_template' => false,
-	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-]);
-$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
+$divTabs->addTab('macroTab', _('Macros'),
+	(new CFormList('macrosFormList'))
+		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+			->addValue(_('Host macros'), 0)
+			->addValue(_('Inherited and host macros'), 1)
+			->setModern(true)
+		)
+		->addRow(null, new CObject((new CView('hostmacros.list.html', [
+			'macros' => $data['macros'],
+			'show_inherited_macros' => $data['show_inherited_macros'],
+			'readonly' => $data['readonly']
+		]))->getOutput()), 'macros_container')
+);
 
 $inventoryFormList = new CFormList('inventorylist');
 
@@ -705,10 +722,10 @@ $inventoryFormList->addRow(null,
 		->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-		->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+		->setEnabled(!$data['readonly'])
 		->setModern(true)
 );
-if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+if ($data['readonly']) {
 	$inventoryFormList->addVar('inventory_mode', $data['inventory_mode']);
 }
 
@@ -772,42 +789,42 @@ $encryption_form_list = (new CFormList('encryption'))
 			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
 			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
 			->setModern(true)
-			->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+			->setEnabled(!$data['readonly'])
 	)
 	->addRow(_('Connections from host'),
 		(new CList())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 			->addItem((new CCheckBox('tls_in_none'))
 				->setLabel(_('No encryption'))
-				->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+				->setEnabled(!$data['readonly'])
 			)
 			->addItem((new CCheckBox('tls_in_psk'))
 				->setLabel(_('PSK'))
-				->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+				->setEnabled(!$data['readonly'])
 			)
 			->addItem((new CCheckBox('tls_in_cert'))
 				->setLabel(_('Certificate'))
-				->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+				->setEnabled(!$data['readonly'])
 			)
 	)
 	->addRow(
 		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
-		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['readonly'], 128))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
-		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
+		(new CTextBox('tls_psk', $data['tls_psk'], $data['readonly'], 512))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(_('Issuer'),
-		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
+		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['readonly'], 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	)
 	->addRow(_x('Subject', 'encryption certificate'),
-		(new CTextBox('tls_subject', $data['tls_subject'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
+		(new CTextBox('tls_subject', $data['tls_subject'], $data['readonly'], 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	);
 
@@ -836,7 +853,6 @@ else {
 }
 
 $frmHost->addItem($divTabs);
-
 $widget->addItem($frmHost);
 
 return $widget;

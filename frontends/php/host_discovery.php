@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -781,11 +781,25 @@ else {
 			order_result($data['discoveries'], $sortField, $sortOrder);
 	}
 
-	// paging
-	$url = (new CUrl('host_discovery.php'))->setArgument('hostid', $data['hostid']);
-
 	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
-	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder, $url);
+
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sortOrder,
+		(new CUrl('host_discovery.php'))->setArgument('hostid', $data['hostid'])
+	);
+
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 
 	// render view

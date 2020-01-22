@@ -32,6 +32,17 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 If you want to specify libpcre installation directories:
 AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
 		[
+			if test "$withval" = "yes"; then
+				if test -f /usr/local/include/pcre.h; then
+					withval="/usr/local"
+				else
+					withval="/usr"
+				fi
+			else
+				_libpcre_dir_lib="$withval/lib"
+			fi
+			_libpcre_dir="$withval"
+			test "x$withval" = "xyes" && withval=/usr
 			LIBPCRE_CFLAGS="-I$withval/include"
 			LIBPCRE_LDFLAGS="-L$withval/lib"
 			_libpcre_dir_set="yes"
@@ -53,10 +64,19 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 			[use libpcre libraries from given path.]
 		),
 		[
+			_libpcre_dir="$withval"
+			_libpcre_dir_lib="$withval"
 			LIBPCRE_LDFLAGS="-L$withval"
 			_libpcre_dir_set="yes"
 		]
 	)
+
+	if test "x$enable_static_libs" = "xyes"; then
+		AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+		PKG_PROG_PKG_CONFIG()
+		test -z "$PKG_CONFIG" -a -z "$_libpcre_dir_lib" && AC_MSG_ERROR([Not found pkg-config library])
+		m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
+	fi
 
 	AC_MSG_CHECKING(for libpcre support)
 
@@ -64,6 +84,29 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 
 	if test "x$enable_static" = "xyes"; then
 		LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
+	elif test "x$enable_static_libs" = "xyes" -a -z "$PKG_CONFIG"; then
+		LIBPCRE_LIBS="$_libpcre_dir_lib/libpcre.a"
+	elif test "x$enable_static_libs" = "xyes"; then
+
+		test "x$static_linking_support" = "xno" -a -z "$_libpcre_dir_lib" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
+
+		if test -z "$_libpcre_dir_lib"; then
+			PKG_CHECK_EXISTS(libpcre,[
+				LIBPCRE_LIBS=`$PKG_CONFIG --static --libs libpcre`
+			],[
+				AC_MSG_ERROR([Not found libpcre package])
+			])
+		else
+			AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libpcre_dir_lib/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre]) || AC_MSG_ERROR(["Not found libpcre package in $_libpcre_dir/lib/pkgconfig"])
+			LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_dir_lib/pkgconfig" $PKG_CONFIG --static --libs libpcre`
+			test -z "$LIBPCRE_LIBS" && LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_dir_lib/pkgconfig" $PKG_CONFIG --libs libpcre`
+		fi
+
+		if test "x$static_linking_support" = "xno"; then
+			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s|-lpcre|$_libpcre_dir_lib/libpcre.a|g"`
+		else
+			LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s/-lpcre/${static_linking_support}static -lpcre ${static_linking_support}dynamic/g"`
+		fi
 	fi
 
 	if test -n "$_libpcre_dir_set" -o -f /usr/include/pcre.h; then

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -346,11 +346,15 @@ unsigned int	zbx_isqrt32(unsigned int value);
 
 /* expression evaluation */
 
+#define ZBX_INFINITY	(1.0 / 0.0)	/* "Positive infinity" value used as a fatal error code */
+#define ZBX_UNKNOWN	(-1.0 / 0.0)	/* "Negative infinity" value used as a code for "Unknown" */
+
 #define ZBX_UNKNOWN_STR		"ZBX_UNKNOWN"	/* textual representation of ZBX_UNKNOWN */
 #define ZBX_UNKNOWN_STR_LEN	ZBX_CONST_STRLEN(ZBX_UNKNOWN_STR)
 
 int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
 		zbx_vector_ptr_t *unknown_msgs);
+int	evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
 
 /* forecasting */
 

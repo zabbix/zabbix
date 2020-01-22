@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "system.sw.arch":
 		return getSwArch()
 	default:
-		return nil, errors.New("Unsupported metric.")
+		return nil, plugin.UnsupportedMetricError
 	}
 
 }

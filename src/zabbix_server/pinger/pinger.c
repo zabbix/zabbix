@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -515,7 +515,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 {
 	int			i, first_index = 0, ping_result;
-	char			error[ITEM_ERROR_LEN_MAX];
+	char			error[ITEM_ERROR_LEN_MAX] = "";
 	static ZBX_FPING_HOST	*hosts = NULL;
 	static int		hosts_alloc = 4;
 	int			hosts_count = 0;

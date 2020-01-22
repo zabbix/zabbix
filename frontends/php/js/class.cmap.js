@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2502,7 +2502,7 @@ ZABBIX.apps.map = (function($) {
 			getDimensions: Shape.prototype.getDimensions,
 
 			/**
-			 * Updates element icon and height/witdh in case element is area type.
+			 * Updates element icon and height/width in case element is area type.
 			 */
 			updateIcon: function() {
 				var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);

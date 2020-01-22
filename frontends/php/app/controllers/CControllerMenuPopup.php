@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -315,7 +315,7 @@ class CControllerMenuPopup extends CController {
 			if ($url['name'] === '' || $url['url'] === '') {
 				unset($selement['urls'][$url_nr]);
 			}
-			elseif (CHtmlUrlValidator::validate($url['url']) === false) {
+			elseif (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
 				$selement['urls'][$url_nr]['url'] = 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
 					zbx_jsvalue($url['url'], false, false)).'\');';
 			}
@@ -591,7 +591,7 @@ class CControllerMenuPopup extends CController {
 
 			if (array_key_exists('urls', $menu_data)) {
 				foreach ($menu_data['urls'] as &$url) {
-					if (!CHtmlUrlValidator::validate($url['url'])) {
+					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
 						$url['url'] = 'javascript: alert(\''.
 							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
 						'\');';

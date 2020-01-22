@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -696,7 +696,19 @@ class testFormWebStep extends CLegacyWebTest {
 					'url' => 'http://www.zabbix.com',
 					'timeout' => 3601,
 					'errors' => [
-						'Incorrect value for field "timeout": a number is too large.'
+						'Invalid parameter "timeout": value must be one of 1-3600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Timeout 3601',
+					'step_name' => 'Step timeout 3601',
+					'url' => 'http://www.zabbix.com',
+					'timeout' => 0,
+					'errors' => [
+						'Invalid parameter "timeout": value must be one of 1-3600.'
 					]
 				]
 			],
@@ -775,7 +787,7 @@ class testFormWebStep extends CLegacyWebTest {
 						['name' => 'header', 'value' => 'test_header'],
 					],
 					'retrieve' => 'Body and headers',
-					'timeout' => 0,
+					'timeout' => 1,
 					'string' => 'Zabbix',
 					'code' => 404,
 					'dbCheck' => true
@@ -787,7 +799,7 @@ class testFormWebStep extends CLegacyWebTest {
 	/**
 	 * Add name-value pairs to specific context.
 	 *
-	 * @param string $context	xpath containg context of name-pairs.
+	 * @param string $context	xpath containing context of name-pairs.
 	 * @param array  $items		name-value pairs to be added.
 	 */
 	protected function addPairs($context, $items) {
@@ -820,7 +832,7 @@ class testFormWebStep extends CLegacyWebTest {
 	/**
 	 * Get name-value pairs from specific context.
 	 *
-	 * @param string $context	xpath containg context of name-pairs.
+	 * @param string $context	xpath containing context of name-pairs.
 	 */
 	protected function getPairs($context) {
 		$pairs = [];

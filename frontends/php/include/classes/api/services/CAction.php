@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class CAction extends CApiService {
 			CONDITION_TYPE_DUPTIME, CONDITION_TYPE_DVALUE, CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK,
 			CONDITION_TYPE_PROXY, CONDITION_TYPE_DOBJECT
 		],
-		EVENT_SOURCE_AUTO_REGISTRATION => [
+		EVENT_SOURCE_AUTOREGISTRATION => [
 			CONDITION_TYPE_PROXY, CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_HOST_METADATA
 		],
 		EVENT_SOURCE_INTERNAL => [
@@ -454,8 +454,8 @@ class CAction extends CApiService {
 			}
 
 			$allowedScripts = API::Script()->get([
-				'scriptids' => $scriptIds,
 				'output' => ['scriptid'],
+				'scriptids' => $scriptIds,
 				'preservekeys' => true
 			]);
 			foreach ($scriptIds as $scriptId) {
@@ -598,12 +598,6 @@ class CAction extends CApiService {
 			if (isset($action['filter'])) {
 				$action['evaltype'] = $action['filter']['evaltype'];
 			}
-			$action += [
-				'r_shortdata' => ACTION_DEFAULT_SUBJ_RECOVERY,
-				'r_longdata' => ACTION_DEFAULT_MSG_RECOVERY,
-				'ack_shortdata' => ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-				'ack_longdata' => ACTION_DEFAULT_MSG_ACKNOWLEDGE
-			];
 
 			// Set default values for recovery operations and their messages.
 			if (array_key_exists('recovery_operations', $action)) {
@@ -614,16 +608,11 @@ class CAction extends CApiService {
 							? $operation['opmessage']
 							: [];
 
-						if (array_key_exists('default_msg', $message) && $message['default_msg'] == 1) {
-							$message['subject'] = $action['r_shortdata'];
-							$message['message'] = $action['r_longdata'];
-						}
-
 						$operation['opmessage'] = $message + [
-							'default_msg' => 0,
+							'default_msg' => 1,
 							'mediatypeid' => 0,
-							'subject' => ACTION_DEFAULT_SUBJ_RECOVERY,
-							'message' => ACTION_DEFAULT_MSG_RECOVERY
+							'subject' => '',
+							'message' => ''
 						];
 					}
 				}
@@ -639,16 +628,11 @@ class CAction extends CApiService {
 							? $operation['opmessage']
 							: [];
 
-						if (array_key_exists('default_msg', $message) && $message['default_msg'] == 1) {
-							$message['subject'] = $action['ack_shortdata'];
-							$message['message'] = $action['ack_longdata'];
-						}
-
 						$operation['opmessage'] = $message + [
-							'default_msg'	=> 0,
-							'mediatypeid'	=> 0,
-							'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-							'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+							'default_msg' => 1,
+							'mediatypeid' => 0,
+							'subject' => '',
+							'message' => ''
 						];
 					}
 				}
@@ -890,23 +874,12 @@ class CAction extends CApiService {
 					if (!array_key_exists('operationid', $ack_operation)) {
 						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$opmessage += [
-								'default_msg'	=> 0,
-								'mediatypeid'	=> 0,
-								'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-								'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+							$ack_operation['opmessage'] += [
+								'default_msg' => 1,
+								'mediatypeid' => 0,
+								'subject' => '',
+								'message' => ''
 							];
-
-							if ($opmessage['default_msg'] == 1) {
-								$opmessage['subject'] = array_key_exists('ack_shortdata', $action)
-									? $action['ack_shortdata']
-									: $db_action['ack_shortdata'];
-								$opmessage['message'] = array_key_exists('ack_longdata', $action)
-									? $action['ack_longdata']
-									: $db_action['ack_longdata'];
-							}
-
-							$ack_operation['opmessage'] = $opmessage;
 						}
 
 						$operations_to_create[] = $ack_operation;
@@ -917,22 +890,18 @@ class CAction extends CApiService {
 							$db_opmessage = array_key_exists('opmessage', $db_ack_operations[$ack_operation['operationid']])
 								? $db_ack_operations[$ack_operation['operationid']]['opmessage']
 								: [
-									'default_msg'	=> 0,
-									'mediatypeid'	=> 0,
-									'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-									'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+									'default_msg' => 1,
+									'mediatypeid' => 0,
+									'subject' => '',
+									'message' => ''
 								];
 							$default_msg = array_key_exists('default_msg', $opmessage)
 								? $opmessage['default_msg']
 								: $db_opmessage['default_msg'];
 
 							if ($default_msg == 1) {
-								$opmessage['subject'] = array_key_exists('ack_shortdata', $action)
-									? $action['ack_shortdata']
-									: $db_action['ack_shortdata'];
-								$opmessage['message'] = array_key_exists('ack_longdata', $action)
-									? $action['ack_longdata']
-									: $db_action['ack_longdata'];
+								$opmessage['subject'] = '';
+								$opmessage['message'] = '';
 								$ack_operation['opmessage'] = $opmessage;
 							}
 						}
@@ -1499,7 +1468,7 @@ class CAction extends CApiService {
 					break;
 
 				case OPERATION_TYPE_ACK_MESSAGE:
-					// falls throught
+					// falls through
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 					if ($type_changed) {
 						$operation['opmessage']['operationid'] = $operation['operationid'];
@@ -1684,7 +1653,7 @@ class CAction extends CApiService {
 					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
 					OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY
 				],
-				EVENT_SOURCE_AUTO_REGISTRATION => [
+				EVENT_SOURCE_AUTOREGISTRATION => [
 					OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_GROUP_ADD,
 					OPERATION_TYPE_GROUP_REMOVE, OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE,
 					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
@@ -1874,7 +1843,7 @@ class CAction extends CApiService {
 								);
 							}
 							$scripts = API::Script()->get([
-								'output' => ['scriptid','name'],
+								'output' => ['scriptid', 'name'],
 								'scriptids' => $operation['opcommand']['scriptid'],
 								'preservekeys' => true
 							]);
@@ -2937,7 +2906,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		// Validate conditions and operations in regard to whats in database now.
+		// Validate conditions and operations in regard to what's in database now.
 		if ($conditionsToValidate) {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
@@ -3276,8 +3245,8 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given host groups
 	 *
-	 * @param array $groupids
-	 * @param tring $error
+	 * @param  array     $groupids
+	 * @param  string    $error
 	 */
 	private function checkHostGroupsPermissions(array $groupids, $error) {
 		if ($groupids) {
@@ -3300,8 +3269,8 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts
 	 *
-	 * @param array $hostids
-	 * @param tring $error
+	 * @param  array     $hostids
+	 * @param  string    $error
 	 */
 	private function checkHostsPermissions(array $hostids, $error) {
 		if ($hostids) {

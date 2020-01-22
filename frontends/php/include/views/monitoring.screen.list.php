@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,9 @@ $screenTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_screens'))->onClick("checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
+			(new CUrl('screenconf.php'))->getUrl()
+		),
 		_('Dimension (cols x rows)'),
 		_('Actions')
 	]);
@@ -119,7 +121,7 @@ if (!$data['templateid']) {
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'export.screens.xml')
 			->setArgument('backurl', (new CUrl('screenconf.php'))
-				->setArgument('page', getPageNumber())
+				->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 				->getUrl())
 			->getUrl()
 	];

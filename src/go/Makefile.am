@@ -19,17 +19,17 @@ GOLDFLAGS += -X main.confDefault=${AGENT2_CONFIG_FILE}
 all: build
 
 build:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${GOLDFLAGS}" -mod vendor -o bin ./...
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${GOLDFLAGS}" -o bin ./...
 
 clean:
-	go clean -mod vendor ./...
+	go clean ./...
 	rm -f bin/zabbix_agent2 bin/mock_server
 
 install:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOBIN=${GOBIN} \
-		go install -mod vendor -ldflags="${GOLDFLAGS}" zabbix.com/cmd/zabbix_agent2
+		go install -ldflags="${GOLDFLAGS}" zabbix.com/cmd/zabbix_agent2
 	test -f "$(DESTDIR)@AGENT2_CONFIG_FILE@" || cp "conf/zabbix_agent2.conf" "$(DESTDIR)@AGENT2_CONFIG_FILE@"
 
 check:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test -mod vendor ./...
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test ./...
 

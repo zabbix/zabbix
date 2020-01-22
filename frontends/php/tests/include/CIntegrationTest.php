@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -297,7 +297,12 @@ class CIntegrationTest extends CAPITest {
 			}
 		}
 
-		self::setHostStatus(self::$suite_hosts, HOST_STATUS_NOT_MONITORED);
+		if (self::$suite_hosts) {
+			global $DB;
+			DBconnect($error);
+			self::setHostStatus(self::$suite_hosts, HOST_STATUS_NOT_MONITORED);
+			DBclose();
+		}
 
 		parent::onAfterTestSuite();
 	}
@@ -769,7 +774,7 @@ class CIntegrationTest extends CAPITest {
 			throw $exception;
 		}
 
-		$this->fail('Data requested from '.$method.' API is not present withing specified interval. Params used:'.
+		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
 				"\n".json_encode($params)
 		);
 	}

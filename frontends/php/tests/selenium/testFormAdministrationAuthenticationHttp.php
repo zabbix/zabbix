@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -478,8 +478,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					$this->assertTrue($this->query('xpath', $xpath)->one()->isVisible());
 				}
 				else {
-					$element = $this->query('xpath', $xpath)->one(false);
-					$this->assertTrue($element === null || $element->isVisible(false));
+					$this->assertTrue($this->query('xpath', $xpath)->one(false)->isVisible(false));
 				}
 
 				$this->query('id:name')->one()->fill($this->getUsernameWithoutDomain($data['user']));

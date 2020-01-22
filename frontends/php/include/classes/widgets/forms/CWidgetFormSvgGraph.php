@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,6 +125,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		// Min value on left Y axis.
 		$field_lefty_min = (new CWidgetFieldNumericBox('lefty_min', _('Min')))
 			->setPlaceholder(_('calculated'))
+			->setFullName(_('Left Y').'/'._('Min'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW) {
@@ -139,6 +140,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		// Max value on left Y axis.
 		$field_lefty_max = (new CWidgetFieldNumericBox('lefty_max', _('Max')))
 			->setPlaceholder(_('calculated'))
+			->setFullName(_('Left Y').'/'._('Max'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW) {
@@ -198,6 +200,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		// Min value on right Y axis.
 		$field_righty_min = (new CWidgetFieldNumericBox('righty_min', _('Min')))
 			->setPlaceholder(_('calculated'))
+			->setFullName(_('Right Y').'/'._('Min'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW) {
@@ -212,6 +215,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		// Max value on right Y axis.
 		$field_righty_max = (new CWidgetFieldNumericBox('righty_max', _('Max')))
 			->setPlaceholder(_('calculated'))
+			->setFullName(_('Right Y').'/'._('Max'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW) {
@@ -478,17 +482,21 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$compare = true;
 
 			if (strlen(substr(strrchr($lefty_min, '.'), 1)) > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('too many decimal places'));
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Min'),
+					_('too many decimal places')
+				);
 				$compare = false;
 			}
 			if (strlen(substr(strrchr($lefty_max, '.'), 1))  > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('too many decimal places'));
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Max'),
+					_('too many decimal places')
+				);
 				$compare = false;
 			}
 
 			if ($compare && $lefty_min !== '' && $lefty_max !== ''
 					&& bccomp($lefty_min, $lefty_max, 4) >= 0) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'),
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
@@ -502,17 +510,21 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$compare = true;
 
 			if (strlen(substr(strrchr($righty_min, '.'), 1)) > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('too many decimal places'));
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Min'),
+					_('too many decimal places')
+				);
 				$compare = false;
 			}
 			if (strlen(substr(strrchr($righty_max, '.'), 1))  > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('too many decimal places'));
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Max'),
+					_('too many decimal places')
+				);
 				$compare = false;
 			}
 
 			if ($compare && $righty_min !== '' && $righty_max !== ''
 					&& bccomp($righty_min, $righty_max, 4) >= 0) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'),
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}

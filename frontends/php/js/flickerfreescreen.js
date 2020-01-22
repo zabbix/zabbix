@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2020 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@
 
 			// timeline params
 			// SCREEN_RESOURCE_HTTPTEST_DETAILS, SCREEN_RESOURCE_DISCOVERY, SCREEN_RESOURCE_HTTPTEST
-			if (jQuery.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
+			if ($.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
 				ajax_url.setArgument('from', screen.timeline.from);
 				ajax_url.setArgument('to', screen.timeline.to);
 			}
@@ -185,7 +185,6 @@
 							'filter': screen.data.filter,
 							'filter_task': screen.data.filterTask,
 							'mark_color': screen.data.markColor,
-							'page': screen.data.page,
 							'action': screen.data.action
 						}, function (ajax_key, value) {
 							if (!empty(value)) {
@@ -232,12 +231,17 @@
 				var screen = this.screens[id];
 
 				if (!empty(screen.id) && typeof screen.timeline !== 'undefined') {
-					screen.timeline = jQuery.extend(screen.timeline, {
+					screen.timeline = $.extend(screen.timeline, {
 						from: time_object.from,
 						to: time_object.to,
 						from_ts: time_object.from_ts,
 						to_ts: time_object.to_ts
 					});
+
+					// Reset pager on time range update (SCREEN_RESOURCE_HISTORY, SCREEN_RESOURCE_PROBLEM).
+					if ($.inArray(screen.resourcetype, [17, 24]) !== -1) {
+						screen.page = 1;
+					}
 
 					// restart refresh execution starting from Now
 					clearTimeout(screen.timeoutHandler);
@@ -314,7 +318,7 @@
 				var url = new Curl(screen.data.options.refresh);
 				url.setArgument('curtime', new CDate().getTime());
 
-				jQuery.ajax({
+				$.ajax({
 					'url': url.getUrl()
 				})
 				.fail(function() {
@@ -413,7 +417,7 @@
 					}
 
 					if (zbx_sbox) {
-						img.data('zbx_sbox', jQuery.extend(zbx_sbox, {
+						img.data('zbx_sbox', $.extend(zbx_sbox, {
 							from: screen.timeline.from,
 							from_ts: screen.timeline.from_ts,
 							to: screen.timeline.to,
@@ -425,7 +429,7 @@
 		},
 
 		/**
-		 * Getting shadow box height of graph image, asynchronious. Only for line graphs on dashboard.
+		 * Getting shadow box height of graph image, asynchronous. Only for line graphs on dashboard.
 		 * Will return xhr request for line graphs.
 		 *
 		 * @param {Curl}     url  Curl object for image request.

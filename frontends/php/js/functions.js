@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -199,7 +199,7 @@ function getUniqueId() {
 }
 
 /**
- * Color palette object used for geting different colors from color palette.
+ * Color palette object used for getting different colors from color palette.
  */
 var colorPalette = (function() {
 	'use strict';
@@ -701,7 +701,7 @@ function parseUrlString(url) {
  * @param {bool}         show_close_box  Show close button.
  * @param {bool}         show_details    Show details on opening.
  *
- * @return {string}
+ * @return {jQuery}
  */
 function makeMessageBox(type, messages, title, show_close_box, show_details) {
 	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -193,7 +193,7 @@ $form_list
 		],
 		'request_method_row'
 	)
-	// Append ITEM_TYPE_HTTPAGENT Timeout field to fomr list.
+	// Append ITEM_TYPE_HTTPAGENT Timeout field to form list.
 	->addRow(
 		new CLabel(_('Timeout'), 'timeout'),
 		(new CTextBox('timeout', $data['timeout'], $readonly))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),

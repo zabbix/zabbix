@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class testGeneric extends CLegacyWebTest {
 			['overview.php?form_refresh=1&groupid=0&type=1&view_style=1',	'Overview [refreshed every 30 sec.]'],
 
 			['zabbix.php?action=web.view',					'Web monitoring'],
-			['latest.php',						'Latest data [refreshed every 30 sec.]'],
+			['zabbix.php?action=latest.view',	'Latest data'],
 
 			['zabbix.php?action=problem.view',	'Problems'],
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -262,6 +262,36 @@ zbx_uint64_t	zbx_mock_get_object_member_uint64(zbx_mock_handle_t object, const c
 
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &member)))
+	{
+		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+	}
+
+	return member;
+}
+
+double	zbx_mock_get_parameter_float(const char *path)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	double			parameter;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_float(handle, &parameter)))
+	{
+		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+	}
+
+	return parameter;
+}
+
+double	zbx_mock_get_object_member_float(zbx_mock_handle_t object, const char *name)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	double			member;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_float(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
 	}

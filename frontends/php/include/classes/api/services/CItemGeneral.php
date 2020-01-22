@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2041,7 +2041,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate depth and ammount of elements in the tree of the dependent items.
+	 * Validate depth and amount of elements in the tree of the dependent items.
 	 *
 	 * @param array  $dependent_items
 	 * @param string $dependent_items[<master_itemid>][]  List if the dependent item IDs ("false" for new items)

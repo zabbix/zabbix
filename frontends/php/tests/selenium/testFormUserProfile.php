@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,8 +103,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckHeader('Global view');
-				$row = DBfetch(DBselect("select passwd from users where alias='".PHPUNIT_LOGIN_NAME."'"));
-				$this->assertEquals(md5($data['password1']), $row['passwd']);
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good' , 'User updated');
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);

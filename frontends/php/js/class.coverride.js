@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2020 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -259,7 +259,7 @@ jQuery(function ($) {
 		 *  - changes if specified option of type {option} is already set for given $override.
 		 *
 		 * @param object $override       Object of current override.
-		 * @param string option          String of ovverride option to set (e.g. color, type etc).
+		 * @param string option          String of override option to set (e.g. color, type etc).
 		 * @param string value           Value of option. Can be NULL for options 'color' and 'timeshift'.
 		 */
 		addOverride: function($override, option, value) {
