@@ -332,14 +332,14 @@ class CSetupWizard extends CForm {
 		}
 		if ($this->getConfig('DB_KEY_FILE').$this->getConfig('DB_CERT_FILE').$this->getConfig('DB_CA_FILE') !== '') {
 			$table->addRow(null, null);
-			$table->addRow((new CSpan(_('SSL key file')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_KEY_FILE'));
-			$table->addRow((new CSpan(_('SSL certificate file')))->addClass(ZBX_STYLE_GREY),
+			$table->addRow((new CSpan(_('TLS key file')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_KEY_FILE'));
+			$table->addRow((new CSpan(_('TLS certificate file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_CERT_FILE')
 			);
-			$table->addRow((new CSpan(_('SSL certificate authority file')))->addClass(ZBX_STYLE_GREY),
+			$table->addRow((new CSpan(_('TLS certificate authority file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_CA_FILE')
 			);
-			$table->addRow((new CSpan(_('SSL cipher list')))->addClass(ZBX_STYLE_GREY),
+			$table->addRow((new CSpan(_('TLS cipher list')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_CIPHER_LIST')
 			);
 		}
@@ -481,7 +481,7 @@ class CSetupWizard extends CForm {
 		if ($this->getStep() == 1) {
 			if (hasRequest('next') && array_key_exists(1, getRequest('next'))) {
 				$finalResult = CFrontendSetup::CHECK_OK;
-				foreach ($this->frontendSetup->checkRequirements(true) as $req) {
+				foreach ($this->frontendSetup->checkRequirements() as $req) {
 					if ($req['result'] > $finalResult) {
 						$finalResult = $req['result'];
 					}
