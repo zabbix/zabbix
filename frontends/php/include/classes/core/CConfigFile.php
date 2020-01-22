@@ -195,7 +195,7 @@ $DB[\'PASSWORD\'] = \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 // Schema name. Used for PostgreSQL.
 $DB[\'SCHEMA\'] = \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
 
-// Used for SSL connection.
+// Used for TLS connection.
 $DB[\'KEY_FILE\']    = \''.addcslashes($this->config['DB']['KEY_FILE'], "'\\").'\';
 $DB[\'CERT_FILE\']   = \''.addcslashes($this->config['DB']['CERT_FILE'], "'\\").'\';
 $DB[\'CA_FILE\']     = \''.addcslashes($this->config['DB']['CA_FILE'], "'\\").'\';
