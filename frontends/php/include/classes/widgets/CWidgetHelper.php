@@ -856,7 +856,9 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
@@ -1245,7 +1247,9 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color) {'.
 						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
