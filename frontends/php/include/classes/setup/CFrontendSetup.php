@@ -687,11 +687,11 @@ class CFrontendSetup {
 		}
 
 		return [
-			'name' => _('SSL certificate file'),
+			'name' => _('TLS certificate file'),
 			'current' => implode(', ', $writeable),
 			'required' => null,
 			'result' => $writeable ? self::CHECK_FATAL : self::CHECK_OK,
-			'error' => _s('SSL certificate files must be read-only')
+			'error' => _s('TLS certificate files must be read-only')
 		];
 	}
 }

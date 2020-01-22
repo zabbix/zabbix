@@ -249,19 +249,19 @@ class CSetupWizard extends CForm {
 			(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
-		$table->addRow(_('SSL key file'),
+		$table->addRow(_('TLS key file'),
 			(new CTextBox('key_file', $this->getConfig('DB_KEY_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		);
 
-		$table->addRow(_('SSL certificate file'),
+		$table->addRow(_('TLS certificate file'),
 			(new CTextBox('cert_file', $this->getConfig('DB_CERT_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		);
 
-		$table->addRow(_('SSL certificate authority file'),
+		$table->addRow(_('TLS certificate authority file'),
 			(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		);
 
-		$table->addRow(_('SSL cipher list'),
+		$table->addRow(_('TLS cipher list'),
 			(new CTextBox('cipher_list', $this->getConfig('DB_CIPHER_LIST')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		);
 

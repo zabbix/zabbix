@@ -106,7 +106,7 @@ class PostgresqlDbBackend extends DbBackend {
 
 		if ($this->ssl_key_file || $this->ssl_cert_file || $this->ssl_ca_file) {
 			$params += [
-				'sslmode' => 'verify-ca',
+				'sslmode' => 'verify-full',
 				'sslkey' => $this->ssl_key_file,
 				'sslcert' => $this->ssl_cert_file,
 				'sslrootcert' => $this->ssl_ca_file
