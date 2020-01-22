@@ -3147,6 +3147,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   white-space: nowrap; }
   .overlay-dialogue-body textarea {
     white-space: pre-wrap; }
+  .overlay-dialogue-body .debug-output {
+    margin: 10px 0 0; }
 
 .overlay-dialogue-footer {
   text-align: right; }
