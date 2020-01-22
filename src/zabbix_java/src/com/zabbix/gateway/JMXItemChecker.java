@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,11 +22,13 @@ package com.zabbix.gateway;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
+import javax.management.AttributeList;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import javax.management.MalformedObjectNameException;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.remote.JMXConnector;
@@ -47,6 +49,7 @@ class JMXItemChecker extends ItemChecker
 
 	private String username;
 	private String password;
+	private String jmx_endpoint;
 
 	private enum DiscoveryMode {
 		ATTRIBUTES,
@@ -56,8 +59,6 @@ class JMXItemChecker extends ItemChecker
 	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
 		super(request);
-
-		String jmx_endpoint;
 
 		try
 		{
@@ -193,9 +194,19 @@ class JMXItemChecker extends ItemChecker
 			if (2 < argumentCount)
 				throw new ZabbixException("required key format: " + item.getKeyId() + "[<discovery mode>,<object name>]");
 
+			ObjectName filter;
+
+			try
+			{
+				filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
+			}
+			catch (MalformedObjectNameException e)
+			{
+				throw new ZabbixException("invalid object name format: " + item.getArgument(2));
+			}
+
 			boolean mapped = item.getKeyId().equals("jmx.discovery");
 			JSONArray counters = new JSONArray();
-			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
 			DiscoveryMode mode = DiscoveryMode.ATTRIBUTES;
 			if (0 < argumentCount)
 			{
@@ -285,21 +296,69 @@ class JMXItemChecker extends ItemChecker
 	{
 		for (ObjectName name : mbsc.queryNames(filter, null))
 		{
-			for (MBeanAttributeInfo attrInfo : mbsc.getMBeanInfo(name).getAttributes())
+			Map<String, Object> values = new HashMap<String, Object>();
+			MBeanAttributeInfo[] attributeArray = mbsc.getMBeanInfo(name).getAttributes();
+
+			if (0 == attributeArray.length)
 			{
-				if (!attrInfo.isReadable())
+				logger.trace("object has no attributes");
+				return;
+			}
+
+			String[] attributeNames = getAttributeNames(attributeArray);
+			AttributeList attributes;
+			String discoveredObjKey = jmx_endpoint + "#" + name;
+			Long expirationTime = JavaGateway.iterativeObjects.get(discoveredObjKey);
+			long now = System.currentTimeMillis();
+
+			if (null != expirationTime && now <= expirationTime)
+			{
+				attributes = getAttributesIterative(name, attributeNames);
+			}
+			else
+			{
+				try
 				{
-					logger.trace("attribute {} not readable, skipping", attrInfo.getName());
+					attributes = getAttributesBulk(name, attributeNames);
+
+					if (null != expirationTime)
+						JavaGateway.iterativeObjects.remove(discoveredObjKey);
+				}
+				catch (Exception e)
+				{
+					attributes = getAttributesIterative(name, attributeNames);
+
+					// This object's attributes will be collected iteratively for next 24h. After that it will
+					// be checked if it is possible to successfully collect all attributes in bulk mode.
+					JavaGateway.iterativeObjects.put(discoveredObjKey, now + SocketProcessor.MILLISECONDS_IN_HOUR * 24);
+				}
+			}
+
+			if (attributes.isEmpty())
+			{
+				logger.warn("cannot process any attribute for object '{}'", name);
+				return;
+			}
+
+			for (javax.management.Attribute attribute : attributes.asList())
+				values.put(attribute.getName(), attribute.getValue());
+
+			for (MBeanAttributeInfo attrInfo : attributeArray)
+			{
+				logger.trace("discovered attribute '{}'", attrInfo.getName());
+
+				if (null == values.get(attrInfo.getName()))
+				{
+					logger.trace("cannot retrieve attribute value, skipping");
 					continue;
 				}
-				logger.trace("discovered attribute '{}'", attrInfo.getName());
 
 				try
 				{
 					logger.trace("looking for attributes of primitive types");
 					String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
-					getAttributeFields(counters, name, descr, attrInfo.getName(),
-							mbsc.getAttribute(name, attrInfo.getName()), propertiesAsMacros);
+					getAttributeFields(counters, name, descr, attrInfo.getName(), values.get(attrInfo.getName()),
+						propertiesAsMacros);
 				}
 				catch (Exception e)
 				{
@@ -309,6 +368,52 @@ class JMXItemChecker extends ItemChecker
 				}
 			}
 		}
+	}
+
+	private String[] getAttributeNames(MBeanAttributeInfo[] attributeArray)
+	{
+		int i = 0;
+		String[] attributeNames = new String[attributeArray.length];
+
+		for (MBeanAttributeInfo attrInfo : attributeArray)
+		{
+			if (!attrInfo.isReadable())
+			{
+				logger.trace("attribute '{}' not readable, skipping", attrInfo.getName());
+				continue;
+			}
+
+			attributeNames[i++] = attrInfo.getName();
+		}
+
+		return attributeNames;
+	}
+
+	private AttributeList getAttributesBulk(ObjectName name, String[] attributeNames) throws Exception
+	{
+		return mbsc.getAttributes(name, attributeNames);
+	}
+
+	private AttributeList getAttributesIterative(ObjectName name, String[] attributeNames)
+	{
+		AttributeList attributes = new AttributeList();
+
+		for (String attributeName: attributeNames)
+		{
+			try
+			{
+				Object attrValue = mbsc.getAttribute(name, attributeName);
+				attributes.add(new javax.management.Attribute(attributeName, attrValue));
+			}
+			catch (Exception e)
+			{
+				Object[] logInfo = {name, attributeName, ZabbixException.getRootCauseMessage(e)};
+				logger.warn("attribute processing '{},{}' failed: {}", logInfo);
+				logger.debug("error caused by", e);
+			}
+		}
+
+		return attributes;
 	}
 
 	private void discoverBeans(JSONArray counters, ObjectName filter, boolean propertiesAsMacros) throws Exception

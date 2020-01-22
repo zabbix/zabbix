@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ class CMapHelper {
 			]
 		];
 
-		// Apply properties to each sysmap elemenet.
+		// Apply properties to each sysmap element.
 		foreach ($sysmap['selements'] as &$selement) {
 			$prop = $label_properties[$selement['elementtype']];
 			$elmnt_label_type = ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_ON)
@@ -202,7 +202,7 @@ class CMapHelper {
 	 * Resolve map element (selements and links) state.
 	 *
 	 * @param array $sysmap                   Map data.
-	 * @param array $areas                    Areas representing array containing host group element IDs and dimention
+	 * @param array $areas                    Areas representing array containing host group element IDs and dimension
 	 *                                        properties of area.
 	 * @param array $options                  Options used to retrieve actions.
 	 * @param int   $options['severity_min']  Minimum severity.

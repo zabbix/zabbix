@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,6 +49,17 @@ function jsRedirect($url, $timeout = null) {
 		: 'window.location.replace("'.$url.'");';
 
 	insert_js($script);
+}
+
+/**
+ * Check the HTTP request method.
+ *
+ * @param string $method  HTTP request method
+ *
+ * @return bool  true, if the request method matches
+ */
+function isRequestMethod($method) {
+	return (strtolower($method) === strtolower($_SERVER['REQUEST_METHOD']));
 }
 
 /**
@@ -294,7 +305,7 @@ function zbx_date2str($format, $value = null) {
 }
 
 /**
- * Calculates and converts timestamp to string represenation.
+ * Calculates and converts timestamp to string representation.
  *
  * @param int|string $start_date  Start date timestamp.
  * @param int|string $end_date    End date timestamp.
@@ -998,7 +1009,7 @@ function zbx_is_int($var) {
 
 /**
  * Look for two arrays field value and create 3 array lists, one with arrays where field value exists only in first array
- * second with arrays where field values are only in second array and both where fiel values are in both arrays.
+ * second with arrays where field values are only in second array and both where field values are in both arrays.
  *
  * @param array  $primary
  * @param array  $secondary
@@ -1348,7 +1359,7 @@ function zbx_toObject($value, $field, $preserve_keys = false) {
  * Converts the given value to a numeric array:
  * - a scalar value will be converted to an array and added as the only element;
  * - an array with first element key containing only numeric characters will be converted to plain zero-based numeric array.
- * This is used for reseting nonsequential numeric arrays;
+ * This is used for resetting nonsequential numeric arrays;
  * - an associative array will be returned in an array as the only element, except if first element key contains only numeric characters.
  *
  * @param mixed $value
@@ -1520,162 +1531,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 	}
 
 	return new CColHeader(new CLink([$obj, $arrow], $link->getUrl()));
-}
-
-/**
- * Returns the list page number for the current page.
- *
- * The functions first looks for a page number in the HTTP request. If no number is given, falls back to the profile.
- * Defaults to 1.
- *
- * @return int
- */
-function getPageNumber() {
-	global $page;
-
-	$pageNumber = getRequest('page');
-	if (!$pageNumber) {
-		$lastPage = CProfile::get('web.paging.lastpage');
-		// For MVC pages $page is not set so we use action instead
-		if (isset($page['file']) && $lastPage == $page['file']) {
-			$pageNumber = CProfile::get('web.paging.page', 1);
-		}
-		elseif (isset($_REQUEST['action']) && $lastPage == $_REQUEST['action']) {
-			$pageNumber = CProfile::get('web.paging.page', 1);
-		}
-		else {
-			$pageNumber = 1;
-		}
-	}
-
-	return $pageNumber;
-}
-
-/**
- * Returns paging line and recursively slice $items of current page.
- *
- * @param array  $items				list of elements
- * @param string $sortorder			the order in which items are sorted ASC or DESC
- * @param CUrl $url					URL object containing arguments and query
- *
- * @return CDiv
- */
-function getPagingLine(&$items, $sortorder, CUrl $url) {
-	global $page;
-
-	$rowsPerPage = (int) CWebUser::$data['rows_per_page'];
-	$config = select_config();
-
-	$itemsCount = count($items);
-	$limit_exceeded = ($config['search_limit'] < $itemsCount);
-	$offset = 0;
-
-	if ($limit_exceeded) {
-		if ($sortorder == ZBX_SORT_DOWN) {
-			$offset = $itemsCount - $config['search_limit'];
-		}
-		$itemsCount = $config['search_limit'];
-	}
-
-	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
-	$currentPage = getPageNumber();
-
-	if ($currentPage < 1) {
-		$currentPage = 1;
-	}
-	elseif ($currentPage > $pagesCount) {
-		$currentPage = $pagesCount;
-	}
-
-	$tags = [];
-
-	if ($pagesCount > 1) {
-		// For MVC pages $page is not set
-		if (isset($page['file'])) {
-			CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
-			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
-		}
-		elseif (isset($_REQUEST['action'])) {
-			CProfile::update('web.paging.lastpage', $_REQUEST['action'], PROFILE_TYPE_STR);
-			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
-		}
-
-		// viewed pages (better to use odd)
-		$pagingNavRange = 11;
-
-		$endPage = $currentPage + floor($pagingNavRange / 2);
-		if ($endPage < $pagingNavRange) {
-			$endPage = $pagingNavRange;
-		}
-		if ($endPage > $pagesCount) {
-			$endPage = $pagesCount;
-		}
-
-		$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
-
-		if ($startPage > 1) {
-			$url->setArgument('page', 1);
-			$tags[] = new CLink(_x('First', 'page navigation'), $url->getUrl());
-		}
-
-		if ($currentPage > 1) {
-			$url->setArgument('page', $currentPage - 1);
-			$tags[] = new CLink(
-				(new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl()
-			);
-		}
-
-		for ($p = $startPage; $p <= $endPage; $p++) {
-			$url->setArgument('page', $p);
-			$link = new CLink($p, $url->getUrl());
-			if ($p == $currentPage) {
-				$link->addClass(ZBX_STYLE_PAGING_SELECTED);
-			}
-
-			$tags[] = $link;
-		}
-
-		if ($currentPage < $pagesCount) {
-			$url->setArgument('page', $currentPage + 1);
-			$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl());
-		}
-
-		if ($p < $pagesCount) {
-			$url->setArgument('page', $pagesCount);
-			$tags[] = new CLink(_x('Last', 'page navigation'), $url->getUrl());
-		}
-	}
-
-	$total = $limit_exceeded ? $itemsCount.'+' : $itemsCount;
-	$start = ($currentPage - 1) * $rowsPerPage;
-	$end = $start + $rowsPerPage;
-
-	if ($end > $itemsCount) {
-		$end = $itemsCount;
-	}
-
-	if ($pagesCount == 1) {
-		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $total);
-	}
-	else {
-		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start + 1, $end, $total);
-	}
-
-	// Trim array with elements to contain elements for current page.
-	$items = array_slice($items, $start + $offset, $end - $start, true);
-
-	return (new CDiv())
-		->addClass(ZBX_STYLE_TABLE_PAGING)
-		->addItem(
-			(new CDiv())
-				->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-				->addItem($tags)
-				->addItem(
-					(new CDiv())
-						->addClass(ZBX_STYLE_TABLE_STATS)
-						->addItem($table_stats)
-				)
-		);
 }
 
 /************* MATH *************/

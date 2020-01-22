@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1214,7 +1214,7 @@ class CItem extends CItemGeneral {
 			}
 			if ($this->outputIsRequested('error', $options['output'])) {
 				/*
-				 * SQL func COALESCE use for template items because they dont have record
+				 * SQL func COALESCE use for template items because they don't have record
 				 * in item_rtdata table and DBFetch convert null to '0'
 				 */
 				$sqlParts = $this->addQuerySelect(dbConditionCoalesce('ir.error', '', 'error'), $sqlParts);

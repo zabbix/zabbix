@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'sub_pages' => ['httpdetails.php']
 				],
 				[
-					'url' => 'latest.php',
+					'url' => 'zabbix.php',
+					'action' => 'latest.view',
+					'active_if' => ['latest.view'],
 					'label' => _('Latest data'),
 					'sub_pages' => ['history.php', 'chart.php']
 				],

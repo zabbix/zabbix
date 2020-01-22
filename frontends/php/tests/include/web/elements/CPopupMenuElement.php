@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ class CPopupMenuElement extends CElement {
 
 		$name = array_shift($items);
 		$element = $this->query('xpath', './li/a[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
-		if ($element === null) {
+		if (!$element->isValid()) {
 			throw new Exception('Failed to find menu item by name: "'.$name.'".');
 		}
 

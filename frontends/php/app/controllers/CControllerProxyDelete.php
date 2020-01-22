@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,9 +56,13 @@ class CControllerProxyDelete extends CController {
 
 		$deleted = count($proxyids);
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'proxy.list')
+			->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
+		);
 
 		if ($result) {
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_n('Proxy deleted', 'Proxies deleted', $deleted));
 		}
 		else {

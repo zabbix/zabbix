@@ -8,7 +8,7 @@ With Pushover, a user can be notified the most convenient way — with push noti
 
 Register the account at https://pushover.net/ and then install Pushover app at your iOS or Android device.
 
-Next, go to Apps & Settings and click Create a New Application/API Token, fill in Application information, upload Zabbix logo.
+Then [click here](https://pushover.net/apps/clone/zabbix) to create new integration with Zabbix.
 
 [![](images/tn/pushover2.png?raw=true)](images/pushover2.png)
 
@@ -17,6 +17,12 @@ At this point, we have **Application API Token (token)** of the Zabbix applicati
 You would need both in Zabbix pushover webhook.
 
 ## Zabbix setup
+
+### Set {$ZABBIX.URL} global macro
+
+Go to Administration->General (Macro) and create new macro that points to your Zabbix frontend
+
+`{$ZABBIX.URL}` = <https://myzabbix.local>
 
 ### Setup Pushover media type
 

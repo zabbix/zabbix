@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -269,7 +269,7 @@ $data = [
 	'screenid' => getRequest('screenid', 0)
 ];
 
-// getting updated screen, so we wont have to refresh the page to see changes
+// Getting updated screen, so we won't have to refresh the page to see changes.
 $data['screen'] = API::Screen()->get($options);
 if (empty($data['screen'])) {
 	$data['screen'] = API::TemplateScreen()->get($options);

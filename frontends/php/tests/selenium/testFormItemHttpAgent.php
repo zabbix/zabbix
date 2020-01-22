@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -881,7 +881,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data'
 				]
 			],
-			// All posible fields.
+			// All possible fields.
 			[
 				[
 					'fields' => [
@@ -1142,7 +1142,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// All posible fields.
+			// All possible fields.
 			[
 				[
 					'fields' => [

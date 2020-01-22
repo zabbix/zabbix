@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,11 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_dashboards'))
 				->onClick("checkAll('".$form->getName()."', 'all_dashboards', 'dashboardids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'])
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.list')
+				->getUrl()
+		)
 	]);
 
 $url = (new CUrl('zabbix.php'))

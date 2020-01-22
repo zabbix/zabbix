@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1038,7 +1038,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									}
 
 									/*
-									 * $upd_applicationids now contains new and existing application IDs depeding on
+									 * $upd_applicationids now contains new and existing application IDs depending on
 									 * operation we want to perform.
 									 */
 									$item_prototype['applications'] = array_keys(array_flip($upd_applicationids));
@@ -1602,10 +1602,23 @@ else {
 			order_result($data['items'], $sortField, $sortOrder);
 	}
 
-	$url = (new CUrl('disc_prototypes.php'))
-		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$data['paging'] = getPagingLine($data['items'], $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sortOrder,
+		(new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	);
+
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	// render view

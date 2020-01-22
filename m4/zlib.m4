@@ -13,6 +13,7 @@
 
 AC_DEFUN([ZLIB_TRY_LINK],
 [
+found_zlib=$1
 AC_TRY_LINK(
 [
 #include <zlib.h>
@@ -28,8 +29,9 @@ AC_DEFUN([ZLIB_CHECK_CONFIG],
 [
 	AC_ARG_WITH([zlib],[
 If you want to specify zlib installation directories:
-AC_HELP_STRING([--with-zlib=DIR], [use zlib from given base install directory (DIR), default is to search through a number of common places for the zlib files.])],
+AC_HELP_STRING([--with-zlib@<:@=DIR@:>@], [use zlib from given base install directory (DIR), default is to search through a number of common places for the zlib files.])],
 		[
+			test "x$withval" = "xyes" && withval=/usr
 			ZLIB_CFLAGS="-I$withval/include"
 			ZLIB_LDFLAGS="-L$withval/lib"
 			_zlib_dir_set="yes"
@@ -84,7 +86,6 @@ AC_HELP_STRING([--with-zlib=DIR], [use zlib from given base install directory (D
 		LDFLAGS="$LDFLAGS $ZLIB_LDFLAGS"
 		LIBS="$LIBS $ZLIB_LIBS"
 
-		found_zlib="no"
 		ZLIB_TRY_LINK([no])
 
 		CFLAGS="$am_save_CFLAGS"

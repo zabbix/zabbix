@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,15 +62,17 @@ $widget = (new CWidget())
 $maintenanceForm = (new CForm())->setName('maintenanceForm');
 
 // create table
+$url = (new CUrl('maintenance.php'))->getUrl();
+
 $maintenanceTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_maintenances'))->onClick("checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Active till'), 'active_till', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Active till'), 'active_till', $this->data['sort'], $this->data['sortorder'], $url),
 		_('State'),
 		_('Description')
 	]);

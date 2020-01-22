@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -822,7 +822,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'new_application' => getRequest('new_application', ''),
 		'applications' => getRequest('applications', []),
-		'delay_flex' => getRequest('delay_flex', []),
+		'delay_flex' => array_values(getRequest('delay_flex', [])),
 		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
 		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
 		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', 0),
@@ -1752,7 +1752,7 @@ function getTriggerFormData(array $data) {
 
 		$data['limited'] = ($trigger['templateid'] != 0);
 
-		// select first host from triggers if gived not match
+		// Select first host from triggers if no matching value is given.
 		$hosts = $trigger['hosts'];
 		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
 			$host = reset($hosts);

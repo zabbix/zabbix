@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,10 @@ if (!$data['screen']) {
 	else {
 		// Redirect to slide show list.
 		ob_end_clean();
-		redirect('slideconf.php');
+		redirect((new CUrl('slideconf.php'))
+			->setArgument('page', CPagerHelper::loadPage('slideconf.php', null))
+			->getUrl()
+		);
 	}
 }
 

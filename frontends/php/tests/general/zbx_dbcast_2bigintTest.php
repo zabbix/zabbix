@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,21 +36,6 @@ class zbx_dbcast_2bigintTest extends PHPUnit_Framework_TestCase {
 			['field'],
 			['field_1']
 		];
-	}
-
-	/**
-	 * @dataProvider provider
-	 */
-	public function test_ibmdb2($field) {
-		global $DB;
-
-		$oldDB = $DB;
-
-		$DB['TYPE'] = ZBX_DB_DB2;
-
-		$this->assertEquals('CAST('.$field.' AS BIGINT)', zbx_dbcast_2bigint($field));
-
-		$DB = $oldDB;
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -644,9 +644,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 				[
 					'new_name' => 'CLONE: change first expression name as the second expression name',
 					'mappings' => [
-						['expression' => 'expresssion 2 for clone', 'action' => 'update'],
+						['expression' => 'expression 2 for clone', 'action' => 'update'],
 					],
-					'error' => 'Invalid parameter "/1/mappings/2": value (inventory_link, expression)=(1, expresssion 2 for clone) already exists.'
+					'error' => 'Invalid parameter "/1/mappings/2": value (inventory_link, expression)=(1, expression 2 for clone) already exists.'
 				]
 			]
 		];

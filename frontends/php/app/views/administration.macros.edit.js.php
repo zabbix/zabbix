@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		function init_fields($parent) {
+		function initMacroFields($parent) {
 			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $parent).not('.initialized-field').each(function() {
 				var $obj = $(this);
 
@@ -83,10 +83,10 @@
 			})
 			.dynamicRows({template: '#macro-row-tmpl'})
 			.on('click', 'button.element-table-add', function() {
-				init_fields($('#tbl_macros'));
+				initMacroFields($('#tbl_macros'));
 			});
 
-		init_fields($('#tbl_macros'));
+		initMacroFields($('#tbl_macros'));
 
 		$('#update').click(function() {
 			var removedCount = $(this).data('removedCount');
@@ -94,12 +94,6 @@
 			if (removedCount) {
 				return confirm(<?= CJs::encodeJson(_('Are you sure you want to delete')) ?> + ' ' + removedCount + ' ' + <?= CJs::encodeJson(_('macro(s)')) ?> + '?');
 			}
-		});
-
-		$('form[name="macrosForm"]').submit(function() {
-			$('input.macro').each(function() {
-				macroToUpperCase(this);
-			});
 		});
 
 		function macroToUpperCase(element) {

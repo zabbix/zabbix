@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,7 +147,10 @@ class CControllerPopupMaintenancePeriod extends CController {
 			'dayofweek' =>			0,
 			'start_date' =>			date(ZBX_DATE_TIME),
 			'period' =>				SEC_PER_HOUR,
-			'start_time' =>			12 * SEC_PER_HOUR
+			'start_time' =>			12 * SEC_PER_HOUR,
+			'month_date_type' =>	0,
+			'hour' =>				0,
+			'minute' =>				0
 		];
 		$fields = [
 			TIMEPERIOD_TYPE_ONETIME =>	['start_date'],

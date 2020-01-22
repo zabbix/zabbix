@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2019 Zabbix SIA
+dnl Copyright (C) 2001-2020 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -1257,6 +1257,35 @@ AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static]) ;;
 esac])
 
+AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked binaries with selected libs from default folders],
+[case "${enableval}" in
+  yes)
+    static_linking_libs=yes
+    saved_LIBS="$LIBS"
+    LIBS="${saved_LIBS} -Wl,-bstatic -Wl,-bdynamic"
+    AC_MSG_CHECKING([if libs static linking with "-Wl,-b" is possible])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
+      [AC_MSG_RESULT([yes])
+        static_linking_support="-Wl,-b"],
+      [AC_MSG_RESULT([no])
+        static_linking_support=no])
+        LIBS="$saved_LIBS"
+
+    if test "x$static_linking_support" = "xno"; then
+      LIBS="${saved_LIBS} -Wl,-Bstatic -Wl,-Bdynamic"
+      AC_MSG_CHECKING([if libs static linking with "-Wl,-B" is possible])
+      AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
+        [AC_MSG_RESULT([yes])
+          static_linking_support="-Wl,-B"],
+        [AC_MSG_RESULT([no])
+          static_linking_support=no])
+          LIBS="$saved_LIBS"
+    fi
+    ;;
+  no) ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-static-libs]) ;;
+esac])
+
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
 [case "${enableval}" in
   yes) server=yes ;;
@@ -1334,22 +1363,6 @@ fi
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
-	have_multirow_insert="no"
-
-	dnl Checking for IBM DB2 support
-	AX_LIB_IBM_DB2()
-	if test "x$want_ibm_db2" = "xyes"; then
-		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.])
-		fi
-
-		if test "x$found_ibm_db2" = "xyes"; then
-			have_db="IBM DB2"
-			have_multirow_insert="yes"
-		else
-			AC_MSG_ERROR([IBM DB2 library not found])
-		fi
-	fi
 
 	dnl Checking for MySQL support
 	AX_LIB_MYSQL()
@@ -1448,7 +1461,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AC_MSG_CHECKING(for Zabbix server/proxy database selection)
 	if test "x$have_db" = "xno"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR([No database selected for Zabbix server/proxy. Use --with-ibm-db2 or --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
+		AC_MSG_ERROR([No database selected for Zabbix server/proxy. Use --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
@@ -1461,9 +1474,9 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		AC_MSG_RESULT(no)
 	fi
 
-	DB_CFLAGS="$IBM_DB2_CPPFLAGS $MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
-	DB_LDFLAGS="$IBM_DB2_LDFLAGS $MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
-	DB_LIBS="$IBM_DB2_LIBS $MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
+	DB_CFLAGS="$MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
+	DB_LDFLAGS="$MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
+	DB_LIBS="$MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
 
 	AC_SUBST(DB_CFLAGS)
 	AC_SUBST(DB_LDFLAGS)
@@ -1593,6 +1606,9 @@ ZBXGET_LIBS="$ZBXGET_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 SENDER_LDFLAGS="$SENDER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 
+ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
+ZBXJS_LIBS="$ZBXJS_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
+
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
 AM_CONDITIONAL(HAVE_LIBXML2, test "x$have_libxml2" = "xyes")
 
@@ -1701,6 +1717,9 @@ ZBXGET_LIBS="$ZBXGET_LIBS $TLS_LIBS"
 SENDER_LDFLAGS="$SENDER_LDFLAGS $TLS_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 
+ZBXJS_LDFLAGS="$ZLIB_LDFLAGS $TLS_LDFLAGS"
+ZBXJS_LIBS="$ZBXJS_LIBS $TLS_LIBS"
+
 if test "x$agent2" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
 	if test "x$GO" = "xno"; then
@@ -1763,6 +1782,15 @@ dnl Starting from 2.0 agent can do web monitoring
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
+
+ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
+ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
+
 dnl Check for libpcre, used by Zabbix for regular expressions
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
 	LIBPCRE_CHECK_CONFIG([no])
@@ -1779,8 +1807,6 @@ else
 	LIBS="$LIBS $LIBPCRE_LIBS"
 fi
 
-AC_SUBST(LIBPCRE_CFLAGS)
-
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
 LIBICONV_CHECK_CONFIG([no])
@@ -1789,7 +1815,6 @@ if test "x$found_iconv" != "xyes"; then
 fi
 LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
 LIBS="$LIBS $ICONV_LIBS"
-AC_SUBST(ICONV_CFLAGS)
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
@@ -1852,6 +1877,9 @@ AC_SUBST(ZBXGET_LIBS)
 AC_SUBST(SENDER_LDFLAGS)
 AC_SUBST(SENDER_LIBS)
 
+AC_SUBST(ZBXJS_LDFLAGS)
+AC_SUBST(ZBXJS_LIBS)
+
 AC_SUBST(SERVER_CONFIG_FILE)
 AC_SUBST(PROXY_CONFIG_FILE)
 AC_SUBST(AGENT_CONFIG_FILE)
@@ -1908,7 +1936,6 @@ m4_ifdef([CONF_TESTS],[CONF_TESTS(ZBXCMOCKA)])
 AC_OUTPUT([
 	Makefile
 	database/Makefile
-	database/ibm_db2/Makefile
 	database/mysql/Makefile
 	database/oracle/Makefile
 	database/postgresql/Makefile
@@ -1963,6 +1990,7 @@ AC_OUTPUT([
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
+	src/zabbix_js/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
 	src/zabbix_server/alerter/Makefile

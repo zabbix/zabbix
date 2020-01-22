@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -220,5 +220,14 @@ abstract class CBaseElement extends RemoteWebElement {
 	 */
 	public function isSelected($selected = true) {
 		return (parent::isSelected() === $selected);
+	}
+
+	/**
+	 * Check if element is valid (all non-null elements are considered valid).
+	 *
+	 * @return boolean
+	 */
+	public function isValid() {
+		return true;
 	}
 }

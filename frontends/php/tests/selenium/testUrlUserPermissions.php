@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,8 +90,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'latest.php',
-				'title' =>	'Latest data [refreshed every 30 sec.]',
+				'url' => 'zabbix.php?action=latest.view',
+				'title' =>	'Latest data',
 				'header' =>	'Latest data',
 				'users' => [
 					'guest' => true,
@@ -480,7 +480,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=2',
 				'title' =>	'Configuration of actions',
-				'header' => 'Auto registration actions',
+				'header' => 'Autoregistration actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

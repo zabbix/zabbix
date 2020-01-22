@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -642,7 +642,7 @@ class testDependentItems extends CAPITest {
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
 				'method' => 'discoveryrule.create',
 				// 1001: dependent.items.template.1
-				// 1001: dependent.items.tempate.1:master.item.1
+				// 1001: dependent.items.template.1:master.item.1
 				'request_data' => self::getDiscoveryRule(1001, 1001, 'dependent.discovery.rule.1', 2, 2)
 			],
 			// Check for maximum count of item prototypes in the tree on the template level.

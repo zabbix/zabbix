@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ class CzbxjsvalueTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				!$return_as_object,
-				// JSON implementation will return sligtly different result :
+				// JSON implementation will return slightly different result :
 				// 		{"-1":[\'agent_string\',\'another_string\']}
 				[-1 => ['agent_string', 'another_string']],
 				'[[\'agent_string\',\'another_string\']]'

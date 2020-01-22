@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -326,10 +326,10 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestTextPresent($data['name']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM drules WHERE name='.zbx_dbstr($data['name'])));
-		$cheks = 'SELECT NULL FROM dchecks WHERE druleid IN ('.
+		$checks = 'SELECT NULL FROM dchecks WHERE druleid IN ('.
 				'SELECT druleid FROM drules WHERE name='.zbx_dbstr($data['name']).
 				')';
-		$this->assertEquals(count($data['checks']), CDBHelper::getCount($cheks));
+		$this->assertEquals(count($data['checks']), CDBHelper::getCount($checks));
 	}
 
 	public function getUpdateValidationData() {
