@@ -20,6 +20,7 @@
 #include "common.h"
 
 #include "zbxdb.h"
+#include "zbxregexp.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
@@ -340,7 +341,8 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
  *               ZBX_DB_FAIL - failed to connect                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
+int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
+			char *tlsmode, char *cert, char *key, char *ca, char *cipher)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
@@ -358,6 +360,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
+	ZBX_UNUSED(cipher);
 #elif defined(HAVE_SQLITE3)
 	char		*p, *path = NULL;
 #endif
@@ -383,6 +386,13 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
 		exit(EXIT_FAILURE);
 	}
+
+	if (NULL != ca)
+	{
+		const unsigned int ssl_mode = SSL_MODE_VERIFY_IDENTITY;
+		mysql_options(conn, MYSQL_OPT_SSL_MODE, (const void*)&ssl_mode);
+	}
+	mysql_ssl_set(conn, key, cert, ca, NULL, cipher);
 
 	if (NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
 	{
@@ -518,10 +528,45 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	zbx_free(connect);
 #elif defined(HAVE_POSTGRESQL)
+#	define PG_DB_PARAMS_COUNT	9
+#	define PG_TLS_DISABLE		"disable"
+#	define PG_TLS_REQUIRE		"require"
+#	define PG_TLS_VERIFY_CA		"verify-ca"
+#	define PG_TLS_VERIFY_IDENTITY	"verify-full"
+
+	const char	*pg_keywords[PG_DB_PARAMS_COUNT + 1] = {NULL};
+	const char	*pg_values[PG_DB_PARAMS_COUNT + 1] = {NULL};
+	unsigned int	i = 0;
+
 	if (0 != port)
 		cport = zbx_dsprintf(cport, "%d", port);
 
-	conn = PQsetdbLogin(host, cport, NULL, NULL, dbname, user, password);
+	pg_keywords[i] = "host";	pg_values[i++] = host;
+	pg_keywords[i] = "port";	pg_values[i++] = cport;
+	pg_keywords[i] = "dbname";	pg_values[i++] = dbname;
+	pg_keywords[i] = "user";	pg_values[i++] = user;
+	pg_keywords[i] = "password";	pg_values[i++] = password;
+	pg_keywords[i] = "sslcert";	pg_values[i++] = cert;
+	pg_keywords[i] = "sslkey";	pg_values[i++] = key;
+	pg_keywords[i] = "sslrootcert";	pg_values[i++] = ca;
+
+	pg_keywords[i] = "sslmode";
+	if (NULL == host || 0 == strcmp("localhost", host))
+		pg_values[i++] = NULL;
+	else if (NULL == tlsmode)
+		pg_values[i++] = NULL;
+	else if (0 == strcmp(tlsmode, "disable"))
+		pg_values[i++] = PG_TLS_DISABLE;
+	else if (0 == strcmp(tlsmode, "require"))
+		pg_values[i++] = PG_TLS_REQUIRE;
+	else if (0 == strcmp(tlsmode, "verify-ca"))
+		pg_values[i++] = PG_TLS_VERIFY_CA;
+	else if (0 == strcmp(tlsmode, "verify-identity"))
+		pg_values[i++] = PG_TLS_VERIFY_IDENTITY;
+	else
+		pg_values[i++] = NULL;
+
+	conn = PQconnectdbParams(pg_keywords, pg_values, 0);
 
 	zbx_free(cport);
 
