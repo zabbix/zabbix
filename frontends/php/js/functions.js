@@ -590,11 +590,17 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 			// A fix for IE and Edge to stop popup width flickering when having vertical scrollbar.
 			body.css('overflow-y', body_scroll_height > body_height ? 'scroll' : 'hidden');
 
+			// Allow full width to determine actual width taken by the contents.
 			overlay_dialogue.css({
-				'left': Math.max(0, Math.trunc(($(window).width() - $(overlay_dialogue).outerWidth()) / 2)) + 'px',
+				'left': 0,
+				'top': 0
+			});
+
+			overlay_dialogue.css({
+				'left': Math.max(0, parseInt(($(window).width() - $(overlay_dialogue).outerWidth(true)) / 2)) + 'px',
 				'top': overlay_dialogue.hasClass('sticked-to-top')
 					? ''
-					: Math.max(0, Math.trunc(($(window).height() - $(overlay_dialogue).outerHeight()) / 2)) + 'px'
+					: Math.max(0, parseInt(($(window).height() - $(overlay_dialogue).outerHeight(true)) / 2)) + 'px'
 			});
 		},
 		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
