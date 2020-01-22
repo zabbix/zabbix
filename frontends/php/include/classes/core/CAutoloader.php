@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -35,10 +35,10 @@ class CAutoloader {
 	/**
 	 * Register supported namespace.
 	 *
-	 * @param string $namespace   Namespace value without trainling '\'.
-	 * @param array  $paths       Array of namespace files directory absolute path without trailing '/'.
+	 * @param string $namespace  Namespace value without trainling '\'.
+	 * @param array  $paths      Array of namespace files directory absolute path without trailing '/'.
 	 */
-	public function addNamespace($namespace, array $paths) {
+	public function addNamespace(string $namespace, array $paths): void {
 		foreach ($paths as $path) {
 			$path = realpath($path);
 
@@ -53,7 +53,7 @@ class CAutoloader {
 	 *
 	 * @return bool
 	 */
-	public function register() {
+	public function register(): bool {
 		return spl_autoload_register([$this, 'loadClass']);
 	}
 
@@ -64,7 +64,7 @@ class CAutoloader {
 	 *
 	 * @return bool
 	 */
-	protected function loadClass($class_name) {
+	protected function loadClass(string $class_name): bool {
 		$chunks = explode('\\', $class_name);
 		$file_name = array_pop($chunks).'.php';
 
