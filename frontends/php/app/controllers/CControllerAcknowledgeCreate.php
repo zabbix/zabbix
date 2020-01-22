@@ -187,7 +187,7 @@ class CControllerAcknowledgeCreate extends CController {
 		$editable_triggers = ($events && ($this->change_severity || $this->close_problems))
 			? API::Trigger()->get([
 				'output' => ['manual_close'],
-				'triggerids' => array_column($events, 'objectid'),
+				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'editable' => true,
 				'preservekeys' => true
 			])
