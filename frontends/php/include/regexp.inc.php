@@ -172,7 +172,7 @@ function rewriteRegexpExpressions($regexpId, array $expressions) {
 	}
 
 	if ($dbExpressions) {
-		$dbExpressionIds = array_column($dbExpressions, 'expressionid');
+		$dbExpressionIds = zbx_objectValues($dbExpressions, 'expressionid');
 		deleteRegexpExpressions($dbExpressionIds);
 	}
 

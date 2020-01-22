@@ -610,7 +610,7 @@ class CMap extends CMapElement {
 		// Check if map already exists.
 		$db_maps = $this->get([
 			'output' => ['name'],
-			'filter' => ['name' => array_column($maps, 'name')],
+			'filter' => ['name' => zbx_objectValues($maps, 'name')],
 			'nopermissions' => true,
 			'limit' => 1
 		]);
@@ -986,7 +986,7 @@ class CMap extends CMapElement {
 
 			// Map selement links.
 			if (array_key_exists('links', $map) && $map['links']) {
-				$selementids = array_column($map['selements'], 'selementid');
+				$selementids = zbx_objectValues($map['selements'], 'selementid');
 
 				foreach ($map['links'] as $link) {
 					if (!in_array($link['selementid1'], $selementids)) {
@@ -1067,7 +1067,7 @@ class CMap extends CMapElement {
 
 			$db_map_names = $this->get([
 				'output' => ['sysmapid', 'name'],
-				'filter' => ['name' => array_column($check_names, 'name')],
+				'filter' => ['name' => zbx_objectValues($check_names, 'name')],
 				'nopermissions' => true
 			]);
 			$db_map_names = zbx_toHash($db_map_names, 'name');
@@ -1450,7 +1450,7 @@ class CMap extends CMapElement {
 
 			// Map selement links.
 			if (array_key_exists('links', $map) && $map['links']) {
-				$selementids = array_column($map['selements'], 'selementid');
+				$selementids = zbx_objectValues($map['selements'], 'selementid');
 
 				foreach ($map['links'] as $link) {
 					if (!in_array($link['selementid1'], $selementids)) {
@@ -1810,11 +1810,11 @@ class CMap extends CMapElement {
 	 */
 	public function update(array $maps) {
 		$maps = zbx_toArray($maps);
-		$sysmapids = array_column($maps, 'sysmapid');
+		$sysmapids = zbx_objectValues($maps, 'sysmapid');
 
 		$db_maps = $this->get([
 			'output' => API_OUTPUT_EXTEND,
-			'sysmapids' => array_column($maps, 'sysmapid'),
+			'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
@@ -1910,7 +1910,7 @@ class CMap extends CMapElement {
 				}
 
 				$shared_userids_to_delete = array_merge($shared_userids_to_delete,
-					array_column($user_shares_diff['second'], 'sysmapuserid')
+					zbx_objectValues($user_shares_diff['second'], 'sysmapuserid')
 				);
 			}
 
@@ -1933,7 +1933,7 @@ class CMap extends CMapElement {
 				}
 
 				$shared_user_groupids_to_delete = array_merge($shared_user_groupids_to_delete,
-					array_column($user_group_shares_diff['second'], 'sysmapusrgrpid')
+					zbx_objectValues($user_group_shares_diff['second'], 'sysmapusrgrpid')
 				);
 			}
 
@@ -1954,7 +1954,7 @@ class CMap extends CMapElement {
 				}
 
 				$url_ids_to_delete = array_merge($url_ids_to_delete,
-					array_column($url_diff['second'], 'sysmapurlid')
+					zbx_objectValues($url_diff['second'], 'sysmapurlid')
 				);
 			}
 
@@ -2585,7 +2585,7 @@ class CMap extends CMapElement {
 
 			$iconMaps = API::IconMap()->get([
 				'output' => $this->outputExtend($options['selectIconMap'], ['iconmapid']),
-				'iconmapids' => array_column($iconMaps, 'iconmapid'),
+				'iconmapids' => zbx_objectValues($iconMaps, 'iconmapid'),
 				'preservekeys' => true
 			]);
 
@@ -2692,7 +2692,7 @@ class CMap extends CMapElement {
 				'preservekeys' => true
 			]);
 
-			$related_userids = array_column($related_users, 'userid');
+			$related_userids = zbx_objectValues($related_users, 'userid');
 
 			if ($related_userids) {
 				$users = API::getApiService()->select('sysmap_user', [
@@ -2732,7 +2732,7 @@ class CMap extends CMapElement {
 				'preservekeys' => true
 			]);
 
-			$related_groupids = array_column($related_groups, 'usrgrpid');
+			$related_groupids = zbx_objectValues($related_groups, 'usrgrpid');
 
 			if ($related_groupids) {
 				$user_groups = API::getApiService()->select('sysmap_usrgrp', [

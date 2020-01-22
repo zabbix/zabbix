@@ -417,7 +417,7 @@ if (!empty($data['interfaces'])) {
 	$interfacesComboBox = (new CComboBox('interfaceid', $data['interfaceid']))->setAriaRequired();
 
 	// Set up interface groups sorted by priority.
-	$interface_types = array_column($data['interfaces'], 'type');
+	$interface_types = zbx_objectValues($data['interfaces'], 'type');
 	$interface_groups = [];
 	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
 		if (in_array($interface_type, $interface_types)) {

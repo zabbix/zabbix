@@ -108,7 +108,7 @@ class CControllerWidgetWebView extends CControllerWidget {
 		));
 
 		// Fetch HTTP test execution data.
-		$httptest_data = Manager::HttpTest()->getLastData(array_column($result, 'httptestid'));
+		$httptest_data = Manager::HttpTest()->getLastData(zbx_objectValues($result, 'httptestid'));
 
 		foreach ($result as $row) {
 			$group = &$groups[$row['groupid']];

@@ -197,7 +197,7 @@ if ($data['action']['operations']) {
 		$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 		foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
 			if (array_key_exists($var, $operation_for_popup)) {
-				$operation_for_popup[$var] = array_column($operation_for_popup[$var], $field);
+				$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
 			}
 		}
 
@@ -333,7 +333,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
 				if (array_key_exists($var, $operation_for_popup)) {
-					$operation_for_popup[$var] = array_column($operation_for_popup[$var], $field);
+					$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
 				}
 			}
 
@@ -413,7 +413,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
 				if (array_key_exists($var, $operation_for_popup)) {
-					$operation_for_popup[$var] = array_column($operation_for_popup[$var], $field);
+					$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
 				}
 			}
 

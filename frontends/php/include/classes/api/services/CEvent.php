@@ -251,7 +251,7 @@ class CEvent extends CApiService {
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable']
 						]);
-						$options['objectids'] = array_column($items, 'itemid');
+						$options['objectids'] = zbx_objectValues($items, 'itemid');
 					}
 					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
 						$items = API::DiscoveryRule()->get([
@@ -259,7 +259,7 @@ class CEvent extends CApiService {
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable']
 						]);
-						$options['objectids'] = array_column($items, 'itemid');
+						$options['objectids'] = zbx_objectValues($items, 'itemid');
 					}
 				}
 				// all items and LLD rules
@@ -1043,7 +1043,7 @@ class CEvent extends CApiService {
 				if ($requestUserData) {
 					$users = API::User()->get([
 						'output' => $requestUserData,
-						'userids' => array_column($acknowledges, 'userid'),
+						'userids' => zbx_objectValues($acknowledges, 'userid'),
 						'preservekeys' => true
 					]);
 
@@ -1109,7 +1109,7 @@ class CEvent extends CApiService {
 					'output' => ['eventid'],
 					'filter' => ['eventid' => $suppressed_eventids]
 				]);
-				$suppressed_eventids = array_column($suppressed_events, 'eventid', 'eventid');
+				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
 				foreach ($result as &$event) {
 					$event['suppressed'] = array_key_exists($event['eventid'], $suppressed_eventids)
 						? (string) ZBX_PROBLEM_SUPPRESSED_TRUE

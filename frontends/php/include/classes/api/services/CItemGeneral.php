@@ -139,14 +139,14 @@ abstract class CItemGeneral extends CApiService {
 
 			$dbItems = $this->get([
 				'output' => $dbItemsFields,
-				'itemids' => array_column($items, 'itemid'),
+				'itemids' => zbx_objectValues($items, 'itemid'),
 				'editable' => true,
 				'preservekeys' => true
 			]);
 
 			$dbHosts = API::Host()->get([
 				'output' => ['hostid', 'status', 'name'],
-				'hostids' => array_column($dbItems, 'hostid'),
+				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
 				'selectApplications' => ['applicationid', 'flags'],
@@ -165,7 +165,7 @@ abstract class CItemGeneral extends CApiService {
 
 			$dbHosts = API::Host()->get([
 				'output' => ['hostid', 'status', 'name'],
-				'hostids' => array_column($items, 'hostid'),
+				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
 				'selectApplications' => ['applicationid', 'flags'],
@@ -176,7 +176,7 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($this instanceof CItemPrototype) {
 				$itemDbFields['ruleid'] = null;
-				$druleids = array_column($items, 'ruleid');
+				$druleids = zbx_objectValues($items, 'ruleid');
 
 				if ($druleids) {
 					$discovery_rules = API::DiscoveryRule()->get([
@@ -191,7 +191,7 @@ abstract class CItemGeneral extends CApiService {
 		// interfaces
 		$interfaces = API::HostInterface()->get([
 			'output' => ['interfaceid', 'hostid', 'type'],
-			'hostids' => array_column($dbHosts, 'hostid'),
+			'hostids' => zbx_objectValues($dbHosts, 'hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
@@ -605,7 +605,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				// check that the given applications belong to the item's host
-				$dbApplicationIds = array_column($host['applications'], 'applicationid');
+				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
 				foreach ($item['applications'] as $appId) {
 					if (!in_array($appId, $dbApplicationIds)) {
 						$error = _s('Application with ID "%1$s" is not available on "%2$s".', $appId, $host['name']);
@@ -789,7 +789,7 @@ abstract class CItemGeneral extends CApiService {
 			'SELECT i.itemid'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', array_column($new_items, 'itemid')).
+				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
 				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
 		);
 
@@ -856,7 +856,7 @@ abstract class CItemGeneral extends CApiService {
 		// Preparing list of items by item templateid.
 		$sql = 'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.
 			' FROM items i'.
-			' WHERE '.dbConditionInt('i.templateid', array_column($tpl_items, 'itemid'));
+			' WHERE '.dbConditionInt('i.templateid', zbx_objectValues($tpl_items, 'itemid'));
 		if ($hostids !== null) {
 			$sql .= ' AND '.dbConditionInt('i.hostid', $hostids);
 		}

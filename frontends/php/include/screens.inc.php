@@ -318,7 +318,7 @@ function add_slideshow($data) {
 	}
 
 	// Validate screens.
-	$screenids = array_column($data['slides'], 'screenid');
+	$screenids = zbx_objectValues($data['slides'], 'screenid');
 
 	$screens = API::Screen()->get([
 		'output' => ['screenid'],
@@ -447,7 +447,7 @@ function update_slideshow($data) {
 	}
 
 	// validate screens.
-	$screenids = array_column($data['slides'], 'screenid');
+	$screenids = zbx_objectValues($data['slides'], 'screenid');
 
 	$screens = API::Screen()->get([
 		'output' => ['screenid'],
@@ -562,7 +562,7 @@ function update_slideshow($data) {
 		$shared_users_to_add[] = $new_shared_user;
 	}
 
-	$shared_userids_to_delete = array_column($user_shares_diff['second'], 'slideshowuserid');
+	$shared_userids_to_delete = zbx_objectValues($user_shares_diff['second'], 'slideshowuserid');
 
 	// Slide show user group shares.
 	$db_slideshow['userGroups'] = DBfetchArray(DBselect(
@@ -602,7 +602,7 @@ function update_slideshow($data) {
 		$shared_user_groups_to_add[] = $new_shared_user_group;
 	}
 
-	$shared_user_groupids_to_delete = array_column($user_group_shares_diff['second'], 'slideshowusrgrpid');
+	$shared_user_groupids_to_delete = zbx_objectValues($user_group_shares_diff['second'], 'slideshowusrgrpid');
 
 	// User shares.
 	DB::insert('slideshow_user', $shared_users_to_add);
@@ -623,7 +623,7 @@ function update_slideshow($data) {
 	// get slides
 	$db_slides = DBfetchArrayAssoc(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.zbx_dbstr($data['slideshowid'])), 'slideid');
 
-	$slidesToDel = array_column($db_slides, 'slideid');
+	$slidesToDel = zbx_objectValues($db_slides, 'slideid');
 	$slidesToDel = zbx_toHash($slidesToDel);
 	$step = 0;
 	foreach ($data['slides'] as $slide) {

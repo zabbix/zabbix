@@ -191,7 +191,7 @@ class CHostPrototype extends CHostBase {
 			$names_by_ruleid[$host_prototype['ruleid']][] = $host_prototype['name'];
 		}
 
-		$ruleids = array_unique(array_column($host_prototypes, 'ruleid'));
+		$ruleids = array_unique(zbx_objectValues($host_prototypes, 'ruleid'));
 		$groupids = array_keys($groupids);
 
 		$this->checkDiscoveryRulePermissions($ruleids);
@@ -243,7 +243,7 @@ class CHostPrototype extends CHostBase {
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes);
 
-		return ['hostids' => array_column($host_prototypes, 'hostid')];
+		return ['hostids' => zbx_objectValues($host_prototypes, 'hostid')];
 	}
 
 	/**
@@ -311,7 +311,7 @@ class CHostPrototype extends CHostBase {
 		// link templates
 		foreach ($hostPrototypes as $hostPrototype) {
 			if (isset($hostPrototype['templates']) && $hostPrototype['templates']) {
-				$this->link(array_column($hostPrototype['templates'], 'templateid'), [$hostPrototype['hostid']]);
+				$this->link(zbx_objectValues($hostPrototype['templates'], 'templateid'), [$hostPrototype['hostid']]);
 			}
 		}
 
@@ -354,7 +354,7 @@ class CHostPrototype extends CHostBase {
 			'selectDiscoveryRule' => ['itemid'],
 			'selectGroupLinks' => ['group_prototypeid', 'groupid'],
 			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
-			'hostids' => array_column($host_prototypes, 'hostid'),
+			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -489,7 +489,7 @@ class CHostPrototype extends CHostBase {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes, $db_host_prototypes);
 
-		return ['hostids' => array_column($host_prototypes, 'hostid')];
+		return ['hostids' => zbx_objectValues($host_prototypes, 'hostid')];
 	}
 
 	/**
@@ -510,7 +510,7 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
-			'hostids' => array_column($host_prototypes, 'hostid'),
+			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
 			'preservekeys' => true
 		]);
 
@@ -548,8 +548,8 @@ class CHostPrototype extends CHostBase {
 
 			// templates
 			if (isset($host_prototype['templates'])) {
-				$existing_templateids = array_column($ex_host_prototype['templates'], 'templateid');
-				$new_templateids = array_column($host_prototype['templates'], 'templateid');
+				$existing_templateids = zbx_objectValues($ex_host_prototype['templates'], 'templateid');
+				$new_templateids = zbx_objectValues($host_prototype['templates'], 'templateid');
 				$this->unlink(array_diff($existing_templateids, $new_templateids), [$host_prototype['hostid']]);
 				$this->link(array_diff($new_templateids, $existing_templateids), [$host_prototype['hostid']]);
 			}
@@ -632,7 +632,7 @@ class CHostPrototype extends CHostBase {
 					' WHERE hd.parent_itemid=i.itemid'.
 						' AND i.hostid=h.hostid'.
 						' AND h.status='.HOST_STATUS_TEMPLATE.
-						' AND '.dbConditionInt('hd.hostid', array_column($host_prototypes, 'hostid'));
+						' AND '.dbConditionInt('hd.hostid', zbx_objectValues($host_prototypes, 'hostid'));
 			$valid_prototypes = DBfetchArrayAssoc(DBselect($sql), 'hostid');
 
 			foreach ($host_prototypes as $key => $host_prototype) {
@@ -663,7 +663,7 @@ class CHostPrototype extends CHostBase {
 		$discoveryRules = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'hostid'],
 			'selectHosts' => ['hostid'],
-			'itemids' => array_column($hostPrototypes, 'ruleid'),
+			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid'),
 			'templated' => true,
 			'nopermissions' => true,
 			'preservekeys' => true
@@ -674,7 +674,7 @@ class CHostPrototype extends CHostBase {
 		$chdHosts = API::Host()->get([
 			'output' => ['hostid', 'host', 'status'],
 			'selectParentTemplates' => ['templateid'],
-			'templateids' => array_column($discoveryRules, 'hostid'),
+			'templateids' => zbx_objectValues($discoveryRules, 'hostid'),
 			'hostids' => $hostIds,
 			'nopermissions' => true,
 			'templated_hosts' => true,
@@ -699,7 +699,7 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => ['itemid'],
-			'discoveryids' => array_column($childDiscoveryRules, 'itemid'),
+			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid'),
 		]);
 		foreach ($childDiscoveryRules as &$childDiscoveryRule) {
 			$childDiscoveryRule['hostPrototypes'] = [];
@@ -848,7 +848,7 @@ class CHostPrototype extends CHostBase {
 			'hostids' => $data['templateids']
 		]);
 		$hostPrototypes = $this->get([
-			'discoveryids' => array_column($discoveryRules, 'itemid'),
+			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
@@ -940,7 +940,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT hostid FROM host_discovery WHERE '.dbConditionInt('parent_hostid', $hostPrototypeIds)
 		));
 		if ($discoveredHosts) {
-			API::Host()->delete(array_column($discoveredHosts, 'hostid'), true);
+			API::Host()->delete(zbx_objectValues($discoveredHosts, 'hostid'), true);
 		}
 
 		// delete group prototypes and discovered groups
@@ -1302,7 +1302,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT gp.group_prototypeid FROM group_prototype gp WHERE '.dbConditionInt('templateid', $groupPrototypeIds)
 		));
 		if ($groupPrototypeChildren) {
-			$this->deleteGroupPrototypes(array_column($groupPrototypeChildren, 'group_prototypeid'));
+			$this->deleteGroupPrototypes(zbx_objectValues($groupPrototypeChildren, 'group_prototypeid'));
 		}
 
 		// delete discovered groups
@@ -1310,7 +1310,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT groupid FROM group_discovery WHERE '.dbConditionInt('parent_group_prototypeid', $groupPrototypeIds)
 		));
 		if ($hostGroups) {
-			API::HostGroup()->delete(array_column($hostGroups, 'groupid'), true);
+			API::HostGroup()->delete(zbx_objectValues($hostGroups, 'groupid'), true);
 		}
 
 		// delete group prototypes

@@ -709,7 +709,7 @@ class CHost extends CHostGeneral {
 	 */
 	public function update($hosts) {
 		$hosts = zbx_toArray($hosts);
-		$hostids = array_column($hosts, 'hostid');
+		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		$db_hosts = $this->get([
 			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
@@ -801,7 +801,7 @@ class CHost extends CHostGeneral {
 	 */
 	public function massAdd(array $data) {
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : [];
-		$hostIds = array_column($hosts, 'hostid');
+		$hostIds = zbx_objectValues($hosts, 'hostid');
 
 		$this->checkPermissions($hostIds, _('You do not have permission to perform this operation.'));
 
@@ -851,7 +851,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$hosts = zbx_toArray($data['hosts']);
-		$inputHostIds = array_column($hosts, 'hostid');
+		$inputHostIds = zbx_objectValues($hosts, 'hostid');
 		$hostids = array_unique($inputHostIds);
 
 		sort($hostids);
@@ -1025,7 +1025,7 @@ class CHost extends CHostGeneral {
 		 * Update template linkage
 		 */
 		if (isset($updateTemplatesClear)) {
-			$templateIdsClear = array_column($updateTemplatesClear, 'templateid');
+			$templateIdsClear = zbx_objectValues($updateTemplatesClear, 'templateid');
 
 			if ($updateTemplatesClear) {
 				$this->massRemove(['hostids' => $hostids, 'templateids_clear' => $templateIdsClear]);
@@ -1044,7 +1044,7 @@ class CHost extends CHostGeneral {
 			]);
 
 			$hostTemplateids = array_keys($hostTemplates);
-			$newTemplateids = array_column($updateTemplates, 'templateid');
+			$newTemplateids = zbx_objectValues($updateTemplates, 'templateid');
 
 			$templatesToDel = array_diff($hostTemplateids, $newTemplateids);
 			$templatesToDel = array_diff($templatesToDel, $templateIdsClear);
@@ -1192,8 +1192,8 @@ class CHost extends CHostGeneral {
 				'output' => ['groupid'],
 				'hostids' => $hostids
 			]);
-			$hostGroupIds = array_column($hostGroups, 'groupid');
-			$newGroupIds = array_column($updateGroups, 'groupid');
+			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
+			$newGroupIds = zbx_objectValues($updateGroups, 'groupid');
 
 			$groupsToAdd = array_diff($newGroupIds, $hostGroupIds);
 			if ($groupsToAdd) {
@@ -1773,7 +1773,7 @@ class CHost extends CHostGeneral {
 				);
 			}
 
-			$groupids = array_merge($groupids, array_column($host['groups'], 'groupid'));
+			$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
 
 			// Validate tags.
 			if (array_key_exists('tags', $host)) {
@@ -1817,7 +1817,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		$inventory_fields = array_column(getHostInventories(), 'db_field');
+		$inventory_fields = zbx_objectValues(getHostInventories(), 'db_field');
 
 		$valid_inventory_modes = [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC];
 		$inventory_mode = new CLimitedSetValidator([
@@ -1957,7 +1957,7 @@ class CHost extends CHostGeneral {
 			// Permissions to host groups is validated in massUpdate().
 		}
 
-		$inventory_fields = array_column(getHostInventories(), 'db_field');
+		$inventory_fields = zbx_objectValues(getHostInventories(), 'db_field');
 
 		$valid_inventory_modes = [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC];
 		$inventory_mode = new CLimitedSetValidator([

@@ -278,7 +278,7 @@ elseif ((hasRequest('delete') && hasRequest('screenid'))
 		uncheckTableRows($parent_id);
 	}
 	else {
-		uncheckTableRows($parent_id, array_column($screens, 'screenid'));
+		uncheckTableRows($parent_id, zbx_objectValues($screens, 'screenid'));
 	}
 	show_messages($result, _('Screen deleted'), _('Cannot delete screen'));
 }

@@ -59,7 +59,7 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 
 		if ($ret) {
 			$steps = $this->getInput('steps');
-			$prepr_types = array_column($steps, 'type');
+			$prepr_types = zbx_objectValues($steps, 'type');
 			$this->preproc_item = self::getPreprocessingItemType($this->getInput('test_type'));
 			$this->use_prev_value = (count(array_intersect($prepr_types, self::$preproc_steps_using_prev_value)) > 0);
 			$this->show_final_result = ($this->getInput('show_final_result') == 1);

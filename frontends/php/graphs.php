@@ -306,7 +306,7 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 				'editable' => true
 			]);
 
-			uncheckTableRows(getRequest('parent_discoveryid'), array_column($graphs, 'graphid'));
+			uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($graphs, 'graphid'));
 		}
 		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
 	}
@@ -323,7 +323,7 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 				'editable' => true
 			]);
 
-			uncheckTableRows($hostId, array_column($graphs, 'graphid'));
+			uncheckTableRows($hostId, zbx_objectValues($graphs, 'graphid'));
 		}
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
@@ -550,7 +550,7 @@ elseif (isset($_REQUEST['form'])) {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'flags'],
 			'selectHosts' => ['hostid', 'name'],
-			'itemids' => array_column($data['items'], 'itemid'),
+			'itemids' => zbx_objectValues($data['items'], 'itemid'),
 			'filter' => [
 				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 			],
@@ -683,7 +683,7 @@ else {
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
 			'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
-			'graphids' => array_column($data['graphs'], 'graphid')
+			'graphids' => zbx_objectValues($data['graphs'], 'graphid')
 		];
 
 		$data['graphs'] = hasRequest('parent_discoveryid')

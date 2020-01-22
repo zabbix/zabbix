@@ -255,7 +255,7 @@ class CConfigurationExport {
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 			]);
 
-			$options['hosts'] = array_column($hosts, 'hostid');
+			$options['hosts'] = zbx_objectValues($hosts, 'hostid');
 		}
 
 		return $options;
@@ -624,7 +624,7 @@ class CConfigurationExport {
 			'selectApplicationPrototypes' => ['name'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-			'discoveryids' => array_column($items, 'itemid'),
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true
 		]);
@@ -705,7 +705,7 @@ class CConfigurationExport {
 
 		// gather graph prototypes
 		$graphs = API::GraphPrototype()->get([
-			'discoveryids' => array_column($items, 'itemid'),
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
@@ -728,7 +728,7 @@ class CConfigurationExport {
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type'],
 			'selectTags' => ['tag', 'value'],
-			'discoveryids' => array_column($items, 'itemid'),
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true
 		]);
@@ -741,7 +741,7 @@ class CConfigurationExport {
 
 		// gather host prototypes
 		$hostPrototypes = API::HostPrototype()->get([
-			'discoveryids' => array_column($items, 'itemid'),
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
@@ -1012,7 +1012,7 @@ class CConfigurationExport {
 		$itemids = [];
 
 		foreach ($triggers as $trigger) {
-			$itemids = array_merge($itemids, array_column($trigger['items'], 'itemid'));
+			$itemids = array_merge($itemids, zbx_objectValues($trigger['items'], 'itemid'));
 		}
 
 		$items = API::Item()->get([
@@ -1084,7 +1084,7 @@ class CConfigurationExport {
 
 		$images = API::Image()->get([
 			'output' => ['imageid', 'name', 'imagetype'],
-			'sysmapids' => array_column($sysmaps, 'sysmapid'),
+			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
 			'select_image' => true,
 			'preservekeys' => true
 		]);

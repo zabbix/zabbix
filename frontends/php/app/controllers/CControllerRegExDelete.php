@@ -59,7 +59,7 @@ class CControllerRegExDelete extends CController {
 
 	protected function doAction() {
 		DBstart();
-		$regexpids = array_column($this->db_regexes, 'regexpid');
+		$regexpids = zbx_objectValues($this->db_regexes, 'regexpid');
 		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regexpids));
 
 		if ($result) {

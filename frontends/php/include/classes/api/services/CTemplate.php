@@ -540,7 +540,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->updateTags($templates, 'templateid');
 
-		return ['templateids' => array_column($templates, 'templateid')];
+		return ['templateids' => zbx_objectValues($templates, 'templateid')];
 	}
 
 	/**
@@ -553,7 +553,7 @@ class CTemplate extends CHostGeneral {
 	protected function validateUpdate(array $templates) {
 		$dbTemplates = $this->get([
 			'output' => ['templateid'],
-			'templateids' => array_column($templates, 'templateid'),
+			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -778,13 +778,13 @@ class CTemplate extends CHostGeneral {
 	 */
 	public function massAdd(array $data) {
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : [];
-		$templateIds = array_column($templates, 'templateid');
+		$templateIds = zbx_objectValues($templates, 'templateid');
 
 		$this->checkPermissions($templateIds, _('No permissions to referred object or it does not exist!'));
 
 		// link hosts to the given templates
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
-			$hostIds = array_column($data['hosts'], 'hostid');
+			$hostIds = zbx_objectValues($data['hosts'], 'hostid');
 
 			$this->checkHostPermissions($hostIds);
 
@@ -824,7 +824,7 @@ class CTemplate extends CHostGeneral {
 		$this->validateMassUpdate($data);
 
 		$templates = zbx_toArray($data['templates']);
-		$templateIds = array_column($templates, 'templateid');
+		$templateIds = zbx_objectValues($templates, 'templateid');
 
 		$fieldsToUpdate = [];
 
@@ -855,7 +855,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$data['templates_clear'] = isset($data['templates_clear']) ? zbx_toArray($data['templates_clear']) : [];
-		$templateIdsClear = array_column($data['templates_clear'], 'templateid');
+		$templateIdsClear = zbx_objectValues($data['templates_clear'], 'templateid');
 
 		if ($data['templates_clear']) {
 			$this->massRemove([
@@ -877,8 +877,8 @@ class CTemplate extends CHostGeneral {
 				'templated_hosts' => true,
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 			]);
-			$templateHostIds = array_column($templateHosts, 'hostid');
-			$newHostIds = array_column($data['hosts'], 'hostid');
+			$templateHostIds = zbx_objectValues($templateHosts, 'hostid');
+			$newHostIds = zbx_objectValues($data['hosts'], 'hostid');
 
 			$hostsToDelete = array_diff($templateHostIds, $newHostIds);
 			$hostIdsToDelete = array_diff($hostsToDelete, $templateIdsClear);
@@ -901,8 +901,8 @@ class CTemplate extends CHostGeneral {
 				'output' => ['templateid'],
 				'hostids' => $templateIds
 			]);
-			$templateTemplateIds = array_column($templateTemplates, 'templateid');
-			$newTemplateIds = array_column($data['templates_link'], 'templateid');
+			$templateTemplateIds = zbx_objectValues($templateTemplates, 'templateid');
+			$newTemplateIds = zbx_objectValues($data['templates_link'], 'templateid');
 
 			$templatesToDelete = array_diff($templateTemplateIds, $newTemplateIds);
 			$templateIdsToDelete = array_diff($templatesToDelete, $templateIdsClear);
@@ -967,8 +967,8 @@ class CTemplate extends CHostGeneral {
 				'output' => ['groupid'],
 				'templateids' => $templateIds
 			]);
-			$templateGroupIds = array_column($templateGroups, 'groupid');
-			$newGroupIds = array_column($updateGroups, 'groupid');
+			$templateGroupIds = zbx_objectValues($templateGroups, 'groupid');
+			$newGroupIds = zbx_objectValues($updateGroups, 'groupid');
 
 			$groupsToAdd = array_diff($newGroupIds, $templateGroupIds);
 			if ($groupsToAdd) {
@@ -1006,7 +1006,7 @@ class CTemplate extends CHostGeneral {
 
 		$dbTemplates = $this->get([
 			'output' => ['templateid', 'host'],
-			'templateids' => array_column($templates, 'templateid'),
+			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);

@@ -511,7 +511,8 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			}
 			unset($item['itemid']);
 			$item['hostid'] = $dstHost['hostid'];
-			$item['applications'] = get_same_applications_for_host(array_column($item['applications'], 'applicationid'),
+			$item['applications'] = get_same_applications_for_host(
+				zbx_objectValues($item['applications'], 'applicationid'),
 				$dstHost['hostid']
 			);
 
@@ -653,9 +654,7 @@ function copyItems($srcHostId, $dstHostId) {
 		unset($srcItem['itemid']);
 		unset($srcItem['templateid']);
 		$srcItem['hostid'] = $dstHostId;
-		$srcItem['applications'] = get_same_applications_for_host(
-			array_column($srcItem['applications'], 'applicationid'), $dstHostId
-		);
+		$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
 
 		if (!$srcItem['preprocessing']) {
 			unset($srcItem['preprocessing']);

@@ -77,8 +77,8 @@ abstract class CHostGeneral extends CHostBase {
 	 * @return array
 	 */
 	public function massAdd(array $data) {
-		$hostIds = array_column($data['hosts'], 'hostid');
-		$templateIds = array_column($data['templates'], 'templateid');
+		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
+		$templateIds = zbx_objectValues($data['templates'], 'templateid');
 
 		$allHostIds = array_merge($hostIds, $templateIds);
 
@@ -95,7 +95,7 @@ abstract class CHostGeneral extends CHostBase {
 		if (!empty($data['templates_link'])) {
 			$this->checkHostPermissions($allHostIds);
 
-			$this->link(array_column(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
+			$this->link(zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
 		}
 
 		// create macros
@@ -157,7 +157,7 @@ abstract class CHostGeneral extends CHostBase {
 					'macro' => $data['macros']
 				]
 			]);
-			$hostMacroIds = array_column($hostMacros, 'hostmacroid');
+			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
 			API::UserMacro()->delete($hostMacroIds);
 		}
 
@@ -487,7 +487,7 @@ abstract class CHostGeneral extends CHostBase {
 				));
 
 				if ($application_prototypes) {
-					$application_prototypeids = array_column($application_prototypes, 'application_prototypeid');
+					$application_prototypeids = zbx_objectValues($application_prototypes, 'application_prototypeid');
 
 					DB::update('application_prototype', [
 						'values' => ['templateid' => 0],
@@ -591,12 +591,12 @@ abstract class CHostGeneral extends CHostBase {
 		if ($applicationTemplates) {
 			// unlink applications from templates
 			DB::delete('application_template', [
-				'application_templateid' => array_column($applicationTemplates, 'application_templateid')
+				'application_templateid' => zbx_objectValues($applicationTemplates, 'application_templateid')
 			]);
 
 			if ($clear) {
 				// Delete inherited applications that are no longer linked to any templates and items.
-				$applicationids = array_column($applicationTemplates, 'applicationid');
+				$applicationids = zbx_objectValues($applicationTemplates, 'applicationid');
 
 				$applications = DBfetchArray(DBselect(
 					'SELECT a.applicationid'.
@@ -611,7 +611,7 @@ abstract class CHostGeneral extends CHostBase {
 						')'
 				));
 				if ($applications) {
-					$result = API::Application()->delete(array_column($applications, 'applicationid'), true);
+					$result = API::Application()->delete(zbx_objectValues($applications, 'applicationid'), true);
 					if (!$result) {
 						self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications.'));
 					}

@@ -46,7 +46,7 @@ if ($data['display_interfaces']) {
 	$interfaces_combo_box->addItem(new CComboItem(0, '', false, false));
 
 	// Set up interface groups sorted by priority.
-	$interface_types = array_column($data['hosts']['interfaces'], 'type');
+	$interface_types = zbx_objectValues($data['hosts']['interfaces'], 'type');
 	$interface_groups = [];
 
 	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {

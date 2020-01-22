@@ -596,7 +596,7 @@ class CMapHelper {
 			]);
 
 			$new_selementid = (count($sysmap['selements']) > 0)
-				? (int) max(array_column($sysmap['selements'], 'selementid'))
+				? (int) max(zbx_objectValues($sysmap['selements'], 'selementid'))
 				: 0;
 
 			$new_linkid = (count($sysmap['links']) > 0) ? (int) max(array_keys($sysmap['links'])) : 0;

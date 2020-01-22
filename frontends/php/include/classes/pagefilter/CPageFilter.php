@@ -449,7 +449,7 @@ class CPageFilter {
 
 					if ($hosts) {
 						$host = reset($hosts);
-						$groupids = array_column($host['groups'], 'groupid');
+						$groupids = zbx_objectValues($host['groups'], 'groupid');
 					}
 					else {
 						$templates = API::Template()->get([
@@ -459,7 +459,7 @@ class CPageFilter {
 						]);
 
 						$template = reset($templates);
-						$groupids = array_column($template['groups'], 'groupid');
+						$groupids = zbx_objectValues($template['groups'], 'groupid');
 					}
 
 					// Set first possible group (ordered by ID, not names), if found in list. Leave 0 (NONE) otherwise.

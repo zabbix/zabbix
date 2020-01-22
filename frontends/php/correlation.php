@@ -100,7 +100,7 @@ if (hasRequest('action')) {
 	]);
 
 	if (count($correlations) != count(getRequest('g_correlationid'))) {
-		uncheckTableRows(null, array_column($correlations, 'correlationid'));
+		uncheckTableRows(null, zbx_objectValues($correlations, 'correlationid'));
 	}
 }
 
@@ -166,7 +166,7 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 		$conditions = getRequest('conditions', []);
 
 		// Add formulaid to new condition, so we can sort conditions.
-		$used_formulaids = array_column($conditions, 'formulaid');
+		$used_formulaids = zbx_objectValues($conditions, 'formulaid');
 		$new_condition['formulaid'] = CConditionHelper::getNextFormulaId($used_formulaids);
 		$used_formulaids[] = $new_condition['formulaid'];
 

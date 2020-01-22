@@ -328,7 +328,7 @@ class CImage extends CApiService {
 			}
 		}
 
-		return ['imageids' => array_column($images, 'imageid')];
+		return ['imageids' => zbx_objectValues($images, 'imageid')];
 	}
 
 	/**
@@ -447,7 +447,7 @@ class CImage extends CApiService {
 		// check existing names
 		$dbImages = API::getApiService()->select($this->tableName(), [
 			'output' => ['name'],
-			'filter' => ['name' => array_column($images, 'name')],
+			'filter' => ['name' => zbx_objectValues($images, 'name')],
 			'limit' => 1
 		]);
 
@@ -478,7 +478,7 @@ class CImage extends CApiService {
 		}
 
 		$dbImages = API::getApiService()->select($this->tableName(), [
-			'filter' => ['imageid' => array_column($images, 'imageid')],
+			'filter' => ['imageid' => zbx_objectValues($images, 'imageid')],
 			'output' => ['imageid', 'name'],
 			'preservekeys' => true
 		]);

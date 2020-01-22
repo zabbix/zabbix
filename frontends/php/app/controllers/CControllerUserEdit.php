@@ -129,7 +129,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['alias'] = $this->user['alias'];
 			$data['name'] = $this->user['name'];
 			$data['surname'] = $this->user['surname'];
-			$user_groups = array_column($this->user['usrgrps'], 'usrgrpid');
+			$user_groups = zbx_objectValues($this->user['usrgrps'], 'usrgrpid');
 			$data['change_password'] = $this->hasInput('change_password') || $this->hasInput('password1');
 			$data['password1'] = '';
 			$data['password2'] = '';

@@ -1994,7 +1994,7 @@ class CConfigurationImport {
 		$processedHostIds = array_flip($processedHostIds);
 
 		foreach ($triggersToDelete as $triggerId => $trigger) {
-			$triggerHostIds = array_column($trigger['hosts'], 'hostid', 'hostid');
+			$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
 			if (!array_diff_key($triggerHostIds, $processedHostIds)) {
 				$triggerIdsToDelete[] = $triggerId;
 			}
@@ -2065,7 +2065,7 @@ class CConfigurationImport {
 		$processedHostIds = array_flip($processedHostIds);
 
 		foreach ($graphsToDelete as $graphId => $graph) {
-			$graphHostIds = array_column($graph['hosts'], 'hostid', 'hostid');
+			$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
 
 			if (!array_diff_key($graphHostIds, $processedHostIds)) {
 				$graphIdsToDelete[] = $graphId;

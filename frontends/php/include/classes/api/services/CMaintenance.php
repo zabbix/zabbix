@@ -335,7 +335,7 @@ class CMaintenance extends CApiService {
 		// validate if maintenance name already exists
 		$dbMaintenances = $this->get([
 			'output' => ['name'],
-			'filter' => ['name' => array_column($maintenances, 'name')],
+			'filter' => ['name' => zbx_objectValues($maintenances, 'name')],
 			'nopermissions' => true,
 			'limit' => 1
 		]);
@@ -522,7 +522,7 @@ class CMaintenance extends CApiService {
 		}
 
 		$maintenances = zbx_toArray($maintenances);
-		$maintenanceids = array_column($maintenances, 'maintenanceid');
+		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
 
 		if (!$maintenances) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));

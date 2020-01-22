@@ -459,7 +459,7 @@ class CCorrelation extends CApiService {
 			DB::save('corr_operation', $operations_to_create);
 		}
 
-		return ['correlationids' => array_column($correlations, 'correlationid')];
+		return ['correlationids' => zbx_objectValues($correlations, 'correlationid')];
 	}
 
 	/**
@@ -553,7 +553,7 @@ class CCorrelation extends CApiService {
 		// Check if correlation already exists.
 		$db_correlations = API::getApiService()->select('correlation', [
 			'output' => ['name'],
-			'filter' => ['name' => array_column($correlations, 'name')],
+			'filter' => ['name' => zbx_objectValues($correlations, 'name')],
 			'limit' => 1
 		]);
 
@@ -704,7 +704,7 @@ class CCorrelation extends CApiService {
 			'output' => ['correlationid', 'name', 'description', 'status'],
 			'selectFilter' => ['formula', 'eval_formula', 'evaltype', 'conditions'],
 			'selectOperations' => ['type'],
-			'correlationids' => array_column($correlations, 'correlationid'),
+			'correlationids' => zbx_objectValues($correlations, 'correlationid'),
 			'preservekeys' => true
 		]);
 
@@ -746,7 +746,7 @@ class CCorrelation extends CApiService {
 			// Check if correlation already exists.
 			$db_correlation_names = API::getApiService()->select('correlation', [
 				'output' => ['correlationid', 'name'],
-				'filter' => ['name' => array_column($check_names, 'name')]
+				'filter' => ['name' => zbx_objectValues($check_names, 'name')]
 			]);
 			$db_correlation_names = zbx_toHash($db_correlation_names, 'name');
 
@@ -1246,7 +1246,7 @@ class CCorrelation extends CApiService {
 		}
 
 		$conditions = zbx_toHash($correlation['filter']['conditions'], 'formulaid');
-		$constants = array_unique(array_column($parser->constants, 'value'));
+		$constants = array_unique(zbx_objectValues($parser->constants, 'value'));
 
 		foreach ($constants as $constant) {
 			if (!array_key_exists($constant, $conditions)) {

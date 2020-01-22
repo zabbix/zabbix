@@ -125,7 +125,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 							break;
 
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
-							foreach (array_column($selement['elements'], 'triggerid') as $triggerid) {
+							foreach (zbx_objectValues($selement['elements'], 'triggerid') as $triggerid) {
 								$problems_per_trigger[$triggerid] = $this->problems_per_severity_tpl;
 							}
 							break;
@@ -140,7 +140,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			}
 
 			// Select lowest severity to reduce amount of data returned by API.
-			$severity_min = min(array_column($sysmaps, 'severity_min'));
+			$severity_min = min(zbx_objectValues($sysmaps, 'severity_min'));
 
 			// Get triggers related to host groups.
 			if ($host_groups) {
@@ -241,7 +241,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 						// Count problems occurred in triggers which are related to links.
 						foreach ($map['links'] as $link) {
 							$uncounted_problem_triggers = array_diff_key(
-								array_column($link['linktriggers'], 'triggerid', 'triggerid'),
+								array_flip(zbx_objectValues($link['linktriggers'], 'triggerid')),
 								$problems_counted
 							);
 
@@ -304,7 +304,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$problems = $this->problems_per_severity_tpl;
 				$uncounted_problem_triggers = array_diff_key(
-					array_column($selement['elements'], 'triggerid', 'triggerid'),
+					array_flip(zbx_objectValues($selement['elements'], 'triggerid')),
 					$problems_counted
 				);
 				foreach ($uncounted_problem_triggers as $triggerid => $var) {
@@ -376,7 +376,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 							foreach ($sysmaps[$sysmapid]['links'] as $link) {
 								if ($link['permission'] >= PERM_READ) {
 									$uncounted_problem_triggers = array_diff_key(
-										array_column($link['linktriggers'], 'triggerid', 'triggerid'),
+										array_flip(zbx_objectValues($link['linktriggers'], 'triggerid')),
 										$problems_counted
 									);
 									foreach ($uncounted_problem_triggers as $triggerid => $var) {

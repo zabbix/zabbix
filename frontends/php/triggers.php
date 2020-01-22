@@ -178,7 +178,7 @@ if ($triggerIds) {
 	]);
 
 	if (count($triggers) != count($triggerIds)) {
-		uncheckTableRows(getRequest('checkbox_hash'), array_column($triggers, 'triggerid'));
+		uncheckTableRows(getRequest('checkbox_hash'), zbx_objectValues($triggers, 'triggerid'));
 	}
 }
 

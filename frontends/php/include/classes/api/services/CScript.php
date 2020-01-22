@@ -304,7 +304,7 @@ class CScript extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT, $scripts, $db_scripts);
 
-		return ['scriptids' => array_column($scripts, 'scriptid')];
+		return ['scriptids' => zbx_objectValues($scripts, 'scriptid')];
 	}
 
 	/**
@@ -338,7 +338,7 @@ class CScript extends CApiService {
 			'output' => ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid', 'groupid',
 				'host_access', 'confirmation'
 			],
-			'scriptids' => array_column($scripts, 'scriptid'),
+			'scriptids' => zbx_objectValues($scripts, 'scriptid'),
 			'preservekeys' => true
 		]);
 

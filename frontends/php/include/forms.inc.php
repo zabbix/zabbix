@@ -1119,7 +1119,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 				// Merge form submitted data with data existing in DB to find diff and correctly display ListBox.
 				$data['application_prototypes'] = array_unique(
-					zbx_array_merge($data['application_prototypes'], array_column($application_prototypes, 'name'))
+					zbx_array_merge($data['application_prototypes'], zbx_objectValues($application_prototypes, 'name'))
 				);
 			}
 		}

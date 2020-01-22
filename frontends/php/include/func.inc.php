@@ -1010,8 +1010,8 @@ function zbx_is_int($var) {
  * @return array
  */
 function zbx_array_diff(array $primary, array $secondary, $field) {
-	$fields1 = array_column($primary, $field);
-	$fields2 = array_column($secondary, $field);
+	$fields1 = zbx_objectValues($primary, $field);
+	$fields2 = zbx_objectValues($secondary, $field);
 
 	$first = array_diff($fields1, $fields2);
 	$first = zbx_toHash($first);
@@ -1379,6 +1379,34 @@ function zbx_toArray($value) {
 	}
 	else {
 		$result = [$value];
+	}
+
+	return $result;
+}
+
+// value OR object OR array of objects TO an array
+function zbx_objectValues($value, $field) {
+	if (is_null($value)) {
+		return $value;
+	}
+
+	if (!is_array($value)) {
+		$result = [$value];
+	}
+	elseif (isset($value[$field])) {
+		$result = [$value[$field]];
+	}
+	else {
+		$result = [];
+
+		foreach ($value as $val) {
+			if (!is_array($val)) {
+				$result[] = $val;
+			}
+			elseif (isset($val[$field])) {
+				$result[] = $val[$field];
+			}
+		}
 	}
 
 	return $result;

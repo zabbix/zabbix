@@ -1037,7 +1037,7 @@ function getInheritedMacros(array $hostids) {
 			$hosts[$hostid] = [
 				'templateid' => $hostid,
 				'name' => $db_template['name'],
-				'templateids' => array_column($db_template['parentTemplates'], 'templateid'),
+				'templateids' => zbx_objectValues($db_template['parentTemplates'], 'templateid'),
 				'macros' => []
 			];
 

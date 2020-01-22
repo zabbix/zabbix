@@ -233,7 +233,7 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 			}
 		}
 
-		$usedFormulaIds = array_column($conditions, 'formulaid');
+		$usedFormulaIds = zbx_objectValues($conditions, 'formulaid');
 
 		if (isset($newCondition['value'])) {
 			$newConditionValues = zbx_toArray($newCondition['value']);
@@ -430,7 +430,7 @@ if (hasRequest('action') && hasRequest('g_actionid') && !$result) {
 		'output' => [],
 		'editable' => true
 	]);
-	uncheckTableRows(null, array_column($actions, 'actionid'));
+	uncheckTableRows(null, zbx_objectValues($actions, 'actionid'));
 }
 
 /*

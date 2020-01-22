@@ -210,7 +210,7 @@ class CValueMap extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $valuemaps, $db_valuemaps);
 
-		return ['valuemapids' => array_column($valuemaps, 'valuemapid')];
+		return ['valuemapids' => zbx_objectValues($valuemaps, 'valuemapid')];
 	}
 
 	/**
@@ -298,7 +298,7 @@ class CValueMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(array_column($valuemaps, 'name'));
+		$this->checkDuplicates(zbx_objectValues($valuemaps, 'name'));
 	}
 
 	/**
@@ -327,7 +327,7 @@ class CValueMap extends CApiService {
 		// Check value map names.
 		$db_valuemaps = DB::select('valuemaps', [
 			'output' => ['valuemapid', 'name'],
-			'valuemapids' => array_column($valuemaps, 'valuemapid'),
+			'valuemapids' => zbx_objectValues($valuemaps, 'valuemapid'),
 			'preservekeys' => true
 		]);
 

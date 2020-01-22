@@ -192,7 +192,7 @@ class CIconMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(array_column($iconmaps, 'name'));
+		$this->checkDuplicates(zbx_objectValues($iconmaps, 'name'));
 		$this->checkMappings($iconmaps);
 		$this->checkIcons($iconmaps);
 	}
@@ -236,7 +236,7 @@ class CIconMap extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ICON_MAP, $iconmaps, $db_iconmaps);
 
-		return ['iconmapids' => array_column($iconmaps, 'iconmapid')];
+		return ['iconmapids' => zbx_objectValues($iconmaps, 'iconmapid')];
 	}
 
 	/**
@@ -266,7 +266,7 @@ class CIconMap extends CApiService {
 
 		$db_iconmaps = DB::select('icon_map', [
 			'output' => ['iconmapid', 'name', 'default_iconid'],
-			'iconmapids' => array_column($iconmaps, 'iconmapid'),
+			'iconmapids' => zbx_objectValues($iconmaps, 'iconmapid'),
 			'preservekeys' => true
 		]);
 

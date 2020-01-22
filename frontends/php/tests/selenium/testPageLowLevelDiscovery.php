@@ -144,7 +144,7 @@ class testPageLowLevelDiscovery extends CLegacyWebTest {
 			' WHERE hostid='.$rule['hostid'].
 				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE
 		);
-		$hostids = array_column($hostids, 'hostids');
+		$hostids = zbx_objectValues($hostids, 'hostids');
 
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');

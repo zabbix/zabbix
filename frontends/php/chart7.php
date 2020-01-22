@@ -60,7 +60,7 @@ CArrayHelper::sort($items, ['sortorder']);
  * Permissions
  */
 $dbItems = API::Item()->get([
-	'itemids' => array_column($items, 'itemid'),
+	'itemids' => zbx_objectValues($items, 'itemid'),
 	'filter' => [
 		'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 	],

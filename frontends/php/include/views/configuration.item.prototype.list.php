@@ -116,7 +116,7 @@ foreach ($data['items'] as $item) {
 	if (!empty($item['applications'])) {
 		order_result($item['applications'], 'name');
 
-		$applications = array_column($item['applications'], 'name');
+		$applications = zbx_objectValues($item['applications'], 'name');
 		$applications = implode(', ', $applications);
 		if (empty($applications)) {
 			$applications = '';

@@ -142,7 +142,7 @@ class CControllerUserList extends CController {
 		$db_sessions = DBselect(
 			'SELECT s.userid,MAX(s.lastaccess) AS lastaccess,s.status'.
 			' FROM sessions s'.
-			' WHERE '.dbConditionInt('s.userid', array_column($data['users'], 'userid')).
+			' WHERE '.dbConditionInt('s.userid', zbx_objectValues($data['users'], 'userid')).
 			' GROUP BY s.userid,s.status'
 		);
 		while ($db_session = DBfetch($db_sessions)) {

@@ -91,7 +91,7 @@ class CApplicationManager {
 			$dbApplicationTemplates = DBfetchArray(DBselect(
 				'SELECT * '.
 				' FROM application_template at'.
-				' WHERE '.dbConditionInt('at.applicationid', array_column($applications, 'applicationid'))
+				' WHERE '.dbConditionInt('at.applicationid', zbx_objectValues($applications, 'applicationid'))
 			));
 			DB::replace('application_template', $dbApplicationTemplates, $applicationTemplates);
 		}
@@ -231,7 +231,7 @@ class CApplicationManager {
 			'SELECT ia.itemid,ia.applicationid'.
 			' FROM items_applications ia'.
 			' WHERE '.dbConditionInt('ia.applicationid', $appIdPairs).
-				' AND '.dbConditionInt('ia.itemid', array_column($itemApps, 'itemid'))
+				' AND '.dbConditionInt('ia.itemid', zbx_objectValues($itemApps, 'itemid'))
 		);
 		$exItemAppIds = [];
 		while ($row = DBfetch($query)) {
@@ -368,7 +368,7 @@ class CApplicationManager {
 		$dbCursor = DBselect(
 			'SELECT ht.templateid,ht.hostid'.
 			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionInt('ht.templateid', array_column($applications, 'hostid')).
+			' WHERE '.dbConditionInt('ht.templateid', zbx_objectValues($applications, 'hostid')).
 				($hostIds ? ' AND '.dbConditionInt('ht.hostid', $hostIds) : '')
 		);
 		while ($dbHost = DBfetch($dbCursor)) {
@@ -448,7 +448,7 @@ class CApplicationManager {
 						? $existingApplication['applicationTemplates']
 						: [];
 
-					$applicationTemplateIds = array_column($newApplication['applicationTemplates'], 'templateid');
+					$applicationTemplateIds = zbx_objectValues($newApplication['applicationTemplates'], 'templateid');
 
 					if (!in_array($applicationId, $applicationTemplateIds)) {
 						$newApplication['applicationTemplates'][] = [

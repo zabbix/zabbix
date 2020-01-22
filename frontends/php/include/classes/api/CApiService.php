@@ -684,7 +684,7 @@ class CApiService {
 		if ($objects) {
 			$dbObjects = API::getApiService()->select($tableName, [
 				'output' => $fields,
-				$this->pkOption($tableName) => array_column($objects, $this->pk($tableName)),
+				$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
 				'preservekeys' => true
 			]);
 

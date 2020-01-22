@@ -448,7 +448,7 @@ class CMediatype extends CApiService {
 			_('Incorrect media type ID.')
 		);
 
-		$mediatypeids = array_column($mediatypes, 'mediatypeid');
+		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
 
 		// Check value map names.
 		$db_mediatypes = API::getApiService()->select('media_type', [
@@ -931,7 +931,7 @@ class CMediatype extends CApiService {
 				'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
 				'event_menu_url', 'event_menu_name', 'description'
 			],
-			'filter' => ['mediatypeid' => array_column($mediatypes, 'mediatypeid')],
+			'filter' => ['mediatypeid' => zbx_objectValues($mediatypes, 'mediatypeid')],
 			'preservekeys' => true
 		]);
 
@@ -998,7 +998,7 @@ class CMediatype extends CApiService {
 		}
 
 		DB::update('media_type', $update);
-		$mediatypeids = array_column($mediatypes, 'mediatypeid');
+		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
 
 		if ($webhooks_params) {
 			$ins_media_type_param = [];

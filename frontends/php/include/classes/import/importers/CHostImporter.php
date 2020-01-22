@@ -77,19 +77,19 @@ class CHostImporter extends CImporter {
 			$db_template_links = API::Host()->get([
 				'output' => ['hostids'],
 				'selectParentTemplates' => ['hostid'],
-				'hostids' => array_column($hostsToUpdate, 'hostid'),
+				'hostids' => zbx_objectValues($hostsToUpdate, 'hostid'),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_template_links as &$db_template_link) {
-				$db_template_link = array_column($db_template_link['parentTemplates'], 'templateid');
+				$db_template_link = zbx_objectValues($db_template_link['parentTemplates'], 'templateid');
 			}
 			unset($db_template_link);
 
 			foreach ($hostsToUpdate as $host) {
 				if (array_key_exists($host['host'], $templateLinkage)) {
 					$tmpls_to_clear[$host['hostid']] = array_diff($db_template_links[$host['hostid']],
-						array_column($templateLinkage[$host['host']], 'templateid')
+						zbx_objectValues($templateLinkage[$host['host']], 'templateid')
 					);
 				}
 				else {
@@ -244,7 +244,7 @@ class CHostImporter extends CImporter {
 	 */
 	protected function addInterfaceIds(array $xmlHosts) {
 		$dbInterfaces = API::HostInterface()->get([
-			'hostids' => array_column($xmlHosts, 'hostid'),
+			'hostids' => zbx_objectValues($xmlHosts, 'hostid'),
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		]);

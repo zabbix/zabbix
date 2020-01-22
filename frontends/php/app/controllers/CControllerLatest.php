@@ -131,7 +131,7 @@ abstract class CControllerLatest extends CController {
 				],
 				'selectApplications' => ['applicationid'],
 				'selectItemDiscovery' => ['ts_delete'],
-				'applicationids' => ($applications !== null) ? array_column($applications, 'applicationid') : null,
+				'applicationids' => ($applications !== null) ? zbx_objectValues($applications, 'applicationid') : null,
 				'webitems' => true,
 				'filter' => [
 					'status' => [ITEM_STATUS_ACTIVE]
@@ -146,7 +146,7 @@ abstract class CControllerLatest extends CController {
 			if ($applications === null) {
 				$applications = API::Application()->get([
 					'output' => ['applicationid', 'hostid', 'name'],
-					'hostids' => array_keys(array_column($items, 'hostid', 'hostid')),
+					'hostids' => array_keys(array_flip(zbx_objectValues($items, 'hostid'))),
 					'search' => ['name' => $filter['application']],
 					'preservekeys' => true
 				]);

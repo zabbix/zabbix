@@ -269,7 +269,7 @@ class CDRule extends CApiService {
 		// Check drule name duplicates in DB.
 		$db_duplicate = $this->get([
 			'output' => ['name'],
-			'filter' => ['name' => array_column($drules, 'name')],
+			'filter' => ['name' => zbx_objectValues($drules, 'name')],
 			'limit' => 1
 		]);
 
@@ -322,7 +322,7 @@ class CDRule extends CApiService {
 
 		$db_drules = $this->get([
 			'output' => ['druleid', 'name'],
-			'druleids' => array_column($drules, 'druleid'),
+			'druleids' => zbx_objectValues($drules, 'druleid'),
 			'preservekeys' => true
 		]);
 
@@ -421,7 +421,7 @@ class CDRule extends CApiService {
 			// Check drule name duplicates in DB.
 			$db_duplicate = $this->get([
 				'output' => ['name'],
-				'filter' => ['name' => array_column($drule_names_changed, 'name')],
+				'filter' => ['name' => zbx_objectValues($drule_names_changed, 'name')],
 				'limit' => 1
 			]);
 
@@ -731,7 +731,7 @@ class CDRule extends CApiService {
 	 */
 	public function update(array $drules) {
 		$drules = zbx_toArray($drules);
-		$druleids = array_column($drules, 'druleid');
+		$druleids = zbx_objectValues($drules, 'druleid');
 
 		$this->validateUpdate($drules);
 
@@ -781,8 +781,8 @@ class CDRule extends CApiService {
 				}
 
 				$del_dcheckids = array_diff(
-					array_column($db_dchecks, 'dcheckid'),
-					array_column($old_dchecks, 'dcheckid')
+					zbx_objectValues($db_dchecks, 'dcheckid'),
+					zbx_objectValues($old_dchecks, 'dcheckid')
 				);
 
 				if ($del_dcheckids) {

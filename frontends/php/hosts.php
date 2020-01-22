@@ -453,7 +453,7 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 		foreach ($hosts as &$host) {
 			if (array_key_exists('groups', $visible)) {
 				if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
-					$current_groupids = array_column($host['groups'], 'groupid');
+					$current_groupids = zbx_objectValues($host['groups'], 'groupid');
 					$host['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
 						'groupid'
 					);
@@ -462,14 +462,14 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 					$host['groups'] = zbx_toObject($new_groupids, 'groupid');
 				}
 				elseif ($remove_groupids) {
-					$current_groupids = array_column($host['groups'], 'groupid');
+					$current_groupids = zbx_objectValues($host['groups'], 'groupid');
 					$host['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
 				}
 			}
 
 			if (array_key_exists('templates', $visible)) {
 				$host_templateids = array_key_exists('parentTemplates', $host)
-					? array_column($host['parentTemplates'], 'templateid')
+					? zbx_objectValues($host['parentTemplates'], 'templateid')
 					: [];
 
 				switch (getRequest('mass_action_tpls')) {
@@ -756,7 +756,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 			]);
 
-			if ($dbTriggers && !copyTriggersToHosts(array_column($dbTriggers, 'triggerid'), $hostId, $srcHostId)) {
+			if ($dbTriggers && !copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $hostId, $srcHostId)) {
 				throw new Exception();
 			}
 
@@ -769,7 +769,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($dbDiscoveryRules) {
 				$copyDiscoveryRules = API::DiscoveryRule()->copy([
-					'discoveryids' => array_column($dbDiscoveryRules, 'itemid'),
+					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
 					'hostids' => [$hostId]
 				]);
 
@@ -846,7 +846,7 @@ elseif (hasRequest('hosts') && hasRequest('action') && getRequest('action') === 
 			'hostids' => getRequest('hosts'),
 			'editable' => true
 		]);
-		uncheckTableRows(getRequest('hostid'), array_column($hostids, 'hostid'));
+		uncheckTableRows(getRequest('hostid'), zbx_objectValues($hostids, 'hostid'));
 	}
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
@@ -860,7 +860,7 @@ elseif (hasRequest('hosts') && hasRequest('action') && str_in_array(getRequest('
 		'templated_hosts' => true,
 		'output' => ['hostid']
 	]);
-	$actHosts = array_column($actHosts, 'hostid');
+	$actHosts = zbx_objectValues($actHosts, 'hostid');
 
 	if ($actHosts) {
 		DBstart();
@@ -1045,7 +1045,7 @@ elseif (hasRequest('form')) {
 			$data['status'] = $dbHost['status'];
 
 			// Templates
-			$data['templates'] = array_column($dbHost['parentTemplates'], 'templateid');
+			$data['templates'] = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
 			$data['original_templates'] = array_combine($data['templates'], $data['templates']);
 
 			// IPMI
@@ -1098,7 +1098,7 @@ elseif (hasRequest('form')) {
 				$data['visiblename'] = '';
 			}
 
-			$groups = array_column($dbHost['groups'], 'groupid');
+			$groups = zbx_objectValues($dbHost['groups'], 'groupid');
 		}
 		else {
 			if (getRequest('groupid', 0) != 0) {
@@ -1125,7 +1125,7 @@ elseif (hasRequest('form')) {
 				$data['hostDiscovery'] = $dbHost['hostDiscovery'];
 			}
 
-			$templateids = array_column($dbHost['parentTemplates'], 'templateid');
+			$templateids = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
 			$data['original_templates'] = array_combine($templateids, $templateids);
 		}
 
@@ -1381,7 +1381,7 @@ else {
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'selectHostDiscovery' => ['ts_delete'],
 		'selectTags' => ['tag', 'value'],
-		'hostids' => array_column($hosts, 'hostid'),
+		'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'preservekeys' => true
 	]);
 	order_result($hosts, $sortField, $sortOrder);
@@ -1390,7 +1390,7 @@ else {
 	$templateids = [];
 
 	foreach ($hosts as $host) {
-		$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
+		$templateids = array_merge($templateids, zbx_objectValues($host['parentTemplates'], 'templateid'));
 	}
 
 	$templateids = array_keys(array_flip($templateids));
@@ -1406,7 +1406,7 @@ else {
 	$writable_templates = [];
 	if ($templateids) {
 		foreach ($templates as $template) {
-			$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
+			$templateids = array_merge($templateids, zbx_objectValues($template['parentTemplates'], 'templateid'));
 		}
 
 		$writable_templates = API::Template()->get([

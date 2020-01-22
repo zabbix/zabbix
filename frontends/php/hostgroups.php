@@ -215,7 +215,7 @@ elseif (hasRequest('action')) {
 			'output' => []
 		]);
 
-		uncheckTableRows(null, array_column($groups, 'groupid'));
+		uncheckTableRows(null, zbx_objectValues($groups, 'groupid'));
 	}
 }
 
@@ -314,7 +314,7 @@ else {
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $groups, $sortOrder, new CUrl('hostgroups.php'));
 
-	$groupIds = array_column($groups, 'groupid');
+	$groupIds = zbx_objectValues($groups, 'groupid');
 
 	// get hosts and templates count
 	$data['groupCounts'] = API::HostGroup()->get([

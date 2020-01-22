@@ -450,7 +450,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$this->addDependencies($trigger_prototypes);
 		}
 
-		return ['triggerids' => array_column($trigger_prototypes, 'triggerid')];
+		return ['triggerids' => zbx_objectValues($trigger_prototypes, 'triggerid')];
 	}
 
 	/**
@@ -484,7 +484,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$this->updateDependencies($trigger_prototypes);
 		}
 
-		return ['triggerids' => array_column($trigger_prototypes, 'triggerid')];
+		return ['triggerids' => zbx_objectValues($trigger_prototypes, 'triggerid')];
 	}
 
 	/**
@@ -564,7 +564,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @param string $triggerPrototypes[]['triggerid']
 	 */
 	protected function deleteDependencies(array $triggerPrototypes) {
-		$triggerPrototypeIds = array_column($triggerPrototypes, 'triggerid');
+		$triggerPrototypeIds = zbx_objectValues($triggerPrototypes, 'triggerid');
 
 		try {
 			// Delete the dependencies from the child trigger prototypes.
@@ -690,7 +690,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$dRules = $this->get([
 				'output' => ['triggerid'],
 				'selectDiscoveryRule' => ['itemid'],
-				'triggerids' => array_column($triggerPrototypes, 'triggerid'),
+				'triggerids' => zbx_objectValues($triggerPrototypes, 'triggerid'),
 				'preservekeys' => true
 			]);
 
@@ -753,7 +753,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			$triggerid_down = $triggerPrototype['triggerid'];
-			$triggerids_up = array_column($triggerPrototype['dependencies'], 'triggerid');
+			$triggerids_up = zbx_objectValues($triggerPrototype['dependencies'], 'triggerid');
 
 			foreach ($triggerids_up as $triggerid_up) {
 				if (bccomp($triggerid_down, $triggerid_up) == 0) {
@@ -769,7 +769,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				continue;
 			}
 
-			$depTriggerIds = array_column($triggerPrototype['dependencies'], 'triggerid');
+			$depTriggerIds = zbx_objectValues($triggerPrototype['dependencies'], 'triggerid');
 
 			$triggerTemplates = API::Template()->get([
 				'output' => ['hostid', 'status'],
@@ -810,7 +810,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				foreach ($downTriggerIds as $id) {
 					if (isset($triggerPrototypes[$id]) && isset($triggerPrototypes[$id]['dependencies'])) {
 						$upTriggersIds = array_merge($upTriggersIds,
-							array_column($triggerPrototypes[$id]['dependencies'], 'triggerid')
+							zbx_objectValues($triggerPrototypes[$id]['dependencies'], 'triggerid')
 						);
 					}
 				}
@@ -836,7 +836,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$depTemplateIds = array_keys($triggerDepTemplates);
 
 			// run the check only if a templated trigger has dependencies on other templates
-			$triggerTemplateIds = array_column($triggerTemplates, 'templateid', 'templateid');
+			$triggerTemplateIds = zbx_toHash(zbx_objectValues($triggerTemplates, 'templateid'));
 			$tdiff = array_diff($depTemplateIds, $triggerTemplateIds);
 
 			if (!empty($triggerTemplateIds) && !empty($depTemplateIds) && !empty($tdiff)) {

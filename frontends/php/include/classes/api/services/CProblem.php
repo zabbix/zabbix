@@ -483,9 +483,9 @@ class CProblem extends CApiService {
 					'output' => ['eventid'],
 					'filter' => ['eventid' => $suppressed_eventids]
 				]);
-				$suppressed_eventids = array_column($suppressed_events, 'eventid');
+				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
 				foreach ($result as &$problem) {
-					$problem['suppressed'] = in_array($problem['eventid'], $suppressed_eventids)
+					$problem['suppressed'] = array_key_exists($problem['eventid'], $suppressed_eventids)
 						? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
 						: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
 				}

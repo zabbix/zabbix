@@ -516,7 +516,7 @@ if (hasRequest('action') && getRequest('action') !== 'triggerprototype.massupdat
 			'editable' => true
 		]);
 
-	uncheckTableRows(getRequest('parent_discoveryid'), array_column($triggerPrototypes, 'triggerid'));
+	uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($triggerPrototypes, 'triggerid'));
 }
 
 $config = select_config();
@@ -628,7 +628,7 @@ else {
 		'selectHosts' => ['hostid', 'host'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'selectTags' => ['tag', 'value'],
-		'triggerids' => array_column($data['triggers'], 'triggerid')
+		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);
 	order_result($data['triggers'], $sortField, $sortOrder);
 

@@ -211,7 +211,7 @@ class CScreenHostTriggers extends CScreenBase {
 
 		$hostids = [];
 		foreach ($data['triggers'] as $trigger) {
-			$hostids += array_column($trigger['hosts'], 'hostid', 'hostid');
+			$hostids += $trigger['hosts'] ? array_fill_keys(zbx_objectValues($trigger['hosts'], 'hostid'), '') : [];
 		}
 
 		$hosts = API::Host()->get([

@@ -1228,7 +1228,7 @@ function make_trigger_details($trigger, $eventid) {
 
 	$config = select_config();
 
-	$hostIds = array_column($trigger['hosts'], 'hostid');
+	$hostIds = zbx_objectValues($trigger['hosts'], 'hostid');
 
 	$hosts = API::Host()->get([
 		'output' => ['name', 'hostid', 'status'],

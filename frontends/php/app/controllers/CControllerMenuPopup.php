@@ -428,7 +428,7 @@ class CControllerMenuPopup extends CController {
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$menu_data = [
 							'type' => 'map_element_trigger',
-							'triggerids' => array_column($selement['elements'], 'triggerid')
+							'triggerids' => zbx_objectValues($selement['elements'], 'triggerid')
 						];
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severity_min'] = $data['severity_min'];

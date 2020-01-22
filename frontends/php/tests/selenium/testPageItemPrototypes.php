@@ -109,7 +109,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 		$hostid = $rule['hostid'];
 
 		$itemids = CDBHelper::getAll('select itemid from item_discovery where parent_itemid='.$druleid);
-		$itemids = array_column($itemids, 'itemid');
+		$itemids = zbx_objectValues($itemids, 'itemid');
 
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');

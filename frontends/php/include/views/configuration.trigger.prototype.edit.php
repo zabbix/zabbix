@@ -550,7 +550,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
 	$depTriggerDescription = CHtml::encode(
-		implode(', ', array_column($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description']
+		implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description']
 	);
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {

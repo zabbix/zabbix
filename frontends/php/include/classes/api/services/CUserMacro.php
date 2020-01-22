@@ -275,7 +275,7 @@ class CUserMacro extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(array_column($globalmacros, 'macro'));
+		$this->checkDuplicates(zbx_objectValues($globalmacros, 'macro'));
 	}
 
 	/**
@@ -315,7 +315,7 @@ class CUserMacro extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $globalmacros, $db_globalmacros);
 
-		return ['globalmacroids' => array_column($globalmacros, 'globalmacroid')];
+		return ['globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid')];
 	}
 
 	/**
@@ -363,7 +363,7 @@ class CUserMacro extends CApiService {
 
 		$db_globalmacros = DB::select('globalmacro', [
 			'output' => ['globalmacroid', 'macro', 'value', 'description'],
-			'globalmacroids' => array_column($globalmacros, 'globalmacroid'),
+			'globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid'),
 			'preservekeys' => true
 		]);
 
@@ -478,7 +478,7 @@ class CUserMacro extends CApiService {
 			$this->checkHostId($hostmacro);
 		}
 
-		$this->checkHostPermissions(array_unique(array_column($hostmacros, 'hostid')));
+		$this->checkHostPermissions(array_unique(zbx_objectValues($hostmacros, 'hostid')));
 
 		foreach ($hostmacros as $hostmacro) {
 			$this->checkMacro($hostmacro);
@@ -532,11 +532,11 @@ class CUserMacro extends CApiService {
 
 		$db_hostmacros = API::getApiService()->select($this->tableName(), [
 			'output' => ['hostmacroid', 'hostid', 'macro'],
-			'hostmacroids' => array_column($hostmacros, 'hostmacroid')
+			'hostmacroids' => zbx_objectValues($hostmacros, 'hostmacroid')
 		]);
 
 		// Check if the macros exist in host.
-		$this->checkIfHostMacrosExistIn(array_column($hostmacros, 'hostmacroid'), $db_hostmacros);
+		$this->checkIfHostMacrosExistIn(zbx_objectValues($hostmacros, 'hostmacroid'), $db_hostmacros);
 
 		// Check the data required for authorization first.
 		foreach ($hostmacros as $hostmacro) {
@@ -544,8 +544,8 @@ class CUserMacro extends CApiService {
 		}
 
 		// Check permissions for all affected hosts.
-		$affected_hostids = array_merge(array_column($db_hostmacros, 'hostid'),
-			array_column($hostmacros, 'hostid')
+		$affected_hostids = array_merge(zbx_objectValues($db_hostmacros, 'hostid'),
+			zbx_objectValues($hostmacros, 'hostid')
 		);
 		$affected_hostids = array_unique($affected_hostids);
 		$this->checkHostPermissions($affected_hostids);
@@ -587,7 +587,7 @@ class CUserMacro extends CApiService {
 
 		DB::update('hostmacro', $data);
 
-		return ['hostmacroids' => array_column($hostmacros, 'hostmacroid')];
+		return ['hostmacroids' => zbx_objectValues($hostmacros, 'hostmacroid')];
 	}
 
 	/**
@@ -608,7 +608,7 @@ class CUserMacro extends CApiService {
 		]);
 
 		// Check permissions for all affected hosts.
-		$this->checkHostPermissions(array_unique(array_column($db_hostmacros, 'hostid')));
+		$this->checkHostPermissions(array_unique(zbx_objectValues($db_hostmacros, 'hostid')));
 
 		// Check if the macros exist in host.
 		$this->checkIfHostMacrosExistIn($hostmacroids, $db_hostmacros);
@@ -847,7 +847,7 @@ class CUserMacro extends CApiService {
 		// When updating with empty array, don't select any data from database.
 		$db_hostmacros = API::getApiService()->select($this->tableName(), [
 			'output' => ['hostmacroid', 'hostid', 'macro'],
-			'filter' => ['hostid' => array_unique(array_column($hostmacros, 'hostid'))],
+			'filter' => ['hostid' => array_unique(zbx_objectValues($hostmacros, 'hostid'))],
 			'search' => ['macro' => array_keys($macro_names)],
 			'searchByAny' => true
 		]);

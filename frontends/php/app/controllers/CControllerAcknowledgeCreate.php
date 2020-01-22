@@ -153,7 +153,7 @@ class CControllerAcknowledgeCreate extends CController {
 		if ($events) {
 			$related_problems = API::Problem()->get([
 				'output' => [],
-				'objectids' => array_keys(array_column($events, 'objectid', 'objectid')),
+				'objectids' => array_keys(array_flip(zbx_objectValues($events, 'objectid'))),
 				'preservekeys' => true
 			]);
 
