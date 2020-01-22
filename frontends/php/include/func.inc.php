@@ -1384,7 +1384,16 @@ function zbx_toArray($value) {
 	return $result;
 }
 
-// value OR object OR array of objects TO an array
+/**
+ * Converts value OR object OR array of objects TO an array.
+ *
+ * @deprecated  Use array_column() instead.
+ *
+ * @param $value
+ * @param $field
+ *
+ * @return array
+ */
 function zbx_objectValues($value, $field) {
 	if (is_null($value)) {
 		return $value;
