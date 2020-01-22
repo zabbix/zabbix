@@ -86,6 +86,7 @@ class CControllerModuleList extends CController {
 			'filter' => [
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
+			'sortfield' => 'relative_path',
 			'limit' => $config['search_limit'] + 1,
 			'preservekeys' => true
 		]);
@@ -110,6 +111,8 @@ class CControllerModuleList extends CController {
 				count($modules_missing)
 			));
 		}
+
+		order_result($modules, $sort_field, $sort_order);
 
 		$paging = getPagingLine($modules, $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', 'module.list')

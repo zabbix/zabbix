@@ -105,9 +105,6 @@ final class CModuleManager {
 
 		$this->manifests[$relative_path] = $manifest;
 
-		// Maintain sorted manifests.
-		ksort($this->manifests);
-
 		return $manifest;
 	}
 

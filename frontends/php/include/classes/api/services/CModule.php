@@ -26,7 +26,7 @@ class CModule extends CApiService {
 
 	protected $tableName = 'module';
 	protected $tableAlias = 'md';
-	protected $sortColumns = ['moduleid'];
+	protected $sortColumns = ['moduleid', 'relative_path'];
 
 	/**
 	 * Get module data.

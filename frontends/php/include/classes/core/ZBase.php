@@ -601,7 +601,8 @@ class ZBase {
 
 		$db_modules = API::Module()->get([
 			'output' => ['id', 'relative_path', 'config'],
-			'filter' => ['status' => MODULE_STATUS_ENABLED]
+			'filter' => ['status' => MODULE_STATUS_ENABLED],
+			'sortfield' => 'relative_path'
 		], false);
 
 		foreach ($db_modules as $db_module) {

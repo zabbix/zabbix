@@ -78,6 +78,7 @@ class CControllerModuleUpdate extends CController {
 
 		$db_modules = API::Module()->get([
 			'output' => ['relative_path', 'status'],
+			'sortfield' => 'relative_path',
 			'preservekeys' => true
 		]);
 

@@ -44,6 +44,7 @@ class CControllerModuleScan extends CController {
 
 		$db_modules = API::Module()->get([
 			'output' => ['relative_path'],
+			'sortfield' => 'relative_path',
 			'preservekeys' => true
 		]);
 
