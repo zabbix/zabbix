@@ -2884,7 +2884,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: table;
   position: absolute;
   z-index: 1000;
-  margin: 0 10px;
   padding: 15px 10px 10px;
   background-color: #ffffff;
   border: 1px solid #383838;
@@ -2892,7 +2891,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
   .overlay-dialogue.modal {
     position: fixed;
-    overflow: hidden; }
+    overflow: hidden;
+    margin: 0 10px; }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;
