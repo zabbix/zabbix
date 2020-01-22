@@ -48,46 +48,37 @@ $form_list = (new CFormList())
 		'row_dcheck_ports'
 	)
 	->addRow((new CLabel(_('Key'), 'key_'))->setAsteriskMark(),
-		(new CTextBox('key_', array_key_exists('key_', $data['params']) ? $data['params']['key_'] : '',
-			false, DB::getFieldLength('items', 'key_')
-		))
+		(new CTextBox('key_', $data['params']['key_'], false, DB::getFieldLength('items', 'key_')))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired(),
 		'row_dcheck_key'
 	)
 	->addRow((new CLabel(_('SNMP community'), 'snmp_community'))->setAsteriskMark(),
-		(new CTextBox('snmp_community',
-			array_key_exists('snmp_community', $data['params']) ? $data['params']['snmp_community']  : ''
-		))
+		(new CTextBox('snmp_community', $data['params']['snmp_community']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired(),
 		'row_dcheck_snmp_community'
 	)
 	->addRow((new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
-		(new CTextBox('snmp_oid', array_key_exists('key_', $data['params']) ? $data['params']['key_'] : ''))
+		(new CTextBox('snmp_oid', $data['params']['key_']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
 			->setAttribute('maxlength', 512),
 		'row_dcheck_snmp_oid'
 	)
 	->addRow(new CLabel(_('Context name'), 'snmpv3_contextname'),
-		(new CTextBox('snmpv3_contextname',
-			array_key_exists('snmpv3_contextname', $data['params']) ? $data['params']['snmpv3_contextname'] : ''
-		))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+		(new CTextBox('snmpv3_contextname', $data['params']['snmpv3_contextname']))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 		'row_dcheck_snmpv3_contextname'
 	)
 	->addRow(new CLabel(_('Security name'), 'snmpv3_securityname'),
-		(new CTextBox('snmpv3_securityname',
-			array_key_exists('snmpv3_securityname', $data['params']) ? $data['params']['snmpv3_securityname'] : ''
-		))
+		(new CTextBox('snmpv3_securityname', $data['params']['snmpv3_securityname']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAttribute('maxlength', 64),
 		'row_dcheck_snmpv3_securityname'
 	)
 	->addRow(new CLabel(_('Security level'), 'snmpv3_securitylevel'),
-		new CComboBox('snmpv3_securitylevel',
-			array_key_exists('snmpv3_securitylevel', $data['params']) ? $data['params']['snmpv3_securitylevel'] : '',
-			null, [
+		new CComboBox('snmpv3_securitylevel', $data['params']['snmpv3_securitylevel'], null, [
 				ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
 				ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
 				ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
@@ -96,35 +87,27 @@ $form_list = (new CFormList())
 		'row_dcheck_snmpv3_securitylevel'
 	)
 	->addRow(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'),
-		(new CRadioButtonList('snmpv3_authprotocol',
-			array_key_exists('snmpv3_authprotocol', $data['params']) ? $data['params']['snmpv3_authprotocol'] : ''
-		))
+		(new CRadioButtonList('snmpv3_authprotocol', $data['params']['snmpv3_authprotocol']))
 			->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
 			->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 			->setModern(true),
 		'row_dcheck_snmpv3_authprotocol'
 	)
 	->addRow(new CLabel(_('Authentication passphrase'), 'snmpv3_authpassphrase'),
-		(new CTextBox('snmpv3_authpassphrase',
-			array_key_exists('snmpv3_authpassphrase', $data['params']) ? $data['params']['snmpv3_authpassphrase'] : ''
-		))
+		(new CTextBox('snmpv3_authpassphrase', $data['params']['snmpv3_authpassphrase']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAttribute('maxlength', 64),
 		'row_dcheck_snmpv3_authpassphrase'
 	)
 	->addRow(new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol'),
-		(new CRadioButtonList('snmpv3_privprotocol',
-			array_key_exists('snmpv3_privprotocol', $data['params']) ? $data['params']['snmpv3_privprotocol'] : ''
-		))
+		(new CRadioButtonList('snmpv3_privprotocol', $data['params']['snmpv3_privprotocol']))
 			->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
 			->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 			->setModern(true),
 		'row_dcheck_snmpv3_privprotocol'
 	)
 	->addRow((new CLabel(_('Privacy passphrase'), 'snmpv3_privpassphrase'))->setAsteriskMark(),
-		(new CTextBox('snmpv3_privpassphrase',
-			array_key_exists('snmpv3_privpassphrase', $data['params']) ? $data['params']['snmpv3_privpassphrase'] : ''
-		))
+		(new CTextBox('snmpv3_privpassphrase', $data['params']['snmpv3_privpassphrase']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
 			->setAttribute('maxlength', 64),
