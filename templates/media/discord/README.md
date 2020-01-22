@@ -1,11 +1,11 @@
 
 # Discord webhook
 
-This guide describes how to integrate your Zabbix 4.4 installation with Discord using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix. 
+This guide describes how to integrate your Zabbix 4.4 installation with Discord using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Setting up Discord Webhook
 
-1\. Go to https://discordapp.com/app or open Discord Desktop application. Select your server and channel where you want to get Zabbix notifications. 
+1\. Go to https://discordapp.com/app or open Discord Desktop application. Select your server and channel where you want to get Zabbix notifications.
 
 2\. Press **Edit channel**, select **Webhooks** tab and press **Create Webhook** button
 
@@ -14,10 +14,9 @@ This guide describes how to integrate your Zabbix 4.4 installation with Discord 
 
 
 3\. Setup your Discord webhook and press **Save**.
-<br>You can copy Discord webhook URL now or do it later with **Edit** button. 
+<br>You can copy Discord webhook URL now or do it later with **Edit** button.
 
 [![](images/thumb.3.png?raw=true)](images/3.png)
-
 
 
 ## Setting up Zabbix Webhook
@@ -35,7 +34,7 @@ This guide describes how to integrate your Zabbix 4.4 installation with Discord 
 
 [![](images/thumb.5.png?raw=true)](images/5.png)
 
-4\. To receive notifications in Discord, you need to create a **Zabbix user** and add **Media** with the **Discord** media type. 
+4\. To receive notifications in Discord, you need to create a **Zabbix user** and add **Media** with the **Discord** media type.
 The "Send to" field must contain Discord webhook URL created before.
 <br>Also don’t forget that in order to send notifications, this user must have access to hosts that generated such problems
 
@@ -46,7 +45,6 @@ The "Send to" field must contain Discord webhook URL created before.
 [![](images/thumb.7.png?raw=true)](images/7.png)
 
 For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
-
 
 ## Supported Versions
 Zabbix 4.4
