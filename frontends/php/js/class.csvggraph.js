@@ -420,14 +420,15 @@ jQuery(function ($) {
 		var offset = graph.parent().offsetParent().offset(),
 			hbox = $(graph.hintBoxItem),
 			page_bottom = jQuery(window.top).scrollTop() + jQuery(window.top).height(),
-			mouse_distance = 15,
-			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + mouse_distance)
-				? e.clientX + mouse_distance - offset.left
-				: e.clientX - mouse_distance - hbox.outerWidth(true) - offset.left,
+			mouse_distance_x = 10 - (hbox.outerWidth(true) - hbox.outerWidth()) / 2,
+			mouse_distance_y = 10 - (hbox.outerHeight(true) - hbox.outerHeight()) / 2,
+			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth(true) + mouse_distance_x)
+				? e.clientX + mouse_distance_x - offset.left
+				: e.clientX - mouse_distance_x - hbox.outerWidth(true) - offset.left,
 			t = e.pageY - offset.top,
-			t = page_bottom >= t + offset.top + hbox.outerHeight() + mouse_distance
-				? t + mouse_distance
-				: t - mouse_distance - hbox.outerHeight();
+			t = page_bottom >= t + offset.top + hbox.outerHeight(true) + mouse_distance_y
+				? t + mouse_distance_y
+				: t - mouse_distance_y - hbox.outerHeight(true);
 
 		hbox.css({'left': l, 'top': t});
 	}
