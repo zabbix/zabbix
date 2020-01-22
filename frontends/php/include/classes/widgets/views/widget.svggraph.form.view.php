@@ -279,9 +279,19 @@ $form_tabs = (new CTabView())
 // Add CTabView to form.
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
-
 $scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, select, .multiselect", onGraphConfigChange);';
-$scripts[] = 'onGraphConfigChange();';
+$scripts[] =
+	'jQuery(function($) {'.
+		'onGraphConfigChange();'.
+		'$(".overlay-dialogue").on("dialogue-resize", function() {'.
+			'if (jQuery("#svg-graph-preview").length) {'.
+				'onGraphConfigChange();'.
+			'}'.
+			'else {'.
+				'$(".overlay-dialogue").off("dialogue-resize");'.
+			'}'.
+		'});'.
+	'});';
 
 return [
 	'form' => $form,

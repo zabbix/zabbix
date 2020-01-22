@@ -602,6 +602,18 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 					? ''
 					: Math.max(0, parseInt(($(window).height() - $(overlay_dialogue).outerHeight(true)) / 2)) + 'px'
 			});
+
+			var size = {
+					width: overlay_dialogue.width(),
+					height: overlay_dialogue.height(),
+				},
+				size_saved = overlay_dialogue.data('size') || size;
+
+			if (size.width != size_saved.width || size.height != size_saved.height) {
+				overlay_dialogue.trigger('dialogue-resize');
+			}
+
+			overlay_dialogue.data('size', size);
 		},
 		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
 		body_mutation_observer = new body_mutation_observer(function(mutation) {
