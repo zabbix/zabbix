@@ -202,8 +202,11 @@ class CScreenGraph extends CScreenBase {
 			$item = new CDiv();
 		}
 		elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-			$item = new CLink(null, 'charts.php?graphid='.$resourceId.'&from='.$this->timeline['from'].
-				'&to='.$this->timeline['to']
+			$item = new CLink(null, (new CUrl('charts.php'))
+				->setArgument('graphid', $resourceId)
+				->setArgument('from', $this->timeline['from'])
+				->setArgument('to', $this->timeline['to'])
+				->getUrl()
 			);
 		}
 
