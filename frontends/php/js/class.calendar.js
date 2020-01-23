@@ -107,7 +107,7 @@ calendar.prototype = {
 		this.setCDate();
 
 		this.calendarPositionHandler();
-		this.clndr_calendar.show();
+		this.clndr_calendar.style.display = (this.clndr_calendar.tagName === 'span') ? 'inline' : 'block';
 		this.is_visible = true;
 
 		jQuery(window).on('resize', jQuery.proxy(this.calendarPositionHandler, this));
@@ -497,7 +497,7 @@ calendar.prototype = {
 
 	createDaysTab: function() {
 		var tbody = this.clndr_days;
-		tbody.update('');
+		tbody.innerHTML = '';
 
 		var cdt = new CDate();
 
@@ -523,10 +523,9 @@ calendar.prototype = {
 			for (var x = 0; x < 7; x++) {
 				var td = document.createElement('td');
 				tr.appendChild(td);
-				Element.extend(td);
 
 				if (this.month != cdt.getMonth()) {
-					td.addClassName('grey');
+					$(td).addClass('grey');
 				}
 				else {
 					td.setAttribute('data-date', cdt.getDate());
@@ -535,7 +534,7 @@ calendar.prototype = {
 				if (this.sdt.getFullYear() == cdt.getFullYear()
 						&& this.sdt.getMonth() == cdt.getMonth()
 						&& this.sdt.getDate() == cdt.getDate()) {
-					td.addClassName('selected');
+					$(td).addClass('selected');
 				}
 
 				td.setAttribute('aria-label', this.calendarGetReadableDate(cdt));
@@ -565,12 +564,11 @@ calendar.prototype = {
 	 */
 	calendarcreate: function() {
 		this.clndr_calendar = document.createElement('div');
-		Element.extend(this.clndr_calendar);
 		this.clndr_calendar.className = 'overlay-dialogue calendar';
 		this.clndr_calendar.setAttribute('aria-label', t('S_CALENDAR'));
 		this.clndr_calendar.setAttribute('role', 'application');
 		this.clndr_calendar.setAttribute('tabindex', '0');
-		this.clndr_calendar.hide();
+		this.clndr_calendar.style.display = 'none';
 
 		document.body.appendChild(this.clndr_calendar);
 
@@ -679,7 +677,6 @@ calendar.prototype = {
 		 * Days calendar
 		 */
 		this.clndr_days = document.createElement('tbody');
-		Element.extend(this.clndr_days);
 		this.clndr_days.setAttribute('class', 'calendar-date');
 		table.appendChild(this.clndr_days);
 

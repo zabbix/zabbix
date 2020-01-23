@@ -351,13 +351,10 @@ CDoll.prototype = {
 		obj_params.height = this._domobj.offsetHeight;
 		obj_params.width = this._domobj.offsetWidth;
 
-		Element.extend(this._domdark);
-		this._domdark.setStyle({
-			'top': obj_params.top + 'px',
-			'left': obj_params.left + 'px',
-			'width': obj_params.width + 'px',
-			'height': obj_params.height + 'px'
-		});
+		this._domdark.style.top = obj_params.top + 'px';
+		this._domdark.style.left = obj_params.left + 'px';
+		this._domdark.style.width = obj_params.width + 'px';
+		this._domdark.style.height = obj_params.height + 'px';
 	},
 
 	rmwDarken: function() {
