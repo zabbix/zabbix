@@ -423,7 +423,7 @@ jQuery(function ($) {
 			mouse_distance = 15,
 			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + mouse_distance)
 				? e.clientX + mouse_distance - offset.left
-				: e.clientX - mouse_distance - hbox.outerWidth(true) - offset.left,
+				: e.clientX - mouse_distance - hbox.outerWidth() - offset.left,
 			t = e.pageY - offset.top,
 			t = page_bottom >= t + offset.top + hbox.outerHeight() + mouse_distance
 				? t + mouse_distance
