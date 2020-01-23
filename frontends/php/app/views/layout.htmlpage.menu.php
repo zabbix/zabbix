@@ -85,13 +85,14 @@ $user_navigation = (new CList())
 
 $menu = [];
 
+/** @var CMenu $item */
 foreach ($data['menu']->getItems() as $key => $item) {
 	$link = (new CLink($item->getLabel()))
-		->onClick('javascript: MMenu.mouseOver(\''.$item->getUniqueid().'\');')
-		->onKeyup('javascript: MMenu.keyUp(\''.$item->getUniqueid().'\', event);');
+		->onClick('javascript: MMenu.mouseOver(\''.$item->getUniqueId().'\');')
+		->onKeyup('javascript: MMenu.keyUp(\''.$item->getUniqueId().'\', event);');
 	$menu[] = (new CListItem($link))
-		->setId($item->getUniqueid())
-		->addClass($item->getSelected() ? ZBX_STYLE_SELECTED : null);
+		->setId($item->getUniqueId())
+		->addClass($item->isSelected() ? ZBX_STYLE_SELECTED : null);
 }
 
 // 1st level menu
@@ -122,14 +123,14 @@ $sub_menu_div = (new CTag('nav', true))
 // 2nd level menu
 foreach ($data['menu']->getItems() as $item) {
 	$child_menu = (new CList())
-		->setId('sub_'.$item->getUniqueid())
+		->setId('sub_'.$item->getUniqueId())
 		->addClass(ZBX_STYLE_TOP_SUBNAV);
 
 	foreach ($item->getItems() as $child_item) {
 		// TODO: remove if statements, use CUrl instead.
 		$action = $child_item->getAction();
 		$url = substr($action, -4) === '.php' ? $action : 'zabbix.php?action='.$action;
-		$selected = $child_item->getSelected() ? ZBX_STYLE_SELECTED : null;
+		$selected = $child_item->isSelected() ? ZBX_STYLE_SELECTED : null;
 
 		$child_menu->addItem((new CLink($child_item->getLabel(), $url))
 			->addClass($selected)
@@ -137,11 +138,11 @@ foreach ($data['menu']->getItems() as $item) {
 		);
 
 		if ($selected) {
-			insert_js('MMenu.def_label = '.zbx_jsvalue($item->getUniqueid()));
+			insert_js('MMenu.def_label = '.CJs::encodeJson($item->getUniqueId()));
 		}
 	}
 
-	if (!$item->getSelected()) {
+	if (!$item->isSelected()) {
 		$child_menu->setAttribute('style', 'display: none;');
 	}
 

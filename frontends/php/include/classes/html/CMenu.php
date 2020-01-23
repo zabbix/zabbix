@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -22,10 +22,14 @@
 class CMenu {
 
 	protected $label;
-	protected $items = [];
-	protected $alias = [];
 	protected $action;
+
+	protected $items;
+	protected $alias;
+
 	protected $selected = false;
+
+	private $uniqueid;
 
 	/**
 	 * Create menu class instance.
@@ -36,7 +40,7 @@ class CMenu {
 	 * @param string $item['uniqueid']  String qith unique identifier.
 	 * @param array  $item['items']     Array of child menu entries.
 	 */
-	public function __construct($label, array $item) {
+	public function __construct(string $label, array $item) {
 		$this->label = $label;
 		$this->action = array_key_exists('action', $item) ? $item['action'] : '';
 		$this->alias = array_key_exists('alias', $item) ? $item['alias'] : [];
@@ -57,7 +61,7 @@ class CMenu {
 	 *
 	 * @return array
 	 */
-	public function getAlias() {
+	public function getAlias(): array {
 		return $this->alias;
 	}
 
@@ -66,7 +70,7 @@ class CMenu {
 	 *
 	 * @return string
 	 */
-	public function getAction() {
+	public function getAction(): string {
 		return $this->action;
 	}
 
@@ -75,7 +79,7 @@ class CMenu {
 	 *
 	 * @return array
 	 */
-	public function getItems() {
+	public function getItems(): array {
 		return $this->items;
 	}
 
@@ -84,7 +88,7 @@ class CMenu {
 	 *
 	 * @return string
 	 */
-	public function getLabel() {
+	public function getLabel(): string {
 		return $this->label;
 	}
 
@@ -93,7 +97,7 @@ class CMenu {
 	 *
 	 * @return string
 	 */
-	public function getUniqueid() {
+	public function getUniqueId(): string {
 		return $this->uniqueid;
 	}
 
@@ -102,20 +106,20 @@ class CMenu {
 	 *
 	 * @return bool
 	 */
-	public function getSelected() {
-		return array_reduce($this->items, function($carry, $child) {
-			return $carry || $child->getSelected();
+	public function isSelected(): bool {
+		return array_reduce($this->items, function(bool $carry, CMenu $child) {
+			return $carry || $child->isSelected();
 		}, $this->selected);
 	}
 
 	/**
 	 * Set selected property on current menu entry or it nested items according passed $action.
 	 *
-	 * @param string $action   Action name to be selected.
+	 * @param string $action  Action name to be selected.
 	 *
 	 * @return CMenu
 	 */
-	public function setSelected($action) {
+	public function setSelected(string $action): CMenu {
 		if ($this->action === $action || in_array($action, $this->alias)) {
 			$this->selected = true;
 		}
@@ -131,12 +135,12 @@ class CMenu {
 	/**
 	 * Add nested menu items.
 	 *
-	 * @param string $label    Visual label.
-	 * @param array  $item     Item data.
+	 * @param string $label  Visual label.
+	 * @param array  $item   Item data.
 	 *
 	 * @return CMenu
 	 */
-	public function add($label, $item) {
+	public function add(string $label, array $item): CMenu {
 		$this->items[$label] = new CMenu($label, $item);
 
 		return $this;
@@ -145,11 +149,11 @@ class CMenu {
 	/**
 	 * Remove nested item by visual label.
 	 *
-	 * @param string $label    Visual label.
+	 * @param string $label  Visual label.
 	 *
 	 * @return CMenu
 	 */
-	public function remove($label) {
+	public function remove(string $label): CMenu {
 		unset($this->items[$label]);
 
 		return $this;
@@ -162,18 +166,18 @@ class CMenu {
 	 *
 	 * @return CMenu|null
 	 */
-	public function find($label) {
+	public function find(string $label): ?CMenu {
 		return $this->has($label) ? $this->items[$label] : null;
 	}
 
 	/**
 	 * Check element contains nested item with visual label.
 	 *
-	 * @param string $label    Visaul label.
+	 * @param string $label  Visaul label.
 	 *
 	 * @return bool
 	 */
-	public function has($label) {
+	public function has(string $label): bool {
 		return array_key_exists($label, $this->items);
 	}
 
@@ -186,7 +190,7 @@ class CMenu {
 	 *
 	 * @return CMenu
 	 */
-	public function insertBefore($before_label, $label, array $item) {
+	public function insertBefore(string $before_label, string $label, array $item): CMenu {
 		$this->insert($before_label, $label, $item, false);
 
 		return $this;
@@ -195,13 +199,13 @@ class CMenu {
 	/**
 	 * Add new nested element after nested element with $after_label visual label.
 	 *
-	 * @param string $after_label   Visual label to insert item before.
-	 * @param string $label         New item visual label.
-	 * @param array  $item          New item data.
+	 * @param string $after_label  Visual label to insert item before.
+	 * @param string $label        New item visual label.
+	 * @param array  $item         New item data.
 	 *
 	 * @return CMenu
 	 */
-	public function insertAfter($after_label, $label, $item) {
+	public function insertAfter(string $after_label, string $label, array $item): CMenu {
 		$this->insert($after_label, $label, $item);
 
 		return $this;
@@ -215,7 +219,7 @@ class CMenu {
 	 * @param array  $item          New item data.
 	 * @param bool   $after         Insert new item before or after $target_label
 	 */
-	private function insert($target_label, $label, $item, $after = true) {
+	private function insert(string $target_label, string $label, array $item, bool $after = true): void {
 		if ($this->has($target_label)) {
 			$index = array_search($target_label, array_keys($this->items));
 			$before = ($index > 0 || ($after && $index == 0))
