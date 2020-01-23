@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -809,7 +809,7 @@ function getAdministrationGeneralSubmenu() {
 		'main_section' => [
 			'items' => [
 				$gui_url          => _('GUI'),
-				$autoreg_url      => _('Auto registration'),
+				$autoreg_url      => _('Autoregistration'),
 				$housekeeping_url => _('Housekeeping'),
 				$image_url        => _('Images'),
 				$iconmap_url      => _('Icon mapping'),

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,6 +126,7 @@ class CRouter {
 		'popup.httpstep'				=> ['CControllerPopupHttpStep',						'layout.json',			'popup.httpstep'],
 		'popup.maintenance.period'		=> ['CControllerPopupMaintenancePeriod',			'layout.json',			'popup.maintenance.period'],
 		'popup.media'					=> ['CControllerPopupMedia',						'layout.json',			'popup.media'],
+		'popup.mediatype.message'		=> ['CControllerPopupMediatypeMessage',				'layout.json',			'popup.mediatype.message'],
 		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
 		'popup.preproctest.edit'		=> ['CControllerPopupPreprocTestEdit',				'layout.json',			'popup.preproctestedit.view'],

@@ -139,7 +139,7 @@ $(TARGETBIN): $(OBJS) .FORCE
 	set GOLDFLAGS=%GOLDFLAGS% -X $(PKG).compileTime=%BUILD_TIME%
 	cd $(MODULEDIR)
 
-	go build -mod vendor -tags "$(TAGS)" -ldflags="%GOLDFLAGS%" -o $(TARGETBIN) zabbix.com/cmd/zabbix_agent2
+	go build -tags "$(TAGS)" -ldflags="%GOLDFLAGS%" -o $(TARGETBIN) zabbix.com/cmd/zabbix_agent2
 
 clean:
 	go clean -cache

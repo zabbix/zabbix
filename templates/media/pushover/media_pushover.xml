@@ -84,7 +84,6 @@
 	Zabbix.Log(127, 'Pushover notification failed : '+error);&#13;
         throw 'Pushover notification failed : '+error;&#13;
 }</script>
-            <show_event_menu>NO</show_event_menu>
             <description>Please refer to setup guide here: https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/pushover&#13;
 &#13;
 Set token parameter with to your Pushover application key.&#13;

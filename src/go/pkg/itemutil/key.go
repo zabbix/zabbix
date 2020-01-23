@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import (
 	"fmt"
 )
 
-func isKeyChar(c byte) bool {
+func isKeyChar(c byte, wildcard bool) bool {
 	if c >= 'a' && c <= 'z' {
 		return true
 	}
@@ -36,6 +36,9 @@ func isKeyChar(c byte) bool {
 		return true
 	}
 	if c >= 'A' && c <= 'Z' {
+		return true
+	}
+	if wildcard && c == '*' {
 		return true
 	}
 	return false
@@ -61,7 +64,7 @@ func parseQuotedParam(data []byte) (param []byte, left []byte, err error) {
 	return
 }
 
-// parseParams parses item key normal parameter (any combination of any characters except ',' and ']',
+// parseUnquotedParam parses item key normal parameter (any combination of any characters except ',' and ']',
 // including trailing whitespace) and returns the parsed parameter and the data after the parameter.
 func parseUnquotedParam(data []byte) (param []byte, left []byte, err error) {
 	for i, c := range data {
@@ -75,7 +78,7 @@ func parseUnquotedParam(data []byte) (param []byte, left []byte, err error) {
 	return
 }
 
-// parseParams parses item key array parameter [...] and returns.
+// parseArrayParam parses item key array parameter [...] and returns.
 func parseArrayParam(data []byte) (param []byte, left []byte, err error) {
 	var pos int
 	b := data[1:]
@@ -252,9 +255,9 @@ func newKeyError() (err error) {
 	return errors.New("Invalid item key format.")
 }
 
-func parseKey(data []byte) (key string, params []string, left []byte, err error) {
+func parseKey(data []byte, wildcard bool) (key string, params []string, left []byte, err error) {
 	for i, c := range data {
-		if !isKeyChar(c) {
+		if !isKeyChar(c, wildcard) {
 			if i == 0 {
 				err = newKeyError()
 				return
@@ -276,15 +279,13 @@ func parseKey(data []byte) (key string, params []string, left []byte, err error)
 	return
 }
 
-// ParseKey parses item key in format key[param1, param2, ...] and returns
-// the parsed key and parameteres.
-func ParseKey(text string) (key string, params []string, err error) {
+func parseMetricKey(text string, wildcard bool) (key string, params []string, err error) {
 	if text == "" {
 		err = newKeyError()
 		return
 	}
 	var left []byte
-	if key, params, left, err = parseKey([]byte(text)); err != nil {
+	if key, params, left, err = parseKey([]byte(text), wildcard); err != nil {
 		return
 	}
 	if len(left) > 0 {
@@ -293,11 +294,23 @@ func ParseKey(text string) (key string, params []string, err error) {
 	return
 }
 
+// ParseKey parses item key in format key[param1, param2, ...] and returns
+// the parsed key and parameteres.
+func ParseKey(text string) (key string, params []string, err error) {
+	return parseMetricKey(text, false)
+}
+
+// ParseWildcardKey parses item key in format key[param1, param2, ...] and returns
+// the parsed key and parameteres.
+func ParseWildcardKey(text string) (key string, params []string, err error) {
+	return parseMetricKey(text, true)
+}
+
 // ParseAlias parses Alias in format name:key and returns the name
 // and the key separately without changes
 func ParseAlias(text string) (key1, key2 string, err error) {
 	var left, left2 []byte
-	if _, _, left, err = parseKey([]byte(text)); err != nil {
+	if _, _, left, err = parseKey([]byte(text), false); err != nil {
 		return
 	}
 	if len(left) < 2 || left[0] != ':' {
@@ -305,7 +318,7 @@ func ParseAlias(text string) (key1, key2 string, err error) {
 		return
 	}
 	key1 = text[:len(text)-len(left)]
-	if _, _, left2, err = parseKey(left[1:]); err != nil {
+	if _, _, left2, err = parseKey(left[1:], false); err != nil {
 		return
 	}
 	if len(left2) != 0 {
