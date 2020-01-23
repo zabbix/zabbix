@@ -52,7 +52,6 @@ class CFrontendSetup {
 
 	/**
 	 * Perform all requirements checks.
-	 * @param boolean $setup  Is the call follows from the setup.
 	 *
 	 * @return array
 	 */
