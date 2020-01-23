@@ -2244,11 +2244,24 @@ class C50XmlValidator {
 		$consts = [
 			CXmlConstantValue::NO_ENCRYPTION => [CXmlConstantName::NO_ENCRYPTION],
 			CXmlConstantValue::TLS_PSK=> [CXmlConstantName::TLS_PSK],
-			3 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_PSK],
+			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK => [
+				CXmlConstantName::NO_ENCRYPTION,
+				CXmlConstantName::TLS_PSK
+			],
 			CXmlConstantValue::TLS_CERTIFICATE => [CXmlConstantName::TLS_CERTIFICATE],
-			5 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_CERTIFICATE],
-			6 => [CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE],
-			7 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE],
+			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_CERTIFICATE => [
+				CXmlConstantName::NO_ENCRYPTION,
+				CXmlConstantName::TLS_CERTIFICATE
+			],
+			CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
+				CXmlConstantName::TLS_PSK,
+				CXmlConstantName::TLS_CERTIFICATE
+			],
+			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
+				CXmlConstantName::NO_ENCRYPTION,
+				CXmlConstantName::TLS_PSK,
+				CXmlConstantName::TLS_CERTIFICATE
+			]
 		];
 
 		if (!array_key_exists($data['tls_accept'], $consts)) {
