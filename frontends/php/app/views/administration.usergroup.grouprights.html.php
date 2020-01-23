@@ -43,7 +43,7 @@ foreach ($data['group_rights'] as $groupid => $group_right) {
 			[
 				permissionText($group_right['permission']),
 				$form_vars,
-				(new CVar('group_right', json_encode($form_data_json, true)))->removeId()->setEnabled(false)
+				(new CVar('group_right', json_encode($form_data_json, JSON_FORCE_OBJECT)))->removeId()->setEnabled(false)
 			]
 		];
 	}
@@ -66,7 +66,7 @@ foreach ($data['group_rights'] as $groupid => $group_right) {
 				->addValue(_('None'), PERM_NONE)
 				->setModern(true),
 			$form_vars,
-			(new CVar('group_right', json_encode($form_data_json, true)))->removeId()->setEnabled(false)
+			(new CVar('group_right', json_encode($form_data_json, JSON_FORCE_OBJECT)))->removeId()->setEnabled(false)
 		];
 		$row = [$group_name, $permissions];
 	}

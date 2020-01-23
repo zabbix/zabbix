@@ -78,7 +78,7 @@ zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.json_encode([
 	'defaultAutoIconId' => $data['defaultAutoIconId'],
 	'defaultIconId' => $data['defaultIconId'],
 	'defaultIconName' => $data['defaultIconName']
-], true).');');
+], JSON_FORCE_OBJECT).');');
 
 return (new CWidget())
 	->setTitle(_('Network maps'))
