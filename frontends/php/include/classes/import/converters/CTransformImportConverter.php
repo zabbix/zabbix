@@ -20,9 +20,9 @@
 
 
 /**
- * Converters.
+ * Converters for convert XML values to values that API can accept.
  */
-class CAdditionalImportConverter extends CConverter {
+class CTransformImportConverter extends CConverter {
 
 	protected $rules;
 
