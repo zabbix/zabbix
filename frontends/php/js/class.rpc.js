@@ -75,6 +75,7 @@ RPC.Call.prototype = {
 		};
 
 		var request = {
+			'method': 'POST',
 			'headers': header
 		};
 
@@ -95,7 +96,7 @@ RPC.Call.prototype = {
 		new jQuery.ajax(RPC.rpcurl(), request);
 	},
 
-	processRespond: function(resp){
+	processRespond: function(_, _, resp){
 		var isError = this.processError(resp);
 		if (isError) {
 			return false;

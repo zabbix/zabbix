@@ -393,8 +393,8 @@ CSuggest.prototype = {
 
 	// highLight
 	removeHighLight: function() {
-		jQuery('li.suggest-hover').forEach(function(hlRow) {
-			hlRow.className = '';
+		jQuery('li.suggest-hover').each(function() {
+			this.className = '';
 		});
 	},
 
@@ -411,7 +411,7 @@ CSuggest.prototype = {
 			this.dom.input.value = this.userNeedle;
 		}
 		else {
-			this.dom.input.value = document.getElementById('line_' + this.hlIndex).readAttribute('needle');
+			this.dom.input.value = document.getElementById('line_' + this.hlIndex).getAttribute('needle');
 		}
 	},
 
@@ -522,6 +522,7 @@ CSuggest.prototype = {
 			this.dom.sugtab.remove();
 		}
 
+		this.dom.sugtab = sugTab;
 		this.dom.suggest.appendChild(this.dom.sugtab);
 
 		if (count == 0) {
