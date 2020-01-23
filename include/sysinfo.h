@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -318,13 +318,20 @@ MODE_FUNCTION;
 
 typedef struct
 {
-	char		fsname[MAX_STRING_LEN];
-	char		fstype[MAX_STRING_LEN];
 	zbx_uint64_t	total;
 	zbx_uint64_t	not_used;
 	zbx_uint64_t	used;
 	double		pfree;
 	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
 }
 zbx_mpoint_t;
 
@@ -335,6 +342,8 @@ zbx_mpoint_t;
 #define ZBX_SYSINFO_TAG_FSNAME			"fsname"
 #define ZBX_SYSINFO_TAG_FSTYPE			"fstype"
 #define ZBX_SYSINFO_TAG_FSDRIVETYPE		"fsdrivetype"
+#define ZBX_SYSINFO_TAG_BYTES			"bytes"
+#define ZBX_SYSINFO_TAG_INODES			"inodes"
 #define ZBX_SYSINFO_TAG_TOTAL			"total"
 #define ZBX_SYSINFO_TAG_FREE			"free"
 #define ZBX_SYSINFO_TAG_USED			"used"

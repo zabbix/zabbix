@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import (
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/net/netif"
 	_ "zabbix.com/plugins/proc"
+	_ "zabbix.com/plugins/redis"
 	_ "zabbix.com/plugins/system/cpucollector"
 	_ "zabbix.com/plugins/system/uname"
 	_ "zabbix.com/plugins/system/uptime"

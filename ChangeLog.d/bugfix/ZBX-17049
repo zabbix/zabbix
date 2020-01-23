@@ -1,1 +1,0 @@
-A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create and maintenance.update; fixed undefined index in maintenance create and update popup (gcalenko)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ class CWebTest extends CTest {
 
 	// Screenshot taken on test failure.
 	private $screenshot = null;
+	// Browser errors captured during test.
+	private $errors = null;
 	// Failed test URL.
 	private $current_url = null;
 
@@ -65,6 +67,10 @@ class CWebTest extends CTest {
 	 * @inheritdoc
 	 */
 	protected function onNotSuccessfulTest($exception) {
+		if ($this->errors !== null && $exception instanceof Exception) {
+			CExceptionHelper::setMessage($exception, $exception->getMessage()."\n\n".$this->errors);
+		}
+
 		if ($this->screenshot !== null && $exception instanceof Exception) {
 			$screenshot_name = md5(microtime(true)).'.png';
 
@@ -93,22 +99,30 @@ class CWebTest extends CTest {
 	 * @inheritdoc
 	 */
 	protected function tearDown() {
-		// Check for JS errors.
-		if (!$this->hasFailed() && $this->getStatus() !== null) {
-			if (self::$shared_page !== null) {
-				$errors = [];
+		$errors = [];
 
-				foreach (self::$shared_page->getBrowserLog() as $log) {
-					$errors[] = $log['message'];
-				}
-
-				if (!$this->supress_case_errors && $errors) {
-					$this->captureScreenshot();
-					$this->fail("Severe browser errors:\n" . implode("\n", array_unique($errors)));
-				}
+		if (self::$shared_page !== null) {
+			foreach (self::$shared_page->getBrowserLog() as $log) {
+				$errors[] = $log['message'];
 			}
 		}
-		else {
+
+		// Check for JS errors.
+		if ($errors) {
+			$errors = "Severe browser errors:\n".implode("\n", array_unique($errors));
+
+			if (!$this->hasFailed() && $this->getStatus() !== null) {
+				if (!$this->supress_case_errors) {
+					$this->captureScreenshot();
+					$this->fail($errors);
+				}
+			}
+			else {
+				$this->errors = $errors;
+			}
+		}
+
+		if ($this->hasFailed() || $this->getStatus() !== null) {
 			$this->captureScreenshot();
 		}
 	}
