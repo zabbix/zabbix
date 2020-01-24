@@ -343,7 +343,7 @@ final class CModuleManager {
 		}
 
 		// Check manifest version.
-		if ($manifest['manifest_version'] > self::MAX_MANIFEST_VERSION) {
+		if (!is_numeric($manifest['manifest_version']) || $manifest['manifest_version'] > self::MAX_MANIFEST_VERSION) {
 			return null;
 		}
 
