@@ -53,6 +53,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'sub_pages' => ['tr_events.php']
 				],
 				[
+					'url' => 'zabbix.php',
+					'action' => 'host.view',
+					'active_if' => ['host.view'],
+					'label' => _('Hosts'),
+					'sub_pages' => ['charts.php']
+				],
+				[
 					'url' => 'overview.php',
 					'label' => _('Overview')
 				],

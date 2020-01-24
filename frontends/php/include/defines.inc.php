@@ -1783,6 +1783,8 @@ define('ZBX_STYLE_WIDGET_URL', 'widget-url');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
+define('ZBX_STYLE_PROBLEM_ICON_LIST' , 'problem-icon-list');
+define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
