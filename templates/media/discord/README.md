@@ -1,4 +1,3 @@
-
 # Discord webhook
 
 This guide describes how to integrate your Zabbix 4.4 installation with Discord using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
@@ -20,7 +19,17 @@ This guide describes how to integrate your Zabbix 4.4 installation with Discord 
 
 
 ## Setting up Zabbix Webhook
-1\. Before setting up Discord Webhook, you need to setup the global macro "{$ZABBIX.URL}", which must contain the URL to the Zabbix frontend
+1\. Before setting up Discord Webhook, you need to setup the global macro "{$ZABBIX.URL}", which must contain the URL to the Zabbix frontend.
+<br>The URL should be either an IP address, a fully qualified domain name or localhost. Protocol is is mandatory, port is optional. 
+Good examples:
+http://zabbix.com
+https://zabbix.lan/
+http://localhost
+http://127.0.0.1:8080
+
+Bad examples:
+zabbix.com
+http://zabbix/
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
@@ -43,6 +52,9 @@ The "Send to" field must contain Discord webhook URL created before.
 5\. Got Alerts! You are awesome!
 
 [![](images/thumb.7.png?raw=true)](images/7.png)
+
+Please note that currently there is a limited support of Unicode. Problems are mostly caused by 3 and 4 byte UTF-8 sequences (or example, if emoji symbols are used in message text) and such UTF-8 sequences can cause errors like "400: Bad Request".
+To avoid such cases in production environments, we propose to avoid using 3 and 4 byte UTF-8 sequences and to use mediatype test functionality to make sure that it works for you.
 
 For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
 
