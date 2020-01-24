@@ -38,6 +38,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'label' => _('Monitoring'),
 			'user_type' => USER_TYPE_ZABBIX_USER,
 			'default_page_id' => 0,
+			'icon' => 'monitoring',
 			'pages' => [
 				[
 					'url' => 'zabbix.php',
@@ -126,6 +127,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'label' => _('Inventory'),
 			'user_type' => USER_TYPE_ZABBIX_USER,
 			'default_page_id' => 0,
+			'icon' => 'inventory',
 			'pages' => [
 				[
 					'url' => 'hostinventoriesoverview.php',
@@ -141,6 +143,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'label' => _('Reports'),
 			'user_type' => USER_TYPE_ZABBIX_USER,
 			'default_page_id' => 0,
+			'icon' => 'reports',
 			'pages' => [
 				[
 					'url' => 'zabbix.php',
@@ -179,6 +182,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'label' => _('Configuration'),
 			'user_type' => USER_TYPE_ZABBIX_ADMIN,
 			'default_page_id' => 0,
+			'icon' => 'configuration',
 			'pages' => [
 				[
 					'url' => 'conf.import.php'
@@ -237,6 +241,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'label' => _('Administration'),
 			'user_type' => USER_TYPE_SUPER_ADMIN,
 			'default_page_id' => 0,
+			'icon' => 'administration',
 			'pages' => [
 				[
 					'url' => 'zabbix.php',
@@ -330,6 +335,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			$show_menu = false;
 		}
 
+		$sub_menu = (new CList())->addClass(ZBX_STYLE_TOP_SUBNAV);
 		$menu_class = null;
 		$sub_menus[$label] = [];
 
@@ -385,7 +391,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				// permission check
 				$deny &= (CWebUser::$data['type'] < $menu['user_type'] || CWebUser::$data['type'] < $sub_page['user_type']);
 
-				$menu_class = 'selected';
+				$menu_class = 'selected expanded';
 				$page_exists = true;
 				$page['menu'] = $label;
 				$row['selected'] = true;
@@ -397,6 +403,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 
 			if ($show_sub_menu) {
 				$sub_menus[$label][] = $row;
+				$sub_menu->addItem((new CListItem(
+						new CLink($row['menu_text'], (new CUrl($row['menu_url']))
+							->setArgument('action', $row['menu_action'])
+							->getUrl()
+						)
+					))->addClass($row['selected'] ? ZBX_STYLE_SELECTED : null)
+				);
 			}
 		}
 
@@ -409,19 +422,14 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			continue;
 		}
 
-		if ($sub_menus[$label][$menu['default_page_id']]['menu_action'] === null) {
-			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'];
-		}
-		else {
-			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
-		}
-		$mmenu_entry = (new CListItem(
+		$mmenu_entry = (new CListItem([
 			(new CLink($menu['label']))
-				->onClick('javascript: MMenu.mouseOver(\''.$label.'\');')
-				->onKeyup('javascript: MMenu.keyUp(\''.$label.'\', event);')
-				->setAttribute('tabindex', 0)
-		))
+				->addClass(array_key_exists('icon', $menu) ? 'menu-main-icon-'.$menu['icon'] : null)
+				->setAttribute('tabindex', 0),
+			$sub_menu
+		]))
 			->addClass($menu_class)
+			->addClass('has-subnav')
 			->setId($label);
 
 		array_push($main_menu, $mmenu_entry);

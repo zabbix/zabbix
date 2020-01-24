@@ -55,6 +55,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	if (!defined('ZBX_PAGE_NO_MENU')) {
 		makePageFooter()->show();
 	}
+	echo '</div>'."\n";
 	insertPagePostJs();
 	require_once 'include/views/js/common.init.js.php';
 

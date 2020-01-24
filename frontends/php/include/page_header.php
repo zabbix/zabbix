@@ -250,7 +250,7 @@ if ($page['type'] == PAGE_TYPE_HTML && (CSession::keyExists('messageOk') || CSes
 }
 
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
-	$pageMenu = new CView('layout.htmlpage.menu', [
+	$pageMenu = new CView('layout.htmlpage.aside', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 		'menu' => [
 			'main_menu' => $main_menu,
@@ -269,6 +269,7 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORM
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
+	echo '<div class="wrapper">'."\n";
 	echo '<main>';
 }
 

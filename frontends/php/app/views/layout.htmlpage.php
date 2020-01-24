@@ -78,7 +78,7 @@ function local_generateHeader($data) {
 	if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 		global $ZBX_SERVER_NAME;
 
-		$pageMenu = new CView('layout.htmlpage.menu', [
+		$pageMenu = new CView('layout.htmlpage.aside', [
 			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 			'menu' => [
 				'main_menu' => $main_menu,
@@ -96,6 +96,7 @@ function local_generateHeader($data) {
 		echo $pageMenu->getOutput();
 	}
 
+	echo '<div class="wrapper">'."\n";
 	echo '<main'.(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' class="'.ZBX_STYLE_LAYOUT_KIOSKMODE.'"' : '').'>';
 
 	// if a user logs in after several unsuccessful attempts, display a warning
@@ -127,7 +128,8 @@ function local_generateFooter($data) {
 		'web_layout_mode' => $data['web_layout_mode']
 	]);
 	echo '</main>'."\n";
-	echo $pageFooter->getOutput();
+	echo $pageFooter->getOutput()."\n";
+	echo '</div>'."\n";
 }
 
 function local_showMessage() {

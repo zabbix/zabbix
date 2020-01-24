@@ -109,7 +109,16 @@ class CWidget {
 	}
 
 	private function createTopHeader() {
-		$divs = [];
+		$divs = [
+			(new CTag('nav', true, (new CButton(null, _('Show sidebar')))
+				->setId('sidebar-switcher')
+				->addClass('sidebar-switcher')
+				->setAttribute('title', _('Show sidebar'))
+			))
+				->addClass('sidebar-switch-nav')
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Sidebar control'))
+		];
 
 		if ($this->title !== null) {
 			$title_tag = (new CTag('h1', true, $this->title))->setId(ZBX_STYLE_PAGE_TITLE);
@@ -135,6 +144,6 @@ class CWidget {
 			$divs[] = (new CDiv($this->controls))->addClass(ZBX_STYLE_NOWRAP);
 		}
 
-		return (new CDiv($divs))->addClass(ZBX_STYLE_HEADER_TITLE);
+		return (new CTag('header', true, $divs))->addClass(ZBX_STYLE_HEADER_TITLE);
 	}
 }
