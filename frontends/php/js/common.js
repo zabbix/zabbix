@@ -919,11 +919,31 @@ Function.prototype.bindAsEventListener = function (context) {
 	};
 };
 
+/**
+ * Template class implements token replacement logic for strings containing HTML and tokens.
+ *
+ * The following format is used for tokens: #{token_name}.
+ * When found in template String, token will be replaced with value of the key "token_name" of object passed to
+ * evaluate function. All occurences of tokens are replaced by values from object with HTML entities escaped.
+ * Token name should be prefixed with character '*' to avoid escaping of HTML entities (for example, #{*test}).
+ * Backslash character (\\) can be used to escape token (such tokens will not be affected).
+ *
+ * Nested object properties could be used in templated by using square bracket token syntax (for example, #{a[b][c]}).
+ * Previous example will look for nested value a->b->c ({'a': {'b': {'c': 'value'}}}).
+ */
 var Template = function(template) {
-	this.template = template.toString();
+	this.template = template;
 };
 
 Template.prototype = {
+	/**
+	 * Helper function called when match is found in template.
+	 *
+	 * @param Array  match     result of regex matching
+	 * @param Object object    object containing data
+	 *
+	 * @returns {String}
+	 */
 	onMatch: function (match, object) {
 		if (object == null) {
 			return match[1] + '';
@@ -934,8 +954,11 @@ Template.prototype = {
 			return match[2];
 		}
 
-		var ctx = object, expr = match[3], notEscHTML = (expr.substring(0, 1) === '*');
-		if(notEscHTML) {
+		var ctx = object,
+			expr = match[3],
+			escape = (expr.substring(0, 1) !== '*');
+
+		if(!escape) {
 			expr = expr.substring(1);
 		}
 
@@ -958,16 +981,21 @@ Template.prototype = {
 		}
 
 		ctx = '' + (((typeof ctx === 'undefined') || (ctx === null)) ? '' : ctx);
-		return before + (notEscHTML ? ctx : ctx.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-				.replace(/\"/g,'&quot;').replace(/\'/g,'&apos;'));
+		return before + (escape ? ctx.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+				.replace(/\"/g,'&quot;').replace(/\'/g,'&apos;') : ctx);
 	},
 
+	/**
+	 * Fill template with data defined in object.
+	 *
+	 * @param Object object    object containing data
+	 *
+	 * @returns String
+	 */
 	evaluate: function(object) {
-		if (object && typeof object.toTemplateReplacements === 'function') {
-			object = object.toTemplateReplacements();
-		}
+		var result = '',
+			source = this.template;
 
-		var result = '', source = this.template;
 		while (source.length > 0) {
 			var match = source.match(/(^|.|\r|\n)(#\{(.*?)\})/);
 			if (match) {
