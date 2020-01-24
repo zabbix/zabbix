@@ -113,6 +113,10 @@ class CHostInterface extends CApiService {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 			$sqlParts['where']['hostid'] = dbConditionInt('hi.hostid', $options['hostids']);
+
+			if ($options['groupCount']) {
+				$sqlParts['group']['hostid'] = 'hi.hostid';
+			}
 		}
 
 		// itemids
