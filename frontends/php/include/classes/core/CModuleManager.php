@@ -30,7 +30,7 @@ final class CModuleManager {
 	/**
 	 * Highest supported manifest version.
 	 */
-	const MAX_MANIFEST_VERSION = '1';
+	const MAX_MANIFEST_VERSION = 1;
 
 	/**
 	 * Home path of modules.
@@ -343,7 +343,7 @@ final class CModuleManager {
 		}
 
 		// Check manifest version.
-		if (version_compare((string) $manifest['manifest_version'], self::MAX_MANIFEST_VERSION) == 1) {
+		if (!is_numeric($manifest['manifest_version']) || $manifest['manifest_version'] > self::MAX_MANIFEST_VERSION) {
 			return null;
 		}
 
