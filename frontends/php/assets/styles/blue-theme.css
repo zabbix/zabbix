@@ -4642,22 +4642,10 @@ svg {
     padding: 8px 0; }
     .navtree .tree .tree-item > .tree-row:hover {
       background-color: #e8f5ff; }
-    .navtree .tree .tree-item > .tree-row > .problems {
+    .navtree .tree .tree-item > .tree-row > .problem-icon-list {
       float: right;
-      position: relative;
       padding-left: 10px;
-      margin-right: 10px;
-      background: inherit;
-      display: flex; }
-      .navtree .tree .tree-item > .tree-row > .problems .problems-per-item {
-        flex: 0 0 7px;
-        background: #808080;
-        color: #ffffff;
-        padding: 3px 4px 2px;
-        font-size: 12px;
-        line-height: 1;
-        border-radius: 3px;
-        margin: 0 5px 0 0; }
+      margin-right: 10px; }
     .navtree .tree .tree-item > .tree-row > .tools {
       float: right;
       position: relative;
@@ -4750,6 +4738,21 @@ svg {
   .navtree .tree .placeholder {
     background-color: #ebeef0;
     animation: fadein .5s; }
+
+.problem-icon-list {
+  float: left;
+  position: relative;
+  background: inherit;
+  display: flex; }
+  .problem-icon-list .problem-icon-list-item {
+    flex: 0 0 7px;
+    background: #808080;
+    color: #ffffff;
+    padding: 3px 4px 2px;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 3px;
+    margin: 0 5px 0 0; }
 
 :-ms-input-placeholder {
   color: #9d9d9d !important; }

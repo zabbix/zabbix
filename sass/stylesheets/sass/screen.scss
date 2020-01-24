@@ -7010,24 +7010,10 @@ svg {
 					background-color: $ui-hover-color;
 				}
 
-				> .problems {
+				> .problem-icon-list {
 					float: right;
-					position: relative;
 					padding-left: 10px;
 					margin-right: 10px;
-					background: inherit;
-					display: flex;
-
-					.problems-per-item {
-						flex: 0 0 7px;
-						background: #808080;
-						color: $white;
-						padding: 3px 4px 2px;
-						font-size: 12px;
-						line-height: 1;
-						border-radius: 3px;
-						margin: 0 5px 0 0;
-					}
 				}
 
 				> .tools {
@@ -7185,6 +7171,24 @@ svg {
 			background-color: $ui-placeholder-background-color;
 			animation: fadein .5s;
 		}
+	}
+}
+
+.problem-icon-list {
+	float: left;
+	position: relative;
+	background: inherit;
+	display: flex;
+
+	.problem-icon-list-item {
+		flex: 0 0 7px;
+		background: #808080;
+		color: $white;
+		padding: 3px 4px 2px;
+		font-size: 12px;
+		line-height: 1;
+		border-radius: 3px;
+		margin: 0 5px 0 0;
 	}
 }
 
