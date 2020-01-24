@@ -1500,7 +1500,9 @@ class CHost extends CHostGeneral {
 
 				$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
 
-				$interfaces = $this->unsetExtraFields($interfaces, ['hostid', 'interfaceid'], $options['selectInterfaces']);
+				$interfaces = $this->unsetExtraFields($interfaces, ['hostid', 'interfaceid'],
+					$options['selectInterfaces']
+				);
 				$result = $relationMap->mapMany($result, $interfaces, 'interfaces', $options['limitSelects']);
 			}
 			else {
@@ -1548,12 +1550,15 @@ class CHost extends CHostGeneral {
 					'countOutput' => true,
 					'groupCount' => true
 				]);
-				$screens = zbx_toHash($screens, 'hostid');
 
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['screens'] = array_key_exists($hostid, $screens)
-						? $screens[$hostid]['rowscount']
-						: '0';
+					$result[$hostid]['screens'] = 0;
+
+					foreach ($screens as $screen) {
+						if (bccomp($screen['hostid'], $hostid) == 0) {
+							$result[$hostid]['screens'] += $screen['rowscount'];
+						}
+					}
 				}
 			}
 		}
