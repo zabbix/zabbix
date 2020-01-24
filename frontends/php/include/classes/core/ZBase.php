@@ -499,30 +499,39 @@ class ZBase {
 	private function processResponseFinal(CRouter $router, CControllerResponse $response) {
 		// Controller returned data?
 		if ($response instanceof CControllerResponseData) {
+			$layout_data_defaults = [
+				'page' => [
+					'title' => $response->getTitle(),
+					'file' => $response->getFileName()
+				],
+				'controller' => [
+					'action' => $router->getAction()
+				],
+				'main_block' => '',
+				'javascript' => [
+					'files' => [],
+					'pre' => '',
+					'post' => ''
+				]
+			];
+
 			if ($router->getView() !== null && $response->isViewEnabled()) {
 				$view = new CView($router->getView(), $response->getData());
 
-				$data = [
-					'page' => [
-						'title' => $response->getTitle(),
-						'file' => $response->getFileName()
-					],
-					'controller' => [
-						'action' => $router->getAction()
-					],
+				$layout_data = array_replace($layout_data_defaults, [
 					'main_block' => $view->getOutput(),
 					'javascript' => [
 						'files' => $view->getAddedJS(),
 						'pre' => $view->getIncludedJS(),
 						'post' => $view->getPostJS()
 					]
-				];
-
-				echo (new CView($router->getLayout(), $data))->getOutput();
+				]);
 			}
 			else {
-				echo (new CView($router->getLayout(), $response->getData()))->getOutput();
+				$layout_data = array_replace_recursive($layout_data_defaults, $response->getData());
 			}
+
+			echo (new CView($router->getLayout(), $layout_data))->getOutput();
 		}
 		// Controller returned redirect to another page?
 		elseif ($response instanceof CControllerResponseRedirect) {
