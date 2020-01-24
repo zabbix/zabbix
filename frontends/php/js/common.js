@@ -911,18 +911,6 @@ if (typeof Element.prototype.remove === 'undefined') {
 /**
  * TODO: some additional comment for prototype related code block?
  */
-Function.prototype.bind = function (context) {
-	if (arguments.length < 2 && typeof(arguments[0]) === 'undefined') {
-		return this;
-	}
-
-	var method = this, args = Array.prototype.slice.call(arguments, 1);
-
-	return function() {
-		return method.apply(context, args.concat(Array.prototype.slice.call(arguments, 0)));
-	};
-};
-
 Function.prototype.bindAsEventListener = function (context) {
 	var method = this, args = Array.prototype.slice.call(arguments, 1);
 
