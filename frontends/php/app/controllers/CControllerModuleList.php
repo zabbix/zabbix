@@ -71,18 +71,17 @@ class CControllerModuleList extends CController {
 		}
 
 		$filter = [
-			'name' => CProfile::get('web.modules.filter.name', ''),
+			'name' => trim(CProfile::get('web.modules.filter.name', '')),
 			'status' => CProfile::get('web.modules.filter.status', -1)
 		];
+
+		$filter_name_terms = ($filter['name'] === '') ? [] : preg_split('/\s+/', $filter['name']);
 
 		// data prepare
 		$config = select_config();
 
 		$db_modules = API::Module()->get([
 			'output' => ['id', 'relative_path', 'status'],
-			'search' => [
-				'id' => ($filter['name'] === '') ? null : $filter['name']
-			],
 			'filter' => [
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
@@ -99,7 +98,22 @@ class CControllerModuleList extends CController {
 			$manifest = $module_manager->addModule($db_module['relative_path']);
 
 			if ($manifest) {
-				$modules[$moduleid] = $db_module + $manifest;
+				if ($filter_name_terms) {
+					$keep_manifest = false;
+					foreach ($filter_name_terms as $term) {
+						$keep_manifest = mb_stripos($manifest['name'], $term) !== false;
+						if (!$keep_manifest) {
+							break;
+						}
+					}
+				}
+				else {
+					$keep_manifest = true;
+				}
+
+				if ($keep_manifest) {
+					$modules[$moduleid] = $db_module + $manifest;
+				}
 			}
 			else {
 				$modules_missing[] = $db_module['relative_path'];
