@@ -3271,7 +3271,8 @@ ZABBIX.apps.map = (function($) {
 
 					list.push({
 						elementType: elementTypeText,
-						elementName: element.getName().escapeHTML()
+						elementName: element.getName().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+								.replace(/\"/g,'&quot;').replace(/\'/g,'&apos;')
 					});
 				}
 
@@ -3655,7 +3656,8 @@ ZABBIX.apps.map = (function($) {
 
 					for (i = 0, ln = optgroups[optgroupType].length; i < ln; i++) {
 						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">'
-							+ optgroups[optgroupType][i].getName().escapeHTML() + '</option>'
+							+ optgroups[optgroupType][i].getName().replace(/&/g,'&amp;').replace(/</g,'&lt;')
+									.replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/\'/g,'&apos;') + '</option>'
 						);
 					}
 
