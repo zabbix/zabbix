@@ -155,9 +155,10 @@ jQuery(function ($) {
 			});
 
 			if (option_to_edit) {
+				var key = Object.keys(menu)[0];
 				sections.push({
-					label: Object.keys(menu)[0],
-					items: getMenuPopupItems($obj, Object.values(menu)[0].items, trigger_elmnt)
+					label: key,
+					items: getMenuPopupItems($obj, menu[key].items, trigger_elmnt)
 				});
 			}
 			else {
