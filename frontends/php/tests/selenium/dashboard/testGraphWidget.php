@@ -41,7 +41,7 @@ class testGraphWidget extends CWebTest {
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int';
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str';
 
 	/*
 	 * Set "Graph" as default widget type.
@@ -1496,7 +1496,7 @@ class testGraphWidget extends CWebTest {
 						'fields' => [
 							'Show problems' => true,
 							'Selected items only' => false,
-							'Problem hosts' => ['Simple form test host', 'ЗАББИКС Сервер'],
+							'Problem hosts' => ['Simple form test host'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
 							'Tags' => 'Or'
@@ -1788,7 +1788,7 @@ class testGraphWidget extends CWebTest {
 						'fields' => [
 							'Show problems' => true,
 							'Selected items only' => false,
-							'Problem hosts' => ['ЗАББИКС Сервер', 'Simple form test host'],
+							'Problem hosts' => ['Simple form test host', 'ЗАББИКС Сервер'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
 							'Tags' => 'Or'

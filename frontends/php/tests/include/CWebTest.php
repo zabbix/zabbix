@@ -122,7 +122,7 @@ class CWebTest extends CTest {
 			}
 		}
 
-		if ($this->hasFailed() || $this->getStatus() !== null) {
+		if ($this->hasFailed() || $this->getStatus() === null || $errors) {
 			$this->captureScreenshot();
 		}
 	}
