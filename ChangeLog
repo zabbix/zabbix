@@ -3986,6 +3986,7 @@ Changes for 3.0.30rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-16024] fixed maintenance status not being updated in cache if host is disabled (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.29
