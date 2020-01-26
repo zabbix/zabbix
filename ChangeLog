@@ -1,6 +1,8 @@
 Changes for 5.0.0alpha1
 
 New features:
+A.F....PS. [ZBXNEXT-1423] added ipmi.get item for IPMI sensor LLD (akozlovs, Ivo)
+A.F.....S. [ZBXNEXT-5546,ZBXNEXT-5548] added support of default message templates for each media type (agriscenko, asestakovs)
 .......... [ZBXNEXT-5671] added zabbix_js command line utility for embedded javascript testing (wiper)
 ...G...... [ZBXNEXT-5490] added new key vfs.fs.get to collect mounted filesystems information and relevant metrics into json (akozlovs)
 .........T [ZBXNEXT-5636] added "Template App HAProxy" (mchudinov)
