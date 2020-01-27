@@ -57,14 +57,12 @@ function validateMedia(overlay) {
 	overlay.xhr = jQuery.ajax({
 		url: $form.attr('action'),
 		data: $form.serialize(),
-		complete: function() {
-			overlay.unsetLoading();
-		},
 		success: function(ret) {
 			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.errors !== 'undefined') {
 				jQuery(ret.errors).insertBefore($form);
+				overlay.unsetLoading();
 			}
 			else {
 				add_media(ret.dstfrm, ret.media, ret.mediatypeid, ret.sendto, ret.period, ret.active, ret.severity);
