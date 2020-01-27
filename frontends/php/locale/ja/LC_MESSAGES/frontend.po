@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-01-26 01:45+0200\n"
-"PO-Revision-Date: 2020-01-20 04:14+0300\n"
+"PO-Revision-Date: 2020-01-27 02:17+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1579486495.000000\n"
+"X-POOTLE-MTIME: 1580084227.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -682,7 +682,7 @@ msgstr "追加"
 
 #: app/views/administration.mediatype.edit.js.php:107
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "追加 (メッセージタイプのリミットに到達)"
 
 #: jsLoader.php:127
 msgid "Add a new widget"
@@ -1309,20 +1309,20 @@ msgstr "アイコンの自動選択"
 #: app/views/popup.mediatype.message.php:54 include/audit.inc.php:57
 #: include/classes/helpers/CMediatypeHelper.php:119 include/html.inc.php:812
 msgid "Autoregistration"
-msgstr ""
+msgstr "自動登録"
 
 #: include/views/configuration.action.list.php:25
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "自動登録アクション"
 
 #: app/views/administration.housekeeping.edit.php:67
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "自動登録データの保存期間"
 
 #: include/profiles.inc.php:221
 #, c-format
 msgid "Autoregistration event and alert data storage period \"%1$s\"."
-msgstr ""
+msgstr "自動登録イベントとアラートのデータ保存期間 \"%1$s\"。"
 
 #: include/views/configuration.host.list.php:184
 msgid "Availability"
@@ -4039,7 +4039,7 @@ msgstr "マップ\"%2$s\"のカスタムラベルのタイプ要素\"%1$s\"を�
 
 #: app/views/popup.operation.common.php:255
 msgid "Custom message"
-msgstr ""
+msgstr "メッセージのカスタマイズ"
 
 #: include/items.inc.php:1728
 msgid "Custom multiplier"
@@ -7444,7 +7444,7 @@ msgstr "IPMIセンサー"
 
 #: include/classes/items/CHelpItems.php:1101
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
-msgstr ""
+msgstr "IPMIセンサーのIDとその他のセンサーに関連したパラメーターを取得。JSONで返す。"
 
 #: app/views/administration.iconmap.edit.php:54
 #: app/views/administration.image.edit.php:69
@@ -8958,12 +8958,12 @@ msgstr "内部イベントとアラートのデータ保存期間 \"%1$s\"。"
 #: app/views/popup.mediatype.message.php:57
 #: include/classes/helpers/CMediatypeHelper.php:130
 msgid "Internal problem"
-msgstr ""
+msgstr "内部イベント発生"
 
 #: app/views/popup.mediatype.message.php:60
 #: include/classes/helpers/CMediatypeHelper.php:141
 msgid "Internal problem recovery"
-msgstr ""
+msgstr "内部イベント復旧"
 
 #: include/httptest.inc.php:400
 msgid "Internet Explorer"
@@ -9010,7 +9010,7 @@ msgstr "監査データの保存期間が正しくありません：%1$s。"
 #: include/profiles.inc.php:97
 #, c-format
 msgid "Invalid autoregistration data storage period: %1$s."
-msgstr ""
+msgstr "自動登録データの保存期間が正しくありません：%1$s。"
 
 #: include/profiles.inc.php:139
 #, c-format
@@ -10719,11 +10719,11 @@ msgstr "メッセージフォーマット"
 
 #: app/controllers/CControllerPopupMediatypeMessage.php:98
 msgid "Message template"
-msgstr ""
+msgstr "メッセージテンプレート"
 
 #: app/views/administration.mediatype.edit.php:287
 msgid "Message templates"
-msgstr ""
+msgstr "メッセージテンプレート"
 
 #: app/views/administration.user.edit.php:358
 #: app/views/administration.user.edit.php:366
@@ -10733,7 +10733,7 @@ msgstr "表示期間"
 #: app/views/administration.mediatype.edit.php:269
 #: app/views/popup.mediatype.message.php:40
 msgid "Message type"
-msgstr ""
+msgstr "メッセージタイプ"
 
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
 msgid "Message/Command"
@@ -13277,7 +13277,7 @@ msgstr "障害"
 #: app/views/popup.mediatype.message.php:45
 #: include/classes/helpers/CMediatypeHelper.php:61
 msgid "Problem recovery"
-msgstr ""
+msgstr "障害復旧"
 
 #: include/actions.inc.php:2059
 msgid "Problem resolved"
@@ -13290,7 +13290,7 @@ msgstr "障害時間"
 #: app/views/popup.mediatype.message.php:48
 #: include/classes/helpers/CMediatypeHelper.php:76
 msgid "Problem update"
-msgstr ""
+msgstr "障害更新"
 
 #: include/services.inc.php:25
 msgid "Problem, if all children have problems"
@@ -18743,11 +18743,11 @@ msgstr "少なくとも1つのオーバーライドオプションを指定す�
 
 #: include/events.inc.php:62
 msgid "autoregistered host"
-msgstr ""
+msgstr "自動登録されたホスト"
 
 #: include/events.inc.php:36
 msgid "autoregistration"
-msgstr ""
+msgstr "自動登録"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1855
 #: include/classes/graphdraw/CLineGraphDraw.php:1877
