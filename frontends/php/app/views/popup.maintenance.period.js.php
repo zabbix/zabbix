@@ -64,14 +64,12 @@ function submitMaintenancePeriod(overlay) {
 		data: elements,
 		dataType: 'json',
 		type: 'post',
-		complete: function() {
-			overlay.unsetLoading();
-		},
 		success: function(response) {
 			if ('errors' in response) {
 				overlay.$dialogue.find('.msg-bad').remove();
 
 				jQuery(response.errors).insertBefore($container);
+				overlay.unsetLoading();
 			}
 			else if ('params' in response) {
 				var index = response.params.index;
