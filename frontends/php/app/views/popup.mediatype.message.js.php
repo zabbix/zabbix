@@ -53,25 +53,32 @@ function getDefaultMessageTemplate(message_type) {
 
 /**
  * Sends message template form data to the server for validation before adding it to the main form.
+ *
+ * @param {Overlay} overlay
  */
-function submitMessageTemplate() {
-	var $form = jQuery(document.forms['mediatype_message_form']);
+function submitMessageTemplate(overlay) {
+	var $form = overlay.$dialogue.find('form');
+	overlay.setLoading();
 
-	sendAjaxData('zabbix.php', {
+	overlay.xhr = sendAjaxData('zabbix.php', {
 		data: $form.serialize(),
 		dataType: 'json',
 		method: 'POST',
 		success: function(response) {
-			$form.parent().find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 			if ('errors' in response) {
 				jQuery(response.errors).insertBefore($form);
 			}
 			else {
 				populateMessageTemplates([response.params]);
-				overlayDialogueDestroy($form.closest('[data-dialogueid]').data('dialogueid'));
+				overlayDialogueDestroy(overlay.dialogueid);
 			}
 		}
+	});
+
+	overlay.xhr.always(function() {
+		overlay.unsetLoading();
 	});
 }
 
