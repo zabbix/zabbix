@@ -75,8 +75,6 @@ class CControllerModuleList extends CController {
 			'status' => CProfile::get('web.modules.filter.status', -1)
 		];
 
-		$filter_name_terms = ($filter['name'] === '') ? [] : preg_split('/\s+/', $filter['name']);
-
 		// data prepare
 		$config = select_config();
 
@@ -96,23 +94,8 @@ class CControllerModuleList extends CController {
 		foreach ($db_modules as $moduleid => $db_module) {
 			$manifest = $module_manager->addModule($db_module['relative_path']);
 
-			if ($manifest) {
-				if ($filter_name_terms) {
-					$keep_manifest = false;
-					foreach ($filter_name_terms as $term) {
-						$keep_manifest = mb_stripos($manifest['name'], $term) !== false;
-						if (!$keep_manifest) {
-							break;
-						}
-					}
-				}
-				else {
-					$keep_manifest = true;
-				}
-
-				if ($keep_manifest) {
-					$modules[$moduleid] = $db_module + $manifest;
-				}
+			if ($manifest && ($filter['name'] === '' || mb_stripos($manifest['name'], $filter['name']) !== false)) {
+				$modules[$moduleid] = $db_module + $manifest;
 			}
 		}
 
