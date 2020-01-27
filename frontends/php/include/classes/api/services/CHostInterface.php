@@ -748,9 +748,9 @@ class CHostInterface extends CApiService {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts
 	 *
-	 * @param array $hostids	an array of host IDs
+	 * @param array $hostIds	an array of host IDs
 	 */
-	protected function checkHostPermissions(array $hostids) {
+	protected function checkHostPermissions(array $hostIds) {
 		if ($hostids) {
 			$hostids = array_unique($hostids);
 
