@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-01-24T12:46:56Z</date>
+    <date>2020-01-27T16:32:25Z</date>
     <media_types>
         <media_type>
             <name>Discord</name>
@@ -132,10 +132,10 @@ try {&#13;
     var params = JSON.parse(value);&#13;
 &#13;
     if (!params.discord_endpoint) {&#13;
-        throw &quot;Cannot get discord_endpoint&quot;;&#13;
+        throw 'Cannot get discord_endpoint';&#13;
     }&#13;
     else if (!params.discord_endpoint.startsWith('https://discordapp.com/api/webhooks')) {&#13;
-        throw &quot;Invalid Discord webhook URL: &quot; + params.discord_endpoint;&#13;
+        throw 'Invalid Discord webhook URL: ' + params.discord_endpoint;&#13;
     }&#13;
     else {&#13;
         params.discord_endpoint = params.discord_endpoint.replace('/api/', '/api/v1000/') + '?wait=True';&#13;
@@ -145,11 +145,11 @@ try {&#13;
         ? params.zabbix_url.slice(0, -1) : params.zabbix_url;&#13;
 &#13;
     if (!(params.event_value == 0 || params.event_value == 1)) {&#13;
-        throw &quot;Incorrect event_value parameter given: &quot; + params.event_value + &quot;\nMust be 0 or 1.&quot;;&#13;
+        throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
     if (!(params.event_update_status == 0 || params.event_update_status == 1)) {&#13;
-        throw &quot;Incorrect event_value parameter given: &quot; + params.event_update_status + &quot;\nMust be 0 or 1.&quot;;&#13;
+        throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
     if (params.event_value == 0) {&#13;
@@ -157,7 +157,7 @@ try {&#13;
     }&#13;
 &#13;
     if (!SEVERITY_COLORS[params.event_nseverity]) {&#13;
-        throw &quot;Incorrect event_nseverity parameter given: &quot; + params.event_nseverity + &quot;\nMust be 0-5.&quot;;&#13;
+        throw 'Incorrect &quot;event_nseverity&quot; parameter given: ' + params.event_nseverity + '\nMust be 0-5.';&#13;
     }&#13;
 &#13;
     var color = parseInt(SEVERITY_COLORS[params.event_nseverity].replace('#', ''), 16),&#13;
@@ -166,8 +166,8 @@ try {&#13;
             embeds: [&#13;
                 {&#13;
                     color: color || 0,&#13;
-                    url: params.zabbix_url + '/tr_events.php?triggerid='&#13;
-						+ params.trigger_id + '&amp;eventid=' + params.event_id&#13;
+                    url: params.zabbix_url + '/tr_events.php?triggerid=' +&#13;
+                        params.trigger_id + '&amp;eventid=' + params.event_id&#13;
                 }&#13;
             ]&#13;
         };&#13;

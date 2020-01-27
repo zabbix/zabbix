@@ -53,9 +53,6 @@ The "Send to" field must contain Discord webhook URL created before.
 
 [![](images/thumb.7.png?raw=true)](images/7.png)
 
-Please note that currently there is a limited support of Unicode. Problems are mostly caused by 3 and 4 byte UTF-8 sequences (or example, if emoji symbols are used in message text) and such UTF-8 sequences can cause errors like "400: Bad Request".
-To avoid such cases in production environments, we propose to avoid using 3 and 4 byte UTF-8 sequences and to use mediatype test functionality to make sure that it works for you.
-
 For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
 
 ## Supported Versions
