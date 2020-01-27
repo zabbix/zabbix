@@ -169,7 +169,7 @@ Overlay.prototype.containFocus = function() {
  */
 Overlay.prototype.setLoading = function() {
 	this.$dialogue.$body.addClass('is-loading');
-	this.$dialogue.$controls.find('select').prop('disabled', true);
+	this.$dialogue.$controls.find('select, button').prop('disabled', true);
 	this.$btn_submit && this.$btn_submit.prop('disabled', true);
 };
 
