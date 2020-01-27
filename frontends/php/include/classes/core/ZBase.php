@@ -173,8 +173,6 @@ class ZBase {
 				$this->initMainMenu();
 				$this->initModuleManager();
 
-				array_map('error', $this->module_manager->getErrors());
-
 				$file = basename($_SERVER['SCRIPT_NAME']);
 				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
 
@@ -637,5 +635,7 @@ class ZBase {
 		}
 
 		$this->module_manager->initModules();
+
+		array_map('error', $this->module_manager->getErrors());
 	}
 }
