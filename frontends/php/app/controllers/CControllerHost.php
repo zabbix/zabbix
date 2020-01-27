@@ -29,20 +29,20 @@ abstract class CControllerHost extends CController {
 	/**
 	 * Prepares the host list based on the given filter and sorting options.
 	 *
-	 * @param array  $filter                     Filter options.
-	 * @param string $filter['name']             Filter hosts by name.
-	 * @param array  $filter['groupids']         Filter hosts by host groups.
-	 * @param string $filter['ip']               Filter hosts by IP.
-	 * @param string $filter['dns']	             Filter hosts by DNS.
-	 * @param string $filter['port']             Filter hosts by port.
-	 * @param string $filter['status']           Filter hosts by status.
-	 * @param string $filter['evaltype']         Filter hosts by tags.
-	 * @param string $filter['tags']             Filter hosts by tag names and values.
-	 * @param string $filter['severities']       Filter problems on hosts by severities.
-	 * @param string $filter['show_suppressed']  Filter supressed problems.
-	 * @param int    $filter['maintenance']      Filter hosts by maintenance.
-	 * @param string $sort						 Sorting field.
-	 * @param string $sortorder                  Sorting order.
+	 * @param array  $filter                        Filter options.
+	 * @param string $filter['name']                Filter hosts by name.
+	 * @param array  $filter['groupids']            Filter hosts by host groups.
+	 * @param string $filter['ip']                  Filter hosts by IP.
+	 * @param string $filter['dns']	                Filter hosts by DNS.
+	 * @param string $filter['port']                Filter hosts by port.
+	 * @param string $filter['status']              Filter hosts by status.
+	 * @param string $filter['evaltype']            Filter hosts by tags.
+	 * @param string $filter['tags']                Filter hosts by tag names and values.
+	 * @param string $filter['severities']          Filter problems on hosts by severities.
+	 * @param string $filter['show_suppressed']     Filter supressed problems.
+	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
+	 * @param string $sort						    Sorting field.
+	 * @param string $sortorder                     Sorting order.
 	 */
 	protected function prepareData(array $filter, $sort, $sortorder) {
 		$child_groups = [];
@@ -97,6 +97,7 @@ abstract class CControllerHost extends CController {
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
 			'groupids' => $groupids,
+			'severities' => $filter['severities'] ? $filter['severities'] : null,
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name'],
 				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
@@ -145,11 +146,17 @@ abstract class CControllerHost extends CController {
 				'hostids' => $host['hostid'],
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
-				'severities' => $filter['severities'] ? $filter['severities'] : null,
 				'suppressed' => ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 			]);
-			if ($filter['severities'] && !$host['problems']) {
-				unset($hosts[$key]);
+
+			$host['problem_total_count'] = count($host['problems']);
+
+			if ($host['problems'] && $filter['severities']) {
+				foreach ($host['problems'] as $i => $problem) {
+					if (!in_array($problem['severity'], $filter['severities'])) {
+						unset($host['problems'][$i]);
+					}
+				}
 			}
 		}
 		unset($host);

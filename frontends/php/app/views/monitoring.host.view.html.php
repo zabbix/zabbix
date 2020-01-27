@@ -21,10 +21,8 @@ declare(strict_types=1);
 **/
 
 
-// create form
 $form = (new CForm())->setName('host_view');
 
-// create table
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'host.view')
 	->getUrl();
@@ -34,14 +32,12 @@ $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 $view_url = $data['view_curl']->getUrl();
 
 $table->setHeader([
-	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)
-		->addStyle('width: 13%'),
+	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)->addStyle('width: 13%'),
 	(new CColHeader(_('Interface')))->addStyle('width: 134px;'),
 	(new CColHeader(_('Availability')))->addStyle('width: 117px;'),
 	(new CColHeader(_('Tags')))->addStyle('width: 17%'),
 	(new CColHeader(_('Problems')))->addStyle('width: 117px;'),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url)
-		->addStyle('width: 5%'),
+	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url)->addStyle('width: 5%'),
 	(new CColHeader(_('Latest data')))->addStyle('width: 6%'),
 	(new CColHeader(_('Problems')))->addStyle('width: 7%'),
 	(new CColHeader(_('Graphs')))->addStyle('width: 7%'),
@@ -65,7 +61,6 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 	$host_interface .= $interface['port'] ? NAME_DELIMITER.$interface['port'] : '';
-	$problem_count = count($host['problems']);
 
 	$problems_div = (new CDiv())->addClass(ZBX_STYLE_PROBLEM_ICON_LIST);
 
@@ -135,7 +130,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 			),
-			CViewHelper::showNum($problem_count)
+			CViewHelper::showNum($host['problem_total_count'])
 		],
 		$host['graphs']
 			? [

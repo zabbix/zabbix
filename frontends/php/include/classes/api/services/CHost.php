@@ -457,9 +457,8 @@ class CHost extends CHostGeneral {
 					'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_DISASTER)), 'uniq' => true
 				]
 			]];
-
-			if (!CApiInputValidator::validate($api_input_rules,
-					array_intersect_key($options, $api_input_rules['fields']), '/', $error)) {
+			$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+			if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
