@@ -503,7 +503,7 @@
 					// Create new input[type=text].
 					const input = document.createElement('input')
 					input.type = 'text';
-					input.disabled = true;
+					input.readOnly = true;
 					input.value = value;
 
 					// Replace select with created input.
