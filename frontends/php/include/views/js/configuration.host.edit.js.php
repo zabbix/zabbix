@@ -501,7 +501,7 @@
 					const value = elem.options[elem.selectedIndex].text;
 
 					// Create new input[type=text].
-					const input = document.createElement('input')
+					const input = document.createElement('input');
 					input.type = 'text';
 					input.readOnly = true;
 					input.value = value;
