@@ -204,13 +204,15 @@ class CHostInterface extends CApiService {
 					'contextname' => ''
 				];
 
-				if ($value['type'] != INTERFACE_TYPE_SNMP) {
+				$interface_type = $value['type'];
+
+				if (!$this->outputIsRequested('type', $options['output'])) {
+					unset($value['type']);
+				}
+
+				if ($interface_type != INTERFACE_TYPE_SNMP) {
 					foreach(array_keys($snmp) as $field_name) {
 						unset($value[$field_name]);
-					}
-
-					if (!$this->outputIsRequested('type', $options['output'])) {
-						unset($value['type']);
 					}
 
 					$value['details'] = [];
