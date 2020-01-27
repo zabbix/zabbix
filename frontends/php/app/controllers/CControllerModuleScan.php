@@ -37,13 +37,15 @@ class CControllerModuleScan extends CController {
 	}
 
 	protected function doAction() {
+		clear_messages();
+
 		$db_modules_create = [];
 		$db_modules_create_names = [];
 		$db_modules_delete = [];
 		$db_modules_delete_names = [];
 
 		$db_modules = API::Module()->get([
-			'output' => ['relative_path'],
+			'output' => ['id', 'relative_path'],
 			'sortfield' => 'relative_path',
 			'preservekeys' => true
 		]);
@@ -70,9 +72,14 @@ class CControllerModuleScan extends CController {
 				continue;
 			}
 
-			$healthy_modules[] = $relative_path;
+			$is_stored = array_key_exists($relative_path, $db_moduleids);
+			$is_healthy = !$is_stored || $db_modules[$db_moduleids[$relative_path]]['id'] === $manifest['id'];
 
-			if (!array_key_exists($relative_path, $db_moduleids)) {
+			if ($is_healthy) {
+				$healthy_modules[] = $relative_path;
+			}
+
+			if (!$is_stored || !$is_healthy) {
 				$db_modules_create[] = [
 					'id' => $manifest['id'],
 					'relative_path' => $relative_path,

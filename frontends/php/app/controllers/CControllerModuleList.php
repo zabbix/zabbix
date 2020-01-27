@@ -92,7 +92,6 @@ class CControllerModuleList extends CController {
 
 		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
 		$modules = [];
-		$modules_missing = [];
 
 		foreach ($db_modules as $moduleid => $db_module) {
 			$manifest = $module_manager->addModule($db_module['relative_path']);
@@ -115,15 +114,6 @@ class CControllerModuleList extends CController {
 					$modules[$moduleid] = $db_module + $manifest;
 				}
 			}
-			else {
-				$modules_missing[] = $db_module['relative_path'];
-			}
-		}
-
-		if ($modules_missing) {
-			error(_n('Cannot load module at: %s.', 'Cannot load modules at: %s.', implode(', ', $modules_missing),
-				count($modules_missing)
-			));
 		}
 
 		order_result($modules, $sort_field, $sort_order);

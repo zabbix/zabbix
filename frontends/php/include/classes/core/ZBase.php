@@ -614,8 +614,22 @@ class ZBase {
 			'sortfield' => 'relative_path'
 		], false);
 
+		$modules_missing = [];
+
 		foreach ($db_modules as $db_module) {
-			$this->module_manager->addModule($db_module['relative_path'], $db_module['id'], $db_module['config']);
+			$manifest = $this->module_manager->addModule($db_module['relative_path'], $db_module['id'],
+				$db_module['config']
+			);
+
+			if (!$manifest) {
+				$modules_missing[] = $db_module['relative_path'];
+			}
+		}
+
+		if ($modules_missing) {
+			error(_n('Cannot load module at: %s.', 'Cannot load modules at: %s.', implode(', ', $modules_missing),
+				count($modules_missing)
+			));
 		}
 
 		foreach ($this->module_manager->getNamespaces() as $namespace => $paths) {
