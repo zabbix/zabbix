@@ -142,11 +142,8 @@ function getItemFilterForm(&$items) {
 		if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP) {
 			zbx_subarray_push($fTypeVisibility, $type, 'filter_delay_row');
 		}
-
-		switch ($type) {
-			case ITEM_TYPE_SNMP:
-				zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_oid_row');
-				break;
+		if ($type == ITEM_TYPE_SNMP) {
+			zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_oid_row');
 		}
 	}
 

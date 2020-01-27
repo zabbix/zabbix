@@ -104,9 +104,7 @@ $fields = [
 									],
 	'snmp_oid' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
-											' && '.IN(ITEM_TYPE_SNMP,
-												'type'
-											),
+											' && {type} == '.ITEM_TYPE_SNMP,
 										_('SNMP OID')
 									],
 	'ipmi_sensor' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,

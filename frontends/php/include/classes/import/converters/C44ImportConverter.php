@@ -381,7 +381,7 @@ class C44ImportConverter extends CConverter {
 
 						// Check if interface used in items.
 						if (array_key_exists($interfaceid, $interfaces)) {
-							// Copy interface as new and mapping him with parent interface.
+							// Clone interface and map it with parent interface.
 							$new_interfaces[$interfaceid][] = [
 								'interface_ref' => 'if'.(++$max_interfaceid),
 								'new' => true
@@ -418,7 +418,7 @@ class C44ImportConverter extends CConverter {
 								}
 								unset($iface);
 
-								// Find interfaces with same version.
+								// Find interfaces having same SNMP version.
 								$same_ver_interfaces = array_filter($new_interfaces[$interfaceid],
 									function($iface) use ($item) {
 										return $iface['details']['version'] === $item['type'];
@@ -428,7 +428,7 @@ class C44ImportConverter extends CConverter {
 								if ($same_ver_interfaces) {
 									$same_interfaces = array_filter($same_ver_interfaces,
 										function($iface) use ($item, $parent_interface) {
-											// If item port diff from interface ports it is 100% new interface.
+											// If item port differs from interface ports it is 100% new interface.
 											if ($item['port'] === '') {
 												// Item port not set and interface port not equel parent port.
 												if ($iface['port'] !== $parent_interface['port']) {
@@ -442,21 +442,21 @@ class C44ImportConverter extends CConverter {
 												}
 											}
 
-											// If community equel between item it is our interface.
+											// If interface community string is equel with item it is our interface.
 											if ($item['type'] === CXmlConstantName::SNMPV1
 													|| $item['type'] === CXmlConstantName::SNMPV2) {
-												return $iface['details']['community'] === $item['community'];
+												return ($iface['details']['community'] === $item['community']);
 											}
 
-											// The same.
+											// Compare all item specific SNMPV3 fields with interface properties.
 											if ($item['type'] === CXmlConstantName::SNMPV3) {
-												return $iface['details']['contextname'] === $item['contextname']
+												return ($iface['details']['contextname'] === $item['contextname']
 													&& $iface['details']['securityname'] === $item['securityname']
 													&& $iface['details']['securitylevel'] === $item['securitylevel']
 													&& $iface['details']['authprotocol'] === $item['authprotocol']
 													&& $iface['details']['authpassphrase'] === $item['authpassphrase']
 													&& $iface['details']['privprotocol'] === $item['privprotocol']
-													&& $iface['details']['privpassphrase'] === $item['privpassphrase'];
+													&& $iface['details']['privpassphrase'] === $item['privpassphrase']);
 											}
 										}
 									);

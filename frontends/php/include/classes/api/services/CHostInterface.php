@@ -151,9 +151,8 @@ class CHostInterface extends CApiService {
 		}
 
 		if ($this->outputIsRequested('details', $options['output'])) {
-			$sqlParts['left_join'] = ['interface_snmp' => ['from' => 'interface_snmp his',
-					'on' => 'his.interfaceid=hi.interfaceid'
-				]
+			$sqlParts['left_join']['interface_snmp'] = ['from' => 'interface_snmp his',
+				'on' => 'his.interfaceid=hi.interfaceid'
 			];
 			$sqlParts['left_table'] = 'interface';
 		}
@@ -206,8 +205,8 @@ class CHostInterface extends CApiService {
 				];
 
 				if ($value['type'] != INTERFACE_TYPE_SNMP) {
-					foreach(array_keys($snmp) as $field) {
-						unset($value[$field]);
+					foreach(array_keys($snmp) as $field_name) {
+						unset($value[$field_name]);
 					}
 
 					if (!$this->outputIsRequested('type', $options['output'])) {
@@ -392,6 +391,7 @@ class CHostInterface extends CApiService {
 
 			$this->checkSnmpBulk($interface);
 		}
+		unset($interface);
 	}
 
 	/**
@@ -463,8 +463,8 @@ class CHostInterface extends CApiService {
 		DB::update('interface', $data);
 
 		$db_interfaces = $this->get([
+			'output' => ['details'],
 			'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
-			'output' => ['interfaceid', 'type', 'details'],
 			'filter' => ['type' => INTERFACE_TYPE_SNMP],
 			'preservekeys' => true
 		]);
@@ -932,9 +932,11 @@ class CHostInterface extends CApiService {
 	}
 
 	/**
-	 * Check SNMP version is valid. Valid version is SNMP_V1, SNMP_V2C, SNMP_V3.
+	 * Check if SNMP version is valid. Valid versions: SNMP_V1, SNMP_V2C, SNMP_V3.
 	 *
 	 * @param array $interface
+	 *
+	 * @throws APIException if "version" value is incorrect.
 	 */
 	protected function checkSnmpVersion(array $interface) {
 		if (!array_key_exists('version', $interface['details'])
@@ -947,11 +949,13 @@ class CHostInterface extends CApiService {
 	 * Check SNMP community. For SNMPv1 and SNMPv2c it required.
 	 *
 	 * @param array $interface
+	 *
+	 * @throws APIException if "community" value is incorrect.
 	 */
 	protected function checkSnmpCommunity(array $interface) {
 		if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
 				&& (!array_key_exists('community', $interface['details'])
-					|| $interface['details']['community'] == '')) {
+					|| $interface['details']['community'] === '')) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
 		}
 	}
@@ -959,9 +963,9 @@ class CHostInterface extends CApiService {
 	/**
 	 * Validates SNMP interface "bulk" field.
 	 *
-	 * @throws APIException if bulk field is incorrect.
-	 *
 	 * @param array $interface
+	 *
+	 * @throws APIException if "bulk" value is incorrect.
 	 */
 	protected function checkSnmpBulk(array $interface) {
 		if ($interface['type'] !== null && (($interface['type'] != INTERFACE_TYPE_SNMP

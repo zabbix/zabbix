@@ -621,9 +621,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 						continue;
 					}
 
-					$interfaces[$key]['details']['bulk'] = !isset($interface['details']['bulk'])
-						? SNMP_BULK_DISABLED
-						: SNMP_BULK_ENABLED;
+					$interfaces[$key]['details']['bulk'] = array_key_exists('bulk', $interface['details'])
+						? SNMP_BULK_ENABLED
+						: SNMP_BULK_DISABLED;
 				}
 
 				if ($interface['isNew']) {

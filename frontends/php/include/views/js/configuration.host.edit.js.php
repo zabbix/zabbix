@@ -24,9 +24,9 @@
 <div class="<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?>" id="interface_row_#{iface.interfaceid}" data-type="#{iface.type}" data-interfaceid="#{iface.interfaceid}">
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][items]" value="#{iface.items}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][locked]" value="#{iface.locked}" />
-	<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}">
-	<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}">
-	<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
+	<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
+	<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
+	<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
 
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_ICON ?>">
 		<button type="button" class="<?= ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE ?>"></button>
@@ -194,7 +194,7 @@
 			},
 			setSnmpFields: function(elem, iface) {
 				if (iface.type != '<?= INTERFACE_TYPE_SNMP ?>') {
-					$('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?>', elem).remove()
+					$('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?>', elem).remove();
 					return false;
 				}
 
@@ -211,23 +211,23 @@
 					$('#interfaces_' + iface.interfaceid + '_details_bulk').prop('checked', true);
 				}
 
-				new CViewSwitcher('interfaces_'+iface.interfaceid+'_details_version', 'change',
+				new CViewSwitcher('interfaces_' + iface.interfaceid + '_details_version', 'change',
 					{
-						<?= SNMP_V1 ?>: ["row_snmp_community_" + iface.interfaceid],
-						<?= SNMP_V2C ?>: ["row_snmp_community_" + iface.interfaceid],
+						<?= SNMP_V1 ?>: ['row_snmp_community_' + iface.interfaceid],
+						<?= SNMP_V2C ?>: ['row_snmp_community_' + iface.interfaceid],
 						<?= SNMP_V3 ?>: [
-							"row_snmpv3_contextname_" + iface.interfaceid,
-							"row_snmpv3_securityname_" + iface.interfaceid,
-							"row_snmpv3_securitylevel_" + iface.interfaceid,
-							"row_snmpv3_authprotocol_" + iface.interfaceid,
-							"row_snmpv3_authpassphrase_" + iface.interfaceid,
-							"row_snmpv3_privprotocol_" + iface.interfaceid,
-							"row_snmpv3_privpassphrase_" + iface.interfaceid
+							'row_snmpv3_contextname_' + iface.interfaceid,
+							'row_snmpv3_securityname_' + iface.interfaceid,
+							'row_snmpv3_securitylevel_' + iface.interfaceid,
+							'row_snmpv3_authprotocol_' + iface.interfaceid,
+							'row_snmpv3_authpassphrase_' + iface.interfaceid,
+							'row_snmpv3_privprotocol_' + iface.interfaceid,
+							'row_snmpv3_privpassphrase_' + iface.interfaceid
 						]
 					}
 				);
 
-				$('#interfaces_'+iface.interfaceid+'_details_version').on('change', function() {
+				$('#interfaces_' + iface.interfaceid + '_details_version').on('change', function() {
 					$('#interfaces_' + iface.interfaceid + '_details_securitylevel').off('change');
 
 					if ($(this).val() == '<?= SNMP_V3 ?>') {
@@ -235,14 +235,14 @@
 							{
 								<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>: [],
 								<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>: [
-									"row_snmpv3_authprotocol_" + iface.interfaceid,
-									"row_snmpv3_authpassphrase_" + iface.interfaceid,
+									'row_snmpv3_authprotocol_' + iface.interfaceid,
+									'row_snmpv3_authpassphrase_' + iface.interfaceid,
 								],
 								<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>: [
-									"row_snmpv3_authprotocol_" + iface.interfaceid,
-									"row_snmpv3_authpassphrase_" + iface.interfaceid,
-									"row_snmpv3_privprotocol_" + iface.interfaceid,
-									"row_snmpv3_privpassphrase_" + iface.interfaceid
+									'row_snmpv3_authprotocol_' + iface.interfaceid,
+									'row_snmpv3_authpassphrase_' + iface.interfaceid,
+									'row_snmpv3_privprotocol_' + iface.interfaceid,
+									'row_snmpv3_privpassphrase_' + iface.interfaceid
 								]
 							}
 						);
@@ -320,8 +320,8 @@
 
 		function render(iface) {
 			var container = document.querySelector(helper.getContainerId(iface.type)),
-				disabled = iface.items > 0,
-				locked = iface.locked > 0;
+				disabled = (iface.items > 0),
+				locked = (iface.locked > 0);
 
 			iface.type_name = helper.getNameByType(iface.type);
 
@@ -496,7 +496,7 @@
 				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('input[type="radio"], input[type="checkbox"], select').prop('disabled', true);
 				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>').remove();
 			}
-		}
+		};
 	})(jQuery);
 
 	jQuery(document).ready(function() {
