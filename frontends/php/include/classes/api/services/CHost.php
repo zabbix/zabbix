@@ -107,6 +107,7 @@ class CHost extends CHostGeneral {
 			// filter
 			'evaltype'							=> TAG_EVAL_TYPE_AND_OR,
 			'tags'								=> null,
+			'severities'						=> null,
 			'filter'							=> null,
 			'search'							=> null,
 			'searchInventory'					=> null,
@@ -447,6 +448,31 @@ class CHost extends CHostGeneral {
 				],
 				$sqlParts
 			);
+		}
+
+		// Filter hosts by given problem severities.
+		if ($options['severities'] !== null) {
+			$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+				'severities' =>	[
+					'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_DISASTER)), 'uniq' => true
+				]
+			]];
+
+			if (!CApiInputValidator::validate($api_input_rules,
+					array_intersect_key($options, $api_input_rules['fields']), '/', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM items i,functions f,problem p'.
+				' WHERE i.hostid=h.hostid'.
+					' AND i.itemid=f.itemid'.
+					' AND f.triggerid=p.objectid'.
+					' AND p.object='.EVENT_OBJECT_TRIGGER.
+					' AND p.source='.EVENT_SOURCE_TRIGGERS.
+					' AND '.dbConditionInt('p.severity', zbx_toArray($options['severities'])).
+				')';
 		}
 
 		// filter
