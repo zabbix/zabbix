@@ -421,12 +421,10 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
 	this.fetch('notifications.read', {ids: this.getEventIds()})
 		.catch(console.error)
 		.then(function(resp) {
-			if (resp.ids) {
-				resp.ids.forEach(function(id) {
-					this.removeById(id);
-					this.debounceRender();
-				}.bind(this));
-			}
+			resp.ids.forEach(function(id) {
+				this.removeById(id);
+				this.debounceRender();
+			}.bind(this));
 
 			this.alarm.reset();
 			this.pushUpdates();

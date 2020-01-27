@@ -213,17 +213,15 @@
 		}
 
 		var result = false;
-		if (data['widgets']) {
-			data['widgets'].forEach(function(widget) {
-				// Widget popup open (refresh rate)?
-				if (widget['content_header'].find('[data-expanded="true"]').length > 0
-						// Widget being dragged or resized in dashboard edit mode?
-						|| widget['div'].hasClass('ui-draggable-dragging')
-						|| widget['div'].hasClass('ui-resizable-resizing')) {
-					result = true;
-				}
-			});
-		}
+		data['widgets'].forEach(function(widget) {
+			// Widget popup open (refresh rate)?
+			if (widget['content_header'].find('[data-expanded="true"]').length > 0
+					// Widget being dragged or resized in dashboard edit mode?
+					|| widget['div'].hasClass('ui-draggable-dragging')
+					|| widget['div'].hasClass('ui-resizable-resizing')) {
+				result = true;
+			}
+		});
 
 		return result;
 	}
