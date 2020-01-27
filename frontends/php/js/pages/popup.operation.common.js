@@ -112,14 +112,12 @@ function validateOperationPopup(overlay) {
 	});
 
 	overlay.xhr
-		.always(function() {
-			overlay.unsetLoading();
-		})
 		.done(function(response) {
 			overlay.$dialogue.find('.msg-bad').remove();
 
 			if (typeof response.errors !== 'undefined') {
 				jQuery(response.errors).insertBefore($form);
+				overlay.unsetLoading();
 			}
 			else {
 				submitOperationPopup(response);
