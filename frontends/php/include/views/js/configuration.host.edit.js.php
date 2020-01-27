@@ -495,6 +495,20 @@
 				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('input[type="text"]').prop('readonly', true);
 				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('input[type="radio"], input[type="checkbox"], select').prop('disabled', true);
 				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>').remove();
+
+				// Change select to input
+				[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')].map((elem) => {
+					const value = elem.options[elem.selectedIndex].text;
+
+					// Create new input[type=text]
+					const input = document.createElement('input')
+					input.type = 'text';
+					input.disabled = true;
+					input.value = value;
+
+					// Replace select with created input.
+					elem.replace(input);
+				});
 			}
 		};
 	})(jQuery);
