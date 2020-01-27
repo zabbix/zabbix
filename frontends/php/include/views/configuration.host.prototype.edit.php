@@ -68,7 +68,7 @@ $visiblenameTB = (new CTextBox('name', $name, (bool) $hostPrototype['templateid'
 	->setAttribute('maxlength', 128);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
-// display inherited parameters only for hosts prototypes on hosts
+// Display inherited parameters only for hosts prototypes on hosts.
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$existingInterfaceTypes = [];
 	foreach ($parentHost['interfaces'] as $interface) {
@@ -85,52 +85,20 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'agent');
 
-	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
-		$agent_interfaces->addItem(
-			(new CDiv(
-				(new CDiv(_('No agent interfaces found.')))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
-			))->addClass(ZBX_STYLE_HOST_INTERFACE_ROW)
-		);
-	}
-
 	$snmp_interfaces = (new CDiv())
 		->setId('SNMPInterfaces')
 		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
 		->setAttribute('data-type', 'snmp');
-
-	if (!array_key_exists(INTERFACE_TYPE_SNMP, $existingInterfaceTypes)) {
-		$snmp_interfaces->addItem(
-			(new CDiv(
-				(new CDiv(_('No SNMP interfaces found.')))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
-			))->addClass(ZBX_STYLE_HOST_INTERFACE_ROW)
-		);
-	}
 
 	$jmx_interfaces = (new CDiv())
 		->setId('JMXInterfaces')
 		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'jmx');
 
-	if (!array_key_exists(INTERFACE_TYPE_JMX, $existingInterfaceTypes)) {
-		$jmx_interfaces->addItem(
-			(new CDiv(
-				(new CDiv(_('No JMX interfaces found.')))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
-			))->addClass(ZBX_STYLE_HOST_INTERFACE_ROW)
-		);
-	}
-
 	$ipmi_interfaces = (new CDiv())
 		->setId('IPMIInterfaces')
 		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'ipmi');
-
-	if (!array_key_exists(INTERFACE_TYPE_IPMI, $existingInterfaceTypes)) {
-		$ipmi_interfaces->addItem(
-			(new CDiv(
-				(new CDiv(_('No IPMI interfaces found.')))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
-			))->addClass(ZBX_STYLE_HOST_INTERFACE_ROW)
-		);
-	}
 
 	$hostList->addRow(new CLabel(_('Interfaces')),
 		[new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces])]

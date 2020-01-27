@@ -75,9 +75,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-port"]/input[@type="text"][@readonly]');
-		$this->zbxTestAssertElementText('//tr[@id="SNMPInterfacesFooter"]', 'No SNMP interfaces found.');
-		$this->zbxTestAssertElementText('//tr[@id="JMXInterfacesFooter"]', 'No JMX interfaces found.');
-		$this->zbxTestAssertElementText('//tr[@id="IPMIInterfacesFooter"]', 'No IPMI interfaces found.');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="proxy_hostid"][@readonly]');
 
 		// Check layout at Groups tab.
