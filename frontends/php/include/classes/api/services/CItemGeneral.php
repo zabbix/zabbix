@@ -524,15 +524,15 @@ abstract class CItemGeneral extends CApiService {
 
 			// ssh, telnet
 			if ($fullItem['type'] == ITEM_TYPE_SSH || $fullItem['type'] == ITEM_TYPE_TELNET) {
-				if (zbx_empty($fullItem['username'])) {
+				if ($fullItem['username'] === '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No authentication user name specified.'));
 				}
 
 				if ($fullItem['type'] == ITEM_TYPE_SSH && $fullItem['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
-					if (zbx_empty($fullItem['publickey'])) {
+					if ($fullItem['publickey'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No public key file specified.'));
 					}
-					if (zbx_empty($fullItem['privatekey'])) {
+					if ($fullItem['privatekey'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No private key file specified.'));
 					}
 				}
@@ -545,7 +545,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// snmp oid
-			if ($fullItem['type'] == ITEM_TYPE_SNMP && zbx_empty($fullItem['snmp_oid'])) {
+			if ($fullItem['type'] == ITEM_TYPE_SNMP && $fullItem['snmp_oid'] === '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP OID specified.'));
 			}
 
