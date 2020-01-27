@@ -924,12 +924,16 @@ Function.prototype.bindAsEventListener = function (context) {
  *
  * The following format is used for tokens: #{token_name}.
  * When found in template String, token will be replaced with value of the key "token_name" of object passed to
- * evaluate function. All occurences of tokens are replaced by values from object with HTML entities escaped.
+ * evaluate function. All occurrences of tokens are replaced by values from object with HTML entities escaped.
  * Token name should be prefixed with character '*' to avoid escaping of HTML entities (for example, #{*test}).
  * Backslash character (\\) can be used to escape token (such tokens will not be affected).
  *
  * Nested object properties could be used in templated by using square bracket token syntax (for example, #{a[b][c]}).
  * Previous example will look for nested value a->b->c ({'a': {'b': {'c': 'value'}}}).
+ *
+ * @param {string} template    template string
+ *
+ * @return {Template}
  */
 var Template = function(template) {
 	this.template = template;
@@ -939,10 +943,10 @@ Template.prototype = {
 	/**
 	 * Helper function called when match is found in template.
 	 *
-	 * @param Array  match     result of regex matching
-	 * @param Object object    object containing data
+	 * @param {array}  match     result of regex matching
+	 * @param {object} object    object containing data
 	 *
-	 * @returns {String}
+	 * @return {string}
 	 */
 	onMatch: function (match, object) {
 		if (object == null) {
@@ -988,9 +992,9 @@ Template.prototype = {
 	/**
 	 * Fill template with data defined in object.
 	 *
-	 * @param Object object    object containing data
+	 * @param {object} object    object containing data
 	 *
-	 * @returns String
+	 * @return {string}
 	 */
 	evaluate: function(object) {
 		var result = '',
