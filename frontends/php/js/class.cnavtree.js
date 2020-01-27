@@ -524,9 +524,8 @@ jQuery(function($) {
 						var obj = $(this);
 
 						$('>.tree-row>.problem-icon-list', this).append($('<span/>', {
-								'style': 'background: #' + conf['color'],
-								'class': 'problem-icon-list-item',
-								'title': conf['name']
+								'class': 'problem-icon-list-item ' + conf.style_class,
+								'title': conf.name
 							})
 							.html(obj.attr('data-problems' + sev))
 						);

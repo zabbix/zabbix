@@ -452,8 +452,8 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$this->problems_per_severity_tpl[$severity] = 0;
 			$severity_config[$severity] = [
-				'color' => $config['severity_color_'.$severity],
-				'name' => $config['severity_name_'.$severity]
+				'name' => getSeverityName($severity, $config),
+				'style_class' => getSeverityStatusStyle($severity)
 			];
 		}
 

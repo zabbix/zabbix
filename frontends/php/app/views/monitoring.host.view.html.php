@@ -34,10 +34,11 @@ $view_url = $data['view_curl']->getUrl();
 $table->setHeader([
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)->addStyle('width: 13%'),
 	(new CColHeader(_('Interface')))->addStyle('width: 134px;'),
-	(new CColHeader(_('Availability')))->addStyle('width: 117px;'),
+	(new CColHeader(_('Availability')))->addStyle('width: 125px;'),
 	(new CColHeader(_('Tags')))->addStyle('width: 17%'),
-	(new CColHeader(_('Problems')))->addStyle('width: 117px;'),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url)->addStyle('width: 5%'),
+	(new CColHeader(_('Problems'))),
+	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url)
+		->addStyle('width: 5%'),
 	(new CColHeader(_('Latest data')))->addStyle('width: 6%'),
 	(new CColHeader(_('Problems')))->addStyle('width: 7%'),
 	(new CColHeader(_('Graphs')))->addStyle('width: 7%'),
@@ -66,11 +67,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$problems = [];
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$problems[$severity] = [
-			'count' => 0,
-			'severity_name' => $data['config']['severity_name_'.$severity],
-			'severity_color' => $data['config']['severity_color_'.$severity],
-		];
+		$problems[$severity] = ['count' => 0];
 	}
 
 	foreach ($host['problems'] as $problem) {
@@ -80,12 +77,12 @@ foreach ($data['hosts'] as $hostid => $host) {
 	// Sort by severity starting from highest severity.
 	krsort($problems);
 
-	foreach ($problems as $problem) {
+	foreach ($problems as $severity => $problem) {
 		if ($problem['count'] > 0) {
 			$problems_div->addItem((new CSpan($problem['count']))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
-				->setAttribute('title', $problem['severity_name'])
-				->addStyle('background: #'.$problem['severity_color'])
+				->addClass(getSeverityStatusStyle($severity))
+				->setAttribute('title', getSeverityName($severity, $data['config']))
 			);
 		}
 	}
