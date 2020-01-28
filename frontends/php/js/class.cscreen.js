@@ -51,8 +51,7 @@ Cscreen.prototype = {
 
 		jQuery('.draggable').draggable({
 			revert: 'invalid',
-			zIndex: 999,
-			start: function() {}
+			zIndex: 999
 		});
 
 		jQuery('.screenitem').droppable({
