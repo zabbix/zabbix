@@ -497,9 +497,6 @@
 			jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>])
 				.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE ?>'});
 
-			// Expend first SNMP interface.
-			jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>]).zbx_vertical_accordion("expandNth", 0);
-
 			// Add event to expand SNMP interface accordion if focused or clicked on inputs.
 			jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>]).on("focus", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>:not(.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>) .<?= ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND ?>", (event) => {
 				var index = jQuery(event.currentTarget).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').index();
