@@ -956,3 +956,63 @@ out:
 
 	return ret;
 }
+
+int	DBcheck_double_type(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL;
+	const int	total_dbl_cols = 9;
+	static int	ret = ZBX_DB_DBL_PRECISION_UNKNOWN;
+
+
+	/* database changes are not expected after DB upgrade process completed so result will remain the same */
+	if (ZBX_DB_DBL_PRECISION_UNKNOWN != ret)
+		return ret;
+	else
+		ret = ZBX_DB_DBL_PRECISION_DISABLED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+#if defined(HAVE_MYSQL)
+	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
+			" where table_schema like '%s' and column_type like 'double'", CONFIG_DBNAME);
+#elif defined(HAVE_POSTGRESQL)
+	sql = zbx_strdup(sql, "select count(*) from information_schema.columns"
+			" where data_type like 'double precision'");
+#elif defined(HAVE_ORACLE)
+	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
+			" where data_type like 'BINARY_DOUBLE'");
+#elif defined(HAVE_SQLITE3)
+	//TODO
+	goto out;
+#endif
+
+	if (NULL == (result = DBselect("%s"
+			" and ((table_name like 'graphs'"
+					" and (column_name like 'yaxismin' or column_name like 'yaxismax'"
+					" or column_name like 'percent_left' or column_name like 'percent_right'))"
+			" or (table_name like 'trends'"
+					" and (column_name like 'value_min' or column_name like 'value_avg'"
+					" or column_name like 'value_max'))"
+			" or (table_name like 'services' and (column_name like 'goodsla'))"
+			" or (table_name like 'history' and (column_name like 'value')))", sql)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot select records with columns information");
+		goto out;
+	}
+
+	if (NULL != (row = DBfetch(result)) && total_dbl_cols == atoi(row[0]))
+		ret = ZBX_DB_DBL_PRECISION_ENABLED;
+
+	DBfree_result(result);
+out:
+	DBclose();
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
+}

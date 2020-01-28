@@ -1071,6 +1071,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 
+	if (ZBX_DB_DBL_PRECISION_ENABLED != DBcheck_double_type())
+		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
+
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS

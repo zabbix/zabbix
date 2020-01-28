@@ -349,13 +349,13 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value)
 	return zbx_get_variant_type_desc(value->type);
 }
 
-int	zbx_validate_value_dbl(double value)
+int	zbx_validate_value_dbl(double value, int dbl_precision)
 {
-	const double	pg_min_numeric = -1e+308;
-	const double	pg_max_numeric = 1e+308;
-
-	if (value < pg_min_numeric || value > pg_max_numeric)
+	if ((ZBX_DB_DBL_PRECISION_ENABLED == dbl_precision && (value < -1e+308 || value > 1e+308)) ||
+			(ZBX_DB_DBL_PRECISION_ENABLED != dbl_precision && (value <= -1e12 || value >= 1e12)))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }

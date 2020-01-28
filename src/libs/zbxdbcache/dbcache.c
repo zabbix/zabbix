@@ -36,6 +36,7 @@
 #include "export.h"
 #include "zbxjson.h"
 #include "zbxhistory.h"
+#include "zbxdbupgrade.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -492,16 +493,11 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, siz
 			+ num * value_avg.dbl) / (trend->num + num);
 	trend->num += num;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-			"update trends set num=%d,value_min=%.*g,value_avg="
-			"%.*g,value_max=%.*g where itemid=" ZBX_FS_UI64
-			" and clock=%d;\n",
-			trend->num,
-			DECIMAL_DIG, trend->value_min.dbl,
-			DECIMAL_DIG, trend->value_avg.dbl,
-			DECIMAL_DIG, trend->value_max.dbl,
-			trend->itemid,
-			trend->clock);
+	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "update trends set"
+			" num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL ",value_max=" ZBX_FS_DBL
+			" where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
+			trend->num, trend->value_min.dbl, trend->value_avg.dbl, trend->value_max.dbl,
+			trend->itemid, trend->clock);
 }
 
 /******************************************************************************
@@ -1746,7 +1742,7 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 {
 	char	*errmsg = NULL;
 
-	if (FAIL == zbx_variant_to_value_type(value, value_type, &errmsg))
+	if (FAIL == zbx_variant_to_value_type(value, value_type, DBcheck_double_type(), &errmsg))
 	{
 		dc_history_set_error(hdata, errmsg);
 		return;
@@ -1828,7 +1824,7 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 				logvalue[zbx_db_strlen_n(logvalue, HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl))
+				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, DBcheck_double_type()))
 				{
 					dc_history_set_error(hdata, zbx_dsprintf(NULL, "Value " ZBX_FS_DBL
 							" is too small or too large.", hdata->value.dbl));

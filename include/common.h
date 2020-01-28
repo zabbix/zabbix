@@ -745,6 +745,11 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 
 #define ZBX_PROBLEM_UPDATE_ACTION_COUNT	4
 
+/* database double precision upgrade states */
+#define ZBX_DB_DBL_PRECISION_ENABLED	0
+#define ZBX_DB_DBL_PRECISION_DISABLED	1
+#define ZBX_DB_DBL_PRECISION_UNKNOWN	2
+
 
 #define ZBX_USER_ONLINE_TIME	600
 
@@ -1556,7 +1561,7 @@ void	*zbx_variant_data_bin_copy(const void *bin);
 void	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
 zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
 
-int	zbx_validate_value_dbl(double value);
+int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
@@ -1571,7 +1576,7 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
-int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
+int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, int dbl_precision, char **errmsg);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
