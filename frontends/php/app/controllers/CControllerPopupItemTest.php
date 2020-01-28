@@ -863,6 +863,10 @@ abstract class CControllerPopupItemTest extends CController {
 
 			// Get strings to resolve and types of supported macros.
 			if ($field === 'query_fields' || $field === 'headers') {
+				if (!array_key_exists($field, $inputs) || !$inputs[$field]) {
+					continue;
+				}
+
 				foreach (['name', 'value'] as $key) {
 					foreach (array_keys($inputs[$field][$key]) as $nr) {
 						$str = &$inputs[$field][$key][$nr];
