@@ -448,8 +448,16 @@ jQuery(document).ready(function($) {
 
 	<?php if ($data['is_item_testable']): ?>
 		$('#get_value').on('change', function() {
-			$rows = $('#host_address_row, #proxy_hostid_row, #get_value_row');
+			$rows = $('#host_address_row, #proxy_hostid_row, #get_value_row'),
+			$form = $('#preprocessing-test-form');
+
 			if ($(this).is(':checked')) {
+				$('#value', $form).multilineInput('setReadOnly');
+
+				<?php if ($data['show_prev']): ?>
+					$('#prev_value', $form).multilineInput('setReadOnly');
+				<?php endif ?>
+
 				<?php if ($data['proxies_enabled']): ?>
 					$('#proxy_hostid').prop('disabled', false);
 				<?php endif ?>
@@ -465,6 +473,12 @@ jQuery(document).ready(function($) {
 				$rows.show();
 			}
 			else {
+				$('#value', $form).multilineInput('unsetReadOnly');
+
+				<?php if ($data['show_prev']): ?>
+					$('#prev_value', $form).multilineInput('unsetReadOnly');
+				<?php endif ?>
+
 				<?php if ($data['proxies_enabled']): ?>
 					$('#proxy_hostid').prop('disabled', true);
 				<?php endif ?>
