@@ -159,8 +159,9 @@ typedef off_t	zbx_offset_t;
 
 #endif	/* _WINDOWS */
 
-#define	ZBX_FS_DBL		"%lf"
-#define	ZBX_FS_DBL_EXT(p)	"%." #p "lf"
+#define	ZBX_FS_ARG_LIST(m, a)	m(a)
+#define	ZBX_FS_DBL_EXT(p)	"%." #p "g"
+#define	ZBX_FS_DBL		ZBX_FS_ARG_LIST(ZBX_FS_DBL_EXT, DECIMAL_DIG)
 
 #define ZBX_PTR_SIZE		sizeof(void *)
 #define ZBX_FS_SIZE_T		ZBX_FS_UI64
