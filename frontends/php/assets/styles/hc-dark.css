@@ -3057,7 +3057,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   overflow: hidden;
   resize: none;
   word-break: break-all;
-  height: 24px; }
+  height: 24px;
+  line-height: 14px; }
 
 .btn-back-map-container {
   text-align: left;
