@@ -207,12 +207,12 @@ class CXmlConstantName {
 	const AUTHPRIV = 'AUTHPRIV';
 
 	const ZABBIX_PASSIVE = 'ZABBIX_PASSIVE';
-	const SNMPV1 = 'SNMPV1'; // Used by item type in 4.4 and as interface snmp version in 5.0.
+	const SNMPV1 = 'SNMPV1'; // Used by item type in 4.4 and as interface SNMP version in 5.0.
 	const TRAP = 'TRAP';
 	// const SIMPLE = 'SIMPLE'; // Duplicate.
-	const SNMPV2 = 'SNMPV2'; // Used by item type in 4.4 and as interface snmp version in 5.0.
+	const SNMPV2 = 'SNMPV2'; // Used by item type in 4.4 and as interface SNMP version in 5.0.
 	const INTERNAL = 'INTERNAL';
-	const SNMPV3 = 'SNMPV3'; // Used by item type in 4.4 and as interface snmp version in 5.0.
+	const SNMPV3 = 'SNMPV3'; // Used by item type in 4.4 and as interface SNMP version in 5.0.
 	const ZABBIX_ACTIVE = 'ZABBIX_ACTIVE';
 	const AGGREGATE = 'AGGREGATE';
 	const EXTERNAL = 'EXTERNAL';

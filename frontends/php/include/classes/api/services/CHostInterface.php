@@ -379,7 +379,7 @@ class CHostInterface extends CApiService {
 	 */
 	protected function checkSnmpInput(array &$interfaces) {
 		foreach ($interfaces as &$interface) {
-			if ($interface['type'] != INTERFACE_TYPE_SNMP) {
+			if (!array_key_exists('type', $interface) || $interface['type'] != INTERFACE_TYPE_SNMP) {
 				continue;
 			}
 
