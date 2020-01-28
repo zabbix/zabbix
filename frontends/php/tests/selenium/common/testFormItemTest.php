@@ -442,7 +442,7 @@ class testFormItemTest extends CWebTest {
 		]);
 	}
 
-	public function checkTestItem($create_link, $data,  $is_host) {
+	public function checkTestItem($create_link, $data, $is_host) {
 		$proxy = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid IN '
 			. '(SELECT proxy_hostid FROM hosts WHERE host = "Test item host")');
 
@@ -474,11 +474,13 @@ class testFormItemTest extends CWebTest {
 				$this->assertTrue($get_host_value->isChecked());
 
 				$elements = [
-					'address' => $test_form->query('id:interface_address')->one(),
-					'port' => $test_form->query('id:interface_port')->one(),
-					'proxy' => $test_form->getField('Proxy'),
-					'button' => $test_form->query('button:Get value')->one()
+					'address' => 'id:interface_address',
+					'port' => 'id:interface_port',
+					'proxy' => 'id:proxy_hostid',
 				];
+				foreach ($elements as $name => $selector) {
+					$elements[$name] = $test_form->query($selector)->one()->detect();
+				}
 
 				// Check interface and proxy fields.
 				switch ($data['fields']['Type']) {
@@ -487,30 +489,23 @@ class testFormItemTest extends CWebTest {
 					case 'SNMPv2 agent':
 					case 'SNMPv3 agent':
 					case 'IPMI agent':
-						if ($is_host){
-							$this->assertEquals($elements['address']->getAttribute('value'), $host_interface[0]);
-							$this->assertEquals($elements['port']->getAttribute('value'), $host_interface[1]);
-							$this->assertEquals($elements['proxy']->getText(), $proxy);
-						}
-						else {
-							$this->assertEquals($elements['address']->getAttribute('value'), '');
-							$this->assertEquals($elements['port']->getAttribute('value'), '');
-							$this->assertEquals($elements['proxy']->getText(), '(no proxy)');
-						}
-						$this->assertTrue($elements['proxy']->isEnabled());
+						$fields_value = [
+							'address' => $is_host ? $host_interface[0] : '',
+							'port' => $is_host ? $host_interface[1] : '',
+							'proxy' => $is_host ? $proxy : '(no proxy)'
+						];
+						$fields_state = ['address' => true, 'port' => true, 'proxy' => true];
 						break;
+
 					case 'Simple check':
-						if ($is_host){
-							$this->assertEquals($elements['address']->getAttribute('value'), $host_interface[0]);
-							$this->assertEquals($elements['proxy']->getText(), $proxy);
-						}
-						else{
-							$this->assertEquals($elements['address']->getAttribute('value'), '');
-							$this->assertEquals($elements['proxy']->getText(), '(no proxy)');
-						}
-						$this->assertFalse($elements['port']->isEnabled());
-						$this->assertEquals($elements['port']->getAttribute('value'), '');
+						$fields_value = [
+							'address' => $is_host ? $host_interface[0] : '',
+							'port' => '',
+							'proxy' => $is_host ? $proxy : '(no proxy)'
+						];
+						$fields_state = ['address' => true, 'port' => false, 'proxy' => true];
 						break;
+
 					case 'Zabbix internal':
 					case 'External check':
 					case 'Database monitor':
@@ -518,34 +513,34 @@ class testFormItemTest extends CWebTest {
 					case 'TELNET agent':
 					case 'HTTP agent':
 					case 'JMX agent':
-						if ($is_host){
-							$this->assertEquals($elements['proxy']->getText(), $proxy);
-						}
-						else{
-							$this->assertEquals($elements['proxy']->getText(), '(no proxy)');
-						}
-						$this->assertFalse($elements['address']->isEnabled());
-						$this->assertEquals($elements['address']->getAttribute('value'), '');
-						$this->assertFalse($elements['port']->isEnabled());
-						$this->assertEquals($elements['port']->getAttribute('value'), '');
-						$this->assertTrue($elements['proxy']->isEnabled());
+						$fields_value = [
+							'address' => '',
+							'port' => '',
+							'proxy' => $is_host ? $proxy : '(no proxy)'
+						];
+						$fields_state = ['address' => false, 'port' => false, 'proxy' => true];
 						break;
+
 					case 'Zabbix aggregate':
 					case 'Calculated':
-						$this->assertFalse($elements['address']->isEnabled());
-						$this->assertEquals($elements['address']->getAttribute('value'), '');
-						$this->assertFalse($elements['port']->isEnabled());
-						$this->assertEquals($elements['port']->getAttribute('value'), '');
-						$this->assertFalse($elements['proxy']->isEnabled());
-						$this->assertEquals($elements['proxy']->getText(), '(no proxy)');
+						$fields_value = ['address' => '', 'port' => '', 'proxy' => '(no proxy)'];
+						$fields_state = ['address' => false, 'port' => false, 'proxy' => false];
 						break;
+				}
+
+				foreach ($fields_value as $field => $value) {
+					$this->assertEquals($elements[$field]->getValue(), $value);
+				}
+				foreach ($fields_state as $field => $state) {
+					$this->assertTrue($elements[$field]->isEnabled($state));
 				}
 
 				// Check value fields.
 				$this->checkValueFields($data);
 
 				// Click Get value button.
-				$elements['button']->click();
+				$button = $test_form->query('button:Get value')->one();
+				$button->click();
 				$this->checkServerMessage(['Connection to Zabbix server "localhost" refused. Possible reasons:']);
 
 				// Click Test button in test form.
@@ -558,13 +553,13 @@ class testFormItemTest extends CWebTest {
 				])){
 					$elements['address']->clear();
 					$elements['port']->clear();
-					$elements['button']->click();
+					$button->click();
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.',
 						'Incorrect value for field "Port": cannot be empty.']);
 				}
 				if (in_array($data['fields']['Type'], ['Simple check'])){
 					$elements['address']->clear();
-					$elements['button']->click();
+					$button->click();
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.']);
 				}
 
@@ -572,9 +567,10 @@ class testFormItemTest extends CWebTest {
 				if(CTestArrayHelper::get($data, 'host_value', true) === false){
 					$get_host_value->uncheck();
 					// Check that interface and proxy fields disappeared.
-					foreach ($elements as $element) {
-						$element->waitUntilNotVisible();
+					foreach (['address', 'port', 'proxy'] as $field) {
+						$elements[$field]->waitUntilNotVisible();
 					}
+					$button->waitUntilNotVisible();
 					// Check that value fields still present after "Get value from host" checkbox is unset.
 					$this->checkValueFields($data);
 				}
