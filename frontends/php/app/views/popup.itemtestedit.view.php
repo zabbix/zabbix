@@ -271,7 +271,7 @@ $output = [
 	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [
 		[
-			'title' => _('Test'),
+			'title' => _('Get value and test'),
 			'class' => 'submit-test-btn',
 			'keepOpen' => true,
 			'enabled' => true,
