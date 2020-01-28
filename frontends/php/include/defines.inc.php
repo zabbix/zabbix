@@ -447,12 +447,12 @@ define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
 
 define('ITEM_TYPE_ZABBIX',			0);
-define('ITEM_TYPE_SNMPV1',			1); // Deprecated. Use ITEM_TYPE_SNMP instead.
+define('ITEM_TYPE_SNMPV1',			1); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_TRAPPER',			2);
 define('ITEM_TYPE_SIMPLE',			3);
-define('ITEM_TYPE_SNMPV2C',			4); // Deprecated. Use ITEM_TYPE_SNMP instead.
+define('ITEM_TYPE_SNMPV2C',			4); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_INTERNAL',		5);
-define('ITEM_TYPE_SNMPV3',			6); // Deprecated. Use ITEM_TYPE_SNMP instead.
+define('ITEM_TYPE_SNMPV3',			6); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
 define('ITEM_TYPE_AGGREGATE',		8);
 define('ITEM_TYPE_HTTPTEST',		9);
