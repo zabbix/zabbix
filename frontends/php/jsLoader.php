@@ -98,6 +98,7 @@ $availableJScripts = [
 	'class.cviewswitcher.js' => '',
 	'class.pmaster.js' => '',
 	'class.rpc.js' => '',
+	'class.template.js' => '',
 	'init.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
@@ -342,6 +343,7 @@ if (empty($_GET['files'])) {
 		'class.rpc.js',
 		'class.bbcode.js',
 		'class.csuggest.js',
+		'class.template.js',
 		'main.js',
 		'chkbxrange.js',
 		'functions.js',
