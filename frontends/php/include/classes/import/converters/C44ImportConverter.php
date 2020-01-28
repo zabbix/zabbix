@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -31,7 +31,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	public function convert($data) {
+	public function convert($data): array {
 		$data['zabbix_export']['version'] = '5.0';
 
 		if (array_key_exists('hosts', $data['zabbix_export'])) {
@@ -51,7 +51,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	protected function sanitizeSnmpFields(array $data) {
+	protected function sanitizeSnmpFields(array $data): array {
 		$fields = ['snmp_community', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port'
 		];
@@ -114,7 +114,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	protected function getDefaultInterfaceArray(array $interface) {
+	protected function getDefaultInterfaceArray(array $interface): array {
 		return $interface + [
 			'default' => CXmlConstantName::YES,
 			'type' => CXmlConstantName::SNMP,
@@ -133,7 +133,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	protected function createHelperArray(array $data, $type) {
+	protected function createHelperArray(array $data, int $type): array {
 		return [
 			'from' => $type,
 			'name' => $data['name'],
@@ -180,7 +180,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return string
 	 */
-	protected function getInterfaceKey(array $interfaces) {
+	protected function getInterfaceKey(array $interfaces): string {
 		// Check zero element.
 		if (!array_key_exists('interface', $interfaces)) {
 			return 'interface';
@@ -203,7 +203,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	protected function extractSnmpFields(array $host) {
+	protected function extractSnmpFields(array $host): array {
 		// SNMP types.
 		$types = [CXmlConstantName::SNMPV1, CXmlConstantName::SNMPV2, CXmlConstantName::SNMPV3];
 		$interfaces = [];
@@ -232,7 +232,7 @@ class C44ImportConverter extends CConverter {
 					// Getting all SNMP item prototypes and their interfaces.
 					foreach ($drule['item_prototypes'] as $prototype) {
 						if (array_key_exists('type', $prototype) && in_array($prototype['type'], $types)) {
-							$interfaceid = str_replace('if', '', $drule['interface_ref']);
+							$interfaceid = str_replace('if', '', $prototype['interface_ref']);
 
 							$interfaces[$interfaceid][] = $this->createHelperArray($prototype, 3);
 						}
@@ -251,7 +251,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return int
 	 */
-	protected function getHostMaxInterfaceId(array $interfaces) {
+	protected function getHostMaxInterfaceId(array $interfaces): int {
 		$max_id = 1;
 
 		foreach ($interfaces as $interface) {
@@ -274,7 +274,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	protected function createNewInterface(array $item, $maxid, array $parent_interface) {
+	protected function createNewInterface(array $item, int $maxid, array $parent_interface): array {
 		$interface = ['interface_ref' => 'if'.$maxid] + $parent_interface;
 
 		$interface['details']['version'] = $item['type'];
@@ -309,7 +309,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	protected function updateInterfaceRef(array $host, array $updates) {
+	protected function updateInterfaceRef(array $host, array $updates): array {
 		if (array_key_exists('items', $host) && array_key_exists('1', $updates)) {
 			foreach ($host['items'] as &$item) {
 				if (array_key_exists($item['name'], $updates[1])) {
@@ -347,10 +347,7 @@ class C44ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	protected function convertSnmpFieldsToInterfaces(array $hosts) {
-		// SNMP types.
-		$types = [CXmlConstantName::SNMPV1, CXmlConstantName::SNMPV2, CXmlConstantName::SNMPV3];
-
+	protected function convertSnmpFieldsToInterfaces(array $hosts): array {
 		foreach ($hosts as &$host) {
 			// Store new interfaces.
 			$new_interfaces = [];
@@ -420,14 +417,14 @@ class C44ImportConverter extends CConverter {
 
 								// Find interfaces having same SNMP version.
 								$same_ver_interfaces = array_filter($new_interfaces[$interfaceid],
-									function($iface) use ($item) {
+									function(array $iface) use ($item): bool {
 										return $iface['details']['version'] === $item['type'];
 									}
 								);
 
 								if ($same_ver_interfaces) {
 									$same_interfaces = array_filter($same_ver_interfaces,
-										function($iface) use ($item, $parent_interface) {
+										function(array $iface) use ($item, $parent_interface): bool {
 											// If item port differs from interface ports it is 100% new interface.
 											if ($item['port'] === '') {
 												// Item port not set and interface port not equel parent port.
@@ -467,8 +464,8 @@ class C44ImportConverter extends CConverter {
 									}
 									else {
 										// Create new interface if not found.
-										$iface = $this->createNewInterface($item,
-											++$max_interfaceid, $parent_interface
+										$iface = $this->createNewInterface($item, ++$max_interfaceid,
+											$parent_interface
 										);
 
 										$new_interfaces[$interfaceid][] = $iface;
@@ -478,9 +475,7 @@ class C44ImportConverter extends CConverter {
 								}
 								else {
 									// Create new interface if not found with same version.
-									$iface = $this->createNewInterface($item, ++$max_interfaceid,
-										$parent_interface
-									);
+									$iface = $this->createNewInterface($item, ++$max_interfaceid, $parent_interface);
 
 									$new_interfaces[$interfaceid][] = $iface;
 
@@ -495,7 +490,7 @@ class C44ImportConverter extends CConverter {
 								] + $parent_interface;
 						}
 
-						// Delete original interface, because we create new.
+						// Delete original interface because we created new.
 						unset($host['interfaces'][$key]);
 						continue;
 					}
