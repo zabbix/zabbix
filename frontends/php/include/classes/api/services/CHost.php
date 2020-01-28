@@ -108,6 +108,7 @@ class CHost extends CHostGeneral {
 			'evaltype'							=> TAG_EVAL_TYPE_AND_OR,
 			'tags'								=> null,
 			'severities'						=> null,
+			'inheritedTags'						=> false,
 			'filter'							=> null,
 			'search'							=> null,
 			'searchInventory'					=> null,
@@ -416,13 +417,6 @@ class CHost extends CHostGeneral {
 			$sqlParts['where'][] = 'a.hostid=h.hostid';
 		}
 
-		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-				'host_tag', 'hostid'
-			);
-		}
-
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('hosts h', $options, $sqlParts);
@@ -450,18 +444,30 @@ class CHost extends CHostGeneral {
 			);
 		}
 
+		// filter
+		if (is_array($options['filter'])) {
+			$this->dbFilter('hosts h', $options, $sqlParts);
+
+			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
+				$sqlParts['from']['interface'] = 'interface hi';
+				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
+			}
+		}
+
+		// Validate input parameters "hostid_from", "hostid_till", "severities".
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'inheritedTags' => ['type' => API_BOOLEAN, 'default' => false],
+			'severities' =>	[
+				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_DISASTER)), 'uniq' => true
+			]
+		]];
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		// Filter hosts by given problem severities.
 		if ($options['severities'] !== null) {
-			$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-				'severities' =>	[
-					'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_DISASTER)), 'uniq' => true
-				]
-			]];
-			$options_filter = array_intersect_key($options, $api_input_rules['fields']);
-			if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM items i,functions f,problem p'.
@@ -474,13 +480,88 @@ class CHost extends CHostGeneral {
 				')';
 		}
 
-		// filter
-		if (is_array($options['filter'])) {
-			$this->dbFilter('hosts h', $options, $sqlParts);
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			if ($options['inheritedTags']) {
+				$tags = [];
+				$where = '';
 
-			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
-				$sqlParts['from']['interface'] = 'interface hi';
-				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
+				foreach ($options['tags'] as $num => $tag) {
+					$templates = API::Template()->get([
+						'output' => [],
+						'evaltype' => TAG_EVAL_TYPE_OR,
+						'tags' => [['tag' => $tag['tag'], 'value' => $tag['value'], 'operator' => $tag['operator']]],
+						'preservekeys' => true,
+						'nopermissions' => true
+					]);
+
+					if (!array_key_exists($tag['tag'], $tags)) {
+						$tags[$tag['tag']] = [
+							'templateids' => [],
+							'pairs' => []
+						];
+					}
+
+					$tags[$tag['tag']]['pairs'][] = [
+						'value' => $tag['value'],
+						'operator' => $tag['operator']
+					];
+
+					$templateids = array_keys($templates);
+					$tags[$tag['tag']]['templateids'] = array_merge($tags[$tag['tag']]['templateids'], $templateids);
+
+					do {
+						$templates = API::Template()->get([
+							'output' => [],
+							'parentTemplateids' => $templateids,
+							'preservekeys' => true,
+							'nopermissions' => true
+						]);
+
+						$templateids = array_keys($templates);
+						$tags[$tag['tag']]['templateids'] = array_merge($tags[$tag['tag']]['templateids'],
+							$templateids
+						);
+					} while ($templateids);
+				}
+
+				$_tags = [];
+				$num = 1;
+				$tag_cnt = count($tags);
+
+				foreach ($tags as $tag => $_tag) {
+					foreach ($_tag['pairs'] as $pair) {
+						$_tags[] = [
+							'tag' => $tag,
+							'value' => $pair['value'],
+							'operator' => $pair['operator']
+						];
+					}
+
+					$where .= '('.
+						CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid').
+						' OR '.dbConditionInt('ht2.templateid', $_tag['templateids']).
+					')';
+
+					if ($num != $tag_cnt) {
+						$where .= ($options['evaltype'] == TAG_EVAL_TYPE_AND_OR) ? ' AND ' : ' OR ';
+					}
+
+					$num++;
+				}
+
+				$sqlParts['left_join']['hosts_templates'] = [
+					'from' => 'hosts_templates ht2',
+					'on' => 'h.hostid=ht2.hostid'
+				];
+				$sqlParts['left_table'] = $this->tableName();
+
+				$sqlParts['where'][] = '('.$where.')';
+			}
+			else {
+				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
+					'host_tag', 'hostid'
+				);
 			}
 		}
 
