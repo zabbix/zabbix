@@ -133,6 +133,11 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
+// TLS mode
+define('ZBX_DB_TLS_DISABLED',		'DISABLED');
+define('ZBX_DB_TLS_ENABLED',		'ENABLED');
+define('ZBX_DB_TLS_VERIFY_HOST',	'VERIFY_HOST');
+
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
 define('PAGE_TYPE_HTML',				0);

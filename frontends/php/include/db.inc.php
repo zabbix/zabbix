@@ -61,10 +61,12 @@ function DBconnect(&$error) {
 	}
 
 	$db = new $db_types[$DB['TYPE']];
-	$require_ssl = (bool) ($DB['KEY_FILE'] || $DB['CERT_FILE'] || $DB['CA_FILE'] || $DB['CIPHER_LIST']);
+	$require_tls = (bool) ($DB['ENCRYPTION'] !== ZBX_DB_TLS_DISABLED);
 
-	if ($require_ssl) {
-		$db->setConnectionSecurity($DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE'], $DB['CIPHER_LIST']);
+	if ($require_tls) {
+		$db->setConnectionSecurity($DB['ENCRYPTION'], $DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE'],
+			$DB['CIPHER_LIST']
+		);
 	}
 
 	$DB['DB'] = $db->connect($DB['SERVER'], $DB['PORT'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['SCHEMA']);
@@ -73,7 +75,7 @@ function DBconnect(&$error) {
 		$db->init();
 	}
 
-	if ($db->getError() || ($require_ssl && !$db->isConnectionSecure()) || !$db->checkDbVersion()
+	if ($db->getError() || ($require_tls && !$db->isConnectionSecure()) || !$db->checkDbVersion()
 			|| !$db->checkConfig()) {
 		$error = $db->getError();
 		return false;

@@ -46,7 +46,8 @@ class MysqlDbBackend extends DbBackend {
 	 */
 	public function isConnectionSecure() {
 		$row = DBfetch(DBselect("SHOW STATUS LIKE 'ssl_cipher'"));
-		$pattern = '/'.str_replace('*', '.+', $this->ssl_cipher_list).'/';
+
+		$pattern = '/'.str_replace('*', '.+', $this->tls_cipher_list).'/';
 
 		if (!$row || !$row['Value']) {
 			$this->setError('Error connecting to database. Empty cipher.');
@@ -76,18 +77,25 @@ class MysqlDbBackend extends DbBackend {
 	 */
 	public function connect($host, $port, $user, $password, $dbname, $schema) {
 		$resource = mysqli_init();
-		$ssl_mode = null;
+		$tls_mode = null;
 
-		if ($this->ssl_key_file || $this->ssl_cert_file || $this->ssl_ca_file) {
-			$resource->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
-			$cipher_suit = ($this->ssl_cipher_list && strpos($this->ssl_cipher_list, '*') === false)
-				? $this->ssl_cipher_list
+		if ($this->tls_encryption !== ZBX_DB_TLS_DISABLED) {
+			if ($this->tls_encryption === ZBX_DB_TLS_VERIFY_HOST) {
+				$resource->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
+			}
+
+			$cipher_suit = ($this->tls_cipher_list && strpos($this->tls_cipher_list, '*') === false)
+				? $this->tls_cipher_list
 				: null;
-			$resource->ssl_set($this->ssl_key_file, $this->ssl_cert_file, $this->ssl_ca_file, null, $cipher_suit);
-			$ssl_mode = MYSQLI_CLIENT_SSL;
+			$resource->ssl_set($this->tls_key_file, $this->tls_cert_file, $this->tls_ca_file, null, $cipher_suit);
+
+			$tls_mode = ($this->tls_encryption === ZBX_DB_TLS_VERIFY_HOST || !($this->tls_ca_file))
+				? MYSQLI_CLIENT_SSL
+				: MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT;
+
 		}
 
-		$resource->real_connect($host, $user, $password, $dbname, $port, null, $ssl_mode);
+		$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
 
 		if ($resource->error) {
 			$this->setError($resource->error);

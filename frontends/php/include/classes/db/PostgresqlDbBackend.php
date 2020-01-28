@@ -74,9 +74,9 @@ class PostgresqlDbBackend extends DbBackend {
 			' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
 				' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
 
-		$pattern = '/'. str_replace('*', '.+', $this->ssl_cipher_list).'/';
+		$pattern = '/'. str_replace('*', '.+', $this->tls_cipher_list).'/';
 
-		if (!$row || ($this->ssl_cipher_list !== '' && !preg_match($pattern, $row['cipher']))) {
+		if (!$row || ($this->tls_cipher_list !== '' && !preg_match($pattern, $row['cipher']))) {
 			$this->setError('Error connecting to database. Invalid cipher.');
 
 			return false;
@@ -104,12 +104,13 @@ class PostgresqlDbBackend extends DbBackend {
 		$this->schema = ($schema) ? $schema : 'public';
 		$params = compact(['host', 'port', 'user', 'password', 'dbname']);
 
-		if ($this->ssl_key_file || $this->ssl_cert_file || $this->ssl_ca_file) {
+		if ($this->tls_encryption === ZBX_DB_TLS_VERIFY_HOST
+				|| ($this->tls_encryption === ZBX_DB_TLS_ENABLED && ((bool) $this->tls_ca_file))) {
 			$params += [
-				'sslmode' => 'verify-full',
-				'sslkey' => $this->ssl_key_file,
-				'sslcert' => $this->ssl_cert_file,
-				'sslrootcert' => $this->ssl_ca_file
+				'sslmode' => ($this->tls_encryption === ZBX_DB_TLS_VERIFY_HOST) ? 'verify-full' : 'verify-ca',
+				'sslkey' => $this->tls_key_file,
+				'sslcert' => $this->tls_cert_file,
+				'sslrootcert' => $this->tls_ca_file
 			];
 		}
 

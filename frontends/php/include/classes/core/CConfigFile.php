@@ -112,6 +112,10 @@ class CConfigFile {
 			$this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
 		}
 
+		if (isset($DB['ENCRYPTION'])) {
+			$this->config['DB']['ENCRYPTION'] = $DB['ENCRYPTION'];
+		}
+
 		if (isset($DB['KEY_FILE'])) {
 			$this->config['DB']['KEY_FILE'] = $DB['KEY_FILE'];
 		}
@@ -196,6 +200,7 @@ $DB[\'PASSWORD\'] = \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 $DB[\'SCHEMA\'] = \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
 
 // Used for TLS connection.
+$DB[\'ENCRYPTION\']  = \''.addcslashes($this->config['DB']['ENCRYPTION'], "'\\").'\';
 $DB[\'KEY_FILE\']    = \''.addcslashes($this->config['DB']['KEY_FILE'], "'\\").'\';
 $DB[\'CERT_FILE\']   = \''.addcslashes($this->config['DB']['CERT_FILE'], "'\\").'\';
 $DB[\'CA_FILE\']     = \''.addcslashes($this->config['DB']['CA_FILE'], "'\\").'\';
@@ -218,6 +223,7 @@ $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
 			'USER' => '',
 			'PASSWORD' => '',
 			'SCHEMA' => '',
+			'ENCRYPTION' => ZBX_DB_TLS_DISABLED,
 			'KEY_FILE' => '',
 			'CERT_FILE' => '',
 			'CA_FILE' => '',

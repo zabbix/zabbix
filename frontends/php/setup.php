@@ -46,6 +46,7 @@ $fields = [
 	'password' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'schema' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'key_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
+	'tls_encryption' =>		[T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_TLS_DISABLED.'","'.ZBX_DB_TLS_ENABLED.'","'.ZBX_DB_TLS_VERIFY_HOST.'"'), null],
 	'cert_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'ca_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'cipher_list' =>		[T_ZBX_STR, O_OPT, null,	null, 				null],
