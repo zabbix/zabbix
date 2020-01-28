@@ -21,15 +21,15 @@ This guide describes how to integrate your Zabbix 4.4 installation with Discord 
 ## Setting up Zabbix Webhook
 1\. Before setting up Discord Webhook, you need to setup the global macro "{$ZABBIX.URL}", which must contain the URL to the Zabbix frontend.
 <br>The URL should be either an IP address, a fully qualified domain name or localhost. Protocol is is mandatory, port is optional. 
-Good examples:
-http://zabbix.com
-https://zabbix.lan/
-http://localhost
-http://127.0.0.1:8080
+Good examples:<br>
+http://zabbix.com<br>
+https://zabbix.lan/<br>
+http://localhost<br>
+http://127.0.0.1:8080<br>
 
-Bad examples:
-zabbix.com
-http://zabbix/
+Bad examples:<br>
+zabbix.com<br>
+http://zabbix/<br>
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
