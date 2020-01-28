@@ -75,8 +75,9 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
 
-	zbx_add_post_js('hostInterfaceManager.render('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
-	zbx_add_post_js('hostInterfaceManager.disableEdit();');
+	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode(array_values($parentHost['interfaces'])).');');
+	zbx_add_post_js('hostInterfaceManager.render();');
+	zbx_add_post_js('HostInterfaceManager.disableEdit();');
 
 	$interface_header = renderInterfaceHeaders();
 

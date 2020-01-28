@@ -99,7 +99,8 @@ $hostList
 
 // Interfaces for normal hosts.
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	zbx_add_post_js('hostInterfaceManager.render('.CJs::encodeJson($data['interfaces']).');');
+	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode($data['interfaces']).');');
+	zbx_add_post_js('hostInterfaceManager.render();');
 	if (!$data['interfaces']) {
 		zbx_add_post_js('hostInterfaceManager.addAgent()');
 	}
@@ -149,8 +150,9 @@ else {
 	foreach ($data['interfaces'] as $interface) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
-	zbx_add_post_js('hostInterfaceManager.render('.CJs::encodeJson($data['interfaces']).');');
-	zbx_add_post_js('hostInterfaceManager.disableEdit();');
+	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode($data['interfaces']).');');
+	zbx_add_post_js('hostInterfaceManager.render();');
+	zbx_add_post_js('HostInterfaceManager.disableEdit();');
 
 	$hostList->addVar('interfaces', $data['interfaces']);
 

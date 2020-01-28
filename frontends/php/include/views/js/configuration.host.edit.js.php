@@ -132,386 +132,413 @@
 <script type="text/javascript">
 	'use strict';
 
-	/**
-	 * Class to manage interface rows.
-	 */
-	var hostInterfaceManager = (function($) {
-		var TEMPLATE = new Template(document.querySelector('#host-interface-row-tmpl').innerHTML),
-			DEFAULT_PORTS = {
-				agent: 10050,
-				snmp: 161,
-				jmx: 12345,
-				ipmi: 623
-			},
-			AGENT_CONTAINER_ID = '#agentInterfaces',
-			SNMP_CONTAINER_ID = '#SNMPInterfaces',
-			JMX_CONTAINER_ID = '#JMXInterfaces',
-			IPMI_CONTAINER_ID = '#IPMIInterfaces',
-			data = {};
+	class HostInterfaceManager {
 
-		var helper = {
-			getContainerId: function(type) {
-				switch (type) {
-					case '<?= INTERFACE_TYPE_AGENT ?>':
-						return AGENT_CONTAINER_ID;
-					case '<?= INTERFACE_TYPE_SNMP ?>':
-						return SNMP_CONTAINER_ID;
-					case '<?= INTERFACE_TYPE_JMX ?>':
-						return JMX_CONTAINER_ID;
-					case '<?= INTERFACE_TYPE_IPMI ?>':
-						return IPMI_CONTAINER_ID;
-					default:
-						throw new Error('Unknown host interface type.');
-				}
-			},
-			getTypeByName: function(typeName) {
-				switch (typeName) {
-					case 'agent':
-						return '<?= INTERFACE_TYPE_AGENT ?>';
-					case 'snmp':
-						return '<?= INTERFACE_TYPE_SNMP ?>';
-					case 'jmx':
-						return '<?= INTERFACE_TYPE_JMX ?>';
-					case 'ipmi':
-						return '<?= INTERFACE_TYPE_IPMI ?>';
-					default:
-						throw new Error('Unknown host interface type name.');
-				}
-			},
-			getNameByType: function(type) {
-				switch (type) {
-					case '<?= INTERFACE_TYPE_AGENT ?>':
-						return 'Agent';
-					case '<?= INTERFACE_TYPE_SNMP ?>':
-						return 'SNMP';
-					case '<?= INTERFACE_TYPE_JMX ?>':
-						return 'JMX';
-					case '<?= INTERFACE_TYPE_IPMI ?>':
-						return 'IPMI';
-					default:
-						throw new Error('Unknown host interface type.');
-				}
-			},
-			setSnmpFields: function(elem, iface) {
-				if (iface.type != '<?= INTERFACE_TYPE_SNMP ?>') {
-					$('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?>', elem).remove();
-					return false;
-				}
-
-				$('#interfaces_' + iface.interfaceid + '_details_version').val(iface.details.version);
-				$('#interfaces_' + iface.interfaceid + '_details_securitylevel').val(iface.details.securitylevel);
-
-				if (iface.details.privprotocol == '<?= ITEM_PRIVPROTOCOL_AES ?>') {
-					$('#snmpv3_privprotocol_' + iface.interfaceid + '_1').prop('checked', true);
-				}
-				if (iface.details.authprotocol == '<?= ITEM_AUTHPROTOCOL_SHA ?>') {
-					$('#snmpv3_authprotocol_' + iface.interfaceid + '_1').prop('checked', true);
-				}
-				if (iface.details.bulk == '<?= SNMP_BULK_ENABLED ?>') {
-					$('#interfaces_' + iface.interfaceid + '_details_bulk').prop('checked', true);
-				}
-
-				new CViewSwitcher('interfaces_' + iface.interfaceid + '_details_version', 'change',
-					{
-						<?= SNMP_V1 ?>: ['row_snmp_community_' + iface.interfaceid],
-						<?= SNMP_V2C ?>: ['row_snmp_community_' + iface.interfaceid],
-						<?= SNMP_V3 ?>: [
-							'row_snmpv3_contextname_' + iface.interfaceid,
-							'row_snmpv3_securityname_' + iface.interfaceid,
-							'row_snmpv3_securitylevel_' + iface.interfaceid,
-							'row_snmpv3_authprotocol_' + iface.interfaceid,
-							'row_snmpv3_authpassphrase_' + iface.interfaceid,
-							'row_snmpv3_privprotocol_' + iface.interfaceid,
-							'row_snmpv3_privpassphrase_' + iface.interfaceid
-						]
-					}
-				);
-
-				$('#interfaces_' + iface.interfaceid + '_details_version').on('change', function() {
-					$('#interfaces_' + iface.interfaceid + '_details_securitylevel').off('change');
-
-					if ($(this).val() == '<?= SNMP_V3 ?>') {
-						new CViewSwitcher('interfaces_' + iface.interfaceid + '_details_securitylevel', 'change',
-							{
-								<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>: [],
-								<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>: [
-									'row_snmpv3_authprotocol_' + iface.interfaceid,
-									'row_snmpv3_authpassphrase_' + iface.interfaceid,
-								],
-								<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>: [
-									'row_snmpv3_authprotocol_' + iface.interfaceid,
-									'row_snmpv3_authpassphrase_' + iface.interfaceid,
-									'row_snmpv3_privprotocol_' + iface.interfaceid,
-									'row_snmpv3_privpassphrase_' + iface.interfaceid
-								]
-							}
-						);
-					}
-				}).trigger('change');
-			},
-			getNewId: function() {
-				var id = 1;
-
-				while (data[id] !== undefined) {
-					id++;
-				}
-
-				return id;
-			},
-			getNewData: function(type) {
-				return {
-					interfaceid: helper.getNewId(),
-					isNew: true,
-					useip: 1,
-					type: helper.getTypeByName(type),
-					type_name: helper.getNameByType(helper.getTypeByName(type)),
-					port: DEFAULT_PORTS[type],
-					ip: '127.0.0.1',
-					main: '0',
-					details: {
-						version: <?= SNMP_V2C ?>,
-						bulk: <?= SNMP_BULK_ENABLED ?>,
-						securitylevel: <?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>,
-						authprotocol: <?= ITEM_AUTHPROTOCOL_MD5 ?>,
-						privprotocol: <?= ITEM_PRIVPROTOCOL_DES ?>
-					}
-				};
-			},
-			getInterfaces: function() {
-				var types = {
-						'<?= INTERFACE_TYPE_AGENT ?>': {main: null, all: []},
-						'<?= INTERFACE_TYPE_SNMP ?>': {main: null, all: []},
-						'<?= INTERFACE_TYPE_JMX ?>': {main: null, all: []},
-						'<?= INTERFACE_TYPE_IPMI ?>': {main: null, all: []}
-					};
-
-				for (var i in data) {
-					if (data.hasOwnProperty(i)) {
-						var iface = data[i];
-
-						types[iface.type].all.push(i);
-						if (iface.main == '1') {
-							if (types[iface.type].main !== null) {
-								throw new Error('Multiple default interfaces for same type.');
-							}
-
-							types[iface.type].main = i;
-						}
-					}
-				}
-
-				return types;
-			}
+		// Constants.
+		TEMPLATE = new Template(document.getElementById('host-interface-row-tmpl').innerHTML);
+		DEFAULT_PORTS = {
+			agent: 10050,
+			snmp: 161,
+			jmx: 12345,
+			ipmi: 623
+		};
+		CONTAINER_IDS = {
+			'<?= INTERFACE_TYPE_AGENT ?>': '#agentInterfaces',
+			'<?= INTERFACE_TYPE_SNMP ?>': '#SNMPInterfaces',
+			'<?= INTERFACE_TYPE_JMX ?>': '#JMXInterfaces',
+			'<?= INTERFACE_TYPE_IPMI ?>': '#IPMIInterfaces'
+		};
+		INTERFACE_TYPES = {
+			'agent': '<?= INTERFACE_TYPE_AGENT ?>',
+			'snmp': '<?= INTERFACE_TYPE_SNMP ?>',
+			'jmx': '<?= INTERFACE_TYPE_JMX ?>',
+			'ipmi': '<?= INTERFACE_TYPE_IPMI ?>'
+		};
+		INTERFACE_NAMES = {
+			'<?= INTERFACE_TYPE_AGENT ?>': '<?= _('Agent') ?>',
+			'<?= INTERFACE_TYPE_SNMP ?>': '<?= _('SNMP') ?>',
+			'<?= INTERFACE_TYPE_JMX ?>': '<?= _('JMX') ?>',
+			'<?= INTERFACE_TYPE_IPMI ?>': '<?= _('IPMI') ?>'
 		};
 
-		function setData(new_data) {
+		// Variables.
+		interfaces = {};
+
+		constructor(data) {
+			this.data = data;
+		}
+
+		/**
+		 * Setter for interface store.
+		 *
+		 * @param object new_data
+		 */
+		set data(new_data) {
 			if (typeof new_data  !== 'object') {
 				throw new Error('Incorrect data.');
 			}
 
-			for (var i in new_data) {
-				if (new_data.hasOwnProperty(i)) {
-					data[new_data[i]['interfaceid']] = new_data[i];
-				}
-			}
+			Object
+				.entries(new_data)
+				.forEach(([_, value]) => this.interfaces[value.interfaceid] = value);
 
-			return true;
+			return this;
 		}
 
-		function render(iface) {
-			var container = document.querySelector(helper.getContainerId(iface.type)),
+		/**
+		 * Getter for interface store.
+		 */
+		get data() {
+			return this.interfaces;
+		}
+
+		setSnmpFields(elem, iface) {
+			if (iface.type != '<?= INTERFACE_TYPE_SNMP ?>') {
+				return elem
+					.querySelector('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?>')
+					.remove();
+			}
+
+			elem
+				.querySelector(`#interfaces_${iface.interfaceid}_details_version`)
+				.value = iface.details.version;
+
+			elem
+				.querySelector(`#interfaces_${iface.interfaceid}_details_securitylevel`)
+				.value = iface.details.securitylevel;
+
+			if (iface.details.privprotocol == '<?= ITEM_PRIVPROTOCOL_AES ?>') {
+				elem
+					.querySelector(`#snmpv3_privprotocol_${iface.interfaceid}_1`)
+					.checked = true;
+			}
+
+			if (iface.details.authprotocol == '<?= ITEM_AUTHPROTOCOL_SHA ?>') {
+				elem
+					.querySelector(`#snmpv3_authprotocol_${iface.interfaceid}_1`)
+					.checked = true;
+			}
+
+			if (iface.details.bulk == '<?= SNMP_BULK_ENABLED ?>') {
+				elem
+					.querySelector(`#interfaces_${iface.interfaceid}_details_bulk`)
+					.checked = true;
+			}
+
+			new CViewSwitcher(`interfaces_${iface.interfaceid}_details_version`, 'change',
+				{
+					<?= SNMP_V1 ?>: [`row_snmp_community_${iface.interfaceid}`],
+					<?= SNMP_V2C ?>: [`row_snmp_community_${iface.interfaceid}`],
+					<?= SNMP_V3 ?>: [
+						`row_snmpv3_contextname_${iface.interfaceid}`,
+						`row_snmpv3_securityname_${iface.interfaceid}`,
+						`row_snmpv3_securitylevel_${iface.interfaceid}`,
+						`row_snmpv3_authprotocol_${iface.interfaceid}`,
+						`row_snmpv3_authpassphrase_${iface.interfaceid}`,
+						`row_snmpv3_privprotocol_${iface.interfaceid}`,
+						`row_snmpv3_privpassphrase_${iface.interfaceid}`,
+					]
+				}
+			);
+
+			jQuery(`#interfaces_${iface.interfaceid}_details_version`).on('change', function() {
+				jQuery(`#interfaces_${iface.interfaceid}_details_securitylevel`).off('change');
+
+				if (jQuery(this).val() == '<?= SNMP_V3 ?>') {
+					new CViewSwitcher(`interfaces_${iface.interfaceid}_details_securitylevel`, 'change',
+						{
+							<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>: [],
+							<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>: [
+								'row_snmpv3_authprotocol_' + iface.interfaceid,
+								'row_snmpv3_authpassphrase_' + iface.interfaceid,
+							],
+							<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>: [
+								'row_snmpv3_authprotocol_' + iface.interfaceid,
+								'row_snmpv3_authpassphrase_' + iface.interfaceid,
+								'row_snmpv3_privprotocol_' + iface.interfaceid,
+								'row_snmpv3_privpassphrase_' + iface.interfaceid
+							]
+						}
+					);
+				}
+			}).trigger('change');
+		}
+
+		generateId() {
+			let id = 1;
+
+			while (this.data[id] !== undefined) {
+				id++;
+			}
+
+			return id;
+		}
+
+		getNewData(type) {
+			return {
+				interfaceid: this.generateId(),
+				isNew: true,
+				useip: 1,
+				type: this.INTERFACE_TYPES[type],
+				type_name: this.INTERFACE_NAMES[this.INTERFACE_TYPES[type]],
+				port: this.DEFAULT_PORTS[type],
+				ip: '127.0.0.1',
+				main: '0',
+				details: {
+					version: <?= SNMP_V2C ?>,
+					bulk: <?= SNMP_BULK_ENABLED ?>,
+					securitylevel: <?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>,
+					authprotocol: <?= ITEM_AUTHPROTOCOL_MD5 ?>,
+					privprotocol: <?= ITEM_PRIVPROTOCOL_DES ?>
+				}
+			};
+		}
+
+		getInterfaces() {
+			let types = {
+					'<?= INTERFACE_TYPE_AGENT ?>': {main: null, all: []},
+					'<?= INTERFACE_TYPE_SNMP ?>': {main: null, all: []},
+					'<?= INTERFACE_TYPE_JMX ?>': {main: null, all: []},
+					'<?= INTERFACE_TYPE_IPMI ?>': {main: null, all: []}
+				};
+
+			Object
+				.entries(this.data)
+				.forEach(([_, value]) => {
+					types[value.type].all.push(value.interfaceid);
+
+					if (value.main == <?= INTERFACE_PRIMARY ?>) {
+						if (types[value.type].main !== null) {
+							throw new Error('Multiple default interfaces for same type.');
+						}
+
+						types[value.type].main = value.interfaceid;
+					}
+				});
+
+			return types;
+		}
+
+		renderRow(iface) {
+			const container = document.querySelector(this.CONTAINER_IDS[iface.type]),
 				disabled = (iface.items > 0),
 				locked = (iface.locked > 0);
 
-			iface.type_name = helper.getNameByType(iface.type);
+			iface.type_name = this.INTERFACE_NAMES[iface.type];
 
 			/*
 			 * New line break css selector :empty. Trim used to avoid this.
 			 * Template added with new line. Because template <script> tag it contain for code readability.
 			 */
-			$(container).append(TEMPLATE.evaluate({iface: iface}).trim());
+			container.insertAdjacentHTML('beforeend', this.TEMPLATE.evaluate({iface: iface}).trim());
 
-			var elem = document.querySelector('#interface_row_' + iface.interfaceid);
+			const elem = document.getElementById(`interface_row_${iface.interfaceid}`);
 
 			// Select proper use ip radio element.
-			$('#interfaces_' + iface.interfaceid + '_useip_' + iface.useip).prop('checked', true);
+			elem
+				.querySelector(`#interfaces_${iface.interfaceid}_useip_${iface.useip}`)
+				.checked = true;
 
 			if (disabled) {
-				$('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>', elem).attr('disabled', 'disabled');
+				elem
+					.querySelector('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')
+					.disabled = true;
 			}
 
-			helper.setSnmpFields(elem, iface);
+			this.setSnmpFields(elem, iface);
 
 			// Set onclick actions.
-			$('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>', elem).on('click', function() {
-				return remove(iface.interfaceid);
-			});
-			$('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE ?>', elem).on('click', function() {
-				return setMainInterface(iface.interfaceid);
-			});
-			$('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_USEIP ?> input', elem).on('click', function() {
-				return setUseIp(elem, $(this).val());
-			});
+			elem
+				.querySelector('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')
+				.addEventListener('click', () => this.removeById(iface.interfaceid));
 
-			resetMainInterfaces();
+			elem
+				.querySelector('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE ?>')
+				.addEventListener('click', () => this.setMainInterfaceById(iface.interfaceid));
+
+			[...elem.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_USEIP ?> input')].forEach(
+				(el) => el.addEventListener('click', (event) => this.setUseIp(elem, event.currentTarget.value))
+			);
 
 			return true;
 		}
 
-		function remove(id) {
-			var elem = document.querySelector('#interface_row_' + id);
+		removeById(id) {
+			const elem = document.getElementById(`interface_row_${id}`);
+
 			if (!elem) {
 				return false;
 			}
 
 			elem.remove();
-			delete data[id];
+			delete this.data[id];
 
-			resetMainInterfaces();
+			this.resetMainInterfaces();
 
 			return true;
 		}
 
-		function addNewDataByTypeName(type) {
-			var new_data = helper.getNewData(type),
-				data = {};
+		createRowByTypeName(type) {
+			const new_data = this.getNewData(type);
+			let data = {};
+
 			data[new_data.interfaceid] = new_data;
 
-			setData(data);
-			render(new_data);
+			this.data = data;
+			this.renderRow(new_data);
+
+			this.resetMainInterfaces();
 
 			if (new_data.type == <?= INTERFACE_TYPE_SNMP ?>) {
-				var index = $('#interface_row_' + new_data.interfaceid).index();
-				$(SNMP_CONTAINER_ID).zbx_vertical_accordion('expandNth', index);
+				const elem = document.getElementById(`interface_row_${new_data.interfaceid}`);
+				const index = [...elem.parentElement.children].indexOf(elem)
+
+				jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>]).zbx_vertical_accordion('expandNth', index);
 			}
 
 			return true;
 		}
 
-		function resetMainInterfaces() {
-			var interfaces = helper.getInterfaces();
+		resetMainInterfaces() {
+			const interfaces = this.getInterfaces();
 
-			for (var type in interfaces) {
+			for (let type in interfaces) {
 				if (!interfaces.hasOwnProperty(type)) {
 					continue;
 				}
 
-				var type_interfaces = interfaces[type];
+				let type_interfaces = interfaces[type];
 
 				if (!type_interfaces.main && type_interfaces.all.length) {
-					for (var i = 0; i < type_interfaces.all.length; i++) {
-						if (data[type_interfaces.all[i]].main == '<?= INTERFACE_PRIMARY ?>') {
-							type_interfaces.main = data[type_interfaces.all[i]].interfaceid;
+					for (let i = 0; i < type_interfaces.all.length; i++) {
+						if (this.data[type_interfaces.all[i]].main == '<?= INTERFACE_PRIMARY ?>') {
+							interfaces[type].main = this.data[type_interfaces.all[i]].interfaceid;
 						}
 					}
 
 					if (!type_interfaces.main) {
 						type_interfaces.main = type_interfaces.all[0];
-						data[type_interfaces.main].main = '<?= INTERFACE_PRIMARY ?>';
+						this.data[type_interfaces.main].main = '<?= INTERFACE_PRIMARY ?>';
 					}
 				}
 			}
 
-			for (var type in interfaces) {
-				if (!interfaces.hasOwnProperty(type)) {
-					continue;
-				}
+			for (let type in interfaces) {
+				if (interfaces.hasOwnProperty(type)) {
+					let type_interfaces = interfaces[type];
 
-				type_interfaces = interfaces[type];
-
-				if (type_interfaces.main) {
-					$('#interface_main_' + type_interfaces.main).prop('checked', true);
+					if (type_interfaces.main) {
+						document
+							.getElementById(`interface_main_${type_interfaces.main}`)
+							.checked = true;
+					}
 				}
 			}
 
 			return true;
 		}
 
-		function setMainInterface(id) {
-			var interfaces = helper.getInterfaces(),
-				type = data[id].type,
+		setMainInterfaceById(id) {
+			const interfaces = this.getInterfaces(),
+				type = this.data[id].type,
 				old = interfaces[type].main;
 
 			if (id != old) {
-				data[id].main = '1';
-				data[old].main = '0';
+				this.data[id].main = '<?= INTERFACE_PRIMARY ?>';
+				this.data[old].main = '<?= INTERFACE_SECONDARY ?>';
 			}
 
 			return true;
 		}
 
-		function setUseIp(elem, use_ip) {
-			var interfaceid = $(elem).data('interfaceid');
+		setUseIp(elem, use_ip) {
+			const interfaceid = elem.dataset.interfaceid;
 
-			data[interfaceid].useip = use_ip;
+			this.data[interfaceid].useip = use_ip;
 
-			$('input', elem)
-				.filter('[name$="[ip]"],[name$="[dns]"]')
-				.removeAttr('aria-required')
-				.filter((use_ip == <?= INTERFACE_USE_IP ?>) ? '[name$="[ip]"]' : '[name$="[dns]"]')
-				.attr('aria-required', true);
+			[...elem.querySelectorAll('input[name$="[ip]"], input[name$="[dns]"]')].map((el) => {
+				el.removeAttribute('aria-required')
+				return el;
+			});
+
+			elem
+				.querySelector((use_ip == <?= INTERFACE_USE_IP ?>) ? '[name$="[ip]"]' : '[name$="[dns]"]')
+				.setAttribute('aria-required', true);
 
 			return true;
 		}
 
-		return {
-			addAgent: function() {
-				addNewDataByTypeName('agent');
-			},
-			addSnmp: function() {
-				addNewDataByTypeName('snmp');
-			},
-			addJmx: function() {
-				addNewDataByTypeName('jmx');
-			},
-			addIpmi: function() {
-				addNewDataByTypeName('ipmi');
-			},
-			render: function(data) {
-				setData(data);
+		addAgent() {
+			this.createRowByTypeName('agent');
+		}
 
-				for (var i in data) {
-					if (data.hasOwnProperty(i)) {
-						render(data[i]);
-					}
+		addSnmp() {
+			this.createRowByTypeName('snmp');
+		}
+
+		addJmx() {
+			this.createRowByTypeName('jmx');
+		}
+
+		addIpmi() {
+			this.createRowByTypeName('ipmi');
+		}
+
+		render() {
+			for (let i in this.data) {
+				if (this.data.hasOwnProperty(i)) {
+					this.renderRow(this.data[i]);
 				}
-
-				// Add accordion functionality to SNMP interfaces.
-				$(SNMP_CONTAINER_ID).zbx_vertical_accordion({handler: ".<?= ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE ?>"});
-				// Expend first SNMP interface.
-				$(SNMP_CONTAINER_ID).zbx_vertical_accordion("expandNth", 0);
-				// Add event to expand SNMP interface accordion if focused or clicked on inputs.
-				$(SNMP_CONTAINER_ID).on("focus", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>:not(.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>) .<?= ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND ?>", function() {
-					var index = $(this).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').index();
-
-					$(SNMP_CONTAINER_ID).zbx_vertical_accordion("expandNth", index);
-				});
-			},
-			disableEdit: function() {
-				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>')
-					.find('input, select')
-					.removeAttr('id')
-					.removeAttr('name');
-				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('input[type="text"]').prop('readonly', true);
-				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('input[type="radio"], input[type="checkbox"], select').prop('disabled', true);
-				$('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>').find('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>').remove();
-
-				// Change select to input.
-				[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')].map((elem) => {
-					const value = elem.options[elem.selectedIndex].text;
-
-					// Create new input[type=text].
-					const input = document.createElement('input');
-					input.type = 'text';
-					input.readOnly = true;
-					input.value = value;
-
-					// Replace select with created input.
-					elem.replace(input);
-				});
 			}
-		};
-	})(jQuery);
+
+			this.resetMainInterfaces();
+
+			// Add accordion functionality to SNMP interfaces.
+			jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>])
+				.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE ?>'});
+
+			// Expend first SNMP interface.
+			jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>]).zbx_vertical_accordion("expandNth", 0);
+
+			// Add event to expand SNMP interface accordion if focused or clicked on inputs.
+			jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>]).on("focus", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>:not(.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>) .<?= ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND ?>", (event) => {
+				var index = jQuery(event.currentTarget).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').index();
+
+				jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>]).zbx_vertical_accordion("expandNth", index);
+			});
+		}
+
+		static disableEdit() {
+			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input, .<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')]
+				.map((elem) => {
+					elem.removeAttribute('id');
+					elem.removeAttribute('name');
+				});
+
+			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input[type="text"]')]
+				.map((elem) => elem.readOnly = true);
+
+			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input[type="radio"], .<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>  input[type="checkbox"]')]
+				.map(elem => elem.disabled = true);
+
+			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> .<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')]
+				.map((elem) => elem.remove());
+
+			// Change select to input.
+			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')].map((elem) => {
+				const value = elem.options[elem.selectedIndex].text;
+
+				// Create new input[type=text].
+				const input = document.createElement('input');
+				input.type = 'text';
+				input.readOnly = true;
+				input.value = value;
+
+				// Replace select with created input.
+				elem.replace(input);
+			});
+		}
+	}
 
 	jQuery(document).ready(function() {
 		'use strict';
