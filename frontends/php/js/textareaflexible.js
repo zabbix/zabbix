@@ -48,10 +48,11 @@
 			$textarea.val(new_value);
 		}
 
-		if (new_value !== '') {
-			$textarea.height(0).innerHeight($textarea[0].scrollHeight);
-			$(window).scrollTop(scroll_pos);
-		}
+		$textarea
+			.height(0)
+			.innerHeight($textarea[0].scrollHeight);
+
+		$(window).scrollTop(scroll_pos);
 	}
 
 	var methods = {
