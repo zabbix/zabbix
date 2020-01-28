@@ -106,9 +106,8 @@ if ($data['is_item_testable']) {
 				? (new CComboBox('proxy_hostid',
 						array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
 						[0 => _('(no proxy)')] + $data['proxies']))
-				: (new CComboBox('proxy_hostid'))
-					->addItem(0, _('(no proxy)'))
-					->setEnabled(false),
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				: (new CTextBox(null, _('(no proxy)'), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			'proxy_hostid_row'
 		)
 		->addRow(
