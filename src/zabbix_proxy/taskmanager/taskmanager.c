@@ -241,7 +241,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	if (SUCCEED != (ret = zbx_json_brackets_open(row[1], &jp_data)))
 		info = zbx_strdup(NULL, zbx_json_strerror());
 	else
-		ret = zbx_trapper_item_test_run(&jp_data, &info);
+		ret = zbx_trapper_item_test_run(&jp_data, 0, &info);
 
 	task->data = zbx_tm_data_result_create(parent_taskid, ret, info);
 

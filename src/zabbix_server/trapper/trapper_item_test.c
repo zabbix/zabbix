@@ -125,7 +125,7 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 		ZBX_STR2UCHAR(*string, DBget_field(table, fieldname)->default_value);
 }
 
-int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
+int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info)
 {
 	char			tmp[MAX_STRING_LEN + 1], **pvalue;
 	DC_ITEM			item = {0};
@@ -140,6 +140,14 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 		table_items = DBget_table("items");
 
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_TYPE, table_items, "type", &item.type);
+	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
+
+	if (0 != proxy_hostid && FAIL == is_item_processed_by_server(item.type, item.key_orig))
+	{
+		ret = zbx_tm_execute_task_data(jp_data->start, jp_data->end - jp_data->start + 1, proxy_hostid, info);
+		goto out;
+	}
+
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, table_items, "value_type", &item.value_type);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_SECURITYLEVEL, table_items, "snmpv3_securitylevel",
 			&item.snmpv3_securitylevel);
@@ -161,7 +169,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_IPMI_SENSOR, table_items, "ipmi_sensor", item.ipmi_sensor,
 			sizeof(item.ipmi_sensor));
 
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
+
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMP_COMMUNITY, table_items, "snmp_community",
 			item.snmp_community_orig, sizeof(item.snmp_community_orig));
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMP_OID, table_items, "snmp_oid", item.snmp_oid_orig,
@@ -351,7 +359,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info)
 	zbx_free(item.params);
 	zbx_free(item.posts);
 	zbx_free(item.headers);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -394,10 +402,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	else
 		proxy_hostid = 0;
 
-	if (0 == proxy_hostid)
-		ret = zbx_trapper_item_test_run(&jp_data, &info);
-	else
-		ret = zbx_tm_execute_task_data(jp_data.start, jp_data.end - jp_data.start + 1, proxy_hostid, &info);
+	ret = zbx_trapper_item_test_run(&jp_data, proxy_hostid, &info);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);

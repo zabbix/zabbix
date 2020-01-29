@@ -24,6 +24,6 @@
 #include "zbxjson.h"
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp);
-int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, char **info);
+int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info);
 
 #endif
