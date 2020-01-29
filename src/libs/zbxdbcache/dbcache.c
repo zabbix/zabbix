@@ -480,6 +480,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, size_t *sql_offset)
 {
 	history_value_t	value_min, value_avg, value_max;
+	int		i;
 
 	value_min.dbl = atof(row[2]);
 	value_avg.dbl = atof(row[3]);
@@ -487,11 +488,12 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, siz
 
 	if (value_min.dbl < trend->value_min.dbl)
 		trend->value_min.dbl = value_min.dbl;
+
 	if (value_max.dbl > trend->value_max.dbl)
 		trend->value_max.dbl = value_max.dbl;
-	trend->value_avg.dbl = (trend->num * trend->value_avg.dbl
-			+ num * value_avg.dbl) / (trend->num + num);
-	trend->num += num;
+
+	for (i = 0; i < num; i++)
+		trend->value_avg.dbl += (value_avg.dbl - trend->value_avg.dbl) / ++(trend->num);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "update trends set"
 			" num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL ",value_max=" ZBX_FS_DBL
@@ -803,8 +805,7 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
 				trend->value_min.dbl = history->value.dbl;
 			if (trend->num == 0 || history->value.dbl > trend->value_max.dbl)
 				trend->value_max.dbl = history->value.dbl;
-			trend->value_avg.dbl = (trend->num * trend->value_avg.dbl
-				+ history->value.dbl) / (trend->num + 1);
+			trend->value_avg.dbl += (history->value.dbl - trend->value_avg.dbl) / (trend->num + 1);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (trend->num == 0 || history->value.ui64 < trend->value_min.ui64)
