@@ -401,7 +401,7 @@ class CHostInterface extends CApiService {
 	 *
 	 * @param array $interfaces
 	 */
-	protected function createSnmpInterface(array $interfaces) {
+	protected function createSnmpInterfaceDetails(array $interfaces) {
 		if (count($interfaces)) {
 			if (count(zbx_objectValues($interfaces, 'interfaceid')) != count($interfaces)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
@@ -436,7 +436,7 @@ class CHostInterface extends CApiService {
 			}
 		}
 
-		$this->createSnmpInterface($snmp_interfaces);
+		$this->createSnmpInterfaceDetails($snmp_interfaces);
 
 		return ['interfaceids' => $interfaceIds];
 	}
@@ -486,7 +486,7 @@ class CHostInterface extends CApiService {
 		$this->checkSnmpInput($snmp_data);
 
 		foreach ($snmp_data as &$interface) {
-			$this->createSnmpInterface([$interface['details'] + ['interfaceid' => $interface['interfaceid']]]);
+			$this->createSnmpInterfaceDetails([$interface['details'] + ['interfaceid' => $interface['interfaceid']]]);
 		}
 		unset($interface);
 
