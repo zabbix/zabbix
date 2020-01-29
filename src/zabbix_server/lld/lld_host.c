@@ -3118,6 +3118,8 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			unsigned char interface_type;
+
 			ZBX_STR2UINT64(hostid, row[0]);
 			ZBX_DBROW2UINT64(parent_interfaceid, row[1]);
 			ZBX_DBROW2UINT64(interfaceid, row[2]);
@@ -3129,13 +3131,24 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			}
 
 			host = (zbx_lld_host_t *)hosts->values[i];
+			ZBX_STR2UCHAR(interface_type, row[3]);
 
-			lld_interface_make(&host->interfaces, parent_interfaceid, interfaceid,
-					(unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]),
-					(unsigned char)atoi(row[5]), row[6], row[7], row[8],
-					(unsigned char)atoi(row[9]), (unsigned char)atoi(row[10]), row[11], row[12],
-					(unsigned char)atoi(row[13]), row[14], row[15],(unsigned char)atoi(row[16]),
-					(unsigned char)atoi(row[17]), row[18]);
+			if (INTERFACE_TYPE_SNMP == interface_type)
+			{
+				lld_interface_make(&host->interfaces, parent_interfaceid, interfaceid,
+						interface_type, (unsigned char)atoi(row[4]),
+						(unsigned char)atoi(row[5]), row[6], row[7], row[8],
+						(unsigned char)atoi(row[9]), (unsigned char)atoi(row[10]), row[11],
+						row[12], (unsigned char)atoi(row[13]), row[14], row[15],
+						(unsigned char)atoi(row[16]), (unsigned char)atoi(row[17]), row[18]);
+			}
+			else
+			{
+				lld_interface_make(&host->interfaces, parent_interfaceid, interfaceid,
+						interface_type, (unsigned char)atoi(row[4]),
+						(unsigned char)atoi(row[5]), row[6], row[7], row[8],
+						0, 0, NULL, NULL, 0, NULL, NULL,0, 0, NULL);
+			}
 		}
 		DBfree_result(result);
 	}
