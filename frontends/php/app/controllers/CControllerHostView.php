@@ -180,8 +180,6 @@ class CControllerHostView extends CControllerHost {
 			'maintenance_status' => CProfile::get('web.host.filter.maintenance_status', HOST_MAINTENANCE_STATUS_ON)
 		];
 
-		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'host.view');
-
 		$refresh_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'host.view.refresh')
 			->setArgument('filter_name', $filter['name'])
@@ -198,20 +196,17 @@ class CControllerHostView extends CControllerHost {
 			->setArgument('sortorder', $sortorder)
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
 
-		// data sort and pager
-		$prepared_data = $this->prepareData($filter, $sort, $sortorder);
+		$filter['page'] = $this->hasInput('page') ? $this->getInput('page') : null;
 
-		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['hosts'], ZBX_SORT_UP, $view_curl);
+		$prepared_data = $this->prepareData($filter, $sort, $sortorder);
 
 		$data = [
 			'filter' => $filter,
 			'sort' => $sort,
 			'sortorder' => $sortorder,
-			'view_curl' => $view_curl,
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'active_tab' => $active_tab,
-			'paging' => $paging
+			'active_tab' => $active_tab
 		] + $prepared_data;
 
 		CView::$has_web_layout_mode = true;

@@ -93,9 +93,10 @@ abstract class CControllerHost extends CController {
 		$config = select_config();
 
 		$hosts = API::Host()->get([
-			'output' => [$sort],
+			'output' => ['hostid', 'name', 'status'],
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
+			'inheritedTags' => true,
 			'groupids' => $groupids,
 			'severities' => $filter['severities'] ? $filter['severities'] : null,
 			'search' => [
@@ -110,11 +111,20 @@ abstract class CControllerHost extends CController {
 					? null
 					: HOST_MAINTENANCE_STATUS_OFF,
 			],
-			'sortfield' => $sort,
+			'sortfield' => 'name',
 			'limit' => $config['search_limit'] + 1,
 			'preservekeys' => true
 		]);
 
+		// Sort for paging so we know which IDs go to which page.
+		CArrayHelper::sort($hosts, [['field' => $sort, 'order' => $sortorder]]);
+
+		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'host.view');
+
+		// Split result array and create paging.
+		$paging = CPagerHelper::paginate($filter['page'], $hosts, $sortorder, $view_curl);
+
+		// Get additonal data to limited host amount.
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type',
 				'available', 'snmp_available', 'jmx_available', 'ipmi_available', 'error', 'ipmi_error', 'snmp_error',
@@ -125,9 +135,11 @@ abstract class CControllerHost extends CController {
 			'selectScreens' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'hostids' => array_keys($hosts),
 			'preservekeys' => true
 		]);
+		// Re-sort the results again.
 		CArrayHelper::sort($hosts, [['field' => $sort, 'order' => $sortorder]]);
 
 		$maintenanceids = [];
@@ -158,6 +170,30 @@ abstract class CControllerHost extends CController {
 					}
 				}
 			}
+
+			// Merge host tags with template tags, and skip duplicate tags and values.
+			$tags = [];
+
+			if ($host['inheritedTags']) {
+				if ($host['tags']) {
+					$tags = $host['tags'];
+
+					foreach ($host['inheritedTags'] as $template_tag) {
+						foreach ($tags as $host_tag) {
+							// Skip tags with same name and value.
+							if ($host_tag['tag'] === $template_tag['tag'] && $host_tag['value'] === $template_tag['value']) {
+								continue 2;
+							}
+						}
+						$tags[] = $template_tag;
+					}
+				}
+				else {
+					$tags = $host['inheritedTags'];
+				}
+			}
+
+			$host['tags'] = $tags;
 		}
 		unset($host);
 
@@ -179,6 +215,8 @@ abstract class CControllerHost extends CController {
 		unset($host);
 
 		return [
+			'paging' => $paging,
+			'view_curl' => $view_curl,
 			'hosts' => $hosts,
 			'maintenances' => $maintenances,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
