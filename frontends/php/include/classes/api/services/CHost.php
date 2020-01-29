@@ -134,6 +134,8 @@ class CHost extends CHostGeneral {
 			'selectHostDiscovery'				=> null,
 			'selectTags'						=> null,
 			'selectInheritedTags'				=> null,
+			'selectProblemsBySeverity'			=> false,
+			'withProblemsSuppressed'			=> false,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
 			'preservekeys'						=> false,
@@ -461,7 +463,9 @@ class CHost extends CHostGeneral {
 			'selectInheritedTags' => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 			'severities' =>	[
 				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_DISASTER)), 'uniq' => true
-			]
+			],
+			'selectProblemsBySeverity' => ['type' => API_BOOLEAN, 'default' => false],
+			'withProblemsSuppressed' => ['type' => API_BOOLEAN, 'default' => false]
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -1778,6 +1782,36 @@ class CHost extends CHostGeneral {
 
 				$host['inheritedTags'] = $tags;
 			}
+		}
+
+		if ($options['selectProblemsBySeverity'] === true) {
+			$problems = DBfetchArray(DBselect(
+				'SELECT i.hostid,p.severity,count(p.eventid)'.
+				' FROM problem p,functions f,items i'.
+				' WHERE '.dbConditionId('i.hostid', $hostids).
+					' AND i.itemid=f.itemid'.
+					' AND f.triggerid=p.objectid'.
+					' AND p.object='.EVENT_OBJECT_TRIGGER.
+					' AND p.source='.EVENT_SOURCE_TRIGGERS.
+					(($options['withProblemsSuppressed'] === true) ? '' :
+						' AND NOT EXISTS (SELECT NULL FROM event_suppress es WHERE es.eventid=p.eventid)').
+				' GROUP BY p.severity,i.hostid'.
+				' ORDER BY i.hostid,p.severity DESC'
+			));
+
+			foreach ($result as &$host) {
+				$host['problemsBySeverity'] = [];
+
+				foreach ($problems as $problem) {
+					if (bccomp($host['hostid'], $problem['hostid']) == 0) {
+						$host['problemsBySeverity'][] = [
+							'severity' => $problem['severity'],
+							'count' => $problem['count']
+						];
+					}
+				}
+			}
+			unset($host);
 		}
 
 		return $result;
