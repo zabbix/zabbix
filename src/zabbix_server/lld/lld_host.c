@@ -1926,29 +1926,29 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
  *                                                                            *
  ******************************************************************************/
 static void	lld_interface_snmp_prepare_sql(const zbx_uint64_t interfaceid, const zbx_lld_interface_snmp_t *snmp,
-		char *sql, size_t *sql_alloc, size_t *sql_offset)
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	const char	*d = "";
 	char		*value_esc;
 
-	zbx_strcpy_alloc(&sql, sql_alloc, sql_offset, "update interface_snmp set ");
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update interface_snmp set ");
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE))
 	{
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "version=%d", (int)snmp->version);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "version=%d", (int)snmp->version);
 		d = ",";
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK))
 	{
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "%sbulk=%d", d, (int)snmp->bulk);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sbulk=%d", d, (int)snmp->bulk);
 		d = ",";
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY))
 	{
 		value_esc = DBdyn_escape_string(snmp->community);
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "%scommunity='%s'", d, value_esc);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%scommunity='%s'", d, value_esc);
 		zbx_free(value_esc);
 		d = ",";
 	}
@@ -1956,21 +1956,21 @@ static void	lld_interface_snmp_prepare_sql(const zbx_uint64_t interfaceid, const
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME))
 	{
 		value_esc = DBdyn_escape_string(snmp->securityname);
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "%ssecurityname='%s'", d, value_esc);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssecurityname='%s'", d, value_esc);
 		zbx_free(value_esc);
 		d = ",";
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECLEVEL))
 	{
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "%ssecuritylevel=%d", d, (int)snmp->securitylevel);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssecuritylevel=%d", d, (int)snmp->securitylevel);
 		d = ",";
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS))
 	{
 		value_esc = DBdyn_escape_string(snmp->authpassphrase);
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "%sauthpassphrase='%s'", d, value_esc);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sauthpassphrase='%s'", d, value_esc);
 		zbx_free(value_esc);
 		d = ",";
 	}
@@ -1978,31 +1978,31 @@ static void	lld_interface_snmp_prepare_sql(const zbx_uint64_t interfaceid, const
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS))
 	{
 		value_esc = DBdyn_escape_string(snmp->privpassphrase);
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "%sprivpassphrase='%s'", d, value_esc);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sprivpassphrase='%s'", d, value_esc);
 		zbx_free(value_esc);
 		d = ",";
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPROTOCOL))
 	{
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "%sauthprotocol=%d", d, (int)snmp->authprotocol);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sauthprotocol=%d", d, (int)snmp->authprotocol);
 		d = ",";
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPROTOCOL))
 	{
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "%sprivprotocol=%d", d, (int)snmp->privprotocol);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sprivprotocol=%d", d, (int)snmp->privprotocol);
 		d = ",";
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT))
 	{
 		value_esc = DBdyn_escape_string(snmp->contextname);
-		zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, "%scontextname='%s'", d, value_esc);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%scontextname='%s'", d, value_esc);
 		zbx_free(value_esc);
 	}
 
-	zbx_snprintf_alloc(&sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
 }
 
 /******************************************************************************
@@ -2161,7 +2161,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		zbx_db_insert_prepare(&db_insert_hinventory, "host_inventory", "hostid", "inventory_mode", NULL);
 	}
 
-	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_hostmacros)
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros)
 	{
 		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 	}
@@ -2438,7 +2438,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				else if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE))
 				{
 					lld_interface_snmp_prepare_sql(interface->interfaceid, interface->data.snmp,
-							sql1, &sql1_alloc, &sql1_offset);
+							&sql1, &sql1_alloc, &sql1_offset);
 				}
 			}
 		}
