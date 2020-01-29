@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -276,7 +276,12 @@ class CPageFilter {
 	private function _getProfiles(array $options) {
 		global $page;
 
-		$profileSection = $this->config['individual'] ? $page['file'] : $page['menu'];
+		if ($page === null) {
+			$profileSection = '';
+		}
+		else {
+			$profileSection = $this->config['individual'] ? $page['file'] : $page['menu'];
+		}
 
 		$this->_profileIdx['groups'] = 'web.'.$profileSection.'.groupid';
 		$this->_profileIdx['hosts'] = 'web.'.$profileSection.'.hostid';

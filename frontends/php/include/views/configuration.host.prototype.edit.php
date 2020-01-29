@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 
 $divTabs = new CTabView();
+
 if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
@@ -230,7 +231,7 @@ if ($hostPrototype['templateid']) {
 		->setHeader([_('Name')]);
 
 	foreach ($hostPrototype['templates'] as $template) {
-		$tmplList->addVar('templates['.$template['templateid'].']', $template['templateid']);
+		$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
 		if (array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
@@ -258,7 +259,7 @@ else {
 		->setHeader([_('Name'), _('Action')]);
 
 	foreach ($hostPrototype['templates'] as $template) {
-		$tmplList->addVar('templates['.$template['templateid'].']', $template['templateid']);
+		$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
 		if (array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
@@ -283,26 +284,35 @@ else {
 		$disableids[] = $template['templateid'];
 	}
 
-	$linkedTemplateTable->addRow([
-		(new CSimpleButton(_('Add')))
-			->onClick('return PopUp("popup.generic",'.CJs::encodeJson([
-				'dstfrm' => $frmHost->getName(),
-				'dstfld1' => $frmHost->getName(),
+	$add_templates_ms = (new CMultiSelect([
+		'name' => 'add_templates[]',
+		'object_name' => 'templates',
+		'data' => $hostPrototype['add_templates'],
+		'popup' => [
+			'parameters' => [
 				'srctbl' => 'templates',
 				'srcfld1' => 'hostid',
-				'templated_hosts' => '1',
-				'popup_type' => 'templates',
-				'multiselect' => 1,
+				'srcfld2' => 'host',
+				'dstfrm' => $frmHost->getName(),
+				'dstfld1' => 'add_templates_',
 				'disableids' => $disableids
-			]).', null, this);')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
+			]
+		]
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
+	$tmplList
+		->addRow(_('Linked templates'),
+			(new CDiv($linkedTemplateTable))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+		->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
+			(new CDiv(
+				(new CTable())->addRow([$add_templates_ms])
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		);
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
@@ -330,21 +340,19 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 
 	// macros
-	$macros = $parentHost['macros'];
-	if ($data['show_inherited_macros']) {
-		$macros = mergeInheritedMacros($macros,
-			getInheritedMacros(zbx_objectValues($hostPrototype['templates'], 'templateid'))
-		);
-	}
-	$macros = array_values(order_macros($macros, 'macro'));
-
-	$macrosView = new CView('hostmacros', [
-		'macros' => $macros,
-		'show_inherited_macros' => $data['show_inherited_macros'],
-		'is_template' => false,
-		'readonly' => true
-	]);
-	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
+	$divTabs->addTab('macroTab', _('Macros'),
+		(new CFormList('macrosFormList'))
+			->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+				->addValue(_('Host macros'), 0)
+				->addValue(_('Inherited and host macros'), 1)
+				->setModern(true)
+			)
+			->addRow(null, new CObject((new CView('hostmacros.list.html', [
+				'macros' => $data['macros'],
+				'show_inherited_macros' => $data['show_inherited_macros'],
+				'readonly' => $data['readonly']
+			]))->getOutput()), 'macros_container')
+	);
 }
 
 $inventoryFormList = (new CFormList('inventorylist'))

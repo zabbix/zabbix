@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,7 +175,7 @@ class CDashboardWidgetMap extends CDiv {
 		}
 
 		if ($this->sysmap_data && $this->error === null) {
-			$this->sysmap_data['container'] = "#map_{$this->uniqueid}";
+			$this->sysmap_data['container'] = '#map_'.$this->uniqueid;
 
 			$script_run .= 'jQuery(function($) {'.
 				'$("#'.$this->getId().'").zbx_mapwidget({'.
@@ -195,6 +195,24 @@ class CDashboardWidgetMap extends CDiv {
 						'trigger_name: "on_dashboard_ready_'.$this->uniqueid.'"'.
 					'}'.
 				');';
+		}
+
+		// Fix text label disappearing on DOM change in Internet Explorer 11 on Windows 7 (important).
+		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_MAP && $this->initial_load) {
+			$script_run .=
+				'if (IE11) {'.
+					'jQuery(".dashbrd-grid-container")'.
+						'.dashboardGrid("getWidgetsBy", "uniqueid", "'.$this->uniqueid.'")'.
+						'.each(function(widget) {'.
+							'var observer = new MutationObserver(function() {'.
+									'widget.content_body.find("svg text").each(function() {'.
+										'jQuery(this).attr("textLength", this.getBBox().width);'.
+									'});'.
+								'});'.
+
+							'observer.observe(widget.div[0], {attributes: true});'.
+						'});'.
+				'}';
 		}
 
 		return $script_run;

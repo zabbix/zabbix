@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2020 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,14 @@
 
 /**
  * JQuery class that adds interactivity of vertical accordion for CList element.
+ *
+ * @event collapse - Event fires when accordion section is collapsed.
+ * @property {object} section - section object.
+ *
+ * @event expand - Event fires when accordion section is expanded.
+ * @property {object} section - section object.
  */
-jQuery(function ($) {
+jQuery(function($) {
 	"use strict";
 
 	var methods = {
@@ -69,11 +75,13 @@ jQuery(function ($) {
 			var accordion = $(this),
 				options = accordion.data('options');
 
-			$('.' + options['active_class'], accordion)
-				.removeClass(options['active_class'])
-				.addClass(options['closed_class']);
+			$('.' + options['active_class'], accordion).each(function() {
+				$(this)
+					.removeClass(options['active_class'])
+					.addClass(options['closed_class']);
 
-			$('textarea', accordion).scrollTop(0);
+				accordion.trigger('collapse', {section: $(this)});
+			});
 
 			$(options['handler'], accordion).attr('title', t('S_EXPAND'));
 		},
@@ -89,6 +97,9 @@ jQuery(function ($) {
 			section
 				.removeClass(options['closed_class'])
 				.addClass(options['active_class']);
+
+			accordion.trigger('expand', {section: section});
+
 			handler.attr('title', t('S_COLLAPSE'));
 		}
 	};

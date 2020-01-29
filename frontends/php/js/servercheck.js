@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2020 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -26,84 +26,83 @@ jQuery(function($) {
 	 *
 	 * @type {Object}
 	 */
-	var checker = {
-		timeout: 10000, // 10 seconds
+	var ServerChecker = {
+		$elem: null,
+		elem_offset_top: 0,
+		delay: 10000, // 10 seconds
 		warning: false,
 
 		/**
-		 * Sends ajax request to get Zabbix server availability and message to show if server is not available.
+		 * Function to start check server status via RPC call.
 		 *
-		 * @param nocache add 'nocache' parameter to get result not from cache
+		 * @param {object}  $elem    General element.
+		 * @param {integer} timeout  Check rate.
 		 */
-		check: function(nocache) {
-			var params = nocache ? {nocache: true} : {};
+		start: function($elem, timeout) {
+			if (!$elem.length) {
+				return false;
+			}
+
+			this.prepareNext(timeout);
+
+			this.$elem = $elem;
+			this.$elem.on('mouseenter', this.hideMessage.bind(this));
+		},
+
+		prepareNext: function(delay) {
+			setTimeout(this.check.bind(this), delay || this.delay);
+		},
+
+		/**
+		 * Sends ajax request to get Zabbix server availability and message to show if server is not available.
+		 */
+		check: function() {
 			new RPC.Call({
 				'method': 'zabbix.status',
-				'params': params,
-				'onSuccess': $.proxy(this.onSuccess, this)
+				'params': {nocache: true},
+				'onSuccess': this.onSuccess.bind(this)
 			});
 		},
 
-		onSuccess: function(result) {
-			if (result.result) {
-				this.hideWarning();
+		onSuccess: function(response) {
+			if (response.result) {
+				this.hideMessage();
 			}
 			else {
-				this.showWarning(result.message);
+				this.$elem.text(response.message);
+				this.showMessage()
 			}
+
+			this.prepareNext();
 		},
 
-		showWarning: function(message) {
-			if (!this.warning) {
-				$('#msg-global-footer').text(message);
-				$('#msg-global-footer').fadeIn(100);
+		showMessage: function(e) {
+			if (!this.warning || (e && (e.pageY < this.elem_offset_top || e.type === 'mouseleave'))) {
+				$(document).off('mousemove.ServerChecker mouseleave.ServerChecker');
+
 				this.warning = true;
+				this.$elem
+					.css('display', 'flex')
+					.hide()
+					.fadeIn(200);
 			}
 		},
 
-		hideWarning: function() {
+		hideMessage: function(e) {
 			if (this.warning) {
-				$('#msg-global-footer').fadeOut(100);
-				this.warning = false;
+				if (e && e.type === 'mouseenter') {
+					$(document).on('mousemove.ServerChecker mouseleave.ServerChecker', this.showMessage.bind(this));
+
+					this.elem_offset_top = this.$elem.offset().top;
+				}
+				else {
+					this.warning = false;
+				}
+
+				this.$elem.fadeOut(200);
 			}
 		}
 	};
 
-	// looping function that check for server status every 10 seconds
-	function checkStatus(nocache) {
-		checker.check(nocache);
-
-		window.setTimeout(checkStatus, checker.timeout);
-	}
-
-	// start server status checks with 5 sec dealy after page is loaded
-	window.setTimeout(function() {
-		checkStatus(true);
-	}, 5000);
-
-
-	// event that hide warning message when mouse hover it
-	$('#msg-global-footer').on('mouseenter', function() {
-		var obj = $(this),
-			offset = obj.offset(),
-			x1 = Math.floor(offset.left),
-			x2 = x1 + obj.outerWidth(),
-			y1 = Math.floor(offset.top),
-			y2 = y1 + obj.outerHeight();
-
-		obj.fadeOut(100);
-
-		$(document).on('mousemove.messagehide', function(e) {
-			if (e.pageX < x1 || e.pageX > x2 || e.pageY < y1 || e.pageY > y2) {
-				obj.fadeIn(100);
-				$(document).off('mousemove.messagehide');
-				$(document).off('mouseleave.messagehide');
-			}
-		});
-		$(document).on('mouseleave.messagehide', function() {
-			obj.fadeIn(100);
-			$(document).off('mouseleave.messagehide');
-			$(document).off('mousemove.messagehide');
-		});
-	});
+	ServerChecker.start($('#msg-global-footer'), 5000);
 });

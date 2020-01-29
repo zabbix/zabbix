@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,15 +72,15 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'users' => [
 						[
 							'alias' => 'admin-zabbix',
-							'notifications' => [ '', '', '', '4 (2/2/0)', '', '', '', '', '', '', '', '12 (6/6/0)']
+							'notifications' => [ '', '', '', '4 (2/0/0/0/0/0/0/2/0)', '', '', '', '', '', '', '', '12 (6/0/0/0/0/0/0/6/0)']
 						],
 						[
 							'alias' => 'guest',
-							'notifications' => [ '', '2 (1/1/0)', '', '', '', '', '', '', '', '10 (5/5/0)', '', '']
+							'notifications' => [ '', '2 (1/0/0/0/0/0/0/1/0)', '', '', '', '', '', '', '', '10 (5/0/0/0/0/0/0/5/0)', '', '']
 						],
 						[
 							'alias' => 'test-user',
-							'notifications' => [ '', '', '3 (1/2/0)', '', '', '', '', '', '', '', '11 (5/6/0)', '']
+							'notifications' => [ '', '', '3 (1/0/0/0/0/0/0/2/0)', '', '', '', '', '', '', '', '11 (5/0/0/0/0/0/0/6/0)', '']
 						]
 					]
 				]
@@ -97,11 +97,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 						],
 						[
 							'alias' => 'disabled-user',
-							'notifications' => [ '', '', '', '', '', '', '', '', '', '', '15 (6/9/0)', '']
+							'notifications' => [ '', '', '', '', '', '', '', '', '', '', '15 (6/0/0/0/0/0/0/9/0)', '']
 						],
 						[
 							'alias' => 'user-for-blocking',
-							'notifications' => [ '', '', '', '', '', '', '14 (6/8/0)', '', '', '', '', '']
+							'notifications' => [ '', '', '', '', '', '', '14 (6/0/0/0/0/0/0/8/0)', '', '', '', '', '']
 						]
 					]
 				]
@@ -113,11 +113,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'users' => [
 						[
 							'alias' => 'admin-zabbix',
-							'notifications' => [ '', '', '', '', '', '16 (8/8/0)', '']
+							'notifications' => [ '', '', '', '', '', '16 (8/0/0/0/0/0/0/8/0)', '']
 						],
 						[
 							'alias' => 'disabled-user',
-							'notifications' => [ '', '', '', '', '15 (6/9/0)', '7 (3/4/0)', '']
+							'notifications' => [ '', '', '', '', '15 (6/0/0/0/0/0/0/9/0)', '7 (3/0/0/0/0/0/0/4/0)', '']
 						]
 					]
 				]

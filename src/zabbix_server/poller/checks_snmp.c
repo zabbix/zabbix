@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1375,11 +1375,7 @@ retry:
 			if (*max_succeed < mapping_num)
 				*max_succeed = mapping_num;
 		}
-		else if (1 < mapping_num)
-		{
-			if (*min_fail > mapping_num)
-				*min_fail = mapping_num;
-		}
+		/* min_fail value is updated when bulk request is halved in the case of failure */
 	}
 	else if (STAT_SUCCESS == status && SNMP_ERR_NOSUCHNAME == response->errstat && 0 != response->errindex)
 	{

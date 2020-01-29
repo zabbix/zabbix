@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -467,7 +467,10 @@ $item_form_list
 			->setLabel(_('Show value'))
 			->setChecked(isset($data['visible']['valuemapid'])),
 		(new CDiv([$value_maps_combo_box, SPACE,
-			(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')
+			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'valuemap.list')
+				->getUrl()
+			))->setAttribute('target', '_blank')
 		]))->setId('valuemap')
 	)
 	->addRow(

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,10 +151,10 @@ class CMultifieldTableElement extends CTableElement {
 			else {
 				$control = (!is_array($this->mapping) || array_key_exists($label, $this->mapping))
 						? CElementQuery::getInputElement($column, '.', CTestArrayHelper::get($mapping, 'class'))
-						: null;
+						: new CNullElement();
 			}
 
-			if ($control === null) {
+			if (!$control->isValid()) {
 				continue;
 			}
 

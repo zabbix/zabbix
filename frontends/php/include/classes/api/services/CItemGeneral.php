@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -545,6 +545,14 @@ abstract class CItemGeneral extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No private key file specified.'));
 					}
 				}
+			}
+
+			// Prevent IPMI sensor field being empty if item key is not "ipmi.get".
+			if ($fullItem['type'] == ITEM_TYPE_IPMI && $fullItem['key_'] !== 'ipmi.get'
+					&& (!array_key_exists('ipmi_sensor', $fullItem) || $fullItem['ipmi_sensor'] === '')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'ipmi_sensor', _('cannot be empty')
+				));
 			}
 
 			// snmp trap
@@ -2041,7 +2049,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate depth and ammount of elements in the tree of the dependent items.
+	 * Validate depth and amount of elements in the tree of the dependent items.
 	 *
 	 * @param array  $dependent_items
 	 * @param string $dependent_items[<master_itemid>][]  List if the dependent item IDs ("false" for new items)
@@ -2227,7 +2235,7 @@ abstract class CItemGeneral extends CApiService {
 
 		if (array_key_exists('templateid', $data) && $data['templateid']) {
 			$rules['interfaceid'] = [
-				'type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY
+				'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY
 			];
 		}
 

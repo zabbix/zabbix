@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/correlation.inc.php';
 
 $page['title'] = _('Event correlation rules');
 $page['file'] = 'correlation.php';
-$page['scripts'] = ['multiselect.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'popup.condition.common.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 // VAR									TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -475,9 +475,22 @@ else {
 		'limit' => $config['search_limit'] + 1
 	]);
 
-	// sorting && paging
 	order_result($data['correlations'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['correlations'], $sortOrder, new CUrl('correlation.php'));
+
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['correlations'], $sortOrder, new CUrl('correlation.php'));
 
 	// Render view.
 	$correlationView = new CView('configuration.correlation.list', $data);

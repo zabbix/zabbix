@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,5 +57,9 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 		const char *output_template, char **output);
 int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps);
 void	zbx_regexp_escape(char **string);
+
+/* wildcards */
+void	zbx_wildcard_minimize(char *str);
+int	zbx_wildcard_match(const char *value, const char *wildcard);
 
 #endif /* ZABBIX_ZBXREGEXP_H */

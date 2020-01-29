@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -819,11 +819,10 @@ class CWidgetHelper {
 	 * Return javascript necessary to initialize CWidgetFieldGraphOverride field.
 	 *
 	 * @param CWidgetFieldGraphOverride $field
-	 * @param string                    $form_name  Form name in which override field is located.
 	 *
 	 * @return string
 	 */
-	public static function getGraphOverrideJavascript($field, $form_name) {
+	public static function getGraphOverrideJavascript($field) {
 		$scripts = [
 			// Define it as function to avoid redundancy.
 			'function initializeOverrides() {'.
@@ -1235,8 +1234,8 @@ class CWidgetHelper {
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.
 						'data.color = function(num) {'.
-							'var palete = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETE.';'.
-							'return palete[num % palete.length];'.
+							'var palette = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE.';'.
+							'return palette[num % palette.length];'.
 						'} (data.rowNum);'.
 						'return data;'.
 					'}'.
@@ -1276,10 +1275,20 @@ class CWidgetHelper {
 					'}'.
 				'});',
 
-			// Intialize vertical accordion.
-			'jQuery("#data_sets").zbx_vertical_accordion({'.
-				'handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"'.
-			'});',
+			// Initialize vertical accordion.
+			'jQuery("#data_sets")'.
+				'.on("focus", ".'.CMultiSelect::ZBX_STYLE_CLASS.' input.input", function() {'.
+					'jQuery("#data_sets").zbx_vertical_accordion("expandNth",'.
+						'jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());'.
+					'})'.
+				'.on("collapse", function(event, data) {'.
+					'jQuery("textarea, .multiselect", data.section).scrollTop(0);'.
+					'jQuery(window).trigger("resize");'.
+				'})'.
+				'.on("expand", function() {'.
+					'jQuery(window).trigger("resize");'.
+				'})'.
+				'.zbx_vertical_accordion({handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"});',
 
 			// Initialize rangeControl UI elements.
 			'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'", jQuery("#data_sets")).rangeControl();',
@@ -1288,9 +1297,10 @@ class CWidgetHelper {
 			'jQuery("#data_sets").on("click", "'.implode(', ', [
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CPatternSelect::ZBX_STYLE_CLASS,
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
-			]).'", function() {'.
+			]).'", function(event) {'.
 				'var index = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index();'.
 				'jQuery("#data_sets").zbx_vertical_accordion("expandNth", index);'.
+				'jQuery(event.currentTarget).find("input.input").focus();'.
 			'});',
 
 			// Initialize pattern fields.

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,7 +117,10 @@ $icon_mapping = (new CComboBox('iconmapid', $data['sysmap']['iconmapid']))
 foreach ($data['iconMaps'] as $iconMap) {
 	$icon_mapping->addItem($iconMap['iconmapid'], $iconMap['name']);
 }
-$icon_mapping_link = (new CLink(_('show icon mappings'), 'adm.iconmapping.php'))
+$icon_mapping_link = (new CLink(_('show icon mappings'), (new CUrl('zabbix.php'))
+		->setArgument('action', 'iconmap.list')
+		->getUrl()
+	))
 	->setAttribute('target', '_blank');
 $map_tab->addRow(_('Automatic icon mapping'), [$icon_mapping, SPACE, $icon_mapping_link]);
 

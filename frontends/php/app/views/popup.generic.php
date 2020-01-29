@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -278,7 +278,12 @@ switch ($data['popup_type']) {
 					$options['dstfld2'] => $trigger[$options['srcfld2']]
 				];
 				if (array_key_exists('dstfld3', $options)) {
-					$values[$options['dstfld3']] = $trigger[$trigger[$options['srcfld3']]];
+					if (array_key_exists($options['srcfld3'], $trigger) && array_key_exists($trigger[$options['srcfld3']], $trigger)) {
+						$values[$options['dstfld3']] = $trigger[$trigger[$options['srcfld3']]];
+					}
+					else {
+						$values[$options['dstfld3']] = null;
+					}
 				}
 				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).','.zbx_jsvalue($values).');';
 			}

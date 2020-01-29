@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ package zbxlib
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 
@@ -171,8 +172,6 @@ static void free_log_result(log_result_t *result)
 	zbx_free(result);
 }
 
-int processValue(void *server, const char *value, int state, zbx_uint64_t lastlogsize, int mtime);
-
 int	process_value_cb(const char *server, unsigned short port, const char *host, const char *key,
 		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
@@ -190,7 +189,6 @@ import "C"
 
 import (
 	"errors"
-	"fmt"
 	"time"
 	"unsafe"
 
@@ -235,8 +233,10 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 		flags |= MetricFlagLogCount | MetricFlagLogLog
 	case "logrt.count":
 		flags |= MetricFlagLogCount | MetricFlagLogLogrt
+	case "eventlog":
+		flags |= MetricFlagLogEventlog
 	default:
-		return nil, fmt.Errorf("Unsupported item key: %s", key)
+		return nil, errors.New("Unsupported item key.")
 	}
 	ckey := C.CString(itemutil.MakeKey(key, params))
 	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil

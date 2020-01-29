@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -693,6 +693,8 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 
 			zbx_vector_ptr_append(add_results, add_result);
 		}
+		else
+			zbx_free(add_result);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __func__, add_results->values_num);

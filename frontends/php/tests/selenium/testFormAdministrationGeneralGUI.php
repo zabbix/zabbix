@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 	*/
 	public function testFormAdministrationGeneralGUI_CheckLayout($allValues) {
 
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
@@ -88,7 +88,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralGUI_ChangeTheme() {
 
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['default_theme']).' FROM config ORDER BY configid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
@@ -111,7 +111,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstEntry() {
 
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$sql_hash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
@@ -133,7 +133,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstRemember() {
 
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['dropdown_first_remember']).' FROM config ORDER BY configid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
@@ -157,7 +157,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeSearchLimit() {
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['search_limit']).' FROM config ORDER BY configid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
@@ -196,8 +196,8 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent(['GUI', 'Limit for search and filter results']);
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
-		$this->zbxTestTextPresent('Incorrect value "0" for "Limit for search and filter results" field: must be between 1 and 999999.');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
+		$this->zbxTestTextPresent('Incorrect value "0" for "search_limit" field.');
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		// Check to enter -1 value
@@ -208,7 +208,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent(['GUI', 'Limit for search and filter results']);
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "-1" for "Limit for search and filter results" field: must be between 1 and 999999.']);
+		$this->zbxTestTextPresent(['Cannot update configuration', 'Incorrect value "-1" for "search_limit" field.']);
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -218,7 +218,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['max_in_table']).' FROM config ORDER BY configid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$this->zbxTestInputTypeOverwrite('max_in_table', '1000');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent([
@@ -261,8 +261,8 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('max_in_table', '-1');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent([
-			'Page received incorrect data',
-			'Incorrect value "-1" for "Max count of elements to show inside table cell" field: must be between 1 and 99999.',
+			'Cannot update configuration',
+			'Incorrect value "-1" for "max_in_table" field.',
 			'GUI',
 			'Max count of elements to show inside table cell'
 		]);
@@ -272,7 +272,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralGUI_EventCheckInterval() {
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['server_check_interval']).' FROM config ORDER BY configid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 

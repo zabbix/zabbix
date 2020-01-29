@@ -325,7 +325,7 @@
 #endif
 
 /* MinGW.  Also GCC flags (DUK_F_GCC) are enabled now. */
-#if defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(__MINGW32__)
 #define DUK_F_MINGW
 #endif
 

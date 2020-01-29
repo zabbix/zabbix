@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,12 +125,11 @@ $overviewFormList->addRow(_('Monitoring'),
 			'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].url_param('groupid')
 		),
 		new CLink(_('Latest data'),
-			(new CUrl('latest.php'))
-				->setArgument('form', '1')
-				->setArgument('select', '')
-				->setArgument('show_details', '1')
-				->setArgument('filter_set', 'Filter')
-				->setArgument('hostids[]', $data['host']['hostid'])
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'latest.view')
+				->setArgument('filter_hostids[]', $data['host']['hostid'])
+				->setArgument('filter_show_details', '1')
+				->setArgument('filter_set', '1')
 		),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))

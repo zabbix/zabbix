@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,17 +70,18 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_setproctitle("%s [waiting %d sec for processes]", get_process_type_string(process_type),
-			CONFIG_CONFSYNCER_FREQUENCY);
-
 	zbx_set_sigusr_handler(zbx_dbconfig_sigusr_handler);
-
-	/* the initial configuration sync is done by server before worker processes are forked */
-	zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	sec = zbx_time();
+	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
+	DCsync_configuration(ZBX_DBSYNC_INIT);
+	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
+			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
+	zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 
 	while (ZBX_IS_RUNNING())
 	{

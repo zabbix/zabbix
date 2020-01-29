@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,14 +20,22 @@
 
 define('ZABBIX_VERSION',		'5.0.0alpha1');
 define('ZABBIX_API_VERSION',	'5.0.0');
+<<<<<<< HEAD
 define('ZABBIX_EXPORT_VERSION',	'4.4');
 define('ZABBIX_DB_VERSION',		4050008);
+=======
+define('ZABBIX_EXPORT_VERSION',	'5.0');
+define('ZABBIX_DB_VERSION',		4050027);
+>>>>>>> 9ee19e435ca31e1d2e13589fed4b1a4668c45e10
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2019');
+define('ZABBIX_COPYRIGHT_TO',	'2020');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
+
+define('ZBX_BCRYPT_COST',		10);
+define('ZBX_MD5_SIZE',			32);
 
 define('ZBX_SESSION_NAME', 'zbx_sessionid'); // Session cookie name for Zabbix front-end.
 
@@ -48,7 +56,7 @@ define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
-// Date and time format seperators must be synced with setSDateFromOuterObj() in class.calendar.js.
+// Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
 
@@ -121,7 +129,6 @@ define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);
 define('ZBX_AUTH_CASE_SENSITIVE',	1);
 
-define('ZBX_DB_DB2',		'IBM_DB2');
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
@@ -156,10 +163,6 @@ define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
 define('T_ZBX_RANGE_TIME',	3);
-define('T_ZBX_CLR',			5);
-define('T_ZBX_DBL_BIG',		9);
-define('T_ZBX_DBL_STR',		10);
-define('T_ZBX_TP',			11);
 define('T_ZBX_TU',			12);
 define('T_ZBX_ABS_TIME',	13);
 
@@ -662,30 +665,6 @@ define('SMTP_AUTHENTICATION_NORMAL',	1);
 define('SMTP_MESSAGE_FORMAT_PLAIN_TEXT',	0);
 define('SMTP_MESSAGE_FORMAT_HTML',			1);
 
-define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
-define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
-define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Updated problem: {EVENT.NAME}');
-define('ACTION_DEFAULT_SUBJ_PROBLEM', 'Problem: {EVENT.NAME}');
-define('ACTION_DEFAULT_SUBJ_RECOVERY', 'Resolved: {EVENT.NAME}');
-
-define('ACTION_DEFAULT_MSG_AUTOREG', "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}");
-define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\n".
-		"Device IP: {DISCOVERY.DEVICE.IPADDRESS}\nDevice DNS: {DISCOVERY.DEVICE.DNS}\n".
-		"Device status: {DISCOVERY.DEVICE.STATUS}\nDevice uptime: {DISCOVERY.DEVICE.UPTIME}\n\n".
-		"Device service name: {DISCOVERY.SERVICE.NAME}\nDevice service port: {DISCOVERY.SERVICE.PORT}\n".
-		"Device service status: {DISCOVERY.SERVICE.STATUS}\nDevice service uptime: {DISCOVERY.SERVICE.UPTIME}"
-);
-define('ACTION_DEFAULT_MSG_ACKNOWLEDGE',
-		"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
-		"{EVENT.UPDATE.MESSAGE}\n\n".
-		"Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}."
-);
-define('ACTION_DEFAULT_MSG_PROBLEM', "Problem started at {EVENT.TIME} on {EVENT.DATE}\nProblem name: {EVENT.NAME}\n".
-		"Host: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}");
-define('ACTION_DEFAULT_MSG_RECOVERY', "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-		"Problem name: {EVENT.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\n".
-		"Original problem ID: {EVENT.ID}\n{TRIGGER.URL}");
-
 define('ACTION_STATUS_ENABLED',		0);
 define('ACTION_STATUS_DISABLED',	1);
 
@@ -957,10 +936,10 @@ define('ZBX_TM_TASK_CHECK_NOW',		6);
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
 
-define('EVENT_SOURCE_TRIGGERS',				0);
-define('EVENT_SOURCE_DISCOVERY',			1);
-define('EVENT_SOURCE_AUTO_REGISTRATION',	2);
-define('EVENT_SOURCE_INTERNAL', 			3);
+define('EVENT_SOURCE_TRIGGERS',			0);
+define('EVENT_SOURCE_DISCOVERY',		1);
+define('EVENT_SOURCE_AUTOREGISTRATION',	2);
+define('EVENT_SOURCE_INTERNAL',			3);
 
 define('EVENT_OBJECT_TRIGGER',			0);
 define('EVENT_OBJECT_DHOST',			1);
@@ -1172,7 +1151,7 @@ define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
 		)*? # match \" or any character except "
 	\")
 	|
-	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at begining and any character except , and ] afterwards
+	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at beginning and any character except , and ] afterwards
 	|
 	() # match empty and only empty part
 )');
@@ -1295,6 +1274,7 @@ define('API_ALLOW_LLD_MACRO',			0x0080);
 define('API_REQUIRED_LLD_MACRO',		0x0100);
 define('API_TIME_UNIT_WITH_YEAR',		0x0200);
 define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
+define('API_PRESERVE_KEYS',				0x0800);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
@@ -1697,7 +1677,6 @@ define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
 define('ZBX_STYLE_PAGING_SELECTED', 'paging-selected');
-define('ZBX_STYLE_PRELOADER', 'preloader');
 define('ZBX_STYLE_PAGE_TITLE', 'page-title-general');
 define('ZBX_STYLE_PAGE_TITLE_SUBMENU', 'page-title-submenu');
 define('ZBX_STYLE_PROGRESS_BAR_BG', 'progress-bar-bg');
@@ -1829,17 +1808,6 @@ define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS
 define('ZBX_PROPERTY_INHERITED',	0x01);
 define('ZBX_PROPERTY_OWN',			0x02);
 define('ZBX_PROPERTY_BOTH',			0x03);	// ZBX_PROPERTY_INHERITED | ZBX_PROPERTY_OWN
-
-// if magic quotes on, then get rid of them
-if (get_magic_quotes_gpc()) {
-	function zbx_stripslashes($value) {
-		$value = is_array($value) ? array_map('zbx_stripslashes', $value) : stripslashes($value);
-		return $value;
-	}
-	$_GET = zbx_stripslashes($_GET);
-	$_POST = zbx_stripslashes($_POST);
-	$_COOKIE = zbx_stripslashes($_COOKIE);
-}
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

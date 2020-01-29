@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,12 +109,10 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		var	host_inventory = {
 				label: t('Host inventory')
 			},
-			host_inventory_url = new Curl('hostinventories.php', false),
 			// latest
 			latest_data = {
 				label: t('Latest data')
 			},
-			latest_data_url = new Curl('latest.php', false),
 			// problems
 			problems = {
 				label: t('Problems')
@@ -129,16 +127,19 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			};
 
 		// inventory link
-		host_inventory_url.setArgument('hostid', options.hostid);
-		host_inventory.url = host_inventory_url.getUrl();
+		var url = new Curl('hostinventories.php', false);
+		url.setArgument('hostid', options.hostid);
+		host_inventory.url = url.getUrl();
 
 		// latest data link
+		var url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'latest.view');
 		if (typeof options.filter_application !== 'undefined') {
-			latest_data_url.setArgument('application', options.filter_application);
+			url.setArgument('filter_application', options.filter_application);
 		}
-		latest_data_url.setArgument('hostids[]', options.hostid);
-		latest_data_url.setArgument('filter_set', '1');
-		latest_data.url = latest_data_url.getUrl();
+		url.setArgument('filter_hostids[]', options.hostid);
+		url.setArgument('filter_set', '1');
+		latest_data.url = url.getUrl();
 
 		if (!options.showTriggers) {
 			problems.disabled = true;
@@ -986,7 +987,11 @@ jQuery(function($) {
 
 			options = $.extend({
 				position: {
-					of: event,
+					/*
+					 * Please note that click event is also triggered by hitting spacebar on the keyboard,
+					 * in which case the number of mouse clicks (stored in event.originalEvent.detail) will be zero.
+					 */
+					of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
 					my: 'left top',
 					at: 'left bottom'
 				}
@@ -1075,7 +1080,7 @@ jQuery(function($) {
 
 				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
 
-				if (overlay !== null && typeof overlay['element'] !== undefined) {
+				if (overlay && typeof overlay['element'] !== undefined) {
 					// Remove expanded attribute of the original opener.
 					$(overlay['element']).removeAttr('data-expanded');
 				}

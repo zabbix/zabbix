@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ $discoveryFormList->addRow(_('Host name'),
 			->addValue(_('DNS name'), ZBX_DISCOVERY_DNS, 'host_source_chk_dns')
 			->addValue(_('IP address'), ZBX_DISCOVERY_IP, 'host_source_chk_ip')
 	))
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
@@ -115,7 +115,7 @@ $discoveryFormList->addRow(_('Visible name'),
 			->addValue(_('DNS name'), ZBX_DISCOVERY_DNS, 'name_source_chk_dns')
 			->addValue(_('IP address'), ZBX_DISCOVERY_IP, 'name_source_chk_ip')
 	))
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 

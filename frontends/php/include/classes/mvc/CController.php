@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -227,8 +227,11 @@ abstract class CController {
 	/**
 	 * Check if input parameter exists.
 	 *
+<<<<<<< HEAD
 	 * @param string $var
 	 *
+=======
+>>>>>>> 9ee19e435ca31e1d2e13589fed4b1a4668c45e10
 	 * @return bool
 	 */
 	public function hasInput($var) {

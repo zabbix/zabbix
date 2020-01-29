@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,22 +134,22 @@ class CTableElement extends CElement {
 	 * @param string $column    column name
 	 * @param string $value     column value
 	 *
-	 * @return CTableRow|null
+	 * @return CTableRow|CNullElement
 	 */
 	public function findRow($column, $value) {
 		$headers = $this->getHeadersText();
 
 		if (is_string($column)) {
-			$column = array_search($column, $headers);
-			if ($column === false) {
-				return null;
+			$index = array_search($column, $headers);
+			if ($index === false) {
+				return new CNullElement(['locator' => '"'.$column.'" (table column name)']);
 			}
 
-			$column++;
+			$column = $index + 1;
 		}
 
 		$suffix = '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
-		$xpaths = ['//tbody/tr/td'.$suffix, '//tbody/tr/th'.$suffix];
+		$xpaths = ['.//tbody/tr/td'.$suffix, './/tbody/tr/th'.$suffix];
 
 		return $this->query('xpath', implode('|', $xpaths))->asTableRow(['parent' => $this])->one(false);
 	}
@@ -159,7 +159,7 @@ class CTableElement extends CElement {
 	 *
 	 * @param array $content    column data
 	 *
-	 * @return CTableRow|null
+	 * @return CElementCollection
 	 */
 	public function findRows($content) {
 		$rows = [];
@@ -192,21 +192,26 @@ class CTableElement extends CElement {
 	/**
 	 * Index table row text by values of table column.
 	 *
-	 * @param string $column	column name
+	 * @param string  $column	         column name
+	 * @param boolean $include_column    flag used to include or remove column used in index
 	 *
 	 * @return array
 	 */
-	public function index($column = null) {
+	public function index($column = null, $include_column = false) {
 		$table = [];
 		foreach ($this->getCells() as $i => $row) {
 			$data = [];
 			$id = $i;
 
 			foreach ($row as $header => $element) {
-				$data[$header] = $element->getText();
+				$value = $element->getText();
 
 				if ($header === $column) {
-					$id = $data[$header];
+					$id = $value;
+				}
+
+				if ($include_column || $header !== $column) {
+					$data[$header] = $value;
 				}
 			}
 

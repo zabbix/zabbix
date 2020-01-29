@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -152,7 +152,7 @@ calendar.prototype = {
 	 * This function is workaround for Firefox bug.
 	 *
 	 * When triggering keydown event on [space] button, event is called for both, the actual element as well as calendar
-	 * icon elemnet, so the calendar is first closed (by handeler of actually focused element) and immediately opened
+	 * icon elemnet, so the calendar is first closed (by handler of actually focused element) and immediately opened
 	 * again (by calendar icon element's handler).
 	 *
 	 * Workaround works as follow - it separates [enter] and [space] button in 2 handlers with similar functionality

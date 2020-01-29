@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,10 @@ abstract class CControllerPopupConditionCommon extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		if ($this->hasInput('validate')) {
+			$ret = $ret && $this->validateFieldsManually();
+		}
+
 		if (!$ret) {
 			$output = [];
 			if (($messages = getMessages()) !== null) {
@@ -53,25 +57,14 @@ abstract class CControllerPopupConditionCommon extends CController {
 
 	protected function doAction() {
 		if ($this->hasInput('validate')) {
-			$this->validateFieldsManually();
-
-			// Return collected error messages.
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-			else {
-				$output = $this->getManuallyValidatedFields();
-			}
-
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			return $this->setResponse(
+				(new CControllerResponseData(
+					['main_block' => CJs::encodeJson($this->getManuallyValidatedFields())]
+				))->disableView()
 			);
 		}
-		else {
-			$output = $this->getControllerResponseData();
 
-			$this->setResponse(new CControllerResponseData($output));
-		}
+		return $this->setResponse(new CControllerResponseData($this->getControllerResponseData()));
 	}
 
 	/**

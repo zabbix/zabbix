@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,11 +57,11 @@ class CControllerProxyList extends CController {
 		CProfile::update('web.proxies.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		// filter
-		if (hasRequest('filter_set')) {
-			CProfile::update('web.proxies.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.proxies.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.proxies.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.proxies.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
 		}
-		elseif (hasRequest('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.proxies.filter_name');
 			CProfile::delete('web.proxies.filter_status');
 		}
@@ -98,13 +98,15 @@ class CControllerProxyList extends CController {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-		// sorting & paging
+
+		// data sort and pager
 		order_result($data['proxies'], $sortField, $sortOrder);
 
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'proxy.list');
-
-		$data['paging'] = getPagingLine($data['proxies'], $sortOrder, $url);
+		$page_num = getRequest('page', 1);
+		CPagerHelper::savePage('proxy.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['proxies'], $sortOrder,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
 
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'auto_compress'],

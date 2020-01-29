@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ class CMediatype extends CApiService {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
+			'selectMessageTemplates'	=> null,
 			'selectUsers'				=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -222,7 +223,7 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $mediatype['name']));
 			}
 
-			// Check additional fields and values depeding on type.
+			// Check additional fields and values depending on media type.
 			$this->checkRequiredFieldsByType($mediatype);
 
 			switch ($mediatype['type']) {
@@ -799,46 +800,48 @@ class CMediatype extends CApiService {
 	/**
 	 * Add Media types.
 	 *
-	 * @param array		$mediatypes							multidimensional array with media types data
-	 * @param int		$mediatypes['type']					type
-	 * @param string	$mediatypes['name']
-	 * @param string	$mediatypes['smtp_server']			SMTP server
-	 * @param int		$mediatypes['smtp_port']			SMTP port
-	 * @param string	$mediatypes['smtp_helo']			SMTP hello
-	 * @param string	$mediatypes['smtp_email']			SMTP email
-	 * @param int		$mediatypes['smtp_security']		SMTP connection security
-	 * @param int		$mediatypes['smtp_verify_peer']		SMTP verify peer
-	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
-	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
-	 * @param int		$mediatypes['content_type']			Message format
-	 * @param string	$mediatypes['exec_path']			script name/message text limit
-	 * @param string	$mediatypes['exec_params']			script parameters
-	 * @param string	$mediatypes['gsm_modem']			GSM modem
-	 * @param string	$mediatypes['username']				username
-	 * @param string	$mediatypes['passwd']				password
-	 * @param int		$mediatypes['status']				media type status
-	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
-	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
-	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
-	 * @param string    $mediatypes['script']               Webhook javascript body.
-	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
-	 *                                                      ['name' => .. 'value' => .. ]
-	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
-	 * @param string    $mediatypes['process_tags']         Webhook HTTP response should be saved as tags.
-	 * @param string    $mediatypes['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
-	 * @param string    $mediatypes['event_menu_url']       Webhook additional info in frontend, supports received tags.
-	 * @param string    $mediatypes['event_menu_name']	    Webhook 'url' visual name.
-	 * @param string    $mediatypes['description']          Media type description.
+	 * @param array  $mediatypes                           A multidimensional array with media types data.
+	 * @param int    $mediatypes[]['type']                 Transport used by the media type.
+	 * @param string $mediatypes[]['name']                 Name of the media type.
+	 * @param string $mediatypes[]['smtp_server']          SMTP server.
+	 * @param int    $mediatypes[]['smtp_port']            SMTP server port.
+	 * @param string $mediatypes[]['smtp_helo']            SMTP HELO.
+	 * @param string $mediatypes[]['smtp_email']           SMTP email.
+	 * @param int    $mediatypes[]['smtp_security']        SMTP connection security level.
+	 * @param int    $mediatypes[]['smtp_verify_peer']     SMTP verify peer.
+	 * @param int    $mediatypes[]['smtp_verify_host']     SMTP verify host.
+	 * @param int    $mediatypes[]['smtp_authentication']  SMTP authentication.
+	 * @param int    $mediatypes[]['content_type']         Message format.
+	 * @param string $mediatypes[]['exec_path']            Script name.
+	 * @param string $mediatypes[]['exec_params']          Script parameters.
+	 * @param string $mediatypes[]['gsm_modem']            Serial device name of the GSM modem.
+	 * @param string $mediatypes[]['username']             User name used for authentication.
+	 * @param string $mediatypes[]['passwd']               Password used for authentication.
+	 * @param int    $mediatypes[]['status']               Media type status.
+	 * @param int    $mediatypes[]['maxsessions']          Limit of simultaneously processed alerts.
+	 * @param int    $mediatypes[]['maxattempts']          Maximum attempts to deliver alert successfully.
+	 * @param string $mediatypes[]['attempt_interval']     Interval between alert delivery attempts.
+	 * @param string $mediatypes[]['script']               Webhook JavaScript body.
+	 * @param array  $mediatypes[]['parameters']           An array of webhook parameters:
+	 *                                                     ['name' => .., 'value' => ..]
+	 * @param string $mediatypes[]['timeout']              Webhook JavaScript HTTP request timeout.
+	 * @param string $mediatypes[]['process_tags']         Webhook HTTP response should be saved as tags.
+	 * @param string $mediatypes[]['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
+	 * @param string $mediatypes[]['event_menu_url']       Webhook additional info in frontend, supports received tags.
+	 * @param string $mediatypes[]['event_menu_name']      Webhook 'url' visual name.
+	 * @param string $mediatypes[]['description']          Media type description.
+	 * @param array  $mediatypes[]['message_templates']    An array of media type message templates.
 	 *
 	 * @return array
 	 */
-	public function create($mediatypes) {
+	public function create(array $mediatypes) {
 		$mediatypes = zbx_toArray($mediatypes);
 
 		$this->validateCreate($mediatypes);
 
 		$mediatypeids = DB::insert('media_type', $mediatypes);
 		$ins_media_type_param = [];
+		$ins_media_type_message = [];
 
 		foreach ($mediatypes as $i => $mediatype) {
 			$mediatypeid = $mediatypeids[$i];
@@ -853,10 +856,20 @@ class CMediatype extends CApiService {
 
 				$this->validateEventMenu($mediatype);
 			}
+
+			if (array_key_exists('message_templates', $mediatype)) {
+				foreach ($mediatype['message_templates'] as $message_template) {
+					$ins_media_type_message[] = ['mediatypeid' => $mediatypeid] + $message_template;
+				}
+			}
 		}
 
 		if ($ins_media_type_param) {
 			DB::insertBatch('media_type_param', $ins_media_type_param);
+		}
+
+		if ($ins_media_type_message) {
+			DB::insertBatch('media_type_message', $ins_media_type_message);
 		}
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MEDIA_TYPE, $mediatypes);
@@ -867,47 +880,49 @@ class CMediatype extends CApiService {
 	/**
 	 * Update Media types.
 	 *
-	 * @param array		$mediatypes							multidimensional array with media types data
-	 * @param int		$mediatypes['mediatypeid']			id
-	 * @param int		$mediatypes['type']					type
-	 * @param string	$mediatypes['name']
-	 * @param string	$mediatypes['smtp_server']			SMTP server
-	 * @param int		$mediatypes['smtp_port']			SMTP port
-	 * @param string	$mediatypes['smtp_helo']			SMTP hello
-	 * @param string	$mediatypes['smtp_email']			SMTP email
-	 * @param int		$mediatypes['smtp_security']		SMTP connection security
-	 * @param int		$mediatypes['smtp_verify_peer']		SMTP verify peer
-	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
-	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
-	 * @param int		$mediatypes['content_type']			Message format
-	 * @param string	$mediatypes['exec_path']			script name/message text limit
-	 * @param string	$mediatypes['exec_params']			script parameters
-	 * @param string	$mediatypes['gsm_modem']			GSM modem
-	 * @param string	$mediatypes['username']				username
-	 * @param string	$mediatypes['passwd']				password
-	 * @param int		$mediatypes['status']				media type status
-	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
-	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
-	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
-	 * @param string    $mediatypes['script']               Webhook javascript body.
-	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
-	 *                                                      ['name' => .. 'value' => .. ]
-	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
-	 * @param string    $mediatypes['process_tags']         Webhook HTTP response should be saved as tags.
-	 * @param string    $mediatypes['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
-	 * @param string    $mediatypes['event_menu_url']       Webhook additional info in frontend, supports received tags.
-	 * @param string    $mediatypes['event_menu_name']	    Webhook 'url' visual name.
-	 * @param string    $mediatypes['description']          Media type description.
+	 * @param array  $mediatypes                           A multidimensional array with media types data.
+	 * @param int    $mediatypes[]['mediatypeid']          Media type ID.
+	 * @param int    $mediatypes[]['type']                 Transport used by the media type.
+	 * @param string $mediatypes[]['name']                 Name of the media type.
+	 * @param string $mediatypes[]['smtp_server']          SMTP server.
+	 * @param int    $mediatypes[]['smtp_port']            SMTP server port.
+	 * @param string $mediatypes[]['smtp_helo']            SMTP HELO.
+	 * @param string $mediatypes[]['smtp_email']           SMTP email.
+	 * @param int    $mediatypes[]['smtp_security']        SMTP connection security level.
+	 * @param int    $mediatypes[]['smtp_verify_peer']     SMTP verify peer.
+	 * @param int    $mediatypes[]['smtp_verify_host']     SMTP verify host.
+	 * @param int    $mediatypes[]['smtp_authentication']  SMTP authentication.
+	 * @param int    $mediatypes[]['content_type']         Message format.
+	 * @param string $mediatypes[]['exec_path']            Script name.
+	 * @param string $mediatypes[]['exec_params']          Script parameters.
+	 * @param string $mediatypes[]['gsm_modem']            Serial device name of the GSM modem.
+	 * @param string $mediatypes[]['username']             User name used for authentication.
+	 * @param string $mediatypes[]['passwd']               Password used for authentication.
+	 * @param int    $mediatypes[]['status']               Media type status.
+	 * @param int    $mediatypes[]['maxsessions']          Limit of simultaneously processed alerts.
+	 * @param int    $mediatypes[]['maxattempts']          Maximum attempts to deliver alert successfully.
+	 * @param string $mediatypes[]['attempt_interval']     Interval between alert delivery attempts.
+	 * @param string $mediatypes[]['script']               Webhook JavaScript body.
+	 * @param array  $mediatypes[]['parameters']           An array of webhook parameters:
+	 *                                                     ['name' => .., 'value' => ..]
+	 * @param string $mediatypes[]['timeout']              Webhook JavaScript HTTP request timeout.
+	 * @param string $mediatypes[]['process_tags']         Webhook HTTP response should be saved as tags.
+	 * @param string $mediatypes[]['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
+	 * @param string $mediatypes[]['event_menu_url']       Webhook additional info in frontend, supports received tags.
+	 * @param string $mediatypes[]['event_menu_name']      Webhook 'url' visual name.
+	 * @param string $mediatypes[]['description']          Media type description.
+	 * @param array  $mediatypes[]['message_templates']    An array of media type message templates.
 	 *
 	 * @return array
 	 */
-	public function update($mediatypes) {
+	public function update(array $mediatypes) {
 		$mediatypes = zbx_toArray($mediatypes);
 
 		$this->validateUpdate($mediatypes);
 
 		$update = [];
 		$webhooks_params = [];
+		$message_templates = [];
 		$default_values = DB::getDefaults('media_type');
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
@@ -962,6 +977,11 @@ class CMediatype extends CApiService {
 				}
 
 				$this->validateEventMenu($mediatype, $db_mediatype);
+			}
+
+			if (array_key_exists('message_templates', $mediatype)) {
+				$message_templates[$mediatypeid] = $mediatype['message_templates'];
+				unset($mediatype['message_templates']);
 			}
 
 			if ($type != $db_type) {
@@ -1028,6 +1048,70 @@ class CMediatype extends CApiService {
 
 			if ($ins_media_type_param) {
 				DB::insert('media_type_param', $ins_media_type_param);
+			}
+		}
+
+		if ($message_templates) {
+			$db_media_type_messages = DB::select('media_type_message', [
+				'output' => ['mediatype_messageid', 'mediatypeid', 'eventsource', 'recovery', 'subject', 'message'],
+				'filter' => ['mediatypeid' => array_keys($message_templates)],
+				'preservekeys' => true
+			]);
+
+			$ins_media_type_message = [];
+			$del_media_type_message = zbx_toHash(array_keys($db_media_type_messages));
+			$upd_media_type_message = [];
+
+			$message_template_defaults = [
+				'subject' => DB::getDefault('media_type_message', 'subject'),
+				'message' => DB::getDefault('media_type_message', 'message')
+			];
+
+			foreach ($db_media_type_messages as $mediatype_messageid => $db_message_template) {
+				$db_mediatypeid = $db_message_template['mediatypeid'];
+
+				foreach ($message_templates[$db_mediatypeid] as $idx => $message_template) {
+					if ($db_message_template['eventsource'] == $message_template['eventsource']
+							&& $db_message_template['recovery'] == $message_template['recovery']) {
+						$values = [];
+						$message_template += $message_template_defaults;
+
+						if ($db_message_template['subject'] !== $message_template['subject']) {
+							$values['subject'] = $message_template['subject'];
+						}
+
+						if ($db_message_template['message'] !== $message_template['message']) {
+							$values['message'] = $message_template['message'];
+						}
+
+						if ($values) {
+							$upd_media_type_message[] = [
+								'values' => $values,
+								'where' => ['mediatype_messageid' => $mediatype_messageid]
+							];
+						}
+
+						unset($message_templates[$db_mediatypeid][$idx], $del_media_type_message[$mediatype_messageid]);
+					}
+				}
+			}
+
+			foreach ($message_templates as $mediatypeid => $templates) {
+				foreach ($templates as $template) {
+					$ins_media_type_message[] = ['mediatypeid' => $mediatypeid] + $template;
+				}
+			}
+
+			if ($del_media_type_message) {
+				DB::delete('media_type_message', ['mediatype_messageid' => $del_media_type_message]);
+			}
+
+			if ($upd_media_type_message) {
+				DB::update('media_type_message', $upd_media_type_message);
+			}
+
+			if ($ins_media_type_message) {
+				DB::insert('media_type_message', $ins_media_type_message);
 			}
 		}
 
@@ -1120,6 +1204,22 @@ class CMediatype extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		// adding message templates
+		if ($options['selectMessageTemplates'] !== null && $options['selectMessageTemplates'] != API_OUTPUT_COUNT) {
+			$relation_map = $this->createRelationMap($result, 'mediatypeid', 'mediatype_messageid',
+				'media_type_message'
+			);
+			$message_templates = API::getApiService()->select('media_type_message', [
+				'output' => $options['selectMessageTemplates'],
+				'filter' => ['mediatype_messageid' => $relation_map->getRelatedIds()],
+				'preservekeys' => true
+			]);
+			$message_templates = $this->unsetExtraFields($message_templates, ['mediatype_messageid', 'mediatypeid'],
+				[]
+			);
+			$result = $relation_map->mapMany($result, $message_templates, 'message_templates');
+		}
+
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
@@ -1162,7 +1262,17 @@ class CMediatype extends CApiService {
 	 */
 	protected function getValidationRules($type, $method) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')]
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')],
+			'message_templates' =>	['type' => API_OBJECTS, 'uniq' => [['eventsource', 'recovery']], 'fields' => [
+				'eventsource' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL])],
+				'recovery' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_ACKNOWLEDGE_OPERATION])],
+											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION])], 'type' => API_INT32, 'in' => ACTION_OPERATION],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION])]
+				]],
+				'subject' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'subject')],
+				'message' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'message')]
+			]]
 		]];
 
 		if ($type == MEDIA_TYPE_WEBHOOK) {
@@ -1171,7 +1281,7 @@ class CMediatype extends CApiService {
 				'timeout' =>			['type' => API_TIME_UNIT, 'length' => DB::getFieldLength('media_type', 'timeout'), 'in' => '1:60'],
 				'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
 				'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
-				// Should be checked as string not as url because it can contain maros tags.
+				// Should be checked as string not as URL because it can contain macros tags.
 				'event_menu_url' =>		['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
 				'event_menu_name' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_name')],
 				'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [

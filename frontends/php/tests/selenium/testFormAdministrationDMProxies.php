@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -261,7 +261,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 						$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Active proxy has not been added into Zabbix DB');
 
 						$sql = "SELECT h.hostid FROM hosts h, interface i WHERE h.host='$name' AND h.status=$mode and h.hostid=i.hostid and i.port='$port' and i.dns='$dns' and i.ip='$ip' and i.main=".INTERFACE_PRIMARY;
-						$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Interface was not linked correcty to proxy');
+						$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Interface was not linked correctly to proxy');
 						break;
 				}
 				break;

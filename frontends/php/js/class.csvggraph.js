@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2020 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -401,7 +401,7 @@ jQuery(function ($) {
 	/**
 	 * Get tolerance for given data set. Tolerance is used to find which elements are hovered by mouse. Script takes
 	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
-	 * this function. Tolerance is used to find exacly matched point only.
+	 * this function. Tolerance is used to find exactly matched point only.
 	 */
 	function getDataPointTolerance(ds) {
 		var data_tag = ds.querySelector(':not(.svg-point-highlight)');

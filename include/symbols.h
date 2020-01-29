@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,12 +20,22 @@
 #ifndef ZABBIX_SYMBOLS_H
 #define ZABBIX_SYMBOLS_H
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 
 /* some definitions which are not available on older MS Windows versions */
 typedef enum {
-	zbx_FileIdInfo	= 18	/* we need only one value, the rest of enumerated values are omitted here */
+	/* we only use below values, the rest of enumerated values are omitted here */
+	zbx_FileBasicInfo	= 0,
+	zbx_FileIdInfo		= 18
 } ZBX_FILE_INFO_BY_HANDLE_CLASS;
+
+typedef struct {
+	LARGE_INTEGER	CreationTime;
+	LARGE_INTEGER	LastAccessTime;
+	LARGE_INTEGER	LastWriteTime;
+	LARGE_INTEGER	ChangeTime;
+	DWORD		FileAttributes;
+} ZBX_FILE_BASIC_INFO;
 
 typedef struct {
 	ULONGLONG	LowPart;

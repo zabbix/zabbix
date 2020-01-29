@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -528,7 +528,8 @@ class CTemplate extends CHostGeneral {
 
 			$templateCopy = $template;
 
-			$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
+			$template['templates_link'] = array_key_exists('templates', $template) ? $template['templates'] : null;
+
 			unset($template['templates'], $template['templateid'], $templateCopy['templates']);
 			$template['templates'] = [$templateCopy];
 

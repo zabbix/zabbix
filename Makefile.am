@@ -59,11 +59,6 @@ dist-hook:
 	rm -rf $(top_distdir)/sass/img_source
 
 if DBSCHEMA
-dbschema_ibm_db2:
-	cd database/ibm_db2 && \
-	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) schema.sql
-
 dbschema_mysql:
 	cd database/mysql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
@@ -89,7 +84,7 @@ dbschema_c:
 	cd src/libs/zbxdbhigh && \
 	$(MAKE) $(AM_MAKEFLAGS) dbschema.c
 
-dbschema: dbschema_ibm_db2 dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_sqlite3 dbschema_c
+dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_sqlite3 dbschema_c
 endif
 
 gettext:

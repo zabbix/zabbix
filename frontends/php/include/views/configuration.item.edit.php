@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -193,7 +193,7 @@ $form_list
 		],
 		'request_method_row'
 	)
-	// Append ITEM_TYPE_HTTPAGENT Timeout field to fomr list.
+	// Append ITEM_TYPE_HTTPAGENT Timeout field to form list.
 	->addRow(
 		new CLabel(_('Timeout'), 'timeout'),
 		(new CTextBox('timeout', $data['timeout'], $readonly))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
@@ -577,11 +577,8 @@ $form_list
 		(new CTextBox('port', $data['port'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'row_port'
 	)
-	->addRow(
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setAsteriskMark(),
-		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
+	->addRow(_('IPMI sensor'),
+		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_ipmi_sensor'
 	);
 
@@ -659,13 +656,13 @@ $form_list
 // Append value type to form list.
 if ($readonly) {
 	$form->addVar('value_type', $data['value_type']);
-	$form_list->addRow((new CLabel(_('Type of information'), 'value_type_name'))->setAsteriskMark(),
+	$form_list->addRow(new CLabel(_('Type of information'), 'value_type_name'),
 		(new CTextBox('value_type_name', itemValueTypeString($data['value_type']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 }
 else {
-	$form_list->addRow((new CLabel(_('Type of information'), 'value_type')),
+	$form_list->addRow(new CLabel(_('Type of information'), 'value_type'),
 		(new CComboBox('value_type', $data['value_type'], null, [
 			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
@@ -757,7 +754,10 @@ $keep_history_hint = null;
 if ($data['config']['hk_history_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-		? (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'housekeeping.edit')
+				->getUrl()
+			))
 				->setAttribute('target', '_blank')
 		: _x('global housekeeping settings', 'item_form');
 
@@ -790,7 +790,10 @@ $keep_trend_hint = null;
 if ($data['config']['hk_trends_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-		? (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'housekeeping.edit')
+				->getUrl()
+			))
 				->setAttribute('target', '_blank')
 		: _x('global housekeeping settings', 'item_form');
 
@@ -842,7 +845,10 @@ else {
 
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$valuemapComboBox = [$valuemapComboBox, '&nbsp;',
-		(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')
+		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.list')
+			->getUrl()
+		))->setAttribute('target', '_blank')
 	];
 }
 

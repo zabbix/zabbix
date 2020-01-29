@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,280 +122,18 @@ $action_tab->addRow(_('Type of calculation'), [
 	(new CSpan())->setId('conditionLabel'),
 	$formula
 ]);
+
+$condition_table->addRow([
+	(new CSimpleButton(_('Add')))
+		->onClick('return PopUp("popup.condition.actions",'.CJs::encodeJson([
+			'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
+			'source' => $data['eventsource']
+		]).', null, this);')
+		->addClass(ZBX_STYLE_BTN_LINK)
+]);
+
 $action_tab->addRow(_('Conditions'),
 	(new CDiv($condition_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
-
-// append new condition to form list
-$conditionTypeComboBox = new CComboBox('new_condition[conditiontype]', $data['new_condition']['conditiontype'], 'submit()');
-foreach ($data['allowedConditions'] as $key => $condition) {
-	$data['allowedConditions'][$key] = [
-		'name' => condition_type2str($condition),
-		'type' => $condition
-	];
-}
-
-foreach ($data['allowedConditions'] as $condition) {
-	$conditionTypeComboBox->addItem($condition['type'], $condition['name']);
-}
-
-$condition_operators_list = get_operators_by_conditiontype($data['new_condition']['conditiontype']);
-
-if (count($condition_operators_list) > 1) {
-	$condition_operator = new CComboBox('new_condition[operator]', $data['new_condition']['operator']);
-
-	foreach ($condition_operators_list as $operator) {
-		$condition_operator->addItem($operator, condition_operator2str($operator));
-	}
-}
-else {
-	$condition_operator = [new CVar('new_condition[operator]', $condition_operators_list[0]),
-		condition_operator2str($condition_operators_list[0])
-	];
-}
-
-$condition2 = null;
-
-switch ($data['new_condition']['conditiontype']) {
-	case CONDITION_TYPE_HOST_GROUP:
-		$condition = (new CMultiSelect([
-			'name' => 'new_condition[value][]',
-			'object_name' => 'hostGroup',
-			'default_value' => 0,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $actionForm->getName(),
-					'dstfld1' => 'new_condition_value_',
-					'editable' => true
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_TEMPLATE:
-		$condition = (new CMultiSelect([
-			'name' => 'new_condition[value][]',
-			'object_name' => 'templates',
-			'default_value' => 0,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'templates',
-					'srcfld1' => 'hostid',
-					'srcfld2' => 'host',
-					'dstfrm' => $actionForm->getName(),
-					'dstfld1' => 'new_condition_value_',
-					'editable' => true
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_HOST:
-		$condition = (new CMultiSelect([
-			'name' => 'new_condition[value][]',
-			'object_name' => 'hosts',
-			'default_value' => 0,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'hosts',
-					'srcfld1' => 'hostid',
-					'dstfrm' => $actionForm->getName(),
-					'dstfld1' => 'new_condition_value_',
-					'editable' => true
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_TRIGGER:
-		$condition = (new CMultiSelect([
-			'name' => 'new_condition[value][]',
-			'object_name' => 'triggers',
-			'default_value' => 0,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'triggers',
-					'srcfld1' => 'triggerid',
-					'dstfrm' => $actionForm->getName(),
-					'dstfld1' => 'new_condition_value_',
-					'editable' => true,
-					'noempty' => true
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_TRIGGER_NAME:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_TIME_PERIOD:
-		$condition = (new CTextBox('new_condition[value]', ZBX_DEFAULT_INTERVAL))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_TRIGGER_SEVERITY:
-		$severityNames = [];
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severityNames[] = getSeverityName($severity, $data['config']);
-		}
-		$condition = new CComboBox('new_condition[value]', null, null, $severityNames);
-		break;
-
-	case CONDITION_TYPE_DRULE:
-		$condition = (new CMultiSelect([
-			'name' => 'new_condition[value][]',
-			'object_name' => 'drules',
-			'default_value' => 0,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'drules',
-					'srcfld1' => 'druleid',
-					'dstfrm' => $actionForm->getName(),
-					'dstfld1' => 'new_condition_value_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_DCHECK:
-		$action_tab->addItem(new CVar('new_condition[value]', '0'));
-		$condition = [
-			(new CTextBox('dcheck', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('btn1', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
-						'srctbl' => 'dchecks',
-						'srcfld1' => 'dcheckid',
-						'srcfld2' => 'name',
-						'dstfrm' => $actionForm->getName(),
-						'dstfld1' => 'new_condition_value',
-						'dstfld2' => 'dcheck',
-						'writeonly' => '1'
-					]).', null, this);'
-				)
-		];
-		break;
-
-	case CONDITION_TYPE_PROXY:
-		$condition = (new CMultiSelect([
-			'name' => 'new_condition[value]',
-			'object_name' => 'proxies',
-			'multiple' => false,
-			'default_value' => 0,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'proxies',
-					'srcfld1' => 'proxyid',
-					'srcfld2' => 'host',
-					'dstfrm' => $actionForm->getName(),
-					'dstfld1' => 'new_condition_value'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_DHOST_IP:
-		$condition = (new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1'))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_DSERVICE_TYPE:
-		$discoveryCheckTypes = discovery_check_type2str();
-		order_result($discoveryCheckTypes);
-
-		$condition = new CComboBox('new_condition[value]', null, null, $discoveryCheckTypes);
-		break;
-
-	case CONDITION_TYPE_DSERVICE_PORT:
-		$condition = (new CTextBox('new_condition[value]', '0-1023,1024-49151'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_DSTATUS:
-		$condition = new CComboBox('new_condition[value]');
-		foreach ([DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER, DOBJECT_STATUS_LOST] as $stat) {
-			$condition->addItem($stat, discovery_object_status2str($stat));
-		}
-		break;
-
-	case CONDITION_TYPE_DOBJECT:
-		$condition = new CComboBox('new_condition[value]');
-		foreach ([EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE] as $object) {
-			$condition->addItem($object, discovery_object2str($object));
-		}
-		break;
-
-	case CONDITION_TYPE_DUPTIME:
-		$condition = (new CNumericBox('new_condition[value]', 600, 15))->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
-		break;
-
-	case CONDITION_TYPE_DVALUE:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_APPLICATION:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_HOST_NAME:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_EVENT_TYPE:
-		$condition = new CComboBox('new_condition[value]', null, null, eventType());
-		break;
-
-	case CONDITION_TYPE_HOST_METADATA:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-		break;
-
-	case CONDITION_TYPE_EVENT_TAG:
-		$condition = (new CTextBox('new_condition[value]', ''))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('tag'));
-		break;
-
-	case CONDITION_TYPE_EVENT_TAG_VALUE:
-		$condition = (new CTextBox('new_condition[value]', ''))
-			->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-			->setAttribute('placeholder', _('value'));
-
-		$condition2 = (new CTextBox('new_condition[value2]', ''))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('tag'));
-		break;
-
-	default:
-		$condition = null;
-}
-
-$action_tab->addRow(_('New condition'),
-	(new CDiv(
-		(new CTable())
-			->setAttribute('style', 'width: 100%;')
-			->addRow(
-				new CCol([
-					$conditionTypeComboBox,
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$condition2,
-					($condition2 === null) ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$condition_operator,
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$condition
-				])
-			)
-			->addRow(
-				(new CSimpleButton(_('Add')))
-					->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "add_condition", "1");')
-					->addClass(ZBX_STYLE_BTN_LINK)
-			)
-	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
@@ -414,14 +152,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			->setAriaRequired()
 	);
 }
-
-$operation_tab
-	->addRow(_('Default subject'),
-		(new CTextBox('def_shortdata', $data['action']['def_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('Default message'),
-		(new CTextArea('def_longdata', $data['action']['def_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operation_tab->addRow(_('Pause operations for suppressed problems'),
@@ -443,12 +173,7 @@ else {
 if ($data['action']['operations']) {
 	$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_OPERATION);
 
-	$default_message = [
-		'subject' => $data['action']['def_shortdata'],
-		'message' => $data['action']['def_longdata']
-	];
-
-	$action_operation_hints = getActionOperationHints($data['action']['operations'], $default_message);
+	$action_operation_hints = getActionOperationHints($data['action']['operations']);
 
 	$simple_interval_parser = new CSimpleIntervalParser();
 
@@ -577,24 +302,8 @@ $operation_tab->addRow(_('Operations'),
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
-// Append tabs to form.
-$action_tabs = (new CTabView())
-	->addTab('actionTab', _('Action'), $action_tab)
-	->addTab('operationTab', _('Operations'), $operation_tab);
-
-$bottom_note = _('At least one operation must exist.');
-
 // Recovery operation tab.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$bottom_note = _('At least one operation or recovery operation must exist.');
-	$recovery_tab = (new CFormList())
-		->addRow(_('Default subject'),
-			(new CTextBox('r_shortdata', $data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-		->addRow(_('Default message'),
-			(new CTextArea('r_longdata', $data['action']['r_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		);
-
 	// Create operation table.
 	$operations_table = (new CTable())->setAttribute('style', 'width: 100%;');
 	$operations_table->setHeader([_('Details'), _('Action')]);
@@ -602,12 +311,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	if ($data['action']['recovery_operations']) {
 		$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_RECOVERY_OPERATION);
 
-		$default_message = [
-			'subject' => $data['action']['r_shortdata'],
-			'message' => $data['action']['r_longdata']
-		];
-
-		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations'], $default_message);
+		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations']);
 
 		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
@@ -672,27 +376,16 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
-	$recovery_tab->addRow(_('Operations'),
+	$operation_tab->addRow(_('Recovery operations'),
 		(new CDiv($operations_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
-
-	$action_tabs->addTab('recoveryOperationTab', _('Recovery operations'), $recovery_tab);
 }
 
 // Acknowledge operations
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$bottom_note = _('At least one operation, recovery operation or update operation must exist.');
 	$action_formname = $actionForm->getName();
-
-	$acknowledge_tab = (new CFormList())
-		->addRow(_('Default subject'),
-			(new CTextBox('ack_shortdata', $data['action']['ack_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-		->addRow(_('Default message'),
-			(new CTextArea('ack_longdata', $data['action']['ack_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		);
 
 	$operations_table = (new CTable())->setAttribute('style', 'width: 100%;');
 	$operations_table->setHeader([_('Details'), _('Action')]);
@@ -700,12 +393,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	if ($data['action']['ack_operations']) {
 		$operation_descriptions = getActionOperationDescriptions([$data['action']], ACTION_ACKNOWLEDGE_OPERATION);
 
-		$default_message = [
-			'subject' => $data['action']['ack_shortdata'],
-			'message' => $data['action']['ack_longdata']
-		];
-
-		$operation_hints = getActionOperationHints($data['action']['ack_operations'], $default_message);
+		$operation_hints = getActionOperationHints($data['action']['ack_operations']);
 
 		foreach ($data['action']['ack_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION])) {
@@ -768,14 +456,17 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
-	$acknowledge_tab->addRow(_('Operations'),
+	$operation_tab->addRow(_('Update operations'),
 		(new CDiv($operations_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
-
-	$action_tabs->addTab('acknowledgeTab', _('Update operations'), $acknowledge_tab);
 }
+
+// Append tabs to form.
+$action_tabs = (new CTabView())
+	->addTab('actionTab', _('Action'), $action_tab)
+	->addTab('operationTab', _('Operations'), $operation_tab);
 
 if (!hasRequest('form_refresh')) {
 	$action_tabs->setSelected(0);
@@ -807,7 +498,7 @@ $action_tabs->setFooter([
 		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addItem([
 			new CDiv(''),
-			(new CDiv((new CLabel($bottom_note))->setAsteriskMark()))
+			(new CDiv((new CLabel(_('At least one operation must exist.')))->setAsteriskMark()))
 				->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 		]),
 	makeFormFooter($form_buttons[0], $form_buttons[1])

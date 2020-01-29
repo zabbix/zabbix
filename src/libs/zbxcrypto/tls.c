@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,26 +24,10 @@
 #include "comms.h"
 #include "threads.h"
 #include "log.h"
+#include "zbxcrypto.h"
 #include "tls.h"
 #include "tls_tcp.h"
 #include "tls_tcp_active.h"
-
-#if defined(HAVE_POLARSSL)
-#	include <polarssl/entropy.h>
-#	include <polarssl/ctr_drbg.h>
-#	include <polarssl/ssl.h>
-#	include <polarssl/error.h>
-#	include <polarssl/debug.h>
-#	include <polarssl/oid.h>
-#	include <polarssl/version.h>
-#elif defined(HAVE_GNUTLS)
-#	include <gnutls/gnutls.h>
-#	include <gnutls/x509.h>
-#elif defined(HAVE_OPENSSL)
-#	include <openssl/ssl.h>
-#	include <openssl/err.h>
-#	include <openssl/rand.h>
-#endif
 
 /* use only TLS 1.2 (which has number 3.3) with PolarSSL */
 #if defined(HAVE_POLARSSL)
@@ -119,19 +103,6 @@ static void	zbx_openssl_thread_cleanup(void)
 	zbx_free(crypto_mutexes);
 }
 #endif	/* _WINDOWS */
-
-#if !defined(LIBRESSL_VERSION_NUMBER)
-#define OPENSSL_INIT_LOAD_SSL_STRINGS			0
-#define OPENSSL_INIT_LOAD_CRYPTO_STRINGS		0
-#define OPENSSL_VERSION					SSLEAY_VERSION
-#endif
-#define OpenSSL_version					SSLeay_version
-#define TLS_method					TLSv1_2_method
-#define TLS_client_method				TLSv1_2_client_method
-#define SSL_CTX_get_ciphers(ciphers)			((ciphers)->cipher_list)
-#if !defined(LIBRESSL_VERSION_NUMBER)
-#define SSL_CTX_set_min_proto_version(ctx, TLSv)	1
-#endif
 
 static int	zbx_openssl_init_ssl(int opts, void *settings)
 {
@@ -508,27 +479,6 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
 	}
 }
 #endif
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_tls_version                                                  *
- *                                                                            *
- * Purpose: print tls library version on stdout by application request with   *
- *          parameter '-V'                                                    *
- *                                                                            *
- ******************************************************************************/
-void	zbx_tls_version(void)
-{
-#if defined(HAVE_POLARSSL)
-	printf("Compiled with %s\n", POLARSSL_VERSION_STRING_FULL);
-#elif defined(HAVE_GNUTLS)
-	printf("Compiled with GnuTLS %s\nRunning with GnuTLS %s\n", GNUTLS_VERSION, gnutls_check_version(NULL));
-#elif defined(HAVE_OPENSSL)
-	printf("This product includes software developed by the OpenSSL Project\n"
-			"for use in the OpenSSL Toolkit (http://www.openssl.org/).\n\n");
-	printf("Compiled with %s\nRunning with %s\n", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
-#endif
-}
 
 /******************************************************************************
  *                                                                            *

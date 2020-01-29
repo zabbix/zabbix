@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ class CCheckboxElement extends CElement {
 	/**
 	 * Get label element.
 	 *
-	 * @return CElement|null
+	 * @return CElement|CNullElement
 	 */
 	public function getLabel() {
 		return $this->query('xpath:../label')->one(false);
@@ -90,7 +90,8 @@ class CCheckboxElement extends CElement {
 	 * @return string|null
 	 */
 	public function getText() {
-		if (($label = $this->getLabel()) !== null) {
+		$label = $this->getLabel();
+		if ($label->isValid()) {
 			return $label->getText();
 		}
 

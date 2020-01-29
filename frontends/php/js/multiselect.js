@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -351,7 +351,13 @@ jQuery(function($) {
 				css: ms.options.styles
 			}));
 
-			var $selected_div = $('<div>', {'class': 'selected'}),
+			var $selected_div = $('<div>', {'class': 'selected'}).on('click', function() {
+					/*
+					 * Focus without options because here it don't matter.
+					 * Click used instead focus because in patternselect listen only click.
+					 */
+					$('input[type="text"]', $obj).click().focus();
+				}),
 				$selected_ul = $('<ul>', {'class': 'multiselect-list'});
 
 			$obj.append($selected_div.append($selected_ul));
@@ -369,7 +375,6 @@ jQuery(function($) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
-						$('input[type="text"]', $obj).focus();
 					}
 				});
 
@@ -398,6 +403,8 @@ jQuery(function($) {
 				}
 
 				popup_button.on('click', function(event) {
+					// Click used instead focus because in patternselect listen only click.
+					$('input[type="text"]', $obj).click();
 					return PopUp('popup.generic', ms.options.popup.parameters, null, event.target);
 				});
 
@@ -616,17 +623,17 @@ jQuery(function($) {
 							break;
 					}
 				})
-				.on('focusin', function() {
+				.on('focusin', function($event) {
 					$obj.addClass('active');
 				})
-				.on('focusout', function() {
+				.on('focusout', function($event) {
 					if (ms.values.available_false_click) {
 						ms.values.available_false_click = false;
-						$('input[type="text"]', $obj).focus();
+						$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 					}
 					else {
 						$obj.removeClass('active');
-						$('.selected li:selected', $obj).removeClass('selected');
+						$('.selected li.selected', $obj).removeClass('selected');
 						cleanSearchInput($obj);
 						hideAvailable($obj);
 					}
@@ -658,7 +665,7 @@ jQuery(function($) {
 		addSelected($obj, ms.values.available[id]);
 
 		if (isSearchFieldVisible($obj)) {
-			$('input[type="text"]', $obj).focus();
+			$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 		}
 
 		$obj.trigger('change', ms);
@@ -703,7 +710,7 @@ jQuery(function($) {
 								if (!ms.options.disabled && !item_disabled) {
 									removeSelected($obj, item.id);
 									if (isSearchFieldVisible($obj)) {
-										$('input[type="text"]', $obj).focus();
+										$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 									}
 
 									$obj.trigger('change', ms);
@@ -715,7 +722,6 @@ jQuery(function($) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
-						$('input[type="text"]', $obj).focus();
 					}
 				});
 
@@ -795,7 +801,7 @@ jQuery(function($) {
 		var addNew = false;
 
 		if (ms.options.addNew && ms.values.search.length) {
-			if (data.length || objectLength(ms.values.selected) > 0) {
+			if (data.length || objectSize(ms.values.selected) > 0) {
 				var names = {};
 
 				// Check if value exists among available values.
@@ -810,7 +816,7 @@ jQuery(function($) {
 				}
 
 				// Check if value exists among selected values.
-				if (!addNew && objectLength(ms.values.selected) > 0) {
+				if (!addNew && objectSize(ms.values.selected) > 0) {
 					$.each(ms.values.selected, function(i, item) {
 						if (typeof item.isNew === 'undefined') {
 							names[item.name.toUpperCase()] = true;
@@ -833,7 +839,7 @@ jQuery(function($) {
 		var available_more = false;
 
 		$.each(data, function(i, item) {
-			if (ms.options.limit == 0 || objectLength(ms.values.available) < ms.options.limit) {
+			if (ms.options.limit == 0 || objectSize(ms.values.available) < ms.options.limit) {
 				if (typeof ms.values.available[item.id] === 'undefined'
 						&& typeof ms.values.selected[item.id] === 'undefined'
 						&& ms.options.excludeids.indexOf(item.id) === -1) {
@@ -856,13 +862,13 @@ jQuery(function($) {
 		var found = 0,
 			preselected = '';
 
-		if (objectLength(ms.values.available) == 0) {
+		if (objectSize(ms.values.available) == 0) {
 			var div = $('<div>', {
 					'class': 'multiselect-matches',
 					text: ms.options.labels['No matches found']
 				})
 					.on('click', function() {
-						$('input[type="text"]', $obj).focus();
+						$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 					});
 
 			ms.values.available_div.append(div);
@@ -900,7 +906,7 @@ jQuery(function($) {
 					text: ms.options.labels['More matches found...']
 				})
 					.on('click', function() {
-						$('input[type="text"]', $obj).focus();
+						$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 					});
 
 			ms.values.available_div.prepend(div);
@@ -945,7 +951,7 @@ jQuery(function($) {
 				$(window).height() + $(window).scrollTop() - available_top - obj_padding_y - 10
 			));
 
-		if (objectLength(ms.values.available) > 0) {
+		if (objectSize(ms.values.available) > 0) {
 			available_width_min = Math.max(available_width, 300);
 
 			// Prevent less than 15% width difference for the available list and the input field.
@@ -969,7 +975,7 @@ jQuery(function($) {
 
 		$available.scrollTop(0);
 
-		if (objectLength(ms.values.available) != 0) {
+		if (objectSize(ms.values.available) != 0) {
 			// Remove selected item selected state.
 			$('.selected li.selected', $obj).removeClass('selected');
 
@@ -1119,19 +1125,7 @@ jQuery(function($) {
 		var ms = $obj.data('multiSelect');
 
 		return (ms.options.limit != 0)
-			? ms.options.limit + objectLength(ms.values.selected) + ms.options.excludeids.length + 1
+			? ms.options.limit + objectSize(ms.values.selected) + ms.options.excludeids.length + 1
 			: null;
-	}
-
-	function objectLength(obj) {
-		var length = 0;
-
-		for (var key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				length++;
-			}
-		}
-
-		return length;
 	}
 });

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -450,7 +450,7 @@ class CMacrosResolverHelper {
 
 		$resolvedGraph = reset($graphMap);
 		foreach ($data as &$graph) {
-			if ($graph['graphid'] === $resolvedGraph['graphid']) {
+			if ($resolvedGraph && $graph['graphid'] === $resolvedGraph['graphid']) {
 				$graph['name'] = $resolvedGraph['name'];
 				$resolvedGraph = next($graphMap);
 			}

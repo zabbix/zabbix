@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->assertRegexp('/Monday/', $text);
 		$this->assertRegexp('/Sunday/', $text);
 
-		// Add "Monthly" maintenace period with "January" and "November".
+		// Add "Monthly" maintenance period with "January" and "November".
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Monthly');

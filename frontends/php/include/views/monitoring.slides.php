@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ $widget
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
 	)
 	->addItem(
-		(new CDiv((new CDiv())->addClass('preloader')))
+		(new CDiv((new CDiv())->addStyle('position: relative;margin-top: 20px;')->addClass('is-loading')))
 			->setId(WIDGET_SLIDESHOW)
 	);
 

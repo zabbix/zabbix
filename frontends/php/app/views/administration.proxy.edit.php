@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,7 +119,10 @@ $tabs->addTab('proxyTab', _('Proxy'), $proxy_form_list);
 $tabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 // append buttons to form
-$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
+$cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'proxy.list')
+	->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
+))->setId('cancel');
 
 if ($data['proxyid'] == 0) {
 	$tabs->setFooter(makeFormFooter(

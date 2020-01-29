@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,23 +109,17 @@ class CFormElement extends CElement {
 	 *
 	 * @param CElement $label    label element
 	 *
-	 * @return CElement|null
+	 * @return CElement|CNullElement
 	 */
 	public function getFieldByLabelElement($label) {
-		if (($element = CElementQuery::getInputElement($label, './../../'.self::TABLE_FORM_RIGHT)) !== null) {
+		if (($element = CElementQuery::getInputElement($label, './../../'.self::TABLE_FORM_RIGHT))->isValid()) {
 			return $element;
 		}
 
 		// Nested table forms.
-		$element = $label->query('xpath', './../../'.self::TABLE_FORM_RIGHT.'//'.self::TABLE_FORM.'/..')
+		return $label->query('xpath', './../../'.self::TABLE_FORM_RIGHT.'//'.self::TABLE_FORM.'/..')
 				->cast('CFormElement', ['normalized' => true])
 				->one(false);
-
-		if ($element !== null) {
-			return $element;
-		}
-
-		return null;
 	}
 
 	/**
@@ -139,7 +133,7 @@ class CFormElement extends CElement {
 		foreach ($this->getLabels() as $label) {
 			$element = $this->getFieldByLabelElement($label);
 
-			if ($element !== null) {
+			if ($element->isValid()) {
 				$fields[$label->getText()] = $element;
 			}
 		}
@@ -165,18 +159,18 @@ class CFormElement extends CElement {
 		}
 
 		$parts = explode(':', $name, 2);
-		$element = null;
+		$element = new CNullElement(['locator' => 'form field (by name or selector "'.$name.'")']);
 
 		if (count($parts) === 2
 				&& in_array($parts[0], ['id', 'name', 'css', 'class', 'tag', 'link', 'button', 'xpath'])
-				&& (($element = $this->query($name)->one(false)) !== null)) {
+				&& (($element = $this->query($name)->one(false))->isValid())) {
 			$element = $element->detect();
 		}
 
-		if ($element === null) {
+		if (!$element->isValid()) {
 			$label = $this->getLabel($name);
 
-			if (($element = $this->getFieldByLabelElement($label)) === null) {
+			if (($element = $this->getFieldByLabelElement($label))->isValid() === false) {
 				throw new Exception('Failed to find form field by label name or selector: "'.$name.'".');
 			}
 		}
@@ -199,17 +193,17 @@ class CFormElement extends CElement {
 		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
 		$label = $this->query($prefix.'/label[@for='.CXPathHelper::escapeQuotes($id).']')->one(false);
 
-		if (!$label) {
+		if ($label->isValid() === false) {
 			$label = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_RIGHT.'//*[@id='.
 					CXPathHelper::escapeQuotes($id).']/ancestor::'.self::TABLE_FORM_RIGHT.'/../'.
 					self::TABLE_FORM_LEFT.'/label')->one(false);
 
-			if (!$label) {
+			if (!$label->isValid()) {
 				throw new Exception('Failed to find form label by field id: "'.$id.'".');
 			}
 		}
 
-		if (($element = $this->getFieldByLabelElement($label)) === null) {
+		if (!($element = $this->getFieldByLabelElement($label))->isValid()) {
 			throw new Exception('Failed to find form field by label id: "'.$id.'".');
 		}
 
@@ -281,7 +275,7 @@ class CFormElement extends CElement {
 	 */
 	public function submit() {
 		$submit = $this->query('xpath:.//button[@type="submit"]')->one(false);
-		if ($submit !== null) {
+		if ($submit->isValid()) {
 			$submit->click();
 		}
 		else {

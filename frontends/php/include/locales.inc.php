@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,19 +87,20 @@ function getLocales() {
 }
 
 /**
- * Get URL for support link by language.
+ * Get support URL for specified language.
  *
- * @param string $language  Language 2 char ISO639-1 code.
+ * @param string $language  ISO639-1 code or null for English support URL.
  *
  * @return string
  */
-function getSupportUrl($language) {
+function getSupportUrl($language = null) {
 	$urls = [
-		'ru' => 'https://www.zabbix.com/ru/support/',
-		'ja' => 'https://www.zabbix.com/jp/support/'
+		'ja' => 'https://www.zabbix.com/jp/support',
+		'ru' => 'https://www.zabbix.com/ru/support',
+		'zh' => 'https://www.zabbix.com/cn/support'
 	];
 
-	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support/';
+	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support';
 }
 
 /**

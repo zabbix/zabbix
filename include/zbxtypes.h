@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,23 +23,29 @@
 #if defined(_WINDOWS)
 #	define ZBX_THREAD_LOCAL __declspec(thread)
 #else
-#	if defined(__GNUC__) || defined(__clang__)
+#	if defined(HAVE_THREAD_LOCAL) && (defined(__GNUC__) || defined(__clang__) || defined(__MINGW32__))
 #		define ZBX_THREAD_LOCAL __thread
 #	else
 #		define ZBX_THREAD_LOCAL
 #	endif
 #endif
 
-#define	ZBX_FS_DBL		"%lf"
-#define	ZBX_FS_DBL_EXT(p)	"%." #p "lf"
-
-#define ZBX_PTR_SIZE		sizeof(void *)
+#if defined(_WINDOWS)
+#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
+#	define PATH_SEPARATOR	'\\'
+#elif defined(__MINGW32__)
+#	define zbx_open(pathname, flags)	open(pathname, flags | O_BINARY)
+#	define PATH_SEPARATOR	'\\'
+#else
+#	define zbx_open(pathname, flags)	open(pathname, flags)
+#	define PATH_SEPARATOR	'/'
+#endif
 
 #if defined(_WINDOWS)
 #	include <strsafe.h>
 
 #	define zbx_stat(path, buf)		__zbx_stat(path, buf)
-#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
+#	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
 
 #	ifndef __UINT64_C
 #		define __UINT64_C(x)	x
@@ -69,19 +75,20 @@ typedef unsigned __int32	zbx_uint32_t;
 typedef uint32_t		zbx_uint32_t;
 #	endif
 
-#	ifndef PATH_SEPARATOR
-#		define PATH_SEPARATOR	'\\'
-#	endif
-
 #	define strcasecmp	lstrcmpiA
 
 typedef __int64	zbx_offset_t;
 #	define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
 
-#else	/* _WINDOWS */
+#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
+typedef int	ssize_t;
+#	else
+typedef long	ssize_t;
+#	endif
 
+#else	/* _WINDOWS */
 #	define zbx_stat(path, buf)		stat(path, buf)
-#	define zbx_open(pathname, flags)	open(pathname, flags)
+#	define zbx_fstat(fd, buf)		fstat(fd, buf)
 
 #	ifndef __UINT64_C
 #		ifdef UINT64_C
@@ -147,15 +154,15 @@ typedef __int64	zbx_offset_t;
 
 typedef uint32_t	zbx_uint32_t;
 
-#	ifndef PATH_SEPARATOR
-#		define PATH_SEPARATOR	'/'
-#	endif
-
 typedef off_t	zbx_offset_t;
 #	define zbx_lseek(fd, offset, whence)	lseek(fd, (zbx_offset_t)(offset), whence)
 
 #endif	/* _WINDOWS */
 
+#define	ZBX_FS_DBL		"%lf"
+#define	ZBX_FS_DBL_EXT(p)	"%." #p "lf"
+
+#define ZBX_PTR_SIZE		sizeof(void *)
 #define ZBX_FS_SIZE_T		ZBX_FS_UI64
 #define ZBX_FS_SSIZE_T		ZBX_FS_I64
 #define ZBX_FS_TIME_T		ZBX_FS_I64

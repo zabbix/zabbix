@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class testFormAction extends CLegacyWebTest {
 	private $event_sources = [
 		EVENT_SOURCE_TRIGGERS => 'Trigger actions',
 		EVENT_SOURCE_DISCOVERY => 'Discovery actions',
-		EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
+		EVENT_SOURCE_AUTOREGISTRATION => 'Autoregistration actions',
 		EVENT_SOURCE_INTERNAL => 'Internal actions'
 	];
 
@@ -55,7 +55,7 @@ class testFormAction extends CLegacyWebTest {
 				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Send message',
-					'new_operation_opmessage_default_msg' => 'unchecked'
+					'new_operation_opmessage_custom_msg' => 'unchecked'
 				]
 			],
 			[
@@ -199,7 +199,7 @@ class testFormAction extends CLegacyWebTest {
 				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Send message',
-					'new_operation_opmessage_default_msg' => 'unchecked'
+					'new_operation_opmessage_custom_msg' => 'unchecked'
 				]
 			],
 			[
@@ -277,54 +277,54 @@ class testFormAction extends CLegacyWebTest {
 				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Disable host']
 			],
 			[
-				['eventsource' => 'Auto registration']
+				['eventsource' => 'Autoregistration']
 			],
 			[
-				['eventsource' => 'Auto registration', 'new_condition_conditiontype' => 'Host name']
+				['eventsource' => 'Autoregistration', 'new_condition_conditiontype' => 'Host name']
 			],
 			[
-				['eventsource' => 'Auto registration', 'new_condition_conditiontype' => 'Proxy']
+				['eventsource' => 'Autoregistration', 'new_condition_conditiontype' => 'Proxy']
 			],
 			[
-				['eventsource' => 'Auto registration', 'new_condition_conditiontype' => 'Host metadata']
+				['eventsource' => 'Autoregistration', 'new_condition_conditiontype' => 'Host metadata']
 			],
 			[
 				[
-					'eventsource' => 'Auto registration',
+					'eventsource' => 'Autoregistration',
 					'new_operation_operationtype' => 'Send message'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Auto registration',
+					'eventsource' => 'Autoregistration',
 					'new_operation_operationtype' => 'Send message',
-					'new_operation_opmessage_default_msg' => 'unchecked'
+					'new_operation_opmessage_custom_msg' => 'unchecked'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Auto registration',
+					'eventsource' => 'Autoregistration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Custom script'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Auto registration',
+					'eventsource' => 'Autoregistration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'IPMI'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Auto registration',
+					'eventsource' => 'Autoregistration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'SSH'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Auto registration',
+					'eventsource' => 'Autoregistration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'SSH',
 					'new_operation_opcommand_authtype' => 'Public key'
@@ -332,32 +332,35 @@ class testFormAction extends CLegacyWebTest {
 			],
 			[
 				[
-					'eventsource' => 'Auto registration',
+					'eventsource' => 'Autoregistration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Telnet'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Auto registration',
+					'eventsource' => 'Autoregistration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Global script'
 				]
 			],
 			[
-				['eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Add host']
+				['eventsource' => 'Autoregistration', 'new_operation_operationtype' => 'Add host']
 			],
 			[
-				['eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Add to host group']
+				['eventsource' => 'Autoregistration', 'new_operation_operationtype' => 'Add to host group']
 			],
 			[
-				['eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Link to template']
+				['eventsource' => 'Autoregistration', 'new_operation_operationtype' => 'Link to template']
 			],
 			[
-				['eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Disable host']
+				['eventsource' => 'Autoregistration', 'new_operation_operationtype' => 'Disable host']
 			],
 			[
 				['eventsource' => 'Internal']
+			],
+			[
+				['eventsource' => 'Internal', 'recovery_msg' => true]
 			],
 			[
 				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Application']
@@ -381,7 +384,7 @@ class testFormAction extends CLegacyWebTest {
 				[
 					'eventsource' => 'Internal',
 					'new_operation_operationtype' => 'Send message',
-					'new_operation_opmessage_default_msg' => 'unchecked'
+					'new_operation_opmessage_custom_msg' => 'unchecked'
 				]
 			]
 		];
@@ -399,8 +402,8 @@ class testFormAction extends CLegacyWebTest {
 			case 'Discovery':
 				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY.'&form=Create+action');
 				break;
-			case 'Auto registration':
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION.'&form=Create+action');
+			case 'Autoregistration':
+				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTOREGISTRATION.'&form=Create+action');
 				break;
 			case 'Internal';
 				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_INTERNAL.'&form=Create+action');
@@ -425,12 +428,20 @@ class testFormAction extends CLegacyWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		if (array_key_exists('evaltype', $data)) {
-			$this->zbxTestInputTypeWait('new_condition_value', 'TEST1');
-			$this->zbxTestClickXpathWait('//div[@id="actionTab"]//button[text()="Add" and contains(@onclick, "add_condition")]');
-			$this->zbxTestInputTypeWait('new_condition_value', 'TEST2');
-			$this->zbxTestClickXpathWait('//div[@id="actionTab"]//button[text()="Add" and contains(@onclick, "add_condition")]');
-
-			$this->zbxTestDropdownSelect('evaltype', $data['evaltype']);
+			// Open Condition overlay dialog and fill first condition.
+			$this->zbxTestClickXpath('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+			$this->zbxTestLaunchOverlayDialog('New condition');
+			$this->zbxTestInputTypeWait('value', 'TEST1');
+			$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('conditions_0'));
+			// Open Condition overlay dialog again and fill second condition.
+			$this->zbxTestClickXpath('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+			$this->zbxTestLaunchOverlayDialog('New condition');
+			$this->zbxTestInputTypeWait('value', 'TEST2');
+			$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+			// Wait until overlay is closed and value is added, so that Type of calculation dropdown is clickable.
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('evaltype'));
+			$this->zbxTestDropdownSelectWait('evaltype', $data['evaltype']);
 			$evaltype = $data['evaltype'];
 		}
 
@@ -476,16 +487,19 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
 
-		if (isset($data['new_condition_conditiontype'])) {
-			$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $data['new_condition_conditiontype']);
-		}
-		$new_condition_conditiontype = $this->zbxTestGetSelectedLabel('new_condition_conditiontype');
+		// Open Condition overlay dialog.
+		$this->zbxTestClickXpath('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestLaunchOverlayDialog('New condition');
 
-		$this->zbxTestTextPresent('New condition');
-		$this->zbxTestAssertElementPresentId('new_condition_conditiontype');
+		if (isset($data['new_condition_conditiontype'])) {
+			$this->zbxTestDropdownSelectWait('condition_type', $data['new_condition_conditiontype']);
+		}
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+		$new_condition_conditiontype = $this->zbxTestGetSelectedLabel('condition_type');
+
 		switch ($eventsource) {
 			case 'Triggers':
-				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', [
+				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Application',
 						'Host group',
 						'Template',
@@ -498,7 +512,7 @@ class testFormAction extends CLegacyWebTest {
 				]);
 				break;
 			case 'Discovery':
-				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', [
+				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Host IP',
 						'Service type',
 						'Service port',
@@ -511,15 +525,15 @@ class testFormAction extends CLegacyWebTest {
 						'Proxy'
 				]);
 				break;
-			case 'Auto registration':
-				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', [
+			case 'Autoregistration':
+				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Host name',
 						'Proxy',
 						'Host metadata'
 				]);
 				break;
 			case 'Internal':
-				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', [
+				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Application',
 						'Event type',
 						'Host group',
@@ -530,33 +544,17 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if (isset($data['new_condition_conditiontype'])) {
-			$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', $new_condition_conditiontype);
-		}
-		else {
-			switch ($eventsource) {
-				case 'Triggers':
-					$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', 'Trigger name');
-					break;
-				case 'Discovery':
-					$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', 'Host IP');
-					break;
-				case 'Auto registration':
-					$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', 'Host name');
-					break;
-				case 'Internal':
-					$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', 'Application');
-					break;
-			}
+			$this->zbxTestDropdownAssertSelected('condition_type', $new_condition_conditiontype);
 		}
 
-		$this->zbxTestAssertElementPresentId('new_condition_operator');
+		$this->zbxTestAssertElementPresentId('operator');
 
 		switch ($new_condition_conditiontype) {
 			case 'Application':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'equals',
-						'contains',
-						'does not contain'
+				$this->zbxTestTextPresent([
+					'equals',
+					'contains',
+					'does not contain'
 				]);
 				break;
 			case 'Host group':
@@ -568,22 +566,22 @@ class testFormAction extends CLegacyWebTest {
 			case 'Discovery rule':
 			case 'Discovery check':
 			case 'Proxy':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'equals',
-						'does not equal'
+				$this->zbxTestTextPresent([
+					'equals',
+					'does not equal'
 				]);
 				break;
 			case 'Trigger name':
 			case 'Host name':
 			case 'Host metadata':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'contains',
-						'does not contain'
+				$this->zbxTestTextPresent([
+					'contains',
+					'does not contain'
 				]);
 				break;
 			case 'Trigger severity':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'equals',
+				$this->zbxTestTextPresent([
+					'equals',
 						'does not equal',
 						'is greater than or equals',
 						'is less than or equals'
@@ -596,25 +594,25 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestIsElementPresent('//td[@colspan="1" and text()="equals"]');
 				break;
 			case 'Time period':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'in',
-						'not in'
+				$this->zbxTestTextPresent([
+					'in',
+					'not in'
 				]);
 				break;
 			case 'Problem is suppressed':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'No',
-						'Yes'
+				$this->zbxTestTextPresent([
+					'No',
+					'Yes'
 				]);
 				break;
 			case 'Uptime/Downtime':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
+				$this->zbxTestTextPresent([
 						'is greater than or equals',
 						'is less than or equals'
 				]);
 				break;
 			case 'Received value':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
+				$this->zbxTestDropdownHasOptions('operator', [
 						'equals',
 						'does not equal',
 						'is greater than or equals',
@@ -635,15 +633,10 @@ class testFormAction extends CLegacyWebTest {
 			case 'Host name':
 			case 'Host metadata':
 			case 'Service port':
-				$this->zbxTestAssertElementPresentXpath('//input[@id=\'new_condition_value\']');
+				$this->zbxTestAssertElementPresentXpath('//input[@id="value"] | //textarea[@id="value"]');
 				break;
-
-			case 'Discovery check':
-				$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_condition_value\']');
-				break;
-
 			default:
-				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_condition_value\']');
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id="value"] | //textarea[@id="value"]');
 				break;
 		}
 
@@ -656,12 +649,11 @@ class testFormAction extends CLegacyWebTest {
 			case 'Host name':
 			case 'Host metadata':
 			case 'Service port':
-				$this->zbxTestAssertAttribute('//input[@id=\'new_condition_value\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'new_condition_value\']', 'size', 20);
+				$this->zbxTestAssertAttribute('//textarea[@id="value"] | //input[@id="value"]', 'maxlength', 255);
 				break;
 			case 'Uptime/Downtime':
-				$this->zbxTestAssertAttribute('//input[@id=\'new_condition_value\']', 'maxlength', 15);
-				$this->zbxTestAssertAttribute('//input[@id=\'new_condition_value\']', 'size', 20);
+				$this->zbxTestAssertAttribute('//input[@id="value"]', 'maxlength', 15);
+				$this->zbxTestAssertAttribute('//input[@id="value"]', 'size', 20);
 				break;
 		}
 
@@ -671,19 +663,19 @@ class testFormAction extends CLegacyWebTest {
 			case 'Received value':
 			case 'Host name':
 			case 'Host metadata':
-				$this->zbxTestAssertElementValue('new_condition_value', "");
+				$this->zbxTestAssertElementValue('value', "");
 				break;
 			case 'Time period':
-				$this->zbxTestAssertElementValue('new_condition_value', '1-7,00:00-24:00');
+				$this->zbxTestAssertElementValue('value', '1-7,00:00-24:00');
 				break;
 			case 'Service port':
-				$this->zbxTestAssertElementValue('new_condition_value', '0-1023,1024-49151');
+				$this->zbxTestAssertElementValue('value', '0-1023,1024-49151');
 				break;
 			case 'Host IP':
-				$this->zbxTestAssertElementValue('new_condition_value', '192.168.0.1-127,192.168.2.1');
+				$this->zbxTestAssertElementValue('value', '192.168.0.1-127,192.168.2.1');
 				break;
 			case 'Uptime/Downtime':
-				$this->zbxTestAssertElementValue('new_condition_value', 600);
+				$this->zbxTestAssertElementValue('value', 600);
 				break;
 		}
 
@@ -693,13 +685,9 @@ class testFormAction extends CLegacyWebTest {
 			case 'Host':
 			case 'Trigger':
 			case 'Discovery rule':
-				$this->zbxTestAssertElementPresentXpath('//div[@id=\'new_condition_value_\']/input[@placeholder]');
-				break;
-
 			case 'Proxy':
-				$this->zbxTestAssertElementPresentXpath('//div[@id=\'new_condition_value\']/input[@placeholder]');
+				$this->zbxTestAssertElementPresentXpath('//div[@class="multiselect"]/input[@placeholder]');
 				break;
-
 			default:
 				$this->zbxTestAssertElementNotPresentXpath('//div[@id=\'new_condition_value_\']/input[@placeholder]');
 				$this->zbxTestAssertElementNotPresentXpath('//div[@id=\'new_condition_value\']/input[@placeholder]');
@@ -709,20 +697,23 @@ class testFormAction extends CLegacyWebTest {
 		switch ($new_condition_conditiontype) {
 			case 'Trigger severity':
 			case 'Trigger value':
-			case 'Service type':
 			case 'Discovery object':
 			case 'Discovery status':
+				$this->zbxTestAssertElementPresentXpath('//ul[@id="value" and contains(@class, "radio")]');
+				break;
 			case 'Event type':
-				$this->zbxTestAssertElementPresentXpath('//select[@id=\'new_condition_value\']');
+			case 'Service type':
+				$this->zbxTestAssertElementPresentXpath('//input[@type="radio" and contains(@id, "0") and @checked]');
+				$this->zbxTestAssertElementPresentXpath('//select[@id="value"]');
 				break;
 			default:
-				$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_condition_value\']');
+				$this->zbxTestAssertElementNotPresentXpath('//ul[@id="value"]|//select[@id="value"]');
 				break;
 		}
 
 		switch ($new_condition_conditiontype) {
 			case 'Trigger severity':
-				$this->zbxTestDropdownHasOptions('new_condition_value', [
+				$this->zbxTestTextPresent([
 						'Not classified',
 						'Information',
 						'Warning',
@@ -738,7 +729,7 @@ class testFormAction extends CLegacyWebTest {
 				]);
 				break;
 			case 'Service type':
-				$this->zbxTestDropdownHasOptions('new_condition_value', [
+				$this->zbxTestDropdownHasOptions('value', [
 						'SSH',
 						'LDAP',
 						'SMTP',
@@ -758,13 +749,13 @@ class testFormAction extends CLegacyWebTest {
 				]);
 				break;
 			case 'Discovery object':
-				$this->zbxTestDropdownHasOptions('new_condition_value', [
+				$this->zbxTestTextPresent([
 						'Device',
 						'Service'
 				]);
 				break;
 			case 'Discovery status':
-				$this->zbxTestDropdownHasOptions('new_condition_value', [
+				$this->zbxTestTextPresent([
 						'Up',
 						'Down',
 						'Discovered',
@@ -772,7 +763,7 @@ class testFormAction extends CLegacyWebTest {
 				]);
 				break;
 			case 'Event type':
-				$this->zbxTestDropdownHasOptions('new_condition_value', [
+				$this->zbxTestDropdownHasOptions('value', [
 						'Item in "not supported" state',
 						'Low-level discovery rule in "not supported" state',
 						'Trigger in "unknown" state',
@@ -782,10 +773,10 @@ class testFormAction extends CLegacyWebTest {
 
 		switch ($new_condition_conditiontype) {
 			case 'Trigger severity':
-				$this->zbxTestAssertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Not classified\']', 'selected');
+				$this->zbxTestAssertElementPresentXpath('//label[text()="Not classified"]/../input[@checked]');
 				break;
 			case 'Event type':
-				$this->zbxTestAssertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Item in "not supported" state\']', 'selected');
+				$this->zbxTestAssertAttribute('//*[@id="value"]/option[text()=\'Item in "not supported" state\']', 'selected');
 				break;
 		}
 
@@ -807,70 +798,57 @@ class testFormAction extends CLegacyWebTest {
 				break;
 		}
 
-		$this->zbxTestAssertElementPresentXpath('//div[@id="actionTab"]//button[text()="Add" and contains(@onclick,"add_condition")]');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Cancel']");
 
 		$this->zbxTestTabSwitch('Operations');
 
-		$this->zbxTestTextPresent('Default subject');
-		$this->zbxTestAssertVisibleId('def_shortdata');
-		$this->zbxTestAssertAttribute('//input[@id="def_shortdata"]', 'maxlength', 255);
-		$this->zbxTestAssertAttribute('//input[@id="def_shortdata"]', 'size', 20);
+		$form = $this->query('id:action.edit')->asForm()->waitUntilVisible()->one();
+		$operations_field = $form->getField('Operations')->asTable();
+
 		switch ($eventsource) {
 			case 'Triggers':
-				$this->zbxTestAssertElementValue('def_shortdata', 'Problem: {EVENT.NAME}');
+				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
+				$this->zbxTestAssertVisibleId('esc_period');
+				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
+
+				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
+				$this->assertTrue($form->getField('Pause operations for suppressed problems')->getValue());
+				$recovery_field = $form->getField('Recovery operations')->asTable();
+				$this->assertEquals($recovery_field->getHeadersText(), ['Details', 'Action']);
+				$update_field = $form->getField('Update operations')->asTable();
+				$this->assertEquals($update_field->getHeadersText(), ['Details', 'Action']);
 				break;
 			case 'Discovery':
-				$this->zbxTestAssertElementValue('def_shortdata', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
-				break;
-			case 'Auto registration':
-				$this->zbxTestAssertElementValue('def_shortdata', 'Auto registration: {HOST.HOST}');
-				break;
-			case 'Internal':
-				$this->zbxTestAssertElementValue('def_shortdata', '');
-				break;
-		}
-		$this->zbxTestTextPresent('Default message');
-		$this->zbxTestAssertVisibleId('def_longdata');
-		$this->zbxTestAssertAttribute('//textarea[@id="def_longdata"]', 'rows', 7);
-		switch ($eventsource) {
-			case 'Triggers':
-				$def_longdata_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
-					' Problem name: {EVENT.NAME}'.
-					' Host: {HOST.NAME}'.
-					' Severity: {EVENT.SEVERITY}'.
-					' Original problem ID: {EVENT.ID}'.
-					' {TRIGGER.URL}';
-					break;
-			case 'Discovery':
-				$def_longdata_val = 'Discovery rule: {DISCOVERY.RULE.NAME}'.
-					' Device IP: {DISCOVERY.DEVICE.IPADDRESS}'.
-					' Device DNS: {DISCOVERY.DEVICE.DNS}'.
-					' Device status: {DISCOVERY.DEVICE.STATUS}'.
-					' Device uptime: {DISCOVERY.DEVICE.UPTIME}'.
-					' Device service name: {DISCOVERY.SERVICE.NAME}'.
-					' Device service port: {DISCOVERY.SERVICE.PORT}'.
-					' Device service status: {DISCOVERY.SERVICE.STATUS}'.
-					' Device service uptime: {DISCOVERY.SERVICE.UPTIME}';
-				break;
-			case 'Auto registration':
-				$def_longdata_val = 'Host name: {HOST.HOST}'.
-					' Host IP: {HOST.IP}'.
-					' Agent port: {HOST.PORT}';
+			case 'Autoregistration':
+				$this->zbxTestTextNotPresent(['Default operation step duration', 'Pause operations for suppressed problems',
+					'Recovery operations', 'Update operations']);
+				$this->zbxTestAssertElementNotPresentId('esc_period');
+				$this->zbxTestAssertElementNotPresentId('pause_suppressed');
 				break;
 			case 'Internal':
-				$def_longdata_val = "";
+				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
+				$this->zbxTestAssertVisibleId('esc_period');
+				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
+
+				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
+				$recovery_field = $form->getField('Recovery operations')->asTable();
+				$this->assertEquals($recovery_field->getHeadersText(), ['Details', 'Action']);
+				$this->zbxTestTextNotPresent(['Pause operations for suppressed problems', 'Update operations']);
+				$this->zbxTestAssertElementNotPresentId('pause_suppressed');
 				break;
 		}
-		$this->zbxTestAssertElementText('//textarea[@id="def_longdata"]', $def_longdata_val);
 
 		if (isset($data['new_operation_operationtype'])) {
 			$new_operation_operationtype = $data['new_operation_operationtype'];
-			$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
+			$operations_field->query('button:Add')->one()->click();
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			switch ($eventsource) {
 				case 'Triggers':
 				case 'Discovery':
-				case 'Auto registration':
+				case 'Autoregistration':
 					$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operationtype'));
 					$this->zbxTestDropdownSelectWait('operationtype', $new_operation_operationtype);
 					COverlayDialogElement::find()->one()->waitUntilReady();
@@ -908,15 +886,16 @@ class testFormAction extends CLegacyWebTest {
 			$new_operation_opcommand_authtype = null;
 		}
 
-		if (isset($data['new_operation_opmessage_default_msg'])) {
-			$new_operation_opmessage_default_msg = $data['new_operation_opmessage_default_msg'];
-			$this->zbxTestCheckboxSelect('operation_opmessage_default_msg', false);
+		if (isset($data['new_operation_opmessage_custom_msg'])) {
+			$new_operation_opmessage_custom_msg = $data['new_operation_opmessage_custom_msg'];
+			$this->assertFalse($this->zbxTestCheckboxSelected('operation_opmessage_default_msg'));
 		}
 		elseif ($new_operation_operationtype == 'Send message') {
-			$new_operation_opmessage_default_msg = 'checked';
+			$new_operation_opmessage_custom_msg = 'checked';
+			$this->zbxTestCheckboxSelect('operation_opmessage_default_msg');
 		}
 		else {
-			$new_operation_opmessage_default_msg = null;
+			$new_operation_opmessage_custom_msg = null;
 		}
 
 		if (isset($data['add_opcondition'])) {
@@ -928,49 +907,10 @@ class testFormAction extends CLegacyWebTest {
 			$add_opcondition = null;
 		}
 
-		switch ($eventsource) {
-			case 'Triggers':
-			case 'Internal':
-				$this->zbxTestTextPresent([
-						'Default operation step duration'
-				]);
-				$this->zbxTestAssertVisibleId('esc_period');
-				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
-				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'value', '1h');
-				break;
-			default:
-				$this->zbxTestTextNotPresent([
-						'Default operation step duration'
-				]);
-				$this->zbxTestAssertElementNotPresentId('esc_period');
-				break;
-		}
-
-		$this->zbxTestTextPresent(['Operations', 'Details', 'Action']);
-
-		switch ($eventsource) {
-			case 'Triggers':
-			case 'Internal':
-				$this->zbxTestTextPresent([
-						'Steps', 'Start in', 'Duration'
-				]);
-				break;
-			default:
-				$this->zbxTestTextNotPresent([
-						'Steps', 'Start in', 'Duration'
-				]);
-				break;
-		}
-
-			$this->zbxTestAssertVisibleXpath('//div[@id="operationTab"]//button[text()="Add"]');
-
 		if ($new_operation_operationtype != null && $eventsource == 'Triggers' || $eventsource == 'Internal') 	{
 			switch ($new_operation_operationtype) {
 				case 'Send message':
 				case 'Remote command':
-					$this->zbxTestTextPresent ('Step');
-
 					$this->zbxTestTextPresent ('Steps');
 					$this->zbxTestAssertVisibleId('operation_esc_step_from');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'maxlength', 5);
@@ -987,7 +927,7 @@ class testFormAction extends CLegacyWebTest {
 					$this->zbxTestAssertVisibleId('operation_esc_period');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'maxlength', 255);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'size', 20);
-					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'value', '0');
+					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'value', 0);
 					break;
 				}
 			}
@@ -1027,7 +967,7 @@ class testFormAction extends CLegacyWebTest {
 						'Disable host'
 				]);
 					break;
-				case 'Auto registration':
+				case 'Autoregistration':
 				$this->zbxTestDropdownHasOptions('operationtype', [
 						'Send message',
 						'Remote command',
@@ -1044,7 +984,7 @@ class testFormAction extends CLegacyWebTest {
 			switch ($eventsource) {
 				case 'Triggers':
 				case 'Discovery':
-				case 'Auto registration':
+				case 'Autoregistration':
 					$this->zbxTestDropdownAssertSelected('new_operation[operationtype]', $new_operation_operationtype);
 					break;
 			}
@@ -1080,16 +1020,15 @@ class testFormAction extends CLegacyWebTest {
 					'SMS'
 			]);
 
-			$this->zbxTestTextPresent('Default message');
+			$this->zbxTestTextPresent('Custom message');
 			$this->zbxTestAssertElementPresentId('operation_opmessage_default_msg');
 			$this->zbxTestAssertElementPresentXpath('//input[@type=\'checkbox\' and @id=\'operation_opmessage_default_msg\']');
-			if ($new_operation_opmessage_default_msg == 'checked') {
+			if ($new_operation_opmessage_custom_msg == 'checked') {
 				$this->assertTrue($this->zbxTestCheckboxSelected('operation_opmessage_default_msg'));
 			}
 			else {
 				$this->assertFalse($this->zbxTestCheckboxSelected('operation_opmessage_default_msg'));
 			}
-
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentId('addusrgrpbtn');
@@ -1098,64 +1037,20 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentId('operation_opmessage_default_msg');
 		}
 
-		switch ($new_operation_opmessage_default_msg) {
+		switch ($new_operation_opmessage_custom_msg) {
 			case 'unchecked':
+				$this->zbxTestAssertNotVisibleId('operation_opmessage_subject');
+				$this->zbxTestAssertNotVisibleId('operation_opmessage_message');
+				break;
+			case 'checked':
 				$this->zbxTestTextPresent('Subject');
 				$this->zbxTestAssertVisibleId('operation_opmessage_subject');
 				$this->zbxTestAssertAttribute('//input[@id=\'operation_opmessage_subject\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//input[@id=\'operation_opmessage_subject\']', 'size', 20);
-				switch ($eventsource) {
-					case 'Triggers':
-						$this->zbxTestAssertElementValue('operation_opmessage_subject', 'Problem: {EVENT.NAME}');
-						break;
-					case 'Discovery':
-						$this->zbxTestAssertElementValue('operation_opmessage_subject', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
-						break;
-					case 'Auto registration':
-						$this->zbxTestAssertElementValue('operation_opmessage_subject', 'Auto registration: {HOST.HOST}');
-						break;
-					case 'Internal':
-						$this->zbxTestAssertElementValue('operation_opmessage_subject', '');
-						break;
-				}
 
 				$this->zbxTestTextPresent('Message');
 				$this->zbxTestAssertVisibleId('operation_opmessage_message');
 				$this->zbxTestAssertAttribute('//textarea[@id=\'operation_opmessage_message\']', 'rows', 7);
-				switch ($eventsource) {
-					case 'Triggers':
-						$new_operation_opmessage_message_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
-							' Problem name: {EVENT.NAME}'.
-							' Host: {HOST.NAME}'.
-							' Severity: {EVENT.SEVERITY}'.
-							' Original problem ID: {EVENT.ID}'.
-							' {TRIGGER.URL}';
-							break;
-					case 'Discovery':
-						$new_operation_opmessage_message_val = 'Discovery rule: {DISCOVERY.RULE.NAME}'.
-							' Device IP: {DISCOVERY.DEVICE.IPADDRESS}'.
-							' Device DNS: {DISCOVERY.DEVICE.DNS}'.
-							' Device status: {DISCOVERY.DEVICE.STATUS}'.
-							' Device uptime: {DISCOVERY.DEVICE.UPTIME}'.
-							' Device service name: {DISCOVERY.SERVICE.NAME}'.
-							' Device service port: {DISCOVERY.SERVICE.PORT}'.
-							' Device service status: {DISCOVERY.SERVICE.STATUS}'.
-							' Device service uptime: {DISCOVERY.SERVICE.UPTIME}';
-						break;
-					case 'Auto registration':
-						$new_operation_opmessage_message_val = 'Host name: {HOST.HOST}'.
-							' Host IP: {HOST.IP}'.
-							' Agent port: {HOST.PORT}';
-						break;
-					case 'Internal':
-						$new_operation_opmessage_message_val = "";
-						break;
-				}
-				$this->zbxTestAssertElementText('//textarea[@id=\'operation_opmessage_message\']', $new_operation_opmessage_message_val);
-				break;
-			case 'checked':
-				$this->zbxTestAssertNotVisibleId('operation_opmessage_subject');
-				$this->zbxTestAssertNotVisibleId('operation_opmessage_message');
 				break;
 			default:
 				$this->zbxTestAssertElementNotPresentId('operation_opmessage_subject');
@@ -1181,15 +1076,11 @@ class testFormAction extends CLegacyWebTest {
 						'Event acknowledged'
 				]);
 
-				$this->zbxTestAssertVisibleXpath('//label[text()="equals"]');
-
-				$this->zbxTestAssertVisibleXpath('//select[@id=\'value\']');
-				$this->zbxTestDropdownAssertSelected('value', 'Not Ack');
-				$this->zbxTestDropdownHasOptions('value', [
-						'Not Ack',
-						'Ack'
-				]);
-				$this->zbxTestClickXpathWait('//h4[text()="New condition"]//ancestor::div//button[text()="Add"]');
+				$this->zbxTestAssertVisibleXpath('//div[@id="overlay_dialogue"]//label[text()="equals"]');
+				$this->zbxTestAssertVisibleXpath('//div[@id="overlay_dialogue"]//ul[@id="value" and @class="radio-list-control"]');
+				$this->zbxTestAssertElementPresentXpath('//label[text()="No"]/../input[@checked]');
+				$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"][2]//button[text()="Add"]');
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"][2]'));
 			}
 		}
 		else {
@@ -1419,103 +1310,12 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath('//div[@id="operationTab"]//button[contains(@onclick,"cancel_new_operation")]');
 		}
 
-		if (array_key_exists('recovery_msg', $data)) {
-			$this->zbxTestTabSwitch('Recovery operations');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('r_shortdata'));
-			$recovery_msg = $data['recovery_msg'];
-		}
-		else {
-			$recovery_msg = false;
+		if (CTestArrayHelper::get($data, 'recovery_msg', false)) {
+			$this->checkRecoveryUpdateOperations($recovery_field, $eventsource);
 		}
 
-		if ($eventsource == 'Triggers' || $eventsource == 'Internal') {
-			$this->zbxTestAssertElementPresentId('tab_recoveryOperationTab');
-		}
-		else {
-			$this->zbxTestTextNotPresent('Recovery operations');
-			$this->zbxTestAssertElementNotPresentId('tab_recoveryOperationTab');
-		}
-
-		if ($recovery_msg == true) {
-			$this->zbxTestTextPresent('Default subject');
-			$this->zbxTestAssertVisibleId('r_shortdata');
-			$this->zbxTestAssertAttribute('//input[@id="r_shortdata"]', 'maxlength', 255);
-			$this->zbxTestAssertAttribute('//input[@id="r_shortdata"]', 'size', 20);
-			switch ($eventsource) {
-				case 'Triggers':
-					$this->zbxTestAssertElementValue('r_shortdata', 'Resolved: {EVENT.NAME}');
-					break;
-				case 'Internal':
-					$this->zbxTestAssertElementValue('r_shortdata', '');
-					break;
-			}
-
-			$this->zbxTestTextPresent('Default message');
-			$this->zbxTestAssertVisibleId('r_longdata');
-			$this->zbxTestAssertAttribute('//textarea[@id="r_longdata"]', 'rows', 7);
-			switch ($eventsource) {
-				case 'Triggers':
-					$r_longdata_val = 'Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}'.
-						' Problem name: {EVENT.NAME}'.
-						' Host: {HOST.NAME}'.
-						' Severity: {EVENT.SEVERITY}'.
-						' Original problem ID: {EVENT.ID}'.
-						' {TRIGGER.URL}';
-						break;
-				case 'Internal':
-					$r_longdata_val = "";
-					break;
-			}
-			$this->zbxTestAssertElementText('//textarea[@id="r_longdata"]', $r_longdata_val);
-		}
-		elseif ($eventsource == 'Triggers' || $eventsource == 'Internal') {
-			$this->zbxTestAssertNotVisibleId('r_shortdata');
-			$this->zbxTestAssertNotVisibleId('r_longdata');
-		}
-		else {
-			$this->zbxTestAssertElementNotPresentId('r_shortdata');
-			$this->zbxTestAssertElementNotPresentId('r_longdata');
-		}
-
-		if (array_key_exists('acknowledge_msg', $data)) {
-			$this->zbxTestTabSwitch('Update operations');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('ack_shortdata'));
-			$acknowledge_msg = $data['acknowledge_msg'];
-		}
-		else {
-			$acknowledge_msg = false;
-		}
-
-		if ($eventsource == 'Triggers') {
-			$this->zbxTestAssertElementPresentId('tab_acknowledgeTab');
-		}
-		else {
-			$this->zbxTestTextNotPresent('Update operations');
-			$this->zbxTestAssertElementNotPresentId('tab_acknowledgeTab');
-		}
-
-		if ($acknowledge_msg == true) {
-			$this->zbxTestTextPresent('Default subject');
-			$this->zbxTestAssertVisibleId('ack_shortdata');
-			$this->zbxTestAssertAttribute('//input[@id="ack_shortdata"]', 'maxlength', 255);
-			$this->zbxTestAssertAttribute('//input[@id="ack_shortdata"]', 'size', 20);
-			$this->zbxTestAssertElementValue('ack_shortdata', 'Updated problem: {EVENT.NAME}');
-
-			$this->zbxTestTextPresent('Default message');
-			$this->zbxTestAssertVisibleId('ack_longdata');
-			$this->zbxTestAssertAttribute('//textarea[@id="ack_longdata"]', 'rows', 7);
-			$ack_longdata_val = '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.'.
-						' {EVENT.UPDATE.MESSAGE}'.
-						' Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.';
-			$this->zbxTestAssertElementText('//textarea[@id="ack_longdata"]', $ack_longdata_val);
-		}
-		elseif ($eventsource == 'Triggers') {
-			$this->zbxTestAssertNotVisibleId('ack_shortdata');
-			$this->zbxTestAssertNotVisibleId('ack_longdata');
-		}
-		else {
-			$this->zbxTestAssertElementNotPresentId('ack_shortdata');
-			$this->zbxTestAssertElementNotPresentId('ack_longdata');
+		if (CTestArrayHelper::get($data, 'acknowledge_msg', false)) {
+			$this->checkRecoveryUpdateOperations($update_field, $eventsource);
 		}
 
 		$this->zbxTestAssertVisibleId('add');
@@ -1523,6 +1323,28 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestAssertVisibleId('cancel');
 		$this->zbxTestAssertAttribute('//button[@id=\'cancel\']', 'name', 'cancel');
+	}
+
+	/*
+	 * Function that checks possible operation types and custom message related fields for recovery and update operations.
+	 */
+	private function checkRecoveryUpdateOperations($operation_field, $eventsource) {
+		$operation_field->query('button:Add')->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$operation_details = $this->query('name:popup.operation')->asForm()->one();
+		// Check available operation types depending on event source and the selected operation type.
+		$message_types = ($eventsource === 'Triggers') ? ['Send message', 'Remote command', 'Notify all involved'] :
+				['Send message', 'Notify all involved'];
+		$this->zbxTestDropdownHasOptions('operationtype', $message_types);
+		$this->assertEquals('Send message', $operation_details->getField('Operation type')->getValue());
+		// Make sure that Custom message is unchecked and that message related fields are not visible.
+		$this->assertFalse($operation_details->getField('Custom message')->getValue());
+		$this->zbxTestTextNotVisibleOnPage('Subject','Message');
+		// Set the Custom message option and check Subject and Message fields.
+		$operation_details->getField('Custom message')->set(true);
+		$this->assertEquals(255, $operation_details->getField('Subject')->waitUntilVisible()->getAttribute('maxlength'));
+		$this->assertFalse($operation_details->getField('Message')->isAttributePresent('maxlength'));
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function update() {
@@ -1537,7 +1359,7 @@ class testFormAction extends CLegacyWebTest {
 		$eventsource = $data['eventsource'];
 
 		if ($name == 'Auto discovery. Linux servers.') {
-			$sqlActions = "SELECT actionid,name,eventsource,evaltype,status,def_shortdata,def_longdata,r_shortdata,r_longdata FROM actions ORDER BY actionid";
+			$sqlActions = "SELECT actionid,name,eventsource,evaltype,status FROM actions ORDER BY actionid";
 		}
 		else {
 			$sqlActions = "SELECT * FROM actions ORDER BY actionid";
@@ -1552,8 +1374,8 @@ class testFormAction extends CLegacyWebTest {
 			case EVENT_SOURCE_DISCOVERY:
 				$this->query('id:page-title-general')->asPopupButton()->one()->select('Discovery actions');
 				break;
-			case EVENT_SOURCE_AUTO_REGISTRATION:
-				$this->query('id:page-title-general')->asPopupButton()->one()->select('Auto registration actions');
+			case EVENT_SOURCE_AUTOREGISTRATION:
+				$this->query('id:page-title-general')->asPopupButton()->one()->select('Autoregistration actions');
 				break;
 			case EVENT_SOURCE_INTERNAL;
 				$this->query('id:page-title-general')->asPopupButton()->one()->select('Internal actions');
@@ -1582,8 +1404,6 @@ class testFormAction extends CLegacyWebTest {
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'name' => 'TestFormAction Triggers 001',
 				'esc_period' => '123',
-				'def_shortdata' => 'def_shortdata',
-				'def_longdata' => 'def_longdata',
 				'conditions' => [
 					[
 						'type' => 'Trigger name',
@@ -1598,7 +1418,7 @@ class testFormAction extends CLegacyWebTest {
 						'value' => 'application',
 					],
 					[
-						'type' => 'Tag',
+						'type' => 'Tag name',
 						'operator' => 'does not contain',
 						'value' => 'Does not contain Tag',
 					],
@@ -1619,8 +1439,6 @@ class testFormAction extends CLegacyWebTest {
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'name' => '',
 				'esc_period' => '123',
-				'def_shortdata' => 'def_shortdata',
-				'def_longdata' => 'def_longdata',
 				'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
@@ -1630,8 +1448,6 @@ class testFormAction extends CLegacyWebTest {
 				'expected' => ACTION_GOOD,
 				'eventsource' => EVENT_SOURCE_DISCOVERY,
 				'name' => 'TestFormAction Discovery 001',
-				'def_shortdata' => 'def_shortdata',
-				'def_longdata' => 'def_longdata',
 				'conditions' => [
 					[
 						'type' => 'Service type',
@@ -1658,8 +1474,6 @@ class testFormAction extends CLegacyWebTest {
 				'expected' => ACTION_BAD,
 				'eventsource' => EVENT_SOURCE_DISCOVERY,
 				'name' => '',
-				'def_shortdata' => 'def_shortdata',
-				'def_longdata' => 'def_longdata',
 				'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
@@ -1667,10 +1481,8 @@ class testFormAction extends CLegacyWebTest {
 			]],
 			[[
 				'expected' => ACTION_GOOD,
-				'eventsource' => EVENT_SOURCE_AUTO_REGISTRATION,
-				'name' => 'TestFormAction Auto registration 001',
-				'def_shortdata' => 'def_shortdata',
-				'def_longdata' => 'def_longdata',
+				'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+				'name' => 'TestFormAction Autoregistration 001',
 				'conditions' => [
 					[
 						'type' => 'Host name',
@@ -1695,10 +1507,8 @@ class testFormAction extends CLegacyWebTest {
 			]],
 			[[
 				'expected' => ACTION_BAD,
-				'eventsource' => EVENT_SOURCE_AUTO_REGISTRATION,
+				'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 				'name' => '',
-				'def_shortdata' => 'def_shortdata',
-				'def_longdata' => 'def_longdata',
 				'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
@@ -1709,8 +1519,6 @@ class testFormAction extends CLegacyWebTest {
 				'eventsource' => EVENT_SOURCE_INTERNAL,
 				'name' => 'TestFormAction Internal 001',
 				'esc_period' => '123',
-				'def_shortdata' => 'def_shortdata',
-				'def_longdata' => 'def_longdata',
 				'conditions' => [
 					[
 						'type' => 'Event type',
@@ -1733,8 +1541,6 @@ class testFormAction extends CLegacyWebTest {
 				'eventsource' => EVENT_SOURCE_INTERNAL,
 				'name' => '',
 				'esc_period' => '123',
-				'def_shortdata' => 'def_shortdata',
-				'def_longdata' => 'def_longdata',
 				'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
@@ -1760,22 +1566,24 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['conditions'])) {
 			foreach ($data['conditions'] as $condition) {
-				$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $condition['type']);
+				$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+				$this->zbxTestDropdownSelectWait('condition_type', $condition['type']);
+				COverlayDialogElement::find()->one()->waitUntilReady();
 				switch ($condition['type']) {
 					case 'Application':
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
-					case 'Tag':
-					case 'Received value':
+					case 'Tag name':
 						if (array_key_exists('operator', $condition)) {
-							$this->zbxTestDropdownSelectWait('new_condition_operator', $condition['operator']);
+							$this->zbxTestClickXpathWait('//label[text()="'.$condition['operator'].'"]');
 						}
-						$this->zbxTestInputTypeWait('new_condition_value', $condition['value']);
-						$this->zbxTestClickXpathWait('//div[@id="actionTab"]//button[contains(@onclick, "add_condition")]');
+						$this->zbxTestInputTypeWait('value', $condition['value']);
+						$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 						switch($condition['type']){
 							case 'Application':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Application equals '.$condition['value']);
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Application equals '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Host name':
@@ -1787,29 +1595,35 @@ class testFormAction extends CLegacyWebTest {
 								$conditionCount++;
 								break;
 							case 'Trigger name':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Trigger name contains '.$condition['value']);
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Trigger name contains '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Tag':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Tag does not contain '.$condition['value']);
-								$conditionCount++;
-								break;
-							case 'Received value':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Received value does not contain '.$condition['value']);
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Tag does not contain '.$condition['value']);
 								$conditionCount++;
 								break;
 						}
 						break;
+					case 'Received value':
+						$this->zbxTestDropdownSelect('operator', $condition['operator']);
+						$this->zbxTestInputTypeWait('value', $condition['value']);
+						$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
+
+						$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Received value does not contain '.$condition['value']);
+						$conditionCount++;
+						break;
 					case 'Trigger severity':
-					case 'Service type':
+						$this->zbxTestClickXpathWait('//label[text()="'.$condition['value'].'"]');
+						$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
+
+						$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Trigger severity equals '.$condition['value']);
+						$conditionCount++;
+						break;
 					case 'Event type':
-						$this->zbxTestDropdownSelect('new_condition_value', $condition['value']);
-						$this->zbxTestDoubleClickXpath('//div[@id="actionTab"]//button[contains(@onclick, "add_condition")]', 'conditions_'.$conditionCount);
+					case 'Service type':
+						$this->zbxTestDropdownSelectWait('value', $condition['value']);
+						$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 						switch($condition['type']){
-							case 'Trigger severity':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Trigger severity equals '.$condition['value']);
-								$conditionCount++;
-								break;
 							case 'Service type':
 								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Service type equals '.$condition['value']);
 								$conditionCount++;
@@ -1826,16 +1640,6 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['operations'])) {
 			$this->zbxTestTabSwitch('Operations');
-
-			if (isset($data['def_shortdata'])){
-				$this->zbxTestInputTypeOverwrite('def_shortdata', $data['def_shortdata']);
-				$this->zbxTestAssertElementValue('def_shortdata', $data['def_shortdata']);
-			}
-
-			if (isset($data['def_longdata'])){
-				$this->zbxTestInputTypeOverwrite('def_longdata', $data['def_longdata']);
-				$this->zbxTestAssertElementValue('def_longdata', $data['def_longdata']);
-			}
 
 			foreach ($data['operations'] as $operation) {
 				$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
@@ -1865,6 +1669,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('operations_0'));
 			}
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_bg'));
 		}
 
 		if (isset($data['esc_period'])){
@@ -1877,6 +1682,7 @@ class testFormAction extends CLegacyWebTest {
 			);
 			$this->zbxTestWaitForPageToLoad();
 		}
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
 		$this->query('xpath://button[@id="add"]')->waitUntilClickable()->one()->click();
 		switch ($data['expected']) {
 			case ACTION_GOOD:
@@ -1905,24 +1711,30 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestInputTypeWait('name', 'action test');
 
 // adding conditions
-		$this->zbxTestInputTypeWait('new_condition_value', 'trigger');
-		$this->zbxTestClickXpathWait('//div[@id="actionTab"]//button[contains(@onclick, "add_condition")]');
-		$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Trigger name contains trigger');
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestLaunchOverlayDialog('New condition');
+		$this->zbxTestDropdownSelectWait('condition_type', 'Trigger name');
+		$this->zbxTestInputTypeWait('value', 'trigger');
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
+		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Trigger name contains trigger');
 
-		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Trigger severity');
-		$this->zbxTestDropdownSelect('new_condition_value', 'Average');
-		$this->zbxTestClickXpathWait('//div[@id="actionTab"]//button[contains(@onclick, "add_condition")]');
-		$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger severity equals Average');
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestLaunchOverlayDialog('New condition');
+		$this->zbxTestDropdownSelectWait('condition_type', 'Trigger severity');
+		$this->zbxTestClickXpathWait('//label[text()="Average"]');
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
+		$this->zbxTestAssertElementText("//tr[@id='conditions_1']/td[2]", 'Trigger severity equals Average');
 
-		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Application');
-		$this->zbxTestInputTypeWait('new_condition_value', 'app');
-		$this->zbxTestClickXpathWait('//div[@id="actionTab"]//button[contains(@onclick, "add_condition")]');
-		$this->zbxTestAssertElementText('//tr[@id="conditions_2"]/td[2]', 'Application equals app');
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestLaunchOverlayDialog('New condition');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+		$this->zbxTestDropdownSelectWait('condition_type', 'Application');
+		$this->zbxTestInputTypeWait('value', 'app');
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
+		$this->zbxTestAssertElementText("//tr[@id='conditions_2']/td[2]", 'Application equals app');
 
 // adding operations
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestInputTypeWait('def_shortdata', 'subject');
-		$this->zbxTestInputType('def_longdata', 'message');
 		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
@@ -1963,6 +1775,8 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestInputType('operation_opcommand_command', 'command');
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->page->waitUntilReady();
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
@@ -1984,6 +1798,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestInputType('operation_opcommand_port', '123');
 		$this->zbxTestInputType('operation_opcommand_command', 'command ssh');
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+		$this->page->waitUntilReady();
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");

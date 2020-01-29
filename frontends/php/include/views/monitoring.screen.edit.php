@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ if (!$data['form_refresh']) {
 	$tabs->setSelected(0);
 }
 
-if ($data['screen']['templateid']) {
+if (array_key_exists('templateid', $data['screen'])) {
 	$widget->addItem(get_header_host_table('screens', $data['screen']['templateid']));
 }
 
@@ -39,7 +39,7 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
-if ($data['screen']['templateid'] != 0) {
+if (array_key_exists('templateid', $data['screen'])) {
 	$form->addVar('templateid', $data['screen']['templateid']);
 }
 else {
@@ -56,7 +56,7 @@ $user_type = CWebUser::getType();
 // Create screen form list.
 $screen_tab = (new CFormList());
 
-if (!$data['screen']['templateid']) {
+if (!array_key_exists('templateid', $data['screen'])) {
 	// Screen owner multiselect.
 	$multiselect_data = [
 		'name' => 'userid',
@@ -118,7 +118,7 @@ $screen_tab->addRow(
 
 // append tab to form
 $tabs->addTab('screen_tab', _('Screen'), $screen_tab);
-if (!$data['screen']['templateid']) {
+if (!array_key_exists('templateid', $data['screen'])) {
 	// User group sharing table.
 	$user_group_shares_table = (new CTable())
 		->setHeader([_('User groups'), _('Permissions'), _('Action')])

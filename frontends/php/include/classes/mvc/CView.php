@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ class CView {
 	 * @throws Exception if invalid filename or file does not exist.
 	 */
 	public function assign($view) {
-		if (!preg_match("/[a-z\.]+/", $view)) {
+		if (!preg_match("/^[a-z\.]+$/", $view)) {
 			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and ".".', $view));
 		}
 

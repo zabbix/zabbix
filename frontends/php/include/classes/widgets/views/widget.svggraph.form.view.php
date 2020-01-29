@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,8 +89,8 @@ $scripts[] =
 			'data = {'.
 				'uniqueid: 0,'.
 				'preview: 1,'.
-				'content_width: $preview.width(),'.
-				'content_height: $preview.height() - 10'.
+				'content_width: Math.floor($preview.width()),'.
+				'content_height: Math.floor($preview.height()) - 10'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
 
@@ -260,7 +260,7 @@ $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 $tab_overrides = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['or']), CWidgetHelper::getGraphOverride($fields['or'], $form_name));
 
-$scripts[] = CWidgetHelper::getGraphOverrideJavascript($fields['or'], $form_name);
+$scripts[] = CWidgetHelper::getGraphOverrideJavascript($fields['or']);
 $jq_templates['overrides-row'] = CWidgetHelper::getGraphOverrideTemplate($fields['or'], $form_name);
 
 // Create CTabView.
@@ -273,7 +273,7 @@ $form_tabs = (new CTabView())
 	->addTab('problems',  _('Problems'), $tab_problems)
 	->addTab('overrides',  _('Overrides'), $tab_overrides)
 	->addClass('graph-widget-config-tabs') // Add special style used for graph widget tabs only.
-	->onTabChange('jQuery.colorpicker("hide");')
+	->onTabChange('jQuery.colorpicker("hide");jQuery(window).trigger("resize");')
 	->setSelected(0);
 
 // Add CTabView to form.

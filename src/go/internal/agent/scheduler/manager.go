@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/glexpr"
@@ -132,11 +133,16 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 
 	for _, r := range update.requests {
 		var key string
+		var params []string
 		var err error
 		var p *pluginAgent
 		r.Key = m.getAlias(r.Key)
-		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
-			if p, ok = m.plugins[key]; !ok {
+		if key, params, err = itemutil.ParseKey(r.Key); err == nil {
+			p, ok = m.plugins[key]
+			if ok {
+				ok = keyaccess.CheckRules(key, params)
+			}
+			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
 				err = c.addRequest(p, r, update.sink, now)
@@ -403,7 +409,7 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (result string,
 	var lastLogsize uint64
 	var mtime int
 
-	w := make(resultWriter)
+	w := make(resultWriter, 1)
 	m.UpdateTasks(0, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
 
 	select {

@@ -46,6 +46,7 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 					&& type != <?= ITEM_TYPE_DB_MONITOR ?>
 					&& type != <?= ITEM_TYPE_SNMPTRAP ?>
 					&& type != <?= ITEM_TYPE_JMX ?>
+					&& type != <?= ITEM_TYPE_IPMI ?>
 			)
 
 			if ((type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>)) {

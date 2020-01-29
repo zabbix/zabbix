@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,19 +77,24 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for Ajax map element menu popup.
 	 *
-	 * @param string $sysmapid
-	 * @param string $selementid
-	 * @param int    $severity_min
-	 * @param string $hostid
+	 * @param string $sysmapid                   Map ID.
+	 * @param array  $selement                   Map element data (ID, type, URLs, etc...).
+	 * @param string $selement[selementid_orig]  Map element ID.
+	 * @param string $selement[elementtype]      Map element type (host, map, trigger, host group, image).
+	 * @param string $selement[urls]             Map element URLs.
+	 * @param int    $severity_min               Minimum severity.
+	 * @param string $hostid                     Host ID.
 	 *
 	 * @return array
 	 */
-	public static function getMapElement($sysmapid, $selementid, $severity_min, $hostid) {
+	public static function getMapElement($sysmapid, $selement, $severity_min, $hostid) {
 		$data = [
 			'type' => 'map_element',
 			'data' => [
 				'sysmapid' => $sysmapid,
-				'selementid' => $selementid
+				'selementid' => $selement['selementid_orig'],
+				'elementtype' => $selement['elementtype'],
+				'urls' => $selement['urls']
 			]
 		];
 

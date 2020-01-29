@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,10 +133,10 @@ Curl.prototype = {
 
 	addSID: function() {
 		var sid = '';
-		var possition = parseInt(location.href.indexOf('sid='));
+		var position = parseInt(location.href.indexOf('sid='));
 
-		if (possition > -1) {
-			sid = location.href.substr(possition + 4, 16);
+		if (position > -1) {
+			sid = location.href.substr(position + 4, 16);
 		}
 		else {
 			sid = jQuery('meta[name="csrf-token"]').attr('content');

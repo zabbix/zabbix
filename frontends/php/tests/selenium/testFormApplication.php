@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,7 +143,7 @@ class testFormApplication extends CLegacyWebTest {
 	public function testFormApplication_Update() {
 		$suffix = ' (updated)';
 
-		// Update is perfomed mutiple times to assure that consequential updates are not broken.
+		// Update performing multiple times to assure that consequential updates are not broken.
 		for ($i = 0; $i < 3; $i++) {
 			$this->updateApplication(self::$application, self::$application.$suffix);
 

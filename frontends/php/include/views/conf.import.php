@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,6 +92,12 @@ foreach ($titles as $key => $title) {
 				&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
 			$cbDeleted->setAttribute('disabled', 'disabled');
 		}
+
+		if ($key === 'templateLinkage') {
+			$cbDeleted->onClick('updateWarning(this, '.CJs::encodeJson(
+				_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
+			).')');
+		}
 	}
 
 	$rulesTable->addRow([
@@ -123,7 +129,7 @@ $tab_view->setFooter(makeFormFooter(
 
 $form = (new CForm('post', null, 'multipart/form-data'))
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('backurl', $data['backurl'])
+	->addVar('rules_preset', $data['rules_preset'])
 	->addItem($tab_view);
 
 // widget

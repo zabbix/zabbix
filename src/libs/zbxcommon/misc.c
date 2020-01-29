@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -164,7 +164,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 {
 	static ZBX_THREAD_LOCAL zbx_timespec_t	last_ts = {0, 0};
 	static ZBX_THREAD_LOCAL int		corr = 0;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	static ZBX_THREAD_LOCAL LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;
 #else
@@ -174,7 +174,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	struct timespec	tp;
 #	endif
 #endif
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 
 	if (0 == tickPerSecond.QuadPart)
 		QueryPerformanceFrequency(&tickPerSecond);
@@ -346,7 +346,7 @@ static int	is_leap_year(int year)
  ******************************************************************************/
 void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 {
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	struct _timeb	current_time;
 
 	_ftime(&current_time);
@@ -367,7 +367,7 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 #	define ZBX_UTC_OFF	offset
 		long		offset;
 		struct tm	tm_utc;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 		tm_utc = *gmtime(&current_time.time);	/* gmtime() cannot return NULL if called with valid parameter */
 #else
 		gmtime_r(&current_time.tv_sec, &tm_utc);
@@ -2823,7 +2823,7 @@ int	is_time_suffix(const char *str, int *value, int length)
 	return SUCCEED;
 }
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 int	_wis_uint(const wchar_t *wide_string)
 {
 	const wchar_t	*wide_char = wide_string;
@@ -3681,7 +3681,7 @@ void	zbx_alarm_flag_clear(void)
 	zbx_timed_out = 0;
 }
 
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 unsigned int	zbx_alarm_on(unsigned int seconds)
 {
 	zbx_alarm_flag_clear();

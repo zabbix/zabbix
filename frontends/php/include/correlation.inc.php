@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ function corrConditionOperatorToString($operator) {
  */
 function corrConditionTypes($type = null) {
 	$types = [
-		ZBX_CORR_CONDITION_OLD_EVENT_TAG => _('Old event tag'),
-		ZBX_CORR_CONDITION_NEW_EVENT_TAG => _('New event tag'),
+		ZBX_CORR_CONDITION_OLD_EVENT_TAG => _('Old event tag name'),
+		ZBX_CORR_CONDITION_NEW_EVENT_TAG => _('New event tag name'),
 		ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP => _('New event host group'),
 		ZBX_CORR_CONDITION_EVENT_TAG_PAIR => _('Event tag pair'),
 		ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE => _('Old event tag value'),
@@ -194,12 +194,12 @@ function getCorrConditionDescription(array $condition, array $values) {
 
 	switch ($condition['type']) {
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
-			$description[] = _('Old event tag').' '.corrConditionOperatorToString($condition['operator']).' ';
+			$description[] = _('Old event tag name').' '.corrConditionOperatorToString($condition['operator']).' ';
 			$description[] = italic(CHtml::encode($values['tag']));
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-			$description[] = _('New event tag').' '.corrConditionOperatorToString($condition['operator']).' ';
+			$description[] = _('New event tag name').' '.corrConditionOperatorToString($condition['operator']).' ';
 			$description[] = italic(CHtml::encode($values['tag']));
 			break;
 
@@ -209,21 +209,22 @@ function getCorrConditionDescription(array $condition, array $values) {
 			break;
 
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-			$description[] = _('Old event tag').' ';
+			$description[] = _('Value of old event tag').' ';
 			$description[] = italic(CHtml::encode($values['oldtag']));
-			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' '._('new event tag').' ';
+			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' '.
+				_('value of new event tag').' ';
 			$description[] = italic(CHtml::encode($values['newtag']));
 			break;
 
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-			$description[] = _('Old event tag').' ';
+			$description[] = _('Value of old event tag').' ';
 			$description[] = italic(CHtml::encode($values['tag']));
 			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' ';
 			$description[] = italic(CHtml::encode($values['value']));
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-			$description[] = _('New event tag').' ';
+			$description[] = _('Value of new event tag').' ';
 			$description[] = italic(CHtml::encode($values['tag']));
 			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' ';
 			$description[] = italic(CHtml::encode($values['value']));

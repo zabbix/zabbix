@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -554,7 +554,7 @@ var hintBox = {
 			top = scrollTop + target.clientY + 10;
 		}
 
-		// fallback if doesn't fit verticaly but could fit if aligned to right or left
+		// fallback if doesn't fit vertically but could fit if aligned to right or left
 		if ((top - scrollTop + hint_height > wHeight)
 				&& (target.clientX - 10 > hint_width || wWidth - target.clientX - 10 > hint_width)) {
 
@@ -854,6 +854,7 @@ function getConditionFormula(conditions, evalType) {
 		return this.each(function() {
 			var table = $(this);
 
+			// If options.remove_next_sibling is true, counter counts each row making the next index twice as large (bug).
 			table.data('dynamicRows', {
 				counter: (options.counter !== null) ? options.counter : $(options.row, table).length
 			});

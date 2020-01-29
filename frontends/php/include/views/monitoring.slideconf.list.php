@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,14 +58,16 @@ $widget->addItem(
 $form = (new CForm())->setName('slideForm');
 
 // create table
+$url = (new CUrl('slideconf.php'))->getUrl();
+
 $slidesTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_shows'))->onClick("checkAll('".$form->getName()."', 'all_shows', 'shows');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'], $url),
 		_('Actions')
 	]);
 

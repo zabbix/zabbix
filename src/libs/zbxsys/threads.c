@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,28 @@
 #include "log.h"
 #include "threads.h"
 
-#if !defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
+int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
+
+static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
+{
+	__try
+	{
+		zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
+
+		return thread_args->entry(thread_args);
+	}
+	__except(zbx_win_exception_filter(GetExceptionCode(), GetExceptionInformation()))
+	{
+		zbx_thread_exit(EXIT_SUCCESS);
+	}
+}
+
+void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
+{
+	_endthreadex(SUCCEED);
+}
+#else
 /******************************************************************************
  *                                                                            *
  * Function: zbx_fork                                                         *
@@ -77,27 +98,6 @@ void	zbx_child_fork(pid_t *pid)
 	if (0 == *pid)
 		signal(SIGCHLD, SIG_DFL);
 }
-#else
-int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
-
-static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
-{
-	__try
-	{
-		zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
-
-		return thread_args->entry(thread_args);
-	}
-	__except(zbx_win_exception_filter(GetExceptionCode(), GetExceptionInformation()))
-	{
-		zbx_thread_exit(EXIT_SUCCESS);
-	}
-}
-
-void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
-{
-	_endthreadex(SUCCEED);
-}
 #endif
 
 /******************************************************************************
@@ -118,7 +118,7 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
  ******************************************************************************/
 void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args, ZBX_THREAD_HANDLE *thread)
 {
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	unsigned		thrdaddr;
 
 	thread_args->entry = handler;
@@ -165,7 +165,8 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 {
 	int	status = 0;	/* significant 8 bits of the status */
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	DWORD	dwstatus;
 
 	if (WAIT_OBJECT_0 != WaitForSingleObject(thread, INFINITE))
 	{
@@ -173,7 +174,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 		return ZBX_THREAD_ERROR;
 	}
 
-	if (0 == GetExitCodeThread(thread, &status))
+	if (0 == GetExitCodeThread(thread, &dwstatus))
 	{
 		zbx_error("Error on thread exit code receiving. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
@@ -184,6 +185,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 		zbx_error("Error on thread closing. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
+	status = dwstatus;
 
 #else	/* not _WINDOWS */
 
@@ -241,7 +243,7 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, int ret)
 void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)
 {
 	int		i;
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t	set;
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
@@ -283,7 +285,7 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 
 long int	zbx_get_thread_id(void)
 {
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	return (long int)GetCurrentThreadId();
 #else
 	return (long int)getpid();

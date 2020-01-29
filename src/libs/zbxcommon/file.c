@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,11 @@
 **/
 
 #include "common.h"
+#include "zbxtypes.h"
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#include "symbols.h"
+
 int	__zbx_open(const char *pathname, int flags)
 {
 	int	ret;
@@ -99,19 +102,20 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
  ******************************************************************************/
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 {
-	size_t		i, szbyte, nbytes;
+	size_t		i, szbyte;
+	ssize_t		nbytes;
 	const char	*cr, *lf;
 	zbx_offset_t	offset;
 
 	if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 		return -1;
 
-	if (0 >= (nbytes = read(fd, buf, (unsigned int)count)))
+	if (0 >= (nbytes = read(fd, buf, count)))
 		return (int)nbytes;
 
 	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
-	for (i = 0; i <= nbytes - szbyte; i += szbyte)
+	for (i = 0; i <= (size_t)nbytes - szbyte; i += szbyte)
 	{
 		if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
 		{
@@ -122,7 +126,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		if (0 == memcmp(&buf[i], cr, szbyte))	/* CR (Mac) */
 		{
 			/* CR+LF (Windows) ? */
-			if (i < nbytes - szbyte && 0 == memcmp(&buf[i + szbyte], lf, szbyte))
+			if (i < (size_t)nbytes - szbyte && 0 == memcmp(&buf[i + szbyte], lf, szbyte))
 				i += szbyte;
 
 			i += szbyte;
@@ -145,3 +149,70 @@ int	zbx_is_regular_file(const char *path)
 
 	return FAIL;
 }
+
+#ifndef _WINDOWS
+int	zbx_get_file_time(const char *path, zbx_file_time_t *time)
+{
+	zbx_stat_t	buf;
+
+	if (0 != zbx_stat(path, &buf))
+		return FAIL;
+
+	time->access_time = (zbx_fs_time_t)buf.st_atime;
+	time->modification_time = (zbx_fs_time_t)buf.st_mtime;
+	time->change_time = (zbx_fs_time_t)buf.st_ctime;
+
+	return SUCCEED;
+}
+#else	/* _WINDOWS */
+static	int	get_file_time_stat(const char *path, zbx_file_time_t *time)
+{
+	zbx_stat_t	buf;
+
+	if (0 != zbx_stat(path, &buf))
+		return FAIL;
+
+	time->modification_time = buf.st_mtime;
+	time->access_time = buf.st_atime;
+
+	/* On Windows st_ctime stores file creation time, not the last change timestamp. */
+	/* Assigning st_atime to change_time as the closest one.                         */
+	time->change_time = buf.st_atime;
+
+	return SUCCEED;
+}
+
+int	zbx_get_file_time(const char *path, zbx_file_time_t *time)
+{
+	int			f = -1, ret = SUCCEED;
+	intptr_t		h;
+	ZBX_FILE_BASIC_INFO	info;
+
+	if (NULL == zbx_GetFileInformationByHandleEx || -1 == (f = zbx_open(path, O_RDONLY)))
+		return get_file_time_stat(path, time); /* fall back to stat() */
+
+	if (-1 == (h = _get_osfhandle(f)) ||
+			0 == zbx_GetFileInformationByHandleEx((HANDLE)h, zbx_FileBasicInfo, &info, sizeof(info)))
+	{
+		ret = FAIL;
+		goto out;
+	}
+
+#define WINDOWS_TICK 10000000
+#define SEC_TO_UNIX_EPOCH 11644473600LL
+
+	/* Convert 100-nanosecond intervals since January 1, 1601 (UTC) to epoch */
+	time->modification_time = info.LastWriteTime.QuadPart / WINDOWS_TICK - SEC_TO_UNIX_EPOCH;
+	time->access_time = info.LastAccessTime.QuadPart / WINDOWS_TICK - SEC_TO_UNIX_EPOCH;
+	time->change_time = info.ChangeTime.QuadPart / WINDOWS_TICK - SEC_TO_UNIX_EPOCH;
+
+#undef WINDOWS_TICK
+#undef SEC_TO_UNIX_EPOCH
+
+out:
+	if (-1 != f)
+		close(f);
+
+	return ret;
+}
+#endif	/* _WINDOWS */

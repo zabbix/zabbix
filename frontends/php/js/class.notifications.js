@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -322,7 +322,7 @@ ZBX_Notifications.prototype.becomeActive = function() {
 
 /**
  * Notification instance may only ever become inactive when another instance becomes active. At single tab unload case
- * various artifacts like seek position are transfered explicitly.
+ * various artifacts like seek position are transferred explicitly.
  */
 ZBX_Notifications.prototype.becomeInactive = function() {
 	if (this.active) {
@@ -384,7 +384,7 @@ ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
  * Latter is always assumed, so when navigating active tab, focus is deligated onto to any tab if possible,
  * then this tab might reclaim focus again at construction if during during that time document has focus.
  * At slow connection during page navigation there will be another active tab polling for notifications (if multitab).
- * Here `tab` is refered as ZBX_Notifications instance and `focus` - wheather instance is `active` (not focused).
+ * Here `tab` is referred as ZBX_Notifications instance and `focus` - whether instance is `active` (not focused).
  *
  * @param {ZBX_BrowseTab} removed_tab  Current tab instance.
  * @param {array} other_tabids  List of alive tab ids (wuthout current tabid).
@@ -882,7 +882,8 @@ ZBX_NotificationsAlarm.prototype.produce = function() {
 		muted: this.muted,
 		severity: this.severity,
 		seek: this.player.getSeek(),
-		timeout: this.player.getTimeout()
+		timeout: this.player.getTimeout(),
+		supported: !! this.player.audio
 	};
 };
 

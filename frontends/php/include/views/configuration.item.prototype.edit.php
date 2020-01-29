@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -512,11 +512,8 @@ $form_list
 	->addRow(_('Port'),
 		(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_port'
 	)
-	->addRow(
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setAsteriskMark(),
-		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
+	->addRow(_('IPMI sensor'),
+		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_ipmi_sensor'
 	)
 	// Append authentication method to form list.
@@ -710,7 +707,10 @@ else {
 
 $form_list
 	->addRow(_('Show value'), [$valuemapComboBox, SPACE,
-		(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')], 'row_valuemap'
+		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.list')
+			->getUrl()
+		))->setAttribute('target', '_blank')], 'row_valuemap'
 	)
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),

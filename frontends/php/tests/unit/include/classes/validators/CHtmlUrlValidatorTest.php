@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 			['http://zabbix.com',				[], true],
 			['https://zabbix.com',				[], true],
 			['zabbix.php?a=1',					[], true],
-			['adm.images.php?a=1',				[], true],
+			['zabbix.php?action=image.list',	[], true],
 			['chart_bar.php?a=1&b=2',			[], true],
 			['mailto:example@example.com',		[], true],
 			['file://localhost/path',			[], true],

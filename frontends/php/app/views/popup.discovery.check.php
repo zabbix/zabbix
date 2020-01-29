@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,7 @@ $form = (new CForm())
 	->cleanItems()
 	->setName('dcheck_form')
 	->addVar('action', 'popup.discovery.check')
-	->addVar('validate', 1)
-	->addVar('index', $data['index']);
+	->addVar('validate', 1);
 
 if ($data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
@@ -36,7 +35,7 @@ if ($data['params']['dcheckid']) {
 $form_list = (new CFormList())
 	->cleanItems()
 	->addRow(new CLabel(_('Check type'), 'type'),
-		(new CComboBox('type', $data['params']['type'], 'setDCheckDefaultPort()', $discovery_ckeck_types))
+		(new CComboBox('type', $data['params']['type'], '', $discovery_ckeck_types))
 	)
 	->addRow((new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
 		(new CTextBox('ports', $data['params']['ports']))

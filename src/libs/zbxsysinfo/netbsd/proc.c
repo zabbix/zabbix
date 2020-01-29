@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,7 +298,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 						stat_ok = 1;
 					break;
 				case ZBX_PROC_STAT_ZOMB:
-					if (SZOMB == pproc->p_stat || LSDEAD == pproc->p_stat)
+					if (0 != P_ZOMBIE(pproc))
 						stat_ok = 1;
 					break;
 				case ZBX_PROC_STAT_DISK:

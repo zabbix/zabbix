@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ type AgentOptions struct {
 	LogFile              string   `conf:"optional,default=/tmp/zabbix_agent2.log"`
 	LogFileSize          int      `conf:"optional,range=0:1024,default=1"`
 	DebugLevel           int      `conf:"optional,range=0:5,default=3"`
-	PidFile              string   `conf:"optional,default=/tmp/zabbix_agent2.pid"`
+	PidFile              string   `conf:"optional"`
 	ServerActive         string   `conf:"optional"`
 	RefreshActiveChecks  int      `conf:"optional,range=30:3600,default=120"`
 	Timeout              int      `conf:"optional,range=1:30,default=3"`
@@ -52,7 +52,6 @@ type AgentOptions struct {
 	StatusPort           int      `conf:"optional,range=1024:32767"`
 	SourceIP             string   `conf:"optional"`
 	Server               string   `conf:"optional"`
-	MaxLinesPerSecond    int      `conf:"optional,range=1:1000,default=20"`
 	UserParameter        []string `conf:"optional"`
 	UnsafeUserParameters int      `conf:"optional,range=0:1,default=0"`
 	ControlSocket        string   `conf:"optional"`
@@ -67,6 +66,9 @@ type AgentOptions struct {
 	TLSKeyFile           string   `conf:"optional"`
 	TLSServerCertIssuer  string   `conf:"optional"`
 	TLSServerCertSubject string   `conf:"optional"`
+
+	AllowKey interface{} `conf:"optional"`
+	DenyKey  interface{} `conf:"optional"`
 
 	Plugins map[string]interface{} `conf:"optional"`
 }

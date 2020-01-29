@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,7 +99,14 @@ if (isset($_REQUEST['favobj'])) {
 				$result = API::Map()->update($sysmapUpdate);
 
 				if ($result !== false) {
-					echo 'if (confirm('.CJs::encodeJson(_('Map is updated! Return?')).')) { location.href = "sysmaps.php"; }';
+					$url = (new CUrl('sysmaps.php'))
+						->setArgument('page', CPagerHelper::loadPage('sysmaps.php', null))
+						->getUrl();
+
+					echo
+						'if (confirm('.CJs::encodeJson(_('Map is updated! Return to map list?')).')) {'.
+							'location.href = "'.$url.'";'.
+						'}';
 				}
 				else {
 					throw new Exception(_('Map update failed.'));

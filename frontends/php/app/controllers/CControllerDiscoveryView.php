@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,12 +55,12 @@ class CControllerDiscoveryView extends CController {
 		CProfile::update('web.discovery.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		// filter
-		if (hasRequest('filter_set')) {
+		if ($this->hasInput('filter_set')) {
 			CProfile::updateArray('web.discovery.filter.druleids', $this->getInput('filter_druleids', []),
 				PROFILE_TYPE_ID
 			);
 		}
-		elseif (hasRequest('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.discovery.filter.druleids');
 		}
 

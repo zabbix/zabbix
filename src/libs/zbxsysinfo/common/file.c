@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ err:
 
 int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	zbx_stat_t	buf;
+	zbx_file_time_t	file_time;
 	char		*filename, *type;
 	int		ret = SYSINFO_RET_FAIL;
 
@@ -82,18 +82,18 @@ int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 != zbx_stat(filename, &buf))
+	if (SUCCEED != zbx_get_file_time(filename, &file_time))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
 	if (NULL == type || '\0' == *type || 0 == strcmp(type, "modify"))	/* default parameter */
-		SET_UI64_RESULT(result, buf.st_mtime);
+		SET_UI64_RESULT(result, file_time.modification_time);
 	else if (0 == strcmp(type, "access"))
-		SET_UI64_RESULT(result, buf.st_atime);
+		SET_UI64_RESULT(result, file_time.access_time);
 	else if (0 == strcmp(type, "change"))
-		SET_UI64_RESULT(result, buf.st_ctime);
+		SET_UI64_RESULT(result, file_time.change_time);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -176,9 +176,9 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 != zbx_stat(filename, &stat_buf))
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
@@ -188,15 +188,15 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)
+	if (0 != zbx_fstat(f, &stat_buf))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
-	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
 		goto err;
 	}
 
@@ -213,12 +213,14 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (CONFIG_TIMEOUT < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
+			zbx_free(contents);
 			goto err;
 		}
 
 		if (ZBX_MAX_DB_FILE_SIZE < (flen += nbytes))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
+			zbx_free(contents);
 			goto err;
 		}
 

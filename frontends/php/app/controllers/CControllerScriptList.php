@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,10 +56,10 @@ class CControllerScriptList extends CController {
 		CProfile::update('web.scripts.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		// filter
-		if (hasRequest('filter_set')) {
-			CProfile::update('web.scripts.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.scripts.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 		}
-		elseif (hasRequest('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.scripts.filter_name');
 		}
 
@@ -80,9 +80,7 @@ class CControllerScriptList extends CController {
 
 		// list of scripts
 		$data['scripts'] = API::Script()->get([
-			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type',
-				'execute_on'
-			],
+			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
@@ -90,13 +88,14 @@ class CControllerScriptList extends CController {
 			'limit' => $config['search_limit'] + 1
 		]);
 
-		// sorting & paging
+		// data sort and pager
 		order_result($data['scripts'], $sortField, $sortOrder);
 
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'script.list');
-
-		$data['paging'] = getPagingLine($data['scripts'], $sortOrder, $url);
+		$page_num = getRequest('page', 1);
+		CPagerHelper::savePage('script.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['scripts'], $sortOrder,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
 
 		// find script host group name and user group name. set to '' if all host/user groups used.
 

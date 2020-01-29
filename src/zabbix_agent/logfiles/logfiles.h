@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,9 +46,10 @@ struct	st_logfile
 	md5_byte_t	md5buf[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
 };
 
-typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
-		unsigned char, zbx_uint64_t *, const int *, unsigned long *, const char *, unsigned short *,
-		unsigned long *, unsigned char);
+typedef int 	(*zbx_process_value_func_t)(const char *server, unsigned short port, const char *host,
+		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime,
+		unsigned long *timestamp, const char *source, unsigned short *severity,
+		unsigned long *logeventid, unsigned char flags);
 
 void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num);
 

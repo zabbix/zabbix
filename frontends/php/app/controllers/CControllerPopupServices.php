@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class CControllerPopupServices extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getInput('serviceid', null)) {
+		if ($this->hasInput('serviceid')) {
 			$service = API::Service()->get([
 				'output' => [],
 				'serviceids' => $this->getInput('serviceid')
@@ -66,7 +66,7 @@ class CControllerPopupServices extends CController {
 
 	protected function doAction() {
 		// Select service.
-		if ($this->getInput('serviceid', null)) {
+		if ($this->hasInput('serviceid')) {
 			$service = API::Service()->get([
 				'output' => ['serviceid', 'name'],
 				'serviceids' => $this->getInput('serviceid')
@@ -79,7 +79,7 @@ class CControllerPopupServices extends CController {
 		}
 
 		// Get data for parent services list.
-		if ($this->getInput('pservices', null)) {
+		if ($this->hasInput('pservices')) {
 			$data = [
 				'title' => _('Service parent'),
 				'parentid' => $this->getInput('parentid', 0)
@@ -113,7 +113,7 @@ class CControllerPopupServices extends CController {
 			$data['db_pservices'] = $parent_services;
 		}
 		// Get data for child services list.
-		elseif ($this->getInput('cservices', null)) {
+		elseif ($this->hasInput('cservices')) {
 			$data = [
 				'title' => _('Service dependencies'),
 				'parentid' => $this->getInput('parentid', 0)

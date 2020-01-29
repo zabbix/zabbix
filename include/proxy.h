@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid);
 void	calc_timestamp(const char *line, int *timestamp, const char *format);
 
 int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
-int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts, char **error);
+int	process_autoregistration(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts, char **error);
 
 int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ $servicesFormList = (new CFormList('servicesFormList'))
 $parent_service_popup_options = [
 	'pservices' => '1'
 ];
-if ($this->data['service']['serviceid']) {
+if ($this->data['service'] && $this->data['service']['serviceid']) {
 	$parent_service_popup_options['serviceid'] = $this->data['service']['serviceid'];
 }
 $servicesFormList->addRow((new CLabel(_('Parent service'), 'parent_name'))->setAsteriskMark(), [
@@ -144,7 +144,7 @@ $servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
 $dep_service_popup_options = [
 	'cservices' => '1'
 ];
-if ($this->data['service']['serviceid']) {
+if ($this->data['service'] && $this->data['service']['serviceid']) {
 	$dep_service_popup_options['serviceid'] = $this->data['service']['serviceid'];
 }
 
@@ -342,7 +342,7 @@ $servicesTab
 	->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
 
 // append buttons to form
-if ($service['serviceid']) {
+if ($service && $service['serviceid']) {
 	$buttons = [new CButtonCancel()];
 	if (!$service['dependencies']) {
 		array_unshift($buttons, new CButtonDelete(

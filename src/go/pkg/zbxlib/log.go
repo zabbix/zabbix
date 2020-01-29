@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ void __zbx_zabbix_log(int level, const char *format, ...)
 
 char	*zbx_strerror(int errnum)
 {
-	static __thread char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
 	return utf8_string;
 }
@@ -64,11 +64,6 @@ char	*zbx_strerror(int errnum)
 void	zbx_handle_log(void)
 {
 	// rotation is handled by go logger backend
-}
-
-char	*strerror_from_system(unsigned long error)
-{
-	return zbx_strerror(errno);
 }
 
 int	zbx_redirect_stdio(const char *filename)

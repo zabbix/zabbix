@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -243,7 +243,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'proc.cpu.util[,,,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 0.5,
+			'treshold' => 10.0,
 			'compareType' => COMPARE_AVERAGE
 		],
 		[
@@ -414,13 +414,14 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::COMPONENT_AGENT,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'DenyKey' => 'placeholder', // Override default DenyKey=system.run[*] rule
 				'EnableRemoteCommands' => '1'
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'ListenPort' => PHPUNIT_PORT_PREFIX.'53',
-				'Plugins.SystemRun.EnableRemoteCommands' => '1',
+				'DenyKey' => 'placeholder', // Override default DenyKey=system.run[*] rule
 				'Plugins.Uptime.Capacity' => '10'
 			]
 		];

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,8 +69,9 @@ else {
 		}
 		else {
 			if (($history_item === null && $row_values)
-					|| ($clock != 0 && $history_item['clock'] != $clock)
-					|| array_key_exists($history_item['itemid'], $row_values)) {
+					|| $history_item !== null
+					&& (($clock != 0 && $history_item['clock'] != $clock)
+						|| array_key_exists($history_item['itemid'], $row_values))) {
 				$table_row = [
 					(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)))->addClass(ZBX_STYLE_NOWRAP)
 				];

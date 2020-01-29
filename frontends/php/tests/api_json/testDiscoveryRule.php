@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1686,7 +1686,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test successful update by not chaning existing records by giving lld_macro_pathid and same lld_macro' => [
+			'Test successful update by not changing existing records by giving lld_macro_pathid and same lld_macro' => [
 				'discoveryrule' => [
 					'itemid' => '110007',
 					'lld_macro_paths' => [
@@ -2877,5 +2877,5 @@ class testDiscoveryRule extends CAPITest {
 		// TODO: add templated discovery rules and check on errors.
 	}
 
-	// TODO: add more tests to check other related discovery rule properties and perfom more tests on templates and templated objects.
+	// TODO: add more tests to check other related discovery rule properties and perform more tests on templates and templated objects.
 }
