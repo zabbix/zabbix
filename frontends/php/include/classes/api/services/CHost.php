@@ -458,7 +458,7 @@ class CHost extends CHostGeneral {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'inheritedTags' => ['type' => API_BOOLEAN, 'default' => false],
-			'selectInheritedTags' => ['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE],
+			'selectInheritedTags' => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 			'severities' =>	[
 				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_DISASTER)), 'uniq' => true
 			]
