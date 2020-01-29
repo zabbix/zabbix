@@ -4606,6 +4606,10 @@ $form-icon-btn: (
 	&.modal-popup {
 		max-width: 1024px;
 
+		&.modal-popup-medium {
+			min-width: 450px;
+		}
+
 		&.modal-popup-generic {
 			min-width: 650px;
 		}

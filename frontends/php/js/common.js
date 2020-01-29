@@ -341,11 +341,23 @@ function get_bodywidth() {
 function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var overlay = overlays_stack.getById(dialogueid);
 	if (!overlay) {
-		var generic_actions = ['popup.generic', 'popup.scriptexec', 'dashboard.share.edit', 'dashboard.properties.edit',
-				'popup.services', 'popup.media', 'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep',
-				'popup.testtriggerexpr', 'popup.triggerwizard'
+		var wide_popup_actions = ['popup.generic', 'popup.scriptexec', 'dashboard.share.edit',
+				'dashboard.properties.edit', 'popup.services', 'popup.media', 'popup.preproctest.edit',
+				'popup.triggerexpr', 'popup.httpstep', 'popup.testtriggerexpr', 'popup.triggerwizard'
 			],
-			dialogue_class = generic_actions.indexOf(action) !== -1 ? ' modal-popup-generic' : '';
+			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.action.recovery',
+				'popup.action.acknowledge', 'popup.action.operation', 'popup.condition.operations',
+				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
+				'popup.mediatype.message'
+			],
+			dialogue_class = '';
+
+		if (wide_popup_actions.indexOf(action) !== -1) {
+			dialogue_class = ' modal-popup-generic';
+		}
+		else if (medium_popup_actions.indexOf(action) !== -1) {
+			dialogue_class = ' modal-popup-medium';
+		}
 
 		overlay = overlayDialogue({
 			'dialogueid': dialogueid,
