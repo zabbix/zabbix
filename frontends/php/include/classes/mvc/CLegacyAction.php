@@ -53,19 +53,16 @@ class CLegacyAction extends CAction {
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
 			$denied = [
-				'hostgroups.php', 'templates.php', 'hosts.php', 'items.php', 'triggers.php', 'graphs.php',
-				'applications.php', 'host_discovery.php', 'disc_prototypes.php', 'trigger_prototypes.php',
-				'host_prototypes.php', 'httpconf.php', 'maintenance.php', 'actionconf.php', 'discoveryconf.php',
-				'services.php'
+				'actionconf.php', 'applications.php', 'conf.import.php', 'disc_prototypes.php', 'discoveryconf.php',
+				'graphs.php', 'host_discovery.php', 'host_prototypes.php', 'hostgroups.php', 'hosts.php',
+				'httpconf.php', 'items.php', 'maintenance.php', 'services.php', 'templates.php',
+				'trigger_prototypes.php', 'triggers.php'
 			];
 		}
 
 		if ($user_type != USER_TYPE_SUPER_ADMIN) {
-			$denied = array_merge($denied, [
-				'auditlogs.php', 'auditacts.php', 'report4.php', 'correlation.php', 'adm.housekeeper.php',
-				'adm.images.php', 'adm.iconmapping.php', 'adm.regexps.php', 'adm.macros.php', 'adm.valuemapping.php',
-				'adm.workingtime.php', 'adm.triggerseverities.php', 'adm.triggerdisplayoptions.php', 'adm.other.php',
-				'autoreg.edit', 'module.list', 'module.edit', 'usergrps.php', 'queue.php'
+			$denied = array_merge($denied, ['auditlogs.php', 'auditacts.php', 'report4.php', 'correlation.php',
+				'queue.php'
 			]);
 		}
 

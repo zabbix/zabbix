@@ -58,8 +58,9 @@ if (!hasRequest('form_refresh')) {
 $tabs->setFooter(makeFormFooter(
 	(new CSubmitButton(_('Update')))->setId('update'),
 	[
-		(new CRedirectButton(_('Cancel'),
-			(new CUrl('zabbix.php'))->setArgument('action', 'module.list')->getUrl()
+		(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'module.list')
+			->setArgument('page', CPagerHelper::loadPage('module.list', null))
 		))->setId('cancel')
 	]
 ));

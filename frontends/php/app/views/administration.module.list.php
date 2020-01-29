@@ -68,7 +68,9 @@ $table = (new CTableInfo())
 				->onClick("checkAll('".$form->getName()."', 'all_modules', 'moduleids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
-			(new CUrl('zabbix.php'))->setArgument('action', 'module.list')->getUrl()
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'module.list')
+				->getUrl()
 		),
 		_('Version'),
 		_('Author'),

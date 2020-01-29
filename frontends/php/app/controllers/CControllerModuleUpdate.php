@@ -120,20 +120,21 @@ class CControllerModuleUpdate extends CController {
 		}
 
 		if (!$result && $this->getAction() === 'module.update') {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'module.edit')
-					->setArgument('moduleid', array_keys($this->modules)[0])
-					->getUrl()
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'module.edit')
+				->setArgument('moduleid', array_keys($this->modules)[0])
 			);
 			$response->setFormData($this->getInputAll());
 		}
 		else {
-			$curl = (new CUrl('zabbix.php'))->setArgument('action', 'module.list');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'module.list')
+				->setArgument('page', CPagerHelper::loadPage('module.list', null))
+			);
+
 			if ($result) {
-				$curl->setArgument('uncheck', '1');
+				$response->setFormData(['uncheck' => '1']);
 			}
-			$response = new CControllerResponseRedirect($curl->getUrl());
 		}
 
 		if ($result) {

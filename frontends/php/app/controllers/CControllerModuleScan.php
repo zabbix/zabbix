@@ -125,11 +125,7 @@ class CControllerModuleScan extends CController {
 			}
 		}
 
-		$response = new CControllerResponseRedirect(
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'module.list')
-				->getUrl()
-		);
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'module.list'));
 
 		$message = ($db_modules_create || $db_modules_delete)
 			? _('Modules updated')

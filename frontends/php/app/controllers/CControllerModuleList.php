@@ -99,10 +99,13 @@ class CControllerModuleList extends CController {
 			}
 		}
 
+		// data sort and pager
 		order_result($modules, $sort_field, $sort_order);
 
-		$paging = getPagingLine($modules, $sort_order,
-			(new CUrl('zabbix.php'))->setArgument('action', 'module.list')
+		$page_num = getRequest('page', 1);
+		CPagerHelper::savePage('module.list', $page_num);
+		$paging = CPagerHelper::paginate($page_num, $modules, $sort_order,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
 		$data = [

@@ -99,10 +99,9 @@ class CControllerModuleEdit extends CController {
 			$this->setResponse($response);
 		}
 		else {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'module.list')
-					->getUrl()
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'module.list')
+				->setArgument('page', CPagerHelper::loadPage('module.list', null))
 			);
 			$response->setMessageError(_s('Cannot load module at: %s.', $this->module['relative_path']));
 			$this->setResponse($response);
