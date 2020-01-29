@@ -2368,6 +2368,8 @@ function getUserGraphTheme() {
  * @param string  $errstr Error message.
  * @param string  $errfile Filename that the error was raised in.
  * @param int     $errline Line number the error was raised in.
+ *
+ * @return bool  False, to continue with the default error handler.
  */
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	// Necessary to suppress errors when calling with error control operator like @function_name().
@@ -2377,6 +2379,8 @@ function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 
 	// Don't show the call to this handler function.
 	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
+
+	return false;
 }
 
 /**
