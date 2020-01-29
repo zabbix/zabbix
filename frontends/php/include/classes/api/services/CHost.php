@@ -1766,6 +1766,15 @@ class CHost extends CHostGeneral {
 					}
 				}
 
+				foreach ($tags as &$tag) {
+					foreach (['tag', 'value'] as $field) {
+						if (!$this->outputIsRequested($field, $options['selectInheritedTags'])) {
+							$tag[$field] = null;
+						}
+					}
+				}
+				unset($tag);
+
 				$host['inheritedTags'] = $tags;
 			}
 		}
