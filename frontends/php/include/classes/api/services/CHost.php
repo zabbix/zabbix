@@ -133,6 +133,7 @@ class CHost extends CHostGeneral {
 			'selectDiscoveryRule'				=> null,
 			'selectHostDiscovery'				=> null,
 			'selectTags'						=> null,
+			'selectInheritedTags'				=> null,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
 			'preservekeys'						=> false,
@@ -1701,6 +1702,69 @@ class CHost extends CHostGeneral {
 				$options['selectHostDiscovery']
 			);
 			$result = $relationMap->mapOne($result, $hostDiscoveries, 'hostDiscovery');
+		}
+
+		if ($options['selectInheritedTags'] !== null && $options['selectInheritedTags'] != API_OUTPUT_COUNT) {
+			foreach ($result as &$host) {
+				$templateids = [];
+
+				// If direct parent templates were selected before, no need to select template IDs again.
+				if ($options['selectParentTemplates'] !== null
+						&& $options['selectParentTemplates'] != API_OUTPUT_COUNT) {
+					$templateids = zbx_objectValues($host['parentTemplates'], 'templateid');
+				}
+				else {
+					$templates = DBfetchArray(DBselect(
+						'SELECT ht.templateid'.
+						' FROM hosts_templates ht'.
+						' WHERE '.dbConditionId('ht.hostid', [$host['hostid']])
+					));
+					$templateids = array_merge($templateids, zbx_objectValues($templates, 'templateid'));
+				}
+
+				$all_templateids = $templateids;
+
+				// Check for more template parents if there are any until all parent templates are collected.
+				do {
+					$templates = DBfetchArray(DBselect(
+						'SELECT ht.templateid FROM hosts_templates ht WHERE '.dbConditionId('ht.hostid', $templateids)
+					));
+					$templateids = zbx_objectValues($templates, 'templateid');
+
+					foreach ($templateids as $idx => $templateid) {
+						if (in_array($templateid, $all_templateids)) {
+							unset($templateids[$idx]);
+						}
+					}
+
+					$all_templateids = array_merge($all_templateids, $templateids);
+				} while ($templateids);
+
+				if ($all_templateids) {
+					$tags = [];
+
+					$templates = API::Template()->get([
+						'output' => [],
+						'selectTags' => ['tag', 'value'],
+						'templateids' => $all_templateids
+					]);
+
+					foreach ($templates as $template) {
+						foreach ($template['tags'] as $tag) {
+							foreach ($tags as $_tag) {
+								// Skip tags with same name and value.
+								if ($_tag['tag'] === $tag['tag'] && $_tag['value'] === $tag['value']) {
+									continue 2;
+								}
+							}
+
+							$tags[] = $tag;
+						}
+					}
+
+					$host['inheritedTags'] = $tags;
+				}
+			}
 		}
 
 		return $result;
