@@ -110,19 +110,14 @@ class CRouter {
 		'mediatype.list'				=> ['CControllerMediatypeList',						'layout.htmlpage',		'administration.mediatype.list'],
 		'mediatype.update'				=> ['CControllerMediatypeUpdate',					null,					null],
 		'menu.popup'					=> ['CControllerMenuPopup',							'layout.json',			null],
-<<<<<<< HEAD
+		'miscconfig.edit'				=> ['CControllerMiscConfigEdit',					'layout.htmlpage',		'administration.miscconfig.edit'],
+		'miscconfig.update'				=> ['CControllerMiscConfigUpdate',					null,					null],
 		'module.disable'				=> ['CControllerModuleUpdate',						null,					null],
 		'module.edit'					=> ['CControllerModuleEdit',						'layout.htmlpage',		'administration.module.edit'],
 		'module.enable'					=> ['CControllerModuleUpdate',						null,					null],
 		'module.list'					=> ['CControllerModuleList',						'layout.htmlpage',		'administration.module.list'],
 		'module.scan'					=> ['CControllerModuleScan',						null,					null],
 		'module.update'					=> ['CControllerModuleUpdate',						null,					null],
-		'notifications.get'     		=> ['CControllerNotificationsGet',				    'layout.json',			null],
-		'notifications.mute'        	=> ['CControllerNotificationsMute',				    'layout.json',			null],
-		'notifications.read'	        => ['CControllerNotificationsRead',				    'layout.json',			null],
-=======
-		'miscconfig.edit'				=> ['CControllerMiscConfigEdit',					'layout.htmlpage',		'administration.miscconfig.edit'],
-		'miscconfig.update'				=> ['CControllerMiscConfigUpdate',					null,					null],
 		'notifications.get'				=> ['CControllerNotificationsGet',					'layout.json',			null],
 		'notifications.mute'			=> ['CControllerNotificationsMute',					'layout.json',			null],
 		'notifications.read'			=> ['CControllerNotificationsRead',					'layout.json',			null],
@@ -147,7 +142,6 @@ class CRouter {
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',				'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerexpr'				=> ['CControllerPopupTriggerExpr',					'layout.json',			'popup.triggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
->>>>>>> 9ee19e435ca31e1d2e13589fed4b1a4668c45e10
 		'problem.view'					=> ['CControllerProblemView',						'layout.htmlpage',		'monitoring.problem.view'],
 		'problem.view.csv'				=> ['CControllerProblemView',						'layout.csv',			'monitoring.problem.view'],
 		'profile.update'				=> ['CControllerProfileUpdate',						'layout.json',			null],
@@ -224,31 +218,12 @@ class CRouter {
 		'widget.systeminfo.view'		=> ['CControllerWidgetSystemInfoView',				'layout.widget',		'monitoring.widget.systeminfo.view'],
 		'widget.trigover.view'			=> ['CControllerWidgetTrigOverView',				'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'				=> ['CControllerWidgetUrlView',						'layout.widget',		'monitoring.widget.url.view'],
-<<<<<<< HEAD
-		'widget.plaintext.view'			=> ['CControllerWidgetPlainTextView',				'layout.widget',		'monitoring.widget.plaintext.view'],
-		'widget.hostavail.view'			=> ['CControllerWidgetHostAvailView',				'layout.widget',		'monitoring.widget.hostavail.view'],
-		'popup.action.operation'		=> ['CControllerPopupActionOperation',				'layout.json',			'popup.operation.common'],
-		'popup.action.recovery'			=> ['CControllerPopupActionRecovery',				'layout.json',			'popup.operation.common'],
-		'popup.action.acknowledge'		=> ['CControllerPopupActionAcknowledge',			'layout.json',			'popup.operation.common'],
-		'popup.condition.operations'	=> ['CControllerPopupConditionOperations',			'layout.json',			'popup.condition.common'],
-		'popup.discovery.check'			=> ['CControllerPopupDiscoveryCheck',				'layout.json',			'popup.discovery.check'],
-		'popup.generic'					=> ['CControllerPopupGeneric',						'layout.json',			'popup.generic'],
-		'popup.httpstep'				=> ['CControllerPopupHttpStep',						'layout.json',			'popup.httpstep'],
-		'popup.media'					=> ['CControllerPopupMedia',						'layout.json',			'popup.media'],
-		'popup.preproctest.edit'		=> ['CControllerPopupPreprocTestEdit',				'layout.json',			'popup.preproctestedit.view'],
-		'popup.preproctest.send'		=> ['CControllerPopupPreprocTestSend',				'layout.json',			null],
-		'popup.scriptexec'				=> ['CControllerPopupScriptExec',					'layout.json',			'popup.scriptexec'],
-		'popup.triggerexpr'				=> ['CControllerPopupTriggerExpr',					'layout.json',			'popup.triggerexpr'],
-		'popup.services'				=> ['CControllerPopupServices',						'layout.json',			'popup.services'],
-		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',				'layout.json',			'popup.testtriggerexpr'],
-		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
-		'popup.maintenance.period'		=> ['CControllerPopupMaintenancePeriod',			'layout.json',			'popup.maintenance.period'],
-		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
-		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
-		'search'						=> ['CControllerSearch',							'layout.htmlpage',		'search'],
+		'widget.web.view'				=> ['CControllerWidgetWebView',						'layout.widget',		'monitoring.widget.web.view'],
+		'workingtime.edit'				=> ['CControllerWorkingTimeEdit',					'layout.htmlpage',		'administration.workingtime.edit'],
+		'workingtime.update'			=> ['CControllerWorkingTimeUpdate',					null,					null],
+
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
-		'adm.gui.php'					=> ['CLegacyAction', null, null],
 		'adm.housekeeper.php'			=> ['CLegacyAction', null, null],
 		'adm.iconmapping.php'			=> ['CLegacyAction', null, null],
 		'adm.images.php'				=> ['CLegacyAction', null, null],
@@ -316,11 +291,6 @@ class CRouter {
 		'trigger_prototypes.php'		=> ['CLegacyAction', null, null],
 		'triggers.php'					=> ['CLegacyAction', null, null],
 		'usergrps.php'					=> ['CLegacyAction', null, null]
-=======
-		'widget.web.view'				=> ['CControllerWidgetWebView',						'layout.widget',		'monitoring.widget.web.view'],
-		'workingtime.edit'				=> ['CControllerWorkingTimeEdit',					'layout.htmlpage',		'administration.workingtime.edit'],
-		'workingtime.update'			=> ['CControllerWorkingTimeUpdate',					null,					null]
->>>>>>> 9ee19e435ca31e1d2e13589fed4b1a4668c45e10
 	];
 
 	/**

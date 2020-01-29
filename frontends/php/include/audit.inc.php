@@ -54,12 +54,8 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_ICON_MAP => _('Icon mapping'),
 		AUDIT_RESOURCE_CORRELATION => _('Event correlation'),
 		AUDIT_RESOURCE_DASHBOARD => _('Dashboard'),
-<<<<<<< HEAD
-		AUDIT_RESOURCE_AUTOREGISTRATION  => _('Auto registration'),
+		AUDIT_RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
 		AUDIT_RESOURCE_MODULE => _('Module')
-=======
-		AUDIT_RESOURCE_AUTOREGISTRATION  => _('Autoregistration')
->>>>>>> 9ee19e435ca31e1d2e13589fed4b1a4668c45e10
 	];
 
 	if (is_null($resource_type)) {

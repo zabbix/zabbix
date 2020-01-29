@@ -757,10 +757,6 @@ function makePageFooter($with_version = true) {
  * @return array  Menu definition for CWidget::setTitleSubmenu.
  */
 function getAdministrationGeneralSubmenu() {
-<<<<<<< HEAD
-	$autoreg_url = (new CUrl('zabbix.php'))->setArgument('action', 'autoreg.edit')->getUrl();
-	$modules_url = (new CUrl('zabbix.php'))->setArgument('action', 'module.list')->getUrl();
-=======
 	$gui_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'gui.edit')
 		->getUrl();
@@ -768,7 +764,6 @@ function getAdministrationGeneralSubmenu() {
 	$autoreg_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'autoreg.edit')
 		->getUrl();
->>>>>>> 9ee19e435ca31e1d2e13589fed4b1a4668c45e10
 
 	$housekeeping_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'housekeeping.edit')
@@ -806,6 +801,10 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
 
+	$modules_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'module.list')
+		->getUrl();
+
 	$miscconfig_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
@@ -813,21 +812,6 @@ function getAdministrationGeneralSubmenu() {
 	return [
 		'main_section' => [
 			'items' => [
-<<<<<<< HEAD
-				'adm.gui.php' => _('GUI'),
-				$autoreg_url => _('Auto registration'),
-				'adm.housekeeper.php' => _('Housekeeping'),
-				'adm.images.php' => _('Images'),
-				'adm.iconmapping.php' => _('Icon mapping'),
-				'adm.regexps.php' => _('Regular expressions'),
-				'adm.macros.php' => _('Macros'),
-				'adm.valuemapping.php' => _('Value mapping'),
-				'adm.workingtime.php' => _('Working time'),
-				'adm.triggerseverities.php' => _('Trigger severities'),
-				'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-				$modules_url => _('Modules'),
-				'adm.other.php' => _('Other')
-=======
 				$gui_url          => _('GUI'),
 				$autoreg_url      => _('Autoregistration'),
 				$housekeeping_url => _('Housekeeping'),
@@ -839,8 +823,8 @@ function getAdministrationGeneralSubmenu() {
 				$workingtime_url  => _('Working time'),
 				$trigseverity_url => _('Trigger severities'),
 				$trigdisplay_url  => _('Trigger displaying options'),
+				$modules_url      => _('Modules'),
 				$miscconfig_url   => _('Other')
->>>>>>> 9ee19e435ca31e1d2e13589fed4b1a4668c45e10
 			]
 		]
 	];

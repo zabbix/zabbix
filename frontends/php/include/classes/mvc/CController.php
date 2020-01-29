@@ -227,11 +227,8 @@ abstract class CController {
 	/**
 	 * Check if input parameter exists.
 	 *
-<<<<<<< HEAD
 	 * @param string $var
 	 *
-=======
->>>>>>> 9ee19e435ca31e1d2e13589fed4b1a4668c45e10
 	 * @return bool
 	 */
 	public function hasInput($var) {
