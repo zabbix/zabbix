@@ -1705,6 +1705,8 @@ class CHost extends CHostGeneral {
 		}
 
 		if ($options['selectInheritedTags'] !== null && $options['selectInheritedTags'] != API_OUTPUT_COUNT) {
+			$templates_cache = [];
+
 			foreach ($result as &$host) {
 				$templateids = [];
 
@@ -1730,25 +1732,33 @@ class CHost extends CHostGeneral {
 						'SELECT ht.templateid FROM hosts_templates ht WHERE '.dbConditionId('ht.hostid', $templateids)
 					));
 					$templateids = zbx_objectValues($templates, 'templateid');
-
-					foreach ($templateids as $idx => $templateid) {
-						if (in_array($templateid, $all_templateids)) {
-							unset($templateids[$idx]);
-						}
-					}
-
 					$all_templateids = array_merge($all_templateids, $templateids);
 				} while ($templateids);
 
 				if ($all_templateids) {
 					$tags = [];
+					$templates = [];
 
-					$templates = API::Template()->get([
-						'output' => [],
-						'selectTags' => ['tag', 'value'],
-						'templateids' => $all_templateids
-					]);
+					foreach ($templates_cache as $templateid => $template) {
+						if (in_array($templateid, $all_templateids)) {
+							$templates[] = $template;
+						}
+					}
 
+					if (!$templates) {
+						// If no previous tags were stored from templates, select from DB and store for later use.
+						$templates = API::Template()->get([
+							'output' => ['templateid'],
+							'selectTags' => ['tag', 'value'],
+							'templateids' => $all_templateids,
+							'nopermissions' => true
+						]);
+						foreach ($templates as $template) {
+							$templates_cache[$template['templateid']] = $template;
+						}
+					}
+
+					// Get template tags from selected or cache.
 					foreach ($templates as $template) {
 						foreach ($template['tags'] as $tag) {
 							foreach ($tags as $_tag) {
