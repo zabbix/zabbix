@@ -136,7 +136,7 @@ class C44ImportConverter extends CConverter {
 	protected function createHelperArray(array $data, int $type): array {
 		return [
 			'from' => $type,
-			'name' => $data['name'],
+			'id' => $data['key'],
 			'ref' => $data['interface_ref'],
 			'port' => array_key_exists('port', $data) ? $data['port'] : '',
 			'type' => $data['type'],
@@ -312,8 +312,8 @@ class C44ImportConverter extends CConverter {
 	protected function updateInterfaceRef(array $host, array $updates): array {
 		if (array_key_exists('items', $host) && array_key_exists('1', $updates)) {
 			foreach ($host['items'] as &$item) {
-				if (array_key_exists($item['name'], $updates[1])) {
-					$item['interface_ref'] = $updates[1][$item['name']];
+				if (array_key_exists($item['key'], $updates[1])) {
+					$item['interface_ref'] = $updates[1][$item['key']];
 				}
 			}
 			unset($item);
@@ -321,14 +321,14 @@ class C44ImportConverter extends CConverter {
 
 		if (array_key_exists('discovery_rules', $host) && array_key_exists('2', $updates)) {
 			foreach ($host['discovery_rules'] as &$drule) {
-				if (array_key_exists($drule['name'], $updates[2])) {
-					$drule['interface_ref'] = $updates[2][$drule['name']];
+				if (array_key_exists($drule['key'], $updates[2])) {
+					$drule['interface_ref'] = $updates[2][$drule['key']];
 				}
 
 				if (array_key_exists('item_prototypes', $drule) && array_key_exists('3', $updates)) {
 					foreach ($drule['item_prototypes'] as &$prototype) {
-						if (array_key_exists($prototype['name'], $updates[3])) {
-							$prototype['interface_ref'] = $updates[3][$prototype['name']];
+						if (array_key_exists($prototype['key'], $updates[3])) {
+							$prototype['interface_ref'] = $updates[3][$prototype['key']];
 						}
 					}
 					unset($prototype);
@@ -460,7 +460,7 @@ class C44ImportConverter extends CConverter {
 
 									if ($same_interfaces) {
 										$iface = current($same_interfaces);
-										$updates[$item['from']][$item['name']] = $iface['interface_ref'];
+										$updates[$item['from']][$item['id']] = $iface['interface_ref'];
 									}
 									else {
 										// Create new interface if not found.
@@ -470,7 +470,7 @@ class C44ImportConverter extends CConverter {
 
 										$new_interfaces[$interfaceid][] = $iface;
 
-										$updates[$item['from']][$item['name']] = $iface['interface_ref'];
+										$updates[$item['from']][$item['id']] = $iface['interface_ref'];
 									}
 								}
 								else {
@@ -479,7 +479,7 @@ class C44ImportConverter extends CConverter {
 
 									$new_interfaces[$interfaceid][] = $iface;
 
-									$updates[$item['from']][$item['name']] = $iface['interface_ref'];
+									$updates[$item['from']][$item['id']] = $iface['interface_ref'];
 								}
 							}
 						}
