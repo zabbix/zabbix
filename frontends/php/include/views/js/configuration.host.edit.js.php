@@ -143,10 +143,10 @@
 			ipmi: 623
 		};
 		CONTAINER_IDS = {
-			'<?= INTERFACE_TYPE_AGENT ?>': '#agentInterfaces',
-			'<?= INTERFACE_TYPE_SNMP ?>': '#SNMPInterfaces',
-			'<?= INTERFACE_TYPE_JMX ?>': '#JMXInterfaces',
-			'<?= INTERFACE_TYPE_IPMI ?>': '#IPMIInterfaces'
+			<?= INTERFACE_TYPE_AGENT ?>: '#agentInterfaces',
+			<?= INTERFACE_TYPE_SNMP ?>: '#SNMPInterfaces',
+			<?= INTERFACE_TYPE_JMX ?>: '#JMXInterfaces',
+			<?= INTERFACE_TYPE_IPMI ?>: '#IPMIInterfaces'
 		};
 		INTERFACE_TYPES = {
 			'agent': '<?= INTERFACE_TYPE_AGENT ?>',
@@ -155,10 +155,10 @@
 			'ipmi': '<?= INTERFACE_TYPE_IPMI ?>'
 		};
 		INTERFACE_NAMES = {
-			'<?= INTERFACE_TYPE_AGENT ?>': '<?= _('Agent') ?>',
-			'<?= INTERFACE_TYPE_SNMP ?>': '<?= _('SNMP') ?>',
-			'<?= INTERFACE_TYPE_JMX ?>': '<?= _('JMX') ?>',
-			'<?= INTERFACE_TYPE_IPMI ?>': '<?= _('IPMI') ?>'
+			<?= INTERFACE_TYPE_AGENT ?>: '<?= _('Agent') ?>',
+			<?= INTERFACE_TYPE_SNMP ?>: '<?= _('SNMP') ?>',
+			<?= INTERFACE_TYPE_JMX ?>: '<?= _('JMX') ?>',
+			<?= INTERFACE_TYPE_IPMI ?>: '<?= _('IPMI') ?>'
 		};
 
 		// Variables.
@@ -193,7 +193,7 @@
 		}
 
 		setSnmpFields(elem, iface) {
-			if (iface.type != '<?= INTERFACE_TYPE_SNMP ?>') {
+			if (iface.type != <?= INTERFACE_TYPE_SNMP ?>) {
 				return elem
 					.querySelector('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?>')
 					.remove();
@@ -207,19 +207,19 @@
 				.querySelector(`#interfaces_${iface.interfaceid}_details_securitylevel`)
 				.value = iface.details.securitylevel;
 
-			if (iface.details.privprotocol == '<?= ITEM_PRIVPROTOCOL_AES ?>') {
+			if (iface.details.privprotocol == <?= ITEM_PRIVPROTOCOL_AES ?>) {
 				elem
 					.querySelector(`#snmpv3_privprotocol_${iface.interfaceid}_1`)
 					.checked = true;
 			}
 
-			if (iface.details.authprotocol == '<?= ITEM_AUTHPROTOCOL_SHA ?>') {
+			if (iface.details.authprotocol == <?= ITEM_AUTHPROTOCOL_SHA ?>) {
 				elem
 					.querySelector(`#snmpv3_authprotocol_${iface.interfaceid}_1`)
 					.checked = true;
 			}
 
-			if (iface.details.bulk == '<?= SNMP_BULK_ENABLED ?>') {
+			if (iface.details.bulk == <?= SNMP_BULK_ENABLED ?>) {
 				elem
 					.querySelector(`#interfaces_${iface.interfaceid}_details_bulk`)
 					.checked = true;
@@ -244,7 +244,7 @@
 			jQuery(`#interfaces_${iface.interfaceid}_details_version`).on('change', function() {
 				jQuery(`#interfaces_${iface.interfaceid}_details_securitylevel`).off('change');
 
-				if (jQuery(this).val() == '<?= SNMP_V3 ?>') {
+				if (jQuery(this).val() == <?= SNMP_V3 ?>) {
 					new CViewSwitcher(`interfaces_${iface.interfaceid}_details_securitylevel`, 'change',
 						{
 							<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>: [],
@@ -296,10 +296,10 @@
 
 		getInterfaces() {
 			let types = {
-					'<?= INTERFACE_TYPE_AGENT ?>': {main: null, all: []},
-					'<?= INTERFACE_TYPE_SNMP ?>': {main: null, all: []},
-					'<?= INTERFACE_TYPE_JMX ?>': {main: null, all: []},
-					'<?= INTERFACE_TYPE_IPMI ?>': {main: null, all: []}
+					<?= INTERFACE_TYPE_AGENT ?>: {main: null, all: []},
+					<?= INTERFACE_TYPE_SNMP ?>: {main: null, all: []},
+					<?= INTERFACE_TYPE_JMX ?>: {main: null, all: []},
+					<?= INTERFACE_TYPE_IPMI ?>: {main: null, all: []}
 				};
 
 			Object
@@ -411,7 +411,7 @@
 
 				if (!type_interfaces.main && type_interfaces.all.length) {
 					for (let i = 0; i < type_interfaces.all.length; i++) {
-						if (this.data[type_interfaces.all[i]].main == '<?= INTERFACE_PRIMARY ?>') {
+						if (this.data[type_interfaces.all[i]].main == <?= INTERFACE_PRIMARY ?>) {
 							interfaces[type].main = this.data[type_interfaces.all[i]].interfaceid;
 						}
 					}
