@@ -51,13 +51,21 @@ class CLegacyAction extends CAction {
 		$user_type = $this->getUserType();
 		$denied = [];
 
-		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
-			$denied = [
-				'actionconf.php', 'applications.php', 'conf.import.php', 'disc_prototypes.php', 'discoveryconf.php',
-				'graphs.php', 'host_discovery.php', 'host_prototypes.php', 'hostgroups.php', 'hosts.php',
-				'httpconf.php', 'items.php', 'maintenance.php', 'services.php', 'templates.php',
-				'trigger_prototypes.php', 'triggers.php'
+		if ($user_type < USER_TYPE_ZABBIX_USER) {
+			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart5.php', 'chart6.php', 'chart7.php', 'charts.php',
+				'history.php', 'hostinventories.php', 'hostinventoriesoverview.php', 'httpdetails.php', 'image.php',
+				'imgstore.php', 'jsrpc.php', 'map.import.php', 'map.php', 'overview.php', 'toptriggers.php',
+				'tr_events.php', 'screenconf.php', 'screenedit.php', 'screen.import.php', 'screens.php',
+				'slideconf.php', 'slides.php', 'srv_status.php', 'sysmap.php', 'sysmaps.php', 'report2.php'
 			];
+		}
+
+		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
+			$denied = array_merge($denied, ['actionconf.php', 'applications.php', 'conf.import.php',
+				'disc_prototypes.php', 'discoveryconf.php', 'graphs.php', 'host_discovery.php', 'host_prototypes.php',
+				'hostgroups.php', 'hosts.php', 'httpconf.php', 'items.php', 'maintenance.php', 'services.php',
+				'templates.php', 'trigger_prototypes.php', 'triggers.php'
+			]);
 		}
 
 		if ($user_type != USER_TYPE_SUPER_ADMIN) {
