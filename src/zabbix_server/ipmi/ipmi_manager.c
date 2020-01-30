@@ -66,6 +66,9 @@ typedef struct
 	/* the current item state (supported/unsupported) */
 	unsigned char		item_state;
 
+	/* the current item flags ( e.g. lld rule) */
+	unsigned char		item_flags;
+
 	/* the request message */
 	zbx_ipc_message_t	message;
 
@@ -721,6 +724,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 	AGENT_RESULT		result;
 	zbx_ipmi_poller_t	*poller;
 	zbx_uint64_t		itemid;
+	unsigned char		flags;
 
 	if (NULL == (poller = ipmi_manager_get_poller_by_client(manager, client)))
 	{
@@ -728,6 +732,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		return;
 	}
 	itemid = poller->request->itemid;
+	flags = poller->request->item_flags;
 
 	zbx_ipmi_deserialize_result(message->data, &ts, &errcode, &value);
 
@@ -759,7 +764,8 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 				init_result(&result);
 				SET_TEXT_RESULT(&result, value);
 				value = NULL;
-				zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, 0, &result, &ts, state, NULL);
+				zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, flags, &result, &ts, state,
+						NULL);
 				free_result(&result);
 			}
 			break;
@@ -768,7 +774,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case AGENT_ERROR:
 		case CONFIG_ERROR:
 			state = ITEM_STATE_NOTSUPPORTED;
-			zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, 0, NULL, &ts, state, value);
+			zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, flags, NULL, &ts, state, value);
 			break;
 		default:
 			/* don't change item's state when network related error occurs */
@@ -788,14 +794,16 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
  *                                                                            *
  * Function: ipmi_manager_serialize_request                                   *
  *                                                                            *
- * Purpose: serializes IPMI poll request (ZBX_IPC_IPMI_VALUE_REQUEST)         *
+ * Purpose: serializes IPMI poll and discovery requests                       *
  *                                                                            *
  * Parameters: item      - [IN] the item to poll                              *
  *             command   - [IN] the command to execute                        *
+ *             key       - [IN] a valid item key                              *
  *             message   - [OUT] the message                                  *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, zbx_ipc_message_t *message)
+static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, const char *key,
+		zbx_ipc_message_t *message)
 {
 	zbx_uint32_t	size;
 
@@ -803,7 +811,11 @@ static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, zbx
 			item->interface.port, item->host.ipmi_authtype, item->host.ipmi_privilege,
 			item->host.ipmi_username, item->host.ipmi_password, item->ipmi_sensor, command);
 
-	message->code = ZBX_IPC_IPMI_VALUE_REQUEST;
+	if (0 == strcmp(key, "ipmi.get"))
+		message->code = ZBX_IPC_IPMI_DISCOVERY_REQUEST;
+	else
+		message->code = ZBX_IPC_IPMI_VALUE_REQUEST;
+
 	message->size = size;
 }
 
@@ -854,25 +866,40 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 
 	for (i = 0; i < num; i++)
 	{
+		AGENT_REQUEST	key_req;
+		zbx_timespec_t	ts;
+		unsigned char	state = ITEM_STATE_NOTSUPPORTED;
+		int		errcode = CONFIG_ERROR;
+
 		if (FAIL == zbx_ipmi_port_expand_macros(items[i].host.hostid, items[i].interface.port_orig,
 				&items[i].interface.port, &error))
 		{
-			zbx_timespec_t	ts;
-			unsigned char	state = ITEM_STATE_NOTSUPPORTED;
-			int		errcode = CONFIG_ERROR;
 
 			zbx_timespec(&ts);
-			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, 0, NULL, &ts, state, error);
+			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags, NULL, &ts,
+					state, error);
 			DCrequeue_items(&items[i].itemid, &state, &ts.sec, &errcode, 1);
 			zbx_free(error);
 			continue;
 		}
 
-		request = ipmi_request_create(items[i].host.hostid);
-		request->itemid = items[i].itemid;
-		request->item_state = items[i].state;
-		ipmi_manager_serialize_request(&items[i], 0, &request->message);
-		ipmi_manager_schedule_request(manager, items[i].host.hostid, request, now);
+		init_request(&key_req);
+		if (SUCCEED == parse_item_key(items[i].key_orig, &key_req))
+		{
+			request = ipmi_request_create(items[i].host.hostid);
+			request->itemid = items[i].itemid;
+			request->item_state = items[i].state;
+			request->item_flags = items[i].flags;
+			ipmi_manager_serialize_request(&items[i], 0, key_req.key, &request->message);
+			ipmi_manager_schedule_request(manager, items[i].host.hostid, request, now);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Item key %s cannot be parsed", items[i].key_orig);
+			zbx_timespec(&ts);
+			DCrequeue_items(&items[i].itemid, &state, &ts.sec, &errcode, 1);
+		}
+		free_request(&key_req);
 	}
 
 	zbx_preprocessor_flush();
@@ -1035,6 +1062,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 						ipmi_manager_process_poller_queue(&ipmi_manager, poller, now);
 					}
 					break;
+				case ZBX_IPC_IPMI_DISCOVERY_RESULT:
 				case ZBX_IPC_IPMI_VALUE_RESULT:
 					ipmi_manager_process_value_result(&ipmi_manager, client, message, now);
 					polled_num++;

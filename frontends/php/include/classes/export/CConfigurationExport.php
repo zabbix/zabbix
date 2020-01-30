@@ -1116,6 +1116,7 @@ class CConfigurationExport {
 				'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name',
 				'description', 'parameters'
 			],
+			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);

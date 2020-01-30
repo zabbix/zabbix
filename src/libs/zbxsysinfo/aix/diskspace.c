@@ -22,6 +22,7 @@
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxalgo.h"
+#include "inodes.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
@@ -284,7 +285,9 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct vmount		*vms = NULL, *vm;
 	struct zbx_json		j;
 	zbx_uint64_t		total, not_used, used;
+	zbx_uint64_t		itotal, inot_used, iused;
 	double			pfree, pused;
+	double			ipfree, ipused;
 	char 			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
@@ -318,14 +321,26 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_free(error);
 			continue;
 		}
+		if (SYSINFO_RET_OK != get_fs_inode_stat(mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused, "pused",
+				&error))
+		{
+			zbx_free(error);
+			continue;
+		}
+
 		mntpoint = (zbx_mpoint_t *)zbx_malloc(NULL, sizeof(zbx_mpoint_t));
 		zbx_strlcpy(mntpoint->fsname, mpoint, MAX_STRING_LEN);
 		zbx_strlcpy(mntpoint->fstype, zbx_get_vfs_name_by_type(vm->vmt_gfstype), MAX_STRING_LEN);
-		mntpoint->total = total;
-		mntpoint->used = used;
-		mntpoint->not_used = not_used;
-		mntpoint->pfree = pfree;
-		mntpoint->pused = pused;
+		mntpoint->bytes.total = total;
+		mntpoint->bytes.used = used;
+		mntpoint->bytes.not_used = not_used;
+		mntpoint->bytes.pfree = pfree;
+		mntpoint->bytes.pused = pused;
+		mntpoint->inodes.total = itotal;
+		mntpoint->inodes.used = iused;
+		mntpoint->inodes.not_used = inot_used;
+		mntpoint->inodes.pfree = ipfree;
+		mntpoint->inodes.pused = ipused;
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 
@@ -353,11 +368,20 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addobject(&j, NULL);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mntpoint->fsname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mntpoint->fstype, ZBX_JSON_TYPE_STRING);
-			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mntpoint->total);
-			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mntpoint->not_used);
-			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mntpoint->used);
-			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->pfree);
-			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->pused);
+			zbx_json_addobject(&j, ZBX_SYSINFO_TAG_BYTES);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mntpoint->bytes.total);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mntpoint->bytes.not_used);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mntpoint->bytes.used);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->bytes.pfree);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->bytes.pused);
+			zbx_json_close(&j);
+			zbx_json_addobject(&j, ZBX_SYSINFO_TAG_INODES);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mntpoint->inodes.total);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mntpoint->inodes.not_used);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mntpoint->inodes.used);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
+			zbx_json_close(&j);
 			zbx_json_close(&j);
 		}
 

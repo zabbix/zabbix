@@ -577,11 +577,8 @@ $form_list
 		(new CTextBox('port', $data['port'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'row_port'
 	)
-	->addRow(
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setAsteriskMark(),
-		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
+	->addRow(_('IPMI sensor'),
+		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_ipmi_sensor'
 	);
 

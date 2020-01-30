@@ -872,12 +872,12 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 
 /******************************************************************************
  *                                                                            *
- * Function: check_auto_registration_condition                                *
+ * Function: check_autoregistration_condition                                 *
  *                                                                            *
  * Purpose: check if event matches single condition                           *
  *                                                                            *
- * Parameters: event - auto registration event to check                       *
- *                         (event->source == EVENT_SOURCE_AUTO_REGISTRATION)  *
+ * Parameters: event - autoregistration event to check                        *
+ *                         (event->source == EVENT_SOURCE_AUTOREGISTRATION)   *
  *             condition - condition for matching                             *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
@@ -885,7 +885,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_auto_registration_condition(const DB_EVENT *event, DB_CONDITION *condition)
+static int	check_autoregistration_condition(const DB_EVENT *event, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1333,8 +1333,8 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 		case EVENT_SOURCE_DISCOVERY:
 			ret = check_discovery_condition(event, condition);
 			break;
-		case EVENT_SOURCE_AUTO_REGISTRATION:
-			ret = check_auto_registration_condition(event, condition);
+		case EVENT_SOURCE_AUTOREGISTRATION:
+			ret = check_autoregistration_condition(event, condition);
 			break;
 		case EVENT_SOURCE_INTERNAL:
 			ret = check_internal_condition(event, condition);
@@ -1743,7 +1743,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	zbx_dc_get_actions_eval(&actions, uniq_conditions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
-	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations (except command and message */
+	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION: execute operations (except command and message  */
 	/*    operations) for events that match action conditions.                                                   */
 	for (i = 0; i < events->values_num; i++)
 	{
@@ -1776,14 +1776,14 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 					zbx_escalation_new_t	*new_escalation;
 
 					/* command and message operations handled by escalators even for    */
-					/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTO_REGISTRATION events */
+					/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTOREGISTRATION events  */
 					new_escalation = (zbx_escalation_new_t *)zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
 					new_escalation->actionid = action->actionid;
 					new_escalation->event = event;
 					zbx_vector_ptr_append(&new_escalations, new_escalation);
 
 					if (EVENT_SOURCE_DISCOVERY == event->source ||
-							EVENT_SOURCE_AUTO_REGISTRATION == event->source)
+							EVENT_SOURCE_AUTOREGISTRATION == event->source)
 					{
 						execute_operations(event, action->actionid);
 					}
@@ -2091,8 +2091,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "actionid", actionids->values,
 			actionids->values_num);
 
-	result = DBselect("select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
-				"r_longdata,pause_suppressed,ack_shortdata,ack_longdata"
+	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -2116,13 +2115,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		}
 		zbx_free(tmp);
 
-		action->shortdata = zbx_strdup(NULL, row[5]);
-		action->longdata = zbx_strdup(NULL, row[6]);
-		action->r_shortdata = zbx_strdup(NULL, row[7]);
-		action->r_longdata = zbx_strdup(NULL, row[8]);
-		ZBX_STR2UCHAR(action->pause_suppressed, row[9]);
-		action->ack_shortdata = zbx_strdup(NULL, row[10]);
-		action->ack_longdata = zbx_strdup(NULL, row[11]);
+		ZBX_STR2UCHAR(action->pause_suppressed, row[5]);
 		action->name = zbx_strdup(NULL, row[1]);
 		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 
@@ -2152,13 +2145,6 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 
 void	free_db_action(DB_ACTION *action)
 {
-	zbx_free(action->shortdata);
-	zbx_free(action->longdata);
-	zbx_free(action->r_shortdata);
-	zbx_free(action->r_longdata);
-	zbx_free(action->ack_shortdata);
-	zbx_free(action->ack_longdata);
 	zbx_free(action->name);
-
 	zbx_free(action);
 }

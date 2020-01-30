@@ -1094,6 +1094,12 @@ class CHelpItems {
 					'key' => 'jmx.get[<discovery mode>,<object name>]',
 					'description' => _('Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD.')
 				]
+			],
+			ITEM_TYPE_IPMI => [
+				[
+					'key' => 'ipmi.get',
+					'description' => _('IPMI sensor IDs and other sensor-related parameters. Returns JSON.')
+				]
 			]
 		];
 	}

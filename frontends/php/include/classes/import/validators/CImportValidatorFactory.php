@@ -46,6 +46,9 @@ class CImportValidatorFactory extends CRegistryFactory {
 			},
 			'4.4' => function () use ($format) {
 				return new C44XmlValidator($format);
+			},
+			'5.0' => function () use ($format) {
+				return new C50XmlValidator($format);
 			}
 		]);
 	}

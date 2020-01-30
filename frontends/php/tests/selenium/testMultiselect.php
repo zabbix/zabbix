@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
+/**
+ * @browsers chrome
+ */
 class testMultiselect extends CWebTest {
 
 	public function testMultiselect_disableDebugMode() {
