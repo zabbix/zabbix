@@ -369,7 +369,7 @@ class C44ImportConverter extends CConverter {
 					if (array_key_exists('type', $interface) && $interface['type'] === CXmlConstantName::SNMP) {
 						// Save bulk value.
 						$interface['details'] = [
-							'bulk' => array_key_exists('bulk', $interface) ? $interface['bulk'] : CXmlConstantName::YES,
+							'bulk' => array_key_exists('bulk', $interface) ? $interface['bulk'] : CXmlConstantName::YES
 						];
 
 						unset($interface['bulk']);
