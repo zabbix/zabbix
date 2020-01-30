@@ -286,6 +286,7 @@
 				main: '0',
 				details: {
 					version: <?= SNMP_V2C ?>,
+					community: '{$SNMP_COMMUNITY}',
 					bulk: <?= SNMP_BULK_ENABLED ?>,
 					securitylevel: <?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>,
 					authprotocol: <?= ITEM_AUTHPROTOCOL_MD5 ?>,
