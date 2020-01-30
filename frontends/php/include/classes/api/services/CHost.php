@@ -470,20 +470,6 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// Filter hosts by given problem severities.
-		if ($options['severities'] !== null) {
-			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM items i,functions f,problem p'.
-				' WHERE i.hostid=h.hostid'.
-					' AND i.itemid=f.itemid'.
-					' AND f.triggerid=p.objectid'.
-					' AND p.object='.EVENT_OBJECT_TRIGGER.
-					' AND p.source='.EVENT_SOURCE_TRIGGERS.
-					' AND '.dbConditionInt('p.severity', zbx_toArray($options['severities'])).
-				')';
-		}
-
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			if ($options['inheritedTags']) {
@@ -577,9 +563,11 @@ class CHost extends CHostGeneral {
 		$sqlParts = $this->applyQueryFilterOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($host = DBfetch($res)) {
-			if ($options['countOutput']) {
+
+		// Return count or grouped counts via direct SQL count.
+		if ($options['countOutput'] && !$this->requiresPostSqlFiltering($options)) {
+			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $options['limit']);
+			while ($host = DBfetch($res)) {
 				if ($options['groupCount']) {
 					$result[] = $host;
 				}
@@ -587,13 +575,15 @@ class CHost extends CHostGeneral {
 					$result = $host['rowscount'];
 				}
 			}
-			else {
-				$result[$host['hostid']] = $host;
-			}
+
+			return $result;
 		}
 
+		$result = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'hostid');
+
+		// Return count for post SQL filtered result sets.
 		if ($options['countOutput']) {
-			return $result;
+			return (string) count($result);
 		}
 
 		if ($result) {
@@ -2403,6 +2393,57 @@ class CHost extends CHostGeneral {
 		}
 
 		$this->validateEncryption($hosts, $db_hosts);
+
+		return $hosts;
+	}
+
+	protected function requiresPostSqlFiltering(array $options) {
+		return ($options['severities'] !== null || $options['withProblemsSuppressed'] !== null);
+	}
+
+	protected function applyPostSqlFiltering(array $hosts, array $options) {
+		$hosts = zbx_toHash($hosts, 'hostid');
+
+		if ($options['severities'] !== null || $options['withProblemsSuppressed'] !== null) {
+			$triggers = API::Trigger()->get([
+				'output' => [],
+				'selectHosts' => ['hostid'],
+				'hostids' => zbx_objectValues($hosts, 'hostid'),
+				'skipDependent' => true,
+				'status' => TRIGGER_STATUS_ENABLED,
+				'preservekeys' => true
+			]);
+
+			$problems = API::Problem()->get([
+				'output' => ['objectid'],
+				'objectids' => array_keys($triggers),
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => $options['withProblemsSuppressed'],
+				'severities' => $options['severities']
+			]);
+
+			if (!$problems) {
+				return [];
+			}
+
+			foreach ($hosts as $key => $host) {
+				$problems_found = false;
+
+				foreach ($problems as $problem) {
+					foreach ($triggers[$problem['objectid']]['hosts'] as $trigger_host) {
+						if (bccomp($trigger_host['hostid'], $host['hostid']) == 0) {
+							$problems_found = true;
+							break 2;
+						}
+					}
+				}
+
+				if (!$problems_found) {
+					unset($hosts[$key]);
+				}
+			}
+		}
 
 		return $hosts;
 	}

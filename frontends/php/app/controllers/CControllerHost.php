@@ -99,6 +99,7 @@ abstract class CControllerHost extends CController {
 			'inheritedTags' => true,
 			'groupids' => $groupids,
 			'severities' => $filter['severities'] ? $filter['severities'] : null,
+			'withProblemsSuppressed' => ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false,
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name'],
 				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
