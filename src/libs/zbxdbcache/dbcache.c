@@ -36,7 +36,6 @@
 #include "export.h"
 #include "zbxjson.h"
 #include "zbxhistory.h"
-#include "zbxdbupgrade.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -57,6 +56,7 @@ static char		*sql = NULL;
 static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
 
 extern unsigned char	program_type;
+extern int		CONFIG_DOUBLE_PRECISION;
 
 #define ZBX_IDS_SIZE	9
 
@@ -1743,7 +1743,7 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 {
 	char	*errmsg = NULL;
 
-	if (FAIL == zbx_variant_to_value_type(value, value_type, DBcheck_double_type(), &errmsg))
+	if (FAIL == zbx_variant_to_value_type(value, value_type, CONFIG_DOUBLE_PRECISION, &errmsg))
 	{
 		dc_history_set_error(hdata, errmsg);
 		return;
@@ -1825,7 +1825,7 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 				logvalue[zbx_db_strlen_n(logvalue, HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, DBcheck_double_type()))
+				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, CONFIG_DOUBLE_PRECISION))
 				{
 					dc_history_set_error(hdata, zbx_dsprintf(NULL, "Value " ZBX_FS_DBL
 							" is too small or too large.", hdata->value.dbl));

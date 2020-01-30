@@ -746,10 +746,8 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_PROBLEM_UPDATE_ACTION_COUNT	4
 
 /* database double precision upgrade states */
-#define ZBX_DB_DBL_PRECISION_ENABLED	0
-#define ZBX_DB_DBL_PRECISION_DISABLED	1
-#define ZBX_DB_DBL_PRECISION_UNKNOWN	2
-
+#define ZBX_DB_DBL_PRECISION_DISABLED	0
+#define ZBX_DB_DBL_PRECISION_ENABLED	1
 
 #define ZBX_USER_ONLINE_TIME	600
 

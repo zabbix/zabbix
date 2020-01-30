@@ -963,14 +963,7 @@ int	DBcheck_double_type(void)
 	DB_ROW		row;
 	char		*sql = NULL;
 	const int	total_dbl_cols = 9;
-	static int	ret = ZBX_DB_DBL_PRECISION_UNKNOWN;
-
-
-	/* database changes are not expected after DB upgrade process completed so result will remain the same */
-	if (ZBX_DB_DBL_PRECISION_UNKNOWN != ret)
-		return ret;
-	else
-		ret = ZBX_DB_DBL_PRECISION_DISABLED;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -986,7 +979,8 @@ int	DBcheck_double_type(void)
 	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
 			" where data_type like 'BINARY_DOUBLE'");
 #elif defined(HAVE_SQLITE3)
-	//TODO
+	/* upgrade patch is not required for sqlite3 */
+	ret = SUCCEED;
 	goto out;
 #endif
 
@@ -1005,7 +999,7 @@ int	DBcheck_double_type(void)
 	}
 
 	if (NULL != (row = DBfetch(result)) && total_dbl_cols == atoi(row[0]))
-		ret = ZBX_DB_DBL_PRECISION_ENABLED;
+		ret = SUCCEED;
 
 	DBfree_result(result);
 out:

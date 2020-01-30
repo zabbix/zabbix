@@ -24,7 +24,8 @@
 #include "preproc.h"
 #include "trapper_preproc.h"
 #include "../preprocessor/preproc_history.h"
-#include "zbxdbupgrade.h"
+
+extern int	CONFIG_DOUBLE_PRECISION;
 
 /******************************************************************************
  *                                                                            *
@@ -252,7 +253,7 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 		{
 			result = (zbx_preproc_result_t *)results.values[results.values_num - 1];
 			if (ZBX_VARIANT_NONE != result->value.type && FAIL == zbx_variant_to_value_type(&result->value,
-					value_type, DBcheck_double_type(), &preproc_error))
+					value_type, CONFIG_DOUBLE_PRECISION, &preproc_error))
 			{
 				break;
 			}
