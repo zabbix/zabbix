@@ -95,6 +95,13 @@ if ($user_type >= USER_TYPE_ZABBIX_ADMIN) {
 			->insertAfter(_('Maps'), _('Discovery'), [
 				'action' => 'discovery.view'
 			]);
+
+	$menu
+		->find(_('Reports'))
+			->add(_('Notifications'), [
+				'action' => 'report4.php'
+			]);
+
 	$menu->insertAfter(_('Reports'), _('Configuration'), [
 		'alias' => ['conf.import.php'],
 		'items' => [
@@ -133,14 +140,11 @@ if ($user_type == USER_TYPE_SUPER_ADMIN) {
 			->insertBefore(_('Availability report'), _('System information'), [
 				'action' => 'report.status'
 			])
-			->add(_('Audit'), [
+			->insertAfter(_('Triggers top 100'), _('Audit'), [
 				'action' => 'auditlogs.php'
 			])
-			->add(_('Action log'), [
+			->insertAfter(_('Audit'), _('Action log'), [
 				'action' => 'auditacts.php'
-			])
-			->add(_('Notifications'), [
-				'action' => 'report4.php'
 			]);
 
 	$menu
