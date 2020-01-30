@@ -65,24 +65,14 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$problems_div = (new CDiv())->addClass(ZBX_STYLE_PROBLEM_ICON_LIST);
 
-	$problems = [];
-	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$problems[$severity] = ['count' => 0];
-	}
+	$problem_type = ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? 'total' : 'unsuppressed';
 
-	foreach ($host['problems'] as $problem) {
-		$problems[$problem['severity']]['count']++;
-	}
-
-	// Sort by severity starting from highest severity.
-	krsort($problems);
-
-	foreach ($problems as $severity => $problem) {
-		if ($problem['count'] > 0) {
-			$problems_div->addItem((new CSpan($problem['count']))
+	foreach ($host['problemsBySeverity'] as $problem) {
+		if ($problem[$problem_type.'_count'] > 0) {
+			$problems_div->addItem((new CSpan($problem[$problem_type.'_count']))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
-				->addClass(getSeverityStatusStyle($severity))
-				->setAttribute('title', getSeverityName($severity, $data['config']))
+				->addClass(getSeverityStatusStyle($problem['severity']))
+				->setAttribute('title', getSeverityName($problem['severity'], $data['config']))
 			);
 		}
 	}

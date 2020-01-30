@@ -136,6 +136,7 @@ abstract class CControllerHost extends CController {
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
 			'selectInheritedTags' => ['tag', 'value'],
+			'selectProblemsBySeverity' => ['severity', 'total_count', 'unsuppressed_count'],
 			'hostids' => array_keys($hosts),
 			'preservekeys' => true
 		]);
@@ -153,21 +154,12 @@ abstract class CControllerHost extends CController {
 				$maintenanceids[$host['maintenanceid']] = true;
 			}
 
-			$host['problems'] = API::Problem()->get([
-				'output' => ['severity'],
-				'hostids' => $host['hostid'],
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'suppressed' => ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
-			]);
+			if ($host['problemsBySeverity']) {
+				$problem_type = ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? 'total' : 'unsuppressed';
+				$host['problem_total_count'] = 0;
 
-			$host['problem_total_count'] = count($host['problems']);
-
-			if ($host['problems'] && $filter['severities']) {
-				foreach ($host['problems'] as $i => $problem) {
-					if (!in_array($problem['severity'], $filter['severities'])) {
-						unset($host['problems'][$i]);
-					}
+				foreach ($host['problemsBySeverity'] as $problem) {
+					$host['problem_total_count'] += $problem[$problem_type.'_count'];
 				}
 			}
 
