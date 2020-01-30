@@ -109,6 +109,8 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 			'filter' => [
 				'maintenance_status' => null
 			],
+			'evaltype' => $fields['evaltype'],
+			'tags' => $fields['tags'],
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);

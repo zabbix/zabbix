@@ -159,6 +159,8 @@ function getSystemStatusData(array $filter) {
 			'triggerids' => array_keys($triggerids),
 			'monitored' => true,
 			'skipDependent' => true,
+			'evaltype' => $filter['evaltype'],
+			'tags' => $filter['tags'],
 			'preservekeys' => true
 		];
 
