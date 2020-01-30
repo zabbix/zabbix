@@ -379,6 +379,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	txn_level = 0;
 
 #if defined(HAVE_MYSQL)
+	unsigned int mysql_tls_mode = SSL_MODE_PREFERRED;
+
 	ZBX_UNUSED(dbschema);
 
 	if (NULL == (conn = mysql_init(NULL)))
@@ -387,14 +389,41 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL != ca)
+	if (NULL == tlsmode)
+		mysql_tls_mode = SSL_MODE_REQUIRED;
+	else if (0 == strcmp(tlsmode, "disable"))
+		mysql_tls_mode = SSL_MODE_DISABLED;
+	else if (0 == strcmp(tlsmode, "enable"))
+		mysql_tls_mode = SSL_MODE_REQUIRED;
+	else if (0 == strcmp(tlsmode, "verify-ca"))
+		mysql_tls_mode = SSL_MODE_VERIFY_CA;
+	else if (0 == strcmp(tlsmode, "verify-identity"))
+		mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
+	else
 	{
-		const unsigned int ssl_mode = SSL_MODE_VERIFY_IDENTITY;
-		mysql_options(conn, MYSQL_OPT_SSL_MODE, (const void*)&ssl_mode);
+		ret = ZBX_DB_FAIL;
+		zabbix_log(LOG_LEVEL_ERR, "unknown DBTLSMode value: %s", tlsmode);
 	}
-	mysql_ssl_set(conn, key, cert, ca, NULL, cipher);
 
-	if (NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
+	mysql_options(conn, MYSQL_OPT_SSL_MODE, &mysql_tls_mode);
+
+	if (NULL != tlsmode &&
+		(0 == strcmp("verify-ca", tlsmode) || 0 == strcmp("verify-identity", tlsmode)) &&
+				NULL == ca)
+	{
+		ret = ZBX_DB_FAIL;
+		zabbix_log(LOG_LEVEL_ERR,
+			"option DBTLSCAFile has to be set, if DBTLSMode is set to verify-ca or verify-identity");
+	}
+
+	mysql_options(conn, MYSQL_OPT_SSL_CA, ca);
+	mysql_options(conn, MYSQL_OPT_SSL_KEY, key);
+	mysql_options(conn, MYSQL_OPT_SSL_CERT, cert);
+	mysql_options(conn, MYSQL_OPT_SSL_CIPHER, cipher);
+
+	if (ZBX_DB_OK == ret &&
+			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
+				CLIENT_MULTI_STATEMENTS))
 	{
 		zbx_db_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
@@ -554,21 +583,32 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (NULL == host || 0 == strcmp("localhost", host))
 		pg_values[i++] = NULL;
 	else if (NULL == tlsmode)
-		pg_values[i++] = NULL;
+		pg_values[i++] = PG_TLS_REQUIRE;
 	else if (0 == strcmp(tlsmode, "disable"))
 		pg_values[i++] = PG_TLS_DISABLE;
-	else if (0 == strcmp(tlsmode, "require"))
+	else if (0 == strcmp(tlsmode, "enable"))
 		pg_values[i++] = PG_TLS_REQUIRE;
 	else if (0 == strcmp(tlsmode, "verify-ca"))
 		pg_values[i++] = PG_TLS_VERIFY_CA;
 	else if (0 == strcmp(tlsmode, "verify-identity"))
 		pg_values[i++] = PG_TLS_VERIFY_IDENTITY;
 	else
-		pg_values[i++] = NULL;
+	{
+		ret = ZBX_DB_FAIL;
+		zabbix_log(LOG_LEVEL_ERR, "unknown DBTLSMode value: %s", tlsmode);
+		goto out;
+	}
+
+	if (NULL != tlsmode && (0 == strcmp("verify-ca", tlsmode) || 0 == strcmp("verify-identity", tlsmode)) &&
+			NULL == ca)
+	{
+		ret = ZBX_DB_FAIL;
+		zabbix_log(LOG_LEVEL_ERR,
+			"option DBTLSCAFile has to be set, if DBTLSMode is set to verify-ca or verify-identity");
+		goto out;
+	}
 
 	conn = PQconnectdbParams(pg_keywords, pg_values, 0);
-
-	zbx_free(cport);
 
 	/* check to see that the backend connection was successfully made */
 	if (CONNECTION_OK != PQstatus(conn))
@@ -632,6 +672,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			ret = ZBX_DB_OK;
 	}
 out:
+zbx_free(cport);
 #elif defined(HAVE_SQLITE3)
 	ZBX_UNUSED(host);
 	ZBX_UNUSED(user);
