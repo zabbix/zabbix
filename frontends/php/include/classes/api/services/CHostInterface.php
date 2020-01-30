@@ -188,20 +188,11 @@ class CHostInterface extends CApiService {
 			$result = zbx_cleanHashes($result);
 		}
 
-		// Moving SNMP related fields to our separate array.
+		// Moving additional fields to separate object.
 		if ($this->outputIsRequested('details', $options['output'])) {
 			foreach ($result as &$value) {
-				$snmp = [
-					'version' => (string) SNMP_V2C,
-					'bulk' => (string) SNMP_BULK_ENABLED,
-					'community' => '',
-					'securityname' => '',
-					'securitylevel' => (string) ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
-					'authpassphrase' => '',
-					'privpassphrase' => '',
-					'authprotocol' => (string) ITEM_AUTHPROTOCOL_MD5,
-					'privprotocol' => (string) ITEM_PRIVPROTOCOL_DES,
-					'contextname' => ''
+				$snmp_fields = ['version', 'bulk', 'community', 'securityname', 'securitylevel', 'authpassphrase',
+					'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
 				];
 
 				$interface_type = $value['type'];
@@ -210,21 +201,33 @@ class CHostInterface extends CApiService {
 					unset($value['type']);
 				}
 
-				if ($interface_type != INTERFACE_TYPE_SNMP) {
-					foreach(array_keys($snmp) as $field_name) {
+				$details = [];
+
+				// Handle SNMP related fields.
+				if ($interface_type == INTERFACE_TYPE_SNMP) {
+					foreach ($snmp_fields as $field_name) {
+						$details[$field_name] = $value[$field_name];
 						unset($value[$field_name]);
 					}
 
-					$value['details'] = [];
-					continue;
+					if ($details['version'] == SNMP_V1 || $details['version'] == SNMP_V2C) {
+						foreach (['securityname', 'securitylevel', 'authpassphrase', 'privpassphrase', 'authprotocol',
+								'privprotocol', 'contextname'] as $snmp_field_name) {
+							unset($details[$snmp_field_name]);
+						}
+					}
+
+					if ($details['version'] == SNMP_V3) {
+						unset($details['community']);
+					}
+				}
+				else {
+					foreach($snmp_fields as $field_name) {
+						unset($value[$field_name]);
+					}
 				}
 
-				foreach (array_keys($snmp) as $field_name) {
-					$snmp[$field_name] = $value[$field_name];
-					unset($value[$field_name]);
-				}
-
-				$value['details'] = $snmp;
+				$value['details'] = $details;
 			}
 			unset($value);
 		}
