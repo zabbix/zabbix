@@ -113,6 +113,8 @@ function getSystemStatusData(array $filter) {
 		'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged', 'severity'],
 		'groupids' => array_keys($data['groups']),
 		'hostids' => $filter_hostids,
+		'evaltype' => $filter['evaltype'],
+		'tags' => $filter['tags'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'suppressed' => false,
@@ -159,8 +161,6 @@ function getSystemStatusData(array $filter) {
 			'triggerids' => array_keys($triggerids),
 			'monitored' => true,
 			'skipDependent' => true,
-			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
 			'preservekeys' => true
 		];
 

@@ -109,8 +109,6 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 			'filter' => [
 				'maintenance_status' => null
 			],
-			'evaltype' => $fields['evaltype'],
-			'tags' => $fields['tags'],
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
@@ -147,6 +145,8 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 				'name' => $filter_problem
 			],
 			'severities' => $filter_severities,
+			'evaltype' => $fields['evaltype'],
+			'tags' => $fields['tags'],
 			'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
 			'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 		]);
