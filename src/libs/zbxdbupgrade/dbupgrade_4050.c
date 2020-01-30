@@ -528,6 +528,20 @@ static int	DBpatch_4050027(void)
 	return DBdrop_field("actions", "ack_longdata");
 }
 
+static int	DBpatch_4050028(void)
+{
+	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("globalmacro", &field);
+}
+
+static int	DBpatch_4050029(void)
+{
+	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hostmacro", &field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -558,5 +572,7 @@ DBPATCH_ADD(4050024, 0, 1)
 DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
+DBPATCH_ADD(4050028, 0, 1)
+DBPATCH_ADD(4050029, 0, 1)
 
 DBPATCH_END()
