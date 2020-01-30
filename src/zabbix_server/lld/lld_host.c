@@ -2988,8 +2988,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		if (0 != strcmp(interface->port, port))
 			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT;
 
-		if (INTERFACE_TYPE_SNMP == interface->type &&
-				0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE))
+		if (INTERFACE_TYPE_SNMP == interface->type && interface->type == type)
 		{
 			zbx_lld_interface_snmp_t *snmp = interface->data.snmp;
 
