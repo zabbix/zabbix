@@ -474,13 +474,7 @@ class ZBase {
 			$action->run();
 
 			if (!($action instanceof CLegacyAction)) {
-				$response = $action->getResponse();
-
-				if (!is_subclass_of($response, CControllerResponse::class)) {
-					throw new Exception(_s('Unexpected response for action %s.', $action_name));
-				}
-
-				$this->processResponseFinal($router, $response);
+				$this->processResponseFinal($router, $action);
 			}
 		}
 		catch (Exception $e) {
@@ -494,9 +488,55 @@ class ZBase {
 		}
 	}
 
-	private function processResponseFinal(CRouter $router, CControllerResponse $response) {
-		// Controller returned data?
-		if ($response instanceof CControllerResponseData) {
+	private function processResponseFinal(CRouter $router, CAction $action) {
+		$response = $action->getResponse();
+
+		// Controller returned redirect to another page?
+		if ($response instanceof CControllerResponseRedirect) {
+			header('Content-Type: text/html; charset=UTF-8');
+			if ($response->getMessageOk() !== null) {
+				CSession::setValue('messageOk', $response->getMessageOk());
+			}
+			if ($response->getMessageError() !== null) {
+				CSession::setValue('messageError', $response->getMessageError());
+			}
+			global $ZBX_MESSAGES;
+			if (isset($ZBX_MESSAGES)) {
+				CSession::setValue('messages', $ZBX_MESSAGES);
+			}
+			if ($response->getFormData() !== null) {
+				CSession::setValue('formData', $response->getFormData());
+			}
+
+			redirect($response->getLocation());
+		}
+		// Controller returned fatal error?
+		elseif ($response instanceof CControllerResponseFatal) {
+			header('Content-Type: text/html; charset=UTF-8');
+
+			global $ZBX_MESSAGES;
+			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+			foreach ($messages as $message) {
+				$response->addMessage($message['message']);
+			}
+
+			$response->addMessage('Controller: '.$router->getAction());
+			ksort($_REQUEST);
+			foreach ($_REQUEST as $key => $value) {
+				if ($key !== 'sid') {
+					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
+				}
+			}
+			CSession::setValue('messages', $response->getMessages());
+
+			redirect('zabbix.php?action=system.warning');
+		}
+		// Action has layout?
+		if ($router->getLayout() !== null) {
+			if (!($response instanceof CControllerResponseData)) {
+				throw new Exception(_s('Unexpected response for action %s.', $router->getAction()));
+			}
+
 			$layout_data_defaults = [
 				'page' => [
 					'title' => $response->getTitle(),
@@ -530,47 +570,6 @@ class ZBase {
 			}
 
 			echo (new CView($router->getLayout(), $layout_data))->getOutput();
-		}
-		// Controller returned redirect to another page?
-		elseif ($response instanceof CControllerResponseRedirect) {
-			header('Content-Type: text/html; charset=UTF-8');
-			if ($response->getMessageOk() !== null) {
-				CSession::setValue('messageOk', $response->getMessageOk());
-			}
-			if ($response->getMessageError() !== null) {
-				CSession::setValue('messageError', $response->getMessageError());
-			}
-			global $ZBX_MESSAGES;
-			if (isset($ZBX_MESSAGES)) {
-				CSession::setValue('messages', $ZBX_MESSAGES);
-			}
-			if ($response->getFormData() !== null) {
-				CSession::setValue('formData', $response->getFormData());
-			}
-
-			redirect($response->getLocation());
-		}
-		// Controller returned fatal error?
-		elseif ($response instanceof CControllerResponseFatal) {
-			header('Content-Type: text/html; charset=UTF-8');
-
-			global $ZBX_MESSAGES;
-			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
-			foreach ($messages as $message) {
-				$response->addMessage($message['message']);
-			}
-
-			$response->addMessage('Controller: '.$router->getAction());
-			ksort($_REQUEST);
-			foreach ($_REQUEST as $key => $value) {
-				// do not output SID
-				if ($key != 'sid') {
-					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
-				}
-			}
-			CSession::setValue('messages', $response->getMessages());
-
-			redirect('zabbix.php?action=system.warning');
 		}
 
 		exit;
