@@ -93,6 +93,7 @@ class testGraphWidget extends CWebTest {
 
 	/*
 	 * Check screenshots of graph widget form.
+	 * @browsers chrome
 	 */
 	public function testGraphWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
