@@ -58,15 +58,16 @@ class CControllerIconMapUpdate extends CController {
 
 		$result = (bool) API::IconMap()->update($iconmap);
 
-		$url = new CUrl('zabbix.php');
-
 		if ($result) {
-			$response = new CControllerResponseRedirect($url->setArgument('action', 'iconmap.list'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'iconmap.list')
+			);
 			$response->setMessageOk(_('Icon map updated'));
 		}
 		else {
-			$url->setArgument('iconmapid', $iconmap['iconmapid']);
-			$response = new CControllerResponseRedirect($url->setArgument('action', 'iconmap.edit'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'iconmap.edit')
+			);
 			$form_data = $this->getInputAll();
 			if (!array_key_exists('mappings', $form_data['iconmap'])) {
 				$form_data['iconmap']['mappings'] = [];
