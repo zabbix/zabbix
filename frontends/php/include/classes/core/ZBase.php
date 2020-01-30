@@ -605,7 +605,7 @@ class ZBase {
 	private function initModuleManager() {
 		$this->module_manager = new CModuleManager($this->rootDir.'/modules');
 
-		$db_modules = API::Module()->get([
+		$db_modules = API::getApiService('module')->get([
 			'output' => ['id', 'relative_path', 'config'],
 			'filter' => ['status' => MODULE_STATUS_ENABLED],
 			'sortfield' => 'relative_path'
