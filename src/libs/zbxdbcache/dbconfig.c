@@ -1781,6 +1781,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		}
 
 		/* store new information in macro structure */
+		ZBX_STR2UCHAR(gmacro->type, row[3]);
 		DCstrpool_replace(found, &gmacro->macro, macro);
 		DCstrpool_replace(found, &gmacro->value, row[2]);
 
@@ -1873,6 +1874,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 
 		/* store new information in macro structure */
 		hmacro->hostid = hostid;
+		ZBX_STR2UCHAR(hmacro->type, row[4]);
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);
 
