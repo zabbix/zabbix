@@ -271,7 +271,7 @@ $output = [
 	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [
 		[
-			'title' => _('Get value and test'),
+			'title' => ($data['is_item_testable'] && $data['get_value']) ? _('Get value and test') : _('Test'),
 			'class' => 'submit-test-btn',
 			'keepOpen' => true,
 			'enabled' => true,

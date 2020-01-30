@@ -449,7 +449,8 @@ jQuery(document).ready(function($) {
 	<?php if ($data['is_item_testable']): ?>
 		$('#get_value').on('change', function() {
 			$rows = $('#host_address_row, #proxy_hostid_row, #get_value_row'),
-			$form = $('#preprocessing-test-form');
+			$form = $('#preprocessing-test-form'),
+			$submit_btn = $('.submit-test-btn');
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
@@ -470,6 +471,7 @@ jQuery(document).ready(function($) {
 					$('#interface_port').prop('disabled', false);
 				<?php endif ?>
 
+				$submit_btn.html('<?= _('Get value and test') ?>');
 				$rows.show();
 			}
 			else {
@@ -491,6 +493,7 @@ jQuery(document).ready(function($) {
 					$('#interface_port').prop('disabled', false);
 				<?php endif ?>
 
+				$submit_btn.html('<?= _('Test') ?>');
 				$rows.hide();
 			}
 		}).trigger('change');
