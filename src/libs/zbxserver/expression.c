@@ -6262,3 +6262,23 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
 	return SUCCEED;
 #endif
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_substitute_notification_macros                               *
+ *                                                                            *
+ * Purpose: wrap substitute_simple_macros with nonsecure macro environment    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_substitute_notification_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		zbx_uint64_t *userid, const DB_ACKNOWLEDGE *ack, char **data, int macro_type)
+{
+	unsigned char	old_macro_env;
+	int		ret;
+
+	old_macro_env = zbx_dc_set_macro_env(ZBX_MACRO_ENV_NONSECURE);
+	ret = substitute_simple_macros(actionid, event, r_event, userid, NULL, NULL, NULL, NULL, ack,
+			data, macro_type, NULL, 0);
+	zbx_dc_set_macro_env(old_macro_env);
+	return ret;
+}

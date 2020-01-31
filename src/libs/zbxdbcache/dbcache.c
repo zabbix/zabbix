@@ -1005,7 +1005,7 @@ zbx_item_info_t;
  *                                                                            *
  * Parameters: items_info - [IN/OUT] output item name and applications        *
  *             itemids    - [IN] the item identifiers                         *
- *                                                                            *
+ *                                 q                                           *
  ******************************************************************************/
 static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
 {

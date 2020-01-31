@@ -393,10 +393,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	message = (NULL == cancel_error ? zbx_strdup(NULL, msg) :
 			zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\n%s", cancel_error, msg));
 
-	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
-			&subject, macro_type, NULL, 0);
-	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
-			&message, macro_type, NULL, 0);
+	zbx_substitute_notification_macros(&actionid, event, r_event, &userid, ack, &subject, macro_type);
+	zbx_substitute_notification_macros(&actionid, event, r_event, &userid, ack, &message, macro_type);
 
 	if (0 == mediatypeid)
 	{
@@ -1149,8 +1147,11 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		if (FAIL == rc)
 			status = ALERT_STATUS_FAILED;
 
+		buffer = zbx_strdup(NULL, row[12]);
+		zbx_substitute_notification_macros(&actionid, event, r_event, NULL, ack, &buffer, macro_type);
 		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
-				script.command, status, error);
+				buffer, status, error);
+		zbx_free(buffer);
 skip:
 		zbx_script_clean(&script);
 	}
