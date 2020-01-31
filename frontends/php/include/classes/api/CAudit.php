@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ class CAudit {
 		AUDIT_RESOURCE_ITEM_PROTOTYPE =>	['itemid', 'name', 'items'],
 		AUDIT_RESOURCE_MACRO =>				['globalmacroid', 'macro', 'globalmacro'],
 		AUDIT_RESOURCE_MEDIA_TYPE =>		['mediatypeid', 'name', 'media_type'],
+		AUDIT_RESOURCE_MODULE =>			['moduleid', 'id', 'module'],
 		AUDIT_RESOURCE_PROXY =>				['proxyid', 'host', 'hosts'],
 		AUDIT_RESOURCE_SCENARIO =>			['httptestid', 'name', 'httptest'],
 		AUDIT_RESOURCE_SCRIPT =>			['scriptid', 'name', 'scripts'],

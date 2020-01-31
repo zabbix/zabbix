@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,6 +66,9 @@ type AgentOptions struct {
 	TLSKeyFile           string   `conf:"optional"`
 	TLSServerCertIssuer  string   `conf:"optional"`
 	TLSServerCertSubject string   `conf:"optional"`
+
+	AllowKey interface{} `conf:"optional"`
+	DenyKey  interface{} `conf:"optional"`
 
 	Plugins map[string]interface{} `conf:"optional"`
 }

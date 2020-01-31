@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ $fields = [
 									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.
 										' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
 								],
-	'ipmi_sensor' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,
+	'ipmi_sensor' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM, null,
 									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_IPMI,
 									_('IPMI sensor')
 								],

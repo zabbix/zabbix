@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ else {
 	$operation_type_combobox = new CComboBox(
 		'operationtype',
 		$data['operationtype'],
-		"reloadPopup(this.form, '".$data['action']."');"
+		"resetOpmessage(); reloadPopup(this.form, '".$data['action']."');"
 	);
 	foreach ($data['allowed_operations'][$data['type']] as $operation) {
 		$operation_type_combobox->addItem($operation, operation_type2str($operation));
@@ -107,39 +107,20 @@ if (in_array($data['operationtype'], [
 ])) {
 	if (!array_key_exists('opmessage', $opr_data)) {
 		$opr_data['opmessage_usr'] = [];
-		$opr_data['opmessage'] = ['default_msg' => 1, 'mediatypeid' => 0];
-
-		switch ($data['source']) {
-			case EVENT_SOURCE_TRIGGERS:
-				if ($data['type'] == ACTION_OPERATION) {
-					$opr_data['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_PROBLEM;
-					$opr_data['opmessage']['message'] = ACTION_DEFAULT_MSG_PROBLEM;
-				}
-				elseif ($data['type'] == ACTION_RECOVERY_OPERATION) {
-					$opr_data['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_RECOVERY;
-					$opr_data['opmessage']['message'] = ACTION_DEFAULT_MSG_RECOVERY;
-				}
-				elseif ($data['type'] == ACTION_ACKNOWLEDGE_OPERATION) {
-					$opr_data['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_ACKNOWLEDGE;
-					$opr_data['opmessage']['message'] = ACTION_DEFAULT_MSG_ACKNOWLEDGE;
-				}
-				break;
-			case EVENT_SOURCE_DISCOVERY:
-				$opr_data['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_DISCOVERY;
-				$opr_data['opmessage']['message'] = ACTION_DEFAULT_MSG_DISCOVERY;
-				break;
-			case EVENT_SOURCE_AUTO_REGISTRATION:
-				$opr_data['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_AUTOREG;
-				$opr_data['opmessage']['message'] = ACTION_DEFAULT_MSG_AUTOREG;
-				break;
-			default:
-				$opr_data['opmessage']['subject'] = '';
-				$opr_data['opmessage']['message'] = '';
-		}
+		$opr_data['opmessage'] = [
+			'default_msg' => 1,
+			'mediatypeid' => 0,
+			'subject' => '',
+			'message' => ''
+		];
 	}
 
 	if (!array_key_exists('default_msg', $opr_data['opmessage'])) {
-		$opr_data['opmessage']['default_msg'] = 0;
+		$opr_data['opmessage']['default_msg'] = 1;
+	}
+
+	if (!array_key_exists('mediatypeid', $opr_data['opmessage'])) {
+		$opr_data['opmessage']['mediatypeid'] = 0;
 	}
 }
 
@@ -271,9 +252,9 @@ switch ($data['operationtype']) {
 	// Notify all involved form elements.
 	case OPERATION_TYPE_RECOVERY_MESSAGE:
 		$form_list
-			->addRow(_('Default message'),
-				(new CCheckBox('operation[opmessage][default_msg]'))
-					->setChecked($opr_data['opmessage']['default_msg'] == 1)
+			->addRow(_('Custom message'),
+				(new CCheckBox('operation[opmessage][default_msg]', 0))
+					->setChecked($opr_data['opmessage']['default_msg'] == 0)
 			)
 			->addRow(_('Subject'),
 				(new CTextBox('operation[opmessage][subject]', $opr_data['opmessage']['subject']))
@@ -293,7 +274,7 @@ switch ($data['operationtype']) {
 						"#".zbx_formatDomId('operation[opmessage][message]').
 					"')".
 						".closest('li')".
-						".toggle(!default_message);".
+						".toggle(default_message);".
 				"});".
 				"jQuery('#".zbx_formatDomId('operation[opmessage][default_msg]')."').trigger('change');";
 		break;

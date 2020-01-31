@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,9 +44,10 @@ static int	zbx_mock_str_to_key_access_type(const char *str)
 
 void	zbx_mock_test_entry(void **state)
 {
+	zbx_mock_error_t	error;
 	zbx_mock_handle_t	hrules, hrule, hmetrics, hmetric;
 	const char		*type, *pattern, *key;
-	int			expected_ret, actual_ret;
+	int			expected_ret, actual_ret, exit_code = SUCCEED;
 	zbx_uint64_t		rules;
 
 	ZBX_UNUSED(state);
@@ -67,6 +68,14 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	finalize_key_access_rules_configuration();
+
+	if (ZBX_MOCK_NO_EXIT_CODE != (error = zbx_mock_exit_code(&exit_code)))
+	{
+		if (ZBX_MOCK_SUCCESS == error)
+			fail_msg("exit(%d) expected", exit_code);
+		else
+			fail_msg("Cannot get exit code from test case data: %s", zbx_mock_error_string(error));
+	}
 
 	rules = zbx_mock_get_parameter_uint64("out.number_of_rules");
 
