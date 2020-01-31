@@ -106,7 +106,6 @@ var PageRefresh = {
  * Main menu
  */
 var MMenu = {
-	menus:			{'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
 	def_label:		null,
 	sub_active: 	false,
 	timeout_reset:	null,
@@ -158,32 +157,16 @@ var MMenu = {
 	},
 
 	showSubMenu: function(show_label, focus_subitem) {
-		var sub_menu = $('sub_' + show_label),
+		var sub_menu = jQuery('#sub_' + show_label),
+			top_menu = jQuery('#' + show_label),
 			focus_subitem = focus_subitem || false;
 
-		if (sub_menu !== null) {
-			$(show_label).className = 'selected';
-			sub_menu.show();
+		if (sub_menu) {
+			top_menu.addClass('selected').siblings().removeClass('selected');
+			sub_menu.show().siblings('.top-subnav').hide();
 
 			if (focus_subitem) {
 				jQuery('li:first > a', sub_menu).focus();
-			}
-
-			for (var key in this.menus) {
-				if (key == show_label) {
-					continue;
-				}
-
-				var menu_cell = $(key);
-				if (menu_cell !== null) {
-					menu_cell.className = '';
-					jQuery('a', menu_cell).blur();
-				}
-
-				var sub_menu_cell = $('sub_' + key);
-				if (sub_menu_cell !== null) {
-					sub_menu_cell.hide();
-				}
 			}
 		}
 	}

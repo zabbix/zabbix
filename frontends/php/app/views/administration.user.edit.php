@@ -166,7 +166,7 @@ $user_form_list
 			: $lang
 	)
 	->addRow(_('Theme'),
-		new CComboBox('theme', $data['theme'], null, [THEME_DEFAULT => _('System default')] + Z::getThemes())
+		new CComboBox('theme', $data['theme'], null, [THEME_DEFAULT => _('System default')] + APP::getThemes())
 	);
 
 // Append auto-login & auto-logout to form list.

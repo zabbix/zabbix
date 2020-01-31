@@ -7795,6 +7795,37 @@ return [
 			],
 		],
 	],
+	'module' => [
+		'key' => 'moduleid',
+		'fields' => [
+			'moduleid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'id' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+			],
+			'relative_path' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'config' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '{}',
+			],
+		],
+	],
 	'dbversion' => [
 		'key' => '',
 		'fields' => [

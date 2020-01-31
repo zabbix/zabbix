@@ -126,16 +126,9 @@ class CView {
 			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and ".".', $view));
 		}
 
-		$found = false;
-		foreach (self::$viewsDir as $dir) {
-			$this->filePath = $dir.'/'.$view.'.php';
-			if (file_exists($this->filePath)) {
-				$found = true;
-				break;
-			}
-		}
+		$this->filePath = $this->findFile($view.'.php');
 
-		if ($found == false) {
+		if (is_null($this->filePath)) {
 			throw new Exception(_s('File provided to a view does not exist. Tried to find "%s".', $this->filePath));
 		}
 	}
@@ -281,11 +274,19 @@ class CView {
 	 */
 	public function getIncludedJS() {
 		ob_start();
+		$data = $this->data;
+
 		foreach ($this->jsIncludeFiles as $filename) {
-			if((include $filename) === false) {
+			$path = $this->findFile($filename);
+
+			if (!is_null($path)) {
+				include $path;
+			}
+			else if((include $filename) === false) {
 				throw new Exception(_s('Cannot include JS file "%s".', $filename));
 			}
 		}
+
 		return ob_get_clean();
 	}
 
@@ -330,5 +331,24 @@ class CView {
 		self::$js_loader_disabled = true;
 
 		return $this;
+	}
+
+	/**
+	 * Find view or view.js file by relative path. Returns absolute path to file.
+	 *
+	 * @param string $filename    File name with extension.
+	 *
+	 * @return string|null
+	 */
+	protected function findFile($filename) {
+		foreach (self::$viewsDir as $dir) {
+			$path = $dir.'/'.$filename;
+
+			if (file_exists($path)) {
+				return $path;
+			}
+		}
+
+		return null;
 	}
 }
