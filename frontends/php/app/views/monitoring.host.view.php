@@ -170,3 +170,7 @@ $widget->addItem((new CView('monitoring.host.view.html', array_intersect_key($da
 ]))))->getOutput());
 
 $widget->show();
+
+$this->addPostJS('jQuery(function($) {'.
+	'host_page.start();'.
+'});');

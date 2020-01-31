@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -59,7 +61,7 @@
 
 		hostPage.prototype = {
 			getCurrentForm: function() {
-				return $('form[name=items]');
+				return $('form[name=host_view]');
 			},
 			addMessages: function(messages) {
 				$('main').prepend(messages);
@@ -82,8 +84,6 @@
 			},
 			doRefresh: function(body) {
 				this.getCurrentForm().replaceWith(body);
-				//this.hydrate();
-				//chkbxRange.init();
 			},
 			bindDataEvents: function(deferred) {
 				var that = this;
@@ -156,6 +156,5 @@
 		};
 
 		window.host_page = new hostPage(true);
-		//window.latest_page.hydrate();
 	});
 </script>

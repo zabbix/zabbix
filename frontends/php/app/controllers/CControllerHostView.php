@@ -177,7 +177,8 @@ class CControllerHostView extends CControllerHost {
 			'tags' => $filter_tags,
 			'severities' => CProfile::getArray('web.host.filter.severities', []),
 			'show_suppressed' => CProfile::get('web.host.filter.show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
-			'maintenance_status' => CProfile::get('web.host.filter.maintenance_status', HOST_MAINTENANCE_STATUS_ON)
+			'maintenance_status' => CProfile::get('web.host.filter.maintenance_status', HOST_MAINTENANCE_STATUS_ON),
+			'page' => $this->hasInput('page') ? $this->getInput('page') : null
 		];
 
 		$refresh_curl = (new CUrl('zabbix.php'))
@@ -194,9 +195,7 @@ class CControllerHostView extends CControllerHost {
 			->setArgument('filter_maintenance_status', $filter['maintenance_status'])
 			->setArgument('sort', $sort)
 			->setArgument('sortorder', $sortorder)
-			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
-
-		$filter['page'] = $this->hasInput('page') ? $this->getInput('page') : null;
+			->setArgument('page', $filter['page']);
 
 		$prepared_data = $this->prepareData($filter, $sort, $sortorder);
 

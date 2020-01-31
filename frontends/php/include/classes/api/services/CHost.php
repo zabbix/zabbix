@@ -29,36 +29,63 @@ class CHost extends CHostGeneral {
 	/**
 	 * Get host data.
 	 *
-	 * @param array			$options
-	 * @param array			$options['groupids']					HostGroup IDs
-	 * @param array			$options['hostids']						Host IDs
-	 * @param bool			$options['monitored_hosts']				only monitored Hosts
-	 * @param bool			$options['templated_hosts']				include templates in result
-	 * @param bool			$options['with_items']					only with items
-	 * @param bool			$options['with_item_prototypes']		only with item prototypes
-	 * @param bool			$options['with_simple_graph_items']		only with items suitable for graphs
-	 * @param bool			$options['with_simple_graph_item_prototypes']	only with item prototypes suitable for graphs
-	 * @param bool			$options['with_monitored_items']		only with monitored items
-	 * @param bool			$options['with_triggers']				only with triggers
-	 * @param bool			$options['with_monitored_triggers']		only with monitored triggers
-	 * @param bool			$options['with_httptests']				only with http tests
-	 * @param bool			$options['with_monitored_httptests']	only with monitored http tests
-	 * @param bool			$options['with_graphs']					only with graphs
-	 * @param bool			$options['with_graph_prototypes']		only with graph prototypes
-	 * @param bool			$options['editable']					only with read-write permission. Ignored for SuperAdmins
-	 * @param bool			$options['selectGroups']				select HostGroups
-	 * @param bool			$options['selectItems']					select Items
-	 * @param bool			$options['selectTriggers']				select Triggers
-	 * @param bool			$options['selectGraphs']				select Graphs
-	 * @param bool			$options['selectApplications']			select Applications
-	 * @param bool			$options['selectMacros']				select Macros
-	 * @param bool|array	$options['selectInventory']				select Inventory
-	 * @param int			$options['count']						count Hosts, returned column name is rowscount
-	 * @param string		$options['pattern']						search hosts by pattern in Host name
-	 * @param string		$options['extendPattern']				search hosts by pattern in Host name, ip and DNS
-	 * @param int			$options['limit']						limit selection
-	 * @param string		$options['sortfield']					field to sort by
-	 * @param string		$options['sortorder']					sort order
+	 * @param array         $options
+	 * @param array         $options['groupids']                           Select hosts by group IDs.
+	 * @param array         $options['hostids']                            Select hosts by host IDs.
+	 * @param array         $options['templateids']                        Select hosts by template IDs.
+	 * @param array         $options['interfaceids']                       Select hosts by interface IDs.
+	 * @param array         $options['itemids']                            Select hosts by item IDs.
+	 * @param array         $options['triggerids']                         Select hosts by trigger IDs.
+	 * @param array         $options['maintenanceids']                     Select hosts by maintenance IDs.
+	 * @param array         $options['graphids']                           Select hosts by graph IDs.
+	 * @param array         $options['applicationids']                     Select hosts by application IDs.
+	 * @param array         $options['dserviceids']                        Select hosts by discovery service IDs.
+	 * @param array         $options['httptestids']                        Select hosts by web scenario IDs.
+	 * @param bool          $options['monitored_hosts']                    Return only monitored hosts.
+	 * @param bool          $options['templated_hosts']                    Include templates in result.
+	 * @param bool          $options['proxy_hosts']                        Include proxies in result.
+	 * @param bool          $options['with_items']                         Select hosts only with items.
+	 * @param bool          $options['with_item_prototypes']               Select hosts only with item prototypes.
+	 * @param bool          $options['with_simple_graph_items']            Select hosts only with items suitable for graphs.
+	 * @param bool          $options['with_simple_graph_item_prototypes']  Select hosts only with item prototypes suitable for graphs.
+	 * @param bool          $options['with_monitored_items']               Select hosts only with monitored items.
+	 * @param bool          $options['with_triggers']                      Select hosts only with triggers.
+	 * @param bool          $options['with_monitored_triggers']            Select hosts only with monitored triggers.
+	 * @param bool          $options['with_httptests']                     Select hosts only with http tests.
+	 * @param bool          $options['with_monitored_httptests']           Select hosts only with monitored http tests.
+	 * @param bool          $options['with_graphs']                        Select hosts only with graphs.
+	 * @param bool          $options['with_graph_prototypes']              Select hosts only with graph prototypes.
+	 * @param bool          $options['with_applications']                  Select hosts with applications.
+	 * @param bool          $options['withProblemsSuppressed']             Select hosts that have suppressed problems. (null - all, true - only suppressed, false - unsuppressed)
+	 * @param bool          $options['editable']                           Select hosts only with read-write permission. Ignored for Super admins.
+	 * @param bool          $options['nopermissions']                      Select hosts by ignoring all permissions. Only available inside API calls.
+	 * @param bool          $options['evaltype']                           Operator for tag filter 0 - AND/OR; 2 - OR.
+	 * @param bool          $options['tags']                               Select hosts by given tags.
+	 * @param bool          $options['severities']                         Select hosts that have only problems with given severities.
+	 * @param bool          $options['inheritedTags']                      Select hosts that have given tags also in their linked templates.
+	 * @param string|array  $options['selectGroups']                       Return a "groups" property with host groups data that the host belongs to.
+	 * @param string|array  $options['selectParentTemplates']              Return a "parentTemplates" property with templates that the host is linked to.
+	 * @param string|array  $options['selectItems']                        Return an "items" property with host items.
+	 * @param string|array  $options['selectDiscoveries']                  Return a "discoveries" property with host low-level discovery rules.
+	 * @param string|array  $options['selectTriggers']                     Return a "triggers" property with host triggers.
+	 * @param string|array  $options['selectGraphs']                       Return a "graphs" property with host graphs.
+	 * @param string|array  $options['selectApplications']                 Return an "applications" property with host applications.
+	 * @param string|array  $options['selectMacros']                       Return a "macros" property with host macros.
+	 * @param string|array  $options['selectScreens']                      Return a "screens" property with host screens.
+	 * @param string|array  $options['selectInterfaces']                   Return an "interfaces" property with host interfaces.
+	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
+	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
+	 * @param string|array  $options['selectDiscoveryRule']                Return a "discoveryRule" property with the low-level discovery rule that created the host (from host prototype in VMware monitoring).
+	 * @param string|array  $options['selectHostDiscovery']                Return a "hostDiscovery" property with host discovery object data.
+	 * @param string|array  $options['selectTags']                         Return a "tags" property with host tags.
+	 * @param string|array  $options['selectInheritedTags']                Return an "inheritedTags" property with tags that are on templates which are linked to host.
+	 * @param bool          $options['countOutput']                        Return host count as output.
+	 * @param bool          $options['groupCount']                         Group the host count.
+	 * @param bool          $options['preservekeys']                       Return host IDs as array keys.
+	 * @param string        $options['sortfield']                          Field to sort by.
+	 * @param string        $options['sortorder']                          Sort order.
+	 * @param int           $options['limit']                              Limit selection.
+	 * @param int           $options['limitSelects']                       Limits the number of records returned by subselects.
 	 *
 	 * @return array|boolean Host data as array or false if error
 	 */
@@ -102,13 +129,13 @@ class CHost extends CHostGeneral {
 			'with_graphs'						=> null,
 			'with_graph_prototypes'				=> null,
 			'with_applications'					=> null,
+			'withProblemsSuppressed'			=> null,
 			'editable'							=> false,
 			'nopermissions'						=> null,
 			// filter
 			'evaltype'							=> TAG_EVAL_TYPE_AND_OR,
 			'tags'								=> null,
 			'severities'						=> null,
-			'withProblemsSuppressed'			=> null,
 			'inheritedTags'						=> false,
 			'filter'							=> null,
 			'search'							=> null,

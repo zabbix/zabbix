@@ -41,6 +41,7 @@ abstract class CControllerHost extends CController {
 	 * @param string $filter['severities']          Filter problems on hosts by severities.
 	 * @param string $filter['show_suppressed']     Filter supressed problems.
 	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
+	 * @param int    $filter['page']                Page number.
 	 * @param string $sort						    Sorting field.
 	 * @param string $sortorder                     Sorting order.
 	 */
