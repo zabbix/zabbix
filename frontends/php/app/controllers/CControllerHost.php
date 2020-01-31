@@ -214,6 +214,9 @@ abstract class CControllerHost extends CController {
 					$tags = $host['inheritedTags'];
 				}
 			}
+			else {
+				$tags = $host['tags'];
+			}
 
 			$host['tags'] = $tags;
 		}
