@@ -62,9 +62,11 @@ function DBconnect(&$error) {
 
 	$db = new $db_types[$DB['TYPE']];
 
-	$db->setConnectionSecurity($DB['ENCRYPTION'], $DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE'],
-		$DB['VERIFY_HOST'],	$DB['CIPHER_LIST']
-	);
+	if ($DB['ENCRYPTION']) {
+		$db->setConnectionSecurity($DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE'], $DB['VERIFY_HOST'],
+			$DB['CIPHER_LIST']
+		);
+	}
 
 	$DB['DB'] = $db->connect($DB['SERVER'], $DB['PORT'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['SCHEMA']);
 

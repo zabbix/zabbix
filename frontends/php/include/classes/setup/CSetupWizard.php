@@ -282,7 +282,7 @@ class CSetupWizard extends CForm {
 
 			if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 				$verify_host_box
-					->setChecked(ZBX_DB_TLS_VERIFY_HOST)
+					->setChecked(true)
 					->setAttribute('readonly', true);
 			}
 			else {
@@ -482,8 +482,8 @@ class CSetupWizard extends CForm {
 		$DB['USER'] = $this->getConfig('DB_USER', 'root');
 		$DB['PASSWORD'] = $this->getConfig('DB_PASSWORD', '');
 		$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
-		$DB['ENCRYPTION'] = (bool) $this->getConfig('DB_ENCRYPTION', ZBX_DB_TLS_ENCRYPTION);
-		$DB['VERIFY_HOST'] = (bool) $this->getConfig('DB_VERIFY_HOST', ZBX_DB_TLS_VERIFY_HOST);
+		$DB['ENCRYPTION'] = (bool) $this->getConfig('DB_ENCRYPTION', true);
+		$DB['VERIFY_HOST'] = (bool) $this->getConfig('DB_VERIFY_HOST', true);
 		$DB['KEY_FILE'] = $this->getConfig('DB_KEY_FILE', '');
 		$DB['CERT_FILE'] = $this->getConfig('DB_CERT_FILE', '');
 		$DB['CA_FILE'] = $this->getConfig('DB_CA_FILE', '');
@@ -546,10 +546,10 @@ class CSetupWizard extends CForm {
 			$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
 			$this->setConfig('DB_SCHEMA', getRequest('schema', $this->getConfig('DB_SCHEMA', '')));
 			$this->setConfig('DB_ENCRYPTION',
-				getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', ZBX_DB_TLS_ENCRYPTION))
+				getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', true))
 			);
 			$this->setConfig('DB_VERIFY_HOST',
-				getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', ZBX_DB_TLS_VERIFY_HOST))
+				getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', true))
 			);
 			$this->setConfig('DB_KEY_FILE', getRequest('key_file', $this->getConfig('DB_KEY_FILE', '')));
 			$this->setConfig('DB_CERT_FILE', getRequest('cert_file', $this->getConfig('DB_CERT_FILE', '')));
