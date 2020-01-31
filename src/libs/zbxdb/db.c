@@ -342,7 +342,7 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tlsmode, char *cert, char *key, char *ca, char *cipher)
+			char *tls_connect, char *cert, char *key, char *ca, char *cipher)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
@@ -360,7 +360,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
-	ZBX_UNUSED(cipher);
 #elif defined(HAVE_SQLITE3)
 	char		*p, *path = NULL;
 #endif
@@ -389,31 +388,38 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == tlsmode)
+	if (NULL == tls_connect)
+		mysql_tls_mode = SSL_MODE_PREFERRED;
+	else if (0 == strcmp(tls_connect, "preferred"))
+		mysql_tls_mode = SSL_MODE_PREFERRED;
+	else if (0 == strcmp(tls_connect, "required"))
 		mysql_tls_mode = SSL_MODE_REQUIRED;
-	else if (0 == strcmp(tlsmode, "disable"))
-		mysql_tls_mode = SSL_MODE_DISABLED;
-	else if (0 == strcmp(tlsmode, "enable"))
-		mysql_tls_mode = SSL_MODE_REQUIRED;
-	else if (0 == strcmp(tlsmode, "verify-ca"))
+	else if (0 == strcmp(tls_connect, "verify_ca"))
 		mysql_tls_mode = SSL_MODE_VERIFY_CA;
-	else if (0 == strcmp(tlsmode, "verify-identity"))
+	else if (0 == strcmp(tls_connect, "verify_full"))
 		mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
 	else
 	{
+		zabbix_log(LOG_LEVEL_ERR, "unknown \"DBTLSConnect\" value: \"%s\"", tls_connect);
 		ret = ZBX_DB_FAIL;
-		zabbix_log(LOG_LEVEL_ERR, "unknown DBTLSMode value: %s", tlsmode);
 	}
 
 	mysql_options(conn, MYSQL_OPT_SSL_MODE, &mysql_tls_mode);
 
-	if (NULL != tlsmode &&
-		(0 == strcmp("verify-ca", tlsmode) || 0 == strcmp("verify-identity", tlsmode)) &&
-				NULL == ca)
+	if (NULL != tls_connect &&
+			(0 == strcmp("verify_ca", tls_connect) || 0 == strcmp("verify_full", tls_connect)) &&
+			NULL == ca)
 	{
+		zabbix_log(LOG_LEVEL_ERR, "option \"DBTLSCAFile\" has to be set, if \"DBTLSConnect\" is set to "
+			"\"verify_ca\" or \"verify_full\"");
 		ret = ZBX_DB_FAIL;
-		zabbix_log(LOG_LEVEL_ERR,
-			"option DBTLSCAFile has to be set, if DBTLSMode is set to verify-ca or verify-identity");
+	}
+
+	if ((NULL != cert || NULL != key) && (NULL == cert || NULL == key || NULL == ca))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "if \"DBTLSKeyFile\" or \"DBTLSCertFile\" is set, all three of options"
+			"\"DBTLSKeyFile\", \"DBTLSCertFile\" and \"DBTLSCAFile\" has to be set");
+		ret = ZBX_DB_FAIL;
 	}
 
 	mysql_options(conn, MYSQL_OPT_SSL_CA, ca);
@@ -563,10 +569,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	zbx_free(connect);
 #elif defined(HAVE_POSTGRESQL)
 #	define PG_DB_PARAMS_COUNT	9
-#	define PG_TLS_DISABLE		"disable"
+#	define PG_TLS_PREFER		"prefer"
 #	define PG_TLS_REQUIRE		"require"
 #	define PG_TLS_VERIFY_CA		"verify-ca"
-#	define PG_TLS_VERIFY_IDENTITY	"verify-full"
+#	define PG_TLS_VERIFY_FULL	"verify-full"
+
+	ZBX_UNUSED(cipher);
 
 	const char	*pg_keywords[PG_DB_PARAMS_COUNT + 1] = {NULL};
 	const char	*pg_values[PG_DB_PARAMS_COUNT + 1] = {NULL};
@@ -585,31 +593,38 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	pg_keywords[i] = "sslrootcert";	pg_values[i++] = ca;
 
 	pg_keywords[i] = "sslmode";
-	if (NULL == host || 0 == strcmp("localhost", host))
-		pg_values[i++] = NULL;
-	else if (NULL == tlsmode)
+	if (NULL == tls_connect)
+		pg_values[i++] = PG_TLS_PREFER;
+	else if (0 == strcmp(tls_connect, "preferred"))
+		pg_values[i++] = PG_TLS_PREFER;
+	else if (0 == strcmp(tls_connect, "required"))
 		pg_values[i++] = PG_TLS_REQUIRE;
-	else if (0 == strcmp(tlsmode, "disable"))
-		pg_values[i++] = PG_TLS_DISABLE;
-	else if (0 == strcmp(tlsmode, "enable"))
-		pg_values[i++] = PG_TLS_REQUIRE;
-	else if (0 == strcmp(tlsmode, "verify-ca"))
+	else if (0 == strcmp(tls_connect, "verify_ca"))
 		pg_values[i++] = PG_TLS_VERIFY_CA;
-	else if (0 == strcmp(tlsmode, "verify-identity"))
-		pg_values[i++] = PG_TLS_VERIFY_IDENTITY;
+	else if (0 == strcmp(tls_connect, "verify_full"))
+		pg_values[i++] = PG_TLS_VERIFY_FULL;
 	else
 	{
 		ret = ZBX_DB_FAIL;
-		zabbix_log(LOG_LEVEL_ERR, "unknown DBTLSMode value: %s", tlsmode);
+		zabbix_log(LOG_LEVEL_ERR, "unknown \"DBTLSConnect\" value: %s", tls_connect);
 		goto out;
 	}
 
-	if (NULL != tlsmode && (0 == strcmp("verify-ca", tlsmode) || 0 == strcmp("verify-identity", tlsmode)) &&
+	if (NULL != tls_connect &&
+			(0 == strcmp("verify_ca", tls_connect) || 0 == strcmp("verify_full", tls_connect)) &&
 			NULL == ca)
 	{
+		zabbix_log(LOG_LEVEL_ERR, "option \"DBTLSCAFile\" has to be set, if \"DBTLSConnect\" is set to "
+			"\"verify_ca\" or \"verify_full\"");
 		ret = ZBX_DB_FAIL;
-		zabbix_log(LOG_LEVEL_ERR,
-			"option DBTLSCAFile has to be set, if DBTLSMode is set to verify-ca or verify-identity");
+		goto out;
+	}
+
+	if ((NULL != cert || NULL != key) && (NULL == cert || NULL == key || NULL == ca))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "if \"DBTLSKeyFile\" or \"DBTLSCertFile\" is set, all three of "
+			"\"DBTLSKeyFile\", \"DBTLSCertFile\" and \"DBTLSCAFile\" has to be set");
+		ret = ZBX_DB_FAIL;
 		goto out;
 	}
 

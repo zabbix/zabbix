@@ -31,7 +31,7 @@ extern char	*CONFIG_DBSCHEMA;
 extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 extern char	*CONFIG_DBSOCKET;
-extern char	*CONFIG_DB_TLS_MODE;
+extern char	*CONFIG_DB_TLS_CONNECT;
 extern char	*CONFIG_DB_TLS_CERT_FILE;
 extern char	*CONFIG_DB_TLS_KEY_FILE;
 extern char	*CONFIG_DB_TLS_CA_FILE;
