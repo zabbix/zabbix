@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class testGraphWidget extends CWebTest {
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int';
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str';
 
 	/*
 	 * Set "Graph" as default widget type.
@@ -93,6 +93,7 @@ class testGraphWidget extends CWebTest {
 
 	/*
 	 * Check screenshots of graph widget form.
+	 * @browsers chrome
 	 */
 	public function testGraphWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
@@ -1496,7 +1497,7 @@ class testGraphWidget extends CWebTest {
 						'fields' => [
 							'Show problems' => true,
 							'Selected items only' => false,
-							'Problem hosts' => ['Simple form test host', 'ЗАББИКС Сервер'],
+							'Problem hosts' => ['Simple form test host'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
 							'Tags' => 'Or'
@@ -1788,7 +1789,7 @@ class testGraphWidget extends CWebTest {
 						'fields' => [
 							'Show problems' => true,
 							'Selected items only' => false,
-							'Problem hosts' => ['ЗАББИКС Сервер', 'Simple form test host'],
+							'Problem hosts' => ['Simple form test host', 'ЗАББИКС Сервер'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
 							'Tags' => 'Or'

@@ -4900,6 +4900,11 @@ $form-icon-btn: (
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
+
+	// for IE11
+	textarea {
+		white-space: pre-wrap;
+	}
 }
 
 .overlay-dialogue-footer {
@@ -7195,7 +7200,7 @@ svg {
 	color: $input-placeholder-color;
 }
 
-:placeholder-shown {
+::placeholder {
 	color: $input-placeholder-color;
 }
 

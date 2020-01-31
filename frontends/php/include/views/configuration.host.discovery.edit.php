@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -470,11 +470,9 @@ $form_list
 	->addRow(_('Port'),
 		(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_port'
 	)
-	->addRow(
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setAsteriskMark(),
+	->addRow(_('IPMI sensor'),
 		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $data['limited'], 128))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_ipmi_sensor'
 	)
 	// Append authentication method to form list.

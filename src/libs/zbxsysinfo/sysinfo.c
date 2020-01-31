@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -301,9 +301,8 @@ void finalize_key_access_rules_configuration(void)
 		/* if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration */
 		if (0 < allow_rules && 0 == deny_rules)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "adding DenyKey=* rule for proper whitelist configuration");
-			add_key_access_rule("*", ZBX_KEY_ACCESS_DENY);
-			deny_rules++;
+			zabbix_log(LOG_LEVEL_CRIT, "\"AllowKey\" without \"DenyKey\" rules are meaningless");
+			exit(EXIT_FAILURE);
 		}
 		else
 		{

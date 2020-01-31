@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/testPageProblems.php';
 require_once dirname(__FILE__).'/testPageScreens.php';
 require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoRegistration.php';
+require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
@@ -153,7 +153,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
-		$suite->addTestSuite('testFormAdministrationGeneralAutoRegistration');
+		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
 		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1093,6 +1093,12 @@ class CHelpItems {
 				[
 					'key' => 'jmx.get[<discovery mode>,<object name>]',
 					'description' => _('Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD.')
+				]
+			],
+			ITEM_TYPE_IPMI => [
+				[
+					'key' => 'ipmi.get',
+					'description' => _('IPMI sensor IDs and other sensor-related parameters. Returns JSON.')
 				]
 			]
 		];

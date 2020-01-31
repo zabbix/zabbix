@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -691,6 +691,60 @@ static void	vc_warn_low_memory(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vc_release_unused_items                                          *
+ *                                                                            *
+ * Purpose: frees space in cache by dropping items not accessed for more than *
+ *          24 hours                                                          *
+ *                                                                            *
+ * Parameters: source_item - [IN] the item requesting more space to store its *
+ *                                data                                        *
+ *                                                                            *
+ * Return value:  number of bytes freed                                       *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
+{
+	int			timestamp;
+	zbx_hashset_iter_t	iter;
+	zbx_vc_item_t		*item;
+	size_t			freed = 0;
+
+	timestamp = time(NULL) - ZBX_VC_ITEM_EXPIRE_PERIOD;
+
+	zbx_hashset_iter_reset(&vc_cache->items, &iter);
+
+	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (item->last_accessed < timestamp && 0 == item->refcount && source_item != item)
+		{
+			freed += vch_item_free_cache(item) + sizeof(zbx_vc_item_t);
+			zbx_hashset_iter_remove(&iter);
+		}
+	}
+
+	return freed;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vc_housekeeping_value_cache                                  *
+ *                                                                            *
+ * Purpose: release unused items from value cache                             *
+ *                                                                            *
+ * Comments: If unused items are not cleared from value cache periodically    *
+ *           then they will only be cleared when value cache is full, see     *
+ *           vc_release_space().                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_housekeeping_value_cache(void)
+{
+	vc_try_lock();
+	vc_release_unused_items(NULL);
+	vc_try_unlock();
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vc_release_space                                                 *
  *                                                                            *
  * Purpose: frees space in cache to store the specified number of bytes by    *
@@ -710,29 +764,16 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 {
 	zbx_hashset_iter_t		iter;
 	zbx_vc_item_t			*item;
-	int				timestamp, i;
-	size_t				freed = 0;
+	int				i;
+	size_t				freed;
 	zbx_vector_vc_itemweight_t	items;
-
-	timestamp = time(NULL) - ZBX_VC_ITEM_EXPIRE_PERIOD;
 
 	/* reserve at least min_free_request bytes to avoid spamming with free space requests */
 	if (space < vc_cache->min_free_request)
 		space = vc_cache->min_free_request;
 
 	/* first remove items with the last accessed time older than a day */
-	zbx_hashset_iter_reset(&vc_cache->items, &iter);
-
-	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (0 == item->refcount && source_item != item && item->last_accessed < timestamp)
-		{
-			freed += vch_item_free_cache(item) + sizeof(zbx_vc_item_t);
-			zbx_hashset_iter_remove(&iter);
-		}
-	}
-
-	if (freed >= space)
+	if ((freed = vc_release_unused_items(source_item)) >= space)
 		return;
 
 	/* failed to free enough space by removing old items, entering low memory mode */

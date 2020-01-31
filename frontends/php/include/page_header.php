@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,17 +134,6 @@ switch ($page['type']) {
 		break;
 }
 
-// construct menu
-$main_menu = [];
-$sub_menus = [];
-
-$denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
-
-// render the "Deny access" page
-if ($denied_page_requested) {
-	access_deny(ACCESS_DENY_PAGE);
-}
-
 if ($page['type'] == PAGE_TYPE_HTML) {
 	global $ZBX_SERVER_NAME;
 
@@ -252,11 +241,7 @@ if ($page['type'] == PAGE_TYPE_HTML && (CSession::keyExists('messageOk') || CSes
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 	$pageMenu = new CView('layout.htmlpage.aside', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
-		'menu' => [
-			'main_menu' => $main_menu,
-			'sub_menus' => $sub_menus,
-			'selected' => $page['menu']
-		],
+		'menu' => APP::Component()->get('menu.main'),
 		'user' => [
 			'is_guest' => CWebUser::isGuest(),
 			'alias' => CWebUser::$data['alias'],
@@ -272,9 +257,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	echo '<div class="wrapper">'."\n";
 	echo '<main>';
 }
-
-// unset multiple variables
-unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 
 // if a user logs in after several unsuccessful attempts, display a warning
 if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {

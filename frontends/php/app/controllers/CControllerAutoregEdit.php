@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ class CControllerAutoregEdit extends CController {
 		$this->getInputs($data, ['tls_accept', 'tls_psk_identity', 'tls_psk']);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Auto registration'));
+		$response->setTitle(_('Autoregistration'));
 		$this->setResponse($response);
 	}
 }

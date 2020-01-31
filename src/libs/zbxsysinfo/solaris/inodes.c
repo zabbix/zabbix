@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "log.h"
+#include "inodes.h"
 
-static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree, zbx_uint64_t *iused, double *pfree,
+		double *pused, const char *mode, char **error)
 {
 #ifdef HAVE_SYS_STATVFS_H
 #	define ZBX_STATFS	statvfs
@@ -30,9 +32,44 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 #	define ZBX_STATFS	statfs
 #	define ZBX_FFREE	f_ffree
 #endif
-	char			*fsname, *mode;
 	zbx_uint64_t		total;
 	struct ZBX_STATFS	s;
+
+	if (0 != ZBX_STATFS(fs, &s))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s",
+				zbx_strerror(errno));
+		return SYSINFO_RET_FAIL;
+	}
+
+	*itotal = (zbx_uint64_t)s.f_files;
+	*ifree = (zbx_uint64_t)s.ZBX_FFREE;
+	*iused =  (zbx_uint64_t)(s.f_files - s.f_ffree);
+	total = s.f_files;
+#ifdef HAVE_SYS_STATVFS_H
+	total -= s.f_ffree - s.f_favail;
+#endif
+	if (0 != total)
+	{
+		*pfree = (100.0 *  s.ZBX_FFREE) / total;
+		*pused = 100.0 - (double)(100.0 * s.ZBX_FFREE) / total;
+	}
+	else
+	{
+		if (0 == strcmp(mode, "pfree") || 0 == strcmp(mode, "pused"))
+		{
+			*error = zbx_strdup(NULL, "Cannot calculate percentage because total is zero.");
+			return SYSINFO_RET_FAIL;
+		}
+	}
+	return SYSINFO_RET_OK;
+}
+
+static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char			*fsname, *mode, *error;
+	zbx_uint64_t		total, free, used;
+	double 			pfree, pused;
 
 	if (2 < request->nparam)
 	{
@@ -49,56 +86,31 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (0 != ZBX_STATFS(fsname, &s))
+	if (SYSINFO_RET_OK != get_fs_inode_stat(fsname, &total, &free, &used, &pfree, &pused, mode, &error))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s",
-				zbx_strerror(errno)));
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
 	{
-		SET_UI64_RESULT(result, s.f_files);
+		SET_UI64_RESULT(result, total);
 	}
 	else if (0 == strcmp(mode, "free"))
 	{
-		SET_UI64_RESULT(result, s.ZBX_FFREE);
+		SET_UI64_RESULT(result, free);
 	}
 	else if (0 == strcmp(mode, "used"))
 	{
-		SET_UI64_RESULT(result, s.f_files - s.f_ffree);
+		SET_UI64_RESULT(result, used);
 	}
 	else if (0 == strcmp(mode, "pfree"))
 	{
-		total = s.f_files;
-#ifdef HAVE_SYS_STATVFS_H
-		total -= s.f_ffree - s.f_favail;
-#endif
-		if (0 != total)
-		{
-			SET_DBL_RESULT(result, (double)(100.0 * s.ZBX_FFREE) / total);
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
-			return SYSINFO_RET_FAIL;
-		}
+		SET_DBL_RESULT(result, pfree);
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
-		total = s.f_files;
-#ifdef HAVE_SYS_STATVFS_H
-		total -= s.f_ffree - s.f_favail;
-#endif
-		if (0 != total)
-		{
-			SET_DBL_RESULT(result, 100.0 - (double)(100.0 * s.ZBX_FFREE) / total);
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
-			return SYSINFO_RET_FAIL;
-		}
+		SET_DBL_RESULT(result, pused);
 	}
 	else
 	{
