@@ -322,11 +322,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestInputTypeOverwrite($id, $str) {
-		$element = $this->query('id:'.$id)->waitUntilVisible()->one();
-
-		$element->click();
-		$this->page->keyPress([WebDriverKeys::CONTROL, 'a', WebDriverKeys::CONTROL]);
-		$element->sendKeys($str);
+		$this->query('id:'.$id)->waitUntilVisible()->one()->overwrite($str);
 	}
 
 	public function zbxTestInputTypeByXpath($xpath, $str, $validate = true) {
