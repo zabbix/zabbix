@@ -1303,6 +1303,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
+#ifdef HAVE_NETSNMP
+	zbx_init_snmp();
+#endif
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
