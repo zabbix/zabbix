@@ -459,6 +459,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 #elif defined(HAVE_ORACLE)
 	ZBX_UNUSED(dbschema);
+	ZBX_UNUSED(tlsmode);
+	ZBX_UNUSED(cert);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(ca);
+	ZBX_UNUSED(cipher);
 
 	memset(&oracle, 0, sizeof(oracle));
 
@@ -679,6 +684,11 @@ zbx_free(cport);
 	ZBX_UNUSED(password);
 	ZBX_UNUSED(dbschema);
 	ZBX_UNUSED(port);
+	ZBX_UNUSED(tlsmode);
+	ZBX_UNUSED(cert);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(ca);
+	ZBX_UNUSED(cipher);
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
