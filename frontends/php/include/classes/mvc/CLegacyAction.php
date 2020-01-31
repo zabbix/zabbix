@@ -63,13 +63,13 @@ class CLegacyAction extends CAction {
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
 			$denied = array_merge($denied, ['actionconf.php', 'applications.php', 'conf.import.php',
 				'disc_prototypes.php', 'discoveryconf.php', 'graphs.php', 'host_discovery.php', 'host_prototypes.php',
-				'hostgroups.php', 'hosts.php', 'httpconf.php', 'items.php', 'maintenance.php', 'services.php',
-				'templates.php', 'trigger_prototypes.php', 'triggers.php'
+				'hostgroups.php', 'hosts.php', 'httpconf.php', 'items.php', 'maintenance.php', 'report4.php',
+				'services.php', 'templates.php', 'trigger_prototypes.php', 'triggers.php'
 			]);
 		}
 
 		if ($user_type != USER_TYPE_SUPER_ADMIN) {
-			$denied = array_merge($denied, ['auditlogs.php', 'auditacts.php', 'report4.php', 'correlation.php',
+			$denied = array_merge($denied, ['auditlogs.php', 'auditacts.php', 'correlation.php',
 				'queue.php'
 			]);
 		}
