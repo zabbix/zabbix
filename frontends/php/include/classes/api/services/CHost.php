@@ -135,7 +135,6 @@ class CHost extends CHostGeneral {
 			'selectHostDiscovery'				=> null,
 			'selectTags'						=> null,
 			'selectInheritedTags'				=> null,
-			'selectProblemsBySeverity'			=> null,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
 			'preservekeys'						=> false,
@@ -1771,72 +1770,6 @@ class CHost extends CHostGeneral {
 
 				$host['inheritedTags'] = $tags;
 			}
-		}
-
-		if ($options['selectProblemsBySeverity'] !== null && $options['selectProblemsBySeverity'] != API_OUTPUT_COUNT) {
-			$total_problems = [];
-			if ($this->outputIsRequested('total_count', $options['selectProblemsBySeverity'])) {
-				$total_problems = DBfetchArray(DBselect(
-					'SELECT i.hostid,p.severity,count(p.eventid)'.
-					' FROM problem p,functions f,items i'.
-					' WHERE '.dbConditionId('i.hostid', $hostids).
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=p.objectid'.
-						' AND p.object='.EVENT_OBJECT_TRIGGER.
-						' AND p.source='.EVENT_SOURCE_TRIGGERS.
-					' GROUP BY p.severity,i.hostid'
-				));
-			}
-
-			$unsuppressed_problems = [];
-			if ($this->outputIsRequested('unsuppressed_count', $options['selectProblemsBySeverity'])) {
-				$unsuppressed_problems = DBfetchArray(DBselect(
-					'SELECT i.hostid,p.severity,count(p.eventid)'.
-					' FROM problem p,functions f,items i'.
-					' WHERE '.dbConditionId('i.hostid', $hostids).
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=p.objectid'.
-						' AND p.object='.EVENT_OBJECT_TRIGGER.
-						' AND p.source='.EVENT_SOURCE_TRIGGERS.
-						' AND NOT EXISTS (SELECT NULL FROM event_suppress es WHERE es.eventid=p.eventid)'.
-					' GROUP BY p.severity,i.hostid'
-				));
-			}
-
-			foreach ($result as &$host) {
-				$host['problemsBySeverity'] = [];
-
-				// Order severities in descending order.
-				for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED;
-						$severity--) {
-					$host['problemsBySeverity'][$severity] = [];
-
-					if ($this->outputIsRequested('severity', $options['selectProblemsBySeverity'])) {
-						$host['problemsBySeverity'][$severity]['severity'] = $severity;
-					}
-
-					foreach (['total_count', 'unsuppressed_count'] as $field) {
-						if ($this->outputIsRequested($field, $options['selectProblemsBySeverity'])) {
-							$host['problemsBySeverity'][$severity][$field] = 0;
-						}
-					}
-
-					foreach ($total_problems as $problem) {
-						if ($problem['severity'] == $severity && bccomp($host['hostid'], $problem['hostid']) == 0) {
-							$host['problemsBySeverity'][$severity]['total_count'] = $problem['count'];
-						}
-					}
-
-					foreach ($unsuppressed_problems as $problem) {
-						if ($problem['severity'] == $severity && bccomp($host['hostid'], $problem['hostid']) == 0) {
-							$host['problemsBySeverity'][$severity]['unsuppressed_count'] = $problem['count'];
-						}
-					}
-				}
-
-				$host['problemsBySeverity'] = array_values($host['problemsBySeverity']);
-			}
-			unset($host);
 		}
 
 		return $result;

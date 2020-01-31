@@ -139,7 +139,6 @@ abstract class CControllerHost extends CController {
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
 			'selectInheritedTags' => ['tag', 'value'],
-			'selectProblemsBySeverity' => ['severity', 'total_count', 'unsuppressed_count'],
 			'hostids' => array_keys($hosts),
 			'preservekeys' => true
 		]);
@@ -147,6 +146,24 @@ abstract class CControllerHost extends CController {
 		CArrayHelper::sort($hosts, [['field' => $sort, 'order' => $sortorder]]);
 
 		$maintenanceids = [];
+
+		// Select triggers and problems to calculate number of problems for each host.
+		$triggers = API::Trigger()->get([
+			'output' => [],
+			'selectHosts' => ['hostid'],
+			'hostids' => array_keys($hosts),
+			'skipDependent' => true,
+			'status' => TRIGGER_STATUS_ENABLED,
+			'preservekeys' => true
+		]);
+
+		$problems = API::Problem()->get([
+			'output' => ['objectid', 'severity'],
+			'objectids' => array_keys($triggers),
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'suppressed' => ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false
+		]);
 
 		foreach ($hosts as $key => &$host) {
 			CArrayHelper::sort($host['interfaces'], [
@@ -157,12 +174,21 @@ abstract class CControllerHost extends CController {
 				$maintenanceids[$host['maintenanceid']] = true;
 			}
 
-			if ($host['problemsBySeverity']) {
-				$problem_type = ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? 'total' : 'unsuppressed';
-				$host['problem_total_count'] = 0;
+			for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
+				$host['problem_count'][$severity] = 0;
+			}
 
-				foreach ($host['problemsBySeverity'] as $problem) {
-					$host['problem_total_count'] += $problem[$problem_type.'_count'];
+			// Count the number of problems (as value) per severity (as key).
+			foreach ($problems as $key => $problem) {
+				foreach ($triggers[$problem['objectid']]['hosts'] as $trigger_host) {
+					if (bccomp($trigger_host['hostid'], $host['hostid']) == 0) {
+						for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED;
+								$severity--) {
+							if ($severity == $problem['severity']) {
+								$host['problem_count'][$severity]++;
+							}
+						}
+					}
 				}
 			}
 
@@ -176,7 +202,8 @@ abstract class CControllerHost extends CController {
 					foreach ($host['inheritedTags'] as $template_tag) {
 						foreach ($tags as $host_tag) {
 							// Skip tags with same name and value.
-							if ($host_tag['tag'] === $template_tag['tag'] && $host_tag['value'] === $template_tag['value']) {
+							if ($host_tag['tag'] === $template_tag['tag']
+									&& $host_tag['value'] === $template_tag['value']) {
 								continue 2;
 							}
 						}

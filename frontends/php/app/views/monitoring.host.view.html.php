@@ -65,14 +65,18 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$problems_div = (new CDiv())->addClass(ZBX_STYLE_PROBLEM_ICON_LIST);
 
-	$problem_type = ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? 'total' : 'unsuppressed';
+	$total_problem_count = 0;
 
-	foreach ($host['problemsBySeverity'] as $problem) {
-		if ($problem[$problem_type.'_count'] > 0) {
-			$problems_div->addItem((new CSpan($problem[$problem_type.'_count']))
+	// Fill the severity icons by problem count and style, and calculate the total number of problems.
+	foreach ($host['problem_count'] as $severity => $count) {
+		$total_problem_count += $count;
+
+		if (($count > 0 && $data['filter']['severities'] && in_array($severity, $data['filter']['severities']))
+				|| (!$data['filter']['severities'] && $count > 0)) {
+			$problems_div->addItem((new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
-				->addClass(getSeverityStatusStyle($problem['severity']))
-				->setAttribute('title', getSeverityName($problem['severity'], $data['config']))
+				->addClass(getSeverityStatusStyle($severity))
+				->setAttribute('title', getSeverityName($severity, $data['config']))
 			);
 		}
 	}
@@ -117,7 +121,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 			),
-			CViewHelper::showNum($host['problem_total_count'])
+			CViewHelper::showNum($total_problem_count)
 		],
 		$host['graphs']
 			? [
