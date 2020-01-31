@@ -49,7 +49,7 @@ class CUserMacro extends CApiService {
 		$userid = self::$userData['userid'];
 
 		$sqlParts = [
-			'select'	=> ['macros' => 'hm.hostmacroid', 'macrotype' => 'hm.type'],
+			'select'	=> ['macros' => 'hm.hostmacroid'],
 			'from'		=> ['hostmacro hm'],
 			'where'		=> [],
 			'order'		=> [],
@@ -57,7 +57,7 @@ class CUserMacro extends CApiService {
 		];
 
 		$sqlPartsGlobal = [
-			'select'	=> ['macros' => 'gm.globalmacroid', 'macrotype' => 'gm.type'],
+			'select'	=> ['macros' => 'gm.globalmacroid'],
 			'from'		=> ['globalmacro gm'],
 			'where'		=> [],
 			'order'		=> [],
