@@ -1049,6 +1049,24 @@ static int	DBpatch_4050040(void)
 	return DBdrop_field("items", "port");
 }
 
+static int	DBpatch_4050041(void)
+{
+	const ZBX_TABLE table =
+		{"module", "moduleid", 0,
+			{
+				{"moduleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"relative_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"config", "", NULL, NULL, 2048, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1092,5 +1110,6 @@ DBPATCH_ADD(4050037, 0, 1)
 DBPATCH_ADD(4050038, 0, 1)
 DBPATCH_ADD(4050039, 0, 1)
 DBPATCH_ADD(4050040, 0, 1)
+DBPATCH_ADD(4050041, 0, 1)
 
 DBPATCH_END()

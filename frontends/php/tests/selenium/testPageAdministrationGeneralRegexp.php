@@ -57,7 +57,7 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 		$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
 		$this->assertEquals([
 			'GUI', 'Autoregistration', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros', 'Value mapping',
-			'Working time', 'Trigger severities', 'Trigger displaying options', 'Other'
+			'Working time', 'Trigger severities', 'Trigger displaying options', 'Modules', 'Other'
 		], $popup_menu->getItems()->asText());
 
 		$this->zbxTestAssertElementPresentXpath('//button[text()="New regular expression"]');
