@@ -718,6 +718,54 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcheck_capabilities                                             *
+ *                                                                            *
+ * Purpose: checks DBMS for optional features and adjusting configuration     *
+ *                                                                            *
+ ******************************************************************************/
+void	DBcheck_capabilities(void)
+{
+#ifdef HAVE_POSTGRESQL
+	int	compression_available = 0;
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
+	if (100200 <= zbx_dbms_get_version())
+	{
+		DB_RESULT	result;
+		DB_ROW		row;
+		int		major, minor, patch, version;
+
+		result = DBselect("select extversion from pg_extension where extname = 'timescaledb'");
+
+		if (NULL == result)
+			goto out;
+
+		if (NULL == (row = DBfetch(result)))
+			goto clean;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
+
+		sscanf((const char*)row[0],"%d.%d.%d", &major, &minor, &patch);
+		version = major * 10000;
+		version += minor * 100;
+		version += patch;
+
+		if (10500 <= version)
+			compression_available = 1;
+clean:
+		DBfree_result(result);
+	}
+out:
+	DBexecute("update config set compression_availability=%d", compression_available);
+
+	DBclose();
+#endif
+}
+
 #define MAX_EXPRESSIONS	950
 #define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
 

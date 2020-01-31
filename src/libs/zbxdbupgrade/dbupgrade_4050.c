@@ -546,6 +546,27 @@ static int	DBpatch_4050028(void)
 	return DBcreate_table(&table);
 }
 
+static int	DBpatch_4050029(void)
+{
+	const ZBX_FIELD	field = {"compression_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050030(void)
+{
+	const ZBX_FIELD	field = {"compression_availability", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050031(void)
+{
+	const ZBX_FIELD field = {"compress_older", "7d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -577,5 +598,8 @@ DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
 DBPATCH_ADD(4050028, 0, 1)
+DBPATCH_ADD(4050029, 0, 1)
+DBPATCH_ADD(4050030, 0, 1)
+DBPATCH_ADD(4050031, 0, 1)
 
 DBPATCH_END()

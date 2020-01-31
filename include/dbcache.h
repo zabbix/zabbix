@@ -348,6 +348,15 @@ typedef struct
 }
 zbx_config_hk_t;
 
+typedef struct
+{
+	char		*extension;
+	unsigned char	history_compression_status;
+	unsigned char	history_compression_availability;
+	int		history_compress_older;
+}
+zbx_config_db_t;
+
 /* global configuration data (loaded from config table) */
 typedef struct
 {
@@ -360,7 +369,9 @@ typedef struct
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
-	char		*db_extension;
+
+	/* database extension configuration data */
+	zbx_config_db_t	db;
 
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;

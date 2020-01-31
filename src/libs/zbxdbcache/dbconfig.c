@@ -850,7 +850,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_services_mode", "hk_services", "hk_audit_mode", "hk_audit",
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
-					"default_inventory_mode", "db_extension", "autoreg_tls_accept"};	/* sync with zbx_dbsync_compare_config() */
+					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
+					"compression_status", "compression_availability", "compress_older"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
@@ -914,8 +915,16 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 	config->config->default_inventory_mode = atoi(row[26]);
-	DCstrpool_replace(found, &config->config->db_extension, row[27]);
+	DCstrpool_replace(found, (const char **)&config->config->db.extension, row[27]);
 	config->config->autoreg_tls_accept = (unsigned char)atoi(row[28]);
+	config->config->db.history_compression_status = (0 == atoi(row[29]) ? OFF : ON);
+	config->config->db.history_compression_availability = (0 == atoi(row[30]) ? OFF : ON);
+
+	if (SUCCEED != is_time_suffix(row[31], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid history compression age: %s", row[31]);
+		config->config->db.history_compress_older = 0;
+	}
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
 		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
@@ -974,7 +983,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #ifdef HAVE_POSTGRESQL
 	if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode &&
 			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
-			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 	{
 		config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
 	}
@@ -993,7 +1002,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #ifdef HAVE_POSTGRESQL
 	if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode &&
 			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
-			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 	{
 		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
 	}
@@ -10565,7 +10574,12 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 		cfg->hk = config->config->hk;
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
-		cfg->db_extension = zbx_strdup(NULL, config->config->db_extension);
+	{
+		cfg->db.extension = zbx_strdup(NULL, config->config->db.extension);
+		cfg->db.history_compression_status = config->config->db.history_compression_status;
+		cfg->db.history_compression_availability = config->config->db.history_compression_availability;
+		cfg->db.history_compress_older = config->config->db.history_compress_older;
+	}
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT))
 		cfg->autoreg_tls_accept = config->config->autoreg_tls_accept;
@@ -10598,7 +10612,7 @@ void	zbx_config_clean(zbx_config_t *cfg)
 	}
 
 	if (0 != (cfg->flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
-		zbx_free(cfg->db_extension);
+		zbx_free(cfg->db.extension);
 }
 
 /******************************************************************************
