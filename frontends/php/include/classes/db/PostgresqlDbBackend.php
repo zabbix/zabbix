@@ -104,10 +104,9 @@ class PostgresqlDbBackend extends DbBackend {
 		$this->schema = ($schema) ? $schema : 'public';
 		$params = compact(['host', 'port', 'user', 'password', 'dbname']);
 
-		if ($this->tls_encryption === ZBX_DB_TLS_VERIFY_HOST
-				|| ($this->tls_encryption === ZBX_DB_TLS_ENABLED && ((bool) $this->tls_ca_file))) {
+		if ($this->tls_encryption && (bool) $this->tls_ca_file) {
 			$params += [
-				'sslmode' => ($this->tls_encryption === ZBX_DB_TLS_VERIFY_HOST) ? 'verify-full' : 'verify-ca',
+				'sslmode' => $this->tls_verify_host ? 'verify-full' : 'verify-ca',
 				'sslkey' => $this->tls_key_file,
 				'sslcert' => $this->tls_cert_file,
 				'sslrootcert' => $this->tls_ca_file

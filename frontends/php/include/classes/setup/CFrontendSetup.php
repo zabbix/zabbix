@@ -693,18 +693,4 @@ class CFrontendSetup {
 			'error' => _s('TLS certificate files must be read-only')
 		];
 	}
-
-	/**
-	 * Returns TLS mode options.
-	 *
-	 * @return array
-	 */
-	public static function getTlsEencryptions() {
-		return [
-			ZBX_DB_TLS_DISABLED => _('Disabled'),
-			ZBX_DB_TLS_ENABLED => _('Enabled'),
-			ZBX_DB_TLS_VERIFY_HOST => _('With host verification')
-		];
-	}
-
 }

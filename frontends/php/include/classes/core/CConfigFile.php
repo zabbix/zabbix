@@ -116,6 +116,10 @@ class CConfigFile {
 			$this->config['DB']['ENCRYPTION'] = $DB['ENCRYPTION'];
 		}
 
+		if (isset($DB['VERIFY_HOST'])) {
+			$this->config['DB']['VERIFY_HOST'] = $DB['VERIFY_HOST'];
+		}
+
 		if (isset($DB['KEY_FILE'])) {
 			$this->config['DB']['KEY_FILE'] = $DB['KEY_FILE'];
 		}
@@ -200,10 +204,11 @@ $DB[\'PASSWORD\'] = \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 $DB[\'SCHEMA\'] = \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
 
 // Used for TLS connection.
-$DB[\'ENCRYPTION\']  = \''.addcslashes($this->config['DB']['ENCRYPTION'], "'\\").'\';
+$DB[\'ENCRYPTION\']  = '.($this->config['DB']['ENCRYPTION'] ? 'true' : 'false').';
 $DB[\'KEY_FILE\']    = \''.addcslashes($this->config['DB']['KEY_FILE'], "'\\").'\';
 $DB[\'CERT_FILE\']   = \''.addcslashes($this->config['DB']['CERT_FILE'], "'\\").'\';
 $DB[\'CA_FILE\']     = \''.addcslashes($this->config['DB']['CA_FILE'], "'\\").'\';
+$DB[\'VERIFY_HOST\']  = '.($this->config['DB']['VERIFY_HOST'] ? 'true' : 'false').';
 $DB[\'CIPHER_LIST\'] = \''.addcslashes($this->config['DB']['CIPHER_LIST'], "'\\").'\';
 
 $ZBX_SERVER      = \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';
@@ -223,10 +228,11 @@ $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
 			'USER' => '',
 			'PASSWORD' => '',
 			'SCHEMA' => '',
-			'ENCRYPTION' => ZBX_DB_TLS_DISABLED,
+			'ENCRYPTION' => true,
 			'KEY_FILE' => '',
 			'CERT_FILE' => '',
 			'CA_FILE' => '',
+			'VERIFY_HOST' => true,
 			'CIPHER_LIST' => ''
 		];
 		$this->config['ZBX_SERVER'] = 'localhost';

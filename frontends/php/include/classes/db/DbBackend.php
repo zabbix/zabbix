@@ -31,11 +31,11 @@ abstract class DbBackend {
 	protected $error;
 
 	/**
-	 * TLS encryption mode.
+	 * TLS encryption on/off.
 	 *
-	 * @var string
+	 * @var bool
 	 */
-	protected $tls_encryption = ZBX_DB_TLS_DISABLED;
+	protected $tls_encryption = ZBX_DB_TLS_ENCRYPTION;
 
 	/**
 	 * Path to TLS key file.
@@ -59,6 +59,13 @@ abstract class DbBackend {
 	protected $tls_ca_file = '';
 
 	/**
+	 * True - need host verification..
+	 *
+	 * @var bool
+	 */
+	protected $tls_verify_host = ZBX_DB_TLS_VERIFY_HOST;
+
+	/**
 	 * Connection required cipher pattern.
 	 *
 	 * @var string
@@ -68,17 +75,19 @@ abstract class DbBackend {
 	/**
 	 * Set TLS specific options for db conection.
 	 *
-	 * @param string $encryption     TLS encryption mode.
+	 * @param bool   $encryption     TLS encryption on (true)/off (false).
 	 * @param string $key_file       Path to TLS key file.
 	 * @param string $cert_file      Path to TLS cert file.
 	 * @param string $ca_file        Path to TLS ca file.
+	 * @param bool   $verify_host    True - need host verification.
 	 * @param string $cipher_list    Connection required cipher pattern.
 	 */
-	public function setConnectionSecurity($encryption, $key_file, $cert_file, $ca_file, $cipher_list) {
+	public function setConnectionSecurity($encryption, $key_file, $cert_file, $ca_file, $verify_host, $cipher_list) {
 		$this->tls_encryption = $encryption;
 		$this->tls_key_file = $key_file;
 		$this->tls_cert_file = $cert_file;
 		$this->tls_ca_file = $ca_file;
+		$this->tls_verify_host = $verify_host;
 		$this->tls_cipher_list = $cipher_list;
 	}
 

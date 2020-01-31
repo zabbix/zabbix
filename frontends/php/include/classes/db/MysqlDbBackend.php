@@ -79,20 +79,13 @@ class MysqlDbBackend extends DbBackend {
 		$resource = mysqli_init();
 		$tls_mode = null;
 
-		if ($this->tls_encryption !== ZBX_DB_TLS_DISABLED) {
-			if ($this->tls_encryption === ZBX_DB_TLS_VERIFY_HOST) {
-				$resource->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
-			}
-
+		if ($this->tls_encryption) {
 			$cipher_suit = ($this->tls_cipher_list && strpos($this->tls_cipher_list, '*') === false)
 				? $this->tls_cipher_list
 				: null;
 			$resource->ssl_set($this->tls_key_file, $this->tls_cert_file, $this->tls_ca_file, null, $cipher_suit);
 
-			$tls_mode = ($this->tls_encryption === ZBX_DB_TLS_VERIFY_HOST || !($this->tls_ca_file))
-				? MYSQLI_CLIENT_SSL
-				: MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT;
-
+			$tls_mode = MYSQLI_CLIENT_SSL;
 		}
 
 		$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
