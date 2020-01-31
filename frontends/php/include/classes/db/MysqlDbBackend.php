@@ -47,14 +47,12 @@ class MysqlDbBackend extends DbBackend {
 	public function isConnectionSecure() {
 		$row = DBfetch(DBselect("SHOW STATUS LIKE 'ssl_cipher'"));
 
-		$pattern = '/'.str_replace('*', '.+', $this->tls_cipher_list).'/';
-
 		if (!$row || !$row['Value']) {
 			$this->setError('Error connecting to database. Empty cipher.');
 			return false;
 		}
 
-		if ($row && !preg_match($pattern, $row['Value'])) {
+		if ($this->tls_cipher_list !== '' && !preg_match('/'.$row['Value'].'/', $this->tls_cipher_list)) {
 			$this->setError('Error connecting to database. Invalid cipher.');
 			return false;
 		}
@@ -80,9 +78,7 @@ class MysqlDbBackend extends DbBackend {
 		$tls_mode = null;
 
 		if ($this->tls_encryption) {
-			$cipher_suit = ($this->tls_cipher_list && strpos($this->tls_cipher_list, '*') === false)
-				? $this->tls_cipher_list
-				: null;
+			$cipher_suit = ($this->tls_cipher_list === '') ? null : $this->tls_cipher_list;
 			$resource->ssl_set($this->tls_key_file, $this->tls_cert_file, $this->tls_ca_file, null, $cipher_suit);
 
 			$tls_mode = MYSQLI_CLIENT_SSL;
