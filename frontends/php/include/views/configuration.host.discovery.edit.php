@@ -418,47 +418,7 @@ $form_list
 	);
 
 $form_list
-<<<<<<< HEAD
-	->addRow(
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setAsteriskMark(),
-=======
-	->addRow(_('Security level'),
-		new CComboBox('snmpv3_securitylevel', $data['snmpv3_securitylevel'], null, [
-			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-		]),
-		'row_snmpv3_securitylevel'
-	)
-	->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol')),
-		(new CRadioButtonList('snmpv3_authprotocol', (int) $data['snmpv3_authprotocol']))
-			->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
-			->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
-			->setModern(true),
-		'row_snmpv3_authprotocol'
-	)
-	->addRow(_('Authentication passphrase'),
-		(new CTextBox('snmpv3_authpassphrase', $data['snmpv3_authpassphrase'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_authpassphrase'
-	)
-	->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol')),
-		(new CRadioButtonList('snmpv3_privprotocol', (int) $data['snmpv3_privprotocol']))
-			->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
-			->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
-			->setModern(true),
-		'row_snmpv3_privprotocol'
-	)
-	->addRow(_('Privacy passphrase'),
-		(new CTextBox('snmpv3_privpassphrase', $data['snmpv3_privpassphrase'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_privpassphrase'
-	)
-	->addRow(_('Port'),
-		(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_port'
-	)
 	->addRow(_('IPMI sensor'),
->>>>>>> 4d142a72dabb7070fe07e12f2daec38e02624a00
 		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $data['limited'], 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_ipmi_sensor'
