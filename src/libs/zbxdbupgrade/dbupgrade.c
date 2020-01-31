@@ -71,13 +71,13 @@ zbx_db_version_t;
 #endif
 
 #if defined(HAVE_MYSQL)
-#	define ZBX_TYPE_FLOAT_STR	"double(16,4)"
+#	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"bigint unsigned"
 #elif defined(HAVE_ORACLE)
-#	define ZBX_TYPE_FLOAT_STR	"number(20,4)"
+#	define ZBX_TYPE_FLOAT_STR	"binary_double"
 #	define ZBX_TYPE_UINT_STR	"number(20)"
 #elif defined(HAVE_POSTGRESQL)
-#	define ZBX_TYPE_FLOAT_STR	"numeric(16,4)"
+#	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"numeric(20)"
 #endif
 
@@ -985,14 +985,12 @@ int	DBcheck_double_type(void)
 #endif
 
 	if (NULL == (result = DBselect("%s"
-			" and ((table_name like 'graphs'"
-					" and (column_name like 'yaxismin' or column_name like 'yaxismax'"
-					" or column_name like 'percent_left' or column_name like 'percent_right'))"
-			" or (table_name like 'trends'"
-					" and (column_name like 'value_min' or column_name like 'value_avg'"
-					" or column_name like 'value_max'))"
-			" or (table_name like 'services' and (column_name like 'goodsla'))"
-			" or (table_name like 'history' and (column_name like 'value')))", sql)))
+			" and ((lower(table_name) like 'graphs'"
+					" and (lower(column_name) in ('yaxismin', 'yaxismax', 'percent_left', 'percent_right')))"
+			" or (lower(table_name) like 'trends'"
+					" and (lower(column_name) in ('value_min', 'value_avg', 'value_max')))"
+			" or (lower(table_name) like 'services' and lower(column_name) like 'goodsla')"
+			" or (lower(table_name) like 'history' and lower(column_name) like 'value'))", sql)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot select records with columns information");
 		goto out;
