@@ -161,6 +161,8 @@ class ZBase {
 		$this->init();
 
 		$this->setMaintenanceMode();
+
+		ini_set('display_errors', 'Off');
 		set_error_handler('zbx_err_handler');
 
 		switch ($mode) {
