@@ -91,5 +91,6 @@ $form->addItem($form_list);
 
 return [
 	'form' => $form,
-	'scripts' => $scripts
+	'scripts' => $scripts,
+	'jq_templates' => $jq_templates
 ];
