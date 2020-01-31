@@ -31,6 +31,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 );
 
 $scripts = [];
+$jq_templates = [];
 
 // Host groups.
 $field_groupids = CWidgetHelper::getGroup($fields['groupids'],
