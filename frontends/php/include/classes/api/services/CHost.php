@@ -108,6 +108,7 @@ class CHost extends CHostGeneral {
 			'evaltype'							=> TAG_EVAL_TYPE_AND_OR,
 			'tags'								=> null,
 			'severities'						=> null,
+			'withProblemsSuppressed'			=> null,
 			'inheritedTags'						=> false,
 			'filter'							=> null,
 			'search'							=> null,
@@ -463,7 +464,7 @@ class CHost extends CHostGeneral {
 			'severities' =>	[
 				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true
 			],
-			'selectProblemsBySeverity' => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			'withProblemsSuppressed' =>  ['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL]
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {

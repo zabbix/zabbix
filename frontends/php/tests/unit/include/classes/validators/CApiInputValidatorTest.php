@@ -1035,6 +1035,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/createMissing": a boolean is expected.'
 			],
 			[
+				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+				null,
+				'/1/createMissing',
+				null
+			],
+			[
 				['type' => API_FLAG],
 				true,
 				'/1/userData',
