@@ -121,7 +121,7 @@ $fields = [
 											' && {type} == '.ITEM_TYPE_SNMP,
 										_('SNMP OID')
 									],
-	'ipmi_sensor' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM, NOT_EMPTY,
+	'ipmi_sensor' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM, null,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_IPMI,
 										_('IPMI sensor')

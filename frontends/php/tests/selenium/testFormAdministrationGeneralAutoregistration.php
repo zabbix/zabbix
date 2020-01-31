@@ -23,17 +23,17 @@ require_once dirname(__FILE__) . '/../include/CWebTest.php';
 /**
  * @backup config
  */
-class testFormAdministrationGeneralAutoRegistration extends CWebTest {
+class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 	/**
-	 * Check the default state of page elements, when first time open Auto registration.
+	 * Check the default state of page elements, when first time open Autoregistration.
 	 */
-	public function testFormAdministrationGeneralAutoRegistration_checkDefaultState() {
-		// Navigate to auto registration page from dashboard page.
+	public function testFormAdministrationGeneralAutoregistration_checkDefaultState() {
+		// Navigate to autoregistration page from dashboard page.
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$this->query('link:Administration')->one()->click();
 		$this->query('xpath://nav[@class="top-subnav-container"]//a[text()="General"]')->one()->click();
-		$this->query('id:page-title-general')->asPopupButton()->one()->select('Auto registration');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Autoregistration');
 
 		// Check elements dafault state.
 		$form = $this->query('id:autoreg-form')->asForm()->one();
@@ -45,7 +45,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 	/**
 	 * Check PSK field values, when PSK encryption is set and unset.
 	 */
-	public function testFormAdministrationGeneralAutoRegistration_PskValues() {
+	public function testFormAdministrationGeneralAutoregistration_PskValues() {
 		$data = [
 			'Encryption level' => ['PSK'],
 			'PSK identity' => 'PSK004',
@@ -85,10 +85,14 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 					],
 					'audit' => [
 						'User' => 'Admin',
-						'Resource' => 'Auto registration',
+						'Resource' => 'Autoregistration',
 						'Action' => 'Updated',
 						'ID' => 1,
-						'Details' => "config.tls_accept: 1 => 2\nconfig.tls_psk_identity: ******** => ********\nconfig.tls_psk: ******** => ********"
+						'Details' => [
+							'config.tls_accept: 1 => 2',
+							'config.tls_psk_identity: ******** => ********',
+							'config.tls_psk: ******** => ********'
+						]
 					]
 				]
 			],
@@ -100,10 +104,10 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 					],
 					'audit' => [
 						'User' => 'Admin',
-						'Resource' => 'Auto registration',
+						'Resource' => 'Autoregistration',
 						'Action' => 'Updated',
 						'ID' => 1,
-						'Details' => "config.tls_accept: 2 => 3"
+						'Details' => ['config.tls_accept: 2 => 3']
 					]
 				]
 			],
@@ -115,10 +119,14 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 					],
 					'audit' => [
 						'User' => 'Admin',
-						'Resource' => 'Auto registration',
+						'Resource' => 'Autoregistration',
 						'Action' => 'Updated',
 						'ID' => 1,
-						'Details' => "config.tls_accept: 3 => 1\nconfig.tls_psk_identity: ******** => ********\nconfig.tls_psk: ******** => ********"
+						'Details' => [
+							'config.tls_accept: 3 => 1',
+							'config.tls_psk_identity: ******** => ********',
+							'config.tls_psk: ******** => ********'
+						]
 					]
 				]
 			]
@@ -129,9 +137,9 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 	 * @dataProvider getAuditReportData
 	 * @backup-once config
 	 *
-	 * Check record on Audit report page, after updating auto registration.
+	 * Check record on Audit report page, after updating autoregistration.
 	 */
-	public function testFormAdministrationGeneralAutoRegistration_Audit($data) {
+	public function testFormAdministrationGeneralAutoregistration_Audit($data) {
 		// Add encryption.
 		$this->page->login()->open('zabbix.php?action=autoreg.edit');
 		$form = $this->query('id:autoreg-form')->asForm()->one();
@@ -141,20 +149,25 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Configuration updated', $message->getTitle());
 
-		// Check Audit record about auto registration update.
+		// Check Audit record about autoregistration update.
 		$this->page->open('auditlogs.php');
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
 		// Get first row data.
 		$row = $rows->get(0);
 		foreach ($data['audit'] as $column => $value) {
-			$text = $row->getColumnData($column, $value);
+			$text = $row->getColumn($column)->getText();
+			if (is_array($value)) {
+				$text = explode("\n", $text);
+				sort($text);
+				sort($value);
+			}
 			$this->assertEquals($value, $text);
 		}
 	}
 
-	public static function getAutoRegistrationValidationData() {
+	public static function getAutoregistrationValidationData() {
 		return [
-			// Auto registration without encryption level.
+			// Autoregistration without encryption level.
 			[
 				[
 					'uncheck_all' => true,
@@ -162,7 +175,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 					'error' => 'Incorrect value "0" for "tls_accept" field.'
 				]
 			],
-			// Auto registration with empty PSK values.
+			// Autoregistration with empty PSK values.
 			[
 				[
 					'fields' => [
@@ -251,20 +264,20 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getAutoRegistrationValidationData
+	 * @dataProvider getAutoregistrationValidationData
 	 * @backup-once config
 	 *
-	 * Check auto registration validation on first update.
+	 * Check autoregistration validation on first update.
 	 */
-	public function testFormAdministrationGeneralAutoRegistration_Validation($data) {
+	public function testFormAdministrationGeneralAutoregistration_Validation($data) {
 		$this->executeValidation($data);
 	}
 
 	/**
-	 * Fields validation when updating auto registration or changing PSK fields.
+	 * Fields validation when updating autoregistration or changing PSK fields.
 	 *
-	 * @param array $data			values of auto registration from data provider
-	 * @param boolean $change		change existing values of PSK
+	 * @param array   $data    Values of autoregistration from data provider.
+	 * @param boolean $change  Change existing values of PSK.
 	 */
 	private function executeValidation($data, $change = false) {
 		$sql_config = 'SELECT * FROM config';
@@ -294,7 +307,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 	}
 
 	/**
-	 * Successfully update auto registration.
+	 * Successfully update autoregistration.
 	 */
 	private function executeUpdate($data) {
 		$this->page->login()->open('zabbix.php?action=autoreg.edit');
@@ -349,9 +362,9 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 		}
 	}
 
-	public static function getAutoRegistrationUpdateData() {
+	public static function getAutoregistrationUpdateData() {
 		return [
-			// Auto registration with default values.
+			// Autoregistration with default values.
 			[
 				[
 					'fields' => [
@@ -359,7 +372,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 					]
 				]
 			],
-			// Auto registration with PSK only.
+			// Autoregistration with PSK only.
 			[
 				[
 					'fields' => [
@@ -369,7 +382,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 					]
 				]
 			],
-			// Auto registration with PSK and 'No encryption' levels.
+			// Autoregistration with PSK and 'No encryption' levels.
 			[
 				[
 					'fields' => [
@@ -383,12 +396,12 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getAutoRegistrationUpdateData
+	 * @dataProvider getAutoregistrationUpdateData
 	 * @backup config
 	 *
-	 * First time update Auto registration data.
+	 * First time update Autoregistration data.
 	 */
-	public function testFormAdministrationGeneralAutoRegistration_Update($data) {
+	public function testFormAdministrationGeneralAutoregistration_Update($data) {
 		$this->executeUpdate($data);
 
 		// Check PSK values in DB.
@@ -400,9 +413,9 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 	}
 
 	/**
-	 * Add PSK encryption to then verify for changes in auto registration.
+	 * Add PSK encryption to then verify for changes in autoregistration.
 	 */
-	public function testFormAdministrationGeneralAutoRegistration_AddPskEncryption() {
+	public function testFormAdministrationGeneralAutoregistration_AddPskEncryption() {
 		$data = [
 			'Encryption level' => ['PSK'],
 			'PSK identity' => 'PSK003',
@@ -420,17 +433,17 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getAutoRegistrationValidationData
-	 * @depends testFormAdministrationGeneralAutoRegistration_AddPskEncryption
+	 * @dataProvider getAutoregistrationValidationData
+	 * @depends testFormAdministrationGeneralAutoregistration_AddPskEncryption
 	 * @backup-once config
 	 *
-	 * Check auto registration validation, when change PSK values.
+	 * Check autoregistration validation, when change PSK values.
 	 */
-	public function testFormAdministrationGeneralAutoRegistration_ValidationChangePsk($data) {
+	public function testFormAdministrationGeneralAutoregistration_ValidationChangePsk($data) {
 		$this->executeValidation($data, true);
 	}
 
-	public static function getAutoRegistrationChangeData() {
+	public static function getAutoregistrationChangeData() {
 		return [
 			// Add "No encryption" level, but unchange PSK data.
 			[
@@ -474,13 +487,13 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getAutoRegistrationChangeData
-	 * @depends testFormAdministrationGeneralAutoRegistration_AddPskEncryption
+	 * @dataProvider getAutoregistrationChangeData
+	 * @depends testFormAdministrationGeneralAutoregistration_AddPskEncryption
 	 * @backup config
 	 *
-	 * Change auto registration data.
+	 * Change autoregistration data.
 	 */
-	public function testFormAdministrationGeneralAutoRegistration_ChangePSK($data) {
+	public function testFormAdministrationGeneralAutoregistration_ChangePSK($data) {
 		$this->executeUpdate($data);
 
 		if (in_array('PSK', $data['fields']['Encryption level'])) {

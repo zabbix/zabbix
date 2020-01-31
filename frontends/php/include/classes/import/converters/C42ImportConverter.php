@@ -83,8 +83,8 @@ class C42ImportConverter extends CConverter {
 		foreach ($hosts as &$host) {
 			if (array_key_exists('tls_accept', $host)) {
 				$host['tls_accept'] = ($host['tls_accept'] === '')
-					? $const[CXmlConstantValue::NO_ENCRYPTION]
-					: $const[$host['tls_accept']];
+					? $consts[CXmlConstantValue::NO_ENCRYPTION]
+					: $consts[$host['tls_accept']];
 			}
 		}
 		unset($host);

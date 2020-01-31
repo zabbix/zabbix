@@ -422,11 +422,13 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result,  HANDLE time
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mpoint->fsname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mpoint->fstype, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSDRIVETYPE, mpoint->fsdrivetype, ZBX_JSON_TYPE_STRING);
+			zbx_json_addobject(&j, ZBX_SYSINFO_TAG_BYTES);
 			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mpoint->total);
 			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mpoint->not_used);
 			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mpoint->used);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mpoint->pfree);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mpoint->pused);
+			zbx_json_close(&j);
 			zbx_json_close(&j);
 		}
 		zbx_free(mpoint_local.fsname);

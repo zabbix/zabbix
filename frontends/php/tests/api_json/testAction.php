@@ -68,7 +68,7 @@ class testAction extends CAPITest {
 				'action' => ['90'],
 				'expected_error' => null
 			],
-			// Auto registration action
+			// Autoregistration action
 			[
 				'action' => ['91'],
 				'expected_error' => null

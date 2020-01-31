@@ -64,7 +64,7 @@ $house_keeper_tab = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Auto-registration data storage period'), 'hk_events_autoreg'))
+		(new CLabel(_('Autoregistration data storage period'), 'hk_events_autoreg'))
 			->setAsteriskMark(),
 		(new CTextBox('hk_events_autoreg', $data['hk_events_autoreg']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)

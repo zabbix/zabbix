@@ -484,11 +484,57 @@ $form_list
 	);
 
 $form_list
+<<<<<<< HEAD
 	->addRow(
 		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setAsteriskMark(),
 		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
+=======
+	->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol')),
+		$snmpv3_authprotocol,
+		'row_snmpv3_authprotocol'
+	)
+	// Append SNMPv3 authentication passphrase to form list.
+	->addRow(_('Authentication passphrase'),
+		(new CTextBox('snmpv3_authpassphrase', $data['snmpv3_authpassphrase'], $discovered_item, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'row_snmpv3_authpassphrase'
+	);
+
+// Append SNMPv3 privacy protocol to form list.
+if ($discovered_item) {
+	$form->addVar('snmpv3_privprotocol', (int) $data['snmpv3_privprotocol']);
+	$snmpv3_privprotocol = (new CRadioButtonList('snmpv3_privprotocol_names', (int) $data['snmpv3_privprotocol']))
+		->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
+		->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
+		->setModern(true)
+		->setEnabled(!$discovered_item);
+}
+else {
+	$snmpv3_privprotocol = (new CRadioButtonList('snmpv3_privprotocol', (int) $data['snmpv3_privprotocol']))
+		->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
+		->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
+		->setModern(true);
+}
+$form_list
+	->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol')),
+		$snmpv3_privprotocol,
+		'row_snmpv3_privprotocol'
+	)
+	// Append SNMPv3 privacy passphrase to form list.
+	->addRow(_('Privacy passphrase'),
+		(new CTextBox('snmpv3_privpassphrase', $data['snmpv3_privpassphrase'], $discovered_item, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'row_snmpv3_privpassphrase'
+	)
+	->addRow(_('Port'),
+		(new CTextBox('port', $data['port'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		'row_port'
+	)
+	->addRow(_('IPMI sensor'),
+		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+>>>>>>> 4d142a72dabb7070fe07e12f2daec38e02624a00
 		'row_ipmi_sensor'
 	);
 
