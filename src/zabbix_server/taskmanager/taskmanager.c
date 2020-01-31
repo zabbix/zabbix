@@ -28,6 +28,7 @@
 #include "../actions.h"
 #include "export.h"
 #include "taskmanager.h"
+#include "../poller/checks_snmp.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
