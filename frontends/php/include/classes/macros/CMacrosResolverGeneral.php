@@ -1096,7 +1096,12 @@ class CMacrosResolverGeneral {
 					}
 
 					if ($context === null) {
-						$global_macros[$macro]['value'] = $db_global_macro['value'];
+						if (array_key_exists('value', $db_global_macro)) {
+							$global_macros[$macro]['value'] = $db_global_macro['value'];
+						}
+						else {
+							$global_macros[$macro]['value'] = ZBX_MACRO_SECRET_MASK;
+						}
 					}
 					else {
 						$global_macros[$macro]['contexts'][$context] = $db_global_macro['value'];
@@ -1215,5 +1220,21 @@ class CMacrosResolverGeneral {
 		}
 
 		return ['value' => null, 'value_default' => $value_default];
+	}
+
+	/**
+	 * Get macro value refer by type.
+	 *
+	 * @param array $macro
+	 *
+	 * @return string
+	 */
+	static public function getMacroValue(array $macro): string {
+		if (!array_key_exists('value', $macro) || (array_key_exists('type', $macro)
+				&& $macro['type'] == ZBX_MACRO_TYPE_SECRET)) {
+			return ZBX_MACRO_SECRET_MASK;
+		}
+
+		return $macro['value'];
 	}
 }

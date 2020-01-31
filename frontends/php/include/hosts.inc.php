@@ -1012,7 +1012,7 @@ function getInheritedMacros(array $hostids) {
 	foreach ($db_global_macros as $db_global_macro) {
 		$all_macros[$db_global_macro['macro']] = true;
 		$global_macros[$db_global_macro['macro']] = [
-			'value' => $db_global_macro['value'],
+			'value' => CMacrosResolverGeneral::getMacroValue($db_global_macro),
 			'description' => $db_global_macro['description']
 		];
 	}

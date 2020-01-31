@@ -1298,6 +1298,10 @@ define('DAY_IN_YEAR', 365);
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
+define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
+define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
+define('ZBX_MACRO_SECRET_MASK', '******'); // Placeholder for masked macro value.
+
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
 define('ZBX_LAYOUT_FULLSCREEN', 1);

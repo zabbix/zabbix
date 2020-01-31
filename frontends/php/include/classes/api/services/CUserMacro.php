@@ -49,7 +49,7 @@ class CUserMacro extends CApiService {
 		$userid = self::$userData['userid'];
 
 		$sqlParts = [
-			'select'	=> ['macros' => 'hm.hostmacroid'],
+			'select'	=> ['macros' => 'hm.hostmacroid', 'macrotype' => 'hm.type'],
 			'from'		=> ['hostmacro hm'],
 			'where'		=> [],
 			'order'		=> [],
@@ -57,7 +57,7 @@ class CUserMacro extends CApiService {
 		];
 
 		$sqlPartsGlobal = [
-			'select'	=> ['macros' => 'gm.globalmacroid'],
+			'select'	=> ['macros' => 'gm.globalmacroid', 'macrotype' => 'gm.type'],
 			'from'		=> ['globalmacro gm'],
 			'where'		=> [],
 			'order'		=> [],
@@ -917,6 +917,15 @@ class CUserMacro extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
+		if (!$this->outputIsRequested('type', $options['output'])) {
+			if ($options['globalmacro'] === null) {
+				$sqlParts['select'][] = "hm.type";
+			}
+			else {
+				$sqlParts['select'][] = "gm.type";
+			}
+		}
+
 		if ($options['output'] != API_OUTPUT_COUNT && $options['globalmacro'] === null) {
 			if ($options['selectGroups'] !== null || $options['selectHosts'] !== null || $options['selectTemplates'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('hostid'), $sqlParts);
@@ -980,5 +989,18 @@ class CUserMacro extends CApiService {
 		}
 
 		return $result;
+	}
+
+	protected function unsetExtraFields(array $objects, array $fields, $output) {
+		foreach ($objects as &$object) {
+			if (array_key_exists('type', $object) && $object['type'] == ZBX_MACRO_TYPE_SECRET) {
+				unset($object['value']);
+			}
+		}
+		unset($object);
+
+		$objects = parent::unsetExtraFields($objects, ['type'], $output);
+
+		return  parent::unsetExtraFields($objects, $fields, $output);
 	}
 }

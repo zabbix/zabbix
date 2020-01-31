@@ -41,7 +41,7 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 
-	$value_input = (new CTextAreaFlexible('macros['.$i.'][value]', $macro['value']))
+	$value_input = (new CTextAreaFlexible('macros['.$i.'][value]', CMacrosResolverGeneral::getMacroValue($macro)))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 

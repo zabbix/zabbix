@@ -71,7 +71,8 @@ class CControllerMacrosUpdate extends CController {
 				unset($macros[$idx], $db_macros[$macro['globalmacroid']]);
 
 				// if the macro is unchanged - skip it
-				if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['value'] === $macro['value']
+				if ($dbMacro['macro'] === $macro['macro'] && (!array_key_exists('value', $dbMacro)
+							|| $dbMacro['value'] === $macro['value'])
 						&& $dbMacro['description'] === $macro['description']) {
 					continue;
 				}
