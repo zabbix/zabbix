@@ -1096,12 +1096,7 @@ class CMacrosResolverGeneral {
 					}
 
 					if ($context === null) {
-						if (array_key_exists('value', $db_global_macro)) {
-							$global_macros[$macro]['value'] = $db_global_macro['value'];
-						}
-						else {
-							$global_macros[$macro]['value'] = ZBX_MACRO_SECRET_MASK;
-						}
+						$global_macros[$macro]['value'] = self::getMacroValue($db_global_macro);
 					}
 					else {
 						$global_macros[$macro]['contexts'][$context] = $db_global_macro['value'];
