@@ -183,16 +183,31 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			web.url = web_url.getUrl();
 		}
 
+		var items = [
+			host_inventory,
+			latest_data,
+			problems,
+			graphs,
+			screens,
+			web
+		];
+
+		if (options.showConfig) {
+			var config = {
+					label: t('Configuration')
+				},
+				config_url = new Curl('hosts.php', false);
+
+			config_url.setArgument('form', 'update');
+			config_url.setArgument('hostid', options.hostid);
+			config.url = config_url.getUrl();
+
+			items.push(config);
+		}
+
 		sections.push({
 			label: t('Host'),
-			items: [
-				host_inventory,
-				latest_data,
-				problems,
-				graphs,
-				screens,
-				web
-			]
+			items: items
 		});
 	}
 
