@@ -57,14 +57,14 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Databases discovery|<p>Scanning databases in DBMS.</p>|ZABBIX_PASSIVE|mysql.db.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `arr = value.split('\n') s = [] for (var i in arr) {   s.push({"{#DBNAME}": arr[i]}) } return JSON.stringify(s)`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND_OR <p>- A: {#DBNAME} NOT_MATCHES_REGEX `information_schema`</p>|
-|Replication discovery|<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p>|ZABBIX_PASSIVE|mysql.replication.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var a = value.match(/Master_Host.*>(.*)<.*/) if (a) {   s = [{"{#MASTERHOST}": a[1]}] }  else {   s = [] } return JSON.stringify(s)`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
+|Databases discovery|<p>Scanning databases in DBMS.</p>|ZABBIX_PASSIVE|mysql.db.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.split("\n").map(function (name) {     return ({"{#DBNAME}": name}); }));`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND_OR <p>- A: {#DBNAME} NOT_MATCHES_REGEX `information_schema`</p>|
+|Replication discovery|<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p>|ZABBIX_PASSIVE|mysql.replication.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var matches = value.match(/Master_Host.*>(.*)<.*/); if (matches) {     return JSON.stringify([{"{#MASTERHOST}": matches[1]}]); } return '[]';`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|MySQL|MySQL: Status||ZABBIX_PASSIVE|mysql.ping["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return value.search(/is alive/)>0?1:0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p>|
+|MySQL|MySQL: Status||ZABBIX_PASSIVE|mysql.ping["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return value.indexOf('is alive') !== -1 ? 1 : 0;`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p>|
 |MySQL|MySQL: Version||ZABBIX_PASSIVE|mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- REGEX: `(Server version)\s+(.+) \2`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
 |MySQL|MySQL: Uptime|<p>The number of seconds that the server has been up.</p>|DEPENDENT|mysql.uptime<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Uptime']/field[@name='Value']/text()`</p>|
 |MySQL|MySQL: Aborted clients per second|<p>The number of connections that were aborted because the client died without closing the connection properly.</p>|DEPENDENT|mysql.aborted_clients.rate<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Aborted_clients']/field[@name='Value']/text()`</p><p>- CHANGE_PER_SECOND|

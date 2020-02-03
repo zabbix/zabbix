@@ -881,7 +881,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>return value.search(/is alive/)&gt;0?1:0</params>
+                     <params>return value.indexOf('is alive') !== -1 ? 1 : 0;</params>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1179,12 +1179,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>arr = value.split('\n')
-s = []
-for (var i in arr) {
-  s.push({"{#DBNAME}": arr[i]})
-}
-return JSON.stringify(s)</params>
+                     <params>return JSON.stringify(value.split("\n").map(function (name) {
+    return ({"{#DBNAME}": name});
+}));</params>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1350,14 +1347,12 @@ As with the I/O thread, this should normally be Yes.</description>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var a = value.match(/Master_Host.*&gt;(.*)&lt;.*/)
-if (a) {
-  s = [{"{#MASTERHOST}": a[1]}]
-} 
-else {
-  s = []
+                     <params>var matches = value.match(/Master_Host.*&gt;(.*)&lt;.*/);
+if (matches) {
+    return JSON.stringify([{"{#MASTERHOST}": matches[1]}]);
 }
-return JSON.stringify(s)</params>
+
+return '[]';</params>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
