@@ -454,6 +454,7 @@ jQuery(document).ready(function($) {
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('setReadOnly');
+					$('#prev_time', $form).prop('disabled', true);
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
@@ -476,6 +477,7 @@ jQuery(document).ready(function($) {
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');
+					$('#prev_time', $form).prop('disabled', false);
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
