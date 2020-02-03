@@ -546,6 +546,14 @@ static int	DBpatch_4050028(void)
 	return DBcreate_table(&table);
 }
 
+static int	DBpatch_4050029(void)
+{
+	if (ZBX_DB_OK > DBexecute("update module set config='{}' where config=''"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -577,5 +585,6 @@ DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
 DBPATCH_ADD(4050028, 0, 1)
+DBPATCH_ADD(4050029, 0, 1)
 
 DBPATCH_END()
