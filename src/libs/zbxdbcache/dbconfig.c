@@ -2017,7 +2017,7 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 
 	ZBX_STR2UCHAR(bulk, row[9]);
 
-	if (found == 0)
+	if (0 == found)
 		*bulk_changed = 1;
 	else if (snmp->bulk != bulk)
 		*bulk_changed = 1;
