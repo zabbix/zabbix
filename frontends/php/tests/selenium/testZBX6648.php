@@ -70,8 +70,10 @@ class testZBX6648 extends CLegacyWebTest {
 			case 'enabled' :
 				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
 				COverlayDialogElement::find()->one()->waitUntilReady();
+				$this->zbxTestLaunchOverlayDialog('Triggers');
 				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
 				COverlayDialogElement::find()->one()->waitUntilReady();
+				$this->zbxTestLaunchOverlayDialog('Triggers');
 				break;
 			case 'disabled' :
 				$hostgroup = $zbx_data['hostgroup'];

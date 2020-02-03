@@ -563,11 +563,11 @@ class testPageOverview extends CLegacyWebTest {
 				foreach ($data['applications'] as $key => $value) {
 					switch ($key) {
 						case 'app_group':
-							$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal modal-popup")]'.
+							$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]'.
 									'//select[@name="groupid"]//option[text()="'.$value.'"]');
 							break;
 						case 'app_host':
-							$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal modal-popup")]'.
+							$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]'.
 									'//select[@name="hostid"]//option[text()="'.$value.'"]');
 							break;
 						case 'application':

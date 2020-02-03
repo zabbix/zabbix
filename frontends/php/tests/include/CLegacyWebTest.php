@@ -507,7 +507,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestLaunchOverlayDialog($header) {
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal modal-popup')]".
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]".
 				"/div[@class='dashbrd-widget-head']/h4[text()='$header']"));
 	}
 
