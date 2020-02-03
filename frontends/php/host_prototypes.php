@@ -312,7 +312,7 @@ if (hasRequest('form')) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectGroups' => ['groupid', 'name'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
-		'selectMacros' => ['macro', 'value', 'description'],
+		'selectMacros' => ['macro', 'value', 'description', 'type'],
 		'hostids' => $discoveryRule['hostid'],
 		'templated_hosts' => true
 	]);

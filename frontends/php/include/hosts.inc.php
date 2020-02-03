@@ -1013,7 +1013,8 @@ function getInheritedMacros(array $hostids) {
 		$all_macros[$db_global_macro['macro']] = true;
 		$global_macros[$db_global_macro['macro']] = [
 			'value' => CMacrosResolverGeneral::getMacroValue($db_global_macro),
-			'description' => $db_global_macro['description']
+			'description' => $db_global_macro['description'],
+			'type' => $db_global_macro['type']
 		];
 	}
 
@@ -1026,7 +1027,7 @@ function getInheritedMacros(array $hostids) {
 		$db_templates = API::Template()->get([
 			'output' => ['name'],
 			'selectParentTemplates' => ['templateid'],
-			'selectMacros' => ['macro', 'value', 'description'],
+			'selectMacros' => ['macro', 'value', 'description', 'type'],
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -1050,7 +1051,8 @@ function getInheritedMacros(array $hostids) {
 				if (array_key_exists($dbMacro['macro'], $all_macros)) {
 					$hosts[$hostid]['macros'][$dbMacro['macro']] = [
 						'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
-						'description' => $dbMacro['description']
+						'description' => $dbMacro['description'],
+						'type' => $dbMacro['type']
 					];
 					$all_macros[$dbMacro['macro']] = true;
 				}
@@ -1062,7 +1064,8 @@ function getInheritedMacros(array $hostids) {
 					if ($tpl_context === null) {
 						$hosts[$hostid]['macros'][$dbMacro['macro']] = [
 							'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
-							'description' => $dbMacro['description']
+							'description' => $dbMacro['description'],
+							'type' => $dbMacro['type']
 						];
 						$all_macros[$dbMacro['macro']] = true;
 					}
@@ -1083,7 +1086,8 @@ function getInheritedMacros(array $hostids) {
 
 								$hosts[$hostid]['macros'][$dbMacro['macro']] = [
 									'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
-									'description' => $dbMacro['description']
+									'description' => $dbMacro['description'],
+									'type' => $dbMacro['type']
 								];
 								$all_macros[$dbMacro['macro']] = true;
 								$global_macros[$dbMacro['macro']] = $global_value;
@@ -1095,7 +1099,8 @@ function getInheritedMacros(array $hostids) {
 						if (!$match_found) {
 							$hosts[$hostid]['macros'][$dbMacro['macro']] = [
 								'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
-								'description' => $dbMacro['description']
+								'description' => $dbMacro['description'],
+								'type' => $dbMacro['type']
 							];
 							$all_macros[$dbMacro['macro']] = true;
 						}
@@ -1125,7 +1130,8 @@ function getInheritedMacros(array $hostids) {
 		if (array_key_exists($macro, $global_macros)) {
 			$inherited_macro['global'] = [
 				'value' => $global_macros[$macro]['value'],
-				'description' => $global_macros[$macro]['description']
+				'description' => $global_macros[$macro]['description'],
+				'type' => $global_macros[$macro]['type']
 			];
 		}
 
@@ -1141,7 +1147,8 @@ function getInheritedMacros(array $hostids) {
 						'description' => $hosts[$templateid]['macros'][$macro]['description'],
 						'templateid' => $hosts[$templateid]['templateid'],
 						'name' => $hosts[$templateid]['name'],
-						'rights' => PERM_READ
+						'rights' => PERM_READ,
+						'type' => $hosts[$templateid]['macros'][$macro]['type']
 					];
 
 					if (!array_key_exists($hosts[$templateid]['templateid'], $all_templates)) {
@@ -1218,14 +1225,16 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 	$user_macro_parser = new CUserMacroParser();
 
 	foreach ($inherited_macros as &$inherited_macro) {
-		$inherited_macro['type'] = ZBX_PROPERTY_INHERITED;
+		$inherited_macro['inherited_type'] = ZBX_PROPERTY_INHERITED;
 		if (array_key_exists('template', $inherited_macro)) {
 			$inherited_macro['value'] = $inherited_macro['template']['value'];
 			$inherited_macro['description'] = $inherited_macro['template']['description'];
+			$inherited_macro['type'] = $inherited_macro['template']['type'];
 		}
 		else {
 			$inherited_macro['value'] = $inherited_macro['global']['value'];
 			$inherited_macro['description'] = $inherited_macro['global']['description'];
+			$inherited_macro['type'] = $inherited_macro['global']['type'];
 		}
 	}
 	unset($inherited_macro);
@@ -1249,7 +1258,7 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 				$hst_context = $user_macro_parser->getContext();
 
 				if ($hst_context === null) {
-					$host_macro['type'] = 0x00;
+					$host_macro['inherited_type'] = 0x00;
 				}
 				else {
 					$match_found = false;
@@ -1271,16 +1280,16 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 					}
 
 					if (!$match_found) {
-						$host_macro['type'] = 0x00;
+						$host_macro['inherited_type'] = 0x00;
 					}
 				}
 			}
 			else {
-				$host_macro['type'] = 0x00;
+				$host_macro['inherited_type'] = 0x00;
 			}
 		}
 
-		$host_macro['type'] |= ZBX_PROPERTY_OWN;
+		$host_macro['inherited_type'] |= ZBX_PROPERTY_OWN;
 	}
 	unset($host_macro);
 
@@ -1300,11 +1309,11 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
  */
 function cleanInheritedMacros(array $macros) {
 	foreach ($macros as $idx => $macro) {
-		if (array_key_exists('type', $macro) && !($macro['type'] & ZBX_PROPERTY_OWN)) {
+		if (array_key_exists('inherited_type', $macro) && !($macro['inherited_type'] & ZBX_PROPERTY_OWN)) {
 			unset($macros[$idx]);
 		}
 		else {
-			unset($macros[$idx]['type'], $macros[$idx]['inherited']);
+			unset($macros[$idx]['inherited_type'], $macros[$idx]['inherited']);
 		}
 	}
 

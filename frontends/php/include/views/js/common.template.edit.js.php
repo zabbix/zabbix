@@ -28,7 +28,7 @@
 						->addClass('macro')
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 						->setAttribute('placeholder', '{$MACRO}'),
-					new CInput('hidden', 'macros[#{rowNum}][type]', ZBX_PROPERTY_OWN)
+					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				'&rArr;',
 				(new CCol(
@@ -131,9 +131,9 @@
 				.on('click', 'button.element-table-change', function() {
 					var macroNum = jQuery(this).attr('id').split('_')[1];
 
-					if (jQuery('#macros_' + macroNum + '_type').val() & <?= ZBX_PROPERTY_OWN ?>) {
-						jQuery('#macros_' + macroNum + '_type')
-							.val(jQuery('#macros_' + macroNum + '_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
+					if (jQuery('#macros_' + macroNum + '_inherited_type').val() & <?= ZBX_PROPERTY_OWN ?>) {
+						jQuery('#macros_' + macroNum + '_inherited_type')
+							.val(jQuery('#macros_' + macroNum + '_inherited_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
 						jQuery('#macros_' + macroNum + '_value')
 							.prop('readonly', true)
 							.val(jQuery('#macros_' + macroNum + '_inherited_value').val())
@@ -146,8 +146,8 @@
 							.text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
 					}
 					else {
-						jQuery('#macros_' + macroNum + '_type')
-							.val(jQuery('#macros_' + macroNum + '_type').val() | <?= ZBX_PROPERTY_OWN ?>);
+						jQuery('#macros_' + macroNum + '_inherited_type')
+							.val(jQuery('#macros_' + macroNum + '_inherited_type').val() | <?= ZBX_PROPERTY_OWN ?>);
 						jQuery('#macros_' + macroNum + '_value')
 							.prop('readonly', false)
 							.focus();

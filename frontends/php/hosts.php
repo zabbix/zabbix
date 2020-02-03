@@ -1016,7 +1016,7 @@ elseif (hasRequest('form')) {
 				],
 				'selectGroups' => ['groupid'],
 				'selectParentTemplates' => ['templateid'],
-				'selectMacros' => ['hostmacroid', 'macro', 'value', 'description'],
+				'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
 				'selectHostDiscovery' => ['parent_hostid'],
 				'selectInventory' => API_OUTPUT_EXTEND,
@@ -1199,7 +1199,7 @@ elseif (hasRequest('form')) {
 	if (!$data['macros'] && !$data['readonly']) {
 		$macro = ['macro' => '', 'value' => '', 'description' => ''];
 		if ($data['show_inherited_macros']) {
-			$macro['type'] = ZBX_PROPERTY_OWN;
+			$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 		}
 		$data['macros'][] = $macro;
 	}

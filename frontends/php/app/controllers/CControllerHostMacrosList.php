@@ -68,9 +68,9 @@ class CControllerHostMacrosList extends CController {
 		$macros = array_values(order_macros($macros, 'macro'));
 
 		if (!$macros && !$readonly) {
-			$macro = ['macro' => '', 'value' => '', 'description' => ''];
+			$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
 			if ($show_inherited_macros) {
-				$macro['type'] = ZBX_PROPERTY_OWN;
+				$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 			}
 			$macros[] = $macro;
 		}
