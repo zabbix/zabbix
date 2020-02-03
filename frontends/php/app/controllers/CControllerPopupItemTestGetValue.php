@@ -39,7 +39,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'key'					=> 'string',
 			'interface'				=> 'array',
 			'ipmi_sensor'			=> 'string',
-			'item_type'				=> 'required|in '.implode(',', self::$testable_item_types),
+			'item_type'				=> 'required|int32',
 			'jmx_endpoint'			=> 'string',
 			'macros'				=> 'array',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
@@ -81,11 +81,18 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
+			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', 0));
 			$this->item_type = $this->getInput('item_type');
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
+			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
+
+			if (!$this->is_item_testable) {
+				error(_s('Test of "%1$s" items is not supported.', item_type2str($this->item_type)));
+				$ret = false;
+			}
 
 			// Check if key is valid for item types it's mandatory.
-			if (in_array($this->item_type, $this->item_types_has_key_mandatory)) {
+			if ($ret && in_array($this->item_type, $this->item_types_has_key_mandatory)) {
 				$key = $this->getInput('key', '');
 
 				/*
@@ -142,9 +149,6 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-		// Used by getItemTestProperties.
-		$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
 		// Get post data for particular item type.
 		$data = $this->getItemTestProperties($this->getInputAll());

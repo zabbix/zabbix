@@ -110,9 +110,11 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
+			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', 0));
 			$this->get_value_from_host = (bool) $this->getInput('get_value');
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
+			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
 
 			$interface = $this->getInput('interface', []);
 			$steps = $this->getInput('steps', []);
@@ -143,8 +145,12 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				}
 			}
 
-			// Test interface properties.
-			if ($this->get_value_from_host && in_array($this->item_type, $this->items_require_interface)) {
+			// Test if item is testable and check interface properties.
+			if ($this->get_value_from_host && !$this->is_item_testable) {
+				error(_s('Test of "%1$s" items is not supported.', item_type2str($this->item_type)));
+				$ret = false;
+			}
+			elseif ($this->get_value_from_host && in_array($this->item_type, $this->items_require_interface)) {
 				if (!array_key_exists('address', $interface) || $interface['address'] === '') {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
 					$ret = false;
@@ -221,8 +227,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-		$this->is_item_testable = in_array($this->item_type, self::$testable_item_types);
 
 		/*
 		 * Define values used to test preprocessing steps.

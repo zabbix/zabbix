@@ -35,9 +35,9 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @var array
 	 */
-	public static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C,
+	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C,
 		ITEM_TYPE_SNMPV3, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-		ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED
+		ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED
 	];
 
 	/**
@@ -224,6 +224,37 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @var int
 	 */
 	protected $eol;
+
+	/**
+	 * Get testable item types based on host type.
+	 *
+	 * @param int $hostid
+	 *
+	 * @return array
+	 */
+	public static function getTestableItemTypes(int $hostid = 0): array {
+		if ($hostid && self::isIpmiTestSupported($hostid)) {
+			self::$testable_item_types[] = ITEM_TYPE_IPMI;
+		}
+
+		return self::$testable_item_types;
+	}
+
+	/**
+	 * Function checks if IPMI item can be tested depending on what type of host it belongs to.
+	 *
+	 * @param int $hostid
+	 *
+	 * @return bool
+	 */
+	protected static function isIpmiTestSupported(int $hostid): bool {
+		$ret = (bool) API::Template()->get([
+			'countOutput' => true,
+			'templateids' => [$hostid]
+		]);
+
+		return !$ret;
+	}
 
 	protected function checkPermissions() {
 		$ret = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);

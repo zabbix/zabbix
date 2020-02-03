@@ -231,7 +231,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 	}
 
 	function updateItemTestBtn() {
-		var testable_item_types = <?= CJs::encodeJson(CControllerPopupItemTest::$testable_item_types) ?>,
+		var testable_item_types = <?= CJs::encodeJson(CControllerPopupItemTest::getTestableItemTypes($this->data['hostid'])) ?>,
 			type = parseInt(jQuery('#type').val()),
 			key = jQuery('#key').val();
 
