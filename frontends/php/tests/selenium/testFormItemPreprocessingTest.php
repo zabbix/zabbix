@@ -314,7 +314,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	 */
 	private function checkTestOverlay($data, $selector, $prev_enabled, $id = null) {
 		$this->query($selector)->waitUntilPresent()->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilPresent()->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_BAD:
@@ -365,7 +365,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	}
 
 	private function chooseDialogActions($data){
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilPresent()->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
 		switch ($data['action']) {
 			case 'Test':
