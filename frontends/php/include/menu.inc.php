@@ -55,9 +55,11 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'zabbix.php',
 					'action' => 'host.view',
-					'active_if' => ['host.view'],
+					'active_if' => ['host.view', 'web.view'],
 					'label' => _('Hosts'),
-					'sub_pages' => ['charts.php']
+					'sub_pages' => ['charts.php', 'chart2.php', 'chart3.php', 'chart6.php', 'chart7.php',
+						'httpdetails.php'
+					]
 				],
 				[
 					'url' => 'overview.php',
@@ -65,22 +67,10 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				],
 				[
 					'url' => 'zabbix.php',
-					'action' => 'web.view',
-					'active_if' => ['web.view'],
-					'label' => _('Web'),
-					'sub_pages' => ['httpdetails.php']
-				],
-				[
-					'url' => 'zabbix.php',
 					'action' => 'latest.view',
 					'active_if' => ['latest.view'],
 					'label' => _('Latest data'),
 					'sub_pages' => ['history.php', 'chart.php']
-				],
-				[
-					'url' => 'charts.php',
-					'label' => _('Graphs'),
-					'sub_pages' => ['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php']
 				],
 				[
 					'url' => 'screens.php',
