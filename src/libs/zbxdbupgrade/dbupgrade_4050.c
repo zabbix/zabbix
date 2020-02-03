@@ -754,7 +754,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 	{
 		dbu_interface_t		interface;
 		dbu_snmp_if_t		snmp;
-		int			item_type;
+		unsigned char		item_type;
 		const char 		*if_port;
 
 		ZBX_DBROW2UINT64(snmp.item_interfaceid, row[0]);
