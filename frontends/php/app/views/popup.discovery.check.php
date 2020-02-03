@@ -79,11 +79,10 @@ $form_list = (new CFormList())
 	)
 	->addRow(new CLabel(_('Security level'), 'snmpv3_securitylevel'),
 		new CComboBox('snmpv3_securitylevel', $data['params']['snmpv3_securitylevel'], null, [
-				ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-				ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-				ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-			]
-		),
+			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+		]),
 		'row_dcheck_snmpv3_securitylevel'
 	)
 	->addRow(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'),
