@@ -152,7 +152,7 @@ function itemGetValueTest() {
 	post_data = jQuery.extend(post_data, {
 		interface: {
 			address: interface ? interface['address'].trim() : '',
-			port: interface ? interface['port'].trim() : '',
+			port: (interface && interface['port']) ? interface['port'].trim() : '',
 			interfaceid: interface ? interface['interfaceid'] : null,
 			useip: interface ? interface['useip'] : null
 		},
@@ -228,7 +228,7 @@ function itemCompleteTest() {
 		steps: form_data['steps'],
 		interface: {
 			address: interface ? interface['address'].trim() : '',
-			port: interface ? interface['port'].trim() : '',
+			port: (interface && interface['port']) ? interface['port'].trim() : '',
 			interfaceid: interface ? interface['interfaceid'] : null,
 			useip: interface ? interface['useip'] : null
 		},
