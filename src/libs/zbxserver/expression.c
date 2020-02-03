@@ -3992,7 +3992,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 					if (NULL != error)
 					{
-						zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
+						zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value or type",
 								(int)(token.loc.r - token.loc.l + 1),
 								*data + token.loc.l);
 					}
