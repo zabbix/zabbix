@@ -693,6 +693,10 @@ static int	db_snmp_new_if_find(const dbu_snmp_if_t *snmp, const zbx_vector_dbu_s
 static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector_dbu_snmp_if_t *snmp_ifs,
 		zbx_vector_dbu_snmp_if_t *snmp_new_ifs)
 {
+#define ITEM_TYPE_SNMPv1	1
+#define ITEM_TYPE_SNMPv2c	4
+#define ITEM_TYPE_SNMPv3	6
+
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			index;
@@ -823,6 +827,11 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 		zbx_vector_dbu_interface_append(interfaces, interface);
 	}
 	DBfree_result(result);
+
+#undef ITEM_TYPE_SNMPv1
+#undef ITEM_TYPE_SNMPv2c
+#undef ITEM_TYPE_SNMPv3
+
 }
 
 static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
