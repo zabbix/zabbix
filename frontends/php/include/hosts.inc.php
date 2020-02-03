@@ -1005,7 +1005,7 @@ function getInheritedMacros(array $hostids) {
 	$global_macros = [];
 
 	$db_global_macros = API::UserMacro()->get([
-		'output' => ['macro', 'value', 'description'],
+		'output' => ['macro', 'value', 'description', 'type'],
 		'globalmacro' => true
 	]);
 
@@ -1049,7 +1049,7 @@ function getInheritedMacros(array $hostids) {
 			foreach ($db_template['macros'] as $dbMacro) {
 				if (array_key_exists($dbMacro['macro'], $all_macros)) {
 					$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-						'value' => $dbMacro['value'],
+						'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
 						'description' => $dbMacro['description']
 					];
 					$all_macros[$dbMacro['macro']] = true;
@@ -1061,7 +1061,7 @@ function getInheritedMacros(array $hostids) {
 
 					if ($tpl_context === null) {
 						$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-							'value' => $dbMacro['value'],
+							'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
 							'description' => $dbMacro['description']
 						];
 						$all_macros[$dbMacro['macro']] = true;
@@ -1082,7 +1082,7 @@ function getInheritedMacros(array $hostids) {
 								);
 
 								$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-									'value' => $dbMacro['value'],
+									'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
 									'description' => $dbMacro['description']
 								];
 								$all_macros[$dbMacro['macro']] = true;
@@ -1094,7 +1094,7 @@ function getInheritedMacros(array $hostids) {
 
 						if (!$match_found) {
 							$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-								'value' => $dbMacro['value'],
+								'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
 								'description' => $dbMacro['description']
 							];
 							$all_macros[$dbMacro['macro']] = true;

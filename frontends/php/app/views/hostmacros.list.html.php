@@ -86,7 +86,7 @@ else {
 			$macro_cell[] = new CVar('macros['.$i.'][type]', $macro['type']);
 		}
 
-		$value_input = (new CTextAreaFlexible('macros['.$i.'][value]', $macro['value'], [
+		$value_input = (new CTextAreaFlexible('macros['.$i.'][value]', CMacrosResolverGeneral::getMacroValue($macro), [
 			'readonly' => (
 				$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & ZBX_PROPERTY_OWN))
 			)
