@@ -5221,7 +5221,7 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 		const char *authpassphrase, const char *privpassphrase, const unsigned char authprotocol,
 		const unsigned char privprotocol, const char *contextname)
 {
-	char *community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc, *contextname_esc;
+	char		*community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc, *contextname_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -5234,7 +5234,7 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		unsigned char db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
+		unsigned char	db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
 
 		ZBX_STR2UCHAR(db_version, row[0]);
 
