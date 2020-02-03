@@ -148,29 +148,52 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
 
 		// Collect item texts and macros to later check their usage.
-		$item_texts = [];
-		$item_macros = [];
+		$texts_support_macros = [];
+		$texts_support_user_macros = [];
+		$texts_support_lld_macros = [];
+		$supported_macros = [];
 		foreach (array_keys(array_intersect_key($inputs, $this->macros_by_item_props)) as $field) {
+			$macros = $this->macros_by_item_props[$field];
+			unset($macros['support_lld_macros'], $macros['support_user_macros']);
+
 			if ($field === 'query_fields' || $field === 'headers') {
 				foreach (['name', 'value'] as $key) {
-					$has_macros = array_filter($inputs[$field][$key], function($str) {
+					$texts_having_macros = array_filter($inputs[$field][$key], function($str) {
 						return (strstr($str, '{') !== false);
 					});
 
-					if ($has_macros) {
-						$item_macros = array_merge_recursive($item_macros, $this->macros_by_item_props[$field]);
-						$item_texts = array_merge($item_texts, $has_macros);
+					if ($texts_having_macros) {
+						$supported_macros = array_merge_recursive($supported_macros, $macros);
+						$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
+						$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+
+						if ($support_lldmacros) {
+							$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
+						}
 					}
 				}
 			}
 			elseif (strstr($inputs[$field], '{') !== false) {
-				$item_macros = array_merge_recursive($item_macros, $this->macros_by_item_props[$field]);
-				$item_texts[] = $inputs[$field];
+				// Field support macros like {HOST.*}, {ITEM.*} etc.
+				if ($macros) {
+					$supported_macros = array_merge_recursive($supported_macros, $macros);
+					$texts_support_macros[] = $inputs[$field];
+				}
+
+				// Check if LLD macros are supported in field.
+				if ($support_lldmacros && $this->macros_by_item_props[$field]['support_lld_macros']) {
+					$texts_support_lld_macros[] = $inputs[$field];
+				}
+
+				// Check if user macros are supported in field.
+				if ($this->macros_by_item_props[$field]['support_user_macros']) {
+					$texts_support_user_macros[] = $inputs[$field];
+				}
 			}
 		}
 
 		// Unset duplicate macros.
-		foreach ($item_macros as &$item_macros_type) {
+		foreach ($supported_macros as &$item_macros_type) {
 			$item_macros_type = array_unique($item_macros_type);
 		}
 		unset($item_macros_type);
@@ -180,10 +203,12 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'steps' => $preprocessing_steps,
 			'hostid' => $this->host ? $this->host['hostid'] : 0,
 			'delay' => $show_prev ? $this->getInput('delay', ZBX_ITEM_DELAY_DEFAULT) : '',
-			'property_texts' => $item_texts,
-			'property_macros' => $item_macros,
+			'texts_support_macros' => $texts_support_macros,
+			'texts_support_lld_macros' => $texts_support_lld_macros,
+			'texts_support_user_macros' => $texts_support_user_macros,
+			'supported_macros' => $supported_macros,
 			'macros_values' => $this->getSupportedMacros($inputs + ['interfaceid' => $this->getInput('interfaceid', 0)])
-		], $support_lldmacros);
+		]);
 
 		// Set resolved macros to previously specified values.
 		if ($usermacros['macros'] && array_key_exists('macros', $data) && is_array($data['macros'])) {

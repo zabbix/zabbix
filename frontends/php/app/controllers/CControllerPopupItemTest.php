@@ -84,62 +84,109 @@ abstract class CControllerPopupItemTest extends CController {
 	protected $macros_by_item_props = [
 		'key' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}']
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'params_es' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}']
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'params_ap' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}']
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'jmx_endpoint' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}']
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'url' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'posts' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'http_proxy' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'ssl_cert_file' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'ssl_key_file' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'query_fields' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
 		'headers' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}']
+			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		],
-		'params_f' => [],
-		'snmp_community' => [],
-		'snmpv3_contextname' => [],
-		'snmpv3_securityname' => [],
-		'snmpv3_authpassphrase' => [],
-		'snmpv3_privpassphrase' => [],
-		'snmp_oid' => []
+		'params_f' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'snmp_community' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'snmpv3_contextname' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'snmpv3_securityname' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'snmpv3_authpassphrase' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'snmpv3_privpassphrase' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'ipmi_sensor' => [
+			'support_user_macros' => false,
+			'support_lld_macros' => true
+		],
+		'snmp_oid' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		]
 	];
 
 	/**
