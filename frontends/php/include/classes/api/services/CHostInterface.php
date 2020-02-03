@@ -216,13 +216,12 @@ class CHostInterface extends CApiService {
 							unset($details[$snmp_field_name]);
 						}
 					}
-
-					if ($details['version'] == SNMP_V3) {
+					else {
 						unset($details['community']);
 					}
 				}
 				else {
-					foreach($snmp_fields as $field_name) {
+					foreach ($snmp_fields as $field_name) {
 						unset($value[$field_name]);
 					}
 				}
