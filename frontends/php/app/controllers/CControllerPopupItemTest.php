@@ -135,6 +135,10 @@ abstract class CControllerPopupItemTest extends CController {
 		],
 		'params_f' => [],
 		'snmp_community' => [],
+		'snmpv3_contextname' => [],
+		'snmpv3_securityname' => [],
+		'snmpv3_authpassphrase' => [],
+		'snmpv3_privpassphrase' => [],
 		'snmp_oid' => []
 	];
 
