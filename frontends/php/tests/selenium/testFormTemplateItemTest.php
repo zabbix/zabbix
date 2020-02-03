@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,18 +29,29 @@ class testFormTemplateItemTest extends testFormItemTest {
 	const IS_HOST		= false;
 	const LLD_ID			= 99349;	// 'Test discovery rule'
 
+	/**
+	 * Creation link forming function for items or LLD.
+	 *
+	 * @param string	$pointer  instance pointing string: items or host_discovery
+	 */
 	public function getCreateLink($pointer) {
 		return $pointer.'.php?form=create&hostid='.self::TEMPLATE_ID;
 	}
 
+	/**
+	 * Saved item or LLD link forming function.
+	 *
+	 * @param string	$pointer  instance pointing string: items or host_discovery
+	 */
 	public function getSavedLink($pointer) {
 		return $pointer.'.php?form=update&hostid='.self::TEMPLATE_ID.'&itemid=';
 	}
 
 	/**
+	 * Check Test item Button enabled/disabled state depending on item type.
+	 *
 	 * @backup-once items
 	 */
-	// Check Test item Button enabled/disabled state depending on item type.
 	public function testFormTemplateItemTest_CheckItemTestButtonState() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(),
 			'Item for Test Button check', $this->getCreateLink('items'),
@@ -48,7 +59,9 @@ class testFormTemplateItemTest extends testFormItemTest {
 		);
 	}
 
-	// Check Test item prototype Button enabled/disabled state depending on item type.
+	/**
+	 * Check Test item prototype Button enabled/disabled state depending on item type.
+	 */
 	public function testFormTemplateItemTest_CheckItemPrototypeTestButtonState() {
 		$prototype_create_link = 'disc_prototypes.php?form=create&parent_discoveryid='.self::LLD_ID;
 		$prototype_saved_link = 'disc_prototypes.php?form=update&parent_discoveryid='.self::LLD_ID.'&itemid=';
@@ -59,7 +72,9 @@ class testFormTemplateItemTest extends testFormItemTest {
 		);
 	}
 
-	// Check Test LLD Button enabled/disabled state depending on item type.
+	/**
+	 * Check Test LLD Button enabled/disabled state depending on item type.
+	 */
 	public function testFormTemplateItemTest_CheckLLDTestButtonState() {
 		$this->checkTestButtonState($this->getCommonTestButtonStateData(),
 			'LLD for Test Button check', $this->getCreateLink('host_discovery'),

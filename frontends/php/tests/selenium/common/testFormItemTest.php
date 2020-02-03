@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class testFormItemTest extends CWebTest {
 	use PreprocessingTrait;
 
 	/*
-	 * Test item button data for item, item prototype and LLD.
+	 * Test item button state data for item, item prototype and LLD.
 	 */
 	public function getCommonTestButtonStateData() {
 		return [
@@ -47,8 +47,8 @@ class testFormItemTest extends CWebTest {
 				['Type' => 'Zabbix trapper'],
 				['Type' => 'External check'],
 				['Type' => 'Database monitor', 'SQL query' => 'query'],
-				['Type' => 'HTTP agent','URL' => 'https://www.zabbix.com'],
-				['Type' => 'IPMI agent','IPMI sensor' => 'Sensor'],
+				['Type' => 'HTTP agent', 'URL' => 'https://www.zabbix.com'],
+				['Type' => 'IPMI agent', 'IPMI sensor' => 'Sensor'],
 				['Type' => 'SSH agent', 'Key' => 'ssh.run[Description,127.0.0.1,50]', 'User name' => 'Name', 'Executed script' => 'Script'],
 				['Type' => 'TELNET agent', 'Key' => 'telnet'],
 				['Type' => 'JMX agent', 'Key' => 'jmx','JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
@@ -57,7 +57,7 @@ class testFormItemTest extends CWebTest {
 	}
 
 	/*
-	 * Test item button data for item and item prototype.
+	 * Test item button state data for item and item prototype.
 	 */
 	public function getItemTestButtonStateData() {
 		return array_merge($this->getCommonTestButtonStateData(), [
@@ -67,9 +67,19 @@ class testFormItemTest extends CWebTest {
 		]);
 	}
 
+	/**
+	 * Check test item button state depending on item type.
+	 *
+	 * @param arary		$data			data provider
+	 * @param string	$item_name		item given name
+	 * @param string	$create_link	url for creating new item
+	 * @param string	$saved_link		url for opening saved item
+	 * @param string	$item_type		type of an item: item, prototype or lld rule
+	 * @param string	$success_text	text part of a success message
+	 * @param boolean	$check_now		possibility of executing item instantly
+	 */
 	public function checkTestButtonState($data, $item_name, $create_link, $saved_link,
-		$item_type, $success_text, $check_now)
-	{
+			$item_type, $success_text, $check_now) {
 		$this->page->login()->open($create_link);
 		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 
@@ -82,10 +92,11 @@ class testFormItemTest extends CWebTest {
 		// Check Test item button.
 		$this->checkTestButtonInPreprocessing($item_type);
 		$this->saveFormAndCheckMessage($item_type.$success_text);
-		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr($item_name));
+		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='
+			.zbx_dbstr($item_name));
 
 		// Open created item and change type.
-		foreach ($data as $update){
+		foreach ($data as $update) {
 			$this->page->open($saved_link.$itemid);
 			$item_form->invalidate();
 			$type = $item_form->getField('Type')->getValue();
@@ -96,18 +107,24 @@ class testFormItemTest extends CWebTest {
 				]));
 
 				$this->checkTestButtonInPreprocessing($item_type, $enabled, $i);
-				// Check "Execute now" button only in host case item saved form and then change type.
+				/*
+				 * Check "Execute now" button only in host case item saved form
+				 * and then change type.
+				 */
 				if ($i === 0) {
-					if($check_now){
-						$execute_button = $this->query('id:check_now')->waitUntilVisible()->one();
+					if ($check_now) {
+						$execute_button = $this->query('id:check_now')
+							->waitUntilVisible()->one();
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}
 
 					$item_form->fill($update);
 					// TODO: workaround for ZBXNEXT-5365
-					if ($item_type === 'Item prototype' && array_key_exists('Master item', $update)){
-						sleep(2);
-						$item_form->getFieldContainer('Master item')->asMultiselect()->select($update['Master item']);
+					if ($item_type === 'Item prototype'
+						&& array_key_exists('Master item', $update)) {
+							sleep(2);
+							$item_form->getFieldContainer('Master item')
+								->asMultiselect()->select($update['Master item']);
 					}
 
 					$type = $update['Type'];
@@ -118,6 +135,9 @@ class testFormItemTest extends CWebTest {
 		}
 	}
 
+	/*
+	 * Test item button data for item, item prototype and LLD.
+	 */
 	public function getCommonTestItemData() {
 		return [
 			[
@@ -137,7 +157,6 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'Simple check',
 						'Key' => 'test.item.key'
 					]
-
 				]
 			],
 			[
@@ -355,6 +374,9 @@ class testFormItemTest extends CWebTest {
 		];
 	}
 
+	/*
+	 * Test item button data for item.
+	 */
 	public function getItemTestItemData() {
 		return array_merge($this->getCommonTestItemData(), [
 			[
@@ -414,6 +436,9 @@ class testFormItemTest extends CWebTest {
 		]);
 	}
 
+	/*
+	 * Test item button data for item prototype.
+	 */
 	public function getPrototypeTestItemData() {
 		return array_merge($this->getItemTestItemData(), [
 			[
@@ -442,6 +467,13 @@ class testFormItemTest extends CWebTest {
 		]);
 	}
 
+	/**
+	 * Check test item form.
+	 *
+	 * @param string	$create_link	url for creating new item
+	 * @param arary		$data			data provider
+	 * @param boolean	$is_host		true if host, false if template
+	 */
 	public function checkTestItem($create_link, $data, $is_host) {
 		$proxy = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid IN '
 			. '(SELECT proxy_hostid FROM hosts WHERE host = "Test item host")');
@@ -451,23 +483,26 @@ class testFormItemTest extends CWebTest {
 
 		$item_form->fill($data['fields']);
 		// Get interface ip and port separately.
-		if ($is_host){
-			$host_interface = explode(' : ', $item_form->getField('Host interface')->getText(), 2);
+		if ($is_host) {
+			$host_interface = explode(' : ', $item_form->getField('Host interface')
+				->getText(), 2);
 		}
 
-		if(CTestArrayHelper::get($data, 'preprocessing')){
+		if (CTestArrayHelper::get($data, 'preprocessing')){
 			$item_form->selectTab('Preprocessing');
 			$this->addPreprocessingSteps($data['preprocessing']);
 		}
 
 		// Open Test item dialog form.
 		$this->query('id:test_item')->waitUntilVisible()->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilPresent()->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = $this->query('id:overlay_dialogue')->waitUntilPresent()->
+			asOverlayDialog()->one()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertEquals('Test item', $dialog->getTitle());
-				$test_form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one()->waitUntilReady();
+				$test_form = $this->query('id:preprocessing-test-form')
+					->waitUntilPresent()->asForm()->one()->waitUntilReady();
 				// Check "Get value from host" checkbox.
 				$get_host_value = $test_form->getField('Get value from host');
 				$this->assertTrue($get_host_value->isEnabled());
@@ -557,21 +592,25 @@ class testFormItemTest extends CWebTest {
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.',
 						'Incorrect value for field "Port": cannot be empty.']);
 				}
-				if (in_array($data['fields']['Type'], ['Simple check'])){
+				if ($data['fields']['Type'] === 'Simple check') {
 					$elements['address']->clear();
 					$button->click();
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.']);
 				}
 
 				// Uncheck "Get value from host" checkbox.
-				if(CTestArrayHelper::get($data, 'host_value', true) === false){
+				if (CTestArrayHelper::get($data, 'host_value', true) === false) {
 					$get_host_value->uncheck();
 					// Check that interface and proxy fields disappeared.
 					foreach (['address', 'port', 'proxy'] as $field) {
 						$elements[$field]->waitUntilNotVisible();
 					}
 					$button->waitUntilNotVisible();
-					// Check that value fields still present after "Get value from host" checkbox is unset.
+
+					/*
+					 * Check that value fields still present after "Get value
+					 * from host" checkbox is unset.
+					 */
 					$this->checkValueFields($data);
 				}
 
@@ -581,7 +620,7 @@ class testFormItemTest extends CWebTest {
 					'actual' => []
 				];
 
-				if($macros['expected']){
+				if ($macros['expected']){
 					foreach ($test_form->getField('Macros')->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 
@@ -595,22 +634,25 @@ class testFormItemTest extends CWebTest {
 							return strcmp($a['macro'], $b['macro']);
 						});
 					}
-					unset($array);
+					unset ($array);
 
 					$this->assertEquals($macros['expected'], $macros['actual']);
 				}
 
 				// Compare preprocessing from data with steps from test table.
-				if(CTestArrayHelper::get($data, 'preprocessing')){
-					$preprocessing_table = $test_form->getField('Preprocessing steps')->asTable();
+				if (CTestArrayHelper::get($data, 'preprocessing')) {
+					$preprocessing_table = $test_form->getField('Preprocessing steps')
+						->asTable();
 
 					foreach ($data['preprocessing'] as $i => $step) {
-						$this->assertEquals(($i+1).': '.$step['type'], $preprocessing_table->getRow($i)->getText());
+						$this->assertEquals(($i+1).': '.$step['type'],
+							$preprocessing_table->getRow($i)->getText());
 					}
 				}
 				break;
 			case TEST_BAD:
-				$message = $dialog->query('tag:output')->waitUntilPresent()->asMessage()->one();
+				$message = $dialog->query('tag:output')->waitUntilPresent()
+					->asMessage()->one();
 				$this->assertTrue($message->isBad());
 				$this->assertTrue($message->hasLine($data['error']));
 				$dialog->close();
@@ -618,11 +660,22 @@ class testFormItemTest extends CWebTest {
 		}
 	}
 
+	/**
+	 * Function for checking presence of fields and their editability
+	 * depending on specific preprocessing steps.
+	 *
+	 * @param array $data data provider
+	 */
 	private function checkValueFields($data) {
-		$test_form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one()->waitUntilReady();
+		$test_form = $this->query('id:preprocessing-test-form')
+			->waitUntilPresent()->asForm()->one()->waitUntilReady();
 		$this->assertTrue($test_form->query('id:value')->asMultiline()->one()->isEnabled());
 
-		if(CTestArrayHelper::get($data, 'preprocessing')){
+		/*
+		 * If item has at least one of following preprocessing steps,
+		 * previous value and time field should become editable.
+		 */
+		if (CTestArrayHelper::get($data, 'preprocessing')){
 			$prev_enabled = false;
 			foreach ($data['preprocessing'] as $step) {
 				if (in_array($step['type'], ['Discard unchanged with heartbeat',
@@ -632,8 +685,10 @@ class testFormItemTest extends CWebTest {
 					break;
 				}
 			}
-			$this->assertTrue($test_form->query('id:prev_value')->asMultiline()->one()->isEnabled($prev_enabled));
-			$this->assertTrue($test_form->query('id:prev_time')->one()->isEnabled($prev_enabled));
+			$this->assertTrue($test_form->query('id:prev_value')->asMultiline()
+				->one()->isEnabled($prev_enabled));
+			$this->assertTrue($test_form->query('id:prev_time')
+				->one()->isEnabled($prev_enabled));
 		}
 
 		$this->assertFalse($test_form->query('id:time')->one()->isEnabled());
@@ -644,7 +699,7 @@ class testFormItemTest extends CWebTest {
 		$test_form = $this->query('id:preprocessing-test-form')->asForm()->one();
 		$message = $test_form->getOverlayMessage();
 		$this->assertTrue($message->isBad());
-		foreach ($message as $line){
+		foreach ($message as $line) {
 			$this->assertTrue($message->hasLine($line));
 		}
 		$message->close();
@@ -663,7 +718,7 @@ class testFormItemTest extends CWebTest {
 		$item_form->selectTab($item_type);
 	}
 
-	private function saveFormAndCheckMessage($message_text){
+	private function saveFormAndCheckMessage($message_text) {
 		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$item_form->submit();
 		$this->page->waitUntilReady();
