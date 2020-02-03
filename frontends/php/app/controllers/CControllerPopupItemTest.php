@@ -77,8 +77,6 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Item properties where macros are supported.
 	 *
-	 * If field supports user macros and LLD macros only, just leave the array empty.
-	 *
 	 * @var array
 	 */
 	protected $macros_by_item_props = [
