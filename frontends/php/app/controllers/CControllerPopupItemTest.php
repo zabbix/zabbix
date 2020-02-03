@@ -507,6 +507,16 @@ abstract class CControllerPopupItemTest extends CController {
 								: null
 						];
 					}
+					elseif ($data['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+						$data += [
+							'snmpv3_authprotocol' => array_key_exists('snmpv3_authprotocol', $input)
+								? $input['snmpv3_authprotocol']
+								: null,
+							'snmpv3_authpassphrase' => array_key_exists('snmpv3_authpassphrase', $input)
+								? $input['snmpv3_authpassphrase']
+								: null
+						];
+					}
 				}
 				break;
 

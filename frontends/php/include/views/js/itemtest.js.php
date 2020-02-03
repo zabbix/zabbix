@@ -140,6 +140,12 @@
 							snmpv3_privpassphrase: form_data['snmpv3_privpassphrase']
 						});
 					}
+					else if (properties.snmpv3_securitylevel == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>) {
+						properties = jQuery.extend(properties, {
+							snmpv3_authprotocol: form_data['snmpv3_authprotocol'],
+							snmpv3_authpassphrase: form_data['snmpv3_authpassphrase']
+						});
+					}
 				}
 				break;
 
