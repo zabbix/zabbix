@@ -163,7 +163,7 @@ class CModule extends CApiService {
 
 		$defaults = [
 			'status' => MODULE_STATUS_DISABLED,
-			'config' => []
+			'config' => '{}'
 		];
 
 		foreach ($modules as &$module) {

@@ -7822,7 +7822,7 @@ return [
 			'config' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => '{}',
+				'default' => '',
 			],
 		],
 	],
