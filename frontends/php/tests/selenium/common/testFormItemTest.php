@@ -33,7 +33,7 @@ class testFormItemTest extends CWebTest {
 	use MacrosTrait;
 	use PreprocessingTrait;
 
-	/*
+	/**
 	 * Test item button state data for item, item prototype and LLD.
 	 */
 	public function getCommonTestButtonStateData() {
@@ -135,7 +135,7 @@ class testFormItemTest extends CWebTest {
 		}
 	}
 
-	/*
+	/**
 	 * Test item button data for item, item prototype and LLD.
 	 */
 	public function getCommonTestItemData() {
@@ -374,7 +374,7 @@ class testFormItemTest extends CWebTest {
 		];
 	}
 
-	/*
+	/**
 	 * Test item button data for item.
 	 */
 	public function getItemTestItemData() {
@@ -436,7 +436,7 @@ class testFormItemTest extends CWebTest {
 		]);
 	}
 
-	/*
+	/**
 	 * Test item button data for item prototype.
 	 */
 	public function getPrototypeTestItemData() {
