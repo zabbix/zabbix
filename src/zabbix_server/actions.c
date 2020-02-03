@@ -1476,6 +1476,7 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	zbx_uint64_t		groupid, templateid;
 	zbx_vector_uint64_t	lnk_templateids, del_templateids,
 				new_groupids, del_groupids;
+	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, actionid);
 
@@ -1490,7 +1491,8 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 				" left join opgroup g on g.operationid=o.operationid"
 				" left join optemplate t on t.operationid=o.operationid"
 				" left join opinventory oi on oi.operationid=o.operationid"
-			" where o.actionid=" ZBX_FS_UI64,
+			" where o.actionid=" ZBX_FS_UI64
+			" order by o.operationid",
 			actionid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1527,11 +1529,27 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
 				if (0 != templateid)
+				{
+					if (FAIL != (i = zbx_vector_uint64_search(&del_templateids, templateid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						zbx_vector_uint64_remove(&del_templateids, i);
+					}
+
 					zbx_vector_uint64_append(&lnk_templateids, templateid);
+				}
 				break;
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
 				if (0 != templateid)
+				{
+					if (FAIL != (i = zbx_vector_uint64_search(&lnk_templateids, templateid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						zbx_vector_uint64_remove(&lnk_templateids, i);
+					}
+
 					zbx_vector_uint64_append(&del_templateids, templateid);
+				}
 				break;
 			case OPERATION_TYPE_HOST_INVENTORY:
 				op_host_inventory_mode(event, inventory_mode);
@@ -1542,18 +1560,18 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	}
 	DBfree_result(result);
 
-	if (0 != lnk_templateids.values_num)
-	{
-		zbx_vector_uint64_sort(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_template_add(event, &lnk_templateids);
-	}
-
 	if (0 != del_templateids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		op_template_del(event, &del_templateids);
+	}
+
+	if (0 != lnk_templateids.values_num)
+	{
+		zbx_vector_uint64_sort(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		op_template_add(event, &lnk_templateids);
 	}
 
 	if (0 != new_groupids.values_num)
