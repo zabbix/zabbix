@@ -15,7 +15,7 @@
 # to the necessary values.
 #
 # Users may override the detected values by doing something like:
-# SSH2_LIBS="-lssh2" SSH_CFLAGS="-I/usr/myinclude" ./configure
+# SSH2_LIBS="-lssh2" SSH2_CFLAGS="-I/usr/myinclude" ./configure
 #
 # This macro is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of

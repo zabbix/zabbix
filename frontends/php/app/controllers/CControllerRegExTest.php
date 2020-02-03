@@ -55,13 +55,12 @@ class CControllerRegExTest extends CController {
 		]);
 
 		foreach ($data['expressions'] as $id => $expression) {
-			if (!in_array($expression['expression_type'], [EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE]) ||
-				$validator->validate($expression['expression'])
-			) {
+			if (!in_array($expression['expression_type'], [EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE])
+					|| $validator->validate($expression['expression'])) {
 				$match = CGlobalRegexp::matchExpression($expression, $data['testString']);
-
 				$result['expressions'][$id] = $match;
-			} else {
+			}
+			else {
 				$match = false;
 				$result['errors'][$id] = $validator->getError();
 			}

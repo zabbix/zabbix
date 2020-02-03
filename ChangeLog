@@ -1,6 +1,15 @@
+Changes for 5.0.0alpha2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.0.0alpha1
 
 New features:
+A.F....PS. [ZBXNEXT-1423] added ipmi.get item for IPMI sensor LLD (akozlovs, Ivo)
+A.F.....S. [ZBXNEXT-5546,ZBXNEXT-5548] added support of default message templates for each media type (agriscenko, asestakovs)
 .......... [ZBXNEXT-5671] added zabbix_js command line utility for embedded javascript testing (wiper)
 ...G...... [ZBXNEXT-5490] added new key vfs.fs.get to collect mounted filesystems information and relevant metrics into json (akozlovs)
 .........T [ZBXNEXT-5636] added "Template App HAProxy" (mchudinov)
@@ -197,6 +206,18 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 ........S. [ZBX-16677] fixed empty sql query DBexecute_overflowed_sql call during host availability update (atumilovics)
 ........S. [ZBX-16383] adjusted timer sleeping period to process maintenances each minute at 00 seconds (wiper)
 .........T [ZBX-16737] changed agent.ping type to ZABBIX_PASSIVE in Template Module Zabbix agent (vitaly)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.6rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.4.5
+
+4.4.5rc1 was released as 4.4.5 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.4.5rc1
@@ -1219,6 +1240,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.18rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.17
+
+4.0.17rc1 was released as 4.0.17 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.17rc1
@@ -3986,6 +4019,7 @@ Changes for 3.0.30rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-16024] fixed maintenance status not being updated in cache if host is disabled (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.29

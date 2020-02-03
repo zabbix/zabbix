@@ -274,6 +274,8 @@
 				});
 		};
 
+		jQuery('#add').click(remove_operationid);
+
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();

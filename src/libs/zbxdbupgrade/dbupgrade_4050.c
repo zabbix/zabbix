@@ -528,6 +528,29 @@ static int	DBpatch_4050027(void)
 	return DBdrop_field("actions", "ack_longdata");
 }
 
+static int	DBpatch_4050028(void)
+{
+	const ZBX_TABLE table =
+		{"module", "moduleid", 0,
+			{
+				{"moduleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"relative_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"config", "", NULL, NULL, 2048, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050030(void)
+{
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -558,5 +581,7 @@ DBPATCH_ADD(4050024, 0, 1)
 DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
+DBPATCH_ADD(4050028, 0, 1)
+DBPATCH_ADD(4050030, 0, 1)
 
 DBPATCH_END()

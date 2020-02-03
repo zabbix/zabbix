@@ -107,7 +107,7 @@ class CControllerPopupDiscoveryCheck extends CController {
 
 		$output = [
 			'title' => _('Discovery check'),
-			'params' => $params,
+			'params' => $params + DB::getDefaults('dchecks'),
 			'update' => $this->getInput('update', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

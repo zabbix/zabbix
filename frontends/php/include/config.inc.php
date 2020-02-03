@@ -19,10 +19,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/classes/core/Z.php';
+require_once dirname(__FILE__).'/classes/core/APP.php';
 
 try {
-	Z::getInstance()->run(ZBase::EXEC_MODE_DEFAULT);
+	APP::getInstance()->run(APP::EXEC_MODE_DEFAULT);
 }
 catch (DBException $e) {
 	(new CView('general.warning', [

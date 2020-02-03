@@ -102,9 +102,8 @@ class CPopupMenuElement extends CElement {
 		}
 
 		if ($items) {
-			$element->hover();
-			$element->parents()->query('class:menu-popup')->asPopupMenu()
-					->waitUntilPresent()->one()->select($items);
+			$parents = $element->parents('tag:li')->one()->hover();
+			$parents->query('class:menu-popup')->asPopupMenu()->waitUntilVisible()->one()->select($items);
 		}
 		else {
 			$element->click();

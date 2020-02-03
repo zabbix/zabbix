@@ -2087,7 +2087,18 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent with spaces',
 					'key' => 'item-ipmi-agent-spaces',
-					'ipmi_sensor' => 'ipmi_sensor',
+					'ipmi_sensor' => '   ipmi_sensor   ',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			// IPMI sensor is optional if item key is ipmi.get
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent with ipmi.get',
+					'key' => 'ipmi.get',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -2122,9 +2133,9 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
 					'key' => 'item-ipmi-agent-error',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value for field "IPMI sensor": cannot be empty.'
+						'Incorrect value for field "ipmi_sensor": cannot be empty.'
 					]
 				]
 			],

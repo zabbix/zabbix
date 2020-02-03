@@ -46,13 +46,13 @@ if (!isset($allowed_content[$content_type])) {
 	return;
 }
 
-require_once dirname(__FILE__).'/include/classes/core/Z.php';
+require_once dirname(__FILE__).'/include/classes/core/APP.php';
 
 header('Content-Type: application/json');
 $data = $http_request->body();
 
 try {
-	Z::getInstance()->run(ZBase::EXEC_MODE_API);
+	APP::getInstance()->run(APP::EXEC_MODE_API);
 
 	$apiClient = API::getWrapper()->getClient();
 
