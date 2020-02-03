@@ -5249,7 +5249,7 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 		if (0 != strcmp(community, row[2]))
 			break;
 
-		if (0 == strcmp(securityname, row[3]))
+		if (0 != strcmp(securityname, row[3]))
 			break;
 
 		ZBX_STR2UCHAR(db_securitylevel, row[4]);
@@ -5257,10 +5257,10 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 		if (securitylevel != db_securitylevel)
 			break;
 
-		if (0 == strcmp(authpassphrase, row[5]))
+		if (0 != strcmp(authpassphrase, row[5]))
 			break;
 
-		if (0 == strcmp(privpassphrase, row[6]))
+		if (0 != strcmp(privpassphrase, row[6]))
 			break;
 
 		ZBX_STR2UCHAR(db_authprotocol, row[7]);
@@ -5273,7 +5273,7 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 		if (privprotocol != db_privprotocol)
 			break;
 
-		if (0 == strcmp(contextname, row[9]))
+		if (0 != strcmp(contextname, row[9]))
 			break;
 
 		DBfree_result(result);
