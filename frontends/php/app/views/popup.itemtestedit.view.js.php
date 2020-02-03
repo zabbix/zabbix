@@ -135,12 +135,6 @@ function cleanPreviousTestResults() {
 		.hide()
 		.find('.table-forms-td-right')
 		.empty();
-
-	jQuery('#value-mapped-result', $form)
-		.hide()
-		.find('.table-forms-td-right > *')
-		.not('.grey')
-		.remove();
 }
 
 /**
@@ -297,24 +291,27 @@ function itemCompleteTest() {
 					$result = jQuery(result).css('float', 'right');
 				}
 
-				jQuery('#final-result')
-					.show()
-					.find('.table-forms-td-right')
-						.append(ret.final.action)
-						.append($result);
+				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'})
+					.append(jQuery('<div>').append(ret.final.action, $result))
+					.css('display', 'block');
 
 				if (typeof ret.mapped_value !== 'undefined') {
 					$mapped_value = makeStepResult({result: ret.mapped_value});
 					$mapped_value.css('float', 'right');
 
-					jQuery('#value-mapped-result')
-						.show()
-						.find('.table-forms-td-right')
-						.append($mapped_value);
+					$result_row.append(jQuery('<div>')
+						.append(
+							jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'})
+								.text('<?= _('Result with value map applied') ?>'),
+							$mapped_value
+						)
+					);
 				}
-				else {
-					jQuery('#value-mapped-result').hide();
-				}
+
+				jQuery('#final-result')
+					.show()
+					.find('.table-forms-td-right')
+					.append($result_row);
 			}
 
 			enableItemTestForm();
@@ -419,7 +416,7 @@ function saveItemTestInputs() {
 }
 
 jQuery(document).ready(function($) {
-	$('#final-result, #value-mapped-result').hide();
+	$('#final-result').hide();
 
 	<?php if ($data['show_prev']): ?>
 		jQuery('#upd_last').val(Math.ceil(+new Date()/1000));

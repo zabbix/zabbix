@@ -205,14 +205,7 @@ if (count($data['steps']) > 0) {
 }
 
 if ($data['show_final_result']) {
-	$form_list
-		->addRow(_('Result'), new CDiv(), 'final-result', ZBX_STYLE_TABLE_FORMS_TIGHT)
-		->addRow(
-			null,
-			[(new CSpan(_('Result with value map applied')))->addClass(ZBX_STYLE_GREY)],
-			'value-mapped-result',
-			ZBX_STYLE_TABLE_FORMS_TIGHT
-		);
+	$form_list->addRow(_('Result'), false, 'final-result');
 }
 
 $form
