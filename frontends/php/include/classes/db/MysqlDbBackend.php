@@ -52,11 +52,6 @@ class MysqlDbBackend extends DbBackend {
 			return false;
 		}
 
-		if ($this->tls_cipher_list !== '' && strpos($this->tls_cipher_list, $row['Value']) === false) {
-			$this->setError('Error connecting to database. Invalid cipher.');
-			return false;
-		}
-
 		return true;
 	}
 

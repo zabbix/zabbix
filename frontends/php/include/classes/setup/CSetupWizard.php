@@ -293,9 +293,12 @@ class CSetupWizard extends CForm {
 
 			$table->addRow(_('With host verification'), $verify_host_box);
 
-			$table->addRow(_('TLS cipher list'),
-				(new CTextBox('cipher_list', $this->getConfig('DB_CIPHER_LIST')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			);
+			If ($DB['TYPE'] == ZBX_DB_MYSQL) {
+				$table->addRow(_('TLS cipher list'),
+					(new CTextBox('cipher_list', $this->getConfig('DB_CIPHER_LIST')))
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				);
+			}
 		}
 
 		if ($this->STEP_FAILED) {

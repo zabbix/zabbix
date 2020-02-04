@@ -74,9 +74,8 @@ class PostgresqlDbBackend extends DbBackend {
 			' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
 				' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
 
-		if (!$row || ($this->tls_cipher_list !== '' && !preg_match('/'.$row['cipher'].'/', $this->tls_cipher_list))) {
-			$this->setError('Error connecting to database. Invalid cipher.');
-
+		if (!$row ) {
+			$this->setError('Error connecting to database. Empty cipher.');
 			return false;
 		}
 
