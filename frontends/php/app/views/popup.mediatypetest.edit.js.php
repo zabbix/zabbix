@@ -23,52 +23,49 @@ return <<<'JS'
 /**
  * Send media type test data to server and get a response.
  *
- * @param {string} formname  Form name that is sent to server for validation.
+ * @param {Overlay} overlay
  */
-function mediatypeTestSend(formname) {
-	var form = window.document.forms[formname],
-		$form = jQuery(form),
+function mediatypeTestSend(overlay) {
+	var $form = overlay.$dialogue.find('form'),
 		$form_fields = $form.find('#sendto, #subject, #message'),
-		$submit_btn = jQuery('.submit-test-btn'),
 		data = $form.serialize(),
 		url = new Curl($form.attr('action'));
 
 	$form.trimValues(['#sendto', '#subject', '#message']);
-
 	$form_fields.prop('disabled', true);
 
-	$submit_btn.prop('disabled', true).addClass('is-loading').blur();
-
-	jQuery.ajax({
+	overlay.setLoading();
+	overlay.xhr = jQuery.ajax({
 		url: url.getUrl(),
 		data: data,
 		success: function(ret) {
-			$form.parent().find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.messages !== 'undefined') {
 				jQuery(ret.messages).insertBefore($form);
 				$form.parent().find('.link-action').click();
 			}
 
-			$submit_btn.prop('disabled', false).removeClass('is-loading');
-
 			if ('response' in ret) {
-				jQuery('#webhook_response_value', form).val(ret.response.value);
-				jQuery('#webhook_response_type', form).text(ret.response.type);
+				jQuery('#webhook_response_value', $form).val(ret.response.value);
+				jQuery('#webhook_response_type', $form).text(ret.response.type);
 			}
 
+			overlay.unsetLoading();
 			$form_fields.prop('disabled', false);
 		},
 		error: function(request, status, error) {
 			if (request.status == 200) {
-				$submit_btn.prop('disabled', false).removeClass('is-loading');
+				overlay.unsetLoading();
 				$form_fields.prop('disabled', false);
 				alert(error);
 			}
-			else if (window.document.forms[formname]) {
+			else if (window.document.forms['mediatypetest_form']) {
 				var request = this,
 					retry = function() {
-						jQuery.ajax(request);
+						if (window.document.forms['mediatypetest_form']) {
+							overlay.xhr = jQuery.ajax(request);
+						}
 					};
 
 				// Retry with 2s interval.

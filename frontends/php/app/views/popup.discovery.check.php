@@ -128,7 +128,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitDCheck();'
+			'action' => 'return submitDCheck(overlay);'
 		]
 	]
 ];

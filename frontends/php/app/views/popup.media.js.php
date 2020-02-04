@@ -46,21 +46,23 @@ jQuery(document).ready(function($) {
 /**
  * Send media form data to server for validation before adding them to user media tab.
  *
- * @param {string} formname		form name that is sent to server for validation
+ * @param {Overlay} overlay
  */
-function validateMedia(formname) {
-	var form = window.document.forms[formname];
+function validateMedia(overlay) {
+	var $form = overlay.$dialogue.find('form');
 
-	jQuery(form).trimValues(['#period', '#sendto', 'input[name^="sendto_emails"]']);
+	$form.trimValues(['#period', '#sendto', 'input[name^="sendto_emails"]']);
 
-	jQuery.ajax({
-		url: jQuery(form).attr('action'),
-		data: jQuery(form).serialize(),
+	overlay.setLoading();
+	overlay.xhr = jQuery.ajax({
+		url: $form.attr('action'),
+		data: $form.serialize(),
 		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(form));
+				jQuery(ret.errors).insertBefore($form);
+				overlay.unsetLoading();
 			}
 			else {
 				add_media(ret.dstfrm, ret.media, ret.mediatypeid, ret.sendto, ret.period, ret.active, ret.severity);

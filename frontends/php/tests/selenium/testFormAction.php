@@ -900,7 +900,8 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['add_opcondition'])) {
 			$this->zbxTestClickXpathWait('//table[@id="operationConditionTable"]//button[text()="Add"]');
-			$this->page->query('xpath://div[@id="overlay_dialogue"][2]')->asOverlayDialog()->waitUntilReady();
+			$this->page->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]')
+					->asOverlayDialog()->waitUntilReady();
 			$add_opcondition = $data['add_opcondition'];
 		}
 		else {
@@ -1068,7 +1069,8 @@ class testFormAction extends CLegacyWebTest {
 			}
 			else {
 				$this->zbxTestTextPresent ('New condition');
-				$this->query('xpath://div[@id="overlay_dialogue"][2]//button[text()="Cancel"]')->one()->waitUntilVisible();
+				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]'.
+						'//button[text()="Cancel"]')->one()->waitUntilVisible();
 
 				$this->zbxTestAssertVisibleXpath('//select[@id="condition_type"]');
 				$this->zbxTestDropdownAssertSelected('condition_type', 'Event acknowledged');
@@ -1076,11 +1078,15 @@ class testFormAction extends CLegacyWebTest {
 						'Event acknowledged'
 				]);
 
-				$this->zbxTestAssertVisibleXpath('//div[@id="overlay_dialogue"]//label[text()="equals"]');
-				$this->zbxTestAssertVisibleXpath('//div[@id="overlay_dialogue"]//ul[@id="value" and @class="radio-list-control"]');
+				$this->zbxTestAssertVisibleXpath('//div[contains(@class, "overlay-dialogue modal")]'.
+						'//label[text()="equals"]');
+				$this->zbxTestAssertVisibleXpath('//div[contains(@class, "overlay-dialogue modal")]'.
+						'//ul[@id="value" and @class="radio-list-control"]');
 				$this->zbxTestAssertElementPresentXpath('//label[text()="No"]/../input[@checked]');
-				$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"][2]//button[text()="Add"]');
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"][2]'));
+				$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")][2]'.
+						'//button[text()="Add"]');
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue '.
+						'modal")][2]'));
 			}
 		}
 		else {
@@ -1669,7 +1675,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('operations_0'));
 			}
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_bg'));
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay-bg'));
 		}
 
 		if (isset($data['esc_period'])){
@@ -1682,7 +1688,7 @@ class testFormAction extends CLegacyWebTest {
 			);
 			$this->zbxTestWaitForPageToLoad();
 		}
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
 		$this->query('xpath://button[@id="add"]')->waitUntilClickable()->one()->click();
 		switch ($data['expected']) {
 			case ACTION_GOOD:
@@ -1775,7 +1781,7 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestInputType('operation_opcommand_command', 'command');
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
-		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->query('id:overlay-bg')->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
@@ -1824,7 +1830,8 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath('//tr[@id="opmsgUserListFooter"]//button'));
 
 		$this->zbxTestClickXpath('//tr[@id="opmsgUserListFooter"]//button');
-		$this->page->query('xpath://div[@id="overlay_dialogue"][2]//button[text()="Cancel"]')->waitUntilClickable()->one()->click();
+		$this->page->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]'.
+				'//button[text()="Cancel"]')->waitUntilClickable()->one()->click();
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
 

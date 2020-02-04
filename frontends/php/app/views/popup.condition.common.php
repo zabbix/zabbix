@@ -664,7 +664,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return validateConditionPopup();'
+			'action' => 'return validateConditionPopup(overlay);'
 		]
 	]
 ];

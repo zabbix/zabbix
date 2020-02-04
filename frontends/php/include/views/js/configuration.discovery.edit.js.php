@@ -293,10 +293,10 @@
 	/**
 	 * Sends discovery check form data to the server for validation before adding it to the main form.
 	 *
-	 * @param {string} form_name  Form name that is sent to the server for validation.
+	 * @param {Overlay} overlay
 	 */
-	function submitDCheck(form_name) {
-		var $form = jQuery(document.forms['dcheck_form']);
+	function submitDCheck(overlay) {
+		var $form = overlay.$dialogue.find('form');
 
 		$form.trimValues([
 			'#ports', '#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
@@ -314,10 +314,14 @@
 			return false;
 		}
 
-		return sendAjaxData('zabbix.php', {
+		overlay.setLoading();
+		overlay.xhr = sendAjaxData('zabbix.php', {
 			data: data,
 			dataType: 'json',
 			method: 'POST',
+			complete: function() {
+				overlay.unsetLoading();
+			}
 		}).done(function(response) {
 			$form
 				.parent()
@@ -349,7 +353,7 @@
 				}
 
 				addDCheck([dcheck]);
-				overlayDialogueDestroy(dialogueid);
+				overlayDialogueDestroy(overlay.dialogueid);
 			}
 		});
 	}
