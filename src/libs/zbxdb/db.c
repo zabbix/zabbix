@@ -574,8 +574,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #	define PG_TLS_VERIFY_CA		"verify-ca"
 #	define PG_TLS_VERIFY_FULL	"verify-full"
 
-	ZBX_UNUSED(cipher);
-
 	const char	*pg_keywords[PG_DB_PARAMS_COUNT + 1] = {NULL};
 	const char	*pg_values[PG_DB_PARAMS_COUNT + 1] = {NULL};
 	unsigned int	i = 0;
@@ -624,6 +622,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		zabbix_log(LOG_LEVEL_ERR, "if \"DBTLSKeyFile\" or \"DBTLSCertFile\" is set, all three of "
 			"\"DBTLSKeyFile\", \"DBTLSCertFile\" and \"DBTLSCAFile\" has to be set");
+		ret = ZBX_DB_FAIL;
+		goto out;
+	}
+
+	if (NULL != cipher)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "setting option \"DBTLSCipher\" is not supported for PostgreSQL. "
+			"Unset this option to connect to PostgreSQL");
 		ret = ZBX_DB_FAIL;
 		goto out;
 	}
