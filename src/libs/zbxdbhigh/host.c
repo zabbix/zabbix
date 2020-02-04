@@ -5276,11 +5276,8 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 		if (0 != strcmp(contextname, row[9]))
 			break;
 
-		DBfree_result(result);
-
-		return;
+		goto out;
 	}
-	DBfree_result(result);
 
 	community_esc = DBdyn_escape_field("interface_snmp", "community", community);
 	securityname_esc = DBdyn_escape_field("interface_snmp", "securityname", securityname);
@@ -5323,6 +5320,8 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 	zbx_free(authpassphrase_esc);
 	zbx_free(privpassphrase_esc);
 	zbx_free(contextname_esc);
+out:
+	DBfree_result(result);
 }
 
 /******************************************************************************
