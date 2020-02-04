@@ -27,23 +27,22 @@ $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'host.view')
 	->getUrl();
 
-$table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+$table = (new CTableInfo());
 
 $view_url = $data['view_curl']->getUrl();
 
 $table->setHeader([
-	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)->addStyle('width: 13%'),
-	(new CColHeader(_('Interface')))->addStyle('width: 134px;'),
-	(new CColHeader(_('Availability')))->addStyle('width: 125px;'),
-	(new CColHeader(_('Tags')))->addStyle('width: 17%'),
+	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
+	(new CColHeader(_('Interface'))),
+	(new CColHeader(_('Availability'))),
+	(new CColHeader(_('Tags'))),
 	(new CColHeader(_('Problems'))),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url)
-		->addStyle('width: 5%'),
-	(new CColHeader(_('Latest data')))->addStyle('width: 6%'),
-	(new CColHeader(_('Problems')))->addStyle('width: 7%'),
-	(new CColHeader(_('Graphs')))->addStyle('width: 7%'),
-	(new CColHeader(_('Screens')))->addStyle('width: 7%'),
-	(new CColHeader(_('Web')))->addStyle('width: 5%')
+	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url),
+	(new CColHeader(_('Latest data'))),
+	(new CColHeader(_('Problems'))),
+	(new CColHeader(_('Graphs'))),
+	(new CColHeader(_('Screens'))),
+	(new CColHeader(_('Web')))
 ]);
 
 foreach ($data['hosts'] as $hostid => $host) {
@@ -99,7 +98,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$table->addRow([
 		[$host_name, $maintenance_icon],
-		$host_interface,
+		(new CCol($host_interface))->addClass(ZBX_STYLE_NOWRAP),
 		getHostAvailabilityTable($host),
 		$host['tags'],
 		$problems_div,
