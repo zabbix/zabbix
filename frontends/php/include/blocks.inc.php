@@ -674,6 +674,14 @@ function make_status_of_zbx() {
 				);
 			}
 		}
+
+		$db = DB::getDbBackend();
+
+		if (!$db->checkEncoding()) {
+			$table->addRow(
+				(new CRow((new CCol($db->getWarning()))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
+			);
+		}
 	}
 
 	return $table;

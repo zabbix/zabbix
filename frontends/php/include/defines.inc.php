@@ -133,6 +133,10 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
+// Default db and field character set
+define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
+define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
 define('PAGE_TYPE_HTML',				0);
