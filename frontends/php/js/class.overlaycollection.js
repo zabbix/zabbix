@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,6 +87,21 @@ OverlayCollection.prototype.removeById = function(id) {
 	}
 
 	return overlay;
+};
+
+/**
+ * Get unused overlay id.
+ *
+ * @return {string}
+ */
+OverlayCollection.prototype.getNextId = function() {
+	var overlayid = Math.random().toString(36).substring(7);
+
+	while (this.stack.indexOf(overlayid) !== -1) {
+		overlayid = Math.random().toString(36).substring(7);
+	}
+
+	return overlayid;
 };
 
 /**

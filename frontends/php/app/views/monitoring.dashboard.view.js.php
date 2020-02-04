@@ -61,24 +61,31 @@
 		PopUp('dashboard.properties.edit', options, 'dashboard_properties', this);
 	};
 
-	function dashbrdApplyProperties() {
+	/**
+	 * @param {Overlay} overlay
+	 */
+	function dashbrdApplyProperties(overlay) {
 		var dashboard = jQuery('.dashbrd-grid-container'),
-			form = jQuery('[name=dashboard_properties_form]'),
+			$form = overlay.$dialogue.find('form'),
 			url = new Curl('zabbix.php', false),
 			form_data = {};
 
-		form.trimValues(['#name']);
-		form_data = form.serializeJSON();
+		$form.trimValues(['#name']);
+		form_data = $form.serializeJSON();
 		url.setArgument('action', 'dashboard.properties.check');
 
-		jQuery.ajax({
+		overlay.setLoading();
+		overlay.xhr = jQuery.ajax({
 			data: form_data,
 			url: url.getUrl(),
 			dataType: 'json',
 			method: 'POST',
-			success: function (response) {
+			complete: function() {
+				overlay.unsetLoading();
+			},
+			success: function(response) {
 				var errors = [];
-				form.parent().find('>.msg-good, >.msg-bad').remove();
+				overlay.$dialogue.find('>.msg-good, >.msg-bad').remove();
 
 				if (typeof response === 'object') {
 					if ('errors' in response) {
@@ -87,7 +94,7 @@
 				}
 
 				if (errors.length) {
-					jQuery(errors).insertBefore(form);
+					jQuery(errors).insertBefore($form);
 				}
 				else {
 					dashboard.dashboardGrid('setDashboardData', {
@@ -98,28 +105,37 @@
 					jQuery('#<?= ZBX_STYLE_PAGE_TITLE ?>').text(form_data['name']);
 					jQuery('#dashboard-direct-link').text(form_data['name']);
 
-					overlayDialogueDestroy('dashboard_properties');
+					overlayDialogueDestroy(overlay.dialogueid);
 				}
 			}
 		});
 	}
 
-	function dashbrdConfirmSharing() {
-		var form = jQuery('[name=dashboard_sharing_form]'),
+	/**
+	 * @param {Overlay} overlay
+	 *
+	 * @return {bool}
+	 */
+	function dashbrdConfirmSharing(overlay) {
+		var $form = overlay.$dialogue.find('form'),
 			url = new Curl('zabbix.php', false);
 
 		url.setArgument('action', 'dashboard.share.update');
 
-		jQuery.ajax({
+		overlay.setLoading();
+		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: form.serializeJSON(),
+			data: $form.serializeJSON(),
 			dataType: 'json',
 			method: 'POST',
-			success: function (response) {
+			complete: function() {
+				overlay.unsetLoading();
+			},
+			success: function(response) {
 				var errors = [],
 					messages = [];
 
-				form.parent().find('>.msg-good, >.msg-bad').remove();
+				overlay.$dialogue.find('>.msg-good, >.msg-bad').remove();
 
 				if (typeof response === 'object') {
 					if ('errors' in response) {
@@ -131,7 +147,7 @@
 				}
 
 				if (errors.length) {
-					jQuery(errors).insertBefore(form);
+					jQuery(errors).insertBefore($form);
 				}
 				else {
 					jQuery('main').find('> .msg-bad, > .msg-good').remove();
@@ -139,7 +155,7 @@
 					if (messages.length) {
 						jQuery('main').prepend(messages);
 					}
-					overlayDialogueDestroy('dashboard_share');
+					overlayDialogueDestroy(overlay.dialogueid);
 				}
 			}
 		});

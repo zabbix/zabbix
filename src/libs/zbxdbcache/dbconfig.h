@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -730,6 +730,8 @@ typedef struct
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
 	int			item_sync_ts;
+
+	unsigned int		internal_actions;		/* number of enabled internal actions */
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */

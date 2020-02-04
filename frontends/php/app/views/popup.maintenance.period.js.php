@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,22 +49,27 @@ jQuery('#timeperiod_type').change(function() {
 	jQuery(window).trigger('resize');
 }).trigger('change');
 
-function submitMaintenancePeriod(selector) {
-	var $container = jQuery(selector),
+/**
+ * @param {Overlay} overlay
+ */
+function submitMaintenancePeriod(overlay) {
+	var $container = overlay.$dialogue.find('form'),
 		elements;
 
 	$container.trimValues(['#start_date']);
 	elements = jQuery('input:visible,select:visible,input[type=hidden]', $container).serialize();
 
-	sendAjaxData('zabbix.php', {
+	overlay.setLoading();
+	overlay.xhr = sendAjaxData('zabbix.php', {
 		data: elements,
 		dataType: 'json',
 		type: 'post',
 		success: function(response) {
 			if ('errors' in response) {
-				$container.parent().find('.msg-bad').remove();
+				overlay.$dialogue.find('.msg-bad').remove();
 
 				jQuery(response.errors).insertBefore($container);
+				overlay.unsetLoading();
 			}
 			else if ('params' in response) {
 				var index = response.params.index;

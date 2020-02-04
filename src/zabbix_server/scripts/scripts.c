@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 	DC_ITEM		item;
 	int             (*function)(DC_ITEM *, AGENT_RESULT *);
 
-#ifdef HAVE_SSH2
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
 #else
 	assert(ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -146,7 +146,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 			break;
 	}
 
-#ifdef HAVE_SSH2
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	if (ZBX_SCRIPT_TYPE_SSH == script->type)
 	{
 		item.key = zbx_dsprintf(item.key, "ssh.run[,,%s]", script->port);
@@ -157,7 +157,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 #endif
 		item.key = zbx_dsprintf(item.key, "telnet.run[,,%s]", script->port);
 		function = get_value_telnet;
-#ifdef HAVE_SSH2
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	}
 #endif
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
@@ -465,7 +465,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 #endif
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
-#ifndef HAVE_SSH2
+#if !defined(HAVE_SSH2) && !defined(HAVE_SSH)
 			zbx_strlcpy(error, "Support for SSH script was not compiled in.", max_error_len);
 			break;
 #endif

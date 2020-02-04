@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@
 #	include <strsafe.h>
 
 #	define zbx_stat(path, buf)		__zbx_stat(path, buf)
+#	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
 
 #	ifndef __UINT64_C
 #		define __UINT64_C(x)	x
@@ -79,8 +80,15 @@ typedef uint32_t		zbx_uint32_t;
 typedef __int64	zbx_offset_t;
 #	define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
 
+#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
+typedef int	ssize_t;
+#	else
+typedef long	ssize_t;
+#	endif
+
 #else	/* _WINDOWS */
 #	define zbx_stat(path, buf)		stat(path, buf)
+#	define zbx_fstat(fd, buf)		fstat(fd, buf)
 
 #	ifndef __UINT64_C
 #		ifdef UINT64_C

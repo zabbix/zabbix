@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1278,7 +1278,7 @@ static int	DBregister_host_active(void)
 			" from actions"
 			" where eventsource=%d"
 				" and status=%d",
-			EVENT_SOURCE_AUTO_REGISTRATION,
+			EVENT_SOURCE_AUTOREGISTRATION,
 			ACTION_STATUS_ACTIVE);
 
 	if (NULL == DBfetch(result))
@@ -1396,8 +1396,8 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 					break;
 				}
 
-				/* process with auto registration if the connection type was forced and */
-				/* is different from the last registered connection type                */
+				/* process with autoregistration if the connection type was forced and */
+				/* is different from the last registered connection type               */
 				if (ZBX_CONN_DEFAULT != autoreg_host->flag)
 				{
 					unsigned short	port;
@@ -1570,7 +1570,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
 		ts.sec = autoreg_host->now;
-		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
+		zbx_add_event(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
 				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
 	}
 

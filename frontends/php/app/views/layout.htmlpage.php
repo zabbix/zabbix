@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,12 +54,6 @@ function local_generateHeader($data) {
 	}
 
 
-	// construct menu
-	$main_menu = [];
-	$sub_menus = [];
-
-	zbx_construct_menu($main_menu, $sub_menus, $page, $data['controller']['action']);
-
 	$pageHeader = new CView('layout.htmlpage.header', [
 		'javascript' => [
 			'files' => $data['javascript']['files']
@@ -80,11 +74,7 @@ function local_generateHeader($data) {
 
 		$pageMenu = new CView('layout.htmlpage.menu', [
 			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
-			'menu' => [
-				'main_menu' => $main_menu,
-				'sub_menus' => $sub_menus,
-				'selected' => $page['menu']
-			],
+			'menu' => APP::Component()->get('menu.main'),
 			'user' => [
 				'is_guest' => CWebUser::isGuest(),
 				'alias' => CWebUser::$data['alias'],

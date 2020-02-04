@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -324,7 +324,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			foreach ($data['groups'] as $group) {
 				$this->zbxTestClickButtonMultiselect('group_links_');
 				$this->zbxTestLaunchOverlayDialog('Host groups');
-				$this->zbxTestClickXpath('//div[@id="overlay_dialogue"]//a[text()="'.$group.'"]');
+				$this->zbxTestClickXpath('//div[contains(@class, "overlay-dialogue modal")]//a[text()="'.$group.'"]');
 			}
 		}
 

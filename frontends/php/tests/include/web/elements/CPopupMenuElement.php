@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,9 +102,8 @@ class CPopupMenuElement extends CElement {
 		}
 
 		if ($items) {
-			$element->hover();
-			$element->parents()->query('class:menu-popup')->asPopupMenu()
-					->waitUntilPresent()->one()->select($items);
+			$parents = $element->parents('tag:li')->one()->hover();
+			$parents->query('class:menu-popup')->asPopupMenu()->waitUntilVisible()->one()->select($items);
 		}
 		else {
 			$element->click();

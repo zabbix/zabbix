@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -301,9 +301,8 @@ void finalize_key_access_rules_configuration(void)
 		/* if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration */
 		if (0 < allow_rules && 0 == deny_rules)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "adding DenyKey=* rule for proper whitelist configuration");
-			add_key_access_rule("*", ZBX_KEY_ACCESS_DENY);
-			deny_rules++;
+			zabbix_log(LOG_LEVEL_CRIT, "\"AllowKey\" without \"DenyKey\" rules are meaningless");
+			exit(EXIT_FAILURE);
 		}
 		else
 		{
@@ -1914,3 +1913,19 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	return WAIT_OBJECT_0 == rc ? metric_args.agent_ret : SYSINFO_RET_FAIL;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mpoints_free                                                 *
+ *                                                                            *
+ * Purpose: frees previously allocated mount-point structure                  *
+ *                                                                            *
+ * Parameters: mpoint - [IN] pointer to structure from vector                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
+{
+	zbx_free(mpoint);
+}

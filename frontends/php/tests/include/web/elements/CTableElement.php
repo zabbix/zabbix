@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -192,21 +192,26 @@ class CTableElement extends CElement {
 	/**
 	 * Index table row text by values of table column.
 	 *
-	 * @param string $column	column name
+	 * @param string  $column	         column name
+	 * @param boolean $include_column    flag used to include or remove column used in index
 	 *
 	 * @return array
 	 */
-	public function index($column = null) {
+	public function index($column = null, $include_column = false) {
 		$table = [];
 		foreach ($this->getCells() as $i => $row) {
 			$data = [];
 			$id = $i;
 
 			foreach ($row as $header => $element) {
-				$data[$header] = $element->getText();
+				$value = $element->getText();
 
 				if ($header === $column) {
-					$id = $data[$header];
+					$id = $value;
+				}
+
+				if ($include_column || $header !== $column) {
+					$data[$header] = $value;
 				}
 			}
 

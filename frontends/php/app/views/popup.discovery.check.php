@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $discovery_ckeck_types = discovery_check_type2str();
 order_result($discovery_ckeck_types);
 
@@ -28,7 +32,7 @@ $form = (new CForm())
 	->addVar('action', 'popup.discovery.check')
 	->addVar('validate', 1);
 
-if ($data['params']['dcheckid']) {
+if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
 }
 
@@ -124,7 +128,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitDCheck();'
+			'action' => 'return submitDCheck(overlay);'
 		]
 	]
 ];
