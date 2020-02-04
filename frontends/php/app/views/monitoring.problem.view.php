@@ -162,12 +162,12 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Problem'),
 			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
-        ->addRow(_('Severity'),
-            (new CSeverityCheckBoxList('filter_severity'))
+		->addRow(_('Severity'),
+			(new CSeverityCheckBoxList('filter_severity'))
 				->setChecked($data['filter']['severity'])
-                ->addClass(ZBX_STYLE_COLUMNS)
-                ->addClass(ZBX_STYLE_COLUMNS_3)
-        );
+				->addClass(ZBX_STYLE_COLUMNS)
+				->addClass(ZBX_STYLE_COLUMNS_3)
+		);
 
 	$filter_age = (new CNumericBox('filter_age', $data['filter']['age'], 3, false, false, false))
 		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);

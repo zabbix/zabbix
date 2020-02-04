@@ -85,14 +85,14 @@ class CSeverity extends CRadioButtonList {
 	 */
 	public static function getSeverities() {
 		$config = select_config();
-        $severities = [];
-        foreach (self::getRange() as $severity) {
-            $severities[] = [
-                'name' => getSeverityName($severity, $config),
-                'value' => $severity,
+		$severities = [];
+		foreach (self::getRange() as $severity) {
+			$severities[] = [
+				'name' => getSeverityName($severity, $config),
+				'value' => $severity,
 				'style' => getSeverityStyle($severity)
-            ];
-        }
+			];
+		}
 
 		return $severities;
 	}
