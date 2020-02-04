@@ -77,9 +77,10 @@ class testFormItemTest extends CWebTest {
 	 * @param string	$item_type		type of an item: item, prototype or lld rule
 	 * @param string	$success_text	text part of a success message
 	 * @param boolean	$check_now		possibility of executing item instantly
+	 * @param boolean	$is_host		true if host, false if template
 	 */
 	public function checkTestButtonState($data, $item_name, $create_link, $saved_link,
-			$item_type, $success_text, $check_now) {
+			$item_type, $success_text, $check_now, $is_host) {
 		$this->page->login()->open($create_link);
 		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 
@@ -102,9 +103,15 @@ class testFormItemTest extends CWebTest {
 			$type = $item_form->getField('Type')->getValue();
 
 			for ($i = 0; $i < 2; $i++) {
-				$enabled = (!in_array($type, ['Zabbix agent (active)',
-						'SNMP trap', 'Zabbix trapper','Dependent item'
-				]));
+
+				if ($type === 'IPMI agent' && $is_host === false) {
+					$enabled = false;
+				}
+				else {
+					$enabled = (!in_array($type, ['Zabbix agent (active)',
+							'SNMP trap', 'Zabbix trapper','Dependent item'
+					]));
+				}
 
 				$this->checkTestButtonInPreprocessing($item_type, $enabled, $i);
 				/*
@@ -255,8 +262,19 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'JMX agent',
-						'Key' => 'test.jmx.agent'
-					]
+						'Key' => 'test.jmx.agent',
+						'JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+					],
+					'macros' => [
+						[
+							'macro' => '{HOST.CONN}',
+							'value' => '127.0.0.4'
+						],
+						[
+							'macro' => '{HOST.PORT}',
+							'value' => '12345'
+						]
+					],
 				]
 			],
 			[
@@ -370,6 +388,16 @@ class testFormItemTest extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
+						'Key' => 'test.item.interface.trailing.spaces'
+					],
+					'interface' => ['address' => '  127.0.0.1   ', 'port' => '   10050    '],
+				]
 			]
 		];
 	}
@@ -475,8 +503,9 @@ class testFormItemTest extends CWebTest {
 	 * @param boolean	$is_host		true if host, false if template
 	 */
 	public function checkTestItem($create_link, $data, $is_host) {
-		$proxy = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid IN '
-			. '(SELECT proxy_hostid FROM hosts WHERE host = "Test item host")');
+		if (!$is_host && $data['fields']['Type'] === 'IPMI agent') {
+			return;
+		}
 
 		$this->page->login()->open($create_link);
 		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
@@ -511,12 +540,15 @@ class testFormItemTest extends CWebTest {
 				$elements = [
 					'address' => 'id:interface_address',
 					'port' => 'id:interface_port',
-					'proxy' => 'id:proxy_hostid',
+//					'proxy' => 'id:proxy_hostid
+					'proxy' => 'xpath:.//li[@id="proxy_hostid_row"]/div[@class="table-forms-td-right"]/*'
+
 				];
 				foreach ($elements as $name => $selector) {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
-
+				$proxy = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid IN '
+					. '(SELECT proxy_hostid FROM hosts WHERE host = "Test item host")');
 				// Check interface and proxy fields.
 				switch ($data['fields']['Type']) {
 					case 'Zabbix agent':
@@ -573,6 +605,12 @@ class testFormItemTest extends CWebTest {
 				// Check value fields.
 				$this->checkValueFields($data);
 
+				// Change interface fileds in testing form.
+				if (CTestArrayHelper::get($data, 'interface')) {
+					$elements['address']->fill($data['interface']['address']);
+					$elements['port']->fill($data['interface']['port']);
+				}
+
 				// Click Get value button.
 				$button = $test_form->query('button:Get value')->one();
 				$button->click();
@@ -619,6 +657,20 @@ class testFormItemTest extends CWebTest {
 					'expected' => CTestArrayHelper::get($data, 'macros'),
 					'actual' => []
 				];
+
+				// Global macros values for items on template are empty.
+				if (!$is_host && $data['fields']['Type'] === 'JMX agent') {
+					foreach ($macros['expected'] as &$macro) {
+						if (substr($macro['macro'], 1, 1) === '$' ||
+							substr($macro['macro'], 1, 1) === '#')
+						{
+							continue;
+						}
+
+						$macro['value'] = '';
+					}
+					unset($macro);
+				}
 
 				if ($macros['expected']){
 					foreach ($test_form->getField('Macros')->getRows() as $row) {
@@ -669,27 +721,35 @@ class testFormItemTest extends CWebTest {
 	private function checkValueFields($data) {
 		$test_form = $this->query('id:preprocessing-test-form')
 			->waitUntilPresent()->asForm()->one()->waitUntilReady();
-		$this->assertTrue($test_form->query('id:value')->asMultiline()->one()->isEnabled());
+		$get_host_value = $test_form->getField('Get value from host');
 
-		/*
-		 * If item has at least one of following preprocessing steps,
-		 * previous value and time field should become editable.
-		 */
-		if (CTestArrayHelper::get($data, 'preprocessing')){
-			$prev_enabled = false;
-			foreach ($data['preprocessing'] as $step) {
-				if (in_array($step['type'], ['Discard unchanged with heartbeat',
-					'Simple change', 'Change per second', 'Discard unchanged'
-				])) {
-					$prev_enabled = true;
-					break;
+		$checked = $get_host_value->isChecked();
+		$prev_enabled = false;
+
+		if (!$checked) {
+			/*
+			 * If item has at least one of following preprocessing steps,
+			 * previous value and time field should become editable.
+			 */
+			if (CTestArrayHelper::get($data, 'preprocessing')){
+				$prev_enabled = false;
+				foreach ($data['preprocessing'] as $step) {
+					if (in_array($step['type'], ['Discard unchanged with heartbeat',
+						'Simple change', 'Change per second', 'Discard unchanged'
+					])) {
+						$prev_enabled = true;
+						break;
+					}
 				}
 			}
-			$this->assertTrue($test_form->query('id:prev_value')->asMultiline()
-				->one()->isEnabled($prev_enabled));
-			$this->assertTrue($test_form->query('id:prev_time')
-				->one()->isEnabled($prev_enabled));
 		}
+
+		$this->assertTrue($test_form->query('id:value')->asMultiline()
+				->one()->isEnabled(!$checked));
+		$this->assertTrue($test_form->query('id:prev_value')->asMultiline()
+				->one()->isEnabled($checked && $prev_enabled));
+		$this->assertTrue($test_form->query('id:prev_time')
+				->one()->isEnabled($checked && $prev_enabled));
 
 		$this->assertFalse($test_form->query('id:time')->one()->isEnabled());
 		$this->assertTrue($test_form->getField('End of line sequence')->isEnabled());
@@ -708,6 +768,7 @@ class testFormItemTest extends CWebTest {
 	private function checkTestButtonInPreprocessing($item_type, $enabled = true, $i = 0) {
 		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$test_button = $this->query('id:test_item')->waitUntilVisible()->one();
+
 
 		$this->assertTrue($test_button->isEnabled($enabled));
 		$item_form->selectTab('Preprocessing');

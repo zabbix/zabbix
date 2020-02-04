@@ -58,7 +58,7 @@ class testFormHostItemTest extends testFormItemTest {
 	public function testFormHostItemTest_CheckItemTestButtonState() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(),
 			'Item for Test Button check', $this->getCreateLink('items'),
-			$this->getSavedLink('items'), 'Item', ' added', true
+			$this->getSavedLink('items'), 'Item', ' added', true, self::HOST_ID
 		);
 	}
 
@@ -71,7 +71,7 @@ class testFormHostItemTest extends testFormItemTest {
 
 		$this->checkTestButtonState($this->getItemTestButtonStateData(),
 			'Item prototype for Test Button check', $prototype_create_link,
-			$prototype_saved_link, 'Item prototype', ' added', false
+			$prototype_saved_link, 'Item prototype', ' added', false, self::HOST_ID
 		);
 	}
 
@@ -81,7 +81,8 @@ class testFormHostItemTest extends testFormItemTest {
 	public function testFormHostItemTest_CheckLLDTestButtonState() {
 		$this->checkTestButtonState($this->getCommonTestButtonStateData(),
 			'LLD for Test Button check', $this->getCreateLink('host_discovery'),
-			$this->getSavedLink('host_discovery'), 'Discovery rule', ' created', true
+			$this->getSavedLink('host_discovery'), 'Discovery rule', ' created',
+			true, self::HOST_ID
 		);
 	}
 
