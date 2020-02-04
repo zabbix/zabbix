@@ -5310,8 +5310,8 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 				",authpassphrase='%s'"
 				",privpassphrase='%s'"
 				",authprotocol=%d"
-				",privprotocol=%d,"
-				" contextname='%s'"
+				",privprotocol=%d"
+				",contextname='%s'"
 			" where interfaceid=" ZBX_FS_UI64,
 			(int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
