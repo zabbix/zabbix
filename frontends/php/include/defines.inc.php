@@ -51,6 +51,9 @@ define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
+// Applied to tables with variable count of columns. Columns above this limit will be truncated and noted with ellipsis.
+define('ZBX_MAX_TABLE_COLUMNS', 50);
+
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
