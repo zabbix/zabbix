@@ -286,9 +286,7 @@ class CSetupWizard extends CForm {
 					->setAttribute('readonly', true);
 			}
 			else {
-				$verify_host_box
-					->setChecked($this->getConfig('DB_VERIFY_HOST'))
-					->onChange('submit()');
+				$verify_host_box->setChecked($this->getConfig('DB_VERIFY_HOST'));
 			}
 
 			$table->addRow(_('With host verification'), $verify_host_box);
@@ -299,6 +297,13 @@ class CSetupWizard extends CForm {
 						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				);
 			}
+		}
+		else {
+			$table
+				->addVar('key_file', '', 'key_file_off')
+				->addVar('cert_file', '', 'cert_file_off')
+				->addVar('ca_file', '', 'ca_file_off')
+				->addVar('cipher_list', '', 'cipher_list_off');
 		}
 
 		if ($this->STEP_FAILED) {
