@@ -203,9 +203,11 @@
 				.querySelector(`#interfaces_${iface.interfaceid}_details_version`)
 				.value = iface.details.version;
 
-			elem
-				.querySelector(`#interfaces_${iface.interfaceid}_details_securitylevel`)
-				.value = iface.details.securitylevel;
+			if (iface.details.securitylevel) {
+				elem
+					.querySelector(`#interfaces_${iface.interfaceid}_details_securitylevel`)
+					.value = iface.details.securitylevel;
+			}
 
 			if (iface.details.privprotocol == <?= ITEM_PRIVPROTOCOL_AES ?>) {
 				elem
@@ -524,7 +526,8 @@
 
 			// Change select to input.
 			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')].map((elem) => {
-				const value = elem.options[elem.selectedIndex].text;
+				const index = elem.selectedIndex;
+				const value = elem.options[index].text;
 
 				// Create new input[type=text].
 				const input = document.createElement('input');
