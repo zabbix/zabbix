@@ -300,10 +300,10 @@ class CSetupWizard extends CForm {
 		}
 		else {
 			$table
-				->addVar('key_file', '', 'key_file_off')
-				->addVar('cert_file', '', 'cert_file_off')
-				->addVar('ca_file', '', 'ca_file_off')
-				->addVar('cipher_list', '', 'cipher_list_off');
+				->addVar('key_file', '')
+				->addVar('cert_file', '')
+				->addVar('ca_file', '')
+				->addVar('cipher_list', '');
 		}
 
 		if ($this->STEP_FAILED) {
