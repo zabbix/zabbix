@@ -263,9 +263,9 @@ abstract class CControllerPopupItemTest extends CController {
 		 * Preprocessing test can be done from mass-update section so host is non mandatory but if it is used, it must
 		 * be editable.
 		 */
-		$hostid = $this->getInput('hostid', false);
+		$hostid = $this->getInput('hostid', 0);
 
-		if ($ret && $hostid) {
+		if ($ret && $hostid != 0) {
 			$hosts = API::Host()->get([
 				'output' => ['hostid', 'host', 'name', 'status', 'available', 'proxy_hostid', 'tls_subject',
 					'ipmi_available', 'jmx_available', 'snmp_available', 'maintenance_status', 'maintenance_type',
