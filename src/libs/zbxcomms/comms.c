@@ -536,7 +536,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		THIS_SHOULD_NEVER_HAPPEN;
 		return FAIL;
 	}
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_PSK == tls_connect && '\0' == *tls_arg1)
 	{
 		zbx_set_socket_strerror("cannot connect with PSK: PSK not available");
@@ -605,7 +605,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		goto out;
 	}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
 			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, &error))
 	{
@@ -644,7 +644,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		THIS_SHOULD_NEVER_HAPPEN;
 		return FAIL;
 	}
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_PSK == tls_connect && '\0' == *tls_arg1)
 	{
 		zbx_set_socket_strerror("cannot connect with PSK: PSK not available");
@@ -718,7 +718,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		return FAIL;
 	}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
 			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, &error))
 	{
@@ -754,13 +754,13 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 {
 	ssize_t	res;
 	int	err;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char	*error = NULL;
 #endif
 #ifdef _WINDOWS
 	double	sec;
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL != s->tls_ctx)	/* TLS connection */
 	{
 		if (ZBX_PROTO_ERROR == (res = zbx_tls_write(s, buf, len, &error)))
@@ -1424,7 +1424,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	/* if the 1st byte is 0x16 then assume it's a TLS connection */
 	if (1 == res && '\x16' == buf)
 	{
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (0 != (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 		{
 			char	*error = NULL;
@@ -1479,7 +1479,7 @@ out:
  ******************************************************************************/
 void	zbx_tcp_unaccept(zbx_socket_t *s)
 {
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_close(s);
 #endif
 	if (!s->accepted) return;
@@ -1661,7 +1661,7 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 #ifdef _WINDOWS
 	double	sec;
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL != s->tls_ctx)	/* TLS connection */
 	{
 		char	*error = NULL;

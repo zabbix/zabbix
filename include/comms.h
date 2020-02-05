@@ -70,7 +70,7 @@ zbx_buf_type_t;
 #define ZBX_SOCKET_COUNT	256
 #define ZBX_STAT_BUF_LEN	2048
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct zbx_tls_context	zbx_tls_context_t;
 #endif
 
@@ -81,7 +81,7 @@ typedef struct
 	size_t				read_bytes;
 	char				*buffer;
 	char				*next_line;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_context_t		*tls_ctx;
 #endif
 	unsigned int 			connection_type;	/* type of connection actually established: */

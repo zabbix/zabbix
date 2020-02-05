@@ -1298,7 +1298,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 	find_psk_in_cache = DCget_psk_by_identity;
 #endif

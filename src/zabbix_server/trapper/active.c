@@ -108,7 +108,7 @@ static int	zbx_autoreg_check_permissions(const char *host, const char *ip, unsig
 		goto out;
 	}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (0 == (ZBX_PSK_FOR_AUTOREG & zbx_tls_get_psk_usage()))
@@ -177,7 +177,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	host_esc = DBdyn_escape_string(host);
 
 	result =
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		DBselect(
 			"select h.hostid,h.status,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,"
 			"a.host_metadata,a.listen_ip,a.listen_dns,a.listen_port,a.flags"
@@ -211,7 +211,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			goto done;
 		}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 		{
 			zbx_tls_conn_attr_t	attr;
@@ -241,7 +241,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 				goto done;
 			}
 		}
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 		else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 		{
 			zbx_tls_conn_attr_t	attr;
