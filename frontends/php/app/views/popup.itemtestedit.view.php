@@ -107,7 +107,9 @@ if ($data['is_item_testable']) {
 						array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
 						[0 => _('(no proxy)')] + $data['proxies']))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				: (new CTextBox(null, _('(no proxy)'), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+				: (new CTextBox(null, _('(no proxy)'), true))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setId('proxy_hostid'), // Automated tests need this.
 			'proxy_hostid_row'
 		)
 		->addRow(
