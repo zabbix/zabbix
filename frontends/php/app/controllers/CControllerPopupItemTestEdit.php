@@ -158,6 +158,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			unset($macros['support_lld_macros'], $macros['support_user_macros']);
 
 			if ($field === 'query_fields' || $field === 'headers') {
+				if (!array_key_exists($field, $inputs) || !$inputs[$field]) {
+					continue;
+				}
+
 				foreach (['name', 'value'] as $key) {
 					$texts_having_macros = array_filter($inputs[$field][$key], function($str) {
 						return (strstr($str, '{') !== false);
