@@ -267,8 +267,10 @@ $output = [
 	'buttons' => [
 		[
 			'title' => ($data['is_item_testable'] && $data['get_value']) ? _('Get value and test') : _('Test'),
-			'class' => 'submit-test-btn',
-			'action' => 'return itemCompleteTest();'
+			'keepOpen' => true,
+			'enabled' => true,
+			'isSubmit' => true,
+			'action' => 'return itemCompleteTest(overlay);'
 		]
 	]
 ];

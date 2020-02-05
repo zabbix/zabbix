@@ -80,11 +80,6 @@ function disableItemTestForm() {
 	<?php endif ?>
 
 	jQuery('#eol input').prop('disabled', true);
-
-	jQuery('.submit-test-btn')
-		.prop('disabled', false)
-		.addClass('is-loading')
-		.blur();
 }
 
 /**
@@ -117,10 +112,6 @@ function enableItemTestForm() {
 	<?php endif ?>
 
 	jQuery('#eol input').prop('disabled', false);
-
-	jQuery('.submit-test-btn')
-		.prop('disabled', false)
-		.removeClass('is-loading');
 }
 
 /**
@@ -139,9 +130,11 @@ function cleanPreviousTestResults() {
 
 /**
  * Send item get value request and display retrieved results.
+ *
+ * @param {Overlay} overlay
  */
-function itemGetValueTest() {
-	var $form = jQuery('#preprocessing-test-form'),
+function itemGetValueTest(overlay) {
+	var $form = overlay.$dialogue.find('form'),
 		form_data = $form.serializeJSON(),
 		post_data = getItemTestProperties('#preprocessing-test-form'),
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
@@ -172,15 +165,20 @@ function itemGetValueTest() {
 	delete post_data.interfaceid;
 	delete post_data.delay;
 
-	jQuery.ajax({
+	overlay.xhr = jQuery.ajax({
 		url: url.getUrl(),
 		data: post_data,
 		beforeSend: function() {
+			overlay.setLoading();
 			disableItemTestForm();
 			cleanPreviousTestResults();
 		},
+		complete: function() {
+			enableItemTestForm();
+			overlay.unsetLoading();
+		},
 		success: function(ret) {
-			$form.parent().find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.messages !== 'undefined') {
 				jQuery(ret.messages).insertBefore($form);
@@ -201,8 +199,6 @@ function itemGetValueTest() {
 					jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 				}
 			}
-
-			enableItemTestForm();
 		},
 		dataType: 'json',
 		type: 'post'
@@ -212,10 +208,10 @@ function itemGetValueTest() {
 /**
  * Send item preprocessing test details and display results in table.
  *
- * @param string formid  Selector for form to send.
+ * @param {Overlay} overlay
  */
-function itemCompleteTest() {
-	var $form = jQuery('#preprocessing-test-form'),
+function itemCompleteTest(overlay) {
+	var $form = overlay.$dialogue.find('form'),
 		form_data = $form.serializeJSON(),
 		post_data = getItemTestProperties('#preprocessing-test-form'),
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
@@ -254,15 +250,20 @@ function itemCompleteTest() {
 		});
 	<?php endif ?>
 
-	jQuery.ajax({
+	overlay.xhr = jQuery.ajax({
 		url: url.getUrl(),
 		data: post_data,
 		beforeSend: function() {
+			overlay.setLoading();
 			disableItemTestForm();
 			cleanPreviousTestResults();
 		},
+		complete: function() {
+			enableItemTestForm();
+			overlay.unsetLoading();
+		},
 		success: function(ret) {
-			$form.parent().find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.messages !== 'undefined') {
 				jQuery(ret.messages).insertBefore($form);
@@ -313,8 +314,6 @@ function itemCompleteTest() {
 					.find('.table-forms-td-right')
 					.append($result_row);
 			}
-
-			enableItemTestForm();
 		},
 		dataType: 'json',
 		type: 'post'
@@ -497,7 +496,9 @@ jQuery(document).ready(function($) {
 			}
 		}).trigger('change');
 
-		$('#get_value_btn').on('click', itemGetValueTest);
+		$('#get_value_btn').on('click', function() {
+			itemGetValueTest(overlays_stack.getById('item-test'));
+		});
 	<?php endif ?>
 
 	$('#preprocessing-test-form .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
