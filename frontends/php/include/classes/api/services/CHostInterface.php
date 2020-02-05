@@ -481,7 +481,7 @@ class CHostInterface extends CApiService {
 				continue;
 			}
 
-			$snmp_data[] = ['details' => $interface['details'] + $db_interfaces[$interface['interfaceid']]['details']]
+			$snmp_data[] = ['type' => INTERFACE_TYPE_SNMP, 'details' => $interface['details'] + $db_interfaces[$interface['interfaceid']]['details']]
 				+ $db_interfaces[$interface['interfaceid']];
 		}
 
