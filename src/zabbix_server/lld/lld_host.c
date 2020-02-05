@@ -2891,7 +2891,7 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
-			zbx_lld_interface_snmp_t *snmp;
+			zbx_lld_interface_snmp_t	*snmp;
 
 			snmp = (zbx_lld_interface_snmp_t *)zbx_malloc(NULL, sizeof(zbx_lld_interface_snmp_t));
 			ZBX_STR2UCHAR(snmp->version, row[7]);
