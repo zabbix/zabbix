@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -502,14 +502,6 @@ static int	open_trap_file(void)
 	zbx_stat_t	file_buf;
 	char		*error = NULL;
 
-	if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
-	{
-		error = zbx_dsprintf(error, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
-				zbx_strerror(errno));
-		delay_trap_logs(error, LOG_LEVEL_CRIT);
-		goto out;
-	}
-
 	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
@@ -518,6 +510,16 @@ static int	open_trap_file(void)
 					CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 			delay_trap_logs(error, LOG_LEVEL_CRIT);
 		}
+		goto out;
+	}
+
+	if (0 != zbx_fstat(trap_fd, &file_buf))
+	{
+		error = zbx_dsprintf(error, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
+				zbx_strerror(errno));
+		delay_trap_logs(error, LOG_LEVEL_CRIT);
+		close(trap_fd);
+		trap_fd = -1;
 		goto out;
 	}
 

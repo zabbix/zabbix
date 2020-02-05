@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -268,9 +268,6 @@ $output = [
 		[
 			'title' => ($data['is_item_testable'] && $data['get_value']) ? _('Get value and test') : _('Test'),
 			'class' => 'submit-test-btn',
-			'keepOpen' => true,
-			'enabled' => true,
-			'isSubmit' => true,
 			'action' => 'return itemCompleteTest();'
 		]
 	]

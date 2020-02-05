@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,15 +40,22 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 	protected function getNumberOfProblemsBySysmap(array $navtree_items = []) {
 		$response = [];
-		$sysmapids = array_keys(array_flip(zbx_objectValues($navtree_items, 'mapid')));
+		$sysmapids = [];
 
-		$sysmaps = API::Map()->get([
-			'output' => ['sysmapid', 'severity_min'],
-			'selectLinks' => ['linktriggers', 'permission'],
-			'selectSelements' => ['elements', 'elementtype', 'permission'],
-			'sysmapids' => $sysmapids,
-			'preservekeys' => true
-		]);
+		foreach ($navtree_items as $navtree_item) {
+			$sysmapids[$navtree_item['sysmapid']] = true;
+		}
+		unset($sysmapids[0]);
+
+		$sysmaps = $sysmapids
+			? API::Map()->get([
+				'output' => ['sysmapid', 'severity_min'],
+				'selectLinks' => ['linktriggers', 'permission'],
+				'selectSelements' => ['elements', 'elementtype', 'permission'],
+				'sysmapids' => array_keys($sysmapids),
+				'preservekeys' => true
+			])
+			: [];
 
 		if ($sysmaps) {
 			$triggers_per_hosts = [];
@@ -204,20 +211,18 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			}
 
 			// Count problems in each submap included in navigation tree:
-			foreach ($navtree_items as $itemid => $item_details) {
-				$maps_need_to_count_in = $item_details['children_mapids'];
-				if ($item_details['mapid']) {
-					$maps_need_to_count_in[] = $item_details['mapid'];
+			foreach ($navtree_items as $id => $navtree_item) {
+				$maps_need_to_count_in = $navtree_item['child_sysmapids'];
+				if ($navtree_item['sysmapid'] != 0) {
+					$maps_need_to_count_in[$navtree_item['sysmapid']] = true;
 				}
 
-				$maps_need_to_count_in = array_keys(array_flip($maps_need_to_count_in));
-
-				$response[$itemid] = $this->problems_per_severity_tpl;
+				$response[$id] = $this->problems_per_severity_tpl;
 				$problems_counted = [];
 
-				foreach ($maps_need_to_count_in as $mapid) {
-					if (array_key_exists($mapid, $sysmaps)) {
-						$map = $sysmaps[$mapid];
+				foreach (array_keys($maps_need_to_count_in) as $sysmapid) {
+					if (array_key_exists($sysmapid, $sysmaps)) {
+						$map = $sysmaps[$sysmapid];
 
 						// Count problems occurred in linked elements.
 						foreach ($map['selements'] as $selement) {
@@ -228,7 +233,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 								);
 
 								if ($problems !== null) {
-									$response[$itemid] = self::sumArrayValues($response[$itemid], $problems);
+									$response[$id] = self::sumArrayValues($response[$id], $problems);
 								}
 							}
 						}
@@ -253,7 +258,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 									}
 								}
 
-								$response[$itemid] = self::sumArrayValues($response[$itemid], $problems_to_add);
+								$response[$id] = self::sumArrayValues($response[$id], $problems_to_add);
 							}
 							unset($uncounted_problem_triggers);
 						}
@@ -404,50 +409,30 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		$error = null;
 
 		// Get list of sysmapids.
+		$sysmapids = [];
 		$navtree_items = [];
-		foreach ($fields as $field_key => $field_value) {
-			if (is_numeric($field_value)) {
-				preg_match('/^map\.parent\.(\d+)$/', $field_key, $field_details);
-				if ($field_details) {
-					$fieldid = $field_details[1];
-					$navtree_items[$fieldid] = [
-						'parent' => $field_value,
-						'mapid' => array_key_exists('mapid.'.$fieldid, $fields) ? $fields['mapid.'.$fieldid] : 0,
-						'children_mapids' => []
-					];
-				}
+		foreach ($fields['navtree'] as $id => $navtree_item) {
+			$sysmapid = array_key_exists('sysmapid', $navtree_item) ? $navtree_item['sysmapid'] : 0;
+			if ($sysmapid != 0) {
+				$sysmapids[$sysmapid] = true;
 			}
-		}
 
-		// Find and fix circular dependencies.
-		foreach ($navtree_items as $fieldid => $field_details) {
-			if ($field_details['parent'] != 0) {
-				$parent = $navtree_items[$field_details['parent']];
-				while ($parent['parent'] != 0) {
-					if ($parent['parent'] == $fieldid) {
-						$navtree_items[$fieldid]['parent'] = 0;
-						break;
-					}
-					elseif (array_key_exists($parent['parent'], $navtree_items)) {
-						$parent = $navtree_items[$parent['parent']];
-					}
-					else {
-						break;
-					}
-				}
-			}
+			$navtree_items[$id] = [
+				'parent' => $navtree_item['parent'],
+				'sysmapid' => $sysmapid,
+				'child_sysmapids' => []
+			];
 		}
 
 		// Propagate item mapids to all its parent items.
-		foreach ($navtree_items as $field_details) {
-			$parentid = $field_details['parent'];
-			if ($field_details['parent'] != 0 && array_key_exists($parentid, $navtree_items)) {
-				while (array_key_exists($parentid, $navtree_items)) {
-					if ($field_details['mapid'] != 0) {
-						$navtree_items[$parentid]['children_mapids'][] = $field_details['mapid'];
-					}
-					$parentid = $navtree_items[$parentid]['parent'];
+		foreach ($navtree_items as $navtree_item) {
+			$parent = $navtree_item['parent'];
+
+			while (array_key_exists($parent, $navtree_items)) {
+				if ($navtree_item['sysmapid'] != 0) {
+					$navtree_items[$parent]['child_sysmapids'][$navtree_item['sysmapid']] = true;
 				}
+				$parent = $navtree_items[$parent]['parent'];
 			}
 		}
 
@@ -456,20 +441,19 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		$config = select_config();
 		$severity_config = [];
 
-		$sysmapids = array_keys(array_flip(zbx_objectValues($navtree_items, 'mapid')));
-		$maps_accessible = API::Map()->get([
-			'output' => ['sysmapid'],
-			'sysmapids' => $sysmapids,
-			'preservekeys' => true
-		]);
+		$maps_accessible = $sysmapids
+			? API::Map()->get([
+				'output' => [],
+				'sysmapids' => array_keys($sysmapids),
+				'preservekeys' => true
+			])
+			: [];
 
-		$maps_accessible = array_keys($maps_accessible);
-
-		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$this->problems_per_severity_tpl[$severity] = 0;
 			$severity_config[$severity] = [
 				'color' => $config['severity_color_'.$severity],
-				'name' => $config['severity_name_'.$severity],
+				'name' => $config['severity_name_'.$severity]
 			];
 		}
 
@@ -489,11 +473,12 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'uniqueid' => $this->getInput('uniqueid'),
+			'navtree' => $fields['navtree'],
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,
 			'problems' => $this->getNumberOfProblemsBySysmap($navtree_items),
-			'show_unavailable' => array_key_exists('show_unavailable', $fields) ? $fields['show_unavailable'] : 0,
-			'maps_accessible' => $maps_accessible,
+			'show_unavailable' => $fields['show_unavailable'],
+			'maps_accessible' => array_keys($maps_accessible),
 			'severity_config' => $severity_config,
 			'initial_load' => $this->getInput('initial_load', 0),
 			'error' => $error,

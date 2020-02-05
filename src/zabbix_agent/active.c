@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -598,7 +598,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 	else if (NULL != CONFIG_HOST_METADATA_ITEM)
 	{
-		process_config_item(&json,CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA);
+		process_config_item(&json, CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA);
 	}
 
 	if (NULL != CONFIG_HOST_INTERFACE)
@@ -607,7 +607,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 	else if (NULL != CONFIG_HOST_INTERFACE_ITEM)
 	{
-		process_config_item(&json,CONFIG_HOST_INTERFACE_ITEM, HOST_INTERFACE_LEN, ZBX_PROTO_TAG_INTERFACE);
+		process_config_item(&json, CONFIG_HOST_INTERFACE_ITEM, HOST_INTERFACE_LEN, ZBX_PROTO_TAG_INTERFACE);
 	}
 
 	if (NULL != CONFIG_LISTEN_IP)

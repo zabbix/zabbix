@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -322,11 +322,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestInputTypeOverwrite($id, $str) {
-		$element = $this->query('id:'.$id)->waitUntilVisible()->one();
-
-		$element->click();
-		$this->page->keyPress([WebDriverKeys::CONTROL, 'a', WebDriverKeys::CONTROL]);
-		$element->sendKeys($str);
+		$this->query('id:'.$id)->waitUntilVisible()->one()->overwrite($str);
 	}
 
 	public function zbxTestInputTypeByXpath($xpath, $str, $validate = true) {
@@ -507,7 +503,8 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestLaunchOverlayDialog($header) {
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']/div[@class='dashbrd-widget-head']/h4[text()='$header']"));
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]".
+				"/div[@class='dashbrd-widget-head']/h4[text()='$header']"));
 	}
 
 	public function zbxTestClickAndAcceptAlert($id) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,11 +125,14 @@ class CControllerUserList extends CController {
 			'limit' => $config['search_limit'] + 1
 		]);
 
+		// data sort and pager
 		CArrayHelper::sort($data['users'], [['field' => $sortfield, 'order' => $sortorder]]);
 
-		$url = (new CUrl('zabbix.php'))->setArgument('action', 'user.list');
-
-		$data['paging'] = getPagingLine($data['users'], $sortorder, $url);
+		$page_num = getRequest('page', 1);
+		CPagerHelper::savePage('user.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['users'], $sortorder,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
 
 		// set default lastaccess time to 0
 		foreach ($data['users'] as $user) {

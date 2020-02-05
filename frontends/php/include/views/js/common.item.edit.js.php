@@ -301,7 +301,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			setAuthTypeLabel();
 		});
 
-		$('[data-action="parse_url"]').click(function() {
+		$('[data-action="parse_url"]').click(function(e) {
 			var url_node = $(this).siblings('[name="url"]'),
 				table = $('#query_fields_pairs').data('editableTable'),
 				url = parseUrlString(url_node.val())
@@ -336,7 +336,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 							action: function() {}
 						}
 					]
-				});
+				}, e.target);
 			}
 		});
 

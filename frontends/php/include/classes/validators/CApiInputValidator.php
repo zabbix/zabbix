@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1008,7 +1008,7 @@ class CApiInputValidator {
 	 * Array of objects validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS
 	 * @param array  $rule['fields']
 	 * @param mixed  $data
 	 * @param string $path
@@ -1041,7 +1041,9 @@ class CApiInputValidator {
 			}
 		}
 
-		$data = array_values($data);
+		if (!($flags & API_PRESERVE_KEYS)) {
+			$data = array_values($data);
+		}
 
 		foreach ($data as $index => &$value) {
 			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);

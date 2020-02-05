@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2311,7 +2311,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 	zbx_lld_dependency_t			*dependency;
 	zbx_lld_tag_t				*tag;
 	zbx_vector_ptr_t			upd_functions;	/* the ordered list of functions which will be updated */
-	zbx_vector_uint64_t			del_functionids, del_triggerdepids, del_triggertagids;
+	zbx_vector_uint64_t			del_functionids, del_triggerdepids, del_triggertagids, trigger_protoids;
 	zbx_uint64_t				triggerid = 0, functionid = 0, triggerdepid = 0, triggerid_up, triggertagid;
 	char					*sql = NULL, *function_esc, *parameter_esc;
 	size_t					sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
@@ -2324,6 +2324,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 	zbx_vector_uint64_create(&del_functionids);
 	zbx_vector_uint64_create(&del_triggerdepids);
 	zbx_vector_uint64_create(&del_triggertagids);
+	zbx_vector_uint64_create(&trigger_protoids);
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
@@ -2403,9 +2404,15 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 	DBbegin();
 
-	if (SUCCEED != DBlock_hostid(hostid))
+	for (i = 0; i < trigger_prototypes->values_num; i++)
 	{
-		/* the host was removed while processing lld rule */
+		trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes->values[i];
+		zbx_vector_uint64_append(&trigger_protoids, trigger_prototype->triggerid);
+	}
+
+	if (SUCCEED != DBlock_hostid(hostid) || SUCCEED != DBlock_triggerids(&trigger_protoids))
+	{
+		/* the host or trigger prototype was removed while processing lld rule */
 		DBrollback();
 		ret = FAIL;
 		goto out;
@@ -2804,6 +2811,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 	DBcommit();
 out:
+
+	zbx_vector_uint64_destroy(&trigger_protoids);
 	zbx_vector_uint64_destroy(&del_triggertagids);
 	zbx_vector_uint64_destroy(&del_triggerdepids);
 	zbx_vector_uint64_destroy(&del_functionids);

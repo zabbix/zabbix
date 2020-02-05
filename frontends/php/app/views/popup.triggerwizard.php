@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -139,11 +139,7 @@ $output['buttons'] = [[
 	'class' => '',
 	'keepOpen' => true,
 	'isSubmit' => true,
-	'action' => 'return validateTriggerWizard("'.$form->getName().'", '.
-					'jQuery(window.document.forms["'.$form->getName().'"])'.
-						'.closest("[data-dialogueid]")'.
-						'.attr("data-dialogueid")'.
-				');'
+	'action' => 'return validateTriggerWizard(overlay);'
 ]];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

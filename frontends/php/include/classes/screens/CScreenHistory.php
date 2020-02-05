@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class CScreenHistory extends CScreenBase {
 	public $graphid = 0;
 
 	/**
-	 * String containing page file name with extension.
+	 * String containing base URL for pager.
 	 *
 	 * @var string
 	 */
@@ -107,7 +107,7 @@ class CScreenHistory extends CScreenBase {
 		// optional
 		$this->itemids = array_key_exists('itemids', $options) ?  $options['itemids'] : [];
 		$this->plaintext = isset($options['plaintext']) ? $options['plaintext'] : false;
-		$this->page_file = array_key_exists('pageFile', $options) ? $options['pageFile'] : '';
+		$this->page_file = array_key_exists('pageFile', $options) ? $options['pageFile'] : null;
 
 		if (!$this->itemids && array_key_exists('graphid', $options)) {
 			$itemids = API::Item()->get([
@@ -440,9 +440,11 @@ class CScreenHistory extends CScreenBase {
 					}
 				}
 
-				$url = (new CUrl($this->page_file))->formatGetArguments();
 				// Array $history_data will be modified according page and rows on page.
-				$pagination = getPagingLine($history_data, [], $url);
+				$pagination = CPagerHelper::paginate($this->page, $history_data, ZBX_SORT_UP,
+					new CUrl($this->page_file)
+				);
+
 				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader($table_header);
 
 				foreach ($history_data as $history_data_row) {
@@ -519,7 +521,7 @@ class CScreenHistory extends CScreenBase {
 			];
 
 			if ($this->action == HISTORY_VALUES) {
-				$flickerfreeData['page'] = getPageNumber();
+				$flickerfreeData['page'] = $this->page;
 			}
 
 			if ($this->graphid != 0) {

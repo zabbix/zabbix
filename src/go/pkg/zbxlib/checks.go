@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,7 +69,6 @@ import "C"
 
 import (
 	"errors"
-	"fmt"
 	"unsafe"
 
 	"zabbix.com/pkg/itemutil"
@@ -79,7 +78,7 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 	cfunc := resolveMetric(key)
 
 	if cfunc == nil {
-		return nil, fmt.Errorf("Unsupported metric %s", key)
+		return nil, errors.New("Unsupported item key.")
 	}
 
 	var cvalue, cerrmsg *C.char

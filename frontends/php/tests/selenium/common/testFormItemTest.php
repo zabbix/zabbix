@@ -540,9 +540,7 @@ class testFormItemTest extends CWebTest {
 				$elements = [
 					'address' => 'id:interface_address',
 					'port' => 'id:interface_port',
-//					'proxy' => 'id:proxy_hostid
-					'proxy' => 'xpath:.//li[@id="proxy_hostid_row"]/div[@class="table-forms-td-right"]/*'
-
+					'proxy' => 'id:proxy_hostid'
 				];
 				foreach ($elements as $name => $selector) {
 					$elements[$name] = $test_form->query($selector)->one()->detect();

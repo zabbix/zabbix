@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -211,27 +211,35 @@ func setStructValue(value reflect.Value, node *Node) (err error) {
 
 func setMapValue(value reflect.Value, node *Node) (err error) {
 	m := reflect.MakeMap(reflect.MapOf(value.Type().Key(), value.Type().Elem()))
-	for _, child := range node.nodes {
-		k := reflect.New(value.Type().Key())
-		if err = setBasicValue(k.Elem(), nil, &child.name); err != nil {
-			return
+	for _, v := range node.Nodes {
+		if child, ok := v.(*Node); ok {
+			k := reflect.New(value.Type().Key())
+			if err = setBasicValue(k.Elem(), nil, &child.Name); err != nil {
+				return
+			}
+			v := reflect.New(value.Type().Elem())
+			if err = setValue(v.Elem(), nil, child); err != nil {
+				return
+			}
+			m.SetMapIndex(k.Elem(), v.Elem())
 		}
-		v := reflect.New(value.Type().Elem())
-		if err = setValue(v.Elem(), nil, child); err != nil {
-			return
-		}
-		m.SetMapIndex(k.Elem(), v.Elem())
 	}
 	value.Set(m)
 	return
 }
 
 func setSliceValue(value reflect.Value, node *Node) (err error) {
-	size := len(node.values)
+	tmpValues := make([][]byte, 0)
+	for _, v := range node.Nodes {
+		if val, ok := v.(*Value); ok {
+			tmpValues = append(tmpValues, val.Value)
+		}
+	}
+	size := len(tmpValues)
 	values := reflect.MakeSlice(reflect.SliceOf(value.Type().Elem()), 0, size)
 
-	if len(node.values) > 0 {
-		for _, data := range node.values {
+	if len(tmpValues) > 0 {
+		for _, data := range tmpValues {
 			v := reflect.New(value.Type().Elem())
 			str := string(data)
 			if err = setBasicValue(v.Elem(), nil, &str); err != nil {
@@ -240,12 +248,14 @@ func setSliceValue(value reflect.Value, node *Node) (err error) {
 			values = reflect.Append(values, v.Elem())
 		}
 	} else {
-		for _, child := range node.nodes {
-			v := reflect.New(value.Type().Elem())
-			if err = setValue(v.Elem(), nil, child); err != nil {
-				return
+		for _, n := range node.Nodes {
+			if child, ok := n.(*Node); ok {
+				v := reflect.New(value.Type().Elem())
+				if err = setValue(v.Elem(), nil, child); err != nil {
+					return
+				}
+				values = reflect.Append(values, v.Elem())
 			}
-			values = reflect.Append(values, v.Elem())
 		}
 	}
 	value.Set(values)
@@ -444,7 +454,7 @@ func parseConfig(root *Node, data []byte) (err error) {
 // a byte array ([]byte) with configuration file or interface{} either returned by Marshal
 // or a configuration file Unmarshaled into interface{} variable before.
 // The third is optional 'strict' parameter that forces strict validation of configuration
-// and structure fields (enabled by efault). When disabled it will unmarshal part of
+// and structure fields (enabled by default). When disabled it will unmarshal part of
 // configuration into incomplete target structures.
 func Unmarshal(data interface{}, v interface{}, args ...interface{}) (err error) {
 	rv := reflect.ValueOf(v)
@@ -464,20 +474,18 @@ func Unmarshal(data interface{}, v interface{}, args ...interface{}) (err error)
 	switch u := data.(type) {
 	case nil:
 		root = &Node{
-			name:   "",
+			Name:   "",
 			used:   false,
-			values: make([][]byte, 0),
-			nodes:  make([]*Node, 0),
+			Nodes:  make([]interface{}, 0),
 			parent: nil,
-			line:   0}
+			Line:   0}
 	case []byte:
 		root = &Node{
-			name:   "",
+			Name:   "",
 			used:   false,
-			values: make([][]byte, 0),
-			nodes:  make([]*Node, 0),
+			Nodes:  make([]interface{}, 0),
 			parent: nil,
-			line:   0}
+			Line:   0}
 
 		if err = parseConfig(root, u); err != nil {
 			return fmt.Errorf("Cannot read configuration: %s", err.Error())
@@ -504,13 +512,13 @@ func Load(filename string, v interface{}) (err error) {
 	var file std.File
 
 	if file, err = stdOs.Open(filename); err != nil {
-		return fmt.Errorf(`Cannot open configuration file: %s`, err.Error())
+		return fmt.Errorf(`cannot open configuration file: %s`, err.Error())
 	}
 	defer file.Close()
 
 	buf := bytes.Buffer{}
 	if _, err = buf.ReadFrom(file); err != nil {
-		return fmt.Errorf("Cannot load configuration: %s", err.Error())
+		return fmt.Errorf("cannot load configuration: %s", err.Error())
 	}
 
 	return Unmarshal(buf.Bytes(), v)

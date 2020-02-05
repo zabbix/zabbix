@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,13 +30,15 @@
 #define ZBX_IPC_IPMI_REGISTER		1
 #define ZBX_IPC_IPMI_VALUE_RESULT	2
 #define ZBX_IPC_IPMI_COMMAND_RESULT	3
-#define ZBX_IPC_IPMI_TEST_RESULT	4
+#define ZBX_IPC_IPMI_DISCOVERY_RESULT	4
+#define ZBX_IPC_IPMI_TEST_RESULT	5
 
 /* manager -> poller */
 #define ZBX_IPC_IPMI_VALUE_REQUEST	101
 #define ZBX_IPC_IPMI_COMMAND_REQUEST	102
 #define ZBX_IPC_IPMI_CLEANUP_REQUEST	103
-#define ZBX_IPC_IPMI_TEST_REQUEST	104
+#define ZBX_IPC_IPMI_DISCOVERY_REQUEST	104
+#define ZBX_IPC_IPMI_TEST_REQUEST	105
 
 /* client -> manager */
 #define ZBX_IPC_IPMI_SCRIPT_REQUEST	201

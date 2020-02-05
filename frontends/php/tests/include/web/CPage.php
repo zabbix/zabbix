@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,15 +66,29 @@ class CPage {
 	 * Web driver and CElementQuery initialization.
 	 */
 	public function __construct() {
-		$options = new ChromeOptions();
-		$options->addArguments([
-			'--no-sandbox',
-			'--enable-font-antialiasing=false',
-			'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT
-		]);
+		$capabilities = DesiredCapabilities::chrome();
+		if (defined('PHPUNIT_BROWSER_NAME')) {
+			$capabilities->setBrowserName(PHPUNIT_BROWSER_NAME);
+		}
 
-		$this->driver = RemoteWebDriver::create('http://localhost:4444/wd/hub',
-				DesiredCapabilities::chrome()->setCapability(ChromeOptions::CAPABILITY, $options)
+		if (!defined('PHPUNIT_BROWSER_NAME') || PHPUNIT_BROWSER_NAME === 'chrome') {
+			$options = new ChromeOptions();
+			$options->addArguments([
+				'--no-sandbox',
+				'--enable-font-antialiasing=false',
+				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT
+			]);
+
+			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
+		}
+
+		$this->driver = RemoteWebDriver::create('http://'.
+				(defined('PHPUNIT_DRIVER_ADDRESS') ? PHPUNIT_DRIVER_ADDRESS : 'localhost').
+				':4444/wd/hub', $capabilities
+		);
+
+		$this->driver->manage()->window()->setSize(
+				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
 		);
 
 		CElementQuery::setPage($this);
@@ -256,7 +270,9 @@ class CPage {
 
 		try {
 			// Screenshot is 1px smaller to ensure that scroll is still present.
-			$this->height = (int)$this->driver->executeScript('return document.documentElement.getHeight();') - 1;
+			$this->height = (int)$this->driver->executeScript(
+					'return window.getComputedStyle(document.documentElement)["height"];'
+			) - 1;
 
 			if ($this->height > self::DEFAULT_PAGE_HEIGHT) {
 				$this->setViewport(self::DEFAULT_PAGE_WIDTH, $this->height);

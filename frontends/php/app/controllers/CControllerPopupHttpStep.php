@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@ class CControllerPopupHttpStep extends CController {
 	protected function checkInput() {
 
 		$fields = [
-			'httpstepid' =>			'int32',
+			'no' =>					'int32',
+			'httpstepid' =>			'db httpstep.httpstepid',
 			'name' =>				'string|not_empty',
 			'url' =>				'string|not_empty',
 			'post_type' =>			'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_FORM]),
@@ -75,7 +76,8 @@ class CControllerPopupHttpStep extends CController {
 			'required' => $this->getInput('required', ''),
 			'status_codes' => $this->getInput('status_codes', ''),
 			'old_name' => $this->getInput('old_name', ''),
-			'httpstepid' => $this->getInput('httpstepid', -1),
+			'httpstepid' => $this->getInput('httpstepid', 0),
+			'no' => $this->getInput('no', -1),
 			'steps_names' => $this->getInput('steps_names', [])
 		];
 
@@ -94,8 +96,10 @@ class CControllerPopupHttpStep extends CController {
 			elseif ($page_options['timeout'][0] !== '{') {
 				$seconds = timeUnitToSeconds($page_options['timeout']);
 
-				if (bccomp($seconds, SEC_PER_HOUR) > 0) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a number is too large')));
+				if ($seconds < 1 || bccomp($seconds, SEC_PER_HOUR) > 0) {
+					error(_s('Invalid parameter "%1$s": %2$s.', 'timeout',
+						_s('value must be one of %1$s', '1-'.SEC_PER_HOUR)
+					));
 				}
 			}
 
@@ -123,10 +127,9 @@ class CControllerPopupHttpStep extends CController {
 					'required' => $page_options['required'],
 					'status_codes' => $page_options['status_codes'],
 					'follow_redirects' => $page_options['follow_redirects'],
-					'retrieve_mode' => $page_options['retrieve_mode']
+					'retrieve_mode' => $page_options['retrieve_mode'],
+					'no' => $page_options['no']
 				];
-
-				$params['httpstepid'] = $page_options['httpstepid'];
 
 				$output = [
 					'params' => $params

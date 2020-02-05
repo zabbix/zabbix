@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -436,8 +436,20 @@ else {
 	}
 	order_result($data['screens'], $sortField, $sortOrder);
 
-	// paging
-	$data['paging'] = getPagingLine($data['screens'], $sortOrder, new CUrl('screenconf.php'));
+	// pager
+	if (hasRequest('page')) {
+		$data['page'] = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$data['page'] = 1;
+	}
+	else {
+		$data['page'] = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $data['page']);
+
+	$data['paging'] = CPagerHelper::paginate($data['page'], $data['screens'], $sortOrder, new CUrl('screenconf.php'));
 
 	// render view
 	$screenView = new CView('monitoring.screen.list', $data);
