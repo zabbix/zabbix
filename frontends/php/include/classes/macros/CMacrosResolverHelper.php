@@ -628,7 +628,7 @@ class CMacrosResolverHelper {
 	 * @param array  $data['texts_support_macros']               List of texts potentially could contain macros.
 	 * @param array  $data['texts_support_user_macros']          List of texts potentially could contain user macros.
 	 * @param array  $data['texts_support_lld_macros']           List of texts potentially could contain LLD macros.
-	 * @param string $data['hostids']                            Hostid for which tested item belongs to.
+	 * @param int    $data['hostids']                            Hostid for which tested item belongs to.
 	 *
 	 * @return array
 	 */
