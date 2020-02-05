@@ -21,7 +21,6 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "log.h"
-#include "zbxalgo.h"
 #include "../zbxalgo/vectorimpl.h"
 
 /*

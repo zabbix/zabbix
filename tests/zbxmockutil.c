@@ -151,15 +151,8 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
  ******************************************************************************/
 int	zbx_mock_str_to_item_type(const char *str)
 {
-#define ITEM_TYPE_SNMPv1	1
-#define ITEM_TYPE_SNMPv2c	4
-#define ITEM_TYPE_SNMPv3	6
-
 	if (0 == strcmp(str, "ITEM_TYPE_ZABBIX"))
 		return ITEM_TYPE_ZABBIX;
-
-	if (0 == strcmp(str, "ITEM_TYPE_SNMPv1"))
-		return ITEM_TYPE_SNMPv1;
 
 	if (0 == strcmp(str, "ITEM_TYPE_TRAPPER"))
 		return ITEM_TYPE_TRAPPER;
@@ -167,14 +160,8 @@ int	zbx_mock_str_to_item_type(const char *str)
 	if (0 == strcmp(str, "ITEM_TYPE_SIMPLE"))
 		return ITEM_TYPE_SIMPLE;
 
-	if (0 == strcmp(str, "ITEM_TYPE_SNMPv2c"))
-		return ITEM_TYPE_SNMPv2c;
-
 	if (0 == strcmp(str, "ITEM_TYPE_INTERNAL"))
 		return ITEM_TYPE_INTERNAL;
-
-	if (0 == strcmp(str, "ITEM_TYPE_SNMPv3"))
-		return ITEM_TYPE_SNMPv3;
 
 	if (0 == strcmp(str, "ITEM_TYPE_ZABBIX_ACTIVE"))
 		return ITEM_TYPE_ZABBIX_ACTIVE;
@@ -219,10 +206,6 @@ int	zbx_mock_str_to_item_type(const char *str)
 		return ITEM_TYPE_SNMP;
 
 	return FAIL;
-
-#undef ITEM_TYPE_SNMPv1
-#undef ITEM_TYPE_SNMPv2c
-#undef ITEM_TYPE_SNMPv3
 }
 
 /******************************************************************************
