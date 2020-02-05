@@ -989,7 +989,7 @@ static int	dbsync_compare_global_macro(const ZBX_DC_GMACRO *gmacro, const DB_ROW
 	char	*macro = NULL, *context = NULL;
 	int	ret = FAIL;
 
-	if (FAIL == dbsync_compare_int(dbrow[3], gmacro->type))
+	if (FAIL == dbsync_compare_uchar(dbrow[3], gmacro->type))
 		return FAIL;
 
 	if (FAIL == dbsync_compare_str(dbrow[2], gmacro->value))
