@@ -160,10 +160,6 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			unset($data['value_type']);
 		}
 
-		if ($this->item_type == ITEM_TYPE_IPMI) {
-			unset($data['key']);
-		}
-
 		// Rename fields according protocol.
 		$data = CArrayHelper::renameKeys($data, [
 			'params_ap' => 'params',

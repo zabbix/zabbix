@@ -292,10 +292,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				unset($item_test_data['value_type']);
 			}
 
-			if ($this->item_type == ITEM_TYPE_IPMI) {
-				unset($item_test_data['key']);
-			}
-
 			// Send test to be executed on Zabbix server.
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
 			$result = $server->testItem($item_test_data, get_cookie('zbx_sessionid'));
