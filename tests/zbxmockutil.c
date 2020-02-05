@@ -151,6 +151,10 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
  ******************************************************************************/
 int	zbx_mock_str_to_item_type(const char *str)
 {
+#define ITEM_TYPE_SNMPv1	1
+#define ITEM_TYPE_SNMPv2c	4
+#define ITEM_TYPE_SNMPv3	6
+
 	if (0 == strcmp(str, "ITEM_TYPE_ZABBIX"))
 		return ITEM_TYPE_ZABBIX;
 
@@ -215,6 +219,10 @@ int	zbx_mock_str_to_item_type(const char *str)
 		return ITEM_TYPE_SNMP;
 
 	return FAIL;
+
+#undef ITEM_TYPE_SNMPv1
+#undef ITEM_TYPE_SNMPv2c
+#undef ITEM_TYPE_SNMPv3
 }
 
 /******************************************************************************
