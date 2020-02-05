@@ -265,6 +265,10 @@
 			interfaceid: form_data['interfaceid'] || form_data['selectedInterfaceId']
 		});
 
+		if (properties.interfaceid == undefined) {
+			properties.interfaceid = 0;
+		}
+
 		return properties;
 	}
 

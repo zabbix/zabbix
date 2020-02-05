@@ -385,7 +385,7 @@ function saveItemTestInputs() {
 		input_values = jQuery.extend(input_values, {
 			get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
 			proxy_hostid: jQuery('#proxy_hostid', $form).val(),
-			interfaceid: <?= $data['interfaceid'] ?> || undefined,
+			interfaceid: <?= $data['interfaceid'] ?> || 0,
 			address: jQuery('#interface_address', $form).val(),
 			port: jQuery('#interface_port', $form).val()
 		});
