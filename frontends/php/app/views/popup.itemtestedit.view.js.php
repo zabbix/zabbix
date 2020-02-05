@@ -318,6 +318,8 @@ function itemCompleteTest(overlay) {
 		dataType: 'json',
 		type: 'post'
 	});
+
+	return false;
 }
 
 /**
@@ -411,7 +413,7 @@ function saveItemTestInputs() {
 		$test_obj = jQuery('.preprocessing-list-item[data-step=<?= $data['step_obj'] ?>]', jQuery('#preprocessing'));
 	<?php endif ?>
 
-	$test_obj.data('test-data', input_values)
+	$test_obj.data('test-data', input_values);
 }
 
 jQuery(document).ready(function($) {
