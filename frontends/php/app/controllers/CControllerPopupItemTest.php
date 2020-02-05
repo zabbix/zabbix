@@ -159,23 +159,23 @@ abstract class CControllerPopupItemTest extends CController {
 		],
 		'snmp_community' => [
 			'support_user_macros' => true,
-			'support_lld_macros' => true
+			'support_lld_macros' => false
 		],
 		'snmpv3_contextname' => [
 			'support_user_macros' => true,
-			'support_lld_macros' => true
+			'support_lld_macros' => false
 		],
 		'snmpv3_securityname' => [
 			'support_user_macros' => true,
-			'support_lld_macros' => true
+			'support_lld_macros' => false
 		],
 		'snmpv3_authpassphrase' => [
 			'support_user_macros' => true,
-			'support_lld_macros' => true
+			'support_lld_macros' => false
 		],
 		'snmpv3_privpassphrase' => [
 			'support_user_macros' => true,
-			'support_lld_macros' => true
+			'support_lld_macros' => false
 		],
 		'ipmi_sensor' => [
 			'support_user_macros' => false,
