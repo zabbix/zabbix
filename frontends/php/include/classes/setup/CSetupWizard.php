@@ -251,7 +251,7 @@ class CSetupWizard extends CForm {
 			(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
-		If ($DB['TYPE'] == null || $DB['TYPE'] == ZBX_DB_MYSQL || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+		If ($DB['TYPE'] === null || $DB['TYPE'] == ZBX_DB_MYSQL || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 			$table->addRow(_('TLS encryption'),
 				(new CCheckBox('tls_encryption'))
 					->setChecked($this->getConfig('DB_ENCRYPTION'))
