@@ -818,7 +818,7 @@ class CUserMacro extends CApiService {
 	 * @param array $hostmacros
 	 * @param int $hostmacros[]['hostmacroid']
 	 * @param int $hostmacros[]['hostid']
-	 * @paramt string $hostmacros['macro']
+	 * @param string $hostmacros['macro']
 	 *
 	 * @throws APIException if any of the given macros already exist.
 	 */
