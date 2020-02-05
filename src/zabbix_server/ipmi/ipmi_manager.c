@@ -168,6 +168,7 @@ static int	ipmi_request_priority(const zbx_ipmi_request_t *request)
 		case ZBX_IPC_IPMI_SCRIPT_REQUEST:
 			return 0;
 		case ZBX_IPC_IPMI_TEST_REQUEST:
+		case ZBX_IPC_IPMI_DISCOVERY_TEST_REQUEST:
 			return 0;
 		default:
 			return INT_MAX;
@@ -576,6 +577,7 @@ static void	ipmi_manager_process_poller_queue(zbx_ipmi_manager_t *manager, zbx_i
 		{
 			case ZBX_IPC_IPMI_COMMAND_REQUEST:
 			case ZBX_IPC_IPMI_TEST_REQUEST:
+			case ZBX_IPC_IPMI_DISCOVERY_TEST_REQUEST:
 			case ZBX_IPC_IPMI_CLEANUP_REQUEST:
 				break;
 			case ZBX_IPC_IPMI_VALUE_REQUEST:
