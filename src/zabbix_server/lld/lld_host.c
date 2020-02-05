@@ -46,7 +46,6 @@ static void	lld_hostmacro_free(zbx_lld_hostmacro_t *hostmacro)
 	zbx_free(hostmacro);
 }
 
-
 typedef struct
 {
 	char		*community;
@@ -105,11 +104,12 @@ typedef struct
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT)
 #define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000080)	/* interfaces which should be deleted */
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE	__UINT64_C(0x00000100)	/* snmp data which should be deleted */
-	zbx_uint64_t			flags;
+	zbx_uint64_t	flags;
 	union _data
 	{
 		zbx_lld_interface_snmp_t *snmp;
-	}				data;
+	}
+	data;
 }
 zbx_lld_interface_t;
 
