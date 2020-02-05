@@ -141,7 +141,7 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 			zbx_snprintf(buf, sizeof(buf), "%hhu", interfaces[i].bulk);
 			zbx_json_addstring(j, "{#IF.SNMP.BULK}", buf, ZBX_JSON_TYPE_INT);
 
-			switch(interfaces[i].snmp_version)
+			switch (interfaces[i].snmp_version)
 			{
 				case ZBX_IF_SNMP_VERSION_1:
 					p = "SNMPv1";

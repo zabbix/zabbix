@@ -3117,7 +3117,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			unsigned char interface_type;
+			unsigned char	interface_type;
 
 			ZBX_STR2UINT64(hostid, row[0]);
 			ZBX_DBROW2UINT64(parent_interfaceid, row[1]);
