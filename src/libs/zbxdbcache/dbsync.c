@@ -1108,7 +1108,7 @@ static int	dbsync_compare_host_macro(const ZBX_DC_HMACRO *hmacro, const DB_ROW d
 	char	*macro = NULL, *context = NULL;
 	int	ret = FAIL;
 
-	if (FAIL == dbsync_compare_int(dbrow[4], hmacro->type))
+	if (FAIL == dbsync_compare_uchar(dbrow[4], hmacro->type))
 		return FAIL;
 
 	if (FAIL == dbsync_compare_str(dbrow[3], hmacro->value))
