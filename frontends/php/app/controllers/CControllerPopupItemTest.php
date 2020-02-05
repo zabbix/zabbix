@@ -233,7 +233,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @return array
 	 */
 	public static function getTestableItemTypes(int $hostid = 0): array {
-		if ($hostid && self::isIpmiTestSupported($hostid)) {
+		if ($hostid != 0 && self::isIpmiTestSupported($hostid)) {
 			self::$testable_item_types[] = ITEM_TYPE_IPMI;
 		}
 
