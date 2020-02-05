@@ -1074,6 +1074,10 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 					ipmi_manager_process_client_request(&ipmi_manager, client, message, now,
 							ZBX_IPC_IPMI_TEST_REQUEST);
 					break;
+				case ZBX_IPC_IPMI_DISCOVERY_TEST_ITEM_REQUEST:
+					ipmi_manager_process_client_request(&ipmi_manager, client, message, now,
+							ZBX_IPC_IPMI_DISCOVERY_TEST_REQUEST);
+					break;
 				case ZBX_IPC_IPMI_SCRIPT_REQUEST:
 					ipmi_manager_process_client_request(&ipmi_manager, client, message, now,
 							ZBX_IPC_IPMI_COMMAND_REQUEST);
