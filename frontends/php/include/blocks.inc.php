@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -673,6 +673,14 @@ function make_status_of_zbx() {
 					(new CRow([$req['name'], $req['current'], $req['error']]))->addClass(ZBX_STYLE_RED)
 				);
 			}
+		}
+
+		$db = DB::getDbBackend();
+
+		if (!$db->checkEncoding()) {
+			$table->addRow(
+				(new CRow((new CCol($db->getWarning()))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
+			);
 		}
 	}
 

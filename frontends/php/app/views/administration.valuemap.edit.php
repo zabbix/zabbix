@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,6 +85,11 @@ $form_list->addRow(
 $tab_view = (new CTabView())->addTab('valuemap_tab', _('Value mapping'), $form_list);
 
 // append buttons
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'valuemap.list')
+	->setArgument('page', CPagerHelper::loadPage('valuemap.list', null))
+))->setId('cancel');
+
 if ($data['valuemapid'] != 0) {
 	if ($data['valuemap_count'] == 0) {
 		$confirm_message = _('Delete selected value mapping?');
@@ -106,10 +111,7 @@ if ($data['valuemapid'] != 0) {
 					->setArgument('valuemapids', (array) $data['valuemapid']),
 				$confirm_message
 			))->setId('delete'),
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'valuemap.list')
-				->getUrl()
-			))->setId('cancel')
+			$cancel_button
 		]
 	));
 }
@@ -117,9 +119,7 @@ else {
 	$tab_view->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'valuemap.list')
-			))->setId('cancel')
+			$cancel_button
 		]
 	));
 }

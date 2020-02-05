@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2282,7 +2282,9 @@ static int	jsonpath_apply_functions(const struct zbx_json_parse *jp_root, const 
 		else
 			zbx_vector_str_clear(&input);
 
-		zbx_vector_str_append(&input, *output);
+		if (NULL != *output)
+			zbx_vector_str_append(&input, *output);
+
 		*output = NULL;
 		clear_input_contents = 1;
 

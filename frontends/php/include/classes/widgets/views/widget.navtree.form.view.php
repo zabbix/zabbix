@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,16 +34,27 @@ $scripts = [];
 
 // Map widget reference.
 $field = $fields[CWidgetFieldReference::FIELD_NAME];
-$form->addVar($field->getName(), $field->getValue());
+$form->addItem((new CVar($field->getName(), $field->getValue()))->removeId());
 
 if ($field->getValue() === '') {
 	$scripts[] = $field->getJavascript('#'.$form->getAttribute('id'));
 }
 
-// Register dynamically created item fields. Only for map.name.#, map.parent.#, map.order.#, mapid.#
-foreach ($fields as $field) {
-	if ($field instanceof CWidgetFieldHidden) {
-		$form->addVar($field->getName(), $field->getValue());
+// Add dynamically created fields navtree.name.<N>, navtree.parent.<N>, navtree.order.<N> and navtree.sysmapid.<N>.
+$field = $fields['navtree'];
+$navtree_items = $field->getValue();
+$field_name = $field->getName();
+
+foreach ($navtree_items as $i => $navtree_item) {
+	$form->addItem((new CVar($field_name.'.name.'.$i, $navtree_item['name']))->removeId());
+	if ($navtree_item['order'] != 1) {
+		$form->addItem((new CVar($field_name.'.order.'.$i, $navtree_item['order']))->removeId());
+	}
+	if ($navtree_item['parent'] != 0) {
+		$form->addItem((new CVar($field_name.'.parent.'.$i, $navtree_item['parent']))->removeId());
+	}
+	if (array_key_exists('sysmapid', $navtree_item)) {
+		$form->addItem((new CVar($field_name.'.sysmapid.'.$i, $navtree_item['sysmapid']))->removeId());
 	}
 }
 

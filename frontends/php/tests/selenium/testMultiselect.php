@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
+/**
+ * @browsers chrome
+ */
 class testMultiselect extends CWebTest {
 
 	public function testMultiselect_disableDebugMode() {
@@ -75,8 +78,7 @@ class testMultiselect extends CWebTest {
 	public function testMultiselect_SuggestInOverlay() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->query('button:Create dashboard')->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilVisible()
-			->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
 		$dialog->close();
 		$dashboard = CDashboardElement::find()->one();

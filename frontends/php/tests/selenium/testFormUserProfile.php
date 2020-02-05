@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -553,7 +553,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestWaitForPageToLoad();
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay-bg']"));
 				$this->zbxTestClickWait('update');
 				$this->zbxTestCheckHeader('Global view');
 				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";

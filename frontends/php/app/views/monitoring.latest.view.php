@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,7 +105,8 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 }
 
 $widget->addItem((new CView('monitoring.latest.view.html', array_intersect_key($data, array_flip([
-	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set'
+	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set',
+	'paging'
 ]))))->getOutput());
 
 $widget->show();

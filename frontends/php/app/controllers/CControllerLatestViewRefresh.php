@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,25 +72,21 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 		$sort_field = $this->getInput('sort', 'name');
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
 
-		$view_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'latest.view')
-			->setArgument('filter_groupids', $filter['groupids'])
-			->setArgument('filter_hostids', $filter['hostids'])
-			->setArgument('filter_application', $filter['application'])
-			->setArgument('filter_select', $filter['select'])
-			->setArgument('filter_show_without_data', $filter['show_without_data'] ? 1 : null)
-			->setArgument('filter_show_details', $filter['show_details'] ? 1 : null)
-			->setArgument('filter_set', 1)
-			->setArgument('sort', $sort_field)
-			->setArgument('sortorder', $sort_order);
+		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
+
+		// data sort and pager
+		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
+
+		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['items'], ZBX_SORT_UP, $view_curl);
 
 		// display
 		$data = [
 			'filter' => $filter,
 			'sort_field' => $sort_field,
 			'sort_order' => $sort_order,
-			'view_curl' => $view_curl
-		] + $this->prepareData($filter, $sort_field, $sort_order);
+			'view_curl' => $view_curl,
+			'paging' => $paging
+		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

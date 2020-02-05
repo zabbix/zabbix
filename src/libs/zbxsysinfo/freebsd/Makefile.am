@@ -10,7 +10,7 @@ libspecsysinfo_a_SOURCES = \
 	diskio.c \
 	diskspace.c \
 	freebsd.c \
-	inodes.c \
+	inodes.c inodes.h \
 	kernel.c \
 	memory.c \
 	net.c \

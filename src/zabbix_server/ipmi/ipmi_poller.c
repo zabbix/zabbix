@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,12 +106,22 @@ static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zb
 	zbx_ipmi_deserialize_request(message->data, &itemid, &addr, &port, &authtype,
 			&privilege, &username, &password, &sensor, &command);
 
-	zabbix_log(LOG_LEVEL_TRACE, "%s() itemid:" ZBX_FS_UI64 " addr:%s port:%d authtype:%d privilege:%d username:%s"
-			" sensor:%s", __func__, itemid, addr, (int)port, (int)authtype, (int)privilege,
-			username, sensor);
-
-	errcode = get_value_ipmi(itemid, addr, port, authtype, privilege, username, password, sensor, &value);
-	ipmi_poller_send_result(socket, code, errcode, value);
+	if (ZBX_IPC_IPMI_DISCOVERY_REQUEST == message->code)
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "%s() for discovery itemid:" ZBX_FS_UI64 " addr:%s port:%d authtype:%d"
+				" privilege:%d username:%s", __func__, itemid, addr, (int)port, (int)authtype,
+				(int)privilege,	username);
+		errcode = get_discovery_ipmi(itemid, addr, port, authtype, privilege, username, password, &value);
+		ipmi_poller_send_result(socket, code, errcode, value);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "%s() itemid:" ZBX_FS_UI64 " addr:%s port:%d authtype:%d privilege:%d"
+				" username:%s sensor:%s", __func__, itemid, addr, (int)port, (int)authtype,
+				(int)privilege, username, sensor);
+		errcode = get_value_ipmi(itemid, addr, port, authtype, privilege, username, password, sensor, &value);
+		ipmi_poller_send_result(socket, code, errcode, value);
+	}
 
 	zbx_free(value);
 	zbx_free(addr);
@@ -248,6 +258,10 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 		switch (message->code)
 		{
+			case ZBX_IPC_IPMI_DISCOVERY_REQUEST:
+				ipmi_poller_process_value_request(&ipmi_socket, message, ZBX_IPC_IPMI_DISCOVERY_RESULT);
+				polled_num++;
+				break;
 			case ZBX_IPC_IPMI_VALUE_REQUEST:
 				ipmi_poller_process_value_request(&ipmi_socket, message, ZBX_IPC_IPMI_VALUE_RESULT);
 				polled_num++;

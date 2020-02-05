@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,8 @@
 **/
 
 
-$paging = getPagingLine($data['items'], ZBX_SORT_UP, clone $data['view_curl']);
-
 $form = (new CForm('GET', 'history.php'))
+	->cleanItems()
 	->setName('items')
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 
@@ -472,7 +471,7 @@ foreach ($data['hosts'] as $hostid => $db_host) {
 
 $form->addItem([
 	$table,
-	$paging,
+	$data['paging'],
 	new CActionButtonList('graphtype', 'itemids', [
 		GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph')],
 		GRAPH_TYPE_NORMAL => ['name' => _('Display graph')]

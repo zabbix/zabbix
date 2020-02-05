@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,13 +92,15 @@
 			/**
 			 * Send all expressions data to server with test string.
 			 *
-			 * @param {String} string Test string to test expression against
+			 * @param {string} string Test string to test expression against
+			 *
+			 * @return {jqXHR}
 			 */
 			testExpressions: function(string) {
 				var ajaxData = {
-						testString: string,
-						expressions: {}
-					};
+					testString: string,
+					expressions: {}
+				};
 
 				$('#testResultTable').css({opacity: 0.5});
 
@@ -116,7 +118,7 @@
 				var url = new Curl('zabbix.php');
 				url.setArgument('action', 'regex.test');
 
-				$.post(
+				return $.post(
 					url.getUrl(),
 					{ajaxdata: ajaxData},
 					$.proxy(this.showTestResults, this),
@@ -202,14 +204,26 @@
 	}(jQuery));
 
 	jQuery(function($) {
-		var $form = $('form#regex');
+		var $form = $('form#regex'),
+			$test_string = $('#test_string');
+			$test_btn = $('#testExpression');
 
 		$form.on('submit', function() {
 			$form.trimValues(['#name']);
 		});
 
 		$('#testExpression, #tab_test').click(function() {
-			zabbixRegExp.testExpressions($('#test_string').val());
+			$test_btn.addClass('is-loading');
+			$test_btn.prop('disabled', true);
+			$test_string.prop('disabled', true);
+
+			zabbixRegExp
+				.testExpressions($test_string.val())
+				.always(function() {
+					$test_btn.removeClass('is-loading');
+					$test_btn.prop('disabled', false);
+					$test_string.prop('disabled', false);
+				});
 		});
 
 		$('#tbl_expr').dynamicRows({

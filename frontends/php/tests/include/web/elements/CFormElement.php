@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -193,7 +193,7 @@ class CFormElement extends CElement {
 		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
 		$label = $this->query($prefix.'/label[@for='.CXPathHelper::escapeQuotes($id).']')->one(false);
 
-		if ($label->isValid()) {
+		if ($label->isValid() === false) {
 			$label = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_RIGHT.'//*[@id='.
 					CXPathHelper::escapeQuotes($id).']/ancestor::'.self::TABLE_FORM_RIGHT.'/../'.
 					self::TABLE_FORM_LEFT.'/label')->one(false);
@@ -266,7 +266,7 @@ class CFormElement extends CElement {
 	 * @return CMessageElement
 	 */
 	public function getOverlayMessage() {
-		return $this->parents('class:overlay-dialogue-body')->one()
+		return $this->parents('class:overlay-dialogue-body')->waitUntilVisible()->one()
 				->query('tag:output')->asMessage()->waitUntilVisible()->one();
 	}
 

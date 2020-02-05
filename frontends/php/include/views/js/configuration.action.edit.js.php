@@ -255,6 +255,12 @@
 		}
 	}
 
+	function resetOpmessage() {
+		jQuery('#operation_opmessage_mediatypeid').val(0);
+		jQuery('#operation_opmessage_default_msg').val(1);
+		jQuery('#operation_opmessage_subject, #operation_opmessage_message').val('');
+	}
+
 	jQuery(document).ready(function() {
 		var remove_operationid = function() {
 			var operationid_RegExp = /^(operations|recovery_operations|ack_operations)\[\d+\]\[operationid\]$/;
@@ -267,6 +273,8 @@
 					}
 				});
 		};
+
+		jQuery('#add').click(remove_operationid);
 
 		// clone button
 		jQuery('#clone').click(function() {

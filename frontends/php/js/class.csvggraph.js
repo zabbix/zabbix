@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2020 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -120,7 +120,9 @@ jQuery(function ($) {
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
 			data.isHintBoxFrozen = true;
 			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
-			overlayDialogueOnLoad(true, graph.hintBoxItem);
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				$('.dashbrd-grid-container')

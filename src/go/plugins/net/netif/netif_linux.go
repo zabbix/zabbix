@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,14 +22,21 @@ package netif
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/std"
 )
 
-type msgIfDiscovery struct {
-	Ifname string `json:"{#IFNAME}"`
-}
+const (
+	errorCannotFindIf     = "Cannot find information for this network interface in /proc/net/dev."
+	errorCannotOpenNetDev = "Cannot open /proc/net/dev: %s"
+)
+
+var stdOs std.Os
 
 var mapNetStatIn = map[string]uint{
 	"bytes":      0,
@@ -53,39 +60,34 @@ var mapNetStatOut = map[string]uint{
 	"compressed": 15,
 }
 
-func addStatNum(statName string, mapNetStat map[string]uint, statNums *[]uint) error {
-	statNum, ok := mapNetStat[statName]
-
-	if !ok {
-		return fmt.Errorf("Invalid second parameter.")
+func (p *Plugin) addStatNum(statName string, mapNetStat map[string]uint, statNums *[]uint) error {
+	if statNum, ok := mapNetStat[statName]; ok {
+		*statNums = append(*statNums, statNum)
+	} else {
+		return errors.New(errorInvalidSecondParam)
 	}
-
-	*statNums = append(*statNums, statNum)
-
 	return nil
 }
 
-func getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
+func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
 	var statNums []uint
 
 	if dir&dirIn != 0 {
-		if err = addStatNum(statName, mapNetStatIn, &statNums); err != nil {
+		if err = p.addStatNum(statName, mapNetStatIn, &statNums); err != nil {
 			return
 		}
 	}
 
 	if dir&dirOut != 0 {
-		if err = addStatNum(statName, mapNetStatOut, &statNums); err != nil {
+		if err = p.addStatNum(statName, mapNetStatOut, &statNums); err != nil {
 			return
 		}
 	}
 
 	file, err := stdOs.Open("/proc/net/dev")
-
 	if err != nil {
-		return 0, fmt.Errorf("Cannot open /proc/net/dev: %s", err)
+		return 0, fmt.Errorf(errorCannotOpenNetDev, err)
 	}
-
 	defer file.Close()
 
 	var total uint64
@@ -110,45 +112,92 @@ loop:
 			break
 		}
 	}
-
-	err = fmt.Errorf("Cannot find information for this network interface in /proc/net/dev.")
-
+	err = errors.New(errorCannotFindIf)
 	return
 }
 
-func getDevList() (string, error) {
-	var netInterfaces []msgIfDiscovery
-	var netInterface msgIfDiscovery
-	var result string
-
-	file, err := stdOs.Open("/proc/net/dev")
-
-	if err != nil {
-		return "", fmt.Errorf("Cannot open /proc/net/dev: %s", err)
+func (p *Plugin) getDevDiscovery() (netInterfaces []msgIfDiscovery, err error) {
+	var f std.File
+	if f, err = stdOs.Open("/proc/net/dev"); err != nil {
+		return nil, fmt.Errorf(errorCannotOpenNetDev, err)
 	}
+	defer f.Close()
 
-	defer file.Close()
-
-	for sLines := bufio.NewScanner(file); sLines.Scan(); {
+	netInterfaces = make([]msgIfDiscovery, 0)
+	for sLines := bufio.NewScanner(f); sLines.Scan(); {
 		dev := strings.Split(sLines.Text(), ":")
-
 		if len(dev) > 1 {
-			netInterface.Ifname = strings.TrimSpace(dev[0])
-			netInterfaces = append(netInterfaces, netInterface)
+			netInterfaces = append(netInterfaces, msgIfDiscovery{strings.TrimSpace(dev[0])})
 		}
 	}
 
-	if len(netInterfaces) > 0 {
-		req, err := json.Marshal(netInterfaces)
+	return netInterfaces, nil
+}
 
-		if err != nil {
-			return "", fmt.Errorf("Cannot obtain network interfaces from /proc/net/dev: %s", err)
+// Export -
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	var direction dirFlag
+	var mode string
+
+	switch key {
+	case "net.if.discovery":
+		if len(params) > 0 {
+			return nil, errors.New(errorParametersNotAllowed)
+		}
+		var devices []msgIfDiscovery
+		if devices, err = p.getDevDiscovery(); err != nil {
+			return
+		}
+		var b []byte
+		if b, err = json.Marshal(devices); err != nil {
+			return
+		}
+		return string(b), nil
+	case "net.if.collisions":
+		if len(params) > 1 {
+			return nil, errors.New(errorTooManyParams)
 		}
 
-		result = string(req)
+		if len(params) < 1 || params[0] == "" {
+			return nil, errors.New(errorEmptyIfName)
+		}
+		return p.getNetStats(params[0], "collisions", dirOut)
+	case "net.if.in":
+		direction = dirIn
+	case "net.if.out":
+		direction = dirOut
+	case "net.if.total":
+		direction = dirIn | dirOut
+	default:
+		/* SHOULD_NEVER_HAPPEN */
+		return nil, errors.New(errorUnsupportedMetric)
+	}
+
+	if len(params) < 1 || params[0] == "" {
+		return nil, errors.New(errorEmptyIfName)
+	}
+
+	if len(params) > 2 {
+		return nil, errors.New(errorTooManyParams)
+	}
+
+	if len(params) == 2 && params[1] != "" {
+		mode = params[1]
 	} else {
-		result = "[]"
+		mode = "bytes"
 	}
 
-	return result, nil
+	return p.getNetStats(params[0], mode, direction)
+}
+
+func init() {
+	stdOs = std.NewOs()
+
+	plugin.RegisterMetrics(&impl, "NetIf",
+		"net.if.collisions", "Returns number of out-of-window collisions.",
+		"net.if.in", "Returns incoming traffic statistics on network interface.",
+		"net.if.out", "Returns outgoing traffic statistics on network interface.",
+		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
+		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.")
+
 }

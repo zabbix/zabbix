@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -167,10 +167,12 @@ if ($triggerData) {
 
 	$reportWidget->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))
+			->addItem(new CLink($triggerData['hostname'], (new CUrl('report2.php'))
+				->setArgument('page', CPagerHelper::loadPage('report2.php', null))
+				->getUrl()
+			))
 			->addItem($triggerData['description'])
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 	$table = (new CTableInfo())
@@ -182,6 +184,7 @@ if ($triggerData) {
 }
 elseif (hasRequest('filter_hostid')) {
 	$reportWidget->setControls((new CForm('get'))
+		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
 			->addItem([
@@ -456,7 +459,10 @@ elseif (hasRequest('filter_hostid')) {
 
 	CArrayHelper::sort($triggers, ['host_name', 'description']);
 
-	$paging = getPagingLine($triggers, ZBX_SORT_UP, new CUrl('report2.php'));
+	// pager
+	$page_num = getRequest('page', 1);
+	CPagerHelper::savePage($page['file'], $page_num);
+	$paging = CPagerHelper::paginate($page_num, $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 
 	foreach ($triggers as $trigger) {
 		$availability = calculateAvailability($trigger['triggerid'], $data['filter']['timeline']['from_ts'],

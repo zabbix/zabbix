@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  * Comments: starting with fping (4.x), the packets interval can be 0ms, 1ms, *
  *           otherwise minimum value is 10ms                                  *
  ******************************************************************************/
-static int	get_interval_option(const char * fping, const char *dst, int *value, char *error, int max_error_len)
+static int	get_interval_option(const char * fping, const char *dst, int *value, char *error, size_t max_error_len)
 {
 	int	ret_exec, ret = FAIL;
 	char	tmp[MAX_STRING_LEN], err[255], *out = NULL;
@@ -190,10 +190,11 @@ static int	get_ipv6_support(const char * fping, const char *dst)
 #endif	/* HAVE_IPV6 */
 
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
-		char *error, int max_error_len)
+		char *error, size_t max_error_len)
 {
-	const int	fping_response_time_add_chars = 5;
-	const int	fping_response_time_chars_max = 15;
+	const unsigned int	fping_response_time_add_chars = 5;
+	const unsigned int	fping_response_time_chars_max = 15;
+
 	FILE		*f;
 	char		params[70];
 	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buff[MAX_STRING_LEN];
@@ -201,7 +202,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	ZBX_FPING_HOST	*host;
 	int 		i, ret = NOTSUPPORTED, index;
 	char		*str = NULL;
-	int		str_sz, timeout_str_sz;
+	unsigned int	str_sz, timeout_str_sz;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -341,7 +342,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #ifdef HAVE_IPV6
 	if (NULL != CONFIG_SOURCE_IP)
 	{
-		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, max_error_len))
+		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, (int)max_error_len))
 			return ret;
 
 		if (family == PF_INET)
@@ -417,12 +418,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		return ret;
 	}
 
-	timeout_str_sz = (0 != timeout ? zbx_snprintf(buff, sizeof(buff), "%d", timeout) +
+	timeout_str_sz = (0 != timeout ? (unsigned int)zbx_snprintf(buff, sizeof(buff), "%d", timeout) +
 			fping_response_time_add_chars : fping_response_time_chars_max);
-	str_sz = count * timeout_str_sz + MAX_STRING_LEN;
+	str_sz = (unsigned int)count * timeout_str_sz + MAX_STRING_LEN;
 	str = zbx_malloc(str, (size_t)str_sz);
 
-	if (NULL == fgets(str, str_sz, f))
+	if (NULL == fgets(str, (int)str_sz, f))
 	{
 		strscpy(tmp, "no output");
 	}
@@ -430,8 +431,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		for (i = 0; i < hosts_count; i++)
 		{
-			hosts[i].status = (char *)zbx_malloc(NULL, count);
-			memset(hosts[i].status, 0, count);
+			hosts[i].status = (char *)zbx_malloc(NULL, (size_t)count);
+			memset(hosts[i].status, 0, (size_t)count);
 		}
 
 		do
@@ -529,12 +530,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 					0 != (fping_existence & FPING_EXISTS) &&
 					0 != (fping_existence & FPING6_EXISTS))
 			{
-				memset(host->status, 0, count);	/* reset response statuses for IPv6 */
+				memset(host->status, 0, (size_t)count);	/* reset response statuses for IPv6 */
 			}
 #endif
 			ret = SUCCEED;
 		}
-		while (NULL != fgets(str, str_sz, f));
+		while (NULL != fgets(str, (int)str_sz, f));
 
 		for (i = 0; i < hosts_count; i++)
 			zbx_free(hosts[i].status);
@@ -569,7 +570,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
  * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
  ******************************************************************************/
-int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len)
+int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error,
+			size_t max_error_len)
 {
 	int	res;
 

@@ -151,10 +151,11 @@ Default location of Zabbix agent 2 configuration file (if not modified during co
 Documentation
 .UE
 .PP
-.BR zabbix_agent (8),
-.BR zabbix_get (8),
+.BR zabbix_agentd (8),
+.BR zabbix_get (1),
 .BR zabbix_proxy (8),
-.BR zabbix_sender (8),
-.BR zabbix_server (8)
+.BR zabbix_sender (1),
+.BR zabbix_server (8),
+.BR zabbix_js (1)
 .SH AUTHOR
 Zabbix LLC

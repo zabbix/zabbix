@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ $tab_view->setFooter(makeFormFooter(
 
 $form = (new CForm('post', null, 'multipart/form-data'))
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('backurl', $data['backurl'])
+	->addVar('rules_preset', $data['rules_preset'])
 	->addItem($tab_view);
 
 // widget

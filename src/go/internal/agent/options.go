@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ type AgentOptions struct {
 	HostnameItem         string   `conf:"optional"`
 	HostMetadata         string   `conf:"optional"`
 	HostMetadataItem     string   `conf:"optional"`
+	HostInterface        string   `conf:"optional"`
+	HostInterfaceItem    string   `conf:"optional"`
 	BufferSend           int      `conf:"optional,range=1:3600,default=5"`
 	BufferSize           int      `conf:"optional,range=2:65535,default=100"`
 	ListenIP             string   `conf:"optional"`
@@ -66,6 +68,9 @@ type AgentOptions struct {
 	TLSKeyFile           string   `conf:"optional"`
 	TLSServerCertIssuer  string   `conf:"optional"`
 	TLSServerCertSubject string   `conf:"optional"`
+
+	AllowKey interface{} `conf:"optional"`
+	DenyKey  interface{} `conf:"optional"`
 
 	Plugins map[string]interface{} `conf:"optional"`
 }
@@ -222,4 +227,26 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 		SourceIP: Options.SourceIP,
 	}
 	return
+}
+
+func ValidateOptions(options AgentOptions) error {
+	const hostNameLen = 128
+	const hostMetadataLen = 255
+	const hostInterfaceLen = 255
+	var err error
+
+	if len(options.Hostname) > hostNameLen {
+		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", hostNameLen)
+	}
+	if err = CheckHostname(options.Hostname); err != nil {
+		return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
+	}
+	if len(options.HostMetadata) > 0 && len(options.HostMetadata) > hostMetadataLen {
+		return fmt.Errorf("the value of \"HostMetadata\" configuration parameter cannot be longer than %d characters", hostMetadataLen)
+	}
+	if len(options.HostInterface) > hostInterfaceLen {
+		return fmt.Errorf("the value of \"HostInterface\" configuration parameter cannot be longer than %d characters", hostInterfaceLen)
+	}
+
+	return nil
 }
