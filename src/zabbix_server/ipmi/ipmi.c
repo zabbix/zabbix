@@ -120,7 +120,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	}
 
 	data_len = zbx_ipmi_serialize_request(&data, host->hostid, interface.addr, interface.port, host->ipmi_authtype,
-			host->ipmi_privilege, host->ipmi_username, host->ipmi_password, sensor, op);
+			host->ipmi_privilege, host->ipmi_username, host->ipmi_password, sensor, op, "");
 
 	if (FAIL == zbx_ipc_socket_write(&ipmi_socket, ZBX_IPC_IPMI_SCRIPT_REQUEST, data, data_len))
 	{
@@ -191,12 +191,11 @@ int	zbx_ipmi_test_item(const DC_ITEM *item, char **info)
 
 	data_len = zbx_ipmi_serialize_request(&data, item->host.hostid, item->interface.addr, item->interface.port,
 			item->host.ipmi_authtype, item->host.ipmi_privilege, item->host.ipmi_username,
-			item->host.ipmi_password, item->ipmi_sensor, 0);
+			item->host.ipmi_password, item->ipmi_sensor, 0, item->key);
 
 	zbx_ipc_message_init(&message);
 
-	if (FAIL == zbx_ipc_socket_write(&ipmi_socket, 0 == strcmp(item->key, "ipmi.get") ?
-			ZBX_IPC_IPMI_DISCOVERY_TEST_ITEM_REQUEST : ZBX_IPC_IPMI_TEST_ITEM_REQUEST, data, data_len))
+	if (FAIL == zbx_ipc_socket_write(&ipmi_socket, ZBX_IPC_IPMI_VALUE_REQUEST, data, data_len))
 	{
 		*info = zbx_strdup(NULL, "cannot send script request message to IPMI service");
 		goto cleanup;
@@ -208,7 +207,7 @@ int	zbx_ipmi_test_item(const DC_ITEM *item, char **info)
 		goto cleanup;
 	}
 
-	if (ZBX_IPC_IPMI_TEST_ITEM_RESULT != message.code)
+	if (ZBX_IPC_IPMI_VALUE_RESULT != message.code)
 	{
 		*info = zbx_dsprintf(NULL, "invalid response code:%u received from IPMI service", message.code);
 		goto cleanup;
