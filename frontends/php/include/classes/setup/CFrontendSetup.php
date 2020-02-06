@@ -103,7 +103,7 @@ class CFrontendSetup {
 			'current' => PHP_VERSION,
 			'required' => self::MIN_PHP_VERSION,
 			'result' => $check ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required PHP version is %s.', self::MIN_PHP_VERSION)
+			'error' => _s('Minimum required PHP version is %1$s.', self::MIN_PHP_VERSION)
 		];
 	}
 
