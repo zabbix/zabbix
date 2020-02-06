@@ -736,7 +736,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 				" from items i"
 					" left join hosts h on i.hostid=h.hostid"
 					" left join interface f on i.interfaceid=f.interfaceid"
-				" where  i.type in (1,4,6)"
+				" where i.type in (1,4,6)"
 					" and h.status <> 3"
 				" group by i.interfaceid,"
 					"i.type,"
