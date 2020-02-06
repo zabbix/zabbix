@@ -53,23 +53,25 @@ function makeStepResult(step) {
 /**
  * Send item preprocessing test details and display results in table.
  *
- * @param string formid  Selector for form to send.
+ * @param {Overlay} overlay
  */
-function itemPreprocessingTest(form) {
-	var form = jQuery(form),
-		url = new Curl(jQuery(form).attr('action')),
+function itemPreprocessingTest(overlay) {
+	var $form = overlay.$dialogue.find('form'),
+		url = new Curl($form.attr('action')),
 		is_prev_enabled = <?= $data['show_prev'] ? 'true' : 'false' ?>;
 
-	jQuery.ajax({
+	overlay.setLoading();
+	overlay.xhr = jQuery.ajax({
 		url: url.getUrl(),
-		data: jQuery(form).serialize(),
+		data: $form.serialize(),
+		complete: function() {
+			overlay.unsetLoading();
+		},
 		beforeSend: function() {
 			jQuery('#value, #time, [name^=macros]').prop('disabled', true);
 			if (is_prev_enabled) {
 				jQuery('#prev_value, #prev_time').prop('disabled', true);
 			}
-
-			jQuery('.submit-test-btn').prop('disabled', true).addClass('is-loading').blur();
 
 			// Clean previous results.
 			jQuery('[id^="preproc-test-step-"][id$="-result"]').empty();
@@ -80,12 +82,12 @@ function itemPreprocessingTest(form) {
 				.empty();
 		},
 		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			processItemPreprocessingTestResults(ret.steps);
 
 			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(form));
+				jQuery(ret.messages).insertBefore($form);
 			}
 
 			if (typeof ret.final !== 'undefined') {
@@ -105,8 +107,6 @@ function itemPreprocessingTest(form) {
 			if (is_prev_enabled) {
 				jQuery('#prev_value, #prev_time').prop('disabled', false);
 			}
-
-			jQuery('.submit-test-btn').prop('disabled', false).removeClass('is-loading');
 		},
 		dataType: 'json',
 		type: 'post'

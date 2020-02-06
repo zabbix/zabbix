@@ -112,7 +112,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return validateMedia("'.$form->getName().'");'
+			'action' => 'return validateMedia(overlay);'
 		]
 	]
 ];

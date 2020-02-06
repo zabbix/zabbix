@@ -539,7 +539,7 @@ static int	DBpatch_4050028(void)
 				{"id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"relative_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"config", "", NULL, NULL, 2048, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"config", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -548,7 +548,12 @@ static int	DBpatch_4050028(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050029(void)
+static int	DBpatch_4050030(void)
+{
+	return SUCCEED;
+}
+
+static int	DBpatch_4050031(void)
 {
 	const ZBX_TABLE table =
 		{"interface_snmp", "interfaceid", 0,
@@ -572,7 +577,7 @@ static int	DBpatch_4050029(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050030(void)
+static int	DBpatch_4050032(void)
 {
 	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -975,7 +980,7 @@ static int	DBpatch_items_type_update(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4050031(void)
+static int	DBpatch_4050033(void)
 {
 	zbx_vector_dbu_interface_t	interfaces;
 	zbx_vector_dbu_snmp_if_t	snmp_ifs, snmp_new_ifs, snmp_def_ifs;
@@ -1026,52 +1031,52 @@ static int	DBpatch_4050031(void)
 	return ret;
 }
 
-static int	DBpatch_4050032(void)
+static int	DBpatch_4050034(void)
 {
 	return DBdrop_field("interface", "bulk");
 }
 
-static int	DBpatch_4050033(void)
+static int	DBpatch_4050035(void)
 {
 	return DBdrop_field("items", "snmp_community");
 }
 
-static int	DBpatch_4050034(void)
+static int	DBpatch_4050036(void)
 {
 	return DBdrop_field("items", "snmpv3_securityname");
 }
 
-static int	DBpatch_4050035(void)
+static int	DBpatch_4050037(void)
 {
 	return DBdrop_field("items", "snmpv3_securitylevel");
 }
 
-static int	DBpatch_4050036(void)
+static int	DBpatch_4050038(void)
 {
 	return DBdrop_field("items", "snmpv3_authpassphrase");
 }
 
-static int	DBpatch_4050037(void)
+static int	DBpatch_4050039(void)
 {
 	return DBdrop_field("items", "snmpv3_privpassphrase");
 }
 
-static int	DBpatch_4050038(void)
+static int	DBpatch_4050040(void)
 {
 	return DBdrop_field("items", "snmpv3_authprotocol");
 }
 
-static int	DBpatch_4050039(void)
+static int	DBpatch_4050041(void)
 {
 	return DBdrop_field("items", "snmpv3_privprotocol");
 }
 
-static int	DBpatch_4050040(void)
+static int	DBpatch_4050042(void)
 {
 	return DBdrop_field("items", "snmpv3_contextname");
 }
 
-static int	DBpatch_4050041(void)
+static int	DBpatch_4050043(void)
 {
 	return DBdrop_field("items", "port");
 }
@@ -1107,7 +1112,6 @@ DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
 DBPATCH_ADD(4050028, 0, 1)
-DBPATCH_ADD(4050029, 0, 1)
 DBPATCH_ADD(4050030, 0, 1)
 DBPATCH_ADD(4050031, 0, 1)
 DBPATCH_ADD(4050032, 0, 1)
@@ -1120,5 +1124,7 @@ DBPATCH_ADD(4050038, 0, 1)
 DBPATCH_ADD(4050039, 0, 1)
 DBPATCH_ADD(4050040, 0, 1)
 DBPATCH_ADD(4050041, 0, 1)
+DBPATCH_ADD(4050042, 0, 1)
+DBPATCH_ADD(4050043, 0, 1)
 
 DBPATCH_END()

@@ -127,8 +127,7 @@
 &#13;
     result = {};&#13;
 }&#13;
-return JSON.stringify(result);&#13;
-</script>
+return JSON.stringify(result);</script>
             <process_tags>YES</process_tags>
             <show_event_menu>YES</show_event_menu>
             <event_menu_url>{EVENT.TAGS.opsgenie_issue_key}</event_menu_url>
@@ -137,9 +136,8 @@ return JSON.stringify(result);&#13;
   &#13;
 Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;
 Add dedicated user with media type &quot;Opsgenie&quot;.&#13;
-Change the values of the variables url (https://api.opsgenie.com/v2/alerts or https://api.eu.opsgenie.com/v2/alerts) , &#13;
-web (for example, https://myzabbix.app.opsgenie.com), token.&#13;
-</description>
+Change the values of the variables url (https://api.opsgenie.com/v2/alerts or https://api.eu.opsgenie.com/v2/alerts),&#13;
+web (for example, https://myzabbix.app.opsgenie.com), token.</description>
         </media_type>
     </media_types>
 </zabbix_export>

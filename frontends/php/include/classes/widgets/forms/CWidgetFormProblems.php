@@ -89,7 +89,7 @@ class CWidgetFormProblems extends CWidgetForm {
 
 		$this->fields[$field_severities->getName()] = $field_severities;
 
-		// Tag evalype (And/Or).
+		// Tag evaltype (And/Or).
 		$field_evaltype = (new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
 			TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 			TAG_EVAL_TYPE_OR => _('Or')

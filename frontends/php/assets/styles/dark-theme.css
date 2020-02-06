@@ -2966,6 +2966,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 50px; }
   .overlay-dialogue.modal-popup {
     max-width: 1024px; }
+    .overlay-dialogue.modal-popup.modal-popup-medium {
+      min-width: 450px; }
     .overlay-dialogue.modal-popup.modal-popup-generic {
       min-width: 650px; }
   .overlay-dialogue .hintbox-scrollable {
@@ -2984,7 +2986,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
-    z-index: 1000; }
+    z-index: 2; }
   .overlay-dialogue .list-table {
     white-space: normal;
     border: 0; }
@@ -3373,7 +3375,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     left: 0;
     right: 0;
     top: 0;
-    z-index: 999; }
+    z-index: 1; }
 
 .svg-graph {
   display: block; }
@@ -4101,7 +4103,7 @@ td[class] + td.disaster-bg {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1; }
+    z-index: 3; }
   .is-loading::after {
     background-color: rgba(43, 43, 43, 0.8);
     border: 2px solid #ccd5d9;
@@ -4117,7 +4119,7 @@ td[class] + td.disaster-bg {
     left: 0;
     right: 0;
     animation: is-loading-kf .6s infinite linear;
-    z-index: 1;
+    z-index: 3;
     content: ''; }
   .is-loading.is-loading-fadein::before {
     opacity: 0;
@@ -4151,8 +4153,10 @@ span.is-loading {
   margin: calc(.25rem + 1px); }
 
 .overlay-dialogue.modal .overlay-dialogue-body.is-loading {
-  position: relative;
   overflow: hidden; }
+  .overlay-dialogue.modal .overlay-dialogue-body.is-loading:before {
+    top: 42px;
+    bottom: 42px; }
 
 .menu-popup-preloader {
   background: #0e1012;

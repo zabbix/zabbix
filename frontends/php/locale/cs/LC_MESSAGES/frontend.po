@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-26 01:45+0200\n"
+"POT-Creation-Date: 2020-02-02 01:45+0200\n"
 "PO-Revision-Date: 2019-05-06 14:01+0300\n"
 "Last-Translator: martinds <kotyk@datasys.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -23,8 +23,8 @@ msgstr ""
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
 #: include/classes/import/validators/C42XmlValidator.php:1350
-#: include/classes/import/validators/C44XmlValidator.php:1755
-#: include/classes/import/validators/C50XmlValidator.php:1788
+#: include/classes/import/validators/C44XmlValidator.php:1757
+#: include/classes/import/validators/C50XmlValidator.php:1790
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr "\"%1$s\" je očekávána"
@@ -235,7 +235,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, vybrané"
 
-#: app/views/layout.htmlpage.php:106 include/page_header.php:284
+#: app/views/layout.htmlpage.php:96 include/page_header.php:266
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -250,6 +250,11 @@ msgid_plural "%d devices"
 msgstr[0] "%d zařízení"
 msgstr[1] "%d zařízení"
 msgstr[2] "%d zařízení"
+
+#: include/classes/core/CModuleManager.php:228
+#, c-format
+msgid "%s - thrown by module located at %s."
+msgstr ""
 
 #: include/users.inc.php:158
 #, c-format
@@ -343,7 +348,7 @@ msgstr "<sub-menu/sub-menu/...>skript"
 msgid "ADD OVERRIDE"
 msgstr "PŘIDEJ PŘEPIS"
 
-#: app/views/popup.discovery.check.php:100
+#: app/views/popup.discovery.check.php:105
 #: include/views/configuration.host.discovery.edit.php:461
 #: include/views/configuration.item.edit.php:555
 #: include/views/configuration.item.edit.php:562
@@ -495,6 +500,11 @@ msgstr "Pro akci \"%1$s\" není definována operace."
 msgid "Action added"
 msgstr "Akce byla přidána"
 
+#: include/classes/core/ZBase.php:451
+#, c-format
+msgid "Action class %s must extend %s class."
+msgstr ""
+
 #: actionconf.php:204
 msgid "Action deleted"
 msgstr "Akce byla smazána"
@@ -514,7 +524,7 @@ msgstr[1] "Akce zapnuty"
 msgstr[2] "Akce zapnuty"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:168
-#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:168
+#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:146
 #: include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:21
 msgid "Action log"
@@ -532,8 +542,8 @@ msgstr "Akce byla aktualizována"
 #: include/classes/screens/CScreenProblem.php:934
 #: include/classes/screens/CScreenProblem.php:1189
 #: include/classes/screens/CScreenProblem.php:1250 include/events.inc.php:256
-#: include/forms.inc.php:1249 include/menu.inc.php:219
-#: include/views/configuration.action.edit.php:24
+#: include/forms.inc.php:1249 include/menu.inc.php:123
+#: include/menu.inc.php:152 include/views/configuration.action.edit.php:24
 #: include/views/configuration.discovery.edit.php:70
 #: include/views/monitoring.screen.list.php:85
 #: include/views/monitoring.slideconf.list.php:71
@@ -598,7 +608,7 @@ msgstr "Aktivní do"
 #: app/views/monitoring.problem.view.php:209
 #: app/views/monitoring.problem.view.php:256
 #: app/views/popup.condition.common.php:663
-#: app/views/popup.discovery.check.php:123 app/views/popup.httpstep.php:69
+#: app/views/popup.discovery.check.php:128 app/views/popup.httpstep.php:69
 #: app/views/popup.httpstep.php:95 app/views/popup.httpstep.php:119
 #: app/views/popup.httpstep.php:138 app/views/popup.httpstep.php:177
 #: app/views/popup.maintenance.period.php:164 app/views/popup.media.php:48
@@ -688,7 +698,7 @@ msgstr "Aktivní do"
 #: include/views/configuration.triggers.list.php:129
 #: include/views/configuration.triggers.massupdate.php:80
 #: include/views/configuration.triggers.massupdate.php:135
-#: include/views/js/configuration.action.edit.js.php:281
+#: include/views/js/configuration.action.edit.js.php:283
 #: include/views/js/configuration.correlation.edit.js.php:47
 #: include/views/js/configuration.discovery.edit.js.php:203
 #: include/views/js/monitoring.screen.edit.js.php:83
@@ -792,7 +802,7 @@ msgstr "Nastav interval obnovy prvků"
 msgid "Admin"
 msgstr "Admin"
 
-#: include/menu.inc.php:237
+#: include/menu.inc.php:156
 msgid "Administration"
 msgstr "Administrace"
 
@@ -985,6 +995,7 @@ msgid "And/Or"
 msgstr "A/Nebo"
 
 #: app/views/administration.mediatype.list.php:46
+#: app/views/administration.module.list.php:52
 #: app/views/administration.proxy.list.php:45
 #: app/views/administration.usergroup.list.php:47
 #: app/views/administration.user.list.php:63
@@ -1234,7 +1245,8 @@ msgstr "Interval pokusu"
 msgid "Attempts"
 msgstr "Pokusy"
 
-#: app/views/administration.housekeeping.edit.php:89 include/menu.inc.php:163
+#: app/views/administration.housekeeping.edit.php:89 include/menu.inc.php:143
+#: include/menu.inc.php:146
 msgid "Audit"
 msgstr "Audit"
 
@@ -1257,7 +1269,7 @@ msgstr "Srpen"
 
 #: app/views/administration.authentication.edit.php:137
 #: app/views/administration.authentication.edit.php:146
-#: app/views/administration.mediatype.edit.php:78 include/menu.inc.php:274
+#: app/views/administration.mediatype.edit.php:78 include/menu.inc.php:171
 #: include/views/configuration.httpconf.edit.php:230
 #: include/views/configuration.httpconf.list.php:92
 msgid "Authentication"
@@ -1287,7 +1299,7 @@ msgstr "Autentizační metoda"
 msgid "Authentication method changed"
 msgstr "Metoda ověření byla změněna"
 
-#: app/views/popup.discovery.check.php:91
+#: app/views/popup.discovery.check.php:96
 #: include/views/configuration.host.discovery.edit.php:453
 #: include/views/configuration.item.edit.php:544
 #: include/views/configuration.item.massupdate.php:227
@@ -1296,7 +1308,7 @@ msgstr "Metoda ověření byla změněna"
 msgid "Authentication passphrase"
 msgstr "Autentizační přístupové heslo"
 
-#: app/views/popup.discovery.check.php:84
+#: app/views/popup.discovery.check.php:89
 #: include/views/configuration.host.discovery.edit.php:446
 #: include/views/configuration.item.edit.php:539
 #: include/views/configuration.item.massupdate.php:215
@@ -1308,6 +1320,11 @@ msgstr "Autentizační protokol"
 #: app/controllers/CControllerAuthenticationUpdate.php:239
 msgid "Authentication settings updated"
 msgstr "Nastavení ověření bylo aktualizováno"
+
+#: app/views/administration.module.edit.php:40
+#: app/views/administration.module.list.php:76
+msgid "Author"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:157
@@ -1349,7 +1366,7 @@ msgstr "Automatický výběr ikony"
 #: app/views/administration.autoreg.edit.php:25
 #: app/views/administration.autoreg.edit.php:85
 #: app/views/popup.mediatype.message.php:54 include/audit.inc.php:57
-#: include/classes/helpers/CMediatypeHelper.php:119 include/html.inc.php:812
+#: include/classes/helpers/CMediatypeHelper.php:119 include/html.inc.php:816
 msgid "Autoregistration"
 msgstr ""
 
@@ -1370,7 +1387,8 @@ msgstr ""
 msgid "Availability"
 msgstr "Dostupnost"
 
-#: include/menu.inc.php:154 report2.php:25 report2.php:159
+#: include/menu.inc.php:81 include/menu.inc.php:140 report2.php:25
+#: report2.php:159
 msgid "Availability report"
 msgstr "Protokol dostupnosti"
 
@@ -1442,7 +1460,7 @@ msgstr "Bind heslo"
 msgid "Blocked"
 msgstr "Blokovaný"
 
-#: include/classes/core/ZBase.php:267
+#: include/classes/core/ZBase.php:307
 msgid "Blue"
 msgstr "Modrá"
 
@@ -1585,6 +1603,7 @@ msgstr "Nemůže být odstraněno"
 #: app/views/administration.image.edit.php:81
 #: app/views/administration.image.edit.php:92
 #: app/views/administration.mediatype.edit.php:336
+#: app/views/administration.module.edit.php:61
 #: app/views/administration.proxy.edit.php:122
 #: app/views/administration.regex.edit.php:145
 #: app/views/administration.regex.edit.php:155
@@ -1682,7 +1701,7 @@ msgstr "Není možné přidat prototyp hosta"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:107
-#: app/controllers/CControllerImageCreate.php:135
+#: app/controllers/CControllerImageCreate.php:133
 msgid "Cannot add image"
 msgstr "Nelze přidat obrázek"
 
@@ -1716,6 +1735,14 @@ msgstr "Není možná přidat složku map pro mapu \"%1$s\" kvůli cyklickému o
 #: app/controllers/CControllerMediatypeCreate.php:165
 msgid "Cannot add media type"
 msgstr "Nelze přidat typ média"
+
+#: app/controllers/CControllerModuleScan.php:107
+#, c-format
+msgid "Cannot add module: %s."
+msgid_plural "Cannot add modules: %s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -1910,7 +1937,7 @@ msgstr "Nelze vytvořit závislost prototypu spouštěče na sobě samém."
 msgid "Cannot create discovery rule"
 msgstr "Nelze vytvořit pravidlo nálezu"
 
-#: app/controllers/CControllerIconMapCreate.php:53
+#: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Nelze vytvořit mapu ikon"
 
@@ -2027,11 +2054,11 @@ msgstr "Není možné smazat prototyp hosta."
 msgid "Cannot delete host prototypes"
 msgstr "Není možné smazat prototypy hostů"
 
-#: app/controllers/CControllerIconMapDelete.php:67
+#: app/controllers/CControllerIconMapDelete.php:68
 msgid "Cannot delete icon map"
 msgstr "Není možné smazat mapu ikon"
 
-#: app/controllers/CControllerImageDelete.php:76
+#: app/controllers/CControllerImageDelete.php:74
 msgid "Cannot delete image"
 msgstr "Nelze smazat obrázek"
 
@@ -2065,6 +2092,14 @@ msgid_plural "Cannot delete media types"
 msgstr[0] "Není možné smazat typ média"
 msgstr[1] "Není možné smazat typy médií"
 msgstr[2] "Není možné smazat typy médií"
+
+#: app/controllers/CControllerModuleScan.php:122
+#, c-format
+msgid "Cannot delete module: %s."
+msgid_plural "Cannot delete modules: %s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: sysmaps.php:259
 msgid "Cannot delete network map"
@@ -2247,6 +2282,14 @@ msgstr[0] "Není možné vypnout typ média"
 msgstr[1] "Není možné vypnout typ média"
 msgstr[2] "Není možné vypnout typ média"
 
+#: app/controllers/CControllerModuleUpdate.php:159
+#, c-format
+msgid "Cannot disable module: %s."
+msgid_plural "Cannot disable modules: %s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: triggers.php:553
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
@@ -2311,6 +2354,14 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Není možné povolit typ média"
 msgstr[1] "Není možné povolit typy médií"
 msgstr[2] "Není možné povolit typy médií"
+
+#: app/controllers/CControllerModuleUpdate.php:154
+#, c-format
+msgid "Cannot enable module: %s."
+msgid_plural "Cannot enable modules: %s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: triggers.php:552
 msgid "Cannot enable trigger"
@@ -2478,7 +2529,7 @@ msgstr[2] "Není možné importovat šablonu \"%1$s\", připojené šablony \"%2
 msgid "Cannot include JS file \"%s\"."
 msgstr "Není možné vložit JS soubor \"%s\"."
 
-#: include/classes/mvc/CView.php:201
+#: include/classes/mvc/CView.php:194
 #, c-format
 msgid "Cannot include view file \"%s\"."
 msgstr "Není možné vložit view soubor \"%s\"."
@@ -2495,6 +2546,15 @@ msgstr "Není možné nalinkovat šablonu"
 #: include/classes/api/services/CTemplate.php:943
 msgid "Cannot link template."
 msgstr "Není možné nalinkovat šablonu."
+
+#: app/controllers/CControllerModuleEdit.php:106
+#: include/classes/core/ZBase.php:629
+#, c-format
+msgid "Cannot load module at: %s."
+msgid_plural "Cannot load modules at: %s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
@@ -2790,11 +2850,11 @@ msgid "Cannot update authentication"
 msgstr "Nejde aktualizovat ověření"
 
 #: app/controllers/CControllerAutoregUpdate.php:41
-#: app/controllers/CControllerAutoregUpdate.php:74
+#: app/controllers/CControllerAutoregUpdate.php:73
 #: app/controllers/CControllerGuiUpdate.php:45
 #: app/controllers/CControllerGuiUpdate.php:84
 #: app/controllers/CControllerHousekeepingUpdate.php:55
-#: app/controllers/CControllerHousekeepingUpdate.php:124
+#: app/controllers/CControllerHousekeepingUpdate.php:123
 #: app/controllers/CControllerMiscConfigUpdate.php:43
 #: app/controllers/CControllerMiscConfigUpdate.php:80
 #: app/controllers/CControllerTrigDisplayUpdate.php:47
@@ -2802,7 +2862,7 @@ msgstr "Nejde aktualizovat ověření"
 #: app/controllers/CControllerTrigSeverityUpdate.php:46
 #: app/controllers/CControllerTrigSeverityUpdate.php:83
 #: app/controllers/CControllerWorkingTimeUpdate.php:37
-#: app/controllers/CControllerWorkingTimeUpdate.php:63
+#: app/controllers/CControllerWorkingTimeUpdate.php:62
 msgid "Cannot update configuration"
 msgstr "Není možné aktualizovat nastavení"
 
@@ -2865,13 +2925,13 @@ msgstr[2] "Nelze aktualizovat host prototyp"
 msgid "Cannot update hosts"
 msgstr "Nelze aktualizovat hosty"
 
-#: app/controllers/CControllerIconMapUpdate.php:75
+#: app/controllers/CControllerIconMapUpdate.php:77
 msgid "Cannot update icon map"
 msgstr "Nelze aktualizovat mapu ikon"
 
 #: app/controllers/CControllerImageUpdate.php:43
-#: app/controllers/CControllerImageUpdate.php:111
-#: app/controllers/CControllerImageUpdate.php:149
+#: app/controllers/CControllerImageUpdate.php:110
+#: app/controllers/CControllerImageUpdate.php:146
 msgid "Cannot update image"
 msgstr "Nelze upravit obrázek"
 
@@ -3160,7 +3220,7 @@ msgstr "Kontrola předpokladů"
 msgid "Check the key, please. Default example was passed."
 msgstr "Zkontrolujte prosím klíč. Byl zadaný předvolený klíč z příkladu."
 
-#: app/views/popup.discovery.check.php:37
+#: app/views/popup.discovery.check.php:41
 msgid "Check type"
 msgstr "Typ kontroly"
 
@@ -3243,6 +3303,11 @@ msgstr "Kruhový odkaz v šablonách: %1$s."
 #: include/classes/api/services/CHostBase.php:257
 msgid "Circular template linkage is not allowed."
 msgstr "Kruhové odkazování šablon není povolené."
+
+#: include/classes/core/ZBase.php:445
+#, c-format
+msgid "Class %s not found for action %s."
+msgstr ""
 
 #: jsLoader.php:219
 msgid "Clear"
@@ -3398,6 +3463,16 @@ msgstr "Celkový pohled"
 msgid "Comparing several triggers with \"and\" is not allowed."
 msgstr "Porovnání více spouštěčů pomocí \"and\" není dovoleno."
 
+#: include/classes/core/CComponentRegistry.php:53
+#, c-format
+msgid "Component %s already registered."
+msgstr ""
+
+#: include/classes/core/CComponentRegistry.php:37
+#, c-format
+msgid "Component %s is not registered."
+msgstr ""
+
 #: app/views/administration.proxy.list.php:71
 msgid "Compression"
 msgstr "Komprimace"
@@ -3453,8 +3528,8 @@ msgstr "Podmínky"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "Podmínky duplikáty pro korelaci \"%1$s\"."
 
-#: include/menu.inc.php:179 include/views/inventory.host.view.php:180
-#: jsLoader.php:263
+#: include/menu.inc.php:105 include/menu.inc.php:151
+#: include/views/inventory.host.view.php:180 jsLoader.php:263
 msgid "Configuration"
 msgstr "Nastavení"
 
@@ -3624,13 +3699,13 @@ msgstr "Nastavení monitorování web prezentací"
 msgid "Configuration of working time"
 msgstr "Nastavení času pracovní doby"
 
-#: app/controllers/CControllerAutoregUpdate.php:70
+#: app/controllers/CControllerAutoregUpdate.php:69
 #: app/controllers/CControllerGuiUpdate.php:80
-#: app/controllers/CControllerHousekeepingUpdate.php:120
+#: app/controllers/CControllerHousekeepingUpdate.php:119
 #: app/controllers/CControllerMiscConfigUpdate.php:77
 #: app/controllers/CControllerTrigDisplayUpdate.php:86
 #: app/controllers/CControllerTrigSeverityUpdate.php:79
-#: app/controllers/CControllerWorkingTimeUpdate.php:59
+#: app/controllers/CControllerWorkingTimeUpdate.php:58
 msgid "Configuration updated"
 msgstr "Nastavení bylo aktualizováno"
 
@@ -3761,6 +3836,7 @@ msgstr "Obsahuje"
 #: app/views/administration.iconmap.list.php:32
 #: app/views/administration.image.list.php:57
 #: app/views/administration.mediatype.list.php:33
+#: app/views/administration.module.list.php:37
 #: app/views/administration.proxy.list.php:32
 #: app/views/administration.regex.list.php:36
 #: app/views/administration.script.list.php:32
@@ -3815,7 +3891,7 @@ msgstr ""
 msgid "Content menu"
 msgstr "Nabídka obsahu"
 
-#: app/views/popup.discovery.check.php:65
+#: app/views/popup.discovery.check.php:69
 #: include/views/configuration.host.discovery.edit.php:419
 #: include/views/configuration.item.edit.php:485
 #: include/views/configuration.item.massupdate.php:190
@@ -4205,7 +4281,7 @@ msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr "DD.MM.YY"
 
-#: app/views/popup.discovery.check.php:99
+#: app/views/popup.discovery.check.php:104
 #: include/views/configuration.host.discovery.edit.php:460
 #: include/views/configuration.item.edit.php:554
 #: include/views/configuration.item.edit.php:561
@@ -4241,12 +4317,12 @@ msgstr "Jméno DNS"
 msgid "Daily"
 msgstr "Denně"
 
-#: include/classes/core/ZBase.php:268
+#: include/classes/core/ZBase.php:308
 msgid "Dark"
 msgstr "Tmavý"
 
 #: app/controllers/CControllerDashboardView.php:160 include/audit.inc.php:56
-#: include/menu.inc.php:46
+#: include/menu.inc.php:28
 msgid "Dashboard"
 msgstr "Řídící panel"
 
@@ -4401,7 +4477,7 @@ msgstr "Datum koupě HW"
 msgid "Day"
 msgstr "Den"
 
-#: include/func.inc.php:2519
+#: include/func.inc.php:2523
 msgid "Day before yesterday"
 msgstr "Předevčírem"
 
@@ -4420,7 +4496,7 @@ msgstr "Den v týdnu"
 msgid "Days"
 msgstr "Dní"
 
-#: include/html.inc.php:1006 include/html.inc.php:1010
+#: include/html.inc.php:1011 include/html.inc.php:1015
 msgid "Debug"
 msgstr "Ladící výstup"
 
@@ -4883,6 +4959,8 @@ msgstr "Stav nasazení"
 
 #: app/views/administration.macros.edit.php:32
 #: app/views/administration.mediatype.edit.php:254
+#: app/views/administration.module.edit.php:41
+#: app/views/administration.module.list.php:77
 #: app/views/administration.proxy.edit.php:78
 #: app/views/administration.script.edit.php:68
 #: app/views/hostmacros.list.html.php:49 app/views/popup.triggerwizard.php:125
@@ -4938,12 +5016,17 @@ msgstr "Jedinečný identifikátor zařízení"
 msgid "Dimension (cols x rows)"
 msgstr "Rozměr (soupce x řádky)"
 
+#: app/views/administration.module.edit.php:42
+msgid "Directory"
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:595
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Velikost adresáře (v bajtech). Vrací celé číslo"
 
 #: app/views/administration.mediatype.list.php:158
+#: app/views/administration.module.list.php:124
 #: app/views/administration.usergroup.list.php:206
 #: include/views/administration.auditlogs.list.php:50
 #: include/views/configuration.action.list.php:146
@@ -5020,6 +5103,10 @@ msgstr "Zakázat vybrané položky?"
 msgid "Disable selected media types?"
 msgstr "Zakázat označené media typy?"
 
+#: app/views/administration.module.list.php:124
+msgid "Disable selected modules?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:334
 msgid "Disable selected triggers?"
 msgstr "Zakázat vybrané spouštěče?"
@@ -5031,6 +5118,8 @@ msgstr "Zakázat označené scénáře?"
 #: app/views/administration.mediatype.list.php:48
 #: app/views/administration.mediatype.list.php:126
 #: app/views/administration.miscconfig.edit.php:49
+#: app/views/administration.module.list.php:54
+#: app/views/administration.module.list.php:101
 #: app/views/administration.user.edit.php:224
 #: app/views/administration.usergroup.list.php:49
 #: app/views/administration.usergroup.list.php:87
@@ -5097,7 +5186,7 @@ msgstr "Nalezené položky"
 #: app/views/search.php:78 app/views/search.php:79 app/views/search.php:196
 #: app/views/search.php:241 app/views/search.php:242
 #: include/classes/helpers/CMediatypeHelper.php:93 include/forms.inc.php:322
-#: include/forms.inc.php:713 include/menu.inc.php:100 include/menu.inc.php:228
+#: include/forms.inc.php:713 include/menu.inc.php:95 include/menu.inc.php:126
 #: include/views/configuration.host.list.php:177
 #: include/views/configuration.host.list.php:409
 #: include/views/configuration.template.list.php:144
@@ -5659,6 +5748,7 @@ msgid "Empty screen ID."
 msgstr "Prázdné ID obrazovky."
 
 #: app/views/administration.mediatype.list.php:157
+#: app/views/administration.module.list.php:123
 #: app/views/administration.usergroup.list.php:200
 #: include/views/administration.auditlogs.list.php:49
 #: include/views/configuration.action.list.php:145
@@ -5753,6 +5843,10 @@ msgstr "Povolit vybrané položky?"
 msgid "Enable selected media types?"
 msgstr "Povolit označené typy médií?"
 
+#: app/views/administration.module.list.php:123
+msgid "Enable selected modules?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:333
 msgid "Enable selected triggers?"
 msgstr "Povolit vybrané spouštěče?"
@@ -5772,6 +5866,9 @@ msgstr "Zapnout pasti"
 #: app/views/administration.mediatype.edit.php:257
 #: app/views/administration.mediatype.list.php:47
 #: app/views/administration.mediatype.list.php:122
+#: app/views/administration.module.edit.php:45
+#: app/views/administration.module.list.php:53
+#: app/views/administration.module.list.php:95
 #: app/views/administration.user.edit.php:218
 #: app/views/administration.usergroup.edit.php:71
 #: app/views/administration.usergroup.edit.php:84
@@ -5877,7 +5974,7 @@ msgstr "ID události"
 msgid "Event acknowledged"
 msgstr "Událost potvrzena"
 
-#: include/audit.inc.php:55 include/menu.inc.php:224
+#: include/audit.inc.php:55 include/menu.inc.php:152
 #: include/views/configuration.correlation.list.php:23
 msgid "Event correlation"
 msgstr "Korelace událostí"
@@ -6243,7 +6340,7 @@ msgstr "Formát souboru není podporovaný."
 msgid "File is too big, max upload size is %1$s bytes."
 msgstr "Soubor je příliš velký, maximální velikost je %1$s bytů."
 
-#: include/classes/mvc/CView.php:139
+#: include/classes/mvc/CView.php:132
 #, c-format
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
 msgstr "Soubor poskytnutý pro náhled neexistuje. Nenašel jsem \"%s\"."
@@ -6284,6 +6381,7 @@ msgid "Filled region"
 msgstr "Oblast"
 
 #: app/views/administration.mediatype.list.php:38
+#: app/views/administration.module.list.php:44
 #: app/views/administration.proxy.list.php:37
 #: app/views/administration.script.list.php:37
 #: app/views/administration.usergroup.list.php:39
@@ -6471,7 +6569,7 @@ msgid "GSM modem"
 msgstr "GSM modem"
 
 #: app/views/administration.gui.edit.php:23
-#: app/views/administration.gui.edit.php:59 include/html.inc.php:811
+#: app/views/administration.gui.edit.php:59 include/html.inc.php:815
 msgid "GUI"
 msgstr "GUI"
 
@@ -6479,7 +6577,7 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "GUI přístup vypnut."
 
-#: include/menu.inc.php:244
+#: include/menu.inc.php:159
 msgid "General"
 msgstr "Obecné"
 
@@ -6754,7 +6852,7 @@ msgstr "Graf s totožným jménem, ale jiného typu již existuje."
 #: app/views/search.php:37 app/views/search.php:74 app/views/search.php:75
 #: app/views/search.php:112 app/views/search.php:137 app/views/search.php:179
 #: app/views/search.php:196 app/views/search.php:233 app/views/search.php:234
-#: graphs.php:418 include/html.inc.php:406 include/menu.inc.php:75
+#: graphs.php:418 include/html.inc.php:406 include/menu.inc.php:47
 #: include/views/configuration.graph.edit.php:26
 #: include/views/configuration.graph.list.php:39
 #: include/views/configuration.host.discovery.list.php:54
@@ -6991,7 +7089,7 @@ msgstr "Z hexadecimální do desítkové"
 msgid "Hidden"
 msgstr "Skryta"
 
-#: include/html.inc.php:1010
+#: include/html.inc.php:1015
 msgid "Hide debug"
 msgstr "Skrýt debug"
 
@@ -7015,11 +7113,11 @@ msgstr "Hierarchie"
 msgid "High"
 msgstr "Závažný"
 
-#: include/classes/core/ZBase.php:270
+#: include/classes/core/ZBase.php:310
 msgid "High-contrast dark"
 msgstr "Vysoký tmavý kontrast"
 
-#: include/classes/core/ZBase.php:269
+#: include/classes/core/ZBase.php:309
 msgid "High-contrast light"
 msgstr "Vysoký světlý kontrast"
 
@@ -7073,6 +7171,10 @@ msgstr "Historie událostí"
 #: include/views/configuration.item.prototype.massupdate.php:400 items.php:65
 msgid "History storage period"
 msgstr "Období uložení historie"
+
+#: app/views/administration.module.edit.php:44
+msgid "Homepage"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:49
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:96
@@ -7276,7 +7378,7 @@ msgstr "Skupina hostů s ID \"%1$s\" není dostupná."
 #: include/classes/widgets/forms/CWidgetFormProblems.php:48
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:46
 #: include/classes/widgets/forms/CWidgetFormWeb.php:31
-#: include/forms.inc.php:176 include/menu.inc.php:188
+#: include/forms.inc.php:176 include/menu.inc.php:108
 #: include/views/configuration.copy.elements.php:57
 #: include/views/configuration.hostgroups.edit.php:22
 #: include/views/configuration.hostgroups.list.php:23
@@ -7461,8 +7563,8 @@ msgstr "Host se stejným viditelným jménem \"%s\" již existuje."
 #: include/classes/widgets/forms/CWidgetFormProblems.php:66
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:222 include/forms.inc.php:673
-#: include/items.inc.php:1182 include/menu.inc.php:136
-#: include/menu.inc.php:200 include/triggers.inc.php:950
+#: include/items.inc.php:1182 include/menu.inc.php:72 include/menu.inc.php:114
+#: include/triggers.inc.php:950
 #: include/views/configuration.copy.elements.php:58
 #: include/views/configuration.graph.list.php:88
 #: include/views/configuration.host.discovery.list.php:55
@@ -7498,7 +7600,7 @@ msgid "Hours"
 msgstr "Hodin"
 
 #: app/views/administration.housekeeping.edit.php:25
-#: app/views/administration.housekeeping.edit.php:154 include/html.inc.php:813
+#: app/views/administration.housekeeping.edit.php:154 include/html.inc.php:817
 msgid "Housekeeping"
 msgstr "Údržba"
 
@@ -7631,7 +7733,7 @@ msgstr "Mapová ikona \"%1$s\" nemůže byt smazaná. Je použita v mapě \"%2$s
 msgid "Icon map \"%s\" already exists."
 msgstr "Mapová ikona \"%s\" již existuje."
 
-#: app/controllers/CControllerIconMapCreate.php:48
+#: app/controllers/CControllerIconMapCreate.php:49
 msgid "Icon map created"
 msgstr "Mapová ikona byla vytvořena"
 
@@ -7645,7 +7747,7 @@ msgstr "Mapová ikona byla aktualizována"
 
 #: app/views/administration.iconmap.edit.php:25
 #: app/views/administration.iconmap.list.php:23 include/audit.inc.php:54
-#: include/html.inc.php:815
+#: include/html.inc.php:819
 msgid "Icon mapping"
 msgstr "Mapování ikon"
 
@@ -7657,6 +7759,21 @@ msgstr "Ikona s ID \"%1$s\" není dostupná."
 #: include/views/js/monitoring.sysmaps.js.php:216
 msgid "Icons"
 msgstr "Ikony"
+
+#: include/classes/core/CModuleManager.php:155
+#, c-format
+msgid "Identical ID (%s) is used by modules located at %s."
+msgstr ""
+
+#: include/classes/core/CModuleManager.php:173
+#, c-format
+msgid "Identical actions are used by modules located at %s."
+msgstr ""
+
+#: include/classes/core/CModuleManager.php:162
+#, c-format
+msgid "Identical namespace (%s) is used by modules located at %s."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:571
@@ -7687,7 +7804,7 @@ msgstr "Obrázek \"%1$s\" již existuje."
 msgid "Image added"
 msgstr "Obrázek byl přidán"
 
-#: app/controllers/CControllerImageDelete.php:68
+#: app/controllers/CControllerImageDelete.php:67
 msgid "Image deleted"
 msgstr "Obrázek byl smazán"
 
@@ -7706,12 +7823,12 @@ msgstr "Chyba načtení obrázku [%1$s] v [%2$s]."
 msgid "Image size must be less than %s."
 msgstr "Velikost obrázku musí být menší než %s."
 
-#: app/controllers/CControllerImageUpdate.php:139
+#: app/controllers/CControllerImageUpdate.php:137
 msgid "Image updated"
 msgstr "Obrázek byl aktualizován"
 
 #: app/views/administration.image.edit.php:25
-#: app/views/administration.image.list.php:24 include/html.inc.php:814
+#: app/views/administration.image.list.php:24 include/html.inc.php:818
 #: include/views/conf.import.php:46
 msgid "Images"
 msgstr "Obrázky"
@@ -9294,6 +9411,7 @@ msgstr "Neplatný počet parametrů."
 #: include/classes/api/services/CItemGeneral.php:2328
 #: include/classes/api/services/CItemGeneral.php:2338
 #: include/classes/api/services/CItemGeneral.php:2367
+#: include/classes/api/services/CModule.php:291
 #: include/classes/api/services/CUser.php:663
 #: include/classes/api/services/CUser.php:674
 #: include/classes/validators/CApiInputValidator.php:254
@@ -9390,7 +9508,7 @@ msgid "Invalid second parameter."
 msgstr "Neplatný druhý parametr."
 
 #: include/classes/export/CConfigurationExportBuilder.php:76
-#: include/classes/export/CConfigurationExportBuilder.php:103
+#: include/classes/export/CConfigurationExportBuilder.php:104
 #: include/classes/import/converters/CConstantImportConverter.php:60
 #: include/classes/import/readers/CXmlImportReader.php:77
 #: include/classes/import/readers/CXmlImportReader.php:116
@@ -9408,20 +9526,20 @@ msgstr "Neplatný druhý parametr."
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
 #: include/classes/import/validators/C42XmlValidator.php:1350
-#: include/classes/import/validators/C44XmlValidator.php:1755
-#: include/classes/import/validators/C44XmlValidator.php:2037
-#: include/classes/import/validators/C44XmlValidator.php:2171
-#: include/classes/import/validators/C44XmlValidator.php:2191
-#: include/classes/import/validators/C44XmlValidator.php:2215
-#: include/classes/import/validators/C44XmlValidator.php:2257
-#: include/classes/import/validators/C44XmlValidator.php:2318
-#: include/classes/import/validators/C50XmlValidator.php:1788
-#: include/classes/import/validators/C50XmlValidator.php:2070
-#: include/classes/import/validators/C50XmlValidator.php:2209
-#: include/classes/import/validators/C50XmlValidator.php:2229
-#: include/classes/import/validators/C50XmlValidator.php:2253
-#: include/classes/import/validators/C50XmlValidator.php:2295
-#: include/classes/import/validators/C50XmlValidator.php:2356
+#: include/classes/import/validators/C44XmlValidator.php:1757
+#: include/classes/import/validators/C44XmlValidator.php:2039
+#: include/classes/import/validators/C44XmlValidator.php:2149
+#: include/classes/import/validators/C44XmlValidator.php:2169
+#: include/classes/import/validators/C44XmlValidator.php:2193
+#: include/classes/import/validators/C44XmlValidator.php:2235
+#: include/classes/import/validators/C44XmlValidator.php:2296
+#: include/classes/import/validators/C50XmlValidator.php:1790
+#: include/classes/import/validators/C50XmlValidator.php:2072
+#: include/classes/import/validators/C50XmlValidator.php:2182
+#: include/classes/import/validators/C50XmlValidator.php:2202
+#: include/classes/import/validators/C50XmlValidator.php:2226
+#: include/classes/import/validators/C50XmlValidator.php:2268
+#: include/classes/import/validators/C50XmlValidator.php:2329
 #: include/classes/import/validators/CXmlValidatorGeneral.php:98
 #: include/classes/import/validators/CXmlValidatorGeneral.php:117
 #: include/classes/import/validators/CXmlValidatorGeneral.php:136
@@ -9462,7 +9580,7 @@ msgstr "Neplatná perioda pro ukládání dat sezení uživatele: %1$s."
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "Neplatné view jméno pro \"%s\". Povolené znaky: \"a-z\" a \".\"."
 
-#: include/menu.inc.php:126 include/views/configuration.host.edit.php:782
+#: include/menu.inc.php:66 include/views/configuration.host.edit.php:782
 #: include/views/configuration.host.massupdate.php:303
 #: include/views/configuration.host.prototype.edit.php:368
 msgid "Inventory"
@@ -9886,7 +10004,7 @@ msgstr ""
 #: app/controllers/CControllerPopupGeneric.php:211
 #: app/controllers/CControllerPopupGeneric.php:222
 #: app/controllers/CControllerPopupGeneric.php:274
-#: app/views/popup.discovery.check.php:46 disc_prototypes.php:48
+#: app/views/popup.discovery.check.php:50 disc_prototypes.php:48
 #: host_discovery.php:50 include/forms.inc.php:315
 #: include/views/configuration.host.discovery.edit.php:67
 #: include/views/configuration.host.discovery.list.php:56
@@ -9986,7 +10104,7 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Poslední"
 
-#: include/func.inc.php:2572
+#: include/func.inc.php:2576
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -9994,7 +10112,7 @@ msgstr[0] "Poslední %1$d den"
 msgstr[1] "Posledních %1$d dnů"
 msgstr[2] "Posledních %1$d dnů"
 
-#: include/func.inc.php:2566
+#: include/func.inc.php:2570
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -10002,7 +10120,7 @@ msgstr[0] "Poslední %1$d hodinu"
 msgstr[1] "Posledních %1$d hodin"
 msgstr[2] "Posledních %1$d hodin"
 
-#: include/func.inc.php:2559
+#: include/func.inc.php:2563
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -10010,7 +10128,7 @@ msgstr[0] "Poslední %1$d minutu"
 msgstr[1] "Posledních %1$d minut"
 msgstr[2] "Posledních %1$d minut"
 
-#: include/func.inc.php:2575
+#: include/func.inc.php:2579
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -10018,7 +10136,7 @@ msgstr[0] "Poslední %1$d měsíc"
 msgstr[1] "Posledních %1$d měsíců"
 msgstr[2] "Posledních %1$d měsíců"
 
-#: include/func.inc.php:2552
+#: include/func.inc.php:2556
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -10026,7 +10144,7 @@ msgstr[0] "Poslední %1$d sekundu"
 msgstr[1] "Posledních %1$d sekund"
 msgstr[2] "Posledních %1$d sekund"
 
-#: include/func.inc.php:2578
+#: include/func.inc.php:2582
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10099,7 +10217,7 @@ msgstr "Graf za poslední týden"
 #: app/controllers/CControllerLatestView.php:139
 #: app/views/monitoring.latest.view.php:30 app/views/search.php:29
 #: app/views/search.php:100 app/views/search.php:135 app/views/search.php:167
-#: include/menu.inc.php:70 include/views/inventory.host.view.php:127
+#: include/menu.inc.php:43 include/views/inventory.host.view.php:127
 #: jsLoader.php:282
 msgid "Latest data"
 msgstr "Poslední hodnoty"
@@ -10347,8 +10465,7 @@ msgstr "Logovat i nenastavené SNMP trapy"
 #: app/views/administration.authentication.edit.php:123
 #: app/views/administration.user.list.php:93 auditlogs.php:138
 #: include/func.inc.php:1645 include/func.inc.php:1660
-#: include/menu.inc.php:307 include/views/administration.auditlogs.list.php:44
-#: index_http.php:91
+#: include/views/administration.auditlogs.list.php:44 index_http.php:91
 msgid "Login"
 msgstr "Přihlásit"
 
@@ -10399,7 +10516,7 @@ msgstr "ÚDRŽBA"
 msgid "MD2"
 msgstr "MD2"
 
-#: app/views/popup.discovery.check.php:86 include/hosts.inc.php:34
+#: app/views/popup.discovery.check.php:91 include/hosts.inc.php:34
 #: include/views/configuration.host.discovery.edit.php:448
 #: include/views/configuration.item.edit.php:526
 #: include/views/configuration.item.edit.php:533
@@ -10443,7 +10560,7 @@ msgstr "Makro s hostmacroid \"%1$s\" neexistuje."
 
 #: app/views/administration.macros.edit.php:26
 #: app/views/administration.macros.edit.php:79
-#: app/views/popup.preproctestedit.view.php:123 include/html.inc.php:817
+#: app/views/popup.preproctestedit.view.php:123 include/html.inc.php:821
 #: include/views/configuration.host.edit.php:704
 #: include/views/configuration.host.prototype.edit.php:343
 #: include/views/configuration.template.edit.php:421
@@ -10474,12 +10591,12 @@ msgstr "Makra byla aktualizována"
 msgid "Main filter"
 msgstr "Hlavní filtr"
 
-#: app/views/layout.htmlpage.menu.php:99
+#: app/views/layout.htmlpage.menu.php:111
 msgid "Main navigation"
 msgstr "Hlavní navigace"
 
 #: include/audit.inc.php:50 include/maps.inc.php:511 include/maps.inc.php:600
-#: include/menu.inc.php:215
+#: include/menu.inc.php:120
 #: include/views/configuration.maintenance.edit.php:244
 #: include/views/js/monitoring.sysmaps.js.php:226
 msgid "Maintenance"
@@ -10527,15 +10644,15 @@ msgstr "Typ servisního okna"
 msgid "Maintenance updated"
 msgstr "Servisní okno bylo aktualizováno"
 
-#: include/html.inc.php:865
+#: include/html.inc.php:870
 msgid "Maintenance with data collection"
 msgstr "Údržba se sběrem dat"
 
-#: include/html.inc.php:864
+#: include/html.inc.php:869
 msgid "Maintenance without data collection"
 msgstr "Údržba bez sběru dat"
 
-#: include/html.inc.php:901
+#: include/html.inc.php:906
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Údržba: %1$s"
@@ -10646,8 +10763,8 @@ msgid "Mappings"
 msgstr "Mapování"
 
 #: app/controllers/CControllerPopupGeneric.php:280
-#: app/views/monitoring.map.view.php:29 include/menu.inc.php:93
-#: include/views/conf.import.php:40
+#: app/views/monitoring.map.view.php:29 include/menu.inc.php:55
+#: include/menu.inc.php:95 include/views/conf.import.php:40
 #: include/views/monitoring.sysmap.list.php:23
 msgid "Maps"
 msgstr "Mapy"
@@ -10835,7 +10952,7 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Typ media s ID \"%1$s\" není dostupný."
 
 #: app/views/administration.mediatype.edit.php:25
-#: app/views/administration.mediatype.list.php:27 include/menu.inc.php:292
+#: app/views/administration.mediatype.list.php:27 include/menu.inc.php:183
 #: include/views/conf.import.php:47
 msgid "Media types"
 msgstr "Typy médií"
@@ -11044,6 +11161,58 @@ msgstr "Mód"
 msgid "Model"
 msgstr "Model"
 
+#: app/views/administration.module.edit.php:52 include/audit.inc.php:58
+msgid "Module"
+msgstr ""
+
+#: app/controllers/CControllerModuleScan.php:102
+#, c-format
+msgid "Module added: %s."
+msgid_plural "Modules added: %s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerModuleScan.php:117
+#, c-format
+msgid "Module deleted: %s."
+msgid_plural "Modules deleted: %s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerModuleUpdate.php:147
+#, c-format
+msgid "Module disabled: %s."
+msgid_plural "Modules disabled: %s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerModuleUpdate.php:142
+#, c-format
+msgid "Module enabled: %s."
+msgid_plural "Modules enabled: %s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/classes/core/CModuleManager.php:222
+#, c-format
+msgid "Module.php class must extend %s for module located at %s."
+msgstr ""
+
+#: app/controllers/CControllerModuleEdit.php:98
+#: app/controllers/CControllerModuleList.php:123
+#: app/views/administration.module.edit.php:23
+#: app/views/administration.module.list.php:27 include/html.inc.php:826
+msgid "Modules"
+msgstr ""
+
+#: app/controllers/CControllerModuleScan.php:131
+msgid "Modules updated"
+msgstr ""
+
 #: include/func.inc.php:224
 msgid "Mon"
 msgstr "Po"
@@ -11066,7 +11235,8 @@ msgstr "Sledován přes proxy"
 msgid "Monitored host"
 msgstr "Sledovaný hostitel"
 
-#: include/menu.inc.php:38 include/views/inventory.host.view.php:122
+#: include/menu.inc.php:25 include/menu.inc.php:94
+#: include/views/inventory.host.view.php:122
 msgid "Monitoring"
 msgstr "Sledování"
 
@@ -11162,6 +11332,9 @@ msgstr "NTLM"
 #: app/views/administration.mediatype.edit.php:145
 #: app/views/administration.mediatype.list.php:39
 #: app/views/administration.mediatype.list.php:69
+#: app/views/administration.module.edit.php:38
+#: app/views/administration.module.list.php:45
+#: app/views/administration.module.list.php:70
 #: app/views/administration.proxy.list.php:38
 #: app/views/administration.proxy.list.php:64
 #: app/views/administration.regex.edit.php:97
@@ -11285,6 +11458,10 @@ msgstr "Jméno"
 #: include/views/js/configuration.httpconf.edit.js.php:74
 msgid "Name of the form field should not exceed 255 characters."
 msgstr "Název v poli formuláře nesmí překročit 255 znaků."
+
+#: app/views/administration.module.edit.php:43
+msgid "Namespace"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:59
 msgid "Network discovery data storage period"
@@ -11723,6 +11900,10 @@ msgstr "Žádné mapy nebyly přidané."
 msgid "No matches found"
 msgstr "Žádné výběry nenalezené"
 
+#: app/controllers/CControllerModuleScan.php:132
+msgid "No new modules discovered"
+msgstr ""
+
 #: include/classes/api/services/CCorrelation.php:1300
 #, c-format
 msgid "No operation type given for correlation \"%1$s\"."
@@ -11846,6 +12027,7 @@ msgstr "Žádné oprávnění pro přístup do systému."
 #: include/classes/api/services/CMap.php:1999
 #: include/classes/api/services/CMap.php:2061
 #: include/classes/api/services/CMediatype.php:471
+#: include/classes/api/services/CModule.php:224
 #: include/classes/api/services/CProxy.php:163
 #: include/classes/api/services/CProxy.php:253
 #: include/classes/api/services/CProxy.php:415
@@ -12068,7 +12250,7 @@ msgstr "Nic na vykonání."
 msgid "Notification report"
 msgstr "Protokol zpráv"
 
-#: include/menu.inc.php:173 report4.php:69
+#: include/menu.inc.php:101 report4.php:69
 msgid "Notifications"
 msgstr "Zprávy"
 
@@ -12691,7 +12873,7 @@ msgstr "Nebo"
 msgid "Original"
 msgstr "Původní"
 
-#: include/html.inc.php:822
+#: include/html.inc.php:827
 msgid "Other"
 msgstr "Další"
 
@@ -12733,7 +12915,7 @@ msgstr "Přepsaná položka trendové periody"
 msgid "Overrides"
 msgstr "Přepisování"
 
-#: include/menu.inc.php:57 include/menu.inc.php:132
+#: include/menu.inc.php:36 include/menu.inc.php:69
 #: include/views/inventory.host.view.php:194 overview.php:27
 msgid "Overview"
 msgstr "Přehled"
@@ -13249,7 +13431,7 @@ msgstr "Port"
 msgid "Port cannot be empty for host interface."
 msgstr "Port nemůže být prázdny pro rozhraní hosta."
 
-#: app/views/popup.discovery.check.php:40
+#: app/views/popup.discovery.check.php:44
 msgid "Port range"
 msgstr "Rozsah portů"
 
@@ -13307,7 +13489,7 @@ msgstr "Před. čas"
 msgid "Preview"
 msgstr "Náhled"
 
-#: include/func.inc.php:2522
+#: include/func.inc.php:2526
 msgid "Previous month"
 msgstr "Předchozí měsíc"
 
@@ -13320,11 +13502,11 @@ msgstr ""
 msgid "Previous value"
 msgstr "Předchozí hodnota"
 
-#: include/func.inc.php:2521
+#: include/func.inc.php:2525
 msgid "Previous week"
 msgstr "Předchozí týden"
 
-#: include/func.inc.php:2523
+#: include/func.inc.php:2527
 msgid "Previous year"
 msgstr "Předchozí rok"
 
@@ -13356,7 +13538,7 @@ msgstr "Primární POC telefon B"
 msgid "Primary POC screen name"
 msgstr "Primární POC jméno obrazovky"
 
-#: app/views/popup.discovery.check.php:104
+#: app/views/popup.discovery.check.php:109
 #: include/views/configuration.host.discovery.edit.php:465
 #: include/views/configuration.item.edit.php:571
 #: include/views/configuration.item.massupdate.php:248
@@ -13365,7 +13547,7 @@ msgstr "Primární POC jméno obrazovky"
 msgid "Privacy passphrase"
 msgstr "Fráze utajení"
 
-#: app/views/popup.discovery.check.php:97
+#: app/views/popup.discovery.check.php:102
 #: include/views/configuration.host.discovery.edit.php:458
 #: include/views/configuration.item.edit.php:566
 #: include/views/configuration.item.massupdate.php:235
@@ -13488,7 +13670,7 @@ msgstr "Problém, když alespoň jeden podřazený má problém"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:273
 #: include/maps.inc.php:293 include/maps.inc.php:305 include/maps.inc.php:377
 #: include/maps.inc.php:389 include/maps.inc.php:470 include/maps.inc.php:482
-#: include/maps.inc.php:558 include/maps.inc.php:570 include/menu.inc.php:52
+#: include/maps.inc.php:558 include/maps.inc.php:570 include/menu.inc.php:32
 #: include/views/common.filter.trigger.php:42
 #: include/views/inventory.host.view.php:134 jsLoader.php:287 report2.php:458
 msgid "Problems"
@@ -13537,7 +13719,7 @@ msgstr "Poskytnuté URL \"%1$s\" je neplatné."
 
 #: app/controllers/CControllerPopupGeneric.php:112
 #: app/views/administration.proxy.edit.php:24
-#: app/views/administration.proxy.list.php:27 include/menu.inc.php:268
+#: app/views/administration.proxy.list.php:27 include/menu.inc.php:167
 msgid "Proxies"
 msgstr "Proxy"
 
@@ -13639,7 +13821,7 @@ msgstr "Soubor s veřejným klíčem"
 msgid "Query fields"
 msgstr "Pole dotazů"
 
-#: include/menu.inc.php:302 queue.php:25
+#: include/menu.inc.php:191 queue.php:25
 msgid "Queue"
 msgstr "Fronta"
 
@@ -13849,7 +14031,7 @@ msgid "Regular expression updated"
 msgstr "Regulární výraz byl aktualizován"
 
 #: app/views/administration.regex.edit.php:25
-#: app/views/administration.regex.list.php:27 include/html.inc.php:816
+#: app/views/administration.regex.list.php:27 include/html.inc.php:820
 msgid "Regular expressions"
 msgstr "Regulární výrazy"
 
@@ -14052,7 +14234,8 @@ msgstr "Nahradit"
 msgid "Replace dependencies"
 msgstr "Nahradit závislosti"
 
-#: include/menu.inc.php:141
+#: include/menu.inc.php:78 include/menu.inc.php:100 include/menu.inc.php:105
+#: include/menu.inc.php:139
 msgid "Reports"
 msgstr "Protokoly"
 
@@ -14401,7 +14584,7 @@ msgctxt "Sunday short"
 msgid "S"
 msgstr "Ne"
 
-#: app/views/popup.discovery.check.php:87
+#: app/views/popup.discovery.check.php:92
 #: include/views/configuration.host.discovery.edit.php:449
 #: include/views/configuration.item.edit.php:527
 #: include/views/configuration.item.edit.php:534
@@ -14450,7 +14633,7 @@ msgstr "SMTP port serveru"
 msgid "SNMP"
 msgstr "SNMP"
 
-#: app/views/popup.discovery.check.php:58 disc_prototypes.php:116
+#: app/views/popup.discovery.check.php:62 disc_prototypes.php:116
 #: host_discovery.php:106 include/forms.inc.php:299
 #: include/views/configuration.host.discovery.edit.php:412
 #: include/views/configuration.item.edit.php:478
@@ -14458,7 +14641,7 @@ msgstr "SNMP"
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
-#: app/views/popup.discovery.check.php:52 disc_prototypes.php:109
+#: app/views/popup.discovery.check.php:56 disc_prototypes.php:109
 #: host_discovery.php:101 include/forms.inc.php:274
 #: include/views/configuration.host.discovery.edit.php:424
 #: include/views/configuration.item.edit.php:491
@@ -14596,6 +14779,10 @@ msgstr "Ulož změny"
 msgid "Save it as \"%1$s\""
 msgstr "Uložte jej jako \"%1$s\""
 
+#: app/views/administration.module.list.php:35
+msgid "Scan directory"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:228
 msgid "Scenario"
 msgstr "Scénář"
@@ -14696,7 +14883,7 @@ msgstr "Obrazovka byla aktualizována"
 
 #: app/controllers/CControllerPopupGeneric.php:227 app/views/search.php:32
 #: app/views/search.php:113 app/views/search.php:196 app/views/search.php:237
-#: app/views/search.php:238 include/html.inc.php:417 include/menu.inc.php:80
+#: app/views/search.php:238 include/html.inc.php:417 include/menu.inc.php:51
 #: include/views/configuration.template.edit.php:306
 #: include/views/configuration.template.list.php:143
 #: include/views/configuration.template.list.php:262
@@ -14773,7 +14960,7 @@ msgstr "Skript byl aktualizován"
 
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:25
-#: app/views/administration.script.list.php:27 include/menu.inc.php:298
+#: app/views/administration.script.list.php:27 include/menu.inc.php:187
 #: jsLoader.php:290
 msgid "Scripts"
 msgstr "Skripty"
@@ -14819,7 +15006,7 @@ msgstr "Sekundární POC telefon B"
 msgid "Secondary POC screen name"
 msgstr "Sekundární POC jméno obrazovky"
 
-#: app/views/popup.discovery.check.php:76
+#: app/views/popup.discovery.check.php:80
 #: include/views/configuration.host.discovery.edit.php:438
 #: include/views/configuration.item.edit.php:520
 #: include/views/configuration.item.massupdate.php:204
@@ -14828,7 +15015,7 @@ msgstr "Sekundární POC jméno obrazovky"
 msgid "Security level"
 msgstr "Bezpečnostní úroveň"
 
-#: app/views/popup.discovery.check.php:70 include/forms.inc.php:278
+#: app/views/popup.discovery.check.php:74 include/forms.inc.php:278
 #: include/views/configuration.host.discovery.edit.php:430
 #: include/views/configuration.item.edit.php:497
 #: include/views/configuration.item.massupdate.php:197
@@ -15082,8 +15269,8 @@ msgstr "Typ služby"
 msgid "Service updated"
 msgstr "Služba byla aktualizována"
 
-#: app/views/administration.housekeeping.edit.php:75 include/menu.inc.php:106
-#: include/menu.inc.php:232 include/views/configuration.services.edit.php:26
+#: app/views/administration.housekeeping.edit.php:75 include/menu.inc.php:59
+#: include/menu.inc.php:129 include/views/configuration.services.edit.php:26
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.services.list.php:23 srv_status.php:26
 #: srv_status.php:162
@@ -15622,6 +15809,8 @@ msgstr "Statický"
 #: app/controllers/CControllerPopupGeneric.php:214
 #: app/views/administration.mediatype.list.php:44
 #: app/views/administration.mediatype.list.php:71
+#: app/views/administration.module.list.php:50
+#: app/views/administration.module.list.php:78
 #: app/views/administration.usergroup.list.php:45
 #: app/views/administration.usergroup.list.php:73
 #: app/views/administration.user.list.php:96
@@ -15764,7 +15953,7 @@ msgstr "Strukturované údaje"
 msgid "Style"
 msgstr "Styl"
 
-#: app/views/layout.htmlpage.menu.php:106
+#: app/views/layout.htmlpage.menu.php:118
 msgid "Sub navigation"
 msgstr "Podnavigace"
 
@@ -15816,7 +16005,7 @@ msgstr "Neděle"
 msgid "Support"
 msgstr "Podpora"
 
-#: include/html.inc.php:896
+#: include/html.inc.php:901
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "Potlačeno do: %1$s"
@@ -15876,7 +16065,7 @@ msgstr "Název hostitelského systému. Návratová hodnota string"
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/report.status.php:25
 #: include/classes/screens/CScreenServerInfo.php:38
-#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:149
+#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:140
 #: include/screens.inc.php:36
 msgid "System information"
 msgstr "Informace systému"
@@ -16132,7 +16321,7 @@ msgstr "Šablona se stejným zobrazovaným jménem \"%s\" již existuje."
 #: app/views/popup.condition.common.php:340
 #: app/views/popup.operation.common.php:633 app/views/search.php:140
 #: app/views/search.php:158 app/views/search.php:161 app/views/search.php:162
-#: app/views/search.php:263 include/menu.inc.php:192
+#: app/views/search.php:263 include/menu.inc.php:111
 #: include/views/configuration.copy.elements.php:59
 #: include/views/configuration.host.edit.php:653
 #: include/views/configuration.hostgroups.list.php:61
@@ -16320,7 +16509,7 @@ msgstr "Aplikace web scénáře patří k jinému hostu, než je host web scén�
 msgid "Theme"
 msgstr "Téma"
 
-#: include/func.inc.php:2520
+#: include/func.inc.php:2524
 msgid "This day last week"
 msgstr "Tento den v minulém týdnu"
 
@@ -16333,11 +16522,11 @@ msgstr "Toto pole je automaticky vyplněné položkou \"%s\"."
 msgid "This is the test message from Zabbix"
 msgstr "Toto je nová testovací zpráva ze Zabbixu"
 
-#: include/func.inc.php:2528 srv_status.php:41
+#: include/func.inc.php:2532 srv_status.php:41
 msgid "This month"
 msgstr "Tento měsíc"
 
-#: include/func.inc.php:2529
+#: include/func.inc.php:2533
 msgid "This month so far"
 msgstr "Prozatím tento měsíc"
 
@@ -16349,19 +16538,19 @@ msgstr "Tento sloupec obrazovky není prázdny. Přesto smazat?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Tento řádek obrazovky není prázdny. Přesto smazat?"
 
-#: include/func.inc.php:2526 srv_status.php:40
+#: include/func.inc.php:2530 srv_status.php:40
 msgid "This week"
 msgstr "Tento týden"
 
-#: include/func.inc.php:2527
+#: include/func.inc.php:2531
 msgid "This week so far"
 msgstr "Prozatím tento týden"
 
-#: include/func.inc.php:2530 srv_status.php:42
+#: include/func.inc.php:2534 srv_status.php:42
 msgid "This year"
 msgstr "Tento rok"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2535
 msgid "This year so far"
 msgstr "Prozatím tento rok"
 
@@ -16486,12 +16675,12 @@ msgstr "Do"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Na nastavení rozhraní hosta označte jeden typ položky pro všechny položky"
 
-#: include/classes/screens/CScreenProblem.php:749 include/func.inc.php:2524
+#: include/classes/screens/CScreenProblem.php:749 include/func.inc.php:2528
 #: srv_status.php:39
 msgid "Today"
 msgstr "Dnes"
 
-#: include/func.inc.php:2525
+#: include/func.inc.php:2529
 msgid "Today so far"
 msgstr "Dnes prozatím"
 
@@ -16672,7 +16861,7 @@ msgstr[1] "Spouštěče vypnuté"
 msgstr[2] "Spouštěče vypnuté"
 
 #: app/views/administration.trigdisplay.edit.php:26
-#: app/views/administration.trigdisplay.edit.php:101 include/html.inc.php:821
+#: app/views/administration.trigdisplay.edit.php:101 include/html.inc.php:825
 msgid "Trigger displaying options"
 msgstr "Zobrazovací možnosti spouštěčů"
 
@@ -16799,7 +16988,7 @@ msgid "Trigger recovery expression must contain at least one host:key reference.
 msgstr "Výraz obnovy spouštěče musí obsahovat alespoň jednu host:key referenci."
 
 #: app/views/administration.trigseverity.edit.php:26
-#: app/views/administration.trigseverity.edit.php:90 include/html.inc.php:820
+#: app/views/administration.trigseverity.edit.php:90 include/html.inc.php:824
 msgid "Trigger severities"
 msgstr "Závažnosti spouštěče"
 
@@ -16851,7 +17040,7 @@ msgstr "Spouštěče"
 msgid "Triggers deleted"
 msgstr "Spouštěče byly smazány"
 
-#: include/menu.inc.php:159
+#: include/menu.inc.php:85 include/menu.inc.php:143
 msgid "Triggers top 100"
 msgstr "100 nejaktivnějších spouštěčů"
 
@@ -17096,6 +17285,11 @@ msgstr "Odblokovat"
 msgid "Unblock selected users?"
 msgstr "Odblokovat vybrané uživatele?"
 
+#: include/classes/core/ZBase.php:539
+#, c-format
+msgid "Unexpected response for action %s."
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:231
 #: include/views/configuration.item.edit.php:677
@@ -17160,7 +17354,7 @@ msgstr "Zadaný hostitel v systému neexistuje"
 msgid "Unknown interface type."
 msgstr "Neznámy typ rozhraní."
 
-#: include/audit.inc.php:65
+#: include/audit.inc.php:66
 msgid "Unknown resource"
 msgstr "Neznámý zdroj"
 
@@ -17282,6 +17476,7 @@ msgstr "Dostupný"
 #: app/views/administration.macros.edit.php:81
 #: app/views/administration.mediatype.edit.php:350
 #: app/views/administration.miscconfig.edit.php:71
+#: app/views/administration.module.edit.php:59
 #: app/views/administration.proxy.edit.php:135
 #: app/views/administration.regex.edit.php:137
 #: app/views/administration.script.edit.php:132
@@ -17294,7 +17489,7 @@ msgstr "Dostupný"
 #: app/views/administration.workingtime.edit.php:36
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
-#: app/views/popup.discovery.check.php:123 app/views/popup.httpstep.php:177
+#: app/views/popup.discovery.check.php:128 app/views/popup.httpstep.php:177
 #: app/views/popup.media.php:111 app/views/popup.mediatype.message.php:88
 #: app/views/popup.operation.common.php:752
 #: app/views/popup.triggerwizard.php:138
@@ -17573,7 +17768,7 @@ msgstr "Skupina uživatelů ID \"%1$s\" není dostupná."
 #: app/controllers/CControllerPopupGeneric.php:176
 #: app/views/administration.usergroup.edit.php:24
 #: app/views/administration.usergroup.list.php:27
-#: app/views/dashboard.sharing.edit.php:24 include/menu.inc.php:280
+#: app/views/dashboard.sharing.edit.php:24 include/menu.inc.php:175
 #: include/views/monitoring.screen.edit.php:124
 #: include/views/monitoring.slideconf.edit.php:173
 #: include/views/monitoring.sysmap.edit.php:294
@@ -17689,7 +17884,7 @@ msgstr "Jméno uživatele a heslo"
 #: app/views/administration.usergroup.edit.php:44
 #: app/views/administration.usergroup.list.php:184
 #: app/views/administration.user.list.php:27
-#: app/views/dashboard.sharing.edit.php:45 include/menu.inc.php:286
+#: app/views/dashboard.sharing.edit.php:45 include/menu.inc.php:179
 #: include/views/monitoring.screen.edit.php:160
 #: include/views/monitoring.slideconf.edit.php:211
 #: include/views/monitoring.sysmap.edit.php:330
@@ -18034,7 +18229,7 @@ msgstr "Mapa hodnot byla aktualizována"
 
 #: app/views/administration.valuemap.edit.php:25
 #: app/views/administration.valuemap.edit.php:85
-#: app/views/administration.valuemap.list.php:26 include/html.inc.php:818
+#: app/views/administration.valuemap.list.php:26 include/html.inc.php:822
 msgid "Value mapping"
 msgstr "Mapování hodnot"
 
@@ -18093,6 +18288,11 @@ msgstr "Výrobce"
 msgid "Verbose"
 msgstr "Upovídaný"
 
+#: app/views/administration.module.edit.php:39
+#: app/views/administration.module.list.php:75
+msgid "Version"
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:371
 msgid "Version of Zabbix agent. Returns string"
@@ -18119,7 +18319,7 @@ msgstr "Vietnamsky (vi_VN)"
 msgid "View as"
 msgstr "Pohled jako"
 
-#: include/classes/mvc/CView.php:219
+#: include/classes/mvc/CView.php:212
 msgid "View is not rendered."
 msgstr "Pohled není vykreslovaný."
 
@@ -18166,7 +18366,7 @@ msgstr "Je nám líto, maximální počet elementů na zapamatování byl již d
 #: app/views/search.php:33 app/views/search.php:39 app/views/search.php:82
 #: app/views/search.php:83 app/views/search.php:114 app/views/search.php:138
 #: app/views/search.php:180 app/views/search.php:196 app/views/search.php:245
-#: app/views/search.php:246 include/menu.inc.php:63
+#: app/views/search.php:246 include/menu.inc.php:39
 #: include/views/configuration.host.list.php:178
 #: include/views/configuration.host.list.php:413
 #: include/views/configuration.template.list.php:145
@@ -18342,7 +18542,7 @@ msgstr "Pomocník"
 
 #: app/views/administration.workingtime.edit.php:23
 #: app/views/administration.workingtime.edit.php:27
-#: app/views/administration.workingtime.edit.php:29 include/html.inc.php:819
+#: app/views/administration.workingtime.edit.php:29 include/html.inc.php:823
 msgid "Working time"
 msgstr "Pracovní doba"
 
@@ -18355,6 +18555,11 @@ msgstr "Pracovní čas \"%1$s\"."
 #: app/views/administration.script.list.php:109
 msgid "Write"
 msgstr "Zápis"
+
+#: include/classes/core/CModuleManager.php:203
+#, c-format
+msgid "Wrong Module.php class name for module located at %s."
+msgstr ""
 
 #: include/classes/api/services/CService.php:386
 #, c-format
@@ -18516,8 +18721,8 @@ msgstr "YYYY-MM-DD hh:mm"
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
 #: include/classes/import/validators/C42XmlValidator.php:1350
-#: include/classes/import/validators/C44XmlValidator.php:1755
-#: include/classes/import/validators/C50XmlValidator.php:1788
+#: include/classes/import/validators/C44XmlValidator.php:1757
+#: include/classes/import/validators/C50XmlValidator.php:1790
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
@@ -18553,7 +18758,7 @@ msgstr "Ročně"
 msgid "Yes"
 msgstr "Ano"
 
-#: include/classes/screens/CScreenProblem.php:757 include/func.inc.php:2518
+#: include/classes/screens/CScreenProblem.php:757 include/func.inc.php:2522
 msgid "Yesterday"
 msgstr "Včera"
 
@@ -18592,6 +18797,10 @@ msgstr "Nespecifikovali jste cíle pro akci globálního skriptu \"%s\"."
 #: include/classes/api/services/CMaintenance.php:521
 #: include/classes/api/services/CMaintenance.php:953
 #: include/classes/api/services/CMaintenance.php:965
+#: include/classes/api/services/CModule.php:48
+#: include/classes/api/services/CModule.php:142
+#: include/classes/api/services/CModule.php:203
+#: include/classes/api/services/CModule.php:261
 #: include/classes/api/services/CScript.php:241
 #: include/classes/api/services/CScript.php:318
 #: include/classes/api/services/CScript.php:560
@@ -18635,7 +18844,7 @@ msgstr "Vaše databáze nefunguje správně. Počkejte prosím několik minut a 
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
-#: include/page_header.php:156
+#: include/page_header.php:145
 msgid "Zabbix"
 msgstr "Zabbix"
 
@@ -18849,7 +19058,7 @@ msgstr "agent"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1873
 #: include/classes/html/CSeverity.php:80
-#: include/classes/pagefilter/CPageFilter.php:772
+#: include/classes/pagefilter/CPageFilter.php:783
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18879,12 +19088,13 @@ msgstr "všechny média"
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CItemGeneral.php:2261
 #: include/classes/api/services/CItemGeneral.php:2285
-#: include/classes/import/validators/C44XmlValidator.php:2171
-#: include/classes/import/validators/C44XmlValidator.php:2191
-#: include/classes/import/validators/C44XmlValidator.php:2318
-#: include/classes/import/validators/C50XmlValidator.php:2209
-#: include/classes/import/validators/C50XmlValidator.php:2229
-#: include/classes/import/validators/C50XmlValidator.php:2356
+#: include/classes/api/services/CModule.php:291
+#: include/classes/import/validators/C44XmlValidator.php:2149
+#: include/classes/import/validators/C44XmlValidator.php:2169
+#: include/classes/import/validators/C44XmlValidator.php:2296
+#: include/classes/import/validators/C50XmlValidator.php:2182
+#: include/classes/import/validators/C50XmlValidator.php:2202
+#: include/classes/import/validators/C50XmlValidator.php:2329
 #: include/classes/import/validators/CXmlValidatorGeneral.php:215
 #: include/classes/validators/CApiInputValidator.php:394
 #: include/classes/validators/CApiInputValidator.php:526
@@ -19177,7 +19387,7 @@ msgstr "dayofweek() - Den týdne"
 msgid "days"
 msgstr "dní"
 
-#: include/classes/pagefilter/CPageFilter.php:659
+#: include/classes/pagefilter/CPageFilter.php:670
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:61
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -19653,8 +19863,8 @@ msgstr "mimo"
 
 #: app/controllers/CControllerDashboardView.php:137
 #: hostinventoriesoverview.php:75
-#: include/classes/pagefilter/CPageFilter.php:718
-#: include/classes/pagefilter/CPageFilter.php:772 include/forms.inc.php:980
+#: include/classes/pagefilter/CPageFilter.php:729
+#: include/classes/pagefilter/CPageFilter.php:783 include/forms.inc.php:980
 #: include/views/monitoring.screen.php:65 slides.php:194
 msgid "not selected"
 msgstr "nevybráno"
@@ -19751,7 +19961,7 @@ msgstr "vzorec problému"
 msgid "reference to a non-existent tree element"
 msgstr ""
 
-#: include/page_header.php:159 include/views/general.warning.php:21
+#: include/page_header.php:148 include/views/general.warning.php:21
 #, c-format
 msgid "refreshed every %1$s sec."
 msgstr "obnovované každých %1$s sek."
@@ -19927,8 +20137,8 @@ msgid "the parameter \"%1$s\" is missing"
 msgstr "parametr \"%1$s\" chybí"
 
 #: include/classes/export/CConfigurationExportBuilder.php:77
-#: include/classes/import/validators/C44XmlValidator.php:2037
-#: include/classes/import/validators/C50XmlValidator.php:2070
+#: include/classes/import/validators/C44XmlValidator.php:2039
+#: include/classes/import/validators/C50XmlValidator.php:2072
 #: include/classes/import/validators/CXmlValidatorGeneral.php:118
 #: include/classes/import/validators/CXmlValidatorGeneral.php:137
 #, c-format
@@ -19989,17 +20199,17 @@ msgstr "pište zde pro vyhledávání"
 msgid "unacceptable URL"
 msgstr ""
 
-#: include/classes/import/validators/C44XmlValidator.php:2258
-#: include/classes/import/validators/C50XmlValidator.php:2296
+#: include/classes/import/validators/C44XmlValidator.php:2236
+#: include/classes/import/validators/C50XmlValidator.php:2269
 #: include/classes/import/validators/CXmlValidatorGeneral.php:230
 #, c-format
 msgid "unexpected constant \"%1$s\""
 msgstr ""
 
-#: include/classes/export/CConfigurationExportBuilder.php:104
+#: include/classes/export/CConfigurationExportBuilder.php:105
 #: include/classes/import/converters/CConstantImportConverter.php:60
-#: include/classes/import/validators/C44XmlValidator.php:2216
-#: include/classes/import/validators/C50XmlValidator.php:2254
+#: include/classes/import/validators/C44XmlValidator.php:2194
+#: include/classes/import/validators/C50XmlValidator.php:2227
 #, c-format
 msgid "unexpected constant value \"%1$s\""
 msgstr ""

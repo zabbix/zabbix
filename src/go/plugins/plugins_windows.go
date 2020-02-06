@@ -22,6 +22,7 @@ package plugins
 import (
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/net/netif"
+	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/systemrun"
 	_ "zabbix.com/plugins/vfs/file"
 	_ "zabbix.com/plugins/windows/eventlog"

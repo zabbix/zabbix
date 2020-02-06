@@ -89,7 +89,7 @@ $output = [
 			'class' => 'dialogue-widget-save',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitMessageTemplate();'
+			'action' => 'submitMessageTemplate(overlay);'
 		]
 	],
 	'params' => $data['params'],
