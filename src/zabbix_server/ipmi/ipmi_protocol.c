@@ -37,7 +37,7 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objec
 	username_len = strlen(username) + 1;
 	password_len = strlen(password) + 1;
 	sensor_len = strlen(sensor) + 1;
-	key_len = strlen(key) + 1;
+	key_len = NULL != key ? strlen(key) + 1 : 0;
 
 	data_len = sizeof(zbx_uint64_t) + sizeof(short) + sizeof(char) * 2 + addr_len + username_len + password_len +
 			sensor_len + key_len + sizeof(zbx_uint32_t) * 5 + sizeof(int);
@@ -87,7 +87,7 @@ zbx_uint32_t	zbx_ipmi_serialize_result(unsigned char **data, const zbx_timespec_
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len, value_len;
 
-	value_len = (NULL != value ? strlen(value)  + 1 : 0);
+	value_len = NULL != value ? strlen(value) + 1 : 0;
 
 	data_len = value_len + sizeof(zbx_uint32_t) + sizeof(int) * 3;
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);

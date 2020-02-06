@@ -105,7 +105,7 @@ static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zb
 	zbx_ipmi_deserialize_request(message->data, &itemid, &addr, &port, &authtype, &privilege, &username, &password,
 			&sensor, &command, &key);
 
-	if (0 == strncmp(key, "ipmi.get", sizeof("ipmi.get") - 1))
+	if (0 == strcmp(key, "ipmi.get") || 0 == strncmp(key, "ipmi.get[", ZBX_CONST_STRLEN("ipmi.get[")))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s() for discovery itemid:" ZBX_FS_UI64 " addr:%s port:%d authtype:%d"
 				" privilege:%d username:%s", __func__, itemid, addr, (int)port, (int)authtype,
