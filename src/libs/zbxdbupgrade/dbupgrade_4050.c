@@ -639,18 +639,18 @@ static int	db_snmp_if_cmp(const dbu_snmp_if_t *snmp1, const dbu_snmp_if_t *snmp2
 	if (0 != (ret = strcmp(s1, s2)))	\
 		return ret;
 
-	int ret;
+	int	ret;
 
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->securitylevel, snmp2->securitylevel);
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->authprotocol, snmp2->authprotocol);
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->privprotocol, snmp2->privprotocol);
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->version, snmp1->version);
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->bulk, snmp1->bulk);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->community,snmp2->community);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->securityname,snmp2->securityname);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->authpassphrase,snmp2->authpassphrase);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->privpassphrase,snmp2->privpassphrase);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->contextname,snmp2->contextname);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->community, snmp2->community);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->securityname, snmp2->securityname);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->authpassphrase, snmp2->authpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->privpassphrase, snmp2->privpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->contextname, snmp2->contextname);
 
 	return 0;
 }
@@ -702,7 +702,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 	int			index;
 
 	result = DBselect(
-			"SELECT s.interfaceid,"
+			"select s.interfaceid,"
 				"s.type,"
 				"s.bulk,"
 				"s.snmp_community,"
@@ -720,7 +720,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 				"n.ip,"
 				"n.dns,"
 				"n.port"
-			" FROM (SELECT i.interfaceid,"
+			" from (select i.interfaceid,"
 					"i.type,"
 					"f.bulk,"
 					"i.snmp_community,"
@@ -733,12 +733,12 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 					"i.snmpv3_contextname,"
 					"i.port,"
 					"i.hostid"
-				" FROM items i"
-					" LEFT JOIN hosts h ON i.hostid=h.hostid"
-					" LEFT JOIN interface f ON i.interfaceid=f.interfaceid"
-				" WHERE  i.type IN (1,4,6)"
-					" AND h.status <> 3"
-				" GROUP BY i.interfaceid,"
+				" from items i"
+					" left join hosts h on i.hostid=h.hostid"
+					" left join interface f on i.interfaceid=f.interfaceid"
+				" where  i.type in (1,4,6)"
+					" and h.status <> 3"
+				" group by i.interfaceid,"
 					"i.type,"
 					"f.bulk,"
 					"i.snmp_community,"
@@ -751,8 +751,8 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 					"i.snmpv3_contextname,"
 					"i.port,"
 					"i.hostid) s"
-				" LEFT JOIN interface n ON s.interfaceid=n.interfaceid"
-				" ORDER BY s.interfaceid ASC");
+				" left join interface n on s.interfaceid=n.interfaceid"
+				" order by s.interfaceid asc");
 
 	while (NULL != (row = DBfetch(result)))
 	{
