@@ -493,10 +493,13 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, siz
 		trend->value_max.dbl = value_max.dbl;
 
 	for (i = 0; i < num; i++)
-		trend->value_avg.dbl += (value_avg.dbl - trend->value_avg.dbl) / ++(trend->num);
+	{
+		trend->num++;
+		trend->value_avg.dbl += value_avg.dbl / trend->num - trend->value_avg.dbl / trend->num;
+	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "update trends set"
-			" num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL ",value_max=" ZBX_FS_DBL
+			" num=%d,value_min=" ZBX_FS_DBL64 ",value_avg=" ZBX_FS_DBL64 ",value_max=" ZBX_FS_DBL64
 			" where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
 			trend->num, trend->value_min.dbl, trend->value_avg.dbl, trend->value_max.dbl,
 			trend->itemid, trend->clock);
@@ -805,7 +808,8 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
 				trend->value_min.dbl = history->value.dbl;
 			if (trend->num == 0 || history->value.dbl > trend->value_max.dbl)
 				trend->value_max.dbl = history->value.dbl;
-			trend->value_avg.dbl += (history->value.dbl - trend->value_avg.dbl) / (trend->num + 1);
+			trend->value_avg.dbl += history->value.dbl / (trend->num + 1) -
+					trend->value_avg.dbl / (trend->num + 1);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (trend->num == 0 || history->value.ui64 < trend->value_min.ui64)
@@ -1602,7 +1606,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 	switch (h->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, h->value.dbl);
+			zbx_snprintf(value, sizeof(value), ZBX_FS_DBL64, h->value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, h->value.ui64);
@@ -1827,7 +1831,7 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 			case ITEM_VALUE_TYPE_FLOAT:
 				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, CONFIG_DOUBLE_PRECISION))
 				{
-					dc_history_set_error(hdata, zbx_dsprintf(NULL, "Value " ZBX_FS_DBL
+					dc_history_set_error(hdata, zbx_dsprintf(NULL, "Value " ZBX_FS_DBL64
 							" is too small or too large.", hdata->value.dbl));
 				}
 				break;
@@ -2147,7 +2151,7 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 			switch (h->value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL, h->value.dbl);
+					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
 					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
@@ -2218,7 +2222,7 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 			switch (h->value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL, h->value.dbl);
+					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
 					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);

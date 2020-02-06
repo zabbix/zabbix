@@ -276,7 +276,7 @@ void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *val
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(buffer, size, ZBX_FS_DBL, value->dbl);
+			zbx_snprintf(buffer, size, ZBX_FS_DBL64, value->dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_snprintf(buffer, size, ZBX_FS_UI64, value->ui64);
