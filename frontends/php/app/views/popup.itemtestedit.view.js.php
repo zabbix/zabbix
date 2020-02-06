@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ function cleanPreviousTestResults() {
 /**
  * Send item get value request and display retrieved results.
  *
- * @param {Overlay} overlay
+ * @param {Overlay} overlay  Overlay dialog object.
  */
 function itemGetValueTest(overlay) {
 	var $form = overlay.$dialogue.find('form'),
@@ -162,7 +162,7 @@ function itemGetValueTest(overlay) {
 	<?php if ($data['show_prev']): ?>
 		post_data['time_change'] = (form_data['upd_prev'] !== '')
 			? parseInt(form_data['upd_last']) - parseInt(form_data['upd_prev'])
-			: Math.ceil(+new Date()/1000) - parseInt(form_data['upd_last']);
+			: Math.ceil(+new Date() / 1000) - parseInt(form_data['upd_last']);
 	<?php endif ?>
 
 	delete post_data.interfaceid;
@@ -194,7 +194,7 @@ function itemGetValueTest(overlay) {
 						jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
 						jQuery('#prev_time', $form).val(ret.prev_time);
 						jQuery('#upd_prev', $form).val(form_data['upd_last']);
-						jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
+						jQuery('#upd_last', $form).val(Math.ceil(+new Date() / 1000));
 					}
 				<?php endif ?>
 
@@ -213,7 +213,7 @@ function itemGetValueTest(overlay) {
 /**
  * Send item preprocessing test details and display results in table.
  *
- * @param {Overlay} overlay
+ * @param {Overlay} overlay  Overlay dialog object.
  */
 function itemCompleteTest(overlay) {
 	var $form = overlay.$dialogue.find('form'),
@@ -246,7 +246,7 @@ function itemCompleteTest(overlay) {
 		if (post_data.get_value) {
 			post_data['time_change'] = (form_data['upd_prev'] !== '')
 				? parseInt(form_data['upd_last']) - parseInt(form_data['upd_prev'])
-				: Math.ceil(+new Date()/1000) - parseInt(form_data['upd_last']);
+				: Math.ceil(+new Date() / 1000) - parseInt(form_data['upd_last']);
 		}
 
 		post_data = jQuery.extend(post_data, {
@@ -281,7 +281,7 @@ function itemCompleteTest(overlay) {
 					jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
 					jQuery('#prev_time', $form).val(ret.prev_time);
 					jQuery('#upd_prev', $form).val(post_data['upd_last']);
-					jQuery('#upd_last', $form).val(Math.ceil(+new Date()/1000));
+					jQuery('#upd_last', $form).val(Math.ceil(+new Date() / 1000));
 				}
 			<?php endif ?>
 
@@ -330,7 +330,7 @@ function itemCompleteTest(overlay) {
 /**
  * Process test results and make visual changes in test dialog results block.
  *
- * @param array steps  Array of objects containing details about each preprocessing step test results.
+ * @param {array} steps  Array of objects containing details about each preprocessing step test results.
  */
 function processItemPreprocessingTestResults(steps) {
 	var tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html()),
@@ -425,7 +425,7 @@ jQuery(document).ready(function($) {
 	$('#final-result').hide();
 
 	<?php if ($data['show_prev']): ?>
-		jQuery('#upd_last').val(Math.ceil(+new Date()/1000));
+		jQuery('#upd_last').val(Math.ceil(+new Date() / 1000));
 	<?php endif ?>
 
 	$('#value').multilineInput({

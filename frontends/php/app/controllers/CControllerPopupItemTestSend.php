@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,16 +25,22 @@
 class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 	/**
+	 * Show final result in item test dialog.
+	 *
 	 * @var bool
 	 */
 	protected $show_final_result;
 
 	/**
+	 * Use previous value for preprocessing test.
+	 *
 	 * @var bool
 	 */
 	protected $use_prev_value;
 
 	/**
+	 * Retrieve value from host.
+	 *
 	 * @var bool
 	 */
 	protected $get_value_from_host;
