@@ -926,6 +926,8 @@ static int	DBpatch_interface_create(zbx_vector_dbu_interface_t *interfaces)
 
 static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 {
+#define ITEM_TYPE_SNMP	20
+
 	int	i, ret = SUCCEED;
 	char	*sql;
 	size_t	sql_alloc = snmp_ifs->values_num * ZBX_KIBIBYTE / 3 , sql_offset = 0;
@@ -935,7 +937,7 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 	for (i = 0; i < snmp_ifs->values_num && SUCCEED == ret; i++)
 	{
-		dbu_snmp_if_t *s = &snmp_ifs->values[i];
+		dbu_snmp_if_t	*s = &snmp_ifs->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update items i, hosts h set i.type=%d, i.interfaceid=" ZBX_FS_UI64
@@ -970,14 +972,20 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	zbx_free(sql);
 
 	return ret;
+
+#undef ITEM_TYPE_SNMP
 }
 
 static int	DBpatch_items_type_update(void)
 {
+#define ITEM_TYPE_SNMP	20
+
 	if (ZBX_DB_OK > DBexecute("update items set type=%d where type in (1,4,6)", ITEM_TYPE_SNMP))
 		return FAIL;
 
 	return SUCCEED;
+
+#undef ITEM_TYPE_SNMP
 }
 
 static int	DBpatch_4050033(void)
@@ -993,7 +1001,7 @@ static int	DBpatch_4050033(void)
 
 	DBpatch_load_data(&interfaces, &snmp_ifs, &snmp_new_ifs);
 
-	while(1)
+	while (1)
 	{
 		if (0 < snmp_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_ifs))
 			break;
