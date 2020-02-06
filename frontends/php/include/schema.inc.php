@@ -5201,11 +5201,11 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
-			'details' => [
+			'note' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
-				'default' => '0',
+				'default' => '',
 			],
 			'ip' => [
 				'null' => false,

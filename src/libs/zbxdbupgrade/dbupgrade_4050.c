@@ -551,6 +551,18 @@ static int	DBpatch_4050030(void)
 	return SUCCEED;
 }
 
+static int DBpatch_4050031(void)
+{
+	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
+}
+
+static int DBpatch_4050032(void)
+{
+	const ZBX_FIELD	field = {"note", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("auditlog", "details", &field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -583,5 +595,7 @@ DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
 DBPATCH_ADD(4050028, 0, 1)
 DBPATCH_ADD(4050030, 0, 1)
+DBPATCH_ADD(4050031, 0, 1)
+DBPATCH_ADD(4050032, 0, 1)
 
 DBPATCH_END()
