@@ -3654,8 +3654,16 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(actionid, row[0]);
 		action = (zbx_dc_action_t *)DCfind_id(&config->actions, actionid, sizeof(zbx_dc_action_t), &found);
 
+		ZBX_STR2UCHAR(action->eventsource, row[1]);
+		ZBX_STR2UCHAR(action->evaltype, row[2]);
+
+		DCstrpool_replace(found, &action->formula, row[3]);
+
 		if (0 == found)
 		{
+			if (EVENT_SOURCE_INTERNAL == action->eventsource)
+				config->internal_actions++;
+
 			zbx_vector_ptr_create_ext(&action->conditions, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
 
@@ -3663,11 +3671,6 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 
 			action->opflags = ZBX_ACTION_OPCLASS_NONE;
 		}
-
-		ZBX_STR2UCHAR(action->eventsource, row[1]);
-		ZBX_STR2UCHAR(action->evaltype, row[2]);
-
-		DCstrpool_replace(found, &action->formula, row[3]);
 	}
 
 	/* remove deleted actions */
@@ -3675,6 +3678,9 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 	{
 		if (NULL == (action = (zbx_dc_action_t *)zbx_hashset_search(&config->actions, &rowid)))
 			continue;
+
+		if (EVENT_SOURCE_INTERNAL == action->eventsource)
+			config->internal_actions--;
 
 		zbx_strpool_release(action->formula);
 		zbx_vector_ptr_destroy(&action->conditions);
@@ -6047,6 +6053,8 @@ int	init_configuration_cache(char **error)
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
+
+	config->internal_actions = 0;
 
 	/* maintenance data are used only when timers are defined (server) */
 	if (0 != CONFIG_TIMER_FORKS)
@@ -10518,6 +10526,28 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __func__, hosts->num_data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_internal_action_count                                      *
+ *                                                                            *
+ * Purpose: get number of enabled internal actions                            *
+ *                                                                            *
+ * Return value: number of enabled internal actions                           *
+ *                                                                            *
+ ******************************************************************************/
+unsigned int	DCget_internal_action_count(void)
+{
+	unsigned int count;
+
+	RDLOCK_CACHE;
+
+	count = config->internal_actions;
+
+	UNLOCK_CACHE;
+
+	return count;
 }
 
 /******************************************************************************

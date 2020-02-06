@@ -1,1 +1,0 @@
-A.......S. [ZBX-16811] fixed SQL error during prototype removal by adding select for update locks (atumilovics)

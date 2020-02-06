@@ -197,10 +197,9 @@ $output = [
 	'buttons' => [
 		[
 			'title' => _('Test'),
-			'class' => 'submit-test-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return itemPreprocessingTest("#'.$form->getId().'");'
+			'action' => 'return itemPreprocessingTest(overlay);'
 		]
 	]
 ];

@@ -165,7 +165,7 @@ $output = [
 			'class' => 'dialogue-widget-save',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitMaintenancePeriod("#'.$form->getId().'")'
+			'action' => 'return submitMaintenancePeriod(overlay);'
 		]
 	],
 	'params' => $data['params'],

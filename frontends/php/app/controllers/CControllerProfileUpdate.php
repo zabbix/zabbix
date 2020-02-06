@@ -53,6 +53,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.layout.mode':
 				case 'web.maintenance.filter.active':
 				case 'web.media_types.filter.active':
+				case 'web.modules.filter.active':
 				case 'web.overview.filter.active':
 				case 'web.problem.filter.active':
 				case 'web.proxies.filter.active':

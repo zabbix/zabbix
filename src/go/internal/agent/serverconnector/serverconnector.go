@@ -56,12 +56,13 @@ type Connector struct {
 }
 
 type activeChecksRequest struct {
-	Request      string `json:"request"`
-	Host         string `json:"host"`
-	Version      string `json:"version"`
-	HostMetadata string `json:"host_metadata,omitempty"`
-	ListenIP     string `json:"ip,omitempty"`
-	ListenPort   int    `json:"port,omitempty"`
+	Request       string `json:"request"`
+	Host          string `json:"host"`
+	Version       string `json:"version"`
+	HostMetadata  string `json:"host_metadata,omitempty"`
+	HostInterface string `json:"interface,omitempty"`
+	ListenIP      string `json:"ip,omitempty"`
+	ListenPort    int    `json:"port,omitempty"`
 }
 
 type activeChecksResponse struct {
@@ -91,7 +92,7 @@ func ParseServerActive() ([]string, error) {
 		u := url.URL{Host: addresses[i]}
 		ip := net.ParseIP(addresses[i])
 		if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
-			return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": empty value", addresses[i])
+			return nil, fmt.Errorf("address \"%s\": empty value", addresses[i])
 		}
 
 		if nil != ip {
@@ -103,14 +104,14 @@ func ParseServerActive() ([]string, error) {
 		}
 
 		if h, p, err := net.SplitHostPort(checkAddr); err != nil {
-			return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
+			return nil, fmt.Errorf("address \"%s\": %s", addresses[i], err)
 		} else {
 			addresses[i] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
 		}
 
 		for j := 0; j < i; j++ {
 			if addresses[j] == addresses[i] {
-				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than once", addresses[i])
+				return nil, fmt.Errorf("address \"%s\" specified more than once", addresses[i])
 			}
 		}
 	}
@@ -121,7 +122,12 @@ func ParseServerActive() ([]string, error) {
 func (c *Connector) refreshActiveChecks() {
 	var err error
 
-	a := activeChecksRequest{Request: "active checks", Host: c.options.Hostname, Version: version.Short()}
+	a := activeChecksRequest{
+		Request:       "active checks",
+		Host:          c.options.Hostname,
+		Version:       version.Short(),
+		HostInterface: c.options.HostInterface,
+	}
 
 	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)

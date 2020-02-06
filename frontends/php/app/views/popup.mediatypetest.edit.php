@@ -89,11 +89,10 @@ $output = [
 	'buttons' => [
 		[
 			'title' => _('Test'),
-			'class' => 'submit-test-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'enabled' => $data['enabled'],
-			'action' => 'mediatypeTestSend("'.$form->getName().'");'
+			'action' => 'return mediatypeTestSend(overlay);'
 		]
 	]
 ];
