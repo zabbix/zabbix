@@ -128,6 +128,8 @@ define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 
+define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
+
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
 // maximum number of records for create() or update() API calls

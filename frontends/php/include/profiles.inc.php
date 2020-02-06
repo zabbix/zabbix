@@ -143,7 +143,13 @@ function update_config($config) {
 			'max' => SEC_PER_DAY,
 			'allow_zero' => false,
 			'message' => _('Invalid refresh of unsupported items: %1$s')
-		]
+		],
+		'compress_older' => [
+			'min' => SEC_PER_DAY * 7,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _('Invalid value in "Compress records older than": %1$s.')
+		],
 	];
 
 	foreach ($fields as $field => $args) {

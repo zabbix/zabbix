@@ -974,34 +974,41 @@ elseif (hasRequest('check_now') && hasRequest('itemid')) {
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	$result = false;
+	$config = select_config();
 
-	$itemId = getRequest('itemid');
+	if ($config['compression_status']) {
+		$error_message = _('History cleanup is not supported if compression is enabled');
+	}
+	else {
+		$error_message = _('Cannot clear history');
+		$itemId = getRequest('itemid');
 
-	$items = API::Item()->get([
-		'output' => ['key_'],
-		'itemids' => [$itemId],
-		'selectHosts' => ['name'],
-		'editable' => true
-	]);
+		$items = API::Item()->get([
+			'output' => ['key_'],
+			'itemids' => [$itemId],
+			'selectHosts' => ['name'],
+			'editable' => true
+		]);
 
-	if ($items) {
-		DBstart();
+		if ($items) {
+			DBstart();
 
-		$result = Manager::History()->deleteHistory([$itemId]);
+			$result = Manager::History()->deleteHistory([$itemId]);
 
-		if ($result) {
-			$item = reset($items);
-			$host = reset($item['hosts']);
+			if ($result) {
+				$item = reset($items);
+				$host = reset($item['hosts']);
 
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$itemId.'] '.
-				_('Host').' ['.$host['name'].'] '._('History cleared')
-			);
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$itemId.'] '.
+					_('Host').' ['.$host['name'].'] '._('History cleared')
+				);
+			}
+
+			$result = DBend($result);
 		}
-
-		$result = DBend($result);
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History cleared'), $error_message);
 }
 // mass update
 elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) {
@@ -1389,40 +1396,48 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
 	$result = false;
+	$config = select_config();
 
-	$itemIds = getRequest('group_itemid');
+	if ($config['compression_status']) {
+		$error_message = _('History cleanup is not supported if compression is enabled');
+	}
+	else {
+		$error_message = _('Cannot clear history');
 
-	$items = API::Item()->get([
-		'output' => ['itemid', 'key_'],
-		'itemids' => $itemIds,
-		'selectHosts' => ['name'],
-		'editable' => true
-	]);
+		$itemIds = getRequest('group_itemid');
 
-	if ($items) {
-		DBstart();
+		$items = API::Item()->get([
+			'output' => ['itemid', 'key_'],
+			'itemids' => $itemIds,
+			'selectHosts' => ['name'],
+			'editable' => true
+		]);
 
-		$result = Manager::History()->deleteHistory($itemIds);
+		if ($items) {
+			DBstart();
 
-		if ($result) {
-			foreach ($items as $item) {
-				$host = reset($item['hosts']);
+			$result = Manager::History()->deleteHistory($itemIds);
 
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-					_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
-						_('History cleared')
-				);
+			if ($result) {
+				foreach ($items as $item) {
+					$host = reset($item['hosts']);
+
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+						_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
+							_('History cleared')
+					);
+				}
 			}
-		}
 
-		$result = DBend($result);
+			$result = DBend($result);
 
-		if ($result) {
-			uncheckTableRows(getRequest('checkbox_hash'));
+			if ($result) {
+				uncheckTableRows(getRequest('checkbox_hash'));
+			}
 		}
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History cleared'), $error_message);
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
 	$group_itemid = getRequest('group_itemid');
