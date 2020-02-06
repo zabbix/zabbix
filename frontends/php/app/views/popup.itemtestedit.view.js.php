@@ -169,11 +169,13 @@ function itemGetValueTest(overlay) {
 		url: url.getUrl(),
 		data: post_data,
 		beforeSend: function() {
+			jQuery('#get_value_btn').addClass('is-loading');
 			overlay.setLoading();
 			disableItemTestForm();
 			cleanPreviousTestResults();
 		},
 		complete: function() {
+			jQuery('#get_value_btn').removeClass('is-loading');
 			enableItemTestForm();
 			overlay.unsetLoading();
 		},
