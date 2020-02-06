@@ -67,16 +67,16 @@ function disableItemTestForm() {
 			jQuery('#interface_port').prop('disabled', true);
 		<?php endif ?>
 
+		<?php if ($data['proxies_enabled']): ?>
+			jQuery('#proxy_hostid').prop('disabled', true);
+		<?php endif ?>
+
 	<?php else: ?>
 		jQuery('#get_value, #get_value_btn').prop('disabled', true);
 	<?php endif ?>
 
-	<?php if ($data['proxies_enabled']): ?>
-		jQuery('#proxy_hostid').prop('disabled', true);
-	<?php endif ?>
-
 	<?php if ($data['show_prev']): ?>
-		jQuery('#prev_value, #prev_time').prop('disabled', true);
+		jQuery('#prev_time').prop('readonly', true);
 	<?php endif ?>
 
 	jQuery('#eol input').prop('disabled', true);
@@ -99,16 +99,19 @@ function enableItemTestForm() {
 			jQuery('#interface_port').prop('disabled', false);
 		<?php endif ?>
 
+		<?php if ($data['proxies_enabled']): ?>
+			jQuery('#proxy_hostid').prop('disabled', false);
+		<?php endif ?>
+
 	<?php else: ?>
 		jQuery('#get_value, #get_value_btn').prop('disabled', false);
 	<?php endif ?>
 
-	<?php if ($data['proxies_enabled']): ?>
-		jQuery('#proxy_hostid').prop('disabled', false);
-	<?php endif ?>
-
 	<?php if ($data['show_prev']): ?>
-		jQuery('#prev_value, #prev_time').prop('disabled', false);
+		if (!jQuery('#get_value').is(':checked')) {
+			jQuery('#prev_value').multilineInput('unsetReadOnly');
+			jQuery('#prev_time').prop('readonly', false);
+		}
 	<?php endif ?>
 
 	jQuery('#eol input').prop('disabled', false);
@@ -457,7 +460,7 @@ jQuery(document).ready(function($) {
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('setReadOnly');
-					$('#prev_time', $form).prop('disabled', true);
+					$('#prev_time', $form).prop('readonly', true);
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
@@ -480,7 +483,7 @@ jQuery(document).ready(function($) {
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');
-					$('#prev_time', $form).prop('disabled', false);
+					$('#prev_time', $form).prop('readonly', false);
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>

@@ -144,7 +144,7 @@ $form_list
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			new CLabel(_('Prev. time'), 'prev_time'),
 			(new CTextBox('prev_time', $data['prev_time']))
-				->setEnabled($data['show_prev'])
+				->setReadonly($data['show_prev'])
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		]))->addClass('preproc-test-popup-value-row')
 	)
