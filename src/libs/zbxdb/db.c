@@ -485,6 +485,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			case OCI_SUCCESS_WITH_INFO:
 				zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_oci_error(err, NULL));
 				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			case OCI_SUCCESS:
 				err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp,
 						(ub4 *)0, OCI_ATTR_SERVER, oracle.errhp);
@@ -976,7 +977,7 @@ static sb4 db_bind_dynamic_cb(dvoid *ctxp, OCIBind *bindp, ub4 iter, ub4 index, 
 				*alenp = 0;
 				break;
 			}
-			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ZBX_TYPE_UINT:
 			*bufpp = &((OCINumber *)context->data)[iter];
 			*alenp = sizeof(OCINumber);
@@ -1063,7 +1064,7 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 			break;
 		case ZBX_TYPE_FLOAT:
 			context->size_max = sizeof(double);
-			data_type = SQLT_FLT;
+			data_type = SQLT_IBDOUBLE;
 			break;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
@@ -2192,7 +2193,7 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
  * Return value: the string length in bytes                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_strlen_n(const char *text, size_t maxlen)
+int	zbx_db_strlen_n(const char *string, size_t maxlen)
 {
-	return zbx_strlen_utf8_nchars(text, maxlen);
+	return zbx_strlen_utf8_nchars(string, maxlen);
 }
