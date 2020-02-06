@@ -938,18 +938,18 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 		dbu_snmp_if_t *s = &snmp_ifs->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"UPDATE items i, hosts h SET i.type=%d, i.interfaceid=" ZBX_FS_UI64
-				" WHERE i.hostid=h.hostid AND"
-					" type IN (1,4,6) AND h.status <> 3 AND"
-					" interfaceid=" ZBX_FS_UI64 " AND "
-					" snmp_community='%s' AND"
-					" snmpv3_securityname='%s' AND"
-					" snmpv3_securitylevel=%d AND"
-					" snmpv3_authpassphrase='%s' AND"
-					" snmpv3_privpassphrase='%s' AND"
-					" snmpv3_authprotocol=%d AND"
-					" snmpv3_privprotocol=%d AND"
-					" snmpv3_contextname='%s' AND"
+				"update items i, hosts h set i.type=%d, i.interfaceid=" ZBX_FS_UI64
+				" where i.hostid=h.hostid and"
+					" type in (1,4,6) and h.status <> 3 and"
+					" interfaceid=" ZBX_FS_UI64 " and"
+					" snmp_community='%s' and"
+					" snmpv3_securityname='%s' and"
+					" snmpv3_securitylevel=%d and"
+					" snmpv3_authpassphrase='%s' and"
+					" snmpv3_privpassphrase='%s' and"
+					" snmpv3_authprotocol=%d and"
+					" snmpv3_privprotocol=%d and"
+					" snmpv3_contextname='%s' and"
 					" port='%s';\n",
 				ITEM_TYPE_SNMP, s->interfaceid,
 				s->item_interfaceid, s->community, s->securityname, (int)s->securitylevel,
@@ -974,7 +974,7 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 static int	DBpatch_items_type_update(void)
 {
-	if (ZBX_DB_OK > DBexecute("update items set type=%d where type IN (1,4,6)", ITEM_TYPE_SNMP))
+	if (ZBX_DB_OK > DBexecute("update items set type=%d where type in (1,4,6)", ITEM_TYPE_SNMP))
 		return FAIL;
 
 	return SUCCEED;
