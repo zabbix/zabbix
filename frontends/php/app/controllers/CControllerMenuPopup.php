@@ -170,7 +170,8 @@ class CControllerMenuPopup extends CController {
 				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
 				$menu_data['showScreens'] = (bool) $db_host['screens'];
 				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
-				$menu_data['showConfig'] = $rw_hosts;
+				$menu_data['showConfig'] = (CWebUser::getType() > USER_TYPE_ZABBIX_USER);
+				$menu_data['isWriteable'] = $rw_hosts;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
 					$menu_data['severity_min'] = $data['severity_min'];

@@ -141,7 +141,6 @@ class CControllerHostView extends CControllerHost {
 			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			echo 'filter reset<br>';
 			CProfile::delete('web.host.filter.name');
 			CProfile::deleteIdx('web.host.filter.groupids');
 			CProfile::delete('web.host.filter.ip');

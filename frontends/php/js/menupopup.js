@@ -194,13 +194,18 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 		if (options.showConfig) {
 			var config = {
-					label: t('Configuration')
-				},
-				config_url = new Curl('hosts.php', false);
+				label: t('Configuration')
+			};
 
-			config_url.setArgument('form', 'update');
-			config_url.setArgument('hostid', options.hostid);
-			config.url = config_url.getUrl();
+			if (options.isWriteable) {
+				var config_url = new Curl('hosts.php', false);
+				config_url.setArgument('form', 'update');
+				config_url.setArgument('hostid', options.hostid);
+				config.url = config_url.getUrl();
+			}
+			else {
+				config.disabled = true;
+			}
 
 			items.push(config);
 		}
