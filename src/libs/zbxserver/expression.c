@@ -2621,20 +2621,21 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
- * Function: wrap_negative_double_suffix                                      *
+ * Function: wrap_signed_double_suffix                                        *
  *                                                                            *
- * Purpose: wrap a replacement string that represents a negative number in    *
- *          parentheses (for instance, turn "-123.456M" into "(-123.456M)")   *
+ * Purpose: wrap a replacement string that represents a signed number in      *
+ *          parentheses (for instance, turn "-123.456M" into "(-123.456M)"    *
+ *          or turn "+1e+2M" into "(+1e+2M)")                                 *
  *                                                                            *
  * Parameters: replace_to       - [IN/OUT] replacement string                 *
  *             replace_to_alloc - [IN/OUT] number of allocated bytes          *
  *                                                                            *
  ******************************************************************************/
-static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_alloc)
+static void	wrap_signed_double_suffix(char **replace_to, size_t *replace_to_alloc)
 {
 	size_t	replace_to_len;
 
-	if ('-' != (*replace_to)[0])
+	if ('-' != (*replace_to)[0] && '+' != (*replace_to)[0])
 		return;
 
 	replace_to_len = strlen(*replace_to);
@@ -4490,7 +4491,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			{
 				if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
 				{
-					wrap_negative_double_suffix(&replace_to, NULL);
+					wrap_signed_double_suffix(&replace_to, NULL);
 				}
 				else if (NULL != error)
 				{
@@ -5092,7 +5093,8 @@ static int	substitute_expression_functions_results(zbx_hashset_t *ifuncs, char *
 			return FAIL;
 		}
 
-		if (SUCCEED != is_double_suffix(func->value, ZBX_FLAG_DOUBLE_SUFFIX) || '-' == *func->value)
+		if (SUCCEED != is_double_suffix(func->value, ZBX_FLAG_DOUBLE_SUFFIX) ||
+				'-' == *func->value || '+' == *func->value)
 		{
 			zbx_chrcpy_alloc(out, out_alloc, &out_offset, '(');
 			zbx_strcpy_alloc(out, out_alloc, &out_offset, func->value);
@@ -5475,7 +5477,7 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 			size_t	replace_to_alloc;
 
 			replace_to_alloc = strlen(replace_to) + 1;
-			wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
+			wrap_signed_double_suffix(&replace_to, &replace_to_alloc);
 		}
 		else
 		{

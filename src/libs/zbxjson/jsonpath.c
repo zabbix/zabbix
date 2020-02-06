@@ -466,28 +466,10 @@ static int	jsonpath_parse_number(const char *start, int *len)
 	int		size;
 	double		tmp;
 
-	if ('-' == *ptr || '+' == *ptr)
-		ptr++;
-
 	if (FAIL == zbx_number_parse(ptr, &size))
 		return FAIL;
 
 	ptr += size;
-
-	if ('e' == *ptr || 'E' == *ptr)
-	{
-		ptr++;
-
-		if ('-' == *ptr || '+' == *ptr)
-			ptr++;
-
-		if (0 == isdigit((unsigned char)*ptr))
-			return FAIL;
-
-		while (0 != isdigit((unsigned char)*ptr))
-			ptr++;
-	}
-
 	errno = 0;
 	tmp = strtod(start, &end);
 

@@ -4173,9 +4173,12 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
  ******************************************************************************/
 int	zbx_number_parse(const char *number, int *len)
 {
-	int	digits = 0, dots = 0;
+	int	digits = 0, dots = 0, exp = 0;
 
 	*len = 0;
+
+	if ('-' == number[*len] || '+' == number[*len])
+		(*len)++;
 
 	while (1)
 	{
@@ -4193,7 +4196,23 @@ int	zbx_number_parse(const char *number, int *len)
 			continue;
 		}
 
-		if (1 > digits || 1 < dots)
+		if ('e' == number[*len] || 'E' == number[*len])
+		{
+			(*len)++;
+
+			if ('-' == number[*len] || '+' == number[*len])
+				(*len)++;
+
+			if (0 == isdigit(number[*len]))
+				return FAIL;
+
+			while (0 != isdigit(number[++(*len)]));
+
+			exp++;
+			continue;
+		}
+
+		if (1 > digits || 1 < dots || 1 < exp)
 			return FAIL;
 
 		return SUCCEED;

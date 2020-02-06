@@ -2657,9 +2657,6 @@ int	is_double_suffix(const char *str, unsigned char flags)
 {
 	int	len;
 
-	if ('-' == *str)	/* check leading sign */
-		str++;
-
 	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
 
@@ -2676,29 +2673,10 @@ static int	is_double_valid_syntax(const char *str)
 	/* Valid syntax is a decimal number optionally followed by a decimal exponent. */
 	/* Leading and trailing white space, NAN, INF and hexadecimal notation are not allowed. */
 
-	if ('-' == *str || '+' == *str)		/* check leading sign */
-		str++;
-
 	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
 
-	str += len;
-
-	if ('e' == *str || 'E' == *str)		/* check exponential part */
-	{
-		str++;
-
-		if ('-' == *str || '+' == *str)	/* check exponent sign */
-			str++;
-
-		if (0 == isdigit(*str))		/* check exponent */
-			return FAIL;
-
-		while (0 != isdigit(*str))
-			str++;
-	}
-
-	return '\0' == *str ? SUCCEED : FAIL;
+	return '\0' == *(str + len) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************

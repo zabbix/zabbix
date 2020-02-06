@@ -563,26 +563,12 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 		return SUCCEED;
 	}
 
+	ptr = data + pos;
+
 	if (FAIL == zbx_number_parse(ptr, &len))
 		return FAIL;
 
-	ptr += len;
-
-	if ('e' == *ptr || 'E' == *ptr)
-	{
-		ptr++;
-
-		if ('-' == *ptr || '+' == *ptr)
-			ptr++;
-
-		if (0 == isdigit(*ptr))
-			return FAIL;
-
-		while (0 != isdigit(*ptr))
-			ptr++;
-	}
-
-	loc->r = ptr - data - 1;
+	loc->r = ptr + len - data - 1;
 
 	return SUCCEED;
 }
