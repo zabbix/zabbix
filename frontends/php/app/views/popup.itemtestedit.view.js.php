@@ -172,7 +172,7 @@ function itemGetValueTest(overlay) {
 		url: url.getUrl(),
 		data: post_data,
 		beforeSend: function() {
-			jQuery('#get_value_btn').addClass('is-loading');
+			jQuery('#get_value_btn').blur().addClass('is-loading');
 			overlay.setLoading();
 			disableItemTestForm();
 			cleanPreviousTestResults();
