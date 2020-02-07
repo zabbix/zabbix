@@ -1028,12 +1028,12 @@ static int	db_if_cmp(const dbu_interface_t *if1, const dbu_interface_t *if2)
 	int	ret;
 
 	ZBX_RETURN_IF_NOT_EQUAL(if1->hostid, if2->hostid);
-	ZBX_RETURN_IF_NOT_EQUAL(if1->type,if2->type);
-	ZBX_RETURN_IF_NOT_EQUAL(if1->main,if2->main);
-	ZBX_RETURN_IF_NOT_EQUAL(if1->useip,if2->useip);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->ip,if2->ip);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->dns,if2->dns);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->port,if2->port);
+	ZBX_RETURN_IF_NOT_EQUAL(if1->type, if2->type);
+	ZBX_RETURN_IF_NOT_EQUAL(if1->main, if2->main);
+	ZBX_RETURN_IF_NOT_EQUAL(if1->useip, if2->useip);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->ip, if2->ip);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->dns, if2->dns);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->port, if2->port);
 
 	return 0;
 
