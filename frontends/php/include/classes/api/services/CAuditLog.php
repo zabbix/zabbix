@@ -90,6 +90,8 @@ class CAuditLog extends CApiService {
 				'oldvalue' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'newvalue' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
+			'time_from' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_till' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'selectDetails' => 			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $this->details_fields), 'default' => null],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -127,6 +129,16 @@ class CAuditLog extends CApiService {
 		if ($options['userids'] !== null) {
 			$userids = array_filter(is_array($options['userids']) ? $options['userids'] : [$options['userids']]);
 			$sql_parts['where']['userid'] = dbConditionInt('a.userid', $userids);
+		}
+
+		// time_from
+		if ($options['time_from']) {
+			$sql_parts['where'][] = 'a.clock>='.zbx_dbstr($options['time_from']);
+		}
+
+		// time_till
+		if ($options['time_till']) {
+			$sql_parts['where'][] = 'a.clock<='.zbx_dbstr($options['time_till']);
 		}
 
 		// limit
