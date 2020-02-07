@@ -916,7 +916,11 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 		dbu_snmp_if_t	*s = &snmp_ifs->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+#ifdef HAVE_MYSQL
 				"update items i, hosts h set i.type=%d, i.interfaceid=" ZBX_FS_UI64
+#else
+				"update items i set type=%d, interfaceid=" ZBX_FS_UI64 " from hosts h"
+#endif
 				" where i.hostid=h.hostid and"
 					" type in (1,4,6) and h.status <> 3 and"
 					" interfaceid=" ZBX_FS_UI64 " and"
