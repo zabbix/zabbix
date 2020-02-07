@@ -18,54 +18,42 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$auditWidget = (new CWidget())->setTitle(_('Audit log'));
 
-// header
+$this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('gtlc.js');
 
-$filterColumn = new CFormList();
-$filterColumn->addRow(_('User'), [
-	(new CTextBox('alias', $this->data['alias']))
-		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus'),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('btn1', _('Select')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
-				'srctbl' => 'users',
-				'srcfld1' => 'alias',
-				'dstfrm' => 'zbx_filter',
-				'dstfld1' => 'alias'
-			]).', null, this);'
-		)
-]);
-$filterColumn->addRow(_('Action'), new CComboBox('action', $this->data['action'], null, [
-	-1 => _('All'),
-	AUDIT_ACTION_LOGIN => _('Login'),
-	AUDIT_ACTION_LOGOUT => _('Logout'),
-	AUDIT_ACTION_ADD => _('Add'),
-	AUDIT_ACTION_UPDATE => _('Update'),
-	AUDIT_ACTION_DELETE => _('Delete'),
-	AUDIT_ACTION_ENABLE => _('Enable'),
-	AUDIT_ACTION_DISABLE => _('Disable')
-]));
-$filterColumn->addRow(_('Resource'), new CComboBox('resourcetype', $this->data['resourcetype'], null,
-	[-1 => _('All')] + audit_resource2str()
-));
+$filter = (new CFormList())
+	->addRow(_('User'), [
+		(new CTextBox('user_alias', $data['user_alias']))
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('select_user', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("popup.generic",'.
+				CJs::encodeJson([
+					'srctbl' => 'users',
+					'srcfld1' => 'alias',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'user_alias'
+				]).', null, this);'
+			)
+	])
+	->addRow(_('Action'), new CComboBox('auditlog_action', $data['auditlog_action'], null, $data['actions']))
+	->addRow(_('Resource'), new CComboBox('resourcetype', $data['resourcetype'], null, $data['resources']));
 
-$auditWidget->addItem(
-	(new CFilter(new CUrl('auditlogs.php')))
+$widget = (new CWidget())
+	->setTitle(_('Audit log'))
+	->addItem((new CFilter(new CUrl('zabbix.php')))
+		->addVar('action', $data['action'])
 		->setProfile($data['timeline']['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
-		->addFilterTab(_('Filter'), [$filterColumn])
+		->addFilterTab(_('Filter'), [$filter])
 );
 
-// create form
-$auditForm = (new CForm('get'))->setName('auditForm');
-
 // create table
-$auditTable = (new CTableInfo())
+$table = (new CTableInfo())
 	->setHeader([
 		_('Time'),
 		_('User'),
@@ -76,45 +64,41 @@ $auditTable = (new CTableInfo())
 		_('Description'),
 		_('Details')
 	]);
-foreach ($this->data['actions'] as $action) {
+
+foreach ($data['auditlogs'] as $auditlog) {
 	$details = [];
-	if (is_array($action['details'])) {
-		foreach ($action['details'] as $detail) {
-			$details[] = [$detail['table_name'].'.'.$detail['field_name'].NAME_DELIMITER.$detail['oldvalue'].' => '.$detail['newvalue'], BR()];
-		}
-	}
-	else {
-		$details = $action['details'];
+
+	foreach ($auditlog['details'] as $detail) {
+		$details[] = [$detail['table_name'].'.'.$detail['field_name'].NAME_DELIMITER.$detail['oldvalue'].
+			' => '.$detail['newvalue'], BR()];
 	}
 
-	$auditTable->addRow([
-		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
-		$action['alias'],
-		$action['ip'],
-		$action['resourcetype'],
-		$action['action'],
-		$action['resourceid'],
-		$action['resourcename'],
-		$details
+	$table->addRow([
+		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $auditlog['clock']),
+		$data['users'][$auditlog['userid']],
+		$auditlog['ip'],
+		$data['resources'][$auditlog['resourcetype']],
+		$data['actions'][$auditlog['action']],
+		$auditlog['resourceid'],
+		$auditlog['resourcename'],
+		$details ? $details : $auditlog['note']
 	]);
 }
-
-// append table to form
-$auditForm->addItem([$auditTable, $this->data['paging']]);
 
 // append navigation bar js
 $objData = [
 	'id' => 'timeline_1',
-	'domid' => 'events',
+	'domid' => 'auditlog',
 	'loadSBox' => 0,
 	'loadImage' => 0,
 	'dynamic' => 0,
 	'mainObject' => 1
 ];
-zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($this->data['timeline']).', '.zbx_jsvalue($objData).');');
+zbx_add_post_js('timeControl.addObject("auditlog", '.json_encode($data['timeline']).', '.json_encode($objData).');');
 zbx_add_post_js('timeControl.processObjects();');
 
 // append form to widget
-$auditWidget->addItem($auditForm);
-
-return $auditWidget;
+$widget->addItem((new CForm('get'))
+	->setName('auditForm')
+	->addItem([$table, $data['paging']])
+)->show();
