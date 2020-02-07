@@ -1096,7 +1096,7 @@ static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vec
 	DB_ROW		row;
 
 	result = DBselect(
-			"select drule.hostid,"
+			"select hreal.hostid,"
 				"i.interfaceid,"
 				"i.main,"
 				"i.type,"
