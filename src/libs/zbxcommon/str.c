@@ -4177,9 +4177,6 @@ int	zbx_number_parse(const char *number, int *len)
 
 	*len = 0;
 
-	if ('-' == number[*len] || '+' == number[*len])
-		(*len)++;
-
 	while (1)
 	{
 		if (0 != isdigit(number[*len]))

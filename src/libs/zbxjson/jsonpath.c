@@ -466,6 +466,9 @@ static int	jsonpath_parse_number(const char *start, int *len)
 	int		size;
 	double		tmp;
 
+	if ('-' == *ptr || '+' == *ptr)
+		ptr++;
+
 	if (FAIL == zbx_number_parse(ptr, &size))
 		return FAIL;
 

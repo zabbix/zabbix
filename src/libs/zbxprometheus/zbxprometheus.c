@@ -563,8 +563,6 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 		return SUCCEED;
 	}
 
-	ptr = data + pos;
-
 	if (FAIL == zbx_number_parse(ptr, &len))
 		return FAIL;
 

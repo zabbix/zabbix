@@ -2657,6 +2657,9 @@ int	is_double_suffix(const char *str, unsigned char flags)
 {
 	int	len;
 
+	if ('-' == *str)	/* check leading sign */
+		str++;
+
 	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
 
@@ -2669,6 +2672,9 @@ int	is_double_suffix(const char *str, unsigned char flags)
 static int	is_double_valid_syntax(const char *str)
 {
 	int	len;
+
+	if ('-' == *str || '+' == *str)		/* check leading sign */
+		str++;
 
 	/* Valid syntax is a decimal number optionally followed by a decimal exponent. */
 	/* Leading and trailing white space, NAN, INF and hexadecimal notation are not allowed. */
