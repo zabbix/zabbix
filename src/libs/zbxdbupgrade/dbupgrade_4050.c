@@ -1070,10 +1070,10 @@ static zbx_uint64_t	db_if_find(const dbu_interface_t *interface, dbu_snmp_if_t *
 	for (i = interfaces->values_num - 1; i >= 0 &&
 			interface->hostid == interfaces->values[i].hostid; i--)
 	{
-		if (0 == db_if_cmp(interface, &interfaces->values[i]))
+		if (0 != db_if_cmp(interface, &interfaces->values[i]))
 			continue;
 
-		if (0 == db_snmp_if_cmp(snmp, &snmp_ifs->values[i]))
+		if (0 != db_snmp_if_cmp(snmp, &snmp_ifs->values[i]))
 			continue;
 
 		return interfaces->values[i].interfaceid;
@@ -1170,8 +1170,10 @@ static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vec
 			continue;
 		}
 
-		interface.interfaceid = DBget_maxid("interface");
-		snmp.interfaceid = interface.interfaceid;
+		if_parentid = DBget_maxid("interface");
+		db_if_link(interface.interfaceid, if_parentid, if_links);
+		interface.interfaceid = if_parentid;
+		snmp.interfaceid = if_parentid;
 		zbx_vector_dbu_interface_append(interfaces, interface);
 		zbx_vector_dbu_snmp_if_append(snmp_ifs, snmp);
 	}
