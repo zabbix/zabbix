@@ -36,8 +36,6 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] == ZBX_LAYOUT_KIOSK
 	define('ZBX_PAGE_NO_MENU', true);
 }
 
-require_once dirname(__FILE__).'/menu.inc.php';
-
 if (!defined('ZBX_PAGE_NO_THEME')) {
 	define('ZBX_PAGE_NO_THEME', false);
 }
@@ -203,7 +201,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader->display();
 ?>
 <body lang="<?= CWebUser::getLang() ?>">
-<output class="<?= ZBX_STYLE_MSG_GLOBAL_FOOTER.' '.ZBX_STYLE_MSG_WARNING ?>" id="msg-global-footer"></output>
 <?php
 }
 
@@ -240,22 +237,13 @@ if ($page['type'] == PAGE_TYPE_HTML && (CSession::keyExists('messageOk') || CSes
 
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 	$pageMenu = new CView('layout.htmlpage.aside', [
-		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
-		'menu' => APP::Component()->get('menu.main'),
-		'user' => [
-			'is_guest' => CWebUser::isGuest(),
-			'alias' => CWebUser::$data['alias'],
-			'name' => CWebUser::$data['name'],
-			'surname' => CWebUser::$data['surname']
-		],
-		'support_url' => getSupportUrl(CWebUser::getLang())
+		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : ''
 	]);
 	echo $pageMenu->getOutput();
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	echo '<div class="wrapper">'."\n";
-	echo '<main>';
 }
 
 // if a user logs in after several unsuccessful attempts, display a warning

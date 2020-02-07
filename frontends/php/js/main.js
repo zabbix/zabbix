@@ -105,6 +105,7 @@ var PageRefresh = {
 /*
  * Main menu
  */
+/* TODO: Legacy
 var MMenu = {
 	def_label:		null,
 	sub_active: 	false,
@@ -171,7 +172,7 @@ var MMenu = {
 		}
 	}
 };
-
+*/
 /*
  * Audio control system
  */

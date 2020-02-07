@@ -283,13 +283,11 @@ class CPageFilter {
 				$profileSection = $page['file'];
 			}
 			else {
-				$menu = APP::Component()->get('menu.main');
+				/** @var CMenuItem $menu_item */
+				$menu_item = APP::Component()->get('menu.main')->findSelected();
 
-				foreach ($menu->getItems() as $menu_item) {
-					if ($menu_item->isSelected()) {
-						$profileSection = $menu_item->getUniqueId();
-						break;
-					}
+				if ($menu_item !== null) {
+					$profileSection = $menu_item->getId();
 				}
 			}
 		}

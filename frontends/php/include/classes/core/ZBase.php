@@ -121,6 +121,7 @@ class ZBase {
 		require_once 'include/func.inc.php';
 		require_once 'include/html.inc.php';
 		require_once 'include/perm.inc.php';
+		require_once 'include/menu.inc.php';
 		require_once 'include/audit.inc.php';
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
@@ -172,7 +173,7 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
-				$this->initMainMenu();
+				$this->initComponents();
 				$this->initModuleManager();
 
 				$file = basename($_SERVER['SCRIPT_NAME']);
@@ -182,7 +183,7 @@ class ZBase {
 				$router->addActions($this->module_manager->getActions());
 				$router->setAction($action_name);
 
-				$this->component_registry->get('menu.main')->setSelected($action_name);
+				$this->component_registry->get('menu.main')->setSelectedByAction($action_name);
 
 				CProfiler::getInstance()->start();
 
@@ -592,10 +593,9 @@ class ZBase {
 	/**
 	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
 	 */
-	private function initMainMenu() {
-		$menu = new CMenu('menu.main', []);
-		$this->component_registry->register('menu.main', $menu);
-		include 'include/menu.inc.php';
+	private function initComponents() {
+		$this->component_registry->register('menu.main', getMainMenu());
+		$this->component_registry->register('menu.user', getUserMenu());
 	}
 
 	/**

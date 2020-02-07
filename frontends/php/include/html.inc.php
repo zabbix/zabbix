@@ -730,6 +730,13 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
 	return makeWarningIcon($warning);
 }
 
+function makeServerStatusOutput() {
+	return (new CTag('output', true))
+		->setId('msg-global-footer')
+		->addClass(ZBX_STYLE_MSG_GLOBAL_FOOTER)
+		->addClass(ZBX_STYLE_MSG_WARNING);
+}
+
 /**
  * Renders a page footer.
  *
@@ -738,7 +745,8 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
  * @return CDiv
  */
 function makePageFooter($with_version = true) {
-	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))->setAttribute('role', 'contentinfo');
+	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))
+		->setAttribute('role', 'contentinfo');
 }
 
 /**

@@ -103,7 +103,7 @@ class CWidget {
 			$widget[] = $this->createTopHeader();
 		}
 
-		$tab = [$widget, $this->body];
+		$tab = [$widget, new CTag('main', true, $this->body)];
 
 		return unpack_object($tab);
 	}

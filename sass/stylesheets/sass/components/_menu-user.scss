@@ -1,0 +1,68 @@
+//$menu-user-icons: (
+//		support: url(../img/icon-sprite.svg) no-repeat -247px -48px,
+//		share: url(../img/icon-sprite.svg) no-repeat -90px -84px,
+//		help: url(../img/icon-sprite.svg) no-repeat -90px -48px,
+//		guest: url(../img/icon-sprite.svg) no-repeat -241px -104px,
+//		profile: url(../img/icon-sprite.svg) no-repeat -90px -120px,
+//		signout: url(../img/icon-sprite.svg) no-repeat -90px -156px
+//);
+
+//@each $class, $bgimage in $menu-user-icons {
+//	.icon-#{$class} {
+//
+//		&::before {
+//			background: $bgimage;
+//			content: '';
+//			height: 12px;
+//			width: 12px;
+//		}
+//	}
+//}
+
+
+.menu-user {
+/*
+	padding: 12px 0;
+
+	li {
+		line-height: 16px;
+	}
+
+	a {
+		display: block;
+		font-size: 12px;
+		padding: 12px 12px 12px 48px;
+		position: relative;
+		white-space: nowrap;
+
+		@if $ui-transitions {
+			transition: color $ui-transition-duration ease-out;
+		}
+
+		&::before {
+			position: absolute;
+			left: 20px;
+			top: 13px;
+			opacity: .75;
+
+			@if $ui-transitions {
+				transition: opacity $ui-transition-duration ease-out;
+			}
+		}
+
+		&:hover,
+		&:focus {
+			border-bottom: none;
+			color: $menu-user-hover-color;
+
+			&::before {
+				opacity: 1;
+			}
+		}
+	}
+
+	a {
+		color: $menu-user-color;
+	}
+*/
+}

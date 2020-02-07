@@ -19,8 +19,6 @@
 **/
 
 
-require_once 'include/menu.inc.php';
-
 function local_generateHeader($data) {
 	// only needed for zbx_construct_menu
 	global $page;
@@ -53,7 +51,6 @@ function local_generateHeader($data) {
 		header('X-Frame-Options: '.$x_frame_options);
 	}
 
-
 	$pageHeader = new CView('layout.htmlpage.header', [
 		'javascript' => [
 			'files' => $data['javascript']['files']
@@ -69,25 +66,17 @@ function local_generateHeader($data) {
 	]);
 	echo $pageHeader->getOutput();
 
-	if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
-		global $ZBX_SERVER_NAME;
+//	if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
+//		global $ZBX_SERVER_NAME;
+//
+//		$pageMenu = new CView('layout.htmlpage.aside', [
+//			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : ''
+//		]);
+//		echo $pageMenu->getOutput();
+//	}
 
-		$pageMenu = new CView('layout.htmlpage.aside', [
-			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
-			'menu' => APP::Component()->get('menu.main'),
-			'user' => [
-				'is_guest' => CWebUser::isGuest(),
-				'alias' => CWebUser::$data['alias'],
-				'name' => CWebUser::$data['name'],
-				'surname' => CWebUser::$data['surname']
-			],
-			'support_url' => getSupportUrl(CWebUser::getLang())
-		]);
-		echo $pageMenu->getOutput();
-	}
-
-	echo '<div class="wrapper">'."\n";
-	echo '<main'.(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' class="'.ZBX_STYLE_LAYOUT_KIOSKMODE.'"' : '').'>';
+//	echo '<div class="wrapper'.
+//		(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">';
 
 	// if a user logs in after several unsuccessful attempts, display a warning
 	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
@@ -109,17 +98,24 @@ function local_generateHeader($data) {
 	show_messages();
 }
 
+function local_generateSidebar($data) {
+	if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
+		global $ZBX_SERVER_NAME;
+
+		echo (new CView('layout.htmlpage.aside', [
+			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : ''
+		]))->getOutput()."\n";
+	}
+}
+
 function local_generateFooter($data) {
-	$pageFooter = new CView('layout.htmlpage.footer', [
+	echo (new CView('layout.htmlpage.footer', [
 		'user' => [
 			'alias' => CWebUser::$data['alias'],
 			'debug_mode' => CWebUser::$data['debug_mode']
 		],
 		'web_layout_mode' => $data['web_layout_mode']
-	]);
-	echo '</main>'."\n";
-	echo $pageFooter->getOutput()."\n";
-	echo '</div>'."\n";
+	]))->getOutput()."\n";
 }
 
 function local_showMessage() {
@@ -145,11 +141,13 @@ function local_showMessage() {
 $data['web_layout_mode'] = CView::getLayoutMode();
 
 local_generateHeader($data);
+local_generateSidebar($data);
+echo '<div class="wrapper'.(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">';
 local_showMessage();
 echo $data['javascript']['pre'];
 echo $data['main_block'];
 echo $data['javascript']['post'];
 local_generateFooter($data);
 show_messages();
-
-echo '</body></html>';
+makeServerStatusOutput()->show();
+echo '</div></body></html>';

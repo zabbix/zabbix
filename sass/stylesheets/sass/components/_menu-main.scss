@@ -1,0 +1,164 @@
+.menu-main {
+/*
+	li {
+		line-height: 16px;
+
+		&.has-submenu {
+
+			& > a {
+
+				&:after {
+					content: '';
+					background: url(../img/icon-sprite.svg) no-repeat -509px -434px;
+					width: 6px;
+					height: 4px;
+					position: absolute;
+					right: 14px;
+					top: 18px;
+					transform: rotate(0deg);
+
+					@if $ui-transitions {
+						transition: transform $ui-transition-duration ease-out;
+					}
+				}
+			}
+		}
+
+		&.has-submenu:not(.expanded) {
+
+			.submenu {
+				max-height: 0 !important;
+
+				@if $ui-transitions {
+					transition: max-height $ui-transition-duration ease;
+					will-change: max-height;
+					transform: translate3d(0, 0, 0);
+				}
+			}
+		}
+
+		&.is-selected {
+
+			& > a {
+
+				&,
+				&:hover,
+				&:focus {
+					background: $menu-main-selected-bg-color;
+					border-color: $menu-main-selected-border-color;
+					color: $menu-main-selected-color;
+				}
+			}
+		}
+
+		&.has-submenu.expanded {
+
+			& > a {
+
+				&,
+				&:hover,
+				&:focus {
+					background: $menu-main-submenu-hover-bg-color;
+					border-color: transparent;
+				}
+
+				&:after {
+					transform: rotate(-180deg);
+				}
+			}
+		}
+	}
+
+	a {
+		border-left: 3px solid transparent;
+		display: block;
+		color: $menu-main-color;
+		font-size: 14px;
+		padding: 12px 12px 12px 45px;
+		position: relative;
+		white-space: nowrap;
+
+		@if $ui-transitions {
+			transition: color $ui-transition-duration ease-out,
+			border-color $ui-transition-duration ease-out,
+			background-color $ui-transition-duration ease-out;
+		}
+
+		&:before {
+			position: absolute;
+			left: 9px;
+			top: 7px;
+		}
+
+		&:hover {
+			background: $menu-main-hover-bg-color;
+			border-bottom: none;
+			border-color: $menu-main-hover-border-color;
+			color: $menu-main-hover-color;
+
+			&:before {
+				background-position-x: -530px;
+			}
+		}
+
+		&:focus {
+			border-bottom: none;
+		}
+	}
+
+	.submenu {
+		box-sizing: border-box;
+		background: $menu-main-submenu-border-color;
+		padding-left: 24px;
+		position: relative;
+		overflow: hidden;
+
+		@if $ui-transitions {
+			transition: max-height $ui-transition-duration ease-out;
+		}
+
+		&:before,
+		&:after {
+			content: '';
+			position: absolute;
+			left: 0;
+			right: 0;
+			box-shadow: 0 0 6px 2px rgba(0, 0, 0, .35);
+		}
+
+		&:before {
+			top: 0;
+		}
+
+		&:after {
+			bottom: 0;
+		}
+
+		li {
+			line-height: 14px;
+
+			&:not(:last-child) {
+				border-bottom: 1px solid #051620;
+			}
+
+			&.is-selected {
+
+				a {
+					background: $menu-main-submenu-selected-bg-color;
+				}
+			}
+		}
+
+		a {
+			background: $menu-main-submenu-bg-color;
+			font-size: 12px;
+			padding: 8px 12px 8px 21px;
+
+			&:hover,
+			&:focus {
+				background: $menu-main-submenu-hover-bg-color;
+			}
+		}
+	}
+*/
+}

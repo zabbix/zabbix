@@ -11,6 +11,6 @@
 		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies
 		cookie.init();
 		chkbxRange.init();
-		MMenu.init();
+		//MMenu.init();
 	});
 </script>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,98 +41,36 @@ $search = (new CForm('get', 'zabbix.php'))
 		(new CDiv())->addClass('search-icon')
 	]);
 
-$menu_main = (new CList())->addClass(ZBX_STYLE_TOP_NAV);
-
-foreach ($data['menu']['main_menu'] as $menu_item) {
-	$menu_main->addItem($menu_item);
-}
-
-$user_navigation = (new CList())
-	->addItem(CBrandHelper::isRebranded()
-		? null
-		: (new CListItem(
-			(new CLink(_('Support'), $data['support_url']))
-				->addClass(ZBX_STYLE_TOP_NAV_SUPPORT)
-				->addClass('menu-user-icon-support')
-				->setAttribute('target', '_blank')
-				->setTitle(_('Zabbix Technical Support'))
-		))
-	)
-	->addItem(CBrandHelper::isRebranded()
-		? null
-		: (new CListItem(
-			(new CLink('Share', 'https://share.zabbix.com/'))
-				->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
-				->addClass('menu-user-icon-share')
-				->setAttribute('target', '_blank')
-				->setTitle(_('Zabbix Share'))
-		))
-	)
-	->addItem((new CLink(_('Help'), CBrandHelper::getHelpUrl()))
-		->addClass(ZBX_STYLE_TOP_NAV_HELP)
-		->addClass('menu-user-icon-help')
-		->setAttribute('target', '_blank')
-		->setTitle(_('Help'))
-	)
-	->addItem(
-		$data['user']['is_guest']
-			? (new CSpan())
-				->addClass(ZBX_STYLE_TOP_NAV_GUEST)
-				->addClass('menu-user-icon-guest')
-				->setTitle(getUserFullname($data['user']))
-			: (new CLink(_('User settings'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'userprofile.edit')
-					->getUrl()
-				))
-				->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
-				->addClass('menu-user-icon-profile')
-				->setTitle(getUserFullname($data['user']))
-	)
-	->addItem(
-		(new CLink(_('Sign out'), 'javascript:;'))
-		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
-			->addClass('menu-user-icon-signout')
-			->setTitle(_('Sign out'))
-			->onClick('ZABBIX.logout()')
-	);
-
 (new CTag('aside', true))
 	->addClass('sidebar')
 	->addItem(
-		(new CDiv())
-			->addClass('sidebar-header')
-			->addItem($logo)
-			->addItem($search)
-			->addItem((new CButton(null, _('Collapse sidebar')))
+		(new CDiv([
+			$logo,
+			$search,
+			(new CButton(null, _('Collapse sidebar')))
 				->addClass('button-compact')
-				->setAttribute('title', _('Collapse sidebar'))
-			)
-			->addItem((new CButton(null, _('Expand sidebar')))
+				->setAttribute('title', _('Collapse sidebar')),
+			(new CButton(null, _('Expand sidebar')))
 				->addClass('button-expand')
-				->setAttribute('title', _('Expand sidebar'))
-			)
-			->addItem((new CButton(null, _('Hide sidebar')))
+				->setAttribute('title', _('Expand sidebar')),
+			(new CButton(null, _('Hide sidebar')))
 				->addClass('button-sidebar-hide')
-				->setAttribute('title', _('Hide sidebar'))
-			)
-			->addItem((new CButton(null, _('Show sidebar')))
+				->setAttribute('title', _('Hide sidebar')),
+			(new CButton(null, _('Show sidebar')))
 				->addClass('button-sidebar-show')
 				->setAttribute('title', _('Show sidebar'))
-			)
+		]))->addClass('sidebar-header')
 	)
-	->addItem((new CDiv())
-		->addClass('sidebar-navigation')
-		->addClass('scrollable')
-		->addItem((new CTag('nav', true, $menu_main))
-			->setId('mmenu')
-			->addClass(ZBX_STYLE_TOP_NAV_CONTAINER)
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _('Main navigation'))
-		)
-		->addItem((new CTag('nav', true, $user_navigation))
-			->addClass(ZBX_STYLE_TOP_NAV_ICONS)
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _('User menu'))
-		)
+	->addItem(
+		(new CDiv([
+			(new CTag('nav', true, APP::Component()->get('menu.main')->addClass('menu-main')))
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Main navigation')),
+			(new CTag('nav', true, APP::Component()->get('menu.user')->addClass('menu-user')))
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('User menu'))
+		]))
+			->addClass('sidebar-navigation')
+			->addClass('scrollable')
 	)
 	->show();

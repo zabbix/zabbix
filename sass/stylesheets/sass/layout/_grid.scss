@@ -1,0 +1,58 @@
+html,
+body {
+	height: 100vh;
+}
+
+body {
+	display: flex;
+	min-width: 1200px;
+	overflow: hidden;
+}
+
+aside
+.wrapper,
+{
+	box-sizing: border-box;
+}
+
+aside {
+
+}
+
+.wrapper {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	overflow: auto;
+	position: relative;
+}
+
+header,
+footer {
+	flex-shrink: 0;
+}
+
+header {
+	margin-bottom: 10px;
+}
+
+main {
+	padding: 0 10px;
+}
+
+footer {
+	margin-top: auto;
+}
+
+
+/*
+
+
+main {
+	padding: 0 10px;
+}
+
+footer {
+
+}
+*/
