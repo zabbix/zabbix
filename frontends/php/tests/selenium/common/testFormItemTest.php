@@ -274,7 +274,7 @@ class testFormItemTest extends CWebTest {
 							'macro' => '{HOST.PORT}',
 							'value' => '12345'
 						]
-					],
+					]
 				]
 			],
 			[
@@ -524,8 +524,8 @@ class testFormItemTest extends CWebTest {
 
 		// Open Test item dialog form.
 		$this->query('id:test_item')->waitUntilVisible()->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilPresent()->
-			asOverlayDialog()->one()->waitUntilReady();
+		$dialog = $this->query('xpath://div[@data-dialogueid="item-test" and @role="dialog"]')
+			->waitUntilPresent()->asOverlayDialog()->one()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -659,12 +659,9 @@ class testFormItemTest extends CWebTest {
 				// Global macros values for items on template are empty.
 				if (!$is_host && $data['fields']['Type'] === 'JMX agent') {
 					foreach ($macros['expected'] as &$macro) {
-						if (substr($macro['macro'], 1, 1) === '$' ||
-							substr($macro['macro'], 1, 1) === '#')
-						{
+						if (in_array(substr($macro['macro'], 1, 1), ['$', '#'])) {
 							continue;
 						}
-
 						$macro['value'] = '';
 					}
 					unset($macro);
@@ -673,7 +670,10 @@ class testFormItemTest extends CWebTest {
 				if ($macros['expected']){
 					foreach ($test_form->getField('Macros')->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
-
+						/*
+						 * Macro columns are represented in following way:
+						 * (0)macro (1)=> (2)value
+						 */
 						$macros['actual'][] = [
 							'macro' => $columns[0]->getText(),
 							'value' => $columns[2]->getText()
@@ -766,7 +766,6 @@ class testFormItemTest extends CWebTest {
 	private function checkTestButtonInPreprocessing($item_type, $enabled = true, $i = 0) {
 		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$test_button = $this->query('id:test_item')->waitUntilVisible()->one();
-
 
 		$this->assertTrue($test_button->isEnabled($enabled));
 		$item_form->selectTab('Preprocessing');
