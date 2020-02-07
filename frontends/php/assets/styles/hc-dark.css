@@ -1504,7 +1504,7 @@ button {
   min-height: 24px;
   cursor: pointer;
   outline: 0;
-  transition: border-color, background-color .2s ease-out; }
+  transition: border-color .2s ease-out, background-color .2s ease-out; }
   button:hover {
     color: #333333;
     background-color: lightgray;
@@ -2838,6 +2838,14 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0;
       margin: 0;
       border-left-color: #cacaca; }
+    .menu-popup .menu-popup-item[class*='icon-']::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      width: 22px;
+      height: 22px;
+      content: ""; }
   .menu-popup .menu-popup-item-disabled {
     display: block;
     height: 24px;
@@ -4031,6 +4039,113 @@ a.link-action {
     border: 1px solid #7d7d7d; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
+
+.input-group {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%; }
+  .input-group * {
+    box-sizing: border-box; }
+  .input-group input,
+  .input-group textarea {
+    flex: 1;
+    border-right: 0; }
+    .input-group input:focus + .btn-undo, .input-group input:active + .btn-undo,
+    .input-group textarea:focus + .btn-undo,
+    .input-group textarea:active + .btn-undo {
+      border-top-color: #333333;
+      border-bottom-color: #333333; }
+  .input-group button {
+    position: relative; }
+    .input-group button.btn-change {
+      border-radius: 0; }
+    .input-group button.btn-undo {
+      display: none;
+      width: 24px;
+      border-left: 0;
+      border-right: 0;
+      border-top: 1px solid #666666;
+      border-bottom: 1px solid #666666;
+      border-radius: 0;
+      background-color: #383838; }
+      .input-group button.btn-undo::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 22px;
+        height: 22px;
+        content: "";
+        background: url(../img/icon-sprite.svg) no-repeat -119px -474px; }
+      .input-group button.btn-undo:hover, .input-group button.btn-undo:focus, .input-group button.btn-undo:active, .input-group button.btn-undo.focused {
+        background-color: #e0e0e0;
+        border-top: 1px solid #bbbbbb;
+        border-bottom: 1px solid #bbbbbb; }
+        .input-group button.btn-undo:hover::before, .input-group button.btn-undo:focus::before, .input-group button.btn-undo:active::before, .input-group button.btn-undo.focused::before {
+          background-position: -431px -474px; }
+    .input-group button.btn-dropdown-toggle {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0; }
+
+.input-secret {
+  position: relative;
+  display: flex;
+  flex: 1; }
+  .input-secret input {
+    flex: 1; }
+  .input-secret button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0; }
+    .input-secret button:hover, .input-secret button:focus, .input-secret button:active {
+      opacity: 1;
+      animation: fadein .2s; }
+
+.dropdown {
+  display: flex; }
+
+.icon-text::before {
+  background: url(../img/icon-sprite.svg) no-repeat -87px -474px; }
+.icon-text:hover::before, .icon-text:focus::before, .icon-text:active::before {
+  background-position: -399px -474px; }
+
+.icon-secret::before {
+  background: url(../img/icon-sprite.svg) no-repeat -87px -510px; }
+.icon-secret:hover::before, .icon-secret:focus::before, .icon-secret:active::before {
+  background-position: -399px -510px; }
+
+.btn-dropdown-toggle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-indent: -200px; }
+  .btn-dropdown-toggle[class*='icon-'] {
+    padding-left: 22px; }
+    .btn-dropdown-toggle[class*='icon-']::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      width: 22px;
+      height: 22px;
+      content: ""; }
+  .btn-dropdown-toggle::after {
+    position: absolute;
+    top: 6px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    content: "";
+    background: url(../img/icon-sprite.svg) no-repeat -547px -431px; }
+  .btn-dropdown-toggle:hover::after, .btn-dropdown-toggle:focus::after, .btn-dropdown-toggle:active::after {
+    background-position: -604px -431px; }
+  .btn-dropdown-toggle.is-opened {
+    background-color: #e0e0e0; }
+    .btn-dropdown-toggle.is-opened::after {
+      background-position: -604px -503px; }
 
 @keyframes is-loading-kf {
   to {

@@ -28,11 +28,33 @@
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			'&rArr;',
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
+				(new CDiv([
+					(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
+						->setAttribute('placeholder', _('value')),
+					new CButtonDropdown(
+						'macros[#{rowNum}][type]',
+						ZBX_MACRO_TYPE_TEXT,
+						[
+							'title' => json_encode(_('Change type')),
+							'active_class' => 'icon-text',
+							'items' => [
+								[
+									'value' => ZBX_MACRO_TYPE_TEXT,
+									'label' => _('Text'),
+									'class' => 'icon-text'
+								],
+								[
+									'value' => ZBX_MACRO_TYPE_SECRET,
+									'label' => _('Secret text'),
+									'class' => 'icon-secret'
+								]
+							]
+						]
+					)
+				]))
+					->addClass(ZBX_STYLE_INPUT_GROUP)
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					->setAttribute('placeholder', _('value'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
@@ -84,6 +106,79 @@
 			.dynamicRows({template: '#macro-row-tmpl'})
 			.on('click', 'button.element-table-add', function() {
 				initMacroFields($('#tbl_macros'));
+			})
+			.on('focus blur', '.input-secret input, .input-group .textarea-flexible', function() {
+				$(this).closest('.input-group').find('.btn-undo').toggleClass('focused');
+			})
+			.on('click', '.btn-undo', function() {
+				var $this = $(this),
+					$container = $(this).closest('.input-group')
+					$input = $('.input-secret input[type=password], .textarea-flexible', $container);
+
+				$input.replaceWith(
+					$('<div>')
+						.addClass('input-secret')
+						.append($('<input>').attr({
+							id: $input.attr('id'),
+							name: $input.attr('name'),
+							type: 'password',
+							value: '******',
+							placeholder: $input.attr('placeholder'),
+							maxlength: $input.attr('maxlength'),
+							disabled: true
+						}))
+						.append($('<button>').attr({
+							type: 'button',
+							class: 'btn-change'
+						}).text(<?= json_encode(_('Set new value')) ?>))
+						.inputSecret()
+				);
+
+				$this.hide();
+			})
+			.on('change', '.dropdown-value', function() {
+				var $this = $(this),
+					value_type = $this.val(),
+					$container = $(this).closest('.input-group'),
+					$input_container = $('.input-secret', $container),
+					$textarea = $('.textarea-flexible', $container);
+
+				if ((value_type == <?= ZBX_MACRO_TYPE_TEXT ?> && $textarea.length)
+						|| (value_type == <?= ZBX_MACRO_TYPE_SECRET ?> && $input_container.length)) {
+					return false;
+				}
+
+				if (value_type == <?= ZBX_MACRO_TYPE_TEXT ?>) {
+					var $input = $('input[type=password]', $input_container);
+
+					$input_container.replaceWith(
+						$('<textarea>')
+							.addClass('textarea-flexible')
+							.attr({
+								id: $input.attr('id'),
+								name: $input.attr('name'),
+								placeholder: $input.attr('placeholder'),
+								maxlength: $input.attr('maxlength')
+							})
+							.text($input.val())
+							.textareaFlexible()
+					);
+				}
+				else {
+					$textarea.replaceWith(
+						$('<div>')
+							.addClass('input-secret')
+							.append($('<input>').attr({
+								id: $textarea.attr('id'),
+								name: $textarea.attr('name'),
+								type: 'password',
+								value: $textarea.val(),
+								placeholder: $textarea.attr('placeholder'),
+								maxlength: $textarea.attr('maxlength')
+							}))
+							.inputSecret()
+					);
+				}
 			});
 
 		initMacroFields($('#tbl_macros'));

@@ -790,6 +790,37 @@ function getMenuPopupItemPrototype(options) {
 }
 
 /**
+ * Get dropdown section data.
+ *
+ * @param {array}  options
+ * @param {object} trigger_elmnt  UI element that was clicked to open overlay dialogue.
+ *
+ * @returns array
+ */
+function getMenuPopupDropdown(options, trigger_elmnt) {
+	var items = [];
+
+	jQuery.each(options.items, function(i, item) {
+		items.push({
+			label: item.label,
+			url: item.url || 'javascript:void(0);',
+			class: item.class,
+			clickCallback: function() {
+				jQuery(trigger_elmnt)
+					.removeClass()
+					.addClass('btn-alt btn-dropdown-toggle ' + item.class)
+					.siblings('.dropdown-value').val(item.value)
+					.trigger('change')
+			}
+		});
+	});
+
+	return [{
+		items: items
+	}]
+}
+
+/**
  * Get menu popup submenu section data.
  *
  * @param object options['submenu']                                    List of menu sections.
@@ -1270,7 +1301,8 @@ jQuery(function($) {
 		options = $.extend({
 			ariaLabel: options.label,
 			selected: false,
-			disabled: false
+			disabled: false,
+			class: false
 		}, options);
 
 		var item = $('<li>'),
@@ -1316,6 +1348,10 @@ jQuery(function($) {
 
 		if (options.selected) {
 			link.addClass('selected');
+		}
+
+		if (options.class) {
+			link.addClass(options.class);
 		}
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {

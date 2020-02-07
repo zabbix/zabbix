@@ -19,6 +19,8 @@
 **/
 
 
+$this->addJsFile('buttondropdown.js');
+$this->addJsFile('inputsecret.js');
 $this->addJsFile('textareaflexible.js');
 $this->includeJSfile('app/views/administration.macros.edit.js.php');
 
@@ -29,7 +31,7 @@ $widget = (new CWidget())
 $table = (new CTable())
 	->setId('tbl_macros')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->setHeader([_('Macro'), '', _('Value'), _('Description'), '']);
+	->setHeader([_('Macro'), _('Value'), _('Description'), '']);
 
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
@@ -41,9 +43,34 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 
-	$value_input = (new CTextAreaFlexible('macros['.$i.'][value]', CMacrosResolverGeneral::getMacroValue($macro)))
-		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-		->setAttribute('placeholder', _('value'));
+	$value_input_group = (new CDiv())
+		->addClass(ZBX_STYLE_INPUT_GROUP)
+		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);
+
+	$value_input = ($macro['type'] == ZBX_MACRO_TYPE_TEXT)
+		? (new CTextAreaFlexible('macros['.$i.'][value]', CMacrosResolverGeneral::getMacroValue($macro)))
+			->setAttribute('placeholder', _('value'))
+		: (new CInputSecret('macros['.$i.'][value]', ZBX_MACRO_SECRET_MASK, _('value')));
+
+	$dropdown_options = [
+		'title' => _('Change type'),
+		'active_class' => ($macro['type'] == ZBX_MACRO_TYPE_TEXT ? 'icon-text' : 'icon-secret'),
+		'items' => [
+			['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => 'icon-text'],
+			['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => 'icon-secret']
+		]
+	];
+
+	$value_input_group->addItem([
+		$value_input,
+		($macro['type'] == ZBX_MACRO_TYPE_SECRET)
+			? (new CButton(null))
+				->setAttribute('title', _('Revert changes'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass(ZBX_STYLE_BTN_UNDO)
+			: null,
+		new CButtonDropdown('macros['.$i.'][type]', $macro['type'], $dropdown_options)
+	]);
 
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -61,8 +88,7 @@ foreach ($data['macros'] as $i => $macro) {
 
 	$table->addRow([
 		(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		'&rArr;',
-		(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($value_input_group))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
