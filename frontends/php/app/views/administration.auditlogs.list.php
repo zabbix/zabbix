@@ -77,7 +77,9 @@ foreach ($data['auditlogs'] as $auditlog) {
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $auditlog['clock']),
 		$data['users'][$auditlog['userid']],
 		$auditlog['ip'],
-		$data['resources'][$auditlog['resourcetype']],
+		array_key_exists($auditlog['resourcetype'], $data['resources'])
+			? $data['resources'][$auditlog['resourcetype']]
+			: _('Unknown resource'),
 		$data['actions'][$auditlog['action']],
 		$auditlog['resourceid'],
 		$auditlog['resourcename'],

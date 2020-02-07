@@ -119,7 +119,7 @@ class CControllerAuditLogList extends CController {
 		}
 
 		$data['auditlogs'] = API::AuditLog()->get($params);
-		$data['paging'] = CPagerHelper::paginate($data['page'], $data['auditlog'], ZBX_SORT_UP,
+		$data['paging'] = CPagerHelper::paginate($data['page'], $data['auditlogs'], ZBX_SORT_UP,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
