@@ -68,7 +68,7 @@ function local_generateHeader($data) {
 
 //	if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 //		global $ZBX_SERVER_NAME;
-//
+
 //		$pageMenu = new CView('layout.htmlpage.aside', [
 //			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : ''
 //		]);
