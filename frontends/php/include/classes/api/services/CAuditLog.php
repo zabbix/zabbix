@@ -34,7 +34,7 @@ class CAuditLog extends CApiService {
 	protected $details_fields = ['table_name', 'field_name', 'oldvalue', 'newvalue'];
 
 	/**
-	 * @see https://www.zabbix.com/documentation/current/manual/api/reference/auditlog/get
+	 * @see https://www.zabbix.com/documentation/current/manual/api/reference/auditlog/auditlog.get
 	 *
 	 * @param array $options    Array of API request options.
 	 *
