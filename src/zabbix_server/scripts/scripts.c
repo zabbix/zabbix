@@ -207,6 +207,7 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 		ZBX_STR2UCHAR(script->type, row[0]);
 		ZBX_STR2UCHAR(script->execute_on, row[1]);
 		script->command = zbx_strdup(script->command, row[2]);
+		script->command_orig = zbx_strdup(script->command_orig, row[2]);
 		ZBX_DBROW2UINT64(*groupid, row[3]);
 		ZBX_STR2UCHAR(script->host_access, row[4]);
 		ret = SUCCEED;
@@ -306,6 +307,7 @@ void	zbx_script_clean(zbx_script_t *script)
 	zbx_free(script->privatekey);
 	zbx_free(script->password);
 	zbx_free(script->command);
+	zbx_free(script->command_orig);
 }
 
 /******************************************************************************
