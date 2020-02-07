@@ -31,7 +31,7 @@ class CAuditLog extends CApiService {
 	/** @var array Database fields list allowed for sort operation. */
 	protected $sortColumns = ['auditid', 'userid', 'clock'];
 	/** @var array Database table with auditlog details supported fields list. */
-	protected $details_fields = ['table_name', 'table_field', 'oldvalue', 'newvalue'];
+	protected $details_fields = ['table_name', 'field_name', 'oldvalue', 'newvalue'];
 
 	/**
 	 * @see https://www.zabbix.com/documentation/current/manual/api/reference/auditlog/get
