@@ -649,8 +649,8 @@ static int	db_snmp_if_cmp(const dbu_snmp_if_t *snmp1, const dbu_snmp_if_t *snmp2
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->securitylevel, snmp2->securitylevel);
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->authprotocol, snmp2->authprotocol);
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->privprotocol, snmp2->privprotocol);
-	ZBX_RETURN_IF_NOT_EQUAL(snmp1->version, snmp1->version);
-	ZBX_RETURN_IF_NOT_EQUAL(snmp1->bulk, snmp1->bulk);
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->version, snmp2->version);
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->bulk, snmp2->bulk);
 	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->community, snmp2->community);
 	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->securityname, snmp2->securityname);
 	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->authpassphrase, snmp2->authpassphrase);
@@ -1028,12 +1028,12 @@ static int	db_if_cmp(const dbu_interface_t *if1, const dbu_interface_t *if2)
 	int	ret;
 
 	ZBX_RETURN_IF_NOT_EQUAL(if1->hostid, if2->hostid);
-	ZBX_RETURN_IF_NOT_EQUAL(if1->type,if1->type);
-	ZBX_RETURN_IF_NOT_EQUAL(if1->main,if1->main);
-	ZBX_RETURN_IF_NOT_EQUAL(if1->useip,if1->useip);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->ip,if1->ip);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->dns,if1->dns);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->port,if1->port);
+	ZBX_RETURN_IF_NOT_EQUAL(if1->type,if2->type);
+	ZBX_RETURN_IF_NOT_EQUAL(if1->main,if2->main);
+	ZBX_RETURN_IF_NOT_EQUAL(if1->useip,if2->useip);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->ip,if2->ip);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->dns,if2->dns);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->port,if2->port);
 
 	return 0;
 
