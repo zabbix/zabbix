@@ -317,23 +317,23 @@ in:
 out:
   return: FAIL
 ---
-test case: succeed +1
+test case: fail +1
 in:
   num: +1
 out:
-  return: SUCCEED
+  return: FAIL
 ---
-test case: succeed +1.0
+test case: fail +1.0
 in:
   num: +1.0
 out:
-  return: SUCCEED
+  return: FAIL
 ---
-test case: succeed +.1
+test case: fail +.1
 in:
   num: +.1
 out:
-  return: SUCCEED
+  return: FAIL
 ---
 test case: succeed 1.K
 in:
