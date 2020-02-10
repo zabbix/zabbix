@@ -152,6 +152,11 @@ function update_config($config) {
 		],
 	];
 
+	if ($config['compression_status'] === 0) {
+		unset($fields['compress_older']);
+		unset($config['compress_older']);
+	}
+
 	foreach ($fields as $field => $args) {
 		if (array_key_exists($field, $config)
 				&& !validateTimeUnit($config[$field], $args['min'], $args['max'], $args['allow_zero'], $error)) {
