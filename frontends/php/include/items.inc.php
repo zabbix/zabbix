@@ -1008,9 +1008,10 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
  * @param int    $viewMode
  * @param int    $show_suppressed  Whether to show suppressed problems.
  *
+ * @deprecated
+ *
  * @return CTableInfo
  */
-
 function getItemsDataOverview(array $groupids, $application, $viewMode,
 		$show_suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE) {
 	// application filter
@@ -1207,6 +1208,11 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 	return $table;
 }
 
+/**
+ * @deprecated
+ *
+ * @return array
+ */
 function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	$ack = null;
 	$css = '';
@@ -1241,6 +1247,251 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	$tableRow[] = $column;
 
 	return $tableRow;
+}
+
+/**
+ * @param array $db_hosts
+ * @param array $db_items
+ * @param array $items_by_name
+ * @param int   $show_suppressed
+ *
+ * @return array
+ */
+function getDataOverviewCellData(array $db_hosts, array $db_items, array $items_by_name, int $show_suppressed) {
+	$visible_items = [];
+	foreach ($items_by_name as $name => $hostid_to_itemid) {
+		foreach ($hostid_to_itemid as $hostid => $itemid) {
+			$visible_items[$itemid] = $db_items[$itemid];
+		}
+	}
+
+	$history = Manager::History()->getLastValues($visible_items, 1, ZBX_HISTORY_PERIOD);
+	$db_triggers = getTriggersWithActualSeverity([
+		'output' => ['triggerid', 'priority', 'value'],
+		'selectItems' => ['itemid'],
+		'itemids' => array_keys($visible_items),
+		'monitored' => true,
+		'preservekeys' => true
+	], ['show_suppressed' => $show_suppressed]);
+	$itemid_to_triggerids = [];
+	foreach ($db_triggers as $triggerid => $db_trigger) {
+		foreach ($db_trigger['items'] as $item) {
+			if (!array_key_exists($item['itemid'], $itemid_to_triggerids)) {
+				$itemid_to_triggerids[$item['itemid']] = [];
+			}
+			$itemid_to_triggerids[$item['itemid']][] = $triggerid;
+		}
+	}
+
+	foreach ($items_by_name as $name => $hostid_to_itemid) {
+		$row = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
+		foreach ($db_hosts as $host) {
+			if (!array_key_exists($host['hostid'], $hostid_to_itemid)) {
+				$row[] = new CCol();
+				continue;
+			}
+
+			$itemid = $hostid_to_itemid[$host['hostid']];
+			$visible_items[$itemid]['value'] = array_key_exists($itemid, $history) ? $history[$itemid][0]['value'] : null;
+			$trigger = null;
+
+			if (array_key_exists($itemid, $itemid_to_triggerids)) {
+				$max_priority = -1;
+				$max_priority_triggerid = -1;
+				foreach ($itemid_to_triggerids[$itemid] as $triggerid) {
+					$trigger = $db_triggers[$triggerid];
+					// Bump lower priority triggers of value "true" ahead of triggers with value "false".
+					$multiplier = $trigger['value'] == TRIGGER_VALUE_TRUE ? TRIGGER_SEVERITY_COUNT : 0;
+					if ($trigger['priority'] + $multiplier > $max_priority) {
+						$max_priority_triggerid = $triggerid;
+						$max_priority = $trigger['priority'] + $multiplier;
+					}
+				}
+				$trigger = $db_triggers[$max_priority_triggerid];
+			}
+			$visible_items[$itemid]['trigger'] = $trigger;
+		}
+	}
+
+	return $visible_items;
+}
+
+/**
+ * @param array $groupids
+ * @param array $hostids
+ * @param string $application
+ *
+ * @return array
+ */
+function getDataOverviewItems($groupids = null, $hostids = null, $application = '') {
+	$config = select_config();
+	if ($application !== '') {
+		$applicationids = array_keys(API::Application()->get([
+			'output' => [],
+			'hostids' => $hostids,
+			'groupids' => $groupids,
+			'search' => ['name' => $application],
+			'preservekeys' => true
+		]));
+
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'applicationids' => $applicationids,
+			'monitored' => true,
+			'webitems' => true,
+			'preservekeys' => true,
+			'limit' => $config['search_limit']
+		]);
+	}
+	else {
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'hostids' => $hostids,
+			'groupids' => $groupids,
+			'monitored' => true,
+			'webitems' => true,
+			'preservekeys' => true,
+			'limit' => $config['search_limit']
+		]);
+	}
+
+	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
+
+	CArrayHelper::sort($db_items, [
+		['field' => 'name_expanded', 'order' => ZBX_SORT_UP],
+		['field' => 'itemid', 'order' => ZBX_SORT_UP]
+	]);
+
+	return $db_items;
+}
+
+/**
+ * @param array $groupids
+ * @param string $application
+ *
+ * @return array
+ */
+function getDataOverviewHosts($groupids = null, $itemids = null, $application = '') {
+	$config = select_config();
+	if ($application !== '') {
+		$applicationids = array_keys(API::Application()->get([
+			'output' => [],
+			'groupids' => $groupids ? $groupids : null,
+			'search' => ['name' => $application],
+			'preservekeys' => true
+		]));
+
+		$db_hosts = API::Host()->get([
+			'output' => ['name', 'hostid'],
+			'groupids' => $groupids,
+			'applicationids' => $applicationids,
+			'monitored_hosts' => true,
+			'with_monitored_items' => true,
+			'preservekeys' => true,
+			'limit' => $config['search_limit']
+		]);
+	}
+	else {
+		$db_hosts = API::Host()->get([
+			'output' => ['name', 'hostid'],
+			'monitored_hosts' => true,
+			'itemids' => $itemids,
+			'groupids' => $groupids,
+			'with_monitored_items' => true,
+			'preservekeys' => true,
+			'limit' => $config['search_limit']
+		]);
+	}
+
+	CArrayHelper::sort($db_hosts, [
+		['field' => 'name', 'order' => ZBX_SORT_UP],
+	]);
+
+	return $db_hosts;
+}
+
+/**
+ * @param array $groupids
+ * @param string $application
+ *
+ * @return array
+ */
+function getDataOverviewLeft($groupids, $application = '') {
+	$db_items = getDataOverviewItems($groupids, null, $application);
+	$items_by_name = [];
+	foreach ($db_items as $itemid => $db_item) {
+		if (!array_key_exists($db_item['name'], $items_by_name)) {
+			$items_by_name[$db_item['name']] = [];
+		}
+		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+	}
+
+	$hidden_items_cnt = count(array_splice($items_by_name, ZBX_MAX_TABLE_COLUMNS));
+	$itemids = [];
+	foreach ($items_by_name as $name => $hostid_to_itemid) {
+		foreach ($hostid_to_itemid as $hostid => $itemid) {
+			$itemids[] = $itemid;
+		}
+	}
+	$db_items = array_intersect_key($db_items, array_flip($itemids));
+
+	$db_hosts = getDataOverviewHosts(null, $itemids);
+
+	return [$db_items, $db_hosts, $items_by_name, $hidden_items_cnt];
+}
+
+/**
+ * @param array $groupids
+ * @param string $application
+ *
+ * @return array
+ */
+function getDataOverviewTop($groupids, $application = '') {
+	$db_hosts = getDataOverviewHosts($groupids, null, $application);
+	$hostids = array_keys($db_hosts);
+	$hidden_db_hosts_cnt = count(array_splice($hostids, ZBX_MAX_TABLE_COLUMNS));
+	$db_hosts = array_intersect_key($db_hosts, array_flip($hostids));
+
+	$db_items = getDataOverviewItems(null, $hostids, $application);
+	$items_by_name = [];
+	foreach ($db_items as $itemid => $db_item) {
+		if (!array_key_exists($db_item['name'], $items_by_name)) {
+			$items_by_name[$db_item['name']] = [];
+		}
+		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+	}
+
+	return [$db_items, $db_hosts, $items_by_name, $hidden_db_hosts_cnt];
+}
+
+/**
+ * @param array $item
+ * @param array $trigger
+ *
+ * @return array
+ */
+function getItemDataOverviewCell($item, $trigger = null) {
+	$ack = null;
+	$css = '';
+	$value = UNKNOWN_VALUE;
+
+	if ($trigger && $trigger['value'] == TRIGGER_VALUE_TRUE) {
+		$css = getSeverityStyle($trigger['priority']);
+
+		if ($trigger['problem']['acknowledged'] == 1) {
+			$ack = [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)];
+		}
+	}
+
+	if ($item['value'] !== null) {
+		$value = formatHistoryValue($item['value'], $item);
+	}
+
+	return (new CCol([$value, $ack]))
+		->addClass($css)
+		->setMenuPopup(CMenuPopupHelper::getHistory($item['itemid']))
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->addClass(ZBX_STYLE_NOWRAP);
 }
 
 /**

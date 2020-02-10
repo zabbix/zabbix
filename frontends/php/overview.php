@@ -225,6 +225,31 @@ else {
 		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', 0)
 	];
 
+	$application = $data['filter']['application'];
+	$show_suppressed = $data['filter']['show_suppressed'];
+	$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
+
+	$paging_url = (new CUrl('overview.php'))
+		->setArgument('view_style', $data['view_style'])
+		->setArgument('type', $data['type'])
+		->setArgument('groupid', $data['pageFilter']->groupid);
+
+
+	if ($data['view_style'] == STYLE_TOP) {
+		list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop($groupids, $application);
+		$paging_line = CPagerHelper::paginate(getRequest('page'), $items_by_name, 'ASC', $paging_url);
+	}
+	else {
+		list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft($groupids, $application);
+		$paging_line = CPagerHelper::paginate(getRequest('page'), $db_hosts, 'ASC', $paging_url);
+	}
+
+	$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name, $show_suppressed);
+	$data['db_hosts'] = $db_hosts;
+	$data['items_by_name'] = $items_by_name;
+	$data['hidden_cnt'] = $hidden_cnt;
+	$data['paging_line'] = $paging_line;
+
 	$overviewView = new CView('monitoring.overview.items', $data);
 }
 

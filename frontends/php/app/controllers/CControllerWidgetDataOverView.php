@@ -34,12 +34,36 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
+		$groupids = $fields['groupids'] ? $fields['groupids'] : null;
+
+		if ($fields['style'] == STYLE_TOP) {
+			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop($groupids,
+				$fields['application']
+			);
+
+			$items_by_name = array_slice($items_by_name, 0, $fields['show_lines'], true);
+		}
+		else {
+			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft($groupids,
+				$fields['application']
+			);
+
+			$db_hosts = array_slice($db_hosts, 0, $fields['show_lines'], true);
+		}
+
+		$visible_items = getDataOverviewCellData($db_hosts, $db_items, $items_by_name, $fields['show_suppressed']);
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'groupids' => getSubGroups($fields['groupids']),
 			'application' => $fields['application'],
 			'show_suppressed' => $fields['show_suppressed'],
 			'style' => $fields['style'],
+			'show_lines' => $fields['show_lines'],
+			'visible_items' => $visible_items,
+			'db_hosts' => $db_hosts,
+			'items_by_name' => $items_by_name,
+			'hidden_cnt' => $hidden_cnt,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

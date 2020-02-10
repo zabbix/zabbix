@@ -19,7 +19,13 @@
 **/
 
 
-$table = getItemsDataOverview($data['groupids'], $data['application'], $data['style'], $data['show_suppressed']);
+
+if ($data['style'] == STYLE_TOP) {
+	$table = new CObject((new CView('dataoverview.table.top', $data))->getOutput());
+}
+else {
+	$table = new CObject((new CView('dataoverview.table.left', $data))->getOutput());
+}
 
 $output = [
 	'header' => $data['name'],

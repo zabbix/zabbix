@@ -28,6 +28,9 @@ class CScreenDataOverview extends CScreenBase {
 	 */
 	public function get() {
 		$groupid = $this->screenitem['resourceid'];
+		if (!$this->screenitem['elements']) {
+			$this->screenitem['elements'] = ZBX_DEFAULT_WIDGET_LINES;
+		}
 
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
@@ -40,9 +43,39 @@ class CScreenDataOverview extends CScreenBase {
 				->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-		$table = getItemsDataOverview((array) $groupid, $this->screenitem['application'], $this->screenitem['style'],
-			ZBX_PROBLEM_SUPPRESSED_FALSE
-		);
+		$data = [];
+		if ($this->screenitem['style'] == STYLE_TOP) {
+			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop((array) $groupid,
+				$this->screenitem['application']
+			);
+
+			$items_by_name = array_slice($items_by_name, 0, $this->screenitem['elements'], true);
+
+			$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name,
+				ZBX_PROBLEM_SUPPRESSED_FALSE
+			);
+			$data['db_hosts'] = $db_hosts;
+			$data['items_by_name'] = $items_by_name;
+			$data['hidden_cnt'] = $hidden_cnt;
+
+			$table = new CObject((new CView('dataoverview.table.top', $data))->getOutput());
+		}
+		else {
+			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft((array) $groupid,
+				$this->screenitem['application']
+			);
+
+			$db_hosts = array_slice($db_hosts, 0, $this->screenitem['elements'], true);
+
+			$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name,
+				ZBX_PROBLEM_SUPPRESSED_FALSE
+			);
+			$data['db_hosts'] = $db_hosts;
+			$data['items_by_name'] = $items_by_name;
+			$data['hidden_cnt'] = $hidden_cnt;
+
+			$table = new CObject((new CView('dataoverview.table.left', $data))->getOutput());
+		}
 
 		$footer = (new CList())
 			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
