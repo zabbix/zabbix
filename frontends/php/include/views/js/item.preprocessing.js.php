@@ -170,7 +170,7 @@
 				case '<?= ZBX_PREPROC_MULTIPLIER ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('number')) ?>
+						placeholder: <?= json_encode(_('number')) ?>
 					})).css('width', <?= ZBX_TEXTAREA_NUMERIC_BIG_WIDTH ?>);
 
 				case '<?= ZBX_PREPROC_RTRIM ?>':
@@ -178,55 +178,55 @@
 				case '<?= ZBX_PREPROC_TRIM ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('list of characters')) ?>
+						placeholder: <?= json_encode(_('list of characters')) ?>
 					})).css('width', <?= ZBX_TEXTAREA_SMALL_WIDTH ?>);
 
 				case '<?= ZBX_PREPROC_XPATH ?>':
 				case '<?= ZBX_PREPROC_ERROR_FIELD_XML ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('XPath')) ?>
+						placeholder: <?= json_encode(_('XPath')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_JSONPATH ?>':
 				case '<?= ZBX_PREPROC_ERROR_FIELD_JSON ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('$.path.to.node')) ?>
+						placeholder: <?= json_encode(_('$.path.to.node')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_REGSUB ?>':
 				case '<?= ZBX_PREPROC_ERROR_FIELD_REGEX ?>':
 					return $(preproc_param_double_tmpl.evaluate({
 						rowNum: index,
-						placeholder_0: <?= CJs::encodeJson(_('pattern')) ?>,
-						placeholder_1: <?= CJs::encodeJson(_('output')) ?>
+						placeholder_0: <?= json_encode(_('pattern')) ?>,
+						placeholder_1: <?= json_encode(_('output')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_VALIDATE_RANGE ?>':
 					return $(preproc_param_double_tmpl.evaluate({
 						rowNum: index,
-						placeholder_0: <?= CJs::encodeJson(_('min')) ?>,
-						placeholder_1: <?= CJs::encodeJson(_('max')) ?>
+						placeholder_0: <?= json_encode(_('min')) ?>,
+						placeholder_1: <?= json_encode(_('max')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_VALIDATE_REGEX ?>':
 				case '<?= ZBX_PREPROC_VALIDATE_NOT_REGEX ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('pattern')) ?>
+						placeholder: <?= json_encode(_('pattern')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_THROTTLE_TIMED_VALUE ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('seconds')) ?>
+						placeholder: <?= json_encode(_('seconds')) ?>
 					})).css('width', <?= ZBX_TEXTAREA_NUMERIC_BIG_WIDTH ?>);
 
 				case '<?= ZBX_PREPROC_SCRIPT ?>':
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
-						title: <?= CJs::encodeJson(_('JavaScript')) ?>,
-						placeholder: <?= CJs::encodeJson(_('script')) ?>,
+						title: <?= json_encode(_('JavaScript')) ?>,
+						placeholder: <?= json_encode(_('script')) ?>,
 						placeholder_textarea: 'return value',
 						label_before: 'function (value) {',
 						label_after: '}',
@@ -238,16 +238,16 @@
 				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
 					return $(preproc_param_double_tmpl.evaluate({
 						rowNum: index,
-						placeholder_0: <?= CJs::encodeJson(
+						placeholder_0: <?= json_encode(
 							_('<metric name>{<label name>="<label value>", ...} == <value>')
 						) ?>,
-						placeholder_1: <?= CJs::encodeJson(_('<label name>')) ?>
+						placeholder_1: <?= json_encode(_('<label name>')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_TO_JSON ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(
+						placeholder: <?= json_encode(
 							_('<metric name>{<label name>="<label value>", ...} == <value>')
 						) ?>
 					}));
@@ -259,7 +259,7 @@
 						width_1: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>,
 						placeholder_0: ',',
 						placeholder_1: '"',
-						chkbox_label: <?= CJs::encodeJson(_('With header row')) ?>,
+						chkbox_label: <?= json_encode(_('With header row')) ?>,
 						chkbox_value: <?= ZBX_PREPROC_CSV_HEADER ?>,
 						chkbox_default: true
 					}));
@@ -393,13 +393,13 @@
 				else if (error_handler == '<?= ZBX_PREPROC_FAIL_SET_VALUE ?>') {
 					$error_handler_params
 						.prop('disabled', false)
-						.attr('placeholder', <?= CJs::encodeJson(_('value')) ?>)
+						.attr('placeholder', <?= json_encode(_('value')) ?>)
 						.show();
 				}
 				else if (error_handler == '<?= ZBX_PREPROC_FAIL_SET_ERROR ?>') {
 					$error_handler_params
 						.prop('disabled', false)
-						.attr('placeholder', <?= CJs::encodeJson(_('error message')) ?>)
+						.attr('placeholder', <?= json_encode(_('error message')) ?>)
 						.show();
 				}
 			});

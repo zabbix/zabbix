@@ -50,7 +50,7 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 		if (($messages = getMessages(false, null, false)) !== null) {
 			$this->setResponse(
 				(new CControllerResponseData([
-					'main_block' => CJs::encodeJson(['errors' => $messages->toString()])
+					'main_block' => json_encode(['errors' => $messages->toString()])
 				]))->disableView()
 			);
 		}
