@@ -1245,8 +1245,14 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.18rc1
 
 New features:
+..F....... [ZBXNEXT-5603] added db checking for charset and collation (rlataria)
+.......PS. [ZBXNEXT-5690] added support for libssh (akozlovs)
+....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
 
 Bug fixes:
+........S. [ZBX-16827] fixed applications being unlinked from items when both items and applications are not discovered anymore (vso)
+........S. [ZBX-17035] internal events are not created if there is no enabled internal actions (atumilovics)
+........S. [ZBX-16965] fixed link/unlink template operation execution order (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.17
