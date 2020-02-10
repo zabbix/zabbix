@@ -134,7 +134,7 @@ function cleanPreviousTestResults() {
 /**
  * Send item get value request and display retrieved results.
  *
- * @param {Overlay} overlay  Overlay dialog object.
+ * @param {object} overlay  Overlay dialog object.
  */
 function itemGetValueTest(overlay) {
 	var $form = overlay.$dialogue.find('form'),
@@ -213,7 +213,7 @@ function itemGetValueTest(overlay) {
 /**
  * Send item preprocessing test details and display results in table.
  *
- * @param {Overlay} overlay  Overlay dialog object.
+ * @param {object} overlay  Overlay dialog object.
  */
 function itemCompleteTest(overlay) {
 	var $form = overlay.$dialogue.find('form'),
