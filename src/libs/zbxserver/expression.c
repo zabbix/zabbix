@@ -3210,6 +3210,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_ID);
+				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
 			{
@@ -3417,6 +3422,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_ID);
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
@@ -3910,6 +3920,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_ID);
 				}
 			}
 		}
