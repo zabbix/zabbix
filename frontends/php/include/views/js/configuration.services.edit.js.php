@@ -78,7 +78,7 @@
 			var inputRemove = document.createElement('button');
 			inputRemove.setAttribute('class', '<?= ZBX_STYLE_BTN_LINK ?>');
 			inputRemove.setAttribute('onclick', 'javascript: removeDependentChild(\'' + serviceid + '\');');
-			inputRemove.appendChild(document.createTextNode(<?= CJs::encodeJson(_('Remove')) ?>));
+			inputRemove.appendChild(document.createTextNode(<?= json_encode(_('Remove')) ?>));
 
 			td.appendChild(inputRemove);
 			tr.appendChild(td);

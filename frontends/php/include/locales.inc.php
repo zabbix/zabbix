@@ -23,14 +23,8 @@ function init_mbstrings() {
 	$res = true;
 	$res &= extension_loaded('mbstring');
 
-	if (version_compare(PHP_VERSION, '5.6', '<')) {
-		ini_set('mbstring.internal_encoding', 'UTF-8');
-		$res &= (ini_get('mbstring.internal_encoding') === 'UTF-8');
-	}
-	else {
-		ini_set('default_charset', 'UTF-8');
-		$res &= (ini_get('default_charset') === 'UTF-8');
-	}
+	ini_set('default_charset', 'UTF-8');
+	$res &= (ini_get('default_charset') === 'UTF-8');
 
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 	$res &= (ini_get('mbstring.detect_order') === 'UTF-8, ISO-8859-1, JIS, SJIS');
@@ -111,7 +105,7 @@ function getSupportUrl($language = null) {
  * @return array A list of possible locale names.
  */
 function zbx_locale_variants($language) {
-	if (strtolower(substr(PHP_OS, 0, 3)) === 'win') {
+	if (stripos(PHP_OS, 'WIN') === 0) {
 		return zbx_locale_variants_win($language);
 	}
 

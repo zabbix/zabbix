@@ -280,7 +280,7 @@
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
 			jQuery('#update')
-				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.text(<?= json_encode(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'})
 				.click(remove_operationid);
 			jQuery('#form').val('clone');

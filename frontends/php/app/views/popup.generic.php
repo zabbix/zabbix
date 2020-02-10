@@ -465,8 +465,8 @@ switch ($data['popup_type']) {
 						: null,
 					(new CLink($item['name_expanded'], 'javascript:void(0);'))
 						->onClick('javascript: addValue('.
-							CJs::encodeJson($options['reference']).', '.
-							CJs::encodeJson($item['itemid']).', '.
+							json_encode($options['reference']).', '.
+							json_encode($item['itemid']).', '.
 							$options['parentid'].
 							');'.$js_action_onclick),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
@@ -517,14 +517,14 @@ switch ($data['popup_type']) {
 			$table->addRow([
 				// Multiselect checkbox.
 				$data['multiselect']
-					? new CCheckBox('item['.CJs::encodeJson($graph[$options['srcfld1']]).']', $graph['graphid'])
+					? new CCheckBox('item['.json_encode($graph[$options['srcfld1']]).']', $graph['graphid'])
 					: null,
 
 				// Clickable graph name.
 				(new CLink($graph['name'], 'javascript:void(0);'))
 					->onClick('javascript: addValue('.
-						CJs::encodeJson($options['reference']).', '.
-						CJs::encodeJson($graph['graphid']).', '.
+						json_encode($options['reference']).', '.
+						json_encode($graph['graphid']).', '.
 						$options['parentid'].
 						');'.$js_action_onclick
 					),
@@ -663,4 +663,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

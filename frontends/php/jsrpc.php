@@ -21,15 +21,13 @@
 
 require_once dirname(__FILE__).'/include/func.inc.php';
 require_once dirname(__FILE__).'/include/defines.inc.php';
-require_once dirname(__FILE__).'/include/classes/json/CJson.php';
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 require_once dirname(__FILE__).'/include/classes/core/CHttpRequest.php';
 
 $requestType = getRequest('type', PAGE_TYPE_JSON);
 if ($requestType == PAGE_TYPE_JSON) {
 	$http_request = new CHttpRequest();
-	$json = new CJson();
-	$data = $json->decode($http_request->body(), true);
+	$data = json_decode($http_request->body(), true);
 }
 else {
 	$data = $_REQUEST;
@@ -551,7 +549,7 @@ switch ($data['method']) {
 
 if ($requestType == PAGE_TYPE_JSON) {
 	if (isset($data['id'])) {
-		echo $json->encode([
+		echo json_encode([
 			'jsonrpc' => '2.0',
 			'result' => $result,
 			'id' => $data['id']
@@ -559,9 +557,7 @@ if ($requestType == PAGE_TYPE_JSON) {
 	}
 }
 elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
-	$json = new CJson();
-
-	echo $json->encode([
+	echo json_encode([
 		'jsonrpc' => '2.0',
 		'result' => $result
 	]);

@@ -95,7 +95,7 @@ if (!$readonly) {
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",jQuery.extend('.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'help_items',
 				'srcfld1' => 'key',
 				'dstfrm' => $form->getName(),
@@ -137,7 +137,7 @@ elseif (!$readonly) {
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
-$query_fields->items = [CJs::encodeJson($query_fields_data)];
+$query_fields->items = [json_encode($query_fields_data)];
 
 $form_list
 	->addRow(
@@ -228,7 +228,7 @@ elseif (!$readonly) {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [CJs::encodeJson($headers_data)];
+$headers->items = [json_encode($headers_data)];
 
 $form_list
 	// Append ITEM_TYPE_HTTPAGENT Headers fields to form list.

@@ -33,8 +33,8 @@ include dirname(__FILE__).'/itemtest.js.php';
 		$('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!$('#visible_type').is(':checked')) {
-				var itemInterfaceTypes = <?= CJs::encodeJson(itemTypeInterface()) ?>;
-				organizeInterfaces(itemInterfaceTypes[<?= CJs::encodeJson($data['initial_item_type']) ?>]);
+				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
+				organizeInterfaces(itemInterfaceTypes[<?= json_encode($data['initial_item_type']) ?>]);
 			}
 			else {
 				$('#type').trigger('change');
@@ -44,7 +44,7 @@ include dirname(__FILE__).'/itemtest.js.php';
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?= CJs::encodeJson(itemTypeInterface()) ?>;
+				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
 				organizeInterfaces(itemInterfaceTypes[parseInt(jQuery(this).val())]);
 			})
 			.trigger('change');

@@ -89,7 +89,7 @@ include dirname(__FILE__).'/itemtest.js.php';
 			$('#conditions')
 				.dynamicRows({
 					template: '#condition-row',
-					counter: <?= CJs::encodeJson($counter) ?>,
+					counter: <?= json_encode($counter) ?>,
 					dataCallback: function(data) {
 						data.formulaId = num2letter(data.rowNum);
 

@@ -44,7 +44,7 @@
 		jQuery('#clone').click(function() {
 			jQuery('#correlationid, #delete, #clone').remove();
 			jQuery('#update')
-				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.text(<?= json_encode(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 
 			// Remove operations IDs.
