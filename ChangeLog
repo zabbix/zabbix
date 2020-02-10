@@ -4017,6 +4017,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.30rc1
 
 New features:
+....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
 
 Bug fixes:
 ........S. [ZBX-16024] fixed maintenance status not being updated in cache if host is disabled (vso)
