@@ -126,7 +126,7 @@ class CAuditLog extends CApiService {
 		}
 
 		// userids
-		if ($options['userids'] !== null && array_filter($options['userids'])) {
+		if ($options['userids'] && array_filter($options['userids'])) {
 			$sql_parts['where']['userid'] = dbConditionInt('a.userid', $options['userids']);
 		}
 
