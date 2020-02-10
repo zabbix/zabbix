@@ -2612,22 +2612,25 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Extract macros from properties used for preprocessing step test and find effective values.
+	 * Extract macros from item property fields and apply effective value for each of extracted macros.
+	 * Each type of macros are extracted separately because there are fields that support only LLD macros and doesn't
+	 * support user macros.
 	 *
 	 * @param array  $data
 	 * @param string $data['steps']                              Preprocessing steps details.
 	 * @param string $data['steps'][]['params']                  Preprocessing step parameters.
 	 * @param string $data['steps'][]['error_handler_params]     Preprocessing steps error handle parameters.
 	 * @param string $data['delay']                              Update interval value.
-	 * @param string $data['hostids']                            Hostid for which tested item belongs to.
-	 * @param bool   $support_lldmacros                          Enable or disable LLD macro selection.
+	 * @param array  $data['supported_macros']                   Supported macros.
+	 * @param array  $data['texts_support_macros']               List of texts potentially could contain macros.
+	 * @param array  $data['texts_support_user_macros']          List of texts potentially could contain user macros.
+	 * @param array  $data['texts_support_lld_macros']           List of texts potentially could contain LLD macros.
+	 * @param int    $data['hostids']                            Hostid for which tested item belongs to.
 	 *
 	 * @return array
 	 */
-	public function extractMacrosFromPreprocessingSteps(array $data, $support_lldmacros = false) {
-		$types = $support_lldmacros
-			? ['usermacros' => true, 'lldmacros' => true]
-			: ['usermacros' => true];
+	public function extractItemTestMacros(array $data) {
+		$macros = [];
 		$delay_macro = $data['delay'];
 
 		$texts = [];
@@ -2650,24 +2653,42 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		$matched_macros = $this->extractMacros($texts, $types);
-		$usermacros = [[
-			'macros' => $matched_macros['usermacros'],
-			'hostids' =>  $data['hostid']
-				? [$data['hostid']]
-				: []
-		]];
+		if ($data['supported_macros']) {
+			$matched_macros = $this->extractMacros(array_merge($texts, $data['texts_support_macros']),
+				['macros' => $data['supported_macros']]
+			);
 
-		$macros = [];
-		if ($support_lldmacros) {
-			foreach (array_keys($matched_macros['lldmacros']) as $lldmacro) {
-				$macros[$lldmacro] = $lldmacro;
+			foreach ($matched_macros['macros'] as $type => $matches) {
+				foreach ($matches as $macro) {
+					$macros[$macro] = $data['macros_values'][$type][$macro];
+				}
 			}
 		}
 
-		$usermacros = $this->getUserMacros($usermacros)[0]['macros'];
-		foreach ($usermacros as $macro => $value) {
-			$macros[$macro] = $value;
+		if ($data['texts_support_user_macros']) {
+			$matched_macros = $this->extractMacros(array_merge($texts, $data['texts_support_user_macros']),
+				['usermacros' => true]
+			);
+
+			$usermacros = [[
+				'macros' => $matched_macros['usermacros'],
+				'hostids' =>  ($data['hostid'] == 0) ? [] : [$data['hostid']]
+			]];
+
+			$usermacros = $this->getUserMacros($usermacros)[0]['macros'];
+			foreach ($usermacros as $macro => $value) {
+				$macros[$macro] = $value;
+			}
+		}
+
+		if ($data['texts_support_lld_macros']) {
+			$matched_macros = $this->extractMacros(array_merge($texts, $data['texts_support_lld_macros']),
+				['lldmacros' => true]
+			);
+
+			foreach (array_keys($matched_macros['lldmacros']) as $lldmacro) {
+				$macros[$lldmacro] = $lldmacro;
+			}
 		}
 
 		if (array_key_exists($delay_macro, $macros)) {

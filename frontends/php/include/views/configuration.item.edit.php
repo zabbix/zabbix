@@ -421,6 +421,7 @@ if ($data['interfaces']) {
 			$data['interfaces'] = zbx_toHash($data['interfaces'], 'interfaceid');
 			$interface = $data['interfaces'][$data['interfaceid']];
 
+			$form->addVar('selectedInterfaceId', $data['interfaceid']);
 			$form_list->addRow((new CLabel(_('Host interface'), 'interface'))->setAsteriskMark(),
 				(new CTextBox('interface',
 					$interface['useip']
@@ -962,12 +963,14 @@ if ($data['itemid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Check now')))
+		$buttons[] = (new CSubmit('check_now', _('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
 			);
 	}
+
+	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 
 	if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$buttons[] = new CButtonQMessage(
@@ -986,7 +989,7 @@ if ($data['itemid'] != 0) {
 else {
 	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('hostid'))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('hostid'))]
 	));
 }
 

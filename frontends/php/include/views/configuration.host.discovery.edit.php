@@ -798,12 +798,14 @@ if (!empty($data['itemid'])) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Check now')))
+		$buttons[] = (new CSubmit('check_now', _('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
 			);
 	}
+
+	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 
 	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid'])))
 		->setEnabled(!$data['limited']);
@@ -814,7 +816,7 @@ if (!empty($data['itemid'])) {
 else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('hostid'))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('hostid'))]
 	));
 }
 

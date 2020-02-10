@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_SIMPLE_H
-#define ZABBIX_CHECKS_SIMPLE_H
+#ifndef ZABBIX_TRAPPER_ITEM_TEST_H
+#define ZABBIX_TRAPPER_ITEM_TEST_H
 
-#include "common.h"
-#include "dbcache.h"
-#include "sysinfo.h"
+#include "comms.h"
+#include "zbxjson.h"
 
-int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
+void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp);
+int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info);
 
 #endif
