@@ -148,7 +148,7 @@ function update_config($config) {
 			'min' => SEC_PER_DAY * 7,
 			'max' => 25 * SEC_PER_YEAR,
 			'allow_zero' => false,
-			'message' => _('Invalid value in "Compress records older than": %1$s.')
+			'message' => _s('Invalid parameter "%1$s": %2$s.', _('Compress records older than'), '%1$s')
 		],
 	];
 
