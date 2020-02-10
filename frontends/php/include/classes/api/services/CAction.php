@@ -2189,11 +2189,13 @@ class CAction extends CApiService {
 
 					$db_opmessages = DBselect(
 						'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
-							' FROM opmessage o'.
-							' WHERE '.dbConditionInt('operationid', $opmessage)
+						' FROM opmessage o'.
+						' WHERE '.dbConditionInt('o.operationid', $opmessage)
 					);
 					while ($db_opmessage = DBfetch($db_opmessages)) {
-						$operations[$db_opmessage['operationid']]['opmessage'] = $db_opmessage;
+						$operationid = $db_opmessage['operationid'];
+						unset($db_opmessage['operationid']);
+						$operations[$operationid]['opmessage'] = $db_opmessage;
 					}
 				}
 
@@ -2204,11 +2206,13 @@ class CAction extends CApiService {
 
 					$db_opmessage_grp = DBselect(
 						'SELECT og.operationid,og.usrgrpid'.
-							' FROM opmessage_grp og'.
-							' WHERE '.dbConditionInt('operationid', $opmessage)
+						' FROM opmessage_grp og'.
+						' WHERE '.dbConditionInt('og.operationid', $opmessage)
 					);
 					while ($opmessage_grp = DBfetch($db_opmessage_grp)) {
-						$operations[$opmessage_grp['operationid']]['opmessage_grp'][] = $opmessage_grp;
+						$operationid = $opmessage_grp['operationid'];
+						unset($opmessage_grp['operationid']);
+						$operations[$operationid]['opmessage_grp'][] = $opmessage_grp;
 					}
 				}
 
@@ -2219,11 +2223,13 @@ class CAction extends CApiService {
 
 					$db_opmessage_usr = DBselect(
 						'SELECT ou.operationid,ou.userid'.
-							' FROM opmessage_usr ou'.
-							' WHERE '.dbConditionInt('operationid', $opmessage)
+						' FROM opmessage_usr ou'.
+						' WHERE '.dbConditionInt('ou.operationid', $opmessage)
 					);
 					while ($opmessage_usr = DBfetch($db_opmessage_usr)) {
-						$operations[$opmessage_usr['operationid']]['opmessage_usr'][] = $opmessage_usr;
+						$operationid = $opmessage_usr['operationid'];
+						unset($opmessage_usr['operationid']);
+						$operations[$operationid]['opmessage_usr'][] = $opmessage_usr;
 					}
 				}
 			}
@@ -2236,12 +2242,15 @@ class CAction extends CApiService {
 					}
 
 					$db_opcommands = DBselect(
-						'SELECT o.*'.
-							' FROM opcommand o'.
-							' WHERE '.dbConditionInt('operationid', $opcommand)
+						'SELECT o.operationid,o.type,o.scriptid,o.execute_on,o.port,o.authtype,o.username,o.password,'.
+							'o.publickey,o.privatekey,o.command'.
+						' FROM opcommand o'.
+						' WHERE '.dbConditionInt('o.operationid', $opcommand)
 					);
 					while ($db_opcommand = DBfetch($db_opcommands)) {
-						$operations[$db_opcommand['operationid']]['opcommand'] = $db_opcommand;
+						$operationid = $db_opcommand['operationid'];
+						unset($db_opcommand['operationid']);
+						$operations[$operationid]['opcommand'] = $db_opcommand;
 					}
 				}
 
@@ -2252,11 +2261,13 @@ class CAction extends CApiService {
 
 					$db_opcommand_hst = DBselect(
 						'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
-							' FROM opcommand_hst oh'.
-							' WHERE '.dbConditionInt('operationid', $opcommand)
+						' FROM opcommand_hst oh'.
+						' WHERE '.dbConditionInt('oh.operationid', $opcommand)
 					);
 					while ($opcommand_hst = DBfetch($db_opcommand_hst)) {
-						$operations[$opcommand_hst['operationid']]['opcommand_hst'][] = $opcommand_hst;
+						$operationid = $opcommand_hst['operationid'];
+						unset($opcommand_hst['operationid']);
+						$operations[$operationid]['opcommand_hst'][] = $opcommand_hst;
 					}
 				}
 
@@ -2267,11 +2278,13 @@ class CAction extends CApiService {
 
 					$db_opcommand_grp = DBselect(
 						'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
-							' FROM opcommand_grp og'.
-							' WHERE '.dbConditionInt('operationid', $opcommand)
+						' FROM opcommand_grp og'.
+						' WHERE '.dbConditionInt('og.operationid', $opcommand)
 					);
 					while ($opcommand_grp = DBfetch($db_opcommand_grp)) {
-						$operations[$opcommand_grp['operationid']]['opcommand_grp'][] = $opcommand_grp;
+						$operationid = $opcommand_grp['operationid'];
+						unset($opcommand_grp['operationid']);
+						$operations[$operationid]['opcommand_grp'][] = $opcommand_grp;
 					}
 				}
 			}
@@ -2285,11 +2298,13 @@ class CAction extends CApiService {
 
 					$db_opgroup = DBselect(
 						'SELECT o.operationid,o.groupid'.
-							' FROM opgroup o'.
-							' WHERE '.dbConditionInt('operationid', $opgroup)
+						' FROM opgroup o'.
+						' WHERE '.dbConditionInt('o.operationid', $opgroup)
 					);
 					while ($opgroup = DBfetch($db_opgroup)) {
-						$operations[$opgroup['operationid']]['opgroup'][] = $opgroup;
+						$operationid = $opgroup['operationid'];
+						unset($opgroup['operationid']);
+						$operations[$operationid]['opgroup'][] = $opgroup;
 					}
 				}
 			}
@@ -2303,11 +2318,13 @@ class CAction extends CApiService {
 
 					$db_optemplate = DBselect(
 						'SELECT o.operationid,o.templateid'.
-							' FROM optemplate o'.
-							' WHERE '.dbConditionInt('operationid', $optemplate)
+						' FROM optemplate o'.
+						' WHERE '.dbConditionInt('o.operationid', $optemplate)
 					);
 					while ($optemplate = DBfetch($db_optemplate)) {
-						$operations[$optemplate['operationid']]['optemplate'][] = $optemplate;
+						$operationid = $optemplate['operationid'];
+						unset($optemplate['operationid']);
+						$operations[$operationid]['optemplate'][] = $optemplate;
 					}
 				}
 			}
@@ -2321,16 +2338,18 @@ class CAction extends CApiService {
 
 					$db_opinventory = DBselect(
 						'SELECT o.operationid,o.inventory_mode'.
-							' FROM opinventory o'.
-							' WHERE '.dbConditionInt('operationid', $opinventory)
+						' FROM opinventory o'.
+						' WHERE '.dbConditionInt('o.operationid', $opinventory)
 					);
 					while ($opinventory = DBfetch($db_opinventory)) {
-						$operations[$opinventory['operationid']]['opinventory'] = $opinventory;
+						$operationid = $opinventory['operationid'];
+						unset($opinventory['operationid']);
+						$operations[$operationid]['opinventory'] = $opinventory;
 					}
 				}
 			}
 
-			$operations = $this->unsetExtraFields($operations, ['operationid', 'actionid' ,'operationtype'],
+			$operations = $this->unsetExtraFields($operations, ['operationid', 'actionid', 'operationtype'],
 				$options['selectOperations']
 			);
 			$result = $relationMap->mapMany($result, $operations, 'operations');
@@ -2397,11 +2416,13 @@ class CAction extends CApiService {
 
 					$db_opmessages = DBselect(
 						'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
-							' FROM opmessage o'.
-							' WHERE '.dbConditionInt('operationid', $opmessage)
+						' FROM opmessage o'.
+						' WHERE '.dbConditionInt('o.operationid', $opmessage)
 					);
 					while ($db_opmessage = DBfetch($db_opmessages)) {
-						$recovery_operations[$db_opmessage['operationid']]['opmessage'] = $db_opmessage;
+						$operationid = $db_opmessage['operationid'];
+						unset($db_opmessage['operationid']);
+						$recovery_operations[$operationid]['opmessage'] = $db_opmessage;
 					}
 				}
 
@@ -2412,11 +2433,13 @@ class CAction extends CApiService {
 
 					$db_opmessage_grp = DBselect(
 						'SELECT og.operationid,og.usrgrpid'.
-							' FROM opmessage_grp og'.
-							' WHERE '.dbConditionInt('operationid', $opmessage)
+						' FROM opmessage_grp og'.
+						' WHERE '.dbConditionInt('og.operationid', $opmessage)
 					);
 					while ($opmessage_grp = DBfetch($db_opmessage_grp)) {
-						$recovery_operations[$opmessage_grp['operationid']]['opmessage_grp'][] = $opmessage_grp;
+						$operationid = $opmessage_grp['operationid'];
+						unset($opmessage_grp['operationid']);
+						$recovery_operations[$operationid]['opmessage_grp'][] = $opmessage_grp;
 					}
 				}
 
@@ -2427,11 +2450,13 @@ class CAction extends CApiService {
 
 					$db_opmessage_usr = DBselect(
 						'SELECT ou.operationid,ou.userid'.
-							' FROM opmessage_usr ou'.
-							' WHERE '.dbConditionInt('operationid', $opmessage)
+						' FROM opmessage_usr ou'.
+						' WHERE '.dbConditionInt('ou.operationid', $opmessage)
 					);
 					while ($opmessage_usr = DBfetch($db_opmessage_usr)) {
-						$recovery_operations[$opmessage_usr['operationid']]['opmessage_usr'][] = $opmessage_usr;
+						$operationid = $opmessage_usr['operationid'];
+						unset($opmessage_usr['operationid']);
+						$recovery_operations[$operationid]['opmessage_usr'][] = $opmessage_usr;
 					}
 				}
 			}
@@ -2444,12 +2469,15 @@ class CAction extends CApiService {
 					}
 
 					$db_opcommands = DBselect(
-						'SELECT o.*'.
-							' FROM opcommand o'.
-							' WHERE '.dbConditionInt('operationid', $opcommand)
+						'SELECT o.operationid,o.type,o.scriptid,o.execute_on,o.port,o.authtype,o.username,o.password,'.
+							'o.publickey,o.privatekey,o.command'.
+						' FROM opcommand o'.
+						' WHERE '.dbConditionInt('o.operationid', $opcommand)
 					);
 					while ($db_opcommand = DBfetch($db_opcommands)) {
-						$recovery_operations[$db_opcommand['operationid']]['opcommand'] = $db_opcommand;
+						$operationid = $db_opcommand['operationid'];
+						unset($db_opcommand['operationid']);
+						$recovery_operations[$operationid]['opcommand'] = $db_opcommand;
 					}
 				}
 
@@ -2460,11 +2488,13 @@ class CAction extends CApiService {
 
 					$db_opcommand_hst = DBselect(
 						'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
-							' FROM opcommand_hst oh'.
-							' WHERE '.dbConditionInt('operationid', $opcommand)
+						' FROM opcommand_hst oh'.
+						' WHERE '.dbConditionInt('oh.operationid', $opcommand)
 					);
 					while ($opcommand_hst = DBfetch($db_opcommand_hst)) {
-						$recovery_operations[$opcommand_hst['operationid']]['opcommand_hst'][] = $opcommand_hst;
+						$operationid = $opcommand_hst['operationid'];
+						unset($opcommand_hst['operationid']);
+						$recovery_operations[$operationid]['opcommand_hst'][] = $opcommand_hst;
 					}
 				}
 
@@ -2475,11 +2505,13 @@ class CAction extends CApiService {
 
 					$db_opcommand_grp = DBselect(
 						'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
-							' FROM opcommand_grp og'.
-							' WHERE '.dbConditionInt('operationid', $opcommand)
+						' FROM opcommand_grp og'.
+						' WHERE '.dbConditionInt('og.operationid', $opcommand)
 					);
 					while ($opcommand_grp = DBfetch($db_opcommand_grp)) {
-						$recovery_operations[$opcommand_grp['operationid']]['opcommand_grp'][] = $opcommand_grp;
+						$operationid = $opcommand_grp['operationid'];
+						unset($opcommand_grp['operationid']);
+						$recovery_operations[$operationid]['opcommand_grp'][] = $opcommand_grp;
 					}
 				}
 			}
@@ -2493,17 +2525,19 @@ class CAction extends CApiService {
 
 					$db_opmessages = DBselect(
 						'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
-							' FROM opmessage o'.
-							' WHERE '.dbConditionInt('operationid', $op_recovery_message)
+						' FROM opmessage o'.
+						' WHERE '.dbConditionInt('o.operationid', $op_recovery_message)
 					);
 					while ($db_opmessage = DBfetch($db_opmessages)) {
-						$recovery_operations[$db_opmessage['operationid']]['opmessage'] = $db_opmessage;
+						$operationid = $db_opmessage['operationid'];
+						unset($db_opmessage['operationid']);
+						$recovery_operations[$operationid]['opmessage'] = $db_opmessage;
 					}
 				}
 			}
 
 			$recovery_operations = $this->unsetExtraFields($recovery_operations,
-				['operationid', 'actionid' ,'operationtype'], $options['selectRecoveryOperations']
+				['operationid', 'actionid', 'operationtype'], $options['selectRecoveryOperations']
 			);
 			$result = $relationMap->mapMany($result, $recovery_operations, 'recoveryOperations');
 		}
@@ -2548,15 +2582,15 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opmessage'] = [];
 				}
 
-				$messages = DB::select('opmessage', [
-					'output' => ['operationid', 'default_msg', 'subject', 'message', 'mediatypeid'],
-					'filter' => ['operationid' => $opmessages]
-				]);
-
-				foreach ($messages as $message) {
-					$operationid = $message['operationid'];
-					unset($message['operationid']);
-					$ack_operations[$operationid]['opmessage'] = $message;
+				$db_opmessages = DBselect(
+					'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+					' FROM opmessage o'.
+					' WHERE '.dbConditionInt('o.operationid', $opmessages)
+				);
+				while ($db_opmessage = DBfetch($db_opmessages)) {
+					$operationid = $db_opmessage['operationid'];
+					unset($db_opmessage['operationid']);
+					$ack_operations[$operationid]['opmessage'] = $db_opmessage;
 				}
 			}
 
@@ -2565,15 +2599,15 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opmessage_grp'] = [];
 				}
 
-				$messages_groups = DB::select('opmessage_grp', [
-					'output' => ['operationid', 'usrgrpid'],
-					'filter' => ['operationid' => $nonack_messages]
-				]);
-
-				foreach ($messages_groups as $messages_group) {
-					$operationid = $messages_group['operationid'];
-					unset($messages_group['operationid']);
-					$ack_operations[$operationid]['opmessage_grp'][] = $messages_group;
+				$db_opmessage_grp = DBselect(
+					'SELECT og.operationid,og.usrgrpid'.
+					' FROM opmessage_grp og'.
+					' WHERE '.dbConditionInt('og.operationid', $nonack_messages)
+				);
+				while ($opmessage_grp = DBfetch($db_opmessage_grp)) {
+					$operationid = $opmessage_grp['operationid'];
+					unset($opmessage_grp['operationid']);
+					$ack_operations[$operationid]['opmessage_grp'][] = $opmessage_grp;
 				}
 			}
 
@@ -2582,15 +2616,15 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opmessage_usr'] = [];
 				}
 
-				$messages_users = DB::select('opmessage_usr', [
-					'output' => ['operationid', 'userid'],
-					'filter' => ['operationid' => $nonack_messages]
-				]);
-
-				foreach ($messages_users as $messages_user) {
-					$operationid = $messages_user['operationid'];
-					unset($messages_user['operationid']);
-					$ack_operations[$operationid]['opmessage_usr'][] = $messages_user;
+				$db_opmessage_usr = DBselect(
+					'SELECT ou.operationid,ou.userid'.
+					' FROM opmessage_usr ou'.
+					' WHERE '.dbConditionInt('ou.operationid', $nonack_messages)
+				);
+				while ($opmessage_usr = DBfetch($db_opmessage_usr)) {
+					$operationid = $opmessage_usr['operationid'];
+					unset($opmessage_usr['operationid']);
+					$ack_operations[$operationid]['opmessage_usr'][] = $opmessage_usr;
 				}
 			}
 		}
@@ -2601,17 +2635,16 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opcommand'] = [];
 				}
 
-				$commands = DB::select('opcommand', [
-					'output' => ['operationid', 'type', 'scriptid', 'execute_on', 'port', 'authtype', 'username',
-						'password', 'publickey', 'privatekey', 'command'
-					],
-					'filter' => ['operationid' => $opcommands]
-				]);
-
-				foreach ($commands as $command) {
-					$operationid = $command['operationid'];
-					unset($command['operationid']);
-					$ack_operations[$operationid]['opcommand'] = $command;
+				$db_opcommands = DBselect(
+					'SELECT o.operationid,o.type,o.scriptid,o.execute_on,o.port,o.authtype,o.username,o.password,'.
+						'o.publickey,o.privatekey,o.command'.
+					' FROM opcommand o'.
+					' WHERE '.dbConditionInt('o.operationid', $opcommands)
+				);
+				while ($db_opcommand = DBfetch($db_opcommands)) {
+					$operationid = $db_opcommand['operationid'];
+					unset($db_opcommand['operationid']);
+					$ack_operations[$operationid]['opcommand'] = $db_opcommand;
 				}
 			}
 
@@ -2620,15 +2653,15 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opcommand_hst'] = [];
 				}
 
-				$commands_history = DB::select('opcommand_hst', [
-					'output' => ['opcommand_hstid', 'operationid', 'hostid'],
-					'filter' => ['operationid' => $opcommands]
-				]);
-
-				foreach ($commands_history as $command_history) {
-					$operationid = $command_history['operationid'];
-					unset($command_history['operationid']);
-					$ack_operations[$operationid]['opcommand_hst'][] = $command_history;
+				$db_opcommand_hst = DBselect(
+					'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
+					' FROM opcommand_hst oh'.
+					' WHERE '.dbConditionInt('oh.operationid', $opcommands)
+				);
+				while ($opcommand_hst = DBfetch($db_opcommand_hst)) {
+					$operationid = $opcommand_hst['operationid'];
+					unset($opcommand_hst['operationid']);
+					$ack_operations[$operationid]['opcommand_hst'][] = $opcommand_hst;
 				}
 			}
 
@@ -2637,15 +2670,15 @@ class CAction extends CApiService {
 					$ack_operations[$operationid]['opcommand_grp'] = [];
 				}
 
-				$commands_groups = DB::select('opcommand_grp', [
-					'output' => ['opcommand_grpid', 'operationid', 'groupid'],
-					'filter' => ['operationid' => $opcommands]
-				]);
-
-				foreach ($commands_groups as $command_group) {
-					$operationid = $command_group['operationid'];
-					unset($command_group['operationid']);
-					$ack_operations[$operationid]['opcommand_grp'][] = $command_group;
+				$db_opcommand_grp = DBselect(
+					'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
+					' FROM opcommand_grp og'.
+					' WHERE '.dbConditionInt('og.operationid', $opcommands)
+				);
+				while ($opcommand_grp = DBfetch($db_opcommand_grp)) {
+					$operationid = $opcommand_grp['operationid'];
+					unset($opcommand_grp['operationid']);
+					$ack_operations[$operationid]['opcommand_grp'][] = $opcommand_grp;
 				}
 			}
 		}
