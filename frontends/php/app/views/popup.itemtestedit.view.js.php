@@ -31,14 +31,14 @@ ob_start(); ?>
 function makeStepResult(step) {
 	if (typeof step.error !== 'undefined') {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: step.error || <?= CJs::encodeJson(_('<empty string>')) ?>}
+			{error: step.error || <?= json_encode(_('<empty string>')) ?>}
 		));
 	}
 	else if (typeof step.result === 'undefined' || step.result === null) {
-		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= CJs::encodeJson(_('No value')) ?>);
+		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('No value')) ?>);
 	}
 	else if (step.result === '') {
-		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= CJs::encodeJson(_('<empty string>')) ?>);
+		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('<empty string>')) ?>);
 	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
 		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
@@ -344,19 +344,19 @@ function processItemPreprocessingTestResults(steps) {
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_DISCARD_VALUE ?>:
-					step.action = jQuery(tmpl_gray_label.evaluate(<?= CJs::encodeJson([
+					step.action = jQuery(tmpl_gray_label.evaluate(<?= json_encode([
 						'label' => _('Discard value')
 					]) ?>));
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
-					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= CJs::encodeJson([
+					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
 					]) ?>, {failed: step.result})));
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_ERROR ?>:
-					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= CJs::encodeJson([
+					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set error to')
 					]) ?>, {failed: step.failed})));
 					break;
@@ -366,7 +366,7 @@ function processItemPreprocessingTestResults(steps) {
 		step.result = makeStepResult(step);
 
 		if (typeof step.action !== 'undefined' && step.action !== null) {
-			jQuery('#preproc-test-step-' + i + '-name').append(jQuery(tmpl_gray_label.evaluate(<?= CJs::encodeJson([
+			jQuery('#preproc-test-step-' + i + '-name').append(jQuery(tmpl_gray_label.evaluate(<?= json_encode([
 				'label' => _('Custom on fail')
 			]) ?>)));
 		}
@@ -429,8 +429,8 @@ jQuery(document).ready(function($) {
 	<?php endif ?>
 
 	$('#value').multilineInput({
-		placeholder: <?= CJs::encodeJson(_('value')) ?>,
-		value: <?= CJs::encodeJson($data['value']) ?>,
+		placeholder: <?= json_encode(_('value')) ?>,
+		value: <?= json_encode($data['value']) ?>,
 		monospace_font: false,
 		maxlength: 65535,
 		autofocus: true,
@@ -440,8 +440,8 @@ jQuery(document).ready(function($) {
 	});
 
 	$('#prev_value').multilineInput({
-		placeholder: <?= $data['show_prev'] ? CJs::encodeJson(_('value')) : '""' ?>,
-		value: <?= CJs::encodeJson($data['prev_value']) ?>,
+		placeholder: <?= $data['show_prev'] ? json_encode(_('value')) : '""' ?>,
+		value: <?= json_encode($data['prev_value']) ?>,
 		monospace_font: false,
 		maxlength: 65535,
 		disabled: <?= $data['show_prev'] ? 'false' : 'true' ?>,

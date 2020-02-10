@@ -133,7 +133,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		if (($messages = getMessages()) !== null) {
 			$this->setResponse(
 				(new CControllerResponseData([
-					'main_block' => CJs::encodeJson([
+					'main_block' => json_encode([
 						'messages' => $messages->toString(),
 						'user' => [
 							'debug_mode' => $this->getDebugMode()
@@ -213,6 +213,6 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			$output['messages'] = $messages->toString();
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }

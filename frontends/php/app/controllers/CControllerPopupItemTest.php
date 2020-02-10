@@ -854,7 +854,7 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 		}
 
-		return CJs::encodeJson($result);
+		return json_encode($result);
 	}
 
 	/**
