@@ -24,29 +24,26 @@ class CButtonDropdown extends CTag {
 	/**
 	 * Default CSS class name for HTML root element.
 	 */
-	const ZBX_STYLE_CLASS = 'dropdown';
+	public const ZBX_STYLE_CLASS = 'btn-dropdown-container';
 
 	public function __construct(string $name, string $value = '', array $options = []) {
 		parent::__construct('div', true);
 
 		$this
-			->setId(uniqid('dropdown-'))
+			->setId(uniqid('btn-dropdown-'))
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addItem(
 				(new CButton(null))
 					->setAttribute('title', $options['title'])
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass(ZBX_STYLE_BTN_DROPDOWN_TOGGLE)
-					->addClass($options['active_class'])
+					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, ZBX_STYLE_BTN_DROPDOWN_TOGGLE, $options['active_class']]))
 					->setMenuPopup([
 						'type' => 'dropdown',
 						'data' => [
 							'items' => $options['items']
 						]
 					])
-			)->addItem(
-				(new CInput('hidden', $name, $value))->addClass('dropdown-value')
-			);
+			)
+			->addItem((new CInput('hidden', $name, $value))->addClass('dropdown-value'));
 
 		zbx_add_post_js($this->getPostJS());
 	}

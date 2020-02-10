@@ -54,10 +54,10 @@ foreach ($data['macros'] as $i => $macro) {
 
 	$dropdown_options = [
 		'title' => _('Change type'),
-		'active_class' => ($macro['type'] == ZBX_MACRO_TYPE_TEXT ? 'icon-text' : 'icon-secret'),
+		'active_class' => ($macro['type'] == ZBX_MACRO_TYPE_TEXT) ? ZBX_STYLE_ICON_TEXT : ZBX_STYLE_ICON_SECRET_TEXT,
 		'items' => [
-			['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => 'icon-text'],
-			['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => 'icon-secret']
+			['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_STYLE_ICON_TEXT],
+			['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_SECRET_TEXT]
 		]
 	];
 
@@ -66,8 +66,7 @@ foreach ($data['macros'] as $i => $macro) {
 		($macro['type'] == ZBX_MACRO_TYPE_SECRET)
 			? (new CButton(null))
 				->setAttribute('title', _('Revert changes'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass(ZBX_STYLE_BTN_UNDO)
+				->addClass(ZBX_STYLE_BTN_ALT.' '.ZBX_STYLE_BTN_UNDO)
 			: null,
 		new CButtonDropdown('macros['.$i.'][type]', $macro['type'], $dropdown_options)
 	]);

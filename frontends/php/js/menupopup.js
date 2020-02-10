@@ -793,11 +793,11 @@ function getMenuPopupItemPrototype(options) {
  * Get dropdown section data.
  *
  * @param {array}  options
- * @param {object} trigger_elmnt  UI element that was clicked to open overlay dialogue.
+ * @param {object} trigger_elem  UI element that was clicked to open overlay dialogue.
  *
  * @returns array
  */
-function getMenuPopupDropdown(options, trigger_elmnt) {
+function getMenuPopupDropdown(options, trigger_elem) {
 	var items = [];
 
 	jQuery.each(options.items, function(i, item) {
@@ -805,19 +805,16 @@ function getMenuPopupDropdown(options, trigger_elmnt) {
 			label: item.label,
 			url: item.url || 'javascript:void(0);',
 			class: item.class,
-			clickCallback: function() {
-				jQuery(trigger_elmnt)
-					.removeClass()
-					.addClass('btn-alt btn-dropdown-toggle ' + item.class)
-					.siblings('.dropdown-value').val(item.value)
-					.trigger('change')
-			}
+			clickCallback: () =>
+				jQuery(trigger_elem)
+					.parent()
+					.buttonDropdown('change', trigger_elem, item)
 		});
 	});
 
 	return [{
 		items: items
-	}]
+	}];
 }
 
 /**

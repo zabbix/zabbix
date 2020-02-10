@@ -24,7 +24,7 @@ class CInputSecret extends CTag {
 	/**
 	 * Default CSS class name for HTML root element.
 	 */
-	const ZBX_STYLE_CLASS = 'input-secret';
+	public const ZBX_STYLE_CLASS = 'input-secret';
 
 	public function __construct(string $name, string $caption, string $placeholder = '') {
 		parent::__construct('div', true);
@@ -37,10 +37,7 @@ class CInputSecret extends CTag {
 					->setAttribute('placeholder', $placeholder)
 					->setEnabled(false)
 			)
-			->addItem(
-				(new CButton(null, _('Set new value')))
-					->addClass('btn-change')
-			);
+			->addItem((new CButton(null, _('Set new value')))->addClass('btn-change'));
 
 		zbx_add_post_js($this->getPostJS());
 	}

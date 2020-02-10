@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 (function($) {
 	'use strict';
 
@@ -41,6 +42,7 @@
 			var settings = $.extend({}, options);
 
 			return this.each(function() {
+				$(this).data('is-activated', false);
 				$('button', $(this)).on('click', enable);
 			});
 		}

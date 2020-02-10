@@ -295,7 +295,7 @@ class CUserMacro extends CApiService {
 			$upd_globalmacro = [];
 
 			// strings
-			foreach (['macro', 'value', 'description'] as $field_name) {
+			foreach (['macro', 'value', 'description', 'type'] as $field_name) {
 				if (array_key_exists($field_name, $globalmacro)
 						&& $globalmacro[$field_name] !== $db_globalmacro[$field_name]) {
 					$upd_globalmacro[$field_name] = $globalmacro[$field_name];
@@ -364,7 +364,7 @@ class CUserMacro extends CApiService {
 		}
 
 		$db_globalmacros = DB::select('globalmacro', [
-			'output' => ['globalmacroid', 'macro', 'value', 'description'],
+			'output' => ['globalmacroid', 'macro', 'value', 'description', 'type'],
 			'globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid'),
 			'preservekeys' => true
 		]);

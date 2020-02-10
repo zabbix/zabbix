@@ -17,16 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 (function($) {
 	'use strict';
 
 	var methods = {
-		init: function(options) {
+		// $input_elem: null,
+		init(options) {
 			var settings = $.extend({}, options);
 
 			return this.each(function() {
-				// some logic here
+
 			});
+		},
+		change(elem, value) {
+			$(elem)
+				.removeClass()
+				.addClass(['btn-alt', 'btn-dropdown-toggle', value.class].join(' '));
+
+			$('input[type=hidden]', $(elem).parent())
+				.val(value.value)
+				.trigger('change');
 		}
 	};
 

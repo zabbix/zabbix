@@ -53,7 +53,8 @@ else {
 	foreach ($data['macros'] as $i => $macro) {
 		$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro'], [
 			'readonly' => (
-				$data['readonly'] || ($data['show_inherited_macros'] && ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED))
+				$data['readonly']
+				|| ($data['show_inherited_macros'] && ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED))
 			)
 		]))
 			->addClass('macro')
@@ -65,6 +66,8 @@ else {
 			if (array_key_exists('hostmacroid', $macro)) {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
+
+			$macro_cell[] = new CVar('macros['.$i.'][type]', $macro['type']);
 
 			if ($data['show_inherited_macros'] && ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED)) {
 				if (array_key_exists('template', $macro)) {
@@ -93,6 +96,10 @@ else {
 		]))
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 			->setAttribute('placeholder', _('value'));
+
+		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+			$value_input->setEnabled(false);
+		}
 
 		$row = [
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),

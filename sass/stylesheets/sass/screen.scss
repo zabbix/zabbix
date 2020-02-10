@@ -6234,191 +6234,6 @@ a.overlay-close-btn {
 	}
 }
 
-// Input group
-.input-group {
-	position: relative;
-	display: flex;
-	flex-wrap: wrap;
-	align-items: stretch;
-	width: 100%;
-
-	* {
-		box-sizing: border-box;
-	}
-
-	input,
-	textarea {
-		flex: 1;
-		border-right: 0;
-
-		&:focus,
-		&:active {
-
-			+ .btn-undo {
-				border-top-color: $btn-border-color;
-				border-bottom-color: $btn-border-color;
-			}
-		}
-	}
-
-	button {
-		position: relative;
-
-		&.btn-change {
-			border-radius: 0;
-		}
-
-		&.btn-undo {
-			display: none;
-			width: 24px;
-			border-left: 0;
-			border-right: 0;
-			border-top: 1px solid $form-border-color;
-			border-bottom: 1px solid $form-border-color;
-			border-radius: 0;
-			background-color: $form-bg-color;
-
-			&::before {
-				position: absolute;
-				top: 0;
-				left: 0;
-				display: block;
-				width: 22px;
-				height: 22px;
-				content: "";
-				background: url(../img/icon-sprite.svg) no-repeat -119px -474px;
-			}
-
-			&:hover,
-			&:focus,
-			&:active,
-			&.focused {
-				background-color: $btn-bg-color;
-				border-top: 1px solid $form-border-focus-color;
-				border-bottom: 1px solid $form-border-focus-color;
-
-				&::before {
-					background-position: -431px -474px;
-				}
-			}
-		}
-
-		&.btn-dropdown-toggle {
-			border-top-left-radius: 0;
-			border-bottom-left-radius: 0;
-		}
-	}
-}
-
-.input-secret {
-	position: relative;
-	display: flex;
-	flex: 1;
-
-	input {
-		flex: 1;
-	}
-
-	button {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		opacity: 0;
-
-		&:hover,
-		&:focus,
-		&:active {
-			opacity: 1;
-			animation: fadein .2s;
-		}
-	}
-}
-
-// Dropdown
-.dropdown {
-	display: flex;
-}
-
-.icon-text {
-
-	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -87px -474px;
-	}
-
-	&:hover,
-	&:focus,
-	&:active {
-
-		&::before {
-			background-position: -399px -474px;
-		}
-	}
-}
-
-.icon-secret {
-
-	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -87px -510px;
-	}
-
-	&:hover,
-	&:focus,
-	&:active {
-
-		&::before {
-			background-position: -399px -510px;
-		}
-	}
-}
-
-.btn-dropdown-toggle {
-	white-space: nowrap;
-	overflow: hidden;
-	text-indent: -200px;
-
-	&[class*='icon-'] {
-		padding-left: 22px;
-
-		&::before {
-			position: absolute;
-			top: 0;
-			left: 0;
-			display: block;
-			width: 22px;
-			height: 22px;
-			content: "";
-		}
-	}
-
-	&::after {
-		position: absolute;
-		top: 6px;
-		right: 2px;
-		width: 10px;
-		height: 10px;
-		content: "";
-		background: url(../img/icon-sprite.svg) no-repeat -547px -431px;
-	}
-
-	&:hover,
-	&:focus,
-	&:active {
-
-		&::after {
-			background-position: -604px -431px;
-		}
-	}
-
-	&.is-opened {
-		background-color: $btn-bg-color;
-
-		&::after {
-			background-position: -604px -503px;
-		}
-	}
-}
-
 // Preloader
 
 @keyframes is-loading-kf {
@@ -7802,6 +7617,212 @@ table.preprocessing-test-results {
 
 	.host-avail-total {
 		background: $host-avail-total-bg-color;
+	}
+}
+
+// Input group
+
+.input-group {
+	position: relative;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	width: 100%;
+
+	* {
+		box-sizing: border-box;
+	}
+
+	input,
+	textarea {
+		flex: 1;
+		border-right: 0;
+
+		&:focus,
+		&:active {
+
+			+ .btn-undo {
+				border-top-color: $btn-border-color;
+				border-bottom-color: $btn-border-color;
+			}
+		}
+	}
+
+	button {
+		position: relative;
+
+		&.btn-change {
+			border-radius: 0;
+		}
+
+		&.btn-undo {
+			display: none;
+			width: 24px;
+			border-left: 0;
+			border-right: 0;
+			border-top: 1px solid $form-border-color;
+			border-bottom: 1px solid $form-border-color;
+			border-radius: 0;
+			background-color: $form-bg-color;
+
+			&::before {
+				position: absolute;
+				top: 0;
+				left: 0;
+				display: block;
+				width: 22px;
+				height: 22px;
+				content: "";
+				background: url(../img/icon-sprite.svg) no-repeat -119px -474px;
+			}
+
+			&.is-focused {
+				border-top: 1px solid $form-border-focus-color;
+				border-bottom: 1px solid $form-border-focus-color;
+			}
+
+			&:hover,
+			&:focus,
+			&:active {
+				background-color: $btn-bg-color;
+				border-top: 1px solid $form-border-focus-color;
+				border-bottom: 1px solid $form-border-focus-color;
+
+				&::before {
+					background-position: -431px -474px;
+				}
+			}
+		}
+
+		&.btn-dropdown-toggle {
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+	}
+}
+
+.input-secret {
+	position: relative;
+	display: flex;
+	flex: 1;
+
+	input {
+		flex: 1;
+	}
+
+	button {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		opacity: 0;
+
+		&:hover,
+		&:focus,
+		&:active {
+			opacity: 1;
+			animation: fadein .2s;
+		}
+	}
+}
+
+// Dropdown
+.btn-dropdown-container {
+	display: flex;
+}
+
+.icon-text {
+
+	&::before {
+		background: url(../img/icon-sprite.svg) no-repeat -87px -474px;
+	}
+
+	&:not(.highlighted) {
+		&:hover,
+		&:focus,
+		&:active,
+		&[data-expanded="true"] {
+
+			&::before {
+				background-position: -399px -474px;
+			}
+		}
+	}
+}
+
+.icon-secret {
+
+	&::before {
+		background: url(../img/icon-sprite.svg) no-repeat -87px -510px;
+	}
+
+	&:not(.highlighted) {
+		&:hover,
+		&:focus,
+		&:active,
+		&[data-expanded="true"] {
+
+			&::before {
+				background-position: -399px -510px;
+			}
+		}
+	}
+}
+
+.btn-dropdown-toggle {
+	white-space: nowrap;
+	overflow: hidden;
+	text-indent: -200px;
+
+	&[class*='icon-'] {
+		padding-left: 22px;
+
+		&::before {
+			position: absolute;
+			top: 0;
+			left: 0;
+			display: block;
+			width: 22px;
+			height: 22px;
+			content: '';
+		}
+	}
+
+	&::after {
+		position: absolute;
+		top: 6px;
+		right: 2px;
+		width: 10px;
+		height: 10px;
+		content: '';
+		background: url(../img/icon-sprite.svg) no-repeat -547px -431px;
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		&::after {
+			background-position: -604px -431px;
+		}
+	}
+
+	&[data-expanded="true"] {
+		background-color: $btn-bg-color;
+		color: #ffffff;
+
+		&::after {
+			background: url(../img/icon-sprite.svg) no-repeat -604px -503px;
+		}
+
+		&:hover,
+		&:focus,
+		&:active {
+
+			&::after {
+				background: url(../img/icon-sprite.svg) no-repeat -604px -503px;
+			}
+		}
 	}
 }
 

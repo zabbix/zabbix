@@ -1500,7 +1500,6 @@ define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');
 define('ZBX_STYLE_BTN_DASHBRD_NORMAL', 'btn-dashbrd-normal');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
-define('ZBX_STYLE_BTN_DROPDOWN_TOGGLE', 'btn-dropdown-toggle');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
@@ -1513,7 +1512,6 @@ define('ZBX_STYLE_BTN_TIME', 'btn-time');
 define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');
 define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out');
 define('ZBX_STYLE_BTN_TIME_RIGHT', 'btn-time-right');
-define('ZBX_STYLE_BTN_UNDO', 'btn-undo');
 define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
 define('ZBX_STYLE_BTN_WIDGET_DELETE', 'btn-widget-delete');
@@ -1610,7 +1608,6 @@ define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_ICON_NONE', 'icon-none');
-define('ZBX_STYLE_INPUT_GROUP', 'input-group');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
 define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
@@ -1798,6 +1795,14 @@ define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 
 // Widget "Problems by severity" styles.
 define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
+
+// InputSecret and ButtonDropdown styles.
+define('ZBX_STYLE_ICON_TEXT', 'icon-text');
+define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
+
+define('ZBX_STYLE_BTN_DROPDOWN_TOGGLE', 'btn-dropdown-toggle');
+define('ZBX_STYLE_BTN_UNDO', 'btn-undo');
+define('ZBX_STYLE_INPUT_GROUP', 'input-group');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

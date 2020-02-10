@@ -37,17 +37,17 @@
 						ZBX_MACRO_TYPE_TEXT,
 						[
 							'title' => json_encode(_('Change type')),
-							'active_class' => 'icon-text',
+							'active_class' => ZBX_STYLE_ICON_TEXT,
 							'items' => [
 								[
 									'value' => ZBX_MACRO_TYPE_TEXT,
 									'label' => _('Text'),
-									'class' => 'icon-text'
+									'class' => ZBX_STYLE_ICON_TEXT
 								],
 								[
 									'value' => ZBX_MACRO_TYPE_SECRET,
 									'label' => _('Secret text'),
-									'class' => 'icon-secret'
+									'class' => ZBX_STYLE_ICON_SECRET_TEXT
 								]
 							]
 						]
@@ -108,7 +108,7 @@
 				initMacroFields($('#tbl_macros'));
 			})
 			.on('focus blur', '.input-secret input, .input-group .textarea-flexible', function() {
-				$(this).closest('.input-group').find('.btn-undo').toggleClass('focused');
+				$(this).closest('.input-group').find('.btn-undo').toggleClass('is-focused');
 			})
 			.on('click', '.btn-undo', function() {
 				var $this = $(this),
@@ -122,7 +122,7 @@
 							id: $input.attr('id'),
 							name: $input.attr('name'),
 							type: 'password',
-							value: '******',
+							value: '<?= ZBX_MACRO_SECRET_MASK ?>',
 							placeholder: $input.attr('placeholder'),
 							maxlength: $input.attr('maxlength'),
 							disabled: true
@@ -133,6 +133,9 @@
 						}).text(<?= json_encode(_('Set new value')) ?>))
 						.inputSecret()
 				);
+
+				$('.btn-dropdown-container button', $container)
+					.addClass(['btn-alt', 'btn-dropdown-toggle', 'icon-secret'].join(' '));
 
 				$this.hide();
 			})
@@ -150,6 +153,11 @@
 
 				if (value_type == <?= ZBX_MACRO_TYPE_TEXT ?>) {
 					var $input = $('input[type=password]', $input_container);
+
+					if (!$input_container.data('is-activated')) {
+						$('.btn-undo', $container).show();
+						$input_container.data('is-activated', true);
+					}
 
 					$input_container.replaceWith(
 						$('<textarea>')
