@@ -128,13 +128,15 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info)
 {
 	char			tmp[MAX_STRING_LEN + 1], **pvalue;
-	DC_ITEM			item = {0};
+	DC_ITEM			item;
 	static const ZBX_TABLE	*table_items, *table_interface, *table_hosts;
 	struct zbx_json_parse	jp_interface, jp_host;
 	AGENT_RESULT		result;
 	int			errcode, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	memset(&item, 0, sizeof(item));
 
 	if (NULL == table_items)
 		table_items = DBget_table("items");
