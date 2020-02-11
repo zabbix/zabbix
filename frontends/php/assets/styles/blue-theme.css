@@ -1090,6 +1090,7 @@ output {
     padding-bottom: 2px; }
     .multiselect .multiselect-list li {
       display: block;
+      padding-left: 0 !important;
       margin: 2px 2px 0 0;
       overflow: hidden;
       white-space: nowrap;

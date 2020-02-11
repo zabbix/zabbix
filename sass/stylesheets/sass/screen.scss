@@ -1713,6 +1713,7 @@ output {
 
 		li {
 			display: block; // Override ".table-forms li".
+			padding-left: 0 !important;
 			margin: 2px 2px 0 0;
 			overflow: hidden;
 			white-space: nowrap;

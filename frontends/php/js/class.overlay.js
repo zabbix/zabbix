@@ -191,6 +191,9 @@ Overlay.prototype.load = function(action, options) {
 	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
 
+	this.action = action;
+	this.options = options;
+
 	if (this.xhr) {
 		this.xhr.abort();
 	}
@@ -208,6 +211,14 @@ Overlay.prototype.load = function(action, options) {
 	}.bind(this));
 
 	return this.xhr;
+};
+
+/**
+ * Reload popup with new options.
+ */
+Overlay.prototype.reload = function(options) {
+	PopUp(this.action, options, this.dialogueid);
+	return true;
 };
 
 /**
