@@ -25,7 +25,7 @@
 class CView {
 
 	/**
-	 * View directory list ordered by search priority.
+	 * Directory list of MVC views ordered by search priority.
 	 *
 	 * @static
 	 *
@@ -202,5 +202,16 @@ class CView {
 	 */
 	public function getLayoutMode() {
 		return $this->layout_modes_enabled ? CViewHelper::loadLayoutMode() : ZBX_LAYOUT_NORMAL;
+	}
+
+	/**
+	 * Add custom directory to the directory list of MVC views. The last added will have the highest piority.
+	 *
+	 * @param string $directory
+	 */
+	public static function addDirectory($directory) {
+		if (!in_array($directory, self::$directories)) {
+			array_unshift(self::$directories, $directory);
+		}
 	}
 }

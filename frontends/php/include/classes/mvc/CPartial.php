@@ -26,7 +26,7 @@
 class CPartial {
 
 	/**
-	 * Partial directory list ordered by search priority.
+	 * Directory list of MVC partials ordered by search priority.
 	 *
 	 * @static
 	 *
@@ -65,7 +65,7 @@ class CPartial {
 	 * @throws RuntimeException if partial not found or not readable.
 	 */
 	public function __construct($name, array $data = []) {
-		if (!preg_match('/^[a-z\.]+$/', $name)) {
+		if (!preg_match('/^[a-z\.\/]+$/', $name)) {
 			throw new InvalidArgumentException(sprintf('Invalid partial name: "%s".', $name));
 		}
 
@@ -155,5 +155,16 @@ class CPartial {
 	 */
 	public function includeJsFile($file_name) {
 		echo $this->readJsFile($file_name);
+	}
+
+	/**
+	 * Add custom directory to the directory list of MVC partials. The last added will have the highest piority.
+	 *
+	 * @param string $directory
+	 */
+	public static function addDirectory($directory) {
+		if (!in_array($directory, self::$directories)) {
+			array_unshift(self::$directories, $directory);
+		}
 	}
 }
