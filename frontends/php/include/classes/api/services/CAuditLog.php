@@ -24,13 +24,24 @@
  */
 class CAuditLog extends CApiService {
 
-	/** @var string Database table name. */
+	/**
+	 * @var string Database table name.
+	 */
 	protected $tableName = 'auditlog';
-	/** @var string Database table name alias. */
+
+	/**
+	 * @var string Database table name alias.
+	 */
 	protected $tableAlias = 'a';
-	/** @var array Database fields list allowed for sort operation. */
+
+	/**
+	 * @var array Database fields list allowed for sort operation.
+	 */
 	protected $sortColumns = ['auditid', 'userid', 'clock'];
-	/** @var array Database table with auditlog details supported fields list. */
+
+	/**
+	 * @var array Database table with auditlog details supported fields list.
+	 */
 	protected $details_fields = ['table_name', 'field_name', 'oldvalue', 'newvalue'];
 
 	/**
@@ -124,22 +135,18 @@ class CAuditLog extends CApiService {
 			$options['output'] = $fields;
 		}
 
-		// userids
 		if ($options['userids'] && array_filter($options['userids'])) {
 			$sql_parts['where']['userid'] = dbConditionInt('a.userid', $options['userids']);
 		}
 
-		// time_from
 		if ($options['time_from']) {
 			$sql_parts['where'][] = 'a.clock>='.zbx_dbstr($options['time_from']);
 		}
 
-		// time_till
 		if ($options['time_till']) {
 			$sql_parts['where'][] = 'a.clock<='.zbx_dbstr($options['time_till']);
 		}
 
-		// limit
 		if ($options['limit']) {
 			$sql_parts['limit'] = $options['limit'];
 		}
@@ -169,7 +176,6 @@ class CAuditLog extends CApiService {
 
 		$result = $result ? $this->addRelatedObjects($options, $result) : [];
 
-		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
@@ -182,6 +188,8 @@ class CAuditLog extends CApiService {
 	 *
 	 * @param array $options    Array of API request options.
 	 * @param array $result     Associative array of selected auditlog data, key is auditid property.
+	 *
+	 * @return array
 	 */
 	protected function addRelatedObjects(array $options, array $result): array {
 		$fields = [];
@@ -215,7 +223,9 @@ class CAuditLog extends CApiService {
 	 * @param string $table        Table name.
 	 * @param string $alias        Table alias.
 	 * @param array  $options      Request options.
-	 * @param array  $sql_parts    Array of sql query parts to be modified.
+	 * @param array  $sql_parts    Array of SQL query parts to be modified.
+	 *
+	 * @return array
 	 */
 	protected function applyQueryFilterOptions($table, $alias, array $options, array $sql_parts): array {
 		$filter = array_intersect_key($options['filter'], array_flip($this->details_fields));
