@@ -1,4 +1,4 @@
-<?php
+<?php	declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -23,7 +23,7 @@ class CControllerAuditLogList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'page' =>				'int32',
+			'page' =>				'int32|ge 1',
 			'auditlog_action' =>	'in -1,'.implode(',', array_keys($this->getActionsList())),
 			'resourcetype' =>		'in -1,'.implode(',', array_keys($this->getResourcesList())),
 			'filter_rst' =>			'in 1',
@@ -90,20 +90,23 @@ class CControllerAuditLogList extends CController {
 			$filter['resourcetype'] = $data['resourcetype'];
 		}
 
+		$config = select_config();
 		$params = [
-			'output' => API_OUTPUT_EXTEND,
-			'selectDetails' => API_OUTPUT_EXTEND,
+			'output' => ['auditid', 'userid', 'clock', 'action', 'resourcetype', 'note', 'ip', 'resourceid',
+				'resourcename'
+			],
+			'selectDetails' => ['table_name', 'field_name', 'oldvalue', 'newvalue'],
 			'filter' => $filter,
 			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN,
-			'limit' => select_config()['search_limit'] + 1
+			'limit' => $config['search_limit'] + 1
 		];
 
-		if ($this->hasInput('from')) {
+		if ($data['timeline']['from_ts'] !== null) {
 			$params['time_from'] = $data['timeline']['from_ts'];
 		}
 
-		if ($this->hasInput('to')) {
+		if ($data['timeline']['to_ts'] !== null) {
 			$params['time_till'] = $data['timeline']['to_ts'];
 		}
 
@@ -150,6 +153,8 @@ class CControllerAuditLogList extends CController {
 
 	/**
 	 * Return associated list of available actions and labels.
+	 *
+	 * @return array
 	 */
 	protected function getActionsList(): array {
 		return [
@@ -165,6 +170,8 @@ class CControllerAuditLogList extends CController {
 
 	/**
 	 * Return associated list of available resources and labels.
+	 *
+	 * @return array
 	 */
 	protected function getResourcesList(): array {
 		return [
