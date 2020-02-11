@@ -85,10 +85,9 @@ class CControllerHousekeepingUpdate extends CController {
 		];
 
 		if ($config['hk_events_mode'] == 1) {
-			$config['hk_events_trigger']	= $this->getInput('hk_events_trigger');
-			$config['hk_events_internal']	= $this->getInput('hk_events_internal');
-			$config['hk_events_discovery']	= $this->getInput('hk_events_discovery');
-			$config['hk_events_autoreg']	= $this->getInput('hk_events_autoreg');
+			$this->getInputs($config,
+				['hk_events_trigger', 'hk_events_internal', 'hk_events_discovery', 'hk_events_autoreg']
+			);
 		}
 
 		if ($config['hk_services_mode'] == 1) {
