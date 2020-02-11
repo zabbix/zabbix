@@ -438,20 +438,6 @@ class ZBase {
 			if (!class_exists($action_class, true)) {
 				throw new Exception(_s('Class %s not found for action %s.', $action_class, $action_name));
 			}
-<<<<<<< HEAD
-			else {
-				$view = new CView($router->getView(), $response->getData());
-
-				$data['page']['title'] = $response->getTitle();
-				$data['page']['file'] = $response->getFileName();
-				$data['controller']['action'] = $router->getAction();
-				$data['main_block'] = $view->getOutput();
-				$data['javascript']['files'] = $view->getJsFiles();
-				$data['web_layout_mode'] = $view->getLayoutMode();
-
-				$layout = new CView($router->getLayout(), $data);
-				echo $layout->getOutput();
-=======
 
 			$action = new $action_class();
 
@@ -473,7 +459,6 @@ class ZBase {
 				if (is_subclass_of($module, CModule::class)) {
 					array_unshift(CView::$viewsDir, $module->getDir().'/views');
 				}
->>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94
 			}
 
 			register_shutdown_function(function() use ($action) {
@@ -558,10 +543,9 @@ class ZBase {
 				],
 				'main_block' => '',
 				'javascript' => [
-					'files' => [],
-					'pre' => '',
-					'post' => ''
-				]
+					'files' => []
+				],
+				'web_layout_mode' => ZBX_LAYOUT_NORMAL
 			];
 
 			if ($router->getView() !== null && $response->isViewEnabled()) {
@@ -570,10 +554,9 @@ class ZBase {
 				$layout_data = array_replace($layout_data_defaults, [
 					'main_block' => $view->getOutput(),
 					'javascript' => [
-						'files' => $view->getAddedJS(),
-						'pre' => $view->getIncludedJS(),
-						'post' => $view->getPostJS()
-					]
+						'files' => $view->getJsFiles()
+					],
+					'web_layout_mode' => $view->getLayoutMode()
 				]);
 			}
 			else {

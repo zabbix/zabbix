@@ -265,11 +265,7 @@ $templates = [
 
 $output = [
 	'header' => $data['title'],
-<<<<<<< HEAD:frontends/php/app/views/popup.preproctestedit.view.php
-	'script_inline' => $this->readJsFile('popup.preproctestedit.view.js.php'),
-=======
-	'script_inline' => require 'app/views/popup.itemtestedit.view.js.php',
->>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94:frontends/php/app/views/popup.itemtestedit.view.php
+	'script_inline' => $this->readJsFile('popup.itemtestedit.view.js.php'),
 	'body' => (new CDiv([$form, $templates]))->toString(),
 	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [

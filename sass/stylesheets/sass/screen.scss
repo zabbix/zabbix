@@ -4636,7 +4636,7 @@ $form-icon-btn: (
 		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
-		z-index: 2;
+		z-index: 1000; // Same as parent.
 	}
 
 	.list-table {
@@ -5252,7 +5252,7 @@ $form-icon-btn: (
 		left: 0;
 		right: 0;
 		top: 0;
-		z-index: 1;
+		z-index: 10; // More than form controls of the graph widget; less than .msg-* messages.
 	}
 }
 

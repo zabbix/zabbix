@@ -57,18 +57,7 @@ function local_generateHeader($data) {
 		header('X-Frame-Options: '.$x_frame_options);
 	}
 
-
-<<<<<<< HEAD
-	// construct menu
-	$main_menu = [];
-	$sub_menus = [];
-
-	zbx_construct_menu($main_menu, $sub_menus, $page, $data['controller']['action']);
-
 	$page_header = new CPartial('layout.htmlpage.header', [
-=======
-	$pageHeader = new CView('layout.htmlpage.header', [
->>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94
 		'javascript' => [
 			'files' => $data['javascript']['files']
 		],

@@ -19,17 +19,12 @@
 **/
 
 
-<<<<<<< HEAD:frontends/php/app/views/js/popup.maintenance.period.js.php
 /**
  * @var CView $this
  */
 ?>
 
-new CViewSwitcher('timeperiod_type', 'change', <?= CJs::encodeJson([
-=======
-ob_start(); ?>
 new CViewSwitcher('timeperiod_type', 'change', <?= json_encode([
->>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94:frontends/php/app/views/popup.maintenance.period.js.php
 	TIMEPERIOD_TYPE_ONETIME =>	['row_timepreiod_start_date', 'row_timeperiod_period_length'],
 	TIMEPERIOD_TYPE_DAILY =>	['row_timeperiod_every_day', 'row_timeperiod_period_at_hours_minutes',
 		'row_timeperiod_period_length'
