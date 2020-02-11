@@ -916,7 +916,6 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 		dbu_snmp_if_t	*s = &snmp_ifs->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-
 #ifdef HAVE_ORACLE
 				"update items i set type=%d, interfaceid=" ZBX_FS_UI64
 				" where exists (select 1 from hosts h"
