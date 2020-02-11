@@ -31,7 +31,7 @@ $filter = (new CFormList())
 		(new CButton('select_user', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'users',
 					'srcfld1' => 'alias',
 					'dstfrm' => 'zbx_filter',
@@ -52,7 +52,6 @@ $widget = (new CWidget())
 		->addFilterTab(_('Filter'), [$filter])
 );
 
-// create table
 $table = (new CTableInfo())
 	->setHeader([
 		_('Time'),
@@ -87,8 +86,7 @@ foreach ($data['auditlogs'] as $auditlog) {
 	]);
 }
 
-// append navigation bar js
-$objData = [
+$obj = [
 	'id' => 'timeline_1',
 	'domid' => 'auditlog',
 	'loadSBox' => 0,
@@ -96,8 +94,9 @@ $objData = [
 	'dynamic' => 0,
 	'mainObject' => 1
 ];
-zbx_add_post_js('timeControl.addObject("auditlog", '.json_encode($data['timeline']).', '.json_encode($objData).');');
-zbx_add_post_js('timeControl.processObjects();');
+$this->addPostJS('timeControl.addObject("auditlog", '.json_encode($data['timeline']).', '.json_encode($obj).');'.
+	'timeControl.processObjects();'
+);
 
 // append form to widget
 $widget->addItem((new CForm('get'))
