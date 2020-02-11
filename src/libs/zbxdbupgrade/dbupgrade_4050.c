@@ -916,11 +916,39 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 		dbu_snmp_if_t	*s = &snmp_ifs->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-#ifdef HAVE_MYSQL
-				"update items i, hosts h set i.type=%d, i.interfaceid=" ZBX_FS_UI64
+
+#ifdef HAVE_ORACLE
+				"update items i set type=%d, interfaceid=" ZBX_FS_UI64
+				" where exists (select 1 from hosts h"
+					" where i.hostid=h.hostid and"
+					" i.type in (1,4,6) and h.status <> 3 and"
+					" i.interfaceid=" ZBX_FS_UI64 " and"
+					" (('%s' is null and i.snmp_community is null) or"
+						" i.snmp_community='%s') and"
+					" (('%s' is null and i.snmpv3_securityname is null) or"
+						" i.snmpv3_securityname='%s') and"
+					" i.snmpv3_securitylevel=%d and"
+					" (('%s' is null and i.snmpv3_authpassphrase is null) or"
+						" i.snmpv3_authpassphrase='%s') and"
+					" (('%s' is null and i.snmpv3_privpassphrase is null) or"
+						" i.snmpv3_privpassphrase='%s') and"
+					" i.snmpv3_authprotocol=%d and"
+					" i.snmpv3_privprotocol=%d and"
+					" (('%s' is null and i.snmpv3_contextname is null) or"
+						" i.snmpv3_contextname='%s') and"
+					" (('%s' is null and i.port is null) or"
+						" i.port='%s'));\n",
+				ITEM_TYPE_SNMP, s->interfaceid, s->item_interfaceid, s->community, s->community,
+				s->securityname, s->securityname, (int)s->securitylevel, s->authpassphrase,
+				s->authpassphrase, s->privpassphrase, s->privpassphrase, (int)s->authprotocol,
+				(int)s->privprotocol, s->contextname, s->contextname, s->item_port, s->item_port);
+
 #else
+#	ifdef HAVE_MYSQL
+				"update items i, hosts h set i.type=%d, i.interfaceid=" ZBX_FS_UI64
+#	else
 				"update items i set type=%d, interfaceid=" ZBX_FS_UI64 " from hosts h"
-#endif
+#	endif
 				" where i.hostid=h.hostid and"
 					" type in (1,4,6) and h.status <> 3 and"
 					" interfaceid=" ZBX_FS_UI64 " and"
@@ -937,7 +965,7 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 				s->item_interfaceid, s->community, s->securityname, (int)s->securitylevel,
 				s->authpassphrase, s->privpassphrase, (int)s->authprotocol, (int)s->privprotocol,
 				s->contextname, s->item_port);
-
+#endif
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
