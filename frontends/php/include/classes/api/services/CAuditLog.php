@@ -45,9 +45,26 @@ class CAuditLog extends CApiService {
 	protected $details_fields = ['table_name', 'field_name', 'oldvalue', 'newvalue'];
 
 	/**
-	 * @see https://www.zabbix.com/documentation/current/manual/api/reference/auditlog/auditlog.get
+	 * Method auditlog.get, returns audit log records according filtering criteria.
 	 *
-	 * @param array $options    Array of API request options.
+	 * @param array    $options                   Array of API request options.
+	 * @param array    $options['auditids']       Filter by auditids.
+	 * @param array    $options['userids']        Filter by userids.
+	 * @param int      $options['time_from']      Filter by timestamp, range start time, inclusive.
+	 * @param int      $options['time_till']      Filter by timestamp, range end time, inclusive.
+	 * @param bool     $options['selectDetails']  Select additional details from auditlog_details.
+	 * @param int      $options['sortfield']      Sorting field: auditid, userid, clock.
+	 * @param string   $options['sortorder']      Sorting direction.
+	 * @param array    $options['filter']         Filter by fields value, exact match.
+	 * @param array    $options['search']         Filter by fields value, case insensitive search of substring.
+	 * @param bool     $options['countOutput']
+	 * @param bool     $options['excludeSearch']
+	 * @param int      $options['limit']
+	 * @param string   $options['output']
+	 * @param bool     $options['preservekeys']
+	 * @param bool     $options['searchByAny']
+	 * @param bool     $options['searchWildcardsEnabled']
+	 * @param bool     @options['startSearch']
 	 *
 	 * @throws APIException
 	 *
@@ -58,6 +75,7 @@ class CAuditLog extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
+		$result = [];
 		$fields = array_keys($this->getTableSchema($this->tableName())['fields']);
 		$actions = [
 			AUDIT_ACTION_ADD, AUDIT_ACTION_UPDATE, AUDIT_ACTION_DELETE, AUDIT_ACTION_LOGIN, AUDIT_ACTION_LOGOUT,
@@ -85,7 +103,7 @@ class CAuditLog extends CApiService {
 				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'clock' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'action' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $actions)],
-				'resourcetype' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'id' => implode(',', $resourcetype)],
+				'resourcetype' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $resourcetype)],
 				'note' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'ip' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'resourceid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -131,7 +149,7 @@ class CAuditLog extends CApiService {
 			'limit'		=> null
 		];
 
-		if ($options['output'] === API_OUTPUT_EXTEND || !$options['output']) {
+		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = $fields;
 		}
 
@@ -162,25 +180,22 @@ class CAuditLog extends CApiService {
 				continue;
 			}
 
-			if ($options['groupCount']) {
-				$result[] = $audit;
-			}
-			else {
-				$result = $audit['rowscount'];
-			}
+			$result = $audit['rowscount'];
 		}
 
 		if ($options['countOutput']) {
 			return $result;
 		}
 
-		$result = $result ? $this->addRelatedObjects($options, $result) : [];
-
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+		if ($result && $options['selectDetails'] !== null) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
-		return $result;
+		if (!$options['preservekeys']) {
+			$result = array_values($result);
+		}
+
+		return $this->unsetExtraFields($result, ['auditid'], $options['output']);
 	}
 
 	/**
@@ -194,11 +209,16 @@ class CAuditLog extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$fields = [];
 
-		foreach($this->details_fields as $field) {
+		foreach ($this->details_fields as $field) {
 			if ($this->outputIsRequested($field, $options['selectDetails'])) {
 				$fields[] = $field;
 			}
 		};
+
+		foreach ($result as &$row) {
+			$row['details'] = [];
+		}
+		unset($row);
 
 		if ($fields) {
 			$relation_fields = ['auditid', 'auditdetailid'];
@@ -228,8 +248,12 @@ class CAuditLog extends CApiService {
 	 * @return array
 	 */
 	protected function applyQueryFilterOptions($table, $alias, array $options, array $sql_parts): array {
-		$filter = array_intersect_key($options['filter'], array_flip($this->details_fields));
-		$search = array_intersect_key($options['search'], array_flip(['oldvalue', 'newvalue']));
+		$filter = is_array($options['filter'])
+			? array_intersect_key($options['filter'], array_flip($this->details_fields))
+			: [];
+		$search = is_array($options['search'])
+			? array_intersect_key($options['search'], array_flip(['oldvalue', 'newvalue']))
+			: [];
 
 		if ($filter || $search) {
 			$details_options = compact('filter', 'search') + $options;
