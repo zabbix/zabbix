@@ -218,15 +218,15 @@
 	}
 
 	jQuery(function() {
-		addDCheck(<?= CJs::encodeJson(array_values($data['drule']['dchecks'])) ?>);
+		addDCheck(<?= json_encode(array_values($data['drule']['dchecks'])) ?>);
 
-		jQuery('input:radio[name="uniqueness_criteria"][value=<?= CJs::encodeJson($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="host_source"][value=<?= CJs::encodeJson($data['drule']['host_source']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="name_source"][value=<?= CJs::encodeJson($data['drule']['name_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="uniqueness_criteria"][value=<?= json_encode($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="host_source"][value=<?= json_encode($data['drule']['host_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="name_source"][value=<?= json_encode($data['drule']['name_source']) ?>]').attr('checked', 'checked');
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
-				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.text(<?= json_encode(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#form').val('clone');
@@ -319,10 +319,10 @@
 	/**
 	 * Sends discovery check form data to the server for validation before adding it to the main form.
 	 *
-	 * @param {string} form_name  Form name that is sent to the server for validation.
+	 * @param {Overlay} overlay
 	 */
-	function submitDCheck(form_name) {
-		var $form = jQuery(document.forms['dcheck_form']);
+	function submitDCheck(overlay) {
+		var $form = overlay.$dialogue.find('form');
 
 		$form.trimValues([
 			'#ports', '#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
@@ -340,10 +340,14 @@
 			return false;
 		}
 
-		return sendAjaxData('zabbix.php', {
+		overlay.setLoading();
+		overlay.xhr = sendAjaxData('zabbix.php', {
 			data: data,
 			dataType: 'json',
 			method: 'POST',
+			complete: function() {
+				overlay.unsetLoading();
+			}
 		}).done(function(response) {
 			$form
 				.parent()
@@ -368,14 +372,14 @@
 					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				if (hasDCheckDuplicates()) {
-					jQuery(makeMessageBox('bad', <?= CJs::encodeJson(_('Check already exists.')) ?>, null, true, false))
+					jQuery(makeMessageBox('bad', <?= json_encode(_('Check already exists.')) ?>, null, true, false))
 						.insertBefore($form);
 
 					return false;
 				}
 
 				addDCheck([dcheck]);
-				overlayDialogueDestroy(dialogueid);
+				overlayDialogueDestroy(overlay.dialogueid);
 			}
 		});
 	}

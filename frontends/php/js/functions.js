@@ -464,9 +464,14 @@ function overlayDialogueDestroy(dialogueid) {
 		if (!overlay) {
 			return;
 		}
+
 		if (typeof overlay.xhr !== 'undefined') {
 			overlay.xhr.abort();
 			delete overlay.xhr;
+		}
+
+		if (overlay instanceof Overlay) {
+			overlay.unmount();
 		}
 
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
@@ -482,20 +487,6 @@ function overlayDialogueDestroy(dialogueid) {
 }
 
 /**
- * Get unused overlay dialog id.
- *
- * @return {string}
- */
-function getOverlayDialogueId() {
-	var dialogueid = Math.random().toString(36).substring(7);
-	while (jQuery('[data-dialogueid="' + dialogueid + '"]').length) {
-		dialogueid = Math.random().toString(36).substring(7);
-	}
-
-	return dialogueid;
-}
-
-/**
  * Display modal window.
  *
  * @param {object} params                                   Modal window params.
@@ -508,19 +499,19 @@ function getOverlayDialogueId() {
  * @param {string} params.buttons[]['title']                Text on the button.
  * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
  *                                                          on click.
- * @param {string} params.buttons[]['class']	(optional)  Button class.
- * @param {bool}   params.buttons[]['cancel']	(optional)  It means what this button has cancel action.
- * @param {bool}   params.buttons[]['focused']	(optional)  Focus this button.
- * @param {bool}   params.buttons[]['enabled']	(optional)  Should the button be enabled? Default: true.
- * @param {bool}   params.buttons[]['keepOpen']	(optional)  Prevent dialogue closing, if button action returned false.
+ * @param {string} params.buttons[]['class']    (optional)  Button class.
+ * @param {bool}   params.buttons[]['cancel']   (optional)  It means what this button has cancel action.
+ * @param {bool}   params.buttons[]['focused']  (optional)  Focus this button.
+ * @param {bool}   params.buttons[]['enabled']  (optional)  Should the button be enabled? Default: true.
+ * @param {bool}   params.buttons[]['keepOpen'] (optional)  Prevent dialogue closing, if button action returned false.
  * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
  *                                                          or create a new one if value is not set.
  * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
- * @param {object} trigger_elmnt				(optional)  UI element which triggered opening of overlay dialogue.
- * @param {object} xhr							(optional)  XHR request used to load content. Used to abort loading.
+ * @param {object} trigger_elmnt                (optional)  UI element which triggered opening of overlay dialogue.
  *
- * @return {bool}
+ * @return {Overlay}
  */
+<<<<<<< HEAD
 function overlayDialogue(params, trigger_elmnt, xhr) {
 	if (!jQuery('[data-dialogueid]').length) {
 		jQuery('body').data('overflow', jQuery('body').css('overflow'));
@@ -732,77 +723,26 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	if (typeof params.class !== 'undefined') {
 		overlay_dialogue.addClass(params.class);
 	}
+=======
+function overlayDialogue(params, trigger_elmnt) {
+	params.element = params.element || trigger_elmnt;
+	params.type = params.type || 'popup';
+>>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94
 
-	center_overlay_dialog();
+	var overlay = overlays_stack.getById(params.dialogueid);
 
-	jQuery(window).resize(function() {
-		if (jQuery('#overlay_dialogue').length) {
-			center_overlay_dialog();
-		}
-	});
-
-	if (button_focused !== null) {
-		button_focused.focus();
+	if (!overlay) {
+		overlay = new Overlay(params.type, params.dialogueid);
 	}
 
-	// Don't focus element in overlay, if button is already focused.
-	overlayDialogueOnLoad(!button_focused, jQuery('.overlay-dialogue[data-dialogueid="'+params.dialogueid+'"]'));
-}
+	overlay.setProperties(params);
+	overlay.mount();
+	overlay.recoverFocus();
+	overlay.containFocus();
 
-/**
- * Actions to perform, when overlay UI element is created, as well as, when data in overlay was changed.
- *
- * @param {bool}	focus		Focus first focusable element in overlay.
- * @param {object}	overlay		Overlay object.
- */
-function overlayDialogueOnLoad(focus, overlay) {
-	if (focus) {
-		if (jQuery('[autofocus=autofocus]:focusable', overlay).length) {
-			jQuery('[autofocus=autofocus]:focusable', overlay).first().focus();
-		}
-		else if (jQuery('.overlay-dialogue-body form :focusable', overlay).length) {
-			jQuery('.overlay-dialogue-body form :focusable', overlay).first().focus();
-		}
-		else {
-			jQuery(':focusable:first', overlay).focus();
-		}
-	}
+	addToOverlaysStack(overlay);
 
-	var focusable = jQuery(':focusable', overlay);
-
-	if (focusable.length > 1) {
-		var first_focusable = focusable.filter(':first'),
-			last_focusable = focusable.filter(':last');
-
-		first_focusable
-			.off('keydown')
-			.on('keydown', function(e) {
-				// TAB and SHIFT
-				if (e.which == 9 && e.shiftKey) {
-					last_focusable.focus();
-					return false;
-				}
-			});
-
-		last_focusable
-			.off('keydown')
-			.on('keydown', function(e) {
-				// TAB and not SHIFT
-				if (e.which == 9 && !e.shiftKey) {
-					first_focusable.focus();
-					return false;
-				}
-			});
-	}
-	else {
-		focusable
-			.off('keydown')
-			.on('keydown', function(e) {
-				if (e.which == 9) {
-					return false;
-				}
-			});
-	}
+	return overlay;
 }
 
 /**

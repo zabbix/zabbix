@@ -89,7 +89,7 @@ echo (new CView('general.warning', [
 	'messages' => zbx_objectValues(clear_messages(), 'message'),
 	'buttons' => [
 		(new CButton('login', _('Login')))->onClick('document.location = '.
-			CJs::encodeJson($redirect_to->getUrl()).';')
+			json_encode($redirect_to->getUrl()).';')
 	],
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();

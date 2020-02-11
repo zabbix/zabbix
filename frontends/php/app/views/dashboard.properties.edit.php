@@ -69,7 +69,7 @@ $output = [
 			'title' => _('Apply'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return dashbrdApplyProperties();'
+			'action' => 'return dashbrdApplyProperties(overlay);'
 		]
 	]
 ];
@@ -79,4 +79,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

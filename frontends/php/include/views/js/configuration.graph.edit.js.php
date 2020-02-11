@@ -122,7 +122,7 @@
 </tr>
 </script>
 <script type="text/javascript">
-	colorPalette.setThemeColors(<?= CJs::encodeJson(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
+	colorPalette.setThemeColors(<?= json_encode(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
 
 	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
 		var item = {

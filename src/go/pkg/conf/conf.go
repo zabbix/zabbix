@@ -512,13 +512,13 @@ func Load(filename string, v interface{}) (err error) {
 	var file std.File
 
 	if file, err = stdOs.Open(filename); err != nil {
-		return fmt.Errorf(`Cannot open configuration file: %s`, err.Error())
+		return fmt.Errorf(`cannot open configuration file: %s`, err.Error())
 	}
 	defer file.Close()
 
 	buf := bytes.Buffer{}
 	if _, err = buf.ReadFrom(file); err != nil {
-		return fmt.Errorf("Cannot load configuration: %s", err.Error())
+		return fmt.Errorf("cannot load configuration: %s", err.Error())
 	}
 
 	return Unmarshal(buf.Bytes(), v)

@@ -107,7 +107,7 @@ if ($data['readonly']) {
 	foreach ($data['interfaces'] as $interface) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');');
+	zbx_add_post_js('hostInterfacesManager.add('.json_encode($data['interfaces']).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	$hostList->addVar('interfaces', $data['interfaces']);
@@ -192,7 +192,7 @@ if ($data['readonly']) {
 // Interfaces for normal hosts.
 else {
 	zbx_add_post_js($data['interfaces']
-		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
+		? 'hostInterfacesManager.add('.json_encode($data['interfaces']).');'
 		: 'hostInterfacesManager.addNew("agent");');
 
 	$hostList->addRow('',

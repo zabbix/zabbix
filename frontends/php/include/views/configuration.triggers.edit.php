@@ -137,7 +137,7 @@ $expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.CJs::encodeJson($popup_options).
+		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.json_encode($popup_options).
 			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}), null, this);'
 		)
 		->setEnabled(!$readonly)
@@ -255,7 +255,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
-									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
+									' if (confirm('.json_encode(_('Delete expression?')).')) {'.
 										' delete_expression("'.$e['id'] .'", '.TRIGGER_EXPRESSION.');'.
 										' document.forms["'.$triggersForm->getName().'"].submit();'.
 									' }'
@@ -339,7 +339,7 @@ $recovery_expression_row = [
 	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
-			CJs::encodeJson($popup_options).
+			json_encode($popup_options).
 				',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}), null, this);'
 		)
 		->setEnabled(!$readonly)
@@ -454,7 +454,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
-									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
+									' if (confirm('.json_encode(_('Delete expression?')).')) {'.
 										' delete_expression("'.$e['id'] .'", '.TRIGGER_RECOVERY_EXPRESSION.');'.
 										' document.forms["'.$triggersForm->getName().'"].submit();'.
 									' }'
@@ -605,7 +605,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 			? null
 			: (new CButton('bnt1', _('Add')))
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
+					json_encode([
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',
 						'reference' => 'deptrigger',

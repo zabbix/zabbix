@@ -122,7 +122,7 @@
 		$('#clone').click(function() {
 			$('#slideshowid, #delete, #clone, #inaccessible_user').remove();
 			$('#update')
-				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.text(<?= json_encode(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 
 			$('#form').val('clone');

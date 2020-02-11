@@ -25,12 +25,35 @@
 
 $form = (new CForm())
 	->cleanItems()
-	->addVar('action', 'popup.preproctest.send')
-	->addVar('hostid', $data['hostid'])
-	->addVar('value_type', $data['value_type'])
-	->addVar('test_type', $data['test_type'])
-	->addVar('show_final_result', $data['show_final_result'])
 	->setId('preprocessing-test-form');
+
+if ($data['show_prev']) {
+	$form
+		->addVar('upd_last', '')
+		->addVar('upd_prev', '');
+}
+
+foreach ($data['inputs'] as $name => $value) {
+	if ($name === 'interface') {
+		// SNMPv3 additional details about interface.
+		if (array_key_exists('useip', $value)) {
+			$form->addVar('interface[useip]', $value['useip']);
+		}
+		if (array_key_exists('interfaceid', $value)) {
+			$form->addVar('interface[interfaceid]', $value['interfaceid']);
+		}
+		continue;
+	}
+	elseif ($name === 'host' && array_key_exists('hostid', $value)) {
+		$form->addVar('hostid', $value['hostid']);
+		continue;
+	}
+	elseif (in_array($name, ['proxy_hostid'])) {
+		continue;
+	}
+
+	$form->addVar($name, $value);
+}
 
 // Create macros table.
 $macros_table = $data['macros'] ? (new CTable())->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER) : null;
@@ -54,41 +77,56 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 	]);
 }
 
-// Create results table.
-$result_table = (new CTable())
-	->setId('preprocessing-steps')
-	->addClass('preprocessing-test-results')
-	->addStyle('width: 100%;')
-	->setHeader([
-		'',
-		(new CColHeader(_('Name')))->addStyle('width: 100%;'),
-		(new CColHeader(_('Result')))->addClass(ZBX_STYLE_RIGHT)
-	]);
+$form_list = new CFormList();
 
-foreach ($data['steps'] as $i => $step) {
-	$form
-		->addVar('steps['.$i.'][type]', $step['type'])
-		->addVar('steps['.$i.'][error_handler]', $step['error_handler'])
-		->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
-
-	// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
-	if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON) {
-		$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
-	}
-	else {
-		$form->addVar('steps['.$i.'][params]', $step['params']);
-	}
-
-	$result_table->addRow([
-		$step['num'].':',
-		(new CCol($step['name']))->setId('preproc-test-step-'.$i.'-name'),
-		(new CCol())
-			->addClass(ZBX_STYLE_RIGHT)
-			->setId('preproc-test-step-'.$i.'-result')
-	]);
+if ($data['is_item_testable']) {
+	$form_list
+		->addRow(
+			new CLabel(_('Get value from host'), 'get_value'),
+			(new CCheckBox('get_value', 1))->setChecked($data['get_value'])
+		)
+		->addRow(
+			new CLabel(_('Host address'), 'host_address'),
+			(new CDiv([
+				$data['interface_address_enabled']
+					? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					: (new CTextBox('interface[address]'))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setEnabled(false),
+				new CLabel(_('Port'), 'port'),
+				$data['interface_port_enabled']
+					? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					: (new CTextBox('interface[port]'))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setEnabled(false)
+			]))->addClass('item-test-popup-value-row'),
+			'host_address_row'
+		)
+		->addRow(
+			new CLabel(_('Proxy'), 'proxy_hostid'),
+			$data['proxies_enabled']
+				? (new CComboBox('proxy_hostid',
+						array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
+						[0 => _('(no proxy)')] + $data['proxies']))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				: (new CTextBox(null, _('(no proxy)'), true))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setId('proxy_hostid'), // Automated tests need this.
+			'proxy_hostid_row'
+		)
+		->addRow(
+			null,
+			(new CSimpleButton(_('Get value')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('get_value_btn')
+				->addStyle('float: right'),
+			'get_value_row'
+		);
 }
 
-$form_list = (new CFormList())
+$form_list
 	->addRow(
 		new CLabel(_('Value'), 'value'),
 		(new CDiv([
@@ -129,19 +167,51 @@ if ($macros_table) {
 	);
 }
 
-$form_list->addRow(
-	_('Preprocessing steps'),
-	(new CDiv($result_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+if (count($data['steps']) > 0) {
+	// Create results table.
+	$result_table = (new CTable())
+		->setId('preprocessing-steps')
+		->addClass('preprocessing-test-results')
 		->addStyle('width: 100%;')
-);
+		->setHeader([
+			'',
+			(new CColHeader(_('Name')))->addStyle('width: 100%;'),
+			(new CColHeader(_('Result')))->addClass(ZBX_STYLE_RIGHT)
+		]);
+
+	foreach ($data['steps'] as $i => $step) {
+		$form
+			->addVar('steps['.$i.'][type]', $step['type'])
+			->addVar('steps['.$i.'][error_handler]', $step['error_handler'])
+			->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
+
+		// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
+		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON) {
+			$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
+		}
+		else {
+			$form->addVar('steps['.$i.'][params]', $step['params']);
+		}
+
+		$result_table->addRow([
+			$step['num'].':',
+			(new CCol($step['name']))->setId('preproc-test-step-'.$i.'-name'),
+			(new CCol())
+				->addClass(ZBX_STYLE_RIGHT)
+				->setId('preproc-test-step-'.$i.'-result')
+		]);
+	}
+
+	$form_list->addRow(
+		_('Preprocessing steps'),
+		(new CDiv($result_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('width: 100%;')
+	);
+}
 
 if ($data['show_final_result']) {
-	$form_list->addRow(
-		_('Result'),
-		new CDiv(),
-		'final-result'
-	);
+	$form_list->addRow(_('Result'), false, 'final-result');
 }
 
 $form
@@ -195,16 +265,20 @@ $templates = [
 
 $output = [
 	'header' => $data['title'],
+<<<<<<< HEAD:frontends/php/app/views/popup.preproctestedit.view.php
 	'script_inline' => $this->readJsFile('popup.preproctestedit.view.js.php'),
+=======
+	'script_inline' => require 'app/views/popup.itemtestedit.view.js.php',
+>>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94:frontends/php/app/views/popup.itemtestedit.view.php
 	'body' => (new CDiv([$form, $templates]))->toString(),
-	'cancel_action' => 'return savePreprocessingTestInputs();',
+	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [
 		[
-			'title' => _('Test'),
-			'class' => 'submit-test-btn',
+			'title' => ($data['is_item_testable'] && $data['get_value']) ? _('Get value and test') : _('Test'),
 			'keepOpen' => true,
+			'enabled' => true,
 			'isSubmit' => true,
-			'action' => 'return itemPreprocessingTest("#'.$form->getId().'");'
+			'action' => 'return itemCompleteTest(overlay);'
 		]
 	]
 ];
@@ -214,4 +288,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

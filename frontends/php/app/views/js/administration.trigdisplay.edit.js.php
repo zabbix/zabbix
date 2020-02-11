@@ -38,17 +38,17 @@ $schema = DB::getSchema('config');
 		});
 		jQuery("#resetDefaults").click(function() {
 			overlayDialogue({
-				'title': <?= CJs::encodeJson(_('Reset confirmation')) ?>,
-				'content': jQuery('<span>').text(<?= CJs::encodeJson(_('Reset all fields to default values?')) ?>),
+				'title': <?= json_encode(_('Reset confirmation')) ?>,
+				'content': jQuery('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
 				'buttons': [
 					{
-						'title': <?= CJs::encodeJson(_('Cancel')) ?>,
+						'title': <?= json_encode(_('Cancel')) ?>,
 						'cancel': true,
 						'class': '<?= ZBX_STYLE_BTN_ALT ?>',
 						'action': function() {}
 					},
 					{
-						'title': <?= CJs::encodeJson(_('Reset defaults')) ?>,
+						'title': <?= json_encode(_('Reset defaults')) ?>,
 						'focused': true,
 						'action': function() {
 							var custom_color_enabled = <?=

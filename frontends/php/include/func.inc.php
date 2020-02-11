@@ -43,14 +43,6 @@ function redirect($url) {
 	exit;
 }
 
-function jsRedirect($url, $timeout = null) {
-	$script = is_numeric($timeout)
-		? 'setTimeout(\'window.location="'.$url.'"\', '.($timeout * 1000).')'
-		: 'window.location.replace("'.$url.'");';
-
-	insert_js($script);
-}
-
 /**
  * Check the HTTP request method.
  *
@@ -1392,7 +1384,16 @@ function zbx_toArray($value) {
 	return $result;
 }
 
-// value OR object OR array of objects TO an array
+/**
+ * Converts value OR object OR array of objects TO an array.
+ *
+ * @deprecated  Use array_column() instead.
+ *
+ * @param $value
+ * @param $field
+ *
+ * @return array
+ */
 function zbx_objectValues($value, $field) {
 	if (is_null($value)) {
 		return $value;
@@ -2212,8 +2213,7 @@ function imageOut(&$image, $format = null) {
 			echo $imageSource;
 			break;
 		case PAGE_TYPE_JSON:
-			$json = new CJson();
-			echo $json->encode(['result' => $imageId]);
+			echo json_encode(['result' => $imageId]);
 			break;
 		case PAGE_TYPE_TEXT:
 		default:
@@ -2255,7 +2255,7 @@ function uncheckTableRows($parentid = null, $keepids = []) {
 		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		$keepids = array_combine($keepids, $keepids);
 
-		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.CJs::encodeJson($keepids).'))');
+		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.json_encode($keepids).'))');
 	}
 	else {
 		insert_js('sessionStorage.removeItem("'.$key.'")');
@@ -2368,6 +2368,8 @@ function getUserGraphTheme() {
  * @param string  $errstr Error message.
  * @param string  $errfile Filename that the error was raised in.
  * @param int     $errline Line number the error was raised in.
+ *
+ * @return bool  False, to continue with the default error handler.
  */
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	// Necessary to suppress errors when calling with error control operator like @function_name().
@@ -2377,6 +2379,8 @@ function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 
 	// Don't show the call to this handler function.
 	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
+
+	return false;
 }
 
 /**

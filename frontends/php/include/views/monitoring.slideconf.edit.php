@@ -149,7 +149,7 @@ foreach ($data['slideshow']['slides'] as $key => $slides) {
 $addButtonColumn = (new CCol(
 		(new CButton('add', _('Add')))
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'screens',
 					'srcfld1' => 'screenid',
 					'dstfrm' => $form->getName(),
@@ -179,7 +179,7 @@ $user_group_shares_table = (new CTable())
 
 $add_user_group_btn = ([(new CButton(null, _('Add')))
 	->onClick('return PopUp("popup.generic",'.
-		CJs::encodeJson([
+		json_encode([
 			'srctbl' => 'usrgrp',
 			'srcfld1' => 'usrgrpid',
 			'srcfld2' => 'name',
@@ -217,7 +217,7 @@ $user_shares_table = (new CTable())
 
 $add_user_btn = ([(new CButton(null, _('Add')))
 	->onClick('return PopUp("popup.generic",'.
-		CJs::encodeJson([
+		json_encode([
 			'srctbl' => 'users',
 			'srcfld1' => 'userid',
 			'srcfld2' => 'fullname',

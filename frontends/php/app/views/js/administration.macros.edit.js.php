@@ -96,7 +96,9 @@
 			var removedCount = $(this).data('removedCount');
 
 			if (removedCount) {
-				return confirm(<?= CJs::encodeJson(_('Are you sure you want to delete')) ?> + ' ' + removedCount + ' ' + <?= CJs::encodeJson(_('macro(s)')) ?> + '?');
+				return confirm(<?= json_encode(_('Are you sure you want to delete')) ?> + ' ' + removedCount + ' '
+					+ <?= json_encode(_('macro(s)')) ?> + '?'
+				);
 			}
 		});
 

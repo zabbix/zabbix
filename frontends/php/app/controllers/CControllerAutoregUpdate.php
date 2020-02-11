@@ -63,7 +63,6 @@ class CControllerAutoregUpdate extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'autoreg.edit')
-			->getUrl()
 		);
 
 		if ($result) {

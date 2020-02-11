@@ -32,7 +32,7 @@
 		form.submit(function () {
 			var proceed = !warn
 				|| $('[name=authentication_type]:checked').val() == $('[name=db_authentication_type]').val()
-				|| confirm(<?= CJs::encodeJson(
+				|| confirm(<?= json_encode(
 					_('Switching authentication method will reset all except this session! Continue?')
 				) ?>);
 			warn = true;

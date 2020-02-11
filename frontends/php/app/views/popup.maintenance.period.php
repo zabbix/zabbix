@@ -170,7 +170,7 @@ $output = [
 			'class' => 'dialogue-widget-save',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitMaintenancePeriod("#'.$form->getId().'")'
+			'action' => 'return submitMaintenancePeriod(overlay);'
 		]
 	],
 	'params' => $data['params'],
@@ -182,4 +182,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

@@ -32,7 +32,7 @@ $table_user_groups = (new CTable())
 			(new CCol(
 				(new CButton(null, _('Add')))
 					->onClick('return PopUp("popup.generic",'.
-						CJs::encodeJson([
+						json_encode([
 							'srctbl' => 'usrgrp',
 							'srcfld1' => 'usrgrpid',
 							'srcfld2' => 'name',
@@ -53,7 +53,7 @@ $table_users = (new CTable())
 			(new CCol(
 				(new CButton(null, _('Add')))
 					->onClick('return PopUp("popup.generic",'.
-						CJs::encodeJson([
+						json_encode([
 							'srctbl' => 'users',
 							'srcfld1' => 'userid',
 							'srcfld2' => 'fullname',
@@ -104,7 +104,7 @@ $output = [
 		[
 			'title' => _('Update'),
 			'isSubmit' => true,
-			'action' => 'return dashbrdConfirmSharing();'
+			'action' => 'return dashbrdConfirmSharing(overlay);'
 		]
 	]
 ];
@@ -114,4 +114,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

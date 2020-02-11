@@ -82,6 +82,7 @@ class CView {
 			throw new InvalidArgumentException(sprintf('Invalid view name: "%s".', $name));
 		}
 
+<<<<<<< HEAD
 		$file_path = null;
 
 		foreach (self::$directories as $directory) {
@@ -94,6 +95,12 @@ class CView {
 
 		if ($this->directory === null) {
 			throw new RuntimeException(_s('View not found: "%s".', $name));
+=======
+		$this->filePath = $this->findFile($view.'.php');
+
+		if (is_null($this->filePath)) {
+			throw new Exception(_s('File provided to a view does not exist. Tried to find "%s".', $this->filePath));
+>>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94
 		}
 
 		if (!is_readable($file_path)) {
@@ -166,8 +173,27 @@ class CView {
 	 *
 	 * @throws RuntimeException if the file not found, not readable or returned false.
 	 */
+<<<<<<< HEAD
 	public function includeJsFile($file_name) {
 		echo $this->readJsFile($file_name);
+=======
+	public function getIncludedJS() {
+		ob_start();
+		$data = $this->data;
+
+		foreach ($this->jsIncludeFiles as $filename) {
+			$path = $this->findFile($filename);
+
+			if (!is_null($path)) {
+				include $path;
+			}
+			else if((include $filename) === false) {
+				throw new Exception(_s('Cannot include JS file "%s".', $filename));
+			}
+		}
+
+		return ob_get_clean();
+>>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94
 	}
 
 	/**
@@ -202,5 +228,24 @@ class CView {
 	 */
 	public function getLayoutMode() {
 		return $this->layout_modes_enabled ? CViewHelper::loadLayoutMode() : ZBX_LAYOUT_NORMAL;
+	}
+
+	/**
+	 * Find view or view.js file by relative path. Returns absolute path to file.
+	 *
+	 * @param string $filename    File name with extension.
+	 *
+	 * @return string|null
+	 */
+	protected function findFile($filename) {
+		foreach (self::$viewsDir as $dir) {
+			$path = $dir.'/'.$filename;
+
+			if (file_exists($path)) {
+				return $path;
+			}
+		}
+
+		return null;
 	}
 }

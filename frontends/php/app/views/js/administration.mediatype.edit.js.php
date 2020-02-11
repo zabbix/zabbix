@@ -60,7 +60,7 @@
 	?>
 </script>
 <script type="text/javascript">
-	var message_templates = <?= CJs::encodeJson(CMediatypeHelper::getAllMessageTemplates(), true) ?>,
+	var message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>,
 		message_template_list = {};
 
 	/**
@@ -130,8 +130,8 @@
 		jQuery('#message-templates-footer .btn-link')
 			.prop('disabled', limit_reached)
 			.text(limit_reached
-				? <?= CJs::encodeJson(_('Add (message type limit reached)')) ?>
-				: <?= CJs::encodeJson(_('Add')) ?>
+				? <?= json_encode(_('Add (message type limit reached)')) ?>
+				: <?= json_encode(_('Add')) ?>
 			);
 	}
 
@@ -147,7 +147,7 @@
 	}
 
 	jQuery(function($) {
-		populateMessageTemplates(<?= CJs::encodeJson(array_values($this->data['message_templates'])) ?>);
+		populateMessageTemplates(<?= json_encode(array_values($this->data['message_templates'])) ?>);
 
 		$('#message-templates').on('click', '[data-action]', function() {
 			var $btn = $(this),
@@ -231,7 +231,7 @@
 			$('#mediatypeid, #delete, #clone').remove();
 			$('#chPass_btn').hide();
 			$('#passwd').prop('disabled', false).show();
-			$('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
+			$('#update').text(<?= json_encode(_('Add')) ?>);
 			$('#update').val('mediatype.create').attr({id: 'add'});
 			$('#name').focus();
 		});

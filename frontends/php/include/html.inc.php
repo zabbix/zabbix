@@ -801,6 +801,10 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
 
+	$modules_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'module.list')
+		->getUrl();
+
 	$miscconfig_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
@@ -819,6 +823,7 @@ function getAdministrationGeneralSubmenu() {
 				$workingtime_url  => _('Working time'),
 				$trigseverity_url => _('Trigger severities'),
 				$trigdisplay_url  => _('Trigger displaying options'),
+				$modules_url      => _('Modules'),
 				$miscconfig_url   => _('Other')
 			]
 		]
@@ -997,6 +1002,27 @@ function makeWarningIcon($error) {
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Renders a debug button
+ *
+ * @return CButton
+ */
+function makeDebugButton() {
+	return (new CDiv(
+		(new CLink(_('Debug'), '#debug'))
+			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
+				"this.state = (this.state == 'none' ? 'block' : 'none');".
+				"jQuery(this)".
+					".text(this.state == 'none' ? ".json_encode(_('Debug'))." : ".json_encode(_('Hide debug')).")".
+					".blur();".
+				"showHideByName('zbx_debug_info', this.state);"
+			)
+	))->addClass(ZBX_STYLE_BTN_DEBUG);
+}
+
+/**
+>>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94
  * Returns css for trigger severity backgrounds.
  *
  * @param array $config

@@ -58,6 +58,7 @@ function local_generateHeader($data) {
 	}
 
 
+<<<<<<< HEAD
 	// construct menu
 	$main_menu = [];
 	$sub_menus = [];
@@ -65,6 +66,9 @@ function local_generateHeader($data) {
 	zbx_construct_menu($main_menu, $sub_menus, $page, $data['controller']['action']);
 
 	$page_header = new CPartial('layout.htmlpage.header', [
+=======
+	$pageHeader = new CView('layout.htmlpage.header', [
+>>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94
 		'javascript' => [
 			'files' => $data['javascript']['files']
 		],
@@ -84,11 +88,7 @@ function local_generateHeader($data) {
 
 		$page_menu = new CPartial('layout.htmlpage.menu', [
 			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
-			'menu' => [
-				'main_menu' => $main_menu,
-				'sub_menus' => $sub_menus,
-				'selected' => $page['menu']
-			],
+			'menu' => APP::Component()->get('menu.main'),
 			'user' => [
 				'is_guest' => CWebUser::isGuest(),
 				'alias' => CWebUser::$data['alias'],

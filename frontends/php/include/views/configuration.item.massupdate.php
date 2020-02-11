@@ -143,7 +143,7 @@ else {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [CJs::encodeJson($headers_data)];
+$headers->items = [json_encode($headers_data)];
 
 $item_form_list
 	->addRow(

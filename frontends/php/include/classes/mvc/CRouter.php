@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -112,6 +112,12 @@ class CRouter {
 		'menu.popup'					=> ['CControllerMenuPopup',							'layout.json',			null],
 		'miscconfig.edit'				=> ['CControllerMiscConfigEdit',					'layout.htmlpage',		'administration.miscconfig.edit'],
 		'miscconfig.update'				=> ['CControllerMiscConfigUpdate',					null,					null],
+		'module.disable'				=> ['CControllerModuleUpdate',						null,					null],
+		'module.edit'					=> ['CControllerModuleEdit',						'layout.htmlpage',		'administration.module.edit'],
+		'module.enable'					=> ['CControllerModuleUpdate',						null,					null],
+		'module.list'					=> ['CControllerModuleList',						'layout.htmlpage',		'administration.module.list'],
+		'module.scan'					=> ['CControllerModuleScan',						null,					null],
+		'module.update'					=> ['CControllerModuleUpdate',						null,					null],
 		'notifications.get'				=> ['CControllerNotificationsGet',					'layout.json',			null],
 		'notifications.mute'			=> ['CControllerNotificationsMute',					'layout.json',			null],
 		'notifications.read'			=> ['CControllerNotificationsRead',					'layout.json',			null],
@@ -124,13 +130,14 @@ class CRouter {
 		'popup.discovery.check'			=> ['CControllerPopupDiscoveryCheck',				'layout.json',			'popup.discovery.check'],
 		'popup.generic'					=> ['CControllerPopupGeneric',						'layout.json',			'popup.generic'],
 		'popup.httpstep'				=> ['CControllerPopupHttpStep',						'layout.json',			'popup.httpstep'],
+		'popup.itemtest.edit'			=> ['CControllerPopupItemTestEdit',					'layout.json',			'popup.itemtestedit.view'],
+		'popup.itemtest.getvalue'		=> ['CControllerPopupItemTestGetValue',				'layout.json',			null],
+		'popup.itemtest.send'			=> ['CControllerPopupItemTestSend',					'layout.json',			null],
 		'popup.maintenance.period'		=> ['CControllerPopupMaintenancePeriod',			'layout.json',			'popup.maintenance.period'],
 		'popup.media'					=> ['CControllerPopupMedia',						'layout.json',			'popup.media'],
 		'popup.mediatype.message'		=> ['CControllerPopupMediatypeMessage',				'layout.json',			'popup.mediatype.message'],
 		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
-		'popup.preproctest.edit'		=> ['CControllerPopupPreprocTestEdit',				'layout.json',			'popup.preproctestedit.view'],
-		'popup.preproctest.send'		=> ['CControllerPopupPreprocTestSend',				'layout.json',			null],
 		'popup.scriptexec'				=> ['CControllerPopupScriptExec',					'layout.json',			'popup.scriptexec'],
 		'popup.services'				=> ['CControllerPopupServices',						'layout.json',			'popup.services'],
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',				'layout.json',			'popup.testtriggerexpr'],
@@ -214,60 +221,151 @@ class CRouter {
 		'widget.url.view'				=> ['CControllerWidgetUrlView',						'layout.widget',		'monitoring.widget.url.view'],
 		'widget.web.view'				=> ['CControllerWidgetWebView',						'layout.widget',		'monitoring.widget.web.view'],
 		'workingtime.edit'				=> ['CControllerWorkingTimeEdit',					'layout.htmlpage',		'administration.workingtime.edit'],
-		'workingtime.update'			=> ['CControllerWorkingTimeUpdate',					null,					null]
+		'workingtime.update'			=> ['CControllerWorkingTimeUpdate',					null,					null],
+
+		// legacy actions
+		'actionconf.php'				=> ['CLegacyAction', null, null],
+		'adm.housekeeper.php'			=> ['CLegacyAction', null, null],
+		'adm.iconmapping.php'			=> ['CLegacyAction', null, null],
+		'adm.images.php'				=> ['CLegacyAction', null, null],
+		'adm.macros.php'				=> ['CLegacyAction', null, null],
+		'adm.other.php'					=> ['CLegacyAction', null, null],
+		'adm.regexps.php'				=> ['CLegacyAction', null, null],
+		'adm.triggerdisplayoptions.php'	=> ['CLegacyAction', null, null],
+		'adm.triggerseverities.php'		=> ['CLegacyAction', null, null],
+		'adm.valuemapping.php'			=> ['CLegacyAction', null, null],
+		'adm.workingtime.php'			=> ['CLegacyAction', null, null],
+		'applications.php'				=> ['CLegacyAction', null, null],
+		'auditacts.php'					=> ['CLegacyAction', null, null],
+		'auditlogs.php'					=> ['CLegacyAction', null, null],
+		'browserwarning.php'			=> ['CLegacyAction', null, null],
+		'chart.php'						=> ['CLegacyAction', null, null],
+		'chart2.php'					=> ['CLegacyAction', null, null],
+		'chart3.php'					=> ['CLegacyAction', null, null],
+		'chart4.php'					=> ['CLegacyAction', null, null],
+		'chart5.php'					=> ['CLegacyAction', null, null],
+		'chart6.php'					=> ['CLegacyAction', null, null],
+		'chart7.php'					=> ['CLegacyAction', null, null],
+		'charts.php'					=> ['CLegacyAction', null, null],
+		'conf.import.php'				=> ['CLegacyAction', null, null],
+		'correlation.php'				=> ['CLegacyAction', null, null],
+		'disc_prototypes.php'			=> ['CLegacyAction', null, null],
+		'discoveryconf.php'				=> ['CLegacyAction', null, null],
+		'graphs.php'					=> ['CLegacyAction', null, null],
+		'history.php'					=> ['CLegacyAction', null, null],
+		'host_discovery.php'			=> ['CLegacyAction', null, null],
+		'host_prototypes.php'			=> ['CLegacyAction', null, null],
+		'host_screen.php'				=> ['CLegacyAction', null, null],
+		'hostgroups.php'				=> ['CLegacyAction', null, null],
+		'hostinventories.php'			=> ['CLegacyAction', null, null],
+		'hostinventoriesoverview.php'	=> ['CLegacyAction', null, null],
+		'hosts.php'						=> ['CLegacyAction', null, null],
+		'httpconf.php'					=> ['CLegacyAction', null, null],
+		'httpdetails.php'				=> ['CLegacyAction', null, null],
+		'image.php'						=> ['CLegacyAction', null, null],
+		'imgstore.php'					=> ['CLegacyAction', null, null],
+		'index.php'						=> ['CLegacyAction', null, null],
+		'index_http.php'				=> ['CLegacyAction', null, null],
+		'items.php'						=> ['CLegacyAction', null, null],
+		'jsrpc.php'						=> ['CLegacyAction', null, null],
+		'latest.php'					=> ['CLegacyAction', null, null],
+		'maintenance.php'				=> ['CLegacyAction', null, null],
+		'map.import.php'				=> ['CLegacyAction', null, null],
+		'map.php'						=> ['CLegacyAction', null, null],
+		'overview.php'					=> ['CLegacyAction', null, null],
+		'queue.php'						=> ['CLegacyAction', null, null],
+		'report2.php'					=> ['CLegacyAction', null, null],
+		'report4.php'					=> ['CLegacyAction', null, null],
+		'screen.import.php'				=> ['CLegacyAction', null, null],
+		'screenconf.php'				=> ['CLegacyAction', null, null],
+		'screenedit.php'				=> ['CLegacyAction', null, null],
+		'screens.php'					=> ['CLegacyAction', null, null],
+		'services.php'					=> ['CLegacyAction', null, null],
+		'slideconf.php'					=> ['CLegacyAction', null, null],
+		'slides.php'					=> ['CLegacyAction', null, null],
+		'srv_status.php'				=> ['CLegacyAction', null, null],
+		'sysmap.php'					=> ['CLegacyAction', null, null],
+		'sysmaps.php'					=> ['CLegacyAction', null, null],
+		'templates.php' 				=> ['CLegacyAction', null, null],
+		'toptriggers.php'				=> ['CLegacyAction', null, null],
+		'tr_events.php'					=> ['CLegacyAction', null, null],
+		'trigger_prototypes.php'		=> ['CLegacyAction', null, null],
+		'triggers.php'					=> ['CLegacyAction', null, null],
+		'usergrps.php'					=> ['CLegacyAction', null, null]
 	];
 
-	public function __construct($action) {
-		$this->action = $action;
-		$this->calculateRoute();
+	/**
+	 * Add new actions (potentially overwritting the existing ones).
+	 *
+	 * @param array  $actions                           List of actions.
+	 * @param string $actions['action_name']            Definition of the 'action_name' action.
+	 * @param string $actions['action_name']['class']   Controller class name of the 'action_name' action.
+	 * @param string $actions['action_name']['layout']  Optional layout of the 'action_name' action.
+	 * @param string $actions['action_name']['view']    Optional view of the 'action_name' action.
+	 */
+	public function addActions(array $actions): void {
+		foreach ($actions as $action => $route) {
+			if (is_array($route) && array_key_exists('class', $route)) {
+				$this->routes[$action] = [
+					$route['class'],
+					array_key_exists('layout', $route) ? $route['layout'] : null,
+					array_key_exists('view', $route) ? $route['view'] : null
+				];
+			}
+		}
 	}
 
 	/**
-	 * Locate and set controller, layout and view by action name.
+	 * Set controller, layout and view associated with the specified action.
 	 *
-	 * @return string
+	 * @param string $action  Action name.
 	 */
-	public function calculateRoute() {
-		if (array_key_exists($this->action, $this->routes)) {
-			$this->controller = $this->routes[$this->action][0];
-			$this->layout = $this->routes[$this->action][1];
-			$this->view = $this->routes[$this->action][2];
+	public function setAction(string $action): void {
+		$this->action = $action;
+
+		if (array_key_exists($action, $this->routes)) {
+			[$this->controller, $this->layout, $this->view] = $this->routes[$action];
+		}
+		else {
+			$this->controller = null;
+			$this->layout = null;
+			$this->view = null;
 		}
 	}
 
 	/**
 	 * Returns layout name.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getLayout() {
+	public function getLayout(): ?string {
 		return $this->layout;
 	}
 
 	/**
 	 * Returns controller name.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getController() {
+	public function getController(): ?string {
 		return $this->controller;
 	}
 
 	/**
 	 * Returns view name.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getView() {
+	public function getView(): ?string {
 		return $this->view;
 	}
 
 	/**
 	 * Returns action name.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getAction() {
+	public function getAction(): ?string {
 		return $this->action;
 	}
 }

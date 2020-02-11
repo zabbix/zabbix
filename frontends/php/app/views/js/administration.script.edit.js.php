@@ -57,7 +57,7 @@
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#scriptid, #delete, #clone').remove();
-			jQuery('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
+			jQuery('#update').text(<?= json_encode(_('Add')) ?>);
 			jQuery('#update')
 				.val('script.create')
 				.attr({id: 'add'});

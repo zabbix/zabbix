@@ -36,7 +36,7 @@ $filterColumn->addRow(_('User'), [
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'users',
 				'srcfld1' => 'alias',
 				'dstfrm' => 'zbx_filter',

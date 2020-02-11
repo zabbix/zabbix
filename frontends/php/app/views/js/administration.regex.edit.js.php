@@ -96,13 +96,15 @@
 			/**
 			 * Send all expressions data to server with test string.
 			 *
-			 * @param {String} string Test string to test expression against
+			 * @param {string} string Test string to test expression against
+			 *
+			 * @return {jqXHR}
 			 */
 			testExpressions: function(string) {
 				var ajaxData = {
-						testString: string,
-						expressions: {}
-					};
+					testString: string,
+					expressions: {}
+				};
 
 				$('#testResultTable').css({opacity: 0.5});
 
@@ -120,7 +122,7 @@
 				var url = new Curl('zabbix.php');
 				url.setArgument('action', 'regex.test');
 
-				$.post(
+				return $.post(
 					url.getUrl(),
 					{ajaxdata: ajaxData},
 					$.proxy(this.showTestResults, this),
@@ -150,28 +152,28 @@
 						result = response.data.errors[index];
 					}
 					else {
-						result = expr_result ? <?= CJs::encodeJson(_('TRUE')) ?> : <?= CJs::encodeJson(_('FALSE')) ?>;
+						result = expr_result ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>;
 					}
 
 					switch ($('#expressions_' + index + '_expression_type').val()) {
 						case '<?= EXPRESSION_TYPE_INCLUDED ?>':
-							expression_type_str = <?= CJs::encodeJson(_('Character string included')) ?>;
+							expression_type_str = <?= json_encode(_('Character string included')) ?>;
 							break;
 
 						case '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>':
-							expression_type_str = <?= CJs::encodeJson(_('Any character string included')) ?>;
+							expression_type_str = <?= json_encode(_('Any character string included')) ?>;
 							break;
 
 						case '<?= EXPRESSION_TYPE_NOT_INCLUDED ?>':
-							expression_type_str = <?= CJs::encodeJson(_('Character string not included')) ?>;
+							expression_type_str = <?= json_encode(_('Character string not included')) ?>;
 							break;
 
 						case '<?= EXPRESSION_TYPE_TRUE ?>':
-							expression_type_str = <?= CJs::encodeJson(_('Result is TRUE')) ?>;
+							expression_type_str = <?= json_encode(_('Result is TRUE')) ?>;
 							break;
 
 						case '<?= EXPRESSION_TYPE_FALSE ?>':
-							expression_type_str = <?= CJs::encodeJson(_('Result is FALSE')) ?>;
+							expression_type_str = <?= json_encode(_('Result is FALSE')) ?>;
 							break;
 
 						default:
@@ -189,13 +191,13 @@
 				if (hasErrors) {
 					tplData = {
 						resultClass: '<?= ZBX_STYLE_RED ?>',
-						result: <?= CJs::encodeJson(_('UNKNOWN')) ?>
+						result: <?= json_encode(_('UNKNOWN')) ?>
 					};
 				}
 				else {
 					tplData = {
 						resultClass: response.data.final ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>',
-						result: response.data.final ? <?= CJs::encodeJson(_('TRUE')) ?> : <?= CJs::encodeJson(_('FALSE')) ?>
+						result: response.data.final ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>
 					};
 				}
 
@@ -206,14 +208,26 @@
 	}(jQuery));
 
 	jQuery(function($) {
-		var $form = $('form#regex');
+		var $form = $('form#regex'),
+			$test_string = $('#test_string');
+			$test_btn = $('#testExpression');
 
 		$form.on('submit', function() {
 			$form.trimValues(['#name']);
 		});
 
 		$('#testExpression, #tab_test').click(function() {
-			zabbixRegExp.testExpressions($('#test_string').val());
+			$test_btn.addClass('is-loading');
+			$test_btn.prop('disabled', true);
+			$test_string.prop('disabled', true);
+
+			zabbixRegExp
+				.testExpressions($test_string.val())
+				.always(function() {
+					$test_btn.removeClass('is-loading');
+					$test_btn.prop('disabled', false);
+					$test_string.prop('disabled', false);
+				});
 		});
 
 		$('#tbl_expr').dynamicRows({

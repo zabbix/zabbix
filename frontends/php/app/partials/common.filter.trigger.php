@@ -73,7 +73,7 @@ $column1
 		(new CButton('application_name', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'applications',
 					'srcfld1' => 'name',
 					'dstfrm' => 'zbx_filter',

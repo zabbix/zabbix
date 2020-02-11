@@ -19,12 +19,17 @@
 **/
 
 
+<<<<<<< HEAD:frontends/php/app/views/js/popup.maintenance.period.js.php
 /**
  * @var CView $this
  */
 ?>
 
 new CViewSwitcher('timeperiod_type', 'change', <?= CJs::encodeJson([
+=======
+ob_start(); ?>
+new CViewSwitcher('timeperiod_type', 'change', <?= json_encode([
+>>>>>>> e003c358f30ce1ecfbbe8c68367412d5475f4a94:frontends/php/app/views/popup.maintenance.period.js.php
 	TIMEPERIOD_TYPE_ONETIME =>	['row_timepreiod_start_date', 'row_timeperiod_period_length'],
 	TIMEPERIOD_TYPE_DAILY =>	['row_timeperiod_every_day', 'row_timeperiod_period_at_hours_minutes',
 		'row_timeperiod_period_length'
@@ -53,22 +58,27 @@ jQuery('#timeperiod_type').change(function() {
 	jQuery(window).trigger('resize');
 }).trigger('change');
 
-function submitMaintenancePeriod(selector) {
-	var $container = jQuery(selector),
+/**
+ * @param {Overlay} overlay
+ */
+function submitMaintenancePeriod(overlay) {
+	var $container = overlay.$dialogue.find('form'),
 		elements;
 
 	$container.trimValues(['#start_date']);
 	elements = jQuery('input:visible,select:visible,input[type=hidden]', $container).serialize();
 
-	sendAjaxData('zabbix.php', {
+	overlay.setLoading();
+	overlay.xhr = sendAjaxData('zabbix.php', {
 		data: elements,
 		dataType: 'json',
 		type: 'post',
 		success: function(response) {
 			if ('errors' in response) {
-				$container.parent().find('.msg-bad').remove();
+				overlay.$dialogue.find('.msg-bad').remove();
 
 				jQuery(response.errors).insertBefore($container);
+				overlay.unsetLoading();
 			}
 			else if ('params' in response) {
 				var index = response.params.index;

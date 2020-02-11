@@ -78,6 +78,6 @@
 
 		$('#copy_type').on('change', changeTargetType);
 
-		changeTargetType(<?= CJs::encodeJson($data['copy_targetids']) ?>);
+		changeTargetType(<?= json_encode($data['copy_targetids']) ?>);
 	});
 </script>

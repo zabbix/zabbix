@@ -33,7 +33,7 @@ class CControllerHostMacrosList extends CController {
 
 		if (!$ret) {
 			$this->setResponse((new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
+				'main_block' => json_encode(['errors' => getMessages()->toString()])
 			]))->disableView());
 		}
 

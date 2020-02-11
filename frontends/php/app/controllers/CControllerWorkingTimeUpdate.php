@@ -48,7 +48,6 @@ class CControllerWorkingTimeUpdate extends CController {
 	protected function doAction() {
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'workingtime.edit')
-			->getUrl()
 		);
 
 		DBstart();

@@ -116,7 +116,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return validateMedia("'.$form->getName().'");'
+			'action' => 'return validateMedia(overlay);'
 		]
 	]
 ];
@@ -126,4 +126,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

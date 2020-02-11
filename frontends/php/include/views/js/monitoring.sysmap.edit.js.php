@@ -124,7 +124,7 @@
 			$('#delete, #clone, #full_clone, #inaccessible_user').remove();
 
 			$('#update')
-				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.text(<?= json_encode(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 
 			$('#tab_sysmap_tab').trigger('click');

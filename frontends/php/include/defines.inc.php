@@ -18,11 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.0alpha1');
+define('ZABBIX_VERSION',		'5.0.0alpha2');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050027);
-
+define('ZABBIX_DB_VERSION',		4050035);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
 
@@ -132,6 +131,10 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
+
+// Default db and field character set
+define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
+define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
@@ -244,6 +247,7 @@ define('AUDIT_RESOURCE_GRAPH_PROTOTYPE',	35);
 define('AUDIT_RESOURCE_ITEM_PROTOTYPE',		36);
 define('AUDIT_RESOURCE_HOST_PROTOTYPE',		37);
 define('AUDIT_RESOURCE_AUTOREGISTRATION',	38);
+define('AUDIT_RESOURCE_MODULE',				39);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -341,6 +345,10 @@ define('SNMP_BULK_ENABLED',		1);
 define('MAINTENANCE_STATUS_ACTIVE',		0);
 define('MAINTENANCE_STATUS_APPROACH',	1);
 define('MAINTENANCE_STATUS_EXPIRED',	2);
+
+// Modules.
+define('MODULE_STATUS_DISABLED', 0);
+define('MODULE_STATUS_ENABLED',	1);
 
 define('HOST_AVAILABLE_UNKNOWN',	0);
 define('HOST_AVAILABLE_TRUE',		1);

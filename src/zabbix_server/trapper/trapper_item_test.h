@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,14 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_TRAPPER_ITEM_TEST_H
+#define ZABBIX_TRAPPER_ITEM_TEST_H
 
-require_once dirname(__FILE__).'/ZBase.php';
+#include "comms.h"
+#include "zbxjson.h"
 
-/**
- * A wrapper for the ZBase class.
- *
- * Feel free to modify and extend it to change the functionality of ZBase.
- */
-class Z extends ZBase {
+void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp);
+int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info);
 
-}
+#endif

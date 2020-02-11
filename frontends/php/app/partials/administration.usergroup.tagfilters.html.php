@@ -53,7 +53,7 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 		(new CVar('tag_filters['.$key.'][groupid]', $tag_filter['groupid']))->removeId(),
 		(new CVar('tag_filters['.$key.'][tag]', $tag_filter['tag']))->removeId(),
 		(new CVar('tag_filters['.$key.'][value]', $tag_filter['value']))->removeId(),
-		(new CVar('tag_filter', CJs::encodeJson([
+		(new CVar('tag_filter', json_encode([
 			'groupid' => $tag_filter['groupid'],
 			'tag' => $tag_filter['tag'],
 			'value' => $tag_filter['value']

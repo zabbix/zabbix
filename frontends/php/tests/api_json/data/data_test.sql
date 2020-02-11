@@ -87,7 +87,7 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 15, 6);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 16, 7);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (11, 17, 7);
 INSERT INTO rights (rightid, groupid, permission, id) VALUES (2, 14, 3, 50012);
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (16,'API action',0,0,0,60);
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (16, 'API action', 0, 0, 0, 60);
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (31, 16, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (31, 0, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (21, 31, 20);
@@ -112,7 +112,7 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (17, 14, 14);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (18, 14, 15);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (19, 14, 16);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (20, 14, 5);
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (17,'API action with user',0,0,0,60);
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (17, 'API action with user', 0, 0, 0, 60);
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (32, 17, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (32, 0, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (4, 32, 13);
@@ -146,7 +146,7 @@ INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, de
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (12,'API script with user group','/sbin/shutdown -r',2,7,NULL,'');
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (13,'API script with host group','/sbin/shutdown -r',2,NULL,4,'');
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (14,'API script with write permissions for the host group','/sbin/shutdown -r',3,NULL,NULL,'');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (18,'API action with script',0,0,0,60);
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (18, 'API action with script', 0, 0, 0, 60);
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (33, 18, 1, 0, 1, 1, 0);
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 33, NULL);
 INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (33, 4, 11, 0, '', 0, '', '', '', '', '');
@@ -243,7 +243,7 @@ INSERT INTO hosts (hostid, host, status, description) VALUES (99003, 'Api active
 INSERT INTO hosts (hostid, host, status, description) VALUES (99004, 'Api active proxy with host', 5, '');
 INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99005, 99004,'API Host monitored with proxy', 'API Host monitored with proxy', 0, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99003,99004,1,1,1,'127.0.0.1','','10050');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (90,'API action with proxy',1,0,0,'1h');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (90, 'API action with proxy', 1, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (90, 90, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (90, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (90, 90, 7);
@@ -276,17 +276,17 @@ INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, 
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (54, 'action-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (87, 47, 53);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (88, 47, 54);
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (91,'API Autoregistration action',2,0,0,'1h');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (91, 'API Autoregistration action', 2, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (91, 91, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (91, 0, 'Autoregistration: {HOST.HOST}', 'Host name: {HOST.HOST}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (91, 91, 47);
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (92,	'API Action for deleting',0,0,0,'1h');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (92, 'API Action for deleting', 0, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (92, 91, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (92,0,'Problem: {EVENT.NAME}',	'Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}',NULL);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (92, 0, 'Problem: {EVENT.NAME}', 'Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (92, 92, 47);
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (93,	'API Action for deleting 2',0,0,0,'1h');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (93, 'API Action for deleting 2', 0, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (93, 91, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (93,0,'Problem: {EVENT.NAME}','Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}',NULL);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (93, 0, 'Problem: {EVENT.NAME}', 'Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (94, 93, 47);
 
 -- event correlation
@@ -325,7 +325,7 @@ INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv
 INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (15,NULL,'API discovery rule used in action','192.168.0.1-254','1h',0,0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (15,15,3,'','','21','',0,'','',0,0,0,'');
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (16,15,9,'agent.ping','','10050','',0,'','',0,0,0,'');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (95,'API action for Discovery check',1,0,0,'1h');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (95, 'API action for Discovery check', 1, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (95, 95, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (95, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (95, 95, 47);
@@ -333,7 +333,7 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, v
 
 INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (16,NULL,'API discovery rule used in action 2','192.168.0.1-254','1h',0,0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (17,16,0,'','','22','',0,'','',0,0,0,'');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (96,'API action for Discovery rule',1,0,0,'1h');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (96, 'API action for Discovery rule', 1, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (96, 96, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (96, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (96, 96, 7);
