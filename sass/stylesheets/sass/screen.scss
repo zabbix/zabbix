@@ -7642,8 +7642,8 @@ table.preprocessing-test-results {
 		&:active {
 
 			+ .btn-undo {
-				border-top-color: $btn-border-color;
-				border-bottom-color: $btn-border-color;
+				border-top-color: $form-border-focus-color;
+				border-bottom-color: $form-border-focus-color;
 			}
 		}
 	}
@@ -7672,7 +7672,7 @@ table.preprocessing-test-results {
 				display: block;
 				width: 22px;
 				height: 22px;
-				content: "";
+				content: '';
 				background: url(../img/icon-sprite.svg) no-repeat -119px -474px;
 			}
 
@@ -7684,9 +7684,9 @@ table.preprocessing-test-results {
 			&:hover,
 			&:focus,
 			&:active {
-				background-color: $btn-bg-color;
 				border-top: 1px solid $form-border-focus-color;
 				border-bottom: 1px solid $form-border-focus-color;
+				@include btn-hover-active($btn-font-color, $btn-bg-color);
 
 				&::before {
 					background-position: -431px -474px;
@@ -7695,6 +7695,7 @@ table.preprocessing-test-results {
 		}
 
 		&.btn-dropdown-toggle {
+			border-color: $form-border-focus-color;
 			border-top-left-radius: 0;
 			border-bottom-left-radius: 0;
 		}
@@ -7727,6 +7728,7 @@ table.preprocessing-test-results {
 }
 
 // Dropdown
+
 .btn-dropdown-container {
 	display: flex;
 }
@@ -7737,7 +7739,7 @@ table.preprocessing-test-results {
 		background: url(../img/icon-sprite.svg) no-repeat -87px -474px;
 	}
 
-	&:not(.highlighted) {
+	&:not(.highlighted):enabled {
 		&:hover,
 		&:focus,
 		&:active,
@@ -7756,7 +7758,7 @@ table.preprocessing-test-results {
 		background: url(../img/icon-sprite.svg) no-repeat -87px -510px;
 	}
 
-	&:not(.highlighted) {
+	&:not(.highlighted):enabled {
 		&:hover,
 		&:focus,
 		&:active,
@@ -7798,18 +7800,19 @@ table.preprocessing-test-results {
 		background: url(../img/icon-sprite.svg) no-repeat -547px -431px;
 	}
 
-	&:hover,
-	&:focus,
-	&:active {
+	&:enabled {
+		&:hover,
+		&:focus,
+		&:active {
 
-		&::after {
-			background-position: -604px -431px;
+			&::after {
+				background-position: -604px -431px;
+			}
 		}
 	}
 
 	&[data-expanded="true"] {
-		background-color: $btn-bg-color;
-		color: #ffffff;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 
 		&::after {
 			background: url(../img/icon-sprite.svg) no-repeat -604px -503px;

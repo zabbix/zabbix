@@ -108,7 +108,10 @@
 				initMacroFields($('#tbl_macros'));
 			})
 			.on('focus blur', '.input-secret input, .input-group .textarea-flexible', function() {
-				$(this).closest('.input-group').find('.btn-undo').toggleClass('is-focused');
+				$(this)
+					.closest('.input-group')
+					.find('.btn-undo')
+					.toggleClass('is-focused');
 			})
 			.on('click', '.btn-undo', function() {
 				var $this = $(this),
@@ -129,7 +132,7 @@
 						}))
 						.append($('<button>').attr({
 							type: 'button',
-							class: 'btn-change'
+							class: '<?= ZBX_STYLE_BTN_CHANGE ?>'
 						}).text(<?= json_encode(_('Set new value')) ?>))
 						.inputSecret()
 				);

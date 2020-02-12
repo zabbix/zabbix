@@ -43,6 +43,7 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 
+	// Macro value input group.
 	$value_input_group = (new CDiv())
 		->addClass(ZBX_STYLE_INPUT_GROUP)
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);

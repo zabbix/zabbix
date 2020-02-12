@@ -22,7 +22,7 @@
 	'use strict';
 
 	var methods = {
-		// $input_elem: null,
+		// FIXME: delete me
 		init(options) {
 			var settings = $.extend({}, options);
 
@@ -44,7 +44,7 @@
 	/**
 	 * Button dropdown helper.
 	 */
-	$.fn.buttonDropdown = function(method) {
+	$.fn.buttonDropdown = function (method) {
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		}

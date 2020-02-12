@@ -43,7 +43,7 @@
 
 			return this.each(function() {
 				$(this).data('is-activated', false);
-				$('button', $(this)).on('click', enable);
+				$('.btn-change', $(this)).on('click', enable);
 			});
 		}
 	};

@@ -1804,6 +1804,9 @@ define('ZBX_STYLE_BTN_DROPDOWN_TOGGLE', 'btn-dropdown-toggle');
 define('ZBX_STYLE_BTN_UNDO', 'btn-undo');
 define('ZBX_STYLE_INPUT_GROUP', 'input-group');
 
+define('ZBX_STYLE_BTN_DROPDOWN_VALUE', 'dropdown-value');
+define('ZBX_STYLE_BTN_CHANGE', 'btn-change');
+
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
 

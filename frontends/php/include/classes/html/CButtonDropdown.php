@@ -26,7 +26,27 @@ class CButtonDropdown extends CTag {
 	 */
 	public const ZBX_STYLE_CLASS = 'btn-dropdown-container';
 
-	public function __construct(string $name, string $value = '', array $options = []) {
+	protected $options = [
+		'disabled' => false
+	];
+
+	/**
+	 * CButtonDropdown constructor.
+	 *
+	 * @param string $name
+	 * @param string $value
+	 * @param array  $options
+	 * @param string $options['title']
+	 * @param string $options['active_class']
+	 * @param bool   $options['disabled']     (optional)
+	 * @param array  $options['items']
+	 * @param string $options['items']['label']
+	 * @param string $options['items']['value']
+	 * @param string $options['items']['class']
+	 */
+	public function __construct(string $name, string $value, array $options) {
+		$this->options = array_merge($this->options, $options);
+
 		parent::__construct('div', true);
 
 		$this
@@ -34,26 +54,16 @@ class CButtonDropdown extends CTag {
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addItem(
 				(new CButton(null))
-					->setAttribute('title', $options['title'])
-					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, ZBX_STYLE_BTN_DROPDOWN_TOGGLE, $options['active_class']]))
+					->setAttribute('title', $this->options['title'])
+					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, ZBX_STYLE_BTN_DROPDOWN_TOGGLE, $this->options['active_class']]))
 					->setMenuPopup([
 						'type' => 'dropdown',
 						'data' => [
-							'items' => $options['items']
+							'items' => $this->options['items']
 						]
 					])
+					->setEnabled(!$this->options['disabled'])
 			)
-			->addItem((new CInput('hidden', $name, $value))->addClass('dropdown-value'));
-
-		zbx_add_post_js($this->getPostJS());
-	}
-
-	/**
-	 * Get content of all Javascript code.
-	 *
-	 * @return string  Javascript code.
-	 */
-	public function getPostJS(): string {
-		return 'jQuery("#'.$this->getId().'").buttonDropdown();';
+			->addItem((new CInput('hidden', $name, $value))->addClass(ZBX_STYLE_BTN_DROPDOWN_VALUE));
 	}
 }

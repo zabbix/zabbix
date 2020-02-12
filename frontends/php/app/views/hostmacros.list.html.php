@@ -19,6 +19,8 @@
 **/
 
 
+$scripts = [];
+
 if ($data['readonly'] && !$data['macros']) {
 	$table = new CObject(_('No macros found.'));
 }
@@ -42,21 +44,19 @@ else {
 			$link = null;
 		}
 		$table->setHeader([
-			_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '', [_('Global value'), $link]
+			_('Macro'), _('Effective value'), $actions_col, '', _('Template value'), '', [_('Global value'), $link]
 		]);
 	}
 	else {
-		$table->setHeader([_('Macro'), '', _('Value'), _('Description'), $actions_col]);
+		$table->setHeader([_('Macro'), _('Value'), _('Description'), $actions_col]);
 	}
 
 	// fields
 	foreach ($data['macros'] as $i => $macro) {
-		$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro'], [
-			'readonly' => (
-				$data['readonly']
-				|| ($data['show_inherited_macros'] && ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED))
-			)
-		]))
+		$readonly = ($data['readonly']
+			|| ($data['show_inherited_macros'] && !($macro['inherited_type'] & ZBX_PROPERTY_OWN)));
+
+		$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro'], ['readonly' => $readonly]))
 			->addClass('macro')
 			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 			->setAttribute('placeholder', '{$MACRO}');
@@ -89,22 +89,49 @@ else {
 			$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
 		}
 
-		$value_input = (new CTextAreaFlexible('macros['.$i.'][value]', CMacrosResolverGeneral::getMacroValue($macro), [
-			'readonly' => (
-				$data['readonly'] || ($data['show_inherited_macros'] && !($macro['inherited_type'] & ZBX_PROPERTY_OWN))
-			)
-		]))
-			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-			->setAttribute('placeholder', _('value'));
+		// macro value input group.
+		$value_input_group = (new CDiv())
+			->addClass(ZBX_STYLE_INPUT_GROUP)
+			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);
 
-		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
-			$value_input->setEnabled(false);
+		$value_input = ($macro['type'] == ZBX_MACRO_TYPE_TEXT)
+			? (new CTextareaFlexible('macros['.$i.'][value]', CMacrosResolverGeneral::getMacroValue($macro), ['add_post_js' => false]))
+				->setAttribute('placeholder', _('value'))
+			: new CInputSecret('macros['.$i.'][value]', ZBX_MACRO_SECRET_MASK, _('value'), [
+				'disabled' => $readonly,
+				'add_post_js' => false
+			]);
+
+		// We need load this js code in the end.
+		$scripts[] = $value_input->getPostJS();
+
+		if ($macro['type'] == ZBX_MACRO_TYPE_TEXT && $readonly) {
+			$value_input->setAttribute('readonly', 'readonly');
 		}
+
+		$dropdown_options = [
+			'title' => _('Change type'),
+			'active_class' => ($macro['type'] == ZBX_MACRO_TYPE_TEXT) ? ZBX_STYLE_ICON_TEXT : ZBX_STYLE_ICON_SECRET_TEXT,
+			'disabled' => $readonly,
+			'items' => [
+				['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_STYLE_ICON_TEXT],
+				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_SECRET_TEXT]
+			]
+		];
+
+		$value_input_group->addItem([
+			$value_input,
+			($macro['type'] == ZBX_MACRO_TYPE_SECRET)
+				? (new CButton(null))
+					->setAttribute('title', _('Revert changes'))
+					->addClass(ZBX_STYLE_BTN_ALT.' '.ZBX_STYLE_BTN_UNDO)
+				: null,
+			new CButtonDropdown('macros['.$i.'][type]', $macro['type'], $dropdown_options)
+		]);
 
 		$row = [
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			'&rArr;',
-			(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+			(new CCol($value_input_group))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 		];
 
 		if (!$data['show_inherited_macros']) {
@@ -219,3 +246,5 @@ else {
 }
 
 echo $table;
+
+insert_js(implode("\n", $scripts));

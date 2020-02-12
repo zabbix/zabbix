@@ -156,6 +156,90 @@
 						jQuery('#macros_' + macroNum + '_change')
 							.text(<?= CJs::encodeJson(_('Remove')) ?>);
 					}
+				})
+				.on('focus blur', '.input-secret input, .input-group .textarea-flexible', function() {
+					jQuery(this)
+						.closest('.input-group')
+						.find('.btn-undo')
+						.toggleClass('is-focused');
+				})
+				.on('click', '.btn-undo', function() {
+					var $this = jQuery(this),
+						$container = jQuery(this).closest('.input-group')
+						$input = jQuery('.input-secret input[type=password], .textarea-flexible', $container);
+
+					$input.replaceWith(
+						jQuery('<div>')
+							.addClass('input-secret')
+							.append(jQuery('<input>').attr({
+								id: $input.attr('id'),
+								name: $input.attr('name'),
+								type: 'password',
+								value: '<?= ZBX_MACRO_SECRET_MASK ?>',
+								placeholder: $input.attr('placeholder'),
+								maxlength: $input.attr('maxlength'),
+								disabled: true
+							}))
+							.append(jQuery('<button>').attr({
+								type: 'button',
+								class: '<?= ZBX_STYLE_BTN_CHANGE ?>'
+							}).text(<?= json_encode(_('Set new value')) ?>))
+							.inputSecret()
+					);
+
+					jQuery('.btn-dropdown-container button', $container)
+						.addClass(['btn-alt', 'btn-dropdown-toggle', 'icon-secret'].join(' '));
+
+					$this.hide();
+				})
+				.on('change', '.dropdown-value', function() {
+					var $this = jQuery(this),
+						value_type = $this.val(),
+						$container = jQuery(this).closest('.input-group'),
+						$input_container = jQuery('.input-secret', $container),
+						$textarea = jQuery('.textarea-flexible', $container);
+
+					if ((value_type == <?= ZBX_MACRO_TYPE_TEXT ?> && $textarea.length)
+							|| (value_type == <?= ZBX_MACRO_TYPE_SECRET ?> && $input_container.length)) {
+						return false;
+					}
+
+					if (value_type == <?= ZBX_MACRO_TYPE_TEXT ?>) {
+						var $input = jQuery('input[type=password]', $input_container);
+
+						if (!$input_container.data('is-activated')) {
+							jQuery('.btn-undo', $container).show();
+							$input_container.data('is-activated', true);
+						}
+
+						$input_container.replaceWith(
+							jQuery('<textarea>')
+								.addClass('textarea-flexible')
+								.attr({
+									id: $input.attr('id'),
+									name: $input.attr('name'),
+									placeholder: $input.attr('placeholder'),
+									maxlength: $input.attr('maxlength')
+								})
+								.text($input.val())
+								.textareaFlexible()
+						);
+					}
+					else {
+						$textarea.replaceWith(
+							jQuery('<div>')
+								.addClass('input-secret')
+								.append(jQuery('<input>').attr({
+									id: $textarea.attr('id'),
+									name: $textarea.attr('name'),
+									type: 'password',
+									value: $textarea.val(),
+									placeholder: $textarea.attr('placeholder'),
+									maxlength: $textarea.attr('maxlength')
+								}))
+								.inputSecret()
+						);
+					}
 				});
 
 			initMacroFields($parent);
