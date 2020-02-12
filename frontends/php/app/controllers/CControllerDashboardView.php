@@ -33,7 +33,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$fields = [
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'source_dashboardid' =>	'db dashboard.dashboardid',
-			'groupid' =>			'db hstgrp.groupid',
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
 			'cancel' =>				'in 1',
@@ -53,17 +52,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	protected function checkPermissions() {
 		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
 			return false;
-		}
-
-		if ($this->hasInput('groupid') && $this->getInput('groupid') != 0) {
-			$groups = API::HostGroup()->get([
-				'output' => [],
-				'groupids' => [$this->getInput('groupid')]
-			]);
-
-			if (!$groups) {
-				return false;
-			}
 		}
 
 		if ($this->hasInput('hostid') && $this->getInput('hostid') != 0) {
@@ -126,31 +114,24 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			];
 
 			if (self::hasDynamicWidgets($data['grid_widgets'])) {
-				$data['pageFilter'] = new CPageFilter([
-					'groups' => [
-						'monitored_hosts' => true,
-						'with_items' => true
-					],
-					'hosts' => [
-						'monitored_hosts' => true,
-						'with_items' => true,
-						'DDFirstLabel' => _('not selected')
-					],
-					'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null,
-					'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null
-				]);
+				if ($this->hasInput('hostid')) {
+					$hosts = CArrayHelper::renameObjectsKeys(API::Host()->get([
+						'output' => ['hostid', 'name'],
+						'hostids' => [$this->getInput('hostid')]
+					]), ['hostid' => 'id']);
+				} else {
+					$hosts = [];
+				}
 
 				$data['dynamic'] = [
 					'has_dynamic_widgets' => true,
-					'groupid' => $data['pageFilter']->groupid,
-					'hostid' => $data['pageFilter']->hostid
+					'host' => $hosts ? $hosts : []
 				];
 			}
 			else {
 				$data['dynamic'] = [
 					'has_dynamic_widgets' => false,
-					'groupid' => 0,
-					'hostid' => 0
+					'host' => []
 				];
 			}
 

@@ -93,10 +93,14 @@ jQuery(function($) {
 		 *
 		 * @return jQuery
 		 */
-		addData: function(items) {
+		addData: function(items, triggerChange) {
 			return this.each(function() {
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
+
+				if (typeof triggerChange !== 'boolean') {
+					triggerChange = true;
+				}
 
 				if (ms.options.selectedLimit == 1) {
 					for (var id in ms.values.selected) {
@@ -108,7 +112,7 @@ jQuery(function($) {
 					addSelected($obj, items[i]);
 				}
 
-				$obj.trigger('change', ms);
+				triggerChange && $obj.trigger('change', ms);
 			});
 		},
 
