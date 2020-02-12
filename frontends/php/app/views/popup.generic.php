@@ -36,6 +36,27 @@ $header_form = (new CForm())
 	->cleanItems()
 	->setId('generic-popup-form');
 
+// Make 'empty' button.
+if (in_array($data['popup_type'], ['applications', 'application_prototypes', 'triggers'])
+		&& !array_key_exists('noempty', $options)) {
+	$value1 = (strpos($options['dstfld1'], 'id') !== false) ? 0 : '';
+	$value2 = (strpos($options['dstfld2'], 'id') !== false) ? 0 : '';
+	$value3 = (strpos($options['dstfld3'], 'id') !== false) ? 0 : '';
+
+	$empty_script = get_window_opener($options['dstfld1'], $value1);
+	$empty_script .= get_window_opener($options['dstfld2'], $value2);
+	$empty_script .= get_window_opener($options['dstfld3'], $value3);
+	$empty_script .= ' overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));';
+	$empty_script .= ' return false;';
+
+	$empty_btn = (new CButton('empty', _('Empty')))
+		->addStyle('float: right; margin-left: 5px;')
+		->onClick($empty_script);
+}
+else {
+	$empty_btn = null;
+}
+
 // Add host group multiselect control.
 if (array_key_exists('groups', $data['filter'])) {
 	$multiselect_options = $data['filter']['groups'];
@@ -80,10 +101,19 @@ if (array_key_exists('hosts', $data['filter'])) {
 
 	$controls[] = (new CFormList())->addRow(
 		new CLabel(_('Host'), 'popup_host_ms'),
-		(new CMultiSelect($multiselect_options))
-			->setTitle($multiselect_options['disabled'] ? _('You can not switch hosts for current selection.') : null)
-			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		[
+			$empty_btn,
+			(new CMultiSelect($multiselect_options))
+				->setTitle($multiselect_options['disabled']
+					? _('You can not switch hosts for current selection.')
+					: null
+				)
+				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		]
 	);
+}
+elseif ($empty_btn) {
+	$controls[] = (new CFormList())->addRow($empty_btn);
 }
 
 // Show Type dropdown in header for help items.
@@ -99,22 +129,6 @@ if ($data['popup_type'] === 'help_items') {
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$cmb_types
 	];
-}
-
-if (in_array($data['popup_type'], ['applications', 'application_prototypes', 'triggers'])) {
-	if (!array_key_exists('noempty', $options)) {
-		$value1 = (strpos($options['dstfld1'], 'id') !== false) ? 0 : '';
-		$value2 = (strpos($options['dstfld2'], 'id') !== false) ? 0 : '';
-		$value3 = (strpos($options['dstfld3'], 'id') !== false) ? 0 : '';
-
-		$empty_script = get_window_opener($options['dstfld1'], $value1);
-		$empty_script .= get_window_opener($options['dstfld2'], $value2);
-		$empty_script .= get_window_opener($options['dstfld3'], $value3);
-		$empty_script .= ' overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));';
-		$empty_script .= ' return false;';
-
-		$controls[] = [(new CButton('empty', _('Empty')))->onClick($empty_script)];
-	}
 }
 
 if ($controls) {
