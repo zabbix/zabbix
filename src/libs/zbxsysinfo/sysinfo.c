@@ -1049,7 +1049,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 	}
 
-	if (command->flags & CF_HAVEFLAGS)
+	if (0 != (command->flags & CF_HAVEFLAGS))
 		rc = ((PFLAGS)command->function)(&request, result, flags);
 	else
 		rc = command->function(&request, result);
