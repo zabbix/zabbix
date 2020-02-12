@@ -23,7 +23,7 @@ class CControllerAuditLogList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'page' =>				'int32|ge 1',
+			'page' =>				'ge 1',
 			'auditlog_action' =>	'in -1,'.implode(',', array_keys($this->getActionsList())),
 			'resourcetype' =>		'in -1,'.implode(',', array_keys($this->getResourcesList())),
 			'filter_rst' =>			'in 1',
@@ -156,7 +156,7 @@ class CControllerAuditLogList extends CController {
 	 *
 	 * @return array
 	 */
-	protected function getActionsList(): array {
+	public function getActionsList(): array {
 		return [
 			AUDIT_ACTION_LOGIN => _('Login'),
 			AUDIT_ACTION_LOGOUT => _('Logout'),
@@ -173,7 +173,7 @@ class CControllerAuditLogList extends CController {
 	 *
 	 * @return array
 	 */
-	protected function getResourcesList(): array {
+	public function getResourcesList(): array {
 		return [
 			AUDIT_RESOURCE_USER => _('User'),
 			AUDIT_RESOURCE_ZABBIX_CONFIG => _('Configuration of Zabbix'),
