@@ -32,6 +32,8 @@ type AgentOptions struct {
 	HostnameItem         string   `conf:"optional"`
 	HostMetadata         string   `conf:"optional"`
 	HostMetadataItem     string   `conf:"optional"`
+	HostInterface        string   `conf:"optional"`
+	HostInterfaceItem    string   `conf:"optional"`
 	BufferSend           int      `conf:"optional,range=1:3600,default=5"`
 	BufferSize           int      `conf:"optional,range=2:65535,default=100"`
 	ListenIP             string   `conf:"optional"`
@@ -55,6 +57,9 @@ type AgentOptions struct {
 	TLSKeyFile           string   `conf:"optional"`
 	TLSServerCertIssuer  string   `conf:"optional"`
 	TLSServerCertSubject string   `conf:"optional"`
+
+	AllowKey interface{} `conf:"optional"`
+	DenyKey  interface{} `conf:"optional"`
 
 	Plugins map[string]interface{} `conf:"optional"`
 }

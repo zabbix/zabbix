@@ -57,6 +57,9 @@ type AgentOptions struct {
 	TLSKeyFile           string   `conf:"optional"`
 	TLSServerCertIssuer  string   `conf:"optional"`
 	TLSServerCertSubject string   `conf:"optional"`
+	
+	AllowKey interface{} `conf:"optional"`
+	DenyKey  interface{} `conf:"optional"`
 
 	Plugins map[string]interface{} `conf:"optional"`
 }
