@@ -133,7 +133,6 @@ class CAuditLog extends CApiService {
 			'sortorder' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
-			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
 
@@ -153,15 +152,15 @@ class CAuditLog extends CApiService {
 			$options['output'] = $fields;
 		}
 
-		if ($options['userids'] && array_filter($options['userids'])) {
+		if ($options['userids'] !== null) {
 			$sql_parts['where']['userid'] = dbConditionInt('a.userid', $options['userids']);
 		}
 
-		if ($options['time_from']) {
+		if ($options['time_from'] !== null) {
 			$sql_parts['where'][] = 'a.clock>='.zbx_dbstr($options['time_from']);
 		}
 
-		if ($options['time_till']) {
+		if ($options['time_till'] !== null) {
 			$sql_parts['where'][] = 'a.clock<='.zbx_dbstr($options['time_till']);
 		}
 

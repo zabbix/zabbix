@@ -24,8 +24,8 @@ class CControllerAuditLogList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'page' =>				'ge 1',
-			'auditlog_action' =>	'in -1,'.implode(',', array_keys($this->getActionsList())),
-			'resourcetype' =>		'in -1,'.implode(',', array_keys($this->getResourcesList())),
+			'auditlog_action' =>	'in -1,'.implode(',', array_keys(self::getActionsList())),
+			'resourcetype' =>		'in -1,'.implode(',', array_keys(self::getResourcesList())),
 			'filter_rst' =>			'in 1',
 			'filter_set' =>			'in 1',
 			'user_alias' =>			'string',
@@ -141,7 +141,6 @@ class CControllerAuditLogList extends CController {
 		$data['actions'] = [-1 => _('All')] + $data['actions'];
 		$data['resources'] = [-1 => _('All')] + $data['resources'];
 
-		// render view
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Audit log'));
 		$this->setResponse($response);
@@ -156,7 +155,7 @@ class CControllerAuditLogList extends CController {
 	 *
 	 * @return array
 	 */
-	public function getActionsList(): array {
+	static public function getActionsList(): array {
 		return [
 			AUDIT_ACTION_LOGIN => _('Login'),
 			AUDIT_ACTION_LOGOUT => _('Logout'),
@@ -173,7 +172,7 @@ class CControllerAuditLogList extends CController {
 	 *
 	 * @return array
 	 */
-	public function getResourcesList(): array {
+	static public function getResourcesList(): array {
 		return [
 			AUDIT_RESOURCE_USER => _('User'),
 			AUDIT_RESOURCE_ZABBIX_CONFIG => _('Configuration of Zabbix'),
