@@ -1,6 +1,8 @@
+// +build windows
+
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,18 +19,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package users
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/net/netif"
-	_ "zabbix.com/plugins/system/uptime"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/vfs/file"
-	_ "zabbix.com/plugins/windows/eventlog"
-	_ "zabbix.com/plugins/windows/perfmon"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
+	"errors"
+
+	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/std"
 )
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+var impl Plugin
+var stdOs std.Os
+
+// Export -
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters.")
+	}
+	return getUsersNum()
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of useres logged in.")
+}

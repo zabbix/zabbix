@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package scheduler
+package alias
 
 import (
 	"fmt"
@@ -31,9 +31,12 @@ type keyAlias struct {
 	name, key string
 }
 
-func (m *Manager) loadAlias(options *agent.AgentOptions) (err error) {
-	m.aliases = make([]keyAlias, 0)
-	for _, data := range options.Alias {
+type Manager struct {
+	aliases []keyAlias
+}
+
+func (m *Manager) addAliases(aliases []string) (err error) {
+	for _, data := range aliases {
 		var name, key string
 		if name, key, err = itemutil.ParseAlias(data); err != nil {
 			return fmt.Errorf("cannot add alias \"%s\": %s", data, err)
@@ -48,7 +51,19 @@ func (m *Manager) loadAlias(options *agent.AgentOptions) (err error) {
 	return nil
 }
 
-func (m *Manager) getAlias(orig string) string {
+func NewManager(options *agent.AgentOptions) (m *Manager, err error) {
+	m = &Manager{
+		aliases: make([]keyAlias, 0),
+	}
+	if options != nil {
+		if err = m.initialize(options); err != nil {
+			return nil, err
+		}
+	}
+	return
+}
+
+func (m *Manager) Get(orig string) string {
 	if _, _, err := itemutil.ParseKey(orig); err != nil {
 		return orig
 	}

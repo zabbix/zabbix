@@ -1,6 +1,8 @@
+// +build !windows
+
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,18 +19,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package alias
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/net/netif"
-	_ "zabbix.com/plugins/system/uptime"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/vfs/file"
-	_ "zabbix.com/plugins/windows/eventlog"
-	_ "zabbix.com/plugins/windows/perfmon"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
+	"zabbix.com/internal/agent"
 )
+
+func (m *Manager) initialize(options *agent.AgentOptions) (err error) {
+	return m.addAliases(options.Alias)
+}

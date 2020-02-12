@@ -41,6 +41,7 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 }
 
 func (pc *passiveCheck) handleCheck(data []byte) {
+	// direct passive check timeout is handled by the scheduler
 	s, err := pc.scheduler.PerformTask(string(data), time.Minute)
 
 	if err != nil {
