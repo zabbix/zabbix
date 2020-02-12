@@ -4636,7 +4636,7 @@ $form-icon-btn: (
 		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
-		z-index: 1000; // Same as parent.
+		z-index: 4;
 	}
 
 	.list-table {
@@ -5252,7 +5252,7 @@ $form-icon-btn: (
 		left: 0;
 		right: 0;
 		top: 0;
-		z-index: 10; // More than form controls of the graph widget; less than .msg-* messages.
+		z-index: 3; // More than z-index of form controls, less than z-index of .msg-*.
 	}
 }
 
@@ -6274,7 +6274,7 @@ a.overlay-close-btn {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 3;
+		z-index: 5; // More than z-index of .msg-*.
 	}
 
 	&::after {
@@ -6292,7 +6292,7 @@ a.overlay-close-btn {
 		left: 0;
 		right: 0;
 		animation: is-loading-kf .6s infinite linear;
-		z-index: 3;
+		z-index: 5; // More than z-index of .msg-*.
 		content: '';
 	}
 
