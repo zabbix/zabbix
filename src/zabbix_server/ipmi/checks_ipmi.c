@@ -52,8 +52,6 @@
 #define ZBX_IPMI_TAG_CRIT			"crit"
 #define ZBX_IPMI_TAG_NON_RECOVER		"non_recover"
 
-#define ZBX_IPMI_TAG_NOTSUPPORTED		-999999999
-
 #define ZBX_IPMI_THRESHOLD_STATUS_DISABLED	0
 #define ZBX_IPMI_THRESHOLD_STATUS_ENABLED	1
 
@@ -1800,8 +1798,6 @@ static void add_threshold_ipmi(struct zbx_json *json, const char *tag, zbx_ipmi_
 {
 	if (ZBX_IPMI_THRESHOLD_STATUS_ENABLED == threshold->status)
 		zbx_json_addfloat(json, tag, threshold->val);
-	else
-		zbx_json_addfloat(json, tag, ZBX_IPMI_TAG_NOTSUPPORTED);
 }
 
 int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
