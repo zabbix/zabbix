@@ -356,6 +356,9 @@ Overlay.prototype.unsetProperty = function(key) {
 
 		case 'content':
 			this.$dialogue.$body.html('');
+			if (this.$dialogue.$debug.html().length) {
+				this.$dialogue.$body.append(this.$dialogue.$debug);
+			}
 			break;
 
 		case 'controls':
@@ -400,6 +403,9 @@ Overlay.prototype.setProperties = function(obj) {
 
 			case 'content':
 				this.$dialogue.$body.html(obj[key]);
+				if (this.$dialogue.$debug.html().length) {
+					this.$dialogue.$body.append(this.$dialogue.$debug);
+				}
 				break;
 
 			case 'controls':
