@@ -78,7 +78,7 @@ class CView {
 	 * @throws RuntimeException if view not found or not readable.
 	 */
 	public function __construct($name, array $data = []) {
-		if (strpos($name, '..') !== false || !preg_match('/^[a-z\.\/]+$/', $name)) {
+		if (!preg_match('/^[a-z]+(\/[a-z]+)*(\.[a-z]+)*$/', $name)) {
 			throw new InvalidArgumentException(sprintf('Invalid view name: "%s".', $name));
 		}
 
@@ -205,11 +205,11 @@ class CView {
 	}
 
 	/**
-	 * Add custom directory to the directory list of MVC views. The last added will have the highest priority.
+	 * Register custom directory of MVC views. The last registered will have the first priority.
 	 *
 	 * @param string $directory
 	 */
-	public static function addDirectory($directory) {
+	public static function registerDirectory($directory) {
 		if (!in_array($directory, self::$directories)) {
 			array_unshift(self::$directories, $directory);
 		}

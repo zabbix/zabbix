@@ -457,9 +457,8 @@ class ZBase {
 
 			foreach (array_reverse($modules) as $module) {
 				if (is_subclass_of($module, CModule::class)) {
-					$directory = $module->getDir().'/views';
-					CView::addDirectory($directory);
-					CPartial::addDirectory($directory);
+					CView::registerDirectory($module->getDir().'/views');
+					CPartial::registerDirectory($module->getDir().'/partials');
 				}
 			}
 
