@@ -3554,7 +3554,7 @@ ZABBIX.apps.map = (function($) {
 					linkTrigger = linkTriggerPattern.exec(values[i].name);
 
 					if (linkTrigger !== null) {
-						if (linkTrigger[2] == 'color' && !colorPattern.match(values[i].value.toString())) {
+						if (linkTrigger[2] == 'color' && !values[i].value.toString().match(colorPattern)) {
 							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
@@ -3565,7 +3565,7 @@ ZABBIX.apps.map = (function($) {
 						data.linktriggers[linkTrigger[1]][linkTrigger[2]] = values[i].value.toString();
 					}
 					else {
-						if (values[i].name == 'color' && !colorPattern.match(values[i].value.toString())) {
+						if (values[i].name == 'color' && ! values[i].value.toString().match(colorPattern)) {
 							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
