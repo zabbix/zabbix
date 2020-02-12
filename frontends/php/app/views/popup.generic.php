@@ -140,6 +140,11 @@ if ($data['form']) {
 }
 
 $table_columns = [];
+
+if ($options['hostid'] == 0 && ($data['popup_type'] === 'items' || $data['popup_type'] === 'item_prototypes')) {
+	$table_columns[] = _('Host');
+}
+
 if ($data['multiselect'] && $form !== null) {
 	$ch_box = (new CColHeader(
 		(new CCheckBox('all_records'))->onClick("javascript: checkAll('".$form->getName()."', 'all_records', 'item');")
