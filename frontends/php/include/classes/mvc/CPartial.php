@@ -158,7 +158,7 @@ class CPartial {
 	}
 
 	/**
-	 * Add custom directory to the directory list of MVC partials. The last added will have the highest piority.
+	 * Add custom directory to the directory list of MVC partials. The last added will have the highest priority.
 	 *
 	 * @param string $directory
 	 */

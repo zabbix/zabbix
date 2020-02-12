@@ -205,7 +205,7 @@ class CView {
 	}
 
 	/**
-	 * Add custom directory to the directory list of MVC views. The last added will have the highest piority.
+	 * Add custom directory to the directory list of MVC views. The last added will have the highest priority.
 	 *
 	 * @param string $directory
 	 */
