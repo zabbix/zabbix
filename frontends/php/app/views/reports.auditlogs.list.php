@@ -19,8 +19,10 @@
 **/
 
 
+/** @var CView $this */
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('class.calendar.js');
 
 $filter = (new CFormList())
 	->addRow(_('User'), [
