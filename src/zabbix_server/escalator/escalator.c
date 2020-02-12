@@ -1152,7 +1152,6 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
 				script.command_orig, status, error);
-		zbx_free(buffer);
 skip:
 		zbx_script_clean(&script);
 	}
