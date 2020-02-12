@@ -972,7 +972,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **o
  ******************************************************************************/
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
-	int		ret = NOTSUPPORTED;
+	int		ret = NOTSUPPORTED, rc;
 	ZBX_METRIC	*command = NULL;
 	AGENT_REQUEST	request;
 
@@ -1049,7 +1049,12 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 	}
 
-	if (SYSINFO_RET_OK != command->function(&request, result))
+	if (command->flags & CF_HAVEFLAGS)
+		rc = ((PFLAGS)command->function)(&request, result, flags);
+	else
+		rc = command->function(&request, result);
+
+	if (SYSINFO_RET_OK != rc)
 	{
 		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
 		/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */

@@ -118,8 +118,9 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	if _, ok := p.impl.(plugin.Exporter); ok {
 		var tacc exporterTaskAccessor
 
-		if c.id != 0 {
+		if c.id > agent.ActiveChechksClientID {
 			var task *exporterTask
+
 			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
 				return err
 			}

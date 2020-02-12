@@ -28,8 +28,8 @@ import (
 	"time"
 
 	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/alias"
+	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/glexpr"
@@ -63,7 +63,7 @@ type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, expressions []*glexpr.Expression,
 		requests []*plugin.Request)
 	FinishTask(task performer)
-	PerformTask(key string, timeout time.Duration) (result string, err error)
+	PerformTask(key string, timeout time.Duration, flags uint64) (result string, err error)
 	Query(command string) (status string)
 }
 
@@ -137,7 +137,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		var params []string
 		var err error
 		var p *pluginAgent
-		
+
 		r.Key = m.aliases.Get(r.Key)
 		if key, params, err = itemutil.ParseKey(r.Key); err == nil {
 			p, ok = m.plugins[key]
@@ -407,12 +407,17 @@ func (r resultWriter) PersistSlotsAvailable() int {
 	return 1
 }
 
-func (m *Manager) PerformTask(key string, timeout time.Duration) (result string, err error) {
+func (m *Manager) PerformTask(key string, timeout time.Duration, flags uint64) (result string, err error) {
 	var lastLogsize uint64
 	var mtime int
+	var clientId uint64
 
 	w := make(resultWriter, 1)
-	m.UpdateTasks(0, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+	clientId = 0
+	if flags&0x1 != 0 {
+		clientId = 1
+	}
+	m.UpdateTasks(clientId, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
 
 	select {
 	case r := <-w:

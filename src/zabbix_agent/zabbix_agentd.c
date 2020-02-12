@@ -771,7 +771,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
-			PARM_OPT,	0,			1},
+			PARM_OPT,	0,			2},
 		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"Alias",			&CONFIG_ALIASES,			TYPE_MULTISTRING,
