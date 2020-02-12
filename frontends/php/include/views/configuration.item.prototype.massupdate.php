@@ -135,7 +135,7 @@ else {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [CJs::encodeJson($headers_data)];
+$headers->items = [json_encode($headers_data)];
 
 $item_form_list
 	->addRow(
@@ -533,7 +533,7 @@ $master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 $master_item[] = (new CButton('button', _('Select')))
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick('return PopUp("popup.generic",'.
-		CJs::encodeJson([
+		json_encode([
 			'srctbl' => 'items',
 			'srcfld1' => 'itemid',
 			'srcfld2' => 'name',
@@ -549,7 +549,7 @@ $master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 $master_item[] = (new CButton('button', _('Select prototype')))
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick('return PopUp("popup.generic",'.
-		CJs::encodeJson([
+		json_encode([
 			'srctbl' => 'item_prototypes',
 			'srcfld1' => 'itemid',
 			'srcfld2' => 'name',

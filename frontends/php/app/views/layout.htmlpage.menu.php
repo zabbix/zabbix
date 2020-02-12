@@ -138,7 +138,7 @@ foreach ($data['menu']->getItems() as $item) {
 		);
 
 		if ($selected) {
-			insert_js('MMenu.def_label = '.CJs::encodeJson($item->getUniqueId()));
+			insert_js('MMenu.def_label = '.json_encode($item->getUniqueId()));
 		}
 	}
 

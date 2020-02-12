@@ -43,7 +43,7 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 				$output['errors'][] = $messages->toString();
 			}
 
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 
 		return $ret;
@@ -110,7 +110,7 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 		}
 
 		// Prepare output.
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([
 			'name' => $this->getInput('name'),
 			'sysmapid' => $sysmapid,
 			'hierarchy' => $hierarchy,

@@ -416,7 +416,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				$fields_orig = self::convertWidgetFields($widget['fields']);
 
 				// Transforms corrupted data to default values.
-				$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($fields_orig));
+				$widget_form = CWidgetConfig::getForm($widget['type'], json_encode($fields_orig));
 				$widget_form->validate();
 				$fields = $widget_form->getFieldsData();
 

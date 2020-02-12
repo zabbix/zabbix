@@ -97,7 +97,7 @@ class CClock extends CDiv {
 
 		return 'jQuery(function($) {'.
 			'$("#'.$this->getId().'").zbx_clock('.
-				CJs::encodeJson([
+				json_encode([
 					'time' => $this->time,
 					'time_zone_string' => $this->time_zone_string,
 					'time_zone_offset' => $this->time_zone_offset,
