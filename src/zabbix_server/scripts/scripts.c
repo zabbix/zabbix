@@ -336,6 +336,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 {
 	int		ret = FAIL;
 	zbx_uint64_t	groupid;
+	unsigned char	old_macro_env;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -390,6 +391,17 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			{
 				goto out;
 			}
+			/* expand macros in command_orig used for non-secure logging */
+			old_macro_env = zbx_dc_set_macro_env(ZBX_MACRO_ENV_NONSECURE);
+			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+					NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error, max_error_len))
+			{
+				/* script command_orig is a copy of script command - if the script command  */
+				/* macro substitution succeeded, then it will succeed also for command_orig */
+				THIS_SHOULD_NEVER_HAPPEN;
+			}
+			zbx_dc_set_macro_env(old_macro_env);
+
 
 			/* DBget_script_by_scriptid() may overwrite script type with anything but global script... */
 			if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)

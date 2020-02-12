@@ -1060,6 +1060,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			script.command_orig = zbx_strdup(script.command_orig, row[12]);
 			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
 					NULL, NULL, NULL, ack, &script.command, macro_type, NULL, 0);
+			zbx_substitute_notification_macros(&actionid, event, r_event, NULL, ack, &script.command_orig,
+					macro_type);
 		}
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
@@ -1148,7 +1150,6 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		if (FAIL == rc)
 			status = ALERT_STATUS_FAILED;
 
-		zbx_substitute_notification_macros(&actionid, event, r_event, NULL, ack, &script.command_orig, macro_type);
 		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
 				script.command_orig, status, error);
 		zbx_free(buffer);
