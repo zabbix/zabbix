@@ -117,7 +117,7 @@ class CControllerAuditLogList extends CController {
 			]);
 
 			if ($users) {
-				$params['userids'] = reset($users)['userid'];
+				$params['userids'] = $users[0]['userid'];
 			}
 		}
 
