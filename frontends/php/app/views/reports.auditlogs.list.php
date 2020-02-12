@@ -24,7 +24,7 @@ $this->addJsFile('gtlc.js');
 
 $filter = (new CFormList())
 	->addRow(_('User'), [
-		(new CTextBox('user_alias', $data['user_alias']))
+		(new CTextBox('alias', $data['alias']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -35,7 +35,7 @@ $filter = (new CFormList())
 					'srctbl' => 'users',
 					'srcfld1' => 'alias',
 					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'user_alias'
+					'dstfld1' => 'alias'
 				]).', null, this);'
 			)
 	])
@@ -45,6 +45,7 @@ $filter = (new CFormList())
 $widget = (new CWidget())
 	->setTitle(_('Audit log'))
 	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['action'])))
+		->addVar('action', $data['action'])
 		->setProfile($data['timeline']['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])

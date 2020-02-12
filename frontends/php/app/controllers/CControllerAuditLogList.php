@@ -28,7 +28,7 @@ class CControllerAuditLogList extends CController {
 			'resourcetype' =>		'in -1,'.implode(',', array_keys(self::getResourcesList())),
 			'filter_rst' =>			'in 1',
 			'filter_set' =>			'in 1',
-			'user_alias' =>			'string',
+			'alias' =>				'string',
 			'from' =>				'range_time',
 			'to' =>					'range_time'
 		];
@@ -46,7 +46,7 @@ class CControllerAuditLogList extends CController {
 		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		if ($this->getInput('filter_set', 0)) {
 			CProfile::update('web.auditlogs.filter.alias', $this->getInput('alias', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.auditlogs.filter.action', $this->getInput('action', -1), PROFILE_TYPE_INT);
@@ -69,7 +69,7 @@ class CControllerAuditLogList extends CController {
 
 		$data = [
 			'page' => 1,
-			'user_alias' => CProfile::get('web.auditlogs.filter.alias', ''),
+			'alias' => CProfile::get('web.auditlogs.filter.alias', ''),
 			'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
 			'auditlog_action' => CProfile::get('web.auditlogs.filter.action', -1),
 			'action' => $this->getAction(),
@@ -110,10 +110,10 @@ class CControllerAuditLogList extends CController {
 			$params['time_till'] = $data['timeline']['to_ts'];
 		}
 
-		if ($data['user_alias']) {
+		if ($data['alias']) {
 			$users = API::User()->get([
 				'output' => ['userid', 'alias'],
-				'filter' => ['alias' => $data['user_alias']]
+				'filter' => ['alias' => $data['alias']]
 			]);
 
 			if ($users) {
@@ -146,7 +146,7 @@ class CControllerAuditLogList extends CController {
 		$this->setResponse($response);
 	}
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
