@@ -29,6 +29,7 @@ $page['file'] = 'screens.php';
 $page['scripts'] = [
 	'class.calendar.js',
 	'gtlc.js',
+	'multiselect.js',
 	'flickerfreescreen.js',
 	'class.svg.canvas.js',
 	'class.svg.map.js',
@@ -46,7 +47,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid' =>	[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
 	'hostid' =>		[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
 	'tr_groupid' =>	[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
 	'tr_hostid' =>	[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
@@ -64,9 +64,6 @@ validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
  * Permissions
  */
 // Validate group IDs.
-if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
-	access_deny();
-}
 if (getRequest('tr_groupid') && !isReadableHostGroups([getRequest('tr_groupid')])) {
 	access_deny();
 }
@@ -137,7 +134,21 @@ else {
 	updateTimeSelectorPeriod($timeselector_options);
 
 	$data += $timeselector_options;
+
+	// Dynamic item host selector.
+	$data['has_dynamic_widgets'] = check_dynamic_items($data['screen']['screenid'], 0);
+
+	if ($data['has_dynamic_widgets']) {
+		$data['host'] = hasRequest('hostid')
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => [getRequest('hostid')],
+				'monitored_hosts' => 1
+			]), ['hostid' => 'id'])
+			: [];
+	}
 }
+
 ob_end_flush();
 
 // render view
