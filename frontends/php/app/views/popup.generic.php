@@ -36,15 +36,6 @@ $header_form = (new CForm())
 	->cleanItems()
 	->setId('generic-popup-form');
 
-foreach ($options as $option_key => $option_value) {
-	if ($option_value === true) {
-		$header_form->addItem((new CVar($option_key, 1))->removeId());
-	}
-	elseif ($option_value) {
-		$header_form->addItem((new CVar($option_key, $option_value))->removeId());
-	}
-}
-
 // Add host group multiselect control.
 if (array_key_exists('groups', $data['filter'])) {
 	$multiselect_options = $data['filter']['groups'];

@@ -533,6 +533,11 @@ class CControllerPopupGeneric extends CController {
 			$host_options['editable'] = 1;
 		}
 
+		if ($this->hasInput('with_items')) {
+			$group_options['with_items'] = 1;
+			$host_options['with_items'] = 1;
+		}
+
 		if ($this->source_table === 'hosts') {
 			$group_options['real_hosts'] = 1;
 		}
@@ -627,7 +632,7 @@ class CControllerPopupGeneric extends CController {
 				'objectName' => 'host',
 				'data' => array_values($hosts),
 				'selectedLimit' => 1,
-				'disabled' => array_key_exists('only_hostid', $this->page_options),
+				'disabled' => $this->hasInput('only_hostid'),
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'hosts',
@@ -647,15 +652,10 @@ class CControllerPopupGeneric extends CController {
 	 * @return array
 	 */
 	protected function getPageOptions(): array {
-		$option_fields_binary = ['enrich_parent_groups', 'monitored_hosts', 'noempty', 'normal_only', 'numeric',
-			'real_hosts', 'submit_parent', 'templated_hosts', 'with_applications', 'with_graphs',
-			'with_graph_prototypes', 'with_items', 'with_simple_graph_item_prototypes', 'with_monitored_triggers',
-			'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'
-		];
-		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'orig_names', 'value_types', 'only_hostid'];
+		$option_fields_binary = ['noempty', 'real_hosts', 'submit_parent', 'with_items', 'writeonly'];
+		$option_fields_value = ['host_templates', 'screenid'];
 
 		$page_options = [
-			'srctbl' => $this->source_table,
 			'srcfld1' => $this->getInput('srcfld1', ''),
 			'srcfld2' => $this->getInput('srcfld2', ''),
 			'srcfld3' => $this->getInput('srcfld3', ''),
@@ -663,14 +663,10 @@ class CControllerPopupGeneric extends CController {
 			'dstfld2' => $this->getInput('dstfld2', ''),
 			'dstfld3' => $this->getInput('dstfld3', ''),
 			'dstfrm' => $this->getInput('dstfrm', ''),
-			'dstact' => $this->getInput('dstact', ''),
 			'itemtype' => $this->getInput('itemtype', 0),
-			'multiselect' => $this->getInput('multiselect', 0),
 			'patternselect' => $this->getInput('patternselect', 0),
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
-			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown')),
-			'disableids' => $this->getInput('disableids', []),
-			'excludeids' => $this->getInput('excludeids', [])
+			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
 		];
 
 		$page_options['parentid'] = ($page_options['dstfld1'] !== '')
@@ -712,7 +708,7 @@ class CControllerPopupGeneric extends CController {
 			'filter' => $this->makeFilters(),
 			'form' => array_key_exists('form', $popup) ? $popup['form'] : null,
 			'options' => $this->page_options + ['hostid' => reset($this->hostids)],
-			'multiselect' => $this->page_options['multiselect'],
+			'multiselect' => $this->getInput('multiselect', 0),
 			'table_columns' => $popup['table_columns'],
 			'table_records' => $records,
 			'user' => [
@@ -740,7 +736,7 @@ class CControllerPopupGeneric extends CController {
 	 * @param array $records
 	 */
 	protected function applyExcludedids(array &$records) {
-		$excludeids = $this->getInput('disableids', []);
+		$excludeids = $this->getInput('excludeids', []);
 
 		foreach ($excludeids as $excludeid) {
 			if (array_key_exists($excludeid, $records)) {
@@ -887,7 +883,7 @@ class CControllerPopupGeneric extends CController {
 				];
 
 				if (array_key_exists('real_hosts', $this->page_options)) {
-					$options['real_hosts'] = $this->page_options['real_hosts'];
+					$options['real_hosts'] = 1;
 				}
 
 				if ($this->hasInput('normal_only')) {
@@ -895,7 +891,7 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::HostGroup()->get($options);
-				if (array_key_exists('enrich_parent_groups', $this->page_options)) {
+				if ($this->hasInput('enrich_parent_groups')) {
 					$records = enrichParentGroups($records, [
 						'real_hosts' => null
 					] + $options);
@@ -924,7 +920,7 @@ class CControllerPopupGeneric extends CController {
 					$options['hostids'] = $this->hostids;
 				}
 
-				if (array_key_exists('with_monitored_triggers', $this->page_options)) {
+				if ($this->hasInput('with_monitored_triggers')) {
 					$options['monitored'] = true;
 				}
 
@@ -1000,7 +996,7 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				// Resolve item names by default.
-				$records = array_key_exists('orig_names', $this->page_options)
+				$records = $this->hasInput('orig_names')
 					? CArrayHelper::copyObjectsKeys($records, ['name' => 'name_expanded'])
 					: CMacrosResolverHelper::resolveItemNames($records);
 
