@@ -68,8 +68,9 @@ foreach ($data['auditlogs'] as $auditlog) {
 	$details = [];
 
 	foreach ($auditlog['details'] as $detail) {
-		$details[] = [$detail['table_name'].'.'.$detail['field_name'].NAME_DELIMITER.$detail['oldvalue'].
-			' => '.$detail['newvalue'], BR()];
+		$details[] = [$detail['table_name'].'.'.$detail['field_name'].': '.$detail['oldvalue'].
+			' => '.$detail['newvalue'], BR()
+		];
 	}
 
 	$table->addRow([
@@ -98,7 +99,6 @@ $this->addPostJS('timeControl.addObject("auditlog", '.json_encode($data['timelin
 	'timeControl.processObjects();'
 );
 
-// append form to widget
 $widget->addItem((new CForm('get'))
 	->setName('auditForm')
 	->addItem([$table, $data['paging']])
