@@ -10,6 +10,8 @@ $ui-transition-duration: .2s !default;
 @import "base/typography";
 @import "base/common";
 
+@import "utils/scrollable";
+
 @import "layout/grid";
 @import "layout/header";
 @import "layout/footer";
@@ -110,297 +112,8 @@ $ui-transition-duration: .2s !default;
 
 %space-pre-wrap {
 	white-space: pre-wrap;
-	word-break: break-all;  // For the Internet Explorer.
-	word-break: break-word; // Override for the other browsers.
+	word-break: break-word;
 	overflow-wrap: break-word;
-}
-
-//.top-nav-container {
-//	background-color: $main-nav-bg-color;
-//	height: 45px;
-//	line-height: 45px;
-//	padding: 0 10px;
-//	position: relative;
-//}
-
-.top-nav a,
-.top-subnav a,
-.header-logo {
-	&:active,
-	&:hover,
-	&:link,
-	&:visited {
-		border: 0;
-	}
-}
-
-//.top-nav {
-//	font-size: $font-top-nav-size;
-//	background-color: $main-nav-bg-color;
-//	display: inline-block;
-
-//	li {
-//		display: block;
-//		float: left;
-
-//		&.selected {
-//			position: relative;
-
-//			&::after {
-//				content: '';
-//				position: absolute;
-//				bottom: -1px;
-//				left: 0;
-//				right: 0;
-//				margin: 0 auto;
-//				width: 0;
-//				height: 0;
-//				font-size: 0;
-//				line-height: 0;
-//				border-left: 9px solid $transparent;
-//				border-right: 9px solid $transparent;
-//				border-bottom: 9px solid $main-subnav-bg-color;
-//			}
-
-//			a,
-//			a:hover {
-//				color: $link-main-nav-active-color;
-//			}
-//		}
-//	}
-
-//	a {
-//		padding: 15px 10px;
-//		color: $link-main-nav-color;
-//		text-decoration: none;
-//		cursor: pointer;
-//		outline: 0;
-
-//		&:link {
-//			color: $link-main-nav-color;
-//		}
-
-//		&:visited {
-//			color: $link-main-nav-visited-color;
-//		}
-
-//		&:hover {
-//			color: $link-main-nav-hover-color;
-//		}
-
-//		&:focus {
-//			color: $link-main-nav-active-color;
-//			background-color: $ui-hover-color !important;
-//		}
-
-//		&:active {
-//			color: $link-main-nav-active-color;
-//		}
-//	}
-//}
-
-//.top-nav-icons {
-//	padding: 12px 0;
-
-//	li {
-//		line-height: 16px;
-//	}
-
-//	a {
-//		display: block;
-//		font-size: 12px;
-//		color: $menu-user-color;
-//		padding: 12px 12px 12px 48px;
-//		position: relative;
-//		white-space: nowrap;
-
-//		@if $ui-transitions {
-//			transition: color $ui-transition-duration ease-out;
-//		}
-
-//		&:before {
-//			position: absolute;
-//			left: 20px;
-//			top: 13px;
-//			opacity: .75;
-
-//			@if $ui-transitions {
-//				transition: opacity $ui-transition-duration ease-out;
-//			}
-//		}
-
-//		&:hover,
-//		&:focus {
-//			border-bottom: none;
-//			color: $menu-user-hover-color;
-
-//			&:before {
-//				opacity: 1;
-//			}
-//		}
-//	}
-//}
-
-// ul.top-nav-icons {
-//	position: absolute;
-//	top: 0;
-//	right: 10px;
-
-//	li {
-//		display: block;
-//		float: left;
-//		padding: 0 0 0 10px;
-
-//		.search-suggest {
-//			min-width: 186px;
-
-//			li {
-//				float: none;
-//				padding: .4em 5px;
-
-//				a {
-//					opacity: inherit;
-//					width: inherit;
-//				}
-//			}
-//		}
-//	}
-
-//	a,
-//	span.top-nav-guest {
-//		display: block;
-//		width: 24px;
-//		height: 45px;
-//		line-height: 45px;
-//		color: $link-main-nav-active-color;
-//		font-size: $font-h3-size;
-//		text-decoration: none;
-//		outline: 0;
-//		opacity: .75;
-//		transition: opacity .2s ease-out;
-
-//		&:hover {
-//			opacity: 1;
-//		}
-
-//		&:focus {
-//			background-color: $ui-hover-color !important;
-//			opacity: 1;
-//		}
-//	}
-
-//	.top-nav-help {
-//		background: url(../img/icon-sprite.svg) no-repeat -6px -32px;
-//	}
-
-//	.top-nav-profile {
-//		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
-//	}
-
-//	.top-nav-guest {
-//		background: url(../img/icon-sprite.svg) no-repeat -241px -104px;
-//	}
-
-//	.top-nav-signout {
-//		background: url(../img/icon-sprite.svg) no-repeat -6px -140px;
-//	}
-
-//	.top-nav-zbbshare {
-//		background: url(../img/icon-sprite.svg) no-repeat -9px -68px;
-//		width: auto;
-//		padding: 0 6px 0 17px;
-//	}
-
-//	.top-nav-support {
-//		background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
-//		width: auto;
-//		padding: 0 6px 0 17px;
-//	}
-
-//	form {
-//		position: relative;
-//	}
-
-//	input {
-//		background-color: darken($main-nav-bg-color, 7%);
-//		border: 1px solid darken($main-nav-bg-color, 10%);
-//		width: 198px;
-//		margin: 6px 3px 0 0;
-//		color: $font-color;
-//		padding: 4px 24px 4px 5px;
-
-//		@media (max-width: 1050px) {
-//			width: 130px;
-//		}
-
-//		transition: width .5s ease-out;
-
-//		&:focus {
-//			background-color: $form-bg-color;
-//			border: 1px solid $form-border-color;
-
-//			+ .btn-search {
-//				opacity: 1;
-//			}
-//		}
-//	}
-//}
-
-//.top-subnav-container {
-//	background-color: $main-subnav-bg-color;
-//	height: 30px;
-//	line-height: 30px;
-//	padding: 0 10px;
-//	position: relative;
-//}
-
-.top-subnav {
-	background-color: $menu-main-submenu-bg-color;
-	position: absolute;
-	left: 0;
-
-	li {
-		display: block;
-		float: left;
-		padding: 0 10px;
-
-		&:last-child {
-			box-shadow: 25px 0 10px -10px $menu-main-submenu-bg-color;
-		}
-	}
-
-	a {
-		padding: 8px 0;
-
-		&:link {
-			color: $link-main-subnav-color;
-		}
-
-		&:visited {
-			color: $link-main-subnav-visited-color;
-		}
-
-		&:hover {
-			color: $link-main-subnav-hover-color;
-		}
-
-		&:active {
-			color: $link-main-subnav-active-color;
-		}
-
-		&:focus {
-			border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
-			color: $link-main-subnav-active-color;
-			outline: none;
-			padding-bottom: 4px;
-		}
-
-		&.selected {
-			border-bottom: 4px solid lighten($menu-main-submenu-bg-color, 50%);
-			color: $link-main-subnav-active-color;
-			padding-bottom: 4px;
-		}
-	}
 }
 
 .arrow-up {
@@ -441,92 +154,44 @@ $ui-transition-duration: .2s !default;
 	line-height: 0;
 }
 
+.logo {
+	display: block;
+	width: 91px;
+	height: 24px;
+
+	div {
+		height: 100%;
+		background: url(../img/icon-sprite.svg) no-repeat -570px -400px;
+	}
+
+	img {
+		display: inline-block;
+		max-width: 100%;
+		max-height: 100%;
+	}
+
+	&:active,
+	&:hover,
+	&:link,
+	&:visited {
+		border: 0;
+	}
+
+	&:focus {
+		div,
+		img {
+			box-shadow: 0 0 0 2px rgba($blue, .35);
+			transition: box-shadow $ui-transition-duration ease-out;
+		}
+	}
+}
+
 .object-group {
 	min-height: 24px;
 	line-height: 24px;
 	padding: 10px 0 6px;
 	position: relative;
 	vertical-align: top;
-}
-
-.header-title {
-	//display: flex;
-	//flex-direction: row;
-	//justify-content: space-between;
-	//margin: -10px 0 10px;
-	//border-bottom: 1px solid $ui-border-color;
-
-	//> div {
-	//	overflow: hidden;
-
-	//	&:last-child {
-	//		flex-shrink: 0;
-	//	}
-	//}
-
-	// h1 {
-	//	position: relative;
-	//	line-height: 24px;
-	//	overflow: hidden;
-	//	padding-top: 1px;
-	//	text-overflow: ellipsis;
-	//	white-space: nowrap;
-	//}
-
-	// a.link-action {
-	//	display: block;
-	//	box-sizing: border-box;
-	//	height: 25px;
-
-	//	h1 {
-	//		padding-right: 1em;
-
-	//		&::after {
-	//			content: '';
-	//			position: absolute;
-	//			top: 50%;
-	//			right: .15em;
-	//			margin-top: -.15em;
-	//			width: .3em;
-	//			height: .3em;
-	//			border-right: 2px solid $font-color;
-	//			border-bottom: 2px solid $font-color;
-	//			transform: rotate(45deg);
-	//			transition: border-color .2s ease-out;
-	//		}
-	//	}
-
-	//	&:hover,
-	//	&:focus {
-	//		h1::after {
-	//			border-color: $link-hover-color;
-	//		}
-	//	}
-	//}
-
-	// form {
-	//	display: flex;
-	//	justify-content: flex-end;
-	//}
-
-	// ul {
-	//	text-align: right;
-
-	//	li {
-	//		display: inline-block;
-	//		vertical-align: top;
-	//		position: relative;
-	//		padding: 0 0 0 10px;
-	//	}
-
-	//	ul li:first-child {
-	//		padding-left: 0;
-	//	}
-
-	//	button {
-	//		line-height: 22px;
-	//	}
-	//}
 }
 
 .dashbrd-edit {
@@ -563,7 +228,7 @@ $ui-transition-duration: .2s !default;
 	}
 }
 
-// Object Group Navigation
+// Object group navigation.
 .object-group {
 	margin-bottom: -1px;
 
@@ -625,7 +290,7 @@ $ui-transition-duration: .2s !default;
 	}
 }
 
-// Breadcrumbs inline with filter block
+// Breadcrumbs inline with filter block.
 .filter-breadcrumb {
 	display: inline-block;
 	padding-top: 0;
@@ -686,43 +351,7 @@ $ui-transition-duration: .2s !default;
 	}
 }
 
-// Footer
-// footer {
-//	position: absolute;
-//	bottom: 0;
-//	width: 100%;
-//	height: 30px;
-//	text-align: center;
-//	color: $font-alt-color;
-//}
-
-// main {
-//	@extend article;
-//}
-
-// output {
-//	display: block;
-//}
-
-.logo {
-	float: left;
-	display: block;
-	width: 95px;
-	height: 25px;
-	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
-}
-
-.header-logo {
-	float: left;
-	display: block;
-	margin: 10px 10px 0 0;
-
-	&:focus {
-		box-shadow: 0 0 0 2px rgba($blue, .35);
-	}
-}
-
-// Tables
+// Tables.
 .list-table {
 	width: 100%;
 	background-color: $ui-bg-color;
@@ -1252,28 +881,25 @@ $ui-transition-duration: .2s !default;
 	line-height: 12px;
 	text-align: center;
 
-	&:link {
-		color: $font-color;
-	}
-
-	&:visited {
+	&:link,
+	&:visited,
+	&:hover,
+	&:focus,
+	&:active {
 		color: $font-color;
 	}
 
 	&:hover {
-		color: $font-color;
 		background-color: $ui-hover-color;
 		border-bottom-color: $form-border-color;
 	}
 
 	&:focus {
-		color: $font-color;
 		background-color: $ui-hover-color;
 		border-color: $form-border-focus-color;
 	}
 
 	&:active {
-		color: $font-color;
 		background-color: $ui-hover-color;
 		border-color: $form-border-color;
 	}
@@ -1371,7 +997,7 @@ $ui-transition-duration: .2s !default;
 	@extend %webkit-hor-scrollbar;
 }
 
-// Timeline in table view
+// Timeline in table view.
 .timeline-date {
 	text-align: right;
 	white-space: nowrap;
@@ -1441,7 +1067,7 @@ $ui-transition-duration: .2s !default;
 	border-bottom-color: $ui-bg-color !important;
 }
 
-// Filters
+// Filters.
 .filter-btn-container {
 	position: relative;
 	text-align: right;
@@ -1725,7 +1351,7 @@ $ui-transition-duration: .2s !default;
 	}
 }
 
-// Forms
+// Forms.
 .table-forms-container {
 	margin: 0 0 10px;
 	background-color: $ui-bg-color;
@@ -2496,35 +2122,6 @@ button {
 	}
 }
 
-.btn-search {
-	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
-	position: absolute;
-	border: 0;
-	top: 11px;
-	right: 4px;
-	width: 24px;
-	min-height: 22px;
-	height: 22px;
-	padding: 0;
-	opacity: .75;
-	transition: opacity .2s ease-out;
-
-	&:hover,
-	&:active,
-	&:focus {
-		@extend %btn-search-hover-focus;
-	}
-
-	&[disabled] {
-		background-color: $transparent;
-
-		&:hover {
-			background-color: $transparent;
-			opacity: .75;
-		}
-	}
-}
-
 $icon-btn: (
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
 	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -259px,
@@ -2535,6 +2132,14 @@ $icon-btn: (
 	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px
 );
 
+// Dynamically generated classes:
+//  .btn-conf
+//  .btn-kiosk
+//  .btn-min
+//  .btn-add-fav
+//  .btn-remove-fav
+//  .btn-action
+//  .btn-info
 @each $icon-btn, $bgimage in $icon-btn {
 	.btn-#{$icon-btn} {
 		background: $bgimage;
@@ -2557,6 +2162,19 @@ $icon-widget-btn: (
 	info-clock: url(../img/icon-sprite.svg) no-repeat -87px -762px
 );
 
+// Dynamically generated classes:
+//  .btn-iterator-page-previous
+//  .btn-iterator-page-next
+//  .btn-widget-action
+//  .btn-widget-collapse
+//  .btn-widget-expand
+//  .btn-widget-edit
+//  .btn-widget-delete
+//  .btn-alarm-on
+//  .btn-alarm-off
+//  .btn-sound-on
+//  .btn-sound-off
+//  .btn-info-clock
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
 	.btn-#{$icon-widget-btn} {
 		background: $bgimage;
@@ -2564,8 +2182,7 @@ $icon-widget-btn: (
 	}
 }
 
-// TIME SELECTION
-
+// Time selection.
 .ui-tabs-nav {
 	height: 30px;
 	line-height: 30px;
@@ -2990,11 +2607,6 @@ $icon-widget-btn: (
 	}
 }
 
-%btn-search-hover-focus {
-	background-color: $transparent;
-	opacity: 1;
-}
-
 %btn-widget-hover-active {
 	background-color: $transparent;
 	opacity: 1;
@@ -3033,6 +2645,11 @@ $var-icons: (
 	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
 );
 
+// Dynamically generated classes:
+//  .icon-maint
+//  .icon-depend-up
+//  .icon-depend-down
+//  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
 		margin: 0 18px 0 0;
@@ -3054,28 +2671,42 @@ $trigger-expression-tree-icons: (
 	empty: url(../img/icon-sprite.svg) no-repeat -84px -350px
 );
 
-@each $var-icon, $bgimage in $trigger-expression-tree-icons {
-	.icon-tree-#{$var-icon} {
-		margin: 0 12px 0 0;
+%trigger-expression-tree-icons-common {
+	margin: 0 12px 0 0;
+
+	&::before {
+		background: url(../img/icon-sprite.svg) no-repeat;
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		position: absolute;
+		content: '';
+	}
+}
+
+// Dynamically generated classes:
+//  .icon-tree-top-bottom
+//  .icon-tree-top-bottom-right
+//  .icon-tree-top-right
+//  .icon-tree-empty
+@each $class, $bg-position in $trigger-expression-tree-icons {
+	.icon-tree-#{$class} {
+		@extend %trigger-expression-tree-icons-common;
 
 		&::before {
-			background: $bgimage;
-			display: inline-block;
-			width: 12px;
-			height: 12px;
-			position: absolute;
-			content: '';
+			background-position: $bg-position;
 		}
 	}
 }
 
 $form-icon-btn: (
-	// TODO: check .icon-help
-// help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
 	wzrd-action: url(../img/icon-sprite.svg) no-repeat -6px -617px
 );
 
+// Dynamically generated classes:
+//  .icon-cal
+//  .icon-wzrd-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
@@ -3154,8 +2785,7 @@ $form-icon-btn: (
 	}
 }
 
-// Sign in, Installation
-
+// Sign in, Installation.
 .setup-container {
 	background-color: $ui-bg-color;
 	width: 766px;
@@ -3330,14 +2960,10 @@ $form-icon-btn: (
 	width: 100%;
 }
 
-/*
- * Dashboard, widgets and iterators.
- *
- * To maintain code clarity:
- *   - Do not mix rules for dashboard view mode and dashboard edit mode.
- *   - Do not mix rules for widgets and iterators.
- */
-
+// Dashboard, widgets and iterators.
+// To maintain code clarity:
+//   - Do not mix rules for dashboard view mode and dashboard edit mode.
+//   - Do not mix rules for widgets and iterators.
 .dashbrd-grid-container {
 	position: relative;
 	margin: -4px;
@@ -4315,7 +3941,7 @@ $form-icon-btn: (
 	}
 }
 
-// Action Menus, Pop-up Menus
+// Action Menus, Pop-up Menus.
 .menu-popup {
 	position: absolute;
 	z-index: 1000;
@@ -4938,7 +4564,7 @@ $form-icon-btn: (
 	}
 }
 
-// Problem notification overlay
+// Problem notification overlay.
 .notif {
 	width: 250px;
 
@@ -5014,7 +4640,7 @@ $form-icon-btn: (
 	}
 }
 
-// Maps, Screens, Graphs
+// Maps, Screens, Graphs.
 .screen-table {
 	background-color: $ui-bg-color;
 	width: 100%;
@@ -5254,7 +4880,7 @@ $form-icon-btn: (
 	margin: -3px;
 }
 
-// Debug, Overlay Description
+// Debug, Overlay Description.
 .debug-output {
 	display: none;
 	max-height: 600px;
@@ -5294,17 +4920,17 @@ $form-icon-btn: (
 
 %scroll-vert-shadow {
 	background:
-		// Shadow covers
+		// Shadow covers.
 		linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
 		linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
-		// Shadows
+		// Shadows.
 		radial-gradient(50% 0, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
 		radial-gradient(50% 100%, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background:
-		// Shadow covers
+		// Shadow covers.
 		linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
 		linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
-		// Shadows
+		// Shadows.
 		radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
 		radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background-repeat: no-repeat;
@@ -5313,7 +4939,7 @@ $form-icon-btn: (
 	background-attachment: local, local, scroll, scroll;
 }
 
-// Alerts
+// Alerts.
 .green {
 	color: $green;
 }
@@ -5616,7 +5242,7 @@ a.link-action {
 	background-color: $alt-red;
 }
 
-// SEVERITY STATUSES
+// Severity statuses.
 @if $theme-name == 'blue' or $theme-name == 'dark' {
 	td[class] {
 		+ {
@@ -5661,6 +5287,14 @@ a.link-action {
 		}
 	}
 
+	// Dynamically generated classes:
+	//  .log-na-bg
+	//  .log-normal-bg
+	//  .log-info-bg
+	//  .log-average-bg
+	//  .log-warning-bg
+	//  .log-high-bg
+	//  .log-disaster-bg
 	.log-#{$severity-type} {
 		color: darken($color, 45%);
 		background-color: $color;
@@ -5697,8 +5331,7 @@ td.inactive-bg {
 	@extend .inactive-bg;
 }
 
-// FILTER CHECKBOXES
-
+// Filter checkboxes.
 .table-forms-second-column {
 	display: inline-block;
 	width: 50%;
@@ -5710,8 +5343,7 @@ td.inactive-bg {
 	}
 }
 
-// Event status colors
-
+// Event status colors.
 .problem-unack-fg {
 	color: $problem-unack-fg-color;
 }
@@ -5957,8 +5589,7 @@ td.inactive-bg {
 	max-width: 25%;
 }
 
-// Plus/Add icon
-
+// Plus/Add icon.
 .plus-icon {
 	display: inline-block;
 	@extend %plus-icon;
@@ -5979,8 +5610,7 @@ td.inactive-bg {
 	}
 }
 
-// Close/Remove icon
-
+// Close/Remove icon.
 %close-icon {
 	display: block;
 	padding: 0;
@@ -6060,8 +5690,7 @@ a.overlay-close-btn {
 	}
 }
 
-// Color picker
-
+// Color picker.
 .color-picker {
 	height: 20px;
 	white-space: nowrap;
@@ -6119,8 +5748,7 @@ a.overlay-close-btn {
 	}
 }
 
-// Preloader
-
+// Preloader.
 @keyframes is-loading-kf {
 	to {
 		transform: rotate(360deg);
@@ -6254,24 +5882,25 @@ $browser-logos: (
 	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
 );
 
+%browser-logo-style {
+	background: url(../img/browser-sprite.png) no-repeat;
+	width: 66px;
+	height: 66px;
+	margin: 0 auto;
+	margin-bottom: 5px;
+}
+
 // Dynamically generated classes for the browser logo:
 //  .browser-logo-chrome
 //  .browser-logo-ff
 //  .browser-logo-ie
 //  .browser-logo-opera
 //  .browser-logo-safari
-@each $browser, $bgimage in $browser-logos {
-	.browser-logo-#{$browser} {
-		background: $bgimage;
+@each $class, $bg-position in $browser-logos {
+	.browser-logo-#{$class} {
 		@extend %browser-logo-style;
+		background-position: $bg-position;
 	}
-}
-
-%browser-logo-style {
-	width: 66px;
-	height: 66px;
-	margin: 0 auto;
-	margin-bottom: 5px;
 }
 
 .browser-warning-container {
@@ -6305,6 +5934,7 @@ $browser-logos: (
 	text-align: center;
 }
 
+// TODO: Legacy
 %webkit-scrollbar {
 	&::-webkit-scrollbar {
 		width: 9px;
@@ -6320,6 +5950,7 @@ $browser-logos: (
 	}
 }
 
+// TODO: Legacy
 %webkit-hor-scrollbar {
 	&::-webkit-scrollbar {
 		height: 9px;
@@ -6431,12 +6062,12 @@ tr.cursor-move {
 	display: inline;
 }
 
-// Dashboard widget: URL
+// Dashboard widget - URL.
 .widget-url {
 	display: block;
 }
 
-// Analog Clock
+// Analog Clock.
 .clock {
 	display: flex;
 	justify-content: center;
@@ -7256,7 +6887,7 @@ svg {
 	display: table;
 }
 
-// RANGE CONTROL
+// Range control.
 $range-track-color: #c0c0c0;
 $range-progress-color: $link-color;
 $range-thumb-color: $link-color;
@@ -7401,7 +7032,7 @@ $range-input-width: 31px;
 	}
 }
 
-// Screen reader
+// Screen reader.
 .inline-sr-only {
 	font-size: 0;
 }
@@ -7479,8 +7110,7 @@ table.preprocessing-test-results {
 	}
 }
 
-// WIDGET "HOST AVAILABILITY"
-
+// Widget "Host availability".
 .host-avail-widget {
 
 	td:not(:first-child) {
@@ -7502,16 +7132,5 @@ table.preprocessing-test-results {
 
 	.host-avail-total {
 		background: $host-avail-total-bg-color;
-	}
-}
-
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-
-	/* for IE11 only. Fixed cell height if table has 100% height */
-	.host-avail-widget {
-
-		td {
-			height: 100%;
-		}
 	}
 }

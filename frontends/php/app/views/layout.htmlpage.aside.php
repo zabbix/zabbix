@@ -20,13 +20,11 @@
 
 
 $logo = (new CLink(
-	(new CDiv())
-		->addClass(ZBX_STYLE_LOGO)
-		->addStyle(CBrandHelper::getLogoStyle()),
+	CBrandHelper::getLogo(),
 	(new CUrl('zabbix.php'))
 		->setArgument('action', 'dashboard.view')
 		->getUrl()
-	))->addClass(ZBX_STYLE_HEADER_LOGO);
+	))->addClass(ZBX_STYLE_LOGO);
 
 $search = (new CForm('get', 'zabbix.php'))
 	->cleanItems()
@@ -67,6 +65,7 @@ $search = (new CForm('get', 'zabbix.php'))
 				->setAttribute('role', 'navigation')
 				->setAttribute('aria-label', _('Main navigation')),
 			(new CTag('nav', true, APP::Component()->get('menu.user')->addClass('menu-user')))
+				->addClass('navigation-user')
 				->setAttribute('role', 'navigation')
 				->setAttribute('aria-label', _('User menu'))
 		]))

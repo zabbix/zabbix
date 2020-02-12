@@ -1,6 +1,6 @@
 $theme-name: 'dark';
 
-// NOTIFICATION & ALERT
+// Notification & Alert.
 $red: #e45959;
 $light-red: #503434;
 //$lighter-red: #473232;
@@ -20,7 +20,7 @@ $disabled-bg-color: #2b2b2b;
 $disabled-item-color: #808080;
 $disabled-item-bg-color: #383838;
 
-// MAIN
+// Main
 $main-nav-bg-color: #2b2b2b;
 $main-subnav-bg-color: #454545;
 $main-subnav-bg-selected-color: #2e2e2e;
@@ -49,7 +49,7 @@ $table-border-color: #383838;
 
 $ui-tab-bg-selected-color: #69808d;
 
-// FORMS
+// Forms
 $form-font-color: #e1e3ed;
 $form-bg-color: #383838;
 $form-border-color: #4f4f4f;
@@ -62,13 +62,13 @@ $form-disabled-border-color: #3d3d3d;
 $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #383838;
 
-// ERROR MESSAGES
+// Error messages
 $msg-bad-color: darken(desaturate($red, 10%), 20%);
 $msg-good-color: darken(desaturate($green, 10%), 20%);
 $msg-warning-color: #a97d38;
 $msg-warning-border-color: #614f32;
 
-// BUTTONS
+// Buttons
 $btn-font-color: #f2f2f2;
 $btn-bg-color: #69808d;
 $btn-border-color: #768d99;
@@ -90,7 +90,7 @@ $btn-back-map-background-color: rgba(0, 0, 0, .8);
 $btn-back-text-color: #ffffff;
 $btn-back-background-hover: #768d99;
 
-// LINKS
+// Links
 $link-color: #4796c4;
 $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
@@ -106,19 +106,19 @@ $link-main-subnav-hover-color: #ffffff;
 $link-main-subnav-active-color: #ffffff;
 $link-main-subnav-visited-color: rgba(#ffffff, .8);
 
-// ANALOG CLOCK
+// Analog clock
 $clock-face-color: #383838;
 $clock-hand-color: #f2f2f2;
 $clock-hand-sec-color: #69808d;
 $clock-lines-color: #4f4f4f;
 
-// STATUSES
+// Statuses
 $problem-unack-fg-color: #ff3333;
 $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
-// MULTISELECT
+// Multiselect
 $multiselect-selected-bg-color: #696969;
 
 .status-na-bg,
@@ -128,28 +128,6 @@ $multiselect-selected-bg-color: #696969;
 .status-high-bg,
 .status-disaster-bg {
 	border-color: rgba($ui-bg-color, .2) !important;
-}
-
-.top-nav-help {
-	background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important;
-}
-.top-nav-profile {
-	background: url(../img/icon-sprite.svg) no-repeat -84px -104px !important;
-}
-.top-nav-guest {
-	background: url(../img/icon-sprite.svg) no-repeat -241px -140px !important;
-}
-.top-nav-signout {
-	background: url(../img/icon-sprite.svg) no-repeat -84px -140px !important;
-}
-.top-nav-zbbshare {
-	background: url(../img/icon-sprite.svg) no-repeat -87px -68px !important;
-}
-.top-nav-support {
-	background: url(../img/icon-sprite.svg) no-repeat -245px -32px !important;
-}
-.btn-search {
-	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
 
 .timeline-axis {
@@ -164,14 +142,7 @@ $multiselect-selected-bg-color: #696969;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
-.top-subnav a {
-	&:focus {
-		border-bottom: 4px solid lighten($main-nav-bg-color, 30%) !important;
-		outline: none;
-	}
-}
-
-// TABLES
+// Tables.
 .list-table {
 	thead th {
 		border-color: lighten($table-border-color, 3%);
@@ -306,7 +277,7 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
-// GRAPH AND MAP
+// Graph and map.
 .btn-back-map-container {
 	.btn-back-map {
 		.btn-back-map-icon {
@@ -315,7 +286,7 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
-// TIME SELECTION
+// Time selection.
 .ui-tabs-nav {
 	.ui-tabs-active {
 		.btn-time {
@@ -371,8 +342,7 @@ $multiselect-selected-bg-color: #696969;
 	color: darken($font-color, 85%);
 }
 
-// WIDGET "HOST AVAILABILITY"
-
+// Widget "Host availability".
 .host-avail-widget {
 
 	&.list-table {

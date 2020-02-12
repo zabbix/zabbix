@@ -1,6 +1,6 @@
 $theme-name: 'hc-light';
 
-// NOTIFICATION & ALERT
+// Notification & alert
 $red: #990000;
 $light-red: #cc0000;
 //$lighter-red: #cc0000;
@@ -22,7 +22,7 @@ $disabled-bg-color: #f0f0f0;
 $disabled-item-color: #ffffff;
 $disabled-item-bg-color: #9f9f9f;
 
-// MAIN
+// Main
 $main-nav-bg-color: #ffffff;
 $main-subnav-bg-color: #000000;
 $main-subnav-bg-selected-color: #000000;
@@ -51,7 +51,7 @@ $table-border-color: #888888;
 
 $ui-tab-bg-selected-color: #888888;
 
-// FORMS
+// Forms
 $form-font-color: #000000;
 $form-bg-color: #ffffff;
 $form-border-color: #888888;
@@ -67,13 +67,13 @@ $scrollbar-thumb-color-darken: 30%;
 
 $input-placeholder-color: #777777;
 
-// ERROR MESSAGES
+// Error messages
 $msg-bad-color: $red;
 $msg-good-color: $green;
 $msg-warning-color: #b37e12;
 $msg-warning-border-color: #ffb319;
 
-// BUTTONS
+// Buttons
 $btn-font-color: #ffffff;
 $btn-bg-color: #555555;
 $btn-border-color: #333333;
@@ -95,7 +95,7 @@ $btn-back-map-background-color: rgba(0, 0, 0, .8);
 $btn-back-text-color: #ffffff;
 $btn-back-background-hover: #000000;
 
-// LINKS
+// Links
 $link-color: #555555;
 $link-hover-color: #000000;
 $link-active-color: #555555;
@@ -113,19 +113,19 @@ $link-main-subnav-hover-color: #ffffff;
 $link-main-subnav-active-color: #ffffff;
 $link-main-subnav-visited-color: rgba(255, 255, 255, .8);
 
-// ANALOG CLOCK
+// Analog clock
 $clock-face-color: #ffffff;
 $clock-hand-color: #000000;
 $clock-hand-sec-color: #555555;
 $clock-lines-color: #555555;
 
-// STATUSES
+// Statuses
 $problem-unack-fg-color: #cc0000;
 $problem-ack-fg-color: #cc0000;
 $ok-unack-fg-color: #009900;
 $ok-ack-fg-color: #009900;
 
-// MULTISELECT
+// Multiselect
 $multiselect-selected-bg-color: #777777;
 
 .status-na-bg,
@@ -142,11 +142,19 @@ $multiselect-selected-bg-color: #777777;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
+.logo {
+	&:focus {
+		div,
+		img {
+			box-shadow: 0 0 0 2px $blue;
+		}
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
-
 .dashbrd-grid-new-widget-placeholder {
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,
@@ -187,7 +195,6 @@ $multiselect-selected-bg-color: #777777;
 	}
 }
 
-// ICONS
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -203px -802px,
 	depend-up: url(../img/icon-sprite.svg) no-repeat -208px -729px,
@@ -195,6 +202,11 @@ $var-icons: (
 	ackn: url(../img/icon-sprite.svg) no-repeat -203px -693px
 );
 
+// Dynamically generated classes:
+//  .icon-maint
+//  .icon-depend-up
+//  .icon-depend-down
+//  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
 		margin: 0 18px 0 0;
@@ -206,11 +218,13 @@ $var-icons: (
 }
 
 $form-icon-btn: (
-	help: url(../img/icon-sprite.svg) no-repeat -165px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -201px -834px,
 	wzrd-action: url(../img/icon-sprite.svg) no-repeat -168px -617px
 );
 
+// Dynamically generated classes:
+//  .icon-cal
+//  .icon-wzrd-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
@@ -237,6 +251,19 @@ $icon-widget-btn: (
 	info-clock: url(../img/icon-sprite.svg) no-repeat -246px -762px
 );
 
+// Dynamically generated classes:
+//  .btn-iterator-page-previous
+//  .btn-iterator-page-next
+//  .btn-widget-action
+//  .btn-widget-collapse
+//  .btn-widget-expand
+//  .btn-widget-edit
+//  .btn-widget-delete
+//  .btn-alarm-on
+//  .btn-alarm-off
+//  .btn-sound-on
+//  .btn-sound-off
+//  .btn-info-clock
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
 	.btn-#{$icon-widget-btn} {
 		background: $bgimage;
@@ -244,34 +271,11 @@ $icon-widget-btn: (
 	}
 }
 
-.top-nav-help {
-	background: url(../img/icon-sprite.svg) no-repeat -162px -32px !important;
-}
-.top-nav-profile {
-	background: url(../img/icon-sprite.svg) no-repeat -162px -104px !important;
-}
-.top-nav-guest {
-	background: url(../img/icon-sprite.svg) no-repeat -241px -176px !important;
-}
-
-.top-nav-signout {
-	background: url(../img/icon-sprite.svg) no-repeat -162px -140px !important;
-}
-.top-nav-zbbshare {
-	background: url(../img/icon-sprite.svg) no-repeat -165px -68px !important;
-}
-.top-nav-support {
-	background: url(../img/icon-sprite.svg) no-repeat -245px -68px !important;
-}
-.btn-search {
-	background: url(../img/icon-sprite.svg) no-repeat -162px -7px !important;
-}
 .btn-dashbrd-conf {
 	background: url(../img/icon-sprite.svg) no-repeat -201px -619px !important;
 }
 
 .subfilter-enabled {
-
 	.link-action {
 		color: $link-hover-color;
 
@@ -296,7 +300,6 @@ $icon-widget-btn: (
 }
 
 .menu-popup {
-
 	.menu-popup-item-disabled {
 		color: $form-disabled-font-color;
 	}
@@ -314,7 +317,6 @@ $icon-widget-btn: (
 			}
 
 			&.selected {
-
 				&::before {
 					background: url(../img/icon-sprite.svg) no-repeat -317px -835px;
 				}
@@ -322,7 +324,6 @@ $icon-widget-btn: (
 		}
 
 		&.selected {
-
 			&::before {
 				background: url(../img/icon-sprite.svg) no-repeat -164px -835px;
 			}
@@ -330,42 +331,24 @@ $icon-widget-btn: (
 	}
 }
 
-ul.top-nav-icons {
-	a {
-		&:focus {
-			background-color: darken($ui-hover-color, 3%) !important;
-			box-shadow: 0 0 0 2px $blue;
-			transition: box-shadow .2s ease-out;
-		}
-	}
-
-	input {
-		border: 1px solid $form-border-color !important;
-		background-color: $form-bg-color !important;
-
-		&:focus {
-			border: 1px solid $main-subnav-bg-color !important;
-		}
-	}
-}
-
 .add-child-btn {
 	background: url(../img/icon-sprite.svg) no-repeat -206px -551px !important;
 }
+
 .edit-item-btn {
 	background: url(../img/icon-sprite.svg) no-repeat -206px -478px !important;
 }
+
 .import-items-btn {
 	background: url(../img/icon-sprite.svg) no-repeat -206px -515px !important;
 }
+
 .drag-icon {
 	background: url(../img/icon-sprite.svg) no-repeat -165px -762px !important;
 }
 
-// COLORS AND GENERAL
-
+// Colors and general.
 button {
-
 	&:focus {
 		background-color: lighten($btn-bg-color, 10%);
 		box-shadow: 0 0 0 2px $blue;
@@ -373,21 +356,18 @@ button {
 }
 
 .btn-alt {
-
 	&:focus {
 		box-shadow: 0 0 0 2px $blue;
 	}
 }
 
 .radio-list-control {
-
 	.average-bg,
 	.disaster-bg,
 	.high-bg,
 	.info-bg,
 	.na-bg,
 	.warning-bg {
-
 		&::before,
 		&::after {
 			display: none;
@@ -395,9 +375,7 @@ button {
 	}
 
 	li {
-
 		input[type="radio"] {
-
 			&:checked:not([disabled]) + label {
 				color: $white;
 			}
@@ -483,43 +461,15 @@ a.link-action {
 	}
 }
 
-.top-nav {
-	a {
-		&:focus {
-			background-color: darken($ui-hover-color, 3%) !important;
-			box-shadow: 0 0 0 2px $blue;
-			color: $link-main-nav-active-color;
-			transition: box-shadow .2s ease-out;
-		}
-	}
-}
-
-.top-subnav a {
-	&.selected {
-		font-weight: bold;
-		border-bottom: 4px solid #ffffff;
-	}
-
-	&:focus {
-		color: $link-main-subnav-active-color;
-		padding: 8px 0 4px;
-		border-bottom: 4px solid rgba($ui-hover-color, .8);
-		outline: none;
-	}
-}
-
 .filter-breadcrumb {
-
 	li,
 	> li:first-child {
-
 		> span a:focus {
 			margin-bottom: -2px;
 		}
 	}
 
 	> li {
-
 		> span a:focus {
 			line-height: 12px;
 		}
@@ -583,9 +533,7 @@ a.link-action {
 	}
 
 	.multiselect-list {
-
 		li.selected {
-
 			.subfilter-enabled,
 			.subfilter-disable-btn,
 			.subfilter-disable-btn:active {
@@ -595,16 +543,7 @@ a.link-action {
 	}
 }
 
-.header-logo {
-
-	&:focus {
-		box-shadow: 0 0 0 2px $blue;
-		transition: box-shadow .2s ease-out;
-	}
-}
-
 .checkbox-radio {
-
 	&:focus + label span {
 		box-shadow: 0 0 0 1px $blue;
 		transition: box-shadow .2s ease-out;
@@ -612,7 +551,6 @@ a.link-action {
 }
 
 %form-input-style {
-
 	&:focus {
 		box-shadow: 0 0 0 1px $blue;
 		transition: box-shadow .2s ease-out;
@@ -641,9 +579,7 @@ a.link-action {
 }
 
 .dashbrd-widget-graph-link {
-
 	&:focus {
-
 		&::after {
 			background: $blue;
 			height: 3px;
@@ -652,8 +588,7 @@ a.link-action {
 	}
 }
 
-// Tables
-
+// Tables.
 .list-table {
 	.subfilter-enabled {
 		background-color: $ui-bg-color;
@@ -665,7 +600,6 @@ a.link-action {
 	}
 
 	&.compact-view {
-
 		.flh-na-bg,
 		.flh-info-bg,
 		.flh-warning-bg,
@@ -678,7 +612,6 @@ a.link-action {
 		}
 
 		td {
-
 			&.na-bg,
 			&.normal-bg,
 			&.info-bg,
@@ -710,14 +643,12 @@ a.link-action {
 	}
 }
 
-// Checkbox disabling
-
+// Checkbox disabling.
 .filter-highlight-row-cb {
 	display: none;
 }
 
-// SEVERITY STATUSES
-
+// Severity statuses.
 .na-bg,
 .normal-bg,
 .info-bg,
@@ -789,7 +720,6 @@ a.link-action {
 .na-bg,
 .log-na-bg,
 .normal-bg {
-
 	&::before {
 		background-color: $alt-green;
 	}
@@ -802,7 +732,6 @@ a.link-action {
 .warning-bg,
 .high-bg,
 .disaster-bg {
-
 	&.blink-hidden::after {
 		content: none;
 	}
@@ -812,6 +741,12 @@ a.link-action {
 	}
 }
 
+// Dynamically generated classes:
+//  .log-na-bg
+//  .log-info-bg
+//  .log-warning-bg
+//  .log-high-bg
+//  .log-disaster-bg
 @each $class, $color in (
 	na-bg: $alt-blue-grey,
 	info-bg: $alt-dark-blue,
@@ -897,22 +832,22 @@ td.inactive-bg {
 	position: absolute;
 }
 
-// ERROR MESSAGES
+// Error messages.
 .msg-bad,
 .msg-good,
 .msg-warning {
-
 	.link-action:hover {
 		color: $link-hover-color;
 	}
 }
 
-// GRAPH AND MAP
+// Graph and map.
 .graph-selection {
 	background-color: rgba($font-color, .1);
 	border: 0;
 	outline: 2px solid rgba($font-color, .6);
 }
+
 .svg-graph-selection {
 	fill: rgba($font-color, .1);
 	stroke: rgba($font-color, .6);
@@ -930,9 +865,7 @@ td.inactive-bg {
 
 // Multiline input control.
 .multilineinput-control {
-
 	button {
-
 		&::after {
 			background-position: -206px -478px;
 		}
@@ -944,7 +877,6 @@ td.inactive-bg {
 }
 
 .btn-back-map-container {
-
 	a {
 		border-bottom: 0;
 	}
@@ -957,13 +889,10 @@ td.inactive-bg {
 	}
 }
 
-// TIME SELECTION
-
+// Time selection.
 .ui-tabs-nav {
-
 	.btn-time,
 	.filter-trigger {
-
 		&:hover {
 			background-color: darken($btn-bg-color, 10%);
 		}
@@ -975,7 +904,6 @@ td.inactive-bg {
 	}
 
 	.ui-state-focus {
-
 		.btn-time,
 		.filter-trigger {
 			background-color: lighten($btn-bg-color, 10%);
@@ -983,7 +911,6 @@ td.inactive-bg {
 		}
 
 		&.ui-tabs-active {
-
 			.btn-time,
 			.filter-trigger {
 				background-color: $ui-hover-color;
@@ -1079,7 +1006,6 @@ td.inactive-bg {
 
 .icon-action-msgs,
 .icon-description {
-
 	&::before {
 		background-position: -474px -285px;
 	}
@@ -1103,10 +1029,8 @@ td.inactive-bg {
 	}
 }
 
-// OVERRIDES
-
+// Overrides.
 .overrides-options-list {
-
 	> li > div {
 		background-color: $ui-bg-selected-color !important;
 
@@ -1118,7 +1042,6 @@ td.inactive-bg {
 }
 
 .totals-list {
-
 	> div {
 		border-top: 1px solid $ui-border-color;
 		color: $font-color;
@@ -1136,10 +1059,8 @@ td.inactive-bg {
 	}
 }
 
-// WIDGET "HOST AVAILABILITY"
-
+// Widget "Host availability".
 .host-avail-widget {
-
 	td:not(:first-child) {
 		border-left: 1px solid $ui-border-color;
 	}
@@ -1152,10 +1073,8 @@ td.inactive-bg {
 	}
 }
 
-// WIDGET "PROBLEMS BY SEVERITY"
-
+// Widget "Problems by severity".
 .by-severity-widget {
-
 	> div {
 		min-width: 65px;
 		padding-left: 42px;

@@ -1,4 +1,4 @@
-// NOTIFICATION & ALERT
+// Notification & alert
 // TODO: Naming
 $red: #e33734 !default;
 $light-red: #ed9898 !default;
@@ -39,11 +39,13 @@ $disabled-item-bg-color: #ccd5d9 !default;
 
 $teal: #0f998b;
 
-// LAYOUT
+// Layout
 $header-bg-color: #ffffff !default;
 $sidebar-bg-color: #0a466a !default;
+$sidebar-scrollbar-track-color: rgba(#87d1ff, .55) !default;
+$sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85) !default;
 
-// MAIN
+// Main
 //$main-nav-bg-color: #ffffff !default;
 //$main-subnav-bg-color: #0a466a !default;
 //$main-subnav-bg-selected-color: #026dab !default;
@@ -54,11 +56,15 @@ $font-alt-color: #768d99 !default;
 $body-bg-color: #ebeef0 !default;
 $overlay-bg-color: #ffffff !default;
 
-// MAIN MENU
-//$menu-main-color: #ebeef0 !default;
-//$menu-main-hover-bg-color: #092637 !default;
-//$menu-main-hover-color: #ffffff !default;
-//$menu-main-hover-border-color: #ffffff !default;
+$scrollbar-track-color: rgba(#acbbc2, .55) !default;
+$scrollbar-thumb-color: rgba(#878787, .85) !default;
+$scrollbar-thumb-color-darken: 5% !default;
+
+// Main menu
+$menu-main-color: #ebeef0 !default;
+$menu-main-hover-bg-color: #092637 !default;
+$menu-main-hover-color: #ffffff !default;
+$menu-main-hover-border-color: #ffffff !default;
 //$menu-main-selected-color: #ffffff !default;
 //$menu-main-selected-bg-color: #0a3c5b !default;
 //$menu-main-selected-border-color: #87d1ff !default;
@@ -68,8 +74,8 @@ $menu-main-submenu-bg-color: #0e354d !default;
 //$menu-main-submenu-hover-bg-color: #092637 !default;
 //$menu-main-submenu-selected-bg-color: #0e354d !default;
 
-//$menu-user-color: #cedae1 !default;
-//$menu-user-hover-color: #ffffff !default;
+$menu-user-color: #cedae1 !default;
+$menu-user-hover-color: #ffffff !default;
 
 // UI
 $ui-bg-color: #ffffff !default;
@@ -94,7 +100,7 @@ $table-border-color: #ebeef0 !default;
 
 $ui-tab-bg-selected-color: #0275b8 !default;
 
-// FORMS
+// Forms
 $form-font-color: #1f2c33 !default;
 $form-bg-color: #ffffff !default;
 $form-border-color: #acbbc2 !default;
@@ -105,13 +111,13 @@ $form-disabled-font-color: #acbbc2 !default;
 $form-disabled-bg-color: #ebebeb !default;
 $form-disabled-border-color: #ccd5d9 !default;
 
-$scrollbar-track-color: #ebebeb !default;
-$scrollbar-thumb-color: #ccd5d9 !default;
-$scrollbar-thumb-color-darken: 5% !default;
+//$scrollbar-track-color: #ebebeb !default;
+//$scrollbar-thumb-color: #ccd5d9 !default;
+//$scrollbar-thumb-color-darken: 5% !default;
 
 $input-placeholder-color: #9d9d9d !default;
 
-// ERROR MESSAGES
+// Error messages
 $msg-bad-color: darken(desaturate($red, 10%), 20%) !default;
 $msg-bad-border-color: $light-red !default;
 $msg-good-color: darken(desaturate($green, 10%), 20%) !default;
@@ -119,7 +125,7 @@ $msg-good-border-color: $light-green !default;
 $msg-warning-color: #9a7938 !default;
 $msg-warning-border-color: #ffd788 !default;
 
-// BUTTONS
+// Buttons
 $btn-font-color: #ffffff !default;
 $btn-bg-color: #0275b8 !default;
 $btn-border-color: #0275b8 !default;
@@ -144,7 +150,7 @@ $btn-back-text-color: #0275b8 !default;
 // TODO: naming
 $btn-back-background-hover: $form-bg-color !default;
 
-// LINKS
+// Links
 $link-color: #0275b8 !default;
 $link-hover-color: $link-color !default;
 $link-active-color: $link-color !default;
@@ -166,31 +172,31 @@ $link-main-subnav-active-color: rgba(#ffffff, 1) !default;
 // TODO: legacy?
 $link-main-subnav-visited-color: rgba(#ffffff, .8) !default;
 
-// ANALOG CLOCK
+// Analog clock
 $clock-face-color: #ebebeb !default;
 $clock-hand-color: #1f2c33 !default;
 $clock-hand-sec-color: #0275b8 !default;
 $clock-lines-color: #acbbc2 !default;
 
-// STATUSES
+// Statuses
 $problem-unack-fg-color: #cc0000 !default;
 $problem-ack-fg-color: #cc0000 !default;
 $ok-unack-fg-color: #009900 !default;
 $ok-ack-fg-color: #009900 !default;
 
-// MULTISELECT
+// Multiselect
 $multiselect-selected-bg-color: #93a5af !default;
 $multiselect-disabled-bg-color: $disabled-bg-color;
 $multiselect-item-disabled-color: $disabled-item-color;
 $multiselect-item-disabled-bg-color: $disabled-item-bg-color;
 
-// HOST STATUS
+// Host status
 $host-avail-true-bg-color: $alt-light-green !default;
 $host-avail-false-bg-color: $alt-red !default;
 $host-avail-unknown-bg-color: $alt-blue-grey !default;
 $host-avail-total-bg-color: $transparent !default;
 
-// PRELOADER
+// Preloader
 $preloader-bg-color: $body-bg-color !default;
 $preloader-color: #ccd5d9 !default;
 $preloader-disabled-color: #fdfdfd !default;

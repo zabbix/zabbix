@@ -47,9 +47,7 @@ global $ZBX_SERVER_NAME;
 		? (new CDiv($ZBX_SERVER_NAME))->addClass(ZBX_STYLE_SERVER_NAME)
 		: null,
 	(new CDiv([
-		(new CDiv())
-			->addClass(ZBX_STYLE_SIGNIN_LOGO)
-			->addStyle(CBrandHelper::getLogoStyle()),
+		(new CDiv(CBrandHelper::getLogo()))->addClass(ZBX_STYLE_LOGO),
 		(new CForm())
 			->cleanItems()
 			->setAttribute('aria-label', _('Sign in'))

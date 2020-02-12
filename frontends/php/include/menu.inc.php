@@ -26,6 +26,7 @@ function getMainMenu(): CMenu {
 	$menu = new CMenu([
 		(new CMenuItem(_('Monitoring')))
 			->setId('view')
+			->setIcon('icon-monitoring')
 			->setSubMenu(new Cmenu([
 				(new CMenuItem(_('Dashboard')))
 					->setAction('dashboard.view')
@@ -57,6 +58,7 @@ function getMainMenu(): CMenu {
 			])),
 		(new CMenuItem(_('Inventory')))
 			->setId('cm')
+			->setIcon('icon-inventory')
 			->setSubMenu(new CMenu([
 				(new CMenuItem(_('Overview')))
 					->setUrl(new CUrl('hostinventoriesoverview.php'), 'hostinventoriesoverview.php'),
@@ -65,6 +67,7 @@ function getMainMenu(): CMenu {
 			])),
 		(new CMenuItem(_('Reports')))
 			->setId('reports')
+			->setIcon('icon-reports')
 			->setSubMenu(new CMenu([
 				(new CMenuItem(_('Availability report')))
 					->setUrl(new CUrl('report2.php'), 'report2.php')
@@ -94,6 +97,7 @@ function getMainMenu(): CMenu {
 		$menu->add(
 			(new CMenuItem(_('Configuration')))
 				->setId('config')
+				->setIcon('icon-configuration')
 				->setSubMenu(new CMenu([
 					(new CMenuItem(_('Host groups')))
 						->setUrl(new CUrl('hostgroups.php'), 'hostgroups.php'),
@@ -145,6 +149,7 @@ function getMainMenu(): CMenu {
 		$menu->add(
 			(new CMenuItem(_('Administration')))
 				->setId('admin')
+				->setIcon('icon-administration')
 				->setSubMenu(new CMenu([
 					(new CMenuItem(_('General')))
 						->setAction('gui.edit')

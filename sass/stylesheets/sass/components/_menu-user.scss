@@ -1,27 +1,39 @@
-//$menu-user-icons: (
-//		support: url(../img/icon-sprite.svg) no-repeat -247px -48px,
-//		share: url(../img/icon-sprite.svg) no-repeat -90px -84px,
-//		help: url(../img/icon-sprite.svg) no-repeat -90px -48px,
-//		guest: url(../img/icon-sprite.svg) no-repeat -241px -104px,
-//		profile: url(../img/icon-sprite.svg) no-repeat -90px -120px,
-//		signout: url(../img/icon-sprite.svg) no-repeat -90px -156px
-//);
+$menu-user-icons: (
+		support: -247px -48px,
+		share: -90px -84px,
+		help: -90px -48px,
+		guest: -241px -104px,
+		profile: -90px -120px,
+		signout: -90px -156px
+) !default;
 
-//@each $class, $bgimage in $menu-user-icons {
-//	.icon-#{$class} {
+%menu-user-icon-common {
+	&::before {
+		content: '';
+		width: 12px;
+		height: 12px;
+		background: url(../img/icon-sprite.svg) no-repeat;
+	}
+}
 
-//		&::before {
-//			background: $bgimage;
-//			content: '';
-//			height: 12px;
-//			width: 12px;
-//		}
-//	}
-//}
+// Dynamically generated classes for icons:
+//  .icon-support
+//  .icon-share
+//  .icon-help
+//  .icon-guest
+//  .icon-profile
+//  .icon-signout
+@each $class, $bg-position in $menu-user-icons {
+	.icon-#{$class} {
+		@extend %menu-user-icon-common;
 
+		&::before {
+			background-position: $bg-position;
+		}
+	}
+}
 
 .menu-user {
-/*
 	padding: 12px 0;
 
 	li {
@@ -29,10 +41,11 @@
 	}
 
 	a {
-		display: block;
-		font-size: 12px;
-		padding: 12px 12px 12px 48px;
 		position: relative;
+		display: block;
+		padding: 12px 12px 12px 48px;
+		color: $menu-user-color;
+		font-size: 12px;
 		white-space: nowrap;
 
 		@if $ui-transitions {
@@ -41,8 +54,8 @@
 
 		&::before {
 			position: absolute;
-			left: 20px;
 			top: 13px;
+			left: 20px;
 			opacity: .75;
 
 			@if $ui-transitions {
@@ -60,9 +73,4 @@
 			}
 		}
 	}
-
-	a {
-		color: $menu-user-color;
-	}
-*/
 }

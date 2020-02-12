@@ -87,15 +87,14 @@ class CBrandHelper {
 	}
 
 	/**
-	 * Get logo style.
+	 * Get logo.
 	 *
-	 * @return string|null
+	 * @return CImg|CDiv
 	 */
-	public static function getLogoStyle() {
+	public static function getLogo() {
 		$logo = self::getValue('BRAND_LOGO', null);
-		return ($logo !== null)
-			? 'background: url("'.$logo.'") no-repeat center center; background-size: contain;'
-			: null;
+
+		return ($logo !== null) ? new CImg($logo) : new CDiv();
 	}
 
 	/**

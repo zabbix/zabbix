@@ -1,4 +1,90 @@
+$menu-main-icons: (
+		dashboard: -540px -664px,
+		problems: -540px -688px,
+		monitoring: -540px -712px,
+		inventory: -540px -736px,
+		reports: -540px -760px,
+		configuration: -540px -784px,
+		administration: -540px -808px
+) !default;
+
+%menu-main-icon-common {
+	&::before {
+		content: '';
+		width: 24px;
+		height: 24px;
+		background: url(../img/icon-sprite.svg) no-repeat;
+	}
+}
+
+// Dynamically generated classes for icons:
+//  .icon-dashboard
+//  .icon-problems
+//  .icon-monitoring
+//  .icon-inventory
+//  .icon-reports
+//  .icon-configuration
+//  .icon-administration
+@each $class, $bg-position in $menu-main-icons {
+	.icon-#{$class} {
+		@extend %menu-main-icon-common;
+
+		&::before {
+			background-position: $bg-position;
+		}
+	}
+}
+
 .menu-main {
+
+	li {
+		line-height: 16px;
+	}
+
+	a {
+		position: relative;
+		display: block;
+		padding: 12px 12px 12px 45px;
+		border-left: 3px solid transparent;
+		color: $menu-main-color;
+		font-size: 14px;
+		white-space: nowrap;
+
+		@if $ui-transitions {
+			transition: color $ui-transition-duration ease-out,
+						border-color $ui-transition-duration ease-out,
+						background-color $ui-transition-duration ease-out;
+		}
+
+		&::before {
+			position: absolute;
+			top: 7px;
+			left: 9px;
+		}
+
+		&:hover {
+			background: $menu-main-hover-bg-color;
+			border-bottom: none;
+			border-color: $menu-main-hover-border-color;
+			color: $menu-main-hover-color;
+
+			&:before {
+				background-position-x: -530px;
+			}
+		}
+
+		&:focus {
+			border-bottom: none;
+		}
+	}
+
+	.has-submenu {
+
+		.submenu {
+			display: none;
+		}
+	}
+
 /*
 	li {
 		line-height: 16px;
@@ -69,42 +155,7 @@
 		}
 	}
 
-	a {
-		border-left: 3px solid transparent;
-		display: block;
-		color: $menu-main-color;
-		font-size: 14px;
-		padding: 12px 12px 12px 45px;
-		position: relative;
-		white-space: nowrap;
 
-		@if $ui-transitions {
-			transition: color $ui-transition-duration ease-out,
-			border-color $ui-transition-duration ease-out,
-			background-color $ui-transition-duration ease-out;
-		}
-
-		&:before {
-			position: absolute;
-			left: 9px;
-			top: 7px;
-		}
-
-		&:hover {
-			background: $menu-main-hover-bg-color;
-			border-bottom: none;
-			border-color: $menu-main-hover-border-color;
-			color: $menu-main-hover-color;
-
-			&:before {
-				background-position-x: -530px;
-			}
-		}
-
-		&:focus {
-			border-bottom: none;
-		}
-	}
 
 	.submenu {
 		box-sizing: border-box;
