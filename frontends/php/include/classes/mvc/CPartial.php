@@ -65,7 +65,7 @@ class CPartial {
 	 * @throws RuntimeException if partial not found or not readable.
 	 */
 	public function __construct($name, array $data = []) {
-		if (!preg_match('/^[a-z\.\/]+$/', $name)) {
+		if (strpos($name, '..') !== false || !preg_match('/^[a-z\.\/]+$/', $name)) {
 			throw new InvalidArgumentException(sprintf('Invalid partial name: "%s".', $name));
 		}
 
