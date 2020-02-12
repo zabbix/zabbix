@@ -153,7 +153,7 @@ class CAuditLog extends CApiService {
 		}
 
 		if ($options['userids'] !== null) {
-			$sql_parts['where']['userid'] = dbConditionInt('a.userid', $options['userids']);
+			$sql_parts['where']['userid'] = dbConditionId('a.userid', $options['userids']);
 		}
 
 		if ($options['time_from'] !== null) {
@@ -164,14 +164,10 @@ class CAuditLog extends CApiService {
 			$sql_parts['where'][] = 'a.clock<='.zbx_dbstr($options['time_till']);
 		}
 
-		if ($options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
-		}
-
 		$sql_parts = $this->applyQueryFilterOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
-		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($audit = DBfetch($res)) {
 			if (!$options['countOutput']) {
