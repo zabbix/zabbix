@@ -47,24 +47,24 @@ class CAuditLog extends CApiService {
 	/**
 	 * Method auditlog.get, returns audit log records according filtering criteria.
 	 *
-	 * @param array    $options                   Array of API request options.
-	 * @param array    $options['auditids']       Filter by auditids.
-	 * @param array    $options['userids']        Filter by userids.
-	 * @param int      $options['time_from']      Filter by timestamp, range start time, inclusive.
-	 * @param int      $options['time_till']      Filter by timestamp, range end time, inclusive.
-	 * @param bool     $options['selectDetails']  Select additional details from auditlog_details.
-	 * @param int      $options['sortfield']      Sorting field: auditid, userid, clock.
-	 * @param string   $options['sortorder']      Sorting direction.
-	 * @param array    $options['filter']         Filter by fields value, exact match.
-	 * @param array    $options['search']         Filter by fields value, case insensitive search of substring.
-	 * @param bool     $options['countOutput']
-	 * @param bool     $options['excludeSearch']
-	 * @param int      $options['limit']
-	 * @param string   $options['output']
-	 * @param bool     $options['preservekeys']
-	 * @param bool     $options['searchByAny']
-	 * @param bool     $options['searchWildcardsEnabled']
-	 * @param bool     @options['startSearch']
+	 * @param array          $options                   Array of API request options.
+	 * @param int|array      $options['auditids']       Filter by auditids.
+	 * @param int|array      $options['userids']        Filter by userids.
+	 * @param int            $options['time_from']      Filter by timestamp, range start time, inclusive.
+	 * @param int            $options['time_till']      Filter by timestamp, range end time, inclusive.
+	 * @param string|array   $options['selectDetails']  Select additional details from auditlog_details.
+	 * @param string         $options['sortfield']      Sorting field: auditid, userid, clock.
+	 * @param string         $options['sortorder']      Sorting direction.
+	 * @param array          $options['filter']         Filter by fields value, exact match.
+	 * @param array          $options['search']         Filter by fields value, case insensitive search of substring.
+	 * @param bool           $options['countOutput']
+	 * @param bool           $options['excludeSearch']
+	 * @param int            $options['limit']
+	 * @param string|array   $options['output']
+	 * @param bool           $options['preservekeys']
+	 * @param bool           $options['searchByAny']
+	 * @param bool           $options['searchWildcardsEnabled']
+	 * @param bool           $options['startSearch']
 	 *
 	 * @throws APIException
 	 *
