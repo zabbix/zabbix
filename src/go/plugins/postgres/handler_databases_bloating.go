@@ -21,7 +21,8 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -32,14 +33,14 @@ const (
 func (p *Plugin) databasesBloatingHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var countBloating int64
 
-	multilineArchiveCount := `SELECT count(*) 
-		FROM pg_catalog.pg_stat_all_tables WHERE 
-		(n_dead_tup/(n_live_tup+n_dead_tup)::float8) > 0.2 AND 
-		(n_live_tup+n_dead_tup) > 50;`
+	query := `SELECT count(*) 
+				FROM pg_catalog.pg_stat_all_tables 
+	   		   WHERE (n_dead_tup/(n_live_tup+n_dead_tup)::float8) > 0.2 
+		 		 AND (n_live_tup+n_dead_tup) > 50;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), multilineArchiveCount).Scan(&countBloating)
+	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&countBloating)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}

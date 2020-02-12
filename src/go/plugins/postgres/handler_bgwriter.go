@@ -21,6 +21,8 @@ package postgres
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -31,28 +33,29 @@ const (
 func (p *Plugin) bgwriterHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var bgwriterJSON string
 	query := `
-select row_to_json (T) 
-  from  (
-    select 
-        checkpoints_timed
-      , checkpoints_req
-      , checkpoint_write_time
-      , checkpoint_sync_time
-      , buffers_checkpoint
-      , buffers_clean
-      , maxwritten_clean
-      , buffers_backend
-      , buffers_backend_fsync
-      , buffers_alloc
-    from pg_catalog.pg_stat_bgwriter
-  ) T ;`
+  SELECT row_to_json (T) 
+    FROM (
+          SELECT 
+              checkpoints_timed
+            , checkpoints_req
+            , checkpoint_write_time
+            , checkpoint_sync_time
+            , buffers_checkpoint
+            , buffers_clean
+            , maxwritten_clean
+            , buffers_backend
+            , buffers_backend_fsync
+            , buffers_alloc
+          FROM pg_catalog.pg_stat_bgwriter
+          ) T ;`
 	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&bgwriterJSON)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			p.Errf(err.Error())
+			return nil, errorEmptyResult
+		}
 		p.Errf(err.Error())
 		return nil, errorCannotFetchData
-	}
-	if len(bgwriterJSON) == 0 {
-		return nil, errorCannotParseData
 	}
 
 	return bgwriterJSON, nil

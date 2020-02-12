@@ -21,7 +21,8 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -32,27 +33,36 @@ const (
 // archiveHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
 func (p *Plugin) archiveHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var archiveCountJSON, archiveSizeJSON string
+	var err error
+	queryArchiveCount := `SELECT row_to_json(T) 
+							FROM (
+									SELECT archived_count, failed_count 
+								   	  FROM pg_stat_archiver
+								) T;`
 
-	multilineArchiveCount := `SELECT row_to_json(T) FROM (SELECT archived_count, failed_count from pg_stat_archiver) T;`
+	queryArchiveSize := `SELECT row_to_json(T) 
+							FROM ( 
+									SELECT count(name) AS count_files ,
+									coalesce(sum((pg_stat_file('./pg_wal/' || rtrim(ready.name,'.ready'))).size),0) AS size_files
+									FROM (
+										SELECT name 
+										  FROM pg_ls_dir('./pg_wal/archive_status') name 
+										  WHERE right( name,6)= '.ready'  
+										 ) ready
+								) T;`
 
-	multilineArchiveSize := `SELECT row_to_json(T) FROM ( 
-		SELECT count(name) AS count_files ,
-		coalesce(sum((pg_stat_file('./pg_wal/' ||  rtrim(ready.name,'.ready'))).size),0) AS size_files
-		FROM (
-		SELECT name FROM pg_ls_dir('./pg_wal/archive_status') name WHERE right( name,6)= '.ready'  ) ready) T;`
-
-	err := conn.postgresPool.QueryRow(context.Background(), multilineArchiveCount).Scan(&archiveCountJSON)
+	err = conn.postgresPool.QueryRow(context.Background(), queryArchiveCount).Scan(&archiveCountJSON)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
 		return nil, errorCannotFetchData
 	}
-	err = conn.postgresPool.QueryRow(context.Background(), multilineArchiveSize).Scan(&archiveSizeJSON)
+	err = conn.postgresPool.QueryRow(context.Background(), queryArchiveSize).Scan(&archiveSizeJSON)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}

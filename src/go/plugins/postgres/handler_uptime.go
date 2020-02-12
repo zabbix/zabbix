@@ -21,7 +21,8 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -31,11 +32,11 @@ const (
 // uptimeHandler finds difference btw current time and postmaster start time and returns int64 if all is OK or nil otherwise.
 func (p *Plugin) uptimeHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var uptime float64
-	multiline := `SELECT date_part('epoch', now() - pg_postmaster_start_time());`
+	query := `SELECT date_part('epoch', now() - pg_postmaster_start_time());`
 
-	err := conn.postgresPool.QueryRow(context.Background(), multiline).Scan(&uptime)
+	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&uptime)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}

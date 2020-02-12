@@ -21,8 +21,9 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -33,18 +34,20 @@ const (
 func (p *Plugin) databasesAgeHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var countAge int64
 	var key, formatedLine string
-
+	// for now we are expecting only database name as a param
 	if len(params) > 0 {
 		key = params[0]
-		formatedLine = fmt.Sprintf(`SELECT age(datfrozenxid) FROM 
-			pg_catalog.pg_database where datistemplate = false AND datname ='%v';`, key)
+		formatedLine = fmt.Sprintf(`SELECT age(datfrozenxid) 
+									  FROM pg_catalog.pg_database 
+									 WHERE datistemplate = false 
+									   AND datname ='%v';`, key)
 	} else {
 		return nil, errorEmptyParam
 	}
 
 	err := conn.postgresPool.QueryRow(context.Background(), formatedLine).Scan(&countAge)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}

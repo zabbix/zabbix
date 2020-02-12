@@ -21,7 +21,8 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -31,14 +32,17 @@ const (
 // walHandler executes select from directory which contains wal files and returns JSON if all is OK or nil otherwise.
 func (p *Plugin) walHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var walJSON string
-	multiline := `SELECT row_to_json(T) FROM (
-		SELECT pg_wal_lsn_diff(pg_current_wal_lsn(),'0/00000000') AS WRITE,
-		count(*) FROM pg_ls_waldir() AS COUNT
-		) T;`
+	query := `SELECT row_to_json(T) 
+			    FROM (
+					SELECT 
+						pg_wal_lsn_diff(pg_current_wal_lsn(),'0/00000000') AS WRITE,
+						count(*) 
+					FROM pg_ls_waldir() AS COUNT
+					) T;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), multiline).Scan(&walJSON)
+	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&walJSON)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}

@@ -21,7 +21,8 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -35,17 +36,17 @@ func (p *Plugin) pingHandler(conn *postgresConn, params []string) (interface{}, 
 	var pingOK int64
 	pingOK = -1
 
-	err := conn.postgresPool.QueryRow(context.Background(), "select 1 as pingOk").Scan(&pingOK)
+	err := conn.postgresPool.QueryRow(context.Background(), "SELECT 1 as pingOk").Scan(&pingOK)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
-		return postgresPingFailed, err
+		return nil, errorCannotFetchData
 	}
 	if pingOK != 1 {
-		p.Errf(err.Error())
+		p.Errf(string(errorPostgresPing))
 		return postgresPingFailed, errorPostgresPing
 	}
 	return pingOK, nil

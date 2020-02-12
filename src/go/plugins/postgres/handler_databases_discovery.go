@@ -21,7 +21,8 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -32,12 +33,14 @@ const (
 func (p *Plugin) databasesDiscoveryHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var databasesJSON string
 
-	multilineDatabases := `SELECT json_build_object ('data',json_agg(json_build_object('{#DBNAME}',d.datname))) 
-                            FROM pg_database d WHERE NOT datistemplate AND datallowconn AND datname!='postgres';`
+	query := `SELECT json_build_object ('data',json_agg(json_build_object('{#DBNAME}',d.datname))) 
+				FROM pg_database d 
+			   WHERE NOT datistemplate 
+				 AND datallowconn;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), multilineDatabases).Scan(&databasesJSON)
+	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&databasesJSON)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}

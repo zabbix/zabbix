@@ -21,7 +21,8 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -31,8 +32,9 @@ const (
 // connectionsHandler executes select from pg_stat_activity command and returns JSON if all is OK or nil otherwise.
 func (p *Plugin) connectionsHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var connectionsJSON string
-
-	multiline := `SELECT row_to_json(T) FROM (
+	var err error
+	query := `SELECT row_to_json(T) 
+	FROM (
 		SELECT
 			sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active,
 			sum(CASE WHEN state = 'idle' THEN 1 ELSE 0 END) AS idle,
@@ -46,9 +48,10 @@ func (p *Plugin) connectionsHandler(conn *postgresConn, params []string) (interf
 			(SELECT count(*) FROM pg_prepared_xacts) AS prepared
 		FROM pg_stat_activity WHERE datid is not NULL) T;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), multiline).Scan(&connectionsJSON)
+	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&connectionsJSON)
+
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}

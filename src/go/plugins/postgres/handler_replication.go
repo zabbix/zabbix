@@ -22,6 +22,8 @@ package postgres
 import (
 	"context"
 	"strconv"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -53,14 +55,18 @@ func (p *Plugin) replicationHandler(conn *postgresConn, params []string) (interf
 	switch key {
 	case keyPostgresReplicationStatus:
 
-		err := conn.postgresPool.QueryRow(context.Background(), `SELECT pg_is_in_recovery()`).Scan(&inRecovery)
+		err = conn.postgresPool.QueryRow(context.Background(), `SELECT pg_is_in_recovery()`).Scan(&inRecovery)
 		if err != nil {
 			p.Errf(err.Error())
 			return nil, errorCannotFetchData
 		}
 		if inRecovery {
-			err := conn.postgresPool.QueryRow(context.Background(), `SELECT COUNT(*) FROM pg_stat_wal_receiver`).Scan(&status)
+			err = conn.postgresPool.QueryRow(context.Background(), `SELECT COUNT(*) FROM pg_stat_wal_receiver`).Scan(&status)
 			if err != nil {
+				if err == pgx.ErrNoRows {
+					p.Errf(err.Error())
+					return nil, errorEmptyResult
+				}
 				p.Errf(err.Error())
 				return nil, errorCannotFetchData
 			}
@@ -71,41 +77,43 @@ func (p *Plugin) replicationHandler(conn *postgresConn, params []string) (interf
 
 	case keyPostgresReplicationLagSec:
 		if version >= 100000 {
-			query = `
-SELECT
-  CASE 
-    WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
-	ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
-  END as lag`
+			query = `SELECT
+  						CASE 
+    						WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
+							ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
+  						END as lag`
 		} else {
-			query = `
-SELECT
-  CASE 
-    WHEN pg_last_xlog_receive_location() = pg_last_xlog_replay_location() THEN 0
-	ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
-  END as lag`
+			query = `SELECT
+  						CASE 
+    						WHEN pg_last_xlog_receive_location() = pg_last_xlog_replay_location() THEN 0
+							ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
+  						END as lag`
 		}
 	case keyPostgresReplicationLagB:
-		err := conn.postgresPool.QueryRow(context.Background(), `SELECT pg_is_in_recovery()`).Scan(&inRecovery)
+		err = conn.postgresPool.QueryRow(context.Background(), `SELECT pg_is_in_recovery()`).Scan(&inRecovery)
 		if err != nil {
+			if err == pgx.ErrNoRows {
+				p.Errf(err.Error())
+				return nil, errorEmptyResult
+			}
 			p.Errf(err.Error())
 			return nil, errorCannotFetchData
 		}
 		if inRecovery {
 			if version >= 100000 {
-				query = `
-SELECT  
-	pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
-FROM pg_stat_wal_receiver;`
+				query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn()) 
+						   FROM pg_stat_wal_receiver;`
 			} else {
-				query = `
-select  
-	pg_catalog.pg_xlog_location_diff (received_lsn, pg_last_xlog_replay_location())
-from pg_stat_wal_receiver;`
+				query = `SELECT pg_catalog.pg_xlog_location_diff (received_lsn, pg_last_xlog_replay_location())
+						   FROM pg_stat_wal_receiver;`
 			}
 
-			err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&replicationResult)
+			err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&replicationResult)
 			if err != nil {
+				if err == pgx.ErrNoRows {
+					p.Errf(err.Error())
+					return nil, errorEmptyResult
+				}
 				p.Errf(err.Error())
 				return nil, errorCannotFetchData
 			}
@@ -119,17 +127,22 @@ from pg_stat_wal_receiver;`
 
 	case keyPostgresReplicationCount:
 		query = `SELECT count(*) FROM pg_stat_replication`
+
 	case keyPostgresReplicationMasterDiscoveryApplicationName:
 		query = `SELECT '{"data":'|| coalesce(json_agg(T), '[]'::json)::text || '}'
-FROM (
-	SELECT
-		application_name AS "{#APPLICATION_NAME}",
-        pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), '0/00000000') as master_current_wal,
-        pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), sent_lsn) as master_replication_lag
-	FROM pg_stat_replication
-) T`
+				   FROM (
+						SELECT
+							application_name AS "{#APPLICATION_NAME}",
+        					pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), '0/00000000') AS master_current_wal,
+        					pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), sent_lsn) AS master_replication_lag
+						FROM pg_stat_replication
+					) T`
 		err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&stringResult)
 		if err != nil {
+			if err == pgx.ErrNoRows {
+				p.Errf(err.Error())
+				return nil, errorEmptyResult
+			}
 			p.Errf(err.Error())
 			return nil, errorCannotFetchData
 		}
@@ -138,9 +151,13 @@ FROM (
 
 	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&replicationResult)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			p.Errf(err.Error())
+			return nil, errorEmptyResult
+		}
 		p.Errf(err.Error())
 		return nil, errorCannotFetchData
 	}
 	return replicationResult, nil
-	//todo
+
 }

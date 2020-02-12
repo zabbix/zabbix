@@ -21,48 +21,29 @@ package postgres
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
-	keyPostgresOldestXid             = "pgsql.oldest.xid"
-	keyPostgresOldestTransactionTime = "pgsql.oldest.transaction.time"
+	keyPostgresOldestXid = "pgsql.oldest.xid"
 )
 
-// oldestHandler gets age of the oldest xid and transaction if all is OK or nil otherwise.
+// oldestHandler gets age of the oldest xid if all is OK or nil otherwise.
 func (p *Plugin) oldestHandler(conn *postgresConn, params []string) (interface{}, error) {
-	var resultTransactionTime float64
-	var resultXID int
-	var result float64
+	var resultXID int64
 
-	var query string
-	var key string
-	var err error
+	query := `SELECT greatest(max(age(backend_xmin)), max(age(backend_xid))) 
+				FROM pg_catalog.pg_stat_activity`
 
-	if len(params) == 0 {
-		return nil, errorEmptyParam
-	}
-	key = params[0]
-
-	switch key {
-
-	case keyPostgresOldestXid:
-		query = `SELECT greatest(max(age(backend_xmin)), max(age(backend_xid))) FROM pg_catalog.pg_stat_activity`
-		err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&resultXID)
-		result = float64(resultXID)
-	case keyPostgresOldestTransactionTime:
-		query = `SELECT 
-	CASE 
-		WHEN extract(epoch from max(now() - xact_start)) IS NOT NULL AND extract(epoch FROM max(now() - xact_start))>0 
-			THEN extract(epoch from max(now() - xact_start)) 
-		ELSE 0 END 
-	FROM pg_catalog.pg_stat_activity 
-	WHERE pid NOT IN (SELECT pid FROM pg_stat_replication) AND pid <> pg_backend_pid();`
-		err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&resultTransactionTime)
-		result = resultTransactionTime
-	}
+	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&resultXID)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			p.Errf(err.Error())
+			return nil, errorEmptyResult
+		}
 		p.Errf(err.Error())
 		return nil, errorCannotFetchData
 	}
-	return result, nil
+	return resultXID, nil
 }

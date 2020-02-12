@@ -45,7 +45,6 @@ var maxParams = map[string]int{
 	keyPostgresReplicationMasterDiscoveryApplicationName: 1,
 	keyPostgresLocks:                                     1,
 	keyPostgresOldestXid:                                 1,
-	keyPostgresOldestTransactionTime:                     1,
 	keyPostgresUptime:                                    1,
 	keyPostgresCache:                                     1,
 	keyPostgresSizeArchive:                               1,
@@ -76,7 +75,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	// The first param is always connString for each metric
 	if len(params) > 0 && len(params[0]) > 0 {
-		// redo for PostgreSQL Host,Port,User, Database Params
+		// TODO: identify parameter by type: port,host or smth else
 		strPort := strconv.Itoa(int(p.options.Port))
 		connString = "postgresql://" + p.options.User + ":" + p.options.Password + "@" + p.options.Host + ":" + strPort + "/" + params[0]
 	} else {
@@ -98,19 +97,19 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		handler = p.databasesAgeHandler // postgres.databases[[connString][,section]]
 
 	case keyPostgresTransactions:
-		handler = p.transactionsHandler // postgres.transactions[[connString][,section]]
+		handler = p.transactionsHandler // postgres.transactions[[connString]]
 
 	case keyPostgresSizeArchive:
-		handler = p.archiveHandler // postgres.archive[[connString][,section]]
+		handler = p.archiveHandler // postgres.archive[[connString]]
 
 	case keyPostgresPing:
 		handler = p.pingHandler // postgres.ping[[connString]]
 
 	case keyPostgresConnections:
-		handler = p.connectionsHandler // postgres.connections[[connString][,section]]
+		handler = p.connectionsHandler // postgres.connections[[connString]]
 
 	case keyPostgresWal:
-		handler = p.walHandler // postgres.wal[[connString][,section]]
+		handler = p.walHandler // postgres.wal[[connString]]
 
 	case keyPostgresStat,
 		keyPostgresStatSum:
@@ -119,13 +118,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		params[0] = key
 
 	case keyPostgresBgwriter:
-		handler = p.bgwriterHandler // postgres.bgwriter[[connString][,section]]
+		handler = p.bgwriterHandler // postgres.bgwriter[[connString]]
 
 	case keyPostgresUptime:
-		handler = p.uptimeHandler // postgres.uptime[[connString][,section]]
+		handler = p.uptimeHandler // postgres.uptime[[connString]]
 
 	case keyPostgresCache:
-		handler = p.cacheHandler // postgres.cache[[connString][,section]]
+		handler = p.cacheHandler // postgres.cache[[connString]]
 
 	case keyPostgresReplicationCount,
 		keyPostgresReplicationStatus,
@@ -138,13 +137,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		params[0] = key
 
 	case keyPostgresLocks:
-		handler = p.locksHandler // postgres.locks[[connString][,section]]
+		handler = p.locksHandler // postgres.locks[[connString]]
 
-	case keyPostgresOldestXid,
-		keyPostgresOldestTransactionTime:
-		params = make([]string, 1)
-		params[0] = key
-		handler = p.oldestHandler
+	case keyPostgresOldestXid:
+		handler = p.oldestHandler // postgres.locks[[connString]
 
 	default:
 		return nil, errorUnsupportedMetric
@@ -187,7 +183,6 @@ func init() {
 		keyPostgresDatabasesBloating, "Returns percent of bloating tables for each database.",
 		keyPostgresDatabasesSize, "Returns size for each database.",
 		keyPostgresDatabasesAge, "Returns age for each database.",
-		//keyPostgresCountArchive, "Returns info about quantity of archive files.",
 		keyPostgresStatSum, "Returns JSON for sum of each type of statistic for all database.",
 		keyPostgresReplicationCount, "Returns number of standby servers.",
 		keyPostgresReplicationStatus, "Returns postgreSQL replication status.",
@@ -196,8 +191,7 @@ func init() {
 		keyPostgresReplicationRecoveryRole, "Returns postgreSQL recovery role.",
 		keyPostgresLocks, "Returns collect all metrics from pg_locks.",
 		keyPostgresOldestXid, "Returns age of oldest xid.",
-		keyPostgresOldestTransactionTime, "Returns oldest transaction running time.",
-		keyPostgresReplicationMasterDiscoveryApplicationName, "Returns !!!!!!!!!!!!!!!!!!!!!.",
+		keyPostgresReplicationMasterDiscoveryApplicationName, "Returns JSON discovery with application name from pg_stat_replication.",
 	)
 	/* registerConnectionsMertics() */
 }

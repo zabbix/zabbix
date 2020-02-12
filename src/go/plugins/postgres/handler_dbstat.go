@@ -23,6 +23,8 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -48,28 +50,28 @@ func (p *Plugin) dbStatHandler(conn *postgresConn, params []string) (interface{}
 	switch key {
 	case keyPostgresStatSum:
 		query = `
-select row_to_json (T) 
-  from  (
-    select 
-      sum(numbackends) as numbackends
-    , sum(xact_commit) as xact_commit
-    , sum(xact_rollback) as xact_rollback
-    , sum(blks_read) as blks_read
-    , sum(blks_hit) as blks_hit
-    , sum(tup_returned) as tup_returned
-    , sum(tup_fetched) as tup_fetched
-    , sum(tup_inserted) as tup_inserted
-    , sum(tup_updated) as tup_updated
-    , sum(tup_deleted) as tup_deleted
-    , sum(conflicts) as conflicts
-    , sum(temp_files) as temp_files
-    , sum(temp_bytes) as temp_bytes
-    , sum(deadlocks) as deadlocks
-    , %s as checksum_failures
-    , sum(blk_read_time) as blk_read_time
-    , sum(blk_write_time) as blk_write_time
-    from pg_catalog.pg_stat_database
-  ) T ;`
+  SELECT row_to_json (T) 
+    FROM  (
+      SELECT 
+        sum(numbackends) as numbackends
+      , sum(xact_commit) as xact_commit
+      , sum(xact_rollback) as xact_rollback
+      , sum(blks_read) as blks_read
+      , sum(blks_hit) as blks_hit
+      , sum(tup_returned) as tup_returned
+      , sum(tup_fetched) as tup_fetched
+      , sum(tup_inserted) as tup_inserted
+      , sum(tup_updated) as tup_updated
+      , sum(tup_deleted) as tup_deleted
+      , sum(conflicts) as conflicts
+      , sum(temp_files) as temp_files
+      , sum(temp_bytes) as temp_bytes
+      , sum(deadlocks) as deadlocks
+      , %s as checksum_failures
+      , sum(blk_read_time) as blk_read_time
+      , sum(blk_write_time) as blk_write_time
+      FROM pg_catalog.pg_stat_database
+    ) T ;`
 		if version >= 120000 {
 			query = fmt.Sprintf(query, "sum(checksum_failures)")
 		} else {
@@ -78,29 +80,29 @@ select row_to_json (T)
 
 	case keyPostgresStat:
 		query = `
-SELECT json_object_agg(coalesce (datname,'null'), row_to_json(T)) 
-  from  (
-    select 
-      datname
-    , numbackends as numbackends
-    , xact_commit as xact_commit
-    , xact_rollback as xact_rollback
-    , blks_read as blks_read
-    , blks_hit as blks_hit
-    , tup_returned as tup_returned
-    , tup_fetched as tup_fetched
-    , tup_inserted as tup_inserted
-    , tup_updated as tup_updated
-    , tup_deleted as tup_deleted
-    , conflicts as conflicts
-    , temp_files as temp_files
-    , temp_bytes as temp_bytes
-    , deadlocks as deadlocks
-    , %s as checksum_failures
-    , blk_read_time as blk_read_time
-    , blk_write_time as blk_write_time
-    from pg_catalog.pg_stat_database
-  ) T ;`
+  SELECT json_object_agg(coalesce (datname,'null'), row_to_json(T)) 
+    FROM  (
+      SELECT 
+        datname
+      , numbackends as numbackends
+      , xact_commit as xact_commit
+      , xact_rollback as xact_rollback
+      , blks_read as blks_read
+      , blks_hit as blks_hit
+      , tup_returned as tup_returned
+      , tup_fetched as tup_fetched
+      , tup_inserted as tup_inserted
+      , tup_updated as tup_updated
+      , tup_deleted as tup_deleted
+      , conflicts as conflicts
+      , temp_files as temp_files
+      , temp_bytes as temp_bytes
+      , deadlocks as deadlocks
+      , %s as checksum_failures
+      , blk_read_time as blk_read_time
+      , blk_write_time as blk_write_time
+      FROM pg_catalog.pg_stat_database
+    ) T ;`
 		if version >= 120000 {
 			query = fmt.Sprintf(query, "checksum_failures")
 		} else {
@@ -110,11 +112,12 @@ SELECT json_object_agg(coalesce (datname,'null'), row_to_json(T))
 
 	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&statJSON)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			p.Errf(err.Error())
+			return nil, errorEmptyResult
+		}
 		p.Errf(err.Error())
 		return nil, errorCannotFetchData
-	}
-	if len(statJSON) == 0 {
-		return nil, errorCannotParseData
 	}
 
 	return statJSON, nil

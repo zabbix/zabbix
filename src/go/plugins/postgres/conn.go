@@ -25,9 +25,8 @@ import (
 	"sync"
 	"time"
 
-	"zabbix.com/pkg/log"
-
 	"github.com/jackc/pgx/v4/pgxpool"
+	"zabbix.com/pkg/log"
 )
 
 const poolSize = 10

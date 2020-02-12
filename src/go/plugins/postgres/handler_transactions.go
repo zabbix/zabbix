@@ -21,27 +21,31 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
 	keyPostgresTransactions = "pgsql.transactions"
 )
 
-// transactionsHandler executes select from pg_stat_activity command and returns JSON if all is OK or nil otherwise.
+// transactionsHandler executes select from pg_stat_activity command and returns JSON for active,idle, waiting and prepared transactions if all is OK or nil otherwise.
 func (p *Plugin) transactionsHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var transactionJSON string
 
-	multiline := `SELECT row_to_json(T) FROM
-	 (SELECT coalesce(extract(epoch FROM max(CASE WHEN state = 'idle in transaction' THEN age(now(), query_start) END)), 0) AS idle,
-	 coalesce(extract(epoch FROM max(CASE WHEN state <> 'idle in transaction' AND state <> 'idle' THEN age(now(), query_start) END)), 0) AS active,
-	 coalesce(extract(epoch FROM max(CASE WHEN wait_event IS NOT NULL THEN age(now(), query_start) END)), 0) AS waiting,
-	(SELECT coalesce(extract(epoch FROM max(age(now(), prepared))), 0) FROM pg_prepared_xacts) AS prepared 
-	 FROM pg_stat_activity) T;`
+	query := `SELECT row_to_json(T) 
+	        	FROM (
+					SELECT 
+						coalesce(extract(epoch FROM max(CASE WHEN state = 'idle in transaction' THEN age(now(), xact_start) END)), 0) AS idle,
+	 					coalesce(extract(epoch FROM max(CASE WHEN state = 'active' THEN age(now(), xact_start) END)), 0) AS active,
+	 					coalesce(extract(epoch FROM max(CASE WHEN wait_event IS NOT NULL THEN age(now(), xact_start) END)), 0) AS waiting,
+						(SELECT coalesce(extract(epoch FROM max(age(now(), prepared))), 0) 
+						   FROM pg_prepared_xacts) AS prepared 
+	 				FROM pg_stat_activity) T;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), multiline).Scan(&transactionJSON)
+	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&transactionJSON)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}

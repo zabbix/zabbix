@@ -21,7 +21,8 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -31,13 +32,12 @@ const (
 // cacheHandler finds cache hit percent and returns int64 if all is OK or nil otherwise.
 func (p *Plugin) cacheHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var cache float64
-	multiline := `SELECT round(sum(blks_hit)*100/sum(blks_hit+blks_read), 2) FROM 
-		pg_catalog.pg_stat_database;`
+	query := `SELECT round(sum(blks_hit)*100/sum(blks_hit+blks_read), 2) FROM pg_catalog.pg_stat_database;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), multiline).Scan(&cache)
+	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&cache)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
 			return nil, errorEmptyResult
 		}
