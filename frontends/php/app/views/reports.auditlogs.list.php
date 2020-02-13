@@ -84,7 +84,9 @@ foreach ($data['auditlogs'] as $auditlog) {
 		array_key_exists($auditlog['resourcetype'], $data['resources'])
 			? $data['resources'][$auditlog['resourcetype']]
 			: _('Unknown resource'),
-		$data['actions'][$auditlog['action']],
+		array_key_exists($auditlog['action'], $data['actions'])
+			? $data['actions'][$auditlog['action']]
+			: _('Unknown action'),
 		$auditlog['resourceid'],
 		$auditlog['resourcename'],
 		$details ? $details : $auditlog['note']
