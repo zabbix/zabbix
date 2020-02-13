@@ -142,7 +142,8 @@ $data['web_layout_mode'] = CView::getLayoutMode();
 
 local_generateHeader($data);
 local_generateSidebar($data);
-echo '<div class="wrapper'.(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">';
+echo '<div class="'.ZBX_STYLE_LAYOUT_WRAPPER.
+	(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">';
 local_showMessage();
 echo $data['javascript']['pre'];
 echo $data['main_block'];

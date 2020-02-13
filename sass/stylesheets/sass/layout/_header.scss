@@ -9,7 +9,7 @@ header {
 	> div {
 		overflow: hidden;
 
-		&:last-child {
+		&:last-child:not(:first-of-type) {
 			flex-shrink: 0;
 			margin-left: auto;
 		}
@@ -17,16 +17,16 @@ header {
 
 	h1 {
 		position: relative;
-		line-height: 24px;
-		overflow: hidden;
 		padding-top: 1px;
+		overflow: hidden;
+		line-height: 24px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
 	a.link-action {
-		display: block;
 		box-sizing: border-box;
+		display: block;
 		height: 25px;
 
 		h1 {
@@ -37,9 +37,9 @@ header {
 				position: absolute;
 				top: 50%;
 				right: .15em;
-				margin-top: -.15em;
 				width: .3em;
 				height: .3em;
+				margin-top: -.15em;
 				border-right: 2px solid $font-color;
 				border-bottom: 2px solid $font-color;
 				transform: rotate(45deg);

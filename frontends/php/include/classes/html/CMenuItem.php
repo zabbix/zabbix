@@ -211,6 +211,15 @@ class CMenuItem extends CTag {
 	}
 
 	/**
+	 * Check, if item has submenu.
+	 *
+	 * @return bool
+	 */
+	public function hasSubMenu(): bool {
+		return ($this->sub_menu !== null);
+	}
+
+	/**
 	 * Set attribute target for the menu item link.
 	 *
 	 * @param string $target

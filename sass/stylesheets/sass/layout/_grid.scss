@@ -15,10 +15,6 @@ aside
 	box-sizing: border-box;
 }
 
-aside {
-
-}
-
 .wrapper {
 	display: flex;
 	flex: 1;
@@ -44,15 +40,7 @@ footer {
 	margin-top: auto;
 }
 
-
-/*
-
-
-main {
-	padding: 0 10px;
+output {
+	display: flex;
+	flex-direction: column;
 }
-
-footer {
-
-}
-*/

@@ -1,10 +1,10 @@
 .sidebar {
 	position: relative;
+	z-index: 998;
 	display: flex;
 	flex-direction: column;
 	width: max-content;
 	background: $sidebar-bg-color;
-	z-index: 998;
 
 	.sidebar-header {
 		padding: 12px;
@@ -68,6 +68,7 @@
 	.scrollable {
 
 		.scrollbar-track {
+			z-index: 1000;
 			background: $sidebar-scrollbar-track-color;
 		}
 

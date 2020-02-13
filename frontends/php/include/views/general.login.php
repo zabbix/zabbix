@@ -42,49 +42,52 @@ $http_login_link = $data['http_login_url']
 
 global $ZBX_SERVER_NAME;
 
-(new CTag('main', true, [
-	(isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '')
-		? (new CDiv($ZBX_SERVER_NAME))->addClass(ZBX_STYLE_SERVER_NAME)
-		: null,
-	(new CDiv([
-		(new CDiv(CBrandHelper::getLogo()))->addClass(ZBX_STYLE_LOGO),
-		(new CForm())
-			->cleanItems()
-			->setAttribute('aria-label', _('Sign in'))
-			->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
-			->addItem(
-				(new CList())
-					->addItem([
-						new CLabel(_('Username'), 'name'),
-						(new CTextBox('name'))->setAttribute('autofocus', 'autofocus'),
-						$error
-					])
-					->addItem([new CLabel(_('Password'), 'password'), (new CTextBox('password'))->setType('password')])
-					->addItem(
-						(new CCheckBox('autologin'))
-							->setLabel(_('Remember me for 30 days'))
-							->setChecked($data['autologin'])
-					)
-					->addItem(new CSubmit('enter', _('Sign in')))
-					->addItem($guest)
-					->addItem($http_login_link)
-			)
-	]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
-	(new CDiv([
-		(new CLink(_('Help'), CBrandHelper::getHelpUrl()))
-			->setTarget('_blank')
-			->addClass(ZBX_STYLE_GREY)
-			->addClass(ZBX_STYLE_LINK_ALT),
-		CBrandHelper::isRebranded() ? null : '&nbsp;&nbsp;•&nbsp;&nbsp;',
-		CBrandHelper::isRebranded()
-			? null
-			: (new CLink(_('Support'), getSupportUrl()))
+(new CDiv([
+	(new CTag('main', true, [
+		(isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '')
+			? (new CDiv($ZBX_SERVER_NAME))->addClass(ZBX_STYLE_SERVER_NAME)
+			: null,
+		(new CDiv([
+			(new CDiv(CBrandHelper::getLogo()))->addClass(ZBX_STYLE_SIGNIN_LOGO),
+			(new CForm())
+				->cleanItems()
+				->setAttribute('aria-label', _('Sign in'))
+				->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
+				->addItem(
+					(new CList())
+						->addItem([
+							new CLabel(_('Username'), 'name'),
+							(new CTextBox('name'))->setAttribute('autofocus', 'autofocus'),
+							$error
+						])
+						->addItem([new CLabel(_('Password'), 'password'), (new CTextBox('password'))->setType('password')])
+						->addItem(
+							(new CCheckBox('autologin'))
+								->setLabel(_('Remember me for 30 days'))
+								->setChecked($data['autologin'])
+						)
+						->addItem(new CSubmit('enter', _('Sign in')))
+						->addItem($guest)
+						->addItem($http_login_link)
+				)
+		]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
+		(new CDiv([
+			(new CLink(_('Help'), CBrandHelper::getHelpUrl()))
+				->setTarget('_blank')
+				->addClass(ZBX_STYLE_GREY)
+				->addClass(ZBX_STYLE_LINK_ALT),
+			CBrandHelper::isRebranded() ? null : '&nbsp;&nbsp;•&nbsp;&nbsp;',
+			CBrandHelper::isRebranded()
+				? null
+				: (new CLink(_('Support'), getSupportUrl()))
 				->setTarget('_blank')
 				->addClass(ZBX_STYLE_GREY)
 				->addClass(ZBX_STYLE_LINK_ALT)
-	]))->addClass(ZBX_STYLE_SIGNIN_LINKS)
-]))->show();
-
-makePageFooter(false)->show();
+		]))->addClass(ZBX_STYLE_SIGNIN_LINKS)
+	])),
+	makePageFooter(false)
+]))
+	->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
+	->show();
 ?>
 </body>

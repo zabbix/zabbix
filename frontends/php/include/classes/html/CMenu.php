@@ -149,6 +149,9 @@ class CMenu extends CTag {
 	public function setSelectedByAction(string $action_name): bool {
 		foreach ($this->menu_items as $item) {
 			if ($item->setSelectedByAction($action_name)) {
+				if ($item->hasSubMenu()) {
+					$item->addClass('is-expanded');
+				}
 				return true;
 			}
 		}
