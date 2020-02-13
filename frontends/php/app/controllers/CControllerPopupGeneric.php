@@ -802,7 +802,7 @@ class CControllerPopupGeneric extends CController {
 		$options = [
 			'editable' => $this->hasInput('writeonly'),
 			'preservekeys' => true,
-			'limit' => 10
+			'limit' => 25
 		];
 
 		$popups_support_templated_entries = ['applications', 'triggers', 'trigger_prototypes', 'graphs',
@@ -884,6 +884,9 @@ class CControllerPopupGeneric extends CController {
 
 				if (array_key_exists('real_hosts', $this->page_options)) {
 					$options['real_hosts'] = 1;
+				}
+				elseif ($this->hasInput('templated_hosts')) {
+					$options['templated_hosts'] = 1;
 				}
 
 				if ($this->hasInput('normal_only')) {

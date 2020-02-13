@@ -45,7 +45,7 @@ $fields = [
 	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
 	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
-	'groupid'			=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
+	'groupids'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'tags'				=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'mass_update_tags'	=> [T_ZBX_INT, O_OPT, null,		IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 								null
@@ -80,6 +80,7 @@ $fields = [
 	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_name'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
 	'filter_templates' =>  [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
+	'filter_groups'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
 	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
 								IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
 								null
@@ -94,9 +95,6 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
-	access_deny();
-}
 if (getRequest('templateid')) {
 	$templates = API::Template()->get([
 		'output' => [],
@@ -628,18 +626,6 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
 /*
  * Display
  */
-$pageFilter = new CPageFilter([
-	'config' => [
-		'individual' => 1
-	],
-	'groups' => [
-		'templated_hosts' => true,
-		'editable' => true
-	],
-	'groupid' => getRequest('groupid')
-]);
-$_REQUEST['groupid'] = $pageFilter->groupid;
-
 if (hasRequest('templates') && (getRequest('action') === 'template.massupdateform' || hasRequest('masssave'))) {
 	$data = [
 		'templates' => getRequest('templates', []),
@@ -763,14 +749,12 @@ elseif (hasRequest('form')) {
 		$data['macros'][] = $macro;
 	}
 
-	$groups = [];
-
 	if (!hasRequest('form_refresh')) {
 		if ($data['templateid'] != 0) {
 			$groups = zbx_objectValues($data['dbTemplate']['groups'], 'groupid');
 		}
-		elseif (getRequest('groupid', 0) != 0) {
-			$groups[] = getRequest('groupid');
+		else {
+			$groups = getRequest('groupids', []);
 		}
 	}
 	else {
@@ -846,6 +830,7 @@ else {
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.templates.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 		CProfile::updateArray('web.templates.filter_templates', getRequest('filter_templates', []), PROFILE_TYPE_ID);
+		CProfile::updateArray('web.templates.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
 		CProfile::update('web.templates.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 			PROFILE_TYPE_INT
 		);
@@ -867,6 +852,7 @@ else {
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.templates.filter_name');
 		CProfile::deleteIdx('web.templates.filter_templates');
+		CProfile::deleteIdx('web.templates.filter_groups');
 		CProfile::delete('web.templates.filter.evaltype');
 		CProfile::deleteIdx('web.templates.filter.tags.tag');
 		CProfile::deleteIdx('web.templates.filter.tags.value');
@@ -876,6 +862,7 @@ else {
 	$filter = [
 		'name' => CProfile::get('web.templates.filter_name', ''),
 		'templates' => CProfile::getArray('web.templates.filter_templates', null),
+		'groups' => CProfile::getArray('web.templates.filter_groups', null),
 		'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 		'tags' => []
 	];
@@ -901,21 +888,32 @@ else {
 		]), ['templateid' => 'id'])
 		: [];
 
-	if ($pageFilter->groupsSelected) {
-		$templates = API::Template()->get([
-			'output' => ['templateid', $sortField],
-			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
-			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name']
-			],
-			'parentTemplateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
-			'groupids' => $pageFilter->groupids,
+	// Get host groups.
+	$filter['groups'] = $filter['groups']
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter['groups'],
+			'templated_hosts' => true,
 			'editable' => true,
-			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1
-		]);
-	}
+			'preservekeys' => true
+		]), ['groupid' => 'id'])
+		: [];
+
+	// Select templates.
+	$templates = API::Template()->get([
+		'output' => ['templateid', $sortField],
+		'evaltype' => $filter['evaltype'],
+		'tags' => $filter['tags'],
+		'search' => [
+			'name' => ($filter['name'] === '') ? null : $filter['name']
+		],
+		'parentTemplateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
+		'groupids' => $filter['groups'] ? array_keys($filter['groups']) : null,
+		'editable' => true,
+		'sortfield' => $sortField,
+		'limit' => $config['search_limit'] + 1
+	]);
+
 	order_result($templates, $sortField, $sortOrder);
 
 	// pager
@@ -993,7 +991,6 @@ else {
 	}
 
 	$data = [
-		'pageFilter' => $pageFilter,
 		'templates' => $templates,
 		'paging' => $paging,
 		'page' => $page_num,

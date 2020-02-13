@@ -72,10 +72,23 @@ $filter
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
-			->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
+			->addRow(
+				(new CLabel(_('Host groups'), 'filter_groups__ms')),
+				(new CMultiSelect([
+					'name' => 'filter_groups[]',
+					'object_name' => 'hostGroup',
+					'data' => $data['filter']['groups'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'host_groups',
+							'srcfld1' => 'groupid',
+							'dstfrm' => $filter->getName(),
+							'dstfld1' => 'filter_groups_',
+							'templated_hosts' => 1,
+							'editable' => 1
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(
 				(new CLabel(_('Linked templates'), 'filter_templates__ms')),
@@ -93,36 +106,31 @@ $filter
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
 			),
 		(new CFormList())->addRow(_('Tags'), $filter_tags_table)
 	]);
 
 $widget = (new CWidget())
 	->setTitle(_('Templates'))
-	->setControls(new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getGroupsCB()
-				])
-			),
-		(new CTag('nav', true,
-			(new CList())
-				->addItem(new CRedirectButton(_('Create template'),
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create template'),
 				(new CUrl('templates.php'))
-					->setArgument('groupid', $data['pageFilter']->groupid)
+					->setArgument('groupids', array_keys($data['filter']['groups']))
 					->setArgument('form', 'create')
 					->getUrl()
-				))
-				->addItem(
-					(new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=template")')
 				)
+			)
+			->addItem(
+				(new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=template")')
+			)
 		))->setAttribute('aria-label', _('Content controls'))
-	]))
+	)
 	->addItem($filter);
 
 $form = (new CForm())->setName('templates');
@@ -285,7 +293,6 @@ $form->addItem([
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'export.templates.xml')
 					->setArgument('backurl', (new CUrl('templates.php'))
-						->setArgument('groupid', $data['pageFilter']->groupid)
 						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 						->getUrl())
 					->getUrl()
