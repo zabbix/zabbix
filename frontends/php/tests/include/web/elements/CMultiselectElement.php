@@ -180,8 +180,9 @@ class CMultiselectElement extends CElement {
 	 */
 	public function getControls() {
 		$buttons = [];
+		$xpath = 'xpath:.//button';
 
-		foreach ($this->query('xpath:.//button')->all() as $button) {
+		foreach ($this->query()->all() as $button) {
 			$buttons[$button->getText()] = $button;
 		}
 
