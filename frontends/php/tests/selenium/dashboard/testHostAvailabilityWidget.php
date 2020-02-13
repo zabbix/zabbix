@@ -106,10 +106,10 @@ class testHostAvailabilityWidget extends CWebTest {
 						'Show hosts in maintenance' => true
 					],
 					'expected_values' => [
-						'Total' => '7',
+						'Total' => '8',
 						'Available' => '2',
 						'Not available' => '2',
-						'Unknown' => '3'
+						'Unknown' => '4'
 					]
 				]
 			],
@@ -124,10 +124,10 @@ class testHostAvailabilityWidget extends CWebTest {
 						'Layout' => 'Vertical'
 					],
 					'expected_values' => [
-						'Total' => '5',
+						'Total' => '6',
 						'Available' => '1',
 						'Not available' => '1',
-						'Unknown' => '3'
+						'Unknown' => '4'
 					]
 				]
 			],
@@ -141,10 +141,10 @@ class testHostAvailabilityWidget extends CWebTest {
 						'Interface type' => 'JMX'
 					],
 					'expected_values' => [
-						'Total' => '6',
+						'Total' => '7',
 						'Available' => '1',
 						'Not available' => '1',
-						'Unknown' => '4'
+						'Unknown' => '5'
 					]
 				]
 			],
@@ -173,20 +173,20 @@ class testHostAvailabilityWidget extends CWebTest {
 						'SNMP' => [
 							'Available' => '2',
 							'Not available' => '2',
-							'Unknown' => '3',
-							'Total' => '7'
+							'Unknown' => '4',
+							'Total' => '8'
 						],
 						'JMX' => [
 							'Available' => '2',
 							'Not available' => '2',
-							'Unknown' => '4',
-							'Total' => '8'
+							'Unknown' => '5',
+							'Total' => '9'
 						],
 						'IPMI' => [
 							'Available' => '2',
 							'Not available' => '2',
-							'Unknown' => '3',
-							'Total' => '7'
+							'Unknown' => '4',
+							'Total' => '8'
 						]
 					]
 				]
@@ -213,14 +213,14 @@ class testHostAvailabilityWidget extends CWebTest {
 							'IPMI' => '1'
 						],
 						'Unknown' => [
-							'SNMP' => '3',
-							'JMX' => '4',
-							'IPMI' => '3'
+							'SNMP' => '4',
+							'JMX' => '5',
+							'IPMI' => '4'
 						],
 						'Total' => [
-							'SNMP' => '5',
-							'JMX' => '6',
-							'IPMI' => '5'
+							'SNMP' => '6',
+							'JMX' => '7',
+							'IPMI' => '6'
 						]
 					]
 				]
@@ -342,10 +342,10 @@ class testHostAvailabilityWidget extends CWebTest {
 						'Interface type' => 'JMX'
 					],
 					'expected_values' => [
-						'Total' => '6',
+						'Total' => '7',
 						'Available' => '1',
 						'Not available' => '1',
-						'Unknown' => '4'
+						'Unknown' => '5'
 					]
 				]
 			],

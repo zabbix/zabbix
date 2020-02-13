@@ -1849,15 +1849,6 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 				];
 			}
 			break;
-		case PAGE_TYPE_XML:
-			if ($title !== null) {
-				echo htmlspecialchars($title)."\n";
-			}
-
-			foreach ($messages as $message) {
-				echo '['.$message['type'].'] '.$message['message']."\n";
-			}
-			break;
 		case PAGE_TYPE_HTML:
 		default:
 			if ($title || $messages) {

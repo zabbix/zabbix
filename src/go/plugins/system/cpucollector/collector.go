@@ -172,28 +172,7 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 
 		fallthrough
 	case 2: // type parameter
-		switch params[1] {
-		case "", "user":
-			state = stateUser
-		case "idle":
-			state = stateIdle
-		case "nice":
-			state = stateNice
-		case "system":
-			state = stateSystem
-		case "iowait":
-			state = stateIowait
-		case "interrupt":
-			state = stateIrq
-		case "softirq":
-			state = stateSoftirq
-		case "steal":
-			state = stateSteal
-		case "guest":
-			state = stateGcpu
-		case "guest_nice":
-			state = stateGnice
-		default:
+		if state, err = p.getStateIndex(params[1]); err != nil {
 			return nil, errors.New("Invalid second parameter.")
 		}
 		fallthrough

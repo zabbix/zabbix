@@ -26,9 +26,6 @@
 require_once 'include/menu.inc.php';
 
 function local_generateHeader($data) {
-	// only needed for zbx_construct_menu
-	global $page;
-
 	header('Content-Type: text/html; charset=UTF-8');
 	header('X-Content-Type-Options: nosniff');
 	header('X-XSS-Protection: 1; mode=block');
