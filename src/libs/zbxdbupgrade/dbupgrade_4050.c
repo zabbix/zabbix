@@ -558,7 +558,7 @@ static int DBpatch_4050031(void)
 
 static int DBpatch_4050032(void)
 {
-	const ZBX_FIELD	field = {"note", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"note", "0", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBrename_field("auditlog", "details", &field);
 }
