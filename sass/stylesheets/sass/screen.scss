@@ -7743,7 +7743,7 @@ table.preprocessing-test-results {
 		&:hover,
 		&:focus,
 		&:active,
-		&[data-expanded="true"] {
+		&[aria-expanded="true"] {
 
 			&::before {
 				background-position: -399px -474px;
@@ -7762,7 +7762,7 @@ table.preprocessing-test-results {
 		&:hover,
 		&:focus,
 		&:active,
-		&[data-expanded="true"] {
+		&[aria-expanded="true"] {
 
 			&::before {
 				background-position: -399px -510px;
@@ -7811,7 +7811,7 @@ table.preprocessing-test-results {
 		}
 	}
 
-	&[data-expanded="true"] {
+	&[aria-expanded="true"] {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 
 		&::after {

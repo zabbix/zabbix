@@ -33,7 +33,8 @@
 		change(elem, value) {
 			$(elem)
 				.removeClass()
-				.addClass(['btn-alt', 'btn-dropdown-toggle', value.class].join(' '));
+				.addClass(['btn-alt', 'btn-dropdown-toggle', value.class].join(' '))
+				.attr({'aria-label': t('')});
 
 			$('input[type=hidden]', $(elem).parent())
 				.val(value.value)

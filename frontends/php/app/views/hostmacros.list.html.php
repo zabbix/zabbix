@@ -110,7 +110,7 @@ else {
 		}
 
 		$dropdown_options = [
-			'title' => _('Change type'),
+			'title' => _s('Change type'),
 			'active_class' => ($macro['type'] == ZBX_MACRO_TYPE_TEXT) ? ZBX_STYLE_ICON_TEXT : ZBX_STYLE_ICON_SECRET_TEXT,
 			'disabled' => $readonly,
 			'items' => [

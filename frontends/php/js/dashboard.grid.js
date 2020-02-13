@@ -114,6 +114,7 @@
 									}
 								}),
 								'attr': {
+									'aria-expanded': false,
 									'aria-haspopup': true
 								}
 							})

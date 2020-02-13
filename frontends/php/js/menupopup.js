@@ -1028,7 +1028,7 @@ jQuery(function($) {
 			// Close other action menus and prevent focus jumping before opening a new popup.
 			$('.menu-popup-top').menuPopup('close', null, false);
 
-			$opener.attr('data-expanded', 'true');
+			$opener.attr('aria-expanded', 'true');
 
 			var $menu_popup = $('<ul>', {
 					'role': 'menu',
@@ -1092,11 +1092,11 @@ jQuery(function($) {
 			$menu_popup.focus();
 		},
 
-		close: function(trigger_elmnt, return_focus) {
+		close: function(trigger_elem, return_focus) {
 			var menu_popup = $(this);
 
-			if (!menu_popup.is(trigger_elmnt) && menu_popup.has(trigger_elmnt).length === 0) {
-				$(trigger_elmnt).removeAttr('data-expanded');
+			if (!menu_popup.is(trigger_elem) && menu_popup.has(trigger_elem).length === 0) {
+				$('[aria-expanded="true"]', trigger_elem).attr({'aria-expanded': 'false'});
 				menu_popup.fadeOut(0);
 
 				$('.highlighted', menu_popup).removeClass('highlighted');
@@ -1110,7 +1110,7 @@ jQuery(function($) {
 
 				if (overlay && typeof overlay['element'] !== undefined) {
 					// Remove expanded attribute of the original opener.
-					$(overlay['element']).removeAttr('data-expanded');
+					$(overlay['element']).attr({'aria-expanded': 'false'});
 				}
 
 				menu_popup.remove();

@@ -36,9 +36,9 @@ class CButtonDropdown extends CTag {
 	 * @param string $name
 	 * @param string $value
 	 * @param array  $options
-	 * @param string $options['title']
+	 * @param string $options['title']           aria-label title
 	 * @param string $options['active_class']
-	 * @param bool   $options['disabled']     (optional)
+	 * @param bool   $options['disabled']        (optional)
 	 * @param array  $options['items']
 	 * @param string $options['items']['label']
 	 * @param string $options['items']['value']
@@ -54,15 +54,18 @@ class CButtonDropdown extends CTag {
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addItem(
 				(new CButton(null))
-					->setAttribute('title', $this->options['title'])
-					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, ZBX_STYLE_BTN_DROPDOWN_TOGGLE, $this->options['active_class']]))
+					->setAttribute('aria-label', $this->options['title'])
+					// In setMenuPopup is check for disabled attribute. Its why we set disabled before setMenuPopup.
+					->setEnabled(!$this->options['disabled'])
+					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, ZBX_STYLE_BTN_DROPDOWN_TOGGLE,
+						$this->options['active_class']
+					]))
 					->setMenuPopup([
 						'type' => 'dropdown',
 						'data' => [
 							'items' => $this->options['items']
 						]
 					])
-					->setEnabled(!$this->options['disabled'])
 			)
 			->addItem((new CInput('hidden', $name, $value))->addClass(ZBX_STYLE_BTN_DROPDOWN_VALUE));
 	}

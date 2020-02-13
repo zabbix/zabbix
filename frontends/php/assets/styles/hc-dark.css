@@ -5102,12 +5102,12 @@ table.preprocessing-test-results .rel-container {
 
 .icon-text::before {
   background: url(../img/icon-sprite.svg) no-repeat -87px -474px; }
-.icon-text:not(.highlighted):enabled:hover::before, .icon-text:not(.highlighted):enabled:focus::before, .icon-text:not(.highlighted):enabled:active::before, .icon-text:not(.highlighted):enabled[data-expanded="true"]::before {
+.icon-text:not(.highlighted):enabled:hover::before, .icon-text:not(.highlighted):enabled:focus::before, .icon-text:not(.highlighted):enabled:active::before, .icon-text:not(.highlighted):enabled[aria-expanded="true"]::before {
   background-position: -399px -474px; }
 
 .icon-secret::before {
   background: url(../img/icon-sprite.svg) no-repeat -87px -510px; }
-.icon-secret:not(.highlighted):enabled:hover::before, .icon-secret:not(.highlighted):enabled:focus::before, .icon-secret:not(.highlighted):enabled:active::before, .icon-secret:not(.highlighted):enabled[data-expanded="true"]::before {
+.icon-secret:not(.highlighted):enabled:hover::before, .icon-secret:not(.highlighted):enabled:focus::before, .icon-secret:not(.highlighted):enabled:active::before, .icon-secret:not(.highlighted):enabled[aria-expanded="true"]::before {
   background-position: -399px -510px; }
 
 .btn-dropdown-toggle {
@@ -5134,13 +5134,13 @@ table.preprocessing-test-results .rel-container {
     background: url(../img/icon-sprite.svg) no-repeat -547px -431px; }
   .btn-dropdown-toggle:enabled:hover::after, .btn-dropdown-toggle:enabled:focus::after, .btn-dropdown-toggle:enabled:active::after {
     background-position: -604px -431px; }
-  .btn-dropdown-toggle[data-expanded="true"] {
+  .btn-dropdown-toggle[aria-expanded="true"] {
     color: #333333;
     background-color: lightgray;
     border-color: lightgray; }
-    .btn-dropdown-toggle[data-expanded="true"]::after {
+    .btn-dropdown-toggle[aria-expanded="true"]::after {
       background: url(../img/icon-sprite.svg) no-repeat -604px -503px; }
-    .btn-dropdown-toggle[data-expanded="true"]:hover::after, .btn-dropdown-toggle[data-expanded="true"]:focus::after, .btn-dropdown-toggle[data-expanded="true"]:active::after {
+    .btn-dropdown-toggle[aria-expanded="true"]:hover::after, .btn-dropdown-toggle[aria-expanded="true"]:focus::after, .btn-dropdown-toggle[aria-expanded="true"]:active::after {
       background: url(../img/icon-sprite.svg) no-repeat -604px -503px; }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
