@@ -33,7 +33,8 @@
 			.val('')
 			.focus();
 
-		$btn_change.hide();
+		// $btn_change.hide();
+		$btn_change.prop('disabled', true);
 		$btn_undo.show();
 	}
 

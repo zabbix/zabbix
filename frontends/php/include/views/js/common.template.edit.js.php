@@ -30,11 +30,33 @@
 						->setAttribute('placeholder', '{$MACRO}'),
 					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				'&rArr;',
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
+					(new CDiv([
+						(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
+							->setAttribute('placeholder', _('value')),
+						new CButtonDropdown(
+							'macros[#{rowNum}][type]',
+							ZBX_MACRO_TYPE_TEXT,
+							[
+								'title' => json_encode(_('Change type')),
+								'active_class' => ZBX_STYLE_ICON_TEXT,
+								'items' => [
+									[
+										'value' => ZBX_MACRO_TYPE_TEXT,
+										'label' => _('Text'),
+										'class' => ZBX_STYLE_ICON_TEXT
+									],
+									[
+										'value' => ZBX_MACRO_TYPE_SECRET,
+										'label' => _('Secret text'),
+										'class' => ZBX_STYLE_ICON_SECRET_TEXT
+									]
+								]
+							]
+						)
+					]))
+						->addClass(ZBX_STYLE_INPUT_GROUP)
 						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-						->setAttribute('placeholder', _('value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
@@ -77,11 +99,33 @@
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 						->setAttribute('placeholder', '{$MACRO}')
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				'&rArr;',
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
+					(new CDiv([
+						(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
+							->setAttribute('placeholder', _('value')),
+						new CButtonDropdown(
+							'macros[#{rowNum}][type]',
+							ZBX_MACRO_TYPE_TEXT,
+							[
+								'title' => json_encode(_('Change type')),
+								'active_class' => ZBX_STYLE_ICON_TEXT,
+								'items' => [
+									[
+										'value' => ZBX_MACRO_TYPE_TEXT,
+										'label' => _('Text'),
+										'class' => ZBX_STYLE_ICON_TEXT
+									],
+									[
+										'value' => ZBX_MACRO_TYPE_SECRET,
+										'label' => _('Secret text'),
+										'class' => ZBX_STYLE_ICON_SECRET_TEXT
+									]
+								]
+							]
+						)
+					]))
+						->addClass(ZBX_STYLE_INPUT_GROUP)
 						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-						->setAttribute('placeholder', _('value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
@@ -136,25 +180,37 @@
 
 						jQuery('#macros_' + macro_num + '_inherited_type')
 							.val(jQuery('#macros_' + macro_num + '_inherited_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
+
 						jQuery('#macros_' + macro_num + '_description')
 							.prop('readonly', true)
 							.val(jQuery('#macros_' + macro_num + '_inherited_description').val())
 							.trigger('input');
+
 						jQuery('#macros_' + macro_num + '_type_btn')
 							.buttonDropdown('change', jQuery('#macros_' + macro_num + '_type_btn'), {value: macro_type,
-								class: (macro_type == '1') ? 'icon-secret' : 'icon-text'
+								class: (macro_type == <?= ZBX_MACRO_TYPE_SECRET ?>)
+									? '<?= ZBX_STYLE_ICON_SECRET_TEXT ?>'
+									: '<?= ZBX_STYLE_ICON_TEXT ?>'
 							});
 						jQuery('#macros_' + macro_num + '_type_btn')
 							.prop('disabled', true)
 							.attr({'aria-haspopup': false});
+
 						jQuery('#macros_' + macro_num + '_value')
 							.prop('readonly', true)
 							.val(jQuery('#macros_' + macro_num + '_inherited_value').val())
 							.trigger('input');
-						if (macro_type == '1') {
+
+						if (macro_type == <?= ZBX_MACRO_TYPE_SECRET ?>) {
 							jQuery('#macros_' + macro_num + '_value').prop('disabled', true);
 						}
-						jQuery('#macros_' + macro_num + '_value').closest('.input-group').find('.btn-undo').hide();
+
+						jQuery('#macros_' + macro_num + '_value_btn').prop('disabled', true);
+						jQuery('#macros_' + macro_num + '_value')
+							.closest('.input-group')
+							.find('.btn-undo')
+							.hide();
+
 						jQuery('#macros_' + macro_num + '_change').text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
 					}
 					else {
@@ -163,6 +219,7 @@
 						jQuery('#macros_' + macro_num + '_value')
 							.prop('readonly', false)
 							.focus();
+						jQuery('#macros_' + macro_num + '_value_btn').prop('disabled', false);
 						jQuery('#macros_' + macro_num + '_description').prop('readonly', false);
 						jQuery('#macros_' + macro_num + '_type_btn')
 							.prop('disabled', false)
@@ -196,6 +253,7 @@
 							}))
 							.append(jQuery('<button>').attr({
 								type: 'button',
+								id: $input.attr('name').replace(/\[/g, '_').replace(/\]/g, '') + '_btn',
 								class: '<?= ZBX_STYLE_BTN_CHANGE ?>'
 							}).text(<?= json_encode(_('Set new value')) ?>))
 							.inputSecret()
@@ -243,14 +301,21 @@
 						$textarea.replaceWith(
 							jQuery('<div>')
 								.addClass('input-secret')
-								.append(jQuery('<input>').attr({
-									id: $textarea.attr('id'),
-									name: $textarea.attr('name'),
-									type: 'password',
-									value: $textarea.val(),
-									placeholder: $textarea.attr('placeholder'),
-									maxlength: $textarea.attr('maxlength')
-								}))
+								.append(
+									jQuery('<input>').attr({
+										id: $textarea.attr('id'),
+										name: $textarea.attr('name'),
+										type: 'password',
+										value: $textarea.val(),
+										placeholder: $textarea.attr('placeholder'),
+										maxlength: $textarea.attr('maxlength')
+									}),
+									jQuery('<button>')
+										.attr({id: $textarea.attr('id') + '_btn', type: 'button'})
+										.prop('disabled', true)
+										.addClass('<?= ZBX_STYLE_BTN_CHANGE ?>')
+										.text(<?= json_encode(_('Set new value')) ?>)
+								)
 								.inputSecret()
 						);
 					}

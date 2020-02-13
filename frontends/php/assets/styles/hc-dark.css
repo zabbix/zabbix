@@ -1483,7 +1483,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
   box-sizing: border-box;
   color: #ffffff;
   outline: 0;
-  transition: border-color .2s ease-out; }
+  transition: border-color .2s ease-out, box-shadow .2s ease-out; }
   .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
     border-color: #bbbbbb; }
 
@@ -5055,7 +5055,8 @@ table.preprocessing-test-results .rel-container {
       border-top: 1px solid #666666;
       border-bottom: 1px solid #666666;
       border-radius: 0;
-      background-color: #383838; }
+      background-color: #383838;
+      transition: border-color .2s ease-out, box-shadow .2s ease-out; }
       .input-group button.btn-undo::before {
         position: absolute;
         top: 0;
@@ -5093,7 +5094,7 @@ table.preprocessing-test-results .rel-container {
     left: 0;
     width: 100%;
     opacity: 0; }
-    .input-secret button:hover, .input-secret button:focus, .input-secret button:active {
+    .input-secret button:enabled:hover, .input-secret button:enabled:focus, .input-secret button:enabled:active {
       opacity: 1;
       animation: fadein .2s; }
 
@@ -5492,8 +5493,7 @@ a.link-action {
   transition: box-shadow .2s ease-out; }
 
 .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
-  box-shadow: 0 0 0 1px #ffffff;
-  transition: box-shadow .2s ease-out; }
+  box-shadow: 0 0 0 1px #ffffff; }
 
 .progress-bar-container a:hover .progress-bar-label, .progress-bar-container a:focus .progress-bar-label {
   color: #ffffff !important; }
@@ -5877,3 +5877,6 @@ td.inactive-bg {
   .by-severity-widget > div::after {
     top: 50%;
     transform: translateY(-50%); }
+
+.btn-undo.is-focused {
+  box-shadow: 0 1px 0px #ffffff, 0 -1px 0px #ffffff; }

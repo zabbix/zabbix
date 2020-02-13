@@ -58,11 +58,13 @@ class CInputSecret extends CTag {
 				(new CPassBox($name, $value))
 					->setAttribute('placeholder', $placeholder)
 					->setEnabled(false)
+			)
+			->addItem(
+				(new CButton(null, _('Set new value')))
+					->addClass(ZBX_STYLE_BTN_CHANGE)
+					->setId(zbx_formatDomId($name.'[btn]'))
+					->setEnabled(!$this->options['disabled'])
 			);
-
-		if (!$this->options['disabled']) {
-			$this->addItem((new CButton(null, _('Set new value')))->addClass(ZBX_STYLE_BTN_CHANGE));
-		}
 
 		if ($this->options['add_post_js']) {
 			zbx_add_post_js($this->getPostJS());
