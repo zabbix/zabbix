@@ -115,10 +115,11 @@
 			})
 			.on('click', '.btn-undo', function() {
 				var $this = $(this),
-					$container = $(this).closest('.input-group')
+					$container = $(this).closest('.input-group'),
+					$input_container = $('.input-secret, .textarea-flexible', $container),
 					$input = $('.input-secret input[type=password], .textarea-flexible', $container);
 
-				$input.replaceWith(
+				$input_container.replaceWith(
 					$('<div>')
 						.addClass('input-secret')
 						.append($('<input>').attr({
