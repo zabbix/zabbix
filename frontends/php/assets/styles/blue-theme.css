@@ -371,28 +371,51 @@ footer {
 	}
 */
 .form-search {
-  margin-top: 12px;
-  margin-left: -2px;
-  position: relative; }
+  position: relative;
+  margin-top: 12px; }
   .form-search .search {
+    display: block;
+    width: 100%;
+    padding-right: 20px;
+    color: #ffffff;
     background: #092637;
     border: 1px solid #010a0f;
-    border-radius: 3px;
-    color: #ffffff;
-    padding-right: 20px;
-    display: block;
-    width: 100%; }
+    border-radius: 3px; }
     .form-search .search:focus + .search-icon {
       opacity: 1; }
   .form-search .search-icon {
-    background: url(../img/icon-sprite.svg) no-repeat -90px -12px;
-    height: 12px;
-    width: 12px;
     position: absolute;
-    right: 4px;
     top: 6px;
+    right: 4px;
+    width: 12px;
+    height: 12px;
+    background: url(../img/icon-sprite.svg) no-repeat -90px -12px;
     opacity: .75;
     transition: opacity true ease-out; }
+
+.search-suggest {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  min-width: 16px;
+  padding: 0 5px;
+  color: #768d99;
+  background-color: #ffffff;
+  border: 1px solid #ccd5d9;
+  border-top: 0;
+  box-shadow: 0 6px 10px 0 rgba(118, 141, 153, 0.5); }
+  .search-suggest li {
+    display: block;
+    height: inherit;
+    padding: .4em 5px;
+    margin: 0 -5px;
+    color: #1f2c33;
+    line-height: normal;
+    cursor: pointer;
+    transition: background-color .2s ease-out; }
+    .search-suggest li.suggest-hover {
+      background-color: #e8f5ff; }
 
 .icon-dashboard::before, .icon-problems::before, .icon-monitoring::before, .icon-inventory::before, .icon-reports::before, .icon-configuration::before, .icon-administration::before {
   content: '';
@@ -3169,28 +3192,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border-top: 1px solid #ccd5d9;
     border-left: 1px solid #ccd5d9;
     transform: rotate(45deg); }
-
-.search-suggest {
-  position: absolute;
-  z-index: 1000;
-  padding: 0 5px;
-  min-width: 16px;
-  color: #768d99;
-  background-color: #ffffff;
-  border: 1px solid #ccd5d9;
-  border-top: 0;
-  box-shadow: 0 6px 10px 0 rgba(118, 141, 153, 0.5); }
-  .search-suggest li {
-    display: block;
-    height: inherit;
-    line-height: normal;
-    color: #1f2c33;
-    padding: .4em 5px;
-    margin: 0 -5px;
-    cursor: pointer;
-    transition: background-color .2s ease-out; }
-    .search-suggest li.suggest-hover {
-      background-color: #e8f5ff; }
 
 .overlay-dialogue {
   display: table;

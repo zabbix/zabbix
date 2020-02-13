@@ -1,16 +1,15 @@
 .form-search {
-	margin-top: 12px;
-	margin-left: -2px;
 	position: relative;
+	margin-top: 12px;
 
 	.search {
+		display: block;
+		width: 100%;
+		padding-right: 20px;
+		color: $white;
 		background: $form-search-bg-color;
 		border: 1px solid $form-search-border-color;
 		border-radius: 3px;
-		color: $white;
-		padding-right: 20px;
-		display: block;
-		width: 100%;
 
 		&:focus + .search-icon {
 			opacity: 1;
@@ -18,16 +17,45 @@
 	}
 
 	.search-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -90px -12px;
-		height: 12px;
-		width: 12px;
 		position: absolute;
-		right: 4px;
 		top: 6px;
+		right: 4px;
+		width: 12px;
+		height: 12px;
+		background: url(../img/icon-sprite.svg) no-repeat -90px -12px;
 		opacity: .75;
 
 		@if $ui-transitions {
 			transition: opacity $ui-transitions ease-out;
+		}
+	}
+}
+
+.search-suggest {
+	position: absolute;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+	min-width: 16px;
+	padding: 0 5px;
+	color: $font-alt-color;
+	background-color: $form-bg-color;
+	border: 1px solid $action-border-color;
+	border-top: 0;
+	box-shadow: 0 6px 10px 0 $action-shadow-color;
+
+	li {
+		display: block;
+		height: inherit;
+		padding: .4em 5px;
+		margin: 0 -5px;
+		color: $font-color;
+		line-height: normal;
+		cursor: pointer;
+		transition: background-color .2s ease-out;
+
+		&.suggest-hover {
+			background-color: $action-hover-color;
 		}
 	}
 }

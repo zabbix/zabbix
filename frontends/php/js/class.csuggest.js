@@ -456,11 +456,9 @@ var CSuggest = Class.create({
 			return true;
 		}
 
-		var pos = jQuery(this.dom.input).offset(),
-			dims = getDimensions(this.dom.input);
+		var dims = getDimensions(this.dom.input);
 
-		this.dom.suggest.style.top = (pos.top + dims.height) + 'px';
-		this.dom.suggest.style.left = '0px';
+		this.dom.suggest.style.top = dims.height + 'px';
 	},
 
 	newSugTab: function(needle) {
