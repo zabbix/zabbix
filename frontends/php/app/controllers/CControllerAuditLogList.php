@@ -50,7 +50,9 @@ class CControllerAuditLogList extends CController {
 		if ($this->getInput('filter_set', 0)) {
 			CProfile::update('web.auditlogs.filter.alias', $this->getInput('alias', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.auditlogs.filter.action', $this->getInput('auditlog_action', -1), PROFILE_TYPE_INT);
-			CProfile::update('web.auditlogs.filter.resourcetype', $this->getInput('resourcetype', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.auditlogs.filter.resourcetype', $this->getInput('resourcetype', -1),
+				PROFILE_TYPE_INT
+			);
 		}
 		elseif ($this->getInput('filter_rst', 0)) {
 			CProfile::delete('web.auditlogs.filter.alias');
