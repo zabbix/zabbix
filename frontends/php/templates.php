@@ -926,9 +926,7 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$paging = CPagerHelper::paginate($page_num, $templates, $sortOrder,
-		(new CUrl('templates.php'))->setArgument('groupid', getRequest('groupid', 0))
-	);
+	$paging = CPagerHelper::paginate($page_num, $templates, $sortOrder, new CUrl('templates.php'));
 
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
