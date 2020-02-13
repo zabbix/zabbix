@@ -877,9 +877,6 @@ else {
 
 	$config = select_config();
 
-	// get templates
-	$templates = [];
-
 	$filter['templates'] = $filter['templates']
 		? CArrayHelper::renameObjectsKeys(API::Template()->get([
 			'output' => ['templateid', 'name'],
