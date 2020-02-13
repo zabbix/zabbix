@@ -192,15 +192,15 @@
 	}
 
 	jQuery(function() {
-		addDCheck(<?= CJs::encodeJson(array_values($data['drule']['dchecks'])) ?>);
+		addDCheck(<?= json_encode(array_values($data['drule']['dchecks'])) ?>);
 
-		jQuery('input:radio[name="uniqueness_criteria"][value=<?= CJs::encodeJson($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="host_source"][value=<?= CJs::encodeJson($data['drule']['host_source']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="name_source"][value=<?= CJs::encodeJson($data['drule']['name_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="uniqueness_criteria"][value=<?= json_encode($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="host_source"][value=<?= json_encode($data['drule']['host_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="name_source"][value=<?= json_encode($data['drule']['name_source']) ?>]').attr('checked', 'checked');
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
-				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.text(<?= json_encode(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#form').val('clone');
@@ -346,7 +346,7 @@
 					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				if (hasDCheckDuplicates()) {
-					jQuery(makeMessageBox('bad', <?= CJs::encodeJson(_('Check already exists.')) ?>, null, true, false))
+					jQuery(makeMessageBox('bad', <?= json_encode(_('Check already exists.')) ?>, null, true, false))
 						.insertBefore($form);
 
 					return false;

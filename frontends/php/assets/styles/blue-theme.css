@@ -391,10 +391,10 @@ ul.top-nav-icons {
   margin: -10px 0 10px;
   padding: 10px 0 6px;
   border-bottom: 1px solid #dfe4e7; }
-  .header-title > div {
+  .header-title > div:first-child {
     overflow: hidden; }
-    .header-title > div:last-child {
-      flex-shrink: 0; }
+  .header-title > div:last-child {
+    flex-shrink: 0; }
   .header-title h1 {
     position: relative;
     line-height: 24px;
@@ -4996,8 +4996,10 @@ svg {
 .inline-sr-only {
   font-size: 0; }
 
+.item-test-popup-value-row,
 .preproc-test-popup-value-row {
   display: flex; }
+  .item-test-popup-value-row label,
   .preproc-test-popup-value-row label {
     padding: 0 10px;
     margin-left: auto;

@@ -173,6 +173,26 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_expire_data                                                   *
+ *                                                                            *
+ * Purpose: process expired data task                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_expire_data(zbx_uint64_t taskid)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
+
+	DBbegin();
+
+	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_EXPIRED, taskid);
+
+	DBcommit();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_process_remote_command_result                                 *
  *                                                                            *
  * Purpose: process remote command result task                                *
@@ -243,6 +263,48 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_process_data_result                                           *
+ *                                                                            *
+ * Purpose: process data task result                                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_process_data_result(zbx_uint64_t taskid)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	parent_taskid = 0;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
+
+	DBbegin();
+
+	result = DBselect("select parent_taskid"
+			" from task_result"
+			" where taskid=" ZBX_FS_UI64,
+			taskid);
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(parent_taskid, row[0]);
+
+	DBfree_result(result);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where taskid=" ZBX_FS_UI64,
+			ZBX_TM_STATUS_DONE, taskid);
+	if (0 != parent_taskid)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or taskid=" ZBX_FS_UI64, parent_taskid);
+
+	DBexecute("%s", sql);
+	zbx_free(sql);
+
+	DBcommit();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -552,6 +614,18 @@ static int	tm_process_tasks(int now)
 					zbx_vector_uint64_append(&expire_taskids, taskid);
 				else
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
+				break;
+			case ZBX_TM_TASK_DATA:
+				/* both - 'new' and 'in progress' tasks should expire */
+				if (0 != ttl && clock + ttl < now)
+				{
+					tm_expire_data(taskid);
+					expired_num++;
+				}
+				break;
+			case ZBX_TM_TASK_DATA_RESULT:
+				tm_process_data_result(taskid);
+				processed_num++;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;

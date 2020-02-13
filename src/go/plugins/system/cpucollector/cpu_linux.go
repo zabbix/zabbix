@@ -27,6 +27,7 @@ import "C"
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"os"
 	"strconv"
 	"strings"
@@ -102,4 +103,32 @@ func (p *Plugin) collect() (err error) {
 
 func (p *Plugin) numCPU() int {
 	return int(C.sysconf(C._SC_NPROCESSORS_CONF))
+}
+
+func (p *Plugin) getStateIndex(state string) (index int, err error) {
+	switch state {
+	case "", "user":
+		index = stateUser
+	case "idle":
+		index = stateIdle
+	case "nice":
+		index = stateNice
+	case "system":
+		index = stateSystem
+	case "iowait":
+		index = stateIowait
+	case "interrupt":
+		index = stateIrq
+	case "softirq":
+		index = stateSoftirq
+	case "steal":
+		index = stateSteal
+	case "guest":
+		index = stateGcpu
+	case "guest_nice":
+		index = stateGnice
+	default:
+		err = errors.New("unsupported state")
+	}
+	return
 }

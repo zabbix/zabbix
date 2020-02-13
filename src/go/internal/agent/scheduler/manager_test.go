@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/alias"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/log"
@@ -227,6 +228,7 @@ func (m *mockManager) iterate(t *testing.T, iters int) {
 
 func (m *mockManager) mockInit(t *testing.T) {
 	m.init()
+	m.aliases, _ = alias.NewManager(nil)
 	clock := time.Now().Unix()
 	m.startTime = time.Unix(clock-clock%10, 100)
 	t.Logf("starting time %s", m.startTime.Format(time.Stamp))
