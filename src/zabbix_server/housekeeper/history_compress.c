@@ -83,7 +83,6 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 
 		i++;
 	}
-
 	DBfree_result(result);
 
 	if (1 != i || 1 == configure)
