@@ -19,7 +19,9 @@
 **/
 
 
-/** @var CView $this */
+/**
+ * @var CView $this
+ */
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
