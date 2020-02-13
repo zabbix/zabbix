@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
 ** Zabbix
@@ -26,11 +25,11 @@ declare(strict_types=1);
  */
 class CControllerHostViewRefresh extends CControllerHost {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$severities = [];
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severities[] = $severity;
@@ -76,11 +75,11 @@ class CControllerHostViewRefresh extends CControllerHost {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$filter = [
 			'name' => $this->getInput('filter_name', ''),
 			'groupids' => $this->hasInput('filter_groupids') ? $this->getInput('filter_groupids') : null,

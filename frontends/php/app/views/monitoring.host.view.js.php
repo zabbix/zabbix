@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -21,6 +19,9 @@ declare(strict_types=1);
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
 	<?= (new CRow([

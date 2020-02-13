@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
 ** Zabbix
@@ -44,8 +43,10 @@ abstract class CControllerHost extends CController {
 	 * @param int    $filter['page']                Page number.
 	 * @param string $sort						    Sorting field.
 	 * @param string $sortorder                     Sorting order.
+	 *
+	 * @return array
 	 */
-	protected function prepareData(array $filter, $sort, $sortorder) {
+	protected function prepareData(array $filter, string $sort, string $sortorder): array {
 		$child_groups = [];
 
 		// Multiselect host groups.
