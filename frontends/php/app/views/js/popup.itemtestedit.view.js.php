@@ -19,7 +19,10 @@
 **/
 
 
-ob_start(); ?>
+/**
+ * @var CView $this
+ */
+?>
 
 /**
  * Make step result UI element.
@@ -510,5 +513,3 @@ jQuery(document).ready(function($) {
 
 	$('#preprocessing-test-form .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 });
-
-<?php return ob_get_clean(); ?>
