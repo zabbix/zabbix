@@ -24,6 +24,8 @@
 
 #define ZBX_TS_SEGMENT_BY	"itemid"
 #define ZBX_TS_UNIX_NOW		"zbx_ts_unix_now"
+#define ZBX_TS_UNIX_NOW_CREATE	"create or replace function "ZBX_TS_UNIX_NOW"() returns integer language sql" \
+				" stable as $$ select extract(epoch from now())::integer $$"
 #define COMPRESSION_TOLERANCE	(SEC_PER_HOUR * 2)
 
 typedef enum
@@ -81,6 +83,7 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 
 		i++;
 	}
+
 	DBfree_result(result);
 
 	if (1 != i || 1 == configure)
@@ -142,23 +145,19 @@ static void	hk_check_table_compression_age(const char *table_name, int age)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d", __func__, table_name, age);
 
-	obsolescence_threshold = hk_get_table_compression_age(table_name);
-
-	if (age != obsolescence_threshold)
+	if (age != (obsolescence_threshold = hk_get_table_compression_age(table_name)))
 	{
-		DB_RESULT	result;
+		DB_RESULT	res;
 
 		if (0 != obsolescence_threshold)
 			DBfree_result(DBselect("select remove_compress_chunks_policy('%s')", table_name));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "adding compression policy to table: %s age %d", table_name, age);
 
-		result = DBselect("select add_compress_chunks_policy('%s', integer '%d')", table_name, age);
-
-		if (NULL == result)
+		if (NULL == (res = DBselect("select add_compress_chunks_policy('%s', integer '%d')", table_name, age)))
 			zabbix_log(LOG_LEVEL_ERR, "failed to add compression policy to table '%s'", table_name);
 
-		DBfree_result(result);
+		DBfree_result(res);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -245,8 +244,7 @@ void	hk_history_compression_init(void)
 			}
 			else
 			{
-				DBexecute("create or replace function "ZBX_TS_UNIX_NOW"() returns integer language sql"
-						" stable as $$ select extract(epoch from now())::integer $$");
+				DBexecute(ZBX_TS_UNIX_NOW_CREATE);
 				hk_history_enable_compression(cfg.db.history_compress_older + COMPRESSION_TOLERANCE);
 			}
 		}
@@ -287,8 +285,7 @@ void	hk_history_compression_update(zbx_config_db_t *cfg)
 
 	if (ON == cfg->history_compression_status)
 	{
-		DBexecute("create or replace function "ZBX_TS_UNIX_NOW"() returns integer language sql"
-				" stable as $$ select extract(epoch from now())::integer $$");
+		DBexecute(ZBX_TS_UNIX_NOW_CREATE);
 
 		if (cfg->history_compression_status != compression_status_cache ||
 				cfg->history_compress_older != compress_older_cache)
