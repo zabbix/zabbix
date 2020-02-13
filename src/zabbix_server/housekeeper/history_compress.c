@@ -53,48 +53,6 @@ static int		compress_older_cache = 0;
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_create_ts_unix_now_func                                       *
- *                                                                            *
- * Purpose: Create time series current time function, which is used by        *
- *          TimescaleDB for old history element compression.                  *
- *                                                                            *
- * Return value: SUCCEED - function successfully created                      *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	hk_create_ts_unix_now_func(void)
-{
-	int	ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (ZBX_DB_OK > DBexecute("create or replace function "ZBX_TS_UNIX_NOW"() returns integer language sql stable"
-			" as $$ select extract(epoch from now())::integer $$"))
-	{
-		ret = FAIL;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: hk_set_table_time_function                                       *
- *                                                                            *
- * Purpose: set time function to hypertable for old data compression          *
- *                                                                            *
- * Parameters: table_name - [IN] hypertable name                              *
- *                                                                            *
- ******************************************************************************/
-static void	hk_set_table_time_function(const char *table_name)
-{
-	DBfree_result(DBselect("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)", table_name));
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: hk_check_table_segmentation                                      *
  *                                                                            *
  * Purpose: check that hypertables are segmented by itemid                    *
@@ -223,7 +181,8 @@ static void	hk_history_enable_compression(int age)
 
 	for (i = 0; i < (int)ARRSIZE(compression_tables); i++)
 	{
-		hk_set_table_time_function(compression_tables[i].name);
+		DBfree_result(DBselect("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)",
+				compression_tables[i].name));
 		hk_check_table_segmentation(compression_tables[i].name, compression_tables[i].type);
 		hk_check_table_compression_age(compression_tables[i].name, age);
 	}
@@ -286,7 +245,8 @@ void	hk_history_compression_init(void)
 			}
 			else
 			{
-				hk_create_ts_unix_now_func();
+				DBexecute("create or replace function "ZBX_TS_UNIX_NOW"() returns integer language sql"
+						" stable as $$ select extract(epoch from now())::integer $$");
 				hk_history_enable_compression(cfg.db.history_compress_older + COMPRESSION_TOLERANCE);
 			}
 		}
@@ -327,7 +287,8 @@ void	hk_history_compression_update(zbx_config_db_t *cfg)
 
 	if (ON == cfg->history_compression_status)
 	{
-		hk_create_ts_unix_now_func();
+		DBexecute("create or replace function "ZBX_TS_UNIX_NOW"() returns integer language sql"
+				" stable as $$ select extract(epoch from now())::integer $$");
 
 		if (cfg->history_compression_status != compression_status_cache ||
 				cfg->history_compress_older != compress_older_cache)
