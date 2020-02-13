@@ -111,13 +111,16 @@ Overlay.prototype.centerDialog = function() {
 	});
 
 	var size = {
-			width: this.$dialogue.width(),
-			height: this.$dialogue.height(),
+			width: this.$dialogue.$body[0].scrollWidth,
+			height: this.$dialogue.$body[0].scrollHeight
 		},
 		size_saved = this.$dialogue.data('size') || size;
 
 	if (size.width != size_saved.width || size.height != size_saved.height) {
-		this.$dialogue.trigger('overlay-dialogue-resize');
+		this.$dialogue.trigger('overlay-dialogue-resize', {
+			width: {'old': size_saved.width, 'new': size.width},
+			height: {'old': size_saved.height, 'new': size.height}
+		});
 	}
 
 	this.$dialogue.data('size', size);

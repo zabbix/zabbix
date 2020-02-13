@@ -303,9 +303,11 @@ $scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, select, .m
 $scripts[] =
 	'jQuery(function($) {'.
 		'onGraphConfigChange();'.
-		'$(".overlay-dialogue").on("overlay-dialogue-resize", function() {'.
+		'$(".overlay-dialogue").on("overlay-dialogue-resize", function(event, data) {'.
 			'if (jQuery("#svg-graph-preview").length) {'.
-				'onGraphConfigChange();'.
+				'if (data.width["old"] != data.width["new"]) {'.
+					'onGraphConfigChange();'.
+				'}'.
 			'}'.
 			'else {'.
 				'$(".overlay-dialogue").off("overlay-dialogue-resize");'.
