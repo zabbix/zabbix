@@ -504,11 +504,13 @@ class CScreenHistory extends CScreenBase {
 			if ($this->mode == SCREEN_MODE_JS) {
 				$timeControlData['dynamic'] = 0;
 
-				return 'timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).', '.CJs::encodeJson($timeControlData).');';
+				return 'timeControl.addObject("'.$this->getDataId().'", '.json_encode($this->timeline).', '.
+					json_encode($timeControlData).');';
 			}
-			else {
-				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).', '.CJs::encodeJson($timeControlData).');');
-			}
+
+			zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.json_encode($this->timeline).', '.
+				json_encode($timeControlData).');'
+			);
 		}
 
 		if ($this->mode != SCREEN_MODE_JS) {

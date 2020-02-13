@@ -161,11 +161,11 @@ else {
 		$dashboard_options['updated'] = true;
 	}
 
-	// must be done before adding widgets, because it causes dashboard to resize.
+	// Must be done before adding widgets, because it causes dashboard to resize.
 	if ($data['show_timeselector']) {
 		$this->addPostJS(
-			'timeControl.addObject("scrollbar", '.CJs::encodeJson($data['timeline']).', '.
-				CJs::encodeJson($data['timeControlData']).
+			'timeControl.addObject("scrollbar", '.json_encode($data['timeline']).', '.
+				json_encode($data['timeControlData']).
 			');'.
 			'timeControl.processObjects();'
 		);
@@ -174,10 +174,10 @@ else {
 	// Initialize dashboard grid.
 	$this->addPostJS(
 		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
-			'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
-			'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
-			'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.
-			'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).
+			'.dashboardGrid('.json_encode($dashboard_options).')'.
+			'.dashboardGrid("setDashboardData", '.json_encode($dashboard_data).')'.
+			'.dashboardGrid("setWidgetDefaults", '.json_encode($data['widget_defaults']).')'.
+			'.dashboardGrid("addWidgets", '.json_encode($data['grid_widgets']).
 		');'
 	);
 }

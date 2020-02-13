@@ -3,7 +3,7 @@
 		initPMaster(
 			'slideshows',
 			<?=
-				CJs::encodeJson([
+				json_encode([
 					WIDGET_SLIDESHOW => [
 						'frequency' => timeUnitToSeconds($data['element']['delay']) * $data['refreshMultiplier'],
 						'url' => 'slides.php?output=html&elementid='.$this->data['elementId'].
