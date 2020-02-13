@@ -203,11 +203,10 @@ static void	hk_history_disable_compression(void)
 
 	for (i = 0; i < (int)ARRSIZE(compression_tables); i++)
 	{
-		if (0 != hk_get_table_compression_age(compression_tables[i].name))
-		{
-			DBfree_result(DBselect("select remove_compress_chunks_policy('%s')",
-					compression_tables[i].name));
-		}
+		if (0 == hk_get_table_compression_age(compression_tables[i].name))
+			continue;
+
+		DBfree_result(DBselect("select remove_compress_chunks_policy('%s')", compression_tables[i].name));
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -252,7 +251,7 @@ void	hk_history_compression_init(void)
 			hk_history_disable_compression();
 		}
 	}
-	else
+	else if (ON == cfg.db.history_compression_status)
 	{
 		disable_compression = 1;
 	}
