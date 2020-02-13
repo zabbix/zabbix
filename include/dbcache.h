@@ -370,7 +370,7 @@ typedef struct
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
 
-	/* database extension configuration data */
+	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
 
 	/* housekeeping related configuration data */

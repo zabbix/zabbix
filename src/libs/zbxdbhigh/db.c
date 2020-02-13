@@ -728,7 +728,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 void	DBcheck_capabilities(void)
 {
 #ifdef HAVE_POSTGRESQL
-	int	compression_available = 0;
+	int	compression_available = OFF;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -739,9 +739,7 @@ void	DBcheck_capabilities(void)
 		DB_ROW		row;
 		int		major, minor, patch, version;
 
-		result = DBselect("select extversion from pg_extension where extname = 'timescaledb'");
-
-		if (NULL == result)
+		if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")))
 			goto out;
 
 		if (NULL == (row = DBfetch(result)))
@@ -755,7 +753,7 @@ void	DBcheck_capabilities(void)
 		version += patch;
 
 		if (10500 <= version)
-			compression_available = 1;
+			compression_available = ON;
 clean:
 		DBfree_result(result);
 	}

@@ -913,12 +913,12 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	else
 		config->config->discovery_groupid = ZBX_DISCOVERY_GROUPID_UNDEFINED;
 
-	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
+	ZBX_STR2UCHAR(config->config->snmptrap_logging, row[2]);
 	config->config->default_inventory_mode = atoi(row[26]);
 	DCstrpool_replace(found, (const char **)&config->config->db.extension, row[27]);
-	config->config->autoreg_tls_accept = (unsigned char)atoi(row[28]);
-	config->config->db.history_compression_status = (0 == atoi(row[29]) ? OFF : ON);
-	config->config->db.history_compression_availability = (0 == atoi(row[30]) ? OFF : ON);
+	ZBX_STR2UCHAR(config->config->autoreg_tls_accept, row[28]);
+	ZBX_STR2UCHAR(config->config->db.history_compression_status, row[29]);
+	ZBX_STR2UCHAR(config->config->db.history_compression_availability, row[30]);
 
 	if (SUCCEED != is_time_suffix(row[31], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
 	{
