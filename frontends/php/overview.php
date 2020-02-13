@@ -149,7 +149,14 @@ $data = [
 	'groupid' => $page_filter->groupid,
 	'hostid' => $page_filter->hostid,
 	'profileIdx' => 'web.overview.filter',
-	'active_tab' => CProfile::get('web.overview.filter.active', 1)
+	'active_tab' => CProfile::get('web.overview.filter.active', 1),
+	'db_hosts' => [],
+	'db_triggers' => [],
+	'dependencies' => [],
+	'triggers_by_name' => [],
+	'hosts_by_name' => [],
+	'exceeded_hosts' => false,
+	'exceeded_trigs' => false,
 ];
 
 // fetch trigger data
@@ -203,20 +210,25 @@ if ($type == SHOW_TRIGGERS) {
 
 		$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
 
-		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $host_options,
-			$trigger_options, $problem_options
+		list(
+			$data['db_hosts'],
+			$data['db_triggers'],
+			$data['dependencies'],
+			$data['triggers_by_name'],
+			$data['hosts_by_name'],
+			$data['exceeded_hosts'],
+			$data['exceeded_trigs']
+		) = getTriggersOverviewDataNew(
+			$groupids,
+			$filter['application'],
+			$host_options,
+			$trigger_options,
+			$problem_options
 		);
-	}
-	else {
-		$hosts = [];
-		$triggers = [];
 	}
 
 	$data['filter'] = $filter;
-	$data['hosts'] = $hosts;
-	$data['triggers'] = $triggers;
-
-	$overviewView = new CView('monitoring.overview.triggers', $data);
+	$overview_view = new CView('monitoring.overview.triggers', $data);
 }
 // fetch item data
 else {
@@ -250,11 +262,11 @@ else {
 	$data['hidden_cnt'] = $hidden_cnt;
 	$data['paging_line'] = $paging_line;
 
-	$overviewView = new CView('monitoring.overview.items', $data);
+	$overview_view = new CView('monitoring.overview.items', $data);
 }
 
 // render view
-$overviewView->render();
-$overviewView->show();
+$overview_view->render();
+$overview_view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

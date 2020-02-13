@@ -21,7 +21,14 @@
 
 $back_url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
 
-$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style']);
+
+if ($data['style'] == STYLE_TOP) {
+	$table = new CObject((new CView('trigoverview.table.top', $data))->getOutput());
+}
+else {
+	$table = new CObject((new CView('trigoverview.table.left', $data))->getOutput());
+}
+/* $table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style']); */
 
 $output = [
 	'header' => $data['name'],
