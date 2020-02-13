@@ -23,20 +23,10 @@ require_once dirname(__FILE__).'/js/configuration.host.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
-	->setControls(new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getGroupsCB()
-				])
-			),
-		(new CTag('nav', true, (new CList())
+	->setControls((new CTag('nav', true, (new CList())
 			->addItem(new CRedirectButton(_('Create host'), (new CUrl('hosts.php'))
 				->setArgument('form', 'create')
+				->setArgument('groupids', array_keys($data['filter']['groups']))
 				->getUrl()
 			))
 			->addItem(
@@ -45,7 +35,7 @@ $widget = (new CWidget())
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
-	]));
+	);
 
 $filter_tags = $data['filter']['tags'];
 if (!$filter_tags) {
@@ -99,10 +89,23 @@ $filter
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
-			->addRow(_('Name'),
-				(new CTextBox('filter_host', $data['filter']['host']))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
+			->addRow(
+				(new CLabel(_('Host groups'), 'filter_groups__ms')),
+				(new CMultiSelect([
+					'name' => 'filter_groups[]',
+					'object_name' => 'hostGroup',
+					'data' => $data['filter']['groups'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'host_groups',
+							'srcfld1' => 'groupid',
+							'dstfrm' => $filter->getName(),
+							'dstfld1' => 'filter_groups_',
+							'real_hosts' => 1,
+							'editable' => 1
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(
 				(new CLabel(_('Templates'), 'filter_templates__ms')),
@@ -120,6 +123,11 @@ $filter
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Name'),
+				(new CTextBox('filter_host', $data['filter']['host']))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
 			)
 			->addRow(_('DNS'),
 				(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -382,7 +390,7 @@ foreach ($data['hosts'] as $host) {
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
-			new CLink(_('Applications'), 'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+			new CLink(_('Applications'), 'applications.php?hostid='.$host['hostid']),
 			CViewHelper::showNum($host['applications'])
 		],
 		[
@@ -402,7 +410,7 @@ foreach ($data['hosts'] as $host) {
 			CViewHelper::showNum($host['triggers'])
 		],
 		[
-			new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+			new CLink(_('Graphs'), 'graphs.php?hostid='.$host['hostid']),
 			CViewHelper::showNum($host['graphs'])
 		],
 		[
@@ -440,7 +448,6 @@ $form->addItem([
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'export.hosts.xml')
 					->setArgument('backurl', (new CUrl('hosts.php'))
-						->setArgument('groupid', $data['pageFilter']->groupid)
 						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 						->getUrl())
 					->getUrl()
