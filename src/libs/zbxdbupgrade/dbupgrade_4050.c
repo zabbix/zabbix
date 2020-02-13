@@ -606,21 +606,21 @@ static int	DBpatch_4050035(void)
 
 static int DBpatch_4050036(void)
 {
-	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
-}
-
-static int DBpatch_4050037(void)
-{
 	const ZBX_FIELD	field = {"note", "0", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBrename_field("auditlog", "details", &field);
 }
 
-static int DBpatch_4050038(void)
+static int DBpatch_4050037(void)
 {
 	const ZBX_FIELD	field = {"note", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("auditlog", &field);
+}
+
+static int DBpatch_4050038(void)
+{
+	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
 }
 
 #endif
