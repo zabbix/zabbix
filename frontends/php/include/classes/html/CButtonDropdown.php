@@ -60,6 +60,7 @@ class CButtonDropdown extends CTag {
 					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, ZBX_STYLE_BTN_DROPDOWN_TOGGLE,
 						$this->options['active_class']
 					]))
+					->setId(zbx_formatDomId($name.'[btn]'))
 					->setMenuPopup([
 						'type' => 'dropdown',
 						'data' => [

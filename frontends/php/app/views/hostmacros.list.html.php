@@ -67,20 +67,20 @@ else {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
 
-			$macro_cell[] = new CVar('macros['.$i.'][type]', $macro['type']);
-
 			if ($data['show_inherited_macros'] && ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED)) {
 				if (array_key_exists('template', $macro)) {
 					$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $macro['template']['value']);
 					$macro_cell[] = new CVar('macros['.$i.'][inherited][description]',
 						$macro['template']['description']
 					);
+					$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $macro['template']['type']);
 				}
 				else {
 					$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $macro['global']['value']);
 					$macro_cell[] = new CVar('macros['.$i.'][inherited][description]',
 						$macro['global']['description']
 					);
+					$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $macro['global']['type']);
 				}
 			}
 		}

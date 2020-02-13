@@ -129,32 +129,45 @@
 					initMacroFields($parent);
 				})
 				.on('click', 'button.element-table-change', function() {
-					var macroNum = jQuery(this).attr('id').split('_')[1];
+					const macro_num = jQuery(this).attr('id').split('_')[1];
 
-					if (jQuery('#macros_' + macroNum + '_inherited_type').val() & <?= ZBX_PROPERTY_OWN ?>) {
-						jQuery('#macros_' + macroNum + '_inherited_type')
-							.val(jQuery('#macros_' + macroNum + '_inherited_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
-						jQuery('#macros_' + macroNum + '_value')
+					if (jQuery('#macros_' + macro_num + '_inherited_type').val() & <?= ZBX_PROPERTY_OWN ?>) {
+						const macro_type = jQuery('#macros_' + macro_num + '_inherited_macro_type').val();
+
+						jQuery('#macros_' + macro_num + '_inherited_type')
+							.val(jQuery('#macros_' + macro_num + '_inherited_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
+						jQuery('#macros_' + macro_num + '_description')
 							.prop('readonly', true)
-							.val(jQuery('#macros_' + macroNum + '_inherited_value').val())
+							.val(jQuery('#macros_' + macro_num + '_inherited_description').val())
 							.trigger('input');
-						jQuery('#macros_' + macroNum + '_description')
+						jQuery('#macros_' + macro_num + '_type_btn')
+							.buttonDropdown('change', jQuery('#macros_' + macro_num + '_type_btn'), {value: macro_type,
+								class: (macro_type == '1') ? 'icon-secret' : 'icon-text'
+							});
+						jQuery('#macros_' + macro_num + '_type_btn')
+							.prop('disabled', true)
+							.attr({'aria-haspopup': false});
+						jQuery('#macros_' + macro_num + '_value')
 							.prop('readonly', true)
-							.val(jQuery('#macros_' + macroNum + '_inherited_description').val())
+							.val(jQuery('#macros_' + macro_num + '_inherited_value').val())
 							.trigger('input');
-						jQuery('#macros_' + macroNum + '_change')
-							.text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
+						if (macro_type == '1') {
+							jQuery('#macros_' + macro_num + '_value').prop('disabled', true);
+						}
+						jQuery('#macros_' + macro_num + '_value').closest('.input-group').find('.btn-undo').hide();
+						jQuery('#macros_' + macro_num + '_change').text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
 					}
 					else {
-						jQuery('#macros_' + macroNum + '_inherited_type')
-							.val(jQuery('#macros_' + macroNum + '_inherited_type').val() | <?= ZBX_PROPERTY_OWN ?>);
-						jQuery('#macros_' + macroNum + '_value')
+						jQuery('#macros_' + macro_num + '_inherited_type')
+							.val(jQuery('#macros_' + macro_num + '_inherited_type').val() | <?= ZBX_PROPERTY_OWN ?>);
+						jQuery('#macros_' + macro_num + '_value')
 							.prop('readonly', false)
 							.focus();
-						jQuery('#macros_' + macroNum + '_description')
-							.prop('readonly', false);
-						jQuery('#macros_' + macroNum + '_change')
-							.text(<?= CJs::encodeJson(_('Remove')) ?>);
+						jQuery('#macros_' + macro_num + '_description').prop('readonly', false);
+						jQuery('#macros_' + macro_num + '_type_btn')
+							.prop('disabled', false)
+							.attr({'aria-haspopup': 'true'});
+						jQuery('#macros_' + macro_num + '_change').text(<?= CJs::encodeJson(_('Remove')) ?>);
 					}
 				})
 				.on('focus blur', '.input-secret input, .input-group .textarea-flexible', function() {
