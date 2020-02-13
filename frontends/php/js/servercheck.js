@@ -107,7 +107,7 @@ jQuery(function($) {
 
 		updateWidth: function() {
 			this.$elem.css({
-			 	left: ($('.sidebar').width() || 0) + 10,
+				left: ($('.sidebar').width() || 0) + 10,
 				width: ($('.wrapper').width() || 0) - 20
 			});
 		}
