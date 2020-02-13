@@ -250,7 +250,7 @@ $itemForm->addItem([
 		[
 			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
 			'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')],
-			'item.masscheck_now' => ['name' => _('Check now')],
+			'item.masscheck_now' => ['name' => _('Execute now')],
 			'item.massclearhistory' => $massclearhistory,
 			'item.masscopyto' => ['name' => _('Copy')],
 			'item.massupdateform' => ['name' => _('Mass update')],

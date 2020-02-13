@@ -515,7 +515,7 @@ function validateDateInterval($year, $month, $day) {
  * If the value is incorrect, set an error.
  *
  * @param string $value                  Value to parse and validate.
- * @param int    $min                    Lowed bound.
+ * @param int    $min                    Lower bound.
  * @param int    $max                    Upper bound.
  * @param bool   $allow_zero             Set to "true" to allow value to be zero.
  * @param string $error
@@ -527,6 +527,7 @@ function validateDateInterval($year, $month, $day) {
  */
 function validateTimeUnit($value, $min, $max, $allow_zero, &$error, array $options = []) {
 	$simple_interval_parser = new CSimpleIntervalParser($options);
+	$value = (string) $value;
 
 	if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
 		if ($value[0] !== '{') {

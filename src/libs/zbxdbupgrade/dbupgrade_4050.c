@@ -537,7 +537,7 @@ static int	DBpatch_4050028(void)
 				{"id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"relative_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"config", "", NULL, NULL, 2048, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"config", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -546,21 +546,79 @@ static int	DBpatch_4050028(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050029(void)
+static int	DBpatch_4050030(void)
+{
+	return SUCCEED;
+}
+
+static int	DBpatch_4050031(void)
+{
+	const ZBX_TABLE table =
+			{"task_data", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050032(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_data", 1, &field);
+}
+
+static int	DBpatch_4050033(void)
+{
+	const ZBX_TABLE	table =
+			{"task_result", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050034(void)
+{
+	return DBcreate_index("task_result", "task_result_1", "parent_taskid", 0);
+}
+
+static int	DBpatch_4050035(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_result", 1, &field);
+}
+
+static int	DBpatch_4050036(void)
 {
 	const ZBX_FIELD	field = {"compression_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_4050030(void)
+static int	DBpatch_4050037(void)
 {
 	const ZBX_FIELD	field = {"compression_availability", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_4050031(void)
+static int	DBpatch_4050038(void)
 {
 	const ZBX_FIELD field = {"compress_older", "7d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -598,8 +656,14 @@ DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
 DBPATCH_ADD(4050028, 0, 1)
-DBPATCH_ADD(4050029, 0, 1)
 DBPATCH_ADD(4050030, 0, 1)
 DBPATCH_ADD(4050031, 0, 1)
+DBPATCH_ADD(4050032, 0, 1)
+DBPATCH_ADD(4050033, 0, 1)
+DBPATCH_ADD(4050034, 0, 1)
+DBPATCH_ADD(4050035, 0, 1)
+DBPATCH_ADD(4050036, 0, 1)
+DBPATCH_ADD(4050037, 0, 1)
+DBPATCH_ADD(4050038, 0, 1)
 
 DBPATCH_END()
