@@ -563,6 +563,13 @@ static int DBpatch_4050032(void)
 	return DBrename_field("auditlog", "details", &field);
 }
 
+static int DBpatch_4050033(void)
+{
+	const ZBX_FIELD	field = {"note", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("auditlog", &field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -597,5 +604,6 @@ DBPATCH_ADD(4050028, 0, 1)
 DBPATCH_ADD(4050030, 0, 1)
 DBPATCH_ADD(4050031, 0, 1)
 DBPATCH_ADD(4050032, 0, 1)
+DBPATCH_ADD(4050033, 0, 1)
 
 DBPATCH_END()
