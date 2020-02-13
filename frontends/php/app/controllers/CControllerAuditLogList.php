@@ -76,6 +76,7 @@ class CControllerAuditLogList extends CController {
 			'actions' => $this->getActionsList(),
 			'resources' => $this->getResourcesList(),
 			'timeline' => getTimeSelectorPeriod($timeselector_options),
+			'auditlogs' => [],
 			'active_tab' => CProfile::get('web.auditlogs.filter.active', 1)
 		];
 		$this->getInputs($data, ['user_alias', 'resourcetype', 'auditlog_action', 'page']);
@@ -118,10 +119,13 @@ class CControllerAuditLogList extends CController {
 
 			if ($users) {
 				$params['userids'] = $users[0]['userid'];
+				$data['auditlogs'] = API::AuditLog()->get($params);
 			}
 		}
+		else {
+			$data['auditlogs'] = API::AuditLog()->get($params);
+		}
 
-		$data['auditlogs'] = API::AuditLog()->get($params);
 		$data['paging'] = CPagerHelper::paginate($data['page'], $data['auditlogs'], ZBX_SORT_UP,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
