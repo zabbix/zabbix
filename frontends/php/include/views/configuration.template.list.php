@@ -275,7 +275,11 @@ foreach ($data['templates'] as $template) {
 			CViewHelper::showNum($template['discoveries'])
 		],
 		[
-			new CLink(_('Web'), 'httpconf.php?hostid='.$template['templateid'].url_param('groupid')),
+			new CLink(_('Web'),
+				(new CUrl('httpconf.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['templateid']])
+			),
 			CViewHelper::showNum($template['httpTests'])
 		],
 		$linkedTemplatesOutput,

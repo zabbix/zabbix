@@ -435,7 +435,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// web scenarios
 		$http_tests = new CSpan([
-			new CLink(_('Web scenarios'), 'httpconf.php?hostid='.$db_host['hostid']),
+			new CLink(_('Web scenarios'),
+				(new CUrl('httpconf.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['httpTests'])
 		]);
 		if ($current_element == 'web') {

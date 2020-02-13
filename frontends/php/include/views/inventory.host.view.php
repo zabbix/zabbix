@@ -165,7 +165,11 @@ if ($data['rwHost']) {
 	$discoveryLink = new CLink(_('Discovery'),
 		'host_discovery.php?hostid='.$data['host']['hostid'].url_param('groupid')
 	);
-	$webLink = new CLink(_('Web'), 'httpconf.php?hostid='.$data['host']['hostid'].url_param('groupid'));
+
+	$webLink = new CLink(_('Web'), (new CUrl('httpconf.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$data['host']['hostid']])
+	);
 }
 else {
 	$hostLink = _('Host');

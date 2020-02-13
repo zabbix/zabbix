@@ -79,7 +79,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 		: [_('Discovery'), $discovery_count];
 
 	$httptests_link = $host['editable']
-		? [new CLink(_('Web'), 'httpconf.php?'.$link), $httptest_count]
+		? [new CLink(_('Web'), (new CUrl('httpconf.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$hostid])
+		), $httptest_count]
 		: [_('Web'), $httptest_count];
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -242,7 +245,10 @@ if ($data['admin']) {
 			: [_('Discovery'), $discovery_count];
 
 		$httptests_link = $template['editable']
-			? [new CLink(_('Web'), 'httpconf.php?'.$link), $httptest_count]
+			? [new CLink(_('Web'), (new CUrl('httpconf.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$templateid])
+			), $httptest_count]
 			: [_('Web'), $httptest_count];
 
 		if ($template['host'] !== $template['name'] && strpos($template['host'], $data['search']) !== false) {
