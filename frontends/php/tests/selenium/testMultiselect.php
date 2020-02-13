@@ -85,7 +85,7 @@ class testMultiselect extends CWebTest {
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$form->getField('Type')->asDropdown()->select('Plain text');
-		$form->invalidate();
+		$form->waitUntilReloaded();
 		$element = $form->getField('Items')->query('tag:input')->one();
 		$element->type('Zab');
 		$this->query('class:multiselect-suggest')->waitUntilVisible();
