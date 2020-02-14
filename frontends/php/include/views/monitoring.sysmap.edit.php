@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/monitoring.sysmap.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Network maps'));
@@ -408,4 +412,4 @@ $form->addItem($tabs);
 // Append form to widget.
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

@@ -19,8 +19,13 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('textareaflexible.js');
-$this->includeJSfile('app/views/administration.macros.edit.js.php');
+
+$this->includeJsFile('administration.macros.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Macros'))

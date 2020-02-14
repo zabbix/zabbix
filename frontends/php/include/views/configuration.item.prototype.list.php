@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
 	->setControls(
@@ -183,4 +187,4 @@ $itemForm->addItem([
 // append form to widget
 $widget->addItem($itemForm);
 
-return $widget;
+$widget->show();

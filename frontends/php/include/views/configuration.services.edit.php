@@ -19,7 +19,11 @@
 **/
 
 
-include('include/views/js/configuration.services.edit.js.php');
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('configuration.services.edit.js.php');
 
 $service = $this->data['service'];
 
@@ -368,4 +372,4 @@ $servicesForm->addItem($servicesTab);
 // append form to widget
 $widget->addItem($servicesForm);
 
-return $widget;
+$widget->show();

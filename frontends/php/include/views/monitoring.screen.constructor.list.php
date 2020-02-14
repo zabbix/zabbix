@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Screens').': '.$data['screen']['name']);
 
 if (array_key_exists('templateid', $data['screen'])) {
@@ -38,4 +42,4 @@ $widget->addItem(
 $screenBuilder->insertInitScreenJs($data['screenid']);
 $screenBuilder->insertProcessObjectsJs();
 
-return $widget;
+$widget->show();

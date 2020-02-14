@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
 }
@@ -41,9 +45,10 @@ else {
 	$this->addJsFile('class.svg.canvas.js');
 	$this->addJsFile('class.svg.map.js');
 
-	$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
+	$this->includeJsFile('monitoring.dashboard.view.js.php');
 
-	$breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
+	$this->enableLayoutModes();
+	$web_layout_mode = $this->getLayoutMode();
 
 	$main_filter_form = null;
 
@@ -72,8 +77,6 @@ else {
 			]);
 	}
 
-	$web_layout_mode = CView::getLayoutMode();
-
 	$widget = (new CWidget())
 		->setTitle($data['dashboard']['name'])
 		->setWebLayoutMode($web_layout_mode)
@@ -93,7 +96,7 @@ else {
 						->setAttribute('aria-haspopup', true)
 						->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid']))
 					)
-					->addItem(get_icon('fullscreen'))
+					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 			]))->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem((new CListItem([
@@ -115,7 +118,9 @@ else {
 		->setBreadcrumbs((new CList())
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addItem($breadcrumbs)
+			->addItem(new CPartial('monitoring.dashboard.breadcrumbs', [
+				'dashboard' => $data['dashboard']
+			]))
 			->addClass(ZBX_STYLE_OBJECT_GROUP)
 			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		);
@@ -134,11 +139,10 @@ else {
 		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 		->show();
 
-	/*
-	 * Javascript
-	 */
+	// JavaScript
+
 	// Activate blinking.
-	$this->addPostJS('jqBlink.blink();');
+	(new CScriptTag('jqBlink.blink();'))->show();
 
 	$dashboard_data = [
 		// Name is required for new dashboard creation.
@@ -168,7 +172,7 @@ else {
 	}
 
 	if ($data['dynamic']['has_dynamic_widgets']) {
-		$this->addPostJS(
+		(new CScriptTag(
 			// Add event listener to perform dynamic host switch when browser back/previous buttons are pressed.
 			'window.addEventListener("popstate", e => {' .
 				'var data = (e.state && e.state.host) ? [e.state.host] : [];' .
@@ -200,26 +204,26 @@ else {
 				// Push URL change.
 				'history.pushState({host: host}, "", url.getUrl());' .
 			'});'
-		);
+		))->show();
 	}
 
-	// Must be done before adding widgets, because it causes dashboard to resize.
+	// Process objects before adding widgets, not to cause dashboard to resize.
 	if ($data['show_timeselector']) {
-		$this->addPostJS(
+		(new CScriptTag(
 			'timeControl.addObject("scrollbar", '.json_encode($data['timeline']).', '.
 				json_encode($data['timeControlData']).
 			');'.
 			'timeControl.processObjects();'
-		);
+		))->show();
 	}
 
 	// Initialize dashboard grid.
-	$this->addPostJS(
-		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
+	(new CScriptTag(
+		'$(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
 			'.dashboardGrid('.json_encode($dashboard_options).')'.
 			'.dashboardGrid("setDashboardData", '.json_encode($dashboard_data).')'.
 			'.dashboardGrid("setWidgetDefaults", '.json_encode($data['widget_defaults']).')'.
 			'.dashboardGrid("addWidgets", '.json_encode($data['grid_widgets']).
 		');'
-	);
+	))->show();
 }

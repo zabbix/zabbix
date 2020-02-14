@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Web monitoring'));
 
 // append host summary to widget header
@@ -279,4 +283,4 @@ zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGEN
 
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 
-return $widget;
+$widget->show();

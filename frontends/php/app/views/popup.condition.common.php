@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $inline_js = '';
 
 $form = (new CForm())

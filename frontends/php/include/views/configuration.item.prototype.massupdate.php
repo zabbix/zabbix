@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
 	->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
@@ -631,4 +635,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';
 
-return $widget;
+$widget->show();

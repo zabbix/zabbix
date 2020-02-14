@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 $filter = (new CFilter(new CUrl('applications.php')))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
@@ -145,7 +148,7 @@ $form->addItem([
 ]);
 
 // Make widget.
-return (new CWidget())
+(new CWidget())
 	->setTitle(_('Applications'))
 	->setControls(
 		(new CTag('nav', true, ($data['hostid'] == 0)
@@ -159,4 +162,5 @@ return (new CWidget())
 	)
 	->addItem(get_header_host_table('applications', $data['hostid']))
 	->addItem($filter)
-	->addItem($form);
+	->addItem($form)
+	->show();

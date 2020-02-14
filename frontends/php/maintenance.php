@@ -298,9 +298,7 @@ if (!empty($data['form'])) {
 	CArrayHelper::sort($data['groups_ms'], ['name']);
 
 	// render view
-	$maintenanceView = new CView('configuration.maintenance.edit', $data);
-	$maintenanceView->render();
-	$maintenanceView->show();
+	echo (new CView('configuration.maintenance.edit', $data))->getOutput();
 }
 else {
 	// get maintenances
@@ -403,9 +401,7 @@ else {
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['maintenances'], $sortOrder, new CUrl('maintenance.php'));
 
 	// render view
-	$maintenanceView = new CView('configuration.maintenance.list', $data);
-	$maintenanceView->render();
-	$maintenanceView->show();
+	echo (new CView('configuration.maintenance.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

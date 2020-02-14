@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
 	'header' => $data['title'],
 ];

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $back_url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
 
 

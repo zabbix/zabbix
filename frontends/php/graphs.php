@@ -454,9 +454,7 @@ if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRe
 	$data['action'] = 'graph.masscopyto';
 
 	// render view
-	$graphView = new CView('configuration.copy.elements', $data);
-	$graphView->render();
-	$graphView->show();
+	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
@@ -632,9 +630,7 @@ elseif (isset($_REQUEST['form'])) {
 	$data['is_template'] = ($data['hostid'] == 0) ? false : isTemplate($data['hostid']);
 
 	// render view
-	$graphView = new CView('configuration.graph.edit', $data);
-	$graphView->render();
-	$graphView->show();
+	echo (new CView('configuration.graph.edit', $data))->getOutput();
 }
 else {
 	$config = select_config();
@@ -712,9 +708,7 @@ else {
 	);
 
 	// render view
-	$graphView = new CView('configuration.graph.list', $data);
-	$graphView->render();
-	$graphView->show();
+	echo (new CView('configuration.graph.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

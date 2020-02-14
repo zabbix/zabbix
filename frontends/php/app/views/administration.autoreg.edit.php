@@ -19,7 +19,11 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.autoreg.edit.js.php');
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('administration.autoreg.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Autoregistration'))

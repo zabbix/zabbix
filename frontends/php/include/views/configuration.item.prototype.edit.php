@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Item prototypes'));
 
 if (!empty($data['hostid'])) {
@@ -800,4 +804,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.prototype.edit.js.php';
 
-return $widget;
+$widget->show();

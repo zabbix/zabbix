@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $table = new CTableInfo();
 
 if ($data['error'] != null) {

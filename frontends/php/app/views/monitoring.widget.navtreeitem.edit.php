@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm('post'))
 	->cleanItems()
 	->setId('widget_dialogue_form')

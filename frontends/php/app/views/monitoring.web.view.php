@@ -19,17 +19,24 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('multiselect.js');
 
 
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
+
 (new CWidget())
 	->setTitle(_('Web monitoring'))
-	->setWebLayoutMode(CView::getLayoutMode())
+	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CList([
-		(new CTag('nav', true, get_icon('fullscreen')))
+		(new CTag('nav', true, get_icon('fullscreen', ['mode' => $web_layout_mode])))
 			->setAttribute('aria-label', _('Content controls'))
 		])))
 	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'web.view')))

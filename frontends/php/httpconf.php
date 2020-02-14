@@ -725,9 +725,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// render view
-	$httpView = new CView('configuration.httpconf.edit', $data);
-	$httpView->render();
-	$httpView->show();
+	echo (new CView('configuration.httpconf.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -879,9 +877,7 @@ else {
 	$data['httpTestsLastData'] = $httpTestsLastData;
 
 	// render view
-	$httpView = new CView('configuration.httpconf.list', $data);
-	$httpView->render();
-	$httpView->show();
+	echo (new CView('configuration.httpconf.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

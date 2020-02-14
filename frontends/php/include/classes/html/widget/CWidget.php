@@ -97,7 +97,10 @@ class CWidget {
 		$widget = [];
 
 		if ($this->web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-			$this->addItem(get_icon('fullscreen')->setAttribute('aria-label', _('Content controls')));
+			$this->addItem(
+				get_icon('fullscreen', ['mode' => ZBX_LAYOUT_KIOSKMODE])
+					->setAttribute('aria-label', _('Content controls'))
+			);
 		}
 		elseif ($this->title !== null || $this->controls !== null) {
 			$widget[] = $this->createTopHeader();
