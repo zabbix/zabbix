@@ -247,7 +247,7 @@ foreach ($data['sysmap']['urls'] as $url) {
 			new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types()),
 			(new CCol(
 				(new CButton(null, _('Remove')))
-					->onClick('$("urlEntry_'.$i.'").remove();')
+					->onClick('$("#urlEntry_'.$i.'").remove();')
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('urlEntry_'.$i)
@@ -265,7 +265,7 @@ $template_url_link = (new CTextBox('urls[#{id}][url]', ''))
 $template_url_etype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types());
 $template_url_etype->setAttribute('disabled', 'disabled');
 $template_remove_button = (new CButton(null, _('Remove')))
-	->onClick('$("entry_#{id}").remove();')
+	->onClick('$("#entry_#{id}").remove();')
 	->addClass(ZBX_STYLE_BTN_LINK);
 $template_url_row = (new CRow([
 	$template_url_label,

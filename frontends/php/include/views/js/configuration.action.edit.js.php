@@ -293,8 +293,7 @@
 
 			jQuery('input[name^=operations], input[name^=recovery_operations], input[name^=ack_operations]')
 				.each(function() {
-					// Intentional usage of JS Prototype.
-					if ($(this).getAttribute('name').match(operationid_RegExp)) {
+					if ($(this).attr('name').match(operationid_RegExp)) {
 						$(this).remove();
 					}
 				});

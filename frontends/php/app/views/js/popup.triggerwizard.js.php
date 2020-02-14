@@ -55,7 +55,7 @@
 
 	// Expression sortable table rows initialization.
 	if (data) {
-		data.each(function (row_data) {
+		data.forEach(function (row_data) {
 			$expr_table.find('tbody').append(trigger_row_tmpl.evaluate(row_data));
 		});
 

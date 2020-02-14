@@ -65,7 +65,6 @@ $availableJScripts = [
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
 	// vendors
-	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
 	// classes
@@ -100,6 +99,7 @@ $availableJScripts = [
 	'class.cviewswitcher.js' => '',
 	'class.pmaster.js' => '',
 	'class.rpc.js' => '',
+	'class.template.js' => '',
 	'init.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
@@ -337,7 +337,6 @@ $js = '';
 if (empty($_GET['files'])) {
 
 	$files = [
-		'prototype.js',
 		'jquery.js',
 		'jquery-ui.js',
 		'common.js',
@@ -350,6 +349,7 @@ if (empty($_GET['files'])) {
 		'class.rpc.js',
 		'class.bbcode.js',
 		'class.csuggest.js',
+		'class.template.js',
 		'main.js',
 		'chkbxrange.js',
 		'functions.js',
@@ -393,19 +393,6 @@ foreach ($files as $file) {
 	}
 }
 
-if (in_array('prototype.js', $files)) {
-	// This takes care of the Array toJSON incompatibility with JSON.stringify.
-	$js .=
-		'var _json_stringify = JSON.stringify;'.
-		'JSON.stringify = function(value) {'.
-			'var _array_tojson = Array.prototype.toJSON,'.
-				'ret;'.
-			'delete Array.prototype.toJSON;'.
-			'ret = _json_stringify(value);'.
-			'Array.prototype.toJSON = _array_tojson;'.
-			'return ret;'.
-		'};';
-}
 
 $etag = md5($js);
 /**

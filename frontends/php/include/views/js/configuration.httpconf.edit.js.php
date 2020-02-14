@@ -990,7 +990,7 @@
 			}
 
 			var malformed = (fields.length > 2),
-				non_printable_chars = (/%[01]/.match(fields[0]) || /%[01]/.match(fields[1]));
+				non_printable_chars = (fields[0].match(/%[01]/) || fields[1].match(/%[01]/));
 
 			if (malformed || non_printable_chars) {
 				throw httpconf.msg.data_not_encoded;

@@ -98,7 +98,7 @@
 				case 'add':
 					var index = 0;
 
-					rows.each(function(row) {
+					rows.each(function(_, row) {
 						index = Math.max(index,
 							parseInt($(this).find('[type="hidden"]:first').attr('name').match(/\[(\d+)\]/)[1])
 						);
