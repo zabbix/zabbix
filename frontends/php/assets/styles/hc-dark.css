@@ -4139,7 +4139,7 @@ span.is-loading {
 .browser-logo-ff {
   background: url(../img/browser-sprite.png) no-repeat -66px 0; }
 
-.browser-logo-ie {
+.browser-logo-ed {
   background: url(../img/browser-sprite.png) no-repeat 0 -66px; }
 
 .browser-logo-opera {
@@ -4148,7 +4148,7 @@ span.is-loading {
 .browser-logo-safari {
   background: url(../img/browser-sprite.png) no-repeat 0 -132px; }
 
-.browser-logo-chrome, .browser-logo-ff, .browser-logo-ie, .browser-logo-opera, .browser-logo-safari {
+.browser-logo-chrome, .browser-logo-ff, .browser-logo-ed, .browser-logo-opera, .browser-logo-safari {
   width: 66px;
   height: 66px;
   margin: 0 auto;

@@ -364,7 +364,7 @@ if ($data['action'] !== 'user.edit') {
 			'timeout_row'
 		)
 		->addRow(_('Play sound'),
-			new CComboBox('messages[sounds.repeat]', $data['messages']['sounds.repeat'], 'if (IE) { submit() }', [
+			new CComboBox('messages[sounds.repeat]', $data['messages']['sounds.repeat'], null, [
 				1 => _('Once'),
 				10 => _n('%1$s second', '%1$s seconds', 10),
 				-1 => _('Message timeout')

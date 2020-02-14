@@ -79,10 +79,6 @@ jQuery(function($) {
 		});
 	}
 
-	if (IE) {
-		setTimeout(function () { $('[autofocus]').focus(); }, 10);
-	}
-
 	/**
 	 * Change combobox color according selected option.
 	 */
