@@ -44,7 +44,6 @@
 #define CF_HAVEPARAMS		0x01	/* item accepts either optional or mandatory parameters */
 #define CF_MODULE		0x02	/* item is defined in a loadable module */
 #define CF_USERPARAMETER	0x04	/* item is defined as user parameter */
-#define CF_HAVEFLAGS		0x08	/* item needs additional internal parameter with flags */
 
 /* agent request structure */
 typedef struct
@@ -75,10 +74,6 @@ zbx_log_t;
 #define AR_LOG		0x10
 #define AR_MESSAGE	0x20
 #define AR_META		0x40
-
-/* casts to item functions */
-#define PNOFLAGS	int(*)(AGENT_REQUEST *, AGENT_RESULT *)
-#define PFLAGS		int(*)(AGENT_REQUEST *, AGENT_RESULT *, unsigned)
 
 /* agent return structure */
 typedef struct

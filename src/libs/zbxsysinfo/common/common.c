@@ -43,45 +43,53 @@
 extern int	CONFIG_TIMEOUT;
 
 static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result);
-static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result, unsigned flags);
+static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	SYSTEM_RUN_LOCAL(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+ZBX_METRIC	parameters_common_local[] =
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
+{
+	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN_LOCAL, 	"echo test"},
+	{NULL}
+};
 
 ZBX_METRIC	parameters_common[] =
-/*	KEY			FLAG				FUNCTION		TEST PARAMETERS */
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"system.localtime",	CF_HAVEPARAMS,			SYSTEM_LOCALTIME,	"utc"},
-	{"system.run",		CF_HAVEPARAMS|CF_HAVEFLAGS,	(PNOFLAGS)SYSTEM_RUN,	"echo test"},
+	{"system.localtime",	CF_HAVEPARAMS,	SYSTEM_LOCALTIME,	"utc"},
+	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN,		"echo test"},
 
-	{"web.page.get",	CF_HAVEPARAMS,			WEB_PAGE_GET,		"localhost,,80"},
-	{"web.page.perf",	CF_HAVEPARAMS,			WEB_PAGE_PERF,		"localhost,,80"},
-	{"web.page.regexp",	CF_HAVEPARAMS,			WEB_PAGE_REGEXP,	"localhost,,80,OK"},
+	{"web.page.get",	CF_HAVEPARAMS,	WEB_PAGE_GET,		"localhost,,80"},
+	{"web.page.perf",	CF_HAVEPARAMS,	WEB_PAGE_PERF,		"localhost,,80"},
+	{"web.page.regexp",	CF_HAVEPARAMS,	WEB_PAGE_REGEXP,	"localhost,,80,OK"},
 
-	{"vfs.file.size",	CF_HAVEPARAMS,			VFS_FILE_SIZE,		VFS_TEST_FILE},
-	{"vfs.file.time",	CF_HAVEPARAMS,			VFS_FILE_TIME,		VFS_TEST_FILE ",modify"},
-	{"vfs.file.exists",	CF_HAVEPARAMS,			VFS_FILE_EXISTS,	VFS_TEST_FILE},
-	{"vfs.file.contents",	CF_HAVEPARAMS,			VFS_FILE_CONTENTS,	VFS_TEST_FILE},
-	{"vfs.file.regexp",	CF_HAVEPARAMS,			VFS_FILE_REGEXP,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.regmatch",	CF_HAVEPARAMS,			VFS_FILE_REGMATCH,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.md5sum",	CF_HAVEPARAMS,			VFS_FILE_MD5SUM,	VFS_TEST_FILE},
-	{"vfs.file.cksum",	CF_HAVEPARAMS,			VFS_FILE_CKSUM,		VFS_TEST_FILE},
+	{"vfs.file.size",	CF_HAVEPARAMS,	VFS_FILE_SIZE,		VFS_TEST_FILE},
+	{"vfs.file.time",	CF_HAVEPARAMS,	VFS_FILE_TIME,		VFS_TEST_FILE ",modify"},
+	{"vfs.file.exists",	CF_HAVEPARAMS,	VFS_FILE_EXISTS,	VFS_TEST_FILE},
+	{"vfs.file.contents",	CF_HAVEPARAMS,	VFS_FILE_CONTENTS,	VFS_TEST_FILE},
+	{"vfs.file.regexp",	CF_HAVEPARAMS,	VFS_FILE_REGEXP,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
+	{"vfs.file.regmatch",	CF_HAVEPARAMS,	VFS_FILE_REGMATCH,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
+	{"vfs.file.md5sum",	CF_HAVEPARAMS,	VFS_FILE_MD5SUM,	VFS_TEST_FILE},
+	{"vfs.file.cksum",	CF_HAVEPARAMS,	VFS_FILE_CKSUM,		VFS_TEST_FILE},
 
-	{"vfs.dir.size",	CF_HAVEPARAMS,			VFS_DIR_SIZE,		VFS_TEST_DIR},
-	{"vfs.dir.count",	CF_HAVEPARAMS,			VFS_DIR_COUNT,		VFS_TEST_DIR},
+	{"vfs.dir.size",	CF_HAVEPARAMS,	VFS_DIR_SIZE,		VFS_TEST_DIR},
+	{"vfs.dir.count",	CF_HAVEPARAMS,	VFS_DIR_COUNT,		VFS_TEST_DIR},
 
-	{"net.dns",		CF_HAVEPARAMS,			NET_DNS,		",zabbix.com"},
-	{"net.dns.record",	CF_HAVEPARAMS,			NET_DNS_RECORD,		",zabbix.com"},
-	{"net.tcp.dns",		CF_HAVEPARAMS,			NET_DNS,		",zabbix.com"}, /* deprecated */
-	{"net.tcp.dns.query",	CF_HAVEPARAMS,			NET_DNS_RECORD,		",zabbix.com"}, /* deprecated */
-	{"net.tcp.port",	CF_HAVEPARAMS,			NET_TCP_PORT,		",80"},
+	{"net.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"},
+	{"net.dns.record",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"},
+	{"net.tcp.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"}, /* deprecated */
+	{"net.tcp.dns.query",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"}, /* deprecated */
+	{"net.tcp.port",	CF_HAVEPARAMS,	NET_TCP_PORT,		",80"},
 
-	{"system.users.num",	0,				SYSTEM_USERS_NUM,	NULL},
+	{"system.users.num",	0,		SYSTEM_USERS_NUM,	NULL},
 
-	{"log",			CF_HAVEPARAMS,			ONLY_ACTIVE,		"logfile"},
-	{"log.count",		CF_HAVEPARAMS,			ONLY_ACTIVE,		"logfile"},
-	{"logrt",		CF_HAVEPARAMS,			ONLY_ACTIVE,		"logfile"},
-	{"logrt.count",		CF_HAVEPARAMS,			ONLY_ACTIVE,		"logfile"},
-	{"eventlog",		CF_HAVEPARAMS,			ONLY_ACTIVE,		"system"},
+	{"log",			CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
+	{"log.count",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
+	{"logrt",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
+	{"logrt.count",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
+	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"system"},
 
-	{"zabbix.stats",	CF_HAVEPARAMS,			ZABBIX_STATS,		"127.0.0.1,10051"},
+	{"zabbix.stats",	CF_HAVEPARAMS,	ZABBIX_STATS,		"127.0.0.1,10051"},
 
 	{NULL}
 };
@@ -170,7 +178,7 @@ int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result, unsigned flags)
+static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result, int level)
 {
 	char	*command, *flag;
 
@@ -189,11 +197,7 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result, unsigned fla
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (2 == CONFIG_LOG_REMOTE_COMMANDS ||
-			(1 == CONFIG_LOG_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND)) )
-		zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", command);
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
+	zabbix_log(level, "Executing command '%s'", command);
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 	{
@@ -217,3 +221,28 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result, unsigned fla
 
 	return SYSINFO_RET_OK;
 }
+
+static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	level;
+
+	level = LOG_LEVEL_DEBUG;
+
+	if (0 != CONFIG_LOG_REMOTE_COMMANDS)
+		level = LOG_LEVEL_WARNING;
+
+	return system_run(request, result, level);
+}
+
+static int	SYSTEM_RUN_LOCAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	level;
+
+	level = LOG_LEVEL_DEBUG;
+
+	if (2 == CONFIG_LOG_REMOTE_COMMANDS)
+		level = LOG_LEVEL_WARNING;
+
+	return system_run(request, result, level);
+}
+

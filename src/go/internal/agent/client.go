@@ -23,9 +23,9 @@ import (
 	"sync/atomic"
 )
 
-const ActiveChechksClientID = 100
+const ActiveChecksClientID = 100
 
-var lastClientID uint64 = ActiveChechksClientID
+var lastClientID uint64 = ActiveChecksClientID
 
 // Internal client id assigned to each active server and unique passive bulk request.
 // Single checks (internal and old style passive checks) has built-in client id 0.
