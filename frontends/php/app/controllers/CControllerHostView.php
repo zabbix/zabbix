@@ -148,7 +148,7 @@ class CControllerHostView extends CControllerHost {
 			CProfile::deleteIdx('web.host.filter.severities');
 			CProfile::delete('web.host.filter.status');
 			CProfile::delete('web.host.filter.show_suppressed');
-			CProfile::delete('web.host.filter.maintenance');
+			CProfile::delete('web.host.filter.maintenance_status');
 			CProfile::delete('web.host.filter.evaltype');
 			CProfile::deleteIdx('web.host.filter.tags.tag');
 			CProfile::deleteIdx('web.host.filter.tags.value');
