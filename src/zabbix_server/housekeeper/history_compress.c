@@ -67,7 +67,6 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		i = 0, configure = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
 
@@ -83,6 +82,8 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 				" timescaledb.compress_orderby = '%s')", table_name, ZBX_TS_SEGMENT_BY,
 				(ZBX_COMPRESS_TABLE_HISTORY == type) ? "clock,ns" : "clock");
 	}
+
+	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
