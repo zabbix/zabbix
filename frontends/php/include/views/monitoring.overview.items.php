@@ -92,6 +92,38 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
 			(new CFormList())
+				->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
+					(new CMultiSelect([
+						'multiple' => true,
+						'name' => 'filter_hostids[]',
+						'object_name' => 'host',
+						'data' => [['name' => 'Zabbix server', 'id' => 4]],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'hosts',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_groupids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow((new CLabel(_('Host group'), 'filter_groupids__ms')),
+					(new CMultiSelect([
+						'multiple' => true,
+						'name' => 'filter_groupids[]',
+						'object_name' => 'group',
+						'data' => [['name' => 'Zabbix servers', 'id' => 4]],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'host_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_groupids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
 				->addRow(_('Application'), [
 					(new CTextBox('application', $data['filter']['application']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
