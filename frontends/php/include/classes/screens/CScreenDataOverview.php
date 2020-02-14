@@ -45,7 +45,7 @@ class CScreenDataOverview extends CScreenBase {
 
 		$data = [];
 		if ($this->screenitem['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop((array) $groupid,
+			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop((array) $groupid, null,
 				$this->screenitem['application']
 			);
 
@@ -61,7 +61,7 @@ class CScreenDataOverview extends CScreenBase {
 			$table = new CObject((new CView('dataoverview.table.top', $data))->getOutput());
 		}
 		else {
-			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft((array) $groupid,
+			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft((array) $groupid, null,
 				$this->screenitem['application']
 			);
 

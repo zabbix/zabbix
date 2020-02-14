@@ -28,7 +28,6 @@ if ($data['style'] == STYLE_TOP) {
 else {
 	$table = new CObject((new CView('trigoverview.table.left', $data))->getOutput());
 }
-/* $table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style']); */
 
 $output = [
 	'header' => $data['name'],

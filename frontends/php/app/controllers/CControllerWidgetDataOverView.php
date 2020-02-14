@@ -37,14 +37,14 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 		$groupids = $fields['groupids'] ? $fields['groupids'] : null;
 
 		if ($fields['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop($groupids,
+			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop($groupids, null,
 				$fields['application']
 			);
 
 			$items_by_name = array_slice($items_by_name, 0, $fields['show_lines'], true);
 		}
 		else {
-			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft($groupids,
+			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft($groupids, null,
 				$fields['application']
 			);
 

@@ -102,11 +102,6 @@ $widget = (new CWidget())
 			->addItem(new CInput('hidden', 'type', $this->data['type']))
 			->addItem((new CList())
 				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$this->data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
 					new CLabel(_('Hosts location'), 'view_style'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
@@ -135,10 +130,9 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			'txtSelect' => $filter['txtSelect'],
 			'application' => $filter['application'],
 			'inventory' => $filter['inventory'],
-			'show_suppressed' => $filter['show_suppressed'],
-			'hostId' => $data['hostid'],
-			'groupId' => $data['groupid']
+			'show_suppressed' => $filter['show_suppressed']
 		],
+		'ms_groups' => $data['ms_groups'],
 		'config' => $data['config'],
 		'profileIdx' => $data['profileIdx'],
 		'active_tab' => $data['active_tab']
@@ -148,19 +142,13 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	$widget->addItem($filterForm);
 }
 
-// data table
-if ($data['pageFilter']->groupsSelected) {
-	global $page;
+global $page;
 
-	if ($data['view_style'] == STYLE_TOP) {
-		$table = (new CView('trigoverview.table.top', $data))->getOutput();
-	}
-	else {
-		$table = (new CView('trigoverview.table.left', $data))->getOutput();
-	}
+if ($data['view_style'] == STYLE_TOP) {
+	$table = (new CView('trigoverview.table.top', $data))->getOutput();
 }
 else {
-	$table = new CTableInfo();
+	$table = (new CView('trigoverview.table.left', $data))->getOutput();
 }
 
 $widget->addItem($table);

@@ -660,8 +660,8 @@ function replace_template_dependencies($deps, $hostid) {
 function getTriggersOverviewTableData($db_hosts, $db_triggers, $limit) {
 	$triggers_by_name = [];
 	$hosts_by_name = [];
-	$exceeded_hosts = true;
-	$exceeded_trigs = true;
+	$exceeded_hosts = false;
+	$exceeded_trigs = false;
 
 	foreach ($db_triggers as $trigger) {
 		$trigger_name = $trigger['description'];
@@ -697,16 +697,25 @@ function getTriggersOverviewTableData($db_hosts, $db_triggers, $limit) {
 		}
 	}
 
-	return [
-		$triggers_by_name,
-		$hosts_by_name,
-		$exceeded_hosts,
-		$exceeded_trigs
-	];
+	return [$triggers_by_name, $hosts_by_name, $exceeded_hosts, $exceeded_trigs];
 }
 
-function getTriggersOverviewDataNew(array $groupids, $application, array $host_options = [], array $trigger_options = [],
-		array $problem_options = []) {
+/**
+ * Creates and returns item data overview table for the given host groups.
+ *
+ * @param array  $groupids
+ * @param string $application
+ * @param array  $host_options
+ * @param array  $trigger_options
+ * @param array  $problem_options
+ * @param int    $problem_options['min_severity']     (optional) Minimal problem severity.
+ * @param int    $problem_options['show_suppressed']  (optional) Whether to show triggers with suppressed problems.
+ * @param int    $problem_options['time_from']        (optional) The time starting from which the problems were created.
+ *
+ * @return array
+ */
+function getTriggersOverviewData(array $groupids, $application, array $host_options = [], array $trigger_options = [],
+		array $problem_options = []): array {
 
 	$exhausted_hosts = false;
 	$exhausted_triggers = false;
@@ -784,12 +793,9 @@ function getTriggersOverviewDataNew(array $groupids, $application, array $host_o
 		CArrayHelper::sort($db_hosts, ['name']);
 		CArrayHelper::sort($db_triggers, ['description']);
 
-		list(
-			$triggers_by_name,
-			$hosts_by_name,
-			$exceeded_hosts,
-			$exceeded_trigs
-		) = getTriggersOverviewTableData($db_hosts, $db_triggers, $axis_limit);
+		list($triggers_by_name, $hosts_by_name, $exceeded_hosts, $exceeded_trigs) = getTriggersOverviewTableData(
+			$db_hosts, $db_triggers, $axis_limit
+		);
 
 		if ($exceeded_hosts || $exceeded_trigs) {
 			break;
@@ -798,74 +804,8 @@ function getTriggersOverviewDataNew(array $groupids, $application, array $host_o
 		$limit += $limit;
 	} while (!($exhausted_triggers && $exhausted_hosts));
 
-	return [
-		$db_hosts,
-		$db_triggers,
-		$dependencies,
-		$triggers_by_name,
-		$hosts_by_name,
-		$exceeded_hosts,
-		$exceeded_trigs
+	return [$db_hosts, $db_triggers, $dependencies, $triggers_by_name, $hosts_by_name, $exceeded_hosts, $exceeded_trigs
 	];
-}
-
-/**
- * Creates and returns item data overview table for the given host groups.
- *
- * @param array  $groupids
- * @param string $application
- * @param array  $host_options
- * @param array  $trigger_options
- * @param array  $problem_options
- * @param int    $problem_options['min_severity']     (optional) Minimal problem severity.
- * @param int    $problem_options['show_suppressed']  (optional) Whether to show triggers with suppressed problems.
- * @param int    $problem_options['time_from']        (optional) The time starting from which the problems were created.
- *
- * @return array
- */
-function getTriggersOverviewData(array $groupids, $application, array $host_options = [], array $trigger_options = [],
-		array $problem_options = []) {
-	$problem_options += [
-		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
-		'time_from' => null
-	];
-
-	// fetch hosts
-	$hosts = API::Host()->get([
-		'output' => ['hostid'],
-		'groupids' => $groupids ? $groupids : null,
-		'preservekeys' => true,
-		/* 'limit' => 50 */
-	] + $host_options);
-
-	$hostids = array_keys($hosts);
-
-	$trigger_options = [
-		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
-		'selectHosts' => ['hostid', 'name'],
-		'hostids' => $hostids,
-		'monitored' => true,
-		'sortfield' => 'description',
-		'selectDependencies' => ['triggerid'],
-		'preservekeys' => true,
-		/* 'limit' => 50 */
-	] + $trigger_options;
-
-	// application filter
-	if ($application !== '') {
-		$applications = API::Application()->get([
-			'output' => [],
-			'hostids' => $hostids,
-			'search' => ['name' => $application],
-			'preservekeys' => true
-		]);
-		$trigger_options['applicationids'] = array_keys($applications);
-	}
-
-	$triggers = getTriggersWithActualSeverity($trigger_options, $problem_options);
-
-	return [$hosts, $triggers];
 }
 
 /**
@@ -994,150 +934,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 }
 
 /**
- * Creates and returns the trigger overview table for the given hosts.
- *
- * @param array  $hosts                        An array of hosts with host IDs as keys.
- * @param string $hosts[hostid][name]
- * @param string $hosts[hostid][hostid]
- * @param array  $triggers
- * @param string $triggers[<triggerid>][triggerid]
- * @param string $triggers[<triggerid>][description]
- * @param string $triggers[<triggerid>][expression]
- * @param int    $triggers[<triggerid>][value]
- * @param int    $triggers[<triggerid>][lastchange]
- * @param int    $triggers[<triggerid>][flags]
- * @param array  $triggers[<triggerid>][url]
- * @param int    $triggers[<triggerid>][priority]
- * @param array  $triggers[<triggerid>][hosts]
- * @param string $triggers[<triggerid>][hosts][][hostid]
- * @param string $triggers[<triggerid>][hosts][][name]
- * @param array  $triggers[<triggerid>]['dependencies']
- * @param string $triggers[<triggerid>]['dependencies'][]['triggerid']
- * @param string $pageFile                     The page where the element is displayed.
- * @param int    $viewMode                     Table display style: either hosts on top, or host on the left side.
- * @param string $screenId                     The ID of the screen, that contains the trigger overview table.
- *
- * @return CTableInfo
- */
-function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
-	$data = [];
-	$host_names = [];
-	$trcounter = [];
-
-	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers, true);
-
-	// Make trigger dependencies.
-	if ($triggers) {
-		$dependencies = getTriggerDependencies($triggers);
-	}
-
-	foreach ($triggers as $trigger) {
-		$trigger_name = $trigger['description'];
-
-		foreach ($trigger['hosts'] as $host) {
-			// triggers may belong to hosts that are filtered out and shouldn't be displayed, skip them
-			if (!isset($hosts[$host['hostid']])) {
-				continue;
-			}
-
-			$host_names[$host['hostid']] = $host['name'];
-
-			if (!array_key_exists($host['name'], $trcounter)) {
-				$trcounter[$host['name']] = [];
-			}
-
-			if (!array_key_exists($trigger_name, $trcounter[$host['name']])) {
-				$trcounter[$host['name']][$trigger_name] = 0;
-			}
-
-			$trigger_data = [
-				'triggerid' => $trigger['triggerid'],
-				'value' => $trigger['value'],
-				'lastchange' => $trigger['lastchange'],
-				'priority' => $trigger['priority'],
-				'problem' => $trigger['problem']
-			];
-
-			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = $trigger_data;
-			$trcounter[$host['name']][$trigger_name]++;
-		}
-	}
-
-	$triggerTable = (new CTableInfo())->setHeadingColumn(0);
-
-	if (!$host_names) {
-		return $triggerTable;
-	}
-
-	$triggerTable->makeVerticalRotation();
-
-	order_result($host_names);
-
-	if ($viewMode == STYLE_TOP) {
-		// header
-		$header = [_('Triggers')];
-
-		foreach ($host_names as $host_name) {
-			$header[] = (new CColHeader($host_name))
-				->addClass('vertical_rotation')
-				->setTitle($host_name);
-		}
-		$triggerTable->setHeader($header);
-
-		// data
-		foreach ($data as $trigger_name => $trigger_data) {
-			foreach ($trigger_data as $trigger_hosts) {
-				$columns = [(new CColHeader($trigger_name))->addClass(ZBX_STYLE_NOWRAP)];
-
-				foreach ($host_names as $host_name) {
-					$columns[] = getTriggerOverviewCells(
-						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId
-					);
-				}
-				$triggerTable->addRow($columns);
-			}
-		}
-	}
-	else {
-		// header
-		$header = [_('Hosts')];
-
-		foreach ($data as $trigger_name => $trigger_data) {
-			foreach ($trigger_data as $trigger_hosts) {
-				$header[] = (new CColHeader($trigger_name))
-					->addClass('vertical_rotation')
-					->setTitle($trigger_name);
-			}
-		}
-
-		$triggerTable->setHeader($header);
-
-		// data
-		foreach ($host_names as $hostId => $host_name) {
-			$name = (new CLinkAction($host_name))->setMenuPopup(CMenuPopupHelper::getHost($hostId));
-
-			$columns = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
-			foreach ($data as $trigger_data) {
-				foreach ($trigger_data as $trigger_hosts) {
-					$columns[] = getTriggerOverviewCells(
-						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId
-					);
-				}
-			}
-
-			$triggerTable->addRow($columns);
-		}
-	}
-
-	return $triggerTable;
-}
-
-/**
  * Creates and returns a trigger status cell for the trigger overview table.
- *
- * @see getTriggersOverview()
  *
  * @param array  $trigger
  * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
@@ -1146,57 +943,6 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null) {
-	$ack = null;
-	$css = null;
-	$desc = null;
-	$eventid = 0;
-	$acknowledge = [];
-
-	if ($trigger) {
-		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
-
-		// problem trigger
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-			$eventid = $trigger['problem']['eventid'];
-			$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
-		}
-
-		if ($trigger['problem']['acknowledged'] == 1) {
-			$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
-		}
-
-		$desc = array_key_exists($trigger['triggerid'], $dependencies)
-			? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
-			: [];
-	}
-
-	$column = new CCol([$desc, $ack]);
-
-	if ($css !== null) {
-		$column
-			->addClass($css)
-			->addClass(ZBX_STYLE_CURSOR_POINTER);
-	}
-
-	if ($trigger) {
-		// Calculate for how long triggers should blink on status change (set by user in administration->general).
-		$config = select_config();
-		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
-		$duration = time() - $trigger['lastchange'];
-
-		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
-			$column->addClass('blink');
-			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
-			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
-		}
-
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
-	}
-
-	return $column;
-}
-
 function getTriggerOverviewCell($trigger, $dependencies, $pageFile, $screenid = null) {
 	$ack = null;
 	$css = null;

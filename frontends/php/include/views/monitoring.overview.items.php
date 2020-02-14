@@ -65,11 +65,6 @@ $widget = (new CWidget())
 			->addItem(new CInput('hidden', 'type', $this->data['type']))
 			->addItem((new CList())
 				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$this->data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
 					new CLabel(_('Hosts location'), 'view_style'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
@@ -92,34 +87,37 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
 			(new CFormList())
-				->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
-					(new CMultiSelect([
-						'multiple' => true,
-						'name' => 'filter_hostids[]',
-						'object_name' => 'host',
-						'data' => [['name' => 'Zabbix server', 'id' => 4]],
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'hosts',
-								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_groupids_'
-							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
 				->addRow((new CLabel(_('Host group'), 'filter_groupids__ms')),
 					(new CMultiSelect([
 						'multiple' => true,
 						'name' => 'filter_groupids[]',
 						'object_name' => 'group',
-						'data' => [['name' => 'Zabbix servers', 'id' => 4]],
+						'data' => $data['ms_groups'],
 						'popup' => [
 							'parameters' => [
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_groupids_'
+								'dstfld1' => 'filter_groupids_',
+								'with_monitored_items' => true
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
+					(new CMultiSelect([
+						'multiple' => true,
+						'name' => 'filter_hostids[]',
+						'object_name' => 'host',
+						'data' => $data['ms_hosts'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'hosts',
+								'srcfld1' => 'hostid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_hostids_',
+								'monitored_hosts' => true,
+								'with_monitored_items' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -151,29 +149,21 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	);
 }
 
-// data table
-if ($data['pageFilter']->groupsSelected) {
-	$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
-
-	if ($data['view_style'] == STYLE_TOP) {
-		$table = (new CView('dataoverview.table.top', [
-			'visible_items' => $data['visible_items'],
-			'db_hosts' => $data['db_hosts'],
-			'items_by_name' => $data['items_by_name'],
-			'hidden_cnt' => $data['hidden_cnt']
-		]))->getOutput();
-	}
-	else {
-		$table = (new CView('dataoverview.table.left', [
-			'visible_items' => $data['visible_items'],
-			'db_hosts' => $data['db_hosts'],
-			'items_by_name' => $data['items_by_name'],
-			'hidden_cnt' => $data['hidden_cnt']
-		]))->getOutput();
-	}
+if ($data['view_style'] == STYLE_TOP) {
+	$table = (new CView('dataoverview.table.top', [
+		'visible_items' => $data['visible_items'],
+		'db_hosts' => $data['db_hosts'],
+		'items_by_name' => $data['items_by_name'],
+		'hidden_cnt' => $data['hidden_cnt']
+	]))->getOutput();
 }
 else {
-	$table = new CTableInfo();
+	$table = (new CView('dataoverview.table.left', [
+		'visible_items' => $data['visible_items'],
+		'db_hosts' => $data['db_hosts'],
+		'items_by_name' => $data['items_by_name'],
+		'hidden_cnt' => $data['hidden_cnt']
+	]))->getOutput();
 }
 
 $widget->addItem($table);
