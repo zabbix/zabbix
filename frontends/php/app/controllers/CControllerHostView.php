@@ -27,11 +27,6 @@ class CControllerHostView extends CControllerHost {
 	}
 
 	protected function checkInput(): bool {
-		$severities = [];
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severities[] = $severity;
-		}
-
 		$fields = [
 			'sort' =>						'in name,status',
 			'sortorder' =>					'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
