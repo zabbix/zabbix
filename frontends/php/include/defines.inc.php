@@ -1816,6 +1816,8 @@ define('ZBX_STYLE_HOST_INTERFACE_CELL_IP', 'interface-cell-ip');
 define('ZBX_STYLE_HOST_INTERFACE_CELL_DNS', 'interface-cell-dns');
 define('ZBX_STYLE_HOST_INTERFACE_CELL_USEIP', 'interface-cell-useip');
 define('ZBX_STYLE_HOST_INTERFACE_CELL_PORT', 'interface-cell-port');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_DEFAULT', 'interface-cell-default');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_ACTION', 'interface-cell-action');
 define('ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE', 'interface-btn-toggle');
 define('ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE', 'interface-btn-remove');
 define('ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE', 'interface-btn-main-interface');

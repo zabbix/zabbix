@@ -34,19 +34,19 @@
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_TYPE ?>">
 		#{iface.type_name}
 	</div>
-	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_IP ?>">
 		<?= (new CTextBox('interfaces[#{iface.interfaceid}][ip]', '#{iface.ip}', false, DB::getFieldLength('interface', 'ip')))
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
 		?>
 	</div>
-	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DNS ?>">
 		<?= (new CTextBox('interfaces[#{iface.interfaceid}][dns]', '#{iface.dns}', false, DB::getFieldLength('interface', 'dns')))
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
 		?>
 	</div>
-	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_USEIP ?>">
 		<?= (new CRadioButtonList('interfaces[#{iface.interfaceid}][useip]', null))
 				->addValue(_('IP'), INTERFACE_USE_IP, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_IP.']')
 				->addValue(_('DNS'), INTERFACE_USE_DNS, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']')
@@ -54,25 +54,26 @@
 				->setModern(true)
 		?>
 	</div>
-	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_PORT ?>">
 		<?= (new CTextBox('interfaces[#{iface.interfaceid}][port]', '#{iface.port}', false, DB::getFieldLength('interface', 'port')))
 				->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setAriaRequired()
 		?>
 	</div>
-	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DEFAULT ?>">
 		<input type="radio" class="<?= ZBX_STYLE_CHECKBOX_RADIO ?> <?= ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE ?> <?= ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND ?>" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"><span></span></label>
 	</div>
-	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_ACTION ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> <?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>"><?= _('Remove') ?></button>
 	</div>
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_BODY ?>">
 		<?= (new CFormList('snmp_details_#{iface.interfaceid}'))
 				->cleanItems()
 				->addRow((new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]'))->setAsteriskMark(),
-					new CComboBox('interfaces[#{iface.interfaceid}][details][version]', SNMP_V2C, null, [SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')])
+					new CComboBox('interfaces[#{iface.interfaceid}][details][version]', SNMP_V2C, null, [SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]),
+					'row_snmp_version_#{iface.interfaceid}'
 				)
 				->addRow((new CLabel(_('SNMP community'), 'interfaces[#{iface.interfaceid}][details][community]'))->setAsteriskMark(),
 					(new CTextBox('interfaces[#{iface.interfaceid}][details][community]', '#{iface.details.community}', false, DB::getFieldLength('interface_snmp', 'community')))
@@ -123,7 +124,9 @@
 						->setAriaRequired(),
 					'row_snmpv3_privpassphrase_#{iface.interfaceid}'
 				)
-				->addRow('', (new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))->setLabel(_('Use bulk requests'), 'interfaces[#{iface.interfaceid}][details][bulk]'));
+				->addRow('', (new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))->setLabel(_('Use bulk requests'), 'interfaces[#{iface.interfaceid}][details][bulk]'),
+					'row_snmp_bulk_#{iface.interfaceid}'
+				);
 		?>
 	</div>
 </div>
@@ -511,7 +514,7 @@
 		static disableEdit() {
 			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input, .<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')]
 				.map((elem) => {
-					elem.removeAttribute('id');
+					// elem.removeAttribute('id');
 					elem.removeAttribute('name');
 				});
 
@@ -532,6 +535,7 @@
 				// Create new input[type=text].
 				const input = document.createElement('input');
 				input.type = 'text';
+				input.id = elem.id;
 				input.readOnly = true;
 				input.value = value;
 
