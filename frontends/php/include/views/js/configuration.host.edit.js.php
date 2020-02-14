@@ -514,7 +514,6 @@
 		static disableEdit() {
 			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input, .<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')]
 				.map((elem) => {
-					// elem.removeAttribute('id');
 					elem.removeAttribute('name');
 				});
 
