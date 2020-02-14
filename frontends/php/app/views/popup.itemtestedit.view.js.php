@@ -336,7 +336,7 @@ function processItemPreprocessingTestResults(steps) {
 	var tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html()),
 		tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html());
 
-	steps.each(function(step, i) {
+	steps.forEach(function(step, i) {
 		if (typeof step.action !== 'undefined') {
 			switch (step.action) {
 				case <?= ZBX_PREPROC_FAIL_DEFAULT ?>:

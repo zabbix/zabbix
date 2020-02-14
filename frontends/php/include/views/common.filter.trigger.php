@@ -57,7 +57,7 @@ $column1
 	->addRow(_('Age less than'), [
 		(new CCheckBox('status_change'))
 			->setChecked($filter['statusChange'] == 1)
-			->onClick('javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()'),
+			->onClick('javascript: jQuery("#status_change_days").prop("disabled", !this.checked)'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$statusChangeDays,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
