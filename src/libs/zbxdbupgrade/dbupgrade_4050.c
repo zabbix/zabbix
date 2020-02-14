@@ -732,7 +732,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 				" join hosts h on i.hostid=h.hostid"
 				" join interface f on i.interfaceid=f.interfaceid"
 			" where i.type in (1,4,6)"
-				" and h.status <> 3"
+				" and h.status in (0,1)"
 			" order by i.interfaceid asc, i.type asc, i.port asc, i.snmp_community asc");
 
 	while (NULL != (row = DBfetch(result)))
