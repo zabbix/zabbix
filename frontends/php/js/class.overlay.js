@@ -122,7 +122,7 @@ Overlay.prototype.centerDialog = function() {
 			height: size.height
 		}, {
 			width: size_saved.width,
-			height:size_saved.height
+			height: size_saved.height
 		}]);
 	}
 
