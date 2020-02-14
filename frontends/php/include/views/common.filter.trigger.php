@@ -43,29 +43,32 @@ $column1 = (new CFormList())
 			->addValue(_('Any'), TRIGGERS_OPTION_ALL)
 			->setModern(true)
 	)
-	->addRow(_('Minimum severity'),
-		new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
+	->addRow((new CLabel(_('Host group'), 'filter_hostids__ms')),
+		(new CMultiSelect([
+			'multiple' => true,
+			'name' => 'filter_groupids[]',
+			'object_name' => 'group',
+			'data' => [['name' => 'Zabbix servers', 'id' => 4]],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'filter_groupids_'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	);
+
 
 $statusChangeDays = (new CNumericBox('status_change_days', $filter['statusChangeDays'], 3, false, false, false))
 	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+
 if (!$filter['statusChange']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
 
 $column1
-	->addRow(_('Age less than'), [
-		(new CCheckBox('status_change'))
-			->setChecked($filter['statusChange'] == 1)
-			->onClick('javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$statusChangeDays,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		_('days')
-	])
-	->addRow(_('Name'),
-		(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	)
 	->addRow(_('Application'), [
 		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -81,6 +84,21 @@ $column1
 					'with_applications' => '1'
 				]).', null, this);'
 			)
+	])
+	->addRow(_('Name'),
+		(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Minimum severity'),
+		new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
+	)
+	->addRow(_('Age less than'), [
+		(new CCheckBox('status_change'))
+			->setChecked($filter['statusChange'] == 1)
+			->onClick('javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$statusChangeDays,
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		_('days')
 	]);
 
 // inventory filter
