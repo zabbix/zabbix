@@ -108,7 +108,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					(new CMultiSelect([
 						'multiple' => true,
 						'name' => 'filter_hostids[]',
-						'object_name' => 'host',
+						'object_name' => 'hosts',
 						'data' => $data['ms_hosts'],
 						'popup' => [
 							'parameters' => [
