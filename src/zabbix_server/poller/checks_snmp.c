@@ -2129,4 +2129,10 @@ void	zbx_init_snmp(void)
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
+void	zbx_clear_cache_snmp(void)
+{
+	free_etimelist();
+	clear_user_list();
+}
+
 #endif	/* HAVE_NETSNMP */

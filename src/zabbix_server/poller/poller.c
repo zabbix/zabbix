@@ -874,6 +874,16 @@ exit:
 	return num;
 }
 
+static void	zbx_poller_sigusr_handler(int flags)
+{
+#ifdef HAVE_NETSNMP
+	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+	{
+		zbx_clear_cache_snmp();
+	}
+#endif
+}
+
 ZBX_THREAD_ENTRY(poller_thread, args)
 {
 	int		nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
@@ -904,6 +914,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	zbx_set_sigusr_handler(zbx_poller_sigusr_handler);
 
 	while (ZBX_IS_RUNNING())
 	{

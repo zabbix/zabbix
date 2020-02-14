@@ -227,12 +227,15 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		case ZBX_RTC_HOUSEKEEPER_EXECUTE:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_HOUSEKEEPER, 1, flags);
 			break;
-		case ZBX_RTC_LOG_LEVEL_INCREASE:
+	case ZBX_RTC_LOG_LEVEL_INCREASE:
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ZBX_RTC_GET_SCOPE(flags))
 				zbx_signal_process_by_pid(ZBX_RTC_GET_DATA(flags), flags);
 			else
 				zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags), flags);
+			break;
+		case ZBX_RTC_SNMP_CACHE_RELOAD:
+			zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags), flags);
 			break;
 	}
 #endif
