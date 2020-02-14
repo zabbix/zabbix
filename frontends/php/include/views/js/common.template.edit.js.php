@@ -205,7 +205,9 @@
 							jQuery('#macros_' + macro_num + '_value').prop('disabled', true);
 						}
 
-						jQuery('#macros_' + macro_num + '_value_btn').prop('disabled', true);
+						jQuery('#macros_' + macro_num + '_value_btn')
+							.prop('disabled', true)
+							.show();
 						jQuery('#macros_' + macro_num + '_value')
 							.closest('.input-group')
 							.find('.btn-undo')
@@ -313,6 +315,7 @@
 									jQuery('<button>')
 										.attr({id: $textarea.attr('id') + '_btn', type: 'button'})
 										.prop('disabled', true)
+										.hide()
 										.addClass('<?= ZBX_STYLE_BTN_CHANGE ?>')
 										.text(<?= json_encode(_('Set new value')) ?>)
 								)
