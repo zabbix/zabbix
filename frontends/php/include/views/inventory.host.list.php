@@ -19,23 +19,11 @@
 **/
 
 
-$hostInventoryWidget = (new CWidget())
-	->setTitle(_('Host inventory'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->setAttribute('aria-label', _('Main filter'))
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
-			])
-		)
-	);
+$hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
 
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
-$inventoryFieldsComboBox = (new CComboBox('filter_field', $this->data['filterField']))
+$inventoryFieldsComboBox = (new CComboBox('filter_field', $data['filter']['field']))
 	->setAttribute('autofocus', 'autofocus');
 foreach ($inventoryFields as $inventoryField) {
 	$inventoryFieldsComboBox->addItem($inventoryField['db_field'], $inventoryField['title']);
@@ -47,16 +35,35 @@ $hostInventoryWidget->addItem(
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Field'), [
-				$inventoryFieldsComboBox,
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('filter_exact', $this->data['filterExact'], null, [
-					0 => _('contains'),
-					1 => _('equals')
-				]),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CTextBox('filter_field_value', $this->data['filterFieldValue']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			])
+			(new CFormList())
+				->addRow(
+					(new CLabel(_('Host groups'), 'filter_groups__ms')),
+					(new CMultiSelect([
+						'name' => 'filter_groups[]',
+						'object_name' => 'hostGroup',
+						'data' => $data['filter']['groups'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'host_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_groups_',
+								'real_hosts' => 1
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+				->addRow(_('Field'), [
+					$inventoryFieldsComboBox,
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('filter_exact', $data['filter']['exact'], null, [
+						0 => _('contains'),
+						1 => _('equals')
+					]),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CTextBox('filter_field_value', $data['filter']['fieldValue']))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				])
 		])
 );
 

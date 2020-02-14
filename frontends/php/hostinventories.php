@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
-$page['scripts'] = ['layout.mode.js'];
+$page['scripts'] = ['layout.mode.js', 'multiselect.js'];
 
 $hostId = getRequest('hostid', 0);
 
@@ -38,7 +38,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -46,6 +45,7 @@ $fields = [
 	'filter_field' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_field_value' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_exact' =>		[T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null],
+	'filter_groups' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	// actions
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	// sort and sortorder
@@ -60,9 +60,6 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
-	access_deny();
-}
 if (getRequest('hostid') && !isReadableHosts([getRequest('hostid')])) {
 	access_deny();
 }
@@ -145,14 +142,6 @@ else {
 		'active_tab' => CProfile::get('web.hostinventories.filter.active', 1)
 	];
 
-	// filter
-	$data['pageFilter'] = new CPageFilter([
-		'groups' => [
-			'real_hosts' => true
-		],
-		'groupid' => getRequest('groupid')
-	]);
-
 	/*
 	 * Filter
 	 */
@@ -160,21 +149,38 @@ else {
 		CProfile::update('web.hostinventories.filter_field', getRequest('filter_field', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.hostinventories.filter_field_value', getRequest('filter_field_value', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.hostinventories.filter_exact', getRequest('filter_exact', 0), PROFILE_TYPE_INT);
-
+		CProfile::updateArray('web.hostinventories.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
 	}
 	elseif (hasRequest('filter_rst')) {
 		DBStart();
 		CProfile::delete('web.hostinventories.filter_field');
 		CProfile::delete('web.hostinventories.filter_field_value');
 		CProfile::delete('web.hostinventories.filter_exact');
+		CProfile::deleteIdx('web.hostinventories.filter_groups');
 		DBend();
 	}
 
-	$data['filterField'] = CProfile::get('web.hostinventories.filter_field', '');
-	$data['filterFieldValue'] = CProfile::get('web.hostinventories.filter_field_value', '');
-	$data['filterExact'] = CProfile::get('web.hostinventories.filter_exact', 0);
+	$data['filter'] = [
+		'field' => CProfile::get('web.hostinventories.filter_field', ''),
+		'fieldValue' => CProfile::get('web.hostinventories.filter_field_value', ''),
+		'exact' => CProfile::get('web.hostinventories.filter_exact', 0),
+		'groups' => CProfile::getArray('web.hostinventories.filter_groups', [])
+	];
 
-	if ($data['pageFilter']->groupsSelected) {
+	// Select filter host groups.
+	$data['filter']['groups'] = $data['filter']['groups']
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $data['filter']['groups'],
+			'real_hosts' => true,
+			'preservekeys' => true
+		]), ['groupid' => 'id'])
+		: [];
+
+	/**
+	 * Select data
+	 */
+	if ($data['filter']['groups']) {
 		// which inventory fields we will need for displaying
 		$requiredInventoryFields = [
 			'name',
@@ -188,38 +194,39 @@ else {
 		// checking if correct inventory field is specified for filter
 		$possibleInventoryFields = getHostInventories();
 		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
-		if ($data['filterField'] !== '' && $data['filterFieldValue'] !== ''
-				&& !isset($possibleInventoryFields[$data['filterField']])) {
-			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filterField']));
+		if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== ''
+				&& !isset($possibleInventoryFields[$data['filter']['field']])) {
+			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filter']['field']));
 		}
 		else {
 			// if we are filtering by field, this field is also required
-			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
-				$requiredInventoryFields[] = $data['filterField'];
+			if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== '') {
+				$requiredInventoryFields[] = $data['filter']['field'];
 			}
 
 			$options = [
 				'output' => ['hostid', 'name', 'status'],
 				'selectInventory' => $requiredInventoryFields,
 				'selectGroups' => API_OUTPUT_EXTEND,
-				'groupids' => $data['pageFilter']->groupids,
+				'groupids' => array_keys($data['filter']['groups']),
 				'filter' => ['inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]]
 			];
 
-			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
+			if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== '') {
 				$options['searchInventory'] = [
-					$data['filterField'] => [$data['filterFieldValue']]
+					$data['filter']['field'] => [$data['filter']['fieldValue']]
 				];
 			}
 
 			$data['hosts'] = API::Host()->get($options);
 
 			// filter exact matches
-			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '' && $data['filterExact'] != 0) {
-				$needle = mb_strtolower($data['filterFieldValue']);
+			if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== ''
+					&& $data['filter']['exact'] != 0) {
+				$needle = mb_strtolower($data['filter']['fieldValue']);
 
 				foreach ($data['hosts'] as $num => $host) {
-					$haystack = mb_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]);
+					$haystack = mb_strtolower($data['hosts'][$num]['inventory'][$data['filter']['field']]);
 
 					if ($haystack !== $needle) {
 						unset($data['hosts'][$num]);
@@ -272,9 +279,7 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['hosts'], $sortOrder,
-		(new CUrl('hostinventories.php'))->setArgument('groupid', $data['pageFilter']->groupid)
-	);
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['hosts'], $sortOrder, new CUrl('hostinventories.php'));
 
 	$hostinventoriesView = new CView('inventory.host.list', $data);
 	$hostinventoriesView->render();
