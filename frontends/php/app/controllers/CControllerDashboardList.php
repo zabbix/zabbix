@@ -88,8 +88,6 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 			$this->prepareEditableFlag($data['dashboards']);
 		}
 
-		CView::$has_web_layout_mode = true;
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));
 		$this->setResponse($response);

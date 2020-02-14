@@ -41,7 +41,7 @@ class testGraphWidget extends CWebTest {
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int';
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str';
 
 	/*
 	 * Set "Graph" as default widget type.
@@ -93,6 +93,7 @@ class testGraphWidget extends CWebTest {
 
 	/*
 	 * Check screenshots of graph widget form.
+	 * @browsers chrome
 	 */
 	public function testGraphWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
@@ -162,7 +163,7 @@ class testGraphWidget extends CWebTest {
 
 		sleep(2);
 		$form->submit();
-		$form->parents('id:overlay_dialogue')->query('xpath:div[@class="overlay-dialogue-footer"]'.
+		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
 				'//button[@class="dialogue-widget-save"]')->one()->waitUntilClickable();
 
 		if (!is_array($data['error'])) {
@@ -1496,7 +1497,7 @@ class testGraphWidget extends CWebTest {
 						'fields' => [
 							'Show problems' => true,
 							'Selected items only' => false,
-							'Problem hosts' => ['Simple form test host', 'ЗАББИКС Сервер'],
+							'Problem hosts' => ['Simple form test host'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
 							'Tags' => 'Or'
@@ -1788,7 +1789,7 @@ class testGraphWidget extends CWebTest {
 						'fields' => [
 							'Show problems' => true,
 							'Selected items only' => false,
-							'Problem hosts' => ['ЗАББИКС Сервер', 'Simple form test host'],
+							'Problem hosts' => ['Simple form test host', 'ЗАББИКС Сервер'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
 							'Tags' => 'Or'
@@ -1853,7 +1854,7 @@ class testGraphWidget extends CWebTest {
 		$this->fillForm($data, $form);
 		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
-		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->query('id:overlay-bg')->waitUntilNotVisible();
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 
 		// Check valuse in updated widget.
@@ -1873,7 +1874,7 @@ class testGraphWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
-		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->query('id:overlay-bg')->waitUntilNotVisible();
 		$this->saveGraphWidget($name);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -1899,7 +1900,9 @@ class testGraphWidget extends CWebTest {
 			$form->selectTab($tab);
 			switch ($tab) {
 				case 'Problems':
+					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT_MULTIPLE);
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
+					CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 
 					if (array_key_exists('tags', $data['Problems'])) {
 						$this->setFilterSelector('id:tags_table_tags');

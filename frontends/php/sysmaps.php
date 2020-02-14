@@ -371,9 +371,7 @@ if (hasRequest('form')) {
 	order_result($data['iconMaps'], 'name');
 
 	// render view
-	$mapView = new CView('monitoring.sysmap.edit', $data);
-	$mapView->render();
-	$mapView->show();
+	echo (new CView('monitoring.sysmap.edit', $data))->getOutput();
 }
 else {
 	CProfile::delete('web.maps.sysmapid');
@@ -448,9 +446,7 @@ else {
 	}
 
 	// render view
-	$mapView = new CView('monitoring.sysmap.list', $data);
-	$mapView->render();
-	$mapView->show();
+	echo (new CView('monitoring.sysmap.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

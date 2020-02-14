@@ -30,8 +30,9 @@ class CMultiselectElement extends CElement {
 	/**
 	 * Multiselect fill modes.
 	 */
-	const MODE_SELECT	= 0;
-	const MODE_TYPE		= 1;
+	const MODE_SELECT			= 0;
+	const MODE_SELECT_MULTIPLE	= 1;
+	const MODE_TYPE				= 2;
 
 	protected static $default_mode = self::MODE_TYPE;
 	protected $mode;
@@ -100,9 +101,11 @@ class CMultiselectElement extends CElement {
 	 * @return $this
 	 */
 	public function select($label, $context = null) {
-		$this->edit($context)->query('link:'.$label)->one()->click();
-		$this->query('xpath:.//span[@class="subfilter-enabled"][string()='.CXPathHelper::escapeQuotes($label).']')
-				->waitUntilPresent();
+		if (is_array($label)) {
+			throw new Exception('Select of multiple labels is not supported in single select mode.');
+		}
+
+		$this->edit($context)->query('link:'.$label)->one()->click()->waitUntilNotPresent();
 
 		return $this;
 	}
@@ -181,8 +184,9 @@ class CMultiselectElement extends CElement {
 	 */
 	public function getControls() {
 		$buttons = [];
+		$xpath = 'xpath:.//button';
 
-		foreach ($this->query('xpath:.//button')->all() as $button) {
+		foreach ($this->query($xpath)->all() as $button) {
 			$buttons[$button->getText()] = $button;
 		}
 
@@ -202,7 +206,8 @@ class CMultiselectElement extends CElement {
 		 */
 		$this->getControls()->first()->click();
 
-		return COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($context);
+		return COverlayDialogElement::find()->waitUntilPresent()
+				->all()->last()->waitUntilReady()->setDataContext($context);
 	}
 
 	/**
@@ -223,11 +228,14 @@ class CMultiselectElement extends CElement {
 			}
 
 			$content = CXPathHelper::escapeQuotes($value);
+
 			try {
 				$element = $this->query('xpath', implode('|', [
 					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
+					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@data-label,'.$content.')]'.
+							'/span[contains(@class, "suggest-found") and text()='.$content.']',
 					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]'.
-					'/span[text()='.$content.']'
+							'/span[text()='.$content.']'
 				]))->waitUntilPresent();
 			}
 			catch (NoSuchElementException $exception) {
@@ -257,7 +265,7 @@ class CMultiselectElement extends CElement {
 	 * @return $this
 	 */
 	public function fill($labels, $context = null) {
-		if ($this->mode !== self::MODE_SELECT && $this->mode !== self::MODE_TYPE) {
+		if (!in_array($this->mode, [self::MODE_SELECT, self::MODE_SELECT_MULTIPLE, self::MODE_TYPE])) {
 			throw new Exception('Unknown fill mode is set for multiselect element.');
 		}
 
@@ -279,6 +287,9 @@ class CMultiselectElement extends CElement {
 					}
 
 					if ($this->mode === self::MODE_SELECT) {
+						throw new Exception('Cannot select multiple items in single select mode.');
+					}
+					elseif ($this->mode === self::MODE_SELECT_MULTIPLE) {
 						$this->selectMultiple($label, $context);
 					}
 					else {
@@ -291,6 +302,9 @@ class CMultiselectElement extends CElement {
 		}
 
 		if ($this->mode === self::MODE_SELECT) {
+			return $this->select($labels, $context);
+		}
+		elseif ($this->mode === self::MODE_SELECT_MULTIPLE) {
 			return $this->selectMultiple($labels, $context);
 		}
 

@@ -18,6 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
+
 if ($data['clock']['critical_error'] !== null) {
 	$item = (new CTableInfo())->setNoDataMessage($data['clock']['critical_error']);
 
@@ -61,4 +66,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

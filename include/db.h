@@ -334,6 +334,7 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
 #define ZBX_FLAGS_DB_EVENT_NO_ACTION		0x0002
+#define ZBX_FLAGS_DB_EVENT_RECOVER		0x0004
 	zbx_uint64_t		flags;
 }
 DB_EVENT;
@@ -449,12 +450,6 @@ typedef struct
 {
 	zbx_uint64_t	actionid;
 	char		*name;
-	char		*shortdata;
-	char		*longdata;
-	char		*r_shortdata;
-	char		*r_longdata;
-	char		*ack_shortdata;
-	char		*ack_longdata;
 	int		esc_period;
 	unsigned char	eventsource;
 	unsigned char	pause_suppressed;
@@ -657,6 +652,8 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
+
+void	DBcheck_character_set(void);
 
 /* bulk insert support */
 

@@ -19,8 +19,12 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
-	'body' => (new CView('hostmacros.list.html', $data))->getOutput()
+	'body' => (new CPartial('hostmacros.list.html', $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {
@@ -32,4 +36,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

@@ -1,3 +1,29 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
 <script type="text/x-jquery-tmpl" id="dcheck-row-tmpl">
 	<?= (new CRow([
 			(new CCol(
@@ -192,15 +218,15 @@
 	}
 
 	jQuery(function() {
-		addDCheck(<?= CJs::encodeJson(array_values($data['drule']['dchecks'])) ?>);
+		addDCheck(<?= json_encode(array_values($data['drule']['dchecks'])) ?>);
 
-		jQuery('input:radio[name="uniqueness_criteria"][value=<?= CJs::encodeJson($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="host_source"][value=<?= CJs::encodeJson($data['drule']['host_source']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="name_source"][value=<?= CJs::encodeJson($data['drule']['name_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="uniqueness_criteria"][value=<?= json_encode($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="host_source"][value=<?= json_encode($data['drule']['host_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="name_source"][value=<?= json_encode($data['drule']['name_source']) ?>]').attr('checked', 'checked');
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
-				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.text(<?= json_encode(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#form').val('clone');
@@ -293,10 +319,10 @@
 	/**
 	 * Sends discovery check form data to the server for validation before adding it to the main form.
 	 *
-	 * @param {string} form_name  Form name that is sent to the server for validation.
+	 * @param {Overlay} overlay
 	 */
-	function submitDCheck(form_name) {
-		var $form = jQuery(document.forms['dcheck_form']);
+	function submitDCheck(overlay) {
+		var $form = overlay.$dialogue.find('form');
 
 		$form.trimValues([
 			'#ports', '#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
@@ -314,10 +340,14 @@
 			return false;
 		}
 
-		return sendAjaxData('zabbix.php', {
+		overlay.setLoading();
+		overlay.xhr = sendAjaxData('zabbix.php', {
 			data: data,
 			dataType: 'json',
 			method: 'POST',
+			complete: function() {
+				overlay.unsetLoading();
+			}
 		}).done(function(response) {
 			$form
 				.parent()
@@ -342,14 +372,14 @@
 					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				if (hasDCheckDuplicates()) {
-					jQuery(makeMessageBox('bad', <?= CJs::encodeJson(_('Check already exists.')) ?>, null, true, false))
+					jQuery(makeMessageBox('bad', <?= json_encode(_('Check already exists.')) ?>, null, true, false))
 						.insertBefore($form);
 
 					return false;
 				}
 
 				addDCheck([dcheck]);
-				overlayDialogueDestroy(dialogueid);
+				overlayDialogueDestroy(overlay.dialogueid);
 			}
 		});
 	}

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.trigger.massupdate.js.php';
 
 $widget = (new CWidget())->setTitle(_('Trigger prototypes'));
@@ -131,7 +135,7 @@ $dependencies_div = (new CDiv([
 	new CHorList([
 		(new CButton('add_dep_trigger', _('Add')))
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'triggers',
 					'srcfld1' => 'triggerid',
 					'dstfrm' => 'massupdate',
@@ -148,7 +152,7 @@ $dependencies_div = (new CDiv([
 			->addClass(ZBX_STYLE_BTN_LINK),
 		(new CButton('add_dep_trigger_prototype', _('Add prototype')))
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'trigger_prototypes',
 					'srcfld1' => 'triggerid',
 					'dstfrm' => 'massupdate',
@@ -194,4 +198,4 @@ $form->addItem($tabs);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

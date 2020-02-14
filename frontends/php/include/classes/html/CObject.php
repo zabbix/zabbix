@@ -82,7 +82,10 @@ class CObject {
 
 function unpack_object(&$item) {
 	$res = '';
-	if (is_object($item)) {
+	if ($item instanceof CPartial) {
+		$res = $item->getOutput();
+	}
+	elseif (is_object($item)) {
 		$res = $item->toString(false);
 	}
 	elseif (is_array($item)) {

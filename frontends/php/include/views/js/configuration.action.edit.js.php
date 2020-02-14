@@ -1,3 +1,29 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
 <!-- Trigger Actions-->
 <script type="text/x-jquery-tmpl" id="opmsg-usrgrp-row-tmpl">
 <tr id="#{row}#{usrgrpid}">
@@ -255,24 +281,31 @@
 		}
 	}
 
+	function resetOpmessage() {
+		jQuery('#operation_opmessage_mediatypeid').val(0);
+		jQuery('#operation_opmessage_default_msg').val(1);
+		jQuery('#operation_opmessage_subject, #operation_opmessage_message').val('');
+	}
+
 	jQuery(document).ready(function() {
 		var remove_operationid = function() {
 			var operationid_RegExp = /^(operations|recovery_operations|ack_operations)\[\d+\]\[operationid\]$/;
 
 			jQuery('input[name^=operations], input[name^=recovery_operations], input[name^=ack_operations]')
 				.each(function() {
-					// Intentional usage of JS Prototype.
-					if ($(this).getAttribute('name').match(operationid_RegExp)) {
+					if ($(this).attr('name').match(operationid_RegExp)) {
 						$(this).remove();
 					}
 				});
 		};
 
+		jQuery('#add').click(remove_operationid);
+
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
 			jQuery('#update')
-				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.text(<?= json_encode(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'})
 				.click(remove_operationid);
 			jQuery('#form').val('clone');

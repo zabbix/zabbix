@@ -52,7 +52,7 @@ extern int		server_num, process_num;
  *                                                                            *
  * Function: proxy_data_sender                                                *
  *                                                                            *
- * Purpose: collects host availability, history, discovery, auto registration *
+ * Purpose: collects host availability, history, discovery, autoregistration  *
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/

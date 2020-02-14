@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if ($data['graph']['unavailable_object']) {
 	$item = (new CTableInfo())->setNoDataMessage(_('No permissions to referred object or it does not exist!'));
 
@@ -37,8 +41,8 @@ else {
 		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
 
-	$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.CJs::encodeJson($data['timeline']).', '.
-			CJs::encodeJson($data['time_control_data']).
+	$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.json_encode($data['timeline']).', '.
+			json_encode($data['time_control_data']).
 		');'.
 		'timeControl.processObjects();'.
 		'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
@@ -123,4 +127,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

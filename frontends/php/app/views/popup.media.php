@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $options = $data['options'];
 $severity_row = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
@@ -104,7 +108,7 @@ $form = (new CForm())
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.media.js.php',
+	'script_inline' => $this->readJsFile('popup.media.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
@@ -112,7 +116,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return validateMedia("'.$form->getName().'");'
+			'action' => 'return validateMedia(overlay);'
 		]
 	]
 ];
@@ -122,4 +126,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

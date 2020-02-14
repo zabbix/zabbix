@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
 <!DOCTYPE html>
 <html>

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.correlation.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Event correlation rules'));
@@ -90,7 +94,7 @@ if ($data['correlation']['filter']['conditions']) {
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.condition.event.corr",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.condition.event.corr",'.json_encode([
 			'type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR
 		]).', null, this);')
 		->addClass(ZBX_STYLE_BTN_LINK)
@@ -177,4 +181,4 @@ $form->addItem($correlation_tabs);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

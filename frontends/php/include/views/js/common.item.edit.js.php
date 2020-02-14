@@ -1,3 +1,29 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
 <script type="text/x-jquery-tmpl" id="delayFlexRow">
 	<tr class="form_row">
 		<td>
@@ -221,12 +247,25 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 ?>
 <script type="text/javascript">
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == <?php echo CJs::encodeJson(ITEM_AUTHTYPE_PUBLICKEY); ?>
-				&& jQuery('#type').val() == <?php echo CJs::encodeJson(ITEM_TYPE_SSH); ?>) {
-			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Key passphrase')); ?>);
+		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
+				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
+			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
 		}
 		else {
-			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Password')); ?>);
+			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
+		}
+	}
+
+	function updateItemTestBtn() {
+		var testable_item_types = <?= json_encode(CControllerPopupItemTest::getTestableItemTypes($this->data['hostid'])) ?>,
+			type = parseInt(jQuery('#type').val()),
+			key = jQuery('#key').val();
+
+		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
+			jQuery('#test_item').prop('disabled', true);
+		}
+		else {
+			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
 		}
 	}
 
@@ -260,21 +299,35 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			], true) ?>);
 		}
 
+		$("#key").on('keyup change', updateItemTestBtn);
+
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
+				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
+
+				updateItemTestBtn();
 				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())]);
 
 				setAuthTypeLabel();
 			})
 			.trigger('change');
 
+		$('#test_item').on('click', function() {
+			var step_nums = [];
+			$('select[name^="preprocessing"][name$="[type]"]', $('#preprocessing')).each(function() {
+				var str = $(this).attr('name');
+				step_nums.push(str.substr(14, str.length - 21));
+			});
+
+			openItemTestDialog(step_nums, true, true, this, -2);
+		});
+
 		$('#authtype').bind('change', function() {
 			setAuthTypeLabel();
 		});
 
-		$('[data-action="parse_url"]').click(function() {
+		$('[data-action="parse_url"]').click(function(e) {
 			var url_node = $(this).siblings('[name="url"]'),
 				table = $('#query_fields_pairs').data('editableTable'),
 				url = parseUrlString(url_node.val())
@@ -297,19 +350,19 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			}
 			else {
 				overlayDialogue({
-					'title': <?= CJs::encodeJson(_('Error')); ?>,
+					'title': <?= json_encode(_('Error')); ?>,
 					'content': $('<span>').html(<?=
-						CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
+						json_encode(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
 					?>),
 					'buttons': [
 						{
-							title: <?= CJs::encodeJson(_('Ok')); ?>,
+							title: <?= json_encode(_('Ok')); ?>,
 							class: 'btn-alt',
 							focused: true,
 							action: function() {}
 						}
 					]
-				});
+				}, e.target);
 			}
 		});
 

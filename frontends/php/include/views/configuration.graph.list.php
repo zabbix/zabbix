@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if (!empty($this->data['parent_discoveryid'])) {
 	$widget = (new CWidget())
 		->setTitle(_('Graph prototypes'))
@@ -170,4 +174,4 @@ $graphForm->addItem([
 // append form to widget
 $widget->addItem($graphForm);
 
-return $widget;
+$widget->show();

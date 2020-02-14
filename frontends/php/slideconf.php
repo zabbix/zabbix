@@ -344,9 +344,7 @@ if (hasRequest('form')) {
 	unset($slide);
 
 	// render view
-	$slideshowView = new CView('monitoring.slideconf.edit', $data);
-	$slideshowView->render();
-	$slideshowView->show();
+	echo (new CView('monitoring.slideconf.edit', $data))->getOutput();
 }
 else {
 	CProfile::delete('web.slides.elementid');
@@ -437,9 +435,7 @@ else {
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['slides'], $sortOrder, new CUrl('slideconf.php'));
 
 	// render view
-	$slideshowView = new CView('monitoring.slideconf.list', $data);
-	$slideshowView->render();
-	$slideshowView->show();
+	echo (new CView('monitoring.slideconf.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

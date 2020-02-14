@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/monitoring.screen.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Screens'));
@@ -126,7 +130,7 @@ if (!array_key_exists('templateid', $data['screen'])) {
 
 	$add_user_group_btn = ([(new CButton(null, _('Add')))
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'usrgrp',
 				'srcfld1' => 'usrgrpid',
 				'srcfld2' => 'name',
@@ -162,7 +166,7 @@ if (!array_key_exists('templateid', $data['screen'])) {
 
 	$add_user_btn = ([(new CButton(null, _('Add')))
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'users',
 				'srcfld1' => 'userid',
 				'srcfld2' => 'fullname',
@@ -237,4 +241,4 @@ $form->addItem($tabs);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

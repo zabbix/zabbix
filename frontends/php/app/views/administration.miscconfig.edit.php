@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Other configuration parameters'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());

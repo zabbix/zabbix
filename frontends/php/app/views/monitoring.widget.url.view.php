@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $item = ($data['url']['error'] !== null)
 	? (new CTableInfo())->setNoDataMessage($data['url']['error'])
 	: (new CIFrame($data['url']['url'], '100%', '100%', 'auto'))->addClass(ZBX_STYLE_WIDGET_URL);
@@ -37,4 +41,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

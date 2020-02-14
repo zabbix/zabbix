@@ -19,10 +19,14 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
-	'body' => (new CView('administration.usergroup.grouprights.html', ['group_rights' => $data['group_rights']]))
-		->render()
-		->toString()
+	'body' => (new CPartial('administration.usergroup.grouprights.html', [
+		'group_rights' => $data['group_rights']
+	]))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {
@@ -34,4 +38,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $item = new CDashboardWidgetMap($data['sysmap_data'], $data['widget_settings']);
 
 $output = [
@@ -36,4 +40,4 @@ if ($this->data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

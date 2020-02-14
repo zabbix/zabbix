@@ -19,10 +19,14 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.autoreg.edit.js.php');
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('administration.autoreg.edit.js.php');
 
 $widget = (new CWidget())
-	->setTitle(_('Auto registration'))
+	->setTitle(_('Autoregistration'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $autoreg_form = (new CForm())
@@ -82,7 +86,7 @@ else {
 }
 
 $autoreg_view = (new CTabView())
-	->addTab('autoreg', _('Auto registration'), $autoreg_tab)
+	->addTab('autoreg', _('Autoregistration'), $autoreg_tab)
 	->setFooter(makeFormFooter((new CSubmitButton(_('Update'), 'action', 'autoreg.update'))->setId('update')));
 
 $autoreg_form->addItem($autoreg_view);

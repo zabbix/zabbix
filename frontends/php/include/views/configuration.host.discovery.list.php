@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
 	->setControls(
@@ -172,7 +176,7 @@ $discoveryForm->addItem([
 			'discoveryrule.massdisable' => ['name' => _('Disable'),
 				'confirm' =>_('Disable selected discovery rules?')
 			],
-			'discoveryrule.masscheck_now' => ['name' => _('Check now')],
+			'discoveryrule.masscheck_now' => ['name' => _('Execute now')],
 			'discoveryrule.massdelete' => ['name' => _('Delete'),
 				'confirm' =>_('Delete selected discovery rules?')
 			]
@@ -184,4 +188,4 @@ $discoveryForm->addItem([
 // append form to widget
 $widget->addItem($discoveryForm);
 
-return $widget;
+$widget->show();

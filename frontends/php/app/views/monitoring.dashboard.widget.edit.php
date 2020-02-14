@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget_view = include('include/classes/widgets/views/widget.'.$data['dialogue']['type'].'.form.view.php');
 
 $form = $widget_view['form'];
@@ -51,4 +55,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

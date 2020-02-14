@@ -18,6 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
+
 $auditWidget = (new CWidget())->setTitle(_('Audit log'));
 
 // header
@@ -31,7 +36,7 @@ $filterColumn->addRow(_('User'), [
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'users',
 				'srcfld1' => 'alias',
 				'dstfrm' => 'zbx_filter',
@@ -117,4 +122,4 @@ zbx_add_post_js('timeControl.processObjects();');
 // append form to widget
 $auditWidget->addItem($auditForm);
 
-return $auditWidget;
+$auditWidget->show();

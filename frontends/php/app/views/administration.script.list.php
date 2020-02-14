@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if ($data['uncheck']) {
 	uncheckTableRows('script');
 }
@@ -120,4 +124,6 @@ $scriptsForm->addItem([
 ]);
 
 // append form to widget
-$widget->addItem($scriptsForm)->show();
+$widget
+	->addItem($scriptsForm)
+	->show();
