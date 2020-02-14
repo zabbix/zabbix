@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $type_field_names = [
 	INTERFACE_TYPE_AGENT => _('Zabbix agent'),
 	INTERFACE_TYPE_SNMP => _('SNMP'),

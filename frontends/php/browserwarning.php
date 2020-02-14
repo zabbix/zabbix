@@ -30,4 +30,4 @@ require_once dirname(__FILE__).'/include/classes/html/CLink.php';
 require_once dirname(__FILE__).'/include/classes/helpers/CBrandHelper.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 
-(new CView('general.browserwarning'))->render();
+echo (new CView('general.browserwarning'))->getOutput();

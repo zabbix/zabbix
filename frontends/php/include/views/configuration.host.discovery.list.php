@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
 	->setControls(
@@ -184,4 +188,4 @@ $discoveryForm->addItem([
 // append form to widget
 $widget->addItem($discoveryForm);
 
-return $widget;
+$widget->show();

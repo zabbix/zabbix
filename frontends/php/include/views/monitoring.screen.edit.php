@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/monitoring.screen.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Screens'));
@@ -237,4 +241,4 @@ $form->addItem($tabs);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

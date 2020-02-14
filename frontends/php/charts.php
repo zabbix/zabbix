@@ -27,9 +27,7 @@ $page['title'] = _('Custom graphs');
 $page['file'] = 'charts.php';
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
@@ -107,8 +105,6 @@ $data = [
 ];
 
 // render view
-$chartsView = new CView('monitoring.charts', $data);
-$chartsView->render();
-$chartsView->show();
+echo (new CView('monitoring.charts', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

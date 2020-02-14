@@ -124,7 +124,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case 'web.layout.mode':
-				CView::setLayoutMode($value_int);
+				CViewHelper::saveLayoutMode($value_int);
 				break;
 
 			default:

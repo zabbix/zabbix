@@ -1013,7 +1013,6 @@ else {
 	$view = new CView('configuration.template.list', $data);
 }
 
-$view->render();
-$view->show();
+echo $view->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

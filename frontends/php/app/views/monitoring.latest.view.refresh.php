@@ -19,8 +19,12 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
-	'body' => (new CView('monitoring.latest.view.html', $data))->getOutput()
+	'body' => (new CPartial('monitoring.latest.view.html', $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

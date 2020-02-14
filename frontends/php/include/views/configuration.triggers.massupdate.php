@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.trigger.massupdate.js.php';
 
 $widget = (new CWidget())->setTitle(_('Triggers'));
@@ -174,4 +178,4 @@ $form->addItem($tabs);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

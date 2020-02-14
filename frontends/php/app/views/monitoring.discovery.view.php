@@ -19,17 +19,24 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('multiselect.js');
 
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
+
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))
-	->setWebLayoutMode(CView::getLayoutMode())
+	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)

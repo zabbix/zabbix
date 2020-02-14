@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Items'));
 
 if ($data['hostid'] != 0) {
@@ -618,4 +622,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';
 
-return $widget;
+$widget->show();

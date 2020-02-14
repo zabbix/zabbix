@@ -1951,9 +1951,7 @@
 		widget['content_body'].append(response.body);
 
 		if (typeof response.debug !== 'undefined') {
-			var debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
-
-			$(response.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
+			$(response.debug).appendTo(widget['content_body']);
 		}
 
 		removeWidgetInfoButtons(widget['content_header']);
@@ -3576,41 +3574,41 @@
 				});
 
 				overlay.xhr.done(function(response) {
-						data.dialogue['widget_type'] = response.type;
+					data.dialogue['widget_type'] = response.type;
 
-						body.empty();
-						body.append(response.body);
-						if (typeof response.debug !== 'undefined') {
-							body.append(response.debug);
-						}
-						if (typeof response.messages !== 'undefined') {
-							body.append(response.messages);
-						}
+					body.empty();
+					body.append(response.body);
+					if (typeof response.debug !== 'undefined') {
+						body.append(response.debug);
+					}
+					if (typeof response.messages !== 'undefined') {
+						body.append(response.messages);
+					}
 
-						body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
+					body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
 
-						// Change submit function for returned form.
-						$('#widget_dialogue_form', body).on('submit', function(e) {
-							e.preventDefault();
-							updateWidgetConfig($this, data, widget);
-						});
-
-						if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
-							showMessageExhausted(data);
-						}
-						else {
-							// Enable save button after successful form update.
-							$('.dialogue-widget-save', footer).prop('disabled', false);
-						}
-
-						var $overlay = jQuery('[data-dialogueid="widgetConfg"]');
-						$overlay.toggleClass('sticked-to-top', data.dialogue['widget_type'] === 'svggraph');
-
-						Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});
-						Overlay.prototype.containFocus.call({'$dialogue': $overlay});
-
-						overlay.unsetLoading();
+					// Change submit function for returned form.
+					$('#widget_dialogue_form', body).on('submit', function(e) {
+						e.preventDefault();
+						updateWidgetConfig($this, data, widget);
 					});
+
+					if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
+						showMessageExhausted(data);
+					}
+					else {
+						// Enable save button after successful form update.
+						$('.dialogue-widget-save', footer).prop('disabled', false);
+					}
+
+					var $overlay = jQuery('[data-dialogueid="widgetConfg"]');
+					$overlay.toggleClass('sticked-to-top', data.dialogue['widget_type'] === 'svggraph');
+
+					Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});
+					Overlay.prototype.containFocus.call({'$dialogue': $overlay});
+
+					overlay.unsetLoading();
+				});
 			});
 		},
 

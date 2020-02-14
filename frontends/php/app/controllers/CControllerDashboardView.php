@@ -154,8 +154,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				];
 			}
 
-			CView::$has_web_layout_mode = true;
-
 			$response = new CControllerResponseData($data);
 			$response->setTitle(_('Dashboard'));
 			$this->setResponse($response);

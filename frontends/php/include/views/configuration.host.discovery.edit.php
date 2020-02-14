@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
 	->addItem(get_header_host_table('discoveries', $data['hostid'],
@@ -825,4 +829,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';
 
-return $widget;
+$widget->show();

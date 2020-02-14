@@ -419,9 +419,7 @@ if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRe
 	$data['action'] = 'graph.masscopyto';
 
 	// render view
-	$graphView = new CView('configuration.copy.elements', $data);
-	$graphView->render();
-	$graphView->show();
+	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
@@ -612,9 +610,7 @@ elseif (isset($_REQUEST['form'])) {
 	}
 
 	// render view
-	$graphView = new CView('configuration.graph.edit', $data);
-	$graphView->render();
-	$graphView->show();
+	echo (new CView('configuration.graph.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -703,9 +699,7 @@ else {
 	);
 
 	// render view
-	$graphView = new CView('configuration.graph.list', $data);
-	$graphView->render();
-	$graphView->show();
+	echo (new CView('configuration.graph.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

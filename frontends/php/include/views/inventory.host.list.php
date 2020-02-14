@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setControls((new CForm('get'))
@@ -101,4 +105,4 @@ foreach ($this->data['hosts'] as $host) {
 $table = [$table, $this->data['paging']];
 $hostInventoryWidget->addItem($table);
 
-return $hostInventoryWidget;
+$hostInventoryWidget->show();

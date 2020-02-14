@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Discovery rules'));
@@ -151,4 +155,4 @@ $discoveryForm->addItem($discoveryTabs);
 
 $widget->addItem($discoveryForm);
 
-return $widget;
+$widget->show();

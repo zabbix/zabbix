@@ -30,9 +30,7 @@ $page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.pmaster.js
 	'flickerfreescreen.js', 'layout.mode.js'
 ];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
@@ -215,8 +213,6 @@ show_messages();
 $data['refreshMultiplier'] = CProfile::get('web.slides.rf_rate.'.WIDGET_SLIDESHOW, 1, $data['elementId']);
 
 // render view
-$slidesView = new CView('monitoring.slides', $data);
-$slidesView->render();
-$slidesView->show();
+echo (new CView('monitoring.slides', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

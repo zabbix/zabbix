@@ -19,8 +19,13 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('colorpicker.js');
-$this->includeJSfile('app/views/administration.trigseverity.edit.js.php');
+
+$this->includeJsFile('administration.trigseverity.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger severities'))

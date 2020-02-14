@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/monitoring.slideconf.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Slide shows'));
@@ -288,4 +292,4 @@ else {
 $form->addItem($tabs);
 $widget->addItem($form);
 
-return $widget;
+$widget->show();
