@@ -148,7 +148,9 @@ $overviewFormList->addRow(_('Monitoring'),
 if ($data['rwHost']) {
 	$hostLink = new CLink(_('Host'), 'hosts.php?form=update&hostid='.$data['host']['hostid'].url_param('groupid'));
 	$applicationsLink = new CLink(_('Applications'),
-		'applications.php?hostid='.$data['host']['hostid'].url_param('groupid')
+		(new CUrl('applications.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$data['host']['hostid']])
 	);
 
 	$itemsLink = new CLink(_('Items'),

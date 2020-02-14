@@ -53,7 +53,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$httptest_count = CViewHelper::showNum($host['httpTests']);
 
 	$applications_link = $host['editable']
-		? [new CLink(_('Applications'), 'applications.php?'.$link), $app_count]
+		? [new CLink(_('Applications'), (new CUrl('applications.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$hostid])
+		), $app_count]
 		: [_('Applications'), $app_count];
 
 	$items_link = $host['editable']
@@ -214,8 +217,11 @@ if ($data['admin']) {
 			? [new CLink($visible_name,'templates.php?form=update&'.'&templateid='.$templateid)]
 			: [new CSpan($visible_name)];
 
-		$applications_link = $template['editable']
-			? [new CLink(_('Applications'), 'applications.php?'.$link), $app_count]
+		$applications_link = $host['editable']
+			? [new CLink(_('Applications'), (new CUrl('applications.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$hostid])
+			), $app_count]
 			: [_('Applications'), $app_count];
 
 		$items_link = $template['editable']

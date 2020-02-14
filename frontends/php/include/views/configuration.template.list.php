@@ -243,7 +243,11 @@ foreach ($data['templates'] as $template) {
 		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
-			new CLink(_('Applications'), 'applications.php?hostid='.$template['templateid'].url_param('groupid')),
+			new CLink(_('Applications'),
+				(new CUrl('applications.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['templateid']])
+			),
 			CViewHelper::showNum($template['applications'])
 		],
 		[

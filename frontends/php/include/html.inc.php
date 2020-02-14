@@ -359,13 +359,18 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	$content_menu = (new CList())
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Content menu'));
+
 	/*
 	 * the count of rows
 	 */
 	if ($lld_ruleid == 0) {
 		// applications
 		$applications = new CSpan([
-			new CLink(_('Applications'), 'applications.php?hostid='.$db_host['hostid']),
+			new CLink(_('Applications'),
+				(new CUrl('applications.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['applications'])
 		]);
 		if ($current_element == 'applications') {

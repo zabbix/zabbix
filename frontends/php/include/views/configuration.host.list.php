@@ -390,7 +390,11 @@ foreach ($data['hosts'] as $host) {
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
-			new CLink(_('Applications'), 'applications.php?hostid='.$host['hostid']),
+			new CLink(_('Applications'),
+				(new CUrl('applications.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$host['hostid']])
+			),
 			CViewHelper::showNum($host['applications'])
 		],
 		[

@@ -710,7 +710,9 @@ function makeApplicationTemplatePrefix($applicationid, array $parent_templates) 
 	foreach ($templates as $template) {
 		if ($template['permission'] == PERM_READ_WRITE) {
 			$name = (new CLink(CHtml::encode($template['name']),
-				(new CUrl('applications.php'))->setArgument('hostid', $template['hostid'])
+				(new CUrl('applications.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['hostid']])
 			))->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
