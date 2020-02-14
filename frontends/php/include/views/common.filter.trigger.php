@@ -26,9 +26,7 @@ $config = $this->data['config'];
 
 $filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))
 	->setProfile($data['profileIdx'])
-	->setActiveTab($data['active_tab'])
-	->addVar('groupid', $filter['groupId'])
-	->addVar('hostid', $filter['hostId']);
+	->setActiveTab($data['active_tab']);
 
 $severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -43,18 +41,19 @@ $column1 = (new CFormList())
 			->addValue(_('Any'), TRIGGERS_OPTION_ALL)
 			->setModern(true)
 	)
-	->addRow((new CLabel(_('Host group'), 'filter_hostids__ms')),
+	->addRow((new CLabel(_('Host group'), 'filter_groupids__ms')),
 		(new CMultiSelect([
 			'multiple' => true,
 			'name' => 'filter_groupids[]',
 			'object_name' => 'group',
-			'data' => [['name' => 'Zabbix servers', 'id' => 4]],
+			'data' => $data['ms_groups'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'filter_groupids_'
+					'dstfld1' => 'filter_groupids_',
+					'with_monitored_triggers' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

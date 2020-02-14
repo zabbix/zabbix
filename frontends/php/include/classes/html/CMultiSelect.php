@@ -185,7 +185,7 @@ class CMultiSelect extends CTag {
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
 					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes',
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
-					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names'
+					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -276,6 +276,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('with_monitored_triggers', $parameters) && $parameters['with_monitored_triggers']) {
 					$popup_parameters['with_monitored_triggers'] = '1';
 					$autocomplete_parameters['monitored'] = true;
+				}
+
+				if (array_key_exists('with_monitored_items', $parameters) && $parameters['with_monitored_items']) {
+					$popup_parameters['with_monitored_items'] = '1';
+					$autocomplete_parameters['with_monitored_items'] = true;
 				}
 
 				if (array_key_exists('excludeids', $parameters) && $parameters['excludeids']) {

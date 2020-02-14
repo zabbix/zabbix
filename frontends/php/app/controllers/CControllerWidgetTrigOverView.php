@@ -55,19 +55,9 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 			'show_recent' => ($fields['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null
 		];
 
-		list(
-			$data['db_hosts'],
-			$data['db_triggers'],
-			$data['dependencies'],
-			$data['triggers_by_name'],
-			$data['hosts_by_name'],
-			$data['exceeded_hosts'],
-			$data['exceeded_trigs']
-		) = getTriggersOverviewDataNew(
-			getSubGroups($fields['groupids']),
-			$fields['application'],
-			[],
-			$trigger_options,
+		list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
+			$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
+		) = getTriggersOverviewData(getSubGroups($fields['groupids']), $fields['application'], [], $trigger_options,
 			$problem_options
 		);
 

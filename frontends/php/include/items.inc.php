@@ -1118,15 +1118,18 @@ function getDataOverviewItems($groupids = null, $hostids = null, $application = 
 
 /**
  * @param array $groupids
+ * @param array $hostids
+ * @param array $itemids
  * @param string $application
  *
  * @return array
  */
-function getDataOverviewHosts($groupids = null, $itemids = null, $application = '') {
+function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, string $application = ''): array {
 	$config = select_config();
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
+			'hostids' => $hostids ? $hostids : null,
 			'groupids' => $groupids ? $groupids : null,
 			'search' => ['name' => $application],
 			'preservekeys' => true
@@ -1146,6 +1149,7 @@ function getDataOverviewHosts($groupids = null, $itemids = null, $application = 
 		$db_hosts = API::Host()->get([
 			'output' => ['name', 'hostid'],
 			'monitored_hosts' => true,
+			'hostids' => $hostids,
 			'itemids' => $itemids,
 			'groupids' => $groupids,
 			'with_monitored_items' => true,
@@ -1163,12 +1167,13 @@ function getDataOverviewHosts($groupids = null, $itemids = null, $application = 
 
 /**
  * @param array $groupids
+ * @param array $hostids
  * @param string $application
  *
  * @return array
  */
-function getDataOverviewLeft($groupids = null, $application = '') {
-	$db_items = getDataOverviewItems($groupids, null, $application);
+function getDataOverviewLeft(?array $groupids, ?array $hostids, string $application = ''): array {
+	$db_items = getDataOverviewItems($groupids, $hostids, $application);
 	$items_by_name = [];
 	foreach ($db_items as $itemid => $db_item) {
 		if (!array_key_exists($db_item['name'], $items_by_name)) {
@@ -1186,19 +1191,20 @@ function getDataOverviewLeft($groupids = null, $application = '') {
 	}
 	$db_items = array_intersect_key($db_items, array_flip($itemids));
 
-	$db_hosts = getDataOverviewHosts(null, $itemids);
+	$db_hosts = getDataOverviewHosts(null, null, $itemids);
 
 	return [$db_items, $db_hosts, $items_by_name, $hidden_items_cnt];
 }
 
 /**
  * @param array $groupids
+ * @param array $hostids
  * @param string $application
  *
  * @return array
  */
-function getDataOverviewTop($groupids, $application = '') {
-	$db_hosts = getDataOverviewHosts($groupids, null, $application);
+function getDataOverviewTop(?array $groupids, ?array $hostids, string $application = ''): array {
+	$db_hosts = getDataOverviewHosts($groupids, $hostids, null, $application);
 	$hostids = array_keys($db_hosts);
 	$hidden_db_hosts_cnt = count(array_splice($hostids, ZBX_MAX_TABLE_COLUMNS));
 	$db_hosts = array_intersect_key($db_hosts, array_flip($hostids));

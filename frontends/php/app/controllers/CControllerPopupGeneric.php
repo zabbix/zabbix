@@ -404,6 +404,7 @@ class CControllerPopupGeneric extends CController {
 			'with_simple_graph_item_prototypes' =>	'in 1',
 			'with_triggers' =>						'in 1',
 			'with_monitored_triggers' =>			'in 1',
+			'with_monitored_items' =>				'in 1',
 			'with_webitems' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
@@ -563,7 +564,8 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		foreach (['with_applications', 'with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
-				'with_simple_graph_item_prototypes', 'with_triggers', 'with_monitored_triggers'] as $name) {
+				'with_simple_graph_item_prototypes', 'with_triggers', 'with_monitored_triggers', 'with_monitored_items'
+			] as $name) {
 			if ($this->hasInput($name)) {
 				$group_options[$name] = 1;
 				$host_options[$name] = 1;
