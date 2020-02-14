@@ -21,6 +21,7 @@
 #include "zbxdb.h"
 #include "dbcache.h"
 #include "log.h"
+#include "history_compress.h"
 
 #define ZBX_TS_SEGMENT_BY	"itemid"
 #define ZBX_TS_UNIX_NOW		"zbx_ts_unix_now"
