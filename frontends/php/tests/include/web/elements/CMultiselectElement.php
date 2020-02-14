@@ -101,6 +101,10 @@ class CMultiselectElement extends CElement {
 	 * @return $this
 	 */
 	public function select($label, $context = null) {
+		if (is_array($label)) {
+			throw new Exception('Select of multiple labels is not supported in single select mode.');
+		}
+
 		$this->edit($context)->query('link:'.$label)->one()->click()->waitUntilNotPresent();
 
 		return $this;
@@ -180,8 +184,9 @@ class CMultiselectElement extends CElement {
 	 */
 	public function getControls() {
 		$buttons = [];
+		$xpath = 'xpath:.//button';
 
-		foreach ($this->query('xpath:.//button')->all() as $button) {
+		foreach ($this->query($xpath)->all() as $button) {
 			$buttons[$button->getText()] = $button;
 		}
 

@@ -107,7 +107,7 @@ var chkbxRange = {
 	 */
 	handleClick: function(e) {
 		e = e || window.event;
-		var checkbox = Event.element(e);
+		var checkbox = e.target;
 
 		PageRefresh.restart();
 
@@ -327,7 +327,9 @@ var chkbxRange = {
 			form = footerButton.closest('form'),
 			confirmText = footerButton.attr('confirm');
 		if (confirmText && !confirm(confirmText)) {
-			Event.stop(e);
+			e.preventDefault();
+			e.stopPropagation();
+
 			return false;
 		}
 

@@ -521,7 +521,7 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	}, this);
 
 	this.offset = 0;
-	this.element = this.canvas.createElement('g', null, parent);
+	this.element = this.canvas.createElement('g', {}, parent);
 
 	var parse_links = attributes['parse-links'],
 		size;

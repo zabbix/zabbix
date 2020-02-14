@@ -50,8 +50,7 @@
 			// Remove operations IDs.
 			var operationid_RegExp = /operations\[\d+\]\[operationid\]/;
 			jQuery('input[name^=operations]').each(function() {
-				// Intentional usage of JS Prototype.
-				if ($(this).getAttribute('name').match(operationid_RegExp)) {
+				if ($(this).attr('name').match(operationid_RegExp)) {
 					$(this).remove();
 				}
 			});

@@ -553,7 +553,9 @@ ul.top-nav-icons {
 	border-bottom: 1px solid $ui-border-color;
 
 	> div {
-		overflow: hidden;
+		&:first-child {
+			overflow: hidden;
+		}
 
 		&:last-child {
 			flex-shrink: 0;

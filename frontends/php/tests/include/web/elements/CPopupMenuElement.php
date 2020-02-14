@@ -106,7 +106,7 @@ class CPopupMenuElement extends CElement {
 			$parents->query('class:menu-popup')->asPopupMenu()->waitUntilVisible()->one()->select($items);
 		}
 		else {
-			$element->click();
+			$element->waitUntilClickable()->click();
 		}
 
 		return $this;

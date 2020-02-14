@@ -1,0 +1,1 @@
+.......P.. [ZBX-17213] fixed Zabbix proxy not to execute remote commands on Zabbix agent with timeout and not to wait for execution result (vso)
