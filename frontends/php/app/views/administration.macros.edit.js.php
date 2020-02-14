@@ -134,7 +134,7 @@
 						.append($('<button>').attr({
 							type: 'button',
 							id: $input.attr('name').replace(/\[/g, '_').replace(/\]/g, '') + '_btn',
-							class: '<?= ZBX_STYLE_BTN_CHANGE ?>'
+							class: '<?= CInputSecret::ZBX_STYLE_BTN_CHANGE ?>'
 						}).text(<?= json_encode(_('Set new value')) ?>))
 						.inputSecret()
 				);

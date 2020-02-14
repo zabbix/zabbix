@@ -26,6 +26,12 @@ class CButtonDropdown extends CTag {
 	 */
 	public const ZBX_STYLE_CLASS = 'btn-dropdown-container';
 
+	/**
+	 * Button style names.
+	 */
+	public const ZBX_STYLE_BTN_TOGGLE = 'btn-dropdown-toggle';
+	public const ZBX_STYLE_BTN_VALUE = 'dropdown-value';
+
 	protected $options = [
 		'disabled' => false
 	];
@@ -57,7 +63,7 @@ class CButtonDropdown extends CTag {
 					->setAttribute('aria-label', $this->options['title'])
 					// In setMenuPopup is check for disabled attribute. Its why we set disabled before setMenuPopup.
 					->setEnabled(!$this->options['disabled'])
-					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, ZBX_STYLE_BTN_DROPDOWN_TOGGLE,
+					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, self::ZBX_STYLE_BTN_TOGGLE,
 						$this->options['active_class']
 					]))
 					->setId(zbx_formatDomId($name.'[btn]'))
@@ -68,6 +74,6 @@ class CButtonDropdown extends CTag {
 						]
 					])
 			)
-			->addItem((new CInput('hidden', $name, $value))->addClass(ZBX_STYLE_BTN_DROPDOWN_VALUE));
+			->addItem((new CInput('hidden', $name, $value))->addClass(self::ZBX_STYLE_BTN_VALUE));
 	}
 }

@@ -26,6 +26,8 @@ class CInputSecret extends CTag {
 	 */
 	public const ZBX_STYLE_CLASS = 'input-secret';
 
+	public const ZBX_STYLE_BTN_CHANGE = 'btn-change';
+
 	/**
 	 * Options array
 	 *
@@ -61,7 +63,7 @@ class CInputSecret extends CTag {
 			)
 			->addItem(
 				(new CButton(null, _('Set new value')))
-					->addClass(ZBX_STYLE_BTN_CHANGE)
+					->addClass(self::ZBX_STYLE_BTN_CHANGE)
 					->setId(zbx_formatDomId($name.'[btn]'))
 					->setEnabled(!$this->options['disabled'])
 			);

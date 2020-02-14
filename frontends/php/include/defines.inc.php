@@ -1797,15 +1797,11 @@ define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
 
 // InputSecret and ButtonDropdown styles.
-define('ZBX_STYLE_ICON_TEXT', 'icon-text');
-define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
-
-define('ZBX_STYLE_BTN_DROPDOWN_TOGGLE', 'btn-dropdown-toggle');
 define('ZBX_STYLE_BTN_UNDO', 'btn-undo');
 define('ZBX_STYLE_INPUT_GROUP', 'input-group');
 
-define('ZBX_STYLE_BTN_DROPDOWN_VALUE', 'dropdown-value');
-define('ZBX_STYLE_BTN_CHANGE', 'btn-change');
+define('ZBX_STYLE_ICON_TEXT', 'icon-text');
+define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
