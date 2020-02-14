@@ -38,8 +38,9 @@ $this->addJsFile('multiselect.js');
 		->addFormItem((new CVar('action', 'web.view'))->removeId())
 		->addFilterTab(_('Filter'), [
 			(new CFormList())
-				->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
+				->addRow((new CLabel(_('Host group'), 'filter_groupids__ms')),
 					(new CMultiSelect([
+						'multiple' => true,
 						'name' => 'filter_groupids[]',
 						'object_name' => 'hostGroup',
 						'data' => $data['ms_groups'],
@@ -54,8 +55,9 @@ $this->addJsFile('multiselect.js');
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
-				->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
+				->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
 					(new CMultiSelect([
+						'multiple' => true,
 						'name' => 'filter_hostids[]',
 						'object_name' => 'hosts',
 						'data' => $data['ms_hosts'],
