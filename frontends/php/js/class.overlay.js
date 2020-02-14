@@ -116,14 +116,8 @@ Overlay.prototype.centerDialog = function() {
 		},
 		size_saved = this.$dialogue.data('size') || size;
 
-	if (size.width != size_saved.width || size.height != size_saved.height) {
-		this.$dialogue.trigger('overlay-dialogue-resize', [{
-			width: size.width,
-			height: size.height
-		}, {
-			width: size_saved.width,
-			height: size_saved.height
-		}]);
+	if (JSON.stringify(size) !== JSON.stringify(size_saved)) {
+		this.$dialogue.trigger('overlay-dialogue-resize', [size, size_saved]);
 	}
 
 	this.$dialogue.data('size', size);
