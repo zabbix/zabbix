@@ -86,7 +86,7 @@ class CSeverity extends CRadioButtonList {
 	public static function getSeverities() {
 		$config = select_config();
 		$severities = [];
-		foreach (self::getRange() as $severity) {
+		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
 			$severities[] = [
 				'name' => getSeverityName($severity, $config),
 				'value' => $severity,
@@ -95,12 +95,5 @@ class CSeverity extends CRadioButtonList {
 		}
 
 		return $severities;
-	}
-
-	/**
-	 * Generate array with severities values range.
-	 */
-	public static function getRange() {
-		return range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
 	}
 }

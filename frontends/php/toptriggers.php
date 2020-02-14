@@ -72,7 +72,7 @@ updateTimeSelectorPeriod($timeselector_options);
 
 $data['filter'] = [
 	'severities' => CProfile::getArray('web.toptriggers.filter.severities',
-		hasRequest('filter_set') ? [] : CSeverity::getRange()
+		hasRequest('filter_set') ? [] : range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
 	),
 	'timeline' => getTimeSelectorPeriod($timeselector_options),
 	'active_tab' => CProfile::get('web.toptriggers.filter.active', 1)

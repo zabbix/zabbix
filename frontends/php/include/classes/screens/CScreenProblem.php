@@ -283,11 +283,11 @@ class CScreenProblem extends CScreenBase {
 			}
 			else {
 				$filter['severity'] = null;
-				$options['severities'] = CSeverity::getRange();
+				$options['severities'] = range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
 			}
 			if (array_key_exists('severities', $filter)) {
 				$filter_severities = implode(',', $filter['severities']);
-				$all_severities = implode(',', CSeverity::getRange());
+				$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
 
 				if ($filter_severities !== '' && $filter_severities !== $all_severities) {
 					$options['severities'] = $filter['severities'];
