@@ -553,7 +553,9 @@ ul.top-nav-icons {
 	border-bottom: 1px solid $ui-border-color;
 
 	> div {
-		overflow: hidden;
+		&:first-child {
+			overflow: hidden;
+		}
 
 		&:last-child {
 			flex-shrink: 0;
@@ -4606,6 +4608,10 @@ $form-icon-btn: (
 	&.modal-popup {
 		max-width: 1024px;
 
+		&.modal-popup-medium {
+			min-width: 450px;
+		}
+
 		&.modal-popup-generic {
 			min-width: 650px;
 		}
@@ -4633,7 +4639,7 @@ $form-icon-btn: (
 		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
-		z-index: 1000;
+		z-index: 2;
 	}
 
 	.list-table {
@@ -4901,6 +4907,11 @@ $form-icon-btn: (
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
+
+	// for IE11
+	textarea {
+		white-space: pre-wrap;
+	}
 }
 
 .overlay-dialogue-footer {
@@ -5240,7 +5251,7 @@ $form-icon-btn: (
 		left: 0;
 		right: 0;
 		top: 0;
-		z-index: 999;
+		z-index: 1;
 	}
 }
 
@@ -6238,7 +6249,7 @@ a.overlay-close-btn {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 1;
+		z-index: 3;
 	}
 
 	&::after {
@@ -6256,7 +6267,7 @@ a.overlay-close-btn {
 		left: 0;
 		right: 0;
 		animation: is-loading-kf .6s infinite linear;
-		z-index: 1;
+		z-index: 3;
 		content: '';
 	}
 
@@ -6323,8 +6334,12 @@ span {
 .overlay-dialogue.modal .overlay-dialogue-body {
 
 	&.is-loading {
-		position: relative;
 		overflow: hidden;
+
+		&:before {
+			top: 42px;
+			bottom: 42px;
+		}
 	}
 }
 
@@ -7504,6 +7519,7 @@ $range-input-width: 31px;
 	font-size: 0;
 }
 
+.item-test-popup-value-row,
 .preproc-test-popup-value-row {
 	display: flex;
 

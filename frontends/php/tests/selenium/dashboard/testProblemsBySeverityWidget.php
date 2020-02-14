@@ -915,7 +915,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$dashboard->edit();
 		$form = $dashboard->getWidget('Reference widget')->edit();
 		$form->submit();
-		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->query('id:overlay-bg')->waitUntilNotVisible();
 
 		$widget = $dashboard->getWidget('Reference widget');
 		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
@@ -1034,6 +1034,8 @@ class testProblemsBySeverityWidget extends CWebTest {
 
 	private function fillFormAndSaveDashboard($dashboard, $form, $data, $header) {
 		$form->fill($data['fields']);
+		COverlayDialogElement::find()->one()->waitUntilReady();
+
 		if (CTestArrayHelper::get($data, 'check.disabled', false)) {
 			if (CTestArrayHelper::get($data['fields'], 'Show', 'Host groups') === 'Totals') {
 				$this->assertTrue($form->getField('Layout')->isEnabled());
@@ -1045,7 +1047,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 		$form->submit();
-		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->query('id:overlay-bg')->waitUntilNotVisible();
 		$widget = $dashboard->getWidget($header);
 		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();

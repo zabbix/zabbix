@@ -9,6 +9,7 @@ if (hasRequest('conditions')) {
 include dirname(__FILE__).'/common.item.edit.js.php';
 include dirname(__FILE__).'/item.preprocessing.js.php';
 include dirname(__FILE__).'/editabletable.js.php';
+include dirname(__FILE__).'/itemtest.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="condition-row">
 	<?=
@@ -88,7 +89,7 @@ include dirname(__FILE__).'/editabletable.js.php';
 			$('#conditions')
 				.dynamicRows({
 					template: '#condition-row',
-					counter: <?= CJs::encodeJson($counter) ?>,
+					counter: <?= json_encode($counter) ?>,
 					dataCallback: function(data) {
 						data.formulaId = num2letter(data.rowNum);
 

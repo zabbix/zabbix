@@ -64,7 +64,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			global $ZBX_MESSAGES;
 
 			$this->setResponse(new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['error' => $ZBX_MESSAGES[0]['message']])
+				'main_block' => json_encode(['error' => $ZBX_MESSAGES[0]['message']])
 			]));
 
 			return $ret;
@@ -78,7 +78,7 @@ class CControllerTimeSelectorUpdate extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($this->data)]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($this->data)]));
 		}
 
 		return $ret;
@@ -187,7 +187,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			'to' => $value['to']
 		]);
 
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([
 			'label' => relativeDateToText($value['from'], $value['to']),
 			'from' => $value['from'],
 			'from_ts' => $ts['from'],

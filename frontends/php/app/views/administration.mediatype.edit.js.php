@@ -8,8 +8,156 @@
 		</td>
 	</tr>
 </script>
+<script type="text/x-jquery-tmpl" id="message-templates-row-tmpl">
+	<?= (new CRow([
+			new CCol('#{message_type_name}'),
+			(new CCol([
+				new CSpan('#{message}'),
+				new CInput('hidden', 'message_templates[#{message_type}][eventsource]', '#{eventsource}'),
+				new CInput('hidden', 'message_templates[#{message_type}][recovery]', '#{recovery}'),
+				new CInput('hidden', 'message_templates[#{message_type}][subject]', '#{subject}'),
+				new CInput('hidden', 'message_templates[#{message_type}][message]', '#{message}'),
+			]))
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;'),
+			(new CHorList([
+				(new CButton(null, _('Edit')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('data-action', 'edit'),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick("removeMessageTemplate('#{message_type}');")
+			]))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setAttribute('data-message-type', '#{message_type}')
+			->toString()
+	?>
+</script>
 <script type="text/javascript">
-	jQuery(document).ready(function($) {
+	var message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>,
+		message_template_list = {};
+
+	/**
+	 * Draws message template table.
+	 *
+	 * @param {array} list  An array of message templates.
+	 */
+	function populateMessageTemplates(list) {
+		var row_template = new Template(jQuery('#message-templates-row-tmpl').html());
+
+		for (var i = 0; i < list.length; i++) {
+			var template = list[i],
+				message_template = getMessageTemplate(template.eventsource, template.recovery);
+
+			template.message_type = message_template.message_type;
+			template.message_type_name = message_template.name;
+
+			if ('old_message_type' in template && template.old_message_type != -1) {
+				jQuery('tr[data-message-type=' + template.old_message_type + ']')
+					.replaceWith(row_template.evaluate(template));
+
+				if (template.message_type != template.old_message_type) {
+					delete message_template_list[template.old_message_type];
+				}
+			}
+			else {
+				jQuery('#message-templates-footer').before(row_template.evaluate(template));
+			}
+
+			message_template_list[template.message_type] = template;
+		}
+
+		toggleAddButton();
+	}
+
+	/**
+	 * Returns message type and name by the specified event source and operation mode.
+	 *
+	 * @param {number} eventsource  Event source.
+	 * @param {number} recovery     Operation mode.
+	 *
+	 * @return {object}
+	 */
+	function getMessageTemplate(eventsource, recovery) {
+		for (var message_type in message_templates) {
+			if (!message_templates.hasOwnProperty(message_type)) {
+				continue;
+			}
+
+			var template = message_templates[message_type];
+
+			if (template.eventsource == eventsource && template.recovery == recovery) {
+				return {
+					message_type: message_type,
+					name: template.name
+				};
+			}
+		}
+	}
+
+	/**
+	 * Toggles the "Add" button state and changes its text depending on message template count.
+	 */
+	function toggleAddButton() {
+		var limit_reached = (Object.keys(message_template_list).length == Object.keys(message_templates).length);
+
+		jQuery('#message-templates-footer .btn-link')
+			.prop('disabled', limit_reached)
+			.text(limit_reached
+				? <?= json_encode(_('Add (message type limit reached)')) ?>
+				: <?= json_encode(_('Add')) ?>
+			);
+	}
+
+	/**
+	 * Removes a template from the list of message templates.
+	 *
+	 * @param {number} message_type  Message type.
+	 */
+	function removeMessageTemplate(message_type) {
+		jQuery('tr[data-message-type=' + message_type + ']').remove();
+		delete message_template_list[message_type];
+		toggleAddButton();
+	}
+
+	jQuery(function($) {
+		populateMessageTemplates(<?= json_encode(array_values($this->data['message_templates'])) ?>);
+
+		$('#message-templates').on('click', '[data-action]', function() {
+			var $btn = $(this),
+				params = {
+					type: $('#type').val(),
+					content_type: $('input[name="content_type"]:checked').val(),
+					message_types: $('tr[data-message-type]').map(function() {
+						return $(this).data('message-type');
+					}).get()
+				};
+
+			switch ($btn.data('action')) {
+				case 'add':
+					PopUp('popup.mediatype.message', params, null, $btn);
+					break;
+
+				case 'edit':
+					var $row = $btn.closest('tr');
+
+					params.message_type = $row.data('message-type');
+					params.old_message_type = params.message_type;
+
+					$row.find('input[type="hidden"]').each(function() {
+						var $input = $(this),
+							name = $input.attr('name').match(/\[([^\]]+)]$/);
+
+						if (name) {
+							params[name[1]] = $input.val();
+						}
+					});
+
+					PopUp('popup.mediatype.message', params, null, $btn);
+					break;
+			}
+		});
+
 		var old_media_type = $('#type').val();
 
 		// type of media
@@ -57,7 +205,7 @@
 			$('#mediatypeid, #delete, #clone').remove();
 			$('#chPass_btn').hide();
 			$('#passwd').prop('disabled', false).show();
-			$('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
+			$('#update').text(<?= json_encode(_('Add')) ?>);
 			$('#update').val('mediatype.create').attr({id: 'add'});
 			$('#name').focus();
 		});

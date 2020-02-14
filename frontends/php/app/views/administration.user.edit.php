@@ -166,7 +166,7 @@ $user_form_list
 			: $lang
 	)
 	->addRow(_('Theme'),
-		new CComboBox('theme', $data['theme'], null, [THEME_DEFAULT => _('System default')] + Z::getThemes())
+		new CComboBox('theme', $data['theme'], null, [THEME_DEFAULT => _('System default')] + APP::getThemes())
 	);
 
 // Append auto-login & auto-logout to form list.
@@ -271,7 +271,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).', null, this);'),
+							->onClick('return PopUp("popup.media",'.json_encode($popup_options).', null, this);'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$index.');')
@@ -286,7 +286,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			$media_table_info,
 			(new CButton(null, _('Add')))
 				->onClick('return PopUp("popup.media",'.
-					CJs::encodeJson([
+					json_encode([
 						'dstfrm' => $user_form->getName()
 					]).', null, this);'
 				)

@@ -50,7 +50,9 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'hide_empty_groups' => $fields['hide_empty_groups'],
 			'show_opdata' => $fields['show_opdata'],
 			'ext_ack' => $fields['ext_ack'],
-			'show_timeline' => $fields['show_timeline']
+			'show_timeline' => $fields['show_timeline'],
+			'evaltype' => $fields['evaltype'],
+			'tags' => $fields['tags']
 		];
 
 		$data = getSystemStatusData($filter);

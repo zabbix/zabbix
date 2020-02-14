@@ -32,6 +32,6 @@ class CJsonExportWriter extends CExportWriter {
 	 * @return string
 	 */
 	public function write(array $array) {
-		return (new CJson())->encode($array, [], false, false);
+		return json_encode($array, JSON_UNESCAPED_SLASHES);
 	}
 }

@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
+/**
+ * @browsers chrome
+ */
 class testMultiselect extends CWebTest {
 
 	public function testMultiselect_disableDebugMode() {
@@ -75,15 +78,14 @@ class testMultiselect extends CWebTest {
 	public function testMultiselect_SuggestInOverlay() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->query('button:Create dashboard')->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilVisible()
-			->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
 		$dialog->close();
 		$dashboard = CDashboardElement::find()->one();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$form->getField('Type')->asDropdown()->select('Plain text');
-		$form->invalidate();
+		$form->waitUntilReloaded();
 		$element = $form->getField('Items')->query('tag:input')->one();
 		$element->type('Zab');
 		$this->query('class:multiselect-suggest')->waitUntilVisible();

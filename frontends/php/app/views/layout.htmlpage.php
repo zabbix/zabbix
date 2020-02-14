@@ -22,9 +22,6 @@
 require_once 'include/menu.inc.php';
 
 function local_generateHeader($data) {
-	// only needed for zbx_construct_menu
-	global $page;
-
 	header('Content-Type: text/html; charset=UTF-8');
 	header('X-Content-Type-Options: nosniff');
 	header('X-XSS-Protection: 1; mode=block');
@@ -54,12 +51,6 @@ function local_generateHeader($data) {
 	}
 
 
-	// construct menu
-	$main_menu = [];
-	$sub_menus = [];
-
-	zbx_construct_menu($main_menu, $sub_menus, $page, $data['controller']['action']);
-
 	$pageHeader = new CView('layout.htmlpage.header', [
 		'javascript' => [
 			'files' => $data['javascript']['files']
@@ -80,11 +71,7 @@ function local_generateHeader($data) {
 
 		$pageMenu = new CView('layout.htmlpage.menu', [
 			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
-			'menu' => [
-				'main_menu' => $main_menu,
-				'sub_menus' => $sub_menus,
-				'selected' => $page['menu']
-			],
+			'menu' => APP::Component()->get('menu.main'),
 			'user' => [
 				'is_guest' => CWebUser::isGuest(),
 				'alias' => CWebUser::$data['alias'],

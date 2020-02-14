@@ -70,14 +70,14 @@
 			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
 			ZBX_POSTTYPE_RAW:                    <?= ZBX_POSTTYPE_RAW ?>,
 			msg: {
-				data_not_encoded:           <?= CJs::encodeJson(_('Data is not properly encoded.')) ?>,
-				name_filed_length_exceeded: <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')) ?>,
-				value_without_name:         <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')) ?>,
-				failed_to_parse_url:        <?= CJs::encodeJson(_('Failed to parse URL.')) ?>,
-				ok:                         <?= CJs::encodeJson(_('Ok')) ?>,
-				error:                      <?= CJs::encodeJson(_('Error')) ?>,
-				url_not_encoded_properly:   <?= CJs::encodeJson(_('URL is not properly encoded.')) ?>,
-				cannot_convert_post_data:    <?= CJs::encodeJson(_('Cannot convert POST data:')) ?>
+				data_not_encoded:           <?= json_encode(_('Data is not properly encoded.')) ?>,
+				name_filed_length_exceeded: <?= json_encode(_('Name of the form field should not exceed 255 characters.')) ?>,
+				value_without_name:         <?= json_encode(_('Values without names are not allowed in form fields.')) ?>,
+				failed_to_parse_url:        <?= json_encode(_('Failed to parse URL.')) ?>,
+				ok:                         <?= json_encode(_('Ok')) ?>,
+				error:                      <?= json_encode(_('Error')) ?>,
+				url_not_encoded_properly:   <?= json_encode(_('URL is not properly encoded.')) ?>,
+				cannot_convert_post_data:   <?= json_encode(_('Cannot convert POST data:')) ?>
 			}
 		};
 
@@ -87,9 +87,8 @@
 		).html());
 
 		window.httpconf.pair_row_template = new Template(jQuery('#scenario-pair-row').html());
-		window.httpconf.scenario = new Scenario(
-			$('#scenarioTab'), <?= CJs::encodeJson($this->data['scenario_tab_data']) ?>);
-		window.httpconf.steps = new Steps($('#stepTab'), <?= CJs::encodeJson(array_values($data['steps'])) ?>);
+		window.httpconf.scenario = new Scenario($('#scenarioTab'), <?= json_encode($this->data['scenario_tab_data']) ?>);
+		window.httpconf.steps = new Steps($('#stepTab'), <?= json_encode(array_values($data['steps'])) ?>);
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 
 		window.httpconf.$form = $('#httpForm').on('submit', function(e) {
@@ -110,7 +109,7 @@
 	 * Implementation of jQuery.val for radio buttons. Use this methon within scoped jQuery object;
 	 * Use with jQuery collection of input nodes.
 	 *
-	 * @param {string}  Check button by value. Read value if no param is given.
+	 * @param {string} value  Check button by value. Read value if no param is given.
 	 *
 	 * @return {string}
 	 */
@@ -119,7 +118,7 @@
 			return this.filter(':checked').val();
 		}
 		this.filter('[value="' + value + '"]').get(0).checked = true;
-	};
+	}
 
 	/**
 	 * Returns common $.sortable options.
@@ -1035,10 +1034,11 @@
 	/**
 	 * This method is bound via popup button attribute. It posts serialized version of current form to be validated.
 	 * Note that we do not bother posting dynamic fields, since they are not validated at this point.
+	 *
+	 * @param {Overlay} overlay
 	 */
-	StepEditForm.prototype.validate = function() {
-		var url = new Curl(this.$form.attr('action')),
-			dialogueid = this.$form.closest('[data-dialogueid]').attr('data-dialogueid');
+	StepEditForm.prototype.validate = function(overlay) {
+		var url = new Curl(this.$form.attr('action'));
 
 		this.$form.trimValues(['#step_name', '#url', '#timeout', '#required', '#status_codes']);
 
@@ -1047,11 +1047,15 @@
 
 		var curr_pairs = this.stepPairsData();
 
-		return jQuery.ajax({
+		overlay.setLoading();
+		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
 			data: this.$form.serialize(),
 			dataType: 'json',
 			type: 'post'
+		})
+		.always(function() {
+			overlay.unsetLoading();
 		})
 		.done(function(ret) {
 			if (typeof ret.errors !== 'undefined') {
@@ -1067,7 +1071,7 @@
 			httpconf.steps.data[ret.params.no].update(ret.params);
 			httpconf.steps.renderData();
 
-			overlayDialogueDestroy(dialogueid);
+			overlayDialogueDestroy(overlay.dialogueid);
 		}.bind(this));
 	};
 </script>
