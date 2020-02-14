@@ -168,18 +168,17 @@ class CUserMacro extends CApiService {
 
 		// search
 		if (is_array($options['search'])) {
+			unset($options['search']['value']);
 			zbx_db_search('hostmacro hm', $options, $sqlParts);
 			zbx_db_search('globalmacro gm', $options, $sqlPartsGlobal);
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			if (isset($options['filter']['macro'])) {
-				zbx_value2array($options['filter']['macro']);
+			unset($options['filter']['value']);
 
-				$sqlParts['where'][] = dbConditionString('hm.macro', $options['filter']['macro']);
-				$sqlPartsGlobal['where'][] = dbConditionString('gm.macro', $options['filter']['macro']);
-			}
+			$this->dbFilter('hostmacro hm', $options, $sqlParts);
+			$this->dbFilter('globalmacro gm', $options, $sqlPartsGlobal);
 		}
 
 		// sorting
@@ -995,7 +994,7 @@ class CUserMacro extends CApiService {
 
 	protected function unsetExtraFields(array $objects, array $fields, $output) {
 		foreach ($objects as &$object) {
-			if (array_key_exists('type', $object) && $object['type'] == ZBX_MACRO_TYPE_SECRET) {
+			if ($object['type'] == ZBX_MACRO_TYPE_SECRET) {
 				unset($object['value']);
 			}
 		}
@@ -1003,6 +1002,6 @@ class CUserMacro extends CApiService {
 
 		$objects = parent::unsetExtraFields($objects, ['type'], $output);
 
-		return  parent::unsetExtraFields($objects, $fields, $output);
+		return parent::unsetExtraFields($objects, $fields, $output);
 	}
 }
