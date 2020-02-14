@@ -252,8 +252,6 @@ class CControllerProblemView extends CController {
 		}
 		unset($filter_trigger);
 
-		$severities = CSeverity::getSeverities();
-
 		$inventories = [];
 		foreach (getHostInventories() as $inventory) {
 			$inventories[$inventory['db_field']] = $inventory['title'];
