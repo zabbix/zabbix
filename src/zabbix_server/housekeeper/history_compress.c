@@ -72,23 +72,15 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
 
 	/* get hypertable segmentby attribute name */
-	result = DBselect("select attname from _timescaledb_catalog.hypertable_compression c"
+	result = DBselect("select count(c.attname) from _timescaledb_catalog.hypertable_compression c"
 			" inner join _timescaledb_catalog.hypertable h on (h.id = c.hypertable_id)"
-			" where c.segmentby_column_index<>0 and h.table_name='%s'", table_name);
+			" where c.segmentby_column_index<>0 and h.table_name='%s' and c.attname='%s'",
+			table_name, ZBX_TS_SEGMENT_BY);
 
-	while (NULL != (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)) || 1 != atoi(row[0]))
 	{
-		if (0 != strcmp(row[0], ZBX_TS_SEGMENT_BY))
-			configure = 1;
-
-		i++;
-	}
-	DBfree_result(result);
-
-	if (1 != i || 1 == configure)
-	{
-		DBexecute("alter table %s set (timescaledb.compress, timescaledb.compress_segmentby = 'itemid',"
-				" timescaledb.compress_orderby = '%s')", table_name,
+		DBexecute("alter table %s set (timescaledb.compress, timescaledb.compress_segmentby = '%s',"
+				" timescaledb.compress_orderby = '%s')", table_name, ZBX_TS_SEGMENT_BY,
 				(ZBX_COMPRESS_TABLE_HISTORY == type) ? "clock,ns" : "clock");
 	}
 
@@ -283,11 +275,10 @@ void	hk_history_compression_update(zbx_config_db_t *cfg)
 
 	if (ON == cfg->history_compression_status)
 	{
-		DBexecute(ZBX_TS_UNIX_NOW_CREATE);
-
 		if (cfg->history_compression_status != compression_status_cache ||
 				cfg->history_compress_older != compress_older_cache)
 		{
+			DBexecute(ZBX_TS_UNIX_NOW_CREATE);
 			hk_history_enable_compression(cfg->history_compress_older + COMPRESSION_TOLERANCE);
 		}
 	}
