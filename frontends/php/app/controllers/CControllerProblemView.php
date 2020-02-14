@@ -301,7 +301,6 @@ class CControllerProblemView extends CController {
 				'triggers' => $filter_triggers,
 				'name' => CProfile::get('web.problem.filter.name', ''),
 				'severity' => CProfile::getArray('web.problem.filter.severity', []),
-				'severities' => $severities,
 				'age_state' => CProfile::get('web.problem.filter.age_state', 0),
 				'age' => CProfile::get('web.problem.filter.age', 14),
 				'inventories' => $inventories,
