@@ -74,7 +74,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 		: [_('Triggers'), $trigger_count];
 
 	$graphs_link = $host['editable']
-		? [new CLink(_('Graphs'), 'graphs.php?'.$link), $graph_count]
+		? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$hostid])
+		), $graph_count]
 		: [_('Graphs'), $graph_count];
 
 	$discovery_link = $host['editable']
@@ -239,7 +242,10 @@ if ($data['admin']) {
 			: [_('Triggers'), $trigger_count];
 
 		$graphs_link = $template['editable']
-			? [new CLink(_('Graphs'), 'graphs.php?'.$link), $graph_count]
+			? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$templateid])
+			), $graph_count]
 			: [_('Graphs'), $graph_count];
 
 		$screens_link = $template['editable']

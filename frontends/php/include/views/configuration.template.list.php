@@ -267,7 +267,11 @@ foreach ($data['templates'] as $template) {
 			CViewHelper::showNum($template['triggers'])
 		],
 		[
-			new CLink(_('Graphs'), 'graphs.php?hostid='.$template['templateid'].url_param('groupid')),
+			new CLink(_('Graphs'),
+				(new CUrl('graphs.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['templateid']])
+			),
 			CViewHelper::showNum($template['graphs'])
 		],
 		[
