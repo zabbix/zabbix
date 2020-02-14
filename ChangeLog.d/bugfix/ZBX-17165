@@ -1,1 +1,0 @@
-A......... [ZBX-17165] fixed incorrect validation in XML conversion chain duo wrong XML type for tag tls_accept, added 5.0 XML schema (rlataria)

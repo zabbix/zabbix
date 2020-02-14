@@ -134,7 +134,7 @@ $dependencies_form_list->addRow(
 		$dependencies_table,
 		(new CButton('btn1', _('Add')))
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'triggers',
 					'srcfld1' => 'triggerid',
 					'dstfrm' => 'massupdate',

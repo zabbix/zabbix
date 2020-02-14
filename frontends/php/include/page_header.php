@@ -49,13 +49,6 @@ switch ($page['type']) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
-	case PAGE_TYPE_XML:
-		header('Content-Type: text/xml');
-		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', true);
-		}
-		break;
 	case PAGE_TYPE_JS:
 		header('Content-Type: application/javascript; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
@@ -84,20 +77,6 @@ switch ($page['type']) {
 	case PAGE_TYPE_TEXT_RETURN_JSON:
 	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', true);
-		}
-		break;
-	case PAGE_TYPE_TEXT_FILE:
-		header('Content-Type: text/plain; charset=UTF-8');
-		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', true);
-		}
-		break;
-	case PAGE_TYPE_CSV:
-		header('Content-Type: text/csv; charset=UTF-8');
-		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}

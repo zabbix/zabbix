@@ -189,7 +189,7 @@ function getFontComboBox($name) {
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
 							->onClick('return PopUp("popup.generic",jQuery.extend('.
-								CJs::encodeJson([
+								json_encode([
 									'srctbl' => 'sysmaps',
 									'srcfld1' => 'sysmapid',
 									'srcfld2' => 'name',
@@ -709,7 +709,7 @@ function getFontComboBox($name) {
 							(new CButton(null, _('Add')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('return PopUp("popup.generic",'.
-									CJs::encodeJson([
+									json_encode([
 										'srctbl' => 'triggers',
 										'srcfld1' => 'triggerid',
 										'reference' => 'linktrigger',

@@ -1208,7 +1208,7 @@ class CService extends CApiService {
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
-			if ($options['filter']['triggerid']) {
+			if (is_array($options['filter']) && array_key_exists('triggerid', $options['filter'])) {
 				$accessibleTriggers = API::Trigger()->get([
 					'output' => ['triggerid'],
 					'triggerids' => $options['filter']['triggerid']

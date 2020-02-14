@@ -257,7 +257,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_1 for filter']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_2 with proxy']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_2 for filter']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 3 of 3 found']");
 		$this->zbxTestClickButtonMultiselect('filter_proxyids_');
 		$this->zbxTestLaunchOverlayDialog('Proxies');
 		$this->zbxTestClickLinkTextWait('Proxy_1 for filter');

@@ -52,7 +52,7 @@ class CControllerUsergroupTagfilterAdd extends CController {
 
 		if (!$ret) {
 			$this->setResponse((new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['messages' => getMessages()->toString()])
+				'main_block' => json_encode(['messages' => getMessages()->toString()])
 			]))->disableView());
 		}
 
