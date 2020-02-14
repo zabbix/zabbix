@@ -152,12 +152,17 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
-	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style']);
+	if ($data['view_style'] == STYLE_TOP) {
+		$table = (new CView('trigoverview.table.top', $data))->getOutput();
+	}
+	else {
+		$table = (new CView('trigoverview.table.left', $data))->getOutput();
+	}
 }
 else {
-	$dataTable = new CTableInfo();
+	$table = new CTableInfo();
 }
 
-$widget->addItem($dataTable);
+$widget->addItem($table);
 
 return $widget;

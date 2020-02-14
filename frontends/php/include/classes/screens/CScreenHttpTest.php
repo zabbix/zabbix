@@ -56,59 +56,58 @@ class CScreenHttpTest extends CScreenBase {
 		$httptests = [];
 		$paging = [];
 
-		if ($this->data['hosts_selected']) {
-			$config = select_config();
+		$config = select_config();
 
-			$options = [
-				'output' => ['httptestid', 'name', 'hostid'],
-				'selectHosts' => ['name', 'status'],
-				'selectSteps' => API_OUTPUT_COUNT,
-				'templated' => false,
-				'preservekeys' => true,
-				'filter' => ['status' => HTTPTEST_STATUS_ACTIVE],
-				'limit' => $config['search_limit'] + 1
-			];
+		$options = [
+			'output' => ['httptestid', 'name', 'hostid'],
+			'selectHosts' => ['name', 'status'],
+			'selectSteps' => API_OUTPUT_COUNT,
+			'templated' => false,
+			'preservekeys' => true,
+			'filter' => ['status' => HTTPTEST_STATUS_ACTIVE],
+			'limit' => $config['search_limit'] + 1
+		];
 
-			if ($this->hostid != 0) {
-				$options['hostids'] = [$this->hostid];
-			}
-			elseif ($this->groupid) {
-				$options['groupids'] = zbx_toArray($this->groupid);
-			}
-
-			$httptests = API::HttpTest()->get($options);
-
-			foreach ($httptests as &$httptest) {
-				$httptest['host'] = reset($httptest['hosts']);
-				$httptest['hostname'] = $httptest['host']['name'];
-				unset($httptest['hosts']);
-			}
-			unset($httptest);
-
-			order_result($httptests, $sort_field, $sort_order);
-
-			$paging = CPagerHelper::paginate($this->page, $httptests, $sort_order,
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'web.view')
-					->setArgument('groupid', $this->data['groupid'])
-					->setArgument('hostid', $this->hostid)
-			);
-
-			$httptests = resolveHttpTestMacros($httptests, true, false);
-			order_result($httptests, $sort_field, $sort_order);
-
-			// Fetch the latest results of the web scenario.
-			$last_httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));
-
-			foreach ($httptests as &$httptest) {
-				if (array_key_exists($httptest['httptestid'], $last_httptest_data)) {
-					$httptest['lastcheck'] = $last_httptest_data[$httptest['httptestid']]['lastcheck'];
-					$httptest['lastfailedstep'] = $last_httptest_data[$httptest['httptestid']]['lastfailedstep'];
-					$httptest['error'] = $last_httptest_data[$httptest['httptestid']]['error'];
-				}
-			}
-			unset($httptest);
+		if ($this->hostid) {
+			$options['hostids'] = zbx_toArray($this->hostid);
 		}
+
+		if ($this->groupid) {
+			$options['groupids'] = zbx_toArray($this->groupid);
+		}
+
+		$httptests = API::HttpTest()->get($options);
+
+		foreach ($httptests as &$httptest) {
+			$httptest['host'] = reset($httptest['hosts']);
+			$httptest['hostname'] = $httptest['host']['name'];
+			unset($httptest['hosts']);
+		}
+		unset($httptest);
+
+		order_result($httptests, $sort_field, $sort_order);
+
+		$paging = CPagerHelper::paginate($this->page, $httptests, $sort_order,
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
+				->setArgument('groupids', $this->data['groupids'])
+				->setArgument('hostids', $this->hostid)
+		);
+
+		$httptests = resolveHttpTestMacros($httptests, true, false);
+		order_result($httptests, $sort_field, $sort_order);
+
+		// Fetch the latest results of the web scenario.
+		$last_httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));
+
+		foreach ($httptests as &$httptest) {
+			if (array_key_exists($httptest['httptestid'], $last_httptest_data)) {
+				$httptest['lastcheck'] = $last_httptest_data[$httptest['httptestid']]['lastcheck'];
+				$httptest['lastfailedstep'] = $last_httptest_data[$httptest['httptestid']]['lastfailedstep'];
+				$httptest['error'] = $last_httptest_data[$httptest['httptestid']]['error'];
+			}
+		}
+		unset($httptest);
 
 		// Create table.
 		$table = (new CTableInfo())

@@ -37,11 +37,28 @@ class CScreenTriggersOverview extends CScreenBase {
 			(new CList())->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-		list($hosts, $triggers) = getTriggersOverviewData((array) $this->screenitem['resourceid'],
+		$data = [];
+		list(
+			$data['db_hosts'],
+			$data['db_triggers'],
+			$data['dependencies'],
+			$data['triggers_by_name'],
+			$data['hosts_by_name'],
+			$data['exceeded_hosts'],
+			$data['exceeded_trigs']
+		) = getTriggersOverviewDataNew(
+			(array) $this->screenitem['resourceid'],
 			$this->screenitem['application']
 		);
 
-		$table = getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'], $this->screenid);
+		if ($this->screenitem['style'] == STYLE_TOP) {
+			$table = new CObject((new CView('trigoverview.table.top', $data))->getOutput());
+		}
+		else {
+			$table = new CObject((new CView('trigoverview.table.left', $data))->getOutput());
+		}
+
+		/* $table = getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'], $this->screenid); */
 
 		$footer = (new CList())
 			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))

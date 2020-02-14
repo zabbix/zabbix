@@ -22,44 +22,54 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
+$this->addJsFile('multiselect.js');
+
 
 (new CWidget())
 	->setTitle(_('Web monitoring'))
 	->setWebLayoutMode(CView::getLayoutMode())
 	->setControls((new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addVar('action', 'web.view')
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
-					new CLabel(_('Host'), 'hostid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getHostsCB()
-				])
-			),
 		(new CTag('nav', true, get_icon('fullscreen')))
 			->setAttribute('aria-label', _('Content controls'))
 		])))
-	->addItem(
-		CScreenBuilder::getScreen([
-			'resourcetype' => SCREEN_RESOURCE_HTTPTEST,
-			'mode' => SCREEN_MODE_JS,
-			'dataId' => 'httptest',
-			'groupid' => $data['pageFilter']->groupids,
-			'hostid' => $data['pageFilter']->hostid,
-			'page' => $data['page'],
-			'data' => [
-				'hosts_selected' => $data['pageFilter']->hostsSelected,
-				'sort' => $data['sort'],
-				'sortorder' => $data['sortorder'],
-				'groupid' => $data['pageFilter']->groupid
-			]
-		])->get()
+	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'web.view')))
+		->setProfile('web.web.filter')
+		->setActiveTab(1)
+		->addFormItem((new CVar('action', 'web.view'))->removeId())
+		->addFilterTab(_('Filter'), [
+			(new CFormList())
+				->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
+					(new CMultiSelect([
+						'name' => 'filter_groupids[]',
+						'object_name' => 'hostGroup',
+						'data' => $data['ms_groups'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'host_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_groupids_',
+								'real_hosts' => true,
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
+					(new CMultiSelect([
+						'name' => 'filter_hostids[]',
+						'object_name' => 'hosts',
+						'data' => $data['ms_hosts'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'hosts',
+								'srcfld1' => 'hostid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_hostids_',
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+		])
 	)
+	->addItem($data['screen_view'])
 	->show();

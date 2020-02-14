@@ -657,6 +657,158 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
+function getTriggersOverviewTableData($db_hosts, $db_triggers, $limit) {
+	$triggers_by_name = [];
+	$hosts_by_name = [];
+	$exceeded_hosts = true;
+	$exceeded_trigs = true;
+
+	foreach ($db_triggers as $trigger) {
+		$trigger_name = $trigger['description'];
+		$triggerid = $trigger['triggerid'];
+
+		foreach ($trigger['hosts'] as $host) {
+			$host_name = $host['name'];
+			$hostid = $host['hostid'];
+
+			if (!array_key_exists($hostid, $db_hosts)) {
+				continue;
+			}
+
+			if (!array_key_exists($trigger_name, $triggers_by_name)) {
+				$triggers_by_name[$trigger_name] = [];
+			}
+
+			if (!array_key_exists($host_name, $hosts_by_name)) {
+				$hosts_by_name[$host_name] = [];
+			}
+
+			$triggers_by_name[$trigger_name][$hostid] = $triggerid;
+			$hosts_by_name[$host_name] = $hostid;
+
+			$exceeded_trigs = count($triggers_by_name) > $limit;
+			$exceeded_hosts = count($hosts_by_name) > $limit;
+
+			if ($exceeded_hosts || $exceeded_trigs) {
+				$hosts_by_name = array_slice($hosts_by_name, 0, $limit, true);
+				$triggers_by_name = array_slice($triggers_by_name, 0, $limit, true);
+				break 2;
+			}
+		}
+	}
+
+	return [
+		$triggers_by_name,
+		$hosts_by_name,
+		$exceeded_hosts,
+		$exceeded_trigs
+	];
+}
+
+function getTriggersOverviewDataNew(array $groupids, $application, array $host_options = [], array $trigger_options = [],
+		array $problem_options = []) {
+
+	$exhausted_hosts = false;
+	$exhausted_triggers = false;
+	$exceeded_hosts = false;
+	$exceeded_trigs = false;
+
+	$host_options = [
+		'output' => ['hostid', 'name'],
+		'groupids' => $groupids ? $groupids : null,
+		'preservekeys' => true,
+		'sortfield' => 'name',
+		'sortorder' => 'ASC'
+	] + $host_options;
+
+	$trigger_options = [
+		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
+		'selectHosts' => ['hostid', 'name'],
+		'monitored' => true,
+		'sortfield' => 'description',
+		'selectDependencies' => ['triggerid'],
+		'preservekeys' => true,
+		'sortfield' => 'description',
+		'sortorder' => 'ASC',
+	] + $trigger_options;
+
+	$problem_options += [
+		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
+		'time_from' => null
+	];
+
+	$db_triggers = [];
+	$db_hosts = [];
+	$applicationids = [];
+	$dependencies = [];
+
+	$triggers_by_name = [];
+	$hosts_by_name = [];
+
+	$limit = ZBX_MAX_TABLE_COLUMNS;
+	$axis_limit = ZBX_MAX_TABLE_COLUMNS;
+
+	do {
+		if (!$exhausted_hosts) {
+			$db_hosts = API::Host()->get(['limit' => $limit + 1] + $host_options);
+			$exhausted_hosts = count($db_hosts) < $limit;
+
+			if ($application !== '') {
+				$applications = API::Application()->get([
+					'output' => [],
+					'hostids' => array_keys($db_hosts),
+					'search' => ['name' => $application],
+					'preservekeys' => true
+				]);
+				$applicationids = array_keys($applications);
+			}
+		}
+
+		if (!$exhausted_triggers) {
+			$db_triggers = getTriggersWithActualSeverity([
+				'applicationids' => $application !== '' ? $applicationids : null,
+				'hostids' => array_keys($db_hosts),
+				'limit' => $limit + 1
+			]+ $trigger_options, $problem_options);
+
+			$db_triggers = CMacrosResolverHelper::resolveTriggerNames($db_triggers, true);
+
+			if ($db_triggers) {
+				$dependencies = getTriggerDependencies($db_triggers);
+			}
+
+			$exhausted_triggers = count($db_triggers) < $limit;
+		}
+
+		CArrayHelper::sort($db_hosts, ['name']);
+		CArrayHelper::sort($db_triggers, ['description']);
+
+		list(
+			$triggers_by_name,
+			$hosts_by_name,
+			$exceeded_hosts,
+			$exceeded_trigs
+		) = getTriggersOverviewTableData($db_hosts, $db_triggers, $axis_limit);
+
+		if ($exceeded_hosts || $exceeded_trigs) {
+			break;
+		}
+
+		$limit += $limit;
+	} while (!($exhausted_triggers && $exhausted_hosts));
+
+	return [
+		$db_hosts,
+		$db_triggers,
+		$dependencies,
+		$triggers_by_name,
+		$hosts_by_name,
+		$exceeded_hosts,
+		$exceeded_trigs
+	];
+}
+
 /**
  * Creates and returns item data overview table for the given host groups.
  *
@@ -683,7 +835,8 @@ function getTriggersOverviewData(array $groupids, $application, array $host_opti
 	$hosts = API::Host()->get([
 		'output' => ['hostid'],
 		'groupids' => $groupids ? $groupids : null,
-		'preservekeys' => true
+		'preservekeys' => true,
+		/* 'limit' => 50 */
 	] + $host_options);
 
 	$hostids = array_keys($hosts);
@@ -695,7 +848,8 @@ function getTriggersOverviewData(array $groupids, $application, array $host_opti
 		'monitored' => true,
 		'sortfield' => 'description',
 		'selectDependencies' => ['triggerid'],
-		'preservekeys' => true
+		'preservekeys' => true,
+		/* 'limit' => 50 */
 	] + $trigger_options;
 
 	// application filter
@@ -993,6 +1147,57 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @return CCol
  */
 function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null) {
+	$ack = null;
+	$css = null;
+	$desc = null;
+	$eventid = 0;
+	$acknowledge = [];
+
+	if ($trigger) {
+		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
+
+		// problem trigger
+		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+			$eventid = $trigger['problem']['eventid'];
+			$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
+		}
+
+		if ($trigger['problem']['acknowledged'] == 1) {
+			$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
+		}
+
+		$desc = array_key_exists($trigger['triggerid'], $dependencies)
+			? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
+			: [];
+	}
+
+	$column = new CCol([$desc, $ack]);
+
+	if ($css !== null) {
+		$column
+			->addClass($css)
+			->addClass(ZBX_STYLE_CURSOR_POINTER);
+	}
+
+	if ($trigger) {
+		// Calculate for how long triggers should blink on status change (set by user in administration->general).
+		$config = select_config();
+		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+		$duration = time() - $trigger['lastchange'];
+
+		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
+			$column->addClass('blink');
+			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
+			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
+		}
+
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
+	}
+
+	return $column;
+}
+
+function getTriggerOverviewCell($trigger, $dependencies, $pageFile, $screenid = null) {
 	$ack = null;
 	$css = null;
 	$desc = null;
