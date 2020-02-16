@@ -3879,6 +3879,7 @@ New features:
 ....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
 
 Bug fixes:
+........S. [ZBX-17201] fixed snmp trapper processes exceeding 1000% (arimdjonoks)
 ........S. [ZBX-16024] fixed maintenance status not being updated in cache if host is disabled (vso)
 
 --------------------------------------------------------------------------------
