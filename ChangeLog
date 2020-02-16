@@ -2,12 +2,11 @@ Changes for 5.0.0alpha2
 
 New features:
 ..F....... [ZBXNEXT-5697] removed support for Internet Explorer (talbergs)
-.......PS. [ZBXNEXT-5626] added database character set check (mabele)
 ..F....... [ZBXNEXT-5698] added filter by tags for widget "Problems by severity" and "Problem hosts" (rlataria)
 ..F.I..PS. [ZBXNEXT-5287,ZBXNEXT-5288] implemented functionality to test items (miks, vso)
 A.F.I..... [ZBXNEXT-5514] added functionality for Zabbix frontend customization (ashubin, averza, gcalenko)
 .........T [ZBXNEXT-5660] Added Discord media type (tuskov)
-..F....... [ZBXNEXT-5603] added db checking for charset and collation (rlataria)
+..F....PS. [ZBXNEXT-5603,ZBXNEXT-5626] added database character set check (mabele, rlataria)
 .........T [ZBXNEXT-5659] added "Template DB MySQL by ODBC" (mchudinov)
 .......PS. [ZBXNEXT-5690] added support for libssh (akozlovs)
 ...G...... [ZBXNEXT-5646] added support of configuration parameters HostInterface and HostInterfaceItem (viktors)
@@ -63,9 +62,8 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 Changes for 4.4.6rc1
 
 New features:
-.......PS. [ZBXNEXT-5626] added database character set check (mabele)
 .........T [ZBXNEXT-5660] Added Discord media type (tuskov)
-..F....... [ZBXNEXT-5603] added db checking for charset and collation (rlataria)
+..F....PS. [ZBXNEXT-5603,ZBXNEXT-5626] added database character set check (mabele, rlataria)
 .........T [ZBXNEXT-5659] added "Template DB MySQL by ODBC" (mchudinov)
 .......PS. [ZBXNEXT-5690] added support for libssh (akozlovs)
 ...G...... [ZBXNEXT-5646] added support of configuration parameters HostInterface and HostInterfaceItem (viktors)
@@ -1114,8 +1112,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.18rc1
 
 New features:
-.......PS. [ZBXNEXT-5626] added database character set check (mabele)
-..F....... [ZBXNEXT-5603] added db checking for charset and collation (rlataria)
+..F....PS. [ZBXNEXT-5603,ZBXNEXT-5626] added database character set check (mabele, rlataria)
 .......PS. [ZBXNEXT-5690] added support for libssh (akozlovs)
 ....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
 
