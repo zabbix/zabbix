@@ -236,13 +236,6 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	SYSTEM_RUN_LOCAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	level;
-
-	level = LOG_LEVEL_DEBUG;
-
-	if (2 == CONFIG_LOG_REMOTE_COMMANDS)
-		level = LOG_LEVEL_WARNING;
-
-	return system_run(request, result, level);
+	return system_run(request, result, LOG_LEVEL_DEBUG);
 }
 

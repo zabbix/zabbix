@@ -41,7 +41,7 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 }
 
 func (pc *passiveCheck) handleCheck(data []byte) {
-	s, err := pc.scheduler.PerformTask(string(data), time.Minute, 0)
+	s, err := pc.scheduler.PerformTask(string(data), time.Minute, 1)
 
 	if err != nil {
 		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), pc.conn.Address())

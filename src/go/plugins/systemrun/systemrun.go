@@ -31,7 +31,7 @@ import (
 type Options struct {
 	Timeout           int `conf:"optional,range=1:30"`
 	Capacity          int `conf:"optional,range=1:100"`
-	LogRemoteCommands int `conf:"optional,range=0:2,default=0"`
+	LogRemoteCommands int `conf:"optional,range=0:1,default=0"`
 }
 
 // Plugin -
@@ -66,7 +66,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Invalid first parameter.")
 	}
 
-	if p.options.LogRemoteCommands == 2 || (p.options.LogRemoteCommands == 1 && ctx.ClientID() != 1) {
+	if p.options.LogRemoteCommands == 1 && ctx.ClientID() != 0 {
 		p.Warningf("Executing command:'%s'", params[0])
 	} else {
 		p.Debugf("Executing command:'%s'", params[0])

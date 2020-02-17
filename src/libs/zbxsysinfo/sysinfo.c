@@ -126,7 +126,7 @@ static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error,
 	(*metrics)[i].function = metric->function;
 	(*metrics)[i].test_param = (NULL == metric->test_param ? NULL : zbx_strdup(NULL, metric->test_param));
 
-	(*metrics) = (ZBX_METRIC *)zbx_realloc((*metrics), (i + 2) * sizeof(ZBX_METRIC));
+	*metrics = (ZBX_METRIC *)zbx_realloc(*metrics, (i + 2) * sizeof(ZBX_METRIC));
 	memset(&(*metrics)[i + 1], 0, sizeof(ZBX_METRIC));
 
 	return SUCCEED;
