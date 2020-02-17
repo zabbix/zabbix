@@ -47,86 +47,89 @@ if ($this->data['graphid']) {
 $content_control->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
 $content_control = (new CTag('nav', true, $content_control))->setAttribute('aria-label', _('Content controls'));
 
+$filter = (new CFilter(new CUrl('charts.php')))
+	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	->setActiveTab($data['active_tab'])
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
+		$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
+	);
+
 $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls(new CList([$controls, $content_control]))
-	->addItem(
-		(new CFilter(new CUrl('charts.php')))
-			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
-			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
-				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
-		->addFilterTab(_('Filter'), [
-			(new CFormList())
-				->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
+	->setControls(new CList([$controls, $content_control]));
+
+if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+	$filter->addFilterTab(_('Filter'), [
+		(new CFormList())
+			->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
+				(new CMultiSelect([
+					'multiple' => true,
+					'name' => 'filter_hostids[]',
+					'object_name' => 'host',
+					'data' => [['name' => 'Zabbix server', 'id' => 10084]],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'hosts',
+							'srcfld1' => 'hostid',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_hostids_',
+							'with_graphs' => true
+						]
+					]
+				]))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			)
+			->addRow((new CLabel(_('Search type'), 'waa')),
+				(new CRadioButtonList('search_type', $data['search_type']))
+					->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT, null,
+						'$("#filter_graph_pattern_").multiSelect("hide");$("#filter_graph_").multiSelect("show");'
+					)
+					->addValue(_('Pattern'), ZBX_SEARCH_TYPE_PATTERN, null,
+						'$("#filter_graph_").multiSelect("hide");$("#filter_graph_pattern_").multiSelect("show");'
+					)
+					->setModern(true)
+			)
+			->addRow((new CLabel(_('Graph'), 'filter_hostids_strict__ms')),
+				[
 					(new CMultiSelect([
 						'multiple' => true,
-						'name' => 'filter_hostids[]',
-						'object_name' => 'host',
-						'data' => [['name' => 'Zabbix server', 'id' => 10084]],
+						'name' => 'filter_graph[]',
+						'object_name' => 'graph',
+						'data' => [['name' => 'CPU Jumps', 'id' => 1]],
 						'popup' => [
 							'parameters' => [
-								'srctbl' => 'hosts',
-								'srcfld1' => 'hostid',
+								'srctbl' => 'graphs',
+								'srcfld1' => 'graphid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_hostids_',
-								'with_graphs' => true
+								'templated' => false
 							]
-						]
-					]))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-				->addRow((new CLabel(_('Search type'), 'waa')),
-					(new CRadioButtonList('search_type', $data['search_type']))
-						->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT, null,
-							'$("#filter_graph_pattern_").multiSelect("hide");$("#filter_graph_").multiSelect("show");'
-						)
-						->addValue(_('Pattern'), ZBX_SEARCH_TYPE_PATTERN, null,
-							'$("#filter_graph_").multiSelect("hide");$("#filter_graph_pattern_").multiSelect("show");'
-						)
-						->setModern(true)
-				)
-				->addRow((new CLabel(_('Graph'), 'filter_hostids_strict__ms')),
-					[
-						(new CMultiSelect([
-							'multiple' => true,
-							'name' => 'filter_graph[]',
-							'object_name' => 'graph',
-							'data' => [['name' => 'CPU Jumps', 'id' => 1]],
-							'popup' => [
-								'parameters' => [
-									'srctbl' => 'graphs',
-									'srcfld1' => 'graphid',
-									'dstfrm' => 'zbx_filter',
-									'dstfld1' => 'filter_hostids_',
-									'templated' => false
-								]
-							],
-							'hidden' => ($data['search_type'] == ZBX_SEARCH_TYPE_PATTERN)
-						]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-						(new CPatternSelect([
-							'placeholder' => _('graph pattern'),
-							'name' => 'filter_graph_pattern[]',
-							'object_name' => 'graph',
-							'data' => [['name' => 'CPU Jumps', 'id' => 1]],
-							'popup' => [
-								'parameters' => [
-									'srctbl' => 'graphs',
-									'srcfld1' => 'graphid',
-									'dstfrm' => 'zbx_filter',
-									'dstfld1' => 'filter_graph_pattern_',
-									'templated' => false
-								]
-							],
-							'hidden' => ($data['search_type'] == ZBX_SEARCH_TYPE_STRICT)
-						]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					]
-				)
-		])
-	);
+						],
+						'hidden' => ($data['search_type'] == ZBX_SEARCH_TYPE_PATTERN)
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+					(new CPatternSelect([
+						'placeholder' => _('graph pattern'),
+						'name' => 'filter_graph_pattern[]',
+						'object_name' => 'graph',
+						'data' => [['name' => 'CPU Jumps', 'id' => 1]],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'graphs',
+								'srcfld1' => 'graphid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_graph_pattern_',
+								'templated' => false
+							]
+						],
+						'hidden' => ($data['search_type'] == ZBX_SEARCH_TYPE_STRICT)
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				]
+			)
+	]);
+}
 
-
+$chartsWidget->addItem($filter);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget
