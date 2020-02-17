@@ -62,12 +62,7 @@ $filter_column = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Severity'),
-		(new CCheckBoxList('severities'))
-			->setOptions(CSeverity::getSeverities())
-			->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3)
-			->setChecked($data['filter']['severities'])
-	);
+	->addRow(_('Severity'), (new CSeverityCheckBoxList('severities'))->setChecked($data['filter']['severities']));
 
 $filterForm
 	->setProfile($data['filter']['timeline']['profileIdx'])
