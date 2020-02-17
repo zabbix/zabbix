@@ -503,14 +503,23 @@ class CHost extends CHostGeneral {
 				$tags = [];
 				$where = '';
 
-				foreach ($options['tags'] as $num => $tag) {
-					$templates = API::Template()->get([
-						'output' => [],
-						'evaltype' => TAG_EVAL_TYPE_OR,
-						'tags' => [['tag' => $tag['tag'], 'value' => $tag['value'], 'operator' => $tag['operator']]],
-						'preservekeys' => true,
-						'nopermissions' => true
-					]);
+				$db_template_tags = DBfetchArray(DBselect(
+					'SELECT h.hostid,ht.tag,ht.value'.
+					' FROM hosts h,host_tag ht'.
+					' WHERE '.CApiTagHelper::addWhereCondition($options['tags'], TAG_EVAL_TYPE_OR, 'h','host_tag',
+							'hostid').
+						' AND ht.hostid=h.hostid'.
+						' AND h.status='.HOST_STATUS_TEMPLATE
+				));
+
+				foreach ($options['tags'] as $tag) {
+
+					$templateids = [];
+					foreach ($db_template_tags as $template_tag) {
+						if (CApiTagHelper::checkTag($tag, $template_tag)) {
+							$templateids[$template_tag['hostid']] = true;
+						}
+					}
 
 					if (!array_key_exists($tag['tag'], $tags)) {
 						$tags[$tag['tag']] = [
@@ -524,29 +533,26 @@ class CHost extends CHostGeneral {
 						'operator' => $tag['operator']
 					];
 
-					$templateids = array_keys($templates);
-					$tags[$tag['tag']]['templateids'] = array_merge($tags[$tag['tag']]['templateids'], $templateids);
+					while ($templateids) {
+						$templateids = array_keys($templateids);
+						$tags[$tag['tag']]['templateids'] = array_merge($tags[$tag['tag']]['templateids'],
+							$templateids
+						);
 
-					do {
-						$templates = API::Template()->get([
+						$templateids = API::Template()->get([
 							'output' => [],
 							'parentTemplateids' => $templateids,
 							'preservekeys' => true,
 							'nopermissions' => true
 						]);
-
-						$templateids = array_keys($templates);
-						$tags[$tag['tag']]['templateids'] = array_merge($tags[$tag['tag']]['templateids'],
-							$templateids
-						);
-					} while ($templateids);
+					}
 				}
 
-				$_tags = [];
 				$num = 1;
 				$tag_cnt = count($tags);
 
 				foreach ($tags as $tag => $_tag) {
+					$_tags = [];
 					foreach ($_tag['pairs'] as $pair) {
 						$_tags[] = [
 							'tag' => $tag,
