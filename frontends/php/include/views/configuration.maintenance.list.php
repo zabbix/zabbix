@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Maintenance periods'))
 	->setControls(
@@ -124,4 +128,4 @@ $maintenanceForm->addItem([
 // append form to widget
 $widget->addItem($maintenanceForm);
 
-return $widget;
+$widget->show();

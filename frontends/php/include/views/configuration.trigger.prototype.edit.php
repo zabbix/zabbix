@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $triggersWidget = (new CWidget())
@@ -527,16 +531,13 @@ if (!$data['form_refresh']) {
 }
 $triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);
 
-/*
- * Tags tab
- */
-$tags_view = new CView('configuration.tags.tab', [
+// tags
+$triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 	'source' => 'trigger_prototype',
 	'tags' => $data['tags'],
 	'show_inherited_tags' => $data['show_inherited_tags'],
 	'readonly' => false
-]);
-$triggersTab->addTab('tags-tab', _('Tags'), $tags_view->render());
+]));
 
 /*
  * Dependencies tab
@@ -644,4 +645,4 @@ $triggersForm->addItem($triggersTab);
 
 $triggersWidget->addItem($triggersForm);
 
-return $triggersWidget;
+$triggersWidget->show();

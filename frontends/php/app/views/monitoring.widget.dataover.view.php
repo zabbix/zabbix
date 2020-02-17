@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 
 if ($data['style'] == STYLE_TOP) {
 	$table = new CObject((new CView('dataoverview.table.top', $data))->getOutput());

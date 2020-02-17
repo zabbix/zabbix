@@ -108,8 +108,6 @@ class CControllerWebView extends CController {
 		$data['ms_hosts'] = CArrayHelper::renameObjectsKeys($this->hosts, ['hostid' => 'id']);
 		$data['ms_groups'] = CArrayHelper::renameObjectsKeys($this->groups, ['groupid' => 'id']);
 
-		CView::$has_web_layout_mode = true;
-
 		$data['screen_view'] = CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_HTTPTEST,
 			'mode' => SCREEN_MODE_JS,

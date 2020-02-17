@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $action = 'screenedit.php?form=update&screenid='.getRequest('screenid');
 if (isset($_REQUEST['screenitemid'])) {
 	$action .= '&screenitemid='.getRequest('screenitemid');
@@ -885,4 +889,4 @@ else {
 	));
 }
 
-return $form;
+$form->show();

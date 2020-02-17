@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form_list = (new CFormList());
 
 if ($data['type'] == MEDIA_TYPE_WEBHOOK) {
@@ -84,7 +88,7 @@ $form = (new CForm())
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.mediatypetest.edit.js.php',
+	'script_inline' => $this->readJsFile('popup.mediatypetest.edit.js.php'),
 	'body' => (new CDiv([$data['errors'], $form]))->toString(),
 	'buttons' => [
 		[

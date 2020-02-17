@@ -28,9 +28,7 @@ $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = ['layout.mode.js', 'multiselect.js'];
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 define('SHOW_TRIGGERS', 0);
@@ -211,9 +209,11 @@ if ($type == SHOW_TRIGGERS) {
 	);
 
 	$data['filter'] = $filter;
-	$overview_view = new CView('monitoring.overview.triggers', $data);
+
+	// Render view.
+	echo (new CView('monitoring.overview.triggers', $data))->getOutput();
 }
-// fetch item data
+// Fetch item data.
 else {
 	$data['filter'] = [
 		'application' => CProfile::get('web.overview.filter.application', ''),
@@ -263,11 +263,8 @@ else {
 	$data['hidden_cnt'] = $hidden_cnt;
 	$data['paging_line'] = $paging_line;
 
-	$overview_view = new CView('monitoring.overview.items', $data);
+	// Render view.
+	echo (new CView('monitoring.overview.items', $data))->getOutput();
 }
-
-// render view
-$overview_view->render();
-$overview_view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

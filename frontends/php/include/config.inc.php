@@ -25,11 +25,11 @@ try {
 	APP::getInstance()->run(APP::EXEC_MODE_DEFAULT);
 }
 catch (DBException $e) {
-	(new CView('general.warning', [
+	echo (new CView('general.warning', [
 		'header' => 'Database error',
 		'messages' => [$e->getMessage()],
 		'theme' => ZBX_DEFAULT_THEME
-	]))->render();
+	]))->getOutput();
 
 	exit;
 }
@@ -40,21 +40,21 @@ catch (ConfigFileException $e) {
 			exit;
 
 		case CConfigFile::CONFIG_ERROR:
-			(new CView('general.warning', [
+			echo (new CView('general.warning', [
 				'header' => 'Configuration file error',
 				'messages' => [$e->getMessage()],
 				'theme' => ZBX_DEFAULT_THEME
-			]))->render();
+			]))->getOutput();
 
 			exit;
 	}
 }
 catch (Exception $e) {
-	(new CView('general.warning', [
+	echo (new CView('general.warning', [
 		'header' => $e->getMessage(),
 		'messages' => [],
 		'theme' => ZBX_DEFAULT_THEME
-	]))->render();
+	]))->getOutput();
 
 	exit;
 }

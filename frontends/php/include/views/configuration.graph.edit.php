@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = new CWidget();
 
 if ($data['parent_discoveryid'] === null) {
@@ -487,4 +491,4 @@ $graphForm->addItem($graphTab);
 // Append form to widget.
 $widget->addItem($graphForm);
 
-return $widget;
+$widget->show();

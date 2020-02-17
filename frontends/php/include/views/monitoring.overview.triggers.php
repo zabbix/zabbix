@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 zbx_add_post_js('jqBlink.blink();');
 
 // hint table
@@ -71,7 +75,7 @@ if ($blink_period > 0) {
 }
 
 // header right
-$web_layout_mode = CView::getLayoutMode();
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $submenu_source = [
 	SHOW_TRIGGERS => _('Trigger overview'),
@@ -111,7 +115,7 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -119,27 +123,23 @@ $widget = (new CWidget())
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	// filter
-	$filter = $data['filter'];
-	$filterFormView = new CView('common.filter.trigger', [
+	$widget->addItem(new CPartial('common.filter.trigger', [
 		'filter' => [
-			'showTriggers' => $filter['showTriggers'],
-			'ackStatus' => $filter['ackStatus'],
-			'showSeverity' => $filter['showSeverity'],
-			'statusChange' => $filter['statusChange'],
-			'statusChangeDays' => $filter['statusChangeDays'],
-			'txtSelect' => $filter['txtSelect'],
-			'application' => $filter['application'],
-			'inventory' => $filter['inventory'],
-			'show_suppressed' => $filter['show_suppressed']
+			'showTriggers' => $data['filter']['showTriggers'],
+			'ackStatus' => $data['filter']['ackStatus'],
+			'showSeverity' => $data['filter']['showSeverity'],
+			'statusChange' => $data['filter']['statusChange'],
+			'statusChangeDays' => $data['filter']['statusChangeDays'],
+			'txtSelect' => $data['filter']['txtSelect'],
+			'application' => $data['filter']['application'],
+			'inventory' => $data['filter']['inventory'],
+			'show_suppressed' => $data['filter']['show_suppressed']
 		],
 		'ms_groups' => $data['ms_groups'],
 		'config' => $data['config'],
 		'profileIdx' => $data['profileIdx'],
 		'active_tab' => $data['active_tab']
-	]);
-	$filterForm = $filterFormView->render();
-
-	$widget->addItem($filterForm);
+	]));
 }
 
 global $page;
@@ -153,4 +153,4 @@ else {
 
 $widget->addItem($table);
 
-return $widget;
+$widget->show();

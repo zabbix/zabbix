@@ -574,9 +574,7 @@ if (hasRequest('form')) {
 	}
 
 	// Render view.
-	$actionView = new CView('configuration.action.edit', $data);
-	$actionView->render();
-	$actionView->show();
+	echo (new CView('configuration.action.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -642,9 +640,7 @@ else {
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sortOrder, new CUrl('actionconf.php'));
 
 	// render view
-	$actionView = new CView('configuration.action.list', $data);
-	$actionView->render();
-	$actionView->show();
+	echo (new CView('configuration.action.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

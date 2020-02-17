@@ -19,7 +19,7 @@
 **/
 
 
-$hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
+$widget = (new CWidget())->setTitle(_('Host inventory'));
 
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
@@ -30,7 +30,7 @@ foreach ($inventoryFields as $inventoryField) {
 }
 
 // filter
-$hostInventoryWidget->addItem(
+$widget->addItem(
 	(new CFilter(new CUrl('hostinventories.php')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
@@ -105,7 +105,6 @@ foreach ($this->data['hosts'] as $host) {
 	$table->addRow($row);
 }
 
-$table = [$table, $this->data['paging']];
-$hostInventoryWidget->addItem($table);
+$widget->addItem([$table, $this->data['paging']]);
 
-return $hostInventoryWidget;
+$widget->show();

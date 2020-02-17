@@ -19,8 +19,13 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('multiselect.js');
-$this->includeJSfile('app/views/administration.script.edit.js.php');
+
+$this->includeJsFile('administration.script.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Scripts'));
 

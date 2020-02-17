@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $filter = (new CFilter(new CUrl('httpconf.php')))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
@@ -192,4 +196,4 @@ $httpForm->addItem([
 // append form to widget
 $widget->addItem($httpForm);
 
-return $widget;
+$widget->show();

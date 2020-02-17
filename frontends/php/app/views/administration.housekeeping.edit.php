@@ -19,7 +19,11 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.housekeeping.edit.js.php');
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('administration.housekeeping.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Housekeeping'))

@@ -120,7 +120,7 @@ $form->addItem([
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.discovery.check.js.php',
+	'script_inline' => $this->readJsFile('popup.discovery.check.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
