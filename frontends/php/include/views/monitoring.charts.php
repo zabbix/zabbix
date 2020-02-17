@@ -30,21 +30,6 @@ $controls = (new CForm('get'))
 	->setAttribute('aria-label', _('Main filter'))
 	->addItem((new CList())
 		->addItem([
-			new CLabel(_('Group'), 'groupid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$this->data['pageFilter']->getGroupsCB()
-		])
-		->addItem([
-			new CLabel(_('Host'), 'hostid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$this->data['pageFilter']->getHostsCB()
-		])
-		->addItem([
-			new CLabel(_('Graph'), 'graphid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$this->data['pageFilter']->getGraphsCB()
-		])
-		->addItem([
 			new CLabel(_('View as'), 'action'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CComboBox('action', $data['action'], 'submit()', $data['actions']))->setEnabled((bool) $data['graphid'])
@@ -72,7 +57,73 @@ $chartsWidget = (new CWidget())
 			->setActiveTab($data['active_tab'])
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+		->addFilterTab(_('Filter'), [
+			(new CFormList())
+				->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
+					(new CMultiSelect([
+						'multiple' => true,
+						'name' => 'filter_hostids[]',
+						'object_name' => 'host',
+						'data' => [['name' => 'Zabbix server', 'id' => 10084]],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'hosts',
+								'srcfld1' => 'hostid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_hostids_'
+							]
+						]
+					]))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow((new CLabel(_('Search type'), 'waa')),
+					(new CRadioButtonList('search_type', $data['search_type']))
+						->addValue(_('Strict'), 1, null,
+							'$("#filter_graph_pattern").multiSelect("hide");$("#filter_graph_").multiSelect("show");'
+						)
+						->addValue(_('Pattern'), 2, null,
+							'$("#filter_graph_").multiSelect("hide");$("#filter_graph_pattern").multiSelect("show");'
+						)
+						->setModern(true)
+				)
+				->addRow((new CLabel(_('Graph'), 'filter_hostids_strict__ms')),
+					[
+						(new CMultiSelect([
+							'multiple' => true,
+							'name' => 'filter_graph[]',
+							'object_name' => 'graph',
+							'data' => [['name' => 'CPU Jumps', 'id' => 1]],
+							'popup' => [
+								'parameters' => [
+									'srctbl' => 'graphs',
+									'srcfld1' => 'graphid',
+									'dstfrm' => 'zbx_filter',
+									'dstfld1' => 'filter_hostids_'
+								]
+							],
+							'hidden' => $data['search_type'] == 2
+						]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+						(new CPatternSelect([
+							'placeholder' => _('graph pattern'),
+							'name' => 'filter_graph_pattern[]',
+							'object_name' => 'graph',
+							'data' => [['name' => 'CPU Jumps', 'id' => 1]],
+							'popup' => [
+								'parameters' => [
+									'srctbl' => 'graphs',
+									'srcfld1' => 'graphid',
+									'dstfrm' => 'zbx_filter',
+									'dstfld1' => 'filter_graph_pattern_'
+								]
+							],
+							'hidden' => $data['search_type'] == 1
+						]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					]
+				)
+		])
 	);
+
+
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget
