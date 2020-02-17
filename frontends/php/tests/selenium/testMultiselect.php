@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testMultiselect extends CWebTest {
 
 	/*
-	 * Debug button sometime overlaps widget edit icon, after widget creation.
+	 * Debug button sometimes changes pages layout.
 	 */
 	public static function setDebugMode($value) {
 		DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($value).' WHERE usrgrpid=7');
@@ -42,10 +42,6 @@ class testMultiselect extends CWebTest {
 	public static function enableDebugMode() {
 		self::setDebugMode(1);
 	}
-
-//	public function testMultiselect_disableDebugMode() {
-//		DBexecute('UPDATE usrgrp SET debug_mode=0 WHERE usrgrpid=7');
-//	}
 
 	public function testMultiselect_SuggestExisting() {
 		$this->checkSuggest('zabbix.php?action=problem.view', 'zbx_filter',
