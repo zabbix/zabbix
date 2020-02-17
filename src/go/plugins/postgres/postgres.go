@@ -22,6 +22,7 @@ package postgres
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strconv"
 
 	"zabbix.com/pkg/plugin"
@@ -73,11 +74,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		handler    handler
 	)
 
-	// The first param is always connString for each metric
 	if len(params) > 0 && len(params[0]) > 0 {
 		// TODO: identify parameter by type: port,host or smth else
+		// for now expect only one parameter and expect it to be a database name
 		strPort := strconv.Itoa(int(p.options.Port))
-		connString = "postgresql://" + p.options.User + ":" + p.options.Password + "@" + p.options.Host + ":" + strPort + "/" + params[0]
+		databaseName := url.PathEscape(params[0])
+		connString = "postgresql://" + p.options.User + ":" + p.options.Password + "@" + p.options.Host + ":" + strPort + "/" + databaseName
 	} else {
 		strPort := strconv.Itoa(int(p.options.Port))
 		connString = "postgresql://" + p.options.User + ":" + p.options.Password + "@" + p.options.Host + ":" + strPort + "/" + p.options.Database
@@ -110,6 +112,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	case keyPostgresWal:
 		handler = p.walHandler // postgres.wal[[connString]]
+
+	case keyPostgresAutovacuum:
+		handler = p.autovacuumHandler // postgres.autovacuum.count[[connString]]
 
 	case keyPostgresStat,
 		keyPostgresStatSum:
@@ -191,6 +196,7 @@ func init() {
 		keyPostgresReplicationRecoveryRole, "Returns postgreSQL recovery role.",
 		keyPostgresLocks, "Returns collect all metrics from pg_locks.",
 		keyPostgresOldestXid, "Returns age of oldest xid.",
+		keyPostgresAutovacuum, "Returns count of autovacuum workers.",
 		keyPostgresReplicationMasterDiscoveryApplicationName, "Returns JSON discovery with application name from pg_stat_replication.",
 	)
 	/* registerConnectionsMertics() */
