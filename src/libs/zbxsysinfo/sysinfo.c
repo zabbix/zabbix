@@ -181,7 +181,7 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 		metric.function = &EXECUTE_USER_PARAMETER;
 		metric.test_param = command;
 
-		ret = add_metric( &metric, error, max_error_len);
+		ret = add_metric(&metric, error, max_error_len);
 	}
 	else
 		zbx_strlcpy(error, "syntax error", max_error_len);
@@ -227,7 +227,7 @@ void	init_metrics(void)
 
 	for (i = 0; NULL != parameters_common_local[i].key; i++)
 	{
-		if (SUCCEED != add_metric_local( &parameters_common_local[i], error, sizeof(error)))
+		if (SUCCEED != add_metric_local(&parameters_common_local[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
