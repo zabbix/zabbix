@@ -102,7 +102,7 @@ $data = [
 	'timeline' => getTimeSelectorPeriod($timeselector_options),
 	'page' => getRequest('page', 1),
 	'active_tab' => CProfile::get('web.graphs.filter.active', 1),
-	'search_type' => 1
+	'search_type' => ZBX_SEARCH_TYPE_STRICT
 ];
 
 // render view

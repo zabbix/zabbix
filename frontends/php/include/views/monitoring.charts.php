@@ -70,7 +70,8 @@ $chartsWidget = (new CWidget())
 								'srctbl' => 'hosts',
 								'srcfld1' => 'hostid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_hostids_'
+								'dstfld1' => 'filter_hostids_',
+								'with_graphs' => true
 							]
 						]
 					]))
@@ -78,11 +79,11 @@ $chartsWidget = (new CWidget())
 				)
 				->addRow((new CLabel(_('Search type'), 'waa')),
 					(new CRadioButtonList('search_type', $data['search_type']))
-						->addValue(_('Strict'), 1, null,
-							'$("#filter_graph_pattern").multiSelect("hide");$("#filter_graph_").multiSelect("show");'
+						->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT, null,
+							'$("#filter_graph_pattern_").multiSelect("hide");$("#filter_graph_").multiSelect("show");'
 						)
-						->addValue(_('Pattern'), 2, null,
-							'$("#filter_graph_").multiSelect("hide");$("#filter_graph_pattern").multiSelect("show");'
+						->addValue(_('Pattern'), ZBX_SEARCH_TYPE_PATTERN, null,
+							'$("#filter_graph_").multiSelect("hide");$("#filter_graph_pattern_").multiSelect("show");'
 						)
 						->setModern(true)
 				)
@@ -98,10 +99,11 @@ $chartsWidget = (new CWidget())
 									'srctbl' => 'graphs',
 									'srcfld1' => 'graphid',
 									'dstfrm' => 'zbx_filter',
-									'dstfld1' => 'filter_hostids_'
+									'dstfld1' => 'filter_hostids_',
+									'templated' => false
 								]
 							],
-							'hidden' => $data['search_type'] == 2
+							'hidden' => ($data['search_type'] == ZBX_SEARCH_TYPE_PATTERN)
 						]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 						(new CPatternSelect([
 							'placeholder' => _('graph pattern'),
@@ -113,10 +115,11 @@ $chartsWidget = (new CWidget())
 									'srctbl' => 'graphs',
 									'srcfld1' => 'graphid',
 									'dstfrm' => 'zbx_filter',
-									'dstfld1' => 'filter_graph_pattern_'
+									'dstfld1' => 'filter_graph_pattern_',
+									'templated' => false
 								]
 							],
-							'hidden' => $data['search_type'] == 1
+							'hidden' => ($data['search_type'] == ZBX_SEARCH_TYPE_STRICT)
 						]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 					]
 				)
