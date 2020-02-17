@@ -405,6 +405,7 @@ class CControllerPopupGeneric extends CController {
 			'with_triggers' =>						'in 1',
 			'with_monitored_triggers' =>			'in 1',
 			'with_monitored_items' =>				'in 1',
+			'with_httptests' => 					'in 1',
 			'with_webitems' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
@@ -859,7 +860,9 @@ class CControllerPopupGeneric extends CController {
 			case 'hosts':
 				$options += [
 					'output' => ['hostid', 'name'],
-					'groupids' => $this->groupids ? $this->groupids : null
+					'groupids' => $this->groupids ? $this->groupids : null,
+					'real_hosts' => $this->hasInput('real_hosts') ? '1' : null,
+					'with_httptests' => $this->hasInput('with_httptests') ? '1' : null,
 				];
 
 				$records = API::Host()->get($options);
@@ -889,6 +892,10 @@ class CControllerPopupGeneric extends CController {
 				}
 				elseif ($this->hasInput('templated_hosts')) {
 					$options['templated_hosts'] = 1;
+				}
+
+				if ($this->hasInput('with_httptests')) {
+					$options['with_httptests'] = 1;
 				}
 
 				if ($this->hasInput('normal_only')) {

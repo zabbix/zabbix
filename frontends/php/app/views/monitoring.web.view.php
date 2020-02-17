@@ -58,6 +58,7 @@ $web_layout_mode = $this->getLayoutMode();
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_groupids_',
 								'real_hosts' => true,
+								'with_httptests' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -74,6 +75,8 @@ $web_layout_mode = $this->getLayoutMode();
 								'srcfld1' => 'hostid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_hostids_',
+								'real_hosts' => true,
+								'with_httptests' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
