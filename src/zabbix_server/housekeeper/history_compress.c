@@ -68,16 +68,22 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
 
 	/* get hypertable segmentby attribute name */
-	result = DBselect("select count(c.attname) from _timescaledb_catalog.hypertable_compression c"
+	result = DBselect("select c.attname from _timescaledb_catalog.hypertable_compression c"
 			" inner join _timescaledb_catalog.hypertable h on (h.id = c.hypertable_id)"
-			" where c.segmentby_column_index<>0 and h.table_name='%s' and c.attname='%s'",
-			table_name, ZBX_TS_SEGMENT_BY);
+			" where c.segmentby_column_index<>0 and h.table_name='%s'", table_name);
 
-	if (NULL == (row = DBfetch(result)) || 1 != atoi(row[0]))
+	for (i = 0; NULL != (row = DBfetch(result)); i++)
+	{
+		if (0 != strcmp(row[0], ZBX_TS_SEGMENT_BY))
+			i++;
+	}
+
+	if (1 != i)
 	{
 		DBexecute("alter table %s set (timescaledb.compress, timescaledb.compress_segmentby = '%s',"
 				" timescaledb.compress_orderby = '%s')", table_name, ZBX_TS_SEGMENT_BY,

@@ -733,7 +733,7 @@ void	DBcheck_capabilities(void)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (100200 <= zbx_dbms_get_version())
+	if (100002 <= zbx_dbms_get_version())
 	{
 		DB_RESULT	result;
 		DB_ROW		row;
@@ -747,7 +747,7 @@ void	DBcheck_capabilities(void)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
 
-		sscanf((const char*)row[0],"%d.%d.%d", &major, &minor, &patch);
+		sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch);
 		version = major * 10000;
 		version += minor * 100;
 		version += patch;

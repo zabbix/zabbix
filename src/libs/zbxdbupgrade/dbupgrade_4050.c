@@ -620,7 +620,7 @@ static int	DBpatch_4050037(void)
 
 static int	DBpatch_4050038(void)
 {
-	const ZBX_FIELD field = {"compress_older", "7d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"compress_older", "7d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }

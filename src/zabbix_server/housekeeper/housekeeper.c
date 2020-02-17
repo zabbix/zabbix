@@ -1164,9 +1164,12 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION);
 
-		zbx_setproctitle("%s [synchronizing history and trends compression settings]",
-				get_process_type_string(process_type));
-		hk_history_compression_update(&cfg.db);
+		if (0 == strcmp(cfg.db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+		{
+			zbx_setproctitle("%s [synchronizing history and trends compression settings]",
+					get_process_type_string(process_type));
+			hk_history_compression_update(&cfg.db);
+		}
 
 		zbx_setproctitle("%s [removing old history and trends]",
 				get_process_type_string(process_type));
