@@ -56,6 +56,11 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
+		if (array_key_exists('hidden', $options) && $options['hidden']) {
+			$this->setAttribute('aria-hidden', 'true');
+			$this->setAttribute('style', 'display:none;');
+		}
+
 		// Autocomplete url.
 		$url = (new CUrl('jsrpc.php'))
 			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
@@ -71,6 +76,7 @@ class CMultiSelect extends CTag {
 		$params = [
 			'url' => $url->getUrl(),
 			'name' => $options['name'],
+			'hidden' => $options['hidden'],
 			'labels' => [
 				'No matches found' => _('No matches found'),
 				'More matches found...' => _('More matches found...'),
@@ -133,7 +139,7 @@ class CMultiSelect extends CTag {
 	 */
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup', 'placeholder'
+			'add_post_js', 'styles', 'popup', 'placeholder', 'hidden'
 		];
 
 		foreach ($options as $field => $value) {
@@ -166,6 +172,8 @@ class CMultiSelect extends CTag {
 			$mapped_options['selectedLimit'] = '1';
 		}
 
+		$mapped_options['hidden'] = array_key_exists('hidden', $options) ? $options['hidden'] : false;
+
 		$autocomplete_parameters = [];
 		$popup_parameters = [];
 
@@ -185,7 +193,8 @@ class CMultiSelect extends CTag {
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
 					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes',
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
-					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items'
+					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items',
+					'with_httptests'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -281,6 +290,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('with_monitored_items', $parameters) && $parameters['with_monitored_items']) {
 					$popup_parameters['with_monitored_items'] = '1';
 					$autocomplete_parameters['with_monitored_items'] = true;
+				}
+
+				if (array_key_exists('with_httptests', $parameters) && $parameters['with_httptests']) {
+					$popup_parameters['with_httptests'] = '1';
+					$autocomplete_parameters['with_httptests'] = true;
 				}
 
 				if (array_key_exists('excludeids', $parameters) && $parameters['excludeids']) {

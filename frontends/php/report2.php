@@ -493,7 +493,7 @@ else {
 			($availability['false'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
-			new CLink(_('Show'), 
+			new CLink(_('Show'),
 				(new CUrl('report2.php'))
 					->setArgument('filter_hostids', $trigger['hosts'][0]['hostid'])
 					->setArgument('triggerid', $trigger['triggerid'])
