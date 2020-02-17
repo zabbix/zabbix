@@ -1856,6 +1856,10 @@ output {
 
 	li {
 		display: table-row;
+
+		&.display-none {
+			@extend .display-none
+		}
 	}
 
 	.multiselect-suggest {
@@ -6776,6 +6780,10 @@ svg {
 			display: none;
 		}
 	}
+}
+
+.display-none {
+	display: none;
 }
 
 .checkbox-list {

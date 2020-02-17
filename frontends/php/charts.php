@@ -35,14 +35,16 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid' =>	[T_ZBX_INT,			O_OPT, P_SYS, DB_ID,		null],
-	'hostid' =>		[T_ZBX_INT,			O_OPT, P_SYS, DB_ID,		null],
-	'graphid' =>	[T_ZBX_INT,			O_OPT, P_SYS, DB_ID,		null],
-	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS, null,			null],
-	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS, null,			null],
-	'action' =>		[T_ZBX_STR,			O_OPT, P_SYS, IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'"'), null]
+	'from'                  => [T_ZBX_RANGE_TIME, O_OPT, P_SYS, null,                                                              null],
+	'to'                    => [T_ZBX_RANGE_TIME, O_OPT, P_SYS, null,                                                              null],
+	'action'                => [T_ZBX_STR,        O_OPT, P_SYS, IN('"'.HISTORY_GRAPH.'", "'.HISTORY_VALUES.'"'),                   null],
+	'filter_search_type'    => [T_ZBX_INT,        O_OPT, P_SYS, IN('"'.ZBX_SEARCH_TYPE_STRICT.'", "'.ZBX_SEARCH_TYPE_PATTERN.'"'), null],
+	'filter_hostids'        => [T_ZBX_INT,        O_OPT, null,  DB_ID,                                                             null],
+	'filter_graphids'       => [T_ZBX_INT,        O_OPT, null,  DB_ID,                                                             null],
+	'filter_graph_patterns' => [T_ZBX_STR,        O_OPT, null,  null,                                                              null]
 ];
 check_fields($fields);
+
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 /*
@@ -69,36 +71,26 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit;
 }
 
-$pageFilter = new CPageFilter([
-	'groups' => ['real_hosts' => true, 'with_graphs' => true],
-	'hosts' => ['with_graphs' => true],
-	'groupid' => getRequest('groupid'),
-	'hostid' => getRequest('hostid'),
-	'graphs' => ['templated' => 0],
-	'graphid' => getRequest('graphid')
-]);
-
 /*
  * Display
  */
 $timeselector_options = [
 	'profileIdx' => 'web.graphs.filter',
-	'profileIdx2' => $pageFilter->graphid,
+	'profileIdx2' => null,
 	'from' => getRequest('from'),
 	'to' => getRequest('to')
 ];
 updateTimeSelectorPeriod($timeselector_options);
 
 $data = [
-	'pageFilter' => $pageFilter,
-	'groupid' => $pageFilter->groupid,
-	'hostid' => $pageFilter->hostid,
-	'graphid' => $pageFilter->graphid,
 	'action' => getRequest('action', HISTORY_GRAPH),
 	'actions' => [
 		HISTORY_GRAPH => _('Graph'),
 		HISTORY_VALUES => _('Values')
 	],
+	'ms_hosts' => [],
+	'ms_graphs' => [],
+	'ms_graph_patterns' => [],
 	'timeline' => getTimeSelectorPeriod($timeselector_options),
 	'page' => getRequest('page', 1),
 	'active_tab' => CProfile::get('web.graphs.filter.active', 1),

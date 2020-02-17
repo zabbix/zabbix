@@ -56,11 +56,6 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
-		if (array_key_exists('hidden', $options) && $options['hidden']) {
-			$this->setAttribute('aria-hidden', 'true');
-			$this->setAttribute('style', 'display:none;');
-		}
-
 		// Autocomplete url.
 		$url = (new CUrl('jsrpc.php'))
 			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
@@ -76,7 +71,6 @@ class CMultiSelect extends CTag {
 		$params = [
 			'url' => $url->getUrl(),
 			'name' => $options['name'],
-			'hidden' => $options['hidden'],
 			'labels' => [
 				'No matches found' => _('No matches found'),
 				'More matches found...' => _('More matches found...'),
@@ -139,7 +133,7 @@ class CMultiSelect extends CTag {
 	 */
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup', 'placeholder', 'hidden'
+			'add_post_js', 'styles', 'popup', 'placeholder'
 		];
 
 		foreach ($options as $field => $value) {
@@ -171,8 +165,6 @@ class CMultiSelect extends CTag {
 		if (!$multiple) {
 			$mapped_options['selectedLimit'] = '1';
 		}
-
-		$mapped_options['hidden'] = array_key_exists('hidden', $options) ? $options['hidden'] : false;
 
 		$autocomplete_parameters = [];
 		$popup_parameters = [];

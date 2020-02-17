@@ -67,7 +67,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					'multiple' => true,
 					'name' => 'filter_hostids[]',
 					'object_name' => 'host',
-					'data' => [['name' => 'Zabbix server', 'id' => 10084]],
+					'data' => $data['ms_hosts'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'hosts',
@@ -83,48 +83,56 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			->addRow((new CLabel(_('Search type'), 'waa')),
 				(new CRadioButtonList('search_type', $data['search_type']))
 					->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT, null,
-						'$("#filter_graph_pattern_").multiSelect("hide");$("#filter_graph_").multiSelect("show");'
+						'$("#ms_graph_patterns").addClass("display-none");'.
+						'$("#ms_graphids").removeClass("display-none");'.
+						'$("#filter_graphids_, #filter_graph_pattern_").multiSelect("clean")'
 					)
 					->addValue(_('Pattern'), ZBX_SEARCH_TYPE_PATTERN, null,
-						'$("#filter_graph_").multiSelect("hide");$("#filter_graph_pattern_").multiSelect("show");'
+						'$("#ms_graph_patterns").removeClass("display-none");'.
+						'$("#ms_graphids").addClass("display-none");'.
+						'$("#filter_graphids_, #filter_graph_pattern_").multiSelect("clean")'
 					)
 					->setModern(true)
 			)
-			->addRow((new CLabel(_('Graph'), 'filter_hostids_strict__ms')),
-				[
-					(new CMultiSelect([
-						'multiple' => true,
-						'name' => 'filter_graph[]',
-						'object_name' => 'graph',
-						'data' => [['name' => 'CPU Jumps', 'id' => 1]],
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'graphs',
-								'srcfld1' => 'graphid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_hostids_',
-								'templated' => false
-							]
-						],
-						'hidden' => ($data['search_type'] == ZBX_SEARCH_TYPE_PATTERN)
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-					(new CPatternSelect([
-						'placeholder' => _('graph pattern'),
-						'name' => 'filter_graph_pattern[]',
-						'object_name' => 'graph',
-						'data' => [['name' => 'CPU Jumps', 'id' => 1]],
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'graphs',
-								'srcfld1' => 'graphid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_graph_pattern_',
-								'templated' => false
-							]
-						],
-						'hidden' => ($data['search_type'] == ZBX_SEARCH_TYPE_STRICT)
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				]
+			->addRow(
+				(new CLabel(_('Graphs'), 'filter_graph__ms')),
+				(new CMultiSelect([
+					'multiple' => true,
+					'name' => 'filter_graphids[]',
+					'object_name' => 'graph',
+					'data' => $data['ms_graphs'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'graphs',
+							'srcfld1' => 'graphid',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_graphids_',
+							'templated' => false
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+				'ms_graphids',
+				($data['search_type'] == ZBX_SEARCH_TYPE_STRICT) ? '' : 'display-none'
+			)
+			->addRow(
+				(new CLabel(_('Graphs'), 'filter_graph_patterns__ms')),
+				(new CPatternSelect([
+					'placeholder' => _('graph pattern'),
+					'name' => 'filter_graph_pattern[]',
+					'object_name' => 'graph',
+					'data' => $data['ms_graph_patterns'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'graphs',
+							'srcfld1' => 'graphid',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_graph_pattern_',
+							'templated' => false
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+				'ms_graph_patterns',
+				($data['search_type'] == ZBX_SEARCH_TYPE_STRICT) ? 'display-none' : ''
 			)
 	]);
 }
