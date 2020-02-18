@@ -657,7 +657,14 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
-function getTriggersOverviewTableData($db_hosts, $db_triggers, $limit) {
+/**
+ * @param array $db_hosts
+ * @param array $db_triggers
+ * @param int   $limit
+ *
+ * @return array
+ */
+function getTriggersOverviewTableData(array $db_hosts, array $db_triggers, int $limit): array {
 	$triggers_by_name = [];
 	$hosts_by_name = [];
 	$exceeded_hosts = false;
@@ -701,8 +708,6 @@ function getTriggersOverviewTableData($db_hosts, $db_triggers, $limit) {
 }
 
 /**
- * Creates and returns item data overview table for the given host groups.
- *
  * @param array  $groupids
  * @param string $application
  * @param array  $host_options
@@ -714,8 +719,8 @@ function getTriggersOverviewTableData($db_hosts, $db_triggers, $limit) {
  *
  * @return array
  */
-function getTriggersOverviewData(array $groupids, $application, array $host_options = [], array $trigger_options = [],
-		array $problem_options = []): array {
+function getTriggersOverviewData(array $groupids, string $application, array $host_options = [],
+		array $trigger_options = [], array $problem_options = []): array {
 
 	$exhausted_hosts = false;
 	$exhausted_triggers = false;
@@ -938,58 +943,39 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
  *
  * @param array  $trigger
  * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
- * @param string $pageFile      The page where the element is displayed.
- * @param string $screenid
+ * @param CUrl   $backurl       Used for acknowledge context menu item.
  *
  * @return CCol
  */
-function getTriggerOverviewCell($trigger, $dependencies, $pageFile, $screenid = null) {
-	$ack = null;
-	$css = null;
-	$desc = null;
+function getTriggerOverviewCell(array $trigger, array $dependencies, CUrl $backurl): CCol {
+	$ack = $trigger['problem']['acknowledged'] == 1 ? (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN) : null;
+	$desc = array_key_exists($trigger['triggerid'], $dependencies)
+		? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
+		: [];
+
+	$column = (new CCol([$desc, $ack]))
+		->addClass(getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE))
+		->addClass(ZBX_STYLE_CURSOR_POINTER);
+
 	$eventid = 0;
 	$acknowledge = [];
 
-	if ($trigger) {
-		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
+	$config = select_config();
+	$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+	$duration = time() - $trigger['lastchange'];
 
-		// problem trigger
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-			$eventid = $trigger['problem']['eventid'];
-			$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
-		}
-
-		if ($trigger['problem']['acknowledged'] == 1) {
-			$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
-		}
-
-		$desc = array_key_exists($trigger['triggerid'], $dependencies)
-			? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
-			: [];
+	if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
+		$column->addClass('blink');
+		$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
+		$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 	}
 
-	$column = new CCol([$desc, $ack]);
-
-	if ($css !== null) {
-		$column
-			->addClass($css)
-			->addClass(ZBX_STYLE_CURSOR_POINTER);
+	if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+		$eventid = $trigger['problem']['eventid'];
+		$acknowledge = ['backurl' => $backurl->getUrl()];
 	}
 
-	if ($trigger) {
-		// Calculate for how long triggers should blink on status change (set by user in administration->general).
-		$config = select_config();
-		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
-		$duration = time() - $trigger['lastchange'];
-
-		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
-			$column->addClass('blink');
-			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
-			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
-		}
-
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
-	}
+	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
 
 	return $column;
 }

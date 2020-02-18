@@ -142,13 +142,11 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	]));
 }
 
-global $page;
-
 if ($data['view_style'] == STYLE_TOP) {
-	$table = (new CView('trigoverview.table.top', $data))->getOutput();
+	$table = new CPartial('trigoverview.table.top', $data);
 }
 else {
-	$table = (new CView('trigoverview.table.left', $data))->getOutput();
+	$table = new CPartial('trigoverview.table.left', $data);
 }
 
 $widget->addItem($table);

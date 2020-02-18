@@ -209,6 +209,7 @@ if ($type == SHOW_TRIGGERS) {
 	);
 
 	$data['filter'] = $filter;
+	$data['backurl'] = new CUrl($page['file']);
 
 	// Render view.
 	echo (new CView('monitoring.overview.triggers', $data))->getOutput();

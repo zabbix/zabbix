@@ -1008,7 +1008,7 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
  *
  * @return array
  */
-function getDataOverviewCellData(array $db_hosts, array $db_items, array $items_by_name, int $show_suppressed) {
+function getDataOverviewCellData(array $db_hosts, array $db_items, array $items_by_name, int $show_suppressed): array {
 	$visible_items = [];
 	foreach ($items_by_name as $name => $hostid_to_itemid) {
 		foreach ($hostid_to_itemid as $hostid => $itemid) {
@@ -1068,13 +1068,13 @@ function getDataOverviewCellData(array $db_hosts, array $db_items, array $items_
 }
 
 /**
- * @param array $groupids
- * @param array $hostids
+ * @param array  $groupids
+ * @param array  $hostids
  * @param string $application
  *
  * @return array
  */
-function getDataOverviewItems($groupids = null, $hostids = null, $application = '') {
+function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
 	$config = select_config();
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
@@ -1117,14 +1117,14 @@ function getDataOverviewItems($groupids = null, $hostids = null, $application = 
 }
 
 /**
- * @param array $groupids
- * @param array $hostids
- * @param array $itemids
+ * @param array  $groupids
+ * @param array  $hostids
+ * @param array  $itemids
  * @param string $application
  *
  * @return array
  */
-function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, string $application = ''): array {
+function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
 	$config = select_config();
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
@@ -1166,8 +1166,8 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 }
 
 /**
- * @param array $groupids
- * @param array $hostids
+ * @param array  $groupids
+ * @param array  $hostids
  * @param string $application
  *
  * @return array
@@ -1197,8 +1197,8 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 }
 
 /**
- * @param array $groupids
- * @param array $hostids
+ * @param array  $groupids
+ * @param array  $hostids
  * @param string $application
  *
  * @return array
@@ -1225,9 +1225,9 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
  * @param array $item
  * @param array $trigger
  *
- * @return array
+ * @return CCol
  */
-function getItemDataOverviewCell($item, $trigger = null) {
+function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 	$ack = null;
 	$css = '';
 	$value = UNKNOWN_VALUE;

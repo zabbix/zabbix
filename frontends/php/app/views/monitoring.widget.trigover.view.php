@@ -23,19 +23,16 @@
  * @var CView $this
  */
 
-$back_url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
-
-
 if ($data['style'] == STYLE_TOP) {
-	$table = new CObject((new CView('trigoverview.table.top', $data))->getOutput());
+	$table = (new CPartial('trigoverview.table.top', $data))->getOutput();
 }
 else {
-	$table = new CObject((new CView('trigoverview.table.left', $data))->getOutput());
+	$table = (new CPartial('trigoverview.table.left', $data))->getOutput();
 }
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString()
+	'body' => $table
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -58,7 +58,7 @@ class CScreenDataOverview extends CScreenBase {
 			$data['items_by_name'] = $items_by_name;
 			$data['hidden_cnt'] = $hidden_cnt;
 
-			$table = new CObject((new CView('dataoverview.table.top', $data))->getOutput());
+			$table = new CPartial('dataoverview.table.top', $data);
 		}
 		else {
 			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft((array) $groupid, null,
@@ -74,7 +74,7 @@ class CScreenDataOverview extends CScreenBase {
 			$data['items_by_name'] = $items_by_name;
 			$data['hidden_cnt'] = $hidden_cnt;
 
-			$table = new CObject((new CView('dataoverview.table.left', $data))->getOutput());
+			$table = new CPartial('dataoverview.table.left', $data);
 		}
 
 		$footer = (new CList())

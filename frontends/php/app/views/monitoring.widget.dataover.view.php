@@ -24,15 +24,15 @@
  */
 
 if ($data['style'] == STYLE_TOP) {
-	$table = new CObject((new CView('dataoverview.table.top', $data))->getOutput());
+	$table = (new CPartial('dataoverview.table.top', $data))->getOutput();
 }
 else {
-	$table = new CObject((new CView('dataoverview.table.left', $data))->getOutput());
+	$table = (new CPartial('dataoverview.table.left', $data))->getOutput();
 }
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString()
+	'body' => $table
 ];
 
 if (($messages = getMessages()) !== null) {

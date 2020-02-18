@@ -154,20 +154,20 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 }
 
 if ($data['view_style'] == STYLE_TOP) {
-	$table = (new CView('dataoverview.table.top', [
+	$table = new CPartial('dataoverview.table.top', [
 		'visible_items' => $data['visible_items'],
 		'db_hosts' => $data['db_hosts'],
 		'items_by_name' => $data['items_by_name'],
 		'hidden_cnt' => $data['hidden_cnt']
-	]))->getOutput();
+	]);
 }
 else {
-	$table = (new CView('dataoverview.table.left', [
+	$table = new CPartial('dataoverview.table.left', [
 		'visible_items' => $data['visible_items'],
 		'db_hosts' => $data['db_hosts'],
 		'items_by_name' => $data['items_by_name'],
 		'hidden_cnt' => $data['hidden_cnt']
-	]))->getOutput();
+	]);
 }
 
 $widget->addItem($table);
