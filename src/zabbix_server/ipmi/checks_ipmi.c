@@ -46,8 +46,8 @@
 #define ZBX_IPMI_TAG_UNITS			"units"
 #define ZBX_IPMI_TAG_VALUE			"value"
 #define ZBX_IPMI_TAG_THRESHOLD			"threshold"
-#define ZBX_IPMI_TAG_LOW			"low"
-#define ZBX_IPMI_TAG_UP				"up"
+#define ZBX_IPMI_TAG_LOWER			"lower"
+#define ZBX_IPMI_TAG_UPPER			"upper"
 #define ZBX_IPMI_TAG_NON_CRIT			"non_crit"
 #define ZBX_IPMI_TAG_CRIT			"crit"
 #define ZBX_IPMI_TAG_NON_RECOVER		"non_recover"
@@ -656,6 +656,36 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
 
+/*get sensor units full string*/
+static char *zbx_get_ipmi_units(ipmi_sensor_t *sensor)
+{
+	const char	*base, *mod_use = "", *modifier = "", *rate;
+
+	if (0 != ipmi_sensor_get_percentage(sensor))
+		return zbx_dsprintf(NULL, "%%");
+
+	base = ipmi_sensor_get_base_unit_string(sensor);
+
+	switch (ipmi_sensor_get_modifier_unit_use(sensor))
+	{
+		case IPMI_MODIFIER_UNIT_NONE:
+			break;
+		case IPMI_MODIFIER_UNIT_BASE_DIV_MOD:
+			mod_use = "/";
+			modifier = ipmi_sensor_get_modifier_unit_string(sensor);
+			break;
+		case IPMI_MODIFIER_UNIT_BASE_MULT_MOD:
+			mod_use = "*";
+			modifier = ipmi_sensor_get_modifier_unit_string(sensor);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+	rate = ipmi_sensor_get_rate_unit_string(sensor);
+
+	return zbx_dsprintf(NULL, "%s%s%s%s", base, mod_use, modifier, rate);
+}
+
 /* callback function invoked from OpenIPMI */
 static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_value_present_e value_present,
 		unsigned int raw_value, double val, ipmi_states_t *states, void *cb_data)
@@ -708,38 +738,20 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 
 			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 			{
-				const char	*percent = "", *base, *mod_use = "", *modifier = "", *rate;
+				char		*units;
 				const char	*e_string, *s_type_string, *s_reading_type_string;
 
 				e_string = ipmi_entity_get_entity_id_string(ipmi_sensor_get_entity(sensor));
 				s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
 				s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
-				base = ipmi_sensor_get_base_unit_string(sensor);
 
-				if (0 != ipmi_sensor_get_percentage(sensor))
-					percent = "%";
+				units = zbx_get_ipmi_units(sensor);
 
-				switch (ipmi_sensor_get_modifier_unit_use(sensor))
-				{
-					case IPMI_MODIFIER_UNIT_NONE:
-						break;
-					case IPMI_MODIFIER_UNIT_BASE_DIV_MOD:
-						mod_use = "/";
-						modifier = ipmi_sensor_get_modifier_unit_string(sensor);
-						break;
-					case IPMI_MODIFIER_UNIT_BASE_MULT_MOD:
-						mod_use = "*";
-						modifier = ipmi_sensor_get_modifier_unit_string(sensor);
-						break;
-					default:
-						THIS_SHOULD_NEVER_HAPPEN;
-				}
-				rate = ipmi_sensor_get_rate_unit_string(sensor);
-
-				zabbix_log(LOG_LEVEL_DEBUG, "Value [%s | %s | %s | %s | " ZBX_FS_DBL "%s %s%s%s%s]",
+				zabbix_log(LOG_LEVEL_DEBUG, "Value [%s | %s | %s | %s | " ZBX_FS_DBL " %s]",
 						zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type,
-						s->id_sz), e_string, s_type_string, s_reading_type_string, val, percent,
-						base, mod_use, modifier, rate);
+						s->id_sz), e_string, s_type_string, s_reading_type_string, val, units);
+
+				zbx_free(units);
 			}
 
 			s->state = 0;
@@ -1786,8 +1798,6 @@ static void add_threshold_ipmi(struct zbx_json *json, const char *tag, zbx_ipmi_
 {
 	if (ZBX_IPMI_THRESHOLD_STATUS_ENABLED == threshold->status)
 		zbx_json_addfloat(json, tag, threshold->val);
-	else
-		zbx_json_addstring(json, tag, "", ZBX_JSON_TYPE_STRING);
 }
 
 int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
@@ -1891,6 +1901,8 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		}
 		else	/* threshold */
 		{
+			char	*units;
+
 			state = (zbx_uint64_t)h->sensors[i].state;
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_STATE);
 			zbx_json_adduint64(&json, ZBX_IPMI_TAG_STATE, state);
@@ -1912,13 +1924,15 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			zbx_json_close(&json);
 
 			zbx_json_addfloat(&json, ZBX_IPMI_TAG_VALUE, h->sensors[i].value.threshold);
-			zbx_json_addstring(&json, ZBX_IPMI_TAG_UNITS,
-					ipmi_sensor_get_base_unit_string(h->sensors[i].sensor), ZBX_JSON_TYPE_STRING);
+
+			units = zbx_get_ipmi_units(h->sensors[i].sensor);
+			zbx_json_addstring(&json, ZBX_IPMI_TAG_UNITS, units, ZBX_JSON_TYPE_STRING);
+			zbx_free(units);
 
 			zbx_read_ipmi_thresholds(h, &h->sensors[i]);
 
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_THRESHOLD);
-			zbx_json_addobject(&json, ZBX_IPMI_TAG_LOW);
+			zbx_json_addobject(&json, ZBX_IPMI_TAG_LOWER);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
 					&h->sensors[i].thresholds[IPMI_LOWER_NON_CRITICAL]);
@@ -1929,7 +1943,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 			zbx_json_close(&json);
 
-			zbx_json_addobject(&json, ZBX_IPMI_TAG_UP);
+			zbx_json_addobject(&json, ZBX_IPMI_TAG_UPPER);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
 					&h->sensors[i].thresholds[IPMI_UPPER_NON_CRITICAL]);
