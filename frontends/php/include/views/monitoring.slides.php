@@ -101,6 +101,9 @@ if ($data['has_dynamic_widgets']) {
 			'if (hosts.length) {' .
 				'url.setArgument("hostid", hosts[0].id);' .
 			'}' .
+			'else {' .
+				'url.setArgument("reset", "reset");' .
+			'}' .
 
 			// Push URL change.
 			'return redirect(url.getUrl(), "get", "", false, false);' .
