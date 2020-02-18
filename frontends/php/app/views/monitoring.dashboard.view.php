@@ -205,7 +205,7 @@ else {
 				'history.pushState({host: host}, "", url.getUrl());' .
 
 				// Update user profile.
-				'var hostid = host ? host.id : 0;' .
+				'var hostid = host ? host.id : 1;' .
 				'updateUserProfile("'.CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY.'", hostid);' .
 			'});'
 		))->show();

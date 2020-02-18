@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerDashboardView extends CControllerDashboardAbstract {
 
-	const DYNAMIC_ITEM_HOST_PROFILE_KEY = 'web.dashboard.hostid';
+	const DYNAMIC_ITEM_HOST_PROFILE_KEY = 'web.dashbrd.hostid';
 
 	private $dashboard;
 
