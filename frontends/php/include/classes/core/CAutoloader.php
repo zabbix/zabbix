@@ -81,7 +81,9 @@ class CAutoloader {
 				}
 			}
 
-			$file_name = strtolower(array_pop($chunks)).'/'.$file_name;
+			if ($chunks) {
+				$file_name = strtolower(array_pop($chunks)).'/'.$file_name;
+			}
 		} while ($chunks);
 
 		return false;

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
 	->addItem(get_header_host_table('discoveries', $data['hostid'],
@@ -98,7 +102,7 @@ elseif (!$data['limited']) {
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
-$query_fields->items = [CJs::encodeJson($query_fields_data)];
+$query_fields->items = [json_encode($query_fields_data)];
 
 $form_list
 	->addRow(
@@ -190,7 +194,7 @@ elseif (!$data['limited']) {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [CJs::encodeJson($headers_data)];
+$headers->items = [json_encode($headers_data)];
 
 $form_list
 	->addRow(
@@ -798,12 +802,14 @@ if (!empty($data['itemid'])) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Check now')))
+		$buttons[] = (new CSubmit('check_now', _('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
 			);
 	}
+
+	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 
 	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid'])))
 		->setEnabled(!$data['limited']);
@@ -814,7 +820,7 @@ if (!empty($data['itemid'])) {
 else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('hostid'))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('hostid'))]
 	));
 }
 
@@ -823,4 +829,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';
 
-return $widget;
+$widget->show();

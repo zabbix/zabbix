@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
 $widget = (new CWidget())
@@ -241,7 +245,7 @@ $itemForm->addItem([
 		[
 			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
 			'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')],
-			'item.masscheck_now' => ['name' => _('Check now')],
+			'item.masscheck_now' => ['name' => _('Execute now')],
 			'item.massclearhistory' => ['name' => _('Clear history'),
 				'confirm' => _('Delete history of selected items?')
 			],
@@ -256,4 +260,4 @@ $itemForm->addItem([
 // append form to widget
 $widget->addItem($itemForm);
 
-return $widget;
+$widget->show();

@@ -39,6 +39,8 @@
 #include "zbxcrypto.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "zbxipcservice.h"
+#include "trapper_item_test.h"
+#include "../poller/checks_snmp.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -1199,6 +1201,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					ret = zbx_trapper_preproc_test(sock, &jp);
 			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					zbx_trapper_item_test(sock, &jp);
+			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer, value);
 		}
@@ -1297,6 +1304,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
+#ifdef HAVE_NETSNMP
+	zbx_init_snmp();
+#endif
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();

@@ -556,6 +556,59 @@ static int	DBpatch_4050030(void)
 static int	DBpatch_4050031(void)
 {
 	const ZBX_TABLE table =
+			{"task_data", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050032(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_data", 1, &field);
+}
+
+static int	DBpatch_4050033(void)
+{
+	const ZBX_TABLE	table =
+			{"task_result", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050034(void)
+{
+	return DBcreate_index("task_result", "task_result_1", "parent_taskid", 0);
+}
+
+static int	DBpatch_4050035(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_result", 1, &field);
+}
+
+static int	DBpatch_4050036(void)
+{
+	const ZBX_TABLE table =
 		{"interface_snmp", "interfaceid", 0,
 			{
 				{"interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -577,7 +630,7 @@ static int	DBpatch_4050031(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050032(void)
+static int	DBpatch_4050037(void)
 {
 	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -825,7 +878,6 @@ static void	DBpatch_load_data(zbx_vector_dbu_snmp_if_t *snmp_ifs, zbx_vector_dbu
 #undef ITEM_TYPE_SNMPv1
 #undef ITEM_TYPE_SNMPv2c
 #undef ITEM_TYPE_SNMPv3
-
 }
 
 static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
@@ -1027,17 +1079,17 @@ static int	DBpatch_items_type_update(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_4050033                                                  *
+ * Function: DBpatch_4050038                                                  *
  *                                                                            *
  * Purpose: migration snmp data from 'items' table to 'interface_snmp' new    *
  *          table linked with 'interface' table, except interface links for   *
- *          discovered hosts and host prototype interface                     *
+ *          discovered hosts and parent host interface                        *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	DBpatch_4050033(void)
+static int	DBpatch_4050038(void)
 {
 	zbx_vector_dbu_interface_t	new_ifs;
 	zbx_vector_dbu_snmp_if_t	snmp_ifs, snmp_new_ifs, snmp_def_ifs;
@@ -1143,11 +1195,18 @@ static void	db_if_link(zbx_uint64_t if_slave, zbx_uint64_t if_master, zbx_vector
  * Purpose: loading all unlinked interfaces, snmp data and hostid of host     *
  *          prototype for discovered hosts                                    *
  *                                                                            *
- * Parameters: new_ifs      - [OUT] new interfaces for snmp data              *
+ * Parameters: new_ifs      - [OUT] new interfaces to be created on master    *
+ *                                  hosts                                     *
  *             snmp_new_ifs - [OUT] snmp data associated with new interfaces  *
  *             if_links     - [OUT] set of pairs for discovered host          *
  *                                  interfaceid and parent interfaceid of     *
- *                                  host prototype                            *
+ *                                  parent host                               *
+ *                                                                            *
+ * Comments: When host is created by lld the parent host interfaces are       *
+ *           copied over to the discovered hosts. Previous patch could have   *
+ *           created new SNMP interfaces on discovered hosts, which must be   *
+ *           linked to the corresponding interfaces (created if necessary) to *
+ *           the parent host.                                                 *
  *                                                                            *
  ******************************************************************************/
 static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *new_ifs, zbx_vector_dbu_snmp_if_t *snmp_new_ifs,
@@ -1264,16 +1323,16 @@ static int	DBpatch_interface_discovery_save(zbx_vector_uint64_pair_t *if_links)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_4050034                                                  *
+ * Function: DBpatch_4050039                                                  *
  *                                                                            *
  * Purpose: recovery links between the interfaceid of discovered host and     *
- *          parent interfaceid from host prototype                            *
+ *          parent interfaceid from parent host                               *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	DBpatch_4050034(void)
+static int	DBpatch_4050039(void)
 {
 	zbx_vector_dbu_interface_t	new_ifs;
 	zbx_vector_dbu_snmp_if_t	snmp_new_ifs;
@@ -1310,52 +1369,52 @@ static int	DBpatch_4050034(void)
 	return ret;
 }
 
-static int	DBpatch_4050035(void)
+static int	DBpatch_4050040(void)
 {
 	return DBdrop_field("interface", "bulk");
 }
 
-static int	DBpatch_4050036(void)
+static int	DBpatch_4050041(void)
 {
 	return DBdrop_field("items", "snmp_community");
 }
 
-static int	DBpatch_4050037(void)
+static int	DBpatch_4050042(void)
 {
 	return DBdrop_field("items", "snmpv3_securityname");
 }
 
-static int	DBpatch_4050038(void)
+static int	DBpatch_4050043(void)
 {
 	return DBdrop_field("items", "snmpv3_securitylevel");
 }
 
-static int	DBpatch_4050039(void)
+static int	DBpatch_4050044(void)
 {
 	return DBdrop_field("items", "snmpv3_authpassphrase");
 }
 
-static int	DBpatch_4050040(void)
+static int	DBpatch_4050045(void)
 {
 	return DBdrop_field("items", "snmpv3_privpassphrase");
 }
 
-static int	DBpatch_4050041(void)
+static int	DBpatch_4050046(void)
 {
 	return DBdrop_field("items", "snmpv3_authprotocol");
 }
 
-static int	DBpatch_4050042(void)
+static int	DBpatch_4050047(void)
 {
 	return DBdrop_field("items", "snmpv3_privprotocol");
 }
 
-static int	DBpatch_4050043(void)
+static int	DBpatch_4050048(void)
 {
 	return DBdrop_field("items", "snmpv3_contextname");
 }
 
-static int	DBpatch_4050044(void)
+static int	DBpatch_4050049(void)
 {
 	return DBdrop_field("items", "port");
 }
@@ -1406,5 +1465,10 @@ DBPATCH_ADD(4050041, 0, 1)
 DBPATCH_ADD(4050042, 0, 1)
 DBPATCH_ADD(4050043, 0, 1)
 DBPATCH_ADD(4050044, 0, 1)
+DBPATCH_ADD(4050045, 0, 1)
+DBPATCH_ADD(4050046, 0, 1)
+DBPATCH_ADD(4050047, 0, 1)
+DBPATCH_ADD(4050048, 0, 1)
+DBPATCH_ADD(4050049, 0, 1)
 
 DBPATCH_END()

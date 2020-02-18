@@ -333,7 +333,7 @@ class CWidgetHelper {
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson($field->getPopupOptions($form_name)).', null, this);')
+					json_encode($field->getPopupOptions($form_name)).', null, this);')
 		];
 	}
 
@@ -548,7 +548,7 @@ class CWidgetHelper {
 			(new CButton($field->getName().'_select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick(
-					'return PopUp("popup.generic", '.CJs::encodeJson($field->getFilterParameters()).', null, this);'
+					'return PopUp("popup.generic", '.json_encode($field->getFilterParameters()).', null, this);'
 				)
 		];
 	}
@@ -829,7 +829,7 @@ class CWidgetHelper {
 				'jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_OPTIONS_LIST.'").overrides({'.
 					'add: ".'.ZBX_STYLE_BTN_ALT.'",'.
 					'options: "input[type=hidden]",'.
-					'captions: '.CJs::encodeJson(self::getGraphOverrideOptionNames()).','.
+					'captions: '.json_encode(self::getGraphOverrideOptionNames()).','.
 					'makeName: function(option, row_id) {'.
 						'return "'.$field->getName().'[" + row_id + "][" + option + "]";'.
 					'},'.
@@ -841,7 +841,7 @@ class CWidgetHelper {
 					'override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
 					'overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",'.
 					'onUpdate: onGraphConfigChange,'.
-					'menu: '.CJs::encodeJson(self::getGraphOverrideMenu()).
+					'menu: '.json_encode(self::getGraphOverrideMenu()).
 				'});'.
 			'}',
 
@@ -856,7 +856,9 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
@@ -899,7 +901,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: IE ? "move" : "grabbing",'.
+				'cursor: "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.
@@ -1245,7 +1247,9 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color) {'.
 						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
@@ -1324,7 +1328,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: IE ? "move" : "grabbing",'.
+				'cursor: "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.

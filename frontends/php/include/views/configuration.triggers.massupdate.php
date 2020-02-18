@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.trigger.massupdate.js.php';
 
 $widget = (new CWidget())->setTitle(_('Triggers'));
@@ -134,7 +138,7 @@ $dependencies_form_list->addRow(
 		$dependencies_table,
 		(new CButton('btn1', _('Add')))
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'triggers',
 					'srcfld1' => 'triggerid',
 					'dstfrm' => 'massupdate',
@@ -174,4 +178,4 @@ $form->addItem($tabs);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

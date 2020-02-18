@@ -36,7 +36,7 @@ class CControllerPopupScriptExec extends CController {
 			}
 
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
 			);
 		}
 

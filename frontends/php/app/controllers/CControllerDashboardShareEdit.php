@@ -35,7 +35,7 @@ class CControllerDashboardShareEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$errors = CJs::encodeJson(['errors' => [getMessages()->toString()]]);
+			$errors = json_encode(['errors' => [getMessages()->toString()]]);
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => $errors]))->disableView()
 			);
@@ -75,7 +75,7 @@ class CControllerDashboardShareEdit extends CController {
 
 			$this->setResponse(
 				(new CControllerResponseData([
-					'main_block' => CJs::encodeJson(['errors' => [getMessages()->toString()]])
+					'main_block' => json_encode(['errors' => [getMessages()->toString()]])
 				]))->disableView()
 			);
 		}

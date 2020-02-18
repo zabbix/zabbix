@@ -35,7 +35,7 @@ class CControllerMenuPopup extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 
 		return $ret;
@@ -673,6 +673,6 @@ class CControllerMenuPopup extends CController {
 			$output['errors'] = $messages->toString();
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

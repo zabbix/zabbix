@@ -19,10 +19,14 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.user.edit.common.js.php');
-$this->includeJSfile(($data['action'] === 'user.edit')
-	? 'app/views/administration.user.edit.js.php'
-	: 'app/views/administration.userprofile.edit.js.php'
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('administration.user.edit.common.js.php');
+$this->includeJsFile(($data['action'] === 'user.edit')
+	? 'administration.user.edit.js.php'
+	: 'administration.userprofile.edit.js.php'
 );
 $this->addJsFile('multiselect.js');
 
@@ -271,7 +275,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).', null, this);'),
+							->onClick('return PopUp("popup.media",'.json_encode($popup_options).', null, this);'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$index.');')
@@ -286,7 +290,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			$media_table_info,
 			(new CButton(null, _('Add')))
 				->onClick('return PopUp("popup.media",'.
-					CJs::encodeJson([
+					json_encode([
 						'dstfrm' => $user_form->getName()
 					]).', null, this);'
 				)
@@ -360,7 +364,7 @@ if ($data['action'] !== 'user.edit') {
 			'timeout_row'
 		)
 		->addRow(_('Play sound'),
-			new CComboBox('messages[sounds.repeat]', $data['messages']['sounds.repeat'], 'if (IE) { submit() }', [
+			new CComboBox('messages[sounds.repeat]', $data['messages']['sounds.repeat'], null, [
 				1 => _('Once'),
 				10 => _n('%1$s second', '%1$s seconds', 10),
 				-1 => _('Message timeout')

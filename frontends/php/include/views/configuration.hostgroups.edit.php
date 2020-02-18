@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Host groups'));
 
 $form = (new CForm())
@@ -67,4 +71,4 @@ $form->addItem($tab);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

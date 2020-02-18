@@ -301,6 +301,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	private function openPreprocessing($data) {
 		$this->page->login()->open('items.php?form=create&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->fill(['Key' => 'test.key']);
 		$form->selectTab('Preprocessing');
 	}
 
@@ -334,7 +335,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 
 			case TEST_GOOD:
 				$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
-				$this->assertEquals('Test item preprocessing', $dialog->getTitle());
+				$this->assertEquals('Test item', $dialog->getTitle());
 
 				$time = $dialog->query('id:time')->one();
 				$this->assertTrue($time->getAttribute('readonly') !== null);
