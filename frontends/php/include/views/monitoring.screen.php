@@ -87,6 +87,9 @@ if ($data['has_dynamic_widgets']) {
 			'if (hosts.length) {' .
 				'url.setArgument("hostid", hosts[0].id);' .
 			'}' .
+			'else {' .
+				'url.setArgument("reset", "reset");' .
+			'}' .
 
 			// Push URL change.
 			'return redirect(url.getUrl(), "get", "", false, false);' .
@@ -120,8 +123,7 @@ $widget->setControls((new CTag('nav', true, (new CList())
 $screenBuilder = new CScreenBuilder([
 	'screenid' => $data['screen']['screenid'],
 	'mode' => SCREEN_MODE_PREVIEW,
-	'groupid' => getRequest('groupid'),
-	'hostid' => getRequest('hostid'),
+	'hostid' => $data['hostid'],
 	'profileIdx' => $data['profileIdx'],
 	'profileIdx2' => $data['profileIdx2'],
 	'from' => $data['from'],

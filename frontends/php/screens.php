@@ -88,6 +88,14 @@ $options = [
 	'output' => ['screenid', 'name']
 ];
 
+// Save dynamic item hostid.
+if (hasRequest('hostid')) {
+	CProfile::update('web.screens.hostid', getRequest('hostid'), PROFILE_TYPE_ID);
+}
+elseif (hasRequest('reset')) {
+	CProfile::delete('web.screens.hostid');
+}
+
 if (getRequest('elementid')) {
 	$options['screenids'] = getRequest('elementid');
 	CProfile::update('web.screens.elementid', getRequest('elementid'), PROFILE_TYPE_ID);
@@ -137,13 +145,16 @@ else {
 	$data['has_dynamic_widgets'] = check_dynamic_items($data['screen']['screenid'], 0);
 
 	if ($data['has_dynamic_widgets']) {
-		$data['host'] = hasRequest('hostid')
+		$hostid = getRequest('hostid', CProfile::get('web.screens.hostid', 0));
+		$data['host'] = ($hostid > 0)
 			? CArrayHelper::renameObjectsKeys(API::Host()->get([
 				'output' => ['hostid', 'name'],
-				'hostids' => [getRequest('hostid')],
+				'hostids' => [$hostid],
 				'monitored_hosts' => 1
 			]), ['hostid' => 'id'])
 			: [];
+
+		$data['hostid'] = $data['host'] ? $data['host'][0]['id'] : null;
 	}
 }
 
