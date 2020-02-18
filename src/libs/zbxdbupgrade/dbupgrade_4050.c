@@ -697,7 +697,19 @@ static int	db_snmp_new_if_find(const dbu_snmp_if_t *snmp, const zbx_vector_dbu_s
 	return FAIL;
 }
 
-static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector_dbu_snmp_if_t *snmp_ifs,
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_load_data                                                *
+ *                                                                            *
+ * Purpose: loading a set of unique combination of snmp data within a single  *
+ *          interface and associated interface data                           *
+ *                                                                            *
+ * Parameters: snmp_ifs     - [OUT] snmp data linked with existing interfaces *
+ *             new_ifs      - [OUT] new interfaces for snmp data              *
+ *             snmp_new_ifs - [OUT] snmp data associated with new interfaces  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBpatch_load_data(zbx_vector_dbu_snmp_if_t *snmp_ifs, zbx_vector_dbu_interface_t *new_ifs,
 		zbx_vector_dbu_snmp_if_t *snmp_new_ifs)
 {
 #define ITEM_TYPE_SNMPv1	1
@@ -731,9 +743,10 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 			" from items i"
 				" join hosts h on i.hostid=h.hostid"
 				" join interface f on i.interfaceid=f.interfaceid"
-			" where i.type in (1,4,6)"
+			" where i.type in (%d,%d,%d)"
 				" and h.status in (0,1)"
-			" order by i.interfaceid asc, i.type asc, i.port asc, i.snmp_community asc");
+			" order by i.interfaceid asc,i.type asc,i.port asc,i.snmp_community asc",
+			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -780,7 +793,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 			continue;
 		}
 		else if (0 < snmp_new_ifs->values_num &&
-				FAIL != (index = db_snmp_new_if_find(&snmp, snmp_new_ifs, interfaces, if_port)))
+				FAIL != (index = db_snmp_new_if_find(&snmp, snmp_new_ifs, new_ifs, if_port)))
 		{
 			snmp.skip = 1;
 			snmp.interfaceid = snmp_new_ifs->values[index].interfaceid;
@@ -805,7 +818,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 		else
 			interface.port = zbx_strdup(NULL, if_port);
 
-		zbx_vector_dbu_interface_append(interfaces, interface);
+		zbx_vector_dbu_interface_append(new_ifs, interface);
 	}
 	DBfree_result(result);
 
@@ -902,7 +915,10 @@ static int	DBpatch_interface_create(zbx_vector_dbu_interface_t *interfaces)
 
 static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 {
-#define ITEM_TYPE_SNMP	20
+#define ITEM_TYPE_SNMPv1	1
+#define ITEM_TYPE_SNMPv2c	4
+#define ITEM_TYPE_SNMPv3	6
+#define ITEM_TYPE_SNMP		20
 
 	int	i, ret = SUCCEED;
 	char	*sql;
@@ -920,7 +936,7 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 				"update items i set type=%d, interfaceid=" ZBX_FS_UI64
 				" where exists (select 1 from hosts h"
 					" where i.hostid=h.hostid and"
-					" i.type in (1,4,6) and h.status <> 3 and"
+					" i.type in (%d,%d,%d) and h.status <> 3 and"
 					" i.interfaceid=" ZBX_FS_UI64 " and"
 					" (('%s' is null and i.snmp_community is null) or"
 						" i.snmp_community='%s') and"
@@ -937,10 +953,11 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 						" i.snmpv3_contextname='%s') and"
 					" (('%s' is null and i.port is null) or"
 						" i.port='%s'));\n",
-				ITEM_TYPE_SNMP, s->interfaceid, s->item_interfaceid, s->community, s->community,
-				s->securityname, s->securityname, (int)s->securitylevel, s->authpassphrase,
-				s->authpassphrase, s->privpassphrase, s->privpassphrase, (int)s->authprotocol,
-				(int)s->privprotocol, s->contextname, s->contextname, s->item_port, s->item_port);
+				ITEM_TYPE_SNMP, s->interfaceid, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
+				s->item_interfaceid, s->community, s->community, s->securityname, s->securityname,
+				(int)s->securitylevel, s->authpassphrase, s->authpassphrase, s->privpassphrase,
+				s->privpassphrase, (int)s->authprotocol, (int)s->privprotocol, s->contextname,
+				s->contextname, s->item_port, s->item_port);
 
 #else
 #	ifdef HAVE_MYSQL
@@ -949,7 +966,7 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 				"update items i set type=%d, interfaceid=" ZBX_FS_UI64 " from hosts h"
 #	endif
 				" where i.hostid=h.hostid and"
-					" type in (1,4,6) and h.status <> 3 and"
+					" type in (%d,%d,%d) and h.status <> 3 and"
 					" interfaceid=" ZBX_FS_UI64 " and"
 					" snmp_community='%s' and"
 					" snmpv3_securityname='%s' and"
@@ -961,6 +978,7 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 					" snmpv3_contextname='%s' and"
 					" port='%s';\n",
 				ITEM_TYPE_SNMP, s->interfaceid,
+				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 				s->item_interfaceid, s->community, s->securityname, (int)s->securitylevel,
 				s->authpassphrase, s->privpassphrase, (int)s->authprotocol, (int)s->privprotocol,
 				s->contextname, s->item_port);
@@ -980,40 +998,64 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 	return ret;
 
+#undef ITEM_TYPE_SNMPv1
+#undef ITEM_TYPE_SNMPv2c
+#undef ITEM_TYPE_SNMPv3
 #undef ITEM_TYPE_SNMP
 }
 
 static int	DBpatch_items_type_update(void)
 {
-#define ITEM_TYPE_SNMP	20
+#define ITEM_TYPE_SNMPv1	1
+#define ITEM_TYPE_SNMPv2c	4
+#define ITEM_TYPE_SNMPv3	6
+#define ITEM_TYPE_SNMP		20
 
-	if (ZBX_DB_OK > DBexecute("update items set type=%d where type in (1,4,6)", ITEM_TYPE_SNMP))
+	if (ZBX_DB_OK > DBexecute("update items set type=%d where type in (%d,%d,%d)", ITEM_TYPE_SNMP,
+			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 
+#undef ITEM_TYPE_SNMPv1
+#undef ITEM_TYPE_SNMPv2c
+#undef ITEM_TYPE_SNMPv3
 #undef ITEM_TYPE_SNMP
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_4050033                                                  *
+ *                                                                            *
+ * Purpose: migration snmp data from 'items' table to 'interface_snmp' new    *
+ *          table linked with 'interface' table, except interface links for   *
+ *          discovered hosts and host prototype interface                     *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBpatch_4050033(void)
 {
-	zbx_vector_dbu_interface_t	interfaces;
+	zbx_vector_dbu_interface_t	new_ifs;
 	zbx_vector_dbu_snmp_if_t	snmp_ifs, snmp_new_ifs, snmp_def_ifs;
 	int				ret = FAIL;
 
 	zbx_vector_dbu_snmp_if_create(&snmp_ifs);
 	zbx_vector_dbu_snmp_if_create(&snmp_new_ifs);
 	zbx_vector_dbu_snmp_if_create(&snmp_def_ifs);
-	zbx_vector_dbu_interface_create(&interfaces);
+	zbx_vector_dbu_interface_create(&new_ifs);
 
-	DBpatch_load_data(&interfaces, &snmp_ifs, &snmp_new_ifs);
+	DBpatch_load_data(&snmp_ifs, &new_ifs, &snmp_new_ifs);
 
 	while (1)
 	{
 		if (0 < snmp_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_ifs))
 			break;
 
-		if (0 < interfaces.values_num && SUCCEED != DBpatch_interface_create(&interfaces))
+		if (0 < new_ifs.values_num && SUCCEED != DBpatch_interface_create(&new_ifs))
 			break;
 
 		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_new_ifs))
@@ -1034,8 +1076,8 @@ static int	DBpatch_4050033(void)
 		break;
 	}
 
-	zbx_vector_dbu_interface_clear_ext(&interfaces, db_interface_free);
-	zbx_vector_dbu_interface_destroy(&interfaces);
+	zbx_vector_dbu_interface_clear_ext(&new_ifs, db_interface_free);
+	zbx_vector_dbu_interface_destroy(&new_ifs);
 	zbx_vector_dbu_snmp_if_clear_ext(&snmp_ifs, db_snmpinterface_free);
 	zbx_vector_dbu_snmp_if_destroy(&snmp_ifs);
 	zbx_vector_dbu_snmp_if_clear_ext(&snmp_new_ifs, db_snmpinterface_free);
@@ -1094,7 +1136,21 @@ static void	db_if_link(zbx_uint64_t if_slave, zbx_uint64_t if_master, zbx_vector
 	zbx_vector_uint64_pair_append(if_links, pair);
 }
 
-static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector_dbu_snmp_if_t *snmp_ifs,
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_if_load_data                                             *
+ *                                                                            *
+ * Purpose: loading all unlinked interfaces, snmp data and hostid of host     *
+ *          prototype for discovered hosts                                    *
+ *                                                                            *
+ * Parameters: new_ifs      - [OUT] new interfaces for snmp data              *
+ *             snmp_new_ifs - [OUT] snmp data associated with new interfaces  *
+ *             if_links     - [OUT] set of pairs for discovered host          *
+ *                                  interfaceid and parent interfaceid of     *
+ *                                  host prototype                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *new_ifs, zbx_vector_dbu_snmp_if_t *snmp_new_ifs,
 		zbx_vector_uint64_pair_t *if_links)
 {
 	DB_RESULT	result;
@@ -1123,10 +1179,10 @@ static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vec
 			" left join interface_discovery d on i.interfaceid=d.interfaceid"
 			" join interface_snmp s on i.interfaceid=s.interfaceid"
 			" join hosts hdisc on i.hostid=hdisc.hostid"
-			" join host_discovery hd on hdisc.hostid = hd.hostid"
+			" join host_discovery hd on hdisc.hostid=hd.hostid"
 			" join hosts hproto on hd.parent_hostid=hproto.hostid"
-			" join host_discovery hdd on hd.parent_hostid = hdd.hostid"
-			" join items drule on drule.itemid = hdd.parent_itemid"
+			" join host_discovery hdd on hd.parent_hostid=hdd.hostid"
+			" join items drule on drule.itemid=hdd.parent_itemid"
 			" join hosts hreal on drule.hostid=hreal.hostid"
 			" where"
 				" i.type=2 and"
@@ -1166,8 +1222,8 @@ static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vec
 		snmp.skip = 0;
 		snmp.item_interfaceid = 0;
 
-		if (0 < interfaces->values_num &&
-				0 != (if_parentid = db_if_find(&interface, &snmp, interfaces, snmp_ifs)))
+		if (0 < new_ifs->values_num &&
+				0 != (if_parentid = db_if_find(&interface, &snmp, new_ifs, snmp_new_ifs)))
 		{
 			db_if_link(interface.interfaceid, if_parentid, if_links);
 			db_snmpinterface_free(snmp);
@@ -1179,8 +1235,8 @@ static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vec
 		db_if_link(interface.interfaceid, if_parentid, if_links);
 		interface.interfaceid = if_parentid;
 		snmp.interfaceid = if_parentid;
-		zbx_vector_dbu_interface_append(interfaces, interface);
-		zbx_vector_dbu_snmp_if_append(snmp_ifs, snmp);
+		zbx_vector_dbu_interface_append(new_ifs, interface);
+		zbx_vector_dbu_snmp_if_append(snmp_new_ifs, snmp);
 	}
 	DBfree_result(result);
 }
@@ -1206,25 +1262,36 @@ static int	DBpatch_interface_discovery_save(zbx_vector_uint64_pair_t *if_links)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_4050034                                                  *
+ *                                                                            *
+ * Purpose: recovery links between the interfaceid of discovered host and     *
+ *          parent interfaceid from host prototype                            *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBpatch_4050034(void)
 {
-	zbx_vector_dbu_interface_t	interfaces;
-	zbx_vector_dbu_snmp_if_t	snmp_ifs;
+	zbx_vector_dbu_interface_t	new_ifs;
+	zbx_vector_dbu_snmp_if_t	snmp_new_ifs;
 	zbx_vector_uint64_pair_t	if_links;
 	int				ret = FAIL;
 
-	zbx_vector_dbu_snmp_if_create(&snmp_ifs);
-	zbx_vector_dbu_interface_create(&interfaces);
+	zbx_vector_dbu_snmp_if_create(&snmp_new_ifs);
+	zbx_vector_dbu_interface_create(&new_ifs);
 	zbx_vector_uint64_pair_create(&if_links);
 
-	DBpatch_if_load_data(&interfaces, &snmp_ifs, &if_links);
+	DBpatch_if_load_data(&new_ifs, &snmp_new_ifs, &if_links);
 
 	while (1)
 	{
-		if (0 < interfaces.values_num && SUCCEED != DBpatch_interface_create(&interfaces))
+		if (0 < new_ifs.values_num && SUCCEED != DBpatch_interface_create(&new_ifs))
 			break;
 
-		if (0 < snmp_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_ifs))
+		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_new_ifs))
 			break;
 
 		if (0 < if_links.values_num && SUCCEED != DBpatch_interface_discovery_save(&if_links))
@@ -1235,10 +1302,10 @@ static int	DBpatch_4050034(void)
 	}
 
 	zbx_vector_uint64_pair_destroy(&if_links);
-	zbx_vector_dbu_interface_clear_ext(&interfaces, db_interface_free);
-	zbx_vector_dbu_interface_destroy(&interfaces);
-	zbx_vector_dbu_snmp_if_clear_ext(&snmp_ifs, db_snmpinterface_free);
-	zbx_vector_dbu_snmp_if_destroy(&snmp_ifs);
+	zbx_vector_dbu_interface_clear_ext(&new_ifs, db_interface_free);
+	zbx_vector_dbu_interface_destroy(&new_ifs);
+	zbx_vector_dbu_snmp_if_clear_ext(&snmp_new_ifs, db_snmpinterface_free);
+	zbx_vector_dbu_snmp_if_destroy(&snmp_new_ifs);
 
 	return ret;
 }
