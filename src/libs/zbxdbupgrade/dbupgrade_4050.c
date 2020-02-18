@@ -604,6 +604,27 @@ static int	DBpatch_4050035(void)
 	return DBadd_foreign_key("task_result", 1, &field);
 }
 
+static int	DBpatch_4050036(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
+			"web..hostid", "web.view.groupid", "web.view.hostid", "web.view.graphid",
+			"web.config.groupid", "web.config.hostid", "web.templates.php.groupid", "web.cm.groupid"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute("delete from profiles where idx='%s'", values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -641,6 +662,7 @@ DBPATCH_ADD(4050032, 0, 1)
 DBPATCH_ADD(4050033, 0, 1)
 DBPATCH_ADD(4050034, 0, 1)
 DBPATCH_ADD(4050035, 0, 1)
+DBPATCH_ADD(4050036, 0, 1)
 
 
 DBPATCH_END()
