@@ -160,6 +160,7 @@ if ($type == SHOW_TRIGGERS) {
 		'application' => CProfile::get('web.overview.filter.application', ''),
 		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', 0),
 		'groupids' => CProfile::getArray('web.overview.filter.groupids', []),
+		'hostids' => CProfile::getArray('web.overview.filter.hostids', []),
 		'inventory' => []
 	];
 
@@ -178,6 +179,10 @@ if ($type == SHOW_TRIGGERS) {
 		foreach ($filter['inventory'] as $field) {
 			$host_options['searchInventory'][$field['field']][] = $field['value'];
 		}
+	}
+
+	if ($filter['hostids']) {
+		$host_options['hostids'] = $filter['hostids'];
 	}
 
 	$trigger_options = [
@@ -201,6 +206,11 @@ if ($type == SHOW_TRIGGERS) {
 		'output' => ['groupid', 'name'],
 		'groupids' => $filter['groupids']
 	]), ['groupid' => 'id']) : [];
+
+	$data['ms_hosts'] = $filter['hostids'] ? CArrayHelper::renameObjectsKeys(API::Host()->get([
+		'output' => ['hostid', 'name'],
+		'hostids' => $filter['hostids']
+	]), ['hostid' => 'id']) : [];
 
 	list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 		$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']

@@ -136,6 +136,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			'show_suppressed' => $data['filter']['show_suppressed']
 		],
 		'ms_groups' => $data['ms_groups'],
+		'ms_hosts' => $data['ms_hosts'],
 		'config' => $data['config'],
 		'profileIdx' => $data['profileIdx'],
 		'active_tab' => $data['active_tab']
