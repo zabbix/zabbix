@@ -323,7 +323,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->assertEquals($this->oldHashAction, CDBHelper::getHash($this->sqlHashAction));
 	}
 
-	/*
+	/**
 	 * Debug button sometimes overlaps action link and impossible to click on it.
 	 */
 	public static function setDebugMode($value) {

@@ -119,7 +119,7 @@ class CMultilineInput extends CDiv {
 	 * @return string  Javascript code.
 	 */
 	public function getPostJS() {
-		return 'jQuery("#'.$this->getId().'").multilineInput('.CJs::encodeJson([
+		return 'jQuery("#'.$this->getId().'").multilineInput('.json_encode([
 			'value' => $this->value
 		] + $this->options).');';
 	}

@@ -41,7 +41,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 	$.widget('zbx.sortable_tree', $.extend({}, $.ui.sortable.prototype, {
 		options: {
 			// jQuery UI sortable options:
-			cursor: IE ? 'move' : 'grabbing',
+			cursor: 'grabbing',
 			placeholder: 'placeholder',
 			forcePlaceholderSize: true,
 			toleranceElement: '> div',
@@ -579,22 +579,24 @@ jQuery(function($) {
 							resp.body += resp.debug;
 						}
 
-						overlayDialogue({
+					overlayDialogue({
 							'title': t('Edit tree element'),
 							'content': resp.body,
 							'buttons': [
 								{
 									'title': item_edit ? t('Apply') : t('Add'),
 									'class': 'dialogue-widget-save',
-									'action': function() {
+									'isSubmit': true,
+									'action': function(overlay) {
 										var form = $('#widget_dialogue_form'),
 											url = new Curl('zabbix.php');
 
 										url.setArgument('action', 'widget.navtree.item.update');
 
+										overlay.setLoading();
 										form.trimValues([$('[name="name"]', form)]);
 
-										jQuery.ajax({
+										overlay.xhr = jQuery.ajax({
 											url: url.getUrl(),
 											method: 'POST',
 											data: {
@@ -604,6 +606,9 @@ jQuery(function($) {
 												depth: depth
 											},
 											dataType: 'json',
+											complete: function() {
+												overlay.unsetLoading();
+											},
 											success: function(resp) {
 												var new_item;
 
@@ -682,7 +687,7 @@ jQuery(function($) {
 
 													add_child_level($obj, resp['sysmapid'], id, depth + 1);
 
-													overlayDialogueDestroy('navtreeitem');
+													overlayDialogueDestroy(overlay.dialogueid);
 													setTreeHandlers($obj);
 												}
 											}

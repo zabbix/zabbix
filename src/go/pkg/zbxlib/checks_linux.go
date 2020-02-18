@@ -38,7 +38,6 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -93,8 +92,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.WEB_PAGE_REGEXP)
 	case "net.tcp.listen":
 		cfunc = unsafe.Pointer(C.NET_TCP_LISTEN)
-	case "net.tcp.port":
-		cfunc = unsafe.Pointer(C.NET_TCP_PORT)
 	case "net.tcp.service", "net.udp.service":
 		cfunc = unsafe.Pointer(C.CHECK_SERVICE)
 	case "net.tcp.service.perf", "net.udp.service.perf":

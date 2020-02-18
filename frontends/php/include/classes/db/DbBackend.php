@@ -24,6 +24,8 @@
  */
 abstract class DbBackend {
 
+	protected $warning;
+
 	protected $error;
 
 	/**
@@ -107,5 +109,30 @@ abstract class DbBackend {
 	 */
 	public function getError() {
 		return $this->error;
+	}
+
+	/**
+	 * Check database and table fields encoding.
+	 *
+	 * @return bool
+	 */
+	abstract public function checkEncoding();
+
+	/**
+	 * Set warning message.
+	 *
+	 * @param string $message
+	 */
+	public function setWarning($message) {
+		$this->warning = $message;
+	}
+
+	/**
+	 * Get warning message.
+	 *
+	 * @return mixed
+	 */
+	public function getWarning() {
+		return $this->warning;
 	}
 }

@@ -19,7 +19,11 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.authentication.edit.js.php');
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('administration.authentication.edit.js.php');
 
 // Authentication general fields and HTTP authentication fields.
 $auth_tab = (new CFormList('list_auth'))
@@ -154,4 +158,5 @@ $ldap_tab = (new CFormList('list_ldap'))
 				]
 			))
 			->onTabChange('jQuery("[name=ldap_test]")[(ui.newTab.index() == 2) ? "show" : "hide"]()')
-))->show();
+	))
+	->show();

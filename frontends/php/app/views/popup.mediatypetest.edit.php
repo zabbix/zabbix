@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form_list = (new CFormList());
 
 if ($data['type'] == MEDIA_TYPE_WEBHOOK) {
@@ -84,16 +88,15 @@ $form = (new CForm())
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.mediatypetest.edit.js.php',
+	'script_inline' => $this->readJsFile('popup.mediatypetest.edit.js.php'),
 	'body' => (new CDiv([$data['errors'], $form]))->toString(),
 	'buttons' => [
 		[
 			'title' => _('Test'),
-			'class' => 'submit-test-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'enabled' => $data['enabled'],
-			'action' => 'mediatypeTestSend("'.$form->getName().'");'
+			'action' => 'return mediatypeTestSend(overlay);'
 		]
 	]
 ];
@@ -103,4 +106,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

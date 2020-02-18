@@ -26,7 +26,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
-		$themes = array_keys(Z::getThemes());
+		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
 		$fields = [

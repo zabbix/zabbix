@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.template.list.js.php';
 
 $filter_tags = $data['filter']['tags'];
@@ -301,4 +305,4 @@ $form->addItem([
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

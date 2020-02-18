@@ -23,6 +23,7 @@ import (
 	_ "zabbix.com/plugins/kernel"
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/net/netif"
+	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/proc"
 	_ "zabbix.com/plugins/redis"
 	_ "zabbix.com/plugins/system/cpucollector"

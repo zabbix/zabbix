@@ -23,6 +23,8 @@ package win32
 
 import (
 	"syscall"
+
+	"golang.org/x/sys/windows"
 )
 
 type Hlib syscall.Handle
@@ -104,4 +106,31 @@ type MIB_IPADDRROW struct {
 type MIB_IPADDRTABLE struct {
 	NumEntries uint32
 	Table      [ANY_SIZE]MIB_IPADDRROW
+}
+
+type (
+	PDH_HQUERY   windows.Handle
+	PDH_HCOUNTER windows.Handle
+)
+
+type PDH_COUNTER_PATH_ELEMENTS struct {
+	MachineName    uintptr
+	ObjectName     uintptr
+	InstanceName   uintptr
+	ParentInstance uintptr
+	InstanceIndex  uint32
+	CounterName    uintptr
+}
+type LP_PDH_COUNTER_PATH_ELEMENTS *PDH_COUNTER_PATH_ELEMENTS
+
+type PDH_FMT_COUNTERVALUE_DOUBLE struct {
+	Status uint32
+	_      uint32
+	Value  float64
+}
+
+type PDH_FMT_COUNTERVALUE_LARGE struct {
+	Status uint32
+	_      uint32
+	Value  int64
 }
