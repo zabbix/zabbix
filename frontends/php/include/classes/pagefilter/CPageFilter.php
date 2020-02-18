@@ -20,7 +20,7 @@
 
 
 /**
- * Class to operate with minimum severity dropdown. 
+ * Class to operate with minimum severity dropdown.
  */
 class CPageFilter {
 
