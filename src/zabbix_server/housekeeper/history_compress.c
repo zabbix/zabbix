@@ -230,23 +230,22 @@ void	hk_history_compression_init(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	/* surpress notice logs during DB initialization */
-	result = DBselect("show client_min_messages");
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		db_log_level = zbx_strdup(db_log_level, row[0]);
-		DBexecute("set client_min_messages to warning");
-	}
-	DBfree_result(result);
-
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_EXTENSION);
 	compression_status_cache = cfg.db.history_compression_status;
 	compress_older_cache = cfg.db.history_compress_older;
 
 	if (ON == cfg.db.history_compression_availability)
 	{
+		/* surpress notice logs during DB initialization */
+		result = DBselect("show client_min_messages");
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			db_log_level = zbx_strdup(db_log_level, row[0]);
+			DBexecute("set client_min_messages to warning");
+		}
+		DBfree_result(result);
+
 		if (ON == cfg.db.history_compression_status)
 		{
 			if (0 == cfg.db.history_compress_older)
