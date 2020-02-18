@@ -79,7 +79,7 @@ int	zbx_db_init(const char *dbname, const char *const db_schema, char **error);
 void	zbx_db_deinit(void);
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tlsmode, char *cert, char *key, char *ca, char *cipher);
+			char *tlsmode, char *cert, char *key, char *ca, char *cipher, char *cipher_13);
 void	zbx_db_close(void);
 
 int	zbx_db_begin(void);

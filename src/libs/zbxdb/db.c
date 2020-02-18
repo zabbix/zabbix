@@ -342,7 +342,7 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tls_connect, char *cert, char *key, char *ca, char *cipher)
+			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
@@ -426,6 +426,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	mysql_options(conn, MYSQL_OPT_SSL_KEY, key);
 	mysql_options(conn, MYSQL_OPT_SSL_CERT, cert);
 	mysql_options(conn, MYSQL_OPT_SSL_CIPHER, cipher);
+#if LIBMYSQL_VERSION_ID >= 80000
+	mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13);
+#endif
+	//zabbix_log(LOG_LEVEL_INFORMATION, "cipher_13: %s", cipher_13);
 
 	if (ZBX_DB_OK == ret &&
 			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
