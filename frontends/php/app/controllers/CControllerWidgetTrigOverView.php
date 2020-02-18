@@ -37,6 +37,7 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		$data = [
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'style' => $fields['style'],
+			'backurl' => (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -26,40 +26,47 @@ $table = (new CTableInfo())
 	->makeVerticalRotation()
 	->setHeadingColumn(0);
 
-$headings[] = _('Triggers');
-foreach ($data['hosts_by_name'] as $hostname => $hostid) {
-	$headings[] = (new CColHeader($hostname))
+$headings[] = _('Hosts');
+foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
+	$headings[] = (new CColHeader($trigname))
 		->addClass('vertical_rotation')
-		->setTitle($hostname);
+		->setTitle($trigname);
 }
 
-if ($data['exceeded_hosts']) {
+if ($data['exceeded_trigs']) {
 	$headings[] = (new CColHeader('...'))
 		->setTitle(_('Some data is hidden.'));
 }
 
 $table->setHeader($headings);
 
-foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
-	$row = [(new CColHeader($trigname))->addClass(ZBX_STYLE_NOWRAP)];
+foreach ($data['hosts_by_name'] as $hostname => $hostid) {
+	$name = (new CLinkAction($data['db_hosts'][$hostid]['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
+	$row = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 
-	foreach ($data['hosts_by_name'] as $hostname => $hostid) {
+	foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
 		$trigger = null;
 		if (array_key_exists($hostid, $host_to_trig)) {
 			$triggerid = $host_to_trig[$hostid];
 			$trigger = $data['db_triggers'][$triggerid];
 		}
-		$row[] = getTriggerOverviewCell($trigger, $data['dependencies'], 'waaa');
+
+		if ($trigger) {
+			$row[] = getTriggerOverviewCell($trigger, $data['dependencies'], $data['backurl']);
+		}
+		else {
+			$row[] = new CCol();
+		}
 	}
 
-	if ($data['exceeded_hosts']) {
+	if ($data['exceeded_trigs']) {
 		$row[] = new CCol();
 	}
 
 	$table->addRow($row);
 }
 
-if ($data['exceeded_trigs']) {
+if ($data['exceeded_hosts']) {
 	$table->addRow((new CCol('...'))
 		->setTitle(_('Some data is hidden.')));
 }
