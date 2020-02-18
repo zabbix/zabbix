@@ -75,6 +75,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state':
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
 				case 'web.discovery.filter.active':
+				case CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY:
 					$ret = true;
 					break;
 

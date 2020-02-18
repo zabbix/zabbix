@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerDashboardView extends CControllerDashboardAbstract {
 
+	const DYNAMIC_ITEM_HOST_PROFILE_KEY = 'web.dashboard.hostid';
+
 	private $dashboard;
 
 	protected function init() {
@@ -114,18 +116,18 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			];
 
 			if (self::hasDynamicWidgets($data['grid_widgets'])) {
-				if ($this->hasInput('hostid')) {
-					$hosts = CArrayHelper::renameObjectsKeys(API::Host()->get([
+				$hostid = $this->getInput('hostid', CProfile::get(self::DYNAMIC_ITEM_HOST_PROFILE_KEY, 0));
+
+				$hosts = ($hostid > 0)
+					? CArrayHelper::renameObjectsKeys(API::Host()->get([
 						'output' => ['hostid', 'name'],
-						'hostids' => [$this->getInput('hostid')]
-					]), ['hostid' => 'id']);
-				} else {
-					$hosts = [];
-				}
+						'hostids' => [$hostid]
+					]), ['hostid' => 'id'])
+					: [];
 
 				$data['dynamic'] = [
 					'has_dynamic_widgets' => true,
-					'host' => $hosts ? $hosts : []
+					'host' => $hosts
 				];
 			}
 			else {

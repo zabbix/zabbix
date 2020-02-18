@@ -203,6 +203,10 @@ else {
 
 				// Push URL change.
 				'history.pushState({host: host}, "", url.getUrl());' .
+
+				// Update user profile.
+				'var hostid = host ? host.id : 0;' .
+				'updateUserProfile("'.CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY.'", hostid);' .
 			'});'
 		))->show();
 	}
