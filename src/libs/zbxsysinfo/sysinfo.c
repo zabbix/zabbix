@@ -1037,7 +1037,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			if (0 == strcmp(command->key, request.key))
 				break;
 		}
-
 	}
 
 	if (NULL == command || NULL == command->key)
