@@ -223,10 +223,24 @@ void	hk_history_compression_init(void)
 {
 	int		disable_compression = 0;
 	zbx_config_t	cfg;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*db_log_level = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	/* surpress notice logs during DB initialization */
+	result = DBselect("show client_min_messages");
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		db_log_level = zbx_strdup(db_log_level, row[0]);
+		DBexecute("set client_min_messages to warning");
+	}
+	DBfree_result(result);
+
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_EXTENSION);
 	compression_status_cache = cfg.db.history_compression_status;
 	compress_older_cache = cfg.db.history_compress_older;
@@ -260,6 +274,13 @@ void	hk_history_compression_init(void)
 		zabbix_log(LOG_LEVEL_ERR, "failed to set database compression status");
 
 	zbx_config_clean(&cfg);
+
+	if (NULL != db_log_level)
+	{
+		DBexecute("set client_min_messages to %s", db_log_level);
+		zbx_free(db_log_level);
+	}
+
 	DBclose();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
