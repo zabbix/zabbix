@@ -46,8 +46,8 @@
 #define ZBX_IPMI_TAG_UNITS			"units"
 #define ZBX_IPMI_TAG_VALUE			"value"
 #define ZBX_IPMI_TAG_THRESHOLD			"threshold"
-#define ZBX_IPMI_TAG_LOW			"lower"
-#define ZBX_IPMI_TAG_UP				"upper"
+#define ZBX_IPMI_TAG_LOWER			"lower"
+#define ZBX_IPMI_TAG_UPPER			"upper"
 #define ZBX_IPMI_TAG_NON_CRIT			"non_crit"
 #define ZBX_IPMI_TAG_CRIT			"crit"
 #define ZBX_IPMI_TAG_NON_RECOVER		"non_recover"
@@ -1932,7 +1932,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			zbx_read_ipmi_thresholds(h, &h->sensors[i]);
 
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_THRESHOLD);
-			zbx_json_addobject(&json, ZBX_IPMI_TAG_LOW);
+			zbx_json_addobject(&json, ZBX_IPMI_TAG_LOWER);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
 					&h->sensors[i].thresholds[IPMI_LOWER_NON_CRITICAL]);
@@ -1943,7 +1943,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 			zbx_json_close(&json);
 
-			zbx_json_addobject(&json, ZBX_IPMI_TAG_UP);
+			zbx_json_addobject(&json, ZBX_IPMI_TAG_UPPER);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
 					&h->sensors[i].thresholds[IPMI_UPPER_NON_CRITICAL]);
