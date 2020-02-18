@@ -74,7 +74,7 @@ Default configuration file (unless \fB\-c\fR option is specified) will be used t
 .RS 4
 .TP 4
 .B snmp_cache_reload
-Clear snmp cache.
+Reload SNMP cache.
 .RE
 .RS 4
 .TP 4

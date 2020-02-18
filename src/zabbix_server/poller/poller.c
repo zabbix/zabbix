@@ -938,6 +938,8 @@ static void	zbx_poller_sigusr_handler(int flags)
 	{
 		zbx_clear_cache_snmp();
 	}
+#else
+	ZBX_UNUSED(flags);
 #endif
 }
 

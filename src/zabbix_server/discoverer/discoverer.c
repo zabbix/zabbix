@@ -855,6 +855,18 @@ static int	get_minnextcheck(void)
 	return res;
 }
 
+static void	zbx_discoverer_sigusr_handler(int flags)
+{
+#ifdef HAVE_NETSNMP
+	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+	{
+		zbx_clear_cache_snmp();
+	}
+#else
+	ZBX_UNUSED(flags);
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: discoverer_thread                                                *
@@ -889,6 +901,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	zbx_set_sigusr_handler(zbx_discoverer_sigusr_handler);
 
 	while (ZBX_IS_RUNNING())
 	{

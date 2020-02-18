@@ -159,7 +159,8 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 	{
 #ifdef HAVE_NETSNMP
 		command = ZBX_RTC_SNMP_CACHE_RELOAD;
-		scope = ZBX_PROCESS_TYPE_POLLER;
+		/* Scope is ignored for SNMP. Poller, trapper and discoverer always get targeted. */
+		scope = 0;
 		data = 0;
 #else
 		zbx_error("invalid runtime control option: no SNMP support enabled");

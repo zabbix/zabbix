@@ -1290,6 +1290,18 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts)
 	process_trap(sock, sock->buffer, ts);
 }
 
+static void	zbx_trapper_sigusr_handler(int flags)
+{
+#ifdef HAVE_NETSNMP
+	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+	{
+		zbx_clear_cache_snmp();
+	}
+#else
+	ZBX_UNUSED(flags);
+#endif
+}
+
 ZBX_THREAD_ENTRY(trapper_thread, args)
 {
 	double		sec = 0.0;
@@ -1322,6 +1334,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 		DCsync_configuration(ZBX_DBSYNC_INIT);
 	}
+
+	zbx_set_sigusr_handler(zbx_trapper_sigusr_handler);
 
 	while (ZBX_IS_RUNNING())
 	{
