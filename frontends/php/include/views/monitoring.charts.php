@@ -83,13 +83,13 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			->addRow((new CLabel(_('Search type'), 'waa')),
 				(new CRadioButtonList('search_type', $data['search_type']))
 					->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT, null,
-						'$("#ms_graph_patterns").addClass("display-none");'.
-						'$("#ms_graphids").removeClass("display-none");'.
+						'$("#ms_graph_patterns").addClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
+						'$("#ms_graphids").removeClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
 						'$("#filter_graphids_, #filter_graph_pattern_").multiSelect("clean")'
 					)
 					->addValue(_('Pattern'), ZBX_SEARCH_TYPE_PATTERN, null,
-						'$("#ms_graph_patterns").removeClass("display-none");'.
-						'$("#ms_graphids").addClass("display-none");'.
+						'$("#ms_graph_patterns").removeClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
+						'$("#ms_graphids").addClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
 						'$("#filter_graphids_, #filter_graph_pattern_").multiSelect("clean")'
 					)
 					->setModern(true)
@@ -99,7 +99,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 				(new CMultiSelect([
 					'multiple' => true,
 					'name' => 'filter_graphids[]',
-					'object_name' => 'graph',
+					'object_name' => 'graphs',
 					'data' => $data['ms_graphs'],
 					'popup' => [
 						'parameters' => [
@@ -107,19 +107,19 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 							'srcfld1' => 'graphid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_graphids_',
-							'templated' => false
+							/* 'templated' => false */
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 				'ms_graphids',
-				($data['search_type'] == ZBX_SEARCH_TYPE_STRICT) ? '' : 'display-none'
+				($data['search_type'] == ZBX_SEARCH_TYPE_STRICT) ? '' : ZBX_STYLE_DISPLAY_NONE
 			)
 			->addRow(
 				(new CLabel(_('Graphs'), 'filter_graph_patterns__ms')),
 				(new CPatternSelect([
 					'placeholder' => _('graph pattern'),
 					'name' => 'filter_graph_pattern[]',
-					'object_name' => 'graph',
+					'object_name' => 'graphs',
 					'data' => $data['ms_graph_patterns'],
 					'popup' => [
 						'parameters' => [
@@ -127,18 +127,19 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 							'srcfld1' => 'graphid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_graph_pattern_',
-							'templated' => false
+							/* 'templated' => false */
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 				'ms_graph_patterns',
-				($data['search_type'] == ZBX_SEARCH_TYPE_STRICT) ? 'display-none' : ''
+				($data['search_type'] == ZBX_SEARCH_TYPE_STRICT) ? ZBX_STYLE_DISPLAY_NONE : ''
 			)
 	]);
 }
 
 $chartsWidget->addItem($filter);
 
+dd($data);
 if (!empty($this->data['graphid'])) {
 	// append chart to widget
 
