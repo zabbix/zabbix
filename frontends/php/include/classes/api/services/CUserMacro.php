@@ -917,7 +917,9 @@ class CUserMacro extends CApiService {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// Added type to query because it required to check macro is secret or not.
-		$options['output'][] = 'type';
+		if (!$this->outputIsRequested('type', $options['output'])) {
+			$options['output'][] = 'type';
+		}
 
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
