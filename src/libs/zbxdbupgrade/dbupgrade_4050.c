@@ -1300,7 +1300,6 @@ static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *new_ifs, zbx_vector
 	DBfree_result(result);
 }
 
-
 static int	DBpatch_interface_discovery_save(zbx_vector_uint64_pair_t *if_links)
 {
 	zbx_db_insert_t	db_insert_if_links;
