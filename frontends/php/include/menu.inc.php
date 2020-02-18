@@ -45,7 +45,7 @@ $menu
 				'alias' => ['history.php', 'chart.php']
 			],
 			_('Graphs') => [
-				'action' => 'charts.php',
+				'action' => 'charts.view',
 				'alias' => ['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php']
 			],
 			_('Screens') => [
