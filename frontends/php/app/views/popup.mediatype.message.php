@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm())
 	->cleanItems()
 	->setId('mediatype_message_form')
@@ -89,11 +93,11 @@ $output = [
 			'class' => 'dialogue-widget-save',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitMessageTemplate();'
+			'action' => 'submitMessageTemplate(overlay);'
 		]
 	],
 	'params' => $data['params'],
-	'script_inline' => require 'app/views/popup.mediatype.message.js.php'
+	'script_inline' => $this->readJsFile('popup.mediatype.message.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
@@ -101,4 +105,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

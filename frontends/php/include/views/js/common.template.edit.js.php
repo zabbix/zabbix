@@ -19,7 +19,11 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
+
 <?php if (!$data['readonly']): ?>
 	<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
 		<?= (new CRow([
@@ -213,7 +217,7 @@
 							.find('.btn-undo')
 							.hide();
 
-						jQuery('#macros_' + macro_num + '_change').text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
+						jQuery('#macros_' + macro_num + '_change').text(<?= json_encode(_x('Change', 'verb')) ?>);
 					}
 					else {
 						jQuery('#macros_' + macro_num + '_inherited_type')
@@ -226,7 +230,7 @@
 						jQuery('#macros_' + macro_num + '_type_btn')
 							.prop('disabled', false)
 							.attr({'aria-haspopup': 'true'});
-						jQuery('#macros_' + macro_num + '_change').text(<?= CJs::encodeJson(_('Remove')) ?>);
+						jQuery('#macros_' + macro_num + '_change').text(<?= json_encode(_('Remove')) ?>);
 					}
 				})
 				.on('focus blur', '.input-secret input, .input-group .textarea-flexible', function() {
@@ -397,8 +401,8 @@
 			$ms = $('#add_templates_'),
 			$show_inherited_macros = $('input[name="show_inherited_macros"]'),
 			$form = $show_inherited_macros.closest('form'),
-			linked_templates = <?= CJs::encodeJson($data['macros_tab']['linked_templates']) ?>,
-			add_templates = <?= CJs::encodeJson($data['macros_tab']['add_templates']) ?>,
+			linked_templates = <?= json_encode($data['macros_tab']['linked_templates']) ?>,
+			add_templates = <?= json_encode($data['macros_tab']['add_templates']) ?>,
 			macros_initialized = false;
 
 		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {

@@ -29,4 +29,13 @@ class C44ImportConverter extends CConverter {
 
 		return $data;
 	}
+
+	/**
+	 * Check database and table fields encoding.
+	 *
+	 * @return bool
+	 */
+	public function checkEncoding() {
+		return true;
+	}
 }

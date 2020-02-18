@@ -34,6 +34,8 @@ trait MacrosTrait {
 	 */
 	public function setTableSelector($selector) {
 		$this->table_selector = $selector;
+
+		return $this;
 	}
 
 	/**
@@ -44,7 +46,7 @@ trait MacrosTrait {
 	 * @return CMultifieldTable
 	 */
 	protected function getMacrosTable($value_column = 'Value') {
-		return $this->query('id:tbl_macros')->asMultifieldTable([
+		return $this->query($this->table_selector)->asMultifieldTable([
 			'mapping' => [
 				'Macro' => [
 					'name' => 'macro',

@@ -341,7 +341,9 @@ class C50XmlValidator {
 					'ipmi_username' =>			['type' => XML_STRING, 'default' => ''],
 					'ipmi_password' =>			['type' => XML_STRING, 'default' => ''],
 					'tls_connect' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]],
-					'tls_accept' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'preprocessor' => [$this, 'tlsAcceptConstantPreprocessor'], 'export' => [$this, 'hostTlsAcceptExport']],
+					'tls_accept' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'option', 'default' => CXmlConstantValue::NO_ENCRYPTION, 'export' => [$this, 'hostTlsAcceptExport'], 'rules' => [
+						'option' => ['type' => XML_STRING, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]]
+					]],
 					'tls_issuer' =>				['type' => XML_STRING, 'default' => ''],
 					'tls_subject' =>			['type' => XML_STRING, 'default' => ''],
 					'tls_psk_identity' =>		['type' => XML_STRING, 'default' => ''],
@@ -2166,35 +2168,6 @@ class C50XmlValidator {
 	}
 
 	/**
-	 * Convert tls_accept tag to normal value.
-	 * Used in CXmlValidGeneral.
-	 *
-	 * @param array|string $data         Import data.
-	 * @param array        $parent_data  Data's parent array.
-	 *
-	 * @return string
-	 */
-	public function tlsAcceptConstantPreprocessor($data, array $parent_data = null) {
-		if (is_string($data)) {
-			return $data;
-		}
-
-		$result = 0;
-
-		$rules = [
-			CXmlConstantName::NO_ENCRYPTION => CXmlConstantValue::NO_ENCRYPTION,
-			CXmlConstantName::TLS_PSK => CXmlConstantValue::TLS_PSK,
-			CXmlConstantName::TLS_CERTIFICATE => CXmlConstantValue::TLS_CERTIFICATE
-		];
-
-		foreach ($data as $const) {
-			$result += $rules[$const];
-		}
-
-		return (string) $result;
-	}
-
-	/**
 	 * Export check for ymax_item_1 if ymax_type_1 === ITEM.
 	 *
 	 * @param array $data  Export data.
@@ -2272,7 +2245,7 @@ class C50XmlValidator {
 	public function hostTlsAcceptExport(array $data) {
 		$consts = [
 			CXmlConstantValue::NO_ENCRYPTION => [CXmlConstantName::NO_ENCRYPTION],
-			CXmlConstantValue::TLS_PSK => [CXmlConstantName::TLS_PSK],
+			CXmlConstantValue::TLS_PSK=> [CXmlConstantName::TLS_PSK],
 			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK => [
 				CXmlConstantName::NO_ENCRYPTION,
 				CXmlConstantName::TLS_PSK

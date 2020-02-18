@@ -38,7 +38,7 @@ class CControllerDashboardShareUpdate extends CController {
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
+				'main_block' => json_encode(['errors' => getMessages()->toString()])
 			]));
 		}
 
@@ -101,6 +101,6 @@ class CControllerDashboardShareUpdate extends CController {
 			$response[$result ? 'messages' : 'errors'] = $messages->toString();
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($response)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 	}
 }

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $filterForm = new CFilter(new CUrl('toptriggers.php'));
 
 $severities = [];
@@ -109,7 +113,8 @@ $obj_data = [
 zbx_add_post_js('timeControl.addObject("toptriggers", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');');
 zbx_add_post_js('timeControl.processObjects();');
 
-return (new CWidget())
+(new CWidget())
 	->setTitle(_('100 busiest triggers'))
 	->addItem($filterForm)
-	->addItem($table);
+	->addItem($table)
+	->show();

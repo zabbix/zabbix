@@ -72,7 +72,7 @@ char	*strerror_from_system(unsigned long error)
 
 	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX] ", error);
 
-	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error,
+	if (0 == FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, ZBX_MESSAGE_BUF_SIZE, NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,

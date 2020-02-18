@@ -19,10 +19,16 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
+
 $this->addJsFile('buttondropdown.js');
 $this->addJsFile('inputsecret.js');
 $this->addJsFile('textareaflexible.js');
-$this->includeJSfile('app/views/administration.macros.edit.js.php');
+
+$this->includeJsFile('administration.macros.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Macros'))
@@ -114,4 +120,6 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem($tab_view);
 
-$widget->addItem($form)->show();
+$widget
+	->addItem($form)
+	->show();

@@ -133,8 +133,6 @@ class CControllerLatestView extends CControllerLatest {
 			'paging' => $paging
 		] + $prepared_data;
 
-		CView::$has_web_layout_mode = true;
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Latest data'));
 		$this->setResponse($response);
