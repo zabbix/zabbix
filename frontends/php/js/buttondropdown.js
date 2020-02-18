@@ -18,18 +18,19 @@
 **/
 
 
+/**
+ * CButtonDropdown control.
+ */
 (function($) {
 	'use strict';
 
 	var methods = {
-		// FIXME: delete me
-		init(options) {
-			var settings = $.extend({}, options);
-
-			return this.each(function() {
-
-			});
-		},
+		/**
+		 * Change hidden input value.
+		 *
+		 * @param {element} elem
+		 * @param {object}  value
+		 */
 		change(elem, value) {
 			$(elem)
 				.removeClass()
@@ -49,6 +50,6 @@
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
 
-		return methods.init.apply(this, arguments);
+		return this;
 	};
 })(jQuery);

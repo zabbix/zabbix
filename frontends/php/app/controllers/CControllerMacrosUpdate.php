@@ -54,8 +54,8 @@ class CControllerMacrosUpdate extends CController {
 		unset($macro);
 
 		foreach ($macros as $idx => $macro) {
-			if (!array_key_exists('globalmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
-					&& $macro['description'] === '') {
+			if (!array_key_exists('globalmacroid', $macro) && $macro['macro'] === ''
+					&& (!array_key_exists('value', $macro) || $macro['value'] === '') && $macro['description'] === '') {
 				unset($macros[$idx]);
 			}
 		}

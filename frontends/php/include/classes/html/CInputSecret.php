@@ -26,10 +26,13 @@ class CInputSecret extends CTag {
 	 */
 	public const ZBX_STYLE_CLASS = 'input-secret';
 
+	/**
+	 * Style for change value button.
+	 */
 	public const ZBX_STYLE_BTN_CHANGE = 'btn-change';
 
 	/**
-	 * Options array
+	 * Options array.
 	 *
 	 * @var array
 	 */

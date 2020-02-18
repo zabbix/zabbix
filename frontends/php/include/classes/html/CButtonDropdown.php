@@ -32,6 +32,11 @@ class CButtonDropdown extends CTag {
 	public const ZBX_STYLE_BTN_TOGGLE = 'btn-dropdown-toggle';
 	public const ZBX_STYLE_BTN_VALUE = 'dropdown-value';
 
+	/**
+	 * Options array.
+	 *
+	 * @var array
+	 */
 	protected $options = [
 		'disabled' => false
 	];

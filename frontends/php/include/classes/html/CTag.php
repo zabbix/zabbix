@@ -208,9 +208,11 @@ class CTag extends CObject {
 	public function setMenuPopup(array $data) {
 		$this->setAttribute('data-menu-popup', $data);
 		$this->setAttribute('aria-expanded', 'false');
+
 		if (!$this->getAttribute('disabled')) {
 			$this->setAttribute('aria-haspopup', 'true');
 		}
+
 		return $this;
 	}
 

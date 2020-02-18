@@ -18,13 +18,16 @@
 **/
 
 
+/**
+ * CInputSecret element control.
+ */
 (function($) {
 	'use strict';
 
 	function enable() {
-		var $input = $(this).siblings('input[type=password]'),
-			$btn_change = $(this),
-			$btn_undo = $(this)
+		var $btn_change = $(this),
+			$input = $btn_change.siblings('input[type=password]'),
+			$btn_undo =$btn_change
 				.closest('.input-group')
 				.find('.btn-undo');
 

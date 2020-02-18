@@ -93,6 +93,9 @@ class CUserMacro extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
+		// Forbidden search and filter by value field.
+		unset($options['filter']['value'], $options['search']['value']);
+
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if ($options['editable'] && !is_null($options['globalmacro'])) {
@@ -168,15 +171,12 @@ class CUserMacro extends CApiService {
 
 		// search
 		if (is_array($options['search'])) {
-			unset($options['search']['value']);
 			zbx_db_search('hostmacro hm', $options, $sqlParts);
 			zbx_db_search('globalmacro gm', $options, $sqlPartsGlobal);
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			unset($options['filter']['value']);
-
 			$this->dbFilter('hostmacro hm', $options, $sqlParts);
 			$this->dbFilter('globalmacro gm', $options, $sqlPartsGlobal);
 		}
@@ -916,16 +916,10 @@ class CUserMacro extends CApiService {
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+		// Added type to query because it required to check macro is secret or not.
+		$options['output'][] = 'type';
 
-		if (!$this->outputIsRequested('type', $options['output'])) {
-			if ($options['globalmacro'] === null) {
-				$sqlParts['select'][] = "hm.type";
-			}
-			else {
-				$sqlParts['select'][] = "gm.type";
-			}
-		}
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['output'] != API_OUTPUT_COUNT && $options['globalmacro'] === null) {
 			if ($options['selectGroups'] !== null || $options['selectHosts'] !== null || $options['selectTemplates'] !== null) {

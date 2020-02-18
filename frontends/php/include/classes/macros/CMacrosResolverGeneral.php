@@ -1074,7 +1074,7 @@ class CMacrosResolverGeneral {
 		if (!$all_macros_resolved) {
 			// Global macros.
 			$db_global_macros = API::UserMacro()->get([
-				'output' => ['macro', 'value'],
+				'output' => ['macro', 'value', 'type'],
 				'globalmacro' => true
 			]);
 
@@ -1225,11 +1225,6 @@ class CMacrosResolverGeneral {
 	 * @return string
 	 */
 	static public function getMacroValue(array $macro): string {
-		if (!array_key_exists('value', $macro) || (array_key_exists('type', $macro)
-				&& $macro['type'] == ZBX_MACRO_TYPE_SECRET)) {
-			return ZBX_MACRO_SECRET_MASK;
-		}
-
-		return $macro['value'];
+		return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_MACRO_SECRET_MASK : $macro['value'];
 	}
 }

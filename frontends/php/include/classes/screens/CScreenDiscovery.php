@@ -78,7 +78,7 @@ class CScreenDiscovery extends CScreenBase {
 
 		// user macros
 		$macros = API::UserMacro()->get([
-			'output' => ['macro', 'value'],
+			'output' => ['macro', 'value', 'type'],
 			'globalmacro' => true
 		]);
 		$macros = zbx_toHash($macros, 'macro');
