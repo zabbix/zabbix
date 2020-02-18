@@ -6394,7 +6394,7 @@ span {
 $browser-logos: (
 	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
 	ff: url(../img/browser-sprite.png) no-repeat -66px 0,
-	ie: url(../img/browser-sprite.png) no-repeat 0 -66px,
+	ed: url(../img/browser-sprite.png) no-repeat 0 -66px,
 	opera: url(../img/browser-sprite.png) no-repeat -66px -66px,
 	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
 );
@@ -6402,7 +6402,7 @@ $browser-logos: (
 // Dynamically generated classes for the browser logo:
 //  .browser-logo-chrome
 //  .browser-logo-ff
-//  .browser-logo-ie
+//  .browser-logo-ed
 //  .browser-logo-opera
 //  .browser-logo-safari
 @each $browser, $bgimage in $browser-logos {

@@ -74,7 +74,6 @@ $availableJScripts = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
-	'class.promise.js' => '',
 	'class.localstorage.js' => '',
 	'class.notifications.js' => '',
 	'class.notification.js' => '',
@@ -365,7 +364,6 @@ if (empty($_GET['files'])) {
 			$js .= 'window.ZBX_SESSION_NAME = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
 		}
 
-		$files[] = 'class.promise.js';
 		$files[] = 'class.localstorage.js';
 		$files[] = 'class.browsertab.js';
 		$files[] = 'class.notification.collection.js';

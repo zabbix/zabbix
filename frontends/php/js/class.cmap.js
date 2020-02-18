@@ -1916,7 +1916,7 @@ ZABBIX.apps.map = (function($) {
 							}, this),
 							start: $.proxy(function() {
 								this.domNode
-									.addClass(IE ? 'cursor-move' : 'cursor-dragging')
+									.addClass('cursor-dragging')
 									.removeClass('cursor-pointer');
 								this.sysmap.dragGroupInit(this);
 							}, this),
@@ -1926,7 +1926,7 @@ ZABBIX.apps.map = (function($) {
 							stop: $.proxy(function() {
 								this.domNode
 									.addClass('cursor-pointer')
-									.removeClass(IE ? 'cursor-move' : 'cursor-dragging');
+									.removeClass('cursor-dragging');
 								this.sysmap.dragGroupStop(this);
 							}, this)
 						});
@@ -3066,7 +3066,7 @@ ZABBIX.apps.map = (function($) {
 					items: 'tbody tr.sortable',
 					axis: 'y',
 					containment: 'parent',
-					cursor: IE ? 'move' : 'grabbing',
+					cursor: 'grabbing',
 					handle: 'div.drag-icon',
 					tolerance: 'pointer',
 					opacity: 0.6,
