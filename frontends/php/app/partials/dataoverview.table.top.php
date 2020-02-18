@@ -20,7 +20,7 @@
 
 
 /**
- * @var CView $this
+ * @var CPartial $this
  */
 $table = (new CTableInfo())
 	->makeVerticalRotation()
