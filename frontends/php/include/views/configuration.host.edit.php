@@ -757,7 +757,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 		$name = $data['inventory_items'][$inventoryNo]['name_expanded'];
 
 		$link = (new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']))
-			->setTitle(_s('This field is automatically populated by item "%s".', $name));
+			->setTitle(_s('This field is automatically populated by item "%1$s".', $name));
 
 		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
