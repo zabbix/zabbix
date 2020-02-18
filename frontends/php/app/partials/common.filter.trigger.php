@@ -58,6 +58,21 @@ $column1 = (new CFormList())
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
+		(new CMultiSelect([
+			'name' => 'filter_hostids[]',
+			'object_name' => 'hosts',
+			'data' => $data['ms_hosts'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'filter_hostids_'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	);
 
 
