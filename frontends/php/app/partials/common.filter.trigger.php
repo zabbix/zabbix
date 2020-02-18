@@ -42,7 +42,7 @@ $column1 = (new CFormList())
 			->addValue(_('Any'), TRIGGERS_OPTION_ALL)
 			->setModern(true)
 	)
-	->addRow((new CLabel(_('Host group'), 'filter_groupids__ms')),
+	->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
 		(new CMultiSelect([
 			'multiple' => true,
 			'name' => 'filter_groupids[]',

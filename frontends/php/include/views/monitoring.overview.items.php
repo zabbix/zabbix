@@ -91,7 +91,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
 			(new CFormList())
-				->addRow((new CLabel(_('Host group'), 'filter_groupids__ms')),
+				->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
 					(new CMultiSelect([
 						'multiple' => true,
 						'name' => 'filter_groupids[]',
@@ -108,7 +108,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
-				->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
+				->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
 					(new CMultiSelect([
 						'multiple' => true,
 						'name' => 'filter_hostids[]',
