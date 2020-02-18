@@ -40,14 +40,22 @@
 			return false;
 		}
 
+		/**
+		 * Simulate input by replacing newlines with space character.
+		 * NB! Chrome adds a newline character to textarea when translating content to the next line.
+		 */
 		var old_value = $textarea.val(),
-			new_value = old_value.replace(/\r?\n/gi, ''),
+			new_value = old_value.replace(/\r?\n/gi, ' '),
 			scroll_pos = $(window).scrollTop();
 
-		if (old_value.length !== new_value.length) {
+		if (old_value !== new_value) {
+			var pos = $textarea[0].selectionStart;
+
 			$textarea.val(new_value);
+			$textarea[0].setSelectionRange(pos, pos);
 		}
 
+		// Resize textarea.
 		$textarea
 			.height(0)
 			.innerHeight($textarea[0].scrollHeight);
