@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template DB PostgreSQL</template>
-            <name>Template DB PostgreSQL</name>
+            <template>Template DB PostgreSQL Agent 2</template>
+            <name>Template DB PostgreSQL Agent2 </name>
             <groups>
                 <group>
                     <name>Templates/Databases</name>
