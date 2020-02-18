@@ -117,44 +117,6 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Show multiSelect.
-		 *
-		 * @return jQuery
-		 */
-		show: function() {
-			return this.each(function() {
-				var $obj = $(this),
-					ms = $obj.data('multiSelect');
-
-				if (ms.options.hidden === true) {
-					ms.$popup_button.show().removeAttr('area-hidden');
-					$obj.show().removeAttr('area-hidden');
-					ms.options.hidden = false;
-					cleanSearch($obj);
-				}
-			});
-		},
-
-		/**
-		 * Hide multiSelect.
-		 *
-		 * @return jQuery
-		 */
-		hide: function() {
-			return this.each(function() {
-				var $obj = $(this),
-					ms = $obj.data('multiSelect');
-
-				if (ms.options.hidden === false) {
-					ms.$popup_button.hide().attr('area-hidden', true);
-					$obj.hide().attr('area-hidden', true);
-					ms.options.hidden = true;
-					cleanSearch($obj);
-				}
-			});
-		},
-
-		/**
 		 * Enable multi select UI control.
 		 *
 		 * @return jQuery
@@ -369,8 +331,7 @@ jQuery(function($) {
 						 * In such case the "focusout" event (IE) of the search input should not be processed.
 						 */
 						available_false_click: false
-					},
-					$popup_button: null
+					}
 				};
 
 			ms.values.available_div.on('mousedown', 'li', function() {
@@ -451,13 +412,7 @@ jQuery(function($) {
 					return PopUp('popup.generic', ms.options.popup.parameters, null, event.target);
 				});
 
-				ms.$popup_button = $('<div>', {'class': 'multiselect-button'}).append(popup_button);
-
-				if (ms.options.hidden) {
-					ms.$popup_button.hide().attr('area-hidden', true);
-				}
-
-				$obj.after(ms.$popup_button);
+				$obj.after($('<div>', {'class': 'multiselect-button'}).append(popup_button));
 			}
 		});
 	};

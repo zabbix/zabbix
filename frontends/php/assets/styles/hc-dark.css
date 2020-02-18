@@ -4399,6 +4399,9 @@ svg {
   .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
     display: none; }
 
+.display-none, .table-forms li.display-none {
+  display: none; }
+
 .checkbox-list li {
   margin-top: 4px; }
 
