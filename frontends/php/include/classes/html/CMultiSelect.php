@@ -183,7 +183,7 @@ class CMultiSelect extends CTag {
 
 				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
-					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes',
+					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes', 'with_items',
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
 					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items',
 					'with_httptests'
@@ -287,6 +287,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('with_httptests', $parameters) && $parameters['with_httptests']) {
 					$popup_parameters['with_httptests'] = '1';
 					$autocomplete_parameters['with_httptests'] = true;
+				}
+
+				if (array_key_exists('with_items', $parameters) && $parameters['with_items']) {
+					$popup_parameters['with_items'] = '1';
+					$autocomplete_parameters['with_items'] = true;
 				}
 
 				if (array_key_exists('excludeids', $parameters) && $parameters['excludeids']) {

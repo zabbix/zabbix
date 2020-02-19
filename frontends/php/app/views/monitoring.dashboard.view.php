@@ -70,7 +70,9 @@ else {
 							'srctbl' => 'hosts',
 							'srcfld1' => 'hostid',
 							'dstfrm' => 'dashboard_filter',
-							'dstfld1' => 'dynamic_hostid'
+							'dstfld1' => 'dynamic_hostid',
+							'monitored_hosts' => true,
+							'with_items' => true
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

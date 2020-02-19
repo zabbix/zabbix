@@ -875,6 +875,7 @@ class CControllerPopupGeneric extends CController {
 					'groupids' => $this->groupids ? $this->groupids : null,
 					'real_hosts' => $this->hasInput('real_hosts') ? '1' : null,
 					'with_httptests' => $this->hasInput('with_httptests') ? '1' : null,
+					'with_items' => $this->hasInput('with_items') ? true : null
 				];
 
 				$records = API::Host()->get($options);
@@ -908,6 +909,10 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->hasInput('with_httptests')) {
 					$options['with_httptests'] = 1;
+				}
+
+				if ($this->hasInput('with_items')) {
+					$options['with_items'] = true;
 				}
 
 				if ($this->hasInput('normal_only')) {

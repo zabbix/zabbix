@@ -134,12 +134,13 @@ switch ($data['method']) {
 		switch ($data['objectName']) {
 			case 'hostGroup':
 				$options = [
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
-					'real_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null
+					'real_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null,
+					'with_items' => array_key_exists('with_items', $data) ? $data['with_items'] : null,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
 				];
 				$hostGroups = API::HostGroup()->get($options);
 
@@ -167,6 +168,7 @@ switch ($data['method']) {
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['hostid', 'name'],
 					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
+					'with_items' => array_key_exists('with_items', $data) ? $data['with_items'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);
