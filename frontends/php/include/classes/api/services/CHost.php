@@ -501,7 +501,6 @@ class CHost extends CHostGeneral {
 		if ($options['tags'] !== null && $options['tags']) {
 			if ($options['inheritedTags']) {
 				$tags = [];
-				$where = '';
 
 				$db_template_tags = DBfetchArray(DBselect(
 					'SELECT h.hostid,ht.tag,ht.value'.
@@ -548,9 +547,7 @@ class CHost extends CHostGeneral {
 					}
 				}
 
-				$num = 1;
-				$tag_cnt = count($tags);
-
+				$where = [];
 				foreach ($tags as $tag => $_tag) {
 					$_tags = [];
 					foreach ($_tag['pairs'] as $pair) {
@@ -561,16 +558,10 @@ class CHost extends CHostGeneral {
 						];
 					}
 
-					$where .= '('.
+					$where[] = '('.
 						CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid').
 						' OR '.dbConditionInt('ht2.templateid', $_tag['templateids']).
 					')';
-
-					if ($num != $tag_cnt) {
-						$where .= ($options['evaltype'] == TAG_EVAL_TYPE_AND_OR) ? ' AND ' : ' OR ';
-					}
-
-					$num++;
 				}
 
 				$sqlParts['left_join']['hosts_templates'] = [
@@ -579,7 +570,8 @@ class CHost extends CHostGeneral {
 				];
 				$sqlParts['left_table'] = $this->tableName();
 
-				$sqlParts['where'][] = '('.$where.')';
+				$operator = ($options['evaltype'] == TAG_EVAL_TYPE_AND_OR) ? ' AND ' : ' OR ';
+				$sqlParts['where'][] = '('.implode($operator, $where).')';
 			}
 			else {
 				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
