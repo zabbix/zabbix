@@ -45,6 +45,41 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
 	if test -x "$_libnetsnmp_config"; then
 
+		netsnmp_version_req=$2
+
+		if test -n "$netsnmp_version_req"; then
+			LIBNETSNMP_CONFIG_VERSION=`$_libnetsnmp_config --version`
+			netsnmp_version_major=`expr $LIBNETSNMP_CONFIG_VERSION : '\([[0-9]]*\)'`
+			netsnmp_version_minor=`expr $LIBNETSNMP_CONFIG_VERSION : '[[0-9]]*\.\([[0-9]]*\)'`
+			netsnmp_version_micro=`expr $LIBNETSNMP_CONFIG_VERSION : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
+
+			if test "x$netsnmp_version_micro" = "x"; then
+				netsnmp_version_micro="0"
+			fi
+
+			netsnmp_version_number=`expr $netsnmp_version_major \* 1000000 \
+					\+ $netsnmp_version_minor \* 1000 \
+					\+ $netsnmp_version_micro`
+
+			netsnmp_version_req_major=`expr $netsnmp_version_req : '\([[0-9]]*\)'`
+			netsnmp_version_req_minor=`expr $netsnmp_version_req : '[[0-9]]*\.\([[0-9]]*\)'`
+			netsnmp_version_req_micro=`expr $netsnmp_version_req : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
+
+			if test "x$netsnmp_version_req_micro" = "x"; then
+				netsnmp_version_req_micro="0"
+			fi
+
+			netsnmp_version_req_number=`expr $netsnmp_version_req_major \* 1000000 \
+					\+ $netsnmp_version_req_minor \* 1000 \
+					\+ $netsnmp_version_req_micro`
+
+			netsnmp_version_check=`expr $netsnmp_version_number \>\= $netsnmp_version_req_number`
+
+			if test "$netsnmp_version_check" != "1"; then
+				AC_MSG_RESULT([no])
+			fi
+		fi
+
 		_full_libnetsnmp_cflags="`$_libnetsnmp_config --cflags`"
 		for i in $_full_libnetsnmp_cflags; do
 			case $i in
@@ -110,43 +145,6 @@ session.localname = "";
 		AC_DEFINE(HAVE_NETSNMP_SESSION_LOCALNAME, 1, [Define to 1 if 'session.localname' exist.])
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
-
-		netsnmp_version_req=$2
-
-		if test -n "$netsnmp_version_req"; then
-			LIBNETSNMP_CONFIG_VERSION=`$_libnetsnmp_config --version`
-			netsnmp_version_major=`expr $LIBNETSNMP_CONFIG_VERSION : '\([[0-9]]*\)'`
-			netsnmp_version_minor=`expr $LIBNETSNMP_CONFIG_VERSION : '[[0-9]]*\.\([[0-9]]*\)'`
-			netsnmp_version_micro=`expr $LIBNETSNMP_CONFIG_VERSION : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
-
-			if test "x$netsnmp_version_micro" = "x"; then
-				netsnmp_version_micro="0"
-			fi
-
-			netsnmp_version_number=`expr $netsnmp_version_major \* 1000000 \
-					\+ $netsnmp_version_minor \* 1000 \
-					\+ $netsnmp_version_micro`
-
-			netsnmp_version_req_major=`expr $netsnmp_version_req : '\([[0-9]]*\)'`
-			netsnmp_version_req_minor=`expr $netsnmp_version_req : '[[0-9]]*\.\([[0-9]]*\)'`
-			netsnmp_version_req_micro=`expr $netsnmp_version_req : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
-
-			if test "x$netsnmp_version_req_micro" = "x"; then
-				netsnmp_version_req_micro="0"
-			fi
-
-			netsnmp_version_req_number=`expr $netsnmp_version_req_major \* 1000000 \
-					\+ $netsnmp_version_req_minor \* 1000 \
-					\+ $netsnmp_version_req_micro`
-
-			netsnmp_version_check=`expr $netsnmp_version_number \>\= $netsnmp_version_req_number`
-
-			if test "$netsnmp_version_check" = "1"; then
-				AC_MSG_RESULT([yes])
-			else
-				AC_MSG_RESULT([no])
-			fi
-		fi
 
 		CFLAGS="$_save_netsnmp_cflags"
 		LDFLAGS="$_save_netsnmp_ldflags"
