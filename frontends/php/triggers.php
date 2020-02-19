@@ -623,9 +623,9 @@ $config = select_config();
 if ((getRequest('action') === 'trigger.massupdateform' || hasRequest('massupdate')) && hasRequest('g_triggerid')) {
 	$data = getTriggerMassupdateFormData();
 	$data['action'] = 'trigger.massupdate';
-	$triggersView = new CView('configuration.triggers.massupdate', $data);
-	$triggersView->render();
-	$triggersView->show();
+
+	// render view
+	echo (new CView('configuration.triggers.massupdate', $data))->getOutput();
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
@@ -663,18 +663,15 @@ elseif (isset($_REQUEST['form'])) {
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 	];
 
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($data));
-	$triggersView->render();
-	$triggersView->show();
+	// render view
+	echo (new CView('configuration.triggers.edit', getTriggerFormData($data)))->getOutput();
 }
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('g_triggerid')) {
 	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
 	$data['action'] = 'trigger.masscopyto';
 
 	// render view
-	$triggersView = new CView('configuration.copy.elements', $data);
-	$triggersView->render();
-	$triggersView->show();
+	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 else {
 	$filter_groupids_ms = [];
@@ -1008,10 +1005,9 @@ else {
 		'dep_triggers' => $dep_triggers,
 		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags)
 	];
-	$triggersView = new CView('configuration.triggers.list', $data);
 
-	$triggersView->render();
-	$triggersView->show();
+	// render view
+	echo (new CView('configuration.triggers.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -54,7 +54,8 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_ICON_MAP => _('Icon mapping'),
 		AUDIT_RESOURCE_CORRELATION => _('Event correlation'),
 		AUDIT_RESOURCE_DASHBOARD => _('Dashboard'),
-		AUDIT_RESOURCE_AUTOREGISTRATION  => _('Autoregistration')
+		AUDIT_RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
+		AUDIT_RESOURCE_MODULE => _('Module')
 	];
 
 	if (is_null($resource_type)) {
@@ -112,8 +113,13 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 		$resourcename = mb_substr($resourcename, 0, 252).'...';
 	}
 
-	// CWebUser is not initianized in CUser->login() method.
-	$userid = ($action == AUDIT_ACTION_LOGIN) ? $resourceid : CWebUser::$data['userid'];
+	/*
+	 * CWebUser is not initialized in CUser->login() method.
+	 * $userid with value NULL throws DBEXECUTE_ERROR later, so no audit record will be created.
+	 */
+	$userid = ($action == AUDIT_ACTION_LOGIN)
+		? $resourceid
+		: (CWebUser::$data ? CWebUser::$data['userid'] : null);
 
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 	$values = [

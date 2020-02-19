@@ -18,11 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.0alpha2');
+define('ZABBIX_VERSION',		'5.0.0beta1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050027);
-
+define('ZABBIX_DB_VERSION',		4050035);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
 
@@ -133,19 +132,20 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
+// Default db and field character set
+define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
+define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
-define('PAGE_TYPE_XML',					2);
 define('PAGE_TYPE_JS',					3); // javascript
 define('PAGE_TYPE_CSS',					4);
 define('PAGE_TYPE_HTML_BLOCK',			5); // simple block of html (as text)
 define('PAGE_TYPE_JSON',				6); // simple JSON
 define('PAGE_TYPE_JSON_RPC',			7); // api call
-define('PAGE_TYPE_TEXT_FILE',			8); // api call
 define('PAGE_TYPE_TEXT',				9); // simple text
-define('PAGE_TYPE_CSV',					10); // CSV format
 define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
 define('ZBX_SESSION_ACTIVE',	0);
@@ -244,6 +244,7 @@ define('AUDIT_RESOURCE_GRAPH_PROTOTYPE',	35);
 define('AUDIT_RESOURCE_ITEM_PROTOTYPE',		36);
 define('AUDIT_RESOURCE_HOST_PROTOTYPE',		37);
 define('AUDIT_RESOURCE_AUTOREGISTRATION',	38);
+define('AUDIT_RESOURCE_MODULE',				39);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -341,6 +342,10 @@ define('SNMP_BULK_ENABLED',		1);
 define('MAINTENANCE_STATUS_ACTIVE',		0);
 define('MAINTENANCE_STATUS_APPROACH',	1);
 define('MAINTENANCE_STATUS_EXPIRED',	2);
+
+// Modules.
+define('MODULE_STATUS_DISABLED', 0);
+define('MODULE_STATUS_ENABLED',	1);
 
 define('HOST_AVAILABLE_UNKNOWN',	0);
 define('HOST_AVAILABLE_TRUE',		1);
@@ -1516,7 +1521,7 @@ define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 define('ZBX_STYLE_BOTTOM', 'bottom');
 define('ZBX_STYLE_BROWSER_LOGO_CHROME', 'browser-logo-chrome');
 define('ZBX_STYLE_BROWSER_LOGO_FF', 'browser-logo-ff');
-define('ZBX_STYLE_BROWSER_LOGO_IE', 'browser-logo-ie');
+define('ZBX_STYLE_BROWSER_LOGO_ED', 'browser-logo-ed');
 define('ZBX_STYLE_BROWSER_LOGO_OPERA', 'browser-logo-opera');
 define('ZBX_STYLE_BROWSER_LOGO_SAFARI', 'browser-logo-safari');
 define('ZBX_STYLE_BROWSER_WARNING_CONTAINER', 'browser-warning-container');

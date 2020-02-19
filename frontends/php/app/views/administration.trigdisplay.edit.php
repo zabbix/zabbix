@@ -19,8 +19,13 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('colorpicker.js');
-$this->includeJSfile('app/views/administration.trigdisplay.edit.js.php');
+
+$this->includeJsFile('administration.trigdisplay.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger displaying options'))

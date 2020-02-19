@@ -113,7 +113,6 @@ class CControllerHousekeepingUpdate extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'housekeeping.edit')
-			->getUrl()
 		);
 
 		if ($result) {

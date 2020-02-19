@@ -332,9 +332,7 @@ if (hasRequest('form')) {
 	}
 
 	// render view
-	$servicesView = new CView('configuration.services.edit', $data);
-	$servicesView->render();
-	$servicesView->show();
+	echo (new CView('configuration.services.edit', $data))->getOutput();
 }
 else {
 	// services
@@ -363,9 +361,7 @@ else {
 	$data = ['tree' => $tree];
 
 	// render view
-	$servicesView = new CView('configuration.services.list', $data);
-	$servicesView->render();
-	$servicesView->show();
+	echo (new CView('configuration.services.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

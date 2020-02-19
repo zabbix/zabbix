@@ -52,7 +52,7 @@ class CControllerDashboardWidgetCheck extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 
 		return $ret;
@@ -63,6 +63,6 @@ class CControllerDashboardWidgetCheck extends CController {
 	}
 
 	protected function doAction() {
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([])]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
 	}
 }

@@ -171,8 +171,6 @@ $data['paging'] = CPagerHelper::paginate(getRequest('page', 1), $data['actions']
 );
 
 // render view
-$auditView = new CView('administration.auditlogs.list', $data);
-$auditView->render();
-$auditView->show();
+echo (new CView('administration.auditlogs.list', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

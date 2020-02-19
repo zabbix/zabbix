@@ -39,7 +39,7 @@ class CControllerDashboardWidgetEdit extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['body' => CJs::encodeJson('')]));
+			$this->setResponse(new CControllerResponseData(['body' => json_encode('')]));
 		}
 
 		return $ret;

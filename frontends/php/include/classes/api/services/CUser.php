@@ -261,7 +261,7 @@ class CUser extends CApiService {
 		}
 
 		$locales = array_keys(getLocales());
-		$themes = THEME_DEFAULT.','.implode(',', array_keys(Z::getThemes()));
+		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
@@ -369,7 +369,7 @@ class CUser extends CApiService {
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
 		$locales = array_keys(getLocales());
-		$themes = THEME_DEFAULT.','.implode(',', array_keys(Z::getThemes()));
+		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias']], 'fields' => [
 			'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],

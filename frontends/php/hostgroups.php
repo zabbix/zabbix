@@ -251,9 +251,7 @@ if (hasRequest('form')) {
 	}
 
 	// render view
-	$view = new CView('configuration.hostgroups.edit', $data);
-	$view->render();
-	$view->show();
+	echo (new CView('configuration.hostgroups.edit', $data))->getOutput();
 }
 /*
  * Display list
@@ -344,9 +342,7 @@ else {
 	unset($group);
 
 	// render view
-	$view = new CView('configuration.hostgroups.list', $data);
-	$view->render();
-	$view->show();
+	echo (new CView('configuration.hostgroups.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -192,8 +192,6 @@ $data['hosts'] = API::Host()->get([
 ]);
 
 // render view
-$historyView = new CView('reports.toptriggers', $data);
-$historyView->render();
-$historyView->show();
+echo (new CView('reports.toptriggers', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

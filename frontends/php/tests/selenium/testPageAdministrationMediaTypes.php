@@ -72,7 +72,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Enabled'
 					],
-					'result' => ['Email', 'Email (HTML)', 'Mattermost', 'Opsgenie', 'PagerDuty', 'Pushover', 'Slack', 'SMS']
+					'result' => ['Discord', 'Email', 'Email (HTML)', 'Mattermost', 'Opsgenie', 'PagerDuty', 'Pushover', 'Slack', 'SMS']
 				]
 			],
 			[
@@ -459,7 +459,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', $data['name']);
 		$row->query('button:Test')->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Test media type', $dialog->getTitle());
 		$form = $dialog->asForm();
 
@@ -498,7 +498,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', $media);
 		$row->query('button:Test')->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Test media type', $dialog->getTitle());
 		$form = $dialog->asForm();
 		$form->fill($fields);

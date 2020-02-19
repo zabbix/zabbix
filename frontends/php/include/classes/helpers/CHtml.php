@@ -57,6 +57,6 @@ class CHtml {
 	 * @return string
 	 */
 	public static function serialize(array $data) {
-		return self::encode(CJs::encodeJson($data));
+		return self::encode(json_encode($data));
 	}
 }

@@ -42,13 +42,16 @@ class CControllerIconMapCreate extends CController {
 	protected function doAction() {
 		$result = (bool) API::IconMap()->create((array) $this->getInput('iconmap'));
 
-		$url = new CUrl('zabbix.php');
 		if ($result) {
-			$response = new CControllerResponseRedirect($url->setArgument('action', 'iconmap.list'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'iconmap.list')
+			);
 			$response->setMessageOk(_('Icon map created'));
 		}
 		else {
-			$response = new CControllerResponseRedirect($url->setArgument('action', 'iconmap.edit'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'iconmap.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot create icon map'));
 		}
