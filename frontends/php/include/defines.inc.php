@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.0.0alpha2');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050036);
+define('ZABBIX_DB_VERSION',		4050038);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
 
@@ -157,9 +157,6 @@ define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);
-
-define('ZBX_DROPDOWN_FIRST_NONE',	0);
-define('ZBX_DROPDOWN_FIRST_ALL',	1);
 
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);

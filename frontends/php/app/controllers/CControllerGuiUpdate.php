@@ -25,8 +25,6 @@ class CControllerGuiUpdate extends CController {
 		$themes = array_keys(APP::getThemes());
 		$fields = [
 			'default_theme'           => 'required|in '.implode(',', $themes).'|db config.default_theme',
-			'dropdown_first_entry'    => 'required|db config.dropdown_first_entry|in '.ZBX_DROPDOWN_FIRST_NONE.','.ZBX_DROPDOWN_FIRST_ALL,
-			'dropdown_first_remember' => 'required|db config.dropdown_first_remember|in 0,1',
 			'search_limit'            => 'required|db config.search_limit|ge 1|le 999999',
 			'max_in_table'            => 'required|db config.max_in_table|ge 1|le 99999',
 			'server_check_interval'   => 'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL
@@ -63,8 +61,6 @@ class CControllerGuiUpdate extends CController {
 		DBstart();
 		$result = update_config([
 			'default_theme'           => $this->getInput('default_theme'),
-			'dropdown_first_entry'    => $this->getInput('dropdown_first_entry'),
-			'dropdown_first_remember' => $this->getInput('dropdown_first_remember'),
 			'search_limit'            => $this->getInput('search_limit'),
 			'max_in_table'            => $this->getInput('max_in_table'),
 			'server_check_interval'   => $this->getInput('server_check_interval')

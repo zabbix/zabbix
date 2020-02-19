@@ -625,6 +625,16 @@ static int	DBpatch_4050036(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4050037(void)
+{
+	return DBdrop_field("config", "dropdown_first_entry");
+}
+
+static int	DBpatch_4050038(void)
+{
+	return DBdrop_field("config", "dropdown_first_remember");
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -663,6 +673,8 @@ DBPATCH_ADD(4050033, 0, 1)
 DBPATCH_ADD(4050034, 0, 1)
 DBPATCH_ADD(4050035, 0, 1)
 DBPATCH_ADD(4050036, 0, 1)
+DBPATCH_ADD(4050037, 0, 1)
+DBPATCH_ADD(4050038, 0, 1)
 
 
 DBPATCH_END()
