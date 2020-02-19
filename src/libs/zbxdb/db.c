@@ -426,10 +426,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	mysql_options(conn, MYSQL_OPT_SSL_KEY, key);
 	mysql_options(conn, MYSQL_OPT_SSL_CERT, cert);
 	mysql_options(conn, MYSQL_OPT_SSL_CIPHER, cipher);
-#if LIBMYSQL_VERSION_ID >= 80000
+#if LIBMYSQL_VERSION_ID >= 80016
 	mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13);
 #endif
-	//zabbix_log(LOG_LEVEL_INFORMATION, "cipher_13: %s", cipher_13);
 
 	if (ZBX_DB_OK == ret &&
 			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
