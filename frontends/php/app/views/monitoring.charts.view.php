@@ -77,12 +77,13 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	]));
 
-$filter = (new CFilter(new CUrl('charts.php')))
+$filter = (new CFilter(new CUrl('zabbix.php')))
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 	->setActiveTab($data['active_tab'])
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
 		$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
-	);
+	)
+	->addFormItem((new CVar('action', 'charts.view'))->removeId());
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	$filter->addFilterTab(_('Filter'), [
@@ -154,7 +155,8 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 							'dstfld1' => 'filter_graph_pattern_',
 							/* 'templated' => false */
 						]
-					]
+					],
+					'add_post_js' => true
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 				'ms_graph_patterns',
 				($data['search_type'] == ZBX_SEARCH_TYPE_STRICT) ? ZBX_STYLE_DISPLAY_NONE : ''

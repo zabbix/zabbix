@@ -553,7 +553,9 @@ switch ($data['popup_type']) {
 			// For a "popup_reference".
 			$graph = [
 				'id' => $graph['graphid'],
-				'name' => reset($graph['hosts'])['name'].NAME_DELIMITER.$graph['name']
+				'name' => $options['patternselect']
+					? $graph['name']
+					: reset($graph['hosts'])['name'].NAME_DELIMITER.$graph['name']
 			];
 		}
 		unset($graph);

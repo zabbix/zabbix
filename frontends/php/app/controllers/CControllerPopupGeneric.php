@@ -791,7 +791,19 @@ class CControllerPopupGeneric extends CController {
 					$records[$row['name_expanded']] = ['itemid' => $row['name_expanded']] + $row;
 					unset($records[$itmeid]);
 				}
-			break;
+				break;
+
+			case 'graphs':
+				foreach ($records as $graphid => $row) {
+					$records[$row['name']] = [
+						'name' => $row['name'],
+						'graphid' => $row['name'],
+						'graphtype' => $row['graphtype'],
+						'hosts' => $row['hosts']
+					];
+					unset($records[$graphid]);
+				}
+				break;
 		}
 	}
 

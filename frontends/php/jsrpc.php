@@ -516,6 +516,17 @@ switch ($data['method']) {
 
 				$db_result = API::Item()->get($options);
 				break;
+
+			case 'graphs':
+				$options = [
+					'output' => ['name'],
+					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
+					'searchWildcardsEnabled' => $wildcard_enabled,
+					'limit' => $config['search_limit']
+				];
+
+				$db_result = API::Graph()->get($options);
+				break;
 		}
 
 		$result[] = [
