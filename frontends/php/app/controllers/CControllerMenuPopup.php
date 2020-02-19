@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in dashboard,history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro',
+			'type' => 'required|in dashboard,history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
 			'data' => 'array'
 		];
 
@@ -622,6 +622,45 @@ class CControllerMenuPopup extends CController {
 		return ['type' => 'trigger_macro'];
 	}
 
+	/**
+	 * Prepare data for widget actions menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['widgetName']   Widget index in array of widgets on dashboard.
+	 * @param string $data['currentRate']  Refresh rate for widget.
+	 * @param bool   $data['multiplier']   Multiplier or time mode.
+	 *
+	 * @return mixed
+	 */
+	private static function getMenuDataWidgetActions(array $data) {
+		$menu_data = [
+			'type' => 'widget_actions',
+			'widgetName' => $data['widgetName'],
+			'currentRate' => $data['currentRate'],
+			'multiplier' => (bool) $data['multiplier'],
+			'download' => ($data['widgetType'] == WIDGET_SVG_GRAPH)
+		];
+
+		if (array_key_exists('params', $data)) {
+			$menu_data['params'] = $data['params'];
+		}
+
+		if ($data['widgetType'] == WIDGET_GRAPH && array_key_exists('graphid', $data) && $data['graphid']) {
+			$menu_data['download'] = (bool) API::Graph()->get([
+				'output' => ['graphid'],
+				'graphids' => $data['graphid']
+			]);
+		}
+		elseif ($data['widgetType'] == WIDGET_GRAPH && array_key_exists('itemid', $data) && $data['itemid']) {
+			$menu_data['download'] = (bool) API::Item()->get([
+				'output' => ['itemid'],
+				'itemids' => $data['itemid']
+			]);
+		}
+
+		return $menu_data;
+	}
+
 	protected function doAction() {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
@@ -660,6 +699,10 @@ class CControllerMenuPopup extends CController {
 
 			case 'trigger_macro':
 				$menu_data = self::getMenuDataTriggerMacro();
+				break;
+
+			case 'widget_actions':
+				$menu_data = self::getMenuDataWidgetActions($data);
 				break;
 		}
 

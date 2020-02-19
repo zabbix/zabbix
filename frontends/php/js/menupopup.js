@@ -503,6 +503,50 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 }
 
 /**
+ * Get menu popup widget actions data.
+ *
+ * @param {string}   options['widgetName']   Widget name.
+ * @param {string}   options['currentRate']  Current rate value.
+ * @param {bool}     options['multiplier']   Multiplier or time mode.
+ * @param {callback} options['callback']     Callback function on success (optional).
+ * @param {object}   trigger_elmnt           UI element which triggered opening of overlay dialogue.
+ *
+ * @return array
+ */
+function getMenuPopupWidgetActions(options, trigger_elmnt) {
+	var menu = getMenuPopupRefresh(options, trigger_elmnt),
+		widget_actions = [],
+		widget = jQuery('.dashbrd-grid-container').dashboardGrid('getWidgetsBy', 'widgetid', options.widgetName).pop();
+
+	if (options.download) {
+		widget_actions.push({
+			label: t('Download image'),
+			clickCallback: function() {
+				var svg = widget['content_body'].find('svg').first();
+
+				if (svg.length) {
+					downloadSvgImage(svg, 'graph.png');
+				}
+				else {
+					downloadPngImage(widget['content_body'].find('img').first(), 'graph.png');
+				}
+
+				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
+			}
+		});
+	}
+
+	if (widget_actions.length) {
+		menu.unshift({
+			label: t('Actions'),
+			items: widget_actions
+		});
+	}
+
+	return menu;
+}
+
+/**
  * Get menu popup trigger section data.
  *
  * @param {string} options['dashboardid']

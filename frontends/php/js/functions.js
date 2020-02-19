@@ -798,3 +798,73 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 
 	return $msg_box;
 }
+
+/**
+ * Download svg graph as .png image.
+ *
+ * @param {object} $dom_node    jQuery svg node to download.
+ * @param {string} file_name    File name.
+ */
+function downloadSvgImage($dom_node, file_name) {
+	var canvas = document.createElement('canvas'),
+		labels = $dom_node.next(),
+		$clone = $dom_node.clone(),
+		$container = $dom_node.closest('.dashbrd-grid-widget-content'),
+		image = new Image,
+		a = document.createElement('a'),
+		style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style'),
+		$labels_clone,
+		context2d;
+
+	// Clone only svg graph styles.
+	style.innerText = jQuery.map(document.styleSheets[0].cssRules, function (rule) {
+		return rule.selectorText && rule.selectorText.substr(0, 5) == '.svg-' ? rule.cssText : '';
+	}).join('');
+
+	jQuery.map(['background-color', 'font-family', 'font-size', 'color'], function (key) {
+		$clone.css(key, $container.css(key));
+		console.log(`set ${key} to `+$container.css(key));
+	});
+
+	canvas.width = $dom_node.width()
+	canvas.height = $dom_node.height() + labels.height();
+	context2d = canvas.getContext('2d');
+	image.onload = function() {
+		context2d.drawImage(image, 0, 0);
+		a.href = canvas.toDataURL('image/png');
+		a.rel = 'noopener';
+		a.download = file_name;
+		a.target = '_blank';
+		a.click();
+	}
+	$labels_clone = jQuery(document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject'))
+		.attr({
+			x: 0,
+			y: canvas.height - labels.height(),
+			width: canvas.width,
+			height: labels.height()
+		})
+		.append(jQuery(document.createElementNS('http://www.w3.org/1999/xhtml', 'div'))
+			.append(style)
+			.append(labels.clone())
+		);
+
+	$clone.attr('height', canvas.height + 'px').append($labels_clone);
+	image.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString($clone[0]));
+}
+
+/**
+ * Download classic graph as .png image.
+ *
+ * @param {object} $dom_node    jQuery svg node to download.
+ * @param {string} file_name    File name.
+ */
+function downloadPngImage($dom_node, file_name) {
+	var a = document.createElement('a');
+
+	a.href = $dom_node.attr('src');
+	a.rel = 'noopener';
+	a.download = file_name;
+	a.target = '_blank';
+	a.click();
+}
