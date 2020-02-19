@@ -41,11 +41,13 @@
 		}
 
 		/**
-		 * Simulate input by replacing newlines with space character.
-		 * NB! Chrome adds a newline character to textarea when translating content to the next line.
+		 * Simulate input behaviour by replacing newlines with space character.
+		 * NB! WebKit based browsers add a newline character to textarea when translating content to the next line.
 		 */
 		var old_value = $textarea.val(),
-			new_value = old_value.replace(/\r?\n/gi, ' '),
+			new_value = old_value
+				.replace(/\r?\n+$/g, '')
+				.replace(/\r?\n/g, ' '),
 			scroll_pos = $(window).scrollTop();
 
 		if (old_value !== new_value) {
