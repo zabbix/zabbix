@@ -98,6 +98,18 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
 		AC_CHECK_LIB(netsnmp, main, , [AC_MSG_ERROR([Not found Net-SNMP library])])
 
+		LIBNETSNMP_CONFIG_VERSION=`$_libnetsnmp_config --version`
+		netsnmp_version_major=`expr $LIBNETSNMP_CONFIG_VERSION : '\([[0-9]]*\)'`
+		netsnmp_version_minor=`expr $LIBNETSNMP_CONFIG_VERSION : '[[0-9]]*\.\([[0-9]]*\)'`
+		netsnmp_version_micro=`expr $LIBNETSNMP_CONFIG_VERSION : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
+		if test "x$netsnmp_version_micro" = "x"; then
+			netsnmp_version_micro="0"
+		fi
+
+		netsnmp_version_number=`expr $netsnmp_version_major \* 1000000 \
+				\+ $netsnmp_version_minor \* 1000 \
+				\+ $netsnmp_version_micro`
+
 		dnl Check for localname in struct snmp_session
 		AC_MSG_CHECKING(for localname in struct snmp_session)
 		AC_TRY_COMPILE([
