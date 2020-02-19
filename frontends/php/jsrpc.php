@@ -139,6 +139,7 @@ switch ($data['method']) {
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'real_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null,
 					'with_items' => array_key_exists('with_items', $data) ? $data['with_items'] : null,
+					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
 				];
@@ -164,15 +165,24 @@ switch ($data['method']) {
 				break;
 
 			case 'hosts':
-				$hosts = API::Host()->get([
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
+				$options = [
 					'output' => ['hostid', 'name'],
 					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
 					'with_items' => array_key_exists('with_items', $data) ? $data['with_items'] : null,
+					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => $config['search_limit']
-				]);
+				];
 
+				if (array_key_exists('with_monitored_items', $data)) {
+					$options += [
+						'with_monitored_items' => true,
+						'monitored_hosts' => true
+					];
+				}
+
+				$hosts = API::Host()->get($options);
 
 				if ($hosts) {
 					CArrayHelper::sort($hosts, [

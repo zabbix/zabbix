@@ -539,6 +539,15 @@ class CControllerPopupGeneric extends CController {
 			$group_options['with_items'] = 1;
 			$host_options['with_items'] = 1;
 		}
+		elseif ($this->hasInput('with_monitored_items')) {
+			$group_options['with_monitored_items'] = 1;
+			$host_options['with_monitored_items'] = 1;
+		}
+
+		if ($this->hasInput('with_httptests')) {
+			$group_options['with_httptests'] = 1;
+			$host_options['with_httptests'] = 1;
+		}
 
 		if ($this->source_table === 'hosts') {
 			$group_options['real_hosts'] = 1;
@@ -565,8 +574,7 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		foreach (['with_applications', 'with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
-				'with_simple_graph_item_prototypes', 'with_triggers', 'with_monitored_triggers', 'with_monitored_items'
-			] as $name) {
+				'with_simple_graph_item_prototypes', 'with_triggers', 'with_monitored_triggers'] as $name) {
 			if ($this->hasInput($name)) {
 				$group_options[$name] = 1;
 				$host_options[$name] = 1;
@@ -877,6 +885,13 @@ class CControllerPopupGeneric extends CController {
 					'with_httptests' => $this->hasInput('with_httptests') ? '1' : null,
 					'with_items' => $this->hasInput('with_items') ? true : null
 				];
+
+				if ($this->hasInput('with_monitored_items')) {
+					$options += [
+						'with_monitored_items' => true,
+						'monitored_hosts' => true
+					];
+				}
 
 				$records = API::Host()->get($options);
 				CArrayHelper::sort($records, ['name']);

@@ -45,7 +45,7 @@ $web_layout_mode = $this->getLayoutMode();
 		->addFormItem((new CVar('action', 'web.view'))->removeId())
 		->addFilterTab(_('Filter'), [
 			(new CFormList())
-				->addRow((new CLabel(_('Host group'), 'filter_groupids__ms')),
+				->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
 					(new CMultiSelect([
 						'multiple' => true,
 						'name' => 'filter_groupids[]',
@@ -57,13 +57,14 @@ $web_layout_mode = $this->getLayoutMode();
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_groupids_',
-								'real_hosts' => true,
-								'with_httptests' => true
+								'with_monitored_items' => true,
+								'with_httptests' => true,
+								'real_hosts' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
-				->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
+				->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
 					(new CMultiSelect([
 						'multiple' => true,
 						'name' => 'filter_hostids[]',
@@ -75,8 +76,9 @@ $web_layout_mode = $this->getLayoutMode();
 								'srcfld1' => 'hostid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_hostids_',
-								'real_hosts' => true,
-								'with_httptests' => true
+								'with_monitored_items' => true,
+								'with_httptests' => true,
+								'real_hosts' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
