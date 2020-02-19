@@ -59,9 +59,9 @@ class testProblemsBySeverityWidget extends CWebTest {
 				[
 					'fields' => [
 						'Type' => 'Problems by severity',
-						'Name' => 'HG: Four Or tags in filter'
+						'Name' => 'HG: Four Or tags in filter',
+						'Tags' => 'Or'
 					],
-					'evaluation_type' => 'Or',
 					'tags' => [
 						['name' => 'Service', 'operator' => 'Contains', 'value' => ''],
 						['name' => 'server', 'operator' => 'Contains', 'value' => ''],
@@ -313,9 +313,9 @@ class testProblemsBySeverityWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Four Or tags in filter',
-						'Show' => 'Totals'
+						'Show' => 'Totals',
+						'Tags' => 'Or'
 					],
-					'evaluation_type' => 'Or',
 					'tags' => [
 						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
 						['name' => 'Alpha', 'operator' => 'Contains', 'value' => ''],
@@ -977,12 +977,12 @@ class testProblemsBySeverityWidget extends CWebTest {
 				[
 					'fields' => [
 						'Type' => 'Problems by severity',
-						'Name' => 'HG: Two Or tags in filter'
+						'Name' => 'HG: Two Or tags in filter',
+						'Tags' => 'Or'
 					],
 					'check' => [
 						'pop-up' => true
 					],
-					'evaluation_type' => 'Or',
 					'tags' => [
 						['name' => 'service', 'operator' => 'Contains', 'value' => 'abc'],
 						['name' => 'Street', 'operator' => 'Contains', 'value' => '']
@@ -1020,9 +1020,9 @@ class testProblemsBySeverityWidget extends CWebTest {
 				[
 					'fields' => [
 						'Type' => 'Problems by severity',
-						'Name' => 'HG: Two Or tags in filter 2'
+						'Name' => 'HG: Two Or tags in filter 2',
+						'Tags' => 'Or'
 					],
-					'evaluation_type' => 'Or',
 					'tags' => [
 						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
 						['name' => 'Tag5', 'operator' => 'Equals', 'value' => '5']
@@ -1040,9 +1040,9 @@ class testProblemsBySeverityWidget extends CWebTest {
 				[
 					'fields' => [
 						'Type' => 'Problems by severity',
-						'Name' => 'Two Or tags in filter 3'
+						'Name' => 'Two Or tags in filter 3',
+						'Tags' => 'Or'
 					],
-					'evaluation_type' => 'Or',
 					'tags' => [
 						['name' => 'Alpha', 'operator' => 'Equals', 'value' => 'a'],
 						['name' => 'Delta', 'operator' => 'Equals', 'value' => 't']
@@ -1130,13 +1130,13 @@ class testProblemsBySeverityWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two Or tags in filter',
-						'Show' => 'Totals'
+						'Show' => 'Totals',
+						'Tags' => 'Or'
 					],
 					'check' => [
 						'pop-up' => true,
 						'rows' => 3
 					],
-					'evaluation_type' => 'Or',
 					'tags' => [
 						['name' => 'service', 'operator' => 'Contains', 'value' => 'abc'],
 						['name' => 'Street', 'operator' => 'Contains', 'value' => '']
@@ -1169,9 +1169,9 @@ class testProblemsBySeverityWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two Or tags in filter 2',
-						'Show' => 'Totals'
+						'Show' => 'Totals',
+						'Tags' => 'Or'
 					],
-					'evaluation_type' => 'Or',
 					'tags' => [
 						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
 						['name' => 'Tag5', 'operator' => 'Equals', 'value' => '5']
@@ -1188,9 +1188,9 @@ class testProblemsBySeverityWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two Or tags in filter 3',
-						'Show' => 'Totals'
+						'Show' => 'Totals',
+						'Tags' => 'Or'
 					],
-					'evaluation_type' => 'Or',
 					'tags' => [
 						['name' => 'Alpha', 'operator' => 'Equals', 'value' => 'a'],
 						['name' => 'Delta', 'operator' => 'Equals', 'value' => 't']
@@ -1399,7 +1399,6 @@ class testProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 		if (CTestArrayHelper::get($data,'tags',false)) {
-			$form->fill(['id:evaltype' => CTestArrayHelper::get($data, 'evaluation_type', 'And/Or')]);
 			$this->setFilterSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
