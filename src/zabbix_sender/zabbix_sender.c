@@ -1418,23 +1418,27 @@ int	main(int argc, char **argv)
 					ret = FAIL;
 					break;
 				}
-			}
 
-			if (1 == WITH_NS)
-			{
-				if ('\0' == *p || NULL == (p = get_string(p, clock, sizeof(clock))) || '\0' == *clock)
+				if (1 == WITH_NS)
 				{
-					zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Nanoseconds' required", total_count);
-					ret = FAIL;
-					break;
-				}
+					if ('\0' == *p || NULL == (p = get_string(p, clock, sizeof(clock))) ||
+							'\0' == *clock)
+					{
+						zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Nanoseconds' required",
+								total_count);
+						ret = FAIL;
+						break;
+					}
 
-				if (FAIL == is_uint_n_range(clock, sizeof(clock), &ns, sizeof(ns), 0LL, 999999999LL))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "[line %d] invalid 'Nanoseconds' value detected",
-							total_count);
-					ret = FAIL;
-					break;
+					if (FAIL == is_uint_n_range(clock, sizeof(clock), &ns, sizeof(ns),
+							0LL, 999999999LL))
+					{
+						zabbix_log(LOG_LEVEL_WARNING,
+								"[line %d] invalid 'Nanoseconds' value detected",
+								total_count);
+						ret = FAIL;
+						break;
+					}
 				}
 			}
 
