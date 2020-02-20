@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2019-12-10T08:23:13Z</date>
+    <date>2020-02-20T14:29:11Z</date>
     <media_types>
         <media_type>
             <name>Pushover</name>
@@ -47,6 +47,14 @@
                     <name>triggerid</name>
                     <value>{TRIGGER.ID}</value>
                 </parameter>
+                <parameter>
+                    <name>retry</name>
+                    <value>60</value>
+                </parameter>
+                <parameter>
+                    <name>expire</name>
+                    <value>1200</value>
+                </parameter>
             </parameters>
             <max_sessions>0</max_sessions>
             <script>try {&#13;
@@ -71,12 +79,7 @@
         throw 'field &quot;message&quot; cannot be empty';&#13;
     }&#13;
 &#13;
-    /*&#13;
-     * If a device name is not specified for a user, or the specified device name is no longer enabled/valid,&#13;
-     * notifications will be sent to all active devices for that user to avoid losing messages.&#13;
-     * Messages may be addressed to multiple specific devices by joining them with a comma (such as device=iphone,nexus5).&#13;
-     */&#13;
-    data = JSON.stringify({&#13;
+    data = {&#13;
         token: params.token,&#13;
         user: params.user,&#13;
         title: params.title,&#13;
@@ -84,8 +87,22 @@
         url: params.url + '/tr_events.php?triggerid=' + params.triggerid + '&amp;eventid=' + params.eventid,&#13;
         url_title: params.url_title,&#13;
         priority: params.priority&#13;
-    });&#13;
+    };&#13;
 &#13;
+    if (params.priority == 2) {&#13;
+        if (isNaN(params.retry) || params.retry &lt; 30) {&#13;
+            throw 'field &quot;retry&quot; should be a number with value of at least 30 if &quot;priority&quot; is set to 2';&#13;
+        }&#13;
+&#13;
+        if (isNaN(params.expire) || params.expire &gt; 10800) {&#13;
+            throw 'field &quot;expire&quot; should be a number with value of at most 10800 if &quot;priority&quot; is set to 2';&#13;
+        }&#13;
+&#13;
+        data.params = params.retry;&#13;
+        data.expire = params.expire;&#13;
+    }&#13;
+&#13;
+    data = JSON.stringify(data);&#13;
     Zabbix.Log(4, '[ Pushover Webhook ] Sending request: ' + params.endpoint + '\n' + data);&#13;
 &#13;
     request.AddHeader('Content-Type: application/json');&#13;
