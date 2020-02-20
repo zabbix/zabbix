@@ -33,11 +33,6 @@ foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
 		->setTitle($trigname);
 }
 
-if ($data['exceeded_trigs']) {
-	$headings[] = (new CColHeader('...'))
-		->setTitle(_('Some data is hidden.'));
-}
-
 $table->setHeader($headings);
 
 foreach ($data['hosts_by_name'] as $hostname => $hostid) {
@@ -59,16 +54,7 @@ foreach ($data['hosts_by_name'] as $hostname => $hostid) {
 		}
 	}
 
-	if ($data['exceeded_trigs']) {
-		$row[] = new CCol();
-	}
-
 	$table->addRow($row);
-}
-
-if ($data['exceeded_hosts']) {
-	$table->addRow((new CCol('...'))
-		->setTitle(_('Some data is hidden.')));
 }
 
 echo $table;
