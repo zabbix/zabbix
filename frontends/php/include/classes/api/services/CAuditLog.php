@@ -243,10 +243,10 @@ class CAuditLog extends CApiService {
 	 * @return array
 	 */
 	protected function applyQueryFilterOptions($table, $alias, array $options, array $sql_parts): array {
-		$filter = is_array($options['filter'])
+		$filter = ($options['filter'] !== null)
 			? array_intersect_key($options['filter'], array_flip($this->details_fields))
 			: [];
-		$search = is_array($options['search'])
+		$search = ($options['search'] !== null)
 			? array_intersect_key($options['search'], array_flip(['oldvalue', 'newvalue']))
 			: [];
 
