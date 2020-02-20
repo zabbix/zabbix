@@ -76,6 +76,7 @@ else {
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groups_',
+									'with_hosts_and_templates' => 1,
 									'editable' => 1
 								]
 							]
@@ -93,6 +94,7 @@ else {
 									'srcfld1' => 'hostid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_hostids_',
+									'templated_hosts' => 1,
 									'editable' => 1
 								]
 							]
