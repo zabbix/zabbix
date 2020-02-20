@@ -146,6 +146,18 @@ session.localname = "";
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
+		dnl Check for free_etimelist() and clear_user_list()
+		AC_MSG_CHECKING(for free_etimelist() and clear_userlist())
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>]],
+		[[
+free_etimelist();
+clear_user_list();
+		]])],
+		[AC_MSG_RESULT(yes)],
+		[AC_MSG_ERROR(Not found Net-SNMP functions free_etimelist() and clear_user_list())])
+
 		CFLAGS="$_save_netsnmp_cflags"
 		LDFLAGS="$_save_netsnmp_ldflags"
 		LIBS="$_save_netsnmp_libs"
