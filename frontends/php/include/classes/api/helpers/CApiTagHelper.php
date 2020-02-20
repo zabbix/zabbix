@@ -113,7 +113,7 @@ class CApiTagHelper {
 			case TAG_OPERATOR_LIKE:
 				if ($filter_tag['tag'] === $host_tag['tag']
 						&& ($filter_tag['value'] === ''
-							|| mb_strpos($host_tag['value'], $filter_tag['value']))) {
+							|| mb_strpos($host_tag['value'], $filter_tag['value']) !== false)) {
 					return true;
 				}
 
