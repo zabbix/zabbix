@@ -143,12 +143,6 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	]));
 }
 
-if ($data['exceeded_hosts'] || $data['exceeded_trigs']) {
-	$widget->addItem((new CTableInfo())->setNoDataMessage(
-		_('Not possible to display all results, please provide more specific search criteria.'))
-	);
-}
-
 if ($data['view_style'] == STYLE_TOP) {
 	$table = new CPartial('trigoverview.table.top', $data);
 }

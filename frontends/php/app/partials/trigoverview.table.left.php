@@ -57,4 +57,12 @@ foreach ($data['hosts_by_name'] as $hostname => $hostid) {
 	$table->addRow($row);
 }
 
+if ($data['exceeded_hosts'] || $data['exceeded_trigs']) {
+	$table->setFooter([
+		(new CCol(_('Not all data shown.')))
+			->setColSpan($table->getNumCols())
+			->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
+	]);
+}
+
 echo $table;
