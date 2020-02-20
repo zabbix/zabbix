@@ -757,9 +757,11 @@ elseif (hasRequest('form')) {
 	// The empty inputs will not be shown if there are inherited macros, for example.
 	if (!$data['macros']) {
 		$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
+
 		if ($data['show_inherited_macros']) {
 			$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 		}
+
 		$data['macros'][] = $macro;
 	}
 

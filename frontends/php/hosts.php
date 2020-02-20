@@ -1198,9 +1198,11 @@ elseif (hasRequest('form')) {
 
 	if (!$data['macros'] && !$data['readonly']) {
 		$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
+
 		if ($data['show_inherited_macros']) {
 			$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 		}
+
 		$data['macros'][] = $macro;
 	}
 
