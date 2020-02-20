@@ -533,14 +533,11 @@ class CHost extends CHostGeneral {
 					];
 
 					while ($templateids) {
-						$templateids = array_keys($templateids);
-						$tags[$tag['tag']]['templateids'] = array_merge($tags[$tag['tag']]['templateids'],
-							$templateids
-						);
+						$tags[$tag['tag']]['templateids'] += $templateids;
 
 						$templateids = API::Template()->get([
 							'output' => [],
-							'parentTemplateids' => $templateids,
+							'parentTemplateids' => array_keys($templateids),
 							'preservekeys' => true,
 							'nopermissions' => true
 						]);
@@ -560,7 +557,7 @@ class CHost extends CHostGeneral {
 
 					$where[] = '('.
 						CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid').
-						' OR '.dbConditionInt('ht2.templateid', $_tag['templateids']).
+						' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids'])).
 					')';
 				}
 
