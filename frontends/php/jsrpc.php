@@ -140,6 +140,7 @@ switch ($data['method']) {
 					'real_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null,
 					'with_items' => array_key_exists('with_items', $data) ? $data['with_items'] : null,
 					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
+					'with_hosts_and_templates' => array_key_exists('with_hosts_and_templates', $data) ? $data['with_hosts_and_templates'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
 				];

@@ -186,7 +186,7 @@ class CMultiSelect extends CTag {
 					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes', 'with_items',
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
 					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items',
-					'with_httptests'
+					'with_httptests', 'with_hosts_and_templates'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -250,6 +250,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('templated_hosts', $parameters) && $parameters['templated_hosts']) {
 					$popup_parameters['templated_hosts'] = '1';
 					$autocomplete_parameters['templated_hosts'] = true;
+				}
+
+				if (array_key_exists('with_hosts_and_templates', $parameters) && $parameters['with_hosts_and_templates']) {
+					$popup_parameters['with_hosts_and_templates'] = '1';
+					$autocomplete_parameters['with_hosts_and_templates'] = true;
 				}
 
 				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',

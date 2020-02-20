@@ -406,6 +406,7 @@ class CControllerPopupGeneric extends CController {
 			'with_monitored_triggers' =>			'in 1',
 			'with_monitored_items' =>				'in 1',
 			'with_httptests' => 					'in 1',
+			'with_hosts_and_templates' =>			'in 1',
 			'with_webitems' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
@@ -549,7 +550,7 @@ class CControllerPopupGeneric extends CController {
 			$host_options['with_httptests'] = 1;
 		}
 
-		if ($this->source_table === 'hosts') {
+		if ($this->source_table === 'hosts' && !$this->hasInput('templated_hosts')) {
 			$group_options['real_hosts'] = 1;
 		}
 		elseif ($this->source_table === 'templates') {
@@ -924,6 +925,10 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->hasInput('with_httptests')) {
 					$options['with_httptests'] = 1;
+				}
+
+				if ($this->hasInput('with_hosts_and_templates')) {
+					$options['with_hosts_and_templates'] = 1;
 				}
 
 				if ($this->hasInput('with_items')) {
