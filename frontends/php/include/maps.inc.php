@@ -294,7 +294,7 @@ function addElementNames(array &$selements) {
  *
  * @return array
  */
-function getSelementInfo(array $i, ?int $show_unack): array {
+function getSelementInfo(array $i, ?int $show_unack = null): array {
 	if ($i['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE) {
 		return [
 			'iconid' => $i['iconid_off'],
