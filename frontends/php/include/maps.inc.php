@@ -592,12 +592,23 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 
 	// Get triggers data, triggers from current map and from submaps, select all.
 	if ($triggerIdToSelementIds || $subSysmapTriggerIdToSelementIds) {
+		$all_triggerid_to_selementids = [];
+
+		foreach ([$triggerIdToSelementIds, $subSysmapTriggerIdToSelementIds] as $triggerid_to_selementids) {
+			foreach ($triggerid_to_selementids as $triggerid => $selementid) {
+				if (!array_key_exists($triggerid, $all_triggerid_to_selementids)) {
+					$all_triggerid_to_selementids[$triggerid] = $selementid;
+				}
+				else {
+					$all_triggerid_to_selementids[$triggerid] += $selementid;
+				}
+			}
+		}
+
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'description', 'expression'],
 			'selectHosts' => ['hostid', 'maintenance_status'],
-			'triggerids' => zbx_array_merge(array_keys($triggerIdToSelementIds),
-				array_keys($subSysmapTriggerIdToSelementIds)
-			),
+			'triggerids' => array_keys($all_triggerid_to_selementids),
 			'filter' => ['state' => null],
 			'preservekeys' => true
 		]);
@@ -609,20 +620,14 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			'preservekeys' => true
 		]);
 
-		foreach ($triggers as $trigger) {
-			if (!array_key_exists($trigger['triggerid'], $monitored_triggers)) {
+		foreach ($triggers as $triggerid => $trigger) {
+			if (!array_key_exists($triggerid, $monitored_triggers)) {
 				$trigger['status'] = TRIGGER_STATUS_DISABLED;
 			}
 
-			if (array_key_exists($trigger['triggerid'], $triggerIdToSelementIds)) {
-				foreach ($triggerIdToSelementIds[$trigger['triggerid']] as $belongs_to_sel) {
-					$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
-				}
-			}
-
-			if (array_key_exists($trigger['triggerid'], $subSysmapTriggerIdToSelementIds)) {
-				foreach ($subSysmapTriggerIdToSelementIds[$trigger['triggerid']] as $belongs_to_sel) {
-					$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
+			if (array_key_exists($triggerid, $all_triggerid_to_selementids)) {
+				foreach ($all_triggerid_to_selementids[$triggerid] as $selementid) {
+					$selements[$selementid]['triggers'][$triggerid] = $trigger;
 				}
 			}
 		}
