@@ -140,13 +140,20 @@
 							.val(jQuery('#macros_' + macro_num + '_inherited_description').val())
 							.trigger('input');
 
-						jQuery('#macros_' + macro_num + '_type_btn')
-							.buttonDropdown('change', jQuery('#macros_' + macro_num + '_type_btn'), {value: macro_type,
-								class: (macro_type == <?= ZBX_MACRO_TYPE_SECRET ?>)
-									? '<?= ZBX_STYLE_ICON_SECRET_TEXT ?>'
-									: '<?= ZBX_STYLE_ICON_TEXT ?>'
-							});
-						jQuery('#macros_' + macro_num + '_type_btn')
+						const $dropdown_btn = jQuery('#macros_' + macro_num + '_type_btn');
+
+						$dropdown_btn
+							.removeClass()
+							.addClass(['btn-alt', 'btn-dropdown-toggle', (macro_type == <?= ZBX_MACRO_TYPE_SECRET ?>)
+								? '<?= ZBX_STYLE_ICON_SECRET_TEXT ?>'
+								: '<?= ZBX_STYLE_ICON_TEXT ?>'
+							].join(' '));
+
+						jQuery('input[type=hidden]', $dropdown_btn.parent())
+							.val(macro_type)
+							.trigger('change');
+
+						$dropdown_btn
 							.prop('disabled', true)
 							.attr({'aria-haspopup': false});
 
@@ -161,7 +168,7 @@
 
 						jQuery('#macros_' + macro_num + '_value_btn')
 							.prop('disabled', true)
-							.show();
+							// .show();
 						jQuery('#macros_' + macro_num + '_value')
 							.closest('.input-group')
 							.find('.btn-undo')

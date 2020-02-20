@@ -23,8 +23,6 @@
  * @var CView $this
  */
 
-
-$this->addJsFile('buttondropdown.js');
 $this->addJsFile('inputsecret.js');
 $this->addJsFile('textareaflexible.js');
 
