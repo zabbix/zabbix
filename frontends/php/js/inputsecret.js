@@ -41,7 +41,7 @@
 	}
 
 	var methods = {
-		init: function(options) {
+		init(options) {
 			var settings = $.extend({}, options);
 
 			return this.each(function() {

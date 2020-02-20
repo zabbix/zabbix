@@ -304,7 +304,7 @@
 	 *
 	 * @param {jQuery} $ms  jQuery object of multiselect.
 	 *
-	 * @returns {Array|getAddTemplates.templateids}
+	 * @returns {array|getAddTemplates.templateids}
 	 */
 	function getAddTemplates($ms) {
 		var templateids = [];
@@ -325,7 +325,7 @@
 	 *
 	 * @param {jQuery} $form  jQuery object for host edit form.
 	 *
-	 * @returns {Array}        List of all host macros in the form.
+	 * @returns {array}        List of all host macros in the form.
 	 */
 	function getMacros($form) {
 		var $macros = $form.find('input[name^="macros"], textarea[name^="macros"]'),
@@ -379,7 +379,7 @@
 				<?php if ($data['readonly']): ?>
 					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 				<?php else: ?>
-					initMacroTable($('#tbl_macros'), $show_inherited_macros.val() == 1);
+					initMacroTable($('#tbl_macros'), $('input[name="show_inherited_macros"]:checked').val() == 1);
 				<?php endif ?>
 
 				macros_initialized = true;

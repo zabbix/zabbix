@@ -7691,6 +7691,10 @@ table.preprocessing-test-results {
 
 		&.btn-change {
 			border-radius: 0;
+
+			&:disabled {
+				display: none;
+			}
 		}
 
 		&.btn-undo {
