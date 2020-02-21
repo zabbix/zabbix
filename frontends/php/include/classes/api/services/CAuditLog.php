@@ -101,9 +101,9 @@ class CAuditLog extends CApiService {
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'auditid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'clock' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'action' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $actions)],
-				'resourcetype' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $resourcetype)],
+				'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'action' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $actions)],
+				'resourcetype' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $resourcetype)],
 				'note' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'ip' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'resourceid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
