@@ -98,7 +98,7 @@
             throw 'field &quot;expire&quot; should be a number with value of at most 10800 if &quot;priority&quot; is set to 2';&#13;
         }&#13;
 &#13;
-        data.params = params.retry;&#13;
+        data.retry = params.retry;&#13;
         data.expire = params.expire;&#13;
     }&#13;
 &#13;
