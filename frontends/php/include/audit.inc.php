@@ -19,9 +19,9 @@
 **/
 
 
-function add_audit($action, $resourcetype, $details) {
-	if (mb_strlen($details) > 128) {
-		$details = mb_substr($details, 0, 125).'...';
+function add_audit($action, $resourcetype, $note) {
+	if (mb_strlen($note) > 128) {
+		$note = mb_substr($note, 0, 125).'...';
 	}
 
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
@@ -32,7 +32,7 @@ function add_audit($action, $resourcetype, $details) {
 		'ip' => substr($ip, 0, 39),
 		'action' => $action,
 		'resourcetype' => $resourcetype,
-		'details' => $details
+		'note' => $note
 	];
 
 	try {
@@ -110,7 +110,7 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 	}
 }
 
-function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $details = null, $userId = null) {
+function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $note = null, $userId = null) {
 	if ($userId === null) {
 		$userId = CWebUser::$data['userid'];
 	}
@@ -129,7 +129,7 @@ function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $
 		'resourcetype' => $resourcetype,
 		'resourceid' => $resourceid,
 		'resourcename' => $resourcename,
-		'details' => $details
+		'note' => $note
 	];
 	try {
 		DB::insert('auditlog', [$values]);
