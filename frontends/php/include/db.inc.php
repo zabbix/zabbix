@@ -598,10 +598,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 		$fieldSearch = [];
 		foreach ((array) $patterns as $pattern) {
-			if (zbx_empty($pattern)) {
-				continue;
-			}
-
 			// escaping parameter that is about to be used in LIKE statement
 			$pattern = str_replace("!", "!!", $pattern);
 			$pattern = str_replace("%", "!%", $pattern);
