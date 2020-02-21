@@ -480,7 +480,6 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, size_t *sql_offset)
 {
 	history_value_t	value_min, value_avg, value_max;
-	int		i;
 
 	value_min.dbl = atof(row[2]);
 	value_avg.dbl = atof(row[3]);
@@ -492,11 +491,8 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, siz
 	if (value_max.dbl > trend->value_max.dbl)
 		trend->value_max.dbl = value_max.dbl;
 
-	for (i = 0; i < num; i++)
-	{
-		trend->num++;
-		trend->value_avg.dbl += value_avg.dbl / trend->num - trend->value_avg.dbl / trend->num;
-	}
+	trend->value_avg.dbl = trend->value_avg.dbl / (trend->num + num) * trend->num +
+			value_avg.dbl / (trend->num + num) * num;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "update trends set"
 			" num=%d,value_min=" ZBX_FS_DBL64 ",value_avg=" ZBX_FS_DBL64 ",value_max=" ZBX_FS_DBL64
