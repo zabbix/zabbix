@@ -20,7 +20,6 @@
 #include "common.h"
 
 #include "zbxdb.h"
-#include "zbxregexp.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
@@ -346,6 +345,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
+	unsigned int mysql_tls_mode = SSL_MODE_PREFERRED;
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
 #else
@@ -356,10 +356,19 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	sword		err = OCI_SUCCESS;
 	static ub2	csid = 0;
 #elif defined(HAVE_POSTGRESQL)
+#	define PG_DB_PARAMS_COUNT	9
+#	define PG_TLS_PREFER		"prefer"
+#	define PG_TLS_REQUIRE		"require"
+#	define PG_TLS_VERIFY_CA		"verify-ca"
+#	define PG_TLS_VERIFY_FULL	"verify-full"
+
 	int		rc;
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
+	const char	*pg_keywords[PG_DB_PARAMS_COUNT + 1] = {NULL};
+	const char	*pg_values[PG_DB_PARAMS_COUNT + 1] = {NULL};
+	unsigned int	i = 0;
 #elif defined(HAVE_SQLITE3)
 	char		*p, *path = NULL;
 #endif
@@ -378,8 +387,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	txn_level = 0;
 
 #if defined(HAVE_MYSQL)
-	unsigned int mysql_tls_mode = SSL_MODE_PREFERRED;
-
 	ZBX_UNUSED(dbschema);
 
 	if (NULL == (conn = mysql_init(NULL)))
@@ -404,30 +411,44 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 
-	mysql_options(conn, MYSQL_OPT_SSL_MODE, &mysql_tls_mode);
-
-	if (NULL != tls_connect &&
-			(0 == strcmp("verify_ca", tls_connect) || 0 == strcmp("verify_full", tls_connect)) &&
-			NULL == ca)
+	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_SSL_MODE, &mysql_tls_mode))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "option \"DBTLSCAFile\" has to be set, if \"DBTLSConnect\" is set to "
-			"\"verify_ca\" or \"verify_full\"");
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MYSQL_OPT_SSL_MODE option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if ((NULL != cert || NULL != key) && (NULL == cert || NULL == key || NULL == ca))
+	if (ZBX_DB_OK == ret && NULL != ca && 0 != mysql_options(conn, MYSQL_OPT_SSL_CA, ca))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "if \"DBTLSKeyFile\" or \"DBTLSCertFile\" is set, all three of options"
-			"\"DBTLSKeyFile\", \"DBTLSCertFile\" and \"DBTLSCAFile\" has to be set");
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MYSQL_OPT_SSL_CA option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	mysql_options(conn, MYSQL_OPT_SSL_CA, ca);
-	mysql_options(conn, MYSQL_OPT_SSL_KEY, key);
-	mysql_options(conn, MYSQL_OPT_SSL_CERT, cert);
-	mysql_options(conn, MYSQL_OPT_SSL_CIPHER, cipher);
-#if LIBMYSQL_VERSION_ID >= 80016
-	mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13);
+	if (ZBX_DB_OK == ret && NULL != key && 0 != mysql_options(conn, MYSQL_OPT_SSL_KEY, key))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MYSQL_OPT_SSL_KEY option.");
+		ret = ZBX_DB_FAIL;
+	}
+
+	if (ZBX_DB_OK == ret && NULL != cert && 0 != mysql_options(conn, MYSQL_OPT_SSL_CERT, cert))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MYSQL_OPT_SSL_CERT option.");
+		ret = ZBX_DB_FAIL;
+	}
+
+	if (ZBX_DB_OK == ret && NULL != cipher && 0 != mysql_options(conn, MYSQL_OPT_SSL_CIPHER, cipher))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
+		ret = ZBX_DB_FAIL;
+	}
+
+#if LIBMYSQL_VERSION_ID >= 80016 && defined(MYSQL_OPT_TLS_CIPHERSUITES)
+	if (ZBX_DB_OK == ret && NULL != cipher_13 && 0 != mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MYSQL_OPT_TLS_CIPHERSUITES option.");
+		ret = ZBX_DB_FAIL;
+	}
+#else
+	ZBX_UNUSED(cipher_13);
 #endif
 
 	if (ZBX_DB_OK == ret &&
@@ -465,14 +486,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error())
 		ret = ZBX_DB_DOWN;
-
 #elif defined(HAVE_ORACLE)
 	ZBX_UNUSED(dbschema);
-	ZBX_UNUSED(tlsmode);
+	ZBX_UNUSED(tls_connect);
 	ZBX_UNUSED(cert);
 	ZBX_UNUSED(key);
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
+	ZBX_UNUSED(cipher_13);
 
 	memset(&oracle, 0, sizeof(oracle));
 
@@ -571,27 +592,56 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	zbx_free(connect);
 #elif defined(HAVE_POSTGRESQL)
-#	define PG_DB_PARAMS_COUNT	9
-#	define PG_TLS_PREFER		"prefer"
-#	define PG_TLS_REQUIRE		"require"
-#	define PG_TLS_VERIFY_CA		"verify-ca"
-#	define PG_TLS_VERIFY_FULL	"verify-full"
-
-	const char	*pg_keywords[PG_DB_PARAMS_COUNT + 1] = {NULL};
-	const char	*pg_values[PG_DB_PARAMS_COUNT + 1] = {NULL};
-	unsigned int	i = 0;
-
 	if (0 != port)
 		cport = zbx_dsprintf(cport, "%d", port);
 
-	pg_keywords[i] = "host";	pg_values[i++] = host;
-	pg_keywords[i] = "port";	pg_values[i++] = cport;
-	pg_keywords[i] = "dbname";	pg_values[i++] = dbname;
-	pg_keywords[i] = "user";	pg_values[i++] = user;
-	pg_keywords[i] = "password";	pg_values[i++] = password;
-	pg_keywords[i] = "sslcert";	pg_values[i++] = cert;
-	pg_keywords[i] = "sslkey";	pg_values[i++] = key;
-	pg_keywords[i] = "sslrootcert";	pg_values[i++] = ca;
+	if (NULL != host)
+	{
+		pg_keywords[i] = "host";
+		pg_values[i++] = host;
+	}
+
+	if (NULL != cport)
+	{
+		pg_keywords[i] = "port";
+		pg_values[i++] = cport;
+	}
+
+	if (NULL != dbname)
+	{
+		pg_keywords[i] = "dbname";
+		pg_values[i++] = dbname;
+	}
+
+	if (NULL != user)
+	{
+		pg_keywords[i] = "user";
+		pg_values[i++] = user;
+	}
+
+	if (NULL != password)
+	{
+		pg_keywords[i] = "password";
+		pg_values[i++] = password;
+	}
+
+	if (NULL != cert)
+	{
+		pg_keywords[i] = "sslcert";
+		pg_values[i++] = cert;
+	}
+
+	if (NULL != key)
+	{
+		pg_keywords[i] = "sslkey";
+		pg_values[i++] = key;
+	}
+
+	if (NULL != ca)
+	{
+		pg_keywords[i] = "sslrootcert";
+		pg_values[i++] = ca;
+	}
 
 	pg_keywords[i] = "sslmode";
 	if (NULL == tls_connect)
@@ -608,32 +658,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		ret = ZBX_DB_FAIL;
 		zabbix_log(LOG_LEVEL_ERR, "unknown \"DBTLSConnect\" value: %s", tls_connect);
-		goto out;
-	}
-
-	if (NULL != tls_connect &&
-			(0 == strcmp("verify_ca", tls_connect) || 0 == strcmp("verify_full", tls_connect)) &&
-			NULL == ca)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "option \"DBTLSCAFile\" has to be set, if \"DBTLSConnect\" is set to "
-			"\"verify_ca\" or \"verify_full\"");
-		ret = ZBX_DB_FAIL;
-		goto out;
-	}
-
-	if ((NULL != cert || NULL != key) && (NULL == cert || NULL == key || NULL == ca))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "if \"DBTLSKeyFile\" or \"DBTLSCertFile\" is set, all three of "
-			"\"DBTLSKeyFile\", \"DBTLSCertFile\" and \"DBTLSCAFile\" has to be set");
-		ret = ZBX_DB_FAIL;
-		goto out;
-	}
-
-	if (NULL != cipher)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "setting option \"DBTLSCipher\" is not supported for PostgreSQL. "
-			"Unset this option to connect to PostgreSQL");
-		ret = ZBX_DB_FAIL;
 		goto out;
 	}
 
@@ -708,11 +732,12 @@ zbx_free(cport);
 	ZBX_UNUSED(password);
 	ZBX_UNUSED(dbschema);
 	ZBX_UNUSED(port);
-	ZBX_UNUSED(tlsmode);
+	ZBX_UNUSED(tls_connect);
 	ZBX_UNUSED(cert);
 	ZBX_UNUSED(key);
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
+	ZBX_UNUSED(cipher_13);
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
