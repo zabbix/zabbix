@@ -53,6 +53,7 @@ type connManager struct {
 	keepAlive   time.Duration
 	timeout     time.Duration
 	controlSink chan interface{}
+	log         log.Logger
 }
 
 func (c *connManager) stop() {
@@ -73,6 +74,7 @@ func (p *Plugin) NewConnManager(keepAlive, timeout time.Duration) *connManager {
 		keepAlive:   keepAlive,
 		timeout:     timeout,
 		controlSink: make(chan interface{}),
+		log:         p,
 	}
 
 	// Repeatedly check for unused connections and close them
@@ -107,19 +109,19 @@ func (c *connManager) create(connString string) (conn *postgresConn, err error) 
 	//get conn pool using url created in postgres.go
 	config, err := pgxpool.ParseConfig(connString)
 	if err != nil {
-		log.Errf("[%s] cannot parse config file: %s", connString, err.Error())
+		c.log.Errf("[%s] cannot parse config file: %s", connString, err.Error())
 		return nil, errorCannotParsePostgresURL
 	}
 
 	newConn, err := pgxpool.ConnectConfig(context.Background(), config)
 	if err != nil {
-		log.Errf("[%s] cannot connect to Postgres using connect string: %s", connString, err.Error())
+		c.log.Errf("[%s] cannot connect to Postgres using connect string: %s", connString, err.Error())
 		return nil, errorCannotConnectPostgres
 	}
 
 	versionPG, err := GetPostgresVersion(newConn)
 	if err != nil {
-		log.Errf("[%s] cannot get Postgres version: %s", connString, err.Error())
+		c.log.Errf("[%s] cannot get Postgres version: %s", connString, err.Error())
 		return nil, errorCannotGetPostgresVersion
 	}
 
@@ -129,14 +131,14 @@ func (c *connManager) create(connString string) (conn *postgresConn, err error) 
 	}
 
 	if version < 90000 {
-		log.Errf("[%s] current PG version is not supported : %s", versionPG, errorUnsupportePostgresVersion)
+		c.log.Errf("[%s] current PG version is not supported : %s", versionPG, errorUnsupportePostgresVersion)
 		return nil, errorUnsupportePostgresVersion
 	}
 
 	// save new conn under URL string
 	c.connections[connString] = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: versionPG}
 
-	log.Debugf("[%s] Created new connection: %s", pluginName, connString)
+	c.log.Debugf("[%s] Created new connection: %s", pluginName, connString)
 
 	return c.connections[connString], nil
 }
@@ -164,7 +166,7 @@ func (c *connManager) closeUnused() (err error) {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
 			conn.postgresPool.Close()
 			delete(c.connections, connString)
-			log.Debugf("[%s] Closed unused connection: %s", pluginName, connString)
+			c.log.Debugf("[%s] Closed unused connection: %s", pluginName, connString)
 		}
 	}
 	// Return the last error only
