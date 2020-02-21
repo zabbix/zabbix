@@ -48,20 +48,20 @@ class CControllerAuditLogList extends CController {
 
 	protected function doAction(): void {
 		if ($this->getInput('filter_set', 0)) {
-			CProfile::update('web.auditlogs.filter.alias', $this->getInput('alias', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.auditlogs.filter.action', $this->getInput('auditlog_action', -1), PROFILE_TYPE_INT);
-			CProfile::update('web.auditlogs.filter.resourcetype', $this->getInput('resourcetype', -1),
+			CProfile::update('web.auditlog.filter.alias', $this->getInput('alias', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.auditlog.filter.action', $this->getInput('auditlog_action', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.auditlog.filter.resourcetype', $this->getInput('resourcetype', -1),
 				PROFILE_TYPE_INT
 			);
 		}
 		elseif ($this->getInput('filter_rst', 0)) {
-			CProfile::delete('web.auditlogs.filter.alias');
-			CProfile::delete('web.auditlogs.filter.action');
-			CProfile::delete('web.auditlogs.filter.resourcetype');
+			CProfile::delete('web.auditlog.filter.alias');
+			CProfile::delete('web.auditlog.filter.action');
+			CProfile::delete('web.auditlog.filter.resourcetype');
 		}
 
 		$timeselector_options = [
-			'profileIdx' => 'web.auditlogs.filter',
+			'profileIdx' => 'web.auditlog.filter',
 			'profileIdx2' => 0,
 			'from' => null,
 			'to' => null
@@ -71,15 +71,15 @@ class CControllerAuditLogList extends CController {
 
 		$data = [
 			'page' => 1,
-			'alias' => CProfile::get('web.auditlogs.filter.alias', ''),
-			'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
-			'auditlog_action' => CProfile::get('web.auditlogs.filter.action', -1),
+			'alias' => CProfile::get('web.auditlog.filter.alias', ''),
+			'resourcetype' => CProfile::get('web.auditlog.filter.resourcetype', -1),
+			'auditlog_action' => CProfile::get('web.auditlog.filter.action', -1),
 			'action' => $this->getAction(),
 			'actions' => $this->getActionsList(),
 			'resources' => $this->getResourcesList(),
 			'timeline' => getTimeSelectorPeriod($timeselector_options),
 			'auditlogs' => [],
-			'active_tab' => CProfile::get('web.auditlogs.filter.active', 1)
+			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
 		];
 		$this->getInputs($data, ['user_alias', 'resourcetype', 'auditlog_action', 'page']);
 		$users = [];
