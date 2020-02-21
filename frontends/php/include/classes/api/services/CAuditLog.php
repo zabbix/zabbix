@@ -245,13 +245,13 @@ class CAuditLog extends CApiService {
 	protected function applyQueryFilterOptions($table, $alias, array $options, array $sql_parts): array {
 		$filter = ($options['filter'] !== null)
 			? array_intersect_key($options['filter'], array_flip($this->details_fields))
-			: [];
+			: null;
 		$search = ($options['search'] !== null)
 			? array_intersect_key($options['search'], array_flip(['oldvalue', 'newvalue']))
-			: [];
+			: null;
 
 		if ($filter || $search) {
-			$details_options = compact('filter', 'search') + $options;
+			$details_options = ['filter' => $filter, 'search' => $search] + $options;
 			$sql_parts['where']['aad'] = 'a.auditid=ad.auditid';
 			$sql_parts['from']['auditlog_details'] = 'auditlog_details ad';
 			$sql_parts = parent::applyQueryFilterOptions('auditlog_details', 'ad', $details_options, $sql_parts);
