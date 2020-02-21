@@ -578,8 +578,8 @@ class CHost extends CHostGeneral {
 		}
 
 		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
+		if (!zbx_ctype_digit($options['limit']) || !$options['limit']) {
+			$options['limit'] = null;
 		}
 
 		$sqlParts = $this->applyQueryFilterOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
