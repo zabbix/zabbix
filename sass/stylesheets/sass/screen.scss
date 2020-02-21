@@ -7870,6 +7870,10 @@ table.preprocessing-test-results {
 	}
 }
 
+.checkbox-block {
+	display: none;
+}
+
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 
 	/* for IE11 only. Fixed cell height if table has 100% height */

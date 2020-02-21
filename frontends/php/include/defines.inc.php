@@ -1347,6 +1347,7 @@ define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 define('ZBX_ACTION_ADD',		0);
 define('ZBX_ACTION_REPLACE',	1);
 define('ZBX_ACTION_REMOVE',		2);
+define('ZBX_ACTION_REMOVE_ALL', 3);
 
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
@@ -1807,6 +1808,8 @@ define('ZBX_STYLE_INPUT_GROUP', 'input-group');
 
 define('ZBX_STYLE_ICON_TEXT', 'icon-text');
 define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
+
+define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

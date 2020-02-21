@@ -648,6 +648,7 @@ if (hasRequest('templates') && (getRequest('action') === 'template.massupdatefor
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
 		'tags' => $tags,
+		'macros' => $macros,
 		'description' => getRequest('description'),
 		'linked_templates' => getRequest('linked_templates', [])
 	];
@@ -665,6 +666,14 @@ if (hasRequest('templates') && (getRequest('action') === 'template.massupdatefor
 			'output' => ['templateid', 'name'],
 			'templateids' => $data['linked_templates']
 		]), ['templateid' => 'id'])
+		: [];
+
+	$data['groups'] = $data['groups']
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $data['groups'],
+			'editable' => true
+		]), ['groupid' => 'id'])
 		: [];
 
 	$view = new CView('configuration.template.massupdate', $data);

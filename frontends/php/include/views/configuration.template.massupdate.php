@@ -43,14 +43,6 @@ foreach ($data['templates'] as $templateid) {
  */
 $template_form_list = new CFormList('template-form-list');
 
-$groups_to_update = $data['groups']
-	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $data['groups'],
-		'editable' => true
-	]), ['groupid' => 'id'])
-	: [];
-
 $template_form_list
 	->addRow(
 		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
@@ -68,7 +60,7 @@ $template_form_list
 				'name' => 'groups[]',
 				'object_name' => 'hostGroup',
 				'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
-				'data' => $groups_to_update,
+				'data' => $data['groups'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'host_groups',
@@ -164,6 +156,13 @@ $tabs = (new CTabView())
 	->addTab('template_tab', _('Template'), $template_form_list)
 	->addTab('linked_templates_tab', _('Linked templates'), $linked_templates_form_list)
 	->addTab('tags_tab', _('Tags'), $tags_form_list);
+
+// Macros.
+$tabs->addTab('macros_tab', _('Macros'), new CPartial('massupdate.macros.tab', [
+	'source' => 'template',
+	'visible' => $data['visible'],
+	'macros' => $data['macros']
+]));
 
 // Reset tabs when opening the form for the first time.
 if (!hasRequest('masssave')) {
