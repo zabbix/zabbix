@@ -28,8 +28,6 @@ $table = (new CTable())
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 	->setHeader([_('Macro'), _('Value'), _('Description')]);
 
-$data['macros'] = [['macro' => '', 'type' => 0, 'value' => '', 'description' => '']];
-
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 		->addClass('macro')
@@ -71,20 +69,20 @@ $table->setFooter(new CCol(
 		->addClass('element-table-add')
 ));
 
-$checkbox_add = (new CDiv((new CCheckBox('add_checkbox'))->setLabel(_('Update existing'))))
+$checkbox_add = (new CDiv((new CCheckBox('macros_add'))->setLabel(_('Update existing'))))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_ADD)
 	->addStyle('display: block;');
 
-$checkbox_update = (new CDiv((new CCheckBox('update_checkbox'))->setLabel(_('Add missing'))))
+$checkbox_update = (new CDiv((new CCheckBox('macros_update'))->setLabel(_('Add missing'))))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_REPLACE);
 
-$checkbox_remove = (new CDiv((new CCheckBox('remove_checkbox'))->setLabel(_('Except selected'))))
+$checkbox_remove = (new CDiv((new CCheckBox('macros_remove'))->setLabel(_('Except selected'))))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_REMOVE);
 
-$checkbox_remove_all = (new CDiv((new CCheckBox('remove_all_checkbox'))->setLabel(_('I confirm to remove all macros'))))
+$checkbox_remove_all = (new CDiv((new CCheckBox('macros_remove_all'))->setLabel(_('I confirm to remove all macros'))))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_REMOVE_ALL);
 

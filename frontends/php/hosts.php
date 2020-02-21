@@ -63,6 +63,15 @@ $fields = [
 									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 									null
 								],
+	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'mass_update_macros' => 	[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+									null
+								],
+	'macros_add' =>				[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros_update' =>			[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros_remove' =>			[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros_remove_all' =>		[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'add_templates' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'templates_rem' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
@@ -371,6 +380,15 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			$tags = array_values($unique_tags);
 		}
 
+		if (array_key_exists('macros', $visible)) {
+			$mass_update_macros = getRequest('mass_update_macros', ZBX_ACTION_ADD);
+
+			if ($mass_update_macros == ZBX_ACTION_ADD || $mass_update_macros == ZBX_ACTION_REPLACE
+					|| $mass_update_macros == ZBX_ACTION_REMOVE) {
+				$options['selectMacros'] = ['macro', 'value', 'type', 'description'];
+			}
+		}
+
 		$hosts = API::Host()->get($options);
 
 		if (array_key_exists('groups', $visible)) {
@@ -534,6 +552,85 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 					$host['tags'] = $diff_tags;
 				}
 			}
+
+			if (array_key_exists('macros', $visible)) {
+				switch ($mass_update_macros) {
+					case ZBX_ACTION_ADD:
+						if ($macros) {
+							$update_existing = getRequest('macros_add', 0);
+
+							$new_macros = array_values($host['macros']);
+
+							foreach ($macros as $macro) {
+								foreach ($new_macros as &$host_macro) {
+									if ($macro['macro'] === $host_macro['macro']) {
+										if ($update_existing) {
+											$host_macro = $macro;
+										}
+
+										continue 2;
+									}
+								}
+								unset($host_macro);
+
+								$new_macros[] = $macro;
+							}
+
+							$host['macros'] = $new_macros;
+						}
+						break;
+
+					case ZBX_ACTION_REPLACE:
+						if ($macros) {
+							$add_missing = getRequest('macros_update', 0);
+
+							$new_macros = array_values($host['macros']);
+
+							foreach ($macros as $macro) {
+								foreach ($new_macros as &$host_macro) {
+									if ($macro['macro'] === $host_macro['macro']) {
+										$host_macro = $macro;
+
+										continue 2;
+									}
+								}
+								unset($host_macro);
+
+								if ($add_missing) {
+									$new_macros[] = $macro;
+								}
+							}
+
+							$host['macros'] = $new_macros;
+						}
+						break;
+
+					case ZBX_ACTION_REMOVE:
+						if ($macros && $host['macros']) {
+							$except_selected = getRequest('macros_remove', 0);
+
+							$macros = array_column($macros, 'macro');
+
+							foreach ($host['macros'] as $key => $value) {
+								if (($except_selected && !in_array($value['macro'], $macros))
+										|| (!$except_selected && in_array($value['macro'], $macros))) {
+									unset($host['macros'][$key]);
+								}
+							}
+						}
+						break;
+
+					case ZBX_ACTION_REMOVE_ALL:
+						if (!getRequest('macros_remove_all', 0)) {
+							show_error_message(_('Please confirm your action.'));
+							throw new Exception();
+						}
+
+						$host['macros'] = [];
+						break;
+				}
+			}
+
 
 			unset($host['parentTemplates']);
 
@@ -909,6 +1006,7 @@ if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || ha
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
 		'tags' => $tags,
+		'macros' => $macros,
 		'status' => getRequest('status', HOST_STATUS_MONITORED),
 		'description' => getRequest('description'),
 		'proxy_hostid' => getRequest('proxy_hostid', ''),
@@ -950,6 +1048,10 @@ if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || ha
 			'templateids' => $data['templates']
 		]), ['templateid' => 'id'])
 		: [];
+
+	if (!$data['macros']) {
+		$data['macros'] = [['macro' => '', 'type' => ZBX_MACRO_TYPE_TEXT, 'value' => '', 'description' => '']];
+	}
 
 	$hostView = new CView('configuration.host.massupdate', $data);
 }

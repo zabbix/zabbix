@@ -304,6 +304,12 @@ $hostTab = (new CTabView())
 	->addTab('templatesTab', _('Templates'), $templatesFormList)
 	->addTab('ipmiTab', _('IPMI'), $ipmiFormList)
 	->addTab('tagsTab', _('Tags'), $tags_form_list)
+	->addTab('macros_tab', _('Macros'), new CPartial('massupdate.macros.tab', [
+		'source' => 'host',
+		'visible' => $data['visible'],
+		'macros' => $data['macros']
+	]))
+
 	->addTab('inventoryTab', _('Inventory'), $inventoryFormList)
 	->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
