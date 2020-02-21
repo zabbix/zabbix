@@ -108,33 +108,6 @@ static int	DBpatch_4050012(void)
 	return DBmodify_field_type("users", &field, NULL);
 }
 
-static int	DBpatch_4050013(void)
-{
-	int		i;
-	const char	*values[] = {
-			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
-			"web.usergrps.php.sort", "web.usergroup.sort",
-			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
-			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
-			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
-			"web.latest.php.sort", "web.latest.sort",
-			"web.latest.php.sortorder", "web.latest.sortorder",
-			"web.paging.lastpage", "web.pager.entity",
-			"web.paging.page", "web.pager.page"
-		};
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	for (i = 0; i < (int)ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static int	DBpatch_4050014(void)
 {
 	DB_ROW		row;
@@ -604,23 +577,56 @@ static int	DBpatch_4050035(void)
 	return DBadd_foreign_key("task_result", 1, &field);
 }
 
-static int DBpatch_4050036(void)
+static int	DBpatch_4050036(void)
 {
 	const ZBX_FIELD	field = {"note", "0", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBrename_field("auditlog", "details", &field);
 }
 
-static int DBpatch_4050037(void)
+static int	DBpatch_4050037(void)
 {
 	const ZBX_FIELD	field = {"note", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("auditlog", &field);
 }
 
-static int DBpatch_4050038(void)
+static int	DBpatch_4050038(void)
 {
 	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
+}
+
+static int	DBpatch_4050039(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
+			"web.usergrps.php.sort", "web.usergroup.sort",
+			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
+			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
+			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
+			"web.latest.php.sort", "web.latest.sort",
+			"web.latest.php.sortorder", "web.latest.sortorder",
+			"web.paging.lastpage", "web.pager.entity",
+			"web.paging.page", "web.pager.page",
+			"web.auditlogs.filter.active", "web.auditlog.filter.active",
+			"web.auditlogs.filter.action", "web.auditlog.filter.action",
+			"web.auditlogs.filter.alias", "web.auditlog.filter.alias",
+			"web.auditlogs.filter.resourcetype", "web.auditlog.filter.resourcetype",
+			"web.auditlogs.filter.from", "web.auditlog.filter.from",
+			"web.auditlogs.filter.to", "web.auditlog.filter.to"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 #endif
@@ -638,7 +644,6 @@ DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
 DBPATCH_ADD(4050011, 0, 1)
 DBPATCH_ADD(4050012, 0, 1)
-DBPATCH_ADD(4050013, 0, 1)
 DBPATCH_ADD(4050014, 0, 1)
 DBPATCH_ADD(4050015, 0, 1)
 DBPATCH_ADD(4050016, 0, 1)
@@ -663,6 +668,6 @@ DBPATCH_ADD(4050035, 0, 1)
 DBPATCH_ADD(4050036, 0, 1)
 DBPATCH_ADD(4050037, 0, 1)
 DBPATCH_ADD(4050038, 0, 1)
-
+DBPATCH_ADD(4050039, 0, 1)
 
 DBPATCH_END()
