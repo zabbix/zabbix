@@ -1666,10 +1666,10 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		$data['theme'] = getUserTheme(CWebUser::$data);
 
 		if (detect_page_type() == PAGE_TYPE_JS) {
-			(new CView('layout.json', ['main_block' => json_encode(['error' => $data['header']])]))->render();
+			echo (new CView('layout.json', ['main_block' => json_encode(['error' => $data['header']])]))->getOutput();
 		}
 		else {
-			(new CView('general.warning', $data))->render();
+			echo (new CView('general.warning', $data))->getOutput();
 		}
 		exit;
 	}
@@ -1847,15 +1847,6 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 						? ['R' => 255, 'G' => 55, 'B' => 55]
 						: ['R' => 155, 'G' => 155, 'B' => 55]
 				];
-			}
-			break;
-		case PAGE_TYPE_XML:
-			if ($title !== null) {
-				echo htmlspecialchars($title)."\n";
-			}
-
-			foreach ($messages as $message) {
-				echo '['.$message['type'].'] '.$message['message']."\n";
 			}
 			break;
 		case PAGE_TYPE_HTML:

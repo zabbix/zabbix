@@ -97,27 +97,29 @@ var graphs = {
 };
 
 function cloneRow(elementid, count) {
-	if (typeof(cloneRow.count) == 'undefined') {
+	if (typeof(cloneRow.count) === 'undefined') {
 		cloneRow.count = count;
 	}
 	cloneRow.count++;
 
-	var tpl = new Template($(elementid).cloneNode(true).wrap('div').innerHTML);
+	var element = $('#' + elementid),
+		tpl = new Template($('<div>').append(element.clone(true)).html()),
+		entry = jQuery(tpl.evaluate({'id' : cloneRow.count}));
 
-	var emptyEntry = tpl.evaluate({'id' : cloneRow.count});
-
-	var newEntry = $(elementid).insert({'before' : emptyEntry}).previousSibling;
-
-	$(newEntry).descendants().each(function(e) {
-		e.removeAttribute('disabled');
+	entry.find('*').each(function() {
+		jQuery(this).removeAttr('disabled');
 	});
-	newEntry.setAttribute('id', 'entry_' + cloneRow.count);
-	newEntry.style.display = '';
+
+	entry.attr('id', 'entry_' + cloneRow.count);
+	entry[0].style.display = '';
+	entry.insertBefore(element.parent().children(':last-child'));
 }
 
 function testUserSound(idx) {
-	var sound = $(idx).options[$(idx).selectedIndex].value;
-	var repeat = $('messages_sounds.repeat').options[$('messages_sounds.repeat').selectedIndex].value;
+	var element = document.getElementById(idx);
+	var sound = element.options[element.selectedIndex].value;
+	element = document.getElementById('messages_sounds.repeat');
+	var repeat = element.options[element.selectedIndex].value;
 
 	if (repeat == 1) {
 		AudioControl.playOnce(sound);
@@ -126,7 +128,7 @@ function testUserSound(idx) {
 		AudioControl.playLoop(sound, repeat);
 	}
 	else {
-		AudioControl.playLoop(sound, $('messages_timeout').value);
+		AudioControl.playLoop(sound, document.getElementById('messages_timeout').value);
 	}
 }
 
@@ -663,7 +665,7 @@ function parseUrlString(url) {
 				pair.push('');
 
 				try {
-					if (/%[01]/.match(pair[0]) || /%[01]/.match(pair[1]) ) {
+					if (pair[0].match(/%[01]/) || pair[1].match(/%[01]/)) {
 						// Non-printable characters in URL.
 						throw null;
 					}

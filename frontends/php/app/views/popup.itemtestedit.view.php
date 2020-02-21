@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm())
 	->cleanItems()
 	->setId('preprocessing-test-form');
@@ -261,7 +265,7 @@ $templates = [
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.itemtestedit.view.js.php',
+	'script_inline' => $this->readJsFile('popup.itemtestedit.view.js.php'),
 	'body' => (new CDiv([$form, $templates]))->toString(),
 	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [

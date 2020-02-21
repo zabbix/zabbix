@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Actions'));
@@ -508,4 +512,4 @@ $actionForm->addItem($action_tabs);
 // Append form to widget.
 $widget->addItem($actionForm);
 
-return $widget;
+$widget->show();

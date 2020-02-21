@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
 	'header' => $data['name'],
 	'body' => make_status_of_zbx()->toString()

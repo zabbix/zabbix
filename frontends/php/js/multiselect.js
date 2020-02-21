@@ -338,12 +338,6 @@ jQuery(function($) {
 				return false;
 			});
 
-			if (IE) {
-				ms.values.available_div.on('mousedown', function() {
-					ms.values.available_false_click = true;
-				});
-			}
-
 			$obj.data('multiSelect', ms);
 
 			$obj.wrap($('<div>', {

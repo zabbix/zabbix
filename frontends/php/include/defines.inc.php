@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.0alpha2');
+define('ZABBIX_VERSION',		'5.0.0beta1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		4050035);
@@ -140,15 +140,12 @@ define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
-define('PAGE_TYPE_XML',					2);
 define('PAGE_TYPE_JS',					3); // javascript
 define('PAGE_TYPE_CSS',					4);
 define('PAGE_TYPE_HTML_BLOCK',			5); // simple block of html (as text)
 define('PAGE_TYPE_JSON',				6); // simple JSON
 define('PAGE_TYPE_JSON_RPC',			7); // api call
-define('PAGE_TYPE_TEXT_FILE',			8); // api call
 define('PAGE_TYPE_TEXT',				9); // simple text
-define('PAGE_TYPE_CSV',					10); // CSV format
 define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
 define('ZBX_SESSION_ACTIVE',	0);
@@ -1524,7 +1521,7 @@ define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 define('ZBX_STYLE_BOTTOM', 'bottom');
 define('ZBX_STYLE_BROWSER_LOGO_CHROME', 'browser-logo-chrome');
 define('ZBX_STYLE_BROWSER_LOGO_FF', 'browser-logo-ff');
-define('ZBX_STYLE_BROWSER_LOGO_IE', 'browser-logo-ie');
+define('ZBX_STYLE_BROWSER_LOGO_ED', 'browser-logo-ed');
 define('ZBX_STYLE_BROWSER_LOGO_OPERA', 'browser-logo-opera');
 define('ZBX_STYLE_BROWSER_LOGO_SAFARI', 'browser-logo-safari');
 define('ZBX_STYLE_BROWSER_WARNING_CONTAINER', 'browser-warning-container');
