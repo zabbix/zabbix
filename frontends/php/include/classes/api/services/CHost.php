@@ -2383,14 +2383,25 @@ class CHost extends CHostGeneral {
 				return [];
 			}
 
+			// Keys are the trigger ids, that have problems.
+			$problem_triggers = array_flip(array_column($problems, 'objectid'));
+
+			// Hostids, with triggerids on them.
+			$host_triggers = [];
+			foreach ($triggers as $triggerid => $trigger) {
+				foreach ($trigger['hosts'] as $trigger_host) {
+					$host_triggers[$trigger_host['hostid']][$triggerid] = true;
+				}
+			}
+
 			foreach ($hosts as $key => $host) {
 				$problems_found = false;
 
-				foreach ($problems as $problem) {
-					foreach ($triggers[$problem['objectid']]['hosts'] as $trigger_host) {
-						if (bccomp($trigger_host['hostid'], $host['hostid']) == 0) {
+				if (array_key_exists($host['hostid'], $host_triggers)) {
+					foreach (array_keys($host_triggers[$host['hostid']]) as $host_trigger) {
+						if (array_key_exists($host_trigger, $problem_triggers)) {
 							$problems_found = true;
-							break 2;
+							break;
 						}
 					}
 				}
