@@ -588,16 +588,25 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 	$search = [];
 	foreach ($options['search'] as $field => $patterns) {
-		if (!isset($tableSchema['fields'][$field]) || zbx_empty($patterns)) {
+		if (!isset($tableSchema['fields'][$field]) || $patterns === null) {
 			continue;
 		}
+
+		$patterns = array_filter((array)$patterns, function($pattern) {
+			return ($pattern !== '');
+		});
+
+		if (!$patterns) {
+			continue;
+		}
+
 		if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR
 			&& $tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_TEXT) {
 			continue;
 		}
 
 		$fieldSearch = [];
-		foreach ((array) $patterns as $pattern) {
+		foreach ($patterns as $pattern) {
 			// escaping parameter that is about to be used in LIKE statement
 			$pattern = str_replace("!", "!!", $pattern);
 			$pattern = str_replace("%", "!%", $pattern);
