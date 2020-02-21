@@ -33,32 +33,7 @@
 					->setAttribute('placeholder', '{$MACRO}')
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				(new CDiv([
-					(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
-						->setAttribute('placeholder', _('value')),
-					new CButtonDropdown(
-						'macros[#{rowNum}][type]',
-						ZBX_MACRO_TYPE_TEXT,
-						[
-							'title' => json_encode(_('Change type')),
-							'active_class' => ZBX_STYLE_ICON_TEXT,
-							'items' => [
-								[
-									'value' => ZBX_MACRO_TYPE_TEXT,
-									'label' => _('Text'),
-									'class' => ZBX_STYLE_ICON_TEXT
-								],
-								[
-									'value' => ZBX_MACRO_TYPE_SECRET,
-									'label' => _('Secret text'),
-									'class' => ZBX_STYLE_ICON_SECRET_TEXT
-								]
-							]
-						]
-					)
-				]))
-					->addClass(ZBX_STYLE_INPUT_GROUP)
-					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				new CMacroValue(['type' => ZBX_MACRO_TYPE_TEXT, 'value' => ''], 'macros[#{rowNum}]', ['add_post_js' => false])
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
@@ -98,51 +73,69 @@
 	}
 
 	jQuery(document.getElementById('tbl_macros'))
-		.dynamicRows({
-			template: '#macro-row-tmpl'
-		})
+		.dynamicRows({template: '#macro-row-tmpl'})
 		.on('click', 'button.element-table-add', function() {
 			initMacroFields(jQuery(document.getElementById('tbl_macros')));
 		});
 
+	// TODO: add additional macro helper events.
 
-	// Macro views.
-	(() => {
-		const elem = document.querySelector('#mass_update_macros');
+	class MassUpdateMacros {
 
-		elem.addEventListener('click', (event) => {
+		constructor() {
+			const elem = document.querySelectorAll('[name=mass_update_macros]');
+
+			[...elem].map((el) => el.addEventListener('click', this.controlEvent.bind(this)));
+		}
+
+		controlEvent() {
+			const elem = document.querySelector('#mass_update_macros');
 			const value = elem.querySelector('input:checked').value;
+			const macro_table = document.querySelector('#tbl_macros');
+			const custom_style = document.querySelector('style#macros-massupdate-remove');
 
-			document.querySelector('#tbl_macros').style.display = 'table';
-			[...document.querySelectorAll('#tbl_macros td, #tbl_macros th')].map((el) => {
-				el.style.display = 'table-cell';
-			});
+			macro_table.style.display = 'table';
 
+			if (custom_style) {
+				custom_style.remove();
+			}
 
-			// Hide all checkbox.
-			[...document.querySelectorAll('.<?= ZBX_STYLE_CHECKBOX_BLOCK ?>')].map((el) => {
-				el.style.display = 'none';
-			});
+			this.showCheckboxBlock(value);
 
-			// Show proper checkbox.
-			document.querySelector('[data-type=\'' + value + '\']').style.display = 'block';
-
+			// Hide value and description cell from table.
 			if (value == <?= ZBX_ACTION_REMOVE ?>) {
-				// Hide all table cells.
-				[...document.querySelectorAll('#tbl_macros td, #tbl_macros th')].map((el) => {
-					el.style.display = 'none';
-				});
-
-				// Show only "Macro" cells.
-				[...document.querySelectorAll('#tbl_macros td:nth-child(1), #tbl_macros th:nth-child(1), #tbl_macros td.nowrap')].map((el) => {
-					el.style.display = 'table-cell';
-				});
+				this.createStyleRule();
 			}
 
 			// Hide macros table.
 			if (value == <?= ZBX_ACTION_REMOVE_ALL ?>) {
 				document.querySelector('#tbl_macros').style.display = 'none';
 			}
-		});
-	})();
+		}
+
+		showCheckboxBlock(type) {
+			// Hide all checkbox.
+			[...document.querySelectorAll('.<?= ZBX_STYLE_CHECKBOX_BLOCK ?>')].map((el) => {
+				el.style.display = 'none';
+			});
+
+			// Show proper checkbox.
+			document.querySelector('[data-type=\'' + type + '\']').style.display = 'block';
+		}
+
+		createStyleRule() {
+			const style = document.createElement('style');
+			style.id = 'macros-massupdate-remove';
+			style.innerHTML = `#tbl_macros td, #tbl_macros th {
+					display: none;
+				}
+				#tbl_macros td:nth-child(1), #tbl_macros th:nth-child(1), #tbl_macros td.nowrap {
+					display: table-cell;
+				}`;
+
+			document.body.append(style);
+		}
+	}
+
+	new MassUpdateMacros();
 </script>

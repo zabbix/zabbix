@@ -41,33 +41,7 @@ foreach ($data['macros'] as $i => $macro) {
 	}
 
 	// Macro value input group.
-	$value_input_group = (new CDiv())
-		->addClass(ZBX_STYLE_INPUT_GROUP)
-		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);
-
-	$value_input = ($macro['type'] == ZBX_MACRO_TYPE_TEXT)
-		? (new CTextAreaFlexible('macros['.$i.'][value]', CMacrosResolverGeneral::getMacroValue($macro)))
-			->setAttribute('placeholder', _('value'))
-		: (new CInputSecret('macros['.$i.'][value]', ZBX_MACRO_SECRET_MASK, _('value')));
-
-	$dropdown_options = [
-		'title' => _('Change type'),
-		'active_class' => ($macro['type'] == ZBX_MACRO_TYPE_TEXT) ? ZBX_STYLE_ICON_TEXT : ZBX_STYLE_ICON_SECRET_TEXT,
-		'items' => [
-			['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_STYLE_ICON_TEXT],
-			['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_SECRET_TEXT]
-		]
-	];
-
-	$value_input_group->addItem([
-		$value_input,
-		($macro['type'] == ZBX_MACRO_TYPE_SECRET)
-			? (new CButton(null))
-				->setAttribute('title', _('Revert changes'))
-			->addClass(ZBX_STYLE_BTN_ALT . ' ' . ZBX_STYLE_BTN_UNDO)
-			: null,
-		new CButtonDropdown('macros['.$i.'][type]', $macro['type'], $dropdown_options)
-	]);
+	$macro_value = new CMacroValue($macro, 'macros['.$i.']');
 
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -85,7 +59,7 @@ foreach ($data['macros'] as $i => $macro) {
 
 	$table->addRow([
 		(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($value_input_group))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
@@ -97,20 +71,20 @@ $table->setFooter(new CCol(
 		->addClass('element-table-add')
 ));
 
-$checkbox_add = (new CDiv((new CCheckBox('add_checkbox'))->setLabel('Update existing')))
+$checkbox_add = (new CDiv((new CCheckBox('add_checkbox'))->setLabel(_('Update existing'))))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_ADD)
 	->addStyle('display: block;');
 
-$checkbox_update = (new CDiv((new CCheckBox('add_checkbox'))->setLabel('Add missing')))
+$checkbox_update = (new CDiv((new CCheckBox('update_checkbox'))->setLabel(_('Add missing'))))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_REPLACE);
 
-$checkbox_remove = (new CDiv((new CCheckBox('add_checkbox'))->setLabel('Except selected')))
+$checkbox_remove = (new CDiv((new CCheckBox('remove_checkbox'))->setLabel(_('Except selected'))))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_REMOVE);
 
-$checkbox_remove_all = (new CDiv((new CCheckBox('add_checkbox'))->setLabel('I confirm to remove all macros')))
+$checkbox_remove_all = (new CDiv((new CCheckBox('remove_all_checkbox'))->setLabel(_('I confirm to remove all macros'))))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_REMOVE_ALL);
 

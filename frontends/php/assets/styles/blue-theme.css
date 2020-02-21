@@ -5191,7 +5191,8 @@ table.preprocessing-test-results .rel-container {
       background: url(../img/icon-sprite.svg) no-repeat -604px -503px; }
 
 .checkbox-block {
-  display: none; }
+  display: none;
+  margin: 10px 0; }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
   /* for IE11 only. Fixed cell height if table has 100% height */

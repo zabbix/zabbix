@@ -1802,11 +1802,11 @@ define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 // Widget "Problems by severity" styles.
 define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
 
+define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
+
 // Icons.
 define('ZBX_STYLE_ICON_TEXT', 'icon-text');
 define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
-
-define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
