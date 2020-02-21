@@ -1,3 +1,5 @@
+// +build postgres_tests
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -28,7 +30,7 @@ import (
 
 func TestPlugin_transactionHandler(t *testing.T) {
 	// create pool or aquare conn from old pool
-	sharedPool, err := NewConnPool(t)
+	sharedPool, err := newConnPool(t)
 	if err != nil {
 		t.Fatal(err)
 	}

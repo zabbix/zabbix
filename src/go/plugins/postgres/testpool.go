@@ -22,49 +22,24 @@
 package postgres
 
 import (
-	"fmt"
+	"context"
 	"testing"
+	"time"
 
-	"zabbix.com/pkg/plugin"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-func TestPlugin_archiveHandler(t *testing.T) {
-	sharedPool, err := newConnPool(t)
-	if err != nil {
-		t.Fatal(err)
-	}
+var sharedConn *postgresConn
 
-	impl.Configure(&plugin.GlobalOptions{}, nil)
+func newConnPool(t testing.TB) (*postgresConn, error) {
 
-	type args struct {
-		conn   *postgresConn
-		params []string
+	if sharedConn == nil {
+		newConn, err := pgxpool.Connect(context.Background(), "postgresql://postgres:postgres@localhost:5433/postgres")
+		if err != nil {
+			return nil, err
+		}
+		// FIXME: for different PG versions
+		sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: "100006"}
 	}
-	tests := []struct {
-		name    string
-		p       *Plugin
-		args    args
-		wantErr bool
-	}{
-		{
-			fmt.Sprintf("archiveHandler should return json with data if OK "),
-			&impl,
-			args{conn: sharedPool},
-			false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			got, err := tt.p.archiveHandler(tt.args.conn, tt.args.params)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.archiveHandler() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-			if len(got.(string)) == 0 {
-				t.Errorf("Plugin.archiveHandler() = %v", got)
-			}
-		})
-	}
+	return sharedConn, nil
 }

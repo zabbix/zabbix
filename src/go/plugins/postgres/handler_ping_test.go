@@ -1,3 +1,5 @@
+// +build postgres_tests
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -20,36 +22,17 @@
 package postgres
 
 import (
-	"context"
 	"fmt"
 	"reflect"
 	"testing"
-	"time"
 
-	"github.com/jackc/pgx/v4/pgxpool"
 	"zabbix.com/pkg/plugin"
 )
-
-var sharedConn *postgresConn
-var fakeConn *postgresConn
-
-func NewConnPool(t testing.TB) (*postgresConn, error) {
-
-	if sharedConn == nil {
-		newConn, err := pgxpool.Connect(context.Background(), "postgresql://postgres:postgres@localhost:5433/postgres")
-		if err != nil {
-			return nil, err
-		}
-		// FIXME: for different PG versions
-		sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: "100006"}
-	}
-	return sharedConn, nil
-}
 
 func TestPlugin_pingHandler(t *testing.T) {
 	var pingOK int64 = 1
 	// create pool or aquare conn from old pool for test
-	sharedPool, err := NewConnPool(t)
+	sharedPool, err := newConnPool(t)
 	if err != nil {
 		t.Fatal(err)
 	}

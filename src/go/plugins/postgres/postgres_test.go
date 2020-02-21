@@ -1,3 +1,5 @@
+// +build postgres_tests
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -38,6 +40,7 @@ func TestPlugin_Export(t *testing.T) {
 	}
 	var pingOK int64 = 1
 	impl.Configure(&plugin.GlobalOptions{}, nil)
+	impl.Start()
 
 	tests := []struct {
 		name       string
@@ -90,4 +93,5 @@ func TestPlugin_Export(t *testing.T) {
 			}
 		})
 	}
+	impl.Stop()
 }

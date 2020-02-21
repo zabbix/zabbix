@@ -62,8 +62,18 @@ func CheckMetric(metric string, suppressPrinting bool) (err error) {
 		conf.Configure(GlobalOptions(&Options), Options.Plugins[acc.Name()])
 	}
 
-	var u interface{}
-	if u, err = exporter.Export(key, params, nil); err != nil {
+	var runner plugin.Runner
+	if runner, ok = acc.(plugin.Runner); ok {
+		runner.Start()
+	}
+
+	u, err := exporter.Export(key, params, nil)
+
+	if runner != nil {
+		runner.Stop()
+	}
+
+	if err != nil {
 		return
 	}
 
