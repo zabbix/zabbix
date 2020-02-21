@@ -288,7 +288,7 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 
 const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 {
-	static ZBX_THREAD_LOCAL char	buffer[ZBX_MAX_UINT64_LEN + 1];
+	static ZBX_THREAD_LOCAL char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 	zbx_uint32_t			size, i, len;
 
 	switch (value->type)

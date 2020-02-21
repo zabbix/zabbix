@@ -118,7 +118,7 @@ static history_value_t	history_str2value(char *str, unsigned char value_type)
 
 static const char	*history_value2str(const ZBX_DC_HISTORY *h)
 {
-	static char	buffer[MAX_ID_LEN + 1];
+	static char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
 	switch (h->value_type)
 	{
