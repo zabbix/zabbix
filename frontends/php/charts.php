@@ -41,7 +41,6 @@ $fields = [
 	'filter_search_type'    => [T_ZBX_INT,        O_OPT, P_SYS, IN('"'.ZBX_SEARCH_TYPE_STRICT.'", "'.ZBX_SEARCH_TYPE_PATTERN.'"'), null],
 	'filter_hostids'        => [T_ZBX_INT,        O_OPT, null,  DB_ID,                                                             null],
 	'filter_graphids'       => [T_ZBX_INT,        O_OPT, null,  DB_ID,                                                             null],
-	'filter_graph_patterns' => [T_ZBX_STR,        O_OPT, null,  null,                                                              null]
 ];
 check_fields($fields);
 

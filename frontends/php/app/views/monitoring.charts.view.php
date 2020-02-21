@@ -19,30 +19,14 @@
 **/
 
 
-// spoofs
-$data = [
-	'search_type' => ZBX_SEARCH_TYPE_STRICT,
-	/* 'search_type' => ZBX_SEARCH_TYPE_PATTERN, */
-
-	'graphids' => [910],
-	'graphids' => [910, 39964, 39963],
-
-	'action' => HISTORY_GRAPH,
-	/* 'action' => HISTORY_VALUES, */
-] + $data;
-
 /**
  * @var CView $this
  */
 
-
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.calendar.js');
-
 $this->addJsFile('gtlc.js');
-$this->addJsFile('flickerfreescreen.js');
-/* 'gtlc.js', 'flickerfreescreen.js' */
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -65,7 +49,7 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem($data['search_type'] == ZBX_SEARCH_TYPE_STRICT && count($data['graphids']) == 1
+			->addItem($data['filter_search_type'] == ZBX_SEARCH_TYPE_STRICT && count($data['graphids']) == 1
 				? get_icon('favourite', [
 					'fav' => 'web.favorite.graphids',
 					'elname' => 'graphid',
@@ -77,7 +61,7 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	]));
 
-$filter = (new CFilter(new CUrl('zabbix.php')))
+$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'charts.view')))
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 	->setActiveTab($data['active_tab'])
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
@@ -90,7 +74,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		(new CFormList())
 			->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
 				(new CMultiSelect([
-					'multiple' => true,
+					'multiple' => false,
 					'name' => 'filter_hostids[]',
 					'object_name' => 'host',
 					'data' => $data['ms_hosts'],
@@ -107,16 +91,16 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			)
 			->addRow((new CLabel(_('Search type'), 'waa')),
-				(new CRadioButtonList('search_type', $data['search_type']))
+				(new CRadioButtonList('filter_search_type', $data['filter_search_type']))
 					->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT, null,
 						'$("#ms_graph_patterns").addClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
 						'$("#ms_graphids").removeClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
-						'$("#filter_graphids_, #filter_graph_pattern_").multiSelect("clean")'
+						'$("#filter_graphids_, #filter_graph_patterns_").multiSelect("clean")'
 					)
 					->addValue(_('Pattern'), ZBX_SEARCH_TYPE_PATTERN, null,
 						'$("#ms_graph_patterns").removeClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
 						'$("#ms_graphids").addClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
-						'$("#filter_graphids_, #filter_graph_pattern_").multiSelect("clean")'
+						'$("#filter_graphids_, #filter_graph_patterns_").multiSelect("clean")'
 					)
 					->setModern(true)
 			)
@@ -138,13 +122,13 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					]
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 				'ms_graphids',
-				($data['search_type'] == ZBX_SEARCH_TYPE_STRICT) ? '' : ZBX_STYLE_DISPLAY_NONE
+				($data['filter_search_type'] == ZBX_SEARCH_TYPE_STRICT) ? '' : ZBX_STYLE_DISPLAY_NONE
 			)
 			->addRow(
 				(new CLabel(_('Graphs'), 'filter_graph_patterns__ms')),
 				(new CPatternSelect([
 					'placeholder' => _('graph pattern'),
-					'name' => 'filter_graph_pattern[]',
+					'name' => 'filter_graph_patterns[]',
 					'object_name' => 'graphs',
 					'data' => $data['ms_graph_patterns'],
 					'popup' => [
@@ -152,21 +136,24 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 							'srctbl' => 'graphs',
 							'srcfld1' => 'graphid',
 							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_graph_pattern_',
+							'dstfld1' => 'filter_graph_patterns_',
 							/* 'templated' => false */
 						]
 					],
 					'add_post_js' => true
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 				'ms_graph_patterns',
-				($data['search_type'] == ZBX_SEARCH_TYPE_STRICT) ? ZBX_STYLE_DISPLAY_NONE : ''
+				($data['filter_search_type'] == ZBX_SEARCH_TYPE_STRICT) ? ZBX_STYLE_DISPLAY_NONE : ''
 			)
 	]);
 }
 
 $widget->addItem($filter);
 
-if ($data['graphids']) {
+if ($data['must_specify_host']) {
+	$widget->addItem((new CTableInfo())->setNoDataMessage(_('Specify host to see the graphs.')));
+}
+else if ($data['charts']) {
 	$table = (new CTable())
 		->setAttribute('style', 'width: 100%;');
 
@@ -194,26 +181,22 @@ if ($data['graphids']) {
 		$table->addRow($screen->get());
 	}
 	else {
-		foreach ($data['graphids'] as $graphid) {
-			$screen = CScreenBuilder::getScreen([
-				'resourcetype' => SCREEN_RESOURCE_CHART,
-				'graphid' => $graphid,
-				'profileIdx' => $data['timeline']['profileIdx'],
-				'profileIdx2' => $data['timeline']['profileIdx2']
-			]);
-			CScreenBuilder::insertScreenStandardJs($screen->timeline);
+		$table->setId('charts');
 
-			$table->addRow($screen->get());
-		}
+		$this->includeJsFile('monitoring.charts.view.js.php', [
+			'charts' => $data['charts'],
+			'timeline' => $data['timeline'],
+			'config' => [
+				'refresh_interval' => (int) CWebUser::getRefresh(),
+				'refresh_list' => $data['filter_search_type'] == ZBX_SEARCH_TYPE_PATTERN,
+				'filter_graph_patterns' => $data['filter_graph_patterns']
+			]
+		]);
 	}
 
 	$widget->addItem($table);
-
 }
 else {
-	$screen = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs($screen->timeline);
-
 	$widget->addItem(new CTableInfo());
 }
 

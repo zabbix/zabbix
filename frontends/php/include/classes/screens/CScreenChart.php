@@ -47,8 +47,8 @@ class CScreenChart extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$this->dataId = 'graph_full';
-		$containerId = 'graph_container';
+		$this->dataId = 'graph_full'.$this->graphid;
+		$containerId = 'graph_container'.$this->graphid;
 
 		// time control
 		$graphDims = getGraphDims($this->graphid);

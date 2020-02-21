@@ -62,6 +62,7 @@ class CRouter {
 		'autoreg.edit'					=> ['CControllerAutoregEdit',						'layout.htmlpage',		'administration.autoreg.edit'],
 		'autoreg.update'				=> ['CControllerAutoregUpdate',						null,					null],
 		'charts.view'					=> ['CControllerChartsView',						'layout.htmlpage',		'monitoring.charts.view'],
+		'charts.view.json'				=> ['CControllerChartsViewJson',					'layout.json',			'monitoring.charts.view.json'],
 		'dashboard.delete'				=> ['CControllerDashboardDelete',					null,					null],
 		'dashboard.list'				=> ['CControllerDashboardList',						'layout.htmlpage',		'monitoring.dashboard.list'],
 		'dashboard.properties.check'	=> ['CControllerDashboardPropertiesCheck',			'layout.json',			null],
