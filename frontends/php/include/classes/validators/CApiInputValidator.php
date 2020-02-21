@@ -437,7 +437,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if ((!is_int($data) && !is_string($data)) || preg_match('/^\-?[0-9]+$/', strval($data)) !== 1) {
+		if ((!is_int($data) && !is_string($data)) || !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an integer is expected'));
 			return false;
 		}
@@ -564,7 +564,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (is_int($data) || (is_string($data) && preg_match('/^-?[0-9]*\.?[0-9]+([eE][+-]?[0-9]+)?$/', $data) === 1)) {
+		if (is_int($data) || (is_string($data) && preg_match('/^'.ZBX_PREG_NUMBER.'$/', $data))) {
 			$data = (float) $data;
 		}
 		elseif (!is_float($data)) {
@@ -1170,6 +1170,7 @@ class CApiInputValidator {
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
 			return false;
 		}
 
@@ -1177,22 +1178,32 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$pattern = '/^(-?)0*(0|[1-9][0-9]*)(\.?[0-9]+)?(['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.'])?$/';
+		$number_parser = new CNumberParser();
 
-		if (preg_match($pattern, strval($data)) !== 1) {
+		if ($number_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+
 			return false;
 		}
 
-		$value = convertFunctionValue($data, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+		$value = $number_parser->calcValue();
+		$value_abs = $value[0] === '-' ? substr($value, 1) : $value;
 
-		if (bccomp($value, ZBX_MIN_INT64) < 0 || bccomp($value, ZBX_MAX_INT64) > 0) {
+		if (bccomp($value_abs, numberToDecimal(FLOAT64_MIN_ABS), FLOAT64_SCALE) < 0
+				&& bccomp($value_abs, '0', FLOAT64_SCALE) > 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too small'));
+
+			return false;
+		}
+
+		if (bccomp($value_abs, numberToDecimal(FLOAT64_MAX_ABS), FLOAT64_SCALE) > 0) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+
 			return false;
 		}
 
-		// Trim leading zeroes.
-		$data = preg_replace($pattern, '${1}${2}${3}${4}', (string) $data);
+		// Remove leading zeros.
+		$data = preg_replace('/^(-)?(0+)?(\d.*)$/', '${1}${3}', $data);
 
 		return true;
 	}

@@ -494,7 +494,7 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateNumSuffix($param) {
-		return preg_match('/^(\-?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)$/', $param);
+		return ((new CNumberParser())->parse($param) == CParser::PARSE_SUCCESS);
 	}
 
 	/**
@@ -530,7 +530,7 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validatePercent($param) {
-		return (preg_match('/^\d*(\.\d{0,4})?$/', $param) && $param !== '.' && $param <= 100);
+		return (preg_match('/^\d+(\.\d{1,4})?$/', $param) && $param <= 100);
 	}
 
 	/**

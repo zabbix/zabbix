@@ -23,8 +23,27 @@ function unset_request($key) {
 	unset($_GET[$key], $_POST[$key], $_REQUEST[$key]);
 }
 
-function BETWEEN($min, $max, $var = null) {
+/**
+ * Validation expression for min/max number range.
+ *
+ * @param int $min
+ * @param int $max
+ * @param string $var
+ */
+function BETWEEN($min, $max, $var = '') {
 	return '({'.$var.'}>='.$min.'&&{'.$var.'}<='.$max.')&&';
+}
+
+/**
+ * Validation expression for min/max range as well as max number of digits after the decimal point.
+ *
+ * @param int $min
+ * @param int $max
+ * @param int $scale
+ * @param string $var
+ */
+function BETWEEN_DBL($min, $max, $scale, $var = '') {
+	return BETWEEN($min, $max, $var).'(round({'.$var.'},'.$scale.')=={'.$var.'})&&';
 }
 
 function IN($array, $var = '') {
@@ -143,28 +162,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_DBL) {
-		$decimalValidator = new CDecimalValidator([
-			'maxPrecision' => 16,
-			'maxScale' => 4,
-			'messageInvalid' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
-			'messagePrecision' => _(
-				'Value "%2$s" of "%1$s" is too long: it cannot have more than %3$s digits before the decimal point '.
-				'and more than %4$s digits after the decimal point.'
-			),
-			'messageNatural' => _(
-				'Value "%2$s" of "%1$s" has too many digits before the decimal point: '.
-				'it cannot have more than %3$s digits.'
-			),
-			'messageScale' => _(
-				'Value "%2$s" of "%1$s" has too many digits after the decimal point: '.
-				'it cannot have more than %3$s digits.'
-			)
-		]);
-		$decimalValidator->setObjectName($caption);
-
-		if (!$decimalValidator->validate($var)) {
+		if ((new CNumberParser())->parse($var) != CParser::PARSE_SUCCESS) {
 			$error = true;
-			$message = $decimalValidator->getError();
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is expected'));
 		}
 	}
 	elseif ($type == T_ZBX_STR) {
@@ -303,10 +303,19 @@ function check_field(&$fields, &$field, $checks) {
 			info(_s('Incorrect value for field "%1$s": %2$s.', $caption, _('cannot be empty')));
 		}
 
-		// check for BETWEEN() function pattern and extract numbers e.g. ({}>=0&&{}<=999)&&
-		elseif (preg_match('/\(\{\}\>=([0-9]*)\&\&\{\}\<=([0-9]*)\)\&\&/', $validation, $result)) {
-			info(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-				$_REQUEST[$field], $caption, $result[1], $result[2]));
+		// Check for BETWEEN() or BETWEEN_SCALE function pattern and extract min, max and scale numbers.
+		elseif (preg_match('/\(\{\}>=(?<min>\d+)&&\{\}<=(?<max>\d+)\)&&(\(round\(\{\},(?<scale>\d+)\)==\{\}\)&&)?/',
+				$validation, $matches)) {
+			if (array_key_exists('scale', $matches)) {
+				info(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point.',
+					$_REQUEST[$field], $caption, $matches['min'], $matches['max'], $matches['scale']
+				));
+			}
+			else {
+				info(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+					$_REQUEST[$field], $caption, $result[1], $result[2]
+				));
+			}
 		}
 		elseif (is_scalar($_REQUEST[$field])) {
 			info(_s('Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));

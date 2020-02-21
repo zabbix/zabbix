@@ -1336,7 +1336,7 @@ class CConfigurationExportBuilder {
 
 			// Sort selements by position asc.
 			if ($link['selementpos2'] < $link['selementpos1']) {
-				zbx_swap($link['selementpos1'], $link['selementpos2']);
+				[$link['selementpos1'], $link['selementpos2']] = [$link['selementpos2'], $link['selementpos1']];
 			}
 		}
 		unset($link);

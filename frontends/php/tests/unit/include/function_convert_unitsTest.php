@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../../include/translateDefines.inc.php';
 
-class function_convert_units extends PHPUnit_Framework_TestCase {
+class function_convertUnits extends PHPUnit_Framework_TestCase {
 	protected $defaultTimezone;
 
 	public function setUp() {
@@ -126,7 +126,7 @@ class function_convert_units extends PHPUnit_Framework_TestCase {
 	 * @dataProvider provider
 	 */
 	public function test($in, $out) {
-		$result = call_user_func('convert_units', $in);
+		$result = call_user_func('convertUnits', $in);
 
 		$this->assertSame($out, $result);
 	}

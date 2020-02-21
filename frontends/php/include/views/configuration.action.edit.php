@@ -225,7 +225,7 @@ if ($data['action']['operations']) {
 			$esc_delay_txt = ($delays[$operation['esc_step_from']] === null)
 				? _('Unknown')
 				: ($delays[$operation['esc_step_from']] != 0
-					? convert_units(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
+					? convertUnits(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
 					: _('Immediately')
 				);
 

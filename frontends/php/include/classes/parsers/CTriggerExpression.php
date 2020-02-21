@@ -56,14 +56,16 @@ class CTriggerExpression {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'lldmacros' => true        Enable low-level discovery macros usage in trigger expression.
-	 *   'allow_func_only' => true  Allow trigger expression without host:key pair, i.e. {func(param)}.
+	 *   'lldmacros' => true              Enable low-level discovery macros usage in trigger expression.
+	 *   'allow_func_only' => false       Allow trigger expression without host:key pair, i.e. {func(param)}.
+	 *   'calc_constant_values' => false  Include calculated constant values in the result (i.e., "10K" => 10240).
 	 *
 	 * @var array
 	 */
 	public $options = [
 		'lldmacros' => true,
-		'allow_func_only' => false
+		'allow_func_only' => false,
+		'calc_constant_values' => false
 	];
 
 	/**
@@ -151,6 +153,13 @@ class CTriggerExpression {
 	protected $user_macro_parser;
 
 	/**
+	 * Parser for numbers with optional time or byte suffix.
+	 *
+	 * @var CNumberParser
+	 */
+	protected $number_parser;
+
+	/**
 	 * Chars that should be treated as spaces.
 	 *
 	 * @var array
@@ -174,6 +183,7 @@ class CTriggerExpression {
 		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->lld_macro_function_parser = new CLLDMacroFunctionParser;
 		$this->user_macro_parser = new CUserMacroParser();
+		$this->number_parser = new CNumberParser();
 	}
 
 	/**
@@ -235,6 +245,7 @@ class CTriggerExpression {
 								$char, $this->pos, 1
 							);
 							break;
+
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
@@ -242,6 +253,7 @@ class CTriggerExpression {
 							);
 							$level++;
 							break;
+
 						default:
 							if ($this->parseUsing($this->notOperatorParser,
 									CTriggerExprParserResult::TOKEN_TYPE_OPERATOR)) {
@@ -254,8 +266,8 @@ class CTriggerExpression {
 								break 3;
 							}
 					}
-
 					break;
+
 				case self::STATE_AFTER_BINARY_OPERATOR:
 					switch ($char) {
 						case '-':
@@ -264,6 +276,7 @@ class CTriggerExpression {
 								$char, $this->pos, 1
 							);
 							break;
+
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
@@ -271,6 +284,7 @@ class CTriggerExpression {
 							);
 							$level++;
 							break;
+
 						default:
 							if ($this->parseConstant()) {
 								$state = self::STATE_AFTER_CONSTANT;
@@ -283,15 +297,14 @@ class CTriggerExpression {
 
 							if ($this->parseUsing($this->notOperatorParser,
 									CTriggerExprParserResult::TOKEN_TYPE_OPERATOR)) {
-
 								$state = self::STATE_AFTER_NOT_OPERATOR;
 							}
 							else {
 								break 3;
 							}
 					}
-
 					break;
+
 				case self::STATE_AFTER_LOGICAL_OPERATOR:
 					switch ($char) {
 						case '-':
@@ -303,6 +316,7 @@ class CTriggerExpression {
 							);
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
 							break;
+
 						case '(':
 							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
 								$char, $this->pos, 1
@@ -310,6 +324,7 @@ class CTriggerExpression {
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
+
 						default:
 							if (!$afterSpace) {
 								break 3;
@@ -317,7 +332,6 @@ class CTriggerExpression {
 
 							if ($this->parseUsing($this->notOperatorParser,
 									CTriggerExprParserResult::TOKEN_TYPE_OPERATOR)) {
-
 								$state = self::STATE_AFTER_NOT_OPERATOR;
 							}
 							elseif ($this->parseConstant()) {
@@ -327,8 +341,8 @@ class CTriggerExpression {
 								break 3;
 							}
 					}
-
 					break;
+
 				case self::STATE_AFTER_CLOSE_BRACE:
 					switch ($char) {
 						case ')':
@@ -340,17 +354,16 @@ class CTriggerExpression {
 							);
 							$level--;
 							break;
+
 						default:
 							if ($this->parseUsing($this->binaryOperatorParser,
 									CTriggerExprParserResult::TOKEN_TYPE_OPERATOR)) {
-
 								$state = self::STATE_AFTER_BINARY_OPERATOR;
 								break;
 							}
 
 							if ($this->parseUsing($this->logicalOperatorParser,
 									CTriggerExprParserResult::TOKEN_TYPE_OPERATOR)) {
-
 								$state = self::STATE_AFTER_LOGICAL_OPERATOR;
 								break;
 							}
@@ -358,8 +371,8 @@ class CTriggerExpression {
 								break 3;
 							}
 					}
-
 					break;
+
 				case self::STATE_AFTER_CONSTANT:
 					switch ($char) {
 						case ')':
@@ -372,10 +385,10 @@ class CTriggerExpression {
 							$level--;
 							$state = self::STATE_AFTER_CLOSE_BRACE;
 							break;
+
 						default:
 							if ($this->parseUsing($this->binaryOperatorParser,
 									CTriggerExprParserResult::TOKEN_TYPE_OPERATOR)) {
-
 								$state = self::STATE_AFTER_BINARY_OPERATOR;
 								break;
 							}
@@ -386,15 +399,14 @@ class CTriggerExpression {
 
 							if ($this->parseUsing($this->logicalOperatorParser,
 									CTriggerExprParserResult::TOKEN_TYPE_OPERATOR)) {
-
 								$state = self::STATE_AFTER_LOGICAL_OPERATOR;
 							}
 							else {
 								break 3;
 							}
 					}
-
 					break;
+
 				case self::STATE_AFTER_NOT_OPERATOR:
 					switch ($char) {
 						case '-':
@@ -406,6 +418,7 @@ class CTriggerExpression {
 							);
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
 							break;
+
 						case '(':
 							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
 								$char, $this->pos, 1
@@ -413,6 +426,7 @@ class CTriggerExpression {
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
+
 						default:
 							if (!$afterSpace) {
 								break 3;
@@ -425,8 +439,8 @@ class CTriggerExpression {
 								break 3;
 							}
 					}
-
 					break;
+
 				case self::STATE_AFTER_MINUS_OPERATOR:
 					switch ($char) {
 						case '(':
@@ -436,6 +450,7 @@ class CTriggerExpression {
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
+
 						default:
 							if ($this->parseConstant()) {
 								$state = self::STATE_AFTER_CONSTANT;
@@ -444,7 +459,6 @@ class CTriggerExpression {
 								break 3;
 							}
 					}
-
 					break;
 			}
 
@@ -459,7 +473,6 @@ class CTriggerExpression {
 
 		if ($level != 0 || isset($this->expression[$this->pos])
 				|| ($state != self::STATE_AFTER_CLOSE_BRACE && $state != self::STATE_AFTER_CONSTANT)) {
-
 			$this->error = _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".',
 					substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1));
 			$this->isValid = false;
@@ -655,54 +668,30 @@ class CTriggerExpression {
 	 * Parses a number constant in the trigger expression and
 	 * moves a current position ($this->pos) on a last symbol of the number
 	 *
-	 * comments: !!! Don't forget sync code with C !!!
-	 *
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseNumber() {
-		$j = $this->pos;
-		$digits = 0;
-		$dots = 0;
-
-		while (isset($this->expression[$j])) {
-			if ($this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
-				$digits++;
-				$j++;
-				continue;
-			}
-
-			if ($this->expression[$j] === '.') {
-				$dots++;
-				$j++;
-				continue;
-			}
-
-			break;
-		}
-
-		if ($digits == 0 || $dots > 1) {
+		if ($this->number_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
 			return false;
 		}
 
-		// check for an optional suffix
-		$suffix = null;
-		if (isset($this->expression[$j])
-				&& strpos(ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES, $this->expression[$j]) !== false) {
-			$suffix = $this->expression[$j];
-			$j++;
-		}
+		$token_data = [
+			'suffix' => $this->number_parser->getSuffix()
+		];
 
-		$numberLength = $j - $this->pos;
+		if ($this->options['calc_constant_values']) {
+			$token_data['calc_value'] = $this->number_parser->calcValue();
+		}
 
 		$this->result->addToken(
 			CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
-			substr($this->expression, $this->pos, $numberLength),
+			$this->number_parser->getMatch(),
 			$this->pos,
-			$numberLength,
-			['suffix' => $suffix]
+			$this->number_parser->getLength(),
+			$token_data
 		);
 
-		$this->pos = $j - 1;
+		$this->pos += $this->number_parser->getLength() - 1;
 
 		return true;
 	}

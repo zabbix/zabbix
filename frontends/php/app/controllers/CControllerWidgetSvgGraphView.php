@@ -55,6 +55,12 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$initial_load = $this->getInput('initial_load', 1);
 		$script_inline = '';
 
+		$parser = new CNumberParser();
+		$lefty_min = $parser->parse($fields['lefty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
+		$lefty_max = $parser->parse($fields['lefty_max']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
+		$righty_min = $parser->parse($fields['righty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
+		$righty_max = $parser->parse($fields['righty_max']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
+
 		$graph_data = [
 			'data_sets' => array_values($fields['ds']),
 			'data_source' => $fields['source'],
@@ -65,24 +71,16 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			],
 			'left_y_axis' => [
 				'show' => $fields['lefty'],
-				'min' => ($fields['lefty_min'] !== '')
-					? convertFunctionValue($fields['lefty_min'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
-					: '',
-				'max' => ($fields['lefty_max'] !== '')
-					? convertFunctionValue($fields['lefty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
-					: '',
+				'min' => $lefty_min,
+				'max' => $lefty_max,
 				'units' => ($fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC)
 					? $fields['lefty_static_units']
 					: null
 			],
 			'right_y_axis' => [
 				'show' => $fields['righty'],
-				'min' => ($fields['righty_min'] !== '')
-					? convertFunctionValue($fields['righty_min'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
-					: '',
-				'max' => ($fields['righty_max'] !== '')
-					? convertFunctionValue($fields['righty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
-					: '',
+				'min' => $righty_min,
+				'max' => $righty_max,
 				'units' => ($fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC)
 					? $fields['righty_static_units']
 					: null

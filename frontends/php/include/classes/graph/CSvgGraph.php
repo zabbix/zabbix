@@ -627,7 +627,7 @@ class CSvgGraph extends CSvg {
 			$relative_pos = $this->canvas_height - intval($this->canvas_height * ($max_value - $value) / $delta);
 
 			if ($relative_pos >= 0 && $relative_pos <= $this->canvas_height) {
-				$grid_values[$relative_pos] = convert_units([
+				$grid_values[$relative_pos] = convertUnits([
 					'value' => $value,
 					'units' => $units,
 					'convert' => ITEM_CONVERT_NO_UNITS
@@ -802,7 +802,7 @@ class CSvgGraph extends CSvg {
 						$y = ($point > $max_value) ? max($y_min, $y) : min($y_max, $y);
 					}
 
-					$paths[$path_num][] = [$x, ceil($y), convert_units([
+					$paths[$path_num][] = [$x, ceil($y), convertUnits([
 						'value' => $point,
 						'units' => $metric['units']
 					])];
