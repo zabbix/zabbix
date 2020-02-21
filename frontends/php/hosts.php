@@ -631,7 +631,6 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 				}
 			}
 
-
 			unset($host['parentTemplates']);
 
 			$host = $new_values + $host;
