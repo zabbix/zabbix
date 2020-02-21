@@ -1980,7 +1980,7 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	private function calcSides() {
+	private function calcMinMax() {
 		foreach ($this->getSidesInUse() as $side) {
 			$min = $this->calculateMinY($side);
 			$max = $this->calculateMaxY($side);
@@ -2203,6 +2203,7 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		set_image_header();
+
 		$this->calculateTopPadding();
 
 		$this->expandItems();
@@ -2211,7 +2212,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->selectData();
 
-		$this->calcSides();
+		$this->calcMinMax();
 		$this->calcPercentile();
 		$this->calcVerticalScale();
 		$this->calcZero();

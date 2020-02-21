@@ -1392,36 +1392,38 @@ function numberToDecimal(string $number): string {
  * @return string
  */
 function numberToFloat64(string $number, int $precision, int $decimals = null, bool $exact_decimals = false): string {
-	$number = sprintf('%.'.($precision - 1).'E', $number);
-	[$mantissa, $exponent] = explode('E', $number);
+	// Trim extra precision.
+	$number_sci = sprintf('%.'.($precision - 1).'E', $number);
+	[$mantissa, $exponent] = explode('E', $number_sci);
 
+	// Trim extra precision even more for small numbers.
 	if ($exponent < 0 && $decimals !== null) {
-		$number = sprintf('%.'.($decimals - 1).'E', $number);
-		[$mantissa, $exponent] = explode('E', $number);
+		$number_sci = sprintf('%.'.($decimals - 1).'E', $number);
+		[$mantissa, $exponent] = explode('E', $number_sci);
 	}
 
-	$significant_size = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
+	$significant_size = strlen(rtrim($mantissa, '0')) - ($number_sci[0] === '-' ? 2 : 1);
 
 	// Is number out of range for decimal notation?
 	if ($exponent < $significant_size - $precision || $exponent >= $precision) {
-		$number = sprintf('%.'.($significant_size - 1).'E', $number);
+		$result = sprintf('%.'.($significant_size - 1).'E', $number_sci);
 	}
 	elseif ($decimals === null) {
-		$number = sprintf('%.'.($significant_size - $exponent - 1).'F', $number);
+		$result = sprintf('%.'.($significant_size - $exponent - 1).'F', $number_sci);
 	}
 	else {
 		// Either the exact number of decimals, or first non-zero $decimals digits.
 		$effective_decimals = $exact_decimals ? $decimals : $decimals - min(0, $exponent + 1);
 
-		$number = sprintf('%.'.$effective_decimals.'F', $number);
+		$result = sprintf('%.'.$effective_decimals.'F', $number_sci);
 
-		if (!$exact_decimals && strpos($number, '.') !== false) {
-			$number = rtrim($number, '0');
-			$number = rtrim($number, '.');
+		if (!$exact_decimals && strpos($result, '.') !== false) {
+			$result = rtrim($result, '0');
+			$result = rtrim($result, '.');
 		}
 	}
 
-	return $number;
+	return $result;
 }
 
 function getNumDecimals(string $number): int {
