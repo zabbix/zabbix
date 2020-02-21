@@ -583,8 +583,8 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	}
 
 	$start = $options['startSearch'] ? '' : '%';
-	$exclude = $options['excludeSearch'] ? ' NOT ' : '';
-	$glue = (!$options['searchByAny']) ? ' AND ' : ' OR ';
+	$exclude = $options['excludeSearch'] ? ' NOT' : '';
+	$glue = $options['searchByAny'] ? ' OR ' : ' AND ';
 
 	$search = [];
 	foreach ($options['search'] as $field => $patterns) {
@@ -614,7 +614,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 			if (!$options['searchWildcardsEnabled']) {
 				$fieldSearch[] =
-					' UPPER('.$tableShort.'.'.$field.') '.
+					'UPPER('.$tableShort.'.'.$field.')'.
 					$exclude.' LIKE '.
 					zbx_dbstr($start.mb_strtoupper($pattern).'%').
 					" ESCAPE '!'";
@@ -629,15 +629,15 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			}
 		}
 
-		$search[$field] = '( '.implode($glue, $fieldSearch).' )';
+		$search[$field] = '('.implode($glue, $fieldSearch).')';
 	}
 
-	if (!empty($search)) {
+	if ($search) {
 		if (isset($sql_parts['where']['search'])) {
 			$search[] = $sql_parts['where']['search'];
 		}
 
-		$sql_parts['where']['search'] = '( '.implode($glue, $search).' )';
+		$sql_parts['where']['search'] = '('.implode($glue, $search).')';
 		return true;
 	}
 
