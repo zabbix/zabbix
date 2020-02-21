@@ -36,8 +36,7 @@ func TestPlugin_Export(t *testing.T) {
 		params []string
 		ctx    plugin.ContextProvider
 	}
-	var pingOK int64
-	pingOK = 1
+	var pingOK int64 = 1
 	impl.Configure(&plugin.GlobalOptions{}, nil)
 
 	tests := []struct {

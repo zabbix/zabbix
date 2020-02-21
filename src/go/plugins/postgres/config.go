@@ -21,7 +21,6 @@ package postgres
 
 import (
 	"fmt"
-	"time"
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
@@ -109,10 +108,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 			session.Password = p.options.Password
 		}
 	}
-
-	p.connMgr = NewConnManager(
-		time.Duration(p.options.KeepAlive)*time.Second,
-		time.Duration(p.options.Timeout)*time.Second)
 }
 
 // Validate implements the Configurator interface.

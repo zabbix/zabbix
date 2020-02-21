@@ -52,25 +52,37 @@ type connManager struct {
 	connections map[string]*postgresConn
 	keepAlive   time.Duration
 	timeout     time.Duration
+	controlSink chan interface{}
+}
+
+func (m *connManager) stop() {
+	m.controlSink <- nil
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(keepAlive, timeout time.Duration) *connManager {
+func (p *Plugin) NewConnManager(keepAlive, timeout time.Duration) *connManager {
 	connMgr := &connManager{
 		connections: make(map[string]*postgresConn),
 		keepAlive:   keepAlive,
 		timeout:     timeout,
+		controlSink: make(chan interface{}),
 	}
 
 	// Repeatedly check for unused connections and close them
 	go func() {
-		for range time.Tick(10 * time.Second) {
-			if err := connMgr.closeUnused(); err != nil {
-				log.Errf("[%s] Error occurred while closing postgresCon: %s", pluginName, err.Error())
+		ticker := time.NewTicker(10 * time.Second)
+		for {
+			select {
+			case <-connMgr.controlSink:
+				ticker.Stop()
+				return
+			case <-ticker.C:
+				if err := connMgr.closeUnused(); err != nil {
+					p.Errf("[%s] Error occurred while closing postgresCon: %s", pluginName, err.Error())
+				}
 			}
 		}
 	}()
-
 	return connMgr
 }
 

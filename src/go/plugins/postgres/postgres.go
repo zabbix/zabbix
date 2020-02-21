@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"time"
 
 	"zabbix.com/pkg/plugin"
 )
@@ -66,6 +67,18 @@ type handler func(conn *postgresConn, params []string) (res interface{}, err err
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin
+
+func (p *Plugin) Start() {
+	p.connMgr = p.NewConnManager(
+		time.Duration(p.options.KeepAlive)*time.Second,
+		time.Duration(p.options.Timeout)*time.Second,
+	)
+}
+
+func (p *Plugin) Stop() {
+	p.connMgr.stop()
+	p.connMgr = nil
+}
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {

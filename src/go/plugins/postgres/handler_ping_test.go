@@ -47,8 +47,7 @@ func NewConnPool(t testing.TB) (*postgresConn, error) {
 }
 
 func TestPlugin_pingHandler(t *testing.T) {
-	var pingOK int64
-	pingOK = 1
+	var pingOK int64 = 1
 	// create pool or aquare conn from old pool for test
 	sharedPool, err := NewConnPool(t)
 	if err != nil {
