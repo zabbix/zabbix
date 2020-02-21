@@ -55,8 +55,15 @@ type connManager struct {
 	controlSink chan interface{}
 }
 
-func (m *connManager) stop() {
-	m.controlSink <- nil
+func (c *connManager) stop() {
+	c.controlSink <- nil
+
+	c.connMutex.Lock()
+	defer c.connMutex.Unlock()
+
+	for _, conn := range c.connections {
+		conn.postgresPool.Close()
+	}
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
