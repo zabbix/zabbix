@@ -210,7 +210,7 @@ static void	zbx_log_odbc_connection_info(const char *function, SQLHDBC hdbc)
  * Purpose: Appends a new argument to ODBC connection string.                 *
  *          Connection string is reallocated to fit new value.                *
  *                                                                            *
- * Parameters: connection_str - [IN/OUT] connection_str                       *
+ * Parameters: connection_str - [IN/OUT] connection string                    *
  *             attribute      - [IN] attribute name                           *
  *             value          - [IN] attribute value                          *
  *                                                                            *
@@ -287,9 +287,7 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *connection
 
 					if (NULL != connection && '\0' != *connection)
 					{
-						SQLCHAR		outstr[1024];
-						SQLSMALLINT	outstrlen;
-						char		*connection_str;
+						char	*connection_str;
 
 						connection_str = (char*)connection;
 
