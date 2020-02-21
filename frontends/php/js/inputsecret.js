@@ -41,12 +41,19 @@
 	}
 
 	var methods = {
-		init: function(options) {
+		init(options) {
 			var settings = $.extend({}, options);
 
 			return this.each(function() {
 				$(this).data('is-activated', false);
-				$('.btn-change', $(this)).on('click', enable);
+
+				if ($('.btn-change', $(this)).data('is-activated')) {
+					return false;
+				}
+
+				$('.btn-change', $(this))
+					.on('click', enable)
+					.data('is-activated', true);
 			});
 		}
 	};

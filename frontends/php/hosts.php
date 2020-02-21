@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of hosts');
 $page['file'] = 'hosts.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'buttondropdown.js', 'inputsecret.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -1198,9 +1198,11 @@ elseif (hasRequest('form')) {
 
 	if (!$data['macros'] && !$data['readonly']) {
 		$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
+
 		if ($data['show_inherited_macros']) {
 			$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 		}
+
 		$data['macros'][] = $macro;
 	}
 

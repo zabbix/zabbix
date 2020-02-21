@@ -805,10 +805,15 @@ function getMenuPopupDropdown(options, trigger_elem) {
 			label: item.label,
 			url: item.url || 'javascript:void(0);',
 			class: item.class,
-			clickCallback: () =>
+			clickCallback: () => {
 				jQuery(trigger_elem)
-					.parent()
-					.buttonDropdown('change', trigger_elem, item)
+					.removeClass()
+					.addClass(['btn-alt', 'btn-dropdown-toggle', item.class].join(' '));
+
+				jQuery('input[type=hidden]', jQuery(trigger_elem).parent())
+					.val(item.value)
+					.trigger('change');
+			}
 		});
 	});
 

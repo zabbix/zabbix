@@ -64,7 +64,6 @@ $availableJScripts = [
 	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
-	'buttondropdown.js' => '',
 	'inputsecret.js' => '',
 	// vendors
 	'jquery.js' => 'vendors/',

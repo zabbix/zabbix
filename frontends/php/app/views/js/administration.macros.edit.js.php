@@ -33,32 +33,7 @@
 					->setAttribute('placeholder', '{$MACRO}')
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				(new CDiv([
-					(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
-						->setAttribute('placeholder', _('value')),
-					new CButtonDropdown(
-						'macros[#{rowNum}][type]',
-						ZBX_MACRO_TYPE_TEXT,
-						[
-							'title' => json_encode(_('Change type')),
-							'active_class' => ZBX_STYLE_ICON_TEXT,
-							'items' => [
-								[
-									'value' => ZBX_MACRO_TYPE_TEXT,
-									'label' => _('Text'),
-									'class' => ZBX_STYLE_ICON_TEXT
-								],
-								[
-									'value' => ZBX_MACRO_TYPE_SECRET,
-									'label' => _('Secret text'),
-									'class' => ZBX_STYLE_ICON_SECRET_TEXT
-								]
-							]
-						]
-					)
-				]))
-					->addClass(ZBX_STYLE_INPUT_GROUP)
-					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				new CMacroValue(['type' => ZBX_MACRO_TYPE_TEXT, 'value' => ''], 'macros[#{rowNum}]', ['add_post_js' => false])
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))

@@ -35,32 +35,7 @@
 					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					(new CDiv([
-						(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
-							->setAttribute('placeholder', _('value')),
-						new CButtonDropdown(
-							'macros[#{rowNum}][type]',
-							ZBX_MACRO_TYPE_TEXT,
-							[
-								'title' => json_encode(_('Change type')),
-								'active_class' => ZBX_STYLE_ICON_TEXT,
-								'items' => [
-									[
-										'value' => ZBX_MACRO_TYPE_TEXT,
-										'label' => _('Text'),
-										'class' => ZBX_STYLE_ICON_TEXT
-									],
-									[
-										'value' => ZBX_MACRO_TYPE_SECRET,
-										'label' => _('Secret text'),
-										'class' => ZBX_STYLE_ICON_SECRET_TEXT
-									]
-								]
-							]
-						)
-					]))
-						->addClass(ZBX_STYLE_INPUT_GROUP)
-						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					new CMacroValue(['type' => ZBX_MACRO_TYPE_TEXT, 'value' => ''], 'macros[#{rowNum}]', ['add_post_js' => false])
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
@@ -104,32 +79,7 @@
 						->setAttribute('placeholder', '{$MACRO}')
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					(new CDiv([
-						(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
-							->setAttribute('placeholder', _('value')),
-						new CButtonDropdown(
-							'macros[#{rowNum}][type]',
-							ZBX_MACRO_TYPE_TEXT,
-							[
-								'title' => json_encode(_('Change type')),
-								'active_class' => ZBX_STYLE_ICON_TEXT,
-								'items' => [
-									[
-										'value' => ZBX_MACRO_TYPE_TEXT,
-										'label' => _('Text'),
-										'class' => ZBX_STYLE_ICON_TEXT
-									],
-									[
-										'value' => ZBX_MACRO_TYPE_SECRET,
-										'label' => _('Secret text'),
-										'class' => ZBX_STYLE_ICON_SECRET_TEXT
-									]
-								]
-							]
-						)
-					]))
-						->addClass(ZBX_STYLE_INPUT_GROUP)
-						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					new CMacroValue(['type' => ZBX_MACRO_TYPE_TEXT, 'value' => ''], 'macros[#{rowNum}]', ['add_post_js' => false])
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
@@ -190,13 +140,20 @@
 							.val(jQuery('#macros_' + macro_num + '_inherited_description').val())
 							.trigger('input');
 
-						jQuery('#macros_' + macro_num + '_type_btn')
-							.buttonDropdown('change', jQuery('#macros_' + macro_num + '_type_btn'), {value: macro_type,
-								class: (macro_type == <?= ZBX_MACRO_TYPE_SECRET ?>)
-									? '<?= ZBX_STYLE_ICON_SECRET_TEXT ?>'
-									: '<?= ZBX_STYLE_ICON_TEXT ?>'
-							});
-						jQuery('#macros_' + macro_num + '_type_btn')
+						const $dropdown_btn = jQuery('#macros_' + macro_num + '_type_btn');
+
+						$dropdown_btn
+							.removeClass()
+							.addClass(['btn-alt', 'btn-dropdown-toggle', (macro_type == <?= ZBX_MACRO_TYPE_SECRET ?>)
+								? '<?= ZBX_STYLE_ICON_SECRET_TEXT ?>'
+								: '<?= ZBX_STYLE_ICON_TEXT ?>'
+							].join(' '));
+
+						jQuery('input[type=hidden]', $dropdown_btn.parent())
+							.val(macro_type)
+							.trigger('change');
+
+						$dropdown_btn
 							.prop('disabled', true)
 							.attr({'aria-haspopup': false});
 
@@ -211,7 +168,7 @@
 
 						jQuery('#macros_' + macro_num + '_value_btn')
 							.prop('disabled', true)
-							.show();
+							// .show();
 						jQuery('#macros_' + macro_num + '_value')
 							.closest('.input-group')
 							.find('.btn-undo')
@@ -354,7 +311,7 @@
 	 *
 	 * @param {jQuery} $ms  jQuery object of multiselect.
 	 *
-	 * @returns {Array|getAddTemplates.templateids}
+	 * @returns {array|getAddTemplates.templateids}
 	 */
 	function getAddTemplates($ms) {
 		var templateids = [];
@@ -375,7 +332,7 @@
 	 *
 	 * @param {jQuery} $form  jQuery object for host edit form.
 	 *
-	 * @returns {Array}        List of all host macros in the form.
+	 * @returns {array}        List of all host macros in the form.
 	 */
 	function getMacros($form) {
 		var $macros = $form.find('input[name^="macros"], textarea[name^="macros"]'),
@@ -429,7 +386,7 @@
 				<?php if ($data['readonly']): ?>
 					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 				<?php else: ?>
-					initMacroTable($('#tbl_macros'), $show_inherited_macros.val() == 1);
+					initMacroTable($('#tbl_macros'), $('input[name="show_inherited_macros"]:checked').val() == 1);
 				<?php endif ?>
 
 				macros_initialized = true;

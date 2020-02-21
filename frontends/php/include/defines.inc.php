@@ -1802,10 +1802,7 @@ define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 // Widget "Problems by severity" styles.
 define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
 
-// InputSecret and ButtonDropdown styles.
-define('ZBX_STYLE_BTN_UNDO', 'btn-undo');
-define('ZBX_STYLE_INPUT_GROUP', 'input-group');
-
+// Icons.
 define('ZBX_STYLE_ICON_TEXT', 'icon-text');
 define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
 

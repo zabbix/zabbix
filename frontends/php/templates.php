@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/include/ident.inc.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of templates');
 $page['file'] = 'templates.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'buttondropdown.js', 'inputsecret.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -766,9 +766,11 @@ elseif (hasRequest('form')) {
 	// The empty inputs will not be shown if there are inherited macros, for example.
 	if (!$data['macros']) {
 		$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
+
 		if ($data['show_inherited_macros']) {
 			$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 		}
+
 		$data['macros'][] = $macro;
 	}
 

@@ -5123,6 +5123,8 @@ table.preprocessing-test-results .rel-container {
     position: relative; }
     .input-group button.btn-change {
       border-radius: 0; }
+      .input-group button.btn-change:disabled {
+        display: none; }
     .input-group button.btn-undo {
       display: none;
       width: 24px;
