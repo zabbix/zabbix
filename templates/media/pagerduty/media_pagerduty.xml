@@ -152,11 +152,11 @@
     else&#13;
         throw 'incorrect values. Update message without ack will not be sent.';&#13;
 &#13;
-    Zabbix.Log(4, 'PagerDuty sending request:' + JSON.stringify(fields));&#13;
+    Zabbix.Log(4, '[PagerDuty Webhook] Sending request:' + JSON.stringify(fields));&#13;
     resp = req.Post('https://events.pagerduty.com/v2/enqueue',&#13;
         JSON.stringify(fields)&#13;
     );&#13;
-    Zabbix.Log(4, 'PagerDuty receiving response:' + resp);&#13;
+    Zabbix.Log(4, '[PagerDuty Webhook] Receiving response:' + resp);&#13;
 &#13;
     try {&#13;
         resp = JSON.parse(resp);&#13;
@@ -181,7 +181,7 @@
     return 'OK';&#13;
 }&#13;
 catch (error) {&#13;
-    Zabbix.Log(3, 'PagerDuty notification failed : ' + error);&#13;
+    Zabbix.Log(3, '[PagerDuty Webhook] Notification failed : ' + error);&#13;
     throw 'PagerDuty notification failed : ' + error;&#13;
 }</script>
             <show_event_menu>NO</show_event_menu>
