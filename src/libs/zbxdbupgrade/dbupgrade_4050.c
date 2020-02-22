@@ -629,6 +629,31 @@ static int	DBpatch_4050039(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4050040(void)
+{
+	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_default("auditlog", &field);
+}
+
+static int	DBpatch_4050041(void)
+{
+	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("auditlog", &field);
+}
+
+static int	DBpatch_4050042(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update auditlog set resourceid=null where resourceid=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -669,5 +694,8 @@ DBPATCH_ADD(4050036, 0, 1)
 DBPATCH_ADD(4050037, 0, 1)
 DBPATCH_ADD(4050038, 0, 1)
 DBPATCH_ADD(4050039, 0, 1)
+DBPATCH_ADD(4050040, 0, 1)
+DBPATCH_ADD(4050041, 0, 1)
+DBPATCH_ADD(4050042, 0, 1)
 
 DBPATCH_END()
