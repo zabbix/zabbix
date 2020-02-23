@@ -1,8 +1,12 @@
 Changes for 5.0.0beta1
 
 New features:
+........S. [ZBXNEXT-1797] added HOST.ID macro support to notifications (atumilovics)
+..F....... [ZBXNEXT-5725] added ability to select specific severities in Monitoring->Problems (vasilijs)
 
 Bug fixes:
+.......PS. [ZBX-17295] fixed IPMI sensor LLD JSON output (akozlovs)
+..F....... [ZBX-17222] fixed unlimited data selection in Latest data view (averza)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.0alpha2
