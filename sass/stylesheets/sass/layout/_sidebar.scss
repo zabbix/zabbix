@@ -1,3 +1,7 @@
+$sidebar-width: auto;
+$sidebar-compact-width: 48px;
+$sidebar-padding: 12px;
+
 .sidebar {
 	position: relative;
 	z-index: 998;
@@ -7,7 +11,7 @@
 	background: $sidebar-bg-color;
 
 	.sidebar-header {
-		padding: 12px;
+		padding: $sidebar-padding;
 	}
 
 	.sidebar-navigation {
@@ -20,12 +24,23 @@
 		}
 	}
 
+	.scrollable {
+		.scrollbar-track {
+			z-index: 1000;
+			background: $sidebar-scrollbar-track-color;
+		}
+
+		.scrollbar-thumb {
+			background: $sidebar-scrollbar-thumb-color;
+		}
+	}
+
 	.button-sidebar-hide,
 	.button-sidebar-show,
 	.button-compact,
 	.button-expand {
 		position: absolute;
-		top: 12px;
+		top: $sidebar-padding;
 		width: 24px;
 		height: 24px;
 		background: url(../img/icon-sprite.svg) no-repeat;
@@ -44,36 +59,106 @@
 	}
 
 	.button-sidebar-hide {
-		right: 12px;
+		right: $sidebar-padding;
 		background-position: -540px -568px;
 	}
 
 	.button-sidebar-show {
 		display: none;
-		right: 12px;
+		right: $sidebar-padding;
 		background-position: -570px -568px;
 	}
 
 	.button-compact {
-		right: 36px;
+		right: 24px + $sidebar-padding;
 		background-position: -540px -544px;
 	}
 
 	.button-expand {
 		display: none;
-		right: 36px;
+		right: 24px + $sidebar-padding;
 		background-position: -570px -520px;
 	}
 
-	.scrollable {
+	@if $ui-transitions {
+		transition: max-width $ui-transition-duration ease-out;
+		will-change: max-width;
+		transform: translate3d(0, 0, 0);
 
-		.scrollbar-track {
-			z-index: 1000;
-			background: $sidebar-scrollbar-track-color;
+		.logo {
+			transition: width $ui-transition-duration ease-out;
 		}
 
-		.scrollbar-thumb {
-			background: $sidebar-scrollbar-thumb-color;
+		.form-search {
+			.search {
+				transition: opacity $ui-transition-duration ease-out;
+			}
+
+			.search-icon {
+				transition: transform $ui-transition-duration ease-out;
+			}
+		}
+
+		.menu-main {
+			a {
+				transition: color $ui-transition-duration ease-out;
+			}
+		}
+	}
+
+	&.is-compact {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		box-shadow: 2px 0 6px $action-shadow-color;
+
+		& + .wrapper {
+			margin-left: $sidebar-compact-width;
+		}
+
+		&:not(.is-opened) {
+			max-width: $sidebar-compact-width !important;
+
+			.scrollable {
+				.scrollbar-track {
+					display: none;
+				}
+			}
+
+			.logo {
+				width: $sidebar-compact-width - $sidebar-padding * 2;
+
+				div {
+					background-position: -540px -400px;
+
+					@if $ui-transitions {
+						transition: background 0s $ui-transition-duration;
+					}
+				}
+			}
+
+			.button-compact,
+			.button-expand,
+			.button-sidebar-hide,
+			.button-sidebar-show {
+				opacity: 0;
+			}
+
+			.form-search {
+				.search {
+					opacity: 0;
+				}
+
+				.search-icon {
+					transform: scale(1.6);
+				}
+			}
+
+			.menu-main {
+				a {
+					color: rgba(0, 0, 0, 0);
+				}
+			}
 		}
 	}
 }
@@ -81,28 +166,6 @@
 
 /*
 
-
-	a {
-		vertical-align: middle;
-	}
-
-	& + .wrapper {
-
-		.sidebar-switch-nav {
-			display: none;
-		}
-	}
-
-	&.compact {
-		box-shadow: 2px 0 6px $action-shadow-color;
-		top: 0;
-		bottom: 0;
-		position: fixed;
-
-		& + .wrapper {
-			margin-left: 48px;
-		}
-	}
 
 	&.mobile {
 		box-shadow: 2px 0 6px $action-shadow-color;

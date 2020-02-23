@@ -1012,3 +1012,8 @@ jQuery(function ($) {
 		sessionStorage.removeItem('scrollTop');
 	}
 });
+
+window.addEventListener('load', e => {
+	ZABBIX.MenuMain = new CMenuMain(document.querySelector('.menu-main'));
+	ZABBIX.Sidebar = new CSidebar(document.querySelector('.sidebar')).setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
+});

@@ -23,23 +23,23 @@ jQuery(function($) {
 	const MenuMain = {
 
 		init: function() {
-
-			$('.has-submenu', $('.menu-main'))
-				.each(function() {
-					var $submenu = $('.submenu', $(this)),
-						max_height = 0;
-
-					$('li', $submenu).each(function() {
-						max_height += $(this).outerHeight();
-					});
-
-					$submenu.css({'max-height': max_height});
-				})
-				.children('a').on('click', function () {
-					$(this).parent('li').toggleClass('is-expanded').siblings('.has-submenu').removeClass('is-expanded');
-					return false;
-				})
-				;
+			//
+			// $('.has-submenu', $('.menu-main'))
+			// 	.each(function() {
+			// 		var $submenu = $('.submenu', $(this)),
+			// 			max_height = 0;
+			//
+			// 		$('li', $submenu).each(function() {
+			// 			max_height += $(this).outerHeight();
+			// 		});
+			//
+			// 		$submenu.css({'max-height': max_height});
+			// 	})
+			// 	.children('a').on('click', function () {
+			// 		$(this).parent('li').toggleClass('is-expanded').siblings('.has-submenu').removeClass('is-expanded');
+			// 		return false;
+			// 	})
+			// 	;
 		}
 
 	};

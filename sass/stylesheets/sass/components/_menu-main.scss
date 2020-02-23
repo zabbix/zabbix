@@ -204,3 +204,35 @@ $menu-main-icons: (
 		}
 	}
 }
+
+.is-compact {
+
+	.menu-main {
+
+		li {
+			&.has-submenu {
+				& > a {
+					&::after {
+						display: none;
+					}
+				}
+			}
+
+			&.is-selected {
+				& > a {
+					&,
+					&:hover,
+					&:focus {
+						background: $menu-main-selected-bg-color;
+						border-color: $menu-main-selected-border-color;
+						color: $menu-main-selected-color;
+					}
+				}
+			}
+		}
+
+		.submenu {
+			max-height: 0 !important;
+		}
+	}
+}
