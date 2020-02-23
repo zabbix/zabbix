@@ -660,8 +660,6 @@ function convertUnits(array $options) {
 	static $power_table = [];
 
 	if (!$power_table) {
-		$base_1000 = 1;
-		$base_kibibyte = 1;
 		foreach (['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $power => $prefix) {
 			$power_table[] = [
 				'prefix' => $prefix,
