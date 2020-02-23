@@ -741,31 +741,58 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 
-		$calc_min = $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED;
-		$calc_max = $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED;
 		$tolerance = 0.5;
 
 		foreach ($this->getSidesInUse() as $side_index => $side) {
-			$is_free = $side_index == 0 || !$calc_min || !$calc_max;
+			$is_slave = $side_index > 0 && $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED
+				&& $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED;
 
-			$interval_approx = $is_free
-				? ($this->m_maxY[$side] - $this->m_minY[$side]) * $this->cell_height / $this->sizeY
-				: ($this->m_maxY[$side] - $this->m_minY[$side]) / $rows;
+			$interval_approx = $is_slave
+				? ($this->m_maxY[$side] - $this->m_minY[$side]) / $rows
+				: ($this->m_maxY[$side] - $this->m_minY[$side]) * $this->cell_height / $this->sizeY;
 
 			$interval = null;
+			$slave_min = 0;
+			$slave_max = 1;
 
 			$delta_min = null;
 			foreach ($base_intervals[$side_bases[$side]] as $candidate) {
 				$delta = abs($interval_approx - $candidate);
 
-				if (($delta_min === null || $delta < $delta_min)
-						&& ($is_free || $candidate * $rows / ($rows + 2 + $tolerance * 2) >= $interval_approx)) {
+				if ($delta_min === null || $delta < $delta_min) {
+					if ($is_slave) {
+						if ($this->m_minY[$side] == 0) {
+							$slave_min = 0;
+							$slave_max = $candidate * $rows;
+						}
+						elseif ($this->m_maxY[$side] == 0) {
+							$slave_min = -$candidate * $rows;
+							$slave_max = 0;
+						}
+						else {
+							$slave_min = floor($this->m_minY[$side] / $candidate) * $candidate;
+							if (($this->m_minY[$side] - $slave_min) / $candidate < $tolerance) {
+								$slave_min -= $candidate;
+							}
+							$slave_max = $slave_min + $candidate * $rows;
+						}
+
+						if (($this->m_minY[$side] - $slave_min) / $candidate < $tolerance
+								|| ($slave_max - $this->m_maxY[$side]) / $candidate < $tolerance) {
+							continue;
+						}
+					}
+
 					$interval = $candidate;
 					$delta_min = $delta;
 				}
 			}
 
-			if ($is_free) {
+			if ($is_slave) {
+				$this->m_minY[$side] = $slave_min;
+				$this->m_maxY[$side] = $slave_max;
+			}
+			else {
 				$rows = ceil(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
 
 				$min = null;
@@ -782,51 +809,19 @@ class CLineGraphDraw extends CGraphDraw {
 					$max = ceil($this->m_maxY[$side] / $interval) * $interval;
 				}
 
-				if ($min !== null && $calc_min) {
+				if ($min !== null && $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED) {
 					$this->m_minY[$side] = ($this->m_minY[$side] - $min) / $interval < $tolerance
 						? $min - $interval
 						: $min;
 				}
 
-				if ($max !== null && $calc_max) {
+				if ($max !== null && $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED) {
 					$this->m_maxY[$side] = ($max - $this->m_maxY[$side]) / $interval < $tolerance
 						? $max + $interval
 						: $max;
 				}
 
 				$rows = (int) round(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
-			}
-			else {
-				$min = null;
-				$max = null;
-
-				if ($this->m_minY[$side] == 0) {
-					$this->m_maxY[$side] = $interval * $rows;
-				}
-				elseif ($this->m_maxY[$side] == 0) {
-					$this->m_minY[$side] = -$interval * $rows;
-				}
-				else {
-					$min = floor($this->m_minY[$side] / $interval) * $interval;
-					if (($this->m_minY[$side] - $min) / $interval < $tolerance) {
-						$min -= $interval;
-					}
-
-					$max = ceil($this->m_maxY[$side] / $interval) * $interval;
-					if (($max - $this->m_maxY[$side]) / $interval < $tolerance) {
-						$max += $interval;
-					}
-
-
-					if ($this->m_minY[$side] - $min > $max - $this->m_maxY[$side]) {
-						$this->m_minY[$side] = $min;
-						$this->m_maxY[$side] = $min + $interval * $rows;
-					}
-					else {
-						$this->m_minY[$side] = $max - $interval * $rows;
-						$this->m_maxY[$side] = $max;
-					}
-				}
 			}
 
 			$this->intervals[$side] = $interval;
