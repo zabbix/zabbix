@@ -518,9 +518,10 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget_actions = [],
 		widget = jQuery('.dashbrd-grid-container').dashboardGrid('getWidgetsBy', 'widgetid', options.widgetName).pop();
 
-	if (options.download) {
+	if ('download' in options) {
 		widget_actions.push({
 			label: t('Download image'),
+			disabled: !options.download,
 			clickCallback: function() {
 				var svg = widget['content_body'].find('svg').first();
 

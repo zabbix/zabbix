@@ -637,9 +637,12 @@ class CControllerMenuPopup extends CController {
 			'type' => 'widget_actions',
 			'widgetName' => $data['widgetName'],
 			'currentRate' => $data['currentRate'],
-			'multiplier' => (bool) $data['multiplier'],
-			'download' => ($data['widgetType'] == WIDGET_SVG_GRAPH)
+			'multiplier' => (bool) $data['multiplier']
 		];
+
+		if ($data['widgetType'] == WIDGET_SVG_GRAPH) {
+			$menu_data['download'] = true;
+		}
 
 		if (array_key_exists('params', $data)) {
 			$menu_data['params'] = $data['params'];
