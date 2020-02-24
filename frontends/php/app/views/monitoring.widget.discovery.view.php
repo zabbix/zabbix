@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if ($data['error'] !== null) {
 	$table = (new CTableInfo())->setNoDataMessage($data['error']);
 }
@@ -58,4 +62,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

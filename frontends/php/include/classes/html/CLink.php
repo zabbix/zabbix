@@ -69,7 +69,7 @@ class CLink extends CTag {
 				$url .= 'sid='.substr($_COOKIE[ZBX_SESSION_NAME], 16, 16);
 			}
 			$confirm_script = ($this->confirm_message !== '')
-				? 'Confirm('.CHtml::encode(CJs::encodeJson($this->confirm_message)).') && '
+				? 'Confirm('.CHtml::encode(json_encode($this->confirm_message)).') && '
 				: '';
 			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', 'sid', true)");
 			$this->setAttribute('href', 'javascript:void(0)');
@@ -78,7 +78,7 @@ class CLink extends CTag {
 			$this->setAttribute('href', ($url == null) ? 'javascript:void(0)' : $url);
 
 			if ($this->confirm_message !== '') {
-				$this->onClick('javascript: return Confirm('.CJs::encodeJson($this->confirm_message).');');
+				$this->onClick('javascript: return Confirm('.json_encode($this->confirm_message).');');
 			}
 		}
 

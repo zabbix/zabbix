@@ -402,7 +402,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 		if (isset($data['resetDefaults'])) {
 			$this->zbxTestClick('resetDefaults');
-			$this->zbxTestClickXpath("//div[@id='overlay_dialogue']//button[text()='Reset defaults']");
+			$this->zbxTestClickXpath('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Reset defaults"]');
 		}
 		else {
 			// events and alerts

@@ -1195,7 +1195,7 @@ if (isset($_REQUEST['form'])) {
 
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
-	$data['preprocessing_test_type'] = CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
+	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::$supported_preprocessing_types;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
@@ -1224,9 +1224,7 @@ if (isset($_REQUEST['form'])) {
 
 	// render view
 	if (!$has_errors) {
-		$itemView = new CView('configuration.item.prototype.edit', $data);
-		$itemView->render();
-		$itemView->show();
+		echo (new CView('configuration.item.prototype.edit', $data))->getOutput();
 	}
 }
 elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massupdateform') || hasRequest('massupdate'))
@@ -1270,7 +1268,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
 		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_ACTION_ADD),
-		'preprocessing_test_type' => CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
+		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
@@ -1462,9 +1460,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
 	}
 
-	$view = (new CView('configuration.item.prototype.massupdate', $data))
-		->render()
-		->show();
+	echo (new CView('configuration.item.prototype.massupdate', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -1531,9 +1527,7 @@ else {
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	// render view
-	$itemView = new CView('configuration.item.prototype.list', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.item.prototype.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

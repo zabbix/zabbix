@@ -149,8 +149,6 @@ if ($data['alerts']) {
 }
 
 // render view
-$auditView = new CView('administration.auditacts.list', $data);
-$auditView->render();
-$auditView->show();
+echo (new CView('administration.auditacts.list', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Items'));
 
 if ($data['hostid'] != 0) {
@@ -139,7 +143,7 @@ else {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [CJs::encodeJson($headers_data)];
+$headers->items = [json_encode($headers_data)];
 
 $item_form_list
 	->addRow(
@@ -538,4 +542,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';
 
-return $widget;
+$widget->show();

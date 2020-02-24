@@ -409,9 +409,8 @@ static void	DCdump_interfaces(void)
 			if (ZBX_IF_SNMP_VERSION_3 == snmp->version)
 			{
 				zbx_snprintf_alloc(&if_msg, &alloc, &offset," snmpv3:["
-					"securityname:'%s' securitylevel:%u authpassphrase:'%s' privpassphrase:'%s'"
-					" authprotocol:%u privprotocol:%u contextname:'%s']", snmp->securityname,
-					snmp->securitylevel, snmp->authpassphrase, snmp->privpassphrase,
+					"securityname:'%s' securitylevel:%u authprotocol:%u privprotocol:%u"
+					" contextname:'%s']", snmp->securityname, snmp->securitylevel,
 					snmp->authprotocol, snmp->privprotocol, snmp->contextname);
 			}
 		}

@@ -533,6 +533,82 @@ static int	DBpatch_4050027(void)
 static int	DBpatch_4050028(void)
 {
 	const ZBX_TABLE table =
+		{"module", "moduleid", 0,
+			{
+				{"moduleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"relative_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"config", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050030(void)
+{
+	return SUCCEED;
+}
+
+static int	DBpatch_4050031(void)
+{
+	const ZBX_TABLE table =
+			{"task_data", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050032(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_data", 1, &field);
+}
+
+static int	DBpatch_4050033(void)
+{
+	const ZBX_TABLE	table =
+			{"task_result", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050034(void)
+{
+	return DBcreate_index("task_result", "task_result_1", "parent_taskid", 0);
+}
+
+static int	DBpatch_4050035(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_result", 1, &field);
+}
+
+static int	DBpatch_4050036(void)
+{
+	const ZBX_TABLE table =
 		{"interface_snmp", "interfaceid", 0,
 			{
 				{"interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -554,7 +630,7 @@ static int	DBpatch_4050028(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050029(void)
+static int	DBpatch_4050037(void)
 {
 	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -621,20 +697,22 @@ static int	db_snmp_if_cmp(const dbu_snmp_if_t *snmp1, const dbu_snmp_if_t *snmp2
 	if (0 != (ret = strcmp(s1, s2)))	\
 		return ret;
 
-	int ret;
+	int	ret;
 
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->securitylevel, snmp2->securitylevel);
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->authprotocol, snmp2->authprotocol);
 	ZBX_RETURN_IF_NOT_EQUAL(snmp1->privprotocol, snmp2->privprotocol);
-	ZBX_RETURN_IF_NOT_EQUAL(snmp1->version, snmp1->version);
-	ZBX_RETURN_IF_NOT_EQUAL(snmp1->bulk, snmp1->bulk);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->community,snmp2->community);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->securityname,snmp2->securityname);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->authpassphrase,snmp2->authpassphrase);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->privpassphrase,snmp2->privpassphrase);
-	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->contextname,snmp2->contextname);
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->version, snmp2->version);
+	ZBX_RETURN_IF_NOT_EQUAL(snmp1->bulk, snmp2->bulk);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->community, snmp2->community);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->securityname, snmp2->securityname);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->authpassphrase, snmp2->authpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->privpassphrase, snmp2->privpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(snmp1->contextname, snmp2->contextname);
 
 	return 0;
+
+#undef ZBX_RETURN_IF_NOT_EQUAL_STR
 }
 
 static int	db_snmp_if_newid_cmp(const dbu_snmp_if_t *snmp1, const dbu_snmp_if_t *snmp2)
@@ -672,72 +750,63 @@ static int	db_snmp_new_if_find(const dbu_snmp_if_t *snmp, const zbx_vector_dbu_s
 	return FAIL;
 }
 
-static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector_dbu_snmp_if_t *snmp_ifs,
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_load_data                                                *
+ *                                                                            *
+ * Purpose: loading a set of unique combination of snmp data within a single  *
+ *          interface and associated interface data                           *
+ *                                                                            *
+ * Parameters: snmp_ifs     - [OUT] snmp data linked with existing interfaces *
+ *             new_ifs      - [OUT] new interfaces for snmp data              *
+ *             snmp_new_ifs - [OUT] snmp data associated with new interfaces  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBpatch_load_data(zbx_vector_dbu_snmp_if_t *snmp_ifs, zbx_vector_dbu_interface_t *new_ifs,
 		zbx_vector_dbu_snmp_if_t *snmp_new_ifs)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
-	int			index;
+#define ITEM_TYPE_SNMPv1	1
+#define ITEM_TYPE_SNMPv2c	4
+#define ITEM_TYPE_SNMPv3	6
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		index;
 
 	result = DBselect(
-			"SELECT s.interfaceid,"
-				"s.type,"
-				"s.bulk,"
-				"s.snmp_community,"
-				"s.snmpv3_securityname,"
-				"s.snmpv3_securitylevel,"
-				"s.snmpv3_authpassphrase,"
-				"s.snmpv3_privpassphrase,"
-				"s.snmpv3_authprotocol,"
-				"s.snmpv3_privprotocol,"
-				"s.snmpv3_contextname,"
-				"s.port,"
-				"s.hostid,"
-				"n.type,"
-				"n.useip,"
-				"n.ip,"
-				"n.dns,"
-				"n.port"
-			" FROM (SELECT i.interfaceid,"
-					"i.type,"
-					"f.bulk,"
-					"i.snmp_community,"
-					"i.snmpv3_securityname,"
-					"i.snmpv3_securitylevel,"
-					"i.snmpv3_authpassphrase,"
-					"i.snmpv3_privpassphrase,"
-					"i.snmpv3_authprotocol,"
-					"i.snmpv3_privprotocol,"
-					"i.snmpv3_contextname,"
-					"i.port,"
-					"i.hostid"
-				" FROM items i"
-					" LEFT JOIN hosts h ON i.hostid=h.hostid"
-					" LEFT JOIN interface f ON i.interfaceid=f.interfaceid"
-				" WHERE  i.type IN (1,4,6)"
-					" AND h.status <> 3"
-				" GROUP BY i.interfaceid,"
-					"i.type,"
-					"f.bulk,"
-					"i.snmp_community,"
-					"i.snmpv3_securityname,"
-					"i.snmpv3_securitylevel,"
-					"i.snmpv3_authpassphrase,"
-					"i.snmpv3_privpassphrase,"
-					"i.snmpv3_authprotocol,"
-					"i.snmpv3_privprotocol,"
-					"i.snmpv3_contextname,"
-					"i.port,"
-					"i.hostid) s"
-				" LEFT JOIN interface n ON s.interfaceid=n.interfaceid"
-				" ORDER BY s.interfaceid ASC");
+			"select distinct "
+				"i.interfaceid,"
+				"i.type,"
+				"f.bulk,"
+				"i.snmp_community,"
+				"i.snmpv3_securityname,"
+				"i.snmpv3_securitylevel,"
+				"i.snmpv3_authpassphrase,"
+				"i.snmpv3_privpassphrase,"
+				"i.snmpv3_authprotocol,"
+				"i.snmpv3_privprotocol,"
+				"i.snmpv3_contextname,"
+				"i.port,"
+				"i.hostid,"
+				"f.type,"
+				"f.useip,"
+				"f.ip,"
+				"f.dns,"
+				"f.port"
+			" from items i"
+				" join hosts h on i.hostid=h.hostid"
+				" join interface f on i.interfaceid=f.interfaceid"
+			" where i.type in (%d,%d,%d)"
+				" and h.status in (0,1)"
+			" order by i.interfaceid asc,i.type asc,i.port asc,i.snmp_community asc",
+			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		dbu_interface_t		interface;
-		dbu_snmp_if_t		snmp;
-		int			item_type;
-		const char 		*if_port;
+		dbu_interface_t	interface;
+		dbu_snmp_if_t	snmp;
+		unsigned char	item_type;
+		const char 	*if_port;
 
 		ZBX_DBROW2UINT64(snmp.item_interfaceid, row[0]);
 		ZBX_STR2UCHAR(item_type, row[1]);
@@ -777,7 +846,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 			continue;
 		}
 		else if (0 < snmp_new_ifs->values_num &&
-				FAIL != (index = db_snmp_new_if_find(&snmp, snmp_new_ifs, interfaces, if_port)))
+				FAIL != (index = db_snmp_new_if_find(&snmp, snmp_new_ifs, new_ifs, if_port)))
 		{
 			snmp.skip = 1;
 			snmp.interfaceid = snmp_new_ifs->values[index].interfaceid;
@@ -802,15 +871,19 @@ static void	DBpatch_load_data(zbx_vector_dbu_interface_t *interfaces, zbx_vector
 		else
 			interface.port = zbx_strdup(NULL, if_port);
 
-		zbx_vector_dbu_interface_append(interfaces, interface);
+		zbx_vector_dbu_interface_append(new_ifs, interface);
 	}
 	DBfree_result(result);
+
+#undef ITEM_TYPE_SNMPv1
+#undef ITEM_TYPE_SNMPv2c
+#undef ITEM_TYPE_SNMPv3
 }
 
 static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	result = DBselect(
 			"select h.interfaceid,h.bulk"
@@ -821,7 +894,7 @@ static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		dbu_snmp_if_t		snmp;
+		dbu_snmp_if_t	snmp;
 
 		ZBX_DBROW2UINT64(snmp.interfaceid, row[0]);
 		ZBX_STR2UCHAR(snmp.bulk, row[1]);
@@ -853,7 +926,7 @@ static int	DBpatch_snmp_if_save(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 	for (i = 0; i < snmp_ifs->values_num; i++)
 	{
-		dbu_snmp_if_t *s = &snmp_ifs->values[i];
+		dbu_snmp_if_t	*s = &snmp_ifs->values[i];
 
 		if (0 != s->skip)
 			continue;
@@ -871,8 +944,8 @@ static int	DBpatch_snmp_if_save(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 static int	DBpatch_interface_create(zbx_vector_dbu_interface_t *interfaces)
 {
-	zbx_db_insert_t		db_insert_interfaces;
-	int			i, ret;
+	zbx_db_insert_t	db_insert_interfaces;
+	int		i, ret;
 
 	zbx_db_insert_prepare(&db_insert_interfaces, "interface", "interfaceid", "hostid", "main", "type", "useip",
 			"ip", "dns", "port", NULL);
@@ -894,6 +967,11 @@ static int	DBpatch_interface_create(zbx_vector_dbu_interface_t *interfaces)
 
 static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 {
+#define ITEM_TYPE_SNMPv1	1
+#define ITEM_TYPE_SNMPv2c	4
+#define ITEM_TYPE_SNMPv3	6
+#define ITEM_TYPE_SNMP		20
+
 	int	i, ret = SUCCEED;
 	char	*sql;
 	size_t	sql_alloc = snmp_ifs->values_num * ZBX_KIBIBYTE / 3 , sql_offset = 0;
@@ -903,27 +981,60 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 	for (i = 0; i < snmp_ifs->values_num && SUCCEED == ret; i++)
 	{
-		dbu_snmp_if_t *s = &snmp_ifs->values[i];
+		dbu_snmp_if_t	*s = &snmp_ifs->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"UPDATE items i, hosts h SET i.type=%d, i.interfaceid=" ZBX_FS_UI64
-				" WHERE i.hostid=h.hostid AND"
-					" type IN (1,4,6) AND h.status <> 3 AND"
-					" interfaceid=" ZBX_FS_UI64 " AND "
-					" snmp_community='%s' AND"
-					" snmpv3_securityname='%s' AND"
-					" snmpv3_securitylevel=%d AND"
-					" snmpv3_authpassphrase='%s' AND"
-					" snmpv3_privpassphrase='%s' AND"
-					" snmpv3_authprotocol=%d AND"
-					" snmpv3_privprotocol=%d AND"
-					" snmpv3_contextname='%s' AND"
+#ifdef HAVE_ORACLE
+				"update items i set type=%d, interfaceid=" ZBX_FS_UI64
+				" where exists (select 1 from hosts h"
+					" where i.hostid=h.hostid and"
+					" i.type in (%d,%d,%d) and h.status <> 3 and"
+					" i.interfaceid=" ZBX_FS_UI64 " and"
+					" (('%s' is null and i.snmp_community is null) or"
+						" i.snmp_community='%s') and"
+					" (('%s' is null and i.snmpv3_securityname is null) or"
+						" i.snmpv3_securityname='%s') and"
+					" i.snmpv3_securitylevel=%d and"
+					" (('%s' is null and i.snmpv3_authpassphrase is null) or"
+						" i.snmpv3_authpassphrase='%s') and"
+					" (('%s' is null and i.snmpv3_privpassphrase is null) or"
+						" i.snmpv3_privpassphrase='%s') and"
+					" i.snmpv3_authprotocol=%d and"
+					" i.snmpv3_privprotocol=%d and"
+					" (('%s' is null and i.snmpv3_contextname is null) or"
+						" i.snmpv3_contextname='%s') and"
+					" (('%s' is null and i.port is null) or"
+						" i.port='%s'));\n",
+				ITEM_TYPE_SNMP, s->interfaceid, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
+				s->item_interfaceid, s->community, s->community, s->securityname, s->securityname,
+				(int)s->securitylevel, s->authpassphrase, s->authpassphrase, s->privpassphrase,
+				s->privpassphrase, (int)s->authprotocol, (int)s->privprotocol, s->contextname,
+				s->contextname, s->item_port, s->item_port);
+
+#else
+#	ifdef HAVE_MYSQL
+				"update items i, hosts h set i.type=%d, i.interfaceid=" ZBX_FS_UI64
+#	else
+				"update items i set type=%d, interfaceid=" ZBX_FS_UI64 " from hosts h"
+#	endif
+				" where i.hostid=h.hostid and"
+					" type in (%d,%d,%d) and h.status <> 3 and"
+					" interfaceid=" ZBX_FS_UI64 " and"
+					" snmp_community='%s' and"
+					" snmpv3_securityname='%s' and"
+					" snmpv3_securitylevel=%d and"
+					" snmpv3_authpassphrase='%s' and"
+					" snmpv3_privpassphrase='%s' and"
+					" snmpv3_authprotocol=%d and"
+					" snmpv3_privprotocol=%d and"
+					" snmpv3_contextname='%s' and"
 					" port='%s';\n",
 				ITEM_TYPE_SNMP, s->interfaceid,
+				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 				s->item_interfaceid, s->community, s->securityname, (int)s->securitylevel,
 				s->authpassphrase, s->privpassphrase, (int)s->authprotocol, (int)s->privprotocol,
 				s->contextname, s->item_port);
-
+#endif
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -938,35 +1049,65 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	zbx_free(sql);
 
 	return ret;
+
+#undef ITEM_TYPE_SNMPv1
+#undef ITEM_TYPE_SNMPv2c
+#undef ITEM_TYPE_SNMPv3
+#undef ITEM_TYPE_SNMP
 }
 
 static int	DBpatch_items_type_update(void)
 {
-	if (ZBX_DB_OK > DBexecute("update items set type=%d where type IN (1,4,6)", ITEM_TYPE_SNMP))
+#define ITEM_TYPE_SNMPv1	1
+#define ITEM_TYPE_SNMPv2c	4
+#define ITEM_TYPE_SNMPv3	6
+#define ITEM_TYPE_SNMP		20
+
+	if (ZBX_DB_OK > DBexecute("update items set type=%d where type in (%d,%d,%d)", ITEM_TYPE_SNMP,
+			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
+
+#undef ITEM_TYPE_SNMPv1
+#undef ITEM_TYPE_SNMPv2c
+#undef ITEM_TYPE_SNMPv3
+#undef ITEM_TYPE_SNMP
 }
 
-static int	DBpatch_4050030(void)
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_4050038                                                  *
+ *                                                                            *
+ * Purpose: migration snmp data from 'items' table to 'interface_snmp' new    *
+ *          table linked with 'interface' table, except interface links for   *
+ *          discovered hosts and parent host interface                        *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_4050038(void)
 {
-	zbx_vector_dbu_interface_t	interfaces;
+	zbx_vector_dbu_interface_t	new_ifs;
 	zbx_vector_dbu_snmp_if_t	snmp_ifs, snmp_new_ifs, snmp_def_ifs;
 	int				ret = FAIL;
 
 	zbx_vector_dbu_snmp_if_create(&snmp_ifs);
 	zbx_vector_dbu_snmp_if_create(&snmp_new_ifs);
 	zbx_vector_dbu_snmp_if_create(&snmp_def_ifs);
-	zbx_vector_dbu_interface_create(&interfaces);
+	zbx_vector_dbu_interface_create(&new_ifs);
 
-	DBpatch_load_data(&interfaces, &snmp_ifs, &snmp_new_ifs);
+	DBpatch_load_data(&snmp_ifs, &new_ifs, &snmp_new_ifs);
 
-	while(1)
+	while (1)
 	{
 		if (0 < snmp_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_ifs))
 			break;
 
-		if (0 < interfaces.values_num && SUCCEED != DBpatch_interface_create(&interfaces))
+		if (0 < new_ifs.values_num && SUCCEED != DBpatch_interface_create(&new_ifs))
 			break;
 
 		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_new_ifs))
@@ -987,8 +1128,8 @@ static int	DBpatch_4050030(void)
 		break;
 	}
 
-	zbx_vector_dbu_interface_clear_ext(&interfaces, db_interface_free);
-	zbx_vector_dbu_interface_destroy(&interfaces);
+	zbx_vector_dbu_interface_clear_ext(&new_ifs, db_interface_free);
+	zbx_vector_dbu_interface_destroy(&new_ifs);
 	zbx_vector_dbu_snmp_if_clear_ext(&snmp_ifs, db_snmpinterface_free);
 	zbx_vector_dbu_snmp_if_destroy(&snmp_ifs);
 	zbx_vector_dbu_snmp_if_clear_ext(&snmp_new_ifs, db_snmpinterface_free);
@@ -999,72 +1140,282 @@ static int	DBpatch_4050030(void)
 	return ret;
 }
 
-static int	DBpatch_4050031(void)
+static int	db_if_cmp(const dbu_interface_t *if1, const dbu_interface_t *if2)
 {
-	return DBdrop_field("interface", "bulk");
+#define ZBX_RETURN_IF_NOT_EQUAL_STR(s1, s2)	\
+	if (0 != (ret = strcmp(s1, s2)))	\
+		return ret;
+
+	int	ret;
+
+	ZBX_RETURN_IF_NOT_EQUAL(if1->hostid, if2->hostid);
+	ZBX_RETURN_IF_NOT_EQUAL(if1->type, if2->type);
+	ZBX_RETURN_IF_NOT_EQUAL(if1->main, if2->main);
+	ZBX_RETURN_IF_NOT_EQUAL(if1->useip, if2->useip);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->ip, if2->ip);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->dns, if2->dns);
+	ZBX_RETURN_IF_NOT_EQUAL_STR(if1->port, if2->port);
+
+	return 0;
+
+#undef ZBX_RETURN_IF_NOT_EQUAL_STR
 }
 
-static int	DBpatch_4050032(void)
+static zbx_uint64_t	db_if_find(const dbu_interface_t *interface, dbu_snmp_if_t *snmp,
+		zbx_vector_dbu_interface_t *interfaces, zbx_vector_dbu_snmp_if_t *snmp_ifs)
 {
-	return DBdrop_field("items", "snmp_community");
+	int	i;
+
+	for (i = interfaces->values_num - 1; i >= 0 &&
+			interface->hostid == interfaces->values[i].hostid; i--)
+	{
+		if (0 != db_if_cmp(interface, &interfaces->values[i]))
+			continue;
+
+		if (0 != db_snmp_if_cmp(snmp, &snmp_ifs->values[i]))
+			continue;
+
+		return interfaces->values[i].interfaceid;
+	}
+
+	return 0;
 }
 
-static int	DBpatch_4050033(void)
+static void	db_if_link(zbx_uint64_t if_slave, zbx_uint64_t if_master, zbx_vector_uint64_pair_t *if_links)
 {
-	return DBdrop_field("items", "snmpv3_securityname");
+	zbx_uint64_pair_t	pair = {if_slave, if_master};
+
+	zbx_vector_uint64_pair_append(if_links, pair);
 }
 
-static int	DBpatch_4050034(void)
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_if_load_data                                             *
+ *                                                                            *
+ * Purpose: loading all unlinked interfaces, snmp data and hostid of host     *
+ *          prototype for discovered hosts                                    *
+ *                                                                            *
+ * Parameters: new_ifs      - [OUT] new interfaces to be created on master    *
+ *                                  hosts                                     *
+ *             snmp_new_ifs - [OUT] snmp data associated with new interfaces  *
+ *             if_links     - [OUT] set of pairs for discovered host          *
+ *                                  interfaceid and parent interfaceid of     *
+ *                                  parent host                               *
+ *                                                                            *
+ * Comments: When host is created by lld the parent host interfaces are       *
+ *           copied over to the discovered hosts. Previous patch could have   *
+ *           created new SNMP interfaces on discovered hosts, which must be   *
+ *           linked to the corresponding interfaces (created if necessary) to *
+ *           the parent host.                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *new_ifs, zbx_vector_dbu_snmp_if_t *snmp_new_ifs,
+		zbx_vector_uint64_pair_t *if_links)
 {
-	return DBdrop_field("items", "snmpv3_securitylevel");
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect(
+			"select hreal.hostid,"
+				"i.interfaceid,"
+				"i.main,"
+				"i.type,"
+				"i.useip,"
+				"i.ip,"
+				"i.dns,"
+				"i.port,"
+				"s.version,"
+				"s.bulk,"
+				"s.community,"
+				"s.securityname,"
+				"s.securitylevel,"
+				"s.authpassphrase,"
+				"s.privpassphrase,"
+				"s.authprotocol,"
+				"s.privprotocol,"
+				"s.contextname"
+			" from interface i"
+			" left join interface_discovery d on i.interfaceid=d.interfaceid"
+			" join interface_snmp s on i.interfaceid=s.interfaceid"
+			" join hosts hdisc on i.hostid=hdisc.hostid"
+			" join host_discovery hd on hdisc.hostid=hd.hostid"
+			" join hosts hproto on hd.parent_hostid=hproto.hostid"
+			" join host_discovery hdd on hd.parent_hostid=hdd.hostid"
+			" join items drule on drule.itemid=hdd.parent_itemid"
+			" join hosts hreal on drule.hostid=hreal.hostid"
+			" where"
+				" i.type=2 and"
+				" hdisc.flags=4 and"
+				" drule.flags=1 and"
+				" hproto.flags=2 and"
+				" hreal.status in (1,0) and"
+				" d.interfaceid is null"
+			" order by drule.hostid asc, i.interfaceid asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		dbu_interface_t		interface;
+		dbu_snmp_if_t		snmp;
+		zbx_uint64_t		if_parentid;
+
+		ZBX_DBROW2UINT64(interface.hostid, row[0]);
+		ZBX_DBROW2UINT64(interface.interfaceid , row[1]);
+		ZBX_STR2UCHAR(interface.main, row[2]);
+		ZBX_STR2UCHAR(interface.type, row[3]);
+		ZBX_STR2UCHAR(interface.useip, row[4]);
+		interface.ip = zbx_strdup(NULL, row[5]);
+		interface.dns = zbx_strdup(NULL, row[6]);
+		interface.port = zbx_strdup(NULL, row[7]);
+
+		ZBX_STR2UCHAR(snmp.version, row[8]);
+		ZBX_STR2UCHAR(snmp.bulk, row[9]);
+		snmp.community = zbx_strdup(NULL, row[10]);
+		snmp.securityname = zbx_strdup(NULL, row[11]);
+		ZBX_STR2UCHAR(snmp.securitylevel, row[12]);
+		snmp.authpassphrase = zbx_strdup(NULL, row[13]);
+		snmp.privpassphrase = zbx_strdup(NULL, row[14]);
+		ZBX_STR2UCHAR(snmp.authprotocol, row[15]);
+		ZBX_STR2UCHAR(snmp.privprotocol, row[16]);
+		snmp.contextname = zbx_strdup(NULL, row[17]);
+		snmp.item_port = NULL;
+		snmp.skip = 0;
+		snmp.item_interfaceid = 0;
+
+		if (0 < new_ifs->values_num &&
+				0 != (if_parentid = db_if_find(&interface, &snmp, new_ifs, snmp_new_ifs)))
+		{
+			db_if_link(interface.interfaceid, if_parentid, if_links);
+			db_snmpinterface_free(snmp);
+			db_interface_free(interface);
+			continue;
+		}
+
+		if_parentid = DBget_maxid("interface");
+		db_if_link(interface.interfaceid, if_parentid, if_links);
+		interface.interfaceid = if_parentid;
+		snmp.interfaceid = if_parentid;
+		zbx_vector_dbu_interface_append(new_ifs, interface);
+		zbx_vector_dbu_snmp_if_append(snmp_new_ifs, snmp);
+	}
+	DBfree_result(result);
 }
 
-static int	DBpatch_4050035(void)
+static int	DBpatch_interface_discovery_save(zbx_vector_uint64_pair_t *if_links)
 {
-	return DBdrop_field("items", "snmpv3_authpassphrase");
+	zbx_db_insert_t	db_insert_if_links;
+	int		i, ret;
+
+	zbx_db_insert_prepare(&db_insert_if_links, "interface_discovery", "interfaceid", "parent_interfaceid", NULL);
+
+	for (i = 0; i < if_links->values_num; i++)
+	{
+		zbx_uint64_pair_t	*l = &if_links->values[i];
+
+		zbx_db_insert_add_values(&db_insert_if_links, l->first, l->second);
+	}
+
+	ret = zbx_db_insert_execute(&db_insert_if_links);
+	zbx_db_insert_clean(&db_insert_if_links);
+
+	return ret;
 }
 
-static int	DBpatch_4050036(void)
-{
-	return DBdrop_field("items", "snmpv3_privpassphrase");
-}
-
-static int	DBpatch_4050037(void)
-{
-	return DBdrop_field("items", "snmpv3_authprotocol");
-}
-
-static int	DBpatch_4050038(void)
-{
-	return DBdrop_field("items", "snmpv3_privprotocol");
-}
-
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_4050039                                                  *
+ *                                                                            *
+ * Purpose: recovery links between the interfaceid of discovered host and     *
+ *          parent interfaceid from parent host                               *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBpatch_4050039(void)
 {
-	return DBdrop_field("items", "snmpv3_contextname");
+	zbx_vector_dbu_interface_t	new_ifs;
+	zbx_vector_dbu_snmp_if_t	snmp_new_ifs;
+	zbx_vector_uint64_pair_t	if_links;
+	int				ret = FAIL;
+
+	zbx_vector_dbu_snmp_if_create(&snmp_new_ifs);
+	zbx_vector_dbu_interface_create(&new_ifs);
+	zbx_vector_uint64_pair_create(&if_links);
+
+	DBpatch_if_load_data(&new_ifs, &snmp_new_ifs, &if_links);
+
+	while (1)
+	{
+		if (0 < new_ifs.values_num && SUCCEED != DBpatch_interface_create(&new_ifs))
+			break;
+
+		if (0 < snmp_new_ifs.values_num && SUCCEED != DBpatch_snmp_if_save(&snmp_new_ifs))
+			break;
+
+		if (0 < if_links.values_num && SUCCEED != DBpatch_interface_discovery_save(&if_links))
+			break;
+
+		ret = SUCCEED;
+		break;
+	}
+
+	zbx_vector_uint64_pair_destroy(&if_links);
+	zbx_vector_dbu_interface_clear_ext(&new_ifs, db_interface_free);
+	zbx_vector_dbu_interface_destroy(&new_ifs);
+	zbx_vector_dbu_snmp_if_clear_ext(&snmp_new_ifs, db_snmpinterface_free);
+	zbx_vector_dbu_snmp_if_destroy(&snmp_new_ifs);
+
+	return ret;
 }
 
 static int	DBpatch_4050040(void)
 {
-	return DBdrop_field("items", "port");
+	return DBdrop_field("interface", "bulk");
 }
 
 static int	DBpatch_4050041(void)
 {
-	const ZBX_TABLE table =
-		{"module", "moduleid", 0,
-			{
-				{"moduleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"relative_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"config", "", NULL, NULL, 2048, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
+	return DBdrop_field("items", "snmp_community");
+}
 
-	return DBcreate_table(&table);
+static int	DBpatch_4050042(void)
+{
+	return DBdrop_field("items", "snmpv3_securityname");
+}
+
+static int	DBpatch_4050043(void)
+{
+	return DBdrop_field("items", "snmpv3_securitylevel");
+}
+
+static int	DBpatch_4050044(void)
+{
+	return DBdrop_field("items", "snmpv3_authpassphrase");
+}
+
+static int	DBpatch_4050045(void)
+{
+	return DBdrop_field("items", "snmpv3_privpassphrase");
+}
+
+static int	DBpatch_4050046(void)
+{
+	return DBdrop_field("items", "snmpv3_authprotocol");
+}
+
+static int	DBpatch_4050047(void)
+{
+	return DBdrop_field("items", "snmpv3_privprotocol");
+}
+
+static int	DBpatch_4050048(void)
+{
+	return DBdrop_field("items", "snmpv3_contextname");
+}
+
+static int	DBpatch_4050049(void)
+{
+	return DBdrop_field("items", "port");
 }
 
 #endif
@@ -1098,7 +1449,6 @@ DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
 DBPATCH_ADD(4050028, 0, 1)
-DBPATCH_ADD(4050029, 0, 1)
 DBPATCH_ADD(4050030, 0, 1)
 DBPATCH_ADD(4050031, 0, 1)
 DBPATCH_ADD(4050032, 0, 1)
@@ -1111,5 +1461,13 @@ DBPATCH_ADD(4050038, 0, 1)
 DBPATCH_ADD(4050039, 0, 1)
 DBPATCH_ADD(4050040, 0, 1)
 DBPATCH_ADD(4050041, 0, 1)
+DBPATCH_ADD(4050042, 0, 1)
+DBPATCH_ADD(4050043, 0, 1)
+DBPATCH_ADD(4050044, 0, 1)
+DBPATCH_ADD(4050045, 0, 1)
+DBPATCH_ADD(4050046, 0, 1)
+DBPATCH_ADD(4050047, 0, 1)
+DBPATCH_ADD(4050048, 0, 1)
+DBPATCH_ADD(4050049, 0, 1)
 
 DBPATCH_END()

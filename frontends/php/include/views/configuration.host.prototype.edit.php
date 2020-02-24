@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $discoveryRule = $data['discovery_rule'];
 $hostPrototype = $data['host_prototype'];
 $parentHost = $data['parent_host'];
@@ -296,11 +300,11 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 				->addValue(_('Inherited and host macros'), 1)
 				->setModern(true)
 			)
-			->addRow(null, new CObject((new CView('hostmacros.list.html', [
+			->addRow(null, new CPartial('hostmacros.list.html', [
 				'macros' => $data['macros'],
 				'show_inherited_macros' => $data['show_inherited_macros'],
 				'readonly' => $data['readonly']
-			]))->getOutput()), 'macros_container')
+			]), 'macros_container')
 	);
 }
 
@@ -394,4 +398,4 @@ else {
 $frmHost->addItem($divTabs);
 $widget->addItem($frmHost);
 
-return $widget;
+$widget->show();

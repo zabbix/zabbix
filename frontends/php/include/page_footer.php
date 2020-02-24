@@ -63,7 +63,10 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();
 			CProfiler::getInstance()->show();
-			makeDebugButton()->show();
+
+			(new CButton(null))
+				->addClass(ZBX_STYLE_BTN_DEBUG)
+				->show();
 		}
 	}
 

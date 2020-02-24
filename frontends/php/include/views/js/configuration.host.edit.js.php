@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
 <script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
 <div class="<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?>" id="interface_row_#{iface.interfaceid}" data-type="#{iface.type}" data-interfaceid="#{iface.interfaceid}">

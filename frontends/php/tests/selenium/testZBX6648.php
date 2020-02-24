@@ -67,15 +67,12 @@ class testZBX6648 extends CLegacyWebTest {
 
 		switch ($zbx_data['triggers']) {
 			case 'both' :
-				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
-				$this->zbxTestLaunchOverlayDialog('Triggers');
-				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
-				$this->zbxTestLaunchOverlayDialog('Triggers');
-				break;
 			case 'enabled' :
 				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
+				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->zbxTestLaunchOverlayDialog('Triggers');
 				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
+				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->zbxTestLaunchOverlayDialog('Triggers');
 				break;
 			case 'disabled' :

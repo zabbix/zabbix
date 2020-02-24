@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Screens'));
 
 $form = (new CForm('get'))->cleanItems();
@@ -139,4 +143,4 @@ $screenForm->addItem([
 // append form to widget
 $widget->addItem($screenForm);
 
-return $widget;
+$widget->show();

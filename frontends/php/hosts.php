@@ -1495,7 +1495,6 @@ else {
 	$hostView = new CView('configuration.host.list', $data);
 }
 
-$hostView->render();
-$hostView->show();
+echo $hostView->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -212,7 +212,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 	DB_RESULT		result2;
 	DB_ROW			row;
 	DB_ROW			row2;
-	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid, druleid, interfaceid;
+	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid, druleid;
 	char			*host, *host_esc, *host_unique, *host_visible, *host_visible_unique;
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
@@ -270,6 +270,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			zbx_uint64_t	interfaceid;
+
 			ZBX_STR2UINT64(dhostid, row[0]);
 			ZBX_STR2UINT64(druleid, row[8]);
 			ZBX_DBROW2UINT64(proxy_hostid, row[1]);

@@ -19,6 +19,11 @@
 **/
 
 
+if (version_compare(PHP_VERSION, '7.2.0', '<')) {
+	echo sprintf('Minimum required PHP version is %1$s.', '7.2.0');
+	exit;
+}
+
 require_once dirname(__FILE__).'/ZBase.php';
 
 /**

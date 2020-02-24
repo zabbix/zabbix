@@ -635,7 +635,7 @@ if (hasRequest('form')) {
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['host'] = $host;
-	$data['preprocessing_test_type'] = CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_LLD;
+	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
 
 	if (!hasRequest('form_refresh')) {
@@ -675,9 +675,7 @@ if (hasRequest('form')) {
 
 	// render view
 	if (!$has_errors) {
-		$itemView = new CView('configuration.host.discovery.edit', $data);
-		$itemView->render();
-		$itemView->show();
+		echo (new CView('configuration.host.discovery.edit', $data))->getOutput();
 	}
 }
 else {
@@ -747,9 +745,7 @@ else {
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 
 	// render view
-	$discoveryView = new CView('configuration.host.discovery.list', $data);
-	$discoveryView->render();
-	$discoveryView->show();
+	echo (new CView('configuration.host.discovery.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

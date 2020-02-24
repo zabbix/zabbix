@@ -1,3 +1,29 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-tmpl">
 	<?php
 	$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
@@ -83,82 +109,6 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		/**
-		 * Collect current preprocessing step properties.
-		 *
-		 * @param {array} step_nums  List of step numbers to collect.
-		 *
-		 * @return array
-		 */
-		function getPreprocessingSteps(step_nums) {
-			var steps = [];
-
-			step_nums.each(function(num) {
-				var type = $('[name="preprocessing[' + num + '][type]"]', $preprocessing).val(),
-					error_handler = $('[name="preprocessing[' + num + '][on_fail]"]').is(':checked')
-						? $('[name="preprocessing[' + num + '][error_handler]"]:checked').val()
-						: <?= ZBX_PREPROC_FAIL_DEFAULT ?>,
-					params = [];
-
-				var on_fail = {
-					error_handler: error_handler,
-					error_handler_params: (error_handler == <?= ZBX_PREPROC_FAIL_SET_VALUE ?>
-							|| error_handler == <?= ZBX_PREPROC_FAIL_SET_ERROR ?>)
-						? $('[name="preprocessing[' + num + '][error_handler_params]"]').val()
-						: ''
-				};
-
-				if ($('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
-					params.push($('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
-				}
-				if ($('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
-					params.push($('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
-				}
-				if ($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).length) {
-					// ZBX-16642
-					if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
-						if ($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
-							params.push($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
-						}
-						else {
-							params.push(0);
-						}
-					}
-					else {
-						params.push($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
-					}
-				}
-
-				steps.push($.extend({
-					type: type,
-					params: params.join("\n")
-				}, on_fail));
-			});
-
-			return steps;
-		}
-
-		/**
-		 * Creates preprocessing test modal window.
-		 *
-		 * @param {array}  step_nums          List of step numbers to collect.
-		 * @param {bool}   show_final_result  Either the final result should be displayed.
-		 * @param {object} trigger_elmnt      UI element triggered function.
-		 */
-		function openPreprocessingTestDialog(step_nums, show_final_result, trigger_elmnt) {
-			var $step_obj = $(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot');
-
-			PopUp('popup.preproctest.edit', $.extend({
-				delay: $('#delay').val() || '',
-				value_type: $('#value_type').val() || <?= CControllerPopupPreprocTest::ZBX_DEFAULT_VALUE_TYPE ?>,
-				steps: getPreprocessingSteps(step_nums),
-				hostid: <?= $data['hostid'] ?>,
-				test_type: <?= $data['preprocessing_test_type'] ?>,
-				step_obj: $step_obj.attr('data-step') || -1,
-				show_final_result: show_final_result ? 1 : 0
-			}, {'data': $step_obj.data('test-data') || []}), 'preprocessing-test', trigger_elmnt);
-		}
-
 		function makeParameterInput(index, type) {
 			var preproc_param_single_tmpl = new Template($('#preprocessing-steps-parameters-single-tmpl').html()),
 				preproc_param_double_tmpl = new Template($('#preprocessing-steps-parameters-double-tmpl').html()),
@@ -170,7 +120,7 @@
 				case '<?= ZBX_PREPROC_MULTIPLIER ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('number')) ?>
+						placeholder: <?= json_encode(_('number')) ?>
 					})).css('width', <?= ZBX_TEXTAREA_NUMERIC_BIG_WIDTH ?>);
 
 				case '<?= ZBX_PREPROC_RTRIM ?>':
@@ -178,55 +128,55 @@
 				case '<?= ZBX_PREPROC_TRIM ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('list of characters')) ?>
+						placeholder: <?= json_encode(_('list of characters')) ?>
 					})).css('width', <?= ZBX_TEXTAREA_SMALL_WIDTH ?>);
 
 				case '<?= ZBX_PREPROC_XPATH ?>':
 				case '<?= ZBX_PREPROC_ERROR_FIELD_XML ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('XPath')) ?>
+						placeholder: <?= json_encode(_('XPath')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_JSONPATH ?>':
 				case '<?= ZBX_PREPROC_ERROR_FIELD_JSON ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('$.path.to.node')) ?>
+						placeholder: <?= json_encode(_('$.path.to.node')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_REGSUB ?>':
 				case '<?= ZBX_PREPROC_ERROR_FIELD_REGEX ?>':
 					return $(preproc_param_double_tmpl.evaluate({
 						rowNum: index,
-						placeholder_0: <?= CJs::encodeJson(_('pattern')) ?>,
-						placeholder_1: <?= CJs::encodeJson(_('output')) ?>
+						placeholder_0: <?= json_encode(_('pattern')) ?>,
+						placeholder_1: <?= json_encode(_('output')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_VALIDATE_RANGE ?>':
 					return $(preproc_param_double_tmpl.evaluate({
 						rowNum: index,
-						placeholder_0: <?= CJs::encodeJson(_('min')) ?>,
-						placeholder_1: <?= CJs::encodeJson(_('max')) ?>
+						placeholder_0: <?= json_encode(_('min')) ?>,
+						placeholder_1: <?= json_encode(_('max')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_VALIDATE_REGEX ?>':
 				case '<?= ZBX_PREPROC_VALIDATE_NOT_REGEX ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('pattern')) ?>
+						placeholder: <?= json_encode(_('pattern')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_THROTTLE_TIMED_VALUE ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(_('seconds')) ?>
+						placeholder: <?= json_encode(_('seconds')) ?>
 					})).css('width', <?= ZBX_TEXTAREA_NUMERIC_BIG_WIDTH ?>);
 
 				case '<?= ZBX_PREPROC_SCRIPT ?>':
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
-						title: <?= CJs::encodeJson(_('JavaScript')) ?>,
-						placeholder: <?= CJs::encodeJson(_('script')) ?>,
+						title: <?= json_encode(_('JavaScript')) ?>,
+						placeholder: <?= json_encode(_('script')) ?>,
 						placeholder_textarea: 'return value',
 						label_before: 'function (value) {',
 						label_after: '}',
@@ -238,16 +188,16 @@
 				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
 					return $(preproc_param_double_tmpl.evaluate({
 						rowNum: index,
-						placeholder_0: <?= CJs::encodeJson(
+						placeholder_0: <?= json_encode(
 							_('<metric name>{<label name>="<label value>", ...} == <value>')
 						) ?>,
-						placeholder_1: <?= CJs::encodeJson(_('<label name>')) ?>
+						placeholder_1: <?= json_encode(_('<label name>')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_TO_JSON ?>':
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= CJs::encodeJson(
+						placeholder: <?= json_encode(
 							_('<metric name>{<label name>="<label value>", ...} == <value>')
 						) ?>
 					}));
@@ -259,7 +209,7 @@
 						width_1: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>,
 						placeholder_0: ',',
 						placeholder_1: '"',
-						chkbox_label: <?= CJs::encodeJson(_('With header row')) ?>,
+						chkbox_label: <?= json_encode(_('With header row')) ?>,
 						chkbox_value: <?= ZBX_PREPROC_CSV_HEADER ?>,
 						chkbox_default: true
 					}));
@@ -277,7 +227,7 @@
 			items: 'li.sortable',
 			axis: 'y',
 			containment: 'parent',
-			cursor: IE ? 'move' : 'grabbing',
+			cursor: 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6
@@ -317,13 +267,14 @@
 					step_nums.push(str.substr(14, str.length - 21));
 				});
 
-				openPreprocessingTestDialog(step_nums, true, this);
+				openItemTestDialog(step_nums, true, false, this, -1);
 			})
 			.on('click', '.preprocessing-step-test', function() {
 				var str = $(this).attr('name'),
+					step_nr = $(this).attr('data-step'),
 					num = str.substr(14, str.length - 21);
 
-				openPreprocessingTestDialog([num], false, this);
+				openItemTestDialog([num], false, false, this, num);
 			})
 			.on('click', '.element-table-remove', function() {
 				$(this).closest('li.sortable').remove();
@@ -393,13 +344,13 @@
 				else if (error_handler == '<?= ZBX_PREPROC_FAIL_SET_VALUE ?>') {
 					$error_handler_params
 						.prop('disabled', false)
-						.attr('placeholder', <?= CJs::encodeJson(_('value')) ?>)
+						.attr('placeholder', <?= json_encode(_('value')) ?>)
 						.show();
 				}
 				else if (error_handler == '<?= ZBX_PREPROC_FAIL_SET_ERROR ?>') {
 					$error_handler_params
 						.prop('disabled', false)
-						.attr('placeholder', <?= CJs::encodeJson(_('error message')) ?>)
+						.attr('placeholder', <?= json_encode(_('error message')) ?>)
 						.show();
 				}
 			});

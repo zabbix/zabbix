@@ -2211,8 +2211,6 @@ abstract class CItemGeneral extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$json = new CJson();
-
 		if (array_key_exists('query_fields', $item)) {
 			if (!is_array($item['query_fields'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -2228,9 +2226,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			$json_string = $json->encode($item['query_fields']);
-
-			if (strlen($json_string) > DB::getFieldLength('items', 'query_fields')) {
+			if (strlen(json_encode($item['query_fields'])) > DB::getFieldLength('items', 'query_fields')) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
 					_('cannot convert to JSON, result value too long')
 				));
@@ -2318,9 +2314,9 @@ abstract class CItemGeneral extends CApiService {
 					$shift = $shift + 1 - strlen($substr);
 				}
 
-				$json->decode($posts);
+				json_decode($posts);
 
-				if ($json->hasError()) {
+				if (json_last_error()) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
 					);

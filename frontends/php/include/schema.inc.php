@@ -7125,6 +7125,66 @@ return [
 			],
 		],
 	],
+	'task_data' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'data' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
+			'parent_taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+		],
+	],
+	'task_result' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'parent_taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+			'info' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
+		],
+	],
 	'task_acknowledge' => [
 		'key' => 'taskid',
 		'fields' => [
@@ -7735,6 +7795,39 @@ return [
 			],
 		],
 	],
+	'module' => [
+		'key' => 'moduleid',
+		'fields' => [
+			'moduleid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'id' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'relative_path' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'config' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
+		],
+	],
 	'interface_snmp' => [
 		'key' => 'interfaceid',
 		'fields' => [
@@ -7804,37 +7897,6 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
-			],
-		],
-	],
-	'module' => [
-		'key' => 'moduleid',
-		'fields' => [
-			'moduleid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
-			'id' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-			],
-			'relative_path' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-			],
-			'status' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'config' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => '{}',
 			],
 		],
 	],

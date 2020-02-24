@@ -46,7 +46,6 @@ static void	lld_hostmacro_free(zbx_lld_hostmacro_t *hostmacro)
 	zbx_free(hostmacro);
 }
 
-
 typedef struct
 {
 	char		*community;
@@ -105,11 +104,12 @@ typedef struct
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT)
 #define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000080)	/* interfaces which should be deleted */
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE	__UINT64_C(0x00000100)	/* snmp data which should be deleted */
-	zbx_uint64_t			flags;
+	zbx_uint64_t	flags;
 	union _data
 	{
 		zbx_lld_interface_snmp_t *snmp;
-	}				data;
+	}
+	data;
 }
 zbx_lld_interface_t;
 
@@ -2891,7 +2891,7 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
-			zbx_lld_interface_snmp_t *snmp;
+			zbx_lld_interface_snmp_t	*snmp;
 
 			snmp = (zbx_lld_interface_snmp_t *)zbx_malloc(NULL, sizeof(zbx_lld_interface_snmp_t));
 			ZBX_STR2UCHAR(snmp->version, row[7]);
@@ -3117,7 +3117,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			unsigned char interface_type;
+			unsigned char	interface_type;
 
 			ZBX_STR2UINT64(hostid, row[0]);
 			ZBX_DBROW2UINT64(parent_interfaceid, row[1]);

@@ -1425,7 +1425,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['config'] = select_config();
 	$data['host'] = $host;
-	$data['preprocessing_test_type'] = CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM;
+	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
 	$data['preprocessing_types'] = CItem::$supported_preprocessing_types;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
@@ -1458,9 +1458,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 
 	// render view
 	if (!$has_errors) {
-		$itemView = new CView('configuration.item.edit', $data);
-		$itemView->render();
-		$itemView->show();
+		echo (new CView('configuration.item.edit', $data))->getOutput();
 	}
 }
 elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform') || hasRequest('massupdate'))
@@ -1501,7 +1499,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'headers' => getRequest('headers', []),
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
-		'preprocessing_test_type' => CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM,
+		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 		'preprocessing_types' => CItem::$supported_preprocessing_types,
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
@@ -1662,18 +1660,14 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	}
 
 	// render view
-	$itemView = new CView('configuration.item.massupdate', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.item.massupdate', $data))->getOutput();
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('group_itemid')) {
 	$data = getCopyElementsFormData('group_itemid', _('Items'));
 	$data['action'] = 'item.masscopyto';
 
 	// render view
-	$itemView = new CView('configuration.copy.elements', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 // list of items
 else {
@@ -2009,9 +2003,7 @@ else {
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
 
 	// render view
-	$itemView = new CView('configuration.item.list', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.item.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
