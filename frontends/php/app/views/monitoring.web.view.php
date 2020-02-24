@@ -35,13 +35,13 @@ $web_layout_mode = $this->getLayoutMode();
 (new CWidget())
 	->setTitle(_('Web monitoring'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CList([
+	->setControls(
 		(new CTag('nav', true, get_icon('fullscreen', ['mode' => $web_layout_mode])))
 			->setAttribute('aria-label', _('Content controls'))
-		])))
+	)
 	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'web.view')))
-		->setProfile('web.web.filter')
-		->setActiveTab(1)
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'web.view'))->removeId())
 		->addFilterTab(_('Filter'), [
 			(new CFormList())
@@ -50,14 +50,13 @@ $web_layout_mode = $this->getLayoutMode();
 						'multiple' => true,
 						'name' => 'filter_groupids[]',
 						'object_name' => 'hostGroup',
-						'data' => $data['ms_groups'],
+						'data' => $data['filter']['groupids'],
 						'popup' => [
 							'parameters' => [
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_groupids_',
-								'with_monitored_items' => true,
 								'with_httptests' => true,
 								'real_hosts' => true
 							]
@@ -69,7 +68,7 @@ $web_layout_mode = $this->getLayoutMode();
 						'multiple' => true,
 						'name' => 'filter_hostids[]',
 						'object_name' => 'hosts',
-						'data' => $data['ms_hosts'],
+						'data' => $data['filter']['hostids'],
 						'popup' => [
 							'parameters' => [
 								'srctbl' => 'hosts',
@@ -77,8 +76,7 @@ $web_layout_mode = $this->getLayoutMode();
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_hostids_',
 								'with_monitored_items' => true,
-								'with_httptests' => true,
-								'real_hosts' => true
+								'with_httptests' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

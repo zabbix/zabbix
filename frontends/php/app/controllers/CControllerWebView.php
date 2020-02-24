@@ -21,16 +21,6 @@
 
 class CControllerWebView extends CController {
 
-	/**
-	 * @var array
-	 */
-	protected $groups = [];
-
-	/**
-	 * @var array
-	 */
-	protected $hosts = [];
-
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -56,35 +46,7 @@ class CControllerWebView extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
-			return false;
-		}
-
-		if ($this->getInput('filter_groupids', [])) {
-			$this->groups = API::HostGroup()->get([
-				'output' => ['name', 'groupid'],
-				'groupids' => $this->getInput('filter_groupids'),
-				'preservekeys' => true
-			]);
-
-			if (count($this->groups) != count($this->getInput('filter_groupids'))) {
-				return false;
-			}
-		}
-
-		if ($this->getInput('filter_hostids', [])) {
-			$this->hosts = API::Host()->get([
-				'output' => ['name', 'hostid'],
-				'hostids' => $this->getInput('filter_hostids'),
-				'preservekeys' => true
-			]);
-
-			if (count($this->hosts) != count($this->getInput('filter_hostids'))) {
-				return false;
-			}
-		}
-
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
@@ -105,8 +67,37 @@ class CControllerWebView extends CController {
 			CProfile::deleteIdx('web.httpmon.filter.hostids');
 		}
 
-		$data['ms_hosts'] = CArrayHelper::renameObjectsKeys($this->hosts, ['hostid' => 'id']);
-		$data['ms_groups'] = CArrayHelper::renameObjectsKeys($this->groups, ['groupid' => 'id']);
+		$data['filter'] = [
+			'groupids' => CProfile::getArray('web.httpmon.filter.groupids', []),
+			'hostids' => CProfile::getArray('web.httpmon.filter.hostids', [])
+		];
+
+		// Select host groups.
+		$data['filter']['groupids'] = $data['filter']['groupids']
+			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+				'output' => ['name', 'groupid'],
+				'groupids' => $data['filter']['groupids'],
+				'with_httptests' => true,
+				'real_hosts' => true,
+				'preservekeys' => true
+			]), ['groupid' => 'id'])
+			: [];
+
+		$filter_groupids = $data['filter']['groupids'] ? array_keys($data['filter']['groupids']) : null;
+		if ($filter_groupids) {
+			$filter_groupids = getSubGroups($filter_groupids);
+		}
+
+		// Select hosts.
+		$data['filter']['hostids'] = $data['filter']['hostids']
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['name', 'hostid'],
+				'hostids' => $data['filter']['hostids'],
+				'with_monitored_items' => true,
+				'with_httptests' => true,
+				'preservekeys' => true
+			]), ['hostid' => 'id'])
+			: [];
 
 		$data['screen_view'] = CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_HTTPTEST,
@@ -116,10 +107,15 @@ class CControllerWebView extends CController {
 			'data' => [
 				'sort' => $sort_field,
 				'sortorder' => $sort_order,
-				'groupids' => $this->hasInput('filter_groupids') ? $this->getInput('filter_groupids') : null,
-				'hostids' => $this->hasInput('filter_hostids') ? $this->getInput('filter_hostids') : null
+				'groupids' => $filter_groupids,
+				'hostids' => $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null
 			]
 		])->get();
+
+		$data += [
+			'profileIdx' => 'web.web.filter',
+			'active_tab' => CProfile::get('web.web.filter.active', 1)
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Web monitoring'));

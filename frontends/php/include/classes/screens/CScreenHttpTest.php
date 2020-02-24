@@ -68,8 +68,8 @@ class CScreenHttpTest extends CScreenBase {
 			'limit' => $config['search_limit'] + 1
 		];
 
-		$options['hostids'] = $this->data['hostids'];
-		$options['groupids'] = $this->data['groupids'];
+		$options['hostids'] = $this->data['hostids'] ? $this->data['hostids'] : null;
+		$options['groupids'] = $this->data['groupids'] ? $this->data['groupids'] : null;
 
 		$httptests = API::HttpTest()->get($options);
 
