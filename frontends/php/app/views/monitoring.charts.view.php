@@ -37,12 +37,13 @@ $widget = (new CWidget())
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
+			->addVar('action', 'charts.view')
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CList())
 				->addItem([
-					new CLabel(_('View as'), 'action'),
+					new CLabel(_('View as'), 'view_as'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('action', $data['action'], 'submit()', [
+					new CComboBox('view_as', $data['view_as'], 'submit()', [
 						HISTORY_GRAPH => _('Graph'),
 						HISTORY_VALUES => _('Values')
 					])
@@ -67,6 +68,7 @@ $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'charts.v
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
 		$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 	)
+	->addFormItem((new CVar('view_as', $data['view_as']))->removeId())
 	->addFormItem((new CVar('action', 'charts.view'))->removeId());
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
@@ -153,21 +155,22 @@ $widget->addItem($filter);
 if ($data['must_specify_host']) {
 	$widget->addItem((new CTableInfo())->setNoDataMessage(_('Specify host to see the graphs.')));
 }
-else if ($data['charts']) {
+else if ($data['graphids']) {
 	$table = (new CTable())
 		->setAttribute('style', 'width: 100%;');
 
-	if ($data['action'] === HISTORY_VALUES) {
+	if ($data['view_as'] === HISTORY_VALUES) {
+		$this->addJsFile('flickerfreescreen.js');
 		$screen = CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_HISTORY,
 			'action' => HISTORY_VALUES,
-			/* 'graphid' => $data['graphid'], */
-			'graphids' => $data['graphids'], // << TODO
-			'pageFile' => (new CUrl('charts.php'))
-				->setArgument('groupid', $data['groupid'])
-				->setArgument('hostid', $data['hostid'])
-				->setArgument('graphid', $data['graphid'])
-				->setArgument('action', $data['action'])
+			'itemids' => $data['itemids'],
+			'pageFile' => (new CUrl('zabbix.php'))
+				->setArgument('action', 'charts.view')
+				->setArgument('filter_graph_patterns', $data['filter_graph_patterns'])
+				->setArgument('filter_graphids', $data['filter_graphids'])
+				->setArgument('filter_hostids', $data['filter_hostids'])
+				->setArgument('view_as', $data['view_as'])
 				->getUrl(),
 			'profileIdx' => $data['timeline']['profileIdx'],
 			'profileIdx2' => $data['timeline']['profileIdx2'],
@@ -189,7 +192,8 @@ else if ($data['charts']) {
 			'config' => [
 				'refresh_interval' => (int) CWebUser::getRefresh(),
 				'refresh_list' => $data['filter_search_type'] == ZBX_SEARCH_TYPE_PATTERN,
-				'filter_graph_patterns' => $data['filter_graph_patterns']
+				'filter_graph_patterns' => $data['filter_graph_patterns'],
+				'filter_hostids' => $data['filter_hostids']
 			]
 		]);
 	}

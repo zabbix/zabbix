@@ -29,14 +29,14 @@ class CControllerChartsView extends CController {
 		$fields = [
 			'from'                  => 'range_time',
 			'to'                    => 'range_time',
-			'action'                => 'in '.HISTORY_GRAPH.','.HISTORY_VALUES,
-			'action'                => '',
-			'filter_set' => 'in 1',
-			'filter_rst' => 'in 1',
+			'view_as'               => 'in '.HISTORY_GRAPH.','.HISTORY_VALUES,
+			'filter_set'            => 'in 1',
+			'filter_rst'            => 'in 1',
 			'filter_search_type'    => 'in '.ZBX_SEARCH_TYPE_STRICT.','.ZBX_SEARCH_TYPE_PATTERN,
 			'filter_hostids'        => 'array',
 			'filter_graphids'       => 'array',
-			'filter_graph_patterns' => 'array'
+			'filter_graph_patterns' => 'array',
+			'page'                  => 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -143,12 +143,9 @@ class CControllerChartsView extends CController {
 		updateTimeSelectorPeriod($timeselector_options);
 
 		$data = [
-			'action' => $this->getInput('action', HISTORY_GRAPH),
-			'actions' => [
-				HISTORY_GRAPH => _('Graph'),
-				HISTORY_VALUES => _('Values')
-			],
+			'view_as' => $this->getInput('view_as', HISTORY_GRAPH),
 			'graphids' => [],
+			'charts' => [],
 			'ms_hosts' => [],
 			'ms_graphs' => [],
 			'ms_graph_patterns' => [],
@@ -158,7 +155,8 @@ class CControllerChartsView extends CController {
 			'filter_hostids' => $filter_hostids,
 			'filter_graphids' => $filter_graphids,
 			'filter_graph_patterns' => $filter_graph_patterns,
-			'must_specify_host' => false
+			'must_specify_host' => false,
+			'page' => $this->getInput('page', 1)
 		];
 
 		foreach ($filter_graph_patterns as $pattern) {
@@ -179,19 +177,31 @@ class CControllerChartsView extends CController {
 			]), ['hostid' => 'id']);
 		}
 
-		if ($filter_search_type == ZBX_SEARCH_TYPE_STRICT) {
-			$data['graphids'] = $filter_graphids;
+		$data['must_specify_host'] = (($filter_search_type == ZBX_SEARCH_TYPE_PATTERN)
+			|| ($filter_search_type == ZBX_SEARCH_TYPE_STRICT && !$filter_graphids)) && !$filter_hostids;
+
+		if (!$data['must_specify_host']) {
+			if ($filter_search_type == ZBX_SEARCH_TYPE_STRICT) {
+				$data['graphids'] = $filter_graphids
+					? $filter_graphids
+					: $this->getGraphidsByPatterns([], $filter_hostids);
+			}
+			else {
+				$data['graphids'] = $this->getGraphidsByPatterns($filter_graph_patterns, $filter_hostids);
+			}
 		}
-		else if ($filter_hostids) {
-			$data['graphids'] = $this->getGraphidsByPatterns($filter_graph_patterns, $filter_hostids);
-		}
-		else {
-			$data['must_specify_host'] = true;
-		}
-		$data['graphids'] = [910, 567082, 39963];
 
 		if ($data['graphids']) {
-			$data['charts'] = $this->getChartsById($data['graphids']);
+			if ($data['view_as'] === HISTORY_VALUES) {
+				$data['itemids'] = array_keys(API::Item()->get([
+					'output' => [],
+					'graphids' => $data['graphids'],
+					'preservekeys' => true
+				]));
+			}
+			else {
+				$data['charts'] = $this->getChartsById($data['graphids']);
+			}
 		}
 
 		$response = new CControllerResponseData($data);

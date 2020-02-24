@@ -30,11 +30,11 @@ class CControllerChartsViewJson extends CControllerChartsView {
 
 	protected function checkInput() {
 		$fields = [
-			'from'                 => 'range_time',
-			'to'                   => 'range_time',
-			'search_type'          => 'in '.ZBX_SEARCH_TYPE_STRICT.','.ZBX_SEARCH_TYPE_PATTERN,
-			'filter_graphid'       => 'array',
-			'filter_graph_patterns' => 'array',
+			'from'                  => 'range_time',
+			'to'                    => 'range_time',
+			'search_type'           => 'in '.ZBX_SEARCH_TYPE_STRICT.','.ZBX_SEARCH_TYPE_PATTERN,
+			'filter_hostids'        => 'required | array',
+			'filter_graph_patterns' => 'array'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -59,16 +59,13 @@ class CControllerChartsViewJson extends CControllerChartsView {
 		];
 		updateTimeSelectorPeriod($timeselector_options);
 
-		$graphids = [910, 567082, 39963];
+		$graphids = $this->getGraphidsByPatterns($this->getInput('filter_graph_patterns', []),
+			$this->getInput('filter_hostids')
+		);
 
 		$data = [
 			'charts' => $this->getChartsById($graphids),
-			'timeline' => getTimeSelectorPeriod($timeselector_options),
-			'config' => [
-				'refresh_interval' => (int) CWebUser::getRefresh(),
-				/* 'refresh_list' => $data['search_type'] == ZBX_SEARCH_TYPE_PATTERN, */
-				/* 'graph_patterns' => $data['graph_patterns'] */
-			]
+			'timeline' => getTimeSelectorPeriod($timeselector_options)
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
