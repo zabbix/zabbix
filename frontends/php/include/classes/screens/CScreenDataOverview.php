@@ -45,34 +45,30 @@ class CScreenDataOverview extends CScreenBase {
 
 		$data = [];
 		if ($this->screenitem['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop((array) $groupid, null,
+			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop((array) $groupid, null,
 				$this->screenitem['application']
 			);
-
-			$items_by_name = array_slice($items_by_name, 0, $this->screenitem['elements'], true);
 
 			$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name,
 				ZBX_PROBLEM_SUPPRESSED_FALSE
 			);
 			$data['db_hosts'] = $db_hosts;
 			$data['items_by_name'] = $items_by_name;
-			$data['hidden_cnt'] = $hidden_cnt;
+			$data['has_hidden_data'] = $has_hidden_data;
 
 			$table = new CPartial('dataoverview.table.top', $data);
 		}
 		else {
-			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft((array) $groupid, null,
+			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewLeft((array) $groupid, null,
 				$this->screenitem['application']
 			);
-
-			$db_hosts = array_slice($db_hosts, 0, $this->screenitem['elements'], true);
 
 			$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name,
 				ZBX_PROBLEM_SUPPRESSED_FALSE
 			);
 			$data['db_hosts'] = $db_hosts;
 			$data['items_by_name'] = $items_by_name;
-			$data['hidden_cnt'] = $hidden_cnt;
+			$data['has_hidden_data'] = $has_hidden_data;
 
 			$table = new CPartial('dataoverview.table.left', $data);
 		}

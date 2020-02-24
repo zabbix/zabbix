@@ -52,7 +52,7 @@ foreach ($data['items_by_name'] as $name => $hostid_to_itemid) {
 	$table->addRow($row);
 }
 
-if (1) {
+if ($data['has_hidden_data']) {
 	$table->setFooter([
 		(new CCol(_('Not all results are displayed. Please specify a more specific search criteria.')))
 			->setColSpan($table->getNumCols())

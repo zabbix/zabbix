@@ -1192,8 +1192,10 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 	$db_items = array_intersect_key($db_items, array_flip($itemids));
 
 	$db_hosts = getDataOverviewHosts(null, null, $itemids);
+	$db_hosts_ctn = count($db_hosts);
+	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
 
-	return [$db_items, $db_hosts, $items_by_name, $hidden_items_cnt];
+	return [$db_items, $db_hosts, $items_by_name, $hidden_items_cnt || ($db_hosts_ctn > count($db_hosts))];
 }
 
 /**
@@ -1218,7 +1220,10 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
 	}
 
-	return [$db_items, $db_hosts, $items_by_name, $hidden_db_hosts_cnt];
+	$items_by_name_ctn = count($items_by_name);
+	$items_by_name = array_slice($items_by_name, 0, ZBX_MAX_TABLE_COLUMNS, true);
+
+	return [$db_items, $db_hosts, $items_by_name, $hidden_db_hosts_cnt || ($items_by_name_ctn > count($items_by_name))];
 }
 
 /**

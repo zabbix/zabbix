@@ -37,18 +37,14 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 		$groupids = $fields['groupids'] ? $fields['groupids'] : null;
 
 		if ($fields['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop($groupids, null,
+			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop($groupids, null,
 				$fields['application']
 			);
-
-			$items_by_name = array_slice($items_by_name, 0, ZBX_MAX_TABLE_COLUMNS, true);
 		}
 		else {
-			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft($groupids, null,
+			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewLeft($groupids, null,
 				$fields['application']
 			);
-
-			$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
 		}
 
 		$visible_items = getDataOverviewCellData($db_hosts, $db_items, $items_by_name, $fields['show_suppressed']);
@@ -62,7 +58,7 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'visible_items' => $visible_items,
 			'db_hosts' => $db_hosts,
 			'items_by_name' => $items_by_name,
-			'hidden_cnt' => $hidden_cnt,
+			'has_hidden_data' => $has_hidden_data,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

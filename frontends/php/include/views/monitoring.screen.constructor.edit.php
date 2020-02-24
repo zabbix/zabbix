@@ -766,17 +766,11 @@ if (in_array($resourceType, [SCREEN_RESOURCE_HOST_INFO, SCREEN_RESOURCE_TRIGGER_
 	);
 }
 elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
-	$tmp_elements = $elements ? $elements : ZBX_DEFAULT_WIDGET_LINES;
 	$screenFormList->addRow(_('Hosts location'),
 		(new CRadioButtonList('style', (int) $style))
 			->addValue(_('Left'), STYLE_LEFT)
 			->addValue(_('Top'), STYLE_TOP)
 			->setModern(true)
-	)
-	->addRow((new CLabel(_('Show lines'), 'elements'))->setAsteriskMark(),
-		(new CNumericBox('elements', $tmp_elements, 3))
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 }
 elseif ($resourceType != SCREEN_RESOURCE_CLOCK) {
