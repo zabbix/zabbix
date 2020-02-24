@@ -54,10 +54,9 @@ class CMacroValue extends CDiv {
 				['add_post_js' => $add_post_js]
 			))
 				->setAttribute('placeholder', _('value'))
-			: (new CInputSecret($name.'[value]', ZBX_MACRO_SECRET_MASK, _('value'), [
-				'disabled' => $readonly,
-				'add_post_js' => $add_post_js
-			]));
+			: (new CInputSecret($name.'[value]', _('value'), array_key_exists('value', $macro) ? $macro['value'] : null,
+				['disabled' => $readonly, 'add_post_js' => $add_post_js]
+			));
 
 		if ($macro['type'] == ZBX_MACRO_TYPE_TEXT && $readonly) {
 			$value_input->setAttribute('readonly', 'readonly');
@@ -70,9 +69,11 @@ class CMacroValue extends CDiv {
 			->addItem([
 				$value_input,
 				($macro['type'] == ZBX_MACRO_TYPE_SECRET)
-					? (new CButton(null))
-						->setAttribute('title', _('Revert changes'))
-						->addClass(ZBX_STYLE_BTN_ALT.' '.self::ZBX_STYLE_BTN_UNDO)
+					? array_key_exists('value', $macro)
+						? null
+						: (new CButton(null))
+							->setAttribute('title', _('Revert changes'))
+							->addClass(ZBX_STYLE_BTN_ALT.' '.self::ZBX_STYLE_BTN_UNDO)
 					: null,
 				new CButtonDropdown($name.'[type]', $macro['type'], $dropdown_options)
 			]);
