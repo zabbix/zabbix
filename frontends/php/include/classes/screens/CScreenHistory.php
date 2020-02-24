@@ -221,7 +221,7 @@ class CScreenHistory extends CScreenBase {
 						$value = '"'.$value.'"';
 					}
 					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-						$value = numberToFloat($value, FLOAT64_PRECISION_DISPLAY, ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
+						$value = numberToFloat($value, FLOAT64_PRECISION_DISPLAY, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 					}
 
 					$row = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
@@ -371,7 +371,7 @@ class CScreenHistory extends CScreenBase {
 					$value = $history_row['value'];
 
 					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-						$value = numberToFloat($value, FLOAT64_PRECISION_DISPLAY, ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
+						$value = numberToFloat($value, FLOAT64_PRECISION_DISPLAY, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 					}
 
 					if ($item['valuemapid']) {
@@ -458,7 +458,7 @@ class CScreenHistory extends CScreenBase {
 
 						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 							$value = numberToFloat($value, FLOAT64_PRECISION_DISPLAY,
-								ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT
+								ZBX_UNITS_ROUNDOFF_UNSUFFIXED
 							);
 						}
 

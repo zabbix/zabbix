@@ -765,13 +765,13 @@ class CLineGraphDraw extends CGraphDraw {
 						}
 						else {
 							$slave_min = floor($this->m_minY[$side] / $candidate) * $candidate;
-							if (($this->m_minY[$side] - $slave_min) / $candidate < $clearance) {
+							if ($slave_min != 0 && ($this->m_minY[$side] - $slave_min) / $candidate < $clearance) {
 								$slave_min -= $candidate;
 							}
 							$slave_max = $slave_min + $candidate * $rows;
 						}
 
-						if ($this->m_minY[$side] != 0
+						if ($this->m_minY[$side] != 0 && $slave_min != 0
 								&& ($this->m_minY[$side] - $slave_min) / $candidate < $clearance) {
 							continue;
 						}
