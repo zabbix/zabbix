@@ -654,7 +654,8 @@ class CControllerMenuPopup extends CController {
 		elseif ($data['widgetType'] == WIDGET_GRAPH && array_key_exists('itemid', $data) && $data['itemid']) {
 			$menu_data['download'] = (bool) API::Item()->get([
 				'output' => ['itemid'],
-				'itemids' => $data['itemid']
+				'itemids' => $data['itemid'],
+				'webitems' => true
 			]);
 		}
 
