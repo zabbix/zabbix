@@ -291,7 +291,7 @@ void	free_metrics(void)
 			zbx_free(commands_local[i].test_param);
 		}
 
-		zbx_free(commands);
+		zbx_free(commands_local);
 	}
 
 	free_key_access_rules();
