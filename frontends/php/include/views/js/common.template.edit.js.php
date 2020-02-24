@@ -256,7 +256,7 @@
 									placeholder: $input.attr('placeholder'),
 									maxlength: $input.attr('maxlength')
 								})
-								.text($input.val())
+								.text($input.is(':disabled') ? '' : $input.val())
 								.textareaFlexible()
 						);
 					}
