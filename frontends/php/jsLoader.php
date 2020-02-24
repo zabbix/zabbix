@@ -132,9 +132,7 @@ $tranStrings = [
 		'Widget is too small for the specified number of columns and rows.' =>
 			_('Widget is too small for the specified number of columns and rows.'),
 		'Cannot add widget: not enough free space on the dashboard.' =>
-			_('Cannot add widget: not enough free space on the dashboard.'),
-		'Widget actions' => _('Widget actions'),
-		'Download image' => _('Download image')
+			_('Cannot add widget: not enough free space on the dashboard.')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
@@ -300,7 +298,8 @@ $tranStrings = [
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
-		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
+		'Download image' => _('Download image')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),

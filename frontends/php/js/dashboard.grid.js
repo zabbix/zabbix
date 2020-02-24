@@ -118,7 +118,7 @@
 							$('<button>', {
 								'type': 'button',
 								'class': 'btn-widget-action',
-								'title': t('Widget actions'),
+								'title': t('Actions'),
 								'data-menu-popup': JSON.stringify({
 									'type': 'widget_actions',
 									'data': widget_actions
