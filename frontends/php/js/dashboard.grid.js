@@ -2170,6 +2170,11 @@
 					options = {};
 				}
 
+				// Call refreshCallback handler for expanded popup menu items.
+				if ($obj.find('[data-expanded="true"][data-menu-popup]').length) {
+					$obj.find('[data-expanded="true"][data-menu-popup]').menuPopup('refresh', widget);
+				}
+
 				if (widget['iterator']) {
 					updateIteratorCallback($obj, data, widget, response, options);
 				}
