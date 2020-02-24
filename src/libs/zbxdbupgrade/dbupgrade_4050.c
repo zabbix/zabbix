@@ -610,7 +610,8 @@ static int	DBpatch_4050036(void)
 	const char	*values[] = {
 			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
 			"web..hostid", "web.view.groupid", "web.view.hostid", "web.view.graphid",
-			"web.config.groupid", "web.config.hostid", "web.templates.php.groupid", "web.cm.groupid"
+			"web.config.groupid", "web.config.hostid", "web.templates.php.groupid", "web.cm.groupid",
+			"web.httpmon.php.sort", "web.httpmon.php.sortorder"
 		};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
