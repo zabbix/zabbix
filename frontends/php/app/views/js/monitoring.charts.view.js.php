@@ -72,7 +72,7 @@
 		}
 
 		/**
-		 * Set loading
+		 * Set loading state for chart.
 		 *
 		 * @param {number} delay_loading  (optional) Add loader only when request exceeds this many seconds.
 		 *

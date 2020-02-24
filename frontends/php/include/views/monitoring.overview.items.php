@@ -171,6 +171,5 @@ else {
 }
 
 $widget->addItem($table);
-$widget->addItem($data['paging_line']);
 
 $widget->show();

@@ -76,18 +76,5 @@ class CWidgetFormDataOver extends CWidgetForm {
 		}
 
 		$this->fields[$field_style->getName()] = $field_style;
-
-		// Show lines.
-		$field_lines = (new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
-			ZBX_MAX_WIDGET_LINES
-		))
-			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-			->setDefault(ZBX_DEFAULT_WIDGET_LINES);
-
-		if (array_key_exists('show_lines', $this->data)) {
-			$field_lines->setValue($this->data['show_lines']);
-		}
-
-		$this->fields[$field_lines->getName()] = $field_lines;
 	}
 }

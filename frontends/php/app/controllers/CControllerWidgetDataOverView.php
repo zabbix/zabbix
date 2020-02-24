@@ -41,14 +41,14 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 				$fields['application']
 			);
 
-			$items_by_name = array_slice($items_by_name, 0, $fields['show_lines'], true);
+			$items_by_name = array_slice($items_by_name, 0, ZBX_MAX_TABLE_COLUMNS, true);
 		}
 		else {
 			list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft($groupids, null,
 				$fields['application']
 			);
 
-			$db_hosts = array_slice($db_hosts, 0, $fields['show_lines'], true);
+			$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
 		}
 
 		$visible_items = getDataOverviewCellData($db_hosts, $db_items, $items_by_name, $fields['show_suppressed']);
@@ -59,7 +59,6 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'application' => $fields['application'],
 			'show_suppressed' => $fields['show_suppressed'],
 			'style' => $fields['style'],
-			'show_lines' => $fields['show_lines'],
 			'visible_items' => $visible_items,
 			'db_hosts' => $db_hosts,
 			'items_by_name' => $items_by_name,

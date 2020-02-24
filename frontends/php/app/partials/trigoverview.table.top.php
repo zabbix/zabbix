@@ -58,7 +58,7 @@ foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
 
 if ($data['exceeded_hosts'] || $data['exceeded_trigs']) {
 	$table->setFooter([
-		(new CCol(_('Not all data shown.')))
+		(new CCol(_('Not all results are displayed. Please specify a more specific search criteria.')))
 			->setColSpan($table->getNumCols())
 			->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
 	]);

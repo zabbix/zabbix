@@ -32,11 +32,6 @@ foreach ($data['items_by_name'] as $name => $hostid_to_itemid) {
 		->addClass('vertical_rotation')
 		->setTitle($name);
 }
-if ($data['hidden_cnt']) {
-	$headings[] = (new CColHeader('...'))
-		->addClass('vertical_rotation')
-		->setTitle(_n('%s item hidden', '%s items hidden', $data['hidden_cnt'], $data['hidden_cnt']));
-}
 
 $table->setHeader($headings);
 
@@ -55,11 +50,15 @@ foreach ($data['db_hosts'] as $hostid => $host) {
 		}
 	}
 
-	if ($data['hidden_cnt']) {
-		$row[] = new CCol();
-	}
-
 	$table->addRow($row);
+}
+
+if (1) {
+	$table->setFooter([
+		(new CCol(_('Not all results are displayed. Please specify a more specific search criteria.')))
+			->setColSpan($table->getNumCols())
+			->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
+	]);
 }
 
 echo $table;

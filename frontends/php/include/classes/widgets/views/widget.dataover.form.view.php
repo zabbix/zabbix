@@ -60,9 +60,6 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 // Hosts location.
 $form_list->addRow(CWidgetHelper::getLabel($fields['style']), CWidgetHelper::getRadioButtonList($fields['style']));
 
-// Show lines.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
-
 $form->addItem($form_list);
 
 return [
