@@ -123,7 +123,7 @@ $widget->setControls((new CTag('nav', true, (new CList())
 $screenBuilder = new CScreenBuilder([
 	'screenid' => $data['screen']['screenid'],
 	'mode' => SCREEN_MODE_PREVIEW,
-	'hostid' => $data['hostid'],
+	'hostid' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 	'profileIdx' => $data['profileIdx'],
 	'profileIdx2' => $data['profileIdx2'],
 	'from' => $data['from'],

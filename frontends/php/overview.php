@@ -258,20 +258,18 @@ else {
 	$hostids = $hostids ? $hostids : null;
 
 	if ($data['view_style'] == STYLE_TOP) {
-		list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewTop($groupids, $hostids, $application);
-		$items_by_name = array_slice($items_by_name, 0, ZBX_MAX_TABLE_COLUMNS);
+		list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop($groupids, $hostids, $application);
 	}
 	else {
-		list($db_items, $db_hosts, $items_by_name, $hidden_cnt) = getDataOverviewLeft($groupids, $hostids,
+		list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewLeft($groupids, $hostids,
 			$application
 		);
-		$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS);
 	}
 
 	$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name, $show_suppressed);
 	$data['db_hosts'] = $db_hosts;
 	$data['items_by_name'] = $items_by_name;
-	$data['hidden_cnt'] = $hidden_cnt;
+	$data['has_hidden_data'] = $has_hidden_data;
 
 	// Render view.
 	echo (new CView('monitoring.overview.items', $data))->getOutput();

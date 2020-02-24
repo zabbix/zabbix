@@ -158,7 +158,7 @@ if ($data['view_style'] == STYLE_TOP) {
 		'visible_items' => $data['visible_items'],
 		'db_hosts' => $data['db_hosts'],
 		'items_by_name' => $data['items_by_name'],
-		'hidden_cnt' => $data['hidden_cnt']
+		'has_hidden_data' => $data['has_hidden_data']
 	]);
 }
 else {
@@ -166,7 +166,7 @@ else {
 		'visible_items' => $data['visible_items'],
 		'db_hosts' => $data['db_hosts'],
 		'items_by_name' => $data['items_by_name'],
-		'hidden_cnt' => $data['hidden_cnt']
+		'has_hidden_data' => $data['has_hidden_data']
 	]);
 }
 
