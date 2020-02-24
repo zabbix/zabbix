@@ -61,6 +61,33 @@ class CControllerChartsView extends CController {
 		return true;
 	}
 
+	/**
+	 * Fetches all host graph ids or also intersect with given graphids array (second parameter).
+	 *
+	 * @param array $hostids   If not empty, return the listed host graphids.
+	 * @param array $graphids  If not empty, will be used for graphs filter.
+	 *
+	 * @return array
+	 */
+	protected function getGraphidsByHostids(array $hostids, array $graphids): array {
+		if (!$hostids && $graphids) {
+			return $graphids;
+		}
+
+		$options = [
+			'output' => [],
+			'hostids' => $hostids,
+			'limit' => ZBX_MAX_GRAPHS_PER_PAGE,
+			'preservekeys' => true
+		];
+
+		if ($hostids && $graphids) {
+			$options['graphids'] = $graphids;
+		}
+
+		return array_keys(API::Graph()->get($options));
+	}
+
 	protected function getGraphidsByPatterns(array $patterns, array $hostids): array {
 		return array_keys(API::Graph()->get([
 			'output' => [],
@@ -187,9 +214,7 @@ class CControllerChartsView extends CController {
 
 		if (!$data['must_specify_host']) {
 			if ($filter_search_type == ZBX_SEARCH_TYPE_STRICT) {
-				$data['graphids'] = $filter_graphids
-					? $filter_graphids
-					: $this->getGraphidsByPatterns([], $filter_hostids);
+				$data['graphids'] = $this->getGraphidsByHostids($filter_hostids, $filter_graphids);
 			}
 			else {
 				$data['graphids'] = $this->getGraphidsByPatterns($filter_graph_patterns, $filter_hostids);
