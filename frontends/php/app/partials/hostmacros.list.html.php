@@ -212,4 +212,4 @@ else {
 $table->show();
 
 // Initializing input secret separately.
-insert_js(implode("\n", ["jQuery('.input-secret').inputSecret();"]));
+insert_js("jQuery('.input-secret').inputSecret();");
