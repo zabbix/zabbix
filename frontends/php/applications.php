@@ -113,6 +113,11 @@ $filter['groups'] = $filter['groups']
 	]), ['groupid' => 'id'])
 	: [];
 
+$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+if ($filter_groupids) {
+	$filter_groupids = getSubGroups($filter_groupids);
+}
+
 // Get hosts.
 $filter['hosts'] = $filter['hosts']
 	? CArrayHelper::renameObjectsKeys(API::Host()->get([
@@ -272,7 +277,7 @@ else {
 	$data['applications'] = API::Application()->get([
 		'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
-		'groupids' => $filter['groups'] ? array_keys($filter['groups']) : null,
+		'groupids' => $filter_groupids,
 		'selectHost' => ['hostid', 'name'],
 		'selectItems' => ['itemid'],
 		'selectDiscoveryRule' => ['itemid', 'name'],

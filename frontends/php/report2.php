@@ -422,6 +422,7 @@ else {
 							'srcfld1' => 'groupid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
+							'with_triggers' => true,
 							'real_hosts' => 1
 						]
 					]
@@ -439,6 +440,7 @@ else {
 							'srcfld1' => 'hostid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_hostids_',
+							'with_triggers' => true,
 							'real_hosts' => 1
 						]
 					]

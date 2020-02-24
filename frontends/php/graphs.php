@@ -433,6 +433,11 @@ $filter['groups'] = ($filter['groups'] && !hasRequest('parent_discoveryid'))
 	]), ['groupid' => 'id'])
 	: [];
 
+$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+if ($filter_groupids) {
+	$filter_groupids = getSubGroups($filter_groupids);
+}
+
 // Get hosts.
 $filter['hosts'] = $filter['hosts']
 	? CArrayHelper::renameObjectsKeys(API::Host()->get([
@@ -650,7 +655,7 @@ else {
 	$options = [
 		'output' => ['graphid', 'name', 'graphtype'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
-		'groupids' => $filter['groups'] ? array_keys($filter['groups']) : null,
+		'groupids' => $filter_groupids,
 		'discoveryids' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
 		'editable' => true,
 		'limit' => $config['search_limit'] + 1

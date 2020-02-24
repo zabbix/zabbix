@@ -161,9 +161,7 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['templates'] as $template) {
-	$name = new CLink($template['name'],
-		'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid')
-	);
+	$name = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 
 	$linkedTemplatesOutput = [];
 	$linkedToOutput = [];
@@ -185,7 +183,9 @@ foreach ($data['templates'] as $template) {
 			$linkedTemplatesOutput[] = ', ';
 		}
 
-		$url = 'templates.php?form=update&templateid='.$parentTemplate['templateid'].url_param('groupid');
+		$url = (new CUrl('templates.php'))
+			->setArgument('form', 'update')
+			->setArgument('templateid', $parentTemplate['templateid']);
 
 		if (array_key_exists($parentTemplate['templateid'], $data['writable_templates'])) {
 			$linkedTemplatesOutput[] = (new CLink($parentTemplate['name'], $url))
@@ -218,7 +218,9 @@ foreach ($data['templates'] as $template) {
 
 		if ($linkedToObject['status'] == HOST_STATUS_TEMPLATE) {
 			if (array_key_exists($linkedToObject['templateid'], $data['writable_templates'])) {
-				$url = 'templates.php?form=update&templateid='.$linkedToObject['templateid'].url_param('groupid');
+				$url = (new CUrl('templates.php'))
+					->setArgument('form', 'update')
+					->setArgument('templateid', $linkedToObject['templateid']);
 				$link = (new CLink($linkedToObject['name'], $url))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY);
@@ -230,7 +232,9 @@ foreach ($data['templates'] as $template) {
 		}
 		else {
 			if (array_key_exists($linkedToObject['hostid'], $data['writable_hosts'])) {
-				$url = 'hosts.php?form=update&hostid='.$linkedToObject['hostid'].url_param('groupid');
+				$url = (new CUrl('hosts.php'))
+					->setArgument('form', 'update')
+					->setArgument('hostid', $linkedToObject['hostid']);
 				$link = (new CLink($linkedToObject['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
 			}
 			else {

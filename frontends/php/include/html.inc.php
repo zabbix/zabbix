@@ -294,9 +294,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$breadcrumbs->addItem([
-			new CSpan(
-				new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid'))
-			),
+			new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))),
 			'/',
 			$template
 		]);
@@ -342,7 +340,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$breadcrumbs->addItem([
-			new CSpan(new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid'))),
+			new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))),
 			'/',
 			$host
 		]);

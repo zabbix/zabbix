@@ -86,8 +86,9 @@ foreach ($this->data['groups'] as $group) {
 			$hostsOutput[] = ', ';
 		}
 
-		$url = 'templates.php?form=update&templateid='.$template['templateid'].'&groupid='.$group['groupid'];
-
+		$url = (new CUrl('templates.php'))
+			->setArgument('form', 'update')
+			->setArgument('templateid', $template['templateid']);
 		$hostsOutput[] = (new CLink($template['name'], $url))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_GREY);
@@ -113,7 +114,9 @@ foreach ($this->data['groups'] as $group) {
 			$hostsOutput[] = ', ';
 		}
 
-		$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
+		$url = (new CUrl('hosts.php'))
+			->setArgument('form', 'update')
+			->setArgument('hostid', $host['hostid']);
 		$hostsOutput[] = (new CLink($host['name'], $url))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass($host['status'] == HOST_STATUS_MONITORED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
@@ -140,10 +143,14 @@ foreach ($this->data['groups'] as $group) {
 	$hostGroupTable->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		[new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount)],
-		[
-			(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'])),
-			CViewHelper::showNum($templateCount)
+		[new CLink(_('Hosts'), (new CUrl('hosts.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_groups', [$group['groupid']])
+		), CViewHelper::showNum($hostCount)],
+		[new CLink(_('Templates'), (new CUrl('templates.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_groups', [$group['groupid']])
+		), CViewHelper::showNum($templateCount)
 		],
 		empty($hostsOutput) ? '' : $hostsOutput,
 		makeInformationList($info_icons)

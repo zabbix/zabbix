@@ -230,8 +230,9 @@ foreach ($data['hosts'] as $host) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(CHtml::encode($host['name']),
-		'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid')
+	$description[] = new CLink(CHtml::encode($host['name']), (new CUrl('hosts.php'))
+				->setArgument('form', 'update')
+				->setArgument('hostid', $host['hostid'])
 	);
 
 	$maintenance_icon = false;
@@ -254,16 +255,20 @@ foreach ($data['hosts'] as $host) {
 		$statusCaption = _('Enabled');
 		$statusClass = ZBX_STYLE_GREEN;
 		$confirm_message = _('Disable host?');
-		$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massdisable'.url_param('groupid');
+		$status_url = (new CUrl('hosts.php'))
+			->setArgument('action', 'host.massdisable')
+			->setArgument('hosts', [$host['hostid']]);
 	}
 	else {
 		$statusCaption = _('Disabled');
-		$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massenable'.url_param('groupid');
+		$status_url = (new CUrl('hosts.php'))
+			->setArgument('action', 'host.massenable')
+			->setArgument('hosts', [$host['hostid']]);
 		$confirm_message = _('Enable host?');
 		$statusClass = ZBX_STYLE_RED;
 	}
 
-	$status = (new CLink($statusCaption, $statusUrl))
+	$status = (new CLink($statusCaption, $status_url->getUrl()))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass($statusClass)
 		->addConfirmation($confirm_message)

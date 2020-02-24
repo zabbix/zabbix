@@ -896,6 +896,11 @@ else {
 		]), ['groupid' => 'id'])
 		: [];
 
+	$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+	if ($filter_groupids) {
+		$filter_groupids = getSubGroups($filter_groupids);
+	}
+
 	// Select templates.
 	$templates = API::Template()->get([
 		'output' => ['templateid', $sortField],
@@ -905,7 +910,7 @@ else {
 			'name' => ($filter['name'] === '') ? null : $filter['name']
 		],
 		'parentTemplateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
-		'groupids' => $filter['groups'] ? array_keys($filter['groups']) : null,
+		'groupids' => $filter_groupids,
 		'editable' => true,
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1

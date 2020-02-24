@@ -162,15 +162,19 @@ foreach ($data['groups'] as $groupid => $group) {
 	if ($data['admin']) {
 		$hosts_link = $group['editable']
 			? $group['hosts']
-				? [new CLink(_('Hosts'), 'hosts.php?groupid='.$groupid), CViewHelper::showNum($group['hosts'])]
+				? [new CLink(_('Hosts'), (new CUrl('hosts.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_groups', [$groupid])
+				), CViewHelper::showNum($group['hosts'])]
 				: _('Hosts')
 			: _('Hosts');
 
 		$templates_link = $group['editable']
 			? $group['templates']
-				? [new CLink(_('Templates'), 'templates.php?groupid='.$groupid),
-					CViewHelper::showNum($group['templates'])
-				]
+				? [new CLink(_('Templates'), (new CUrl('templates.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_groups', [$groupid])
+				), CViewHelper::showNum($group['templates'])]
 				: _('Templates')
 			: _('Templates');
 	}
@@ -190,7 +194,12 @@ foreach ($data['groups'] as $groupid => $group) {
 				->setArgument('filter_set', '1')
 		),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
-		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
+		new CLink(_('Web'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
+				->setArgument('filter_groupids[]', $groupid)
+				->setArgument('filter_set', '1')
+		),
 		$hosts_link,
 		$templates_link
 	]);
@@ -227,7 +236,7 @@ if ($data['admin']) {
 		$applications_link = $host['editable']
 			? [new CLink(_('Applications'), (new CUrl('applications.php'))
 				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$hostid])
+				->setArgument('filter_hostids', [$templateid])
 			), $app_count]
 			: [_('Applications'), $app_count];
 

@@ -337,6 +337,11 @@ else {
 		]), ['groupid' => 'id'])
 		: [];
 
+	$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+	if ($filter_groupids) {
+		$filter_groupids = getSubGroups($filter_groupids);
+	}
+
 	$config = select_config();
 
 	$data = [
@@ -353,7 +358,7 @@ else {
 		'search' => [
 			'name' => ($filter['name'] === '') ? null : $filter['name']
 		],
-		'groupids' => $filter['groups'] ? array_keys($filter['groups']) : null,
+		'groupids' => $filter_groupids,
 		'editable' => true,
 		'sortfield' => $sortField,
 		'sortorder' => $sortOrder,

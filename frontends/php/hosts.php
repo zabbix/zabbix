@@ -1290,11 +1290,16 @@ else {
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter['groups'],
-			'templated_hosts' => true,
+			'real_hosts' => true,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['groupid' => 'id'])
 		: [];
+
+	$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+	if ($filter_groupids) {
+		$filter_groupids = getSubGroups($filter_groupids);
+	}
 
 	// Get templates.
 	$filter['templates'] = $filter['templates']
@@ -1329,7 +1334,7 @@ else {
 		'output' => ['hostid', $sortField],
 		'evaltype' => $filter['evaltype'],
 		'tags' => $filter['tags'],
-		'groupids' => $filter['groups'] ? array_keys($filter['groups']) : null,
+		'groupids' => $filter_groupids,
 		'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 		'editable' => true,
 		'sortfield' => $sortField,
