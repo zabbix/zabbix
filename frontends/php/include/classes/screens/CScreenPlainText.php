@@ -65,8 +65,8 @@ class CScreenPlainText extends CScreenBase {
 		foreach ($histories as $history) {
 			switch ($item['value_type']) {
 				case ITEM_VALUE_TYPE_FLOAT:
-					$value = numberToFloat64($history['value'], FLOAT64_PRECISION_DISPLAY,
-						ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT
+					$value = numberToFloat($history['value'], FLOAT64_PRECISION_DISPLAY,
+						ZBX_UNITS_ROUNDOFF_UNSUFFIXED
 					);
 					break;
 

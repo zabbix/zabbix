@@ -2125,7 +2125,7 @@ function evalExpressionData($expression, $replace_function_macros) {
 
 			case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
 				// Use calculated (unsuffixed) number value.
-				$value = '((float) "'.numberToFloat64($token['data']['calc_value'], FLOAT64_PRECISION_STORAGE).'")';
+				$value = '((float) "'.numberToFloat($token['data']['calc_value'], FLOAT64_PRECISION_STORAGE).'")';
 
 				break;
 		}

@@ -103,7 +103,6 @@ class CLineGraphDraw extends CGraphDraw {
 	 * @param int    $item['yaxisside']     Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
 	 * @param int    $item['calc_fnc']      Item calculation function, could be one of CALC_FNC_* constants.
 	 * @param int    $item['calc_type']     Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or GRAPH_ITEM_SUM.
-	 *
 	 */
 	public function addItem(array $graph_item) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
@@ -173,7 +172,12 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->outer = $outer;
 	}
 
-	private function getSidesInUse() {
+	/**
+	 * Get list of vertical scales in use, starting from the main one.
+	 *
+	 * @return array
+	 */
+	private function getVerticalScalesInUse() {
 		return array_keys(array_filter($this->yaxis, function($value) {
 			return $value;
 		}));
@@ -302,17 +306,7 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 
-			if ($data['avg']) {
-				$data['avg_orig'] = 0;
-				$cnt = 1;
-				foreach ($data['avg'] as $avg_row) {
-					$data['avg_orig'] += ($avg_row - $data['avg_orig']) / $cnt;
-					$cnt++;
-				}
-			}
-			else {
-				$data['avg_orig'] = null;
-			}
+			$data['avg_orig'] = $data['avg'] ? zbx_avg($data['avg']) : null;
 
 			// calculate missed points
 			$first_idx = 0;
@@ -678,7 +672,7 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	protected function calcZero() {
-		foreach ($this->getSidesInUse() as $side) {
+		foreach ($this->getVerticalScalesInUse() as $side) {
 			$this->unit2px[$side] = ($this->m_maxY[$side] - $this->m_minY[$side]) / $this->sizeY;
 			if ($this->unit2px[$side] == 0) {
 				$this->unit2px[$side] = 1;
@@ -741,9 +735,9 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 
-		$tolerance = 0.5;
+		$clearance = 0.5;
 
-		foreach ($this->getSidesInUse() as $side_index => $side) {
+		foreach ($this->getVerticalScalesInUse() as $side_index => $side) {
 			$is_slave = $side_index > 0 && $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED
 				&& $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED;
 
@@ -771,14 +765,19 @@ class CLineGraphDraw extends CGraphDraw {
 						}
 						else {
 							$slave_min = floor($this->m_minY[$side] / $candidate) * $candidate;
-							if (($this->m_minY[$side] - $slave_min) / $candidate < $tolerance) {
+							if (($this->m_minY[$side] - $slave_min) / $candidate < $clearance) {
 								$slave_min -= $candidate;
 							}
 							$slave_max = $slave_min + $candidate * $rows;
 						}
 
-						if (($this->m_minY[$side] - $slave_min) / $candidate < $tolerance
-								|| ($slave_max - $this->m_maxY[$side]) / $candidate < $tolerance) {
+						if ($this->m_minY[$side] != 0
+								&& ($this->m_minY[$side] - $slave_min) / $candidate < $clearance) {
+							continue;
+						}
+
+						if ($this->m_maxY[$side] != 0
+								&& ($slave_max - $this->m_maxY[$side]) / $candidate < $clearance) {
 							continue;
 						}
 					}
@@ -810,13 +809,13 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 
 				if ($min !== null && $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED) {
-					$this->m_minY[$side] = ($this->m_minY[$side] - $min) / $interval < $tolerance
+					$this->m_minY[$side] = ($this->m_minY[$side] - $min) / $interval < $clearance
 						? $min - $interval
 						: $min;
 				}
 
 				if ($max !== null && $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED) {
-					$this->m_maxY[$side] = ($max - $this->m_maxY[$side]) / $interval < $tolerance
+					$this->m_maxY[$side] = ($max - $this->m_maxY[$side]) / $interval < $clearance
 						? $max + $interval
 						: $max;
 				}
@@ -1248,7 +1247,7 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	private function drawVerticalScale() {
-		foreach ($this->getSidesInUse() as $side_index => $side) {
+		foreach ($this->getVerticalScalesInUse() as $side_index => $side) {
 			$units = null;
 			$units_long = '';
 			$unit_base = 1000;
@@ -1304,12 +1303,12 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$decimals = getNumDecimals($this->intervals[$side]);
 
-			$tolerance = 0.5;
+			$clearance = 0.5;
 			for ($row_index = 0;; $row_index++) {
-				$value = ceil($this->m_minY[$side] / $this->intervals[$side] + $tolerance + $row_index)
+				$value = ceil($this->m_minY[$side] / $this->intervals[$side] + $row_index + $clearance)
 					* $this->intervals[$side];
 
-				if ($value > $this->m_maxY[$side] - $this->intervals[$side] * $tolerance) {
+				if ($value > $this->m_maxY[$side] - $this->intervals[$side] * $clearance) {
 					break;
 				}
 
@@ -1338,7 +1337,8 @@ class CLineGraphDraw extends CGraphDraw {
 					'power' => $power,
 					'ignore_milliseconds' => $ignore_milliseconds,
 					'precision' => 4,
-					'decimals' => $row['decimals']
+					'decimals' => $row['decimals'],
+					'exact_decimals' => true
 				]);
 
 				$pos_X = ($side == GRAPH_YAXIS_SIDE_LEFT)
@@ -1576,7 +1576,7 @@ class CLineGraphDraw extends CGraphDraw {
 						'value' => $this->getLastValue($i),
 						'units' => $this->items[$i]['units'],
 						'convert' => ITEM_CONVERT_NO_UNITS,
-						'decimals' => ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT
+						'decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED
 					]),
 					'align' => 2
 				]);
@@ -1585,7 +1585,7 @@ class CLineGraphDraw extends CGraphDraw {
 						'value' => min($data['min']),
 						'units' => $this->items[$i]['units'],
 						'convert' => ITEM_CONVERT_NO_UNITS,
-						'decimals' => ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT
+						'decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED
 					]),
 					'align' => 2
 				]);
@@ -1594,7 +1594,7 @@ class CLineGraphDraw extends CGraphDraw {
 						'value' => $data['avg_orig'],
 						'units' => $this->items[$i]['units'],
 						'convert' => ITEM_CONVERT_NO_UNITS,
-						'decimals' => ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT
+						'decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED
 					]),
 					'align' => 2
 				]);
@@ -1603,7 +1603,7 @@ class CLineGraphDraw extends CGraphDraw {
 						'value' => max($data['max']),
 						'units' => $this->items[$i]['units'],
 						'convert' => ITEM_CONVERT_NO_UNITS,
-						'decimals' => ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT
+						'decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED
 					]),
 					'align' => 2
 				]);
@@ -1975,8 +1975,8 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	private function calcMinMax() {
-		foreach ($this->getSidesInUse() as $side) {
+	private function calcMinYMaxY() {
+		foreach ($this->getVerticalScalesInUse() as $side) {
 			$min = $this->calculateMinY($side);
 			$max = $this->calculateMaxY($side);
 
@@ -2207,7 +2207,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->selectData();
 
-		$this->calcMinMax();
+		$this->calcMinYMaxY();
 		$this->calcPercentile();
 		$this->calcVerticalScale();
 		$this->calcZero();

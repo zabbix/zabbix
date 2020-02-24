@@ -476,19 +476,17 @@ function str2mem($value) {
  * @return string
  */
 function mem2str($bytes) {
-	$precision = ZBX_UNITS_ROUNDOFF_UPPER_LIMIT;
-
 	if ($bytes > ZBX_GIBIBYTE) {
-		return round($bytes / ZBX_GIBIBYTE, $precision).'G';
+		return round($bytes / ZBX_GIBIBYTE, ZBX_UNITS_ROUNDOFF_SUFFIXED).'G';
 	}
 	elseif ($bytes > ZBX_MEBIBYTE) {
-		return round($bytes / ZBX_MEBIBYTE, $precision).'M';
+		return round($bytes / ZBX_MEBIBYTE, ZBX_UNITS_ROUNDOFF_SUFFIXED).'M';
 	}
 	elseif ($bytes > ZBX_KIBIBYTE) {
-		return round($bytes / ZBX_KIBIBYTE, $precision).'K';
+		return round($bytes / ZBX_KIBIBYTE, ZBX_UNITS_ROUNDOFF_SUFFIXED).'K';
 	}
 	else {
-		return round($bytes, $precision).'B';
+		return round($bytes).'B';
 	}
 }
 
@@ -509,7 +507,7 @@ function convertUnitsUptime($value) {
 			$result .= _s('%s day', $days);
 		}
 		else {
-			$result .= _s('%s days', numberToFloat64($days, FLOAT64_PRECISION_DISPLAY));
+			$result .= _s('%s days', numberToFloat($days, FLOAT64_PRECISION_DISPLAY));
 		}
 	}
 
@@ -544,8 +542,6 @@ function convertUnitsUptime($value) {
  * @return string
  */
 function convertUnitsS($value, $ignore_millisec = false) {
-	$scale = ZBX_UNITS_ROUNDOFF_UPPER_LIMIT;
-
 	$value = numberToDecimal($value);
 
 	$is_negative = $value[0] === '-';
@@ -600,7 +596,10 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 		if ($start === null || $start >= 3) {
 			if ($ignore_millisec) {
-				$v = $value_int + bcround(bcsub($value, bcfloor($value), $scale + 1), $scale);
+				$v = $value_int + bcround(
+					bcsub($value, bcfloor($value), ZBX_UNITS_ROUNDOFF_SUFFIXED + 1),
+					ZBX_UNITS_ROUNDOFF_SUFFIXED
+				);
 
 				if ($v > 0) {
 					$parts['seconds'] = $v;
@@ -610,7 +609,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 				$parts['seconds'] = $value_int;
 
 				if ($start === null || $start >= 4) {
-					$v = bcsub($value, bcfloor($value), $scale + 4) * 1000;
+					$v = bcsub($value, bcfloor($value), ZBX_UNITS_ROUNDOFF_SUFFIXED + 4) * 1000;
 					if ($v > 0) {
 						$parts['milliseconds'] = $v;
 					}
@@ -632,7 +631,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 	$result = [];
 
 	foreach (array_filter($parts) as $unit => $value) {
-		$result[] = numberToFloat64($value, FLOAT64_PRECISION_DISPLAY, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).$units[$unit];
+		$result[] = numberToFloat($value, FLOAT64_PRECISION_DISPLAY, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$unit];
 	}
 
 	return $result ? ($is_negative ? '-' : '').implode(' ', $result) : '0';
@@ -716,8 +715,8 @@ function convertUnits(array $options) {
 
 	if (in_array($units, $blacklist) || !$do_convert || bccomp($value_abs, '1') < 0) {
 		$result = $options['decimals']
-			? numberToFloat64($value, $options['precision'], $options['decimals'], $options['exact_decimals'])
-			: numberToFloat64($value, $options['precision'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
+			? numberToFloat($value, $options['precision'], $options['decimals'], $options['exact_decimals'])
+			: numberToFloat($value, $options['precision'], ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 
 		$result .= ($units === '' ? '' : ' '.$units);
 
@@ -752,10 +751,10 @@ function convertUnits(array $options) {
 	$result_units = $unit_prefix.$units;
 
 	$result = $options['decimals']
-		? numberToFloat64($result_value, $options['precision'], $options['decimals'], $options['exact_decimals'])
-		: numberToFloat64($result_value, $options['precision'], $result_units === ''
-			? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT
-			: ZBX_UNITS_ROUNDOFF_UPPER_LIMIT
+		? numberToFloat($result_value, $options['precision'], $options['decimals'], $options['exact_decimals'])
+		: numberToFloat($result_value, $options['precision'], $result_units === ''
+			? ZBX_UNITS_ROUNDOFF_UNSUFFIXED
+			: ZBX_UNITS_ROUNDOFF_SUFFIXED
 		);
 
 	$result .= ($result_units === '' ? '' : ' '.$result_units);
@@ -1365,8 +1364,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 	return new CColHeader(new CLink([$obj, $arrow], $link->getUrl()));
 }
 
-/************* MATH *************/
-
 /**
  * Convert number to decimal format, suitable for BC Math arithmetics, not suitable for displaying.
  *
@@ -1383,18 +1380,18 @@ function numberToDecimal(string $number): string {
 }
 
 /**
- * Convert number to Float64 display format
+ * Convert number to Float display format.
  *
  * @param string $number  Valid number in decimal or scientific notation.
  *
  * @return string
  */
-function numberToFloat64(string $number, int $precision, int $decimals = null, bool $exact_decimals = false): string {
+function numberToFloat(string $number, int $precision, int $decimals = null, bool $exact_decimals = false): string {
 	// Trim extra precision.
 	$number_sci = sprintf('%.'.($precision - 1).'E', $number);
 	[$mantissa, $exponent] = explode('E', $number_sci);
 
-	// Trim extra precision even more for small numbers.
+	// Trim extra precision even more for too small numbers.
 	if ($exponent < 0 && $decimals !== null) {
 		$number_sci = sprintf('%.'.($decimals - 1).'E', $number);
 		[$mantissa, $exponent] = explode('E', $number_sci);
@@ -1424,7 +1421,14 @@ function numberToFloat64(string $number, int $precision, int $decimals = null, b
 	return $result;
 }
 
-function getNumDecimals(string $number): int {
+/**
+ * Get number of digits after the decimal dot.
+ *
+ * @param mixed $number  Valid number in decimal or scientific notation.
+ *
+ * @return int
+ */
+function getNumDecimals($number): int {
 	[$mantissa, $exponent] = explode('E', sprintf('%.'.(FLOAT64_PRECISION_DISPLAY - 1).'E', $number));
 
 	$significant_size = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
@@ -1432,6 +1436,13 @@ function getNumDecimals(string $number): int {
 	return max(0, $significant_size - 1 - $exponent);
 }
 
+/**
+ * Round fraction down (BC Math addition).
+ *
+ * @param mixed $number  Valid number in decimal notation.
+ *
+ * @return mixed
+ */
 function bcfloor($number) {
 	if (strpos($number, '.') !== false) {
 		$number = rtrim($number, '0');
@@ -1450,6 +1461,13 @@ function bcfloor($number) {
 	return ($number === '-0') ? '0' : $number;
 }
 
+/**
+ * Round fraction up (BC Math addition).
+ *
+ * @param mixed $number  Valid number in decimal notation.
+ *
+ * @return mixed
+ */
 function bcceil($number) {
 	if (strpos($number, '.') !== false) {
 		$number = rtrim($number, '0');
@@ -1468,8 +1486,17 @@ function bcceil($number) {
 	return ($number === '-0') ? '0' : $number;
 }
 
-function bcround($number, $scale = 0) {
-	if ($scale == 0) {
+/**
+ * Round a float (BC Math addition).
+ *
+ * @param mixed $number      Valid number in decimal notation.
+ * @param int   $precision   Number of decimal digits to round to.
+ *
+ * @return mixed
+ */
+
+function bcround($number, $precision = 0) {
+	if ($precision == 0) {
 		if ($number[0] === '-') {
 			$number = bcsub($number, '0.5', 0);
 		}
@@ -1479,16 +1506,23 @@ function bcround($number, $scale = 0) {
 	}
 	else {
 		if ($number[0] === '-') {
-			$number = bcsub($number, bcmul('0.5', bcpow('10', -$scale, $scale), $scale + 1), $scale);
+			$number = bcsub($number, bcmul('0.5', bcpow('10', -$precision, $precision), $precision + 1), $precision);
 		}
 		else {
-			$number = bcadd($number, bcmul('0.5', bcpow('10', -$scale, $scale), $scale + 1), $scale);
+			$number = bcadd($number, bcmul('0.5', bcpow('10', -$precision, $precision), $precision + 1), $precision);
 		}
 	}
 
-	return bcmul($number, '1', $scale);
+	return bcmul($number, '1', $precision);
 }
 
+/**
+ * Find lowest value (BC Math addition).
+ *
+ * @param mixed $arguments  Array of valid numbers in decimal notation (as number array or array of numbers).
+ *
+ * @return mixed
+ */
 function bcmin(...$arguments) {
 	if (!$arguments) {
 		return false;
@@ -1516,6 +1550,13 @@ function bcmin(...$arguments) {
 	}
 }
 
+/**
+ * Find highest value (BC Math addition).
+ *
+ * @param mixed $arguments  Array of valid numbers in decimal notation (as number array or array of numbers).
+ *
+ * @return mixed
+ */
 function bcmax(...$arguments) {
 	if (!$arguments) {
 		return false;
@@ -1541,6 +1582,24 @@ function bcmax(...$arguments) {
 			}
 			return $result;
 	}
+}
+
+/**
+ * Calculate average value (with overflow protection).
+ *
+ * @param array $values  A non-empty array of values.
+ *
+ * @return float
+ */
+function zbx_avg(array $values) {
+	$result = 0;
+
+	$count = 1;
+	foreach ($values as $value) {
+		$result += ($value - $result) / $count++;
+	}
+
+	return $result;
 }
 
 /**
