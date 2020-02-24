@@ -1721,40 +1721,7 @@ class CHost extends CHostGeneral {
 
 		if ($options['selectInheritedTags'] !== null && $options['selectInheritedTags'] != API_OUTPUT_COUNT) {
 			$hosts_templates = [];
-
-			foreach ($result as $host) {
-				// Get direct parent template IDs either by selecting or cache.
-				if ($options['selectParentTemplates'] !== null
-						&& $options['selectParentTemplates'] != API_OUTPUT_COUNT) {
-					$templateids = zbx_objectValues($host['parentTemplates'], 'templateid');
-				}
-				else {
-					$templates = DBfetchArray(DBselect(
-						'SELECT ht.templateid'.
-						' FROM hosts_templates ht'.
-						' WHERE '.dbConditionId('ht.hostid', [$host['hostid']])
-					));
-					$templateids = zbx_objectValues($templates, 'templateid');
-				}
-
-				// Collect host IDs as keys and parent template IDs as values.
-				$hosts_templates[$host['hostid']] = $templateids;
-
-				// Check for more template parents if there are any until all parent templates are collected.
-				do {
-					$templates = DBfetchArray(DBselect(
-						'SELECT ht.templateid FROM hosts_templates ht WHERE '.dbConditionId('ht.hostid', $templateids)
-					));
-					$templateids = zbx_objectValues($templates, 'templateid');
-					$hosts_templates[$host['hostid']] = array_merge($hosts_templates[$host['hostid']], $templateids);
-				} while ($templateids);
-			}
-
-			// Get all template tags in one request for all hosts.
-			$templateids = [];
-			foreach ($hosts_templates as $host_template) {
-				$templateids = array_merge($templateids, $host_template);
-			}
+			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
 
 			$templates = API::Template()->get([
 				'output' => [],
@@ -1781,16 +1748,9 @@ class CHost extends CHostGeneral {
 					}
 				}
 
-				foreach ($tags as &$tag) {
-					foreach (['tag', 'value'] as $field) {
-						if (!$this->outputIsRequested($field, $options['selectInheritedTags'])) {
-							$tag[$field] = null;
-						}
-					}
-				}
-				unset($tag);
-
-				$host['inheritedTags'] = $tags;
+				$host['inheritedTags'] = $this->unsetExtraFields($tags, ['tag', 'value'],
+					$options['selectInheritedTags']
+				);
 			}
 		}
 
