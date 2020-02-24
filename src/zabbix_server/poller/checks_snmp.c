@@ -2129,6 +2129,22 @@ void	zbx_init_snmp(void)
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
+void	zbx_shutdown_snmp(void)
+{
+	sigset_t	mask, orig_mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+
+	snmp_shutdown(progname);
+
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+}
+
 void	zbx_clear_cache_snmp(void)
 {
 	free_etimelist();

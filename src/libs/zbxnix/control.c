@@ -159,7 +159,7 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 	{
 #ifdef HAVE_NETSNMP
 		command = ZBX_RTC_SNMP_CACHE_RELOAD;
-		/* Scope is ignored for SNMP. Poller, trapper and discoverer always get targeted. */
+		/* Scope is ignored for SNMP. R/U pollers, trapper and discoverer always get targeted. */
 		scope = 0;
 		data = 0;
 #else

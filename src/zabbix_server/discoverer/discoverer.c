@@ -37,6 +37,10 @@ extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
+#ifdef HAVE_NETSNMP
+static volatile sig_atomic_t	snmp_cache_reload_requested;
+#endif
+
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
 /******************************************************************************
@@ -860,7 +864,7 @@ static void	zbx_discoverer_sigusr_handler(int flags)
 #ifdef HAVE_NETSNMP
 	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
 	{
-		zbx_clear_cache_snmp();
+		snmp_cache_reload_requested = 1;
 	}
 #else
 	ZBX_UNUSED(flags);
@@ -908,6 +912,16 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
+
+#ifdef HAVE_NETSNMP
+		if (1 == snmp_cache_reload_requested)
+		{
+			zbx_clear_cache_snmp();
+			zbx_shutdown_snmp();
+			zbx_init_snmp();
+			snmp_cache_reload_requested = 0;
+		}
+#endif
 
 		if (0 != sleeptime)
 		{

@@ -51,6 +51,10 @@ extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsi
 
 extern int	CONFIG_CONFSYNCER_FORKS;
 
+#ifdef HAVE_NETSNMP
+static volatile sig_atomic_t	snmp_cache_reload_requested;
+#endif
+
 typedef struct
 {
 	zbx_counter_value_t	online;
@@ -1295,7 +1299,7 @@ static void	zbx_trapper_sigusr_handler(int flags)
 #ifdef HAVE_NETSNMP
 	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
 	{
-		zbx_clear_cache_snmp();
+		snmp_cache_reload_requested = 1;
 	}
 #else
 	ZBX_UNUSED(flags);
@@ -1349,6 +1353,16 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		/* the data. */
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED);
 		zbx_update_env(zbx_time());
+
+#ifdef HAVE_NETSNMP
+		if (1 == snmp_cache_reload_requested)
+		{
+			zbx_clear_cache_snmp();
+			zbx_shutdown_snmp();
+			zbx_init_snmp();
+			snmp_cache_reload_requested = 0;
+		}
+#endif
 
 		if (SUCCEED == ret)
 		{
