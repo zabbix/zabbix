@@ -281,6 +281,19 @@ void	free_metrics(void)
 		zbx_free(commands);
 	}
 
+	if (NULL != commands_local)
+	{
+		int	i;
+
+		for (i = 0; NULL != commands_local[i].key; i++)
+		{
+			zbx_free(commands_local[i].key);
+			zbx_free(commands_local[i].test_param);
+		}
+
+		zbx_free(commands);
+	}
+
 	free_key_access_rules();
 }
 

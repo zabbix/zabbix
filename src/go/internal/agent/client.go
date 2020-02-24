@@ -24,6 +24,8 @@ import (
 )
 
 const ActiveChecksClientID = 100
+const PassiveChecksClientID = 1
+const LocalChecksClientID = 0
 
 var lastClientID uint64 = ActiveChecksClientID
 
