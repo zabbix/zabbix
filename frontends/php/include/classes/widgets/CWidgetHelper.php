@@ -400,13 +400,8 @@ class CWidgetHelper {
 	 * @return CList
 	 */
 	public static function getSeverities($field, $config) {
-		$severities = [];
-
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severities[$severity] = getSeverityName($severity, $config);
-		}
-
-		return self::getCheckBoxList($field, $severities)->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
+		return self::getCheckBoxList($field, CSeverity::getOrderedSeverities(true))
+			->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
 	}
 
 	/**

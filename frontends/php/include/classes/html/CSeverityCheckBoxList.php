@@ -28,7 +28,7 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	public function __construct($name) {
 		parent::__construct($name);
 
-		$this->setOptions(CSeverity::getSeverities());
+		$this->setOptions(CSeverity::getOrderedSeverities());
 		$this->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
 	}
 }

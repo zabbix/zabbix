@@ -20,6 +20,8 @@
 
 
 class CSeverity extends CRadioButtonList {
+	const MAX_ROWS = 2;     // Number of rows.
+
 	/**
 	 * Options array.
 	 *
@@ -95,5 +97,25 @@ class CSeverity extends CRadioButtonList {
 		}
 
 		return $severities;
+	}
+
+	/**
+	 * Generate array with data for severities options ordered for showing by rows.
+	 *
+	 * @param bool $only_names  Return only name as array value.
+	 *
+	 * @return array
+	 */
+	public static function getOrderedSeverities($only_names = false) {
+		$severities = self::getSeverities();
+		$ordered = [];
+
+		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, self::MAX_ROWS - 1) as $row) {
+			for ($i = TRIGGER_SEVERITY_NOT_CLASSIFIED; $i < count($severities); $i += self::MAX_ROWS) {
+				$ordered[$row + $i] = ($only_names) ? $severities[$row + $i]['name'] : $severities[$row + $i];
+			}
+		}
+
+		return $ordered;
 	}
 }
