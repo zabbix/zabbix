@@ -168,7 +168,6 @@
 
 						jQuery('#macros_' + macro_num + '_value_btn')
 							.prop('disabled', true)
-							// .show();
 						jQuery('#macros_' + macro_num + '_value')
 							.closest('.input-group')
 							.find('.btn-undo')
