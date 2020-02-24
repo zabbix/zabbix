@@ -1178,8 +1178,7 @@ static void	zbx_check_psk_identity_len(size_t psk_identity_len)
  *     Maximum length of PSK hex-digit string is defined by HOST_TLS_PSK_LEN. *
  *     Currently it is 512 characters, which encodes a 2048-bit PSK and is    *
  *     supported by GnuTLS and OpenSSL libraries (compiled with default       *
- *     parameters). PolarSSL supports up to 256-bit PSK (compiled with        *
- *     default parameters). If the key is longer an error message             *
+ *     parameters). If the key is longer an error message                     *
  *     "ssl_set_psk(): SSL - Bad input parameters to function" will be logged *
  *     at runtime.                                                            *
  *                                                                            *
