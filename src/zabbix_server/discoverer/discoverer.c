@@ -917,8 +917,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		if (1 == snmp_cache_reload_requested)
 		{
 			zbx_clear_cache_snmp();
-			zbx_shutdown_snmp();
-			zbx_init_snmp();
 			snmp_cache_reload_requested = 0;
 		}
 #endif

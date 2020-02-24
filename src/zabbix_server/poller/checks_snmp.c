@@ -2149,6 +2149,8 @@ void	zbx_clear_cache_snmp(void)
 {
 	free_etimelist();
 	clear_user_list();
+	zbx_shutdown_snmp();
+	zbx_init_snmp();
 }
 
 #endif	/* HAVE_NETSNMP */
