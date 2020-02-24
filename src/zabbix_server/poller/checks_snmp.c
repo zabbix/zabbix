@@ -2129,7 +2129,7 @@ void	zbx_init_snmp(void)
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-void	zbx_shutdown_snmp(void)
+static void	zbx_shutdown_snmp(void)
 {
 	sigset_t	mask, orig_mask;
 

@@ -1298,9 +1298,7 @@ static void	zbx_trapper_sigusr_handler(int flags)
 {
 #ifdef HAVE_NETSNMP
 	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
-	{
 		snmp_cache_reload_requested = 1;
-	}
 #else
 	ZBX_UNUSED(flags);
 #endif
