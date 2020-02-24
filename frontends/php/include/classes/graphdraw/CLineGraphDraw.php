@@ -1575,8 +1575,7 @@ class CLineGraphDraw extends CGraphDraw {
 					'text' => convertUnits([
 						'value' => $this->getLastValue($i),
 						'units' => $this->items[$i]['units'],
-						'convert' => ITEM_CONVERT_NO_UNITS,
-						'decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED
+						'convert' => ITEM_CONVERT_NO_UNITS
 					]),
 					'align' => 2
 				]);
@@ -1584,8 +1583,7 @@ class CLineGraphDraw extends CGraphDraw {
 					'text' => convertUnits([
 						'value' => min($data['min']),
 						'units' => $this->items[$i]['units'],
-						'convert' => ITEM_CONVERT_NO_UNITS,
-						'decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED
+						'convert' => ITEM_CONVERT_NO_UNITS
 					]),
 					'align' => 2
 				]);
@@ -1593,8 +1591,7 @@ class CLineGraphDraw extends CGraphDraw {
 					'text' => convertUnits([
 						'value' => $data['avg_orig'],
 						'units' => $this->items[$i]['units'],
-						'convert' => ITEM_CONVERT_NO_UNITS,
-						'decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED
+						'convert' => ITEM_CONVERT_NO_UNITS
 					]),
 					'align' => 2
 				]);
@@ -1602,8 +1599,7 @@ class CLineGraphDraw extends CGraphDraw {
 					'text' => convertUnits([
 						'value' => max($data['max']),
 						'units' => $this->items[$i]['units'],
-						'convert' => ITEM_CONVERT_NO_UNITS,
-						'decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED
+						'convert' => ITEM_CONVERT_NO_UNITS
 					]),
 					'align' => 2
 				]);
