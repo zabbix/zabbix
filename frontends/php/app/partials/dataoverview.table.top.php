@@ -54,7 +54,7 @@ foreach ($data['items_by_name'] as $name => $hostid_to_itemid) {
 
 if ($data['has_hidden_data']) {
 	$table->setFooter([
-		(new CCol(_('Not all results are displayed. Please specify a more specific search criteria.')))
+		(new CCol(_('Not all results are displayed. Please provide more specific search criteria.')))
 			->setColSpan($table->getNumCols())
 			->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
 	]);
