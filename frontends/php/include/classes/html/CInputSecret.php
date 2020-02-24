@@ -58,7 +58,7 @@ class CInputSecret extends CTag {
 
 		$input = (new CPassBox($name, $value ? $value : ZBX_MACRO_SECRET_MASK))
 			->setAttribute('placeholder', $placeholder)
-			->setEnabled($value ? true : false);
+			->setEnabled(($value && !$this->options['disabled']) ? true : false);
 
 		$change_btn = (new CButton(null, _('Set new value')))
 			->addClass(self::ZBX_STYLE_BTN_CHANGE)
@@ -70,7 +70,7 @@ class CInputSecret extends CTag {
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addItem($input);
 
-		if (!$value) {
+		if (!$value || $this->options['disabled']) {
 			$this->addItem($change_btn);
 		}
 
