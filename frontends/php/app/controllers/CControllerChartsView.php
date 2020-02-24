@@ -155,7 +155,7 @@ class CControllerChartsView extends CController {
 			'filter_hostids' => $filter_hostids,
 			'filter_graphids' => $filter_graphids,
 			'filter_graph_patterns' => $filter_graph_patterns,
-			'must_specify_host' => false,
+			'must_specify_host' => true,
 			'page' => $this->getInput('page', 1)
 		];
 
@@ -177,8 +177,13 @@ class CControllerChartsView extends CController {
 			]), ['hostid' => 'id']);
 		}
 
-		$data['must_specify_host'] = (($filter_search_type == ZBX_SEARCH_TYPE_PATTERN)
-			|| ($filter_search_type == ZBX_SEARCH_TYPE_STRICT && !$filter_graphids)) && !$filter_hostids;
+		// Host must be specified if pattern select is used or if strict select is used without any selected graphs.
+		if ($filter_search_type == ZBX_SEARCH_TYPE_STRICT && $filter_graphids) {
+			$data['must_specify_host'] = false;
+		}
+		else if ($filter_hostids) {
+			$data['must_specify_host'] = false;
+		}
 
 		if (!$data['must_specify_host']) {
 			if ($filter_search_type == ZBX_SEARCH_TYPE_STRICT) {
