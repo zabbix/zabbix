@@ -27,9 +27,9 @@ class CApiHostHelper {
 	/**
 	 * Get all parent templates recursively for given hosts and/or templates.
 	 *
-	 * @throws APIException if templates are looped.
-	 *
 	 * @param array $hostids  Host or template id's for whom you are searching parents.
+	 *
+	 * @throws APIException if templates are looped.
 	 *
 	 * @return array          List with two arrays: host to parent templates template map, list of all parent templates.
 	 */
@@ -81,12 +81,12 @@ class CApiHostHelper {
 	/**
 	 * Get all parent templates recursively for given templateid.
 	 *
+	 * @param array $template_tree  Array with all template parents.
+	 * @param string $templateid    ID of template whose parents we are looking for.
+	 *
 	 * @throws APIException if templates are looped.
 	 *
-	 * @param array $template_tree  Array with all template parents.
-	 * @param int $templateid       ID of template whose parents we are looking for.
-	 *
-	 * @return array                All parent templates for given templateid. False if error.
+	 * @return array                All parent templates (as keys) for given templateid. False if error.
 	 */
 	private static function recursiveGetAllParents(array &$template_tree, int $templateid): array {
 		if (array_key_exists('started', $template_tree[$templateid])) {
