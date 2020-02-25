@@ -177,11 +177,13 @@ class CControllerChartsView extends CController {
 			'page' => $this->getInput('page', 1)
 		];
 
-		foreach ($filter_graph_patterns as $pattern) {
-			$data['ms_graph_patterns'][] = ['name' => $pattern, 'id' => $pattern];
+		if ($filter_search_type == ZBX_SEARCH_TYPE_PATTERN) {
+			foreach ($filter_graph_patterns as $pattern) {
+				$data['ms_graph_patterns'][] = ['name' => $pattern, 'id' => $pattern];
+			}
 		}
 
-		if ($filter_graphids) {
+		if ($filter_graphids && $filter_search_type == ZBX_SEARCH_TYPE_STRICT) {
 			$data['ms_graphs'] = CArrayHelper::renameObjectsKeys(API::Graph()->get([
 				'output' => ['name', 'graphid'],
 				'graphids' => $filter_graphids
