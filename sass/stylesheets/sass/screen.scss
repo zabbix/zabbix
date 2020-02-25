@@ -7881,6 +7881,15 @@ table.preprocessing-test-results {
 	margin: 10px 0;
 }
 
+#tbl_macros.massupdate-remove {
+	td, th {
+		display: none;
+	}
+	td:nth-child(1), th:nth-child(1), td.nowrap {
+		display: table-cell;
+	}
+}
+
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 
 	/* for IE11 only. Fixed cell height if table has 100% height */

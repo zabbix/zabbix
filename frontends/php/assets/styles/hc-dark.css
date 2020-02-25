@@ -5172,6 +5172,11 @@ table.preprocessing-test-results .rel-container {
   display: none;
   margin: 10px 0; }
 
+#tbl_macros.massupdate-remove td, #tbl_macros.massupdate-remove th {
+  display: none; }
+#tbl_macros.massupdate-remove td:nth-child(1), #tbl_macros.massupdate-remove th:nth-child(1), #tbl_macros.massupdate-remove td.nowrap {
+  display: table-cell; }
+
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
   /* for IE11 only. Fixed cell height if table has 100% height */
   .host-avail-widget td {

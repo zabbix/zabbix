@@ -72,128 +72,58 @@
 		});
 	}
 
+	function macroToUpperCase(element) {
+		var macro = $(element).val(),
+			end = macro.indexOf(':');
+
+		if (end == -1) {
+			$(element).val(macro.toUpperCase());
+		}
+		else {
+			var macro_part = macro.substr(0, end),
+				context_part = macro.substr(end, macro.length);
+
+			$(element).val(macro_part.toUpperCase() + context_part);
+		}
+	}
+
 	jQuery(document.getElementById('tbl_macros'))
 		.dynamicRows({template: '#macro-row-tmpl'})
 		.on('click', 'button.element-table-add', function() {
 			initMacroFields(jQuery(document.getElementById('tbl_macros')));
-		})
-		.on('focus blur', '.input-secret input, .input-group .textarea-flexible', function() {
-			$(this)
-				.closest('.input-group')
-				.find('.btn-undo')
-				.toggleClass('is-focused');
-		})
-		.on('click', '.btn-undo', function() {
-			var $this = $(this),
-				$container = $(this).closest('.input-group'),
-				$input_container = $('.input-secret, .textarea-flexible', $container),
-				$input = $('.input-secret input[type=password], .textarea-flexible', $container);
-
-			$input_container.replaceWith(
-				$('<div>')
-					.addClass('input-secret')
-					.append($('<input>').attr({
-						id: $input.attr('id'),
-						name: $input.attr('name'),
-						type: 'password',
-						value: '<?= ZBX_MACRO_SECRET_MASK ?>',
-						placeholder: $input.attr('placeholder'),
-						maxlength: $input.attr('maxlength'),
-						disabled: true
-					}))
-					.append($('<button>').attr({
-						type: 'button',
-						id: $input.attr('name').replace(/\[/g, '_').replace(/\]/g, '') + '_btn',
-						class: '<?= CInputSecret::ZBX_STYLE_BTN_CHANGE ?>'
-					}).text(<?= json_encode(_('Set new value')) ?>))
-					.inputSecret()
-			);
-
-			$('.btn-dropdown-container button', $container)
-				.addClass(['btn-alt', 'btn-dropdown-toggle', 'icon-secret'].join(' '));
-
-			$this.hide();
-		})
-		.on('change', '.dropdown-value', function() {
-			var $this = $(this),
-				value_type = $this.val(),
-				$container = $(this).closest('.input-group'),
-				$input_container = $('.input-secret', $container),
-				$textarea = $('.textarea-flexible', $container);
-
-			if ((value_type == <?= ZBX_MACRO_TYPE_TEXT ?> && $textarea.length)
-					|| (value_type == <?= ZBX_MACRO_TYPE_SECRET ?> && $input_container.length)) {
-				return false;
-			}
-
-			if (value_type == <?= ZBX_MACRO_TYPE_TEXT ?>) {
-				var $input = $('input[type=password]', $input_container);
-
-				if (!$input_container.data('is-activated')) {
-					$('.btn-undo', $container).show();
-					$input_container.data('is-activated', true);
-				}
-
-				$input_container.replaceWith(
-					$('<textarea>')
-						.addClass('textarea-flexible')
-						.attr({
-							id: $input.attr('id'),
-							name: $input.attr('name'),
-							placeholder: $input.attr('placeholder'),
-							maxlength: $input.attr('maxlength')
-						})
-						.text($input.val())
-						.textareaFlexible()
-				);
-			}
-			else {
-				$textarea.replaceWith(
-					$('<div>')
-						.addClass('input-secret')
-						.append($('<input>').attr({
-							id: $textarea.attr('id'),
-							name: $textarea.attr('name'),
-							type: 'password',
-							value: $textarea.val(),
-							placeholder: $textarea.attr('placeholder'),
-							maxlength: $textarea.attr('maxlength')
-						}))
-						.inputSecret()
-				);
-			}
 		});
+
+	initMacroFields(jQuery(document.getElementById('tbl_macros')));
 
 	class MassUpdateMacros {
 
 		constructor() {
 			const elem = document.querySelectorAll('[name=mass_update_macros]');
 
-			[...elem].map((el) => el.addEventListener('click', this.controlEvent.bind(this)));
+			this.eventHandler = this.controlEventHandle.bind(this);
+
+			[...elem].map((el) => el.addEventListener('click', this.eventHandler));
 		}
 
-		controlEvent() {
+		controlEventHandle() {
 			const elem = document.querySelector('#mass_update_macros');
 			const value = elem.querySelector('input:checked').value;
 			const macro_table = document.querySelector('#tbl_macros');
-			const custom_style = document.querySelector('style#macros-massupdate-remove');
 
 			macro_table.style.display = 'table';
 
-			if (custom_style) {
-				custom_style.remove();
-			}
+			macro_table.classList.remove('massupdate-remove');
 
 			this.showCheckboxBlock(value);
 
 			// Hide value and description cell from table.
 			if (value == <?= ZBX_ACTION_REMOVE ?>) {
-				this.createStyleRule();
+				macro_table.classList.add('massupdate-remove');
 			}
 
 			// Hide macros table.
 			if (value == <?= ZBX_ACTION_REMOVE_ALL ?>) {
-				document.querySelector('#tbl_macros').style.display = 'none';
+				macro_table.style.display = 'none';
 			}
 		}
 
@@ -207,19 +137,12 @@
 			document.querySelector('[data-type=\'' + type + '\']').style.display = 'block';
 		}
 
-		createStyleRule() {
-			const style = document.createElement('style');
-			style.id = 'macros-massupdate-remove';
-			style.innerHTML = `#tbl_macros td, #tbl_macros th {
-					display: none;
-				}
-				#tbl_macros td:nth-child(1), #tbl_macros th:nth-child(1), #tbl_macros td.nowrap {
-					display: table-cell;
-				}`;
+		destroy() {
+			const elem = document.querySelectorAll('[name=mass_update_macros]');
 
-			document.body.append(style);
+			[...elem].map((el) => el.removeEventListener('click', this.eventHandler));
 		}
 	}
 
-	new MassUpdateMacros();
+	var abc = new MassUpdateMacros();
 </script>
