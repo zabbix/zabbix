@@ -48,6 +48,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		netsnmp_version_req=$2
 
 		if test -n "$netsnmp_version_req"; then
+			AC_MSG_CHECKING(version of netsnmp library)
 			LIBNETSNMP_CONFIG_VERSION=`$_libnetsnmp_config --version`
 			netsnmp_version_major=`expr $LIBNETSNMP_CONFIG_VERSION : '\([[0-9]]*\)'`
 			netsnmp_version_minor=`expr $LIBNETSNMP_CONFIG_VERSION : '[[0-9]]*\.\([[0-9]]*\)'`
@@ -77,6 +78,8 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
 			if test "$netsnmp_version_check" != "1"; then
 				AC_MSG_RESULT([no])
+			else
+				AC_MSG_RESULT([yes])
 			fi
 		fi
 
