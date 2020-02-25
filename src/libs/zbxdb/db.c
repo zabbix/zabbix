@@ -595,19 +595,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	ZBX_UNUSED(cipher);
 	ZBX_UNUSED(cipher_13);
 
-	if (0 != port)
-		cport = zbx_dsprintf(cport, "%d", port);
-
 	if (NULL != host)
 	{
 		pg_keywords[i] = "host";
 		pg_values[i++] = host;
-	}
-
-	if (NULL != cport)
-	{
-		pg_keywords[i] = "port";
-		pg_values[i++] = cport;
 	}
 
 	if (NULL != dbname)
@@ -664,7 +655,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		goto out;
 	}
 
+	if (0 != port)
+	{
+		pg_keywords[i] = "port";
+		pg_values[i++] = cport = zbx_dsprintf(cport, "%d", port);
+	}
+
 	conn = PQconnectdbParams(pg_keywords, pg_values, 0);
+
+	zbx_free(cport);
 
 	/* check to see that the backend connection was successfully made */
 	if (CONNECTION_OK != PQstatus(conn))
@@ -728,7 +727,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			ret = ZBX_DB_OK;
 	}
 out:
-zbx_free(cport);
 #elif defined(HAVE_SQLITE3)
 	ZBX_UNUSED(host);
 	ZBX_UNUSED(user);
