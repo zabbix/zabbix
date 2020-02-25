@@ -864,3 +864,115 @@ function find_period_end($periods, $time, $max_time) {
 
 	return -1;
 }
+
+function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_max, $rows_min, $rows_max) {
+	static $base_intervals = [];
+
+	if (!$base_intervals) {
+		for ($range = floor(log10(PHP_FLOAT_MAX)), $base = -$range; $base <= $range; $base++) {
+			foreach ([1, 2, 5] as $multiplier) {
+				$base_interval = pow(10, $base) * $multiplier;
+				if ($base_interval != 0 && $base_interval != INF && $base_interval != -INF) {
+					$base_intervals['1000'][] = $base_interval;
+				}
+			}
+		}
+		sort($base_intervals['1000']);
+
+		for ($range = floor(log(PHP_FLOAT_MAX, 2)), $base = -$range; $base <= $range; $base++) {
+			$base_interval = pow(2, $base);
+			if ($base_interval != 0 && $base_interval != INF && $base_interval != -INF) {
+				$base_intervals['1024'][] = $base_interval;
+			}
+		}
+		sort($base_intervals['1024']);
+	}
+
+	$scale_min = $data_min;
+	$scale_max = $data_max;
+
+	if ($scale_min >= $scale_max) {
+		if ($calc_min) {
+			$scale_min = $scale_min > 0
+				? 0
+				: ($scale_max == 0)
+					? -1
+					: ($scale_max > 0) ? $scale_max * 0.8 : $scale_max * 1.25;
+		}
+		elseif ($calc_max) {
+			$scale_max = ($scale_min < 0)
+				? 0
+				: ($scale_min == 0)
+					? 1
+					: ($scale_min < 0) ? $scale_min * 0.8 : $scale_min * 1.25;
+		}
+		else {
+			return false;
+		}
+	}
+
+	$best_result_value = null;
+	$best_result = [
+		'min' => $scale_min,
+		'max' => $scale_max,
+		'interval' => $scale_max - $scale_min,
+		'rows' => 1
+	];
+
+	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
+		$clearance_min = $rows * 0.05;
+		$clearance_max = $rows * 0.1;
+
+		foreach ($base_intervals[$is_binary ? '1024' : '1000'] as $interval) {
+			if ($calc_min) {
+				$min = floor($scale_min / $interval) * $interval;
+				if ($min != 0 && ($scale_min - $min) / $interval < $clearance_min) {
+					$min -= $interval;
+				}
+				$max = $calc_max ? $min + $interval * $rows : $scale_max;
+			}
+			elseif ($calc_max) {
+				$min = $scale_min;
+				$max = ceil($scale_min / $interval + $rows) * $interval;
+				if ($max != 0 && ($max - $scale_max) / $interval < $clearance_max) {
+					$max += $interval;
+				}
+			}
+			else {
+				$min = $scale_min;
+				$max = $scale_max;
+			}
+
+			if ($calc_min && $min != 0 && ($scale_min - $min) / $interval < $clearance_min) {
+				continue;
+			}
+
+			if ($calc_max && $max != 0 && ($max - $scale_max) / $interval < $clearance_max) {
+				continue;
+			}
+
+			$result = [
+				'min' => $min,
+				'max' => $max,
+				'interval' => $interval,
+				'rows' => $rows
+			];
+
+			$result_value = abs($scale_min - $min) + abs($scale_max - $max);
+
+			if ($best_result_value === null || $result_value < $best_result_value) {
+				$best_result_value = $result_value;
+				$best_result = $result;
+			}
+			elseif ($result_value == $best_result_value) {
+				if (abs(($best_result['max'] - $best_result['min']) / $best_result['rows'] - $best_result['interval'])
+						> abs(($result['max'] - $result['min']) / $result['rows'] - $result['interval'])) {
+					$best_result_value = $result_value;
+					$best_result = $result;
+				}
+			}
+		}
+	}
+
+	return $best_result;
+}

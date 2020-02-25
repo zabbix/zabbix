@@ -97,12 +97,14 @@ class CSvgGraph extends CSvg {
 	protected $left_y_min = null;
 	protected $left_y_max = null;
 	protected $left_y_units = null;
+	protected $left_y_is_binary = false;
 	protected $left_y_empty = true;
 
 	protected $right_y_show = false;
 	protected $right_y_min = null;
 	protected $right_y_max = null;
 	protected $right_y_units = null;
+	protected $right_y_binary = false;
 	protected $right_y_empty = true;
 
 	protected $right_y_zero = null;
@@ -132,6 +134,8 @@ class CSvgGraph extends CSvg {
 	 * @var int
 	 */
 	protected $max_yaxis_width = 120;
+
+	protected $cell_height_min = 40;
 
 	protected $offset_top;
 	protected $time_from;
@@ -494,30 +498,13 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function calculateDimensions() {
 		// Canvas height must be specified before call self::getValuesGridWithPosition.
+
 		$this->offset_top = 10;
 		$this->offset_bottom = self::SVG_GRAPH_X_AXIS_HEIGHT;
 		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
 		$this->canvas_y = $this->offset_top;
 
-		// Set missing properties for left Y axis.
-		if ($this->left_y_min === null) {
-			$this->left_y_min = $this->min_value_left ? : 0;
-		}
-		if ($this->left_y_max === null) {
-			$this->left_y_max = $this->max_value_left ? : 1;
-		}
-
-		if (bccomp($this->left_y_min, $this->left_y_max) == 0) {
-			$this->left_y_min -= 0.5;
-			$this->left_y_max += 0.5;
-		}
-		elseif (bccomp($this->left_y_min, $this->left_y_max) == 1) {
-			$this->left_y_max = $this->left_y_min + 1;
-		}
-
-		$grid = $this->getValueGrid($this->left_y_min, $this->left_y_max);
-		$this->left_y_min = $grid[0];
-		$this->left_y_max = end($grid);
+		// Determine units for left side.
 
 		if ($this->left_y_units === null) {
 			$this->left_y_units = '';
@@ -529,25 +516,7 @@ class CSvgGraph extends CSvg {
 			}
 		}
 
-		// Set missing properties for right Y axis.
-		if ($this->right_y_min === null) {
-			$this->right_y_min = $this->min_value_right ? : 0;
-		}
-		if ($this->right_y_max === null) {
-			$this->right_y_max = $this->max_value_right ? : 1;
-		}
-
-		if (bccomp($this->right_y_min, $this->right_y_max) == 0) {
-			$this->right_y_min -= 0.5;
-			$this->right_y_max += 0.5;
-		}
-		elseif (bccomp($this->right_y_min, $this->right_y_max) == 1) {
-			$this->right_y_max = $this->right_y_min + 1;
-		}
-
-		$grid = $this->getValueGrid($this->right_y_min, $this->right_y_max);
-		$this->right_y_min = $grid[0];
-		$this->right_y_max = end($grid);
+		// Determine units for right side.
 
 		if ($this->right_y_units === null) {
 			$this->right_y_units = '';
@@ -559,7 +528,63 @@ class CSvgGraph extends CSvg {
 			}
 		}
 
+		// Calculate vertical scale parameters for left side.
+
+		$rows_min = (int) max(1, floor($this->canvas_height / $this->cell_height_min / 2));
+		$rows_max = (int) max(1, floor($this->canvas_height / $this->cell_height_min));
+
+		$calc_min = $this->left_y_min === null;
+		$calc_max = $this->left_y_max === null;
+
+		if ($calc_min) {
+			$this->left_y_min = $this->min_value_left ? : 0;
+		}
+		if ($calc_max) {
+			$this->left_y_max = $this->max_value_left ? : 1;
+		}
+
+		$this->left_y_is_binary = in_array($this->left_y_units, ['B', 'Bps']);
+
+		$result = calculateGraphScale($this->left_y_min, $this->left_y_max, $this->left_y_is_binary,
+			$calc_min, $calc_max, $rows_min, $rows_max
+		);
+
+		[
+			'min' => $this->left_y_min,
+			'max' => $this->left_y_max,
+			'interval' => $this->left_y_interval
+		] = $result;
+
+		// Calculate vertical scale parameters for right side.
+
+		if ($calc_min && $calc_max) {
+			$rows_min = $rows_max = $result['rows'];
+		}
+
+		$calc_min = $this->right_y_min === null;
+		$calc_max = $this->right_y_max === null;
+
+		if ($calc_min) {
+			$this->right_y_min = $this->min_value_right ? : 0;
+		}
+		if ($calc_max) {
+			$this->right_y_max = $this->max_value_right ? : 1;
+		}
+
+		$this->right_y_is_binary = in_array($this->right_y_units, ['B', 'Bps']);
+
+		$result = calculateGraphScale($this->right_y_min, $this->right_y_max, $this->right_y_is_binary,
+			$calc_min, $calc_max, $rows_min, $rows_max
+		);
+
+		[
+			'min' => $this->right_y_min,
+			'max' => $this->right_y_max,
+			'interval' => $this->right_y_interval
+		] = $result;
+
 		// Define canvas dimensions and offsets, except canvas height and bottom offset.
+
 		$approx_width = 10;
 
 		if ($this->left_y_show) {
@@ -584,12 +609,13 @@ class CSvgGraph extends CSvg {
 		$this->canvas_width = $this->width - $this->offset_left - $this->offset_right;
 		$this->canvas_x = $this->offset_left;
 
-		// Calculate Y = 0 position.
-		$delta = (($this->right_y_max - $this->right_y_min) ? : 1);
-		$this->right_y_zero = $this->canvas_y + $this->canvas_height * $this->right_y_max / $delta;
+		// Calculate vertical zero position.
 
-		$delta = (($this->left_y_max - $this->left_y_min) ? : 1);
-		$this->left_y_zero = $this->canvas_y + $this->canvas_height * $this->left_y_max / $delta;
+		$this->left_y_zero = $this->canvas_y
+			+ $this->canvas_height * max(0, min(1, $this->left_y_max / ($this->left_y_max - $this->left_y_min)));
+
+		$this->right_y_zero = $this->canvas_y
+			+ $this->canvas_height * max(0, min(1, $this->right_y_max / ($this->right_y_max - $this->right_y_min)));
 	}
 
 	/**
@@ -601,38 +627,57 @@ class CSvgGraph extends CSvg {
 	 * @return array
 	 */
 	protected function getValuesGridWithPosition($side, $empty_set = false) {
-		if ($empty_set) {
-			$units = '';
-		}
-		elseif ($side === GRAPH_YAXIS_SIDE_LEFT) {
-			$min_value = $this->left_y_min;
-			$max_value = $this->left_y_max;
-			$units = $this->left_y_units;
-		}
-		else {
-			$min_value = $this->right_y_min;
-			$max_value = $this->right_y_max;
-			$units = $this->right_y_units;
+		$min = 0;
+		$max = 1;
+		$interval = 1;
+		$is_binary = false;
+		$units = '';
+
+		if (!$empty_set) {
+			if ($side === GRAPH_YAXIS_SIDE_LEFT) {
+				$min = $this->left_y_min;
+				$max = $this->left_y_max;
+				$interval = $this->left_y_interval;
+				$is_binary = $this->left_y_is_binary;
+				$units = $this->left_y_units;
+			}
+			elseif ($side === GRAPH_YAXIS_SIDE_RIGHT) {
+				$min = $this->right_y_min;
+				$max = $this->right_y_max;
+				$interval = $this->right_y_interval;
+				$is_binary = $this->right_y_is_binary;
+				$units = $this->right_y_units;
+			}
 		}
 
-		$grid = $empty_set ? [0, 1] : $this->getValueGrid($min_value, $max_value);
-		$min_value = $grid[0];
-		$max_value = end($grid);
-		$delta = ($max_value != $min_value)
-			? $max_value - $min_value
-			: (count($grid) > 1 ? end($grid) - $grid[0] : 1);
+		$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
+
+		$power = (int) max(0,
+			floor(log(abs($min), $unit_base)),
+			floor(log(abs($max), $unit_base))
+		);
+
+		$decimals = min(4, getNumDecimals($interval / pow($unit_base, $power)));
+
+		$rows = $this->getValueGrid($min, $max, $interval);
+
+		$ignore_milliseconds = $min <= 1 || $max >= 1;
+
 		$grid_values = [];
 
-		foreach ($grid as $value) {
-			$relative_pos = $this->canvas_height - intval($this->canvas_height * ($max_value - $value) / $delta);
+		foreach ($rows as $value) {
+			$relative_pos = (int) round($this->canvas_height * ($value - $min) / ($max - $min));
 
-			if ($relative_pos >= 0 && $relative_pos <= $this->canvas_height) {
-				$grid_values[$relative_pos] = convertUnits([
-					'value' => $value,
-					'units' => $units,
-					'convert' => ITEM_CONVERT_NO_UNITS
-				]);
-			}
+			$grid_values[$relative_pos] = convertUnits([
+				'value' => $value,
+				'units' => $units,
+				'unit_base' => $unit_base,
+				'convert' => ITEM_CONVERT_NO_UNITS,
+				'power' => $power,
+				'ignore_milliseconds' => $ignore_milliseconds,
+				'decimals' => ($value == $min || $value == $max) ? null : $decimals,
+				'exact_decimals' => true
+			]);
 		}
 
 		return $grid_values;
@@ -693,35 +738,24 @@ class CSvgGraph extends CSvg {
 	 *
 	 * @return $array
 	 */
-	protected function getValueGrid($min, $max) {
-		$res = [];
+	public static function getValueGrid($min, $max, $interval) {
+		$rows = [
+			$min,
+			$max
+		];
 
-		// If absolute min/max is equal, calculate grid with 4 rows to make 0 centered. 5 rows otherwise.
-		$grid_rows = (abs($min) == abs($max)) ? 4 : 5;
-		$decimals = strlen(substr(strrchr($max, '.'), 1));
-		$decimals = $decimals > 4 ? 4 : $decimals;
-		$decimals = $decimals < 2 ? 2 : $decimals;
-		for ($base = 10; $base > .01; $base /= 10) {
-			$mul = ($max > 0) ? 1 / pow($base, floor(log10($max))) : 1;
-			$max10 = ceil($mul * $max) / $mul;
-			$min10 = floor($mul * $min) / $mul;
-			$delta = $max10 - $min10;
-			$delta = ceil($mul * $delta) / $mul;
+		$clearance = 0.5;
+		for ($row_index = 0;; $row_index++) {
+			$value = ceil($min / $interval + $row_index + $clearance) * $interval;
 
-			if ($mul >= 1) {
-				if ($delta) {
-					for ($i = 0; $delta >= $i; $i += $delta / $grid_rows) {
-						$res[] = sprintf('%.'.$decimals.'f', $i + $min10);
-					}
-				}
-				else {
-					$res[] = $min10;
-				}
+			if ($value > $max - $interval * $clearance) {
 				break;
 			}
+
+			$rows[] = $value;
 		}
 
-		return $res;
+		return $rows;
 	}
 
 	/**

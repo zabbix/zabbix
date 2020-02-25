@@ -64,7 +64,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->grid = []; // vertical & horizontal grids params
 
 		$this->cell_width = 30;
-		$this->cell_height = 40;
+		$this->cell_height_min = 30;
 
 		$this->intervals = [];
 
@@ -637,13 +637,13 @@ class CLineGraphDraw extends CGraphDraw {
 
 			switch ($calc_fnc) {
 				case CALC_FNC_ALL:
-				case CALC_FNC_MIN:
-					$values = $data['min'];
-					$shift_values = $data['shift_min'];
-					break;
 				case CALC_FNC_MAX:
 					$values = $data['max'];
 					$shift_values = $data['shift_max'];
+					break;
+				case CALC_FNC_MIN:
+					$values = $data['min'];
+					$shift_values = $data['shift_min'];
 					break;
 				case CALC_FNC_AVG:
 				default:
@@ -700,130 +700,6 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->zero[$side] = $this->sizeY + $this->shiftY - abs($this->m_minY[$side] / $this->unit2px[$side]);
 				$this->oxy[$side] = 0;
 			}
-		}
-	}
-
-	protected function calcVerticalScale() {
-		$base_intervals = [];
-
-		for ($range = floor(log10(PHP_FLOAT_MAX)), $base = -$range; $base <= $range; $base++) {
-			foreach ([1, 2, 5] as $multiplier) {
-				$interval = pow(10, $base) * $multiplier;
-				if ($interval != 0 && $interval != INF && $interval != -INF) {
-					$base_intervals['1000'][] = $interval;
-				}
-			}
-		}
-		sort($base_intervals['1000']);
-
-		for ($range = floor(log(PHP_FLOAT_MAX, 2)), $base = -$range; $base <= $range; $base++) {
-			$interval = pow(2, $base);
-			if ($interval != 0 && $interval != INF && $interval != -INF) {
-				$base_intervals['1024'][] = $interval;
-			}
-		}
-		sort($base_intervals['1024']);
-
-		$side_bases = [
-			GRAPH_YAXIS_SIDE_LEFT => '1000',
-			GRAPH_YAXIS_SIDE_RIGHT => '1000'
-		];
-
-		foreach ($this->items as $item) {
-			if ($item['units'] === 'B' || $item['units'] === 'Bps') {
-				$side_bases[$item['yaxisside']] = '1024';
-			}
-		}
-
-		$clearance = 0.5;
-
-		foreach ($this->getVerticalScalesInUse() as $side_index => $side) {
-			$is_slave = $side_index > 0 && $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED
-				&& $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED;
-
-			$interval_approx = $is_slave
-				? ($this->m_maxY[$side] - $this->m_minY[$side]) / $rows
-				: ($this->m_maxY[$side] - $this->m_minY[$side]) * $this->cell_height / $this->sizeY;
-
-			$interval = null;
-			$slave_min = 0;
-			$slave_max = 1;
-
-			$delta_min = null;
-			foreach ($base_intervals[$side_bases[$side]] as $candidate) {
-				$delta = abs($interval_approx - $candidate);
-
-				if ($delta_min === null || $delta < $delta_min) {
-					if ($is_slave) {
-						if ($this->m_minY[$side] == 0) {
-							$slave_min = 0;
-							$slave_max = $candidate * $rows;
-						}
-						elseif ($this->m_maxY[$side] == 0) {
-							$slave_min = -$candidate * $rows;
-							$slave_max = 0;
-						}
-						else {
-							$slave_min = floor($this->m_minY[$side] / $candidate) * $candidate;
-							if ($slave_min != 0 && ($this->m_minY[$side] - $slave_min) / $candidate < $clearance) {
-								$slave_min -= $candidate;
-							}
-							$slave_max = $slave_min + $candidate * $rows;
-						}
-
-						if ($this->m_minY[$side] != 0 && $slave_min != 0
-								&& ($this->m_minY[$side] - $slave_min) / $candidate < $clearance) {
-							continue;
-						}
-
-						if ($this->m_maxY[$side] != 0
-								&& ($slave_max - $this->m_maxY[$side]) / $candidate < $clearance) {
-							continue;
-						}
-					}
-
-					$interval = $candidate;
-					$delta_min = $delta;
-				}
-			}
-
-			if ($is_slave) {
-				$this->m_minY[$side] = $slave_min;
-				$this->m_maxY[$side] = $slave_max;
-			}
-			else {
-				$rows = ceil(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
-
-				$min = null;
-				$max = null;
-
-				if ($this->m_minY[$side] == 0) {
-					$max = $interval * $rows;
-				}
-				elseif ($this->m_maxY[$side] == 0) {
-					$min = -$interval * $rows;
-				}
-				else {
-					$min = floor($this->m_minY[$side] / $interval) * $interval;
-					$max = ceil($this->m_maxY[$side] / $interval) * $interval;
-				}
-
-				if ($min !== null && $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED) {
-					$this->m_minY[$side] = ($this->m_minY[$side] - $min) / $interval < $clearance
-						? $min - $interval
-						: $min;
-				}
-
-				if ($max !== null && $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED) {
-					$this->m_maxY[$side] = ($max - $this->m_maxY[$side]) / $interval < $clearance
-						? $max + $interval
-						: $max;
-				}
-
-				$rows = (int) round(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
-			}
-
-			$this->intervals[$side] = $interval;
 		}
 	}
 
@@ -1301,7 +1177,12 @@ class CLineGraphDraw extends CGraphDraw {
 				['value' => $this->m_maxY[$side], 'decimals' => null, 'draw_line' => $side_index == 0]
 			];
 
-			$decimals = getNumDecimals($this->intervals[$side]);
+			$power = (int) max(0,
+				floor(log(abs($this->m_minY[$side]), $unit_base)),
+				floor(log(abs($this->m_maxY[$side]), $unit_base))
+			);
+
+			$decimals = min(4, getNumDecimals($this->intervals[$side] / pow($unit_base, $power)));
 
 			$clearance = 0.5;
 			for ($row_index = 0;; $row_index++) {
@@ -1319,11 +1200,6 @@ class CLineGraphDraw extends CGraphDraw {
 				];
 			}
 
-			$power = (int) max(0,
-				floor(log(abs($this->m_minY[$side]), $unit_base)),
-				floor(log(abs($this->m_maxY[$side]), $unit_base))
-			);
-
 			$ignore_milliseconds = $this->m_minY[$side] <= 1 || $this->m_maxY[$side] >= 1;
 
 			$line_color = $this->getColor($this->graphtheme['gridcolor'], 0);
@@ -1336,7 +1212,7 @@ class CLineGraphDraw extends CGraphDraw {
 					'convert' => ITEM_CONVERT_NO_UNITS,
 					'power' => $power,
 					'ignore_milliseconds' => $ignore_milliseconds,
-					'precision' => 4,
+					'precision' => 5,
 					'decimals' => $row['decimals'],
 					'exact_decimals' => true
 				]);
@@ -1971,8 +1847,14 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	private function calcMinYMaxY() {
-		foreach ($this->getVerticalScalesInUse() as $side) {
+	private function calcVerticalScale() {
+		$calc_min = $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED;
+		$calc_max = $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED;
+
+		$rows_min = (int) max(1, floor($this->sizeY / $this->cell_height_min / 2));
+		$rows_max = (int) max(1, floor($this->sizeY / $this->cell_height_min));
+
+		foreach ($this->getVerticalScalesInUse() as $side_index => $side) {
 			$min = $this->calculateMinY($side);
 			$max = $this->calculateMaxY($side);
 
@@ -1988,34 +1870,31 @@ class CLineGraphDraw extends CGraphDraw {
 				$min = min(0, $min);
 			}
 
-			if ($min == $max) {
-				if ($min > 0) {
-					$min = 0;
-				}
-				else {
-					$max = ($min < 0) ? 0 : 1;
-				}
-			}
-			elseif ($min > $max && $this->ymin_type != $this->ymax_type) {
-				if ($this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED) {
-					$min = ($max == 0)
-						? -1
-						: ($max > 0) ? $max * 0.8 : $max * 1.2;
-				}
-				elseif ($this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED) {
-					$max = ($min == 0)
-						? 1
-						: ($min < 0) ? $min * 0.8 : $min * 1.2;
+			$is_binary = false;
+
+			foreach ($this->items as $item) {
+				if ($side == $item['yaxisside'] && in_array($item['units'], ['B', 'Bps'])) {
+					$is_binary = true;
+					break;
 				}
 			}
 
-			if ($min >= $max) {
+			$result = calculateGraphScale($min, $max, $is_binary, $calc_min, $calc_max, $rows_min, $rows_max);
+
+			if ($result === false) {
 				show_error_message(_('Y axis MAX value must be greater than Y axis MIN value.'));
 				exit;
 			}
 
-			$this->m_minY[$side] = $min;
-			$this->m_maxY[$side] = $max;
+			[
+				'min' => $this->m_minY[$side],
+				'max' => $this->m_maxY[$side],
+				'interval' => $this->intervals[$side]
+			] = $result;
+
+			if ($calc_min && $calc_max) {
+				$rows_min = $rows_max = $result['rows'];
+			}
 		}
 	}
 
@@ -2203,9 +2082,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->selectData();
 
-		$this->calcMinYMaxY();
-		$this->calcPercentile();
 		$this->calcVerticalScale();
+		$this->calcPercentile();
 		$this->calcZero();
 
 		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')

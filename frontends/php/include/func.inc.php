@@ -1397,11 +1397,19 @@ function numberToFloat(string $number, int $precision, int $decimals = null, boo
 		[$mantissa, $exponent] = explode('E', $number);
 	}
 
+	if ($mantissa == 0) {
+		return '0';
+	}
+
 	$significant_size = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
 
 	// Is number out of range for decimal notation?
 	if ($exponent < $significant_size - $precision || $exponent >= $precision) {
-		$number = sprintf('%.'.($significant_size - 1).'E', $number);
+		$effective_decimals = ($decimals !== null && $exact_decimals)
+			? min($precision, $decimals)
+			: $significant_size - 1;
+
+		$number = sprintf('%.'.$effective_decimals.'E', $number);
 	}
 	elseif ($decimals === null) {
 		$number = sprintf('%.'.($significant_size - $exponent - 1).'F', $number);
