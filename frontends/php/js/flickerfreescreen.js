@@ -196,11 +196,6 @@
 					}
 					break;
 
-				// SCREEN_RESOURCE_CHART
-				case 18:
-					self.refreshImg(id);
-					break;
-
 				// SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 				// SCREEN_RESOURCE_LLD_GRAPH
 				case 20:
