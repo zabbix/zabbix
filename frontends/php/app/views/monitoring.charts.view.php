@@ -106,7 +106,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					->setModern(true)
 			)
 			->addRow(
-				(new CLabel(_('Graphs'), 'filter_graph__ms')),
+				(new CLabel(_('Graphs'), 'filter_graphids__ms')),
 				(new CMultiSelect([
 					'multiple' => true,
 					'name' => 'filter_graphids[]',
@@ -118,7 +118,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 							'srcfld1' => 'graphid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_graphids_',
-							/* 'templated' => false */
+							'real_hosts' => true
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
@@ -138,7 +138,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 							'srcfld1' => 'graphid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_graph_patterns_',
-							/* 'templated' => false */
+							'real_hosts' => true
 						]
 					],
 					'add_post_js' => true
