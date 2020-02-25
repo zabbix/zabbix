@@ -101,7 +101,7 @@ $obj = [
 	'dynamic' => 0,
 	'mainObject' => 1
 ];
-$this->addPostJS('timeControl.addObject("auditlog", '.json_encode($data['timeline']).', '.json_encode($obj).');'.
+zbx_add_post_js('timeControl.addObject("auditlog", '.json_encode($data['timeline']).', '.json_encode($obj).');'.
 	'timeControl.processObjects();'
 );
 
