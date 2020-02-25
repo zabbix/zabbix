@@ -592,6 +592,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	zbx_free(connect);
 #elif defined(HAVE_POSTGRESQL)
+	ZBX_UNUSED(cipher);
+	ZBX_UNUSED(cipher_13);
+
 	if (0 != port)
 		cport = zbx_dsprintf(cport, "%d", port);
 
