@@ -90,6 +90,16 @@ class CControllerMapView extends CController {
 	protected function doAction() {
 		CProfile::update('web.maps.sysmapid', $this->sysmapid, PROFILE_TYPE_ID);
 
+		if ($this->hasInput('severity_min')) {
+			$severity_min = $this->getInput('severity_min');
+			CProfile::update('web.maps.severity_min', $severity_min, PROFILE_TYPE_INT, $this->sysmapid);
+		}
+		else {
+			$severity_min = CProfile::get('web.maps.severity_min', null, $this->sysmapid);
+		}
+
+		CProfile::get('web.maps.severity_min', null, $this->sysmapid);
+
 		$maps = API::Map()->get([
 			'output' => ['name', 'severity_min'],
 			'sysmapids' => [$this->sysmapid]
@@ -103,19 +113,22 @@ class CControllerMapView extends CController {
 			'editable' => true
 		]);
 
-		$page_filter = new CPageFilter([
-			'severitiesMin' => [
-				'default' => $map['severity_min'],
-				'mapid' => $this->sysmapid
-			],
-			'severityMin' => $this->hasInput('severity_min') ? $this->getInput('severity_min') : null
-		]);
+		$config = select_config();
+		$severities_dropdown = [];
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity ++) {
+			$severity_name = getSeverityName($severity, $config);
+
+			$severities_dropdown[$severity] = ($severity == $map['severity_min'])
+				? $severity_name.' ('._('default').')'
+				: $severity_name;
+		}
 
 		$response = new CControllerResponseData([
 			'map' => $map,
-			'pageFilter' => $page_filter,
-			'severity_min' => $page_filter->severityMin
+			'severity_min' => $severity_min,
+			'severities_dropdown' => $severities_dropdown
 		]);
+
 		$response->setTitle(_('Network maps'));
 		$this->setResponse($response);
 	}
