@@ -80,15 +80,20 @@ class CControllerChartsView extends CController {
 	}
 
 	protected function getGraphidsByPatterns(array $patterns, array $hostids): array {
-		return array_keys(API::Graph()->get([
+		$options = [
 			'output' => [],
 			'hostids' => $hostids,
-			'search' => ['name' => $patterns],
-			'searchWildcardsEnabled' => true,
-			'searchByAny' => true,
 			'limit' => ZBX_MAX_GRAPHS_PER_PAGE,
 			'preservekeys' => true
-		]));
+		];
+
+		if (!in_array('*', $patterns)) {
+			$options['search'] = ['name' => $patterns];
+			$options['searchWildcardsEnabled'] = true;
+			$options['searchByAny'] = true;
+		}
+
+		return array_keys(API::Graph()->get($options));
 	}
 
 	protected function getChartsById(array $graphids): array {
