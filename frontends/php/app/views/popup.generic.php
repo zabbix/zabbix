@@ -50,8 +50,8 @@ if (in_array($data['popup_type'], ['applications', 'application_prototypes', 'tr
 	$empty_script = get_window_opener($options['dstfld1'], $value1);
 	$empty_script .= get_window_opener($options['dstfld2'], $value2);
 	$empty_script .= get_window_opener($options['dstfld3'], $value3);
-	$empty_script .= ' overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));';
-	$empty_script .= ' return false;';
+	$empty_script .= 'overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));';
+	$empty_script .= 'return false;';
 
 	$empty_btn = (new CButton('empty', _('Empty')))
 		->addStyle('float: right; margin-left: 5px;')
