@@ -662,11 +662,11 @@ if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $
 }
 
 $output['script_inline'] =
-	$popup_reference .
-	'jQuery(document).ready(function() {' .
-		$output['script_inline'] .
-		'cookie.init();' .
-		'chkbxRange.init();' .
+	$popup_reference.
+	'jQuery(document).ready(function() {'.
+		$output['script_inline'].
+		'cookie.init();'.
+		'chkbxRange.init();'.
 	'});';
 
 if ($form) {
