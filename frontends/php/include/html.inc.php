@@ -467,7 +467,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		$list->addItem([
 			(new CSpan())->addItem(
-				new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'].url_param('groupid'))
+				new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'])
 			),
 			'/',
 			$discovery_rule

@@ -125,8 +125,10 @@ if ($data['host']['description'] !== '') {
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
 	new CHorList([
-		new CLink(_('Web'),
-			'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].url_param('groupid')
+		new CLink(_('Web'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'web.view')
+			->setArgument('filter_hostids[]', $data['host']['hostid'])
+			->setArgument('filter_set', '1')
 		),
 		new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
@@ -141,7 +143,12 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('filter_hostids[]', $data['host']['hostid'])
 				->setArgument('filter_set', '1')
 		),
-		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid')),
+		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'charts.view')
+				->setArgument('view_as', HISTORY_GRAPH)
+				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+				->setArgument('filter_hostids', [$data['host']['hostid']])
+		),
 		new CLink(_('Screens'),
 			'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid')
 		)
@@ -178,7 +185,6 @@ if ($data['rwHost']) {
 	$discoveryLink = new CLink(_('Discovery'),
 		'host_discovery.php?hostid='.$data['host']['hostid'].url_param('groupid')
 	);
-
 	$webLink = new CLink(_('Web'), (new CUrl('httpconf.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])

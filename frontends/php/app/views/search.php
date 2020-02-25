@@ -122,9 +122,18 @@ foreach ($data['hosts'] as $hostid => $host) {
 				->setArgument('filter_hostids[]', $hostid)
 				->setArgument('filter_set', '1')
 		),
-		new CLink(_('Graphs'), 'charts.php?'.$link),
+		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'charts.view')
+				->setArgument('view_as', HISTORY_GRAPH)
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
+		),
 		new CLink(_('Screens'), 'host_screen.php?hostid='.$hostid),
-		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
+		new CLink(_('Web'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
+		),
 		$applications_link,
 		$items_link,
 		$triggers_link,
@@ -219,7 +228,6 @@ if ($data['admin']) {
 	]);
 
 	foreach ($data['templates'] as $templateid => $template) {
-		$link = 'groupid='.$template['groups'][0]['groupid'].'&hostid='.$templateid;
 		$visible_name = make_decoration($template['name'], $data['search']);
 		$app_count = CViewHelper::showNum($template['applications']);
 		$item_count = CViewHelper::showNum($template['items']);
@@ -233,7 +241,7 @@ if ($data['admin']) {
 			? [new CLink($visible_name,'templates.php?form=update&'.'&templateid='.$templateid)]
 			: [new CSpan($visible_name)];
 
-		$applications_link = $host['editable']
+		$applications_link = $template['editable']
 			? [new CLink(_('Applications'), (new CUrl('applications.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
@@ -265,8 +273,10 @@ if ($data['admin']) {
 			? [new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid), $screen_count]
 			: [_('Screens'), $screen_count];
 
+		$discovery_link_url = (new CUrl('host_discovery.php'))->setArgument('hostid', $templateid);
 		$discovery_link = $template['editable']
-			? [new CLink(_('Discovery'), 'host_discovery.php?'.$link), $discovery_count]
+			? [new CLink(_('Discovery'), $discovery_link_url), $discovery_count
+			]
 			: [_('Discovery'), $discovery_count];
 
 		$httptests_link = $template['editable']

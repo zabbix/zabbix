@@ -202,8 +202,11 @@ class CScreenGraph extends CScreenBase {
 			$item = new CDiv();
 		}
 		elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-			$item = new CLink(null, (new CUrl('charts.php'))
-				->setArgument('graphid', $resourceId)
+			$item = new CLink(null, (new CUrl('zabbix.php'))
+				->setArgument('action', 'charts.view')
+				->setArgument('view_as', HISTORY_GRAPH)
+				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+				->setArgument('filter_graphids', [$resourceId])
 				->setArgument('from', $this->timeline['from'])
 				->setArgument('to', $this->timeline['to'])
 				->getUrl()
