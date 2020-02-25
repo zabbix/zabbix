@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-02-17T08:23:29Z</date>
+    <date>2020-02-25T08:11:58Z</date>
     <groups>
         <group>
             <name>Templates/Databases</name>
@@ -10,7 +10,7 @@
     <templates>
         <template>
             <template>Template DB PostgreSQL Agent 2</template>
-            <name>Template DB PostgreSQL Agent2 </name>
+            <name>Template DB PostgreSQL Agent 2</name>
             <groups>
                 <group>
                     <name>Templates/Databases</name>
@@ -1040,7 +1040,6 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</
                     <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
                     <history>1h</history>
                     <trends>0</trends>
-                    <status>DISABLED</status>
                     <value_type>TEXT</value_type>
                     <description>Collect all metrics from pg_stat_database per database&#13;
 https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</description>
@@ -1617,7 +1616,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 <graph_item>
                                     <color>66BB6A</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.blks_hit.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1625,7 +1624,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <sortorder>1</sortorder>
                                     <color>42A5F5</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.blks_read.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1638,7 +1637,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 <graph_item>
                                     <color>66BB6A</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.db.size[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1652,7 +1651,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <drawtype>GRADIENT_LINE</drawtype>
                                     <color>1A7C11</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.xact_commit.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1660,7 +1659,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <sortorder>1</sortorder>
                                     <color>F63100</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.conflicts.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1668,7 +1667,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <sortorder>2</sortorder>
                                     <color>2774A4</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.deadlocks.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1676,7 +1675,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <sortorder>3</sortorder>
                                     <color>A54F10</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.xact_rollback.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1689,7 +1688,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <drawtype>GRADIENT_LINE</drawtype>
                                     <color>66BB6A</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.temp_bytes.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1698,7 +1697,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <color>42A5F5</color>
                                     <yaxisside>RIGHT</yaxisside>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.temp_files.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1711,7 +1710,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 <graph_item>
                                     <color>1A7C11</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.tup_deleted.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1719,7 +1718,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <sortorder>1</sortorder>
                                     <color>F63100</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.tup_fetched.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1727,7 +1726,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <sortorder>2</sortorder>
                                     <color>2774A4</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.tup_inserted.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1735,7 +1734,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <sortorder>3</sortorder>
                                     <color>A54F10</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.tup_returned.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1743,7 +1742,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <sortorder>4</sortorder>
                                     <color>FC6EA3</color>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.tup_updated.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -1849,7 +1848,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <style>0</style>
                             <resource>
                                 <name>DB {#DBNAME}: Tuples</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>Template DB PostgreSQL Agent 2</host>
                             </resource>
                             <width>750</width>
                             <height>200</height>
@@ -1871,7 +1870,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <style>0</style>
                             <resource>
                                 <name>DB {#DBNAME}: Events</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>Template DB PostgreSQL Agent 2</host>
                             </resource>
                             <width>750</width>
                             <height>200</height>
@@ -1893,7 +1892,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <style>0</style>
                             <resource>
                                 <name>DB {#DBNAME}: Block hit/read</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>Template DB PostgreSQL Agent 2</host>
                             </resource>
                             <width>750</width>
                             <height>200</height>
@@ -1915,7 +1914,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <style>0</style>
                             <resource>
                                 <name>DB {#DBNAME}: Temp files</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>Template DB PostgreSQL Agent 2</host>
                             </resource>
                             <width>750</width>
                             <height>200</height>
@@ -1937,7 +1936,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <style>0</style>
                             <resource>
                                 <name>DB {#DBNAME}: Database size</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>Template DB PostgreSQL Agent 2</host>
                             </resource>
                             <width>750</width>
                             <height>200</height>
