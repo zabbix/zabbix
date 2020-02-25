@@ -32,8 +32,7 @@ class CControllerChartsViewJson extends CControllerChartsView {
 		$fields = [
 			'from'                  => 'range_time',
 			'to'                    => 'range_time',
-			'search_type'           => 'in '.ZBX_SEARCH_TYPE_STRICT.','.ZBX_SEARCH_TYPE_PATTERN,
-			'filter_hostids'        => 'required | array',
+			'filter_hostids'        => 'required | array_id',
 			'filter_graph_patterns' => 'array'
 		];
 

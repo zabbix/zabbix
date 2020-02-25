@@ -29,12 +29,12 @@
 		/**
 		 * On timeselector change only existing list of charts is updated.
 		 * If user has page refresh configured:
-		 * - In cese of parren, the list itself is updated.
+		 * - In case of pattern, the list itself is updated.
 		 * - Else each chart is updated.
 		 * Also each page refresh update is counted since last update (regardless if it was initiated by timeselector).
 		 * Loading indicator is delayed for 3 seconds if refresh was instantiated by page refresh interval.
 		 */
-		var data = JSON.parse('<?= json_encode($data) ?>')
+		var data = JSON.parse('<?= json_encode($data) ?>'),
 			$table = $('#charts'),
 			$tmpl_row = $('<tr />').append(
 				$('<div />', {class: 'flickerfreescreen'}).append(
@@ -67,7 +67,7 @@
 			this.curl = new Curl(chart.src, false);
 			this.curl.setArgument('graphid', chart.chartid);
 
-			this.use_sbox = !! chart.sbox;
+			this.use_sbox = !!chart.sbox;
 			this.refresh_interval = 0;
 		}
 
@@ -210,7 +210,7 @@
 						this.updateCharts(delay_loading);
 					}.bind(this))
 				.catch(console.error);
-		}
+		};
 
 		/**
 		 * Clears refresh interval.
@@ -219,7 +219,7 @@
 			if (this._refreshid) {
 				clearInterval(this._refreshid);
 			}
-		}
+		};
 
 		/**
 		 * Starts refresh interval according with page refresh config (no initial refresh).
@@ -233,7 +233,7 @@
 			else if (this.config.refresh_interval) {
 				this._refreshid = setInterval(this.updateCharts.bind(this, 3), this.config.refresh_interval * 1000);
 			}
-		}
+		};
 
 		/**
 		 * Constructs new charts and removes missing, reorders existing charts. Does not call "update" on any of charts.
@@ -263,7 +263,7 @@
 
 			this.charts = charts;
 			this.charts_map = charts_map;
-		}
+		};
 
 		/**
 		 * A response to horizontal window resize is to refresh charts (body min width is taken into account).

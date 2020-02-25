@@ -50,7 +50,7 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem($data['filter_search_type'] == ZBX_SEARCH_TYPE_STRICT && count($data['graphids']) == 1
+			->addItem(($data['filter_search_type'] == ZBX_SEARCH_TYPE_STRICT && count($data['graphids']) == 1)
 				? get_icon('favourite', [
 					'fav' => 'web.favorite.graphids',
 					'elname' => 'graphid',
@@ -89,8 +89,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 							'with_graphs' => true
 						]
 					]
-				]))
-					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			)
 			->addRow((new CLabel(_('Search type'), 'waa')),
 				(new CRadioButtonList('filter_search_type', $data['filter_search_type']))
@@ -155,9 +154,8 @@ $widget->addItem($filter);
 if ($data['must_specify_host']) {
 	$widget->addItem((new CTableInfo())->setNoDataMessage(_('Specify host to see the graphs.')));
 }
-else if ($data['graphids']) {
-	$table = (new CTable())
-		->setAttribute('style', 'width: 100%;');
+elseif ($data['graphids']) {
+	$table = (new CTable())->setAttribute('style', 'width: 100%;');
 
 	if ($data['view_as'] === HISTORY_VALUES) {
 		$this->addJsFile('flickerfreescreen.js');

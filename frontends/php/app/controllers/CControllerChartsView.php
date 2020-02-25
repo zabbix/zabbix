@@ -33,8 +33,8 @@ class CControllerChartsView extends CController {
 			'filter_set'            => 'in 1',
 			'filter_rst'            => 'in 1',
 			'filter_search_type'    => 'in '.ZBX_SEARCH_TYPE_STRICT.','.ZBX_SEARCH_TYPE_PATTERN,
-			'filter_hostids'        => 'array',
-			'filter_graphids'       => 'array',
+			'filter_hostids'        => 'array_id',
+			'filter_graphids'       => 'array_id',
 			'filter_graph_patterns' => 'array',
 			'page'                  => 'ge 1'
 		];
@@ -49,16 +49,7 @@ class CControllerChartsView extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
-			return false;
-		}
-
-		if ($this->getInput('search_type', ZBX_SEARCH_TYPE_STRICT) == ZBX_SEARCH_TYPE_STRICT) {
-		}
-		else {
-		}
-
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	/**
@@ -94,9 +85,9 @@ class CControllerChartsView extends CController {
 			'hostids' => $hostids,
 			'search' => ['name' => $patterns],
 			'searchWildcardsEnabled' => true,
+			'searchByAny' => true,
 			'limit' => ZBX_MAX_GRAPHS_PER_PAGE,
-			'preservekeys' => true,
-			'searchByAny' => true
+			'preservekeys' => true
 		]));
 	}
 
@@ -104,14 +95,13 @@ class CControllerChartsView extends CController {
 		$charts = [];
 
 		foreach ($graphids as $graphid) {
-			$graph_dims = getGraphDims($graphid);
 			$chart = [
 				'chartid' => $graphid,
+				'dimensions' => getGraphDims($graphid)
 			];
 
-			$chart['dimensions'] = $graph_dims;
-
-			if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
+			if ($chart['dimensions']['graphtype'] == GRAPH_TYPE_PIE
+					|| $chart['dimensions']['graphtype'] == GRAPH_TYPE_EXPLODED) {
 				$chart['sbox'] = false;
 				$chart['src'] = 'chart6.php';
 			}
@@ -132,10 +122,10 @@ class CControllerChartsView extends CController {
 			CProfile::deleteIdx('web.graphs.filter.graphids');
 			CProfile::deleteIdx('web.graphs.filter.graph_patterns');
 		}
-		else if ($this->hasInput('filter_set')) {
-			CProfile::update('web.graphs.filter.search_type', $this->getInput('filter_search_type',
-				ZBX_SEARCH_TYPE_STRICT
-			), PROFILE_TYPE_INT);
+		elseif ($this->hasInput('filter_set')) {
+			CProfile::update('web.graphs.filter.search_type',
+				$this->getInput('filter_search_type', ZBX_SEARCH_TYPE_STRICT), PROFILE_TYPE_INT
+			);
 			CProfile::updateArray('web.graphs.filter.graphids', $this->getInput('filter_graphids', []),
 				PROFILE_TYPE_ID
 			);
@@ -145,21 +135,17 @@ class CControllerChartsView extends CController {
 			CProfile::updateArray('web.graphs.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
 		}
 
-		$filter_search_type = (int) $this->getInput('filter_search_type', CProfile::get(
-			'web.graphs.filter.search_type', ZBX_SEARCH_TYPE_STRICT
-		));
+		$filter_search_type = (int) $this->getInput('filter_search_type',
+			CProfile::get('web.graphs.filter.search_type', ZBX_SEARCH_TYPE_STRICT)
+		);
 
-		$filter_graphids = $this->getInput('filter_graphids', CProfile::getArray(
-			'web.graphs.filter.graphids', []
-		));
+		$filter_graphids = $this->getInput('filter_graphids', CProfile::getArray('web.graphs.filter.graphids', []));
 
-		$filter_graph_patterns = $this->getInput('filter_graph_patterns', CProfile::getArray(
-			'web.graphs.filter.graph_patterns', []
-		));
+		$filter_graph_patterns = $this->getInput('filter_graph_patterns',
+			CProfile::getArray('web.graphs.filter.graph_patterns', [])
+		);
 
-		$filter_hostids = $this->getInput('filter_hostids', CProfile::getArray(
-			'web.graphs.filter.hostids', []
-		));
+		$filter_hostids = $this->getInput('filter_hostids', CProfile::getArray('web.graphs.filter.hostids', []));
 
 		$timeselector_options = [
 			'profileIdx' => 'web.graphs.filter',
@@ -208,7 +194,7 @@ class CControllerChartsView extends CController {
 		if ($filter_search_type == ZBX_SEARCH_TYPE_STRICT && $filter_graphids) {
 			$data['must_specify_host'] = false;
 		}
-		else if ($filter_hostids) {
+		elseif ($filter_hostids) {
 			$data['must_specify_host'] = false;
 		}
 
