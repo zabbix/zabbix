@@ -515,32 +515,38 @@
 		}
 
 		static disableEdit() {
-			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input, .<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')]
-				.map((elem) => elem.removeAttribute('name'));
+			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>')].map((row) => {
+				const inputs = row.querySelectorAll('input');
 
-			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input[type="text"]')]
-				.map((elem) => elem.readOnly = true);
+				[...inputs].map((el) => {
+					el.removeAttribute('name');
 
-			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input[type="radio"], .<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>  input[type="checkbox"]')]
-				.map(elem => elem.disabled = true);
+					if (el.matches('[type="text"]')) {
+						el.readOnly = true;
+					}
 
-			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> .<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')]
-				.map((elem) => elem.remove());
+					if (el.matches('[type="radio"], [type="checkbox"]')) {
+						el.disabled = true;
+					}
+				});
 
-			// Change select to input.
-			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')].map((elem) => {
-				const index = elem.selectedIndex;
-				const value = elem.options[index].text;
+				[...row.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')].map((elem) => elem.remove());
 
-				// Create new input[type=text].
-				const input = document.createElement('input');
-				input.type = 'text';
-				input.id = elem.id;
-				input.readOnly = true;
-				input.value = value;
+				// Change select to input.
+				[...row.querySelectorAll('select')].map((elem) => {
+					const index = elem.selectedIndex;
+					const value = elem.options[index].text;
 
-				// Replace select with created input.
-				elem.replaceWith(input);
+					// Create new input[type=text].
+					const input = document.createElement('input');
+					input.type = 'text';
+					input.id = elem.id;
+					input.readOnly = true;
+					input.value = value;
+
+					// Replace select with created input.
+					elem.replaceWith(input);
+				});
 			});
 		}
 	}
