@@ -54,9 +54,7 @@ class CMacroValue extends CDiv {
 				['add_post_js' => $add_post_js]
 			))
 				->setAttribute('placeholder', _('value'))
-			: (new CInputSecret($name.'[value]', _('value'), array_key_exists('value', $macro) ? $macro['value'] : null,
-				['disabled' => $readonly, 'add_post_js' => $add_post_js]
-			));
+			: new CInputSecret($name.'[value]', _('value'), ['disabled' => $readonly, 'add_post_js' => $add_post_js]);
 
 		if ($macro['type'] == ZBX_MACRO_TYPE_TEXT && $readonly) {
 			$value_input->setAttribute('readonly', 'readonly');
