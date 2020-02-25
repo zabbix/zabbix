@@ -57,19 +57,14 @@ $fields = [
 ];
 check_fields($fields);
 
-/*
- * Permissions
- */
-if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
-	access_deny();
-}
-
 $config = select_config();
 if (hasRequest('filter_set')) {
 	CProfile::update('web.overview.filter.show_triggers', getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM),
 		PROFILE_TYPE_INT
 	);
-	CProfile::update('web.overview.filter.show_suppressed', getRequest('show_suppressed', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.overview.filter.show_suppressed', getRequest('show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
+		PROFILE_TYPE_INT
+	);
 	CProfile::update('web.overview.filter.show_severity', getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		PROFILE_TYPE_INT
 	);
@@ -127,8 +122,6 @@ if (hasRequest('view_style')) {
 	CProfile::update('web.overview.view_style', getRequest('view_style'), PROFILE_TYPE_INT);
 }
 
-$showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
-
 /*
  * Display
  */
@@ -151,14 +144,14 @@ $data = [
 if ($type == SHOW_TRIGGERS) {
 	// filter data
 	$filter = [
-		'showTriggers' => $showTriggers,
+		'showTriggers' => CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM),
 		'ackStatus' => CProfile::get('web.overview.filter.ack_status', 0),
 		'showSeverity' => CProfile::get('web.overview.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'statusChange' => CProfile::get('web.overview.filter.status_change', 0),
 		'statusChangeDays' => CProfile::get('web.overview.filter.status_change_days', 14),
 		'txtSelect' => CProfile::get('web.overview.filter.txt_select', ''),
 		'application' => CProfile::get('web.overview.filter.application', ''),
-		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', 0),
+		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
 		'groupids' => CProfile::getArray('web.overview.filter.groupids', []),
 		'hostids' => CProfile::getArray('web.overview.filter.hostids', []),
 		'inventory' => []
@@ -169,20 +162,6 @@ if ($type == SHOW_TRIGGERS) {
 			'field' => $field,
 			'value' => CProfile::get('web.overview.filter.inventory.value', null, $i)
 		];
-	}
-
-	$host_options = [];
-
-	if ($filter['inventory']) {
-		$host_options['searchInventory'] = [];
-
-		foreach ($filter['inventory'] as $field) {
-			$host_options['searchInventory'][$field['field']][] = $field['value'];
-		}
-	}
-
-	if ($filter['hostids']) {
-		$host_options['hostids'] = $filter['hostids'];
 	}
 
 	$trigger_options = [
@@ -202,21 +181,38 @@ if ($type == SHOW_TRIGGERS) {
 		'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
 	];
 
-	$data['ms_groups'] = $filter['groupids'] ? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groupids']
-	]), ['groupid' => 'id']) : [];
+	$filter['groupids'] = $filter['groupids']
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter['groupids'],
+			'preservekeys' => true
+		]), ['groupid' => 'id'])
+		: [];
 
-	$data['ms_hosts'] = $filter['hostids'] ? CArrayHelper::renameObjectsKeys(API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'hostids' => $filter['hostids']
-	]), ['hostid' => 'id']) : [];
+	$groupids = $filter['groupids'] ? getSubGroups(array_keys($filter['groupids'])) : [];
+
+	$filter['hostids'] = $filter['hostids']
+		? CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'hostids' => $filter['hostids'],
+			'preservekeys' => true
+		]), ['hostid' => 'id'])
+		: [];
+
+	$host_options = [];
+	if ($filter['inventory']) {
+		$host_options['searchInventory'] = [];
+		foreach ($filter['inventory'] as $field) {
+			$host_options['searchInventory'][$field['field']][] = $field['value'];
+		}
+	}
+	if ($filter['hostids']) {
+		$host_options['hostids'] = array_keys($filter['hostids']);
+	}
 
 	list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 		$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
-	) = getTriggersOverviewData($filter['groupids'], $filter['application'], $host_options, $trigger_options,
-		$problem_options
-	);
+	) = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);
 
 	$data['filter'] = $filter;
 	$data['backurl'] = new CUrl($page['file']);
@@ -230,43 +226,42 @@ else {
 		'application' => CProfile::get('web.overview.filter.application', ''),
 		'hostids' => CProfile::getArray('web.overview.filter.hostids', []),
 		'groupids' => CProfile::getArray('web.overview.filter.groupids', []),
-		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', 0)
+		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE)
 	];
 
-	$application = $data['filter']['application'];
-	$show_suppressed = $data['filter']['show_suppressed'];
-	$groupids = $data['filter']['groupids'];
-	$hostids = $data['filter']['hostids'];
+	$data['filter']['groupids'] = $data['filter']['groupids']
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $data['filter']['groupids'],
+			'preservekeys' => true
+		]), ['groupid' => 'id'])
+		: [];
 
-	$paging_url = (new CUrl('overview.php'))
-		->setArgument('view_style', $data['view_style'])
-		->setArgument('type', $data['type'])
-		->setArgument('groupids[]', $groupids)
-		->setArgument('hostids[]', $hostids);
+	$data['filter']['hostids'] = $data['filter']['hostids']
+		? CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'hostids' => $data['filter']['hostids'],
+			'preservekeys' => true
+		]), ['hostid' => 'id'])
+		: [];
 
-	$data['ms_groups'] = $groupids ? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $groupids
-	]), ['groupid' => 'id']) : [];
-
-	$data['ms_hosts'] = $hostids ? CArrayHelper::renameObjectsKeys(API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'hostids' => $hostids
-	]), ['hostid' => 'id']) : [];
-
-	$groupids = $groupids ? $groupids : null;
-	$hostids = $hostids ? $hostids : null;
+	$groupids = $data['filter']['groupids'] ? getSubGroups(array_keys($data['filter']['groupids'])) : null;
+	$hostids = $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null;
 
 	if ($data['view_style'] == STYLE_TOP) {
-		list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop($groupids, $hostids, $application);
+		list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop($groupids, $hostids,
+			$data['filter']['application']
+		);
 	}
 	else {
 		list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewLeft($groupids, $hostids,
-			$application
+			$data['filter']['application']
 		);
 	}
 
-	$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name, $show_suppressed);
+	$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name,
+		$data['filter']['show_suppressed']
+	);
 	$data['db_hosts'] = $db_hosts;
 	$data['items_by_name'] = $items_by_name;
 	$data['has_hidden_data'] = $has_hidden_data;
