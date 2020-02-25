@@ -101,9 +101,10 @@ $obj = [
 	'dynamic' => 0,
 	'mainObject' => 1
 ];
-zbx_add_post_js('timeControl.addObject("auditlog", '.json_encode($data['timeline']).', '.json_encode($obj).');'.
-	'timeControl.processObjects();'
-);
+
+(new CScriptTag('timeControl.addObject("auditlog", '.json_encode($data['timeline']).', '.json_encode($obj).');'.
+	'timeControl.processObjects();')
+)->show();
 
 $widget->addItem((new CForm('get'))
 	->setName('auditForm')
