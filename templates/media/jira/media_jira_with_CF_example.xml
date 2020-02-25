@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-02-19T15:13:46Z</date>
+    <media_types>
+        <media_type>
+            <name>Jira with CustomFields</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>jira_url</name>
+                    <value>&lt;PLACE YOUR JIRA URL&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>jira_user</name>
+                    <value>&lt;PLACE LOGIN&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>jira_password</name>
+                    <value>&lt;PLACE PASSWORD OF TOKEN&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>jira_project_key</name>
+                    <value>&lt;PLACE PROJECT KEY&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>jira_issue_type</name>
+                    <value>&lt;PLACE ISSUETYPE NAME&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>summary</name>
+                    <value>[{EVENT.STATUS}] {EVENT.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>trigger_description</name>
+                    <value>{TRIGGER.DESCRIPTION}</value>
+                </parameter>
+                <parameter>
+                    <name>alert_message</name>
+                    <value>{ALERT.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_value</name>
+                    <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_action</name>
+                    <value>{EVENT.UPDATE.ACTION}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_message</name>
+                    <value>{EVENT.UPDATE.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_status</name>
+                    <value>{EVENT.UPDATE.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_user</name>
+                    <value>{USER.FULLNAME}</value>
+                </parameter>
+                <parameter>
+                    <name>jira_issue_key</name>
+                    <value>{EVENT.TAGS.__zbx_jira_issuekey}</value>
+                </parameter>
+                <parameter>
+                    <name>&lt;'URL' CUSTOMFIELD FOR EVENT URL&gt;</name>
+                    <value>{$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&amp;eventid={EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>&lt;'STRING' CUSTOMFIELD FOR HOST\IP&gt;</name>
+                    <value>{HOST.HOST} [{HOST.IP}]</value>
+                </parameter>
+                <parameter>
+                    <name>&lt;'NUMBER' CUSTOMFIELD FOR EVENT.ID&gt;</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>&lt;'NUMBER' CUSTOMFIELD FOR TRIGGER.ID&gt;</name>
+                    <value>{TRIGGER.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>&lt;'DATETIME' CUSTOMFIELD FOR EVENT RECOVERY TIME&gt;</name>
+                    <value>{EVENT.RECOVERY.DATE}T{EVENT.RECOVERY.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>&lt;'STRING' CUSTOMFIELD FOR OPERATIONAL DATA&gt;</name>
+                    <value>{EVENT.OPDATA}</value>
+                </parameter>
+                <parameter>
+                    <name>&lt;'STRING' CUSTOMFIELD FOR SEVERITY&gt;</name>
+                    <value>{EVENT.SEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>&lt;'DATETIME' CUSTOMFIELD FOR EVENT TIME&gt;</name>
+                    <value>{EVENT.DATE}T{EVENT.TIME}</value>
+                </parameter>
+            </parameters>
+            <attempts>1</attempts>
+            <attempt_interval>5s</attempt_interval>
+            <script>var Base64={_keyStr:&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&quot;,encode:function(r){var t,e,a,o,h,n,C,c=&quot;&quot;,i=0;for(r=Base64._utf8_encode(r);i&lt;r.length;)o=(t=r.charCodeAt(i++))&gt;&gt;2,h=(3&amp;t)&lt;&lt;4|(e=r.charCodeAt(i++))&gt;&gt;4,n=(15&amp;e)&lt;&lt;2|(a=r.charCodeAt(i++))&gt;&gt;6,C=63&amp;a,isNaN(e)?(n=64,C=64):isNaN(a)&amp;&amp;(C=64),c=c+this._keyStr.charAt(o)+this._keyStr.charAt(h)+this._keyStr.charAt(n)+this._keyStr.charAt(C);return c},_utf8_encode:function(r){r=r.replace(/\r\n/g,&quot;\n&quot;);for(var t=&quot;&quot;,e=0;e&lt;r.length;e++){var a=r.charCodeAt(e);a&lt;128?t+=String.fromCharCode(a):a&gt;127&amp;&amp;a&lt;2048?(t+=String.fromCharCode(a&gt;&gt;6|192),t+=String.fromCharCode(63&amp;a|128)):(t+=String.fromCharCode(a&gt;&gt;12|224),t+=String.fromCharCode(a&gt;&gt;6&amp;63|128),t+=String.fromCharCode(63&amp;a|128))}return t}};function btoa(s){return Base64.encode(s);}&#13;
+// All the code above this line should be removed after ZBXNEXT-5734 is done.&#13;
+&#13;
+var Jira = {&#13;
+    params: {},&#13;
+&#13;
+    setParams: function (params) {&#13;
+        if (typeof params !== 'object') {&#13;
+            return;&#13;
+        }&#13;
+&#13;
+        Jira.params = params;&#13;
+        if (typeof Jira.params.url === 'string') {&#13;
+            if (!Jira.params.url.endsWith('/')) {&#13;
+                Jira.params.url += '/';&#13;
+            }&#13;
+&#13;
+            Jira.params.url += 'rest/api/latest/';&#13;
+        }&#13;
+    },&#13;
+&#13;
+    addCustomFields: function (data, fields) {&#13;
+        if (typeof fields === 'object' &amp;&amp; Object.keys(fields).length) {&#13;
+            var schema = Jira.getSchema(),&#13;
+                path = ['projects', 0, 'issuetypes', 0, 'fields'],&#13;
+                field;&#13;
+&#13;
+            while ((field = path.shift()) !== undefined) {&#13;
+                schema = schema[field];&#13;
+                if (typeof schema === 'undefined') {&#13;
+                    schema = null;&#13;
+                    break;&#13;
+                }&#13;
+            }&#13;
+&#13;
+            if (schema) {&#13;
+                Object.keys(fields)&#13;
+                    .forEach(function(field) {&#13;
+                        data.fields[field] = fields[field];&#13;
+&#13;
+                        if (typeof schema[field] === 'object' &amp;&amp; typeof schema[field].schema === 'object'&#13;
+                            &amp;&amp; (schema[field].schema.type === 'number' || schema[field].schema.type === 'datetime')) {&#13;
+                            switch (schema[field].schema.type) {&#13;
+                                case 'number':&#13;
+                                    data.fields[field] = parseInt(fields[field]);&#13;
+                                    break;&#13;
+&#13;
+                                case 'datetime':&#13;
+                                    if (fields[field].match(/\d+[.-]\d+[.-]\d+T\d+:\d+:\d+/) !== null) {&#13;
+                                        data.fields[field] = fields[field].replace(/\./g, '-');&#13;
+                                    }&#13;
+                                    else {&#13;
+                                        delete data.fields[field];&#13;
+                                    }&#13;
+                                    break;&#13;
+                            }&#13;
+                        }&#13;
+                    });&#13;
+            }&#13;
+            else {&#13;
+                Zabbix.Log(4, '[ Jira Webhook ] Failed to retrieve field schema.');&#13;
+            }&#13;
+        }&#13;
+&#13;
+        return data;&#13;
+    },&#13;
+&#13;
+    request: function (method, query, data) {&#13;
+        ['url', 'user', 'password', 'project_key', 'issue_type'].forEach(function (field) {&#13;
+            if (typeof Jira.params !== 'object' || typeof Jira.params[field] === 'undefined') {&#13;
+                throw new Error('Required Jira param is not set: ' + field);&#13;
+            }&#13;
+        });&#13;
+&#13;
+        var response,&#13;
+            url = Jira.params.url + query,&#13;
+            request = new CurlHttpRequest();&#13;
+&#13;
+        request.AddHeader('Content-Type: application/json');&#13;
+        request.AddHeader('Authorization: Basic ' + btoa(Jira.params.user + ':' + Jira.params.password));&#13;
+&#13;
+        if (typeof data !== 'undefined') {&#13;
+            data = JSON.stringify(data);&#13;
+        }&#13;
+&#13;
+        Zabbix.Log(4, '[ Jira Webhook ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));&#13;
+&#13;
+        switch (method) {&#13;
+            case 'get':&#13;
+                response = request.Get(url, data);&#13;
+                break;&#13;
+&#13;
+            case 'post':&#13;
+                response = request.Post(url, data);&#13;
+                break;&#13;
+&#13;
+            case 'put':&#13;
+                response = request.Put(url, data);&#13;
+                break;&#13;
+&#13;
+            default:&#13;
+                throw new Error('Unsupported HTTP request method: ' + method);&#13;
+        }&#13;
+&#13;
+        Zabbix.Log(4, '[ Jira Webhook ] Received response with status code ' + request.Status() + '\n' + response);&#13;
+&#13;
+        if (response !== null) {&#13;
+            try {&#13;
+                response = JSON.parse(response);&#13;
+            }&#13;
+            catch (error) {&#13;
+                Zabbix.Log(4, '[ Jira Webhook ] Failed to parse response received from Jira');&#13;
+                response = null;&#13;
+            }&#13;
+        }&#13;
+&#13;
+        if (request.Status() &lt; 200 || request.Status() &gt;= 300) {&#13;
+            var message = 'Request failed with status code ' + request.Status();&#13;
+&#13;
+            if (response !== null &amp;&amp; typeof response.errors !== 'undefined'&#13;
+                &amp;&amp; Object.keys(response.errors).length &gt; 0) {&#13;
+                message += ': ' + JSON.stringify(response.errors);&#13;
+            }&#13;
+            else if (response !== null &amp;&amp; typeof response.errorMessages !== 'undefined'&#13;
+                &amp;&amp; Object.keys(response.errorMessages).length &gt; 0) {&#13;
+                message += ': ' + JSON.stringify(response.errorMessages);&#13;
+            }&#13;
+&#13;
+            throw new Error(message + ' Check debug log for more information.');&#13;
+        }&#13;
+&#13;
+        return {&#13;
+            status: request.Status(),&#13;
+            response: response&#13;
+        };&#13;
+    },&#13;
+&#13;
+    getSchema: function() {&#13;
+        var result = Jira.request('get', 'issue/createmeta?expand=projects.issuetypes.fields&amp;projectKeys=' +&#13;
+                Jira.params.project_key + '&amp;issuetypeNames=' + Jira.params.issue_type);&#13;
+&#13;
+        return result.response;&#13;
+    },&#13;
+&#13;
+    createIssue: function(summary, description, fields) {&#13;
+        var data = {&#13;
+            fields: {&#13;
+                project: {&#13;
+                    key: Jira.params.project_key&#13;
+                },&#13;
+                issuetype: {&#13;
+                    name: Jira.params.issue_type&#13;
+                },&#13;
+                summary: summary,&#13;
+                description: description&#13;
+            }&#13;
+        };&#13;
+&#13;
+        var result = Jira.request('post', 'issue', Jira.addCustomFields(data, fields));&#13;
+&#13;
+        if (typeof result.response !== 'object' || typeof result.response.key === 'undefined') {&#13;
+            throw new Error('Cannot create Jira issue. Check debug log for more information.');&#13;
+        }&#13;
+&#13;
+        return result.response.key;&#13;
+    },&#13;
+&#13;
+    updateIssue: function(summary, fields, update) {&#13;
+        var data = {fields: {}};&#13;
+&#13;
+        if (summary) {&#13;
+            data.fields.summary = summary;&#13;
+        }&#13;
+&#13;
+        Jira.request('put', 'issue/' + Jira.params.issue_key, Jira.addCustomFields(data, fields));&#13;
+&#13;
+        if (update.status == 1) {&#13;
+            Jira.commentIssue(update);&#13;
+        }&#13;
+    },&#13;
+&#13;
+    commentIssue: function(update) {&#13;
+        var data = {};&#13;
+&#13;
+        data.body = update.user + ' ' + update.action + '.';&#13;
+&#13;
+        if (update.message) {&#13;
+            data.body += '\nMessage: {quote}' + update.message + '{quote}';&#13;
+        }&#13;
+&#13;
+        Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
+&#13;
+    }&#13;
+};&#13;
+&#13;
+try {&#13;
+    var params = JSON.parse(value),&#13;
+        fields = {},&#13;
+        jira = {},&#13;
+        update = {};&#13;
+&#13;
+    Object.keys(params)&#13;
+        .forEach(function (key) {&#13;
+            if (key.startsWith('jira_')) {&#13;
+                jira[key.substring(5)] = params[key];&#13;
+            }&#13;
+            else if (key.startsWith('customfield_')) {&#13;
+                fields[key] = params[key];&#13;
+            }&#13;
+            else if (key.startsWith('event_update_')) {&#13;
+                update[key.substring(13)] = params[key];&#13;
+            }&#13;
+        });&#13;
+&#13;
+    Jira.setParams(jira);&#13;
+&#13;
+    if (params.event_value == 1 &amp;&amp; update.status == 0) {&#13;
+        var key = Jira.createIssue(params.summary,&#13;
+            (Object.keys(fields).length ? params.trigger_description : params.alert_message), fields);&#13;
+&#13;
+        return JSON.stringify({&#13;
+            tags: {&#13;
+                __zbx_jira_issuekey: key,&#13;
+                __zbx_jira_issuelink: params.jira_url + (params.jira_url.endsWith('/') ? '' : '/') + 'browse/' + key&#13;
+            }&#13;
+        });&#13;
+    }&#13;
+    else {&#13;
+        if (!(jira.issue_key.startsWith(jira.project_key))) {&#13;
+            throw new Error('Incorrect Issue key given: ' + jira.issue_key);&#13;
+        }&#13;
+        Jira.updateIssue(params.summary, fields, update);&#13;
+&#13;
+        return 'OK';&#13;
+    }&#13;
+}&#13;
+catch (error) {&#13;
+    Zabbix.Log(3, '[ Jira Webhook ] ERROR: ' + error);&#13;
+    throw 'Sending failed: ' + error;&#13;
+}</script>
+            <process_tags>YES</process_tags>
+            <event_menu_url>{EVENT.TAGS.__zbx_jira_issuelink}</event_menu_url>
+            <event_menu_name>Jira: {EVENT.TAGS.__zbx_jira_issuekey}</event_menu_name>
+        </media_type>
+    </media_types>
+</zabbix_export>
