@@ -142,6 +142,7 @@
 #define ZBX_PROTO_TAG_OUTPUT_FORMAT		"output_format"
 #define ZBX_PROTO_TAG_VERIFY_PEER		"verify_peer"
 #define ZBX_PROTO_TAG_VERIFY_HOST		"verify_host"
+#define ZBX_PROTO_TAG_SNMP_VERSION		"snmp_version"
 #define ZBX_PROTO_TAG_SNMP_COMMUNITY		"snmp_community"
 #define ZBX_PROTO_TAG_SNMP_OID			"snmp_oid"
 #define	ZBX_PROTO_TAG_SNMPV3_SECURITYNAME	"snmpv3_securityname"

@@ -32,6 +32,7 @@ static void	dump_item(const DC_ITEM *item)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "key:'%s'", item->key);
 	zabbix_log(LOG_LEVEL_TRACE, "  type: %u", item->type);
+	zabbix_log(LOG_LEVEL_TRACE, "  type: %u", item->snmp_version);
 	zabbix_log(LOG_LEVEL_TRACE, "  value_type: %u", item->value_type);
 	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3_securitylevel: %u", item->snmpv3_securitylevel);
 	zabbix_log(LOG_LEVEL_TRACE, "  authtype: %u", item->authtype);
@@ -129,7 +130,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 {
 	char			tmp[MAX_STRING_LEN + 1], **pvalue;
 	DC_ITEM			item;
-	static const ZBX_TABLE	*table_items, *table_interface, *table_hosts;
+	static const ZBX_TABLE	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
 	struct zbx_json_parse	jp_interface, jp_host;
 	AGENT_RESULT		result;
 	int			errcode, ret = FAIL;
@@ -151,14 +152,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	}
 
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, table_items, "value_type", &item.value_type);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_SECURITYLEVEL, table_items, "snmpv3_securitylevel",
-			&item.snmpv3_securitylevel);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_AUTHTYPE, table_items, "authtype", &item.authtype);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FLAGS, table_items, "flags", &item.flags);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_AUTHPROTOCOL, table_items, "snmpv3_authprotocol",
-			&item.snmpv3_authprotocol);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPROTOCOL, table_items, "snmpv3_privprotocol",
-			&item.snmpv3_privprotocol);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FOLLOW_REDIRECTS, table_items, "follow_redirects",
 			&item.follow_redirects);
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_POST_TYPE, table_items, "post_type", &item.post_type);
@@ -171,17 +166,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_IPMI_SENSOR, table_items, "ipmi_sensor", item.ipmi_sensor,
 			sizeof(item.ipmi_sensor));
 
-
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMP_COMMUNITY, table_items, "snmp_community",
-			item.snmp_community_orig, sizeof(item.snmp_community_orig));
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMP_OID, table_items, "snmp_oid", item.snmp_oid_orig,
 			sizeof(item.snmp_oid_orig));
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_SECURITYNAME, table_items, "snmpv3_securityname",
-			item.snmpv3_securityname_orig, sizeof(item.snmpv3_securityname_orig));
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_AUTHPASSPHRASE, table_items, "snmpv3_authpassphrase",
-			item.snmpv3_authpassphrase_orig, sizeof(item.snmpv3_authpassphrase_orig));
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPASSPHRASE, table_items, "snmpv3_privpassphrase",
-			item.snmpv3_privpassphrase_orig, sizeof(item.snmpv3_privpassphrase_orig));;
 	item.params = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PARAMS, table_items, "params");
 
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_USERNAME, table_items, "username", item.username_orig,
@@ -192,8 +178,6 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			sizeof(item.privatekey_orig));
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_PASSWORD, table_items, "password", item.password_orig,
 			sizeof(item.password_orig));
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_CONTEXTNAME, table_items, "snmpv3_contextname",
-			item.snmpv3_contextname_orig, sizeof(item.snmpv3_contextname_orig));
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_JMX_ENDPOINT, table_items, "jmx_endpoint",
 			item.jmx_endpoint_orig, sizeof(item.jmx_endpoint_orig));
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig,
@@ -246,6 +230,31 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	db_string_from_json(&jp_interface, ZBX_PROTO_TAG_PORT, table_interface, "port", item.interface.port_orig,
 			sizeof(item.interface.port_orig));
+
+	if (NULL == table_interface_snmp)
+		table_interface_snmp = DBget_table("interface_snmp");
+
+	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMP_VERSION, table_interface_snmp, "version", &item.snmp_version);
+	db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMP_COMMUNITY, table_interface_snmp, "community",
+			item.snmp_community_orig, sizeof(item.snmp_community_orig));
+
+	if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
+	{
+		db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_SECURITYNAME, table_interface_snmp, "securityname",
+				item.snmpv3_securityname_orig, sizeof(item.snmpv3_securityname_orig));
+		db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_SECURITYLEVEL, table_interface_snmp, "securitylevel",
+				&item.snmpv3_securitylevel);
+		db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_AUTHPASSPHRASE, table_interface_snmp, "authpassphrase",
+				item.snmpv3_authpassphrase_orig, sizeof(item.snmpv3_authpassphrase_orig));
+		db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPASSPHRASE, table_interface_snmp, "privpassphrase",
+				item.snmpv3_privpassphrase_orig, sizeof(item.snmpv3_privpassphrase_orig));
+		db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_AUTHPROTOCOL, table_interface_snmp, "authprotocol",
+				&item.snmpv3_authprotocol);
+		db_uchar_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_PRIVPROTOCOL, table_interface_snmp, "privprotocol",
+				&item.snmpv3_privprotocol);
+		db_string_from_json(jp_data, ZBX_PROTO_TAG_SNMPV3_CONTEXTNAME, table_interface_snmp, "contextname",
+				item.snmpv3_contextname_orig, sizeof(item.snmpv3_contextname_orig));
+	}
 
 	if (NULL == table_hosts)
 		table_hosts = DBget_table("hosts");
