@@ -156,7 +156,6 @@ $table = (new CTableInfo())
 		_('Host group'),
 		_('Latest data'),
 		_('Problems'),
-		_('Graphs'),
 		_('Web'),
 		$data['admin'] ? _('Hosts') : null,
 		$data['admin'] ? _('Templates') : null
@@ -202,7 +201,6 @@ foreach ($data['groups'] as $groupid => $group) {
 				->setArgument('filter_groupids[]', $groupid)
 				->setArgument('filter_set', '1')
 		),
-		new CLink(_('Graphs'), 'charts.php?'.$link),
 		new CLink(_('Web'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'web.view')
