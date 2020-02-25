@@ -32,6 +32,7 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VA
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (10053, 'Template linkage test host', 'Visible host for template linkage', 0, '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10021,10053,1,1,1,'127.0.0.1','','10050');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10022,10053,1,2,1,'127.0.0.1','','161');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (10022, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10023,10053,1,3,1,'127.0.0.1','','623');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10024,10053,1,4,1,'127.0.0.1','','12345');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90278, 10053, 4);
@@ -704,6 +705,7 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (15001, 'Temp
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15000, 15001, 1, '127.0.0.1', 1, '10051', 1);
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15001, 15001, 1, '127.0.0.2', 1, '10052', 0);
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15002, 15001, 2, '127.0.0.3', 1, '10053', 1);
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (15002, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15003, 15001, 3, '127.0.0.4', 1, '10054', 1);
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15004, 15001, 4, '127.0.0.5', 1, '10055', 1);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15001, 15001, 4);
@@ -1059,6 +1061,7 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (40000, 
 -- testFormItem interfaces
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40011, 40001, 1, 1, 1, '127.0.5.1', '10051');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40012, 40001, 1, 2, 1, '127.0.5.2', '10052');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (40012, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40013, 40001, 1, 3, 1, '127.0.5.3', '10053');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '10054');
 
@@ -2213,6 +2216,7 @@ INSERT INTO hosts (hostid, host, name, status, available, ipmi_available, snmp_a
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99050, 99130, 50015);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55040, 99130, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55041, 99130, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55041, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55042, 99130, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55043, 99130, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
 
@@ -2220,6 +2224,7 @@ INSERT INTO hosts (hostid, host, name, status, available, ipmi_available, snmp_a
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99051, 99131, 50016);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55044, 99131, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55045, 99131, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55045, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55046, 99131, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55047, 99131, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
 
@@ -2235,6 +2240,7 @@ INSERT INTO hosts (hostid, host, name, status, available, ipmi_available, snmp_a
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99054, 99134, 50015);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55050, 99134, 1, '127.0.0.1', '', '1', '10050', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55051, 99134, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55051, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55052, 99134, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55053, 99134, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
 
@@ -2242,6 +2248,7 @@ INSERT INTO hosts (hostid, host, name, status, available, ipmi_available, snmp_a
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99055, 99135, 50016);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55054, 99135, 1, '127.0.0.1', '', '1', '10050', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55055, 99135, 2, '127.0.0.1', '', '1', '10050', '1');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55055, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55056, 99135, 3, '127.0.0.1', '', '1', '10050', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55057, 99135, 4, '127.0.0.1', '', '1', '10050', '1');
 
@@ -2319,6 +2326,7 @@ INSERT INTO hosts (hostid, proxy_hostid, host, name, status, available, descript
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (100999, 99136, 4);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55070, 99136, 1, '127.0.0.1', 'Test1', '1', '10050', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55071, 99136, 2, '127.0.0.2', 'Test2', '1', '161', '1');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55071, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55072, 99136, 3, '127.0.0.3', 'Test3', '1', '623', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55073, 99136, 4, '127.0.0.4', 'Test4', '1', '12345', '1');
 
