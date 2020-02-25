@@ -144,5 +144,5 @@
 		}
 	}
 
-	var abc = new MassUpdateMacros();
+	new MassUpdateMacros();
 </script>
