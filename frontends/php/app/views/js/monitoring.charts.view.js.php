@@ -294,5 +294,18 @@
 			app.timeline = data;
 			app.updateCharts();
 		});
+
+		$('#filter_search_type').change(e => {
+			if (e.target.value === '<?= ZBX_SEARCH_TYPE_STRICT ?>') {
+				$('#ms_graph_patterns').addClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+				$('#ms_graphids').removeClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+				$('#filter_graphids_, #filter_graph_patterns_').multiSelect('clean');
+			}
+			else {
+				$('#ms_graph_patterns').removeClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+				$('#ms_graphids').addClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+				$('#filter_graphids_, #filter_graph_patterns_').multiSelect('clean');
+			}
+		});
 	});
 </script>

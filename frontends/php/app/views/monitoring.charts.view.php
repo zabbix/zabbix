@@ -93,16 +93,8 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			)
 			->addRow((new CLabel(_('Search type'), 'filter_search_type')),
 				(new CRadioButtonList('filter_search_type', $data['filter_search_type']))
-					->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT, null,
-						'$("#ms_graph_patterns").addClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
-						'$("#ms_graphids").removeClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
-						'$("#filter_graphids_, #filter_graph_patterns_").multiSelect("clean")'
-					)
-					->addValue(_('Pattern'), ZBX_SEARCH_TYPE_PATTERN, null,
-						'$("#ms_graph_patterns").removeClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
-						'$("#ms_graphids").addClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
-						'$("#filter_graphids_, #filter_graph_patterns_").multiSelect("clean")'
-					)
+					->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT)
+					->addValue(_('Pattern'), ZBX_SEARCH_TYPE_PATTERN)
 					->setModern(true)
 			)
 			->addRow(
