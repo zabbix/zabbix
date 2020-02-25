@@ -657,7 +657,9 @@ class CSvgGraph extends CSvg {
 			floor(log(abs($max), $unit_base))
 		);
 
-		$decimals = min(4, getNumDecimals($interval / pow($unit_base, $power)));
+		$decimals = min(getNumDecimals($interval / pow($unit_base, $power)),
+			$power > 0 ? ZBX_UNITS_ROUNDOFF_SUFFIXED : ZBX_UNITS_ROUNDOFF_UNSUFFIXED
+		);
 
 		$rows = $this->getValueGrid($min, $max, $interval);
 

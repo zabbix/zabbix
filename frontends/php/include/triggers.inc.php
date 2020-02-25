@@ -2120,13 +2120,11 @@ function evalExpressionData($expression, $replace_function_macros) {
 				if (array_key_exists($token['value'], $replace_operators)) {
 					$value = $replace_operators[$token['value']];
 				}
-
 				break;
 
 			case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
 				// Use calculated (unsuffixed) number value.
-				$value = '((float) "'.numberToFloat($token['data']['calc_value'], FLOAT64_PRECISION_STORAGE).'")';
-
+				$value = '((float) "'.formatFloat($token['data']['calc_value'], PHP_FLOAT_DIG).'")';
 				break;
 		}
 

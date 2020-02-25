@@ -1182,7 +1182,9 @@ class CLineGraphDraw extends CGraphDraw {
 				floor(log(abs($this->m_maxY[$side]), $unit_base))
 			);
 
-			$decimals = min(4, getNumDecimals($this->intervals[$side] / pow($unit_base, $power)));
+			$decimals = min(getNumDecimals($this->intervals[$side] / pow($unit_base, $power)),
+				$power > 0 ? ZBX_UNITS_ROUNDOFF_SUFFIXED : ZBX_UNITS_ROUNDOFF_UNSUFFIXED
+			);
 
 			$clearance = 0.5;
 			for ($row_index = 0;; $row_index++) {

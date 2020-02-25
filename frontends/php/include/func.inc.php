@@ -507,12 +507,12 @@ function convertUnitsUptime($value) {
 			$result .= _s('%s day', $days);
 		}
 		else {
-			$result .= _s('%s days', numberToFloat($days, FLOAT64_PRECISION_DISPLAY));
+			$result .= _s('%s days', formatFloat($days, PHP_FLOAT_DIG));
 		}
 	}
 
 	// Is original value precise enough for showing detailed data?
-	if (strlen($value) <= FLOAT64_PRECISION_DISPLAY) {
+	if (strlen($value) <= PHP_FLOAT_DIG) {
 		if ($days !== '0') {
 			$result .= ', ';
 		}
@@ -567,7 +567,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		$parts['years'] = $start === null ? '1' : bcadd($parts['years'], '1', 0);
 		$start = 0;
 	}
-	elseif ($start === null || strlen($parts['years']) <= FLOAT64_PRECISION_DISPLAY) {
+	elseif ($start === null || strlen($parts['years']) <= PHP_FLOAT_DIG) {
 		if ($v > 0) {
 			$parts['months'] = $v;
 			$value_int -= $v * SEC_PER_MONTH;
@@ -631,7 +631,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 	$result = [];
 
 	foreach (array_filter($parts) as $unit => $value) {
-		$result[] = numberToFloat($value, FLOAT64_PRECISION_DISPLAY, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$unit];
+		$result[] = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$unit];
 	}
 
 	return $result ? ($is_negative ? '-' : '').implode(' ', $result) : '0';
@@ -677,7 +677,7 @@ function convertUnits(array $options) {
 		'power' => null,
 		'unit_base' => null,
 		'ignore_milliseconds' => false,
-		'precision' => FLOAT64_PRECISION_DISPLAY,
+		'precision' => null,
 		'decimals' => null,
 		'exact_decimals' => false
 	];
@@ -714,9 +714,9 @@ function convertUnits(array $options) {
 	$do_convert = $units !== '' || $options['convert'] == ITEM_CONVERT_NO_UNITS;
 
 	if (in_array($units, $blacklist) || !$do_convert || bccomp($value_abs, '1') < 0) {
-		$result = $options['decimals']
-			? numberToFloat($value, $options['precision'], $options['decimals'], $options['exact_decimals'])
-			: numberToFloat($value, $options['precision'], ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
+		$result = ($options['decimals'] !== null)
+			? formatFloat($value, $options['precision'], $options['decimals'], $options['exact_decimals'])
+			: formatFloat($value, $options['precision'], ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 
 		$result .= ($units === '' ? '' : ' '.$units);
 
@@ -750,9 +750,9 @@ function convertUnits(array $options) {
 	$result_value = bcdiv($value, $unit_divisor, FLOAT64_SCALE);
 	$result_units = $unit_prefix.$units;
 
-	$result = $options['decimals']
-		? numberToFloat($result_value, $options['precision'], $options['decimals'], $options['exact_decimals'])
-		: numberToFloat($result_value, $options['precision'], $result_units === ''
+	$result = ($options['decimals'] !== null)
+		? formatFloat($result_value, $options['precision'], $options['decimals'], $options['exact_decimals'])
+		: formatFloat($result_value, $options['precision'], $result_units === ''
 			? ZBX_UNITS_ROUNDOFF_UNSUFFIXED
 			: ZBX_UNITS_ROUNDOFF_SUFFIXED
 		);
@@ -1380,45 +1380,59 @@ function numberToDecimal(string $number): string {
 }
 
 /**
- * Convert number to Float display format.
+ * Format floating-point number for displaying.
  *
- * @param string $number  Valid number in decimal or scientific notation.
+ * @param string    $number          Valid number in decimal or scientific notation.
+ * @param int|null  $precision       Max number of significant digits to take into account.
+ * @param int|null  $decimals        Max number of first non-zero decimals decimals to display.
+ * @param bool      $exact_decimals  Use exact number decimals instead of first non-zero ones.
  *
  * @return string
  */
-function numberToFloat(string $number, int $precision, int $decimals = null, bool $exact_decimals = false): string {
+function formatFloat(string $number, ?int $precision, ?int $decimals, bool $exact_decimals = false): string {
+	$number = (float) $number;
+
+	if ($number == 0) {
+		return '0';
+	}
+
+	if ($number == INF) {
+		return _('Infinity');
+	}
+
+	if ($number == -INF) {
+		return '-'._('Infinity');
+	}
+
+	if ($precision === null) {
+		$precision = PHP_FLOAT_DIG;
+	}
+
 	// Trim extra precision.
 	$number = sprintf('%.'.($precision - 1).'E', $number);
 	[$mantissa, $exponent] = explode('E', $number);
 
 	// Trim extra precision even more for too small numbers.
-	if ($exponent < 0 && $decimals !== null && $decimals < $precision) {
-		$number = sprintf('%.'.($decimals - 1).'E', $number);
+	if ($exponent < 0 && $decimals !== null && $decimals <= $precision) {
+		$number = sprintf('%.'.$decimals.'E', $number);
 		[$mantissa, $exponent] = explode('E', $number);
 	}
 
-	if ($mantissa == 0) {
-		return '0';
-	}
-
-	$significant_size = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
+	$significants = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
 
 	// Is number out of range for decimal notation?
-	if ($exponent < $significant_size - $precision || $exponent >= $precision) {
-		$effective_decimals = ($decimals !== null && $exact_decimals)
-			? min($precision, $decimals)
-			: $significant_size - 1;
-
-		$number = sprintf('%.'.$effective_decimals.'E', $number);
+	if ($exponent < $significants - $precision || $exponent >= $precision) {
+		$num_decimals = ($decimals !== null && $exact_decimals) ? min($precision - 1, $decimals) : $significants - 1;
+		$number = sprintf('%.'.$num_decimals.'E', $number);
 	}
+	// Is decimal integer notation suitable?
 	elseif ($decimals === null) {
-		$number = sprintf('%.'.($significant_size - $exponent - 1).'F', $number);
+		$number = sprintf('%.'.($significants - $exponent - 1).'f', $number);
 	}
+	// Use decimal floating-point notation.
 	else {
-		// Either the exact number of decimals, or first non-zero $decimals digits.
-		$effective_decimals = min($precision, $exact_decimals ? $decimals : $decimals - min(0, $exponent + 1));
-
-		$number = sprintf('%.'.$effective_decimals.'F', $number);
+		$num_decimals = min($precision - 1, $exact_decimals ? $decimals : $decimals - min(0, $exponent + 1));
+		$number = sprintf('%.'.$num_decimals.'f', $number);
 
 		if (!$exact_decimals && strpos($number, '.') !== false) {
 			$number = rtrim($number, '0');
@@ -1437,7 +1451,7 @@ function numberToFloat(string $number, int $precision, int $decimals = null, boo
  * @return int
  */
 function getNumDecimals($number): int {
-	[$mantissa, $exponent] = explode('E', sprintf('%.'.(FLOAT64_PRECISION_DISPLAY - 1).'E', $number));
+	[$mantissa, $exponent] = explode('E', sprintf('%.'.(PHP_FLOAT_DIG - 1).'E', $number));
 
 	$significant_size = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
 
@@ -1522,74 +1536,6 @@ function bcround($number, $precision = 0) {
 	}
 
 	return bcmul($number, '1', $precision);
-}
-
-/**
- * Find lowest value (BC Math addition).
- *
- * @param mixed $arguments  Array of valid numbers in decimal notation (as number array or array of numbers).
- *
- * @return mixed
- */
-function bcmin(...$arguments) {
-	if (!$arguments) {
-		return false;
-	}
-
-	if (is_array($arguments[0])) {
-		$arguments = array_values($arguments[0]);
-	}
-
-	switch ($count = count($arguments)) {
-		case 0:
-			return false;
-
-		case 1:
-			return $arguments[0];
-
-		default:
-			$result = $arguments[0];
-			for ($i = 1; $i < $count; $i++) {
-				if (bccomp($arguments[$i], $result, FLOAT64_SCALE) < 0) {
-					$result = $arguments[$i];
-				}
-			}
-			return $result;
-	}
-}
-
-/**
- * Find highest value (BC Math addition).
- *
- * @param mixed $arguments  Array of valid numbers in decimal notation (as number array or array of numbers).
- *
- * @return mixed
- */
-function bcmax(...$arguments) {
-	if (!$arguments) {
-		return false;
-	}
-
-	if (is_array($arguments[0])) {
-		$arguments = array_values($arguments[0]);
-	}
-
-	switch ($count = count($arguments)) {
-		case 0:
-			return false;
-
-		case 1:
-			return $arguments[0];
-
-		default:
-			$result = $arguments[0];
-			for ($i = 1; $i < $count; $i++) {
-				if (bccomp($arguments[$i], $result, FLOAT64_SCALE) > 0) {
-					$result = $arguments[$i];
-				}
-			}
-			return $result;
-	}
 }
 
 /**
