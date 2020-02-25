@@ -65,7 +65,7 @@
 		?>
 	</div>
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DEFAULT ?>">
-		<input type="radio" class="<?= ZBX_STYLE_CHECKBOX_RADIO ?> <?= ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE ?> <?= ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND ?>" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
+		<input type="radio" class="<?= ZBX_STYLE_CHECKBOX_RADIO ?> <?= ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE ?>" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"><span></span></label>
 	</div>
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_ACTION ?>">
@@ -329,9 +329,9 @@
 		}
 
 		renderRow(iface) {
-			const container = document.querySelector(this.CONTAINER_IDS[iface.type]),
-				disabled = (iface.items > 0),
-				locked = (iface.locked > 0);
+			const container = document.querySelector(this.CONTAINER_IDS[iface.type]);
+			const disabled = (iface.items > 0);
+			const locked = (iface.locked > 0);
 
 			iface.type_name = this.INTERFACE_NAMES[iface.type];
 
@@ -365,7 +365,7 @@
 				.querySelector('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE ?>')
 				.addEventListener('click', () => this.setMainInterfaceById(iface.interfaceid));
 
-			[...elem.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_USEIP ?> input')].forEach(
+			[...elem.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_CELL_USEIP ?> input')].map(
 				(el) => el.addEventListener('click', (event) => this.setUseIp(elem, event.currentTarget.value))
 			);
 
@@ -448,9 +448,9 @@
 		}
 
 		setMainInterfaceById(id) {
-			const interfaces = this.getInterfaces(),
-				type = this.data[id].type,
-				old = interfaces[type].main;
+			const interfaces = this.getInterfaces();
+			const type = this.data[id].type;
+			const old = interfaces[type].main;
 
 			if (id != old) {
 				this.data[id].main = '<?= INTERFACE_PRIMARY ?>';
@@ -512,42 +512,44 @@
 
 				jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>]).zbx_vertical_accordion("expandNth", index);
 			});
+
+			return true;
 		}
 
 		static disableEdit() {
 			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>')].map((row) => {
-				const inputs = row.querySelectorAll('input');
-
-				[...inputs].map((el) => {
+				[...row.querySelectorAll('input')].map((el) => {
 					el.removeAttribute('name');
 
-					if (el.matches('[type="text"]')) {
+					if (el.matches('[type=text]')) {
 						el.readOnly = true;
 					}
 
-					if (el.matches('[type="radio"], [type="checkbox"]')) {
+					if (el.matches('[type=radio], [type=checkbox]')) {
 						el.disabled = true;
 					}
 				});
 
-				[...row.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')].map((elem) => elem.remove());
+				[...row.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')].map((el) => el.remove());
 
 				// Change select to input.
-				[...row.querySelectorAll('select')].map((elem) => {
-					const index = elem.selectedIndex;
-					const value = elem.options[index].text;
+				[...row.querySelectorAll('select')].map((el) => {
+					const index = el.selectedIndex;
+					const value = el.options[index].text;
 
 					// Create new input[type=text].
 					const input = document.createElement('input');
 					input.type = 'text';
-					input.id = elem.id;
+					input.id = el.id;
 					input.readOnly = true;
 					input.value = value;
 
 					// Replace select with created input.
-					elem.replaceWith(input);
+					el.replaceWith(input);
 				});
 			});
+
+			return true;
 		}
 	}
 
