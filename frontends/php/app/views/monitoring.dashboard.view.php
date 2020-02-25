@@ -176,39 +176,39 @@ else {
 	if ($data['dynamic']['has_dynamic_widgets']) {
 		(new CScriptTag(
 			// Add event listener to perform dynamic host switch when browser back/previous buttons are pressed.
-			'window.addEventListener("popstate", e => {' .
-				'var data = (e.state && e.state.host) ? [e.state.host] : [];' .
-				'jQuery("#dynamic_hostid").multiSelect("addData", data, false);' .
-				'jQuery(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", data ? data[0] : null);' .
-			'});' .
+			'window.addEventListener("popstate", e => {'.
+				'var data = (e.state && e.state.host) ? [e.state.host] : [];'.
+				'jQuery("#dynamic_hostid").multiSelect("addData", data, false);'.
+				'jQuery(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", data ? data[0] : null);'.
+			'});'.
 
 			// Dynamic host selector on-change handler.
-			'jQuery("#dynamic_hostid").on("change", function() {' .
-				'var hosts = jQuery(this).multiSelect("getData"),' .
-					'host = hosts.length ? hosts[0] : null,' .
-					'url = new Curl("zabbix.php", false);' .
+			'jQuery("#dynamic_hostid").on("change", function() {'.
+				'var hosts = jQuery(this).multiSelect("getData"),'.
+					'host = hosts.length ? hosts[0] : null,'.
+					'url = new Curl("zabbix.php", false);'.
 
 				// Make URL.
-				'url.setArgument("action", "dashboard.view");' .
-				'url.setArgument("dashboardid", ' . $data['dashboard']['dashboardid'] . ');' .
+				'url.setArgument("action", "dashboard.view");'.
+				'url.setArgument("dashboardid", '.$data['dashboard']['dashboardid'].');'.
 				($data['show_timeselector']
-					? 'url.setArgument("from", "' . $data['timeline']['from'] . '");' .
-						'url.setArgument("to", "' . $data['timeline']['to'] . '");'
-					: '') .
+					? 'url.setArgument("from", "'.$data['timeline']['from'].'");'.
+						'url.setArgument("to", "'.$data['timeline']['to'].'");'
+					: '').
 
-				'if (host) {' .
-					'url.setArgument("hostid", host.id);' .
-				'}' .
+				'if (host) {'.
+					'url.setArgument("hostid", host.id);'.
+				'}'.
 
 				// Refresh dynamic widgets.
-				'jQuery(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", host);' .
+				'jQuery(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", host);'.
 
 				// Push URL change.
-				'history.pushState({host: host}, "", url.getUrl());' .
+				'history.pushState({host: host}, "", url.getUrl());'.
 
 				// Update user profile.
-				'var hostid = host ? host.id : 1;' .
-				'updateUserProfile("'.CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY.'", hostid);' .
+				'var hostid = host ? host.id : 1;'.
+				'updateUserProfile("'.CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY.'", hostid);'.
 			'});'
 		))->show();
 	}

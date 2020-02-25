@@ -92,21 +92,21 @@ if ($data['has_dynamic_widgets']) {
 		);
 
 	zbx_add_post_js(
-		'jQuery("#dynamic_hostid").on("change", function() {' .
-			'var hosts = jQuery(this).multiSelect("getData"),' .
-				'url = new Curl("slides.php", false);' .
+		'jQuery("#dynamic_hostid").on("change", function() {'.
+			'var hosts = jQuery(this).multiSelect("getData"),'.
+				'url = new Curl("slides.php", false);'.
 
 			// Make URL.
-			'url.setArgument("elementid", ' . $data['screen']['slideshowid'] . ');' .
-			'if (hosts.length) {' .
-				'url.setArgument("hostid", hosts[0].id);' .
-			'}' .
-			'else {' .
-				'url.setArgument("reset", "reset");' .
-			'}' .
+			'url.setArgument("elementid", '.$data['screen']['slideshowid'].');'.
+			'if (hosts.length) {'.
+				'url.setArgument("hostid", hosts[0].id);'.
+			'}'.
+			'else {'.
+				'url.setArgument("reset", "reset");'.
+			'}'.
 
 			// Push URL change.
-			'return redirect(url.getUrl(), "get", "", false, false);' .
+			'return redirect(url.getUrl(), "get", "", false, false);'.
 		'});'
 	);
 }

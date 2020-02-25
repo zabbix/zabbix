@@ -67,16 +67,16 @@ if (array_key_exists('groups', $data['filter'])) {
 	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
 	$output['script_inline'] .=
-		'var overlay = overlays_stack.end();' .
-		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {' .
-			'jQuery(ms)' .
-				'.multiSelectHelper(' . json_encode($multiselect_options) . ')' .
-				'.on("change", {overlay: overlay}, function(e) {' .
-					'var groups = jQuery(this).multiSelect("getData").map(i => i.id),' .
-						'new_opts = jQuery.extend(e.data.overlay.options, {groupid: groups.length ? groups[0]: []});' .
-					'e.data.overlay.reload(new_opts);' .
-				'}' .
-			');' .
+		'var overlay = overlays_stack.end();'.
+		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
+			'jQuery(ms)'.
+				'.multiSelectHelper('.json_encode($multiselect_options).')'.
+				'.on("change", {overlay: overlay}, function(e) {'.
+					'var groups = jQuery(this).multiSelect("getData").map(i => i.id),'.
+						'new_opts = jQuery.extend(e.data.overlay.options, {groupid: groups.length ? groups[0]: []});'.
+					'e.data.overlay.reload(new_opts);'.
+				'}'.
+			');'.
 		'});';
 
 	$controls[] = (new CFormList())->addRow(
@@ -91,16 +91,16 @@ if (array_key_exists('hosts', $data['filter'])) {
 	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
 	$output['script_inline'] .=
-		'var overlay = overlays_stack.end();' .
-		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {' .
-			'jQuery(ms)' .
-				'.multiSelectHelper(' . json_encode($multiselect_options) . ')' .
-				'.on("change", {overlay: overlay}, function(e) {' .
-					'var hosts = jQuery(this).multiSelect("getData").map(i => i.id),' .
-						'new_opts = jQuery.extend(e.data.overlay.options, {hostid: hosts.length ? hosts[0]: []});' .
-					'e.data.overlay.reload(new_opts);' .
-				'}' .
-			');' .
+		'var overlay = overlays_stack.end();'.
+		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
+			'jQuery(ms)'.
+				'.multiSelectHelper('.json_encode($multiselect_options).')'.
+				'.on("change", {overlay: overlay}, function(e) {'.
+					'var hosts = jQuery(this).multiSelect("getData").map(i => i.id),'.
+						'new_opts = jQuery.extend(e.data.overlay.options, {hostid: hosts.length ? hosts[0]: []});'.
+					'e.data.overlay.reload(new_opts);'.
+				'}'.
+			');'.
 		'});';
 
 	$controls[] = (new CFormList())->addRow(
