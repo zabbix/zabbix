@@ -91,7 +91,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					]
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			)
-			->addRow((new CLabel(_('Search type'), 'waa')),
+			->addRow((new CLabel(_('Search type'), 'filter_search_type')),
 				(new CRadioButtonList('filter_search_type', $data['filter_search_type']))
 					->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT, null,
 						'$("#ms_graph_patterns").addClass("'.ZBX_STYLE_DISPLAY_NONE.'");'.
