@@ -17,14 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package memcached
 
-import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+type zabbixError string
+
+func (e zabbixError) Error() string { return string(e) }
+
+const (
+	errorInvalidParams     = zabbixError("Invalid parameters.")
+	errorCannotFetchData   = zabbixError("Cannot fetch data.")
+	errorCannotMarshalJson = zabbixError("Cannot marshal JSON.")
+	errorUnsupportedMetric = zabbixError("Unsupported metric.")
+	errorEmptyResult       = zabbixError("Empty result.")
+	errorUnknownSession    = zabbixError("Unknown session.")
 )

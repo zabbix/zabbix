@@ -17,14 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package memcached
 
-import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+const (
+	pingFailed = 0
+	pingOk     = 1
 )
+
+// pingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
+func (p *Plugin) pingHandler(conn mcClient, params []string) (interface{}, error) {
+	if err := conn.NoOp(); err != nil {
+		return pingFailed, nil
+	}
+
+	return pingOk, nil
+}

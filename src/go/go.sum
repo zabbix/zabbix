@@ -1,3 +1,5 @@
+github.com/alimy/mc/v2 v2.0.3 h1:U6rzyP3uSKFKYZbrNcbNQwTBl/Z00X7qPdq1R1ZLuic=
+github.com/alimy/mc/v2 v2.0.3/go.mod h1:Aqx0j/QZWJFSw7LtYGCoD5wZdnj+M2RKDjBE0hYoWek=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=

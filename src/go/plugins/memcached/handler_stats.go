@@ -17,14 +17,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package memcached
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"encoding/json"
+	"strings"
 )
+
+var supportedKeys = map[string]bool{"items": true, "sizes": true, "slabs": true, "settings": true}
+
+// statsHandler gets an output of 'stats <type>' command, parses it and returns it in the JSON format.
+func (p *Plugin) statsHandler(conn mcClient, params []string) (interface{}, error) {
+	statsType := ""
+
+	if len(params) > 1 {
+		if supportedKeys[params[1]] {
+			statsType = strings.ToLower(params[1])
+		} else {
+			return nil, errorInvalidParams
+		}
+	}
+
+	stats, err := conn.Stats(statsType)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+
+	jsonRes, err := json.Marshal(stats)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotMarshalJson
+	}
+
+	return string(jsonRes), nil
+}
