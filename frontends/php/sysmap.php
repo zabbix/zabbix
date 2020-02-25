@@ -308,8 +308,6 @@ if ($data['iconList']) {
 $data['theme'] = getUserGraphTheme();
 
 // render view
-$sysmapView = new CView('monitoring.sysmap.constructor', $data);
-$sysmapView->render();
-$sysmapView->show();
+echo (new CView('monitoring.sysmap.constructor', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

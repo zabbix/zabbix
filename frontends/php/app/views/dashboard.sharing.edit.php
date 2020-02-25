@@ -18,6 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm('post'))->setName('dashboard_sharing_form');
 
 $table_user_groups = (new CTable())
@@ -91,7 +96,7 @@ $form
 $output = [
 	'header' => _('Dashboard sharing'),
 	'body' => $form->toString(),
-	'script_inline' => 
+	'script_inline' =>
 		'jQuery(document).ready(function($) {'.
 			'$("[name='.$form->getName().']").fillDashbrdSharingForm('.json_encode($data['dashboard']).');'.
 		'});',

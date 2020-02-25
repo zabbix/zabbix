@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $allowed_testing = $data['allowed_testing'];
 $test = $data['test'];
 

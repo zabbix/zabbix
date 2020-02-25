@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $item = new CDashboardWidgetMap($data['sysmap_data'], $data['widget_settings']);
 
 $output = [

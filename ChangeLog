@@ -1,15 +1,31 @@
+Changes for 5.0.0beta1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.0.0alpha2
 
 New features:
+..F....... [ZBXNEXT-5697] removed support for Internet Explorer (talbergs)
+..F....... [ZBXNEXT-5698] added filter by tags for widget "Problems by severity" and "Problem hosts" (rlataria)
+..F.I..PS. [ZBXNEXT-5287,ZBXNEXT-5288] implemented functionality to test items (miks, vso)
 A.F.I..... [ZBXNEXT-5514] added functionality for Zabbix frontend customization (ashubin, averza, gcalenko)
 .........T [ZBXNEXT-5660] Added Discord media type (tuskov)
-..F....... [ZBXNEXT-5603] added db checking for charset and collation (rlataria)
+..F....PS. [ZBXNEXT-5603,ZBXNEXT-5626] added database character set check (mabele, rlataria)
 .........T [ZBXNEXT-5659] added "Template DB MySQL by ODBC" (mchudinov)
 .......PS. [ZBXNEXT-5690] added support for libssh (akozlovs)
 ...G...... [ZBXNEXT-5646] added support of configuration parameters HostInterface and HostInterfaceItem (viktors)
 ....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
 
 Bug fixes:
+.......P.. [ZBX-17213] fixed Zabbix proxy not to execute remote commands on Zabbix agent with timeout and not to wait for execution result (vso)
+........S. [ZBX-17201] fixed snmp trapper processes exceeding 1000% (arimdjonoks)
+........S. [ZBX-17121] improved proxy configuration synchronization performance on server when using Oracle database (wiper)
+A.F....... [ZBX-17174] fixed sorting of Webhook parameters using natural sort order (Ivo)
+..F....... [ZBX-17171] fixed padding of dashboard controls while in edit mode (averza)
+A.F....... [ZBX-17220] fixed several PHP 7.4 compatibility issues (miks)
 ...G...... [ZBX-17050] fixed allowed hosts parsing by agent2 (asestakovs)
 ........S. [ZBX-16827] fixed applications being unlinked from items when both items and applications are not discovered anymore (vso)
 ..F....... [ZBX-16697] implemented preloader in popups (talbergs)
@@ -54,13 +70,18 @@ Changes for 4.4.6rc1
 
 New features:
 .........T [ZBXNEXT-5660] Added Discord media type (tuskov)
-..F....... [ZBXNEXT-5603] added db checking for charset and collation (rlataria)
+..F....PS. [ZBXNEXT-5603,ZBXNEXT-5626] added database character set check (mabele, rlataria)
 .........T [ZBXNEXT-5659] added "Template DB MySQL by ODBC" (mchudinov)
 .......PS. [ZBXNEXT-5690] added support for libssh (akozlovs)
 ...G...... [ZBXNEXT-5646] added support of configuration parameters HostInterface and HostInterfaceItem (viktors)
 ....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
 
 Bug fixes:
+.......P.. [ZBX-17213] fixed Zabbix proxy not to execute remote commands on Zabbix agent with timeout and not to wait for execution result (vso)
+........S. [ZBX-17201] fixed snmp trapper processes exceeding 1000% (arimdjonoks)
+........S. [ZBX-17121] improved proxy configuration synchronization performance on server when using Oracle database (wiper)
+A.F....... [ZBX-17174] fixed sorting of Webhook parameters using natural sort order (Ivo)
+A.F....... [ZBX-17220] fixed several PHP 7.4 compatibility issues (miks)
 ...G...... [ZBX-17050] fixed allowed hosts parsing by agent2 (asestakovs)
 ........S. [ZBX-16827] fixed applications being unlinked from items when both items and applications are not discovered anymore (vso)
 ........S. [ZBX-17035] internal events are not created if there is no enabled internal actions (atumilovics)
@@ -1098,11 +1119,14 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.18rc1
 
 New features:
-..F....... [ZBXNEXT-5603] added db checking for charset and collation (rlataria)
+..F....PS. [ZBXNEXT-5603,ZBXNEXT-5626] added database character set check (mabele, rlataria)
 .......PS. [ZBXNEXT-5690] added support for libssh (akozlovs)
 ....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
 
 Bug fixes:
+.......P.. [ZBX-17213] fixed Zabbix proxy not to execute remote commands on Zabbix agent with timeout and not to wait for execution result (vso)
+........S. [ZBX-17201] fixed snmp trapper processes exceeding 1000% (arimdjonoks)
+A.F....... [ZBX-17220] fixed several PHP 7.4 compatibility issues (miks)
 ........S. [ZBX-16827] fixed applications being unlinked from items when both items and applications are not discovered anymore (vso)
 ........S. [ZBX-17035] internal events are not created if there is no enabled internal actions (atumilovics)
 ........S. [ZBX-16965] fixed link/unlink template operation execution order (atumilovics)
@@ -3879,6 +3903,7 @@ New features:
 ....I..... [ZBXNEXT-5706] replaced xml2-config to pkg-config when building with libxml2 (vso)
 
 Bug fixes:
+........S. [ZBX-17201] fixed snmp trapper processes exceeding 1000% (arimdjonoks)
 ........S. [ZBX-16024] fixed maintenance status not being updated in cache if host is disabled (vso)
 
 --------------------------------------------------------------------------------

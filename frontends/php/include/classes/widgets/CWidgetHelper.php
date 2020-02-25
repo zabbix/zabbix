@@ -406,7 +406,7 @@ class CWidgetHelper {
 			$severities[$severity] = getSeverityName($severity, $config);
 		}
 
-		return self::getCheckBoxList($field, $severities);
+		return self::getCheckBoxList($field, $severities)->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
 	}
 
 	/**
@@ -856,7 +856,9 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
@@ -899,7 +901,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: IE ? "move" : "grabbing",'.
+				'cursor: "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.
@@ -1245,7 +1247,9 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color) {'.
 						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
@@ -1324,7 +1328,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: IE ? "move" : "grabbing",'.
+				'cursor: "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.

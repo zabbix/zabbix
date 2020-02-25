@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $table = (new CTableInfo())->setNoDataMessage(_('No graphs added.'));
 
 foreach ($data['graphs'] as $graph) {
