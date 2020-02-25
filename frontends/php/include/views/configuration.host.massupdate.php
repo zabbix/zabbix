@@ -33,7 +33,8 @@ $hostView = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'host.massupdate')
 	->addVar('tls_accept', $data['tls_accept'])
-	->setId('hostForm');
+	->setId('hostForm')
+	->disablePasswordAutofill();
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }

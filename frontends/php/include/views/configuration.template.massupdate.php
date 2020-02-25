@@ -32,7 +32,8 @@ $form = (new CForm())
 	->setName('templateForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'template.massupdate')
-	->setId('templateForm');
+	->setId('templateForm')
+	->disablePasswordAutofill();
 
 foreach ($data['templates'] as $templateid) {
 	$form->addVar('templates['.$templateid.']', $templateid);
