@@ -54,10 +54,7 @@ class CMacroValue extends CDiv {
 				['add_post_js' => $add_post_js]
 			))
 				->setAttribute('placeholder', _('value'))
-			: (new CInputSecret($name.'[value]', ZBX_MACRO_SECRET_MASK, _('value'), [
-				'disabled' => $readonly,
-				'add_post_js' => $add_post_js
-			]));
+			: new CInputSecret($name.'[value]', _('value'), ['disabled' => $readonly, 'add_post_js' => $add_post_js]);
 
 		if ($macro['type'] == ZBX_MACRO_TYPE_TEXT && $readonly) {
 			$value_input->setAttribute('readonly', 'readonly');
@@ -66,6 +63,7 @@ class CMacroValue extends CDiv {
 		// Macro value input group.
 		$this
 			->addClass(self::ZBX_STYLE_INPUT_GROUP)
+			->setId(uniqid('macro-value-'))
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 			->addItem([
 				$value_input,
@@ -76,5 +74,16 @@ class CMacroValue extends CDiv {
 					: null,
 				new CButtonDropdown($name.'[type]', $macro['type'], $dropdown_options)
 			]);
+
+		zbx_add_post_js($this->getPostJS());
+	}
+
+	/**
+	 * Get content of all Javascript code.
+	 *
+	 * @return string  Javascript code.
+	 */
+	public function getPostJS(): string {
+		return 'jQuery("#'.$this->getId().'").macroValue();';
 	}
 }

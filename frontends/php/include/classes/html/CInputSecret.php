@@ -44,32 +44,31 @@ class CInputSecret extends CTag {
 	/**
 	 * CInputSecret constructor.
 	 *
-	 * @param string $name
-	 * @param string $value
-	 * @param string $placeholder
-	 * @param array  $options
-	 * @param bool   $options['disabled']
-	 * @param bool   $options['add_post_js']
+	 * @param string      $name
+	 * @param string      $placeholder
+	 * @param array       $options
+	 * @param bool        $options['disabled']
+	 * @param bool        $options['add_post_js']
 	 */
-	public function __construct(string $name, string $value = '', string $placeholder = '', array $options = []) {
+	public function __construct(string $name, string $placeholder = '', array $options = []) {
 		$this->options = array_merge($this->options, $options);
 
 		parent::__construct('div', true);
 
+		$input = (new CPassBox($name, ZBX_MACRO_SECRET_MASK))
+			->setAttribute('placeholder', $placeholder)
+			->setEnabled(false);
+
+		$change_btn = (new CButton(null, _('Set new value')))
+			->addClass(self::ZBX_STYLE_BTN_CHANGE)
+			->setId(zbx_formatDomId($name.'[btn]'))
+			->setEnabled(!$this->options['disabled']);
+
 		$this
 			->setId(uniqid('input-secret-'))
 			->addClass(self::ZBX_STYLE_CLASS)
-			->addItem(
-				(new CPassBox($name, $value))
-					->setAttribute('placeholder', $placeholder)
-					->setEnabled(false)
-			)
-			->addItem(
-				(new CButton(null, _('Set new value')))
-					->addClass(self::ZBX_STYLE_BTN_CHANGE)
-					->setId(zbx_formatDomId($name.'[btn]'))
-					->setEnabled(!$this->options['disabled'])
-			);
+			->addItem($input)
+			->addItem($change_btn);
 
 		if ($this->options['add_post_js']) {
 			zbx_add_post_js($this->getPostJS());

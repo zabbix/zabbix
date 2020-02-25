@@ -47,6 +47,7 @@
 			return this.each(function() {
 				$(this).data('is-activated', false);
 
+				// Prevent set event more than one time.
 				if ($('.btn-change', $(this)).data('is-activated')) {
 					return false;
 				}
