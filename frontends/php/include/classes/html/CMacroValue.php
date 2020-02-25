@@ -67,11 +67,9 @@ class CMacroValue extends CDiv {
 			->addItem([
 				$value_input,
 				($macro['type'] == ZBX_MACRO_TYPE_SECRET)
-					? array_key_exists('value', $macro)
-						? null
-						: (new CButton(null))
-							->setAttribute('title', _('Revert changes'))
-							->addClass(ZBX_STYLE_BTN_ALT.' '.self::ZBX_STYLE_BTN_UNDO)
+					? (new CButton(null))
+						->setAttribute('title', _('Revert changes'))
+						->addClass(ZBX_STYLE_BTN_ALT.' '.self::ZBX_STYLE_BTN_UNDO)
 					: null,
 				new CButtonDropdown($name.'[type]', $macro['type'], $dropdown_options)
 			]);
