@@ -34,7 +34,8 @@ foreach ($data['graphs'] as $graph) {
 			->setArgument('action', 'charts.view')
 			->setArgument('view_as', HISTORY_GRAPH)
 			->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
-			->setArgument('filter_graphids', [$graph['graphid']]);
+			->setArgument('filter_graphids', [$graph['graphid']])
+			->setArgument('filter_set', '1');
 
 	$on_click = $graph['simple']
 		? "rm4favorites('itemid','".$graph['itemid']."')"
