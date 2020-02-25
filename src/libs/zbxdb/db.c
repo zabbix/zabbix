@@ -366,8 +366,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
-	const char	*pg_keywords[PG_DB_PARAMS_COUNT + 1] = {NULL};
-	const char	*pg_values[PG_DB_PARAMS_COUNT + 1] = {NULL};
+	const char	*pg_keywords[PG_DB_PARAMS_COUNT + 1];
+	const char	*pg_values[PG_DB_PARAMS_COUNT + 1];
 	unsigned int	i = 0;
 #elif defined(HAVE_SQLITE3)
 	char		*p, *path = NULL;
@@ -660,6 +660,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		pg_keywords[i] = "port";
 		pg_values[i++] = cport = zbx_dsprintf(cport, "%d", port);
 	}
+
+	pg_keywords[i] = NULL;
+	pg_values[i] = NULL;
 
 	conn = PQconnectdbParams(pg_keywords, pg_values, 0);
 
