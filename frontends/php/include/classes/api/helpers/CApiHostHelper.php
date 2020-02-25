@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -81,17 +81,17 @@ class CApiHostHelper {
 	/**
 	 * Get all parent templates recursively for given templateid.
 	 *
-	 * @param array $template_tree  Array with all template parents.
-	 * @param string $templateid    ID of template whose parents we are looking for.
+	 * @param array  $template_tree  Array with all template parents.
+	 * @param string $templateid     ID of template whose parents we are looking for.
 	 *
 	 * @throws APIException if templates are looped.
 	 *
-	 * @return array                All parent templates (as keys) for given templateid. False if error.
+	 * @return array                 All parent templates (as keys) for given templateid.
 	 */
-	private static function recursiveGetAllParents(array &$template_tree, int $templateid): array {
+	private static function recursiveGetAllParents(array &$template_tree, $templateid): array {
 		if (array_key_exists('started', $template_tree[$templateid])) {
 			// Loop in recursion detected.
-			throw new APIException(ZBX_API_ERROR_INTERNAL, '');
+			throw new APIException(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
 
 		$parents = $template_tree[$templateid]['parents'];
@@ -101,7 +101,7 @@ class CApiHostHelper {
 			$template_tree[$templateid]['started'] = true;
 
 			foreach (array_keys($template_tree[$templateid]['parents']) as $parentid) {
-				$parents += CApiHostHelper::recursiveGetAllParents($template_tree, $parentid);;
+				$parents += CApiHostHelper::recursiveGetAllParents($template_tree, $parentid);
 			}
 
 			$template_tree[$templateid]['parents'] = $parents;
