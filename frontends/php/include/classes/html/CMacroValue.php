@@ -63,6 +63,7 @@ class CMacroValue extends CDiv {
 		// Macro value input group.
 		$this
 			->addClass(self::ZBX_STYLE_INPUT_GROUP)
+			->setId(uniqid('macro-value-'))
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 			->addItem([
 				$value_input,
@@ -73,5 +74,16 @@ class CMacroValue extends CDiv {
 					: null,
 				new CButtonDropdown($name.'[type]', $macro['type'], $dropdown_options)
 			]);
+
+		zbx_add_post_js($this->getPostJS());
+	}
+
+	/**
+	 * Get content of all Javascript code.
+	 *
+	 * @return string  Javascript code.
+	 */
+	public function getPostJS(): string {
+		return 'jQuery("#'.$this->getId().'").macroValue();';
 	}
 }

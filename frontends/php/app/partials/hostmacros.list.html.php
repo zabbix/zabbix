@@ -211,5 +211,6 @@ else {
 
 $table->show();
 
-// Initializing input secret separately.
-insert_js("jQuery('.input-secret').inputSecret();");
+// Initializing input secret and macro value init script separately.
+(new CScriptTag("jQuery('.input-secret').inputSecret();"))->show();
+(new CScriptTag("jQuery('.input-group').macroValue();"))->show();

@@ -65,6 +65,7 @@ $availableJScripts = [
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
 	'inputsecret.js' => '',
+	'macrovalue.js' => '',
 	// vendors
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
@@ -330,6 +331,9 @@ $tranStrings = [
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel')
+	],
+	'macrovalue.js' => [
+		'Set new value' => _('Set new value')
 	]
 ];
 
