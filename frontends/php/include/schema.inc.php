@@ -5214,10 +5214,9 @@ return [
 				'default' => '',
 			],
 			'resourceid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			],
 			'resourcename' => [
 				'null' => false,
