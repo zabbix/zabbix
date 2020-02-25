@@ -984,16 +984,13 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		zbx_update_env(sec);
 
 #ifdef HAVE_NETSNMP
-		if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
+		if ((ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type) &&
+				1 == snmp_cache_reload_requested)
 		{
-			if (1 == snmp_cache_reload_requested)
-			{
-				zbx_clear_cache_snmp();
-				snmp_cache_reload_requested = 0;
-			}
+			zbx_clear_cache_snmp();
+			snmp_cache_reload_requested = 0;
 		}
 #endif
-
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
