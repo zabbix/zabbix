@@ -516,9 +516,7 @@
 
 		static disableEdit() {
 			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input, .<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> select')]
-				.map((elem) => {
-					elem.removeAttribute('name');
-				});
+				.map((elem) => elem.removeAttribute('name'));
 
 			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> input[type="text"]')]
 				.map((elem) => elem.readOnly = true);
@@ -542,7 +540,7 @@
 				input.value = value;
 
 				// Replace select with created input.
-				elem.replace(input);
+				elem.replaceWith(input);
 			});
 		}
 	}
