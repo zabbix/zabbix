@@ -18,15 +18,24 @@
 **/
 
 
-class CMenuMain {
+class CBaseComponent {
 
 	constructor(node) {
 		this._node = node;
-
-		this._submenus = [];
-
-		for (const item of this._node.querySelectorAll('.has-submenu')) {
-			this._submenus.push(new CMenu(item.querySelector('.submenu')));
-		}
 	}
-}
+
+	on(type, listener, options = false)  {
+		this._node.addEventListener(type, listener, options);
+		return this;
+	}
+
+	off(type, listener, options = false) {
+		this._node.removeEventListener(type, listener, options);
+		return this;
+	}
+
+	trigger(type, options = {}) {
+		this._node.dispatchEvent(new CustomEvent(type, {detail: {...{targetObj: this}, ...options}}));
+		return this;
+	}
+};

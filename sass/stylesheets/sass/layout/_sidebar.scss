@@ -8,6 +8,7 @@ $sidebar-padding: 12px;
 	display: flex;
 	flex-direction: column;
 	width: max-content;
+	max-width: 480px;
 	background: $sidebar-bg-color;
 
 	.sidebar-header {
@@ -37,8 +38,8 @@ $sidebar-padding: 12px;
 
 	.button-sidebar-hide,
 	.button-sidebar-show,
-	.button-compact,
-	.button-expand {
+	.button-sidebar-compact,
+	.button-sidebar-expand {
 		position: absolute;
 		top: $sidebar-padding;
 		width: 24px;
@@ -54,7 +55,7 @@ $sidebar-padding: 12px;
 		}
 
 		@if $ui-transitions {
-			transition: opacity $ui-transition-duration ease-out;
+			transition: opacity $ui-transition-duration;
 		}
 	}
 
@@ -69,51 +70,72 @@ $sidebar-padding: 12px;
 		background-position: -570px -568px;
 	}
 
-	.button-compact {
+	.button-sidebar-compact {
 		right: 24px + $sidebar-padding;
 		background-position: -540px -544px;
 	}
 
-	.button-expand {
+	.button-sidebar-expand {
 		display: none;
 		right: 24px + $sidebar-padding;
-		background-position: -570px -520px;
+		background-position: -540px -520px;
 	}
 
 	@if $ui-transitions {
-		transition: max-width $ui-transition-duration ease-out;
+		transition: max-width $ui-transition-duration,
+					transform $ui-transition-duration ease-out;
 		will-change: max-width;
 		transform: translate3d(0, 0, 0);
 
 		.logo {
-			transition: width $ui-transition-duration ease-out;
+			transition: width $ui-transition-duration;
 		}
 
 		.form-search {
 			.search {
-				transition: opacity $ui-transition-duration ease-out;
+				transition: opacity $ui-transition-duration;
 			}
 
 			.search-icon {
-				transition: transform $ui-transition-duration ease-out;
-			}
-		}
-
-		.menu-main {
-			a {
-				transition: color $ui-transition-duration ease-out;
+				transition: transform $ui-transition-duration;
 			}
 		}
 	}
 
-	&.is-compact {
+	&.is-compact,
+	&.is-hidden {
 		position: fixed;
 		top: 0;
 		bottom: 0;
+		z-index: 10001;
 		box-shadow: 2px 0 6px $action-shadow-color;
+	}
 
+	&.is-compact {
 		& + .wrapper {
 			margin-left: $sidebar-compact-width;
+		}
+
+		.button-sidebar-compact,
+		.button-sidebar-show {
+			display: none;
+		}
+
+		.button-sidebar-expand,
+		.button-sidebar-hide {
+			display: inline-block;
+		}
+
+		.is-selected {
+			& > a {
+				&,
+				&:hover,
+				&:focus {
+					background: $menu-main-selected-bg-color;
+					border-color: $menu-main-selected-border-color;
+					color: $menu-main-selected-color;
+				}
+			}
 		}
 
 		&:not(.is-opened) {
@@ -132,13 +154,13 @@ $sidebar-padding: 12px;
 					background-position: -540px -400px;
 
 					@if $ui-transitions {
-						transition: background 0s $ui-transition-duration;
+						transition: background 0s $ui-transition-duration * .7;
 					}
 				}
 			}
 
-			.button-compact,
-			.button-expand,
+			.button-sidebar-compact,
+			.button-sidebar-expand,
 			.button-sidebar-hide,
 			.button-sidebar-show {
 				opacity: 0;
@@ -154,40 +176,70 @@ $sidebar-padding: 12px;
 				}
 			}
 
-			.menu-main {
+			nav {
 				a {
-					color: rgba(0, 0, 0, 0);
+					color: transparent;
+
+					&::after {
+						opacity: 0;
+					}
 				}
+			}
+
+			.submenu {
+				max-height: 0 !important;
 			}
 		}
 	}
-}
 
-
-/*
-
-
-	&.mobile {
-		box-shadow: 2px 0 6px $action-shadow-color;
-		top: 0;
-		bottom: 0;
-		position: fixed;
-		transform: translate3d(-110%, 0, 0);
-
-		@if $ui-transitions {
-			transition: transform $ui-transition-duration ease-out;
-			will-change: transform;
+	&.is-hidden {
+		.button-sidebar-show {
+			display: inline-block;
 		}
 
-		&.opened {
-			transform: translateX(0);
+		.button-sidebar-compact,
+		.button-sidebar-expand,
+		.button-sidebar-hide {
+			display: none;
 		}
 
 		& + .wrapper {
 
-			.sidebar-switch-nav {
+			.sidebar-toggle-nav {
 				display: block;
 			}
 		}
+
+		&:not(.is-opened) {
+			transform: translate3d(-110%, 0, 0);
+		}
 	}
-*/
+}
+
+.sidebar-toggle-nav {
+	display: none;
+	flex-shrink: 0;
+	margin-right: 10px;
+
+	.sidebar-toggle {
+		width: 24px;
+		height: 24px;
+		background: url(../img/icon-sprite.svg) no-repeat -540px -592px;
+		border: none;
+		border-radius: 0;
+		text-indent: -9999px;
+		opacity: .75;
+
+		&:hover {
+			opacity: 1;
+		}
+
+		@if $ui-transitions {
+			transition: opacity $ui-transition-duration ease-out;
+		}
+	}
+
+	& + div {
+		flex-shrink: 1;
+	}
+}

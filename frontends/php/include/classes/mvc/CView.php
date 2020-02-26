@@ -316,10 +316,29 @@ class CView {
 	/**
 	 * Update layout mode setting
 	 *
-	 * @param int $layout_mode  Possible values ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_KIOSKMODE.
+	 * @param int $layout_mode  Possible values ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_KIOSKMODE
 	 */
 	public static function setLayoutMode($layout_mode) {
 		CProfile::update('web.layout.mode', $layout_mode, PROFILE_TYPE_INT);
+	}
+
+	/**
+	 * Return sidebar mode setting.
+	 *
+	 * @return int
+	 */
+	public static function getSidebarMode() {
+		return (int) CProfile::get('web.sidebar.mode', ZBX_SIDEBAR_VIEW_MODE_FULL);
+	}
+
+	/**
+	 * Update sidebar mode setting
+	 *
+	 * @param int $sidebar_mode  Possible values ZBX_SIDEBAR_VIEW_MODE_FULL, ZBX_SIDEBAR_VIEW_MODE_COMPACT,
+	 *                           ZBX_SIDEBAR_VIEW_MODE_HIDDEN
+	 */
+	public static function setSidebarMode($sidebar_mode) {
+		CProfile::update('web.sidebar.mode', $sidebar_mode, PROFILE_TYPE_INT);
 	}
 
 	/**

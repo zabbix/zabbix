@@ -143,13 +143,14 @@ class CMenu extends CTag {
 	 * Find item by action name and set selected property to true if found.
 	 *
 	 * @param string $action_name  Visual label.
+	 * @param bool $expand         Add class 'is-expanded' for the opening submenu if is selected.
 	 *
 	 * @return bool  Returns true, if of the menu items is selected
 	 */
-	public function setSelectedByAction(string $action_name): bool {
+	public function setSelectedByAction(string $action_name, bool $expand = true): bool {
 		foreach ($this->menu_items as $item) {
-			if ($item->setSelectedByAction($action_name)) {
-				if ($item->hasSubMenu()) {
+			if ($item->setSelectedByAction($action_name, $expand)) {
+				if ($item->hasSubMenu() && $expand) {
 					$item->addClass('is-expanded');
 				}
 				return true;

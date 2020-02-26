@@ -22,73 +22,156 @@ const SIDEBAR_VIEW_MODE_FULL = 0;
 const SIDEBAR_VIEW_MODE_COMPACT = 1;
 const SIDEBAR_VIEW_MODE_HIDDEN = 2;
 
-class CSidebar {
+class CSidebar extends CBaseComponent {
 
 	constructor(node) {
-		this._node = node;
+		super(node);
 
 		this._is_focused = false;
+		this._is_opened = false;
 
-		this._view_mode = (this._node.classList.contains('is-compact'))
-			? SIDEBAR_VIEW_MODE_COMPACT
-			: (this._node.classList.contains('is-hidden'))
-				? SIDEBAR_VIEW_MODE_HIDDEN
-				: SIDEBAR_VIEW_MODE_FULL;
-
-		this._node.style.maxWidth = this._node.scrollWidth + 'px';
-
-		this.setViewMode(this._view_mode);
+		this.init();
 		this.handleEvents();
 	}
 
+	init() {
+		this.setViewMode((this._node.classList.contains('is-compact'))
+			? SIDEBAR_VIEW_MODE_COMPACT
+			: (this._node.classList.contains('is-hidden'))
+				? SIDEBAR_VIEW_MODE_HIDDEN
+				: SIDEBAR_VIEW_MODE_FULL
+		);
+
+		let max_width = 200;  // Minimum sidebar width for the full view mode
+
+		for (const menu of this._node.querySelectorAll('nav > ul')) {
+			const position = window.getComputedStyle(menu).position;
+			menu.style.position = 'absolute';
+			max_width = Math.max(max_width, menu.clientWidth);
+			menu.style.position = position;
+		}
+		this._node.style.maxWidth = max_width + 'px';
+	}
+
 	/**
-	 * Set view mode {0: full, 1: compact, 2: hidden}
+	 * Set view mode {0: full, 1: compact, 2: hidden}.
 	 *
 	 * @param {number} view_mode
 	 *
 	 * @returns {CSidebar}
 	 */
 	setViewMode(view_mode) {
-		this.view_mode = view_mode;
+		this._view_mode = view_mode;
 
-		this._node.classList.toggle('is-compact', this.view_mode === SIDEBAR_VIEW_MODE_COMPACT);
-		this._node.classList.toggle('is-hidden', this.view_mode === SIDEBAR_VIEW_MODE_HIDDEN);
+		this._node.classList.toggle('is-compact', this._view_mode === SIDEBAR_VIEW_MODE_COMPACT);
+		this._node.classList.toggle('is-hidden', this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN);
+
+		window.dispatchEvent(new Event('resize'));
 
 		return this;
 	}
 
 	open() {
-		this._node.classList.add('is-opened');
+		if (!this._is_opened) {
+			this._is_opened = true;
+			this._node.classList.add('is-opened');
+
+			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
+				ZABBIX.MenuMain.expandSelected();
+			}
+			this.trigger('open');
+		}
 
 		return this;
 	}
 
 	close() {
-		this._node.classList.remove('is-opened');
+		if (this._is_opened) {
+			this._is_opened = false;
+			this._node.classList.remove('is-opened');
+
+			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
+				ZABBIX.MenuMain.collapseAll();
+				this.trigger('close');
+			}
+		}
 
 		return this;
 	}
 
+	/**
+	 * Register all DOM events.
+	 */
 	handleEvents() {
 		this._events = {
 
+			focus: () => {
+				this._is_focused = this._node.contains(document.activeElement);
+
+				if (this._is_focused) {
+					if (!this._is_opened) {
+						this._events.open();
+					}
+				}
+				else {
+					this._events.mouseleave();
+				}
+			},
+
+			viewmodechange: (e) => {
+				if (e.target.classList.contains('button-sidebar-compact')) {
+					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
+				}
+				else if (e.target.classList.contains('button-sidebar-hide')) {
+					this.setViewMode(SIDEBAR_VIEW_MODE_HIDDEN);
+				}
+				else {
+					this.setViewMode(SIDEBAR_VIEW_MODE_FULL);
+				}
+
+				this.trigger('viewmodechange', {view_mode: this._view_mode });
+
+				e.preventDefault();
+			},
+
+			mouseenter: () => {
+				this._events.open();
+			},
+
+			mouseleave: () => {
+				if (!this._is_focused) {
+					this._timer = setTimeout(() => {
+						this.close();
+					}, 500);
+				}
+			},
+
 			open: () => {
+				clearTimeout(this._timer);
 				this.open();
 			},
 
-			close: () => {
-				if (!this._is_focused) {
+			toggle: () => {
+				if (!this._is_opened) {
+					this.open();
+					ZABBIX.MenuMain.focusSelected();
+				}
+				else {
 					this.close();
 				}
 			}
 		};
 
-		this._node.addEventListener('mouseenter', this._events.open);
-		this._node.addEventListener('mouseleave', this._events.close);
-	}
+		document.addEventListener('focusin', this._events.focus);
+		document.addEventListener('click', this._events.focus);
 
-	destroy() {
-		this._node.removeEventListener('mouseenter', this._events.open);
-		this._node.removeEventListener('mouseleave', this._events.close);
+		this._node.addEventListener('mouseenter', this._events.mouseenter);
+		this._node.addEventListener('mouseleave', this._events.mouseleave);
+
+		for (const el of this._node.querySelectorAll('.js-sidebar-mode')) {
+			el.addEventListener('click', this._events.viewmodechange);
+		}
+
+		document.getElementById('sidebar-toggle').addEventListener('click', this._events.toggle);
 	}
 }

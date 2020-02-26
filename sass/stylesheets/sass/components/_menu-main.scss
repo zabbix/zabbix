@@ -79,7 +79,8 @@ $menu-main-icons: (
 					transform: rotate(0deg);
 
 					@if $ui-transitions {
-						transition: transform $ui-transition-duration ease-out;
+						transition: transform $ui-transition-duration,
+									opacity $ui-transition-duration;
 					}
 				}
 
@@ -114,7 +115,7 @@ $menu-main-icons: (
 	a {
 		position: relative;
 		display: block;
-		padding: 12px 12px 12px 45px;
+		padding: 12px 34px 12px 44px;
 		font-size: 14px;
 		line-height: inherit;
 		color: $menu-main-color;
@@ -136,9 +137,9 @@ $menu-main-icons: (
 		}
 
 		@if $ui-transitions {
-			transition: color $ui-transition-duration ease-out,
-						border-color $ui-transition-duration ease-out,
-						background-color $ui-transition-duration ease-out;
+			transition: color $ui-transition-duration,
+						border-color $ui-transition-duration,
+						background-color $ui-transition-duration;
 		}
 	}
 
@@ -169,7 +170,7 @@ $menu-main-icons: (
 		}
 
 		a {
-			padding: 8px 12px 8px 21px;
+			padding: 8px 12px 8px 20px;
 			font-size: 12px;
 			background: $menu-main-submenu-bg-color;
 
@@ -201,38 +202,6 @@ $menu-main-icons: (
 			transition: max-height $ui-transition-duration ease;
 			will-change: max-height;
 			transform: translate3d(0, 0, 0);
-		}
-	}
-}
-
-.is-compact {
-
-	.menu-main {
-
-		li {
-			&.has-submenu {
-				& > a {
-					&::after {
-						display: none;
-					}
-				}
-			}
-
-			&.is-selected {
-				& > a {
-					&,
-					&:hover,
-					&:focus {
-						background: $menu-main-selected-bg-color;
-						border-color: $menu-main-selected-border-color;
-						color: $menu-main-selected-color;
-					}
-				}
-			}
-		}
-
-		.submenu {
-			max-height: 0 !important;
 		}
 	}
 }

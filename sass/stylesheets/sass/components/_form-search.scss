@@ -24,10 +24,6 @@
 		height: 12px;
 		background: url(../img/icon-sprite.svg) no-repeat -90px -12px;
 		opacity: .75;
-
-		@if $ui-transitions {
-			transition: opacity $ui-transitions ease-out;
-		}
 	}
 }
 

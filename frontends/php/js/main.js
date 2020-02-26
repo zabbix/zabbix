@@ -1014,6 +1014,9 @@ jQuery(function ($) {
 });
 
 window.addEventListener('load', e => {
-	ZABBIX.MenuMain = new CMenuMain(document.querySelector('.menu-main'));
-	ZABBIX.Sidebar = new CSidebar(document.querySelector('.sidebar')).setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
+	ZABBIX.MenuMain = new CMenu(document.querySelector('.menu-main'));
+	ZABBIX.Sidebar = new CSidebar(document.querySelector('.sidebar'))
+		.on('viewmodechange', (e) => {
+			updateUserProfile('web.sidebar.mode', e.detail.view_mode, []);
+		});
 });

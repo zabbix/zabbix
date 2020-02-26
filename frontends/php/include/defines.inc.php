@@ -1308,6 +1308,11 @@ define('ZBX_LAYOUT_NORMAL',     0);
 define('ZBX_LAYOUT_KIOSKMODE',  1);
 define('ZBX_LAYOUT_MODE', 'layout-mode');
 
+// Sidebar
+define('ZBX_SIDEBAR_VIEW_MODE_FULL',	0);
+define('ZBX_SIDEBAR_VIEW_MODE_COMPACT',	1);
+define('ZBX_SIDEBAR_VIEW_MODE_HIDDEN',	2);
+
 // input fields
 define('ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH',		218);
 define('ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH',	218);

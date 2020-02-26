@@ -60,6 +60,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.triggers.filter.active':
 				case 'web.screens.filter.active':
 				case 'web.screenconf.filter.active':
+				case 'web.sidebar.mode':
 				case 'web.slides.filter.active':
 				case 'web.slideconf.filter.active':
 				case 'web.sysmapconf.filter.active':
@@ -125,6 +126,10 @@ class CControllerProfileUpdate extends CController {
 
 			case 'web.layout.mode':
 				CView::setLayoutMode($value_int);
+				break;
+
+			case 'web.sidebar.mode':
+				CView::setSidebarMode($value_int);
 				break;
 
 			default:
