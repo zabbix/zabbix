@@ -89,23 +89,25 @@ class CControllerMapView extends CController {
 
 	protected function doAction() {
 		CProfile::update('web.maps.sysmapid', $this->sysmapid, PROFILE_TYPE_ID);
-
-		if ($this->hasInput('severity_min')) {
-			$severity_min = $this->getInput('severity_min');
-			CProfile::update('web.maps.severity_min', $severity_min, PROFILE_TYPE_INT, $this->sysmapid);
-		}
-		else {
-			$severity_min = CProfile::get('web.maps.severity_min', null, $this->sysmapid);
-		}
-
-		CProfile::get('web.maps.severity_min', null, $this->sysmapid);
-
 		$maps = API::Map()->get([
 			'output' => ['name', 'severity_min'],
 			'sysmapids' => [$this->sysmapid]
 		]);
 
 		$map = reset($maps);
+
+		if ($this->hasInput('severity_min')) {
+			$severity_min = $this->getInput('severity_min');
+			if ($severity_min == $map['severity_min']) {
+				CProfile::delete('web.maps.severity_min', $this->sysmapid);
+			}
+			else {
+				CProfile::update('web.maps.severity_min', $severity_min, PROFILE_TYPE_INT, $this->sysmapid);
+			}
+		}
+		else {
+			$severity_min = CProfile::get('web.maps.severity_min', $map['severity_min'], $this->sysmapid);
+		}
 
 		$map['editable'] = (bool) API::Map()->get([
 			'output' => [],
