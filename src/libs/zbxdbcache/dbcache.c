@@ -493,6 +493,7 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, siz
 
 	trend->value_avg.dbl = trend->value_avg.dbl / (trend->num + num) * trend->num +
 			value_avg.dbl / (trend->num + num) * num;
+	trend->num += num;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "update trends set"
 			" num=%d,value_min=" ZBX_FS_DBL64 ",value_avg=" ZBX_FS_DBL64 ",value_max=" ZBX_FS_DBL64
