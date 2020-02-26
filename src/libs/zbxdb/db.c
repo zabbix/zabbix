@@ -356,18 +356,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	sword		err = OCI_SUCCESS;
 	static ub2	csid = 0;
 #elif defined(HAVE_POSTGRESQL)
-#	define PG_DB_PARAMS_COUNT	9
-#	define PG_TLS_PREFER		"prefer"
-#	define PG_TLS_REQUIRE		"require"
-#	define PG_TLS_VERIFY_CA		"verify-ca"
-#	define PG_TLS_VERIFY_FULL	"verify-full"
+#	define ZBX_DB_MAX_PARAMS	9
 
 	int		rc;
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
-	const char	*pg_keywords[PG_DB_PARAMS_COUNT + 1];
-	const char	*pg_values[PG_DB_PARAMS_COUNT + 1];
+	const char	*keywords[ZBX_DB_MAX_PARAMS + 1];
+	const char	*values[ZBX_DB_MAX_PARAMS + 1];
 	unsigned int	i = 0;
 #elif defined(HAVE_SQLITE3)
 	char		*p, *path = NULL;
@@ -597,57 +593,57 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (NULL != host)
 	{
-		pg_keywords[i] = "host";
-		pg_values[i++] = host;
+		keywords[i] = "host";
+		values[i++] = host;
 	}
 
 	if (NULL != dbname)
 	{
-		pg_keywords[i] = "dbname";
-		pg_values[i++] = dbname;
+		keywords[i] = "dbname";
+		values[i++] = dbname;
 	}
 
 	if (NULL != user)
 	{
-		pg_keywords[i] = "user";
-		pg_values[i++] = user;
+		keywords[i] = "user";
+		values[i++] = user;
 	}
 
 	if (NULL != password)
 	{
-		pg_keywords[i] = "password";
-		pg_values[i++] = password;
+		keywords[i] = "password";
+		values[i++] = password;
 	}
 
 	if (NULL != cert)
 	{
-		pg_keywords[i] = "sslcert";
-		pg_values[i++] = cert;
+		keywords[i] = "sslcert";
+		values[i++] = cert;
 	}
 
 	if (NULL != key)
 	{
-		pg_keywords[i] = "sslkey";
-		pg_values[i++] = key;
+		keywords[i] = "sslkey";
+		values[i++] = key;
 	}
 
 	if (NULL != ca)
 	{
-		pg_keywords[i] = "sslrootcert";
-		pg_values[i++] = ca;
+		keywords[i] = "sslrootcert";
+		values[i++] = ca;
 	}
 
-	pg_keywords[i] = "sslmode";
+	keywords[i] = "sslmode";
 	if (NULL == tls_connect)
-		pg_values[i++] = PG_TLS_PREFER;
+		values[i++] = "prefer";
 	else if (0 == strcmp(tls_connect, "preferred"))
-		pg_values[i++] = PG_TLS_PREFER;
+		values[i++] = "prefer";
 	else if (0 == strcmp(tls_connect, "required"))
-		pg_values[i++] = PG_TLS_REQUIRE;
+		values[i++] = "require";
 	else if (0 == strcmp(tls_connect, "verify_ca"))
-		pg_values[i++] = PG_TLS_VERIFY_CA;
+		values[i++] = "verify-ca";
 	else if (0 == strcmp(tls_connect, "verify_full"))
-		pg_values[i++] = PG_TLS_VERIFY_FULL;
+		values[i++] = "verify-full";
 	else
 	{
 		ret = ZBX_DB_FAIL;
@@ -657,14 +653,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (0 != port)
 	{
-		pg_keywords[i] = "port";
-		pg_values[i++] = cport = zbx_dsprintf(cport, "%d", port);
+		keywords[i] = "port";
+		values[i++] = cport = zbx_dsprintf(cport, "%d", port);
 	}
 
-	pg_keywords[i] = NULL;
-	pg_values[i] = NULL;
+	keywords[i] = NULL;
+	values[i] = NULL;
 
-	conn = PQconnectdbParams(pg_keywords, pg_values, 0);
+	conn = PQconnectdbParams(keywords, values, 0);
 
 	zbx_free(cport);
 
