@@ -591,6 +591,24 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	ZBX_UNUSED(cipher);
 	ZBX_UNUSED(cipher_13);
 
+	keywords[i] = "sslmode";
+	if (NULL == tls_connect)
+		values[i++] = "prefer";
+	else if (0 == strcmp(tls_connect, "preferred"))
+		values[i++] = "prefer";
+	else if (0 == strcmp(tls_connect, "required"))
+		values[i++] = "require";
+	else if (0 == strcmp(tls_connect, "verify_ca"))
+		values[i++] = "verify-ca";
+	else if (0 == strcmp(tls_connect, "verify_full"))
+		values[i++] = "verify-full";
+	else
+	{
+		ret = ZBX_DB_FAIL;
+		zabbix_log(LOG_LEVEL_ERR, "unknown \"DBTLSConnect\" value: %s", tls_connect);
+		goto out;
+	}
+
 	if (NULL != host)
 	{
 		keywords[i] = "host";
@@ -631,24 +649,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		keywords[i] = "sslrootcert";
 		values[i++] = ca;
-	}
-
-	keywords[i] = "sslmode";
-	if (NULL == tls_connect)
-		values[i++] = "prefer";
-	else if (0 == strcmp(tls_connect, "preferred"))
-		values[i++] = "prefer";
-	else if (0 == strcmp(tls_connect, "required"))
-		values[i++] = "require";
-	else if (0 == strcmp(tls_connect, "verify_ca"))
-		values[i++] = "verify-ca";
-	else if (0 == strcmp(tls_connect, "verify_full"))
-		values[i++] = "verify-full";
-	else
-	{
-		ret = ZBX_DB_FAIL;
-		zabbix_log(LOG_LEVEL_ERR, "unknown \"DBTLSConnect\" value: %s", tls_connect);
-		goto out;
 	}
 
 	if (0 != port)
