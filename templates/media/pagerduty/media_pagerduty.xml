@@ -91,9 +91,6 @@
     if (isNaN(parseInt(params.severity)) || (params.severity &lt; 0 &amp;&amp; params.severity &gt; 5)) {&#13;
         throw 'incorrect value for variable &quot;severity&quot;. The value must be a number 0..5.';&#13;
     }&#13;
-    if (params.triggerdesc.length &lt; 1) {&#13;
-        throw 'incorrect value for variable &quot;triggerdesc&quot;. The value must be a non-empty string.';&#13;
-    }&#13;
     if (isNaN(parseInt(params.triggerid)) || params.triggerid &lt; 1) {&#13;
         throw 'incorrect value for variable &quot;triggerid&quot;. The value must be a positive number.';&#13;
     }&#13;
