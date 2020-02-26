@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -17,26 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_VERSION_H
-#define ZABBIX_VERSION_H
 
-#define ZBX_STR2(str)	#str
-#define ZBX_STR(str)	ZBX_STR2(str)
+class CSeverityCheckBoxList extends CCheckBoxList {
+	/**
+	 * Create check box list with severities.
+	 *
+	 * @param string $name  Field name in form.
+	 */
+	public function __construct($name) {
+		parent::__construct($name);
 
-#define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"17 February 2020"
-#define ZABBIX_VERSION_MAJOR	5
-#define ZABBIX_VERSION_MINOR	0
-#define ZABBIX_VERSION_PATCH	0
-#define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
-#ifdef _WINDOWS
-#	define ZABBIX_VERSION_RC_NUM	{ZABBIX_RC_NUM}
-#endif
-#define ZABBIX_VERSION_RC	"beta1"
-#define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
-				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
-#define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
-
-int	zbx_get_component_version(char *value);
-
-#endif
+		$this->setOptions(CSeverity::getSeverities());
+		$this->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
+	}
+}

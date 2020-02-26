@@ -1,3 +1,14 @@
+Changes for 5.0.0beta1
+
+New features:
+........S. [ZBXNEXT-1797] added HOST.ID macro support to notifications (atumilovics)
+..F....... [ZBXNEXT-5725] added ability to select specific severities in Monitoring->Problems (vasilijs)
+
+Bug fixes:
+.......PS. [ZBX-17295] fixed IPMI sensor LLD JSON output (akozlovs)
+..F....... [ZBX-17222] fixed unlimited data selection in Latest data view (averza)
+
+--------------------------------------------------------------------------------
 Changes for 5.0.0alpha2
 
 New features:
@@ -57,6 +68,11 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 ..F....... [ZBX-402] fixed latest data reloading to updating asynchronously (averza)
 .........T [ZBX-16695] changed default width of various screen elements in Zabbix templates from 500 to 750 pixels (Ivo, talbergs, vasilijs)
 ....I..... [ZBX-11764] fixed automake scripts; thanks to Tomasz Kłoczko for the patch (akozlovs)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.6
+
+4.4.6rc1 was released as 4.4.6 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.4.6rc1
@@ -1107,6 +1123,11 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.18
+
+4.0.18rc1 was released as 4.0.18 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.18rc1
