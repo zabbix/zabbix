@@ -345,7 +345,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
-	unsigned int mysql_tls_mode = SSL_MODE_PREFERRED;
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
 #else
@@ -391,21 +390,25 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == tls_connect)
-		mysql_tls_mode = SSL_MODE_PREFERRED;
-	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_PREFERRED_TXT))
-		mysql_tls_mode = SSL_MODE_PREFERRED;
-	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
-		mysql_tls_mode = SSL_MODE_REQUIRED;
-	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
-		mysql_tls_mode = SSL_MODE_VERIFY_CA;
-	else
-		mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
 
-	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_SSL_MODE, &mysql_tls_mode))
+	if (NULL != tls_connect)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MYSQL_OPT_SSL_MODE option.");
-		ret = ZBX_DB_FAIL;
+		unsigned int	mysql_tls_mode;
+
+		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_PREFERRED_TXT))
+			mysql_tls_mode = SSL_MODE_PREFERRED;
+		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+			mysql_tls_mode = SSL_MODE_REQUIRED;
+		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+			mysql_tls_mode = SSL_MODE_VERIFY_CA;
+		else
+			mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
+
+		if (0 != mysql_options(conn, MYSQL_OPT_SSL_MODE, &mysql_tls_mode))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot set MYSQL_OPT_SSL_MODE option.");
+			ret = ZBX_DB_FAIL;
+		}
 	}
 
 	if (ZBX_DB_OK == ret && NULL != ca && 0 != mysql_options(conn, MYSQL_OPT_SSL_CA, ca))
@@ -586,17 +589,19 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	ZBX_UNUSED(cipher);
 	ZBX_UNUSED(cipher_13);
 
-	keywords[i] = "sslmode";
-	if (NULL == tls_connect)
-		values[i++] = "prefer";
-	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_PREFERRED_TXT))
-		values[i++] = "prefer";
-	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
-		values[i++] = "require";
-	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
-		values[i++] = "verify-ca";
-	else
-		values[i++] = "verify-full";
+	if (NULL != tls_connect)
+	{
+		keywords[i] = "sslmode";
+
+		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_PREFERRED_TXT))
+			values[i++] = "prefer";
+		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+			values[i++] = "require";
+		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+			values[i++] = "verify-ca";
+		else
+			values[i++] = "verify-full";
+	}
 
 	if (NULL != cert)
 	{
