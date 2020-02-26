@@ -19,7 +19,11 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
+
 <script type="text/x-jquery-tmpl" id="hostInterfaceRow">
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
 	<td class="interface-drag-control <?= ZBX_STYLE_TD_DRAG_ICON ?>">

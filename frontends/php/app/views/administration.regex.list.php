@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if ($data['uncheck']) {
 	uncheckTableRows();
 }

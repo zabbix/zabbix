@@ -28,9 +28,7 @@ $page['title'] = _('Details of web scenario');
 $page['file'] = 'httpdetails.php';
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -87,7 +85,7 @@ $details_screen = CScreenBuilder::getScreen([
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
-			->addItem((new CList())->addItem(get_icon('fullscreen')))
+			->addItem((new CList())->addItem(get_icon('fullscreen', ['mode' => $page['web_layout_mode']])))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)

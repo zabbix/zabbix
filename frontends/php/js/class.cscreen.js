@@ -18,7 +18,6 @@
 **/
 
 var ZBX_SCREENS = []; // screens obj reference
-Position.includeScrollOffsets = true;
 
 // screenid always must be a string (js doesn't support uint64) !
 function init_screen(screenid, obj_id, id) {
@@ -34,38 +33,27 @@ function init_screen(screenid, obj_id, id) {
 	ZBX_SCREENS[id].screen = new Cscreen(screenid, obj_id, id);
 }
 
-var Cscreen = Class.create();
+var Cscreen = function(screenid, obj_id, id) {
+	this.screenid = screenid;
+	this.id = id;
+	this.screen_obj = document.getElementById(obj_id);
+
+	jQuery('.draggable').draggable({
+		revert: 'invalid',
+		zIndex: 999
+	});
+
+	jQuery('.screenitem').droppable({
+		accept: '.draggable',
+		drop: this.on_drop,
+		tolerance: 'pointer'
+	});
+};
+
 Cscreen.prototype = {
 	id: 0,
 	screenid: 0,
 	screen_obj: null, // DOM ref to screen obj
-
-	initialize: function(screenid, obj_id, id) {
-		this.screenid = screenid;
-		this.id = id;
-		this.screen_obj = $(obj_id);
-
-		function wedge() {
-			return false;
-		}
-
-		jQuery('.draggable').draggable({
-			revert: 'invalid',
-			zIndex: 999,
-			start: function() {
-				if (IE) {
-					Event.observe(document.body, 'drag', wedge, false);
-					Event.observe(document.body, 'selectstart', wedge, false);
-				}
-			}
-		});
-
-		jQuery('.screenitem').droppable({
-			accept: '.draggable',
-			drop: this.on_drop,
-			tolerance: 'pointer'
-		});
-	},
 
 	on_drop: function(event, ui) {
 		var element = ui.draggable;

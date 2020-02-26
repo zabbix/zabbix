@@ -19,7 +19,11 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
+
 <?php if (!$data['readonly']): ?>
 	<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
 		<?= (new CRow([

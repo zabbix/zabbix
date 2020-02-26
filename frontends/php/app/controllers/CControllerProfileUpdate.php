@@ -34,7 +34,7 @@ class CControllerProfileUpdate extends CController {
 			switch ($this->getInput('idx')) {
 				case 'web.actionconf.filter.active':
 				case 'web.auditacts.filter.active':
-				case 'web.auditlogs.filter.active':
+				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
 				case 'web.correlation.filter.active':
 				case 'web.dashbrd.filter.active':
@@ -125,7 +125,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case 'web.layout.mode':
-				CView::setLayoutMode($value_int);
+				CViewHelper::saveLayoutMode($value_int);
 				break;
 
 			default:

@@ -57,6 +57,7 @@ class CRouter {
 		// action						controller											layout					view
 		'acknowledge.create'			=> ['CControllerAcknowledgeCreate',					null,					null],
 		'acknowledge.edit'				=> ['CControllerAcknowledgeEdit',					'layout.htmlpage',		'monitoring.acknowledge.edit'],
+		'auditlog.list'					=> ['CControllerAuditLogList',						'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'			=> ['CControllerAuthenticationEdit',				'layout.htmlpage',		'administration.authentication.edit'],
 		'authentication.update'			=> ['CControllerAuthenticationUpdate',				null,					null],
 		'autoreg.edit'					=> ['CControllerAutoregEdit',						'layout.htmlpage',		'administration.autoreg.edit'],
@@ -239,7 +240,6 @@ class CRouter {
 		'adm.workingtime.php'			=> ['CLegacyAction', null, null],
 		'applications.php'				=> ['CLegacyAction', null, null],
 		'auditacts.php'					=> ['CLegacyAction', null, null],
-		'auditlogs.php'					=> ['CLegacyAction', null, null],
 		'browserwarning.php'			=> ['CLegacyAction', null, null],
 		'chart.php'						=> ['CLegacyAction', null, null],
 		'chart2.php'					=> ['CLegacyAction', null, null],

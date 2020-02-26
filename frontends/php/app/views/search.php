@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widgets = [];
 
 $table = (new CTableInfo())

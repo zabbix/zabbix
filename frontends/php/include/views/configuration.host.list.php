@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.host.list.js.php';
 
 $widget = (new CWidget())
@@ -455,4 +459,4 @@ $form->addItem([
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

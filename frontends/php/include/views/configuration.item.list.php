@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
 $widget = (new CWidget())
@@ -256,4 +260,4 @@ $itemForm->addItem([
 // append form to widget
 $widget->addItem($itemForm);
 
-return $widget;
+$widget->show();
