@@ -224,7 +224,7 @@ class CUserMacro extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid', 'type'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -995,8 +995,6 @@ class CUserMacro extends CApiService {
 			}
 		}
 		unset($object);
-
-		$objects = parent::unsetExtraFields($objects, ['type'], $output);
 
 		return parent::unsetExtraFields($objects, $fields, $output);
 	}

@@ -126,17 +126,17 @@
 	}
 
 	var methods = {
-		init(options) {
+		init() {
 			return this.each(function () {
-				if ($(this).data('is-activated')) {
-					return false;
-				}
-
-				$(this).data('is-activated', true);
-
-				$('.input-secret input, .input-group .textarea-flexible', $(this)).on('focus blur', btnUndoFocusEventHandle);
-				$('.btn-undo', $(this)).on('click', btnUndoClickEventHandle);
-				$('.dropdown-value', $(this)).on('change', inputDropdownValueChangeEventHandle);
+				$('.input-secret input, .input-group .textarea-flexible', $(this))
+					.off('focus blur', btnUndoFocusEventHandle)
+					.on('focus blur', btnUndoFocusEventHandle);
+				$('.btn-undo', $(this))
+					.off('click', btnUndoClickEventHandle)
+					.on('click', btnUndoClickEventHandle);
+				$('.dropdown-value', $(this))
+					.off('change', inputDropdownValueChangeEventHandle)
+					.on('change', inputDropdownValueChangeEventHandle);
 			});
 		}
 	};

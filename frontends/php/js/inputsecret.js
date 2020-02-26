@@ -24,7 +24,7 @@
 (function($) {
 	'use strict';
 
-	function enable() {
+	function enableHandle() {
 		var $btn_change = $(this),
 			$input = $btn_change.siblings('input[type=password]'),
 			$btn_undo =$btn_change
@@ -41,20 +41,13 @@
 	}
 
 	var methods = {
-		init(options) {
-			var settings = $.extend({}, options);
-
+		init() {
 			return this.each(function() {
 				$(this).data('is-activated', false);
 
-				// Prevent set event more than one time.
-				if ($('.btn-change', $(this)).data('is-activated')) {
-					return false;
-				}
-
 				$('.btn-change', $(this))
-					.on('click', enable)
-					.data('is-activated', true);
+					.off('click', enableHandle)
+					.on('click', enableHandle);
 			});
 		}
 	};

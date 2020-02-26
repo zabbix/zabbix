@@ -1,4 +1,23 @@
-<?php
+<?php declare(strict_types = 1);
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 
 class CMacroValue extends CDiv {
 
@@ -23,6 +42,20 @@ class CMacroValue extends CDiv {
 	];
 
 	/**
+	 * Values array.
+	 *
+	 * @var array
+	 */
+	protected $values = [];
+
+	/**
+	 * Element name.
+	 *
+	 * @var string
+	 */
+	protected $name = '';
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param array  $macro    Macro array.
@@ -34,29 +67,50 @@ class CMacroValue extends CDiv {
 	public function __construct(array $macro, string $name, array $options = []) {
 		$this->options = array_merge($this->options, $options);
 
-		$readonly = $this->options['readonly'];
-		$add_post_js = $this->options['add_post_js'];
-
 		parent::__construct();
+
+		$this->values = $macro;
+		$this->name = $name;
+	}
+
+	/**
+	 * Get content of all Javascript code.
+	 *
+	 * @return string  Javascript code.
+	 */
+	public function getPostJS(): string {
+		return 'jQuery("#'.$this->getId().'").macroValue();';
+	}
+
+	/**
+	 * Render object.
+	 *
+	 * @param boolean $destroy
+	 *
+	 * @return string
+	 */
+	public function toString($destroy = true) {
 
 		$dropdown_options = [
 			'title' => _('Change type'),
-			'active_class' => ($macro['type'] == ZBX_MACRO_TYPE_TEXT) ? ZBX_STYLE_ICON_TEXT : ZBX_STYLE_ICON_SECRET_TEXT,
-			'disabled' => $readonly,
+			'active_class' => ($this->values['type'] == ZBX_MACRO_TYPE_TEXT) ? ZBX_STYLE_ICON_TEXT : ZBX_STYLE_ICON_SECRET_TEXT,
+			'disabled' => $this->options['readonly'],
 			'items' => [
 				['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_STYLE_ICON_TEXT],
 				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_SECRET_TEXT]
 			]
 		];
 
-		$value_input = ($macro['type'] == ZBX_MACRO_TYPE_TEXT)
-			? (new CTextAreaFlexible($name.'[value]', CMacrosResolverGeneral::getMacroValue($macro),
-				['add_post_js' => $add_post_js]
+		$value_input = ($this->values['type'] == ZBX_MACRO_TYPE_TEXT)
+			? (new CTextAreaFlexible($this->name.'[value]', CMacrosResolverGeneral::getMacroValue($this->values),
+				['add_post_js' => $this->options['add_post_js']]
 			))
 				->setAttribute('placeholder', _('value'))
-			: new CInputSecret($name.'[value]', _('value'), ['disabled' => $readonly, 'add_post_js' => $add_post_js]);
+			: new CInputSecret($this->name.'[value]', _('value'), ['disabled' => $this->options['readonly'],
+				'add_post_js' => $this->options['add_post_js']
+			]);
 
-		if ($macro['type'] == ZBX_MACRO_TYPE_TEXT && $readonly) {
+		if ($this->values['type'] == ZBX_MACRO_TYPE_TEXT && $this->options['readonly']) {
 			$value_input->setAttribute('readonly', 'readonly');
 		}
 
@@ -67,23 +121,17 @@ class CMacroValue extends CDiv {
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 			->addItem([
 				$value_input,
-				($macro['type'] == ZBX_MACRO_TYPE_SECRET)
+				($this->values['type'] == ZBX_MACRO_TYPE_SECRET)
 					? (new CButton(null))
 						->setAttribute('title', _('Revert changes'))
-						->addClass(ZBX_STYLE_BTN_ALT.' '.self::ZBX_STYLE_BTN_UNDO)
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->addClass(self::ZBX_STYLE_BTN_UNDO)
 					: null,
-				new CButtonDropdown($name.'[type]', $macro['type'], $dropdown_options)
+				new CButtonDropdown($this->name.'[type]', (string) $this->values['type'], $dropdown_options)
 			]);
 
 		zbx_add_post_js($this->getPostJS());
-	}
 
-	/**
-	 * Get content of all Javascript code.
-	 *
-	 * @return string  Javascript code.
-	 */
-	public function getPostJS(): string {
-		return 'jQuery("#'.$this->getId().'").macroValue();';
+		return parent::toString($destroy);
 	}
 }
