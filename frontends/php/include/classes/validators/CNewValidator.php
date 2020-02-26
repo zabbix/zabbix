@@ -351,7 +351,7 @@ class CNewValidator {
 			return false;
 		}
 
-		return ($value >= 0 && $value <= ZBX_MAX_UINT64);
+		return ($value >= 0 && bccomp($value, ZBX_MAX_UINT64) <= 0);
 	}
 
 	/**

@@ -43,8 +43,6 @@ define('ZBX_MIN_PERIOD',		60); // 1 minute
 define('ZBX_MAX_PERIOD',		63158400); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
-define('ZBX_MIN_INT64',			'-9223372036854775808');
-define('ZBX_MAX_INT64',			'9223372036854775807');
 define('ZBX_MAX_UINT64',		'18446744073709551615');
 define('ZBX_MAX_DATE',			ZBX_MAX_INT32); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
