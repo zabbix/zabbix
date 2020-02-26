@@ -343,7 +343,7 @@ class CNewValidator {
 			return false;
 		}
 
-		return (bccomp($value, ZBX_MIN_INT32, 0) >= 0 && bccomp($value, ZBX_MAX_INT32, 0) <= 0);
+		return ($value >= ZBX_MIN_INT32 && $value <= ZBX_MAX_INT32);
 	}
 
 	public static function is_uint64($value) {
@@ -351,7 +351,7 @@ class CNewValidator {
 			return false;
 		}
 
-		return (bccomp($value, '0', 0) >= 0 && bccomp($value, ZBX_MAX_UINT64, 0) <= 0);
+		return ($value >= 0 && $value <= ZBX_MAX_UINT64);
 	}
 
 	/**

@@ -697,10 +697,8 @@ class CSvgGraphHelper {
 			$metric['time_period'] = $options;
 
 			if ($metric['options']['timeshift'] != 0) {
-				$metric['time_period']['time_from'] =
-					bcadd($metric['time_period']['time_from'], $metric['options']['timeshift'], 0);
-				$metric['time_period']['time_to'] =
-					bcadd($metric['time_period']['time_to'], $metric['options']['timeshift'], 0);
+				$metric['time_period']['time_from'] += $metric['options']['timeshift'];
+				$metric['time_period']['time_to'] += $metric['options']['timeshift'];
 			}
 		}
 		unset($metric);

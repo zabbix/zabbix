@@ -442,7 +442,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (bccomp($data, ZBX_MIN_INT32) < 0 || bccomp($data, ZBX_MAX_INT32) > 0) {
+		if ($data < ZBX_MIN_INT32 || $data > ZBX_MAX_INT32) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
@@ -481,7 +481,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (bccomp($data, ZBX_MAX_UINT64) > 0) {
+		if ($data > ZBX_MAX_UINT64) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
@@ -1187,16 +1187,8 @@ class CApiInputValidator {
 		}
 
 		$value = $number_parser->calcValue();
-		$value_abs = $value[0] === '-' ? substr($value, 1) : $value;
 
-		if (bccomp($value_abs, numberToDecimal(FLOAT64_MIN_ABS), FLOAT64_SCALE) < 0
-				&& bccomp($value_abs, '0', FLOAT64_SCALE) > 0) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too small'));
-
-			return false;
-		}
-
-		if (bccomp($value_abs, numberToDecimal(FLOAT64_MAX_ABS), FLOAT64_SCALE) > 0) {
+		if ($value == NAN || abs($value) == INF) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 
 			return false;
@@ -1454,7 +1446,7 @@ class CApiInputValidator {
 
 		$seconds = timeUnitToSeconds($data);
 
-		if (bccomp(ZBX_MIN_INT32, $seconds) > 0 || bccomp($seconds, ZBX_MAX_INT32) > 0) {
+		if ($seconds < ZBX_MIN_INT32 || $seconds > ZBX_MAX_INT32) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}

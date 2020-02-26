@@ -1381,9 +1381,9 @@ function getItemFunctionalValue($item, $function, $parameter) {
 
 	$parameter = $number_parser->calcValue();
 
-	$time_from = bcsub(time(), $parameter, 0);
+	$time_from = time() - $parameter;
 
-	if (bccomp($time_from, 0, 0) < 0 || bccomp($time_from, ZBX_MAX_DATE, 0) > 0) {
+	if ($time_from < 0 || $time_from > ZBX_MAX_DATE) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 

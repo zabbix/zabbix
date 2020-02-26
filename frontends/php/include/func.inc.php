@@ -418,7 +418,7 @@ function zbx_num2bitstr($num, $rev = false) {
 	$strbin = '';
 
 	$len = 32;
-	if (bccomp($num, ZBX_MAX_INT32) > 0) {
+	if ($num > ZBX_MAX_INT32) {
 		$len = 64;
 	}
 
@@ -491,39 +491,30 @@ function mem2str($bytes) {
 }
 
 function convertUnitsUptime($value) {
-	$value = bcround(numberToDecimal($value));
+	$value = round($value);
+	$value_abs = abs($value);
 
-	$is_negative = $value[0] === '-';
-	if ($is_negative) {
-		$value = substr($value, 1);
-	}
+	$result = $value < 0 ? '-' : '';
 
-	$days = bcdiv($value, SEC_PER_DAY, 0);
+	$days = floor($value_abs / SEC_PER_DAY);
 
-	$result = $is_negative ? '-' : '';
-
-	if ($days !== '0') {
-		if ($days === '1') {
-			$result .= _s('%s day', $days);
-		}
-		else {
-			$result .= _s('%s days', formatFloat($days, PHP_FLOAT_DIG));
-		}
+	if ($days != 0) {
+		$result .= _n('%1$d day', '%1$d days', formatFloat($days));
 	}
 
 	// Is original value precise enough for showing detailed data?
-	if (strlen($value) <= PHP_FLOAT_DIG) {
-		if ($days !== '0') {
+	if (strlen($value_abs) <= PHP_FLOAT_DIG) {
+		if ($days != 0) {
 			$result .= ', ';
 		}
 
-		$value = (int) bcsub($value, bcmul($days, SEC_PER_DAY, 0), 0);
+		$value_abs = $value_abs - $days * SEC_PER_DAY;
 
-		$hours = floor($value / SEC_PER_HOUR);
-		$value -= $hours * SEC_PER_HOUR;
+		$hours = floor($value_abs / SEC_PER_HOUR);
+		$value_abs -= $hours * SEC_PER_HOUR;
 
-		$minutes = floor($value / SEC_PER_MIN);
-		$seconds = $value - $minutes * SEC_PER_MIN;
+		$minutes = floor($value_abs / SEC_PER_MIN);
+		$seconds = $value_abs - $minutes * SEC_PER_MIN;
 
 		$result .= sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
 	}
@@ -542,35 +533,29 @@ function convertUnitsUptime($value) {
  * @return string
  */
 function convertUnitsS($value, $ignore_millisec = false) {
-	$value = numberToDecimal($value);
-
-	$is_negative = $value[0] === '-';
-	if ($is_negative) {
-		$value = substr($value, 1);
-	}
+	$value = (float) $value;
+	$value_abs = abs($value);
 
 	$parts = [];
 	$start = null;
 
-	$value_int = bcfloor($value);
+	$value_abs_int = floor($value_abs);
 
-	if (($s = bcdiv($value_int, SEC_PER_YEAR, 0)) !== '0') {
-		$parts['years'] = $s;
-		$value_int = bcsub($value_int, bcmul($s, SEC_PER_YEAR, 0), 0);
+	if (($v = floor($value_abs_int / SEC_PER_YEAR)) > 0) {
+		$parts['years'] = $v;
+		$value_abs_int -= $v * SEC_PER_YEAR;
 		$start = 0;
 	}
 
-	$value_int = (int) $value_int;
-
-	$v = floor($value_int / SEC_PER_MONTH);
+	$v = floor($value_abs_int / SEC_PER_MONTH);
 	if ($v == 12) {
-		$parts['years'] = $start === null ? '1' : bcadd($parts['years'], '1', 0);
+		$parts['years'] = $start === null ? 1 : $parts['years'] + 1;
 		$start = 0;
 	}
-	elseif ($start === null || strlen($parts['years']) <= PHP_FLOAT_DIG) {
+	elseif ($start === null || ceil(log10($parts['years'])) <= PHP_FLOAT_DIG) {
 		if ($v > 0) {
 			$parts['months'] = $v;
-			$value_int -= $v * SEC_PER_MONTH;
+			$value_abs_int -= $v * SEC_PER_MONTH;
 			$start = $start === null ? 1 : $start;
 		}
 
@@ -580,10 +565,10 @@ function convertUnitsS($value, $ignore_millisec = false) {
 			'hours' => SEC_PER_HOUR,
 			'minutes' => SEC_PER_MIN,
 		] as $part => $sec_per_part) {
-			$v = floor($value_int / $sec_per_part);
+			$v = floor($value_abs_int / $sec_per_part);
 			if ($v > 0) {
 				$parts[$part] = $v;
-				$value_int -= $v * $sec_per_part;
+				$value_abs_int -= $v * $sec_per_part;
 				$start = $start === null ? $level : $start;
 			}
 
@@ -596,20 +581,17 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 		if ($start === null || $start >= 3) {
 			if ($ignore_millisec) {
-				$v = $value_int + bcround(
-					bcsub($value, bcfloor($value), ZBX_UNITS_ROUNDOFF_SUFFIXED + 1),
-					ZBX_UNITS_ROUNDOFF_SUFFIXED
-				);
+				$v = $value_abs_int + round(fmod($value_abs, 1), ZBX_UNITS_ROUNDOFF_SUFFIXED);
 
 				if ($v > 0) {
 					$parts['seconds'] = $v;
 				}
 			}
 			else {
-				$parts['seconds'] = $value_int;
+				$parts['seconds'] = $value_abs_int;
 
 				if ($start === null || $start >= 4) {
-					$v = bcsub($value, bcfloor($value), ZBX_UNITS_ROUNDOFF_SUFFIXED + 4) * 1000;
+					$v = round(fmod($value_abs, 1) * 1000);
 					if ($v > 0) {
 						$parts['milliseconds'] = $v;
 					}
@@ -634,7 +616,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		$result[] = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$unit];
 	}
 
-	return $result ? ($is_negative ? '-' : '').implode(' ', $result) : '0';
+	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
 }
 
 /**
@@ -663,8 +645,8 @@ function convertUnits(array $options) {
 			$power_table[] = [
 				'prefix' => $prefix,
 				'divisor' => [
-					'1000' => bcpow('1000', $power, 0),
-					ZBX_KIBIBYTE => bcpow(ZBX_KIBIBYTE, $power, 0)
+					'1000' => pow(1000, $power),
+					ZBX_KIBIBYTE => pow(ZBX_KIBIBYTE, $power)
 				]
 			];
 		}
@@ -686,10 +668,6 @@ function convertUnits(array $options) {
 	$units = $options['units'] !== null ? $options['units'] : '';
 
 	if ($units === 'unixtime') {
-		if (bccomp(numberToDecimal($value), ZBX_MAX_DATE) > 0) {
-			$value = ZBX_MAX_DATE + 1;
-		}
-
 		return zbx_date2str(DATE_TIME_FORMAT_SECONDS, $value);
 	}
 
@@ -708,12 +686,12 @@ function convertUnits(array $options) {
 		$blacklist[] = $units;
 	}
 
-	$value = numberToDecimal($value);
-	$value_abs = $value[0] === '-' ? substr($value, 1) : $value;
+	$value = (float) $value;
+	$value_abs = abs($value);
 
 	$do_convert = $units !== '' || $options['convert'] == ITEM_CONVERT_NO_UNITS;
 
-	if (in_array($units, $blacklist) || !$do_convert || bccomp($value_abs, '1') < 0) {
+	if (in_array($units, $blacklist) || !$do_convert || $value_abs < 1) {
 		$result = ($options['decimals'] !== null)
 			? formatFloat($value, $options['precision'], $options['decimals'], $options['exact_decimals'])
 			: formatFloat($value, $options['precision'], ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
@@ -733,7 +711,7 @@ function convertUnits(array $options) {
 
 	if ($options['power'] === null) {
 		foreach ($power_table as $power => $data) {
-			if (bccomp($value_abs, $data['divisor'][$unit_base]) >= 0) {
+			if ($value_abs >= $data['divisor'][$unit_base]) {
 				$unit_prefix = $data['prefix'];
 				$unit_divisor = $data['divisor'][$unit_base];
 			}
@@ -742,12 +720,12 @@ function convertUnits(array $options) {
 			}
 		}
 	}
-	elseif (array_key_exists($options['power'], $power_table) && bccomp($value_abs, '0', 0) != 0) {
+	elseif (array_key_exists($options['power'], $power_table) && $value_abs != 0) {
 		$unit_prefix = $power_table[$options['power']]['prefix'];
 		$unit_divisor = $power_table[$options['power']]['divisor'][$unit_base];
 	}
 
-	$result_value = bcdiv($value, $unit_divisor, FLOAT64_SCALE);
+	$result_value = $value / $unit_divisor;
 	$result_units = $unit_prefix.$units;
 
 	$result = ($options['decimals'] !== null)
@@ -780,7 +758,7 @@ function timeUnitToSeconds($time, $with_year = false) {
 
 	$suffix = array_key_exists('suffix', $matches) ? $matches['suffix'] : 's';
 
-	return bcmul($matches['int'], ZBX_TIME_SUFFIX_MULTIPLIERS[$suffix], 0);
+	return $matches['int'] * ZBX_TIME_SUFFIX_MULTIPLIERS[$suffix];
 }
 
 /************* ZBX MISC *************/
@@ -1365,21 +1343,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 }
 
 /**
- * Convert number to decimal format, suitable for BC Math arithmetics, not suitable for displaying.
- *
- * @param string $number  Valid number in decimal or scientific notation.
- *
- * @return string
- */
-function numberToDecimal(string $number): string {
-	$parts = explode('E', strtoupper($number), 2);
-
-	return (count($parts) == 2)
-		? bcmul($parts[0], bcpow(10, $parts[1], FLOAT64_SCALE), FLOAT64_SCALE)
-		: bcmul($number, '1', FLOAT64_SCALE);
-}
-
-/**
  * Format floating-point number for displaying.
  *
  * @param string    $number          Valid number in decimal or scientific notation.
@@ -1456,86 +1419,6 @@ function getNumDecimals($number): int {
 	$significant_size = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
 
 	return max(0, $significant_size - 1 - $exponent);
-}
-
-/**
- * Round fraction down (BC Math addition).
- *
- * @param mixed $number  Valid number in decimal notation.
- *
- * @return mixed
- */
-function bcfloor($number) {
-	if (strpos($number, '.') !== false) {
-		$number = rtrim($number, '0');
-		$number = rtrim($number, '.');
-	}
-
-	if (strpos($number, '.') !== false) {
-		if ($number[0] === '-') {
-			$number = bcsub($number, 1, 0);
-		}
-		else {
-			$number = bcadd($number, 0, 0);
-		}
-	}
-
-	return ($number === '-0') ? '0' : $number;
-}
-
-/**
- * Round fraction up (BC Math addition).
- *
- * @param mixed $number  Valid number in decimal notation.
- *
- * @return mixed
- */
-function bcceil($number) {
-	if (strpos($number, '.') !== false) {
-		$number = rtrim($number, '0');
-		$number = rtrim($number, '.');
-	}
-
-	if (strpos($number, '.') !== false) {
-		if ($number[0] === '-') {
-			$number = bcsub($number, 0, 0);
-		}
-		else {
-			$number = bcadd($number, 1, 0);
-		}
-	}
-
-	return ($number === '-0') ? '0' : $number;
-}
-
-/**
- * Round a float (BC Math addition).
- *
- * @param mixed $number      Valid number in decimal notation.
- * @param int   $precision   Number of decimal digits to round to.
- *
- * @return mixed
- */
-
-function bcround($number, $precision = 0) {
-	if ($precision == 0) {
-		if ($number[0] === '-') {
-			$number = bcsub($number, '0.5', 0);
-		}
-		else {
-			$number = bcadd($number, '0.5', 0);
-		}
-	}
-	else {
-		if ($number[0] === '-') {
-			$number = bcsub($number, bcmul('0.5', bcpow('10', -$precision, $precision), $precision + 1), $precision);
-		}
-		else {
-			$number = bcadd($number, bcmul('0.5', bcpow('10', -$precision, $precision), $precision + 1), $precision);
-		}
-	}
-
-	return bcmul($number, '1', $precision);
 }
 
 /**
@@ -2402,20 +2285,20 @@ function getTimeUnitFilters($values) {
 
 	$res = [$sec, $sec.'s'];
 
-	if (bcmod($sec, SEC_PER_MIN) == 0) {
-		$res[] = bcdiv($sec, SEC_PER_MIN, 0).'m';
+	if ($sec % SEC_PER_MIN == 0) {
+		$res[] = floor($sec / SEC_PER_MIN).'m';
 	}
 
-	if (bcmod($sec, SEC_PER_HOUR) == 0) {
-		$res[] = bcdiv($sec, SEC_PER_HOUR, 0).'h';
+	if ($sec % SEC_PER_HOUR == 0) {
+		$res[] = floor($sec / SEC_PER_HOUR).'h';
 	}
 
-	if (bcmod($sec, SEC_PER_DAY) == 0) {
-		$res[] = bcdiv($sec, SEC_PER_DAY, 0).'d';
+	if ($sec % SEC_PER_DAY == 0) {
+		$res[] = floor($sec / SEC_PER_DAY).'d';
 	}
 
-	if (bcmod($sec, SEC_PER_WEEK) == 0) {
-		$res[] = bcdiv($sec, SEC_PER_WEEK, 0).'w';
+	if ($sec % SEC_PER_WEEK == 0) {
+		$res[] = floor($sec / SEC_PER_WEEK).'w';
 	}
 
 	return $res;

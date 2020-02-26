@@ -177,12 +177,10 @@ foreach ($data['items'] as $key => $item) {
 			|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64)) {
 		$change = '';
 
-		$history_diff = bcsub(numberToDecimal($last_history['value']), numberToDecimal($prev_history['value']),
-			FLOAT64_SCALE
-		);
+		$history_diff = $last_history['value'] - $prev_history['value'];
 
-		if (bccomp($history_diff, '0', FLOAT64_SCALE) != 0) {
-			if ($history_diff[0] !== '-') {
+		if ($history_diff != 0) {
+			if ($history_diff > 0) {
 				$change = '+';
 			}
 
@@ -353,12 +351,10 @@ foreach ($data['items'] as $item) {
 			|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64)) {
 		$change = '';
 
-		$history_diff = bcsub(numberToDecimal($last_history['value']), numberToDecimal($prev_history['value']),
-			FLOAT64_SCALE
-		);
+		$history_diff = $last_history['value'] - $prev_history['value'];
 
-		if (bccomp($history_diff, '0', FLOAT64_SCALE) != 0) {
-			if ($history_diff[0] !== '-') {
+		if ($history_diff != 0) {
+			if ($history_diff > 0) {
 				$change = '+';
 			}
 

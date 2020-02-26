@@ -374,7 +374,7 @@ class CSvgGraph extends CSvg {
 	 */
 	public function getTimeGridWithPosition() {
 		$period = $this->time_till - $this->time_from;
-		$step = round(bcmul(bcdiv($period, $this->canvas_width), 100)); // Grid cell (100px) in seconds.
+		$step = round($period / $this->canvas_width * 100); // Grid cell (100px) in seconds.
 
 		/*
 		 * In case if requested time period is so small that it is rounded to zero, we are displaying only two

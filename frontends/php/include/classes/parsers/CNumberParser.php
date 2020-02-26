@@ -88,11 +88,11 @@ class CNumberParser extends CParser {
 	 *
 	 * @return string
 	 */
-	public function calcValue(): string {
-		$number = numberToDecimal($this->number);
+	public function calcValue(): float {
+		$number = (float) $this->number;
 
 		if ($this->suffix !== null) {
-			$number = bcmul($number, (string) self::$suffix_multipliers[$this->suffix], FLOAT64_SCALE);
+			$number *= self::$suffix_multipliers[$this->suffix];
 		}
 
 		return $number;
