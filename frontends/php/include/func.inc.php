@@ -1356,7 +1356,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  *
  * @return string
  */
-function formatFloat(string $number, ?int $precision, ?int $decimals, bool $exact_decimals = false): string {
+function formatFloat(string $number, int $effective_decimals, ?int $precision): string {
 	$number = (float) $number;
 
 	if ($number == 0) {
@@ -1375,44 +1375,31 @@ function formatFloat(string $number, ?int $precision, ?int $decimals, bool $exac
 		$precision = PHP_FLOAT_DIG;
 	}
 
-	$exponent = floor(log10(abs($number)));
-
-	if ($decimals !== null) {
-		if ($exact_decimals || $exponent >= 0) {
-			$number = round($number, $decimals);
-		}
-		elseif ($decimals - $exponent <= $precision && $decimals > $exponent) {
-			$number = round($number, $decimals - $exponent - 1);
-		}
-	}
-
 	// Trim extra precision.
 	$number = sprintf('%.'.($precision - 1).'E', $number);
 	[$mantissa, $exponent] = explode('E', $number);
 
-	$significants = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
+	$significant_digits = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
 
-	// Is number out of range for decimal notation?
-	if ($exponent < $significants - $precision || $exponent >= $precision) {
-		$num_decimals = ($decimals !== null && $exact_decimals) ? min($precision - 1, $decimals) : $significants - 1;
-		$number = sprintf('%.'.$num_decimals.'E', $number);
-	}
-	// Is decimal integer notation suitable?
-	elseif ($decimals === null) {
-		$number = sprintf('%.'.($significants - $exponent - 1).'f', $number);
-	}
-	// Use decimal floating-point notation.
-	else {
-		$num_decimals = min($precision - 1, $exact_decimals ? $decimals : $decimals - min(0, $exponent + 1));
-		$number = sprintf('%.'.$num_decimals.'f', $number);
-
-		if (!$exact_decimals && strpos($number, '.') !== false) {
-			$number = rtrim($number, '0');
-			$number = rtrim($number, '.');
+	if ($exponent >= 0) {
+		if ($exponent >= $precision) {
+			return $number;
+		}
+		elseif ($exponent + 1 >= $significant_digits) {
+			return sprintf('%d', $number);
+		}
+		else {
+			return sprintf('%.'.$effective_decimals.'f', $number);
 		}
 	}
+//    if ()
 
-	return $number;
+	elseif (-$exponent <= 3 + ceil(log10(-$exponent))) {
+		return sprintf('%.'.($effective_decimals - $exponent - 1).'f', $number) . 'X';
+	}
+	else {
+		return sprintf('%.'.$effective_decimals.'E', $number);
+	}
 }
 
 /**
