@@ -20,8 +20,6 @@
 
 
 class CSeverity extends CRadioButtonList {
-	const MAX_ROWS = 2;     // Number of rows.
-
 	/**
 	 * Options array.
 	 *
@@ -71,51 +69,21 @@ class CSeverity extends CRadioButtonList {
 	}
 
 	public function toString($destroy = true) {
+		$config = select_config();
+
+		$severities = [
+			TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+			TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
+		];
+
 		if ($this->options['all']) {
 			$this->addValue(_('all'), -1);
 		}
 
-		foreach (self::getSeverities() as $severity) {
-			$this->addValue($severity['name'], $severity['value'], $severity['style']);
+		foreach ($severities as $severity) {
+			$this->addValue(getSeverityName($severity, $config), $severity, getSeverityStyle($severity));
 		}
 
 		return parent::toString($destroy);
-	}
-
-	/**
-	 * Generate array with severities options.
-	 */
-	public static function getSeverities() {
-		$config = select_config();
-		$severities = [];
-		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-			$severities[] = [
-				'name' => getSeverityName($severity, $config),
-				'value' => $severity,
-				'style' => getSeverityStyle($severity)
-			];
-		}
-
-		return $severities;
-	}
-
-	/**
-	 * Generate array with data for severities options ordered for showing by rows.
-	 *
-	 * @param bool $only_names  Return only name as array value.
-	 *
-	 * @return array
-	 */
-	public static function getOrderedSeverities($only_names = false) {
-		$severities = self::getSeverities();
-		$ordered = [];
-
-		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, self::MAX_ROWS - 1) as $row) {
-			for ($i = TRIGGER_SEVERITY_NOT_CLASSIFIED; $i < count($severities); $i += self::MAX_ROWS) {
-				$ordered[$row + $i] = ($only_names) ? $severities[$row + $i]['name'] : $severities[$row + $i];
-			}
-		}
-
-		return $ordered;
 	}
 }

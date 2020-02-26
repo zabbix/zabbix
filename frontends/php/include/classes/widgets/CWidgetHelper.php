@@ -395,29 +395,29 @@ class CWidgetHelper {
 
 	/**
 	 * @param CWidgetFieldSeverities $field
-	 * @param array $config
+	 * @param int                    $max_row  Number of rows.
 	 *
 	 * @return CList
 	 */
-	public static function getSeverities($field, $config) {
-		return self::getCheckBoxList($field, CSeverity::getOrderedSeverities(true))
+	public static function getSeverities($field, $max_row = 2) {
+		return self::getCheckBoxList($field, CSeverityCheckBoxList::getOrderedSeverities(true, $max_row))
 			->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
 	}
 
 	/**
 	 * @param CWidgetFieldCheckBoxList $field
-	 * @param array $config
+	 * @param array                    $list  Option list array.
 	 *
 	 * @return CList
 	 */
-	public static function getCheckBoxList($field, array $config) {
+	public static function getCheckBoxList($field, array $list) {
 		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
 		if ($field->getOrientation() == CWidgetFieldCheckBoxList::ORIENTATION_HORIZONTAL) {
 			$checkbox_list->addClass(ZBX_STYLE_HOR_LIST);
 		}
 
-		foreach ($config as $key => $label) {
+		foreach ($list as $key => $label) {
 			$checkbox_list->addItem(
 				(new CCheckBox($field->getName().'[]', $key))
 					->setLabel($label)
