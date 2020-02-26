@@ -88,8 +88,8 @@ void	zbx_db_validate_config(void)
 			0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT, CONFIG_DB_TLS_CONNECT)) &&
 			NULL == CONFIG_DB_TLS_CA_FILE)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "option \"DBTLSCAFile\" has to be set, if \"DBTLSConnect\" is set to "
-			"\"verify_ca\" or \"verify_full\"");
+		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSConnect\" value \"%s\" requires \"DBTLSCAFile\", but it"
+				" is not defined", CONFIG_DB_TLS_CONNECT);
 		exit(EXIT_FAILURE);
 	}
 
@@ -97,8 +97,8 @@ void	zbx_db_validate_config(void)
 			(NULL == CONFIG_DB_TLS_CERT_FILE || NULL == CONFIG_DB_TLS_KEY_FILE ||
 			NULL == CONFIG_DB_TLS_CA_FILE))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "if \"DBTLSKeyFile\" or \"DBTLSCertFile\" is set, all three of options"
-			"\"DBTLSKeyFile\", \"DBTLSCertFile\" and \"DBTLSCAFile\" has to be set");
+		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSKeyFile\" or \"DBTLSCertFile\" is defined, but"
+				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
 		exit(EXIT_FAILURE);
 	}
 }
