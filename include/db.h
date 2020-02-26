@@ -482,6 +482,10 @@ void	DBdeinit(void);
 int	DBconnect(int flag);
 void	DBclose(void);
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+void	zbx_db_validate_config(void);
+#endif
+
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
 #endif

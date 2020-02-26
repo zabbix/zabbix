@@ -393,19 +393,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (NULL == tls_connect)
 		mysql_tls_mode = SSL_MODE_PREFERRED;
-	else if (0 == strcmp(tls_connect, "preferred"))
+	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_PREFERRED_TXT))
 		mysql_tls_mode = SSL_MODE_PREFERRED;
-	else if (0 == strcmp(tls_connect, "required"))
+	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 		mysql_tls_mode = SSL_MODE_REQUIRED;
-	else if (0 == strcmp(tls_connect, "verify_ca"))
+	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 		mysql_tls_mode = SSL_MODE_VERIFY_CA;
-	else if (0 == strcmp(tls_connect, "verify_full"))
-		mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
 	else
-	{
-		zabbix_log(LOG_LEVEL_ERR, "unknown \"DBTLSConnect\" value: \"%s\"", tls_connect);
-		ret = ZBX_DB_FAIL;
-	}
+		mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
 
 	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_SSL_MODE, &mysql_tls_mode))
 	{
@@ -594,19 +589,31 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	keywords[i] = "sslmode";
 	if (NULL == tls_connect)
 		values[i++] = "prefer";
-	else if (0 == strcmp(tls_connect, "preferred"))
+	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_PREFERRED_TXT))
 		values[i++] = "prefer";
-	else if (0 == strcmp(tls_connect, "required"))
+	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 		values[i++] = "require";
-	else if (0 == strcmp(tls_connect, "verify_ca"))
+	else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 		values[i++] = "verify-ca";
-	else if (0 == strcmp(tls_connect, "verify_full"))
-		values[i++] = "verify-full";
 	else
+		values[i++] = "verify-full";
+
+	if (NULL != cert)
 	{
-		ret = ZBX_DB_FAIL;
-		zabbix_log(LOG_LEVEL_ERR, "unknown \"DBTLSConnect\" value: %s", tls_connect);
-		goto out;
+		keywords[i] = "sslcert";
+		values[i++] = cert;
+	}
+
+	if (NULL != key)
+	{
+		keywords[i] = "sslkey";
+		values[i++] = key;
+	}
+
+	if (NULL != ca)
+	{
+		keywords[i] = "sslrootcert";
+		values[i++] = ca;
 	}
 
 	if (NULL != host)
@@ -631,24 +638,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		keywords[i] = "password";
 		values[i++] = password;
-	}
-
-	if (NULL != cert)
-	{
-		keywords[i] = "sslcert";
-		values[i++] = cert;
-	}
-
-	if (NULL != key)
-	{
-		keywords[i] = "sslkey";
-		values[i++] = key;
-	}
-
-	if (NULL != ca)
-	{
-		keywords[i] = "sslrootcert";
-		values[i++] = ca;
 	}
 
 	if (0 != port)

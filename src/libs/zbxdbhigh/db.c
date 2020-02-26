@@ -52,6 +52,41 @@ void	DBclose(void)
 	zbx_db_close();
 }
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+void	zbx_db_validate_config(void)
+{
+	if (NULL != CONFIG_DB_TLS_CONNECT &&
+			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_PREFERRED_TXT) &&
+			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_REQUIRED_TXT) &&
+			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT) &&
+			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DBTLSConnect\" configuration parameter: '%s'",
+				CONFIG_DB_TLS_CONNECT);
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL != CONFIG_DB_TLS_CONNECT &&
+			(0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, CONFIG_DB_TLS_CONNECT) ||
+			0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT, CONFIG_DB_TLS_CONNECT)) &&
+			NULL == CONFIG_DB_TLS_CA_FILE)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "option \"DBTLSCAFile\" has to be set, if \"DBTLSConnect\" is set to "
+			"\"verify_ca\" or \"verify_full\"");
+		exit(EXIT_FAILURE);
+	}
+
+	if ((NULL != CONFIG_DB_TLS_CERT_FILE || NULL != CONFIG_DB_TLS_KEY_FILE) &&
+			(NULL == CONFIG_DB_TLS_CERT_FILE || NULL == CONFIG_DB_TLS_KEY_FILE ||
+			NULL == CONFIG_DB_TLS_CA_FILE))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "if \"DBTLSKeyFile\" or \"DBTLSCertFile\" is set, all three of options"
+			"\"DBTLSKeyFile\", \"DBTLSCertFile\" and \"DBTLSCAFile\" has to be set");
+		exit(EXIT_FAILURE);
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: DBconnect                                                        *
