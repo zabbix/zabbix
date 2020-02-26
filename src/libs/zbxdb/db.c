@@ -1071,7 +1071,7 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 			break;
 		case ZBX_TYPE_FLOAT:
 			context->size_max = sizeof(double);
-			data_type = SQLT_IBDOUBLE;
+			data_type = SQLT_BDOUBLE;
 			break;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
