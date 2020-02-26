@@ -1091,6 +1091,7 @@ out:
 static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
+
 	int				arg1 = 1, ret = FAIL;
 	zbx_value_type_t		arg1_type = ZBX_VALUE_NVALUES;
 	zbx_vector_history_record_t	values;
@@ -1130,8 +1131,20 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 	{
 		if (arg1 <= values.values_num)
 		{
-			zbx_history_value2str(value, MAX_BUFFER_LEN, &values.values[arg1 - 1].value,
+			char		x[MAX_BUFFER_LEN-2];
+			zbx_history_value2str(x, MAX_BUFFER_LEN-2, &values.values[arg1 - 1].value,
 					item->value_type);
+
+			if (ITEM_VALUE_TYPE_STR == item->value_type ||
+				ITEM_VALUE_TYPE_TEXT == item->value_type ||
+				ITEM_VALUE_TYPE_LOG == item->value_type)
+			{
+				value[0] = '"';
+				zbx_strlcpy(value+1,x,MAX_BUFFER_LEN-2);
+				value[strlen(x)+1]='"';
+				value[strlen(x)+2]='\0';
+			}
+
 			ret = SUCCEED;
 		}
 		else
