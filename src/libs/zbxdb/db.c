@@ -439,7 +439,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	ZBX_UNUSED(key);
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
-#endif // LIBMYSQL_VERSION_ID >= 50700
+#endif
 #if LIBMYSQL_VERSION_ID >= 80016
 	if (ZBX_DB_OK == ret && NULL != cipher_13 && 0 != mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13)
 	{
