@@ -388,7 +388,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
 		exit(EXIT_FAILURE);
 	}
-#ifdef LIBMYSQL_VERSION_ID //MySQL
+#ifdef LIBMYSQL_VERSION_ID
 #if LIBMYSQL_VERSION_ID >= 50700
 	if (NULL != tls_connect)
 	{
@@ -439,7 +439,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	ZBX_UNUSED(key);
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
-#endif //LIBMYSQL_VERSION_ID >= 50700
+#endif // LIBMYSQL_VERSION_ID >= 50700
 #if LIBMYSQL_VERSION_ID >= 80016
 	if (ZBX_DB_OK == ret && NULL != cipher_13 && 0 != mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13)
 	{
@@ -448,8 +448,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 #else
 	ZBX_UNUSED(cipher_13);
-#endif //LIBMYSQL_VERSION_ID >= 80016
-#endif //LIBMYSQL_VERSION_ID
+#endif
+#endif
 #if MARIADB_VERSION_ID >= 100100
 	if (NULL != tls_connect && 0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 	{
@@ -498,7 +498,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
 		ret = ZBX_DB_FAIL;
 	}
-#endif //MARIADB_VERSION_ID >= 100100
+#endif
 	if (ZBX_DB_OK == ret &&
 			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
 				CLIENT_MULTI_STATEMENTS))
