@@ -512,7 +512,6 @@ class CHost extends CHostGeneral {
 				));
 
 				foreach ($options['tags'] as $tag) {
-
 					$templateids = [];
 					foreach ($db_template_tags as $template_tag) {
 						if (CApiTagHelper::checkTag($tag, $template_tag)) {

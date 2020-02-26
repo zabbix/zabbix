@@ -131,7 +131,7 @@ class CControllerHostView extends CControllerHost {
 				$this->getInput('filter_show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE), PROFILE_TYPE_INT
 			);
 			CProfile::update('web.host.filter.maintenance_status',
-				$this->getInput('filter_maintenance_status', HOST_MAINTENANCE_STATUS_OFF), PROFILE_TYPE_INT
+				$this->getInput('filter_maintenance_status', HOST_MAINTENANCE_STATUS_ON), PROFILE_TYPE_INT
 			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
