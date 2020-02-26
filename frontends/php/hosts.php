@@ -621,7 +621,6 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 
 					case ZBX_ACTION_REMOVE_ALL:
 						if (!getRequest('macros_remove_all', 0)) {
-							show_error_message(_('Please confirm your action.'));
 							throw new Exception();
 						}
 

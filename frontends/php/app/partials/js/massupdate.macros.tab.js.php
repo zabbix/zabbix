@@ -95,6 +95,38 @@
 
 	initMacroFields(jQuery(document.getElementById('tbl_macros')));
 
+	function removeWarning(event) {
+		if (!document.getElementById('visible_macros').checked) {
+			return true;
+		}
+
+		const checkbox_state = document.getElementById('macros_remove_all').checked;
+		const is_remove_block = document.querySelector('[name=mass_update_macros]:checked').value == <?= ZBX_ACTION_REMOVE_ALL ?>;
+
+		if (is_remove_block && !checkbox_state) {
+			event.preventDefault();
+
+			overlayDialogue({
+				'title': <?= json_encode(_('Warning')) ?>,
+				'type': 'popup',
+				'class': 'modal-popup modal-popup-medium',
+				'content': jQuery('<span>').text(<?= json_encode(_('Please confirm your action.')) ?>),
+				'buttons': [
+					{
+						'title': <?= json_encode(_('Ok')) ?>,
+						'focused': true,
+						'action': function() {}
+					}
+				]
+			}, event.currentTarget);
+		}
+	}
+
+	document
+		.querySelector('#mass_update_macros')
+		.closest('form')
+		.addEventListener('submit', removeWarning);
+
 	class MassUpdateMacros {
 
 		constructor() {
