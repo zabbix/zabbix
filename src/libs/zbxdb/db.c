@@ -1477,33 +1477,38 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 		}
 		else
 		{
-			if (OCI_SUCCESS == err)
+			if (SQLT_IBDOUBLE != data_type && SQLT_BDOUBLE != data_type)
 			{
-				/* retrieve the length semantics for the column */
-				char_semantics = 0;
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics,
-						(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
-			}
-
-			if (OCI_SUCCESS == err)
-			{
-				if (0 != char_semantics)
+				if (OCI_SUCCESS == err)
 				{
-					/* retrieve the column width in characters */
-					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
-							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+					/* retrieve the length semantics for the column */
+					char_semantics = 0;
+					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics,
+							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
+				}
 
-					/* adjust for UTF-8 */
-					col_width *= 4;
-				}
-				else
+				if (OCI_SUCCESS == err)
 				{
-					/* retrieve the column width in bytes */
-					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
-							(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+					if (0 != char_semantics)
+					{
+						/* retrieve the column width in characters */
+						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
+								(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+
+						/* adjust for UTF-8 */
+						col_width *= 4;
+					}
+					else
+					{
+						/* retrieve the column width in bytes */
+						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
+								(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+					}
 				}
+				col_width++;	/* add 1 byte for terminating '\0' */
 			}
-			col_width++;	/* add 1 byte for terminating '\0' */
+			else
+				col_width = ZBX_MAX_DOUBLE_LEN + 1;
 
 			result->values_alloc[counter - 1] = col_width;
 			result->values[counter - 1] = zbx_malloc(NULL, col_width);
@@ -2193,7 +2198,7 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
  * Return value: the string length in bytes                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_strlen_n(const char *string, size_t maxlen)
+int	zbx_db_strlen_n(const char *text, size_t maxlen)
 {
-	return zbx_strlen_utf8_nchars(string, maxlen);
+	return zbx_strlen_utf8_nchars(text, maxlen);
 }
