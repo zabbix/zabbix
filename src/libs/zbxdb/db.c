@@ -569,6 +569,13 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK != ret)
 		goto out;
 
+	/* increase float precision */
+	if (0 < (ret = zbx_db_execute("set extra_float_digits to 3")))
+		ret = ZBX_DB_OK;
+
+	if (ZBX_DB_OK != ret)
+		goto out;
+
 	result = zbx_db_select("show standard_conforming_strings");
 
 	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
