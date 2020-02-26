@@ -53,8 +53,25 @@ void	DBclose(void)
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+
+static void	check_cfg_empty_str(const char *parameter, const char *value)
+{
+	if (NULL != value && 0 == strlen(value))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"%s\" is defined but empty", parameter);
+		exit(EXIT_FAILURE);
+	}
+}
+
 void	zbx_db_validate_config(void)
 {
+	check_cfg_empty_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT);
+	check_cfg_empty_str("DBTLSCertFile", CONFIG_DB_TLS_CERT_FILE);
+	check_cfg_empty_str("DBTLSKeyFile", CONFIG_DB_TLS_KEY_FILE);
+	check_cfg_empty_str("DBTLSCAFile", CONFIG_DB_TLS_CA_FILE);
+	check_cfg_empty_str("DBTLSCipher", CONFIG_DB_TLS_CIPHER);
+	check_cfg_empty_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13);
+
 	if (NULL != CONFIG_DB_TLS_CONNECT &&
 			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_PREFERRED_TXT) &&
 			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_REQUIRED_TXT) &&
