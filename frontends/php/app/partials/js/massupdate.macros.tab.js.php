@@ -95,52 +95,24 @@
 
 	initMacroFields(jQuery(document.getElementById('tbl_macros')));
 
-	function removeWarning(event) {
-		if (!document.getElementById('visible_macros').checked) {
-			return true;
-		}
-
-		const checkbox_state = document.getElementById('macros_remove_all').checked;
-		const is_remove_block = document.querySelector('[name=mass_update_macros]:checked').value == <?= ZBX_ACTION_REMOVE_ALL ?>;
-
-		if (is_remove_block && !checkbox_state) {
-			event.preventDefault();
-
-			overlayDialogue({
-				'title': <?= json_encode(_('Warning')) ?>,
-				'type': 'popup',
-				'class': 'modal-popup modal-popup-medium',
-				'content': jQuery('<span>').text(<?= json_encode(_('Please confirm your action.')) ?>),
-				'buttons': [
-					{
-						'title': <?= json_encode(_('Ok')) ?>,
-						'focused': true,
-						'action': function() {}
-					}
-				]
-			}, event.currentTarget);
-		}
-	}
-
-	document
-		.querySelector('#mass_update_macros')
-		.closest('form')
-		.addEventListener('submit', removeWarning);
-
 	class MassUpdateMacros {
 
 		constructor() {
 			const elem = document.querySelectorAll('[name=mass_update_macros]');
+			const form = document.getElementById('mass_update_macros').closest('form');
 
 			this.eventHandler = this.controlEventHandle.bind(this);
+			this.submitHandler = this.removeHandle.bind(this);
 
 			[...elem].map((el) => el.addEventListener('click', this.eventHandler));
+
+			form.addEventListener('submit', this.submitHandler);
 		}
 
 		controlEventHandle() {
-			const elem = document.querySelector('#mass_update_macros');
+			const elem = document.getElementById('mass_update_macros');
 			const value = elem.querySelector('input:checked').value;
-			const macro_table = document.querySelector('#tbl_macros');
+			const macro_table = document.getElementById('tbl_macros');
 
 			macro_table.style.display = 'table';
 
@@ -169,10 +141,44 @@
 			document.querySelector('[data-type=\'' + type + '\']').style.display = 'block';
 		}
 
+		isMacrosTab() {
+			return document.getElementById('visible_macros').checked;
+		}
+
+		removeHandle(event) {
+			if (!this.isMacrosTab()) {
+				return true;
+			}
+
+			const checkbox_state = document.getElementById('macros_remove_all').checked;
+			const is_remove_block = document.querySelector('[name=mass_update_macros]:checked').value == <?= ZBX_ACTION_REMOVE_ALL ?>;
+
+			if (is_remove_block && !checkbox_state) {
+				event.preventDefault();
+
+				overlayDialogue({
+					'title': <?= json_encode(_('Warning')) ?>,
+					'type': 'popup',
+					'class': 'modal-popup modal-popup-medium',
+					'content': jQuery('<span>').text(<?= json_encode(_('Please confirm your action.')) ?>),
+					'buttons': [
+						{
+							'title': <?= json_encode(_('Ok')) ?>,
+							'focused': true,
+							'action': () => {}
+						}
+					]
+				}, event.currentTarget);
+			}
+		}
+
 		destroy() {
 			const elem = document.querySelectorAll('[name=mass_update_macros]');
+			const form = document.getElementById('mass_update_macros').closest('form');
 
 			[...elem].map((el) => el.removeEventListener('click', this.eventHandler));
+
+			form.removeEventListener('submit', this.submitHandler);
 		}
 	}
 
