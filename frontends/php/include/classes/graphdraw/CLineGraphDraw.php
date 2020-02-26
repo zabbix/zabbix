@@ -1172,19 +1172,51 @@ class CLineGraphDraw extends CGraphDraw {
 				);
 			}
 
-			$rows = [
-				['value' => $this->m_minY[$side], 'decimals' => null, 'draw_line' => false],
-				['value' => $this->m_maxY[$side], 'decimals' => null, 'draw_line' => $side_index == 0]
-			];
-
 			$power = (int) max(0,
 				floor(log(abs($this->m_minY[$side]), $unit_base)),
 				floor(log(abs($this->m_maxY[$side]), $unit_base))
 			);
 
-			$decimals = min(getNumDecimals($this->intervals[$side] / pow($unit_base, $power)),
-				$power > 0 ? ZBX_UNITS_ROUNDOFF_SUFFIXED : ZBX_UNITS_ROUNDOFF_UNSUFFIXED
-			);
+			if ($power == 0) {
+				if (abs($this->intervals[$side]) < 1) {
+					$precision = $units === '' ? 9 : max(2, 8 - mb_strlen($units));
+
+					if ($this->m_minY[$side] < 0) {
+						$precision--;
+					}
+
+					$precision_required = 1 - floor(log10(abs($this->intervals[$side])));
+
+					if ($precision_required > $precision) {
+						$precision = 2;
+						$decimals = 1;
+						$exact_decimals = false;
+					}
+					else {
+						$decimals = min($precision - 1, getNumDecimals($this->intervals[$side]));
+						$exact_decimals = true;
+					}
+				}
+				else {
+					$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED + 1;
+					$decimals = min($precision - 1, getNumDecimals($this->intervals[$side]));
+					$exact_decimals = true;
+				}
+			}
+			else {
+				if ($power > 8) {
+					$power = 0;
+				}
+
+				$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED + 1;
+				$decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED;
+				$exact_decimals = true;
+			}
+
+			$rows = [
+				['value' => $this->m_minY[$side], 'draw_line' => false],
+				['value' => $this->m_maxY[$side], 'draw_line' => $side_index == 0]
+			];
 
 			$clearance = 0.5;
 			for ($row_index = 0;; $row_index++) {
@@ -1195,11 +1227,7 @@ class CLineGraphDraw extends CGraphDraw {
 					break;
 				}
 
-				$rows[] = [
-					'value' => $value,
-					'decimals' => $decimals,
-					'draw_line' => $side_index == 0
-				];
+				$rows[] = ['value' => $value, 'draw_line' => $side_index == 0];
 			}
 
 			$ignore_milliseconds = $this->m_minY[$side] <= 1 || $this->m_maxY[$side] >= 1;
@@ -1214,9 +1242,9 @@ class CLineGraphDraw extends CGraphDraw {
 					'convert' => ITEM_CONVERT_NO_UNITS,
 					'power' => $power,
 					'ignore_milliseconds' => $ignore_milliseconds,
-					'precision' => 5,
-					'decimals' => $row['decimals'],
-					'exact_decimals' => true
+					'precision' => $precision,
+					'decimals' => $decimals,
+					'exact_decimals' => $exact_decimals
 				]);
 
 				$pos_X = ($side == GRAPH_YAXIS_SIDE_LEFT)

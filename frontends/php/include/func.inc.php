@@ -724,6 +724,10 @@ function convertUnits(array $options) {
 		$unit_prefix = $power_table[$options['power']]['prefix'];
 		$unit_divisor = $power_table[$options['power']]['divisor'][$unit_base];
 	}
+	else {
+		$unit_prefix = $power_table[8]['prefix'];
+		$unit_divisor = $power_table[8]['divisor'][$unit_base];
+	}
 
 	$result_value = $value / $unit_divisor;
 	$result_units = $unit_prefix.$units;
@@ -1371,15 +1375,20 @@ function formatFloat(string $number, ?int $precision, ?int $decimals, bool $exac
 		$precision = PHP_FLOAT_DIG;
 	}
 
+	$exponent = floor(log10(abs($number)));
+
+	if ($decimals !== null) {
+		if ($exact_decimals || $exponent >= 0) {
+			$number = round($number, $decimals);
+		}
+		elseif ($decimals - $exponent <= $precision && $decimals > $exponent) {
+			$number = round($number, $decimals - $exponent - 1);
+		}
+	}
+
 	// Trim extra precision.
 	$number = sprintf('%.'.($precision - 1).'E', $number);
 	[$mantissa, $exponent] = explode('E', $number);
-
-	// Trim extra precision even more for too small numbers.
-	if ($exponent < 0 && $decimals !== null && $decimals <= $precision) {
-		$number = sprintf('%.'.$decimals.'E', $number);
-		[$mantissa, $exponent] = explode('E', $number);
-	}
 
 	$significants = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
 

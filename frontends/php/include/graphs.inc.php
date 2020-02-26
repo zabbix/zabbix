@@ -874,17 +874,22 @@ function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_
 				$base_interval = pow(10, $base) * $multiplier;
 				if ($base_interval != 0 && $base_interval != INF && $base_interval != -INF) {
 					$base_intervals['1000'][] = $base_interval;
+
+					if ($base_interval < 1) {
+						$base_intervals['1024'][] = $base_interval;
+					}
 				}
 			}
 		}
-		sort($base_intervals['1000']);
 
-		for ($range = floor(log(PHP_FLOAT_MAX, 2)), $base = -$range; $base <= $range; $base++) {
+		for ($range = floor(log(PHP_FLOAT_MAX, 2)), $base = 0; $base <= $range; $base++) {
 			$base_interval = pow(2, $base);
-			if ($base_interval != 0 && $base_interval != INF && $base_interval != -INF) {
+			if ($base_interval != INF && $base_interval != -INF) {
 				$base_intervals['1024'][] = $base_interval;
 			}
 		}
+
+		sort($base_intervals['1000']);
 		sort($base_intervals['1024']);
 	}
 
@@ -892,22 +897,27 @@ function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_
 	$scale_max = $data_max;
 
 	if ($scale_min >= $scale_max) {
-		if ($calc_min) {
-			$scale_min = $scale_min > 0
-				? 0
-				: ($scale_max == 0)
-					? -1
-					: ($scale_max > 0) ? $scale_max * 0.8 : $scale_max * 1.25;
-		}
-		elseif ($calc_max) {
-			$scale_max = ($scale_min < 0)
-				? 0
-				: ($scale_min == 0)
-					? 1
-					: ($scale_min < 0) ? $scale_min * 0.8 : $scale_min * 1.25;
+		if ($scale_max > 0) {
+			if ($calc_min) {
+				$scale_min = ($scale_max > 0) ? 0 : ($scale_max == 0) ? -1 : $scale_max * 1.25;
+			}
+			elseif ($calc_max) {
+				$scale_max = ($scale_min < 0) ? 0 : ($scale_min == 0) ? 1 : $scale_min * 0.25;
+			}
+			else {
+				return false;
+			}
 		}
 		else {
-			return false;
+			if ($calc_max) {
+				$scale_max = ($scale_min < 0) ? 0 : ($scale_min == 0) ? 1 : $scale_min * 1.25;
+			}
+			elseif ($calc_min) {
+				$scale_min = ($scale_max > 0) ? 0 : ($scale_max == 0) ? -1 : $scale_max * 1.25;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 

@@ -652,14 +652,45 @@ class CSvgGraph extends CSvg {
 
 		$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
 
-		$power = (int) max(0,
+		$power = (int) min(8, max(0,
 			floor(log(abs($min), $unit_base)),
 			floor(log(abs($max), $unit_base))
-		);
+		));
 
-		$decimals = min(getNumDecimals($interval / pow($unit_base, $power)),
-			$power > 0 ? ZBX_UNITS_ROUNDOFF_SUFFIXED : ZBX_UNITS_ROUNDOFF_UNSUFFIXED
-		);
+		if ($power == 0) {
+			if (abs($interval) < 1) {
+				$precision = $units === '' ? 14 : min(14, max(2, 17 - mb_strlen($units)));
+
+				if ($min < 0) {
+					$precision--;
+				}
+
+				$precision_required = 1 - floor(log10(abs($interval)));
+
+				if ($precision_required > $precision) {
+					$decimals = null;
+					$exact_decimals = false;
+				}
+				else {
+					$decimals = min($precision - 1, getNumDecimals($interval));
+					$exact_decimals = true;
+				}
+			}
+			else {
+				$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED + 1;
+				$decimals = min($precision - 1, getNumDecimals($interval));
+				$exact_decimals = true;
+			}
+		}
+		else {
+			if ($power > 8) {
+				$power = 8;
+			}
+
+			$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED + 1;
+			$decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED;
+			$exact_decimals = true;
+		}
 
 		$rows = $this->getValueGrid($min, $max, $interval);
 
@@ -677,8 +708,9 @@ class CSvgGraph extends CSvg {
 				'convert' => ITEM_CONVERT_NO_UNITS,
 				'power' => $power,
 				'ignore_milliseconds' => $ignore_milliseconds,
-				'decimals' => ($value == $min || $value == $max) ? null : $decimals,
-				'exact_decimals' => true
+				'precision' => $precision,
+				'decimals' => $decimals,
+				'exact_decimals' => $exact_decimals
 			]);
 		}
 
