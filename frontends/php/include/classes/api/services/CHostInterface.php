@@ -393,6 +393,8 @@ class CHostInterface extends CApiService {
 
 			$this->checkSnmpCommunity($interface);
 
+			$this->checkSnmpPrivPhrase($interface);
+
 			$this->checkSnmpBulk($interface);
 		}
 		unset($interface);
@@ -655,7 +657,7 @@ class CHostInterface extends CApiService {
 			}
 
 			if ($interfacesToDelete) {
-				$this->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
+				$this->delete(array_column($interfacesToDelete, 'interfaceid'));
 			}
 
 			if ($interfacesToUpdate) {
@@ -673,7 +675,7 @@ class CHostInterface extends CApiService {
 				unset($interface);
 			}
 
-			return ['interfaceids' => zbx_objectValues($host['interfaces'], 'interfaceid')];
+			return ['interfaceids' => array_column($host['interfaces'], 'interfaceid')];
 		}
 
 		return ['interfaceids' => []];
@@ -960,6 +962,22 @@ class CHostInterface extends CApiService {
 		if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
 				&& (!array_key_exists('community', $interface['details'])
 					|| $interface['details']['community'] === '')) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
+		}
+	}
+
+	/**
+	 * Check SNMP privacy passphrase. For SNMPv3 it required.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if field value is incorrect.
+	 */
+	protected function checkSnmpPrivPhrase(array $interface) {
+		if ($interface['details']['version'] == SNMP_V3
+				&& $interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+				&& (!array_key_exists('privpassphrase', $interface['details'])
+					|| $interface['details']['privpassphrase'] === '')) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
 		}
 	}
