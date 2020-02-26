@@ -132,11 +132,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 						->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 				)
 				->addRow(_('Severity'),
-					(new CCheckBoxList('filter_severities'))
-						->setOptions($severities)
-						->setChecked($data['filter']['severities'])
-						->addClass(ZBX_STYLE_COLUMNS)
-						->addClass(ZBX_STYLE_COLUMNS_3)
+					(new CSeverityCheckBoxList('filter_severities'))->setChecked($data['filter']['severities'])
 				),
 			(new CFormList())
 				->addRow(
