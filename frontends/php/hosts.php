@@ -1004,6 +1004,13 @@ if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || ha
 		'groups' => getRequest('groups', []),
 		'tags' => $tags,
 		'macros' => $macros,
+		'macros_checkbox' => [
+			ZBX_ACTION_ADD => getRequest('macros_add', '0'),
+			ZBX_ACTION_REPLACE => getRequest('macros_update', '0'),
+			ZBX_ACTION_REMOVE => getRequest('macros_remove', '0'),
+			ZBX_ACTION_REMOVE_ALL => getRequest('macros_remove_all', '0')
+		],
+		'macros_visible' => getRequest('mass_update_macros', ZBX_ACTION_ADD),
 		'status' => getRequest('status', HOST_STATUS_MONITORED),
 		'description' => getRequest('description'),
 		'proxy_hostid' => getRequest('proxy_hostid', ''),

@@ -107,6 +107,9 @@
 			[...elem].map((el) => el.addEventListener('click', this.eventHandler));
 
 			form.addEventListener('submit', this.submitHandler);
+
+			// If form updated select proper checkbox blocks.
+			this.eventHandler();
 		}
 
 		controlEventHandle() {

@@ -160,9 +160,10 @@ $tabs = (new CTabView())
 
 // Macros.
 $tabs->addTab('macros_tab', _('Macros'), new CPartial('massupdate.macros.tab', [
-	'source' => 'template',
 	'visible' => $data['visible'],
-	'macros' => $data['macros']
+	'macros' => $data['macros'],
+	'macros_checkbox' => $data['macros_checkbox'],
+	'macros_visible' => $data['macros_visible']
 ]));
 
 // Reset tabs when opening the form for the first time.

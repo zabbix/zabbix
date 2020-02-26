@@ -69,20 +69,36 @@ $table->setFooter(new CCol(
 		->addClass('element-table-add')
 ));
 
-$checkbox_add = (new CDiv((new CCheckBox('macros_add'))->setLabel(_('Update existing'))))
+$checkbox_add = (new CDiv(
+	(new CCheckBox('macros_add'))
+		->setLabel(_('Update existing'))
+		->setChecked($data['macros_checkbox'][ZBX_ACTION_ADD])
+))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_ADD)
 	->addStyle('display: block;');
 
-$checkbox_update = (new CDiv((new CCheckBox('macros_update'))->setLabel(_('Add missing'))))
+$checkbox_update = (new CDiv(
+	(new CCheckBox('macros_update'))
+		->setLabel(_('Add missing'))
+		->setChecked($data['macros_checkbox'][ZBX_ACTION_REPLACE])
+))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_REPLACE);
 
-$checkbox_remove = (new CDiv((new CCheckBox('macros_remove'))->setLabel(_('Except selected'))))
+$checkbox_remove = (new CDiv(
+	(new CCheckBox('macros_remove'))
+		->setLabel(_('Except selected'))
+		->setChecked($data['macros_checkbox'][ZBX_ACTION_REMOVE])
+))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_REMOVE);
 
-$checkbox_remove_all = (new CDiv((new CCheckBox('macros_remove_all'))->setLabel(_('I confirm to remove all macros'))))
+$checkbox_remove_all = (new CDiv(
+	(new CCheckBox('macros_remove_all'))
+		->setLabel(_('I confirm to remove all macros'))
+		->setChecked($data['macros_checkbox'][ZBX_ACTION_REMOVE_ALL])
+))
 	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
 	->setAttribute('data-type', ZBX_ACTION_REMOVE_ALL);
 
@@ -92,7 +108,7 @@ $form_list = (new CFormList('macros-form-list'))
 			->setLabel(_('Macros'))
 			->setChecked(array_key_exists('macros', $data['visible'])),
 		(new CDiv([
-			(new CRadioButtonList('mass_update_macros', ZBX_ACTION_ADD))
+			(new CRadioButtonList('mass_update_macros', (int) $data['macros_visible']))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
 				->addValue(_('Update'), ZBX_ACTION_REPLACE)
 				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
