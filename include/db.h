@@ -251,6 +251,12 @@ struct	_DC_TRIGGER;
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
+#ifdef HAVE_ORACLE
+#	define ZBX_DB_FS_DBL64_SQL	ZBX_FS_DBL64 "d"
+#else
+#	define ZBX_DB_FS_DBL64_SQL	ZBX_FS_DBL64
+#endif
+
 typedef struct
 {
 	zbx_uint64_t	druleid;
