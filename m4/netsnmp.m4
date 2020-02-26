@@ -77,7 +77,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 			netsnmp_version_check=`expr $netsnmp_version_number \>\= $netsnmp_version_req_number`
 
 			if test "$netsnmp_version_check" != "1"; then
-				AC_MSG_RESULT([no])
+				AC_MSG_ERROR([Net-SNMP version mismatch])
 			else
 				AC_MSG_RESULT([yes])
 			fi

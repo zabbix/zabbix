@@ -1528,10 +1528,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		if test "x$found_netsnmp" != "xyes"; then
 			AC_MSG_ERROR([Invalid Net-SNMP directory - unable to find net-snmp-config])
 		else
-			if test "$netsnmp_version_check" != "1"; then
-				AC_MSG_ERROR([Net-SNMP version mismatch])
-			fi
-
 			have_snmp="yes"
 		fi
 	fi
