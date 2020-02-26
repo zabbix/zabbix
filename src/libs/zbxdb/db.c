@@ -390,7 +390,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		exit(EXIT_FAILURE);
 	}
 
-
 	if (NULL != tls_connect)
 	{
 		unsigned int	mysql_tls_mode;
