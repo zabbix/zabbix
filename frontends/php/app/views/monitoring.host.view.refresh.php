@@ -20,7 +20,7 @@
 
 
 $output = [
-	'body' => (new CView('monitoring.host.view.html', $data))->getOutput()
+	'body' => (new CPartial('monitoring.host.view.html', $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

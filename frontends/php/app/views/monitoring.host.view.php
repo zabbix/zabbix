@@ -25,15 +25,16 @@
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
 
-$this->includeJSfile('app/views/monitoring.host.view.js.php');
+$this->includeJsFile('monitoring.host.view.js.php');
 
-$web_layout_mode = CView::getLayoutMode();
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
-		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen'))))
+		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -166,12 +167,12 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	);
 }
 
-$widget->addItem((new CView('monitoring.host.view.html', array_intersect_key($data, array_flip([
+$widget->addItem(new CPartial('monitoring.host.view.html', array_intersect_key($data, array_flip([
 	'filter', 'sort', 'sortorder', 'view_curl', 'hosts', 'config', 'maintenances', 'paging'
-]))))->getOutput());
+]))));
 
 $widget->show();
 
-$this->addPostJS('jQuery(function($) {'.
-	'host_page.start();'.
-'});');
+(new CScriptTag('host_page.start();'))
+	->setOnDocumentReady()
+	->show();

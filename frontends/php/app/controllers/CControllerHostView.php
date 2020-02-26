@@ -201,8 +201,6 @@ class CControllerHostView extends CControllerHost {
 			'active_tab' => $active_tab
 		] + $prepared_data;
 
-		CView::$has_web_layout_mode = true;
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Hosts'));
 		$this->setResponse($response);
