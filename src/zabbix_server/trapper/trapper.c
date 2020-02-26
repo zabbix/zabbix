@@ -1341,6 +1341,13 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+#ifdef HAVE_NETSNMP
+		if (1 == snmp_cache_reload_requested)
+		{
+			zbx_clear_cache_snmp();
+			snmp_cache_reload_requested = 0;
+		}
+#endif
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
 
@@ -1351,14 +1358,6 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		/* the data. */
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED);
 		zbx_update_env(zbx_time());
-
-#ifdef HAVE_NETSNMP
-		if (1 == snmp_cache_reload_requested)
-		{
-			zbx_clear_cache_snmp();
-			snmp_cache_reload_requested = 0;
-		}
-#endif
 
 		if (SUCCEED == ret)
 		{
