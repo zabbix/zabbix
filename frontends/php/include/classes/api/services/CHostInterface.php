@@ -407,7 +407,7 @@ class CHostInterface extends CApiService {
 	 */
 	protected function createSnmpInterfaceDetails(array $interfaces) {
 		if (count($interfaces)) {
-			if (count(zbx_objectValues($interfaces, 'interfaceid')) != count($interfaces)) {
+			if (count(array_column($interfaces, 'interfaceid')) != count($interfaces)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
 			}
 
@@ -420,16 +420,20 @@ class CHostInterface extends CApiService {
 	/**
 	 * Add interfaces.
 	 *
-	 * @param array $interfaces multidimensional array with Interfaces data
+	 * @param array $interfaces          multidimensional array with Interfaces data
+	 * @param bool  $checkMainInterface  check main interface
 	 *
 	 * @return array
 	 */
-	public function create(array $interfaces) {
+	public function create(array $interfaces, bool $checkMainInterface = true) {
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
-		$this->checkMainInterfacesOnCreate($interfaces);
 		$this->checkSnmpInput($interfaces);
+
+		if ($checkMainInterface) {
+			$this->checkMainInterfacesOnCreate($interfaces);
+		}
 
 		$interfaceIds = DB::insert('interface', $interfaces);
 
@@ -448,15 +452,19 @@ class CHostInterface extends CApiService {
 	/**
 	 * Update interfaces.
 	 *
-	 * @param array $interfaces multidimensional array with Interfaces data
+	 * @param array $interfaces          multidimensional array with Interfaces data
+	 * @param bool  $checkMainInterface  check main interface
 	 *
 	 * @return array
 	 */
-	public function update(array $interfaces) {
+	public function update(array $interfaces, bool $checkMainInterface = true) {
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
-		$this->checkMainInterfacesOnUpdate($interfaces);
+
+		if ($checkMainInterface) {
+			$this->checkMainInterfacesOnUpdate($interfaces);
+		}
 
 		$data = [];
 		foreach ($interfaces as $interface) {
@@ -470,11 +478,11 @@ class CHostInterface extends CApiService {
 
 		$db_interfaces = $this->get([
 			'output' => ['details'],
-			'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
+			'interfaceids' => array_column($interfaces, 'interfaceid'),
 			'filter' => ['type' => INTERFACE_TYPE_SNMP],
 			'preservekeys' => true
 		]);
-		DB::delete('interface_snmp', ['interfaceid' => zbx_objectValues($interfaces, 'interfaceid')]);
+		DB::delete('interface_snmp', ['interfaceid' => array_column($interfaces, 'interfaceid')]);
 
 		$snmp_data = [];
 		foreach ($interfaces as $interface) {
@@ -483,18 +491,18 @@ class CHostInterface extends CApiService {
 				continue;
 			}
 
-			$snmp_data[] = ['type' => INTERFACE_TYPE_SNMP, 'details' => $interface['details'] + $db_interfaces[$interface['interfaceid']]['details']]
-				+ $db_interfaces[$interface['interfaceid']];
+			$snmp_data[] = ['type' => INTERFACE_TYPE_SNMP, 'details' => $interface['details']
+				+ $db_interfaces[$interface['interfaceid']]['details']] + $db_interfaces[$interface['interfaceid']
+			];
 		}
 
 		$this->checkSnmpInput($snmp_data);
 
-		foreach ($snmp_data as &$interface) {
+		foreach ($snmp_data as $interface) {
 			$this->createSnmpInterfaceDetails([$interface['details'] + ['interfaceid' => $interface['interfaceid']]]);
 		}
-		unset($interface);
 
-		return ['interfaceids' => zbx_objectValues($interfaces, 'interfaceid')];
+		return ['interfaceids' => array_column($interfaces, 'interfaceid')];
 	}
 
 	/**
@@ -634,38 +642,34 @@ class CHostInterface extends CApiService {
 
 			$this->checkHostInterfaces($host['interfaces'], $host['hostid']);
 
-			$interfacesToDelete = $this->get([
+			$interfaces_delete = $this->get([
 				'output' => [],
 				'hostids' => $host['hostid'],
 				'preservekeys' => true,
 				'nopermissions' => true
 			]);
 
-			$interfacesToAdd = [];
-			$interfacesToUpdate = [];
+			$interfaces_add = [];
+			$interfaces_update = [];
 
 			foreach ($host['interfaces'] as $interface) {
 				$interface['hostid'] = $host['hostid'];
 
 				if (!isset($interface['interfaceid'])) {
-					$interfacesToAdd[] = $interface;
+					$interfaces_add[] = $interface;
 				}
-				elseif (isset($interfacesToDelete[$interface['interfaceid']])) {
-					$interfacesToUpdate[] = $interface;
-					unset($interfacesToDelete[$interface['interfaceid']]);
+				elseif (isset($interfaces_delete[$interface['interfaceid']])) {
+					$interfaces_update[] = $interface;
+					unset($interfaces_delete[$interface['interfaceid']]);
 				}
 			}
 
-			if ($interfacesToDelete) {
-				$this->delete(array_column($interfacesToDelete, 'interfaceid'));
+			if ($interfaces_update) {
+				$this->update($interfaces_update, false);
 			}
 
-			if ($interfacesToUpdate) {
-				$this->update($interfacesToUpdate);
-			}
-
-			if ($interfacesToAdd) {
-				$interfaceids = $this->create($interfacesToAdd);
+			if ($interfaces_add) {
+				$interfaceids = $this->create($interfaces_add, false);
 
 				foreach ($host['interfaces'] as &$interface) {
 					if (!array_key_exists('interfaceid', $interface)) {
@@ -673,6 +677,10 @@ class CHostInterface extends CApiService {
 					}
 				}
 				unset($interface);
+			}
+
+			if ($interfaces_delete) {
+				$this->delete(array_column($interfaces_delete, 'interfaceid'));
 			}
 
 			return ['interfaceids' => array_column($host['interfaces'], 'interfaceid')];
