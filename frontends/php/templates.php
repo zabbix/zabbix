@@ -420,11 +420,11 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 						if ($macros && $template['macros']) {
 							$except_selected = getRequest('macros_remove', 0);
 
-							$macros = array_column($macros, 'macro');
+							$macro_names = array_column($macros, 'macro');
 
 							foreach ($template['macros'] as $key => $value) {
-								if (($except_selected && !in_array($value['macro'], $macros))
-										|| (!$except_selected && in_array($value['macro'], $macros))) {
+								if (($except_selected && !in_array($value['macro'], $macro_names))
+										|| (!$except_selected && in_array($value['macro'], $macro_names))) {
 									unset($template['macros'][$key]);
 								}
 							}
