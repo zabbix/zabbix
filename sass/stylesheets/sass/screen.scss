@@ -7882,10 +7882,14 @@ table.preprocessing-test-results {
 }
 
 #tbl_macros.massupdate-remove {
-	td, th {
+	th,
+	td {
 		display: none;
 	}
-	td:nth-child(1), th:nth-child(1), td.nowrap {
+
+	th:nth-child(1),
+	td:nth-child(1),
+	td.nowrap {
 		display: table-cell;
 	}
 }
