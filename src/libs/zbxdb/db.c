@@ -388,8 +388,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
 		exit(EXIT_FAILURE);
 	}
-#ifdef LIBMYSQL_VERSION_ID
-#if LIBMYSQL_VERSION_ID >= 50700
+#if defined(HAVE_MYSQL_TLS)
 	if (NULL != tls_connect)
 	{
 		unsigned int	mysql_tls_mode;
@@ -431,14 +430,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
 		ret = ZBX_DB_FAIL;
 	}
-#else
-	ZBX_UNUSED(tls_connect);
-	ZBX_UNUSED(cert);
-	ZBX_UNUSED(key);
-	ZBX_UNUSED(ca);
-	ZBX_UNUSED(cipher);
-#endif
-#if LIBMYSQL_VERSION_ID >= 80016
+#if defined(HAVE_MYSQL_TLS_CIPHERSUITES)
 	if (ZBX_DB_OK == ret && NULL != cipher_13 && 0 != mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_TLS_CIPHERSUITES option.");
@@ -447,8 +439,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #else
 	ZBX_UNUSED(cipher_13);
 #endif
-#endif
-#if MARIADB_VERSION_ID >= 100100
+#elif defined(HAVE_MARIADB_TLS)
+	ZBX_UNUSED(cipher_13);
+
 	if (NULL != tls_connect && 0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 	{
 		my_bool	enforce_tls = 1;
@@ -458,7 +451,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			ret = ZBX_DB_FAIL;
 		}
 	}
-	else if (NULL != tls_connect && 0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT))
+	else
 	{
 		my_bool	verify = 1;
 		if (0 != mysql_optionsv(conn, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, (void *)&verify))
@@ -466,11 +459,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_VERIFY_SERVER_CERT option.");
 			ret = ZBX_DB_FAIL;
 		}
-	}
-	else if (NULL != tls_connect)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Unknown \"DBTLSConnect\" value");
-		ret = ZBX_DB_FAIL;
 	}
 
 	if (ZBX_DB_OK == ret && NULL != ca && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CA, ca))
@@ -496,6 +484,13 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
 		ret = ZBX_DB_FAIL;
 	}
+#else
+	ZBX_UNUSED(tls_connect);
+	ZBX_UNUSED(cert);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(ca);
+	ZBX_UNUSED(cipher);
+	ZBX_UNUSED(cipher_13);
 #endif
 	if (ZBX_DB_OK == ret &&
 			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
