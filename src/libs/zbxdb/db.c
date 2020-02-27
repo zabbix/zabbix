@@ -394,9 +394,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		unsigned int	mysql_tls_mode;
 
-		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_PREFERRED_TXT))
-			mysql_tls_mode = SSL_MODE_PREFERRED;
-		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 			mysql_tls_mode = SSL_MODE_REQUIRED;
 		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 			mysql_tls_mode = SSL_MODE_VERIFY_CA;
@@ -647,9 +645,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		keywords[i] = "sslmode";
 
-		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_PREFERRED_TXT))
-			values[i++] = "prefer";
-		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 			values[i++] = "require";
 		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 			values[i++] = "verify-ca";
