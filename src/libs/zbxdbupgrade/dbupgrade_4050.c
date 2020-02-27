@@ -604,6 +604,59 @@ static int	DBpatch_4050035(void)
 	return DBadd_foreign_key("task_result", 1, &field);
 }
 
+static int	DBpatch_4050036(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	profileid, userid, idx2;
+	int		ret = SUCCEED, res, i, k, value_int;
+	char		*idx;
+
+	const char	*profiles[] = {
+			"web.problem.filter.severity",
+			"web.problem.filter.severities"
+		};
+
+	result = DBselect(
+			"select profileid,userid,idx,idx2,value_int"
+			" from profiles p", 
+			" where where idx='%s'", profiles[0]);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(profileid, row[0]);
+		ZBX_DBROW2UINT64(userid, row[1]);
+		idx = DBdyn_escape_string(row[2]);
+		idx2 = 0;
+		value_int = atoi(row[3]);
+
+		res = DBexecute("update profiles set idx='%s'"
+				" where profileid=" ZBX_FS_UI64, profiles[1], profileid);
+
+		if (ZBX_DB_OK > res)
+		{
+			ret = FAIL;
+			break;
+		}
+
+		for (k = value_int + 1; k < 6; k++)
+		{
+			if (ZBX_DB_OK > DBexecute("insert into profiles (userid,idx,idx2,value_id,value_int,type)"
+					" values (" ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",0,%d,2)",
+					userid, idx, ++idx2, k))
+			{
+				ret = FAIL;
+				break;
+			}
+		}
+		zbx_free(idx);
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -641,6 +694,7 @@ DBPATCH_ADD(4050032, 0, 1)
 DBPATCH_ADD(4050033, 0, 1)
 DBPATCH_ADD(4050034, 0, 1)
 DBPATCH_ADD(4050035, 0, 1)
+DBPATCH_ADD(4050036, 0, 1)
 
 
 DBPATCH_END()
