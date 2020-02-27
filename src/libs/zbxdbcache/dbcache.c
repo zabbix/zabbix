@@ -496,8 +496,8 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, siz
 	trend->num += num;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "update trends set"
-			" num=%d,value_min=" ZBX_DB_FS_DBL64_SQL ",value_avg=" ZBX_DB_FS_DBL64_SQL
-			",value_max=" ZBX_DB_FS_DBL64_SQL
+			" num=%d,value_min=" ZBX_FS_DBL64_SQL ",value_avg=" ZBX_FS_DBL64_SQL
+			",value_max=" ZBX_FS_DBL64_SQL
 			" where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
 			trend->num, trend->value_min.dbl, trend->value_avg.dbl, trend->value_max.dbl,
 			trend->itemid, trend->clock);

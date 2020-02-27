@@ -1051,14 +1051,14 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YAXISMIN))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismin=" ZBX_DB_FS_DBL64_SQL, d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismin=" ZBX_FS_DBL64_SQL, d,
 						yaxismin);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YAXISMAX))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismax=" ZBX_DB_FS_DBL64_SQL, d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismax=" ZBX_FS_DBL64_SQL, d,
 						yaxismax);
 				d = ",";
 			}
@@ -1099,15 +1099,15 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_PERCENT_LEFT))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spercent_left=" ZBX_DB_FS_DBL64_SQL,
-						d, percent_left);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spercent_left=" ZBX_FS_DBL64_SQL, d,
+						percent_left);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_PERCENT_RIGHT))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"%spercent_right=" ZBX_DB_FS_DBL64_SQL, d, percent_right);
+						"%spercent_right=" ZBX_FS_DBL64_SQL, d, percent_right);
 				d = ",";
 			}
 
