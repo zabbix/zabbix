@@ -98,8 +98,8 @@ if (hasRequest('filter_set')) {
 		CProfile::update($key_prefix.'.hostgroupid', getRequest('hostgroupid', 0), PROFILE_TYPE_ID);
 	}
 	else {
-		CProfile::updateArray($key_prefix.'.groupid', getRequest('filter_groups', []), PROFILE_TYPE_ID);
-		CProfile::updateArray($key_prefix.'.hostid', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+		CProfile::updateArray($key_prefix.'.groupids', getRequest('filter_groups', []), PROFILE_TYPE_ID);
+		CProfile::updateArray($key_prefix.'.hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
 	}
 }
 elseif (hasRequest('filter_rst')) {
@@ -110,8 +110,8 @@ elseif (hasRequest('filter_rst')) {
 		CProfile::delete($key_prefix.'.hostgroupid');
 	}
 	else {
-		CProfile::deleteIdx($key_prefix.'.groupid');
-		CProfile::deleteIdx($key_prefix.'.hostid');
+		CProfile::deleteIdx($key_prefix.'.groupids');
+		CProfile::deleteIdx($key_prefix.'.hostids');
 	}
 }
 
@@ -124,8 +124,8 @@ $data['filter'] = ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE)
 		'hostgroupid' => getRequest('hostgroupid', CProfile::get($key_prefix.'.hostgroupid', 0)) // 'Host group' field.
 	]
 	: [
-		'groups' => CProfile::getArray($key_prefix.'.groupid', getRequest('filter_groups', [])), // 'Host groups' field.
-		'hostids' => CProfile::getArray($key_prefix.'.hostid', getRequest('filter_hostids', [])) // 'Hosts' field.
+		'groups' => CProfile::getArray($key_prefix.'.groupids', getRequest('filter_groups', [])), // 'Host groups' field.
+		'hostids' => CProfile::getArray($key_prefix.'.hostids', getRequest('filter_hostids', [])) // 'Hosts' field.
 	];
 
 // Get time selector filter values.
