@@ -157,6 +157,7 @@ AC_DEFUN([AX_LIB_MYSQL],
 
              _save_mysql_ldflags="${LDFLAGS}"
             _save_mysql_cflags="${CFLAGS}"
+            _save_postgresql_libs="${LIBS}"
             LDFLAGS="${LDFLAGS} ${_full_libmysql_libs}"
             CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
 
@@ -190,7 +191,9 @@ AC_DEFUN([AX_LIB_MYSQL],
                 ;;
                 esac
             done
-
+            CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
+            LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS}"
+            LIBS="${LIBS} ${MYSQL_LIBS}"
             LIBMYSQL_TLS_TRY_LINK([no])
             if test "$found_mysql_tls" == "yes"; then
                 LIBMYSQL_TLS_CIPHERS_TRY_LINK([no])
@@ -200,6 +203,7 @@ AC_DEFUN([AX_LIB_MYSQL],
 
             LDFLAGS="${_save_mysql_ldflags}"
             CFLAGS="${_save_mysql_cflags}"
+            LIBS="${_save_postgresql_libs}"
             unset _save_mysql_ldflags
             unset _save_mysql_cflags
             MYSQL_VERSION=`$MYSQL_CONFIG --version`
