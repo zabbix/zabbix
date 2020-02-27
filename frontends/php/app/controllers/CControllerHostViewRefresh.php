@@ -87,7 +87,7 @@ class CControllerHostViewRefresh extends CControllerHost {
 			'dns' => $this->getInput('filter_dns', ''),
 			'port' => $this->getInput('filter_port', ''),
 			'status' => $this->getInput('filter_status', -1),
-			'evaltype' => $this->getInput('evaltpye', TAG_EVAL_TYPE_AND_OR),
+			'evaltype' => $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 			'tags' => $this->getInput('filter_tags', []),
 			'severities' => $this->getInput('filter_severities', []),
 			'show_suppressed' => $this->getInput('filter_show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
