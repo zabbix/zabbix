@@ -17,31 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package monitor
+package main
 
 import (
-	"sync"
+	"fmt"
+	"time"
+
+	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/scheduler"
 )
 
-const (
-	Input = iota
-	Scheduler
-	Output
-)
-
-var waitGroup [3]sync.WaitGroup
-
-// ServiceStarted must be called by internal services at start
-func Register(group int) {
-	waitGroup[group].Add(1)
-}
-
-// ServiceStopped must be called by internal services at exit
-func Unregister(group int) {
-	waitGroup[group].Done()
-}
-
-// WaitForServices waits until all started services are stopped
-func Wait(group int) {
-	waitGroup[group].Wait()
+func checkMetric(s scheduler.Scheduler, metric string) {
+	value, err := s.PerformTask(metric, time.Duration(agent.Options.Timeout)*time.Second)
+	if err != nil {
+		fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
+	} else {
+		fmt.Printf("%-46s[s|%s]\n", metric, value)
+	}
 }

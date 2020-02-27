@@ -458,7 +458,7 @@ func (t *mockCollectorTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *mockCollectorTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }
 
 type mockStarterTask struct {
@@ -476,7 +476,7 @@ func (t *mockStarterTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *mockStarterTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }
 
 type mockStopperTask struct {
@@ -494,7 +494,7 @@ func (t *mockStopperTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *mockStopperTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }
 
 type mockWatcherTask struct {
@@ -516,7 +516,7 @@ func (t *mockWatcherTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *mockWatcherTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }
 
 // plugin.ContextProvider interface
@@ -557,7 +557,7 @@ func (t *mockConfigerTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *mockConfigerTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }
 
 func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clientItem) {
@@ -914,7 +914,7 @@ func TestScheduleCapacity(t *testing.T) {
 	manager.mockInit(t)
 
 	p := manager.plugins["debug2"]
-	p.capacity = 2
+	p.maxCapacity = 2
 
 	items := []*clientItem{
 		&clientItem{itemid: 1, delay: "1", key: "debug1"},

@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-// performer interface is implemented by task to
+// performer interface provides common access to plugin tasks
 type performer interface {
 	// returns the task plugin
 	getPlugin() *pluginAgent

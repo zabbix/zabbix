@@ -335,7 +335,7 @@ run:
 		}
 	}
 	log.Debugf("[%d] server connector has been stopped", c.clientID)
-	monitor.Unregister()
+	monitor.Unregister(monitor.Input)
 }
 
 func (c *Connector) updateOptions(options *agent.AgentOptions) {
@@ -368,12 +368,15 @@ func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOp
 
 func (c *Connector) Start() {
 	c.resultCache.Start()
-	monitor.Register()
+	monitor.Register(monitor.Input)
 	go c.run()
 }
 
-func (c *Connector) Stop() {
+func (c *Connector) StopConnector() {
 	c.input <- nil
+}
+
+func (c *Connector) StopCache() {
 	c.resultCache.Stop()
 }
 
