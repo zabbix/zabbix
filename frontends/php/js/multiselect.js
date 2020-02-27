@@ -35,7 +35,7 @@ jQuery(function($) {
 	/**
 	 * Multi select helper.
 	 *
-	 * @param string options['objectName']		backend data source
+	 * @param string options['object_name']		backend data source
 	 * @param object options['objectOptions']	parameters to be added the request URL (optional)
 	 *
 	 * @see jQuery.multiSelect()
@@ -46,7 +46,7 @@ jQuery(function($) {
 		var curl = new Curl('jsrpc.php', false);
 		curl.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 		curl.setArgument('method', 'multiselect.get');
-		curl.setArgument('objectName', options.objectName);
+		curl.setArgument('object_name', options.object_name);
 
 		for (var key in options.objectOptions) {
 			curl.setArgument(key, options.objectOptions[key]);

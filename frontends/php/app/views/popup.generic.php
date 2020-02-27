@@ -66,23 +66,19 @@ if (array_key_exists('groups', $data['filter'])) {
 	$multiselect_options = $data['filter']['groups'];
 	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
+	$hostgroup_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Host group'), 'popup_host_group_ms'), $hostgroup_ms);
+
 	$output['script_inline'] .=
+		$hostgroup_ms->getPostJS().
 		'var overlay = overlays_stack.end();'.
 		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
-			'jQuery(ms)'.
-				'.multiSelectHelper('.json_encode($multiselect_options).')'.
-				'.on("change", {overlay: overlay}, function(e) {'.
-					'var groups = jQuery(this).multiSelect("getData").map(i => i.id),'.
-						'new_opts = jQuery.extend(e.data.overlay.options, {groupid: groups.length ? groups[0]: []});'.
-					'e.data.overlay.reload(new_opts);'.
-				'}'.
-			');'.
+			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
+				'var groups = jQuery(this).multiSelect("getData").map(i => i.id),'.
+					'new_opts = jQuery.extend(e.data.overlay.options, {groupid: groups.length ? groups[0]: []});'.
+				'e.data.overlay.reload(new_opts);'.
+			'});'.
 		'});';
-
-	$controls[] = (new CFormList())->addRow(
-		new CLabel(_('Host group'), 'popup_host_group_ms'),
-		(new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	);
 }
 
 // Add host multiselect.
@@ -90,31 +86,22 @@ if (array_key_exists('hosts', $data['filter'])) {
 	$multiselect_options = $data['filter']['hosts'];
 	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
+	$host_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	if ($multiselect_options['disabled']) {
+		$host_ms->setTitle(_('You can not switch hosts for current selection.'));
+	}
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), [$empty_btn, $host_ms]);
+
 	$output['script_inline'] .=
+		$host_ms->getPostJS().
 		'var overlay = overlays_stack.end();'.
 		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
-			'jQuery(ms)'.
-				'.multiSelectHelper('.json_encode($multiselect_options).')'.
-				'.on("change", {overlay: overlay}, function(e) {'.
-					'var hosts = jQuery(this).multiSelect("getData").map(i => i.id),'.
-						'new_opts = jQuery.extend(e.data.overlay.options, {hostid: hosts.length ? hosts[0]: []});'.
-					'e.data.overlay.reload(new_opts);'.
-				'}'.
-			');'.
+			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
+				'var hosts = jQuery(this).multiSelect("getData").map(i => i.id),'.
+					'new_opts = jQuery.extend(e.data.overlay.options, {hostid: hosts.length ? hosts[0]: []});'.
+				'e.data.overlay.reload(new_opts);'.
+			'});'.
 		'});';
-
-	$controls[] = (new CFormList())->addRow(
-		new CLabel(_('Host'), 'popup_host_ms'),
-		[
-			$empty_btn,
-			(new CMultiSelect($multiselect_options))
-				->setTitle($multiselect_options['disabled']
-					? _('You can not switch hosts for current selection.')
-					: null
-				)
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-		]
-	);
 }
 elseif ($empty_btn) {
 	$controls[] = (new CFormList())->addRow($empty_btn);

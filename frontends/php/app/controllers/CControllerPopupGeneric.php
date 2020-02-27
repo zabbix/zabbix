@@ -564,6 +564,7 @@ class CControllerPopupGeneric extends CController {
 		}
 		elseif ($this->hasInput('real_hosts')) {
 			$group_options['real_hosts'] = 1;
+			$host_options['real_hosts'] = 1;
 		}
 		elseif ($this->hasInput('templated_hosts')) {
 			$host_options['templated_hosts'] = 1;
@@ -598,9 +599,9 @@ class CControllerPopupGeneric extends CController {
 			$this->groupids = zbx_objectValues($groups, 'id');
 
 			$filter['groups'] = [
+				'multiple' => false,
 				'name' => 'popup_host_group',
 				'object_name' => 'hostGroup',
-				'objectName' => 'hostGroup',
 				'data' => array_values($groups),
 				'selectedLimit' => 1,
 				'popup' => [
@@ -609,7 +610,8 @@ class CControllerPopupGeneric extends CController {
 						'srcfld1' => 'groupid',
 						'dstfld1' => 'popup_host_group'
 					] + $group_options
-				]
+				],
+				'add_post_js' => false
 			];
 		}
 
@@ -639,9 +641,9 @@ class CControllerPopupGeneric extends CController {
 
 			$this->hostids = zbx_objectValues($hosts, 'id');
 			$filter['hosts'] = [
+				'multiple' => false,
 				'name' => 'popup_host',
-				'object_name' => 'host',
-				'objectName' => 'host',
+				'object_name' => 'hosts',
 				'data' => array_values($hosts),
 				'selectedLimit' => 1,
 				'disabled' => $this->hasInput('only_hostid'),
@@ -651,7 +653,8 @@ class CControllerPopupGeneric extends CController {
 						'srcfld1' => 'hostid',
 						'dstfld1' => 'popup_host'
 					] + $host_options
-				]
+				],
+				'add_post_js' => false
 			];
 		}
 

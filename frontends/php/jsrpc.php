@@ -122,7 +122,7 @@ switch ($data['method']) {
 	 * Create multi select data.
 	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers", "application_prototypes"
 	 *
-	 * @param string $data['objectName']
+	 * @param string $data['object_name']
 	 * @param string $data['search']
 	 * @param int    $data['limit']
 	 *
@@ -131,7 +131,7 @@ switch ($data['method']) {
 	case 'multiselect.get':
 		$config = select_config();
 
-		switch ($data['objectName']) {
+		switch ($data['object_name']) {
 			case 'hostGroup':
 				$options = [
 					'output' => ['groupid', 'name'],
@@ -215,7 +215,7 @@ switch ($data['method']) {
 					'limit' => $config['search_limit']
 				];
 
-				if ($data['objectName'] === 'item_prototypes') {
+				if ($data['object_name'] === 'item_prototypes') {
 					$records = API::ItemPrototype()->get($options);
 				}
 				else {
@@ -256,7 +256,7 @@ switch ($data['method']) {
 					'limit' => $config['search_limit']
 				];
 
-				if ($data['objectName'] === 'graph_prototypes') {
+				if ($data['object_name'] === 'graph_prototypes') {
 					$records = API::GraphPrototype()->get($options);
 				}
 				else {
@@ -505,7 +505,7 @@ switch ($data['method']) {
 		$wildcard_enabled = (strpos($search, '*') !== false);
 		$result = [];
 
-		switch ($data['objectName']) {
+		switch ($data['object_name']) {
 			case 'hosts':
 				$options = [
 					'output' => ['name'],

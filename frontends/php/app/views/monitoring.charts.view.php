@@ -79,7 +79,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 				(new CMultiSelect([
 					'multiple' => false,
 					'name' => 'filter_hostids[]',
-					'object_name' => 'host',
+					'object_name' => 'hosts',
 					'data' => $data['ms_hosts'],
 					'popup' => [
 						'parameters' => [
@@ -87,6 +87,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 							'srcfld1' => 'hostid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_hostids_',
+							'real_hosts' => true,
 							'with_graphs' => true
 						]
 					]

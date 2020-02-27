@@ -60,7 +60,7 @@ class CMultiSelect extends CTag {
 		$url = (new CUrl('jsrpc.php'))
 			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
 			->setArgument('method', static::SEARCH_METHOD)
-			->setArgument('objectName', $options['objectName']);
+			->setArgument('object_name', $options['object_name']);
 
 		if (array_key_exists('objectOptions', $options)) {
 			foreach ($options['objectOptions'] as $option_name => $option_value) {
@@ -145,7 +145,7 @@ class CMultiSelect extends CTag {
 		$mapped_options = [];
 		$mappings = [
 			'name' => 'name',
-			'object_name' => 'objectName',
+			'object_name' => 'object_name',
 			'disabled' => 'disabled',
 			'default_value' => 'defaultValue',
 			'data' => 'data',
@@ -261,12 +261,13 @@ class CMultiSelect extends CTag {
 						'with_simple_graph_item_prototypes', 'with_triggers'] as $name) {
 					if (array_key_exists($name, $parameters) && $parameters[$name]) {
 						$popup_parameters[$name] = '1';
+						$autocomplete_parameters[$name] = true;
 					}
 				}
 
 				if (array_key_exists('webitems', $parameters) && $parameters['webitems']) {
 					$popup_parameters['with_webitems'] = '1';
-					$autocomplete_parameters['webitems'] = '1';
+					$autocomplete_parameters['webitems'] = true;
 				}
 
 				if (array_key_exists('editable', $parameters) && $parameters['editable']) {
@@ -315,7 +316,7 @@ class CMultiSelect extends CTag {
 
 				if (array_key_exists('enrich_parent_groups', $parameters) && $parameters['enrich_parent_groups']) {
 					$popup_parameters['enrich_parent_groups'] = '1';
-					$autocomplete_parameters['enrich_parent_groups'] = '1';
+					$autocomplete_parameters['enrich_parent_groups'] = true;
 				}
 
 				if (array_key_exists('orig_names', $parameters) && $parameters['orig_names']) {
