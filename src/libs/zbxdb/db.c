@@ -350,7 +350,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #else
 	my_bool		mysql_reconnect = 1;
 #endif
-	ZBX_UNUSED(dbschema);
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
@@ -383,6 +382,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	txn_level = 0;
 
 #if defined(HAVE_MYSQL)
+	ZBX_UNUSED(dbschema);
+
 	if (NULL == (conn = mysql_init(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
