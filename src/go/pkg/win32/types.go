@@ -52,6 +52,8 @@ const (
 	MIB_TCP_STATE_DELETE_TCB uint32 = 12
 )
 
+type RGWSTR [ARRAY_MAX / unsafe.Sizeof(uint16(0))]uint16
+
 type GUID struct {
 	Data1 uint32
 	Data2 uint16
@@ -169,4 +171,16 @@ type PDH_FMT_COUNTERVALUE_LARGE struct {
 	Status uint32
 	_      uint32
 	Value  int64
+}
+
+type MEMORYSTATUSEX struct {
+	Length               uint32
+	MemoryLoad           uint32
+	TotalPhys            uint64
+	AvailPhys            uint64
+	TotalPageFile        uint64
+	AvailPageFile        uint64
+	TotalVirtual         uint64
+	AvailVirtual         uint64
+	AvailExtendedVirtual uint64
 }

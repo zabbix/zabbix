@@ -1,3 +1,5 @@
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,3 +20,30 @@
 **/
 
 package win32
+
+import (
+	"syscall"
+	"unsafe"
+)
+
+var (
+	hKernel32 Hlib
+
+	globalMemoryStatusEx uintptr
+)
+
+func init() {
+	hKernel32 = mustLoadLibrary("kernel32.dll")
+
+	globalMemoryStatusEx = hKernel32.mustGetProcAddress("GlobalMemoryStatusEx")
+}
+
+func GlobalMemoryStatusEx() (m *MEMORYSTATUSEX, err error) {
+	m = &MEMORYSTATUSEX{}
+	m.Length = uint32(unsafe.Sizeof(*m))
+	ret, _, syserr := syscall.Syscall(globalMemoryStatusEx, 1, uintptr(unsafe.Pointer(m)), 0, 0)
+	if ret == 0 {
+		return nil, syserr
+	}
+	return
+}
