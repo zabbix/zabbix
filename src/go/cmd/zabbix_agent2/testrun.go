@@ -17,28 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package cpucollector
-
+package main
 
 import (
-	"errors"
+	"fmt"
+	"time"
+
+	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/scheduler"
 )
 
-func (p *Plugin) collect() (err error) {
-	return errors.New("Not implemented")
-}
-
-func (p *Plugin) numCPU() int {
-	// TODO: implementation
-	return 0
-}
-
-func (p *Plugin) getStateIndex(state string) (index int, err error) {
-	switch state {
-	case "", "system":
-		index = stateSystem
-	default:
-		err = errors.New("unsupported state")
+func checkMetric(s scheduler.Scheduler, metric string) {
+	value, err := s.PerformTask(metric, time.Duration(agent.Options.Timeout)*time.Second)
+	if err != nil {
+		fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
+	} else {
+		fmt.Printf("%-46s[s|%s]\n", metric, value)
 	}
-	return 0, errors.New("Not implemented")
 }

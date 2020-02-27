@@ -48,6 +48,10 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
+#ifdef HAVE_NETSNMP
+static volatile sig_atomic_t	snmp_cache_reload_requested;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: db_host_update_availability                                      *
@@ -931,6 +935,16 @@ exit:
 	return num;
 }
 
+static void	zbx_poller_sigusr_handler(int flags)
+{
+#ifdef HAVE_NETSNMP
+	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+		snmp_cache_reload_requested = 1;
+#else
+	ZBX_UNUSED(flags);
+#endif
+}
+
 ZBX_THREAD_ENTRY(poller_thread, args)
 {
 	int		nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
@@ -962,11 +976,21 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	zbx_set_sigusr_handler(zbx_poller_sigusr_handler);
+
 	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
 
+#ifdef HAVE_NETSNMP
+		if ((ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type) &&
+				1 == snmp_cache_reload_requested)
+		{
+			zbx_clear_cache_snmp();
+			snmp_cache_reload_requested = 0;
+		}
+#endif
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",

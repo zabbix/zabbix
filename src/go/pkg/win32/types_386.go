@@ -1,3 +1,5 @@
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,3 +20,7 @@
 **/
 
 package win32
+
+const (
+	ARRAY_MAX = 1 << 31
+)

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package cpucollector
+package cpu
 
 /*
 #include <unistd.h>
@@ -27,17 +27,28 @@ import "C"
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"os"
 	"strconv"
 	"strings"
+
+	"zabbix.com/pkg/plugin"
 )
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+	cpus []*cpuUnit
+}
 
 const (
 	procStatLocation = "/proc/stat"
 )
 
-func (p *Plugin) collect() (err error) {
+func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
+}
+
+func (p *Plugin) Collect() (err error) {
 	var file *os.File
 	if file, err = os.Open(procStatLocation); err != nil {
 		return err
@@ -91,8 +102,8 @@ func (p *Plugin) collect() (err error) {
 			slot.counters[i] = 0
 		}
 		// Linux includes guest times in user and nice times
-		slot.counters[stateUser] -= slot.counters[stateGcpu]
-		slot.counters[stateNice] -= slot.counters[stateGnice]
+		slot.counters[counterUser] -= slot.counters[counterGcpu]
+		slot.counters[counterNice] -= slot.counters[counterGnice]
 
 		if cpu.tail = cpu.tail.inc(); cpu.tail == cpu.head {
 			cpu.head = cpu.head.inc()
@@ -101,34 +112,38 @@ func (p *Plugin) collect() (err error) {
 	return nil
 }
 
-func (p *Plugin) numCPU() int {
+func numCPU() int {
 	return int(C.sysconf(C._SC_NPROCESSORS_CONF))
 }
 
-func (p *Plugin) getStateIndex(state string) (index int, err error) {
-	switch state {
-	case "", "user":
-		index = stateUser
-	case "idle":
-		index = stateIdle
-	case "nice":
-		index = stateNice
-	case "system":
-		index = stateSystem
-	case "iowait":
-		index = stateIowait
-	case "interrupt":
-		index = stateIrq
-	case "softirq":
-		index = stateSoftirq
-	case "steal":
-		index = stateSteal
-	case "guest":
-		index = stateGcpu
-	case "guest_nice":
-		index = stateGnice
-	default:
-		err = errors.New("unsupported state")
+func (p *Plugin) Start() {
+	p.cpus = p.newCpus(numCPU())
+}
+
+func (p *Plugin) Stop() {
+	p.cpus = nil
+}
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if p.cpus == nil || p.cpus[0].head == p.cpus[0].tail {
+		// no data gathered yet
+		return
 	}
-	return
+	switch key {
+	case "system.cpu.discovery":
+		return p.getCpuDiscovery(params)
+	case "system.cpu.num":
+		return p.getCpuNum(params)
+	case "system.cpu.util":
+		return p.getCpuUtil(params)
+	default:
+		return nil, plugin.UnsupportedMetricError
+	}
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, pluginName,
+		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
+		"system.cpu.num", "Number of CPUs.",
+		"system.cpu.util", "CPU utilisation percentage.")
 }

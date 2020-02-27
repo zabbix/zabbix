@@ -23,6 +23,7 @@ import (
 	"container/heap"
 )
 
+// pluginHeap is a queue of agents, sorted by timestamps of their next scheduled tasks
 type pluginHeap []*pluginAgent
 
 func (h pluginHeap) Len() int {

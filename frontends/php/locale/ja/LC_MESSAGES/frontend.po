@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-17 12:04+0200\n"
-"PO-Revision-Date: 2020-02-12 00:15+0300\n"
+"POT-Creation-Date: 2020-02-21 11:12+0200\n"
+"PO-Revision-Date: 2020-02-18 04:35+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1581459313.000000\n"
+"X-POOTLE-MTIME: 1581993359.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:67
 #: include/classes/db/OracleDbBackend.php:87
@@ -276,7 +276,7 @@ msgstr "1分"
 msgid "10 seconds"
 msgstr "10秒"
 
-#: include/views/reports.toptriggers.php:117 toptriggers.php:25
+#: include/views/reports.toptriggers.php:111 toptriggers.php:25
 msgid "100 busiest triggers"
 msgstr "障害発生数上位100項目"
 
@@ -365,9 +365,9 @@ msgstr[0] "アカウントは%1$s秒間ブロックされています。"
 #: app/views/monitoring.widget.problems.view.php:68
 #: include/actions.inc.php:157 include/blocks.inc.php:753
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:908
-#: include/classes/screens/CScreenProblem.php:933
-#: include/classes/screens/CScreenProblem.php:1188 include/events.inc.php:255
+#: include/classes/screens/CScreenProblem.php:912
+#: include/classes/screens/CScreenProblem.php:937
+#: include/classes/screens/CScreenProblem.php:1192 include/events.inc.php:255
 #: include/events.inc.php:467
 msgid "Ack"
 msgstr "確認済"
@@ -511,10 +511,10 @@ msgstr "アクションを更新しました"
 #: app/views/monitoring.dashboard.view.php:89
 #: app/views/monitoring.widget.problems.view.php:69 include/blocks.inc.php:754
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:909
-#: include/classes/screens/CScreenProblem.php:934
-#: include/classes/screens/CScreenProblem.php:1189
-#: include/classes/screens/CScreenProblem.php:1250 include/events.inc.php:256
+#: include/classes/screens/CScreenProblem.php:913
+#: include/classes/screens/CScreenProblem.php:938
+#: include/classes/screens/CScreenProblem.php:1193
+#: include/classes/screens/CScreenProblem.php:1254 include/events.inc.php:256
 #: include/forms.inc.php:1249 include/menu.inc.php:123
 #: include/menu.inc.php:152 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:74
@@ -668,7 +668,7 @@ msgstr "設定有効期間の終了日時"
 #: include/views/configuration.triggers.edit.php:354
 #: include/views/configuration.triggers.edit.php:606
 #: include/views/configuration.triggers.edit.php:639
-#: include/views/configuration.triggers.list.php:133
+#: include/views/configuration.triggers.list.php:127
 #: include/views/configuration.triggers.massupdate.php:84
 #: include/views/configuration.triggers.massupdate.php:139
 #: include/views/js/configuration.action.edit.js.php:308
@@ -965,7 +965,7 @@ msgstr "And"
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.maintenance.edit.php:143
 #: include/views/configuration.template.list.php:37
-#: include/views/configuration.triggers.list.php:103
+#: include/views/configuration.triggers.list.php:97
 msgid "And/Or"
 msgstr "And/Or"
 
@@ -1517,8 +1517,8 @@ msgstr "証明書"
 #: app/views/monitoring.widget.problems.view.php:99
 #: include/classes/graph/CSvgGraph.php:1050
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:1008
-#: include/classes/screens/CScreenProblem.php:1211 include/events.inc.php:345
+#: include/classes/screens/CScreenProblem.php:1012
+#: include/classes/screens/CScreenProblem.php:1215 include/events.inc.php:345
 #: include/events.inc.php:547
 msgid "CLOSING"
 msgstr "クローズ処理中"
@@ -2500,7 +2500,7 @@ msgstr "XML: %1$sが読み込めません。"
 #: include/classes/mvc/CPartial.php:140 include/classes/mvc/CView.php:153
 #, c-format
 msgid "Cannot read file: \"%s\"."
-msgstr ""
+msgstr "ファイルが読み込めません: \"%s\"。"
 
 #: include/classes/server/CZabbixServer.php:432
 #, c-format
@@ -2514,12 +2514,12 @@ msgstr "ゲストユーザーの名前は変更できません。"
 #: include/classes/mvc/CPartial.php:112
 #, c-format
 msgid "Cannot render partial: \"%s\"."
-msgstr ""
+msgstr "部分的にレンダリングできません: \"%s\"。"
 
 #: include/classes/mvc/CView.php:125
 #, c-format
 msgid "Cannot render view: \"%s\"."
-msgstr ""
+msgstr "ビューをレンダリングできません: \"%s\"。"
 
 #: include/classes/api/services/CDRule.php:257
 #: include/classes/api/services/CDRule.php:407
@@ -3709,7 +3709,7 @@ msgstr "連絡先"
 #: include/views/configuration.maintenance.edit.php:158
 #: include/views/configuration.maintenance.edit.php:179
 #: include/views/configuration.template.list.php:50
-#: include/views/configuration.triggers.list.php:116
+#: include/views/configuration.triggers.list.php:110
 #: include/views/js/configuration.host.list.js.php:33
 #: include/views/js/configuration.maintenance.edit.js.php:33
 #: include/views/js/configuration.template.list.js.php:33
@@ -3752,7 +3752,7 @@ msgstr "含む"
 #: include/views/configuration.maintenance.list.php:44
 #: include/views/configuration.template.list.php:128
 #: include/views/configuration.trigger.prototype.list.php:35
-#: include/views/configuration.triggers.list.php:178
+#: include/views/configuration.triggers.list.php:172
 #: include/views/monitoring.charts.php:63
 #: include/views/monitoring.history.php:220
 #: include/views/monitoring.hostscreen.php:67
@@ -3801,7 +3801,7 @@ msgstr "座標"
 #: include/views/configuration.copy.elements.php:77
 #: include/views/configuration.graph.list.php:156
 #: include/views/configuration.item.list.php:252
-#: include/views/configuration.triggers.list.php:339 jsLoader.php:203
+#: include/views/configuration.triggers.list.php:333 jsLoader.php:203
 msgid "Copy"
 msgstr "コピー"
 
@@ -4031,11 +4031,11 @@ msgstr "スライドショーの作成"
 msgid "Create template"
 msgstr "テンプレートの作成"
 
-#: include/views/configuration.triggers.list.php:172 jsLoader.php:266
+#: include/views/configuration.triggers.list.php:166 jsLoader.php:266
 msgid "Create trigger"
 msgstr "トリガーの作成"
 
-#: include/views/configuration.triggers.list.php:177
+#: include/views/configuration.triggers.list.php:171
 msgid "Create trigger (select host first)"
 msgstr "トリガーの作成 (先にホストを選択)"
 
@@ -4485,7 +4485,7 @@ msgstr "遅延時間"
 #: include/views/configuration.maintenance.list.php:116
 #: include/views/configuration.template.list.php:298
 #: include/views/configuration.trigger.prototype.list.php:169
-#: include/views/configuration.triggers.list.php:341
+#: include/views/configuration.triggers.list.php:335
 #: include/views/monitoring.screen.list.php:134
 #: include/views/monitoring.slideconf.list.php:106
 #: include/views/monitoring.sysmap.list.php:105 jsLoader.php:122
@@ -4720,7 +4720,7 @@ msgstr "選択したテンプレートを削除しますか？"
 msgid "Delete selected trigger prototypes?"
 msgstr "選択したトリガーのプロトタイプを削除しますか？"
 
-#: include/views/configuration.triggers.list.php:341
+#: include/views/configuration.triggers.list.php:335
 msgid "Delete selected triggers?"
 msgstr "選択したトリガーを削除しますか？"
 
@@ -4825,7 +4825,7 @@ msgstr "依存アイテム"
 #: app/views/popup.generic.php:298 include/triggers.inc.php:2741
 #: include/views/configuration.services.edit.php:156
 #: include/views/configuration.trigger.prototype.list.php:86
-#: include/views/configuration.triggers.list.php:245
+#: include/views/configuration.triggers.list.php:239
 msgid "Depends on"
 msgstr "依存先"
 
@@ -4914,7 +4914,7 @@ msgstr "ディレクトリのサイズ(バイト単位)。整数値を返す"
 #: include/views/configuration.host.list.php:442
 #: include/views/configuration.httpconf.list.php:170
 #: include/views/configuration.item.list.php:247
-#: include/views/configuration.triggers.list.php:338
+#: include/views/configuration.triggers.list.php:332
 msgid "Disable"
 msgstr "無効"
 
@@ -4984,7 +4984,7 @@ msgstr "選択したメディアタイプを無効にしますか？"
 msgid "Disable selected modules?"
 msgstr "選択したモジュールを無効にしますか？"
 
-#: include/views/configuration.triggers.list.php:338
+#: include/views/configuration.triggers.list.php:332
 msgid "Disable selected triggers?"
 msgstr "選択したトリガーを無効にしますか？"
 
@@ -5040,7 +5040,7 @@ msgid "Discard value"
 msgstr "値を破棄"
 
 #: include/discovery.inc.php:138 include/forms.inc.php:544
-#: include/views/configuration.triggers.list.php:148
+#: include/views/configuration.triggers.list.php:142
 msgid "Discovered"
 msgstr "Discovered"
 
@@ -5397,9 +5397,9 @@ msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"のためのユーザーグループ内のusrgrpid \"%1$s\"が重複しています。"
 
 #: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:752
-#: include/classes/screens/CScreenProblem.php:907
-#: include/classes/screens/CScreenProblem.php:932
-#: include/classes/screens/CScreenProblem.php:1187 include/events.inc.php:254
+#: include/classes/screens/CScreenProblem.php:911
+#: include/classes/screens/CScreenProblem.php:936
+#: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:254
 #: include/events.inc.php:466 include/views/configuration.action.edit.php:170
 msgid "Duration"
 msgstr "継続期間"
@@ -5632,7 +5632,7 @@ msgstr "スクリーンIDが空白です。"
 #: include/views/configuration.host.list.php:441
 #: include/views/configuration.httpconf.list.php:169
 #: include/views/configuration.item.list.php:246
-#: include/views/configuration.triggers.list.php:337
+#: include/views/configuration.triggers.list.php:331
 msgid "Enable"
 msgstr "有効"
 
@@ -5720,7 +5720,7 @@ msgstr "選択したメディアタイプを有効にしますか？"
 msgid "Enable selected modules?"
 msgstr "選択したモジュールを有効にしますか？"
 
-#: include/views/configuration.triggers.list.php:337
+#: include/views/configuration.triggers.list.php:331
 msgid "Enable selected triggers?"
 msgstr "選択したトリガーを有効にしますか？"
 
@@ -5807,7 +5807,7 @@ msgstr "英語 (en_US)"
 #: include/views/configuration.maintenance.edit.php:159
 #: include/views/configuration.maintenance.edit.php:180
 #: include/views/configuration.template.list.php:51
-#: include/views/configuration.triggers.list.php:117
+#: include/views/configuration.triggers.list.php:111
 #: include/views/js/configuration.host.list.js.php:34
 #: include/views/js/configuration.maintenance.edit.js.php:34
 #: include/views/js/configuration.template.list.js.php:34
@@ -5939,7 +5939,7 @@ msgstr "WMIクエリを実行して最初の検索結果を返す。リクエス
 #: include/views/configuration.item.edit.php:970
 #: include/views/configuration.item.list.php:248
 msgid "Execute now"
-msgstr ""
+msgstr "監視データ取得"
 
 #: app/controllers/CControllerPopupGeneric.php:321
 #: app/views/administration.script.edit.php:53
@@ -6021,7 +6021,7 @@ msgstr "CSVエクスポート"
 #: include/views/configuration.triggers.edit.php:208
 #: include/views/configuration.triggers.edit.php:310
 #: include/views/configuration.triggers.edit.php:406
-#: include/views/configuration.triggers.list.php:205
+#: include/views/configuration.triggers.list.php:199
 #: include/views/js/configuration.triggers.edit.js.php:47
 #: trigger_prototypes.php:40 trigger_prototypes.php:51 triggers.php:47
 #: triggers.php:58
@@ -6276,14 +6276,14 @@ msgstr "面"
 #: include/views/configuration.httpconf.list.php:29
 #: include/views/configuration.maintenance.list.php:49
 #: include/views/configuration.template.list.php:77
-#: include/views/configuration.triggers.list.php:166
+#: include/views/configuration.triggers.list.php:160
 #: include/views/inventory.host.list.php:53
 #: include/views/monitoring.history.php:249
 #: include/views/monitoring.overview.items.php:97
 #: include/views/monitoring.screen.list.php:64
 #: include/views/monitoring.slideconf.list.php:52
 #: include/views/monitoring.sysmap.list.php:44
-#: include/views/reports.toptriggers.php:81 report2.php:452
+#: include/views/reports.toptriggers.php:75 report2.php:452
 msgid "Filter"
 msgstr "フィルター"
 
@@ -6474,16 +6474,16 @@ msgstr "Webページコンテンツ取得。テキストとしてWebページの
 
 #: app/views/popup.itemtestedit.view.php:121
 msgid "Get value"
-msgstr ""
+msgstr "値の取得"
 
 #: app/views/js/popup.itemtestedit.view.js.php:481
 #: app/views/popup.itemtestedit.view.php:273
 msgid "Get value and test"
-msgstr ""
+msgstr "値の取得とテスト"
 
 #: app/views/popup.itemtestedit.view.php:85
 msgid "Get value from host"
-msgstr ""
+msgstr "ホストから値を取得"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/triggers.inc.php:1438
@@ -6561,7 +6561,7 @@ msgstr "グラデーションライン"
 #: app/partials/monitoring.latest.view.html.php:374 charts.php:99
 #: include/audit.inc.php:30
 #: include/classes/macros/CMacrosResolverGeneral.php:848
-#: include/classes/screens/CScreenProblem.php:1324
+#: include/classes/screens/CScreenProblem.php:1328
 #: include/classes/widgets/CWidgetConfig.php:49
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
@@ -7014,7 +7014,7 @@ msgstr "行を強調表示"
 #: app/views/monitoring.acknowledge.edit.php:38
 #: app/views/monitoring.problem.view.php:100 history.php:27
 #: include/classes/macros/CMacrosResolverGeneral.php:853
-#: include/classes/screens/CScreenProblem.php:1329
+#: include/classes/screens/CScreenProblem.php:1333
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:284 include/forms.inc.php:718
@@ -7085,9 +7085,9 @@ msgstr "横位置"
 #: include/classes/screens/CScreenHostTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:185
 #: include/classes/screens/CScreenHttpTest.php:116
-#: include/classes/screens/CScreenProblem.php:903
-#: include/classes/screens/CScreenProblem.php:927
-#: include/classes/screens/CScreenProblem.php:1184
+#: include/classes/screens/CScreenProblem.php:907
+#: include/classes/screens/CScreenProblem.php:931
+#: include/classes/screens/CScreenProblem.php:1188
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:274
 #: include/classes/widgets/forms/CWidgetFormProblems.php:205
@@ -7103,7 +7103,7 @@ msgstr "横位置"
 #: include/views/configuration.httpconf.list.php:53
 #: include/views/configuration.httpconf.list.php:90
 #: include/views/configuration.item.list.php:65
-#: include/views/configuration.triggers.list.php:202
+#: include/views/configuration.triggers.list.php:196
 #: include/views/inventory.host.list.php:72
 #: include/views/inventory.host.view.php:153
 #: include/views/inventory.host.view.php:175
@@ -7113,7 +7113,7 @@ msgstr "横位置"
 #: include/views/monitoring.screen.constructor.edit.php:511
 #: include/views/monitoring.screen.php:84
 #: include/views/monitoring.slides.php:82
-#: include/views/reports.toptriggers.php:84 items.php:997 items.php:1412
+#: include/views/reports.toptriggers.php:78 items.php:997 items.php:1412
 #: jsLoader.php:187 queue.php:270 report2.php:435 report2.php:458
 msgid "Host"
 msgid_plural "Hosts"
@@ -7159,7 +7159,7 @@ msgstr "ホストを追加しました"
 #: app/controllers/CControllerPopupItemTestSend.php:161
 #: app/views/popup.itemtestedit.view.php:89
 msgid "Host address"
-msgstr ""
+msgstr "ホストのアドレス"
 
 #: include/classes/widgets/CWidgetConfig.php:42
 msgid "Host availability"
@@ -7792,7 +7792,7 @@ msgstr "アクセスできないアイテム"
 msgid "Inaccessible item prototype"
 msgstr "アクセスできないアイテムのプロトタイプ"
 
-#: include/classes/screens/CScreenProblem.php:416
+#: include/classes/screens/CScreenProblem.php:420
 #: include/hostgroups.inc.php:288 include/triggers.inc.php:2372
 #: include/views/configuration.host.list.php:242
 #: include/views/inventory.host.view.php:40
@@ -8966,8 +8966,8 @@ msgstr "インドネシア語 (id_ID)"
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
 #: include/blocks.inc.php:748 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:902
-#: include/classes/screens/CScreenProblem.php:926
+#: include/classes/screens/CScreenProblem.php:906
+#: include/classes/screens/CScreenProblem.php:930
 #: include/views/administration.auditacts.list.php:67
 #: include/views/configuration.application.list.php:71
 #: include/views/configuration.host.discovery.list.php:64
@@ -8979,7 +8979,7 @@ msgstr "インドネシア語 (id_ID)"
 #: include/views/configuration.trigger.prototype.edit.php:384
 #: include/views/configuration.triggers.edit.php:210
 #: include/views/configuration.triggers.edit.php:408
-#: include/views/configuration.triggers.list.php:207
+#: include/views/configuration.triggers.list.php:201
 msgid "Info"
 msgstr "情報"
 
@@ -8992,7 +8992,7 @@ msgstr "情報"
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "サービス情報の取得。引数がstateやstartupなら整数値を返す。引数がdisplayname、path、userなら文字列値を返す。引数がdescriptionならテキスト値を返す。具体的には引数がstateで状態が開始なら「0」、一時停止なら「１」、開始中なら「2」、一時停止中なら「3」、再開中なら「4」、停止中なら「5」、停止なら「6」、不明なら「7」、該当サービスなしなら「255」を返す。また、引数がstartupでスタートアップの種類が自動なら「0」、自動(遅延開始)なら「1」、手動なら「2」、無効なら「3」、不明なら「4」を返す。"
 
-#: include/views/configuration.triggers.list.php:141
+#: include/views/configuration.triggers.list.php:135
 msgid "Inherited"
 msgstr "継承したもの"
 
@@ -10665,13 +10665,13 @@ msgstr "選択をマーク"
 msgid "Mask"
 msgstr "マスク"
 
-#: include/classes/screens/CScreenProblem.php:1165
+#: include/classes/screens/CScreenProblem.php:1169
 #: include/views/configuration.host.list.php:452
 #: include/views/configuration.item.list.php:253
 #: include/views/configuration.item.prototype.list.php:178
 #: include/views/configuration.template.list.php:297
 #: include/views/configuration.trigger.prototype.list.php:168
-#: include/views/configuration.triggers.list.php:340
+#: include/views/configuration.triggers.list.php:334
 msgid "Mass update"
 msgstr "一括更新"
 
@@ -10892,7 +10892,7 @@ msgstr "メッセージタイプ"
 msgid "Message/Command"
 msgstr "メッセージ/コマンド"
 
-#: include/classes/screens/CScreenProblem.php:1243
+#: include/classes/screens/CScreenProblem.php:1247
 msgid "Messages"
 msgstr "メッセージ"
 
@@ -10931,7 +10931,7 @@ msgstr "PHPアップロードファイルサイズの最小値は%sです (\"upl
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
 msgid "Minimum required PHP version is %1$s."
-msgstr ""
+msgstr "最低限必要なPHPのバージョンは%1$sです。"
 
 #: include/classes/setup/CFrontendSetup.php:190
 #, c-format
@@ -10950,7 +10950,6 @@ msgstr "PHPのpostサイズの最小値は%sです (\"post_max_size\"設定オ�
 
 #: app/partials/common.filter.trigger.php:47
 #: app/views/monitoring.map.view.php:46
-#: app/views/monitoring.problem.view.php:173
 #: include/views/monitoring.sysmap.edit.php:226
 msgid "Minimum severity"
 msgstr "最小の深刻度"
@@ -11280,7 +11279,7 @@ msgstr "NTLM"
 #: include/views/configuration.triggers.edit.php:86
 #: include/views/configuration.triggers.edit.php:576
 #: include/views/configuration.triggers.list.php:62
-#: include/views/configuration.triggers.list.php:203
+#: include/views/configuration.triggers.list.php:197
 #: include/views/configuration.triggers.massupdate.php:90
 #: include/views/configuration.triggers.massupdate.php:102
 #: include/views/inventory.host.list.php:74
@@ -11421,8 +11420,8 @@ msgstr "次のステップ"
 #: app/views/popup.condition.common.php:647 include/actions.inc.php:33
 #: include/blocks.inc.php:626 include/blocks.inc.php:859
 #: include/classes/screens/CScreenHostTriggers.php:273
-#: include/classes/screens/CScreenProblem.php:1132
-#: include/classes/screens/CScreenProblem.php:1268 include/events.inc.php:179
+#: include/classes/screens/CScreenProblem.php:1136
+#: include/classes/screens/CScreenProblem.php:1272 include/events.inc.php:179
 #: include/events.inc.php:381 include/events.inc.php:606
 #: include/triggers.inc.php:1289 include/triggers.inc.php:1294
 #: include/views/configuration.host.prototype.list.php:130
@@ -11430,9 +11429,9 @@ msgstr "次のステップ"
 #: include/views/configuration.item.prototype.list.php:106
 #: include/views/configuration.trigger.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.massupdate.php:66
-#: include/views/configuration.triggers.list.php:145
-#: include/views/configuration.triggers.list.php:152
-#: include/views/configuration.triggers.list.php:159
+#: include/views/configuration.triggers.list.php:139
+#: include/views/configuration.triggers.list.php:146
+#: include/views/configuration.triggers.list.php:153
 #: include/views/configuration.triggers.massupdate.php:68
 msgid "No"
 msgstr "いいえ"
@@ -12031,7 +12030,7 @@ msgstr "なし"
 
 #: app/views/popup.generic.php:517 include/graphs.inc.php:24
 #: include/items.inc.php:158 include/triggers.inc.php:1282
-#: include/views/configuration.triggers.list.php:75
+#: include/views/configuration.triggers.list.php:69
 #: include/views/monitoring.history.php:236
 msgid "Normal"
 msgstr "ノーマル"
@@ -12192,7 +12191,7 @@ msgstr "行数"
 msgid "Number of slides"
 msgstr "スライド数"
 
-#: include/views/reports.toptriggers.php:84
+#: include/views/reports.toptriggers.php:78
 msgid "Number of status changes"
 msgstr "ステータス変更の回数"
 
@@ -12364,7 +12363,7 @@ msgstr "OFF"
 #: app/views/report.services.php:72 app/views/report.services.php:73
 #: app/views/report.services.php:74 app/views/report.services.php:75
 #: include/classes/html/CTriggersInfo.php:76
-#: include/views/configuration.triggers.list.php:89
+#: include/views/configuration.triggers.list.php:83
 #: include/views/js/common.item.edit.js.php:359
 #: include/views/js/configuration.httpconf.edit.js.php:103
 #: include/views/js/conf.import.js.php:50 report2.php:458
@@ -12555,12 +12554,12 @@ msgid "Operation type"
 msgstr "実行内容のタイプ"
 
 #: app/views/monitoring.widget.problems.view.php:66 include/blocks.inc.php:751
-#: include/classes/screens/CScreenProblem.php:930
-#: include/classes/screens/CScreenProblem.php:1186 include/events.inc.php:166
+#: include/classes/screens/CScreenProblem.php:934
+#: include/classes/screens/CScreenProblem.php:1190 include/events.inc.php:166
 #: include/views/configuration.trigger.prototype.edit.php:72
 #: include/views/configuration.trigger.prototype.list.php:56
 #: include/views/configuration.triggers.edit.php:93
-#: include/views/configuration.triggers.list.php:204
+#: include/views/configuration.triggers.list.php:198
 msgid "Operational data"
 msgstr "運用データ"
 
@@ -12623,7 +12622,7 @@ msgstr "オプション"
 #: include/views/configuration.trigger.prototype.edit.php:344
 #: include/views/configuration.triggers.edit.php:172
 #: include/views/configuration.triggers.edit.php:368
-#: include/views/configuration.triggers.list.php:104
+#: include/views/configuration.triggers.list.php:98
 msgid "Or"
 msgstr "Or"
 
@@ -12942,8 +12941,8 @@ msgstr "POP"
 #: app/views/monitoring.widget.problems.view.php:99 chart5.php:199
 #: include/classes/graph/CSvgGraph.php:1045
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:1008
-#: include/classes/screens/CScreenProblem.php:1211 include/events.inc.php:345
+#: include/classes/screens/CScreenProblem.php:1012
+#: include/classes/screens/CScreenProblem.php:1215 include/events.inc.php:345
 #: include/events.inc.php:547 include/maps.inc.php:290
 #: include/maps.inc.php:374 include/maps.inc.php:467 include/maps.inc.php:555
 #: include/triggers.inc.php:234 include/views/monitoring.overview.items.php:36
@@ -13066,12 +13065,12 @@ msgstr "パースエラー"
 #: include/classes/mvc/CPartial.php:83
 #, c-format
 msgid "Partial not found: \"%s\"."
-msgstr ""
+msgstr "一部分が見つかりません: \"%s\"。"
 
 #: include/classes/mvc/CPartial.php:87
 #, c-format
 msgid "Partial not readable: \"%s\"."
-msgstr ""
+msgstr "一部分が読み込めません: \"%s\"。"
 
 #: app/views/administration.proxy.edit.php:71
 #: app/views/administration.proxy.list.php:51
@@ -13445,10 +13444,10 @@ msgstr "特権レベル"
 #: app/views/monitoring.widget.problems.view.php:62
 #: app/views/popup.mediatype.message.php:46 include/blocks.inc.php:750
 #: include/classes/helpers/CMediatypeHelper.php:45
-#: include/classes/screens/CScreenProblem.php:905
-#: include/classes/screens/CScreenProblem.php:928
-#: include/classes/screens/CScreenProblem.php:1099
-#: include/classes/screens/CScreenProblem.php:1185
+#: include/classes/screens/CScreenProblem.php:909
+#: include/classes/screens/CScreenProblem.php:932
+#: include/classes/screens/CScreenProblem.php:1103
+#: include/classes/screens/CScreenProblem.php:1189
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:60
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:60
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
@@ -13457,8 +13456,8 @@ msgstr "特権レベル"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:369
 #: include/views/configuration.item.list.php:172
 #: include/views/configuration.trigger.prototype.list.php:134
-#: include/views/configuration.triggers.list.php:90
-#: include/views/configuration.triggers.list.php:302
+#: include/views/configuration.triggers.list.php:84
+#: include/views/configuration.triggers.list.php:296
 #: include/views/js/monitoring.sysmaps.js.php:245
 msgid "Problem"
 msgstr "障害"
@@ -13521,7 +13520,7 @@ msgstr "すべての子に障害があった場合に障害として検知"
 msgid "Problem, if at least one child has a problem"
 msgstr "子に一つでも障害があった場合に障害として検知"
 
-#: app/controllers/CControllerProblemView.php:350
+#: app/controllers/CControllerProblemView.php:338
 #: app/partials/common.filter.trigger.php:43
 #: app/views/monitoring.problem.view.php:99
 #: app/views/monitoring.problem.view.php:351 app/views/report.services.php:72
@@ -13702,8 +13701,8 @@ msgstr "プロキシごとのキュー概要"
 #: app/views/monitoring.widget.problems.view.php:85
 #: include/classes/graph/CSvgGraph.php:1041
 #: include/classes/screens/CScreenEvents.php:121
-#: include/classes/screens/CScreenProblem.php:994
-#: include/classes/screens/CScreenProblem.php:1199 include/events.inc.php:350
+#: include/classes/screens/CScreenProblem.php:998
+#: include/classes/screens/CScreenProblem.php:1203 include/events.inc.php:350
 #: include/events.inc.php:533
 msgid "RESOLVED"
 msgstr "解決済"
@@ -13793,10 +13792,10 @@ msgid "Recipient (descending)"
 msgstr "受信者 (降順)"
 
 #: app/views/administration.user.edit.php:380
-#: include/classes/screens/CScreenProblem.php:1100
+#: include/classes/screens/CScreenProblem.php:1104
 #: include/views/configuration.item.list.php:173
 #: include/views/configuration.trigger.prototype.list.php:135
-#: include/views/configuration.triggers.list.php:303
+#: include/views/configuration.triggers.list.php:297
 msgid "Recovery"
 msgstr "復旧"
 
@@ -13820,9 +13819,9 @@ msgstr "復旧時の実行内容"
 
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:900
-#: include/classes/screens/CScreenProblem.php:923
-#: include/classes/screens/CScreenProblem.php:1182 include/events.inc.php:251
+#: include/classes/screens/CScreenProblem.php:904
+#: include/classes/screens/CScreenProblem.php:927
+#: include/classes/screens/CScreenProblem.php:1186 include/events.inc.php:251
 #: include/events.inc.php:464
 msgid "Recovery time"
 msgstr "復旧時刻"
@@ -13985,7 +13984,7 @@ msgstr "リモートコマンド"
 #: include/views/configuration.triggers.edit.php:255
 #: include/views/configuration.triggers.edit.php:454
 #: include/views/configuration.triggers.edit.php:592
-#: include/views/configuration.triggers.list.php:123
+#: include/views/configuration.triggers.list.php:117
 #: include/views/configuration.triggers.massupdate.php:86
 #: include/views/configuration.triggers.massupdate.php:124
 #: include/views/js/common.item.edit.js.php:48
@@ -14193,26 +14192,26 @@ msgstr "解決理由"
 
 #: app/views/monitoring.widget.problems.view.php:139
 #: include/classes/screens/CScreenHostTriggers.php:239
-#: include/classes/screens/CScreenProblem.php:1025
+#: include/classes/screens/CScreenProblem.php:1029
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "相関関係ルール\"%1$s\"によって解決済。"
 
 #: app/views/monitoring.widget.problems.view.php:142
 #: include/classes/screens/CScreenHostTriggers.php:242
-#: include/classes/screens/CScreenProblem.php:1028
+#: include/classes/screens/CScreenProblem.php:1032
 msgid "Resolved by correlation rule."
 msgstr "相関関係ルールによって解決済。"
 
 #: app/views/monitoring.widget.problems.view.php:149
 #: include/classes/screens/CScreenHostTriggers.php:249
-#: include/classes/screens/CScreenProblem.php:1035
+#: include/classes/screens/CScreenProblem.php:1039
 msgid "Resolved by inaccessible user."
 msgstr "アクセスできないユーザーによって解決済。"
 
 #: app/views/monitoring.widget.problems.view.php:148
 #: include/classes/screens/CScreenHostTriggers.php:248
-#: include/classes/screens/CScreenProblem.php:1034
+#: include/classes/screens/CScreenProblem.php:1038
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "ユーザー\"%1$s\"によって解決済。"
@@ -14274,7 +14273,7 @@ msgstr "結果のタイプ"
 
 #: app/views/js/popup.itemtestedit.view.js.php:314
 msgid "Result with value map applied"
-msgstr ""
+msgstr "値のマッピングを適用した結果"
 
 #: app/views/popup.httpstep.php:158
 #: include/views/configuration.host.discovery.edit.php:256
@@ -15181,14 +15180,15 @@ msgstr "LDAPリフェラルを「オフ」に設定できませんでした。"
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/controllers/CControllerPopupGeneric.php:171
+#: app/views/monitoring.problem.view.php:173
 #: app/views/monitoring.widget.problems.view.php:64
 #: app/views/popup.condition.common.php:205
 #: app/views/popup.triggerwizard.php:87
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:258
-#: include/classes/screens/CScreenProblem.php:897
-#: include/classes/screens/CScreenProblem.php:919
-#: include/classes/screens/CScreenProblem.php:1180
+#: include/classes/screens/CScreenProblem.php:901
+#: include/classes/screens/CScreenProblem.php:923
+#: include/classes/screens/CScreenProblem.php:1184
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:69
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:69
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
@@ -15202,10 +15202,10 @@ msgstr "LDAPリフェラルを「オフ」に設定できませんでした。"
 #: include/views/configuration.trigger.prototype.massupdate.php:50
 #: include/views/configuration.triggers.edit.php:105
 #: include/views/configuration.triggers.list.php:65
-#: include/views/configuration.triggers.list.php:200
+#: include/views/configuration.triggers.list.php:194
 #: include/views/configuration.triggers.massupdate.php:52
 #: include/views/reports.toptriggers.php:69
-#: include/views/reports.toptriggers.php:84
+#: include/views/reports.toptriggers.php:78
 msgid "Severity"
 msgstr "深刻度"
 
@@ -15219,7 +15219,7 @@ msgid "Severity changed"
 msgstr "深刻度を変更しました"
 
 #: include/actions.inc.php:1757
-#: include/classes/screens/CScreenProblem.php:1247
+#: include/classes/screens/CScreenProblem.php:1251
 msgid "Severity changes"
 msgstr "深刻度変更"
 
@@ -15655,7 +15655,7 @@ msgstr "Zabbixサーバーの起動時刻、UNIXタイムスタンプ。"
 #: include/forms.inc.php:204 include/forms.inc.php:698
 #: include/views/configuration.maintenance.list.php:55
 #: include/views/configuration.maintenance.list.php:81
-#: include/views/configuration.triggers.list.php:72
+#: include/views/configuration.triggers.list.php:66
 msgid "State"
 msgstr "状態"
 
@@ -15681,9 +15681,9 @@ msgstr "固定"
 #: include/classes/screens/CScreenActions.php:116
 #: include/classes/screens/CScreenHttpTestDetails.php:86
 #: include/classes/screens/CScreenHttpTest.php:120
-#: include/classes/screens/CScreenProblem.php:901
-#: include/classes/screens/CScreenProblem.php:925
-#: include/classes/screens/CScreenProblem.php:1183
+#: include/classes/screens/CScreenProblem.php:905
+#: include/classes/screens/CScreenProblem.php:929
+#: include/classes/screens/CScreenProblem.php:1187
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:252 include/events.inc.php:465
@@ -15703,8 +15703,8 @@ msgstr "固定"
 #: include/views/configuration.item.list.php:74
 #: include/views/configuration.item.list.php:144
 #: include/views/configuration.item.massupdate.php:449
-#: include/views/configuration.triggers.list.php:79
-#: include/views/configuration.triggers.list.php:206 srv_status.php:145
+#: include/views/configuration.triggers.list.php:73
+#: include/views/configuration.triggers.list.php:200 srv_status.php:145
 msgid "Status"
 msgstr "ステータス"
 
@@ -16022,9 +16022,9 @@ msgstr "タグの値"
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/views/monitoring.problem.view.php:290
 #: app/views/monitoring.widget.problems.view.php:70 include/blocks.inc.php:755
-#: include/classes/screens/CScreenProblem.php:879
-#: include/classes/screens/CScreenProblem.php:935
-#: include/classes/screens/CScreenProblem.php:1190
+#: include/classes/screens/CScreenProblem.php:883
+#: include/classes/screens/CScreenProblem.php:939
+#: include/classes/screens/CScreenProblem.php:1194
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:78
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:78
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
@@ -16046,8 +16046,8 @@ msgstr "タグの値"
 #: include/views/configuration.trigger.prototype.massupdate.php:78
 #: include/views/configuration.trigger.prototype.massupdate.php:184
 #: include/views/configuration.triggers.edit.php:563
-#: include/views/configuration.triggers.list.php:140
-#: include/views/configuration.triggers.list.php:208
+#: include/views/configuration.triggers.list.php:134
+#: include/views/configuration.triggers.list.php:202
 #: include/views/configuration.triggers.massupdate.php:80
 #: include/views/configuration.triggers.massupdate.php:164
 msgid "Tags"
@@ -16253,7 +16253,7 @@ msgstr "条件式のテスト"
 
 #: app/controllers/CControllerPopupItemTestEdit.php:257
 msgid "Test item"
-msgstr ""
+msgstr "アイテムのテスト"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:75
 msgid "Test media type"
@@ -16264,7 +16264,7 @@ msgstr "メディアタイプのテスト"
 #: app/controllers/CControllerPopupItemTestSend.php:156
 #, c-format
 msgid "Test of \"%1$s\" items is not supported."
-msgstr ""
+msgstr "\"%1$s\"アイテムのテストはサポートしていません。"
 
 #: app/views/administration.regex.edit.php:115
 msgid "Test string"
@@ -16460,8 +16460,8 @@ msgstr "終了"
 #: include/actions.inc.php:1972 include/blocks.inc.php:730
 #: include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:856
-#: include/classes/screens/CScreenProblem.php:1181
+#: include/classes/screens/CScreenProblem.php:860
+#: include/classes/screens/CScreenProblem.php:1185
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:199
@@ -16547,7 +16547,7 @@ msgstr "終了"
 msgid "To set a host interface select a single item type for all items"
 msgstr "すべてのアイテムのため1つのホストインターフェースを選択する必要があります"
 
-#: include/classes/screens/CScreenProblem.php:749 include/func.inc.php:2519
+#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2519
 #: srv_status.php:38
 msgid "Today"
 msgstr "今日"
@@ -16669,7 +16669,7 @@ msgstr "トレンド"
 #: include/views/configuration.triggers.massupdate.php:163
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:730
-#: include/views/reports.toptriggers.php:84 jsLoader.php:189 jsLoader.php:292
+#: include/views/reports.toptriggers.php:78 jsLoader.php:189 jsLoader.php:292
 #: services.php:355
 msgid "Trigger"
 msgstr "トリガー"
@@ -16891,7 +16891,7 @@ msgstr "トリガーを更新しました"
 #: include/views/configuration.template.list.php:145
 #: include/views/configuration.template.list.php:254
 #: include/views/configuration.triggers.edit.php:28
-#: include/views/configuration.triggers.list.php:169
+#: include/views/configuration.triggers.list.php:163
 #: include/views/configuration.triggers.massupdate.php:28
 #: include/views/conf.import.php:40 include/views/inventory.host.view.php:163
 #: include/views/inventory.host.view.php:178
@@ -17182,7 +17182,7 @@ msgstr "単位"
 #: include/triggers.inc.php:244 include/triggers.inc.php:2217
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:230
-#: include/views/configuration.triggers.list.php:76
+#: include/views/configuration.triggers.list.php:70
 msgid "Unknown"
 msgstr "不明"
 
@@ -18004,8 +18004,8 @@ msgstr "バリデーション"
 #: include/views/configuration.item.prototype.massupdate.php:152
 #: include/views/configuration.template.massupdate.php:157
 #: include/views/configuration.trigger.prototype.massupdate.php:88
-#: include/views/configuration.triggers.list.php:86
-#: include/views/configuration.triggers.list.php:201
+#: include/views/configuration.triggers.list.php:80
+#: include/views/configuration.triggers.list.php:195
 #: include/views/configuration.triggers.massupdate.php:90
 #: include/views/monitoring.history.php:151
 #: include/views/monitoring.history.php:273
@@ -18181,12 +18181,12 @@ msgstr "表示形式"
 #: include/classes/mvc/CView.php:96
 #, c-format
 msgid "View not found: \"%s\"."
-msgstr ""
+msgstr "ビューが見つかりません: \"%s\"。"
 
 #: include/classes/mvc/CView.php:100
 #, c-format
 msgid "View not readable: \"%s\"."
-msgstr ""
+msgstr "ビューが読み込めません: \"%s\"。"
 
 #: include/classes/items/CHelpItems.php:329
 #: include/classes/items/CHelpItems.php:647
@@ -18365,7 +18365,7 @@ msgstr "幅"
 msgid "With data collection"
 msgstr "データ収集あり"
 
-#: include/views/configuration.triggers.list.php:155
+#: include/views/configuration.triggers.list.php:149
 msgid "With dependencies"
 msgstr "依存関係がある"
 
@@ -18603,8 +18603,8 @@ msgstr "毎年"
 #: app/views/popup.condition.common.php:648 include/actions.inc.php:32
 #: include/blocks.inc.php:626 include/blocks.inc.php:859
 #: include/classes/screens/CScreenHostTriggers.php:273
-#: include/classes/screens/CScreenProblem.php:1132
-#: include/classes/screens/CScreenProblem.php:1268 include/events.inc.php:179
+#: include/classes/screens/CScreenProblem.php:1136
+#: include/classes/screens/CScreenProblem.php:1272 include/events.inc.php:179
 #: include/events.inc.php:381 include/events.inc.php:606
 #: include/triggers.inc.php:1288 include/triggers.inc.php:1293
 #: include/views/configuration.host.prototype.list.php:130
@@ -18612,14 +18612,14 @@ msgstr "毎年"
 #: include/views/configuration.item.prototype.list.php:106
 #: include/views/configuration.trigger.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.massupdate.php:67
-#: include/views/configuration.triggers.list.php:144
-#: include/views/configuration.triggers.list.php:151
-#: include/views/configuration.triggers.list.php:158
+#: include/views/configuration.triggers.list.php:138
+#: include/views/configuration.triggers.list.php:145
+#: include/views/configuration.triggers.list.php:152
 #: include/views/configuration.triggers.massupdate.php:69
 msgid "Yes"
 msgstr "はい"
 
-#: include/classes/screens/CScreenProblem.php:757 include/func.inc.php:2513
+#: include/classes/screens/CScreenProblem.php:761 include/func.inc.php:2513
 msgid "Yesterday"
 msgstr "昨日"
 
@@ -18918,7 +18918,7 @@ msgid "agent"
 msgstr "エージェント"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1873
-#: include/classes/html/CSeverity.php:80
+#: include/classes/html/CSeverity.php:73
 #: include/classes/pagefilter/CPageFilter.php:783
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
@@ -18929,12 +18929,12 @@ msgstr "エージェント"
 #: include/forms.inc.php:289 include/forms.inc.php:308
 #: include/forms.inc.php:324 include/graphs.inc.php:76
 #: include/views/configuration.httpconf.list.php:33
-#: include/views/configuration.triggers.list.php:74
-#: include/views/configuration.triggers.list.php:81
-#: include/views/configuration.triggers.list.php:88
-#: include/views/configuration.triggers.list.php:143
-#: include/views/configuration.triggers.list.php:150
-#: include/views/configuration.triggers.list.php:157
+#: include/views/configuration.triggers.list.php:68
+#: include/views/configuration.triggers.list.php:75
+#: include/views/configuration.triggers.list.php:82
+#: include/views/configuration.triggers.list.php:137
+#: include/views/configuration.triggers.list.php:144
+#: include/views/configuration.triggers.list.php:151
 #: include/views/js/configuration.graph.edit.js.php:81 report2.php:242
 #: report2.php:278 report2.php:313 report2.php:340 report2.php:427
 #: report4.php:91 report4.php:293
@@ -19960,7 +19960,7 @@ msgstr "指定された資格情報はユニークではありません"
 #: include/views/configuration.host.list.php:73
 #: include/views/configuration.maintenance.edit.php:176
 #: include/views/configuration.template.list.php:47
-#: include/views/configuration.triggers.list.php:113
+#: include/views/configuration.triggers.list.php:107
 #: include/views/js/configuration.host.list.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:60
@@ -20157,7 +20157,7 @@ msgstr "サポートされていないバージョン番号です"
 #: include/views/configuration.item.prototype.edit.php:244
 #: include/views/configuration.maintenance.edit.php:183
 #: include/views/configuration.template.list.php:54
-#: include/views/configuration.triggers.list.php:120
+#: include/views/configuration.triggers.list.php:114
 #: include/views/js/common.template.edit.js.php:41
 #: include/views/js/common.template.edit.js.php:88
 #: include/views/js/configuration.host.list.js.php:37

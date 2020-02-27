@@ -17,9 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package main
 
-func CheckMetrics() {
+import (
+	"zabbix.com/internal/agent/scheduler"
+)
+
+func checkMetrics(s scheduler.Scheduler) {
 	metrics := []string{
 		`agent.hostname`,
 		`agent.ping`,
@@ -95,6 +99,10 @@ func CheckMetrics() {
 	}
 
 	for _, metric := range metrics {
+<<<<<<< HEAD:src/go/internal/agent/testrun_linux.go
 		_ = CheckMetric(metric, true)
+=======
+		checkMetric(s, metric)
+>>>>>>> ef1d305fff... ...G...... [ZBXNEXT-5781] improved agent2 metric testing (-t) and printing (-p) by adding full plugin interface support and verbose testing option:src/go/cmd/zabbix_agent2/testrun_linux.go
 	}
 }

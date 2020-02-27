@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package main
 
-func CheckMetrics() {
+func checkMetrics() {
 	metrics := []string{
 		`agent.hostname`,
 		`agent.ping`,
@@ -29,16 +29,16 @@ func CheckMetrics() {
 		`web.page.get[localhost,,80]`,
 		`web.page.perf[localhost,,80]`,
 		`web.page.regexp[localhost,,80,OK]`,
-		`vfs.file.size[/etc/passwd]`,
-		`vfs.file.time[/etc/passwd,modify]`,
-		`vfs.file.exists[/etc/passwd]`,
-		`vfs.file.contents[/etc/passwd]`,
-		`vfs.file.regexp[/etc/passwd,root]`,
-		`vfs.file.regmatch[/etc/passwd,root]`,
-		`vfs.file.md5sum[/etc/passwd]`,
-		`vfs.file.cksum[/etc/passwd]`,
-		`vfs.dir.size[/var/log]`,
-		`vfs.dir.count[/var/log]`,
+		`vfs.file.size[c:\windows\win.ini]`,
+		`vfs.file.time[c:\windows\win.ini,modify]`,
+		`vfs.file.exists[c:\windows\win.ini]`,
+		`vfs.file.contents[c:\windows\win.ini]`,
+		`vfs.file.regexp[c:\windows\win.ini,fonts]`,
+		`vfs.file.regmatch[c:\windows\win.ini,fonts]`,
+		`vfs.file.md5sum[c:\windows\win.ini]`,
+		`vfs.file.cksum[c:\windows\win.ini]`,
+		`vfs.dir.size[c:\windows]`,
+		`vfs.dir.count[c:\windows]`,
 		`net.dns[,zabbix.com]`,
 		`net.dns.record[,zabbix.com]`,
 		`net.tcp.dns[,zabbix.com]`,
@@ -49,44 +49,36 @@ func CheckMetrics() {
 		`log.count[logfile]`,
 		`logrt[logfile]`,
 		`logrt.count[logfile]`,
+		`eventlog[system]`,
 		`zabbix.stats[127.0.0.1,10051]`,
-		`kernel.maxfiles`,
-		`kernel.maxproc`,
-		`vfs.fs.size[/,free]`,
-		`vfs.fs.inode[/,free]`,
+		`vfs.fs.size[c:,free]`,
 		`vfs.fs.discovery`,
-		`vfs.dev.write[sda,operations]`,
 		`net.tcp.listen[80]`,
-		`net.udp.listen[68]`,
-		`net.if.in[lo,bytes]`,
-		`net.if.out[lo,bytes]`,
-		`net.if.total[lo,bytes]`,
-		`net.if.collisions[lo]`,
+		`net.if.in[MS TCP Loopback interface,bytes]`,
+		`net.if.out[MS TCP Loopback interface,bytes]`,
+		`net.if.total[MS TCP Loopback interface,bytes]`,
 		`net.if.discovery`,
-		`vm.memory.size[total]`,
-		`proc.cpu.util[inetd]`,
-		`proc.num[inetd]`,
-		`proc.mem[inetd]`,
-		`system.cpu.switches`,
-		`system.cpu.intr`,
-		`system.cpu.util[all,user,avg1]`,
+		`net.if.list`,
+		`vm.memory.size[free]`,
+		`proc.num[svchost.exe]`,
+		`system.cpu.util[all,system,avg1]`,
 		`system.cpu.load[all,avg1]`,
 		`system.cpu.num[online]`,
 		`system.cpu.discovery`,
-		`system.uname`,
-		`system.hw.chassis`,
-		`system.hw.cpu`,
-		`system.hw.devices`,
-		`system.hw.macaddr`,
 		`system.sw.arch`,
-		`system.sw.os`,
-		`system.sw.packages`,
 		`system.swap.size[all,free]`,
-		`system.swap.in[all]`,
-		`system.swap.out[all]`,
+		`vm.vmemory.size[total]`,
 		`system.uptime`,
-		`system.boottime`,
-		`sensor[w83781d-i2c-0-2d,temp1]`,
+		`system.uname`,
+		`service.discovery`,
+		`service.info[Zabbix Agent]`,
+		`service_state[Zabbix Agent]`,
+		`services`,
+		`perf_counter[\System\Processes]`,
+		`perf_counter_en[\System\Processes]`,
+		`proc_info[svchost.exe]`,
+		`wmi.get[root\cimv2,select Caption from Win32_OperatingSystem]`,
+		`wmi.getall[root\cimv2,select * from Win32_OperatingSystem]`,
 		`net.tcp.service[ssh,127.0.0.1,22]`,
 		`net.tcp.service.perf[ssh,127.0.0.1,22]`,
 		`net.udp.service[ntp,127.0.0.1,123]`,
@@ -95,6 +87,10 @@ func CheckMetrics() {
 	}
 
 	for _, metric := range metrics {
+<<<<<<< HEAD:src/go/internal/agent/testrun_windows.go
 		_ = CheckMetric(metric, true)
+=======
+		checkMetric(metric)
+>>>>>>> ef1d305fff... ...G...... [ZBXNEXT-5781] improved agent2 metric testing (-t) and printing (-p) by adding full plugin interface support and verbose testing option:src/go/cmd/zabbix_agent2/testrun_windows.go
 	}
 }

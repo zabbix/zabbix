@@ -1,4 +1,20 @@
-
+![](images/PagerDuty-GreenRGB.png?raw=true) 
+# PagerDuty + Zabbix Integration Benefits
+* ***Notify on-call responders based on alerts sent from Zabbix.***
+* ***Send enriched event data from Zabbix including operational data that was triggered during event.***
+* ***Create high and low urgency incidents based on the severity of event from Zabbix.***
+* ***Problem updates are synchronised to PagerDuty from Zabbix.***
+* ***Incidents will automatically resolve in PagerDuty when the metric in Zabbix returns to normal.***
+# How it Works
+* ***If a trigger fires, Zabbix will send an event to a service in PagerDuty. Events from Zabbix will trigger a new incident on the corresponding PagerDuty service or group as alerts into an existing incident.***
+* ***Once the trigger is resolved, a resolving event will be sent to the PagerDuty service to resolve the alert and associated incident on that service.***
+# Requirements
+1. PagerDuty integrations with Zabbix require Events API v2 key. If you do not have permission to create Event API v2 key, please reach out to an Admin or Account Owner within your organization to help you configure the integration.
+2. PagerDuty webhook integration works with Zabbix version 4.4 or higher.
+# Support
+* If you need help use [forum](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393216-discussion-thread-for-official-integration-with-pagerduty) 
+* If you have encountered a bug, please report it using [Zabbix Jira bug tracker](https://support.zabbix.com/).
+# Description
 This guide describes how to integrate your Zabbix 4.4 installation with PagerDuty using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## In PagerDuty
