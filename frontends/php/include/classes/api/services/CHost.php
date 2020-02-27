@@ -172,6 +172,8 @@ class CHost extends CHostGeneral {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->validateGet($options);
+
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -481,20 +483,6 @@ class CHost extends CHostGeneral {
 				$sqlParts['from']['interface'] = 'interface hi';
 				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 			}
-		}
-
-		// Validate input parameters.
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'inheritedTags' => ['type' => API_BOOLEAN, 'default' => false],
-			'selectInheritedTags' => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-			'severities' =>	[
-				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true
-			],
-			'withProblemsSuppressed' =>  ['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL]
-		]];
-		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
-		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		// tags
@@ -1754,6 +1742,29 @@ class CHost extends CHostGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options) {
+		// Validate input parameters.
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'inheritedTags' => ['type' => API_BOOLEAN, 'default' => false],
+			'selectInheritedTags' => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+			'severities' =>	[
+				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true
+			],
+			'withProblemsSuppressed' =>  ['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL]
+		]];
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
