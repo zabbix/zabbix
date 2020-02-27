@@ -1172,41 +1172,26 @@ class CLineGraphDraw extends CGraphDraw {
 				);
 			}
 
-			$power = (int) max(0,
+			$power = (int) min(8, max(0,
 				floor(log(abs($this->m_minY[$side]), $unit_base)),
 				floor(log(abs($this->m_maxY[$side]), $unit_base))
-			);
+			));
 
-			if ($power == 0) {
-				if (abs($this->intervals[$side]) < 1) {
-					$precision = $units === '' ? 9 : max(2, 8 - mb_strlen($units));
+			$units_length = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
+			$precision = $units_length == 0 ? 8 : max(1, 8 - $units_length - ($this->m_minY[$side] < 0 ? 1 : 0));
+			$decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED;
+			$decimals_exact = false;
 
-					if ($this->m_minY[$side] < 0) {
-						$precision--;
-					}
-
-					$precision_required = 1 - floor(log10(abs($this->intervals[$side])));
-
-					if ($precision_required > $precision) {
-						$precision = 2;
-						$decimals = 1;
-					}
-					else {
-						$decimals = min($precision - 1, getNumDecimals($this->intervals[$side]));
-					}
+			$power_interval = $this->intervals[$side] / pow($unit_base, $power);
+			if ($power_interval < 1) {
+				$precision_required = 1 - floor(log10($power_interval));
+				if ($precision_required <= $precision) {
+					$decimals = min(getNumDecimals($power_interval), $precision - 1);
+					$decimals_exact = true;
 				}
 				else {
-					$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED + 1;
-					$decimals = min($precision - 1, getNumDecimals($this->intervals[$side]));
+					$precision = 4;
 				}
-			}
-			else {
-				if ($power > 8) {
-					$power = 0;
-				}
-
-				$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED;
-				$decimals = 0;
 			}
 
 			$rows = [
@@ -1239,7 +1224,8 @@ class CLineGraphDraw extends CGraphDraw {
 					'power' => $power,
 					'ignore_milliseconds' => $ignore_milliseconds,
 					'precision' => $precision,
-					'decimals' => $decimals
+					'decimals' => $decimals,
+					'decimals_exact' => $decimals_exact
 				]);
 
 				$pos_X = ($side == GRAPH_YAXIS_SIDE_LEFT)

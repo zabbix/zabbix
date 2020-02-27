@@ -657,23 +657,20 @@ class CSvgGraph extends CSvg {
 			floor(log(abs($max), $unit_base))
 		));
 
-		$units_len = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
-		$precision = $units_len == 0 ? 15 : max(1, 17 - $units_len - ($min < 0 ? 1 : 0));
-		$decimals = null;
+		$units_length = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
+		$precision = $units_length == 0 ? 15 : max(1, 15 - $units_length - ($min < 0 ? 1 : 0));
+		$decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED;
 		$decimals_exact = false;
 
-		if ($power == 0) {
-			if (abs($interval) < 1) {
-				$precision_required = 1 - floor(log10(abs($interval)));
-				if ($precision_required <= $precision) {
-					$decimals = min(getNumDecimals($interval), $precision - 1);
-					$decimals_exact = true;
-				}
+		$power_interval = $interval / pow($unit_base, $power);
+		if ($power_interval < 1) {
+			$precision_required = 1 - floor(log10($power_interval));
+			if ($precision_required <= $precision) {
+				$decimals = min(getNumDecimals($power_interval), $precision - 1);
+				$decimals_exact = true;
 			}
 			else {
-//					$decimals = min(getNumDecimals($interval), $precision - 1);
-//					$decimals_exact = true;
-				$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED + 1;
+				$precision = 4;
 			}
 		}
 
@@ -693,9 +690,9 @@ class CSvgGraph extends CSvg {
 				'convert' => ITEM_CONVERT_NO_UNITS,
 				'power' => $power,
 				'ignore_milliseconds' => $ignore_milliseconds,
-				'precision' => 15,//$precision,
-//				'decimals' => $decimals,
-//				'decimals_exact' => $decimals_exact
+				'precision' => $precision,
+				'decimals' => $decimals,
+				'decimals_exact' => $decimals_exact
 			]);
 		}
 

@@ -1352,7 +1352,13 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  * @return string
  */
 
-function formatFloat(string $number, ?int $precision, ?int $decimals, bool $exact = false): string {
+function formatFloat(string $number, int $precision = null, int $decimals = null, bool $exact = false): string {
+	static $decimal_point;
+
+	if ($decimal_point === null) {
+		$decimal_point = localeconv()['decimal_point'];
+	}
+
 	$number = (float) $number;
 
 	if ($number == 0) {
@@ -1375,7 +1381,10 @@ function formatFloat(string $number, ?int $precision, ?int $decimals, bool $exac
 		$decimals = 0;
 	}
 
-	$exponent = floor(log10($number));
+	$exponent = floor(log10(abs($number)));
+	if ($number < 0) {
+		$exponent = -$exponent;
+	}
 
 	if ($exponent < 0) {
 		for ($i = 1; $i >= 0; $i--) {
@@ -1408,7 +1417,10 @@ function formatFloat(string $number, ?int $precision, ?int $decimals, bool $exac
 		return '0';
 	}
 
-	$exponent = floor(log10($number));
+	$exponent = floor(log10(abs($number)));
+	if ($number < 0) {
+		$exponent = -$exponent;
+	}
 
 	if ($exponent < 0) {
 		if ($digits - $exponent <= ($exact ? min($decimals + 1, $precision) : $precision)) {
@@ -1422,7 +1434,9 @@ function formatFloat(string $number, ?int $precision, ?int $decimals, bool $exac
 		return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 	}
 	else {
-		return sprintf('%.'.($exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals))).'f', $number);
+		return number_format($number, $exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)),
+			$decimal_point, ' '
+		);
 	}
 }
 
