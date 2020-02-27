@@ -442,22 +442,27 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_MARIADB_TLS)
 	ZBX_UNUSED(cipher_13);
 
-	if (NULL != tls_connect && 0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+	if (NULL != tls_connect)
 	{
-		my_bool	enforce_tls = 1;
-		if (0 != mysql_optionsv(conn, MYSQL_OPT_SSL_ENFORCE, (void *)&enforce_tls))
+		if 0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_ENFORCE option.");
-			ret = ZBX_DB_FAIL;
+			my_bool	enforce_tls = 1;
+
+			if (0 != mysql_optionsv(conn, MYSQL_OPT_SSL_ENFORCE, (void *)&enforce_tls))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_ENFORCE option.");
+				ret = ZBX_DB_FAIL;
+			}
 		}
-	}
-	else
-	{
-		my_bool	verify = 1;
-		if (0 != mysql_optionsv(conn, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, (void *)&verify))
+		else
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_VERIFY_SERVER_CERT option.");
-			ret = ZBX_DB_FAIL;
+			my_bool	verify = 1;
+
+			if (0 != mysql_optionsv(conn, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, (void *)&verify))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_VERIFY_SERVER_CERT option.");
+				ret = ZBX_DB_FAIL;
+			}
 		}
 	}
 
