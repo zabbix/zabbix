@@ -67,6 +67,11 @@ func CheckMetric(metric string, suppressPrinting bool) (err error) {
 		return
 	}
 
+	if u == nil {
+		fmt.Printf("%-46s\n", metric)
+		return
+	}
+
 	switch v := u.(type) {
 	case string:
 		fmt.Printf("%-46s[s|%s]\n", metric, v)

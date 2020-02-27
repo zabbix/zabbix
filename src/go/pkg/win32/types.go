@@ -173,6 +173,34 @@ type PDH_FMT_COUNTERVALUE_LARGE struct {
 	Value  int64
 }
 
+type SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX struct {
+	Relationship uint32
+	Size         uint32
+	Data         [1]byte
+}
+
+type GROUP_AFFINITY struct {
+	Mask     uintptr
+	Group    uint16
+	Reserved [3]uint16
+}
+
+type RGGROUP_AFFINITY [ARRAY_MAX / unsafe.Sizeof(GROUP_AFFINITY{})]GROUP_AFFINITY
+
+type NUMA_NODE_RELATIONSHIP struct {
+	NodeNumber uint32
+	Reserved   [20]uint8
+	GroupMask  GROUP_AFFINITY
+}
+
+type PROCESSOR_RELATIONSHIP struct {
+	Flags           uint8
+	EfficiencyClass uint8
+	Reserved        [20]uint8
+	GroupCount      uint16
+	GroupMask       [1]GROUP_AFFINITY
+}
+
 type MEMORYSTATUSEX struct {
 	Length               uint32
 	MemoryLoad           uint32
