@@ -186,8 +186,16 @@ class CControllerChartsView extends CController {
 		if ($filter_graphids && $filter_search_type == ZBX_SEARCH_TYPE_STRICT) {
 			$data['ms_graphs'] = CArrayHelper::renameObjectsKeys(API::Graph()->get([
 				'output' => ['name', 'graphid'],
+				'selectHosts' => ['name'],
 				'graphids' => $filter_graphids
 			]), ['graphid' => 'id']);
+
+			// Prefix graphs by hostnames.
+			foreach ($data['ms_graphs'] as &$graph) {
+				$graph['prefix'] = $graph['hosts'][0]['name'].NAME_DELIMITER;
+				unset($graph['hosts']);
+			}
+			unset($graph);
 		}
 
 		if ($filter_hostids) {
