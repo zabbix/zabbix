@@ -34,22 +34,23 @@ $web_layout_mode = $this->getLayoutMode();
 $widget = (new CWidget())
 	->setTitle(_('Graphs'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls(new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->addVar('action', 'charts.view')
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('View as'), 'view_as'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('view_as', $data['view_as'], 'submit()', [
-						HISTORY_GRAPH => _('Graph'),
-						HISTORY_VALUES => _('Values')
-					])
-				])
-			),
+	->setControls(
 		(new CTag('nav', true, (new CList())
+			->addItem((new CForm('get'))
+				->cleanItems()
+				->addVar('action', 'charts.view')
+				->setAttribute('aria-label', _('Main filter'))
+				->addItem((new CList())
+					->addItem([
+						new CLabel(_('View as'), 'view_as'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						new CComboBox('view_as', $data['view_as'], 'submit()', [
+							HISTORY_GRAPH => _('Graph'),
+							HISTORY_VALUES => _('Values')
+						])
+					])
+				)
+			)
 			->addItem(($data['filter_search_type'] == ZBX_SEARCH_TYPE_STRICT && count($data['graphids']) == 1)
 				? get_icon('favourite', [
 					'fav' => 'web.favorite.graphids',
@@ -60,7 +61,7 @@ $widget = (new CWidget())
 			)
 			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
-	]));
+	);
 
 $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'charts.view')))
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
