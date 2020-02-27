@@ -2129,4 +2129,27 @@ void	zbx_init_snmp(void)
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
+static void	zbx_shutdown_snmp(void)
+{
+	sigset_t	mask, orig_mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+
+	snmp_shutdown(progname);
+
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+}
+
+void	zbx_clear_cache_snmp(void)
+{
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
+	zbx_shutdown_snmp();
+	zbx_init_snmp();
+}
+
 #endif	/* HAVE_NETSNMP */

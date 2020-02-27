@@ -93,6 +93,7 @@ const char	*help_message[] = {
 	"                                 target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
 	"                                 target is not specified",
+	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",

@@ -1522,7 +1522,8 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AC_SUBST(UNIXODBC_CFLAGS)
 
 	dnl Check for Net-SNMP [by default - skip]
-	LIBNETSNMP_CHECK_CONFIG([no])
+	LIBNETSNMP_CHECK_CONFIG([no], "5.3.0")
+
 	if test "x$want_netsnmp" = "xyes"; then
 		if test "x$found_netsnmp" != "xyes"; then
 			AC_MSG_ERROR([Invalid Net-SNMP directory - unable to find net-snmp-config])
