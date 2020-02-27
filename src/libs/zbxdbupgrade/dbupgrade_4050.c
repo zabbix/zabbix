@@ -619,7 +619,7 @@ static int	DBpatch_4050036(void)
 
 	result = DBselect(
 			"select profileid,userid,idx,idx2,value_int"
-			" from profiles p", 
+			" from profiles p",
 			" where where idx='%s'", profiles[0]);
 
 	while (NULL != (row = DBfetch(result)))
