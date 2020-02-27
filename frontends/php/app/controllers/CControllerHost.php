@@ -185,34 +185,30 @@ abstract class CControllerHost extends CController {
 			// Count the number of problems (as value) per severity (as key).
 			for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
 				$host['problem_count'][$severity] = array_key_exists($severity, $host_problems[$host['hostid']])
-						? count($host_problems[$host['hostid']][$severity])
-						: 0;
+					? count($host_problems[$host['hostid']][$severity])
+					: 0;
 			}
 
 			// Merge host tags with template tags, and skip duplicate tags and values.
-			$tags = [];
-
-			if ($host['inheritedTags']) {
-				if ($host['tags']) {
-					$tags = $host['tags'];
-
-					foreach ($host['inheritedTags'] as $template_tag) {
-						foreach ($tags as $host_tag) {
-							// Skip tags with same name and value.
-							if ($host_tag['tag'] === $template_tag['tag']
-									&& $host_tag['value'] === $template_tag['value']) {
-								continue 2;
-							}
-						}
-						$tags[] = $template_tag;
-					}
-				}
-				else {
-					$tags = $host['inheritedTags'];
-				}
+			if (!$host['inheritedTags']) {
+				$tags = $host['tags'];
+			}
+			elseif (!$host['tags']) {
+				$tags = $host['inheritedTags'];
 			}
 			else {
 				$tags = $host['tags'];
+
+				foreach ($host['inheritedTags'] as $template_tag) {
+					foreach ($tags as $host_tag) {
+						// Skip tags with same name and value.
+						if ($host_tag['tag'] === $template_tag['tag']
+								&& $host_tag['value'] === $template_tag['value']) {
+							continue 2;
+						}
+					}
+					$tags[] = $template_tag;
+				}
 			}
 
 			$host['tags'] = $tags;
