@@ -438,6 +438,10 @@ Overlay.prototype.setProperties = function(obj) {
 			case 'element':
 				this.element = obj[key];
 				break;
+
+			case 'data':
+				this.data = obj[key];
+				break;
 		}
 	}
 

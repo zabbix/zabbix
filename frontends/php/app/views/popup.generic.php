@@ -537,7 +537,7 @@ switch ($data['popup_type']) {
 				$graphtype
 			]);
 
-			// For a "popup_reference".
+			// For returned data array.
 			$graph = [
 				'id' => $graph['graphid'],
 				'name' => $options['patternselect']
@@ -633,9 +633,7 @@ if ($data['multiselect'] && $form !== null) {
 			'title' => _('Select'),
 			'class' => '',
 			'isSubmit' => true,
-			'action' => 'return addSelectedValues('.zbx_jsvalue($form->getId()).', '.
-						zbx_jsvalue($options['reference']).', '.$options['parentid'].'); '.
-						'overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));'
+			'action' => 'return addSelectedValues('.zbx_jsvalue($options['reference']).', '.$options['parentid'].');'
 		]
 	];
 }
@@ -643,13 +641,12 @@ if ($data['multiselect'] && $form !== null) {
 $types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
 	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes'
 ];
-$popup_reference = '';
+
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {
-	$popup_reference = 'var popup_reference = '.zbx_jsvalue($data['table_records'], true).';';
+	$output['data'] = $data['table_records'];
 }
 
 $output['script_inline'] =
-	$popup_reference.
 	'jQuery(document).ready(function() {'.
 		$output['script_inline'].
 		'cookie.init();'.

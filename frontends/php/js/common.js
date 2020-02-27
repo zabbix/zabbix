@@ -381,7 +381,8 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					controls: resp.controls,
 					buttons: buttons,
 					debug: resp.debug,
-					script_inline: resp.script_inline
+					script_inline: resp.script_inline,
+					data: resp.data || null
 				});
 			}
 
@@ -523,9 +524,11 @@ function reloadPopup(form, action) {
  * @param {string} parentid			parent id
  */
 function addValue(object, single_value, parentid) {
-	var value = {};
-	if (isset(single_value, popup_reference)) {
-		value = popup_reference[single_value];
+	var overlay = overlays_stack.end(),
+		value = {};
+
+	if (isset(single_value, overlay.data)) {
+		value = overlay.data[single_value];
 	}
 	else {
 		value[object] = single_value;
@@ -583,32 +586,22 @@ function addValues(frame, values, submit_parent) {
 /**
  * Collects checked values and passes them to add.popup trigger.
  *
- * @param {string} form			source form where checkbox are collected
  * @param {string} object		refers to object that is selected from popup
  * @param {string} parentid		parent id
  */
-function addSelectedValues(form, object, parentid) {
-	form = document.getElementById(form);
-
+function addSelectedValues(object, parentid) {
 	if (typeof parentid === 'undefined') {
 		var parentid = null;
 	}
 
-	var data = {object: object, values: [], parentId: parentid};
-	var chk_boxes = jQuery(form).find('input[type="checkbox"]');
+	var data = {object: object, values: [], parentId: parentid},
+		overlay = overlays_stack.end();
 
-	for (var i = 0; i < chk_boxes.length; i++) {
-		if (chk_boxes[i].checked && (chk_boxes[i].name.indexOf('all_') < 0)) {
-			var value = {};
-			if (isset(chk_boxes[i].value, popup_reference)) {
-				value = popup_reference[chk_boxes[i].value];
-			}
-			else {
-				value[object] = chk_boxes[i].value;
-			}
-			data['values'].push(value);
+	overlay.$dialogue.find('input[type="checkbox"]').filter(':checked').each((i, c) => {
+		if (c.name.indexOf('all_') == -1) {
+			data['values'].push(overlay.data[c.value] || c.value);
 		}
-	}
+	});
 
 	jQuery(document).trigger('add.popup', data);
 }
