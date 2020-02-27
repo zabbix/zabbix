@@ -129,7 +129,7 @@ class CControllerProblemView extends CController {
 				PROFILE_TYPE_ID
 			);
 			CProfile::update('web.problem.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::updateArray('web.problem.filter.severity', $this->getInput('filter_severity', []),
+			CProfile::updateArray('web.problem.filter.severities', $this->getInput('filter_severity', []),
 				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.problem.filter.age_state', $this->getInput('filter_age_state', 0), PROFILE_TYPE_INT);
@@ -201,7 +201,7 @@ class CControllerProblemView extends CController {
 			CProfile::delete('web.problem.filter.application');
 			CProfile::deleteIdx('web.problem.filter.triggerids');
 			CProfile::delete('web.problem.filter.name');
-			CProfile::deleteIdx('web.problem.filter.severity');
+			CProfile::deleteIdx('web.problem.filter.severities');
 			CProfile::delete('web.problem.filter.age_state');
 			CProfile::delete('web.problem.filter.age');
 			CProfile::deleteIdx('web.problem.filter.inventory.field');
@@ -298,7 +298,7 @@ class CControllerProblemView extends CController {
 				'triggerids' => $filter_triggerids,
 				'triggers' => $filter_triggers,
 				'name' => CProfile::get('web.problem.filter.name', ''),
-				'severity' => CProfile::getArray('web.problem.filter.severity', []),
+				'severity' => CProfile::getArray('web.problem.filter.severities', []),
 				'age_state' => CProfile::get('web.problem.filter.age_state', 0),
 				'age' => CProfile::get('web.problem.filter.age', 14),
 				'inventories' => $inventories,
