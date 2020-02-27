@@ -20,9 +20,9 @@
 
 
 /**
- * Controller for the "Latest data" page.
+ * Controller for the chart list refresh in "Charts" charts.view.
  */
-class CControllerChartsViewJson extends CControllerChartsView {
+class CControllerChartsViewJson extends CControllerCharts {
 
 	protected function init() {
 		$this->disableSIDValidation();

@@ -19,7 +19,10 @@
 **/
 
 
-class CControllerChartsView extends CController {
+/**
+ * Class to handle "charts.view" requests.
+ */
+class CControllerChartsView extends CControllerCharts {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -50,75 +53,6 @@ class CControllerChartsView extends CController {
 
 	protected function checkPermissions() {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
-	}
-
-	/**
-	 * Fetches all host graph ids or also intersect with given graphids array (second parameter).
-	 *
-	 * @param array $hostids   If not empty, return the listed host graphids.
-	 * @param array $graphids  If not empty, will be used for graphs filter.
-	 *
-	 * @return array
-	 */
-	protected function getGraphidsByHostids(array $hostids, array $graphids): array {
-		if (!$hostids && $graphids) {
-			return $graphids;
-		}
-
-		$options = [
-			'output' => [],
-			'hostids' => $hostids,
-			'limit' => ZBX_MAX_GRAPHS_PER_PAGE,
-			'preservekeys' => true
-		];
-
-		if ($hostids && $graphids) {
-			$options['graphids'] = $graphids;
-		}
-
-		return array_keys(API::Graph()->get($options));
-	}
-
-	protected function getGraphidsByPatterns(array $patterns, array $hostids): array {
-		$options = [
-			'output' => [],
-			'hostids' => $hostids,
-			'limit' => ZBX_MAX_GRAPHS_PER_PAGE,
-			'preservekeys' => true
-		];
-
-		if (!in_array('*', $patterns)) {
-			$options['search'] = ['name' => $patterns];
-			$options['searchWildcardsEnabled'] = true;
-			$options['searchByAny'] = true;
-		}
-
-		return array_keys(API::Graph()->get($options));
-	}
-
-	protected function getChartsById(array $graphids): array {
-		$charts = [];
-
-		foreach ($graphids as $graphid) {
-			$chart = [
-				'chartid' => $graphid,
-				'dimensions' => getGraphDims($graphid)
-			];
-
-			if ($chart['dimensions']['graphtype'] == GRAPH_TYPE_PIE
-					|| $chart['dimensions']['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				$chart['sbox'] = false;
-				$chart['src'] = 'chart6.php';
-			}
-			else {
-				$chart['sbox'] = true;
-				$chart['src'] = 'chart2.php';
-			}
-
-			$charts[] = $chart;
-		}
-
-		return $charts;
 	}
 
 	protected function doAction() {
