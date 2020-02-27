@@ -652,6 +652,10 @@ static int	DBpatch_4050042(void)
 		return FAIL;
 
 	return SUCCEED;
+}
+
+static int	DBpatch_4050043(void)
+{
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	profileid, userid, idx2;
@@ -746,5 +750,6 @@ DBPATCH_ADD(4050039, 0, 1)
 DBPATCH_ADD(4050040, 0, 1)
 DBPATCH_ADD(4050041, 0, 1)
 DBPATCH_ADD(4050042, 0, 1)
+DBPATCH_ADD(4050043, 0, 1)
 
 DBPATCH_END()
