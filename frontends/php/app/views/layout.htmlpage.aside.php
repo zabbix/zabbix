@@ -46,7 +46,6 @@ $search = (new CForm('get', 'zabbix.php'))
 	->addItem(
 		(new CDiv([
 			$logo,
-			$search,
 			(new CButton(null, _('Collapse sidebar')))
 				->addClass('button-sidebar-compact js-sidebar-mode')
 				->setAttribute('title', _('Collapse sidebar')),
@@ -58,7 +57,8 @@ $search = (new CForm('get', 'zabbix.php'))
 				->setAttribute('title', _('Hide sidebar')),
 			(new CButton(null, _('Show sidebar')))
 				->addClass('button-sidebar-show js-sidebar-mode')
-				->setAttribute('title', _('Show sidebar'))
+				->setAttribute('title', _('Show sidebar')),
+			$search
 		]))->addClass('sidebar-header')
 	)
 	->addItem(

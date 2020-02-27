@@ -24,9 +24,13 @@ class CBaseComponent {
 		this._node = node;
 	}
 
-	on(type, listener, options = false)  {
+	on(type, listener, options = false) {
 		this._node.addEventListener(type, listener, options);
 		return this;
+	}
+
+	one(type, listener, options = false) {
+		return this.on(type, listener, {...options, ...{once: true}});
 	}
 
 	off(type, listener, options = false) {

@@ -22,6 +22,12 @@ const SIDEBAR_VIEW_MODE_FULL = 0;
 const SIDEBAR_VIEW_MODE_COMPACT = 1;
 const SIDEBAR_VIEW_MODE_HIDDEN = 2;
 
+/**
+ * Supported events:
+ *   close
+ *   open
+ *   viewmodechange
+ */
 class CSidebar extends CBaseComponent {
 
 	constructor(node) {
@@ -61,24 +67,32 @@ class CSidebar extends CBaseComponent {
 	 * @returns {CSidebar}
 	 */
 	setViewMode(view_mode) {
-		this._view_mode = view_mode;
+		this._node.classList.toggle('is-compact', view_mode === SIDEBAR_VIEW_MODE_COMPACT);
+		this._node.classList.toggle('is-hidden', view_mode === SIDEBAR_VIEW_MODE_HIDDEN);
 
-		this._node.classList.toggle('is-compact', this._view_mode === SIDEBAR_VIEW_MODE_COMPACT);
-		this._node.classList.toggle('is-hidden', this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN);
-
-		window.dispatchEvent(new Event('resize'));
+		if (this._view_mode !== view_mode) {
+			this._view_mode = view_mode;
+			this.trigger('viewmodechange', {view_mode: this._view_mode });
+		}
 
 		return this;
 	}
 
 	open() {
 		if (!this._is_opened) {
+			clearTimeout(this._timer);
+
 			this._is_opened = true;
 			this._node.classList.add('is-opened');
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 				ZABBIX.MenuMain.expandSelected();
 			}
+
+			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+				this._node.classList.add('hidden');
+			}
+
 			this.trigger('open');
 		}
 
@@ -92,6 +106,13 @@ class CSidebar extends CBaseComponent {
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 				ZABBIX.MenuMain.collapseAll();
+
+				if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+					this._timer = setTimeout(() => {
+						this._node.classList.remove('hidden');
+					}, 500);
+				}
+
 				this.trigger('close');
 			}
 		}
@@ -105,37 +126,10 @@ class CSidebar extends CBaseComponent {
 	handleEvents() {
 		this._events = {
 
-			focus: () => {
-				this._is_focused = this._node.contains(document.activeElement);
-
-				if (this._is_focused) {
-					if (!this._is_opened) {
-						this._events.open();
-					}
-				}
-				else {
-					this._events.mouseleave();
-				}
-			},
-
-			viewmodechange: (e) => {
-				if (e.target.classList.contains('button-sidebar-compact')) {
-					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
-				}
-				else if (e.target.classList.contains('button-sidebar-hide')) {
-					this.setViewMode(SIDEBAR_VIEW_MODE_HIDDEN);
-				}
-				else {
-					this.setViewMode(SIDEBAR_VIEW_MODE_FULL);
-				}
-
-				this.trigger('viewmodechange', {view_mode: this._view_mode });
-
-				e.preventDefault();
-			},
-
 			mouseenter: () => {
-				this._events.open();
+				if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
+					this.open();
+				}
 			},
 
 			mouseleave: () => {
@@ -146,24 +140,56 @@ class CSidebar extends CBaseComponent {
 				}
 			},
 
-			open: () => {
-				clearTimeout(this._timer);
-				this.open();
+			focus: () => {
+				if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
+					this._is_focused = this._node.contains(document.activeElement);
+
+					if (this._is_focused) {
+						document.addEventListener('keyup', this._events.escape);
+						this.open();
+					}
+					else {
+						this.close();
+					}
+				}
 			},
 
-			toggle: () => {
-				if (!this._is_opened) {
-					this.open();
-					ZABBIX.MenuMain.focusSelected();
-				}
-				else {
+			escape: (e) => {
+				if (e.key === 'Escape') {
+					document.removeEventListener('keyup', this._events.escape);
 					this.close();
 				}
+			},
+
+			toggle: (e) => {
+				if (!this._is_opened) {
+					e.target.blur();
+					document.addEventListener('keyup', this._events.escape);
+					this.open();
+				}
+				else {
+					document.removeEventListener('keyup', this._events.escape);
+					this.close();
+				}
+
+				e.preventDefault();
+			},
+
+			viewmodechange: (e) => {
+				if (e.target.classList.contains('button-sidebar-compact')) {
+					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
+				} else if (e.target.classList.contains('button-sidebar-hide')) {
+					this.setViewMode(SIDEBAR_VIEW_MODE_HIDDEN);
+				} else {
+					this.setViewMode(SIDEBAR_VIEW_MODE_FULL);
+				}
+
+				e.preventDefault();
 			}
 		};
 
 		document.addEventListener('focusin', this._events.focus);
-		document.addEventListener('click', this._events.focus);
+		document.addEventListener('focusout', this._events.focus);
 
 		this._node.addEventListener('mouseenter', this._events.mouseenter);
 		this._node.addEventListener('mouseleave', this._events.mouseleave);
@@ -172,6 +198,6 @@ class CSidebar extends CBaseComponent {
 			el.addEventListener('click', this._events.viewmodechange);
 		}
 
-		document.getElementById('sidebar-toggle').addEventListener('click', this._events.toggle);
+		document.getElementById('sidebar-toggle').addEventListener('click', this._events._toggle);
 	}
 }
