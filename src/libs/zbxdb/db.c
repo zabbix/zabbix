@@ -402,7 +402,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 		if (0 != mysql_options(conn, MYSQL_OPT_SSL_MODE, &mysql_tls_mode))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot set MYSQL_OPT_SSL_MODE option.");
+			zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_MODE option.");
 			ret = ZBX_DB_FAIL;
 		}
 	}
