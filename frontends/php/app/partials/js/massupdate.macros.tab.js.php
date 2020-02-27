@@ -102,7 +102,7 @@
 			const form = document.getElementById('mass_update_macros').closest('form');
 
 			this.eventHandler = this.controlEventHandle.bind(this);
-			this.submitHandler = this.removeHandle.bind(this);
+			this.submitHandler = this.submitEventHandle.bind(this);
 
 			[...elem].map((el) => el.addEventListener('click', this.eventHandler));
 
@@ -117,9 +117,8 @@
 			const value = elem.querySelector('input:checked').value;
 			const macro_table = document.getElementById('tbl_macros');
 
-			macro_table.style.display = 'table';
-
 			macro_table.classList.remove('massupdate-remove');
+			macro_table.style.display = 'table';
 
 			this.showCheckboxBlock(value);
 
@@ -135,28 +134,29 @@
 		}
 
 		showCheckboxBlock(type) {
-			// Hide all checkbox.
+			// Hide all checkboxes.
 			[...document.querySelectorAll('.<?= ZBX_STYLE_CHECKBOX_BLOCK ?>')].map((el) => {
 				el.style.display = 'none';
 			});
 
 			// Show proper checkbox.
-			document.querySelector('[data-type=\'' + type + '\']').style.display = 'block';
+			document.querySelector(`[data-type='${type}']`).style.display = 'block';
 		}
 
 		isMacrosTab() {
 			return document.getElementById('visible_macros').checked;
 		}
 
-		removeHandle(event) {
+		submitEventHandle(event) {
 			if (!this.isMacrosTab()) {
 				return true;
 			}
 
-			const checkbox_state = document.getElementById('macros_remove_all').checked;
-			const is_remove_block = document.querySelector('[name=mass_update_macros]:checked').value == <?= ZBX_ACTION_REMOVE_ALL ?>;
+			const is_checked = document.getElementById('macros_remove_all').checked;
+			const is_remove_block =
+					document.querySelector('[name=mass_update_macros]:checked').value == <?= ZBX_ACTION_REMOVE_ALL ?>;
 
-			if (is_remove_block && !checkbox_state) {
+			if (is_remove_block && !is_checked) {
 				event.preventDefault();
 
 				overlayDialogue({

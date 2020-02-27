@@ -52,7 +52,8 @@ $fields = [
 							],
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'mass_update_macros' => [T_ZBX_INT, O_OPT, null,		IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+	'mass_update_macros' => [T_ZBX_INT, O_OPT, null,
+								IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
 								null
 							],
 	'macros_add'		=> [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
