@@ -2147,8 +2147,7 @@ static void	zbx_shutdown_snmp(void)
 
 void	zbx_clear_cache_snmp(void)
 {
-	free_etimelist();
-	clear_user_list();
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp();
 	zbx_init_snmp();
 }
