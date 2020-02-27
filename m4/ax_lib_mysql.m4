@@ -191,6 +191,9 @@ AC_DEFUN([AX_LIB_MYSQL],
                 ;;
                 esac
             done
+            LDFLAGS="${_save_mysql_ldflags}"
+            CFLAGS="${_save_mysql_cflags}"
+
             CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
             LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS}"
             LIBS="${LIBS} ${MYSQL_LIBS}"
