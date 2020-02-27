@@ -176,7 +176,7 @@ class CControllerHostView extends CControllerHost {
 		];
 
 		$refresh_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.hostsmon.refresh')
+			->setArgument('action', 'host.view.refresh')
 			->setArgument('filter_name', $filter['name'])
 			->setArgument('filter_groupids', $filter['groupids'])
 			->setArgument('filter_ip', $filter['ip'])
