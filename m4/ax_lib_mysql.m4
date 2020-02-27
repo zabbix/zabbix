@@ -155,9 +155,9 @@ AC_DEFUN([AX_LIB_MYSQL],
             MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"
             _full_libmysql_libs="`$MYSQL_CONFIG --libs`"
 
-             _save_mysql_ldflags="${LDFLAGS}"
+            _save_mysql_ldflags="${LDFLAGS}"
             _save_mysql_cflags="${CFLAGS}"
-            _save_postgresql_libs="${LIBS}"
+            _save_mysql_libs="${LIBS}"
             LDFLAGS="${LDFLAGS} ${_full_libmysql_libs}"
             CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
 
@@ -203,7 +203,7 @@ AC_DEFUN([AX_LIB_MYSQL],
 
             LDFLAGS="${_save_mysql_ldflags}"
             CFLAGS="${_save_mysql_cflags}"
-            LIBS="${_save_postgresql_libs}"
+            LIBS="${_save_mysql_libs}"
             unset _save_mysql_ldflags
             unset _save_mysql_cflags
             MYSQL_VERSION=`$MYSQL_CONFIG --version`
