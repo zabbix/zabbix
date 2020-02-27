@@ -43,7 +43,6 @@
 #error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
 #endif
 
-#define ZBX_DB_TLS_CONNECT_PREFERRED_TXT	"preferred"
 #define ZBX_DB_TLS_CONNECT_REQUIRED_TXT		"required"
 #define ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT	"verify_ca"
 #define ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT	"verify_full"
