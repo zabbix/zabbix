@@ -19,10 +19,14 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.user.edit.common.js.php');
-$this->includeJSfile(($data['action'] === 'user.edit')
-	? 'app/views/administration.user.edit.js.php'
-	: 'app/views/administration.userprofile.edit.js.php'
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('administration.user.edit.common.js.php');
+$this->includeJsFile(($data['action'] === 'user.edit')
+	? 'administration.user.edit.js.php'
+	: 'administration.userprofile.edit.js.php'
 );
 $this->addJsFile('multiselect.js');
 
@@ -360,7 +364,7 @@ if ($data['action'] !== 'user.edit') {
 			'timeout_row'
 		)
 		->addRow(_('Play sound'),
-			new CComboBox('messages[sounds.repeat]', $data['messages']['sounds.repeat'], 'if (IE) { submit() }', [
+			new CComboBox('messages[sounds.repeat]', $data['messages']['sounds.repeat'], null, [
 				1 => _('Once'),
 				10 => _n('%1$s second', '%1$s seconds', 10),
 				-1 => _('Message timeout')

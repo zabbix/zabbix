@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/common.template.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Templates'));
@@ -333,6 +337,7 @@ $cloneOrFullClone = ($data['form'] === 'clone' || $data['form'] === 'full_clone'
 
 $divTabs->addTab('templateTab', _('Template'), $templateList);
 
+// templates
 $tmplList = new CFormList();
 
 $disableids = [];
@@ -409,13 +414,11 @@ $tmplList
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 
 // tags
-$tags_view = new CView('configuration.tags.tab', [
+$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 	'source' => 'template',
 	'tags' => $data['tags'],
 	'readonly' => $data['readonly']
-]);
-
-$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
+]));
 
 // macros
 $divTabs->addTab('macroTab', _('Macros'),
@@ -425,11 +428,11 @@ $divTabs->addTab('macroTab', _('Macros'),
 			->addValue(_('Inherited and template macros'), 1)
 			->setModern(true)
 		)
-		->addRow(null, new CObject((new CView('hostmacros.list.html', [
+		->addRow(null, new CPartial('hostmacros.list.html', [
 			'macros' => $data['macros'],
 			'show_inherited_macros' => $data['show_inherited_macros'],
 			'readonly' => $data['readonly']
-		]))->getOutput()), 'macros_container')
+		]), 'macros_container')
 );
 
 // footer
@@ -461,4 +464,4 @@ $frmHost->addItem($divTabs);
 
 $widget->addItem($frmHost);
 
-return $widget;
+$widget->show();

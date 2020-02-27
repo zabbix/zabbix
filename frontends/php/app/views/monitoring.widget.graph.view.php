@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if ($data['graph']['unavailable_object']) {
 	$item = (new CTableInfo())->setNoDataMessage(_('No permissions to referred object or it does not exist!'));
 

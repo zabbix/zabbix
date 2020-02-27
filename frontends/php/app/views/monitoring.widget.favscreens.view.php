@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $table = (new CTableInfo())->setNoDataMessage(_('No screens added.'));
 
 foreach ($data['screens'] as $screen) {

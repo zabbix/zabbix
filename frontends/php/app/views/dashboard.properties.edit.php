@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm())
 	->cleanItems()
 	->setName('dashboard_properties_form');

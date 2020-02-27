@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $data['backurl'] = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
 	->getUrl();

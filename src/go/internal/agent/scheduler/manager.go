@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/alias"
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/conf"
@@ -42,7 +43,7 @@ type Manager struct {
 	plugins     map[string]*pluginAgent
 	pluginQueue pluginHeap
 	clients     map[uint64]*client
-	aliases     []keyAlias
+	aliases     *alias.Manager
 }
 
 type updateRequest struct {
@@ -62,7 +63,7 @@ type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, expressions []*glexpr.Expression,
 		requests []*plugin.Request)
 	FinishTask(task performer)
-	PerformTask(key string, timeout time.Duration) (result string, err error)
+	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
 	Query(command string) (status string)
 }
 
@@ -136,7 +137,8 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		var params []string
 		var err error
 		var p *pluginAgent
-		r.Key = m.getAlias(r.Key)
+
+		r.Key = m.aliases.Get(r.Key)
 		if key, params, err = itemutil.ParseKey(r.Key); err == nil {
 			p, ok = m.plugins[key]
 			if ok {
@@ -150,7 +152,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 
 		if err != nil {
-			if c.id != 0 {
+			if c.id > agent.ActiveChecksClientID {
 				if tacc, ok := c.exporters[r.Itemid]; ok {
 					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
 					tacc.task().deactivate()
@@ -405,12 +407,13 @@ func (r resultWriter) PersistSlotsAvailable() int {
 	return 1
 }
 
-func (m *Manager) PerformTask(key string, timeout time.Duration) (result string, err error) {
+func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error) {
 	var lastLogsize uint64
 	var mtime int
 
 	w := make(resultWriter, 1)
-	m.UpdateTasks(0, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+
+	m.UpdateTasks(clientID, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
 
 	select {
 	case r := <-w:
@@ -451,8 +454,9 @@ func (m *Manager) validatePlugins(options *agent.AgentOptions) (err error) {
 	return
 }
 
-func (m *Manager) configure(options *agent.AgentOptions) error {
-	return m.loadAlias(options)
+func (m *Manager) configure(options *agent.AgentOptions) (err error) {
+	m.aliases, err = alias.NewManager(options)
+	return
 }
 
 func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {

@@ -18,6 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
+
 $auditWidget = (new CWidget())->setTitle(_('Action log'));
 
 // create filter
@@ -136,4 +141,4 @@ zbx_add_post_js('timeControl.processObjects();');
 // append form to widget
 $auditWidget->addItem($auditForm);
 
-return $auditWidget;
+$auditWidget->show();

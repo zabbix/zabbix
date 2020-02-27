@@ -139,7 +139,7 @@ func (c *Connector) refreshActiveChecks() {
 
 		a.HostMetadata = c.options.HostMetadata
 	} else if len(c.options.HostMetadataItem) > 0 {
-		a.HostMetadata, err = c.taskManager.PerformTask(c.options.HostMetadataItem, time.Duration(c.options.Timeout)*time.Second)
+		a.HostMetadata, err = c.taskManager.PerformTask(c.options.HostMetadataItem, time.Duration(c.options.Timeout)*time.Second, agent.LocalChecksClientID)
 		if err != nil {
 			log.Errf("cannot get host metadata: %s", err)
 			return
