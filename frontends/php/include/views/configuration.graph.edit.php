@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widget = new CWidget();
 
@@ -188,7 +192,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$yaxisMinData[] = (new CButton('yaxis_min', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",jQuery.extend('.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'items',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -209,7 +213,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMinData[] = (new CButton('yaxis_min_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
+					json_encode([
 						'srctbl' => 'item_prototypes',
 						'srcfld1' => 'itemid',
 						'srcfld2' => 'name',
@@ -270,7 +274,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$yaxisMaxData[] = (new CButton('yaxis_max', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",jQuery.extend('.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'items',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -291,7 +295,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMaxData[] = (new CButton('yaxis_max_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
+					json_encode([
 						'srctbl' => 'item_prototypes',
 						'srcfld1' => 'itemid',
 						'srcfld2' => 'name',
@@ -394,13 +398,13 @@ $items_table->addRow(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
 						->onClick('return PopUp("popup.generic",jQuery.extend('.
-							CJs::encodeJson($popup_options_add).',getOnlyHostParam()), null, this);'
+							json_encode($popup_options_add).',getOnlyHostParam()), null, this);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
 							->onClick('return PopUp("popup.generic",'.
-								CJs::encodeJson($popup_options_add_prototype).', null, this);'
+								json_encode($popup_options_add_prototype).', null, this);'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
@@ -420,8 +424,8 @@ foreach ($this->data['items'] as $n => $item) {
 		$item['yaxisside'] = 0;
 	}
 
-	insert_js('loadItem('.$n.', '.CJs::encodeJson($item['gitemid']).', '.$this->data['graphid'].', '.$item['itemid'].', '.
-		CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
+	insert_js('loadItem('.$n.', '.json_encode($item['gitemid']).', '.$this->data['graphid'].', '.$item['itemid'].', '.
+		json_encode($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
 		$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
 		true
 	);
@@ -488,4 +492,4 @@ $graphForm->addItem($graphTab);
 // Append form to widget.
 $widget->addItem($graphForm);
 
-return $widget;
+$widget->show();

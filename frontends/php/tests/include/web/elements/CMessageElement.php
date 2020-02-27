@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,5 +81,15 @@ class CMessageElement extends CElement {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Close message.
+	 *
+	 * @return $this
+	 */
+	public function close() {
+		$this->query('xpath:.//button[contains(@class, "overlay-close-btn")]')->one()->click();
+		return $this->waitUntilNotPresent();
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,104 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/**
+ * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
+ *
+ * @param url
+ * @param add_sid	boolean	Add SID to given URL. Default: true.
+ */
+var Curl = function(url, add_sid) {
+	url = url || location.href;
+	if (typeof add_sid === 'undefined') {
+		add_sid = true;
+	}
 
-var Curl = Class.create();
+	this.url = url;
+	this.args = {};
+
+	this.query = (this.url.indexOf('?') >= 0) ? this.url.substring(this.url.indexOf('?') + 1) : '';
+	if (this.query.indexOf('#') >= 0) {
+		this.query = this.query.substring(0, this.query.indexOf('#'));
+	}
+
+	var protocolSepIndex = this.url.indexOf('://');
+	if (protocolSepIndex >= 0) {
+		this.protocol = this.url.substring(0, protocolSepIndex).toLowerCase();
+		this.host = this.url.substring(protocolSepIndex + 3);
+
+		if (this.host.indexOf('/') >= 0) {
+			this.host = this.host.substring(0, this.host.indexOf('/'));
+		}
+
+		var atIndex = this.host.indexOf('@');
+		if (atIndex >= 0) {
+			var credentials = this.host.substring(0, atIndex);
+			var colonIndex = credentials.indexOf(':');
+
+			if (colonIndex >= 0) {
+				this.username = credentials.substring(0, colonIndex);
+				this.password = credentials.substring(colonIndex);
+			}
+			else {
+				this.username = credentials;
+			}
+			this.host = this.host.substring(atIndex + 1);
+		}
+
+		var host_ipv6 = this.host.indexOf(']');
+		if (host_ipv6 >= 0) {
+			if (host_ipv6 < (this.host.length - 1)) {
+				host_ipv6++;
+				var host_less = this.host.substring(host_ipv6);
+
+				var portColonIndex = host_less.indexOf(':');
+				if (portColonIndex >= 0) {
+					this.port = host_less.substring(portColonIndex + 1);
+					this.host = this.host.substring(0, host_ipv6);
+				}
+			}
+		}
+		else {
+			var portColonIndex = this.host.indexOf(':');
+			if (portColonIndex >= 0) {
+				this.port = this.host.substring(portColonIndex + 1);
+				this.host = this.host.substring(0, portColonIndex);
+			}
+		}
+		this.file = this.url.substring(protocolSepIndex + 3);
+		this.file = this.file.substring(this.file.indexOf('/'));
+
+		if (this.file == this.host) {
+			this.file = '';
+		}
+	}
+	else {
+		this.file = this.url;
+	}
+
+	if (this.file.indexOf('?') >= 0) {
+		this.file = this.file.substring(0, this.file.indexOf('?'));
+	}
+
+	var refSepIndex = this.file.indexOf('#');
+	if (refSepIndex >= 0) {
+		this.reference = this.file.substring(refSepIndex + 1);
+		this.file = this.file.substring(0, refSepIndex);
+	}
+
+	this.path = this.file;
+	if (this.query.length > 0) {
+		this.file += '?' + this.query;
+	}
+	if (this.query.length > 0) {
+		this.formatArguments();
+	}
+
+	if (add_sid) {
+		this.addSID();
+	}
+};
+
 Curl.prototype = {
 
 	url:		'', // actually, it's deprecated/private variable
@@ -33,110 +129,12 @@ Curl.prototype = {
 	query:		'',
 	args:		null,
 
-	/**
-	 * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
-	 *
-	 * @param url
-	 * @param add_sid	boolean	Add SID to given URL. Default: true.
-	 */
-	initialize: function(url, add_sid) {
-		url = url || location.href;
-		if (typeof add_sid === 'undefined') {
-			add_sid = true;
-		}
-
-		this.url = url;
-		this.args = {};
-
-		this.query = (this.url.indexOf('?') >= 0) ? this.url.substring(this.url.indexOf('?') + 1) : '';
-		if (this.query.indexOf('#') >= 0) {
-			this.query = this.query.substring(0, this.query.indexOf('#'));
-		}
-
-		var protocolSepIndex = this.url.indexOf('://');
-		if (protocolSepIndex >= 0) {
-			this.protocol = this.url.substring(0, protocolSepIndex).toLowerCase();
-			this.host = this.url.substring(protocolSepIndex + 3);
-
-			if (this.host.indexOf('/') >= 0) {
-				this.host = this.host.substring(0, this.host.indexOf('/'));
-			}
-
-			var atIndex = this.host.indexOf('@');
-			if (atIndex >= 0) {
-				var credentials = this.host.substring(0, atIndex);
-				var colonIndex = credentials.indexOf(':');
-
-				if (colonIndex >= 0) {
-					this.username = credentials.substring(0, colonIndex);
-					this.password = credentials.substring(colonIndex);
-				}
-				else {
-					this.username = credentials;
-				}
-				this.host = this.host.substring(atIndex + 1);
-			}
-
-			var host_ipv6 = this.host.indexOf(']');
-			if (host_ipv6 >= 0) {
-				if (host_ipv6 < (this.host.length - 1)) {
-					host_ipv6++;
-					var host_less = this.host.substring(host_ipv6);
-
-					var portColonIndex = host_less.indexOf(':');
-					if (portColonIndex >= 0) {
-						this.port = host_less.substring(portColonIndex + 1);
-						this.host = this.host.substring(0, host_ipv6);
-					}
-				}
-			}
-			else {
-				var portColonIndex = this.host.indexOf(':');
-				if (portColonIndex >= 0) {
-					this.port = this.host.substring(portColonIndex + 1);
-					this.host = this.host.substring(0, portColonIndex);
-				}
-			}
-			this.file = this.url.substring(protocolSepIndex + 3);
-			this.file = this.file.substring(this.file.indexOf('/'));
-
-			if (this.file == this.host) {
-				this.file = '';
-			}
-		}
-		else {
-			this.file = this.url;
-		}
-
-		if (this.file.indexOf('?') >= 0) {
-			this.file = this.file.substring(0, this.file.indexOf('?'));
-		}
-
-		var refSepIndex = this.file.indexOf('#');
-		if (refSepIndex >= 0) {
-			this.reference = this.file.substring(refSepIndex + 1);
-			this.file = this.file.substring(0, refSepIndex);
-		}
-
-		this.path = this.file;
-		if (this.query.length > 0) {
-			this.file += '?' + this.query;
-		}
-		if (this.query.length > 0) {
-			this.formatArguments();
-		}
-
-		if (add_sid) {
-			this.addSID();
-		}
-	},
-
 	addSID: function() {
 		var sid = '';
-		var possition = parseInt(location.href.indexOf('sid='));
+		var position = parseInt(location.href.indexOf('sid='));
 
-		if (possition > -1) {
-			sid = location.href.substr(possition + 4, 16);
+		if (position > -1) {
+			sid = location.href.substr(position + 4, 16);
 		}
 		else {
 			sid = jQuery('meta[name="csrf-token"]').attr('content');

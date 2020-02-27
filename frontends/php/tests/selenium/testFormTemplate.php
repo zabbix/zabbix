@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
 			// Check if template name present on page, if not, check on second page.
-			if ($this->query('link', $name)->one(false) === null) {
+			if (!$this->query('link', $name)->one(false)->isValid()) {
 				$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
 				$this->zbxTestWaitForPageToLoad();
 			}
@@ -213,32 +213,6 @@ class testFormTemplate extends CLegacyWebTest {
 				$this->zbxTestAssertElementValue('description', $data['description']);
 			}
 		}
-	}
-
-	/**
-	 * Adds two macros to an existing host.
-	 */
-	public function testFormTemplate_AddMacros() {
-		$template = CDBHelper::getRow('select hostid from hosts where host='.zbx_dbstr($this->template));
-
-		$this->zbxTestLogin('templates.php?page=1');
-		$this->zbxTestClickLinkTextWait($this->template);
-		$this->zbxTestTabSwitch('Macros');
-		$this->zbxTestInputTypeWait('macros_0_macro', '{$TEST_MACRO}');
-		$this->zbxTestInputType('macros_0_value', '1');
-		$this->zbxTestClick('macro_add');
-		$this->zbxTestInputTypeWait('macros_1_macro', '{$TEST_MACRO2}');
-		$this->zbxTestInputType('macros_1_value', '2');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template updated');
-
-		$this->zbxTestClickLinkTextWait($this->template);
-		$this->zbxTestTabSwitch('Macros');
-		$this->zbxTestAssertElementValue('macros_0_macro', '{$TEST_MACRO}');
-		$this->zbxTestAssertElementValue('macros_0_value', '1');
-		$this->zbxTestAssertElementValue('macros_1_macro', '{$TEST_MACRO2}');
-		$this->zbxTestAssertElementValue('macros_1_value', '2');
-		$this->assertEquals(2, CDBHelper::getCount("SELECT * FROM hostmacro WHERE hostid='".$template['hostid']."'"));
 	}
 
 	public function testFormTemplate_UpdateTemplateName() {

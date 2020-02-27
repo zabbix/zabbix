@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,11 +24,12 @@ function getSounds() {
 	$dir = scandir('./audio');
 
 	foreach ($dir as $file) {
-		if ('audio/' !== substr(mime_content_type('./audio/'.$file), 0, 6)) {
+		$pos = strrpos($file, '.');
+		if ($pos === false || mb_strtolower(substr($file, $pos + 1)) !== 'mp3') {
 			continue;
 		}
 
-		$filename = explode('.', $file)[0];
+		$filename = substr($file, 0, $pos);
 		$file_list[$filename] = $file;
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,17 +70,10 @@ $timeselector_options = [
 ];
 updateTimeSelectorPeriod($timeselector_options);
 
-if (!hasRequest('filter_set')) {
-	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$defaultSeverities[$severity] = $severity;
-	}
-}
-else {
-	$defaultSeverities = [];
-}
-
 $data['filter'] = [
-	'severities' => CProfile::getArray('web.toptriggers.filter.severities', $defaultSeverities),
+	'severities' => CProfile::getArray('web.toptriggers.filter.severities',
+		hasRequest('filter_set') ? [] : range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+	),
 	'timeline' => getTimeSelectorPeriod($timeselector_options),
 	'active_tab' => CProfile::get('web.toptriggers.filter.active', 1)
 ];
@@ -199,8 +192,6 @@ $data['hosts'] = API::Host()->get([
 ]);
 
 // render view
-$historyView = new CView('reports.toptriggers', $data);
-$historyView->render();
-$historyView->show();
+echo (new CView('reports.toptriggers', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

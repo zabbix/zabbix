@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,7 +256,7 @@ ZABBIX.apps.map = (function($) {
 						favobj: 'sysmap',
 						action: 'update',
 						sysmapid: this.sysmapid,
-						sysmap: Object.toJSON(this.data) // TODO: remove prototype method
+						sysmap: JSON.stringify(this.data)
 					},
 					error: function() {
 						throw new Error('Cannot update map.');
@@ -312,7 +312,7 @@ ZABBIX.apps.map = (function($) {
 							favobj: 'sysmap',
 							action: 'expand',
 							sysmapid: this.sysmapid,
-							source: Object.toJSON(post)
+							source: JSON.stringify(post)
 						},
 						success: function(data) {
 							try {
@@ -1916,7 +1916,7 @@ ZABBIX.apps.map = (function($) {
 							}, this),
 							start: $.proxy(function() {
 								this.domNode
-									.addClass(IE ? 'cursor-move' : 'cursor-dragging')
+									.addClass('cursor-dragging')
 									.removeClass('cursor-pointer');
 								this.sysmap.dragGroupInit(this);
 							}, this),
@@ -1926,7 +1926,7 @@ ZABBIX.apps.map = (function($) {
 							stop: $.proxy(function() {
 								this.domNode
 									.addClass('cursor-pointer')
-									.removeClass(IE ? 'cursor-move' : 'cursor-dragging');
+									.removeClass('cursor-dragging');
 								this.sysmap.dragGroupStop(this);
 							}, this)
 						});
@@ -2502,7 +2502,7 @@ ZABBIX.apps.map = (function($) {
 			getDimensions: Shape.prototype.getDimensions,
 
 			/**
-			 * Updates element icon and height/witdh in case element is area type.
+			 * Updates element icon and height/width in case element is area type.
 			 */
 			updateIcon: function() {
 				var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
@@ -2814,7 +2814,7 @@ ZABBIX.apps.map = (function($) {
 				triggers = triggers.concat(selected_triggers);
 
 				if (triggers) {
-					triggers.each(function(trigger) {
+					triggers.forEach(function(trigger) {
 						if ($('input[name^="element_id[' + trigger.id + ']"]').length == 0) {
 							triggerids.push(trigger.id);
 							triggers_to_insert[trigger.id] = {
@@ -2840,8 +2840,8 @@ ZABBIX.apps.map = (function($) {
 							},
 							success: function(data) {
 								data = JSON.parse(data);
-								triggers.each(function(sorted_trigger) {
-									data.result.each(function(trigger) {
+								triggers.forEach(function(sorted_trigger) {
+									data.result.forEach(function(trigger) {
 										if (sorted_trigger.id == trigger.triggerid) {
 											if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
 												trigger.name = triggers_to_insert[trigger.triggerid].name;
@@ -3066,7 +3066,7 @@ ZABBIX.apps.map = (function($) {
 					items: 'tbody tr.sortable',
 					axis: 'y',
 					containment: 'parent',
-					cursor: IE ? 'move' : 'grabbing',
+					cursor: 'grabbing',
 					handle: 'div.drag-icon',
 					tolerance: 'pointer',
 					opacity: 0.6,
@@ -3102,7 +3102,7 @@ ZABBIX.apps.map = (function($) {
 					});
 
 					$('#triggerContainer tbody').html('');
-					triggers.each(function(trigger) {
+					triggers.forEach(function(trigger) {
 						$('#triggerContainer tbody').append(trigger.html);
 					});
 				}
@@ -3271,7 +3271,8 @@ ZABBIX.apps.map = (function($) {
 
 					list.push({
 						elementType: elementTypeText,
-						elementName: element.getName().escapeHTML()
+						elementName: element.getName().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+								.replace(/\"/g,'&quot;').replace(/\'/g,'&apos;')
 					});
 				}
 
@@ -3553,7 +3554,7 @@ ZABBIX.apps.map = (function($) {
 					linkTrigger = linkTriggerPattern.exec(values[i].name);
 
 					if (linkTrigger !== null) {
-						if (linkTrigger[2] == 'color' && !colorPattern.match(values[i].value.toString())) {
+						if (linkTrigger[2] == 'color' && !values[i].value.toString().match(colorPattern)) {
 							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
@@ -3564,7 +3565,7 @@ ZABBIX.apps.map = (function($) {
 						data.linktriggers[linkTrigger[1]][linkTrigger[2]] = values[i].value.toString();
 					}
 					else {
-						if (values[i].name == 'color' && !colorPattern.match(values[i].value.toString())) {
+						if (values[i].name == 'color' && !values[i].value.toString().match(colorPattern)) {
 							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
@@ -3655,7 +3656,8 @@ ZABBIX.apps.map = (function($) {
 
 					for (i = 0, ln = optgroups[optgroupType].length; i < ln; i++) {
 						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">'
-							+ optgroups[optgroupType][i].getName().escapeHTML() + '</option>'
+							+ optgroups[optgroupType][i].getName().replace(/&/g,'&amp;').replace(/</g,'&lt;')
+									.replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/\'/g,'&apos;') + '</option>'
 						);
 					}
 

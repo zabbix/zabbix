@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2020 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ window.ZABBIX = Object.create({
 	 * @param {string} path  Dot separated path. Each segment is used as object key.
 	 * @param {mixed} value  Optional value to be written into path only if path held undefined before.
 	 *
-	 * @return {mixed}  Value underlaying the path is returned.
+	 * @return {mixed}  Value underlying the path is returned.
 	 */
 	namespace: function(path, value) {
 		return path.split('.').reduce(function(obj, pt, idx, src) {
@@ -77,10 +77,6 @@ jQuery(function($) {
 				return false;
 			}
 		});
-	}
-
-	if (IE) {
-		setTimeout(function () { $('[autofocus]').focus(); }, 10);
 	}
 
 	/**
@@ -195,9 +191,8 @@ jQuery(function($) {
 	function createMenuPopupPreloader() {
 		return $('<div>', {
 			'id': 'menu-popup-preloader',
-			'class': 'preloader-container menu-popup-preloader'
+			'class': 'is-loading menu-popup-preloader'
 		})
-			.append($('<div>').addClass('preloader'))
 			.appendTo($('body'))
 			.on('click', function(e) {
 				e.stopPropagation();
@@ -209,7 +204,7 @@ jQuery(function($) {
 	 * Event handler for the preloader elements destroy.
 	 */
 	function menuPopupPreloaderCloseHandler(event) {
-		overlayPreloaderDestroy(event.data.id, event.data.xhr);
+		overlayPreloaderDestroy(event.data.id);
 	}
 
 	/**
@@ -246,8 +241,9 @@ jQuery(function($) {
 				};
 
 			default:
+				// Should match the default algorithm used in $.menuPopup().
 				return {
-					of: event,
+					of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
 					my: 'left top',
 					at: 'left bottom'
 				};
@@ -308,7 +304,7 @@ jQuery(function($) {
 
 			$(document)
 				.off('click', menuPopupPreloaderCloseHandler)
-				.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
+				.on('click', {id: $preloader.prop('id')}, menuPopupPreloaderCloseHandler);
 		}
 		else {
 			showMenuPopup($obj, jQuery.extend({type: data.type}, data.data), event, options);
@@ -370,4 +366,52 @@ jQuery(function($) {
 
 	// Initialize hintBox event handlers.
 	hintBox.bindEvents();
+
+	/**
+	 * @param {boolean} preserve_state  Preserve current state of the debug button.
+	 *
+	 * @returns {boolean} false
+	 */
+	function debug_click_handler(preserve_state) {
+		var $button = $(this),
+			visible = sessionStorage.getItem('debug-info-visible') === '1';
+
+		if (preserve_state !== true) {
+			visible = !visible;
+
+			sessionStorage.setItem('debug-info-visible', visible ? '1' : '0');
+		}
+
+		$button.text(visible ? t('Hide debug') : t('Debug'));
+
+		var style = $button.data('debug-info-style');
+		if (style) {
+			style.sheet.deleteRule(0);
+		}
+		else {
+			style = document.createElement('style');
+			$button.data('debug-info-style', style);
+			document.head.appendChild(style);
+		}
+
+		// ZBX_STYLE_DEBUG_OUTPUT
+		style.sheet.insertRule('.debug-output { display: ' + (visible ? 'block' : 'none') + '; }', 0);
+
+		if (preserve_state !== true) {
+			$.publish('debug.click', {
+				visible: visible
+			});
+		}
+
+		return false;
+	}
+
+	// Initialize ZBX_STYLE_BTN_DEBUG debug button and debug info state.
+	$('.btn-debug').each(function(index, button) {
+		$(button)
+			.on('click', debug_click_handler)
+			.addClass('visible');
+
+		debug_click_handler.call(button, true);
+	});
 });

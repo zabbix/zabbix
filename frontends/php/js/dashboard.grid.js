@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -327,6 +327,10 @@
 	 * @param {object} except_widget  Dashboard widget object.
 	 */
 	function doLeaveWidgetsExcept($obj, data, except_widget) {
+		if (!data['widgets']) {
+			return;
+		}
+
 		data['widgets'].forEach(function(widget) {
 			if (except_widget !== undefined && widget.uniqueid === except_widget.uniqueid) {
 				return;
@@ -493,7 +497,7 @@
 
 		var $widget_actions = $('.dashbrd-grid-widget-actions', $content_header);
 
-		buttons.each(function(button) {
+		buttons.forEach(function(button) {
 			$widget_actions.prepend(
 				$('<li>', {'class': 'widget-info-button'})
 					.append(
@@ -725,7 +729,7 @@
 				});
 			};
 
-		widgets.each(function(w) {
+		widgets.forEach(function(w) {
 			if (widget.uniqueid !== w.uniqueid && !overflow) {
 				w.current_pos = $.extend({}, w.pos);
 			}
@@ -743,7 +747,7 @@
 			.sort(function(box1, box2) {
 				return by_current ? box1.current_pos.y - box2.current_pos.y : box1.pos.y - box2.pos.y;
 			})
-			.each(function(box, index) {
+			.forEach(function(box, index) {
 				box.div.data('widget-index', index);
 			});
 
@@ -764,7 +768,7 @@
 
 				$.map(widgets, function(w) {
 					return (!('affected' in w) && rectOverlap(w_pos, w.pos)) ? w : null;
-				}).each(function(w) {
+				}).forEach(function(w) {
 					if (w.uniqueid !== widget.uniqueid) {
 						w.affected = true;
 						w.affected_by_id = affected_by.uniqueid;
@@ -846,7 +850,7 @@
 						? box
 						: null;
 				})
-				.each(function(box) {
+				.forEach(function(box) {
 					var boundary = $.extend({}, box.current_pos);
 
 					if (box.uniqueid !== widget.uniqueid) {
@@ -863,7 +867,7 @@
 
 		// Resize action for left/up is mirrored right/down action.
 		if ('mirrored' in axis) {
-			widgets.each(function(box) {
+			widgets.forEach(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
 				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
 			});
@@ -882,11 +886,11 @@
 			return box1.current_pos[axis_key] - box2.current_pos[axis_key];
 		});
 
-		/*
-		 * Compact affected widgets removing empty space between them when possible. Additionaly built overlap array
+		/**
+		 * Compact affected widgets removing empty space between them when possible. Additionally build overlap array
 		 * which will contain maximal coordinate occupied by widgets on every opposite axis line.
 		 */
-		affected.each(function(box) {
+		affected.forEach(function(box) {
 			var new_pos = axis_pos[axis_key] + axis_pos[size_key],
 				last = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key],
 				i;
@@ -941,7 +945,7 @@
 			 * Build affected boundaries object with minimum and maximum value on opposite axis for every widget.
 			 * Key in axis_boundaries object will be widget uniqueid and value boundaries object described above.
 			 */
-			affected.each(function(box) {
+			affected.forEach(function(box) {
 				var min = box.current_pos[opposite_axis_key],
 					max = min + box.current_pos[opposite_size_key],
 					size = box.current_pos[size_key],
@@ -959,7 +963,7 @@
 					size = new_max;
 					boxes = getAffectedInBounds(affected_box);
 
-					boxes.each(function(box) {
+					boxes.forEach(function(box) {
 						if (min > box.current_pos[opposite_axis_key]) {
 							min = box.current_pos[opposite_axis_key];
 							bounds_changes = true;
@@ -1038,7 +1042,7 @@
 				});
 
 				if (collapsed) {
-					affected.each(function(box) {
+					affected.forEach(function(box) {
 						if (box.current_pos[axis_key] > slot && box.current_pos[opposite_axis_key] in collapsed_pos) {
 							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
 								box.pos[axis_key]
@@ -1059,7 +1063,7 @@
 					slot += scanline[size_key];
 				}
 
-				next_col.concat(col).each(function(box) {
+				next_col.concat(col).forEach(function(box) {
 					if (collapsed && 'new_pos' in box) {
 						box.current_pos = box.new_pos;
 					}
@@ -1071,13 +1075,13 @@
 
 		/*
 		 * When resize failed to fit affected widgets move them into visible area and decrease size of widget
-		 * which started resize operation, additionaly setting 'overflow' property to widget.
+		 * which started resize operation, additionally setting 'overflow' property to widget.
 		 */
 		if (overlap > 0) {
 			widget.current_pos[size_key] -= overlap;
 			widget.current_pos.overflow = true;
 
-			affected.each(function(box) {
+			affected.forEach(function(box) {
 				box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - overlap, box.pos[axis_key]);
 			});
 		}
@@ -1089,7 +1093,7 @@
 		 */
 		affected.sort(function(box1, box2) {
 			return box2.current_pos[axis_key] - box1.current_pos[axis_key];
-		}).each(function(box) {
+		}).forEach(function(box) {
 			if (box.pos[size_key] > box.current_pos[size_key]) {
 				var new_pos = $.extend({}, box.current_pos),
 					size = Math.min(box.pos[size_key], size_max - box.current_pos[axis_key]);
@@ -1099,7 +1103,7 @@
 					return col_box.uniqueid !== box.uniqueid && rectOverlap(col_box.current_pos, new_pos)
 						? col_box
 						: null;
-				}).each(function(col_box) {
+				}).forEach(function(col_box) {
 					size = Math.min(size,
 						col_box.current_pos[axis_key] - box.current_pos[axis_key]
 					);
@@ -1111,7 +1115,7 @@
 
 		// Resize action for left/up is mirrored right/down action, mirror coordinates back.
 		if ('mirrored' in axis) {
-			widgets.each(function(box) {
+			widgets.forEach(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
 				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
 			});
@@ -1134,7 +1138,7 @@
 					? ['x', 'y']
 					: ['y', 'x'];
 
-		data.widgets.each(function(box) {
+		data.widgets.forEach(function(box) {
 			if (box.uniqueid !== widget.uniqueid) {
 				box.current_pos = $.extend({}, box.pos);
 			}
@@ -1173,7 +1177,7 @@
 					&& rectOverlap(widget.current_pos, box.current_pos))
 					? box
 					: null;
-			}).each(function(box) {
+			}).forEach(function(box) {
 				if (rectOverlap(pos, box.current_pos)) {
 					box.affected_axis = 'y';
 				}
@@ -1184,8 +1188,8 @@
 		widget.prev_pos = $.extend(widget.prev_pos, widget.current_pos);
 
 		// Process changes for every axis.
-		process_order.each(function(axis_key) {
-			data.widgets.each(function(box) {
+		process_order.forEach(function(axis_key) {
+			data.widgets.forEach(function(box) {
 				if ('affected_axis' in box && box.affected_axis === axis_key) {
 					delete box.affected_axis;
 				}
@@ -1273,7 +1277,7 @@
 				alignIteratorContents($obj, data, widget, widget['current_pos']);
 			}
 
-			data.widgets.each(function(box) {
+			data.widgets.forEach(function(box) {
 				if (widget.uniqueid !== box.uniqueid) {
 					if (box['iterator']) {
 						var box_pos = calcDivPosition($obj, data, box['div']);
@@ -1315,7 +1319,7 @@
 
 			if (overflow) {
 				// restore last non-overflow position
-				data.widgets.each(function(w) {
+				data.widgets.forEach(function(w) {
 					w.current_pos = $.extend({}, data.undo_pos[w.uniqueid]);
 				});
 				pos = widget.current_pos;
@@ -1323,7 +1327,7 @@
 			else {
 				// store all widget current_pos objects
 				data.undo_pos = {};
-				data.widgets.each(function(w) {
+				data.widgets.forEach(function(w) {
 					data.undo_pos[w.uniqueid] = $.extend({}, w.current_pos);
 				});
 
@@ -1377,7 +1381,7 @@
 
 	function makeDraggable($obj, data, widget) {
 		widget['div'].draggable({
-			cursor: IE ? 'move' : 'grabbing',
+			cursor: 'grabbing',
 			handle: widget['content_header'],
 			scroll: true,
 			scrollSensitivity: data.options['widget-height'],
@@ -1396,7 +1400,7 @@
 
 				widget.current_pos = $.extend({}, widget.pos);
 				data.undo_pos = {};
-				data.widgets.each(function(w) {
+				data.widgets.forEach(function(w) {
 					data.undo_pos[w.uniqueid] = $.extend({}, w.current_pos);
 				});
 			},
@@ -1413,7 +1417,8 @@
 				delete data.calculated;
 				delete data.undo_pos;
 
-				data.widgets = sortWidgets(data.widgets).each(function(widget) {
+				data.widgets = sortWidgets(data.widgets);
+				data.widgets.forEach(function(widget) {
 					delete widget.affected_by_draggable;
 					delete widget.affected_by_id;
 					delete widget.affected;
@@ -1465,7 +1470,7 @@
 				data['resizing_top'] = handle_class.match(/(^|\s)ui-resizable-(n|ne|nw)($|\s)/) !== null;
 				data['resizing_left'] = handle_class.match(/(^|\s)ui-resizable-(w|sw|nw)($|\s)/) !== null;
 
-				data.widgets.each(function(box) {
+				data.widgets.forEach(function(box) {
 					delete box.affected_axis;
 				});
 
@@ -1546,7 +1551,7 @@
 					});
 
 				// Invoke onResizeEnd on every affected widget.
-				data.widgets.each(function(box) {
+				data.widgets.forEach(function(box) {
 					if ('affected_axis' in box || box.uniqueid === widget.uniqueid) {
 						resizeWidget($obj, data, box);
 					}
@@ -1565,7 +1570,7 @@
 	 * @param {string} ignoreid  All widgets except widget with such uniqueid will be affected.
 	 */
 	function setResizableState(state, widgets, ignoreid) {
-		widgets.each(function(widget) {
+		widgets.forEach(function(widget) {
 			if (widget.uniqueid !== ignoreid) {
 				widget.div.resizable(state);
 			}
@@ -1573,32 +1578,27 @@
 	}
 
 	function showPreloader(widget) {
-		if (typeof widget['preloader_div'] === 'undefined') {
-			if (widget['iterator']) {
-				widget['div'].addClass('iterator-loading');
-			}
-
-			widget['preloader_div'] = $('<div>')
-				.addClass('preloader-container')
-				.append($('<div>').addClass('preloader'));
-
-			widget['div'].append(widget['preloader_div']);
+		if (widget['iterator']) {
+			widget['div'].find('.dashbrd-grid-iterator-content').addClass('is-loading');
+		}
+		else {
+			widget['div'].find('.dashbrd-grid-widget-content').addClass('is-loading');
 		}
 	}
 
 	function hidePreloader(widget) {
-		if (typeof widget['preloader_div'] !== 'undefined') {
-			if (widget['iterator']) {
-				widget['div'].removeClass('iterator-loading');
-			}
-
-			widget['preloader_div'].remove();
-			delete widget['preloader_div'];
+		if (widget['iterator']) {
+			widget['div'].find('.dashbrd-grid-iterator-content').removeClass('is-loading');
+		}
+		else {
+			widget['div'].find('.dashbrd-grid-widget-content').removeClass('is-loading');
 		}
 	}
 
-	function startPreloader(widget) {
-		if (typeof widget['preloader_timeoutid'] !== 'undefined' || typeof widget['preloader_div'] !== 'undefined') {
+	function startPreloader(widget, timeout) {
+		timeout = timeout || widget['preloader_timeout'];
+
+		if (typeof widget['preloader_timeoutid'] !== 'undefined' || widget['div'].find('.is-loading').length) {
 			return;
 		}
 
@@ -1606,8 +1606,7 @@
 			delete widget['preloader_timeoutid'];
 
 			showPreloader(widget);
-			widget['content_body'].stop(true, true).fadeTo(widget['preloader_fadespeed'], 0.4);
-		}, widget['preloader_timeout']);
+		}, timeout);
 	}
 
 	function stopPreloader(widget) {
@@ -1617,10 +1616,6 @@
 		}
 
 		hidePreloader(widget);
-
-		// Stop animations and set to visible state.
-		// Do not use .show(), nor .fadeTo(0, 1) here, since these set display: block, which will break css rules.
-		widget['content_body'].stop(true, true).css('opacity', 1);
 	}
 
 	function setUpdateWidgetContentTimer($obj, data, widget, rf_rate) {
@@ -1775,7 +1770,6 @@
 			'header': '',
 			'view_mode': iterator['view_mode'],
 			'preloader_timeout': 10000,	// in milliseconds
-			'preloader_fadespeed': 500,
 			'update_paused': false,
 			'initial_load': true,
 			'ready': false,
@@ -1957,9 +1951,7 @@
 		widget['content_body'].append(response.body);
 
 		if (typeof response.debug !== 'undefined') {
-			var debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
-
-			$(response.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
+			$(response.debug).appendTo(widget['content_body']);
 		}
 
 		removeWidgetInfoButtons(widget['content_header']);
@@ -2076,7 +2068,7 @@
 		clearUpdateWidgetContentTimer(widget);
 
 		if (widget['updating_content']) {
-			// Waiting for another AJAX request to either complete of fail.
+			// Waiting for another AJAX request to either complete or fail.
 			return;
 		}
 
@@ -2204,6 +2196,11 @@
 			});
 	}
 
+	/**
+	 * @param {object} $obj
+	 * @param {object} data
+	 * @param {object} widget
+	 */
 	function updateWidgetConfig($obj, data, widget) {
 		if (data['options']['updating_config']) {
 			// Waiting for another AJAX request to either complete of fail.
@@ -2245,28 +2242,31 @@
 			ajax_data['fields'] = JSON.stringify(fields);
 		}
 
-		$('.dialogue-widget-save', data.dialogue.div).prop('disabled', true);
+		var $save_btn = data.dialogue.div.find('.dialogue-widget-save'),
+			overlay = overlays_stack.getById('widgetConfg');
 
-		$.ajax({
+		$save_btn.prop('disabled', true);
+
+		overlay.setLoading();
+		overlay.xhr = $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
 			data: ajax_data
-		})
+		});
+
+		overlay.xhr
 			.then(function(response) {
 				if (typeof(response.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
 
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(response.errors);
-					$('.dialogue-widget-save', data.dialogue.div).prop('disabled', false);
+					$save_btn.prop('disabled', false);
 
 					return $.Deferred().reject();
 				}
 				else {
-					// No errors, proceed with update.
-					overlayDialogueDestroy('widgetConfg');
-
 					// Set view mode of a reusable widget early to escape focus flickering.
 					if (widget !== null && widget['type'] === type) {
 						setWidgetViewMode(widget, view_mode);
@@ -2299,6 +2299,8 @@
 				});
 			})
 			.then(function(response) {
+				overlayDialogueDestroy('widgetConfg');
+
 				var configuration = {};
 				if ('configuration' in response) {
 					configuration = response['configuration'];
@@ -2312,7 +2314,7 @@
 
 						$.map(data.widgets, function(box) {
 							return rectOverlap(box.pos, pos) ? box : null;
-						}).each(function(box) {
+						}).forEach(function(box) {
 							if (!rectOverlap(box.pos, pos)) {
 								return;
 							}
@@ -2370,6 +2372,9 @@
 					widget['header'] = name;
 					widget['fields'] = fields;
 
+					// Set preloader to widget content after overlayDialogueDestroy as fast as we can.
+					startPreloader(widget, 100);
+
 					// View mode was just set after the overlayDialogueDestroy was called in first 'then' section.
 
 					applyWidgetConfiguration($obj, data, widget, configuration);
@@ -2414,7 +2419,9 @@
 				data['options']['updated'] = true;
 			})
 			.always(function() {
+				$save_btn.prop('disabled', false);
 				delete data['options']['updating_config'];
+				overlay.unsetLoading();
 			});
 	}
 
@@ -2472,14 +2479,16 @@
 		data.dialogue = {};
 		data.dialogue.widget = widget;
 
-		overlayDialogue({
+		var overlay = overlayDialogue({
 			'title': (edit_mode ? t('Edit widget') : t('Add widget')),
-			'content': '',
+			'class': 'modal-popup modal-popup-generic',
+			'content': jQuery('<div>', {'height': '68px'}),
 			'buttons': [
 				{
 					'title': (edit_mode ? t('Apply') : t('Add')),
 					'class': 'dialogue-widget-save',
 					'keepOpen': true,
+					'isSubmit': true,
 					'action': function() {
 						updateWidgetConfig($obj, data, widget);
 					}
@@ -2493,9 +2502,10 @@
 			'dialogueid': 'widgetConfg'
 		}, trigger_elmnt);
 
-		var overlay_dialogue = $('#overlay_dialogue');
-		data.dialogue.div = overlay_dialogue;
-		data.dialogue.body = $('.overlay-dialogue-body', overlay_dialogue);
+		overlay.setLoading();
+
+		data.dialogue.div = overlay.$dialogue;
+		data.dialogue.body = overlay.$dialogue.$body;
 
 		updateWidgetConfigDialogue();
 	}
@@ -3208,7 +3218,7 @@
 					.on('resize', function() {
 						clearTimeout(resize_timeout);
 						resize_timeout = setTimeout(function() {
-							data.widgets.each(function(widget) {
+							data.widgets.forEach(function(widget) {
 								resizeWidget($this, data, widget);
 							});
 						}, 200);
@@ -3268,7 +3278,6 @@
 				},
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
-				'preloader_fadespeed': 500,
 				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
@@ -3458,6 +3467,9 @@
 				if (current_url.getArgument('dashboardid')) {
 					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
 				}
+				else {
+					url.setArgument('cancel', '1');
+				}
 
 				// Redirect to last active dashboard.
 				// (1) In case of New Dashboard from list, it will open list
@@ -3542,74 +3554,61 @@
 					fields = {};
 				}
 
-				if (Object.keys(fields).length != 0) {
+				if (fields && Object.keys(fields).length != 0) {
 					ajax_data['fields'] = JSON.stringify(fields);
 				}
 
-				jQuery.ajax({
+				var overlay = overlays_stack.getById('widgetConfg');
+
+				overlay.setLoading();
+
+				if (overlay.xhr) {
+					overlay.xhr.abort();
+				}
+
+				overlay.xhr = jQuery.ajax({
 					url: url.getUrl(),
 					method: 'POST',
 					data: ajax_data,
-					dataType: 'json',
-					beforeSend: function() {
-						/*
-						 * Clear the 'sticked-to-top' class before updating the body for it's mutation handler
-						 * to center the popup while the widget form is being loaded.
-						 */
-						jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
+					dataType: 'json'
+				});
 
-						body.empty()
-							.append($('<div>')
-								// The smallest possible size of configuration dialog.
-								.css({
-									'width': '544px',
-									'height': '68px',
-									'max-width': '100%'
-								})
-								.append($('<div>')
-									.addClass('preloader-container')
-									.append($('<div>').addClass('preloader'))
-								));
+				overlay.xhr.done(function(response) {
+					data.dialogue['widget_type'] = response.type;
+
+					body.empty();
+					body.append(response.body);
+					if (typeof response.debug !== 'undefined') {
+						body.append(response.debug);
 					}
-				})
-					.done(function(response) {
-						data.dialogue['widget_type'] = response.type;
+					if (typeof response.messages !== 'undefined') {
+						body.append(response.messages);
+					}
 
-						/*
-						 * Set the 'sticked-to-top' class before updating the body for it's mutation handler
-						 * to have actual data for the popup positioning.
-						 */
-						if (response.options.stick_to_top) {
-							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
-						}
+					body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
 
-						body.empty();
-						body.append(response.body);
-						if (typeof response.debug !== 'undefined') {
-							body.append(response.debug);
-						}
-						if (typeof response.messages !== 'undefined') {
-							body.append(response.messages);
-						}
-
-						body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
-
-						// Change submit function for returned form.
-						$('#widget_dialogue_form', body).on('submit', function(e) {
-							e.preventDefault();
-							updateWidgetConfig($this, data, widget);
-						});
-
-						if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
-							showMessageExhausted(data);
-						}
-						else {
-							// Enable save button after successful form update.
-							$('.dialogue-widget-save', footer).prop('disabled', false);
-						}
-
-						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
+					// Change submit function for returned form.
+					$('#widget_dialogue_form', body).on('submit', function(e) {
+						e.preventDefault();
+						updateWidgetConfig($this, data, widget);
 					});
+
+					if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
+						showMessageExhausted(data);
+					}
+					else {
+						// Enable save button after successful form update.
+						$('.dialogue-widget-save', footer).prop('disabled', false);
+					}
+
+					var $overlay = jQuery('[data-dialogueid="widgetConfg"]');
+					$overlay.toggleClass('sticked-to-top', data.dialogue['widget_type'] === 'svggraph');
+
+					Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});
+					Overlay.prototype.containFocus.call({'$dialogue': $overlay});
+
+					overlay.unsetLoading();
+				});
 			});
 		},
 

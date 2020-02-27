@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1199,7 +1199,7 @@ class testWebScenario extends CAPITest {
 				'httptest' => ['15003', '15003'],
 				'expected_error' => 'Invalid parameter "/2": value (15003) already exists.'
 			],
-			// Try to delet templated web scenario.
+			// Try to delete templated web scenario.
 			[
 				'httptest' => ['15007'],
 				'expected_error' => 'Cannot delete templated web scenario "Api templated web scenario".'

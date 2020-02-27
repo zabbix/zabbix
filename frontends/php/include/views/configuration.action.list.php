@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,14 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $submenu_source = [
 	EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
 	EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
-	EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration actions'),
+	EVENT_SOURCE_AUTOREGISTRATION => _('Autoregistration actions'),
 	EVENT_SOURCE_INTERNAL => _('Internal actions')
 ];
 
@@ -151,4 +155,4 @@ $actionForm->addItem([
 // append form to widget
 $widget->addItem($actionForm);
 
-return $widget;
+$widget->show();

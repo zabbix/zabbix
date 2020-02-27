@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ $fields = [
 									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.
 										' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
 								],
-	'ipmi_sensor' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,
+	'ipmi_sensor' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM, null,
 									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_IPMI,
 									_('IPMI sensor')
 								],
@@ -691,7 +691,7 @@ if (hasRequest('form')) {
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['host'] = $host;
-	$data['preprocessing_test_type'] = CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_LLD;
+	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
 
 	if (!hasRequest('form_refresh')) {
@@ -731,9 +731,7 @@ if (hasRequest('form')) {
 
 	// render view
 	if (!$has_errors) {
-		$itemView = new CView('configuration.host.discovery.edit', $data);
-		$itemView->render();
-		$itemView->show();
+		echo (new CView('configuration.host.discovery.edit', $data))->getOutput();
 	}
 }
 else {
@@ -781,17 +779,29 @@ else {
 			order_result($data['discoveries'], $sortField, $sortOrder);
 	}
 
-	// paging
-	$url = (new CUrl('host_discovery.php'))->setArgument('hostid', $data['hostid']);
-
 	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
-	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder, $url);
+
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sortOrder,
+		(new CUrl('host_discovery.php'))->setArgument('hostid', $data['hostid'])
+	);
+
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 
 	// render view
-	$discoveryView = new CView('configuration.host.discovery.list', $data);
-	$discoveryView->render();
-	$discoveryView->show();
+	echo (new CView('configuration.host.discovery.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

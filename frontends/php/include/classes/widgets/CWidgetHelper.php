@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -333,7 +333,7 @@ class CWidgetHelper {
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson($field->getPopupOptions($form_name)).', null, this);')
+					json_encode($field->getPopupOptions($form_name)).', null, this);')
 		];
 	}
 
@@ -406,7 +406,7 @@ class CWidgetHelper {
 			$severities[$severity] = getSeverityName($severity, $config);
 		}
 
-		return self::getCheckBoxList($field, $severities);
+		return self::getCheckBoxList($field, $severities)->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
 	}
 
 	/**
@@ -548,7 +548,7 @@ class CWidgetHelper {
 			(new CButton($field->getName().'_select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick(
-					'return PopUp("popup.generic", '.CJs::encodeJson($field->getFilterParameters()).', null, this);'
+					'return PopUp("popup.generic", '.json_encode($field->getFilterParameters()).', null, this);'
 				)
 		];
 	}
@@ -631,8 +631,9 @@ class CWidgetHelper {
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50)
 				]))
-					->addClass(ZBX_STYLE_COLUMN_95)
-					->addClass(ZBX_STYLE_COLUMNS),
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
+					->addClass(ZBX_STYLE_COLUMN_95),
 
 				(new CDiv(
 					(new CButton())
@@ -818,18 +819,17 @@ class CWidgetHelper {
 	 * Return javascript necessary to initialize CWidgetFieldGraphOverride field.
 	 *
 	 * @param CWidgetFieldGraphOverride $field
-	 * @param string                    $form_name  Form name in which override field is located.
 	 *
 	 * @return string
 	 */
-	public static function getGraphOverrideJavascript($field, $form_name) {
+	public static function getGraphOverrideJavascript($field) {
 		$scripts = [
 			// Define it as function to avoid redundancy.
 			'function initializeOverrides() {'.
 				'jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_OPTIONS_LIST.'").overrides({'.
 					'add: ".'.ZBX_STYLE_BTN_ALT.'",'.
 					'options: "input[type=hidden]",'.
-					'captions: '.CJs::encodeJson(self::getGraphOverrideOptionNames()).','.
+					'captions: '.json_encode(self::getGraphOverrideOptionNames()).','.
 					'makeName: function(option, row_id) {'.
 						'return "'.$field->getName().'[" + row_id + "][" + option + "]";'.
 					'},'.
@@ -841,7 +841,7 @@ class CWidgetHelper {
 					'override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
 					'overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",'.
 					'onUpdate: onGraphConfigChange,'.
-					'menu: '.CJs::encodeJson(self::getGraphOverrideMenu()).
+					'menu: '.json_encode(self::getGraphOverrideMenu()).
 				'});'.
 			'}',
 
@@ -856,7 +856,9 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
@@ -899,7 +901,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: IE ? "move" : "grabbing",'.
+				'cursor: "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.
@@ -982,8 +984,9 @@ class CWidgetHelper {
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50),
 				]))
-					->addClass(ZBX_STYLE_COLUMN_95)
-					->addClass(ZBX_STYLE_COLUMNS),
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
+					->addClass(ZBX_STYLE_COLUMN_95),
 				(new CDiv([
 					(new CButton())
 						->setAttribute('title', _('Delete'))
@@ -1118,6 +1121,7 @@ class CWidgetHelper {
 						->addClass(ZBX_STYLE_COLUMN_50),
 				]))
 					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
 					->addClass(ZBX_STYLE_COLUMN_95)
 			))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
@@ -1232,8 +1236,8 @@ class CWidgetHelper {
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.
 						'data.color = function(num) {'.
-							'var palete = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETE.';'.
-							'return palete[num % palete.length];'.
+							'var palette = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE.';'.
+							'return palette[num % palette.length];'.
 						'} (data.rowNum);'.
 						'return data;'.
 					'}'.
@@ -1243,12 +1247,14 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color) {'.
 						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
 						'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
-					'}, appendTo: "#overlay_dialogue"});'.
+					'}, appendTo: ".overlay-dialogue-body"});'.
 
 					'jQuery(".multiselect", jQuery("#data_sets")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
@@ -1273,10 +1279,20 @@ class CWidgetHelper {
 					'}'.
 				'});',
 
-			// Intialize vertical accordion.
-			'jQuery("#data_sets").zbx_vertical_accordion({'.
-				'handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"'.
-			'});',
+			// Initialize vertical accordion.
+			'jQuery("#data_sets")'.
+				'.on("focus", ".'.CMultiSelect::ZBX_STYLE_CLASS.' input.input", function() {'.
+					'jQuery("#data_sets").zbx_vertical_accordion("expandNth",'.
+						'jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());'.
+					'})'.
+				'.on("collapse", function(event, data) {'.
+					'jQuery("textarea, .multiselect", data.section).scrollTop(0);'.
+					'jQuery(window).trigger("resize");'.
+				'})'.
+				'.on("expand", function() {'.
+					'jQuery(window).trigger("resize");'.
+				'})'.
+				'.zbx_vertical_accordion({handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"});',
 
 			// Initialize rangeControl UI elements.
 			'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'", jQuery("#data_sets")).rangeControl();',
@@ -1285,9 +1301,10 @@ class CWidgetHelper {
 			'jQuery("#data_sets").on("click", "'.implode(', ', [
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CPatternSelect::ZBX_STYLE_CLASS,
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
-			]).'", function() {'.
+			]).'", function(event) {'.
 				'var index = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index();'.
 				'jQuery("#data_sets").zbx_vertical_accordion("expandNth", index);'.
+				'jQuery(event.currentTarget).find("input.input").focus();'.
 			'});',
 
 			// Initialize pattern fields.
@@ -1299,7 +1316,7 @@ class CWidgetHelper {
 			'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color){'.
 				'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
 				'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
-			'}, appendTo: "#overlay_dialogue"});',
+			'}, appendTo: ".overlay-dialogue-body"});',
 
 			// Initialize sortability.
 			'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2) {'.
@@ -1311,7 +1328,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: IE ? "move" : "grabbing",'.
+				'cursor: "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.

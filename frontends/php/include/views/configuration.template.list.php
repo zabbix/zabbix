@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/configuration.template.list.js.php';
 
@@ -127,12 +131,15 @@ $widget = (new CWidget())
 
 $form = (new CForm())->setName('templates');
 
+// create table
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
+			(new CUrl('templates.php'))->getUrl()
+		),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),
@@ -283,7 +290,7 @@ $form->addItem([
 					->setArgument('action', 'export.templates.xml')
 					->setArgument('backurl', (new CUrl('templates.php'))
 						->setArgument('groupid', $data['pageFilter']->groupid)
-						->setArgument('page', getPageNumber())
+						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 						->getUrl())
 					->getUrl()
 			],
@@ -298,4 +305,4 @@ $form->addItem([
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

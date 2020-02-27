@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 #	include "daemon.h"
 #endif
 
-#include "../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "../libs/zbxcrypto/tls_tcp_active.h"
 
 static void	process_listener(zbx_socket_t *s)

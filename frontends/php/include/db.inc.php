@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ function DBconnect(&$error) {
 	$result = true;
 
 	$DB['DB'] = null; // global db handler
-	$DB['TRANSACTIONS'] = 0; // level of a nested transation
+	$DB['TRANSACTIONS'] = 0; // level of a nested transaction
 	$DB['TRANSACTION_NO_FAILED_SQLS'] = true; // true - if no statements failed in transaction, false - there are failed statements
 	$DB['SELECT_COUNT'] = 0; // stats
 	$DB['EXECUTE_COUNT'] = 0;
@@ -129,46 +129,6 @@ function DBconnect(&$error) {
 					$dbBackend = new OracleDbBackend();
 				}
 				break;
-			case ZBX_DB_DB2:
-				$connect = '';
-				$connect .= 'DATABASE='.$DB['DATABASE'].';';
-				$connect .= 'HOSTNAME='.$DB['SERVER'].';';
-				$connect .= 'PORT='.$DB['PORT'].';';
-				$connect .= 'PROTOCOL=TCPIP;';
-				$connect .= 'UID='.$DB['USER'].';';
-				$connect .= 'PWD='.$DB['PASSWORD'].';';
-
-				$unicodeprefixes = ['C', 'en_US', 'en_GB'];
-				foreach ($unicodeprefixes as $prefix) {
-					$result = setlocale(LC_ALL, [$prefix.'.utf8', $prefix.'.UTF-8']);
-					if ($result) {
-						break;
-					}
-				}
-				if ($result) {
-					$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
-					if (!$DB['DB']) {
-						$error = 'Error connecting to database: '.db2_conn_errormsg();
-						$result = false;
-					}
-					else {
-						$options = [
-							'db2_attr_case' => DB2_CASE_LOWER
-						];
-						db2_set_option($DB['DB'], $options, 1);
-						if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
-							DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
-						}
-					}
-				}
-				else {
-					$error = 'Cannot set UTF-8 locale for web server.';
-				}
-
-				if ($result) {
-					$dbBackend = new Db2DbBackend();
-				}
-				break;
 			default:
 				$error = 'Unsupported database';
 				$result = false;
@@ -203,9 +163,6 @@ function DBclose() {
 			case ZBX_DB_ORACLE:
 				$result = oci_close($DB['DB']);
 				break;
-			case ZBX_DB_DB2:
-				$result = db2_close($DB['DB']);
-				break;
 		}
 	}
 	unset($DB['DB']);
@@ -238,9 +195,6 @@ function DBstart() {
 			break;
 		case ZBX_DB_ORACLE:
 			$result = true;
-			break;
-		case ZBX_DB_DB2:
-			$result = db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_OFF);
 			break;
 	}
 	return $result;
@@ -296,12 +250,6 @@ function DBcommit() {
 		case ZBX_DB_ORACLE:
 			$result = oci_commit($DB['DB']);
 			break;
-		case ZBX_DB_DB2:
-			$result = db2_commit($DB['DB']);
-			if ($result) {
-				db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
-			}
-			break;
 	}
 	return $result;
 }
@@ -320,10 +268,6 @@ function DBrollback() {
 			break;
 		case ZBX_DB_ORACLE:
 			$result = oci_rollback($DB['DB']);
-			break;
-		case ZBX_DB_DB2:
-			$result = db2_rollback($DB['DB']);
-			db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 			break;
 	}
 	return $result;
@@ -380,22 +324,6 @@ function DBselect($query, $limit = null, $offset = 0) {
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
 			}
 			break;
-		case ZBX_DB_DB2:
-			$options = [];
-			if ($DB['TRANSACTIONS']) {
-				$options['autocommit'] = DB2_AUTOCOMMIT_OFF;
-			}
-
-			if (!$result = db2_prepare($DB['DB'], $query)) {
-				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']', 'sql');
-			}
-			elseif (true !== @db2_execute($result, $options)) {
-				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']', 'sql');
-				$result = false;
-			}
-			break;
 	}
 
 	// $result is false only if an error occurred
@@ -426,8 +354,8 @@ function DBselect($query, $limit = null, $offset = 0) {
  * PostgreSQL:
  * SELECT a FROM tbl LIMIT 10 OFFSET 5
  *
- * Oracle, DB2:
- * SELECT a FROM tbe WHERE rownum < 15 // ONLY < 15
+ * Oracle:
+ * SELECT a FROM tbl WHERE rownum < 15 // ONLY < 15
  * SELECT * FROM (SELECT * FROM tbl) WHERE rownum BETWEEN 6 AND 15
  *
  * @param $query
@@ -455,7 +383,6 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 				$query .= $offset != 0 ? ' OFFSET '.intval($offset) : '';
 				break;
 			case ZBX_DB_ORACLE:
-			case ZBX_DB_DB2:
 				$till = $offset + $limit;
 				$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 				break;
@@ -496,19 +423,6 @@ function DBexecute($query, $skip_error_messages = 0) {
 			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
-			}
-			else {
-				$result = true; // function must return boolean
-			}
-			break;
-		case ZBX_DB_DB2:
-			if (!$result = db2_prepare($DB['DB'], $query)) {
-				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']', 'sql');
-			}
-			elseif (true !== @db2_execute($result)) {
-				$e = @db2_stmt_errormsg($result);
-				error('SQL error ['.$query.'] in ['.$e.']', 'sql');
 			}
 			else {
 				$result = true; // function must return boolean
@@ -570,21 +484,6 @@ function DBfetch($cursor, $convertNulls = true) {
 					}
 					$result[strtolower($key)] = $value;
 				}
-			}
-			break;
-		case ZBX_DB_DB2:
-			if (!$result = db2_fetch_assoc($cursor)) {
-				db2_free_result($cursor);
-			}
-			else {
-				// cast all of the values to string to be consistent with other DB drivers: all of them return
-				// only strings.
-				foreach ($result as &$value) {
-					if ($value !== null) {
-						$value = (string) $value;
-					}
-				}
-				unset($value);
 			}
 			break;
 	}
@@ -684,25 +583,30 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	}
 
 	$start = $options['startSearch'] ? '' : '%';
-	$exclude = $options['excludeSearch'] ? ' NOT ' : '';
-	$glue = (!$options['searchByAny']) ? ' AND ' : ' OR ';
+	$exclude = $options['excludeSearch'] ? ' NOT' : '';
+	$glue = $options['searchByAny'] ? ' OR ' : ' AND ';
 
 	$search = [];
 	foreach ($options['search'] as $field => $patterns) {
-		if (!isset($tableSchema['fields'][$field]) || zbx_empty($patterns)) {
+		if (!isset($tableSchema['fields'][$field]) || $patterns === null) {
 			continue;
 		}
+
+		$patterns = array_filter((array)$patterns, function($pattern) {
+			return ($pattern !== '');
+		});
+
+		if (!$patterns) {
+			continue;
+		}
+
 		if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR
 			&& $tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_TEXT) {
 			continue;
 		}
 
 		$fieldSearch = [];
-		foreach ((array) $patterns as $pattern) {
-			if (zbx_empty($pattern)) {
-				continue;
-			}
-
+		foreach ($patterns as $pattern) {
 			// escaping parameter that is about to be used in LIKE statement
 			$pattern = str_replace("!", "!!", $pattern);
 			$pattern = str_replace("%", "!%", $pattern);
@@ -710,7 +614,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 			if (!$options['searchWildcardsEnabled']) {
 				$fieldSearch[] =
-					' UPPER('.$tableShort.'.'.$field.') '.
+					'UPPER('.$tableShort.'.'.$field.')'.
 					$exclude.' LIKE '.
 					zbx_dbstr($start.mb_strtoupper($pattern).'%').
 					" ESCAPE '!'";
@@ -725,15 +629,15 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			}
 		}
 
-		$search[$field] = '( '.implode($glue, $fieldSearch).' )';
+		$search[$field] = '('.implode($glue, $fieldSearch).')';
 	}
 
-	if (!empty($search)) {
+	if ($search) {
 		if (isset($sql_parts['where']['search'])) {
 			$search[] = $sql_parts['where']['search'];
 		}
 
-		$sql_parts['where']['search'] = '( '.implode($glue, $search).' )';
+		$sql_parts['where']['search'] = '('.implode($glue, $search).')';
 		return true;
 	}
 
@@ -1037,7 +941,7 @@ function pg_connect_escape($string) {
 
 /**
  * Escape string for safe usage in SQL queries.
- * Works for ibmdb2, mysql, oracle, postgresql.
+ * Works for mysql, oracle, postgresql.
  *
  * @param array|string $var
  *
@@ -1051,15 +955,6 @@ function zbx_dbstr($var) {
 	}
 
 	switch ($DB['TYPE']) {
-		case ZBX_DB_DB2:
-			if (is_array($var)) {
-				foreach ($var as $vnum => $value) {
-					$var[$vnum] = "'".db2_escape_string($value)."'";
-				}
-				return $var;
-			}
-			return "'".db2_escape_string($var)."'";
-
 		case ZBX_DB_MYSQL:
 			if (is_array($var)) {
 				foreach ($var as $vnum => $value) {
@@ -1094,7 +989,7 @@ function zbx_dbstr($var) {
 
 /**
  * Creates db dependent string with sql expression that casts passed value to bigint.
- * Works for ibmdb2, mysql, oracle, postgresql.
+ * Works for mysql, oracle, postgresql.
  *
  * @param int $field
  *
@@ -1108,7 +1003,6 @@ function zbx_dbcast_2bigint($field) {
 	}
 
 	switch ($DB['TYPE']) {
-		case ZBX_DB_DB2:
 		case ZBX_DB_POSTGRESQL:
 			return 'CAST('.$field.' AS BIGINT)';
 

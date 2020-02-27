@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,16 @@
 
 
 var CLNDR = null,
-	calendar = Class.create();
+	calendar = function (timeobject, trigger_elmnt, date_time_format) {
+		if (!this.checkOuterObj(timeobject)) {
+			throw 'Calendar: constructor expects second parameter to be input form field DOM node.';
+		}
+
+		this.id = jQuery(trigger_elmnt).attr('id');
+		this.trigger_elmnt = trigger_elmnt;
+		this.date_time_format = date_time_format;
+		this.sdt = new CDate();
+	};
 
 function toggleCalendar(trigger_elmnt, time_input, date_time_format) {
 	if (CLNDR && jQuery(trigger_elmnt).is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
@@ -69,17 +78,6 @@ calendar.prototype = {
 	date_time_format: PHP_ZBX_FULL_DATE_TIME,
 	trigger_elmnt: null,		// Calendar visibility trigger element.
 
-	initialize: function(timeobject, trigger_elmnt, date_time_format) {
-		if (!this.checkOuterObj(timeobject)) {
-			throw 'Calendar: constructor expects second parameter to be input form field DOM node.';
-		}
-
-		this.id = jQuery(trigger_elmnt).attr('id');
-		this.trigger_elmnt = trigger_elmnt;
-		this.date_time_format = date_time_format;
-		this.sdt = new CDate();
-	},
-
 	ondateselected: function() {
 		this.setDateToOuterObj();
 		this.clndrhide();
@@ -109,7 +107,7 @@ calendar.prototype = {
 		this.setCDate();
 
 		this.calendarPositionHandler();
-		this.clndr_calendar.show();
+		this.clndr_calendar.style.display = (this.clndr_calendar.tagName === 'span') ? 'inline' : 'block';
 		this.is_visible = true;
 
 		jQuery(window).on('resize', jQuery.proxy(this.calendarPositionHandler, this));
@@ -152,7 +150,7 @@ calendar.prototype = {
 	 * This function is workaround for Firefox bug.
 	 *
 	 * When triggering keydown event on [space] button, event is called for both, the actual element as well as calendar
-	 * icon elemnet, so the calendar is first closed (by handeler of actually focused element) and immediately opened
+	 * icon elemnet, so the calendar is first closed (by handler of actually focused element) and immediately opened
 	 * again (by calendar icon element's handler).
 	 *
 	 * Workaround works as follow - it separates [enter] and [space] button in 2 handlers with similar functionality
@@ -327,9 +325,9 @@ calendar.prototype = {
 			return false;
 		}
 
-		this.timeobject = $(timeobject);
+		this.timeobject = document.getElementById(timeobject);
 
-		if (empty(this.timeobject) || this.timeobject.tagName.toLowerCase() !== 'input') {
+		if (this.timeobject === null || this.timeobject.tagName.toLowerCase() !== 'input') {
 			return false;
 		}
 
@@ -499,7 +497,7 @@ calendar.prototype = {
 
 	createDaysTab: function() {
 		var tbody = this.clndr_days;
-		tbody.update('');
+		tbody.innerHTML = '';
 
 		var cdt = new CDate();
 
@@ -525,10 +523,9 @@ calendar.prototype = {
 			for (var x = 0; x < 7; x++) {
 				var td = document.createElement('td');
 				tr.appendChild(td);
-				Element.extend(td);
 
 				if (this.month != cdt.getMonth()) {
-					td.addClassName('grey');
+					$(td).addClass('grey');
 				}
 				else {
 					td.setAttribute('data-date', cdt.getDate());
@@ -537,7 +534,7 @@ calendar.prototype = {
 				if (this.sdt.getFullYear() == cdt.getFullYear()
 						&& this.sdt.getMonth() == cdt.getMonth()
 						&& this.sdt.getDate() == cdt.getDate()) {
-					td.addClassName('selected');
+					$(td).addClass('selected');
 				}
 
 				td.setAttribute('aria-label', this.calendarGetReadableDate(cdt));
@@ -567,12 +564,11 @@ calendar.prototype = {
 	 */
 	calendarcreate: function() {
 		this.clndr_calendar = document.createElement('div');
-		Element.extend(this.clndr_calendar);
 		this.clndr_calendar.className = 'overlay-dialogue calendar';
 		this.clndr_calendar.setAttribute('aria-label', t('S_CALENDAR'));
 		this.clndr_calendar.setAttribute('role', 'application');
 		this.clndr_calendar.setAttribute('tabindex', '0');
-		this.clndr_calendar.hide();
+		this.clndr_calendar.style.display = 'none';
 
 		document.body.appendChild(this.clndr_calendar);
 
@@ -681,7 +677,6 @@ calendar.prototype = {
 		 * Days calendar
 		 */
 		this.clndr_days = document.createElement('tbody');
-		Element.extend(this.clndr_days);
 		this.clndr_days.setAttribute('class', 'calendar-date');
 		table.appendChild(this.clndr_days);
 

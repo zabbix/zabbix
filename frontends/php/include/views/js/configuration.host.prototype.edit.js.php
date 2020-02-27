@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,11 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
+
 <script type="text/x-jquery-tmpl" id="groupPrototypeRow">
 	<tr class="form_row">
 		<td>
@@ -58,7 +62,7 @@
 			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
 		<?php endif ?>
 		<?php foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype): ?>
-			addGroupPrototypeRow(<?= CJs::encodeJson([
+			addGroupPrototypeRow(<?= json_encode([
 				'name' => $groupPrototype['name'],
 				'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
 			]) ?>);

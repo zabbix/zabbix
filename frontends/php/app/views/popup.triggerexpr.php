@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 // Create form.
 $expression_form = (new CForm())
@@ -64,7 +68,7 @@ $item = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).', null, this);')
+		->onClick('return PopUp("popup.generic",'.json_encode($popup_options).', null, this);')
 ];
 
 if ($data['parent_discoveryid'] !== '') {
@@ -72,7 +76,7 @@ if ($data['parent_discoveryid'] !== '') {
 	$item[] = (new CButton('select', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'item_prototypes',
 				'srcfld1' => 'itemid',
 				'srcfld2' => 'name',
@@ -181,8 +185,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return validate_trigger_expression("expression", '.
-					'jQuery(window.document.forms["expression"]).closest("[data-dialogueid]").attr("data-dialogueid"));'
+			'action' => 'return validate_trigger_expression(overlay);'
 		]
 	],
 	'script_inline' =>
@@ -206,4 +209,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

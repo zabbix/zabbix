@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,9 +27,7 @@ $page['title'] = _('Custom graphs');
 $page['file'] = 'charts.php';
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
@@ -93,6 +91,8 @@ updateTimeSelectorPeriod($timeselector_options);
 
 $data = [
 	'pageFilter' => $pageFilter,
+	'groupid' => $pageFilter->groupid,
+	'hostid' => $pageFilter->hostid,
 	'graphid' => $pageFilter->graphid,
 	'action' => getRequest('action', HISTORY_GRAPH),
 	'actions' => [
@@ -100,12 +100,11 @@ $data = [
 		HISTORY_VALUES => _('Values')
 	],
 	'timeline' => getTimeSelectorPeriod($timeselector_options),
+	'page' => getRequest('page', 1),
 	'active_tab' => CProfile::get('web.graphs.filter.active', 1)
 ];
 
 // render view
-$chartsView = new CView('monitoring.charts', $data);
-$chartsView->render();
-$chartsView->show();
+echo (new CView('monitoring.charts', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

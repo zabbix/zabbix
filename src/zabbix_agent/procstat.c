@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -539,19 +539,16 @@ static void	procstat_add(const char *procname, const char *username, const char 
 
 	/* initialize the created query */
 	query = (zbx_procstat_query_t *)PROCSTAT_PTR_NULL(procstat_ref.addr, query_offset);
+
+	memset(query, 0, sizeof(zbx_procstat_query_t));
+
+	query->procname = procstat_strdup(procstat_ref.addr, procname);
+	query->username = procstat_strdup(procstat_ref.addr, username);
+	query->cmdline = procstat_strdup(procstat_ref.addr, cmdline);
+	query->flags = flags;
+	query->last_accessed = time(NULL);
+	query->next = header->queries;
 	header->queries = query_offset;
-
-	if (NULL != query)
-	{
-		memset(query, 0, sizeof(zbx_procstat_query_t));
-
-		query->procname = procstat_strdup(procstat_ref.addr, procname);
-		query->username = procstat_strdup(procstat_ref.addr, username);
-		query->cmdline = procstat_strdup(procstat_ref.addr, cmdline);
-		query->flags = flags;
-		query->last_accessed = time(NULL);
-		query->next = header->queries;
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

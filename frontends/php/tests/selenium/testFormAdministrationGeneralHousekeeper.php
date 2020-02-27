@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
-		$this->zbxTestLogin('adm.housekeeper.php');
+		$this->zbxTestLogin('zabbix.php?action=housekeeping.edit');
 
 		$this->zbxTestCheckTitle('Configuration of housekeeping');
 		$this->zbxTestCheckHeader('Housekeeping');
@@ -53,7 +53,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "value", '1d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_discovery'][@disabled]");
 
-		$this->zbxTestTextPresent('Auto-registration data storage period');
+		$this->zbxTestTextPresent('Autoregistration data storage period');
 		$this->zbxTestAssertElementPresentId('hk_events_autoreg');
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "maxlength", 255);
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "value", '1d');
@@ -314,7 +314,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_autoreg' => 0,
 					'errors' => [
-						'Invalid auto-registration data storage period: value must be one of 86400-788400000',
+						'Invalid autoregistration data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -398,11 +398,11 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormAdministrationGeneralHousekeeper_SimpleUpdate($data) {
-		$this->zbxTestLogin('adm.housekeeper.php');
+		$this->zbxTestLogin('zabbix.php?action=housekeeping.edit');
 
 		if (isset($data['resetDefaults'])) {
 			$this->zbxTestClick('resetDefaults');
-			$this->zbxTestClickXpath("//div[@id='overlay_dialogue']//button[text()='Reset defaults']");
+			$this->zbxTestClickXpath('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Reset defaults"]');
 		}
 		else {
 			// events and alerts

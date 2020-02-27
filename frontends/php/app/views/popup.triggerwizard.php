@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,14 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $options = $data['options'];
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.triggerwizard.js.php'
+	'script_inline' => $this->readJsFile('popup.triggerwizard.js.php')
 ];
 
 // SID for this form is added by JS getUrl() and "form_refresh" is not used at all.
@@ -52,7 +56,7 @@ foreach ($data['expressions'] as $expr) {
 	];
 }
 
-$output['script_inline'] = 'jQuery("#'.$expression_table->getId().'").data("rows", '.CJs::encodeJson($expressions).');'
+$output['script_inline'] = 'jQuery("#'.$expression_table->getId().'").data("rows", '.json_encode($expressions).');'
 	.$output['script_inline'];
 
 $ms_itemid = (new CMultiSelect([
@@ -139,11 +143,7 @@ $output['buttons'] = [[
 	'class' => '',
 	'keepOpen' => true,
 	'isSubmit' => true,
-	'action' => 'return validateTriggerWizard("'.$form->getName().'", '.
-					'jQuery(window.document.forms["'.$form->getName().'"])'.
-						'.closest("[data-dialogueid]")'.
-						'.attr("data-dialogueid")'.
-				');'
+	'action' => 'return validateTriggerWizard(overlay);'
 ]];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
@@ -151,4 +151,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

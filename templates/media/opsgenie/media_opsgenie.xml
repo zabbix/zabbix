@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2019-12-03T06:23:54Z</date>
+    <media_types>
+        <media_type>
+            <name>Opsgenie</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>url</name>
+                    <value>&lt;put your opsgenie api url&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>web</name>
+                    <value>&lt;put your opsgenie web url&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>token</name>
+                    <value>&lt;put your key&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>subject</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>message</name>
+                    <value>{ALERT.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>eventid</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>severity</name>
+                    <value>{EVENT.NSEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>user</name>
+                    <value>{USER.FULLNAME}</value>
+                </parameter>
+                <parameter>
+                    <name>eventvalue</name>
+                    <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>eventupdate</name>
+                    <value>{EVENT.UPDATE.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>eventaction</name>
+                    <value>{EVENT.UPDATE.ACTION}</value>
+                </parameter>
+                <parameter>
+                    <name>zbxurl</name>
+                    <value>{$ZABBIX.URL}</value>
+                </parameter>
+                <parameter>
+                    <name>triggerid</name>
+                    <value>{TRIGGER.ID}</value>
+                </parameter>
+            </parameters>
+            <script>try {&#13;
+  &#13;
+    var result = {tags: {}},&#13;
+    params = JSON.parse(value),&#13;
+    req = new CurlHttpRequest(),&#13;
+    fields = {},&#13;
+    url = params.url;&#13;
+  &#13;
+    req.AddHeader('Content-Type: application/json');&#13;
+    req.AddHeader('Authorization: GenieKey '+params.token);&#13;
+    //Zabbix: 0 - Not classified, 1 - Information, 2 - Warning, 3 - Average, 4 - High, 5 - Disaster.&#13;
+    //Opsgenie: P5 Informational, P4 Low, P3 Moderate, P2 High, P1 Critical.&#13;
+    if ((params.severity == 0) || (params.severity == 1))&#13;
+      severity = &quot;P5&quot;;&#13;
+    else if (params.severity == 2)&#13;
+      severity = &quot;P4&quot;;&#13;
+    else if (params.severity == 3)&#13;
+      severity = &quot;P3&quot;;&#13;
+    else if (params.severity == 4)&#13;
+      severity = &quot;P2&quot;;&#13;
+    else if (params.severity == 5)&#13;
+      severity = &quot;P1&quot;;&#13;
+&#13;
+    if ((params.eventvalue == 1) &amp;&amp; (params.eventupdate == 0)) {&#13;
+        fields.message = params.subject;&#13;
+        fields.alias = params.eventid;&#13;
+        fields.description = params.message;&#13;
+        fields.details = {&quot;Zabbix server&quot;: params.zbxurl ,&quot;Problem&quot;: params.zbxurl+&quot;/tr_events.php?triggerid=&quot;+params.triggerid+&quot;&amp;eventid=&quot;+params.eventid};&#13;
+        fields.source = &quot;Zabbix&quot;;&#13;
+        fields.priority = severity;&#13;
+    }&#13;
+    else if ((params.eventvalue == 1) &amp;&amp; (params.eventupdate == 1)) {&#13;
+        if (params.eventaction.includes('acknowledged'))&#13;
+            url = url+&quot;/&quot;+params.eventid+&quot;/acknowledge?identifierType=alias&quot; ;&#13;
+        else&#13;
+            url = url+&quot;/&quot;+params.eventid+&quot;/notes?identifierType=alias&quot;;&#13;
+        fields.user = params.user;&#13;
+        fields.note = params.message;&#13;
+    }&#13;
+    else if (params.eventvalue == 0) {&#13;
+        url = url+&quot;/&quot;+params.eventid+&quot;/close?identifierType=alias&quot; &#13;
+        fields.note = params.message;&#13;
+    }&#13;
+&#13;
+    var resp = req.Post(url,&#13;
+        JSON.stringify(fields)&#13;
+    );&#13;
+&#13;
+    if (req.Status() != 202) {&#13;
+        throw JSON.parse(resp).message;&#13;
+    }&#13;
+&#13;
+    resp = JSON.parse(resp);&#13;
+&#13;
+    if ((params.eventvalue == 1) &amp;&amp; (params.eventupdate == 0)) {&#13;
+        url = params.url+&quot;/&quot;+params.eventid+&quot;?identifierType=alias&quot;;&#13;
+        resp = req.Get(url);&#13;
+        resp = JSON.parse(resp);&#13;
+        result.tags.opsgenie_issue_key = params.web+&quot;/alert/detail/&quot;+resp.data.id+&quot;/details&quot;;&#13;
+    }&#13;
+&#13;
+} catch (error) {&#13;
+    Zabbix.Log(3, 'Opsgenie notification failed : '+error);&#13;
+    throw 'Opsgenie notification failed : '+error;&#13;
+&#13;
+    result = {};&#13;
+}&#13;
+return JSON.stringify(result);</script>
+            <process_tags>YES</process_tags>
+            <show_event_menu>YES</show_event_menu>
+            <event_menu_url>{EVENT.TAGS.opsgenie_issue_key}</event_menu_url>
+            <event_menu_name>Alert in Opsgenie</event_menu_name>
+            <description>Please refer to https://docs.opsgenie.com/docs/alert-api and https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook#example_scripts.&#13;
+  &#13;
+Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;
+Add dedicated user with media type &quot;Opsgenie&quot;.&#13;
+Change the values of the variables url (https://api.opsgenie.com/v2/alerts or https://api.eu.opsgenie.com/v2/alerts),&#13;
+web (for example, https://myzabbix.app.opsgenie.com), token.</description>
+        </media_type>
+    </media_types>
+</zabbix_export>

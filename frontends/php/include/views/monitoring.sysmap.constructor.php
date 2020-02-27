@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 include dirname(__FILE__).'/js/monitoring.sysmaps.js.php';
 
@@ -71,16 +75,16 @@ $menu = (new CList())
 $container = (new CDiv())->setId(ZBX_STYLE_MAP_AREA);
 
 // create elements
-zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.CJs::encodeJson([
+zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.json_encode([
 	'theme' => $data['theme'],
 	'sysmap' => $data['sysmap'],
 	'iconList' => $data['iconList'],
 	'defaultAutoIconId' => $data['defaultAutoIconId'],
 	'defaultIconId' => $data['defaultIconId'],
 	'defaultIconName' => $data['defaultIconName']
-], true).');');
+], JSON_FORCE_OBJECT).');');
 
-return (new CWidget())
+(new CWidget())
 	->setTitle(_('Network maps'))
 	->addItem($menu)
 	->addItem(
@@ -89,4 +93,5 @@ return (new CWidget())
 				->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 				->addItem($container)
 		))->addClass('sysmap-scroll-container')
-	);
+	)
+	->show();

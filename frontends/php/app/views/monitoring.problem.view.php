@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $options = [
 	'resourcetype' => SCREEN_RESOURCE_PROBLEM,
 	'mode' => SCREEN_MODE_JS,
@@ -28,7 +32,6 @@ $options = [
 		'action' => $data['action'],
 		'sort' => $data['sort'],
 		'sortorder' => $data['sortorder'],
-		'page' => $data['page'],
 		'filter' => [
 			'show' => $data['filter']['show'],
 			'groupids' => $data['filter']['groupids'],
@@ -79,7 +82,11 @@ if ($data['action'] == 'problem.view') {
 	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
 	$this->addJsFile('layout.mode.js');
-	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
+
+	$this->includeJsFile('monitoring.problem.view.js.php');
+
+	$this->enableLayoutModes();
+	$web_layout_mode = $this->getLayoutMode();
 
 	if ($data['uncheck']) {
 		uncheckTableRows('problem');
@@ -131,7 +138,7 @@ if ($data['action'] == 'problem.view') {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('filter_application_select', _('Select')))
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
+					json_encode([
 						'srctbl' => 'applications',
 						'srcfld1' => 'name',
 						'dstfrm' => 'zbx_filter',
@@ -163,8 +170,8 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Problem'),
 			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
-		->addRow(_('Minimum severity'),
-			new CComboBox('filter_severity', $data['filter']['severity'], null, $data['filter']['severities'])
+		->addRow(_('Severity'),
+			(new CSeverityCheckBoxList('filter_severity'))->setChecked($data['filter']['severity'])
 		);
 
 	$filter_age = (new CNumericBox('filter_age', $data['filter']['age'], 3, false, false, false))
@@ -177,7 +184,7 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Age less than'), [
 			(new CCheckBox('filter_age_state'))
 				->setChecked($data['filter']['age_state'] == 1)
-				->onClick('javascript: this.checked ? $("filter_age").enable() : $("filter_age").disable()'),
+				->onClick('javascript: jQuery("#filter_age").prop("disabled", !this.checked)'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$filter_age,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -332,8 +339,7 @@ if ($data['action'] == 'problem.view') {
 	$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'problem.view')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
-		->addFormItem((new CVar('action', 'problem.view'))->removeId())
-		->addFormItem((new CVar('page', $data['page']))->removeId());
+		->addFormItem((new CVar('action', 'problem.view'))->removeId());
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 		$filter->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
@@ -341,26 +347,17 @@ if ($data['action'] == 'problem.view') {
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
-	$web_layout_mode = CView::getLayoutMode();
-
 	$widget = (new CWidget())
 		->setTitle(_('Problems'))
 		->setWebLayoutMode($web_layout_mode)
-		->setControls((new CTag('nav', true,
-			(new CForm('get'))
-				->cleanItems()
-				->addVar('action', 'problem.view')
-				->addVar('page', $data['page'])
-				->addItem((new CList())
+		->setControls(
+			(new CTag('nav', true,
+				(new CList())
 					->addItem(new CRedirectButton(_('Export to CSV'),
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'problem.view.csv')
-							->setArgument('page',  $data['page'])
+						(new CUrl('zabbix.php'))->setArgument('action', 'problem.view.csv')
 					))
-					->addItem(get_icon('fullscreen'))
-				)
-			))
-				->setAttribute('aria-label', _('Content controls'))
+					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+			))->setAttribute('aria-label', _('Content controls'))
 		);
 
 	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
@@ -371,8 +368,8 @@ if ($data['action'] == 'problem.view') {
 		->addItem($screen->get())
 		->show();
 
-	// activating blinking
-	$this->addPostJS('jqBlink.blink();');
+	// Activate blinking.
+	(new CScriptTag('jqBlink.blink();'))->show();
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 		$objData = [
@@ -383,8 +380,10 @@ if ($data['action'] == 'problem.view') {
 			'mainObject' => 1
 		];
 
-		$this->addPostJS('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($screen->timeline).', '.zbx_jsvalue($objData).');');
-		$this->addPostJS('timeControl.processObjects();');
+		(new CScriptTag(
+			'timeControl.addObject("scroll_events_id", '.zbx_jsvalue($screen->timeline).', '.zbx_jsvalue($objData).');'.
+			'timeControl.processObjects();'
+		))->show();
 	}
 }
 else {

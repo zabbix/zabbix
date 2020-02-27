@@ -8,7 +8,7 @@ $DB['PORT']				= '0';
 $DB['DATABASE']			= '{DBNAME}';
 $DB['USER']				= '{DBUSER}';
 $DB['PASSWORD']			= '{DBPASSWORD}';
-// Schema name. Used for IBM DB2 and PostgreSQL.
+// Schema name. Used for PostgreSQL.
 $DB['SCHEMA']			= '';
 
 $ZBX_SERVER				= 'localhost';

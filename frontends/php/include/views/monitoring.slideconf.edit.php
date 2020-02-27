@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/monitoring.slideconf.edit.js.php';
 
@@ -145,7 +149,7 @@ foreach ($data['slideshow']['slides'] as $key => $slides) {
 $addButtonColumn = (new CCol(
 		(new CButton('add', _('Add')))
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'screens',
 					'srcfld1' => 'screenid',
 					'dstfrm' => $form->getName(),
@@ -175,7 +179,7 @@ $user_group_shares_table = (new CTable())
 
 $add_user_group_btn = ([(new CButton(null, _('Add')))
 	->onClick('return PopUp("popup.generic",'.
-		CJs::encodeJson([
+		json_encode([
 			'srctbl' => 'usrgrp',
 			'srcfld1' => 'usrgrpid',
 			'srcfld2' => 'name',
@@ -213,7 +217,7 @@ $user_shares_table = (new CTable())
 
 $add_user_btn = ([(new CButton(null, _('Add')))
 	->onClick('return PopUp("popup.generic",'.
-		CJs::encodeJson([
+		json_encode([
 			'srctbl' => 'users',
 			'srcfld1' => 'userid',
 			'srcfld2' => 'fullname',
@@ -288,4 +292,4 @@ else {
 $form->addItem($tabs);
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

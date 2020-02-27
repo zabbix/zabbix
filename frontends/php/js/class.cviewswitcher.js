@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,50 +20,50 @@
 
 var globalAllObjForViewSwitcher = {};
 
-var CViewSwitcher = Class.create({
+var CViewSwitcher = function(objId, objAction, confData, disableDDItems) {
+	this.mainObj = document.getElementById(objId);
+	this.objAction = objAction;
+
+	if (is_null(this.mainObj)) {
+		throw('ViewSwitcher error: main object not found!');
+	}
+	this.depObjects = {};
+
+	if (disableDDItems) {
+		this.disableDDItems = disableDDItems;
+	}
+
+	for (var key in confData) {
+		if (empty(confData[key])) {
+			continue;
+		}
+		this.depObjects[key] = {};
+
+		for (var vKey in confData[key]) {
+			if (empty(confData[key][vKey])) {
+				continue;
+			}
+
+			if (is_string(confData[key][vKey])) {
+				this.depObjects[key][vKey] = {'id': confData[key][vKey]};
+			}
+			else if (is_object(confData[key][vKey])) {
+				this.depObjects[key][vKey] = confData[key][vKey];
+			}
+		}
+	}
+
+	jQuery(this.mainObj).on(objAction, this.rebuildView.bindAsEventListener(this));
+	globalAllObjForViewSwitcher[objId] = this;
+
+	this.hideAllObjs();
+	this.rebuildView();
+};
+
+CViewSwitcher.prototype = {
 	mainObj: null,
 	depObjects: {},
 	lastValue: null,
-
-	initialize : function(objId, objAction, confData, disableDDItems) {
-		this.mainObj = $(objId);
-		this.objAction = objAction;
-
-		if (is_null(this.mainObj)) {
-			throw('ViewSwitcher error: main object not found!');
-		}
-		this.depObjects = {};
-
-		if (disableDDItems) {
-			this.disableDDItems = disableDDItems;
-		}
-
-		for (var key in confData) {
-			if (empty(confData[key])) {
-				continue;
-			}
-			this.depObjects[key] = {};
-
-			for (var vKey in confData[key]) {
-				if (empty(confData[key][vKey])) {
-					continue;
-				}
-
-				if (is_string(confData[key][vKey])) {
-					this.depObjects[key][vKey] = {'id': confData[key][vKey]};
-				}
-				else if (is_object(confData[key][vKey])) {
-					this.depObjects[key][vKey] = confData[key][vKey];
-				}
-			}
-		}
-
-		jQuery(this.mainObj).on(objAction, this.rebuildView.bindAsEventListener(this));
-		globalAllObjForViewSwitcher[objId] = this;
-
-		this.hideAllObjs();
-		this.rebuildView();
-	},
 
 	rebuildView: function(e) {
 		var myValue = this.objValue(this.mainObj);
@@ -177,10 +177,10 @@ var CViewSwitcher = Class.create({
 		switch (obj.tagName.toLowerCase()) {
 			case 'th':
 			case 'td':
-				obj.style.display = IE ? '' : 'table-cell';
+				obj.style.display = 'table-cell';
 				break;
 			case 'tr':
-				obj.style.display = IE ? '' : 'table-row';
+				obj.style.display = 'table-row';
 				break;
 			case 'img':
 			case 'div':
@@ -203,21 +203,23 @@ var CViewSwitcher = Class.create({
 	},
 
 	hideObj: function(data) {
-		if (is_null($(data.id))) {
+		var element = document.getElementById(data.id);
+		if (element === null) {
 			return true;
 		}
-		this.disableObj($(data.id), true);
-		$(data.id).style.display = 'none';
+		this.disableObj(element, true);
+		element.style.display = 'none';
 	},
 
 	showObj: function(data) {
-		if (is_null($(data.id))) {
+		var element = document.getElementById(data.id);
+		if (element === null) {
 			return true;
 		}
-		this.disableObj($(data.id), false);
+		this.disableObj(element, false);
 
 		if (!is_null(data)) {
-			var objValue = this.objValue($(data.id));
+			var objValue = this.objValue(element);
 			var defaultValue = false;
 
 			for (var i in this.depObjects) {
@@ -231,10 +233,10 @@ var CViewSwitcher = Class.create({
 				}
 			}
 			if ((objValue == '' || defaultValue) && isset('defaultValue', data)) {
-				this.setObjValue($(data.id), data.defaultValue);
+				this.setObjValue(element, data.defaultValue);
 			}
 		}
-		this.objDisplay($(data.id));
+		this.objDisplay(element);
 	},
 
 	hideAllObjs: function() {
@@ -253,15 +255,15 @@ var CViewSwitcher = Class.create({
 
 				hidden[this.depObjects[i][a].id] = true;
 
-				var elm = $(this.depObjects[i][a].id);
-				if (is_null(elm)) {
+				var elm = document.getElementById(this.depObjects[i][a].id);
+				if (elm === null) {
 					continue;
 				}
 				this.hideObj(this.depObjects[i][a]);
 			}
 		}
 	}
-});
+};
 
 function ActionProcessor(actions) {
 	this.actions = actions || {};

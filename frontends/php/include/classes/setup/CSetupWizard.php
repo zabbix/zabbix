@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,7 +236,7 @@ class CSetupWizard extends CForm {
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
-		if ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 			$table->addRow(_('Database schema'),
 				(new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			);
@@ -311,7 +311,7 @@ class CSetupWizard extends CForm {
 		$table->addRow((new CSpan(_('Database name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
 		$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_USER'));
 		$table->addRow((new CSpan(_('Database password')))->addClass(ZBX_STYLE_GREY), $db_password);
-		if ($db_type == ZBX_DB_DB2 || $db_type == ZBX_DB_POSTGRESQL) {
+		if ($db_type == ZBX_DB_POSTGRESQL) {
 			$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 		}
 
@@ -333,7 +333,7 @@ class CSetupWizard extends CForm {
 	function stage5() {
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
-		$config_file_name = Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
+		$config_file_name = APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($config_file_name);
 		$config->config = [
 			'DB' => [
@@ -413,17 +413,12 @@ class CSetupWizard extends CForm {
 
 		$error = '';
 
-		// during setup set debug to false to avoid displaying unwanted PHP errors in messages
+		// During setup set debug to false to avoid displaying unwanted PHP errors in messages.
 		if (!$result = DBconnect($error)) {
 			error($error);
 		}
 		else {
 			$result = true;
-			if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_DB2) {
-				$db_schema = DBselect('SELECT schemaname FROM syscat.schemata WHERE schemaname=\''.db2_escape_string($DB['SCHEMA']).'\'');
-				$result = DBfetch($db_schema);
-			}
-
 			if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 				$db_schema = DBselect('SELECT schema_name FROM information_schema.schemata WHERE schema_name = \''.pg_escape_string($DB['SCHEMA']).'\';');
 				$result = DBfetch($db_schema);
@@ -432,6 +427,13 @@ class CSetupWizard extends CForm {
 			if ($result) {
 				$result = DBexecute('CREATE TABLE zabbix_installation_test (test_row INTEGER)');
 				$result &= DBexecute('DROP TABLE zabbix_installation_test');
+			}
+
+			$db = DB::getDbBackend();
+
+			if (!$db->checkEncoding()) {
+				error($db->getWarning());
+				return false;
 			}
 		}
 
@@ -502,7 +504,7 @@ class CSetupWizard extends CForm {
 				// make zabbix.conf.php downloadable
 				header('Content-Type: application/x-httpd-php');
 				header('Content-Disposition: attachment; filename="'.basename(CConfigFile::CONFIG_FILE_PATH).'"');
-				$config = new CConfigFile(Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
+				$config = new CConfigFile(APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
 				$config->config = [
 					'DB' => [
 						'TYPE' => $this->getConfig('DB_TYPE'),

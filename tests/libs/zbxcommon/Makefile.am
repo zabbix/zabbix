@@ -16,7 +16,10 @@ SERVER_tests = \
 	zbx_variant_compare \
 	zbx_user_macro_parse \
 	zbx_str_extract \
-	convert_to_utf8
+	convert_to_utf8 \
+	zbx_truncate_itemkey \
+	zbx_truncate_value \
+	zbx_dyn_escape_string
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -325,5 +328,47 @@ convert_to_utf8_LDADD += @SERVER_LIBS@
 convert_to_utf8_LDFLAGS = @SERVER_LDFLAGS@
 
 convert_to_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_truncate_itemkey_SOURCES = \
+	zbx_truncate_itemkey.c \
+	$(COMMON_SRC_FILES)
+
+zbx_truncate_itemkey_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_truncate_itemkey_LDADD += @SERVER_LIBS@
+
+zbx_truncate_itemkey_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_truncate_itemkey_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_truncate_value_SOURCES = \
+	zbx_truncate_value.c \
+	$(COMMON_SRC_FILES)
+
+zbx_truncate_value_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_truncate_value_LDADD += @SERVER_LIBS@
+
+zbx_truncate_value_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_truncate_value_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_dyn_escape_string_SOURCES = \
+	zbx_dyn_escape_string.c \
+	$(COMMON_SRC_FILES)
+
+zbx_dyn_escape_string_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_dyn_escape_string_LDADD += @SERVER_LIBS@
+
+zbx_dyn_escape_string_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_dyn_escape_string_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@
 #define ZBX_PROTO_TAG_HOST_AVAILABILITY		"host availability"
 #define ZBX_PROTO_TAG_HISTORY_DATA		"history data"
 #define ZBX_PROTO_TAG_DISCOVERY_DATA		"discovery data"
-#define ZBX_PROTO_TAG_AUTO_REGISTRATION		"auto registration"
+#define ZBX_PROTO_TAG_AUTOREGISTRATION		"auto registration"
 #define ZBX_PROTO_TAG_MORE			"more"
 #define ZBX_PROTO_TAG_ITEMID			"itemid"
 #define ZBX_PROTO_TAG_TTL			"ttl"
@@ -123,6 +123,52 @@
 #define ZBX_PROTO_TAG_INTERFACE			"interface"
 #define ZBX_PROTO_TAG_FLAGS			"flags"
 #define ZBX_PROTO_TAG_PARAMETERS		"parameters"
+#define ZBX_PROTO_TAG_PROXY_HOSTID		"proxy_hostid"
+#define ZBX_PROTO_TAG_INTERFACE_ID		"interfaceid"
+#define ZBX_PROTO_TAG_USEIP			"useip"
+#define ZBX_PROTO_TAG_ADDRESS			"address"
+#define ZBX_PROTO_TAG_TLS_CONNECT		"tls_connect"
+#define ZBX_PROTO_TAG_TLS_ISSUER		"tls_issuer"
+#define ZBX_PROTO_TAG_TLS_SUBJECT		"tls_subject"
+#define ZBX_PROTO_TAG_TLS_PSK_IDENTITY		"tls_psk_identity"
+#define ZBX_PROTO_TAG_TLS_PSK			"tls_psk"
+#define ZBX_PROTO_TAG_SNMPV3_SECURITYLEVEL	"snmpv3_securitylevel"
+#define ZBX_PROTO_TAG_SNMPV3_AUTHPROTOCOL	"snmpv3_authprotocol"
+#define ZBX_PROTO_TAG_SNMPV3_PRIVPROTOCOL	"snmpv3_privprotocol"
+#define ZBX_PROTO_TAG_FOLLOW_REDIRECTS		"follow_redirects"
+#define ZBX_PROTO_TAG_POST_TYPE			"post_type"
+#define ZBX_PROTO_TAG_RETRIEVE_MODE		"retrieve_mode"
+#define ZBX_PROTO_TAG_REQUEST_METHOD		"request_method"
+#define ZBX_PROTO_TAG_OUTPUT_FORMAT		"output_format"
+#define ZBX_PROTO_TAG_VERIFY_PEER		"verify_peer"
+#define ZBX_PROTO_TAG_VERIFY_HOST		"verify_host"
+#define ZBX_PROTO_TAG_SNMP_COMMUNITY		"snmp_community"
+#define ZBX_PROTO_TAG_SNMP_OID			"snmp_oid"
+#define	ZBX_PROTO_TAG_SNMPV3_SECURITYNAME	"snmpv3_securityname"
+#define ZBX_PROTO_TAG_SNMPV3_AUTHPASSPHRASE	"snmpv3_authpassphrase"
+#define ZBX_PROTO_TAG_SNMPV3_PRIVPASSPHRASE	"snmpv3_privpassphrase"
+#define ZBX_PROTO_TAG_IPMI_SENSOR		"ipmi_sensor"
+#define ZBX_PROTO_TAG_SNMPV3_CONTEXTNAME	"snmpv3_contextname"
+#define ZBX_PROTO_TAG_TIMEOUT			"timeout"
+#define ZBX_PROTO_TAG_URL			"url"
+#define ZBX_PROTO_TAG_QUERY_FIELDS		"query_fields"
+#define ZBX_PROTO_TAG_POSTS			"posts"
+#define ZBX_PROTO_TAG_STATUS_CODES		"status_codes"
+#define ZBX_PROTO_TAG_HTTP_PROXY		"http_proxy"
+#define ZBX_PROTO_TAG_HTTP_HEADERS		"headers"
+#define ZBX_PROTO_TAG_SSL_CERT_FILE		"ssl_cert_file"
+#define ZBX_PROTO_TAG_SSL_KEY_FILE		"ssl_key_file"
+#define ZBX_PROTO_TAG_SSL_KEY_PASSWORD		"ssl_key_password"
+#define ZBX_PROTO_TAG_MAINTENANCE_STATUS	"maintenance_status"
+#define ZBX_PROTO_TAG_MAINTENANCE_TYPE		"maintenance_type"
+#define ZBX_PROTO_TAG_SNMP_AVAILABLE		"snmp_available"
+#define ZBX_PROTO_TAG_IPMI_AVAILABLE		"ipmi_available"
+#define ZBX_PROTO_TAG_IPMI_AUTHTYPE		"ipmi_authtype"
+#define ZBX_PROTO_TAG_IPMI_PRIVILEGE		"ipmi_privilege"
+#define ZBX_PROTO_TAG_IPMI_USERNAME		"ipmi_username"
+#define ZBX_PROTO_TAG_IPMI_PASSWORD		"ipmi_password"
+#define ZBX_PROTO_TAG_JMX_AVAILABLE		"jmx_available"
+#define ZBX_PROTO_TAG_DATA_TYPE			"datatype"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -151,6 +197,7 @@
 #define ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE	"queue"
 
 #define ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND	"alert.send"
+#define ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST	"item.test"
 #define ZBX_PROTO_VALUE_PREPROCESSING_TEST	"preprocessing.test"
 
 typedef enum

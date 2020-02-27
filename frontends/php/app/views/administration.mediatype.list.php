@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 if ($data['uncheck']) {
 	uncheckTableRows('mediatype');
@@ -56,14 +60,18 @@ $widget = (new CWidget())
 $mediaTypeForm = (new CForm())->setName('mediaTypesForm');
 
 // create table
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'mediatype.list')
+	->getUrl();
+
 $mediaTypeTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_media_types'))
 				->onClick("checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
-		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Status'),
 		_('Used in actions'),
 		_('Details'),
@@ -127,7 +135,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		->onClick('return PopUp("popup.mediatypetest.edit",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.mediatypetest.edit",'.json_encode([
 			'mediatypeid' => $mediaType['mediatypeid']
 		]).', "mediatypetest_edit", this);');
 
@@ -157,6 +165,7 @@ $mediaTypeForm->addItem([
 				->setArgument('action', 'export.mediatypes.xml')
 				->setArgument('backurl', (new CUrl('zabbix.php'))
 					->setArgument('action', 'mediatype.list')
+					->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 					->getUrl())
 				->getUrl()
 		],

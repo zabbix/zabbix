@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,10 +31,10 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Problems');
 
 		$this->assertTrue($this->zbxTestCheckboxSelected('filter_show_0'));
-		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem',
-			'Minimum severity', 'Age less than', 'Host inventory', 'Tags', 'Show suppressed problems',
-			'Show unacknowledged only',
-			'Severity', 'Time', 'Recovery time', 'Status', 'Host', 'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
+		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem', 'Not classified',
+			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Age less than', 'Host inventory', 'Tags',
+			'Show suppressed problems', 'Show unacknowledged only', 'Severity', 'Time', 'Recovery time', 'Status', 'Host',
+			'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
 
 		$this->zbxTestCheckNoRealHostnames();
 	}
@@ -47,10 +47,10 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Apply');
 		$this->assertTrue($this->zbxTestCheckboxSelected('filter_show_2'));
 		$this->zbxTestAssertNotVisibleId('filter_age_state');
-		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem',
-			'Minimum severity', 'Host inventory', 'Tags', 'Show suppressed problems',
-			'Show unacknowledged only',
-			'Severity', 'Time', 'Recovery time', 'Status', 'Host', 'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
+		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem', 'Not classified',
+			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Host inventory', 'Tags', 'Show suppressed problems',
+			'Show unacknowledged only', 'Severity', 'Time', 'Recovery time','Status', 'Host', 'Problem', 'Duration',
+			'Ack', 'Actions', 'Tags']);
 
 		$this->zbxTestCheckNoRealHostnames();
 	}
@@ -175,8 +175,9 @@ class testPageProblems extends CLegacyWebTest {
 		// Type problem name
 		$this->zbxTestInputType('filter_name', 'Test trigger');
 
-		// Change minimum severity to Average
-		$this->zbxTestDropdownSelect('filter_severity', 'Average');
+		// Select average, high and disaster severities
+		$this->query('name:zbx_filter')->asForm()->one()->getField('Severity')->fill(['Average', 'High', 'Disaster']);
+
 		// Add tag
 		$this->zbxTestInputType('filter_tags_0_tag', 'service');
 		$this->zbxTestInputType('filter_tags_0_value', 'abc');

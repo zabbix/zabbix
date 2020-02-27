@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,7 +144,7 @@ jQuery(function($) {
 					return this.each(function() {
 						var $this = $(this);
 
-						options['map_options']['canvas']['useViewBox'] = !IE;
+						options['map_options']['canvas']['useViewBox'] = true;
 						options['map_options']['show_timestamp'] = false;
 						widget_data['map_instance'] = new SVGMap(options['map_options']);
 						widget_data['is_refreshing'] = false;

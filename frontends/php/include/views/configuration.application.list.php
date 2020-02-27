@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widget = (new CWidget())
 	->setTitle(_('Applications'))
@@ -60,7 +64,9 @@ $applicationTable = (new CTableInfo())
 				->onClick("checkAll('".$form->getName()."', 'all_applications', 'applications');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		($this->data['hostid'] > 0) ? null : _('Host'),
-		make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder'],
+			(new CUrl('applications.php'))->getUrl()
+		),
 		_('Items'),
 		$data['showInfoColumn'] ? _('Info') : null
 	]);
@@ -134,4 +140,4 @@ $form->addItem([
 // append form to widget
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

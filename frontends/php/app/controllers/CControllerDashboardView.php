@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'groupid' =>			'db hstgrp.groupid',
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
+			'cancel' =>				'in 1',
 			'from' =>				'range_time',
 			'to' =>					'range_time'
 		];
@@ -88,8 +89,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return;
 		}
 		elseif ($this->dashboard === null) {
-			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
-			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
+			$this->setResponse(new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.list')
+				->setArgument('page', $this->hasInput('cancel') ? CPagerHelper::loadPage('dashboard.list', null) : null)
+			));
 
 			return;
 		}
@@ -150,8 +153,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					'hostid' => 0
 				];
 			}
-
-			CView::$has_web_layout_mode = true;
 
 			$response = new CControllerResponseData($data);
 			$response->setTitle(_('Dashboard'));
@@ -429,18 +430,16 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				}
 
 				$widgetid = $widget['widgetid'];
-				$fields = self::convertWidgetFields($widget['fields']);
+				$fields_orig = self::convertWidgetFields($widget['fields']);
 
-				$rf_rate = (array_key_exists('rf_rate', $fields))
-					? ($fields['rf_rate'] == -1)
-						? CWidgetConfig::getDefaultRfRate($widget['type'])
-						: $fields['rf_rate']
-					: CWidgetConfig::getDefaultRfRate($widget['type']);
-
-				$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($fields));
 				// Transforms corrupted data to default values.
+				$widget_form = CWidgetConfig::getForm($widget['type'], json_encode($fields_orig));
 				$widget_form->validate();
 				$fields = $widget_form->getFieldsData();
+
+				$rf_rate = ($fields['rf_rate'] == -1)
+					? CWidgetConfig::getDefaultRfRate($widget['type'])
+					: $fields['rf_rate'];
 
 				$grid_widgets[] = [
 					'widgetid' => $widgetid,
@@ -454,8 +453,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 						'height' => (int) $widget['height']
 					],
 					'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $rf_rate, $widgetid),
-					'fields' => $fields,
-					'configuration' => CWidgetConfig::getConfiguration($widget['type'], $fields, $widget['view_mode']),
+					'fields' => $fields_orig,
+					'configuration' => CWidgetConfig::getConfiguration($widget['type'], $fields, $widget['view_mode'])
 				];
 			}
 		}

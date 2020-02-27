@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,11 @@
 #include "zbxtypes.h"
 #include "version.h"
 #include "md5.h"
+
+#if defined(__MINGW32__)
+#	define __try
+#	define __except(x) if (0)
+#endif
 
 #ifndef va_copy
 #	if defined(__va_copy)
@@ -208,7 +213,7 @@ zbx_item_authtype_t;
 /* event sources */
 #define EVENT_SOURCE_TRIGGERS		0
 #define EVENT_SOURCE_DISCOVERY		1
-#define EVENT_SOURCE_AUTO_REGISTRATION	2
+#define EVENT_SOURCE_AUTOREGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
 #define EVENT_SOURCE_COUNT		4
 
@@ -426,6 +431,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HOUSEKEEPER_EXECUTE	"housekeeper_execute"
 #define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
 #define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
+#define ZBX_SNMP_CACHE_RELOAD	"snmp_cache_reload"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -894,6 +900,7 @@ zbx_task_t;
 #define ZBX_RTC_LOG_LEVEL_DECREASE	2
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
 #define ZBX_RTC_CONFIG_CACHE_RELOAD	8
+#define ZBX_RTC_SNMP_CACHE_RELOAD	9
 
 typedef enum
 {
@@ -1123,6 +1130,10 @@ void	zbx_backtrace(void);
 int	int_in_list(char *list, int value);
 int	ip_in_list(const char *list, const char *ip);
 
+#define VALUE_ERRMSG_MAX	128
+const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len);
+const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len);
+
 /* IP range support */
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1
@@ -1177,7 +1188,7 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 const OSVERSIONINFOEX	*zbx_win_getversion(void);
 void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, char **utf8_value);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
@@ -1190,7 +1201,7 @@ int	_wis_uint(const wchar_t *wide_string);
 #endif
 void	zbx_strlower(char *str);
 void	zbx_strupper(char *str);
-#if defined(_WINDOWS) || defined(HAVE_ICONV)
+#if defined(_WINDOWS) || defined(__MINGW32__) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
@@ -1198,6 +1209,7 @@ size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
 size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
 size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
+size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
@@ -1219,6 +1231,15 @@ int	__zbx_open(const char *pathname, int flags);
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
 
+typedef struct
+{
+	zbx_fs_time_t	modification_time;	/* time of last modification */
+	zbx_fs_time_t	access_time;		/* time of last access */
+	zbx_fs_time_t	change_time;		/* time of last status change */
+}
+zbx_file_time_t;
+
+int	zbx_get_file_time(const char *path, zbx_file_time_t *time);
 void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
@@ -1337,6 +1358,7 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_XPATH		0x080000
 #define ZBX_TOKEN_REGEXP_OUTPUT	0x100000
 #define ZBX_TOKEN_PROMETHEUS	0x200000
+#define ZBX_TOKEN_JSONPATH	0x400000
 
 /* location of a substring */
 typedef struct
@@ -1553,7 +1575,7 @@ char	*zbx_create_token(zbx_uint64_t seed);
 
 int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
 #endif
 

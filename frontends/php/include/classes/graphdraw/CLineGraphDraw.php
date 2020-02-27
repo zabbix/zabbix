@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -295,8 +295,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 					/* --------------------------------------------------
 						We are taking graph on 1px more than we need,
-						and here we are skiping first px, because of MOD (in SELECT),
-						it combines prelast point (it would be last point if not that 1px in begining)
+						and here we are skipping first px, because of MOD (in SELECT),
+						it combines prelast point (it would be last point if not that 1px in beginning)
 						and first point, but we still losing prelast point :(
 						but now we've got the first point.
 					--------------------------------------------------*/
@@ -419,10 +419,12 @@ class CLineGraphDraw extends CGraphDraw {
 						foreach (['min', 'max', 'avg'] as $var_name) {
 							$shift_var_name = 'shift_'.$var_name;
 							$curr_shift = &$curr_data[$shift_var_name];
-							$curr_var = &$curr_data[$var_name];
 							$prev_shift = &$prev_data[$shift_var_name];
 							$prev_var = &$prev_data[$var_name];
-							$curr_shift[$ci] = $prev_var[$ci] + $prev_shift[$ci];
+
+							$prev_var_ci = ($prev_var === null) ? 0 : $prev_var[$ci];
+							$prev_shift_ci = ($prev_shift === null) ? 0 : $prev_shift[$ci];
+							$curr_shift[$ci] = $prev_var_ci + $prev_shift_ci;
 						}
 					}
 					break;
@@ -1217,9 +1219,9 @@ class CLineGraphDraw extends CGraphDraw {
 	/**
 	 * Draw start or end date (and time) label.
 	 *
-	 * @param int $value		Unix time.
-	 * @param sring $format		Date time format.
-	 * @param int $position		Position on X axis.
+	 * @param int $value        Unix time.
+	 * @param string $format    Date time format.
+	 * @param int $position     Position on X axis.
 	 */
 	private function drawStartEndTimePeriod($value, $format, $position) {
 		$point = zbx_date2str(_($format), $value);
@@ -1332,7 +1334,7 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_YEAR * 80, 'sub' => SEC_PER_YEAR * 40]	// 80 years and 40 years
 		];
 
-		// Default inteval values.
+		// Default interval values.
 		$distance = SEC_PER_YEAR * 5;
 		$this->grid['horizontal']['main']['interval'] = 0;
 		$this->grid['horizontal']['sub']['interval'] = 0;
@@ -1475,9 +1477,9 @@ class CLineGraphDraw extends CGraphDraw {
 			$delta_x = bcsub($time, $prev_time) * $this->sizeX / $this->period;
 			$position += $delta_x;
 
-			// First element overlaping check.
+			// First element overlapping check.
 			if ($prev_time != $this->stime || $delta_x > $element_size['width']) {
-				// Last element overlaping check.
+				// Last element overlapping check.
 				if ($position > $this->sizeX - $element_size['width']) {
 					break;
 				}
@@ -2629,7 +2631,13 @@ class CLineGraphDraw extends CGraphDraw {
 					$draw = true;
 				}
 				else {
-					$diff = abs($data['clock'][$i] - $data['clock'][$j]);
+					if ($data['clock'] === null) {
+						$diff = 0;
+					}
+					else {
+						$diff = abs($data['clock'][$i] - $data['clock'][$j]);
+					}
+
 					$cell = ($this->to_time - $this->from_time) / $this->sizeX;
 
 					if ($cell > $delay) {

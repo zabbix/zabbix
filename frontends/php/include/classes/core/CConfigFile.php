@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ class CConfigFile {
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
 	private static $supported_db_types = [
-		ZBX_DB_DB2 => true,
 		ZBX_DB_MYSQL => true,
 		ZBX_DB_ORACLE => true,
 		ZBX_DB_POSTGRESQL => true
@@ -177,7 +176,7 @@ $DB[\'DATABASE\'] = \''.addcslashes($this->config['DB']['DATABASE'], "'\\").'\';
 $DB[\'USER\']     = \''.addcslashes($this->config['DB']['USER'], "'\\").'\';
 $DB[\'PASSWORD\'] = \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 
-// Schema name. Used for IBM DB2 and PostgreSQL.
+// Schema name. Used for PostgreSQL.
 $DB[\'SCHEMA\'] = \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
 
 $ZBX_SERVER      = \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';

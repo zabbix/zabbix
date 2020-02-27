@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,15 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
+$web_layout_mode = CViewHelper::loadLayoutMode();
+
 $controls = (new CForm('get'))
 	->cleanItems()
 	->setAttribute('aria-label', _('Main filter'))
-	->addVar('page', 1)
 	->addItem((new CList())
 		->addItem([
 			new CLabel(_('Group'), 'groupid'),
@@ -54,10 +59,8 @@ if ($this->data['graphid']) {
 	);
 }
 
-$content_control->addItem(get_icon('fullscreen'));
+$content_control->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
 $content_control = (new CTag('nav', true, $content_control))->setAttribute('aria-label', _('Content controls'));
-
-$web_layout_mode = CView::getLayoutMode();
 
 $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
@@ -79,10 +82,17 @@ if (!empty($this->data['graphid'])) {
 			'resourcetype' => SCREEN_RESOURCE_HISTORY,
 			'action' => HISTORY_VALUES,
 			'graphid' => $data['graphid'],
+			'pageFile' => (new CUrl('charts.php'))
+				->setArgument('groupid', $data['groupid'])
+				->setArgument('hostid', $data['hostid'])
+				->setArgument('graphid', $data['graphid'])
+				->setArgument('action', $data['action'])
+				->getUrl(),
 			'profileIdx' => $data['timeline']['profileIdx'],
 			'profileIdx2' => $data['timeline']['profileIdx2'],
 			'from' => $data['timeline']['from'],
-			'to' => $data['timeline']['to']
+			'to' => $data['timeline']['to'],
+			'page' => $data['page']
 		]);
 	}
 	else {
@@ -109,4 +119,4 @@ else {
 	$chartsWidget->addItem(new CTableInfo());
 }
 
-return $chartsWidget;
+$chartsWidget->show();

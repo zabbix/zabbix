@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -509,6 +509,8 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 			return "Provided handle is not a binary string.";
 		case ZBX_MOCK_NOT_AN_UINT64:
 			return "Provided handle is not an unsigned 64 bit integer handle.";
+		case ZBX_MOCK_NOT_A_FLOAT:
+			return "Provided handle is not a floating point number handle.";
 		case ZBX_MOCK_NOT_A_TIMESTAMP:
 			return "Invalid timestamp format.";
 		case ZBX_MOCK_NOT_ENOUGH_MEMORY:
@@ -891,4 +893,30 @@ zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value)
 	}
 
 	return ZBX_MOCK_SUCCESS;
+}
+
+zbx_mock_error_t	zbx_mock_float(zbx_mock_handle_t object, double *value)
+{
+	const zbx_mock_pool_handle_t	*handle;
+	char				*tmp = NULL;
+	zbx_mock_error_t		res = ZBX_MOCK_SUCCESS;
+
+	if (0 > object || object >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[object];
+
+	if (YAML_SCALAR_NODE != handle->node->type)
+		return ZBX_MOCK_NOT_A_FLOAT;
+
+	tmp = zbx_malloc(tmp, handle->node->data.scalar.length + 1);
+	memcpy(tmp, handle->node->data.scalar.value, handle->node->data.scalar.length);
+	tmp[handle->node->data.scalar.length] = '\0';
+
+	if (SUCCEED != is_double(tmp, value))
+		res = ZBX_MOCK_NOT_A_FLOAT;
+
+	zbx_free(tmp);
+
+	return res;
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
@@ -152,7 +156,7 @@ foreach ($data['discoveries'] as $discovery) {
 			CViewHelper::showNum($discovery['graphs'])
 		],
 		$hostPrototypeLink,
-		$discovery['key_'],
+		(new CDiv(CHtml::encode($discovery['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
@@ -172,7 +176,7 @@ $discoveryForm->addItem([
 			'discoveryrule.massdisable' => ['name' => _('Disable'),
 				'confirm' =>_('Disable selected discovery rules?')
 			],
-			'discoveryrule.masscheck_now' => ['name' => _('Check now')],
+			'discoveryrule.masscheck_now' => ['name' => _('Execute now')],
 			'discoveryrule.massdelete' => ['name' => _('Delete'),
 				'confirm' =>_('Delete selected discovery rules?')
 			]
@@ -184,4 +188,4 @@ $discoveryForm->addItem([
 // append form to widget
 $widget->addItem($discoveryForm);
 
-return $widget;
+$widget->show();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widget = (new CWidget())
 	->setTitle(_('Maps'))
@@ -50,14 +54,16 @@ $widget = (new CWidget())
 $sysmapForm = (new CForm())->setName('frm_maps');
 
 // create table
+$url = (new CUrl('sysmaps.php'))->getUrl();
+
 $sysmapTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_maps'))->onClick("checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder'], $url),
 		_('Actions')
 	]);
 
@@ -92,7 +98,7 @@ $sysmapForm->addItem([
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'export.sysmaps.xml')
 				->setArgument('backurl', (new CUrl('sysmaps.php'))
-					->setArgument('page', getPageNumber())
+					->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 					->getUrl())
 				->getUrl()
 		],
@@ -103,4 +109,4 @@ $sysmapForm->addItem([
 // append form to widget
 $widget->addItem($sysmapForm);
 
-return $widget;
+$widget->show();

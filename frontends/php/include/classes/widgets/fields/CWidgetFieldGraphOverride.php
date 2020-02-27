@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,21 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			'timeshift'			=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])]
 		]]);
 		$this->setDefault([]);
+	}
+
+	/**
+	 * Set field values for the overrides.
+	 *
+	 * @return $this
+	 */
+	public function setValue($value) {
+		$overrides = [];
+
+		foreach ((array) $value as $override) {
+			$overrides[] = $override + self::getDefaults();
+		}
+
+		return parent::setValue($overrides);
 	}
 
 	/**

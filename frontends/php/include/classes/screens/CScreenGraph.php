@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -183,35 +183,37 @@ class CScreenGraph extends CScreenBase {
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
-			return 'timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).', '.
-				CJs::encodeJson($timeControlData).')';
+			return 'timeControl.addObject("'.$this->getDataId().'", '.json_encode($this->timeline).', '.
+				json_encode($timeControlData).')';
+		}
+
+		if ($this->mode == SCREEN_MODE_SLIDESHOW) {
+			insert_js('timeControl.addObject("'.$this->getDataId().'", '.json_encode($this->timeline).', '.
+				json_encode($timeControlData).');'
+			);
 		}
 		else {
-			if ($this->mode == SCREEN_MODE_SLIDESHOW) {
-				insert_js('timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).', '.
-					CJs::encodeJson($timeControlData).');'
-				);
-			}
-			else {
-				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).
-					', '.CJs::encodeJson($timeControlData).');'
-				);
-			}
-
-			if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) || !$isDefault) {
-				$item = new CDiv();
-			}
-			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-				$item = new CLink(null, 'charts.php?graphid='.$resourceId.'&from='.$this->timeline['from'].
-					'&to='.$this->timeline['to']
-				);
-			}
-
-			$item
-				->addClass(ZBX_STYLE_GRAPH_WRAPPER)
-				->setId($containerId);
-
-			return $this->getOutput($item);
+			zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.json_encode($this->timeline).', '.
+				json_encode($timeControlData).');'
+			);
 		}
+
+		if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) || !$isDefault) {
+			$item = new CDiv();
+		}
+		elseif ($this->mode == SCREEN_MODE_PREVIEW) {
+			$item = new CLink(null, (new CUrl('charts.php'))
+				->setArgument('graphid', $resourceId)
+				->setArgument('from', $this->timeline['from'])
+				->setArgument('to', $this->timeline['to'])
+				->getUrl()
+			);
+		}
+
+		$item
+			->addClass(ZBX_STYLE_GRAPH_WRAPPER)
+			->setId($containerId);
+
+		return $this->getOutput($item);
 	}
 }

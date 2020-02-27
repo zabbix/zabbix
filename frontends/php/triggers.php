@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -623,9 +623,9 @@ $config = select_config();
 if ((getRequest('action') === 'trigger.massupdateform' || hasRequest('massupdate')) && hasRequest('g_triggerid')) {
 	$data = getTriggerMassupdateFormData();
 	$data['action'] = 'trigger.massupdate';
-	$triggersView = new CView('configuration.triggers.massupdate', $data);
-	$triggersView->render();
-	$triggersView->show();
+
+	// render view
+	echo (new CView('configuration.triggers.massupdate', $data))->getOutput();
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
@@ -656,25 +656,22 @@ elseif (isset($_REQUEST['form'])) {
 		'hostid' => getRequest('hostid', 0),
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
-		'tags' => $tags,
+		'tags' => array_values($tags),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 	];
 
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($data));
-	$triggersView->render();
-	$triggersView->show();
+	// render view
+	echo (new CView('configuration.triggers.edit', getTriggerFormData($data)))->getOutput();
 }
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('g_triggerid')) {
 	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
 	$data['action'] = 'trigger.masscopyto';
 
 	// render view
-	$triggersView = new CView('configuration.copy.elements', $data);
-	$triggersView->render();
-	$triggersView->show();
+	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 else {
 	$filter_groupids_ms = [];
@@ -834,11 +831,22 @@ else {
 		order_result($prefetched_triggers, $sort, $sortorder);
 	}
 
-	$url = (new CUrl('triggers.php'))
-		->setArgument('filter_groupids', $filter_groupids)
-		->setArgument('filter_hostids', $filter_hostids);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$paging = getPagingLine($prefetched_triggers, $sortorder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$paging = CPagerHelper::paginate($page_num, $prefetched_triggers, $sortorder, new CUrl('triggers.php'));
+
+	// fetch triggers
 	$triggers = [];
 	if ($prefetched_triggers) {
 		$triggers = API::Trigger()->get([
@@ -960,14 +968,6 @@ else {
 		}
 	}
 
-	$config_priorities = [];
-	foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-		$config_priorities[] = [
-			'name' => getSeverityName($severity, $config),
-			'value' => $severity
-		];
-	}
-
 	$single_selected_hostid = 0;
 	if (count($filter_hostids) == 1) {
 		$single_selected_hostid = reset($filter_hostids);
@@ -978,7 +978,7 @@ else {
 
 	$data = [
 		'config' => $config,
-		'config_priorities' => $config_priorities,
+		'config_priorities' => CSeverity::getSeverities(),
 		'triggers' => $triggers,
 		'profileIdx' => 'web.triggers.filter',
 		'active_tab' => $active_tab,
@@ -1005,10 +1005,9 @@ else {
 		'dep_triggers' => $dep_triggers,
 		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags)
 	];
-	$triggersView = new CView('configuration.triggers.list', $data);
 
-	$triggersView->render();
-	$triggersView->show();
+	// render view
+	echo (new CView('configuration.triggers.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

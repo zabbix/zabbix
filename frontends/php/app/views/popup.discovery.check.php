@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $discovery_ckeck_types = discovery_check_type2str();
 order_result($discovery_ckeck_types);
 
@@ -26,17 +30,16 @@ $form = (new CForm())
 	->cleanItems()
 	->setName('dcheck_form')
 	->addVar('action', 'popup.discovery.check')
-	->addVar('validate', 1)
-	->addVar('index', $data['index']);
+	->addVar('validate', 1);
 
-if ($data['params']['dcheckid']) {
+if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
 }
 
 $form_list = (new CFormList())
 	->cleanItems()
 	->addRow(new CLabel(_('Check type'), 'type'),
-		(new CComboBox('type', $data['params']['type'], 'setDCheckDefaultPort()', $discovery_ckeck_types))
+		(new CComboBox('type', $data['params']['type'], '', $discovery_ckeck_types))
 	)
 	->addRow((new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
 		(new CTextBox('ports', $data['params']['ports']))
@@ -45,7 +48,7 @@ $form_list = (new CFormList())
 		'row_dcheck_ports'
 	)
 	->addRow((new CLabel(_('Key'), 'key_'))->setAsteriskMark(),
-		(new CTextBox('key_', $data['params']['key_']))
+		(new CTextBox('key_', $data['params']['key_'], false, DB::getFieldLength('items', 'key_')))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired(),
 		'row_dcheck_key'
@@ -117,7 +120,7 @@ $form->addItem([
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.discovery.check.js.php',
+	'script_inline' => $this->readJsFile('popup.discovery.check.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
@@ -125,7 +128,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitDCheck();'
+			'action' => 'return submitDCheck(overlay);'
 		]
 	]
 ];
@@ -135,4 +138,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

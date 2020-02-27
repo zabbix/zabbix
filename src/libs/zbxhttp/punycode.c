@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -347,7 +347,7 @@ int	zbx_http_punycode_encode_url(char **url)
 	if ('\0' != (delimiter = *ptr))
 		*ptr = '\0';
 
-	if (SUCCEED != zbx_http_punycode_encode(domain, &iri))
+	if (FAIL == zbx_http_punycode_encode(domain, &iri))
 	{
 		*ptr = delimiter;
 		return FAIL;

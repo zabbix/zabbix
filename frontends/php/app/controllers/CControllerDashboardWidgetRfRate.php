@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class CControllerDashboardWidgetRfRate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode('')]));
 		}
 
 		return $ret;
@@ -47,6 +47,6 @@ class CControllerDashboardWidgetRfRate extends CController {
 			$this->getInput('widgetid')
 		);
 
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode('')]));
 	}
 }

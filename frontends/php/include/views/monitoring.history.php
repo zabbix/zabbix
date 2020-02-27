@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,15 +19,19 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
+/**
+ * @var CView $this
+ */
+
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $historyWidget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
 	'right' => (new CForm('get'))
+		->cleanItems()
 		->addVar('itemids', getRequest('itemids'))
-		->addVar('page', 1)
 ];
 $header_row = [];
 $first_item = reset($data['items']);
@@ -94,7 +98,9 @@ if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	]));
 }
 
-$action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_icon('fullscreen')]);
+$action_list
+	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
+	->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
 
 $header['right']->addItem($action_list);
 
@@ -176,10 +182,15 @@ if ($data['itemids']) {
 		'resourcetype' => SCREEN_RESOURCE_HISTORY,
 		'action' => $data['action'],
 		'itemids' => $data['itemids'],
+		'pageFile' => (new CUrl('history.php'))
+			->setArgument('action', $data['action'])
+			->setArgument('itemids', $data['itemids'])
+			->getUrl(),
 		'profileIdx' => $data['profileIdx'],
 		'profileIdx2' => $data['profileIdx2'],
 		'from' => $data['from'],
 		'to' => $data['to'],
+		'page' => $data['page'],
 		'filter' => getRequest('filter'),
 		'filter_task' => getRequest('filter_task'),
 		'mark_color' => getRequest('mark_color'),
@@ -218,6 +229,7 @@ else {
 			->hideFilterButtons()
 			->addVar('action', $data['action'])
 			->addVar('itemids', $data['itemids']);
+
 		$filter_tab = [
 			(new CFormList())->addRow(_('Graph type'),
 				(new CRadioButtonList('graphtype', (int) $data['graphtype']))
@@ -236,7 +248,6 @@ else {
 	if ($filter_tab) {
 		$filter_form->addFilterTab(_('Filter'), $filter_tab);
 	}
-
 
 	if ($data['itemids']) {
 		if ($data['action'] !== HISTORY_LATEST) {
@@ -266,4 +277,4 @@ else {
 	}
 }
 
-return $historyWidget;
+$historyWidget->show();

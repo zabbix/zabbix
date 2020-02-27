@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,19 +25,27 @@
 class CAutoloader {
 
 	/**
-	 * An array of directories, where the autoloader will look for the classes.
+	 * Registered namespace array. Key is namespace name with trailing '\' and value is array of directories
+	 * relative path with trailing '/'.
 	 *
 	 * @var array
 	 */
-	protected $includePaths = [];
+	protected $namespaces = [];
 
 	/**
-	 * Initializes object with array of include paths.
+	 * Register supported namespace.
 	 *
-	 * @param array $includePaths absolute paths
+	 * @param string $namespace  Namespace value without trainling '\'.
+	 * @param array  $paths      Array of namespace files directory absolute path without trailing '/'.
 	 */
-	public function __construct(array $includePaths) {
-		$this->includePaths = $includePaths;
+	public function addNamespace(string $namespace, array $paths): void {
+		foreach ($paths as $path) {
+			$path = realpath($path);
+
+			if ($path) {
+				$this->namespaces[$namespace][] = $path.'/';
+			}
+		}
 	}
 
 	/**
@@ -45,36 +53,38 @@ class CAutoloader {
 	 *
 	 * @return bool
 	 */
-	public function register() {
+	public function register(): bool {
 		return spl_autoload_register([$this, 'loadClass']);
 	}
 
 	/**
 	 * Attempts to find and load the given class.
 	 *
-	 * @param $className
-	 */
-	protected function loadClass($className) {
-		if ($classFile = $this->findClassFile($className)) {
-			require $classFile;
-		}
-	}
-
-	/**
-	 * Attempts to find corresponding file for given class name in the current include directories.
+	 * @param string $class_name
 	 *
-	 * @param string $className
-	 *
-	 * @return bool|string
+	 * @return bool
 	 */
-	protected function findClassFile($className) {
-		foreach ($this->includePaths as $includePath) {
-			$filePath = $includePath.'/'.$className.'.php';
+	protected function loadClass(string $class_name): bool {
+		$chunks = explode('\\', $class_name);
+		$file_name = array_pop($chunks).'.php';
 
-			if (is_file($filePath)) {
-				return $filePath;
+		do {
+			$namespace = implode('\\', $chunks);
+
+			if (array_key_exists($namespace, $this->namespaces)) {
+				foreach ($this->namespaces[$namespace] as $dir) {
+					if (is_file($dir.$file_name)) {
+						require $dir.$file_name;
+
+						return true;
+					}
+				}
 			}
-		}
+
+			if ($chunks) {
+				$file_name = strtolower(array_pop($chunks)).'/'.$file_name;
+			}
+		} while ($chunks);
 
 		return false;
 	}

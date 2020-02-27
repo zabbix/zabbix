@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Enabled'
 					],
-					'result' => ['Email', 'SMS']
+					'result' => ['Discord', 'Email', 'Email (HTML)', 'Mattermost', 'Opsgenie', 'PagerDuty', 'Pushover', 'Slack', 'SMS']
 				]
 			],
 			[
@@ -98,7 +98,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'Name' => 'Email',
 						'Status' => 'Enabled'
 					],
-					'result' => ['Email']
+					'result' => ['Email', 'Email (HTML)']
 				]
 			]
 		];
@@ -459,7 +459,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', $data['name']);
 		$row->query('button:Test')->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Test media type', $dialog->getTitle());
 		$form = $dialog->asForm();
 
@@ -498,7 +498,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', $media);
 		$row->query('button:Test')->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Test media type', $dialog->getTitle());
 		$form = $dialog->asForm();
 		$form->fill($fields);

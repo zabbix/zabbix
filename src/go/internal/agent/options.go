@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,45 +31,6 @@ import (
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/tls"
 )
-
-type AgentOptions struct {
-	LogType              string   `conf:"optional,default=file"`
-	LogFile              string   `conf:"optional,default=/tmp/zabbix_agent2.log"`
-	LogFileSize          int      `conf:"optional,range=0:1024,default=1"`
-	DebugLevel           int      `conf:"optional,range=0:5,default=3"`
-	PidFile              string   `conf:"optional,default=/tmp/zabbix_agent2.pid"`
-	ServerActive         string   `conf:"optional"`
-	RefreshActiveChecks  int      `conf:"optional,range=30:3600,default=120"`
-	Timeout              int      `conf:"optional,range=1:30,default=3"`
-	Hostname             string   `conf:"optional"`
-	HostnameItem         string   `conf:"optional"`
-	HostMetadata         string   `conf:"optional"`
-	HostMetadataItem     string   `conf:"optional"`
-	BufferSend           int      `conf:"optional,range=1:3600,default=5"`
-	BufferSize           int      `conf:"optional,range=2:65535,default=100"`
-	ListenIP             string   `conf:"optional"`
-	ListenPort           int      `conf:"optional,range=1024:32767,default=10050"`
-	StatusPort           int      `conf:"optional,range=1024:32767"`
-	SourceIP             string   `conf:"optional"`
-	Server               string   `conf:"optional"`
-	MaxLinesPerSecond    int      `conf:"optional,range=1:1000,default=20"`
-	UserParameter        []string `conf:"optional"`
-	UnsafeUserParameters int      `conf:"optional,range=0:1,default=0"`
-	ControlSocket        string   `conf:"optional"`
-	Alias                []string `conf:"optional"`
-	TLSConnect           string   `conf:"optional"`
-	TLSAccept            string   `conf:"optional"`
-	TLSPSKIdentity       string   `conf:"optional"`
-	TLSPSKFile           string   `conf:"optional"`
-	TLSCAFile            string   `conf:"optional"`
-	TLSCRLFile           string   `conf:"optional"`
-	TLSCertFile          string   `conf:"optional"`
-	TLSKeyFile           string   `conf:"optional"`
-	TLSServerCertIssuer  string   `conf:"optional"`
-	TLSServerCertSubject string   `conf:"optional"`
-
-	Plugins map[string]interface{} `conf:"optional"`
-}
 
 var Options AgentOptions
 
@@ -223,4 +184,26 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 		SourceIP: Options.SourceIP,
 	}
 	return
+}
+
+func ValidateOptions(options AgentOptions) error {
+	const hostNameLen = 128
+	const hostMetadataLen = 255
+	const hostInterfaceLen = 255
+	var err error
+
+	if len(options.Hostname) > hostNameLen {
+		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", hostNameLen)
+	}
+	if err = CheckHostname(options.Hostname); err != nil {
+		return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
+	}
+	if len(options.HostMetadata) > 0 && len(options.HostMetadata) > hostMetadataLen {
+		return fmt.Errorf("the value of \"HostMetadata\" configuration parameter cannot be longer than %d characters", hostMetadataLen)
+	}
+	if len(options.HostInterface) > hostInterfaceLen {
+		return fmt.Errorf("the value of \"HostInterface\" configuration parameter cannot be longer than %d characters", hostInterfaceLen)
+	}
+
+	return nil
 }

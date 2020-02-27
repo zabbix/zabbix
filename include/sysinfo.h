@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,7 +141,7 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 #define ZBX_AVG15		2
 #define ZBX_AVG_COUNT		3
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS)
 #	define MAX_COLLECTOR_PERIOD	(15 * SEC_PER_MIN)
 #endif
 
@@ -192,9 +192,24 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 #define PROCESS_MODULE_COMMAND	0x2
 #define PROCESS_WITH_ALIAS	0x4
 
+typedef enum
+{
+	ZBX_KEY_ACCESS_ALLOW,
+	ZBX_KEY_ACCESS_DENY
+}
+zbx_key_access_rule_type_t;
+
 void	init_metrics(void);
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
+int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	free_metrics(void);
+
+void	init_key_access_rules(void);
+void	finalize_key_access_rules_configuration(void);
+int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type);
+int	check_key_access_rules(const char *metric);
+int	check_request_access_rules(AGENT_REQUEST *request);
+void	free_key_access_rules(void);
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
@@ -267,9 +282,10 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PERF_COUNTER_EN(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -288,7 +304,7 @@ int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event);
 #else
 typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -301,7 +317,42 @@ typedef struct
 }
 MODE_FUNCTION;
 
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+}
+zbx_mpoint_t;
+
+#define ZBX_LLD_MACRO_FSNAME		"{#FSNAME}"
+#define ZBX_LLD_MACRO_FSTYPE		"{#FSTYPE}"
+#define ZBX_LLD_MACRO_FSDRIVETYPE	"{#FSDRIVETYPE}"
+
+#define ZBX_SYSINFO_TAG_FSNAME			"fsname"
+#define ZBX_SYSINFO_TAG_FSTYPE			"fstype"
+#define ZBX_SYSINFO_TAG_FSDRIVETYPE		"fsdrivetype"
+#define ZBX_SYSINFO_TAG_BYTES			"bytes"
+#define ZBX_SYSINFO_TAG_INODES			"inodes"
+#define ZBX_SYSINFO_TAG_TOTAL			"total"
+#define ZBX_SYSINFO_TAG_FREE			"free"
+#define ZBX_SYSINFO_TAG_USED			"used"
+#define ZBX_SYSINFO_TAG_PFREE			"pfree"
+#define ZBX_SYSINFO_TAG_PUSED			"pused"
+
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 
 /* the fields used by proc queries */
 #define ZBX_SYSINFO_PROC_NONE		0x0000
@@ -310,7 +361,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 #define ZBX_SYSINFO_PROC_CMDLINE	0x0004
 #define ZBX_SYSINFO_PROC_USER		0x0008
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #define ZBX_MUTEX_ALL_ALLOW		0
 #define ZBX_MUTEX_THREAD_DENIED		1
 #define ZBX_MUTEX_LOGGING_DENIED	2

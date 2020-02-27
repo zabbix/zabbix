@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 if ($data['graph']['unavailable_object']) {
 	$item = (new CTableInfo())->setNoDataMessage(_('No permissions to referred object or it does not exist!'));
@@ -37,8 +41,8 @@ else {
 		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
 
-	$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.CJs::encodeJson($data['timeline']).', '.
-			CJs::encodeJson($data['time_control_data']).
+	$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.json_encode($data['timeline']).', '.
+			json_encode($data['time_control_data']).
 		');'.
 		'timeControl.processObjects();'.
 		'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
@@ -123,4 +127,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

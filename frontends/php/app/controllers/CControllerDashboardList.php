@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,15 +77,16 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		// sorting & paging
 		order_result($data['dashboards'], $sort_field, $sort_order);
 
-		$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
-
-		$data['paging'] = getPagingLine($data['dashboards'], $sort_order, $url);
+		// pager
+		$page_num = getRequest('page', 1);
+		CPagerHelper::savePage('dashboard.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['dashboards'], $sort_order,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
 
 		if ($data['dashboards']) {
 			$this->prepareEditableFlag($data['dashboards']);
 		}
-
-		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));

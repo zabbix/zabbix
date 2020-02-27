@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,14 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setControls((new CForm('get'))
+		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
 			->addItem([
@@ -59,16 +64,19 @@ $hostInventoryWidget->addItem(
 		])
 );
 
+// create table
+$url = (new CUrl('hostinventories.php'))->getUrl();
+
 $table = (new CTableInfo())
 	->setHeader([
-		make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
 		_('Group'),
-		make_sorting_header(_('Name'), 'pr_name', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Type'), 'pr_type', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('OS'), 'pr_os', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Serial number A'), 'pr_serialno_a', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Tag'), 'pr_tag', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Name'), 'pr_name', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Type'), 'pr_type', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('OS'), 'pr_os', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Serial number A'), 'pr_serialno_a', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Tag'), 'pr_tag', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $this->data['sort'], $this->data['sortorder'], $url)
 	]);
 
 foreach ($this->data['hosts'] as $host) {
@@ -97,4 +105,4 @@ foreach ($this->data['hosts'] as $host) {
 $table = [$table, $this->data['paging']];
 $hostInventoryWidget->addItem($table);
 
-return $hostInventoryWidget;
+$hostInventoryWidget->show();

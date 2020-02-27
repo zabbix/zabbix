@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,6 +46,9 @@ class CImportValidatorFactory extends CRegistryFactory {
 			},
 			'4.4' => function () use ($format) {
 				return new C44XmlValidator($format);
+			},
+			'5.0' => function () use ($format) {
+				return new C50XmlValidator($format);
 			}
 		]);
 	}

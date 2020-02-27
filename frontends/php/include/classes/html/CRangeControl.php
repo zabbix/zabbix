@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class CRangeControl extends CTextBox {
 
 	public function toString($destroy = true) {
 		// Set options for jQuery rangeControl class.
-		$this->setAttribute('data-options', CJs::encodeJson($this->options));
+		$this->setAttribute('data-options', json_encode($this->options));
 		$this->setAttribute('maxlength', max(strlen($this->options['min']), strlen($this->options['max'])));
 
 		return parent::toString($destroy);

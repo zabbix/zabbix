@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/configuration.template.massupdate.js.php';
 
@@ -102,7 +106,7 @@ $new_template_table = (new CTable())
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'linked_templates[]',
-			'object_name' => 'linked_templates',
+			'object_name' => 'templates',
 			'data' => $data['linked_templates'],
 			'popup' => [
 				'parameters' => [
@@ -176,4 +180,4 @@ $form->addItem($tabs);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

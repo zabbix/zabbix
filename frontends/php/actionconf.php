@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('Configuration of actions');
 $page['file'] = 'actionconf.php';
-$page['scripts'] = ['multiselect.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'popup.condition.common.js', 'popup.operation.common.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 // VAR							TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -37,7 +37,7 @@ $fields = [
 										],
 	'eventsource' =>					[T_ZBX_INT, O_OPT, null,
 											IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-												EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL
+												EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL
 											]),
 											null
 										],
@@ -52,12 +52,6 @@ $fields = [
 	'status' =>							[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 											null
 										],
-	'def_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'def_longdata' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'r_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'r_longdata' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'ack_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'ack_longdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'g_actionid' =>						[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'conditions' =>						[null,		O_OPT,	null,	null,		null],
 	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
@@ -80,13 +74,9 @@ $fields = [
 	'add_condition' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel_new_condition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_operation' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel_new_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_recovery_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel_new_recovery_operation' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_ack_operation' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel_new_ack_operation' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_opcondition' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel_new_opcondition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'pause_suppressed' =>				[T_ZBX_STR, O_OPT, null,
 											IN([ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE]),
 											null,
@@ -117,7 +107,7 @@ if ($dataValid && hasRequest('eventsource') && !hasRequest('form')) {
 	CProfile::update('web.actionconf.eventsource', getRequest('eventsource'), PROFILE_TYPE_INT);
 }
 
-if (isset($_REQUEST['actionid'])) {
+if (hasRequest('actionid')) {
 	$actionPermissions = API::Action()->get([
 		'output' => ['actionid'],
 		'actionids' => $_REQUEST['actionid'],
@@ -131,29 +121,11 @@ if (isset($_REQUEST['actionid'])) {
 /*
  * Actions
  */
-if (hasRequest('cancel_new_operation')) {
-	unset($_REQUEST['new_operation']);
-}
-elseif (hasRequest('cancel_new_opcondition')) {
-	unset($_REQUEST['new_opcondition']);
-}
-elseif (hasRequest('cancel_new_recovery_operation')) {
-	unset($_REQUEST['new_recovery_operation']);
-}
-elseif (hasRequest('cancel_new_ack_operation')) {
-	$new_ack_operation = [];
-}
-elseif (hasRequest('add') || hasRequest('update')) {
+if (hasRequest('add') || hasRequest('update')) {
 	$action = [
 		'name' => getRequest('name'),
 		'status' => getRequest('status', ACTION_STATUS_DISABLED),
 		'esc_period' => getRequest('esc_period', DB::getDefault('actions', 'esc_period')),
-		'def_shortdata' => getRequest('def_shortdata', ''),
-		'def_longdata' => getRequest('def_longdata', ''),
-		'r_shortdata' => getRequest('r_shortdata', ''),
-		'r_longdata' => getRequest('r_longdata', ''),
-		'ack_shortdata' => getRequest('ack_shortdata', ''),
-		'ack_longdata' => getRequest('ack_longdata', ''),
 		'operations' => getRequest('operations', []),
 		'recovery_operations' => getRequest('recovery_operations', []),
 		'acknowledge_operations' => getRequest('ack_operations', [])
@@ -163,33 +135,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($action[$operation_key] as &$operation) {
 			if (array_key_exists('opmessage', $operation)
 					&& !array_key_exists('default_msg', $operation['opmessage'])) {
-				$operation['opmessage']['default_msg'] = 0;
+				$operation['opmessage']['default_msg'] = 1;
 			}
 		}
 		unset($operation);
 	}
-
-	foreach ($action['operations'] as &$operation) {
-		if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD
-				|| $operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) {
-			$operation['opgroup'] = [];
-
-			foreach ($operation['groupids'] as $groupid) {
-				$operation['opgroup'][] = ['groupid' => $groupid];
-			}
-			unset($operation['groupids']);
-		}
-		elseif ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD
-				|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
-			$operation['optemplate'] = [];
-
-			foreach ($operation['templateids'] as $templateid) {
-				$operation['optemplate'][] = ['templateid' => $templateid];
-			}
-			unset($operation['templateids']);
-		}
-	}
-	unset($operation);
 
 	$filter = [
 		'conditions' => getRequest('conditions', []),
@@ -285,8 +235,6 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 
 		$usedFormulaIds = zbx_objectValues($conditions, 'formulaid');
 
-		$validateConditions = $conditions;
-
 		if (isset($newCondition['value'])) {
 			$newConditionValues = zbx_toArray($newCondition['value']);
 			foreach ($newConditionValues as $newValue) {
@@ -294,28 +242,11 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 				$condition['value'] = $newValue;
 				$condition['formulaid'] = CConditionHelper::getNextFormulaId($usedFormulaIds);
 				$usedFormulaIds[] = $condition['formulaid'];
-				$validateConditions[] = $condition;
+				$conditions[] = $condition;
 			}
 		}
 
-		$conditionsValid = true;
-		if ($validateConditions) {
-			$filterConditionValidator = new CActionCondValidator();
-			foreach ($validateConditions as $condition) {
-				if (!$filterConditionValidator->validate($condition)) {
-					$conditionsValid = false;
-					break;
-				}
-			}
-		}
-
-		if ($conditionsValid) {
-			$_REQUEST['conditions'] = $validateConditions;
-		}
-		else {
-			error($filterConditionValidator->getError());
-			show_error_message(_('Cannot add action condition'));
-		}
+		$_REQUEST['conditions'] = $conditions;
 	}
 }
 elseif (hasRequest('add_opcondition') && hasRequest('new_opcondition')) {
@@ -341,34 +272,8 @@ elseif (hasRequest('add_opcondition') && hasRequest('new_opcondition')) {
 	}
 }
 elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
-	$new_operation = $_REQUEST['new_operation'];
+	$new_operation = getRequest('new_operation');
 	$result = true;
-
-	switch ($new_operation['operationtype']) {
-		case OPERATION_TYPE_GROUP_ADD:
-		case OPERATION_TYPE_GROUP_REMOVE:
-			$new_operation['opgroup'] = [];
-
-			if (array_key_exists('groupids', $new_operation)) {
-				foreach ($new_operation['groupids'] as $groupid) {
-					$new_operation['opgroup'][] = ['groupid' => $groupid];
-				}
-				unset($new_operation['groupids']);
-			}
-			break;
-
-		case OPERATION_TYPE_TEMPLATE_ADD:
-		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			$new_operation['optemplate'] = [];
-
-			if (array_key_exists('templateids', $new_operation)) {
-				foreach ($new_operation['templateids'] as $templateid) {
-					$new_operation['optemplate'][] = ['templateid' => $templateid];
-				}
-				unset($new_operation['templateids']);
-			}
-			break;
-	}
 
 	$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 
@@ -566,28 +471,6 @@ if (hasRequest('form')) {
 		$data['action']['ack_operations'] = $data['action']['acknowledgeOperations'];
 		unset($data['action']['recoveryOperations'], $data['action']['acknowledgeOperations']);
 
-		foreach ($data['action']['operations'] as &$operation) {
-			if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD
-					|| $operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) {
-				$operation = [
-					'actionid' => $operation['actionid'],
-					'operationid' => $operation['operationid'],
-					'operationtype' => $operation['operationtype'],
-					'groupids' => zbx_objectValues($operation['opgroup'], 'groupid')
-				];
-			}
-			elseif ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD
-					|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
-				$operation = [
-					'actionid' => $operation['actionid'],
-					'operationid' => $operation['operationid'],
-					'operationtype' => $operation['operationtype'],
-					'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
-				];
-			}
-		}
-		unset($operation);
-
 		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
@@ -614,46 +497,31 @@ if (hasRequest('form')) {
 		$data['action']['filter']['conditions'] = getRequest('conditions', []);
 
 		if ($data['actionid'] && hasRequest('form_refresh')) {
-			$data['action']['def_shortdata'] = getRequest('def_shortdata', '');
-			$data['action']['def_longdata'] = getRequest('def_longdata', '');
-			$data['action']['r_shortdata'] = getRequest('r_shortdata', '');
-			$data['action']['r_longdata'] = getRequest('r_longdata', '');
-			$data['action']['ack_shortdata'] = getRequest('ack_shortdata', '');
-			$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
-
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				$data['action']['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 			}
 		}
 		else {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				$data['action']['def_shortdata'] = getRequest('def_shortdata', ACTION_DEFAULT_SUBJ_PROBLEM);
-				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_PROBLEM);
-				$data['action']['r_shortdata'] = getRequest('r_shortdata', ACTION_DEFAULT_SUBJ_RECOVERY);
-				$data['action']['r_longdata'] = getRequest('r_longdata', ACTION_DEFAULT_MSG_RECOVERY);
-				$data['action']['ack_shortdata'] = getRequest('ack_shortdata', ACTION_DEFAULT_SUBJ_ACKNOWLEDGE);
-				$data['action']['ack_longdata'] = getRequest('ack_longdata', ACTION_DEFAULT_MSG_ACKNOWLEDGE);
 				$data['action']['pause_suppressed'] = getRequest('pause_suppressed',
 					hasRequest('form_refresh') ? ACTION_PAUSE_SUPPRESSED_FALSE : ACTION_PAUSE_SUPPRESSED_TRUE
 				);
 			}
-			elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
-				$data['action']['def_shortdata'] = getRequest('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
-				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
-			}
-			elseif ($data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
-				$data['action']['def_shortdata'] = getRequest('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
-				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
-			}
-			else {
-				$data['action']['def_shortdata'] = getRequest('def_shortdata', '');
-				$data['action']['def_longdata'] = getRequest('def_longdata', '');
-				$data['action']['r_shortdata'] = getRequest('r_shortdata', '');
-				$data['action']['r_longdata'] = getRequest('r_longdata', '');
-				$data['action']['ack_shortdata'] = getRequest('ack_shortdata', '');
-				$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
+		}
+	}
+
+	foreach (['operations', 'recovery_operations', 'ack_operations'] as $operations) {
+		foreach ($data['action'][$operations] as &$operation) {
+			if (($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+					|| $operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE
+					|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE)
+					&& !array_key_exists('default_msg', $operation['opmessage'])) {
+				$operation['opmessage']['default_msg'] = 1;
+				$operation['opmessage']['subject'] = '';
+				$operation['opmessage']['message'] = '';
 			}
 		}
+		unset($operation);
 	}
 
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
@@ -687,93 +555,26 @@ if (hasRequest('form')) {
 		];
 	}
 
-	if (is_array($data['new_operation'])) {
-		switch ($data['new_operation']['operationtype']) {
-			case OPERATION_TYPE_GROUP_ADD:
-			case OPERATION_TYPE_GROUP_REMOVE:
-				if (!array_key_exists('groupids', $data['new_operation'])) {
-					$data['new_operation']['groupids'] = [];
-				}
-
-				if ($data['new_operation']['groupids']) {
-					$data['new_operation']['groups'] = API::HostGroup()->get([
-						'groupids' => $data['new_operation']['groupids'],
-						'output' => ['groupid', 'name'],
-						'editable' => true
-					]);
-
-					foreach ($data['new_operation']['groups'] as &$group) {
-						$group['id'] = $group['groupid'];
-						unset($group['groupid']);
-					}
-					unset($group);
-				}
-				else {
-					$data['new_operation']['groups'] = [];
-				}
-				break;
-
-			case OPERATION_TYPE_TEMPLATE_ADD:
-			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				if (!array_key_exists('templateids', $data['new_operation'])) {
-					$data['new_operation']['templateids'] = [];
-				}
-
-				if ($data['new_operation']['templateids']) {
-					$data['new_operation']['templates'] = API::Template()->get([
-						'templateids' => $data['new_operation']['templateids'],
-						'output' => ['templateid', 'name'],
-						'editable' => true
-					]);
-
-					foreach ($data['new_operation']['templates'] as &$template) {
-						$template['id'] = $template['templateid'];
-						unset($template['templateid']);
-					}
-					unset($template);
-				}
-				else {
-					$data['new_operation']['templates'] = [];
-				}
-				break;
-
-			case OPERATION_TYPE_HOST_INVENTORY:
-				if (!array_key_exists('opinventory', $data['new_operation'])) {
-					$data['new_operation']['opinventory'] = ['inventory_mode' => HOST_INVENTORY_MANUAL];
-				}
-				break;
-		}
-	}
-
 	// New recovery operation.
 	if ($data['new_recovery_operation'] && !is_array($data['new_recovery_operation'])) {
 		$data['new_recovery_operation'] = ['operationtype' => OPERATION_TYPE_MESSAGE];
 	}
 
-	$data['available_mediatypes'] = API::MediaType()->get(['output' => ['mediatypeid', 'name']]);
-	order_result($data['available_mediatypes'], 'name');
-
 	if ($data['new_ack_operation'] && !is_array($data['new_ack_operation'])) {
-		$data['new_ack_operation'] = [
-			'operationtype' => OPERATION_TYPE_MESSAGE,
-			'ack_short' => ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-			'ack_long' => ACTION_DEFAULT_MSG_ACKNOWLEDGE,
-		];
+		$data['new_ack_operation'] = ['operationtype' => OPERATION_TYPE_MESSAGE];
 	}
 	if ($data['new_ack_operation'] && !array_key_exists('opmessage', $data['new_ack_operation'])
 			&& $data['new_ack_operation']['operationtype'] != OPERATION_TYPE_COMMAND) {
 		$data['new_ack_operation']['opmessage'] = [
-			'default_msg'	=> 1,
-			'mediatypeid'	=> 0,
-			'subject'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-			'message'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+			'default_msg' => 1,
+			'mediatypeid' => 0,
+			'subject' => '',
+			'message' => ''
 		];
 	}
 
 	// Render view.
-	$actionView = new CView('configuration.action.edit', $data);
-	$actionView->render();
-	$actionView->show();
+	echo (new CView('configuration.action.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -823,38 +624,23 @@ else {
 		'limit' => $config['search_limit'] + 1
 	]);
 
-	foreach ($data['actions'] as &$action) {
-		foreach ($action['operations'] as &$operation) {
-			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_GROUP_ADD:
-				case OPERATION_TYPE_GROUP_REMOVE:
-					$operation = [
-						'operationtype' => $operation['operationtype'],
-						'groupids' => zbx_objectValues($operation['opgroup'], 'groupid')
-					];
-					break;
-
-				case OPERATION_TYPE_TEMPLATE_ADD:
-				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					$operation = [
-						'operationtype' => $operation['operationtype'],
-						'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
-					];
-					break;
-			}
-		}
-		unset($operation);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
 	}
-	unset($action);
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	// sorting && paging
-	order_result($data['actions'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['actions'], $sortOrder, new CUrl('actionconf.php'));
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sortOrder, new CUrl('actionconf.php'));
 
 	// render view
-	$actionView = new CView('configuration.action.list', $data);
-	$actionView->render();
-	$actionView->show();
+	echo (new CView('configuration.action.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

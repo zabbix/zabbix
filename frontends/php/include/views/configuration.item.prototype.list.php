@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
@@ -149,7 +153,7 @@ foreach ($data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
 		$description,
-		$item['key_'],
+		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
 		$item['trends'],
@@ -183,4 +187,4 @@ $itemForm->addItem([
 // append form to widget
 $widget->addItem($itemForm);
 
-return $widget;
+$widget->show();

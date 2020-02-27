@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -284,4 +284,13 @@ class CXmlConstantName {
 
 	const CONTENT_TYPE_TEXT = 'TEXT'; // Duplicate.
 	const CONTENT_TYPE_HTML = 'HTML';
+
+	const TRIGGERS = 'TRIGGERS';
+	const DISCOVERY = 'DISCOVERY';
+	const AUTOREGISTRATION = 'AUTOREGISTRATION';
+	// const INTERNAL = 'INTERNAL'; // Duplicate.
+
+	const PROBLEM = 'PROBLEM';
+	const RECOVERY = 'RECOVERY';
+	const UPDATE = 'UPDATE';
 }

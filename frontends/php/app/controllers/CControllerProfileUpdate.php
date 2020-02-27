@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class CControllerProfileUpdate extends CController {
 			switch ($this->getInput('idx')) {
 				case 'web.actionconf.filter.active':
 				case 'web.auditacts.filter.active':
-				case 'web.auditlogs.filter.active':
+				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
 				case 'web.graphs.filter.active':
 				case 'web.correlation.filter.active':
@@ -50,6 +50,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.layout.mode':
 				case 'web.maintenance.filter.active':
 				case 'web.media_types.filter.active':
+				case 'web.modules.filter.active':
 				case 'web.overview.filter.active':
 				case 'web.problem.filter.active':
 				case 'web.proxies.filter.active':
@@ -123,7 +124,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case 'web.layout.mode':
-				CView::setLayoutMode($value_int);
+				CViewHelper::saveLayoutMode($value_int);
 				break;
 
 			default:

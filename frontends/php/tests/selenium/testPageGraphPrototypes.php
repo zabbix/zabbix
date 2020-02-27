@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -180,7 +180,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 					'SELECT graphid'.
 					' FROM graphs_items'.
 					' WHERE itemid='.$item_id.
-				')';
+				') ORDER BY graphid';
 
 		$old_hash = CDBHelper::getHash($sql_hash);
 

@@ -1,0 +1,11 @@
+Copyright (C) 2001-2020 Zabbix SIA
+
+Mattermost webhook integration is licensed under the terms of the Apache License Version 2.0, or
+alternatively under the terms of the General Public License (GPL) Version 2.
+You may use Mattermost webhook integration according to either of these licenses as is most appropriate
+for your project on a case-by-case basis.
+
+The terms of each license can be found under the following URL:
+
+Apache License: https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/mattermost/LICENSE-APACHE2
+GPL2 License: https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/README

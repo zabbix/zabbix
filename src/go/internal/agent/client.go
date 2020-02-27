@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,15 @@
 
 package agent
 
-import "sync/atomic"
+import (
+	"sync/atomic"
+)
 
-var lastClientID uint64
+const ActiveChecksClientID = 100
+const PassiveChecksClientID = 1
+const LocalChecksClientID = 0
+
+var lastClientID uint64 = ActiveChecksClientID
 
 // Internal client id assigned to each active server and unique passive bulk request.
 // Single checks (internal and old style passive checks) has built-in client id 0.

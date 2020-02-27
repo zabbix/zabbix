@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package kernel
 
 import (
 	"errors"
-	"fmt"
 
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/std"
@@ -50,7 +49,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		proc = false
 	default:
 		/* SHOULD_NEVER_HAPPEN */
-		return 0, fmt.Errorf("Unsupported metric.")
+		return 0, plugin.UnsupportedMetricError
 	}
 
 	return getMax(proc)

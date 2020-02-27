@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@
 #include "events.h"
 #include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
-#include "../libs/zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 #include "zbxipcservice.h"
 #include "zbxhistory.h"
 #include "postinit.h"
@@ -104,6 +104,7 @@ const char	*help_message[] = {
 	"                                 target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
 	"                                 target is not specified",
+	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
@@ -303,6 +304,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	}
 	else if (local_server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
+		/* make initial configuration sync before worker processes are forked */
 		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		*local_process_num = local_server_num - server_count + CONFIG_CONFSYNCER_FORKS;
 	}
@@ -950,10 +952,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #else
 #	define ODBC_FEATURE_STATUS	" NO"
 #endif
-#ifdef HAVE_SSH2
-#	define SSH2_FEATURE_STATUS	"YES"
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
+#	define SSH_FEATURE_STATUS	"YES"
 #else
-#	define SSH2_FEATURE_STATUS	" NO"
+#	define SSH_FEATURE_STATUS	" NO"
 #endif
 #ifdef HAVE_IPV6
 #	define IPV6_FEATURE_STATUS	"YES"
@@ -976,7 +978,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "VMware monitoring:         " VMWARE_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       " SMTP_AUTH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "SSH2 support:              " SSH2_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:               " SSH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:               " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
@@ -1069,25 +1071,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
-
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	/* make initial configuration sync before worker processes are forked */
-	DCsync_configuration(ZBX_DBSYNC_INIT);
-
-	if (SUCCEED != zbx_check_postinit_tasks(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
-	/* update maintenance states */
-	zbx_dc_update_maintenances();
-
-	DBclose();
-
-	zbx_vc_enable();
+	DBcheck_character_set();
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
@@ -1133,6 +1117,24 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
+				DCconfig_wait_sync();
+
+				DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+				if (SUCCEED != zbx_check_postinit_tasks(&error))
+				{
+					zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s",
+							error);
+					zbx_free(error);
+					exit(EXIT_FAILURE);
+				}
+
+				/* update maintenance states */
+				zbx_dc_update_maintenances();
+
+				DBclose();
+
+				zbx_vc_enable();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_type = ZBX_POLLER_TYPE_NORMAL;

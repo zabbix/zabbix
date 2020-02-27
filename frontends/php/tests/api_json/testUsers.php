@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -244,7 +244,6 @@ class testUsers extends CAPITest {
 				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($id));
 				$dbRowUser = DBFetch($dbResultUser);
 				$this->assertEquals($dbRowUser['alias'], $user[$key]['alias']);
-				$this->assertEquals($dbRowUser['passwd'], md5($user[$key]['passwd']));
 				$this->assertEquals($dbRowUser['name'], '');
 				$this->assertEquals($dbRowUser['surname'], '');
 				$this->assertEquals($dbRowUser['autologin'], 0);
@@ -573,7 +572,6 @@ class testUsers extends CAPITest {
 				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($id));
 				$dbRowUser = DBFetch($dbResultUser);
 				$this->assertEquals($dbRowUser['alias'], $users[$key]['alias']);
-				$this->assertEquals($dbRowUser['passwd'], md5($users[$key]['passwd']));
 				$this->assertEquals($dbRowUser['name'], '');
 				$this->assertEquals($dbRowUser['surname'], '');
 				$this->assertEquals($dbRowUser['autologin'], 0);
@@ -972,12 +970,12 @@ class testUsers extends CAPITest {
 					],
 					'user_medias' => [
 						[
-							'mediatypeid' => '10',
+							'mediatypeid' => '1234',
 							'sendto' => 'api@zabbix.com'
 						]
 					],
 				],
-				'expected_error' => 'Media type with ID "10" is not available.'
+				'expected_error' => 'Media type with ID "1234" is not available.'
 			],
 			// Check user media, sendto.
 			[
@@ -1493,7 +1491,6 @@ class testUsers extends CAPITest {
 				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($result['result']['userids'][0]));
 				$dbRowUser = DBFetch($dbResultUser);
 				$this->assertEquals($dbRowUser['alias'], $user['alias']);
-				$this->assertEquals($dbRowUser['passwd'], md5($user['passwd']));
 				$this->assertEquals($dbRowUser['name'], $user['name']);
 				$this->assertEquals($dbRowUser['surname'], $user['surname']);
 				$this->assertEquals($dbRowUser['autologin'], $user['autologin']);

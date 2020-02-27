@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,9 +27,7 @@ $page['file'] = 'history.php';
 $page['title'] = _('History');
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 if (hasRequest('plaintext')) {
 	define('ZBX_PAGE_NO_MENU', true);
@@ -105,6 +103,7 @@ $data = [
 	'action' => getRequest('action'),
 	'from' => getRequest('from'),
 	'to' => getRequest('to'),
+	'page' => getRequest('page', 1),
 	'plaintext' => hasRequest('plaintext'),
 	'graphtype' => getRequest('graphtype', GRAPH_TYPE_NORMAL),
 	'iv_string' => [ITEM_VALUE_TYPE_LOG => true, ITEM_VALUE_TYPE_TEXT => true],
@@ -126,8 +125,6 @@ updateTimeSelectorPeriod([
 ]);
 
 // render view
-$historyView = new CView('monitoring.history', $data);
-$historyView->render();
-$historyView->show();
+echo (new CView('monitoring.history', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

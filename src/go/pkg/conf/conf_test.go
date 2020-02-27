@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@
 package conf
 
 import (
+	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 
@@ -414,7 +416,6 @@ func TestInterface(t *testing.T) {
 		LogLevel = 3
 		Timeout = 10
 		Plugins.Log.MaxLinesPerSecond = 25
-		Plugins.SystemRun.EnableRemoteCommands = 1
 		Plugins.Redis.Enable = 1
 		Plugins.Redis.Sessions.Server1.Address = 127.0.0.1
 		Plugins.Redis.Sessions.Server2.Address = 127.0.0.2
@@ -442,5 +443,66 @@ func TestInterface(t *testing.T) {
 
 	if !reflect.DeepEqual(expectedOpts, returnedOpts) {
 		t.Errorf("Expected %+v while got %+v", expectedOpts, returnedOpts)
+	}
+}
+
+func TestRawAccess(t *testing.T) {
+	type Options struct {
+		LogFile  string
+		LogLevel int
+		Timeout  int
+		AllowKey interface{} `conf:"optional"`
+		DenyKey  interface{} `conf:"optional"`
+	}
+
+	input := `
+		LogFile = /tmp/log
+		LogLevel = 3
+		Timeout = 10
+		AllowKey=system.localtime
+		DenyKey=*
+		AllowKey=vfs.*[*]
+	`
+	var o Options
+	if err := Unmarshal([]byte(input), &o); err != nil {
+		t.Errorf("Failed unmarshaling options: %s", err)
+	}
+
+	values := make([]*Value, 0)
+	if node, ok := o.AllowKey.(*Node); ok {
+		for _, v := range node.Nodes {
+			if value, ok := v.(*Value); ok {
+				value.Value = []byte(fmt.Sprintf("%s: %s", node.Name, string(value.Value)))
+				values = append(values, value)
+			}
+		}
+	}
+	if node, ok := o.DenyKey.(*Node); ok {
+		for _, v := range node.Nodes {
+			if value, ok := v.(*Value); ok {
+				value.Value = []byte(fmt.Sprintf("%s: %s", node.Name, string(value.Value)))
+				values = append(values, value)
+			}
+		}
+	}
+
+	sort.SliceStable(values, func(i, j int) bool {
+		return values[i].Line < values[j].Line
+	})
+
+	var returnedOpts []string
+
+	for _, value := range values {
+		returnedOpts = append(returnedOpts, string(value.Value))
+	}
+
+	expectedOpts := []string{
+		"AllowKey: system.localtime",
+		"DenyKey: *",
+		"AllowKey: vfs.*[*]",
+	}
+
+	if !reflect.DeepEqual(expectedOpts, returnedOpts) {
+		t.Errorf("Expected '%+v' while got '%+v'", expectedOpts, returnedOpts)
 	}
 }

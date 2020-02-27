@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
 	'header' => $data['title'],
 ];
@@ -28,6 +32,7 @@ $options = $data['options'];
 $http_popup_form = (new CForm())
 	->cleanItems()
 	->setId('http_step')
+	->addVar('no', $options['no'])
 	->addVar('httpstepid', $options['httpstepid'])
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
@@ -177,7 +182,7 @@ $output['buttons'] = [
 		'class' => '',
 		'keepOpen' => true,
 		'isSubmit' => true,
-		'action' => 'return httpconf.steps.edit_form.validate();'
+		'action' => 'return httpconf.steps.edit_form.validate(overlay);'
 	]
 ];
 
@@ -185,11 +190,11 @@ $http_popup_form->addItem($http_popup_form_list);
 
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();
-$output['script_inline'] = 'httpconf.steps.onStepOverlayReadyCb('.$options['httpstepid'].');';
+$output['script_inline'] = 'httpconf.steps.onStepOverlayReadyCb('.$options['no'].');';
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

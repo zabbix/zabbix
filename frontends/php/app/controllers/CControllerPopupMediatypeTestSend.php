@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,12 @@
 
 class CControllerPopupMediatypeTestSend extends CController {
 
-	private $metiatype;
+	/**
+	 * Mediatype object.
+	 *
+	 * @var array
+	 */
+	private $mediatype;
 
 	protected function checkInput() {
 		$fields = [
@@ -42,7 +47,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 			}
 
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
 			);
 		}
 
@@ -148,14 +153,13 @@ class CControllerPopupMediatypeTestSend extends CController {
 		}
 
 		if ($this->mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
-			$json = new CJson();
-			$value = $json->decode($result);
+			$value = json_decode($result);
 			$output['response'] = [
-				'type' => $json->hasError() ? _('Response type: String') : _('Response type: JSON'),
-				'value' => $json->hasError() ? $result : $json->encode($value, [], false, true, true)
+				'type' => json_last_error() ? _('Response type: String') : _('Response type: JSON'),
+				'value' => json_last_error() ? $result : json_encode($value, JSON_PRETTY_PRINT)
 			];
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }

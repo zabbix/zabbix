@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class CControllerDashboardWidgetEdit extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['body' => CJs::encodeJson('')]));
+			$this->setResponse(new CControllerResponseData(['body' => json_encode('')]));
 		}
 
 		return $ret;

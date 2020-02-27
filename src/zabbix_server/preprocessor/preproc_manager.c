@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -747,7 +747,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 			zbx_list_iterator_next(&manager->priority_tail);
 	}
 
-	if (REQUEST_STATE_QUEUED == request->state && NULL != item)
+	if (REQUEST_STATE_QUEUED == request->state)
 		preprocessor_link_items(manager, enqueued_at, item);
 
 	/* if no preprocessing is needed, dependent items are enqueued */

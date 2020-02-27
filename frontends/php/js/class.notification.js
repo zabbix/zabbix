@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,8 +134,7 @@ ZBX_Notification.prototype.makeNode = function() {
 };
 
 /**
- * Since there is loaded prototype.js and it extends DOM's native 'remove' method, explicitly check
- * if node is connected. Also, in case of IE11 there is no 'isConnected' getter.
+ * Explicitly check if node is connected. Also, in case of IE11 there is no 'isConnected' getter.
  *
  * @return {bool}
  */

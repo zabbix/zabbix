@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  * Comments: starting with fping (4.x), the packets interval can be 0ms, 1ms, *
  *           otherwise minimum value is 10ms                                  *
  ******************************************************************************/
-static int	get_interval_option(const char * fping, const char *dst, int *value, char *error, int max_error_len)
+static int	get_interval_option(const char * fping, const char *dst, int *value, char *error, size_t max_error_len)
 {
 	int	ret_exec, ret = FAIL;
 	char	tmp[MAX_STRING_LEN], err[255], *out = NULL;
@@ -190,15 +190,19 @@ static int	get_ipv6_support(const char * fping, const char *dst)
 #endif	/* HAVE_IPV6 */
 
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
-		char *error, int max_error_len)
+		char *error, size_t max_error_len)
 {
+	const unsigned int	fping_response_time_add_chars = 5;
+	const unsigned int	fping_response_time_chars_max = 15;
+
 	FILE		*f;
-	char		*c, params[70];
-	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
+	char		params[70];
+	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buff[MAX_STRING_LEN];
 	size_t		offset;
 	ZBX_FPING_HOST	*host;
-	double		sec;
 	int 		i, ret = NOTSUPPORTED, index;
+	char		*str = NULL;
+	unsigned int	str_sz, timeout_str_sz;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -213,6 +217,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	assert(hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __func__, hosts_count);
+
+	error[0] = '\0';
 
 	if (-1 == access(CONFIG_FPING_LOCATION, X_OK))
 	{
@@ -336,7 +342,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #ifdef HAVE_IPV6
 	if (NULL != CONFIG_SOURCE_IP)
 	{
-		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, max_error_len))
+		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, (int)max_error_len))
 			return ret;
 
 		if (family == PF_INET)
@@ -412,7 +418,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		return ret;
 	}
 
-	if (NULL == fgets(tmp, sizeof(tmp), f))
+	timeout_str_sz = (0 != timeout ? (unsigned int)zbx_snprintf(buff, sizeof(buff), "%d", timeout) +
+			fping_response_time_add_chars : fping_response_time_chars_max);
+	str_sz = (unsigned int)count * timeout_str_sz + MAX_STRING_LEN;
+	str = zbx_malloc(str, (size_t)str_sz);
+
+	if (NULL == fgets(str, (int)str_sz, f))
 	{
 		strscpy(tmp, "no output");
 	}
@@ -420,22 +431,25 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		for (i = 0; i < hosts_count; i++)
 		{
-			hosts[i].status = (char *)zbx_malloc(NULL, count);
-			memset(hosts[i].status, 0, count);
+			hosts[i].status = (char *)zbx_malloc(NULL, (size_t)count);
+			memset(hosts[i].status, 0, (size_t)count);
 		}
 
 		do
 		{
-			zbx_rtrim(tmp, "\n");
-			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", tmp);
+			int	new_line_trimmed;
+			char	*c;
+
+			new_line_trimmed = zbx_rtrim(str, "\n");
+			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", str);
 
 			host = NULL;
 
-			if (NULL != (c = strchr(tmp, ' ')))
+			if (NULL != (c = strchr(str, ' ')))
 			{
 				*c = '\0';
 				for (i = 0; i < hosts_count; i++)
-					if (0 == strcmp(tmp, hosts[i].addr))
+					if (0 == strcmp(str, hosts[i].addr))
 					{
 						host = &hosts[i];
 						break;
@@ -446,13 +460,20 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			if (NULL == host)
 				continue;
 
-			if (NULL == (c = strstr(tmp, " : ")))
+			if (NULL == (c = strstr(str, " : ")))
 				continue;
+
+			if (0 == new_line_trimmed)
+			{
+				zbx_snprintf(error, max_error_len, "cannot read whole fping response line at once");
+				ret = NOTSUPPORTED;
+				break;
+			}
 
 			/* when NIC bonding is used, there are also lines like */
 			/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms */
 
-			if (NULL != strstr(tmp, "duplicate for"))
+			if (NULL != strstr(str, "duplicate for"))
 				continue;
 
 			c += 3;
@@ -489,6 +510,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				if (1 == host->status[index])
 				{
+					double sec;
+
 					sec = atof(c) / 1000; /* convert ms to seconds */
 
 					if (0 == host->rcv || host->min > sec)
@@ -507,21 +530,23 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 					0 != (fping_existence & FPING_EXISTS) &&
 					0 != (fping_existence & FPING6_EXISTS))
 			{
-				memset(host->status, 0, count);	/* reset response statuses for IPv6 */
+				memset(host->status, 0, (size_t)count);	/* reset response statuses for IPv6 */
 			}
 #endif
 			ret = SUCCEED;
 		}
-		while (NULL != fgets(tmp, sizeof(tmp), f));
+		while (NULL != fgets(str, (int)str_sz, f));
 
 		for (i = 0; i < hosts_count; i++)
 			zbx_free(hosts[i].status);
 	}
+
+	zbx_free(str);
 	pclose(f);
 
 	unlink(filename);
 
-	if (NOTSUPPORTED == ret)
+	if (NOTSUPPORTED == ret && '\0' == error[0])
 		zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -545,7 +570,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
  * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
  ******************************************************************************/
-int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len)
+int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error,
+			size_t max_error_len)
 {
 	int	res;
 

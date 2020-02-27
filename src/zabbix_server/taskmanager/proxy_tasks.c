@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,12 +50,15 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 			"select t.taskid,t.type,t.clock,t.ttl,"
 				"c.command_type,c.execute_on,c.port,c.authtype,c.username,c.password,c.publickey,"
 				"c.privatekey,c.command,c.alertid,c.parent_taskid,c.hostid,"
-				"cn.itemid"
+				"cn.itemid,"
+				"d.data,d.parent_taskid,d.type"
 			" from task t"
 			" left join task_remote_command c"
 				" on t.taskid=c.taskid"
 			" left join task_check_now cn"
 				" on t.taskid=cn.taskid"
+			" left join task_data d"
+				" on t.taskid=d.taskid"
 			" where t.status=%d"
 				" and t.proxy_hostid=" ZBX_FS_UI64
 				" and (t.ttl=0 or t.clock+t.ttl>" ZBX_FS_TIME_T ")"
@@ -96,6 +99,17 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 
 				ZBX_STR2UINT64(itemid, row[16]);
 				task->data = (void *)zbx_tm_check_now_create(itemid);
+				break;
+			case ZBX_TM_TASK_DATA:
+				if (SUCCEED == DBis_null(row[17]))
+				{
+					zbx_free(task);
+					continue;
+				}
+
+				ZBX_STR2UINT64(parent_taskid, row[18]);
+				task->data = (void *)zbx_tm_data_create(parent_taskid, row[17], strlen(row[17]),
+						atoi(row[19]));
 				break;
 		}
 

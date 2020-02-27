@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 package plugin
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -117,7 +116,7 @@ func Get(key string) (acc Accessor, err error) {
 	if m, ok := Metrics[key]; ok {
 		return m.Plugin, nil
 	}
-	return nil, errors.New("Unsupported item key.")
+	return nil, UnsupportedMetricError
 }
 
 func ClearRegistry() {

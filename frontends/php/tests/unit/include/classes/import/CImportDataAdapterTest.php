@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($adapter->getScreens(), []);
 		$this->assertEquals($adapter->getImages(), []);
 		$this->assertEquals($adapter->getMaps(), []);
+		$this->assertEquals($adapter->getMediaTypes(), []);
 	}
 
 	public function testGetGroups() {
@@ -2069,6 +2070,59 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		]);
 	}
 
+	public function testGetMediaTypes() {
+		$adapter = $this->getAdapter($this->getMediaTypeXml());
+
+		$defaults = DB::getDefaults('media_type') + ['message_templates' => []];
+		unset($defaults['exec_params']);
+
+		$this->assertEquals($adapter->getMediaTypes(), [
+			[
+				'name' => 'Email',
+				'type' => (string) CXmlConstantValue::MEDIA_TYPE_EMAIL,
+				'smtp_server' => 'mail.example.com',
+				'smtp_helo' => 'example.com',
+				'smtp_email' => 'zabbix@example.com',
+				'parameters' => ''
+			] + $defaults,
+			[
+				'name' => 'Script',
+				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
+				'exec_path' => 'script.sh',
+				'exec_params' => ''
+			] + $defaults,
+			[
+				'name' => 'SMS',
+				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SMS,
+				'gsm_modem' => '/dev/ttyS0',
+				'parameters' => ''
+			] + $defaults,
+			[
+				'name' => 'Webhook',
+				'type' => (string) CXmlConstantValue::MEDIA_TYPE_WEBHOOK,
+				'parameters' => [
+					[
+						'name' => 'URL',
+						'value' => ''
+					],
+					[
+						'name' => 'To',
+						'value' => '{ALERT.SENDTO}'
+					],
+					[
+						'name' => 'Subject',
+						'value' => '{ALERT.SUBJECT}'
+					],
+					[
+						'name' => 'Message',
+						'value' => '{ALERT.MESSAGE}'
+					],
+				],
+				'script' => 'return true;'
+			] + $defaults
+		]);
+	}
+
 	public function testConversion() {
 		$adapter = $this->getAdapter($this->get18Xml());
 
@@ -3013,7 +3067,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
-
 	protected function getAdapter($source) {
 		$reader = CImportReaderFactory::getReader(CImportReaderFactory::XML);
 		$source = $reader->read($source);
@@ -3022,7 +3075,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 
 		$source = (new CXmlValidator)->validate($source, 'xml');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2'] as $version) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4'] as $version) {
 			if ($source['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -3038,6 +3091,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$source = (new CConstantImportConverter($schema))->convert($source);
 		$source = (new CDefaultImportConverter($schema))->convert($source);
 		$source = (new CArrayKeysImportConverter($schema))->convert($source);
+		$source = (new CTransformImportConverter($schema))->convert($source);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($source);
@@ -3069,6 +3123,10 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		return $this->getFile('screen.xml');
 	}
 
+	protected function getMediaTypeXml() {
+		return $this->getFile('mediatype.xml');
+	}
+
 	protected function get10Xml() {
 		return $this->getFile('schema_1.0.xml');
 	}
@@ -3080,5 +3138,4 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 
 		return $this->sources[$name];
 	}
-
 }

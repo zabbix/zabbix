@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,20 @@ function createSuggest(oid) {
 	return sid;
 }
 
-var CSuggest = Class.create({
+var CSuggest = function(id, objid) {
+	this.id = id;
+	this.cleanCache();
+	this.dom.input = document.getElementById(objid);
+
+	addListener(this.dom.input, 'keyup', this.keyPressed.bindAsEventListener(this));
+	addListener(this.dom.input, 'blur', this.suggestBlur.bindAsEventListener(this));
+	addListener(window, 'resize', this.positionSuggests.bindAsEventListener(this));
+
+	this.timeoutNeedle = null;
+	this.userNeedle = this.dom.input.value;
+};
+
+CSuggest.prototype = {
 	// public
 	'useLocal':			true,	// use cache to find suggests
 	'useServer':		true,	// use server to find suggests
@@ -56,26 +69,13 @@ var CSuggest = Class.create({
 	'suggestCount':		0,		// suggests shown
 	'mouseOverSuggest':	false,	// indicates if mouse is over suggests
 
-	initialize: function(id, objid) {
-		this.id = id;
-		this.cleanCache();
-		this.dom.input = $(objid);
-
-		addListener(this.dom.input, 'keyup', this.keyPressed.bindAsEventListener(this));
-		addListener(this.dom.input, 'blur', this.suggestBlur.bindAsEventListener(this));
-		addListener(window, 'resize', this.positionSuggests.bindAsEventListener(this));
-
-		this.timeoutNeedle = null;
-		this.userNeedle = this.dom.input.value;
-	},
-
 	needleChange: function(e) {
 		this.hlIndex = 0;
 		this.suggestCount = 0;
 
 		clearTimeout(this.timeoutNeedle);
 
-		var target = Event.element(e),
+		var target = e.target,
 			needle = target.value.toLowerCase();
 
 		if (empty(needle)) {
@@ -321,7 +321,8 @@ var CSuggest = Class.create({
 				this.needleChange(e);
 		}
 
-		Event.stop(e);
+		e.preventDefault();
+		e.stopPropagation();
 	},
 
 	keyUp: function(e) {
@@ -359,7 +360,7 @@ var CSuggest = Class.create({
 	mouseOver: function(e) {
 		this.mouseOverSuggest = true;
 
-		var row = Event.element(e);
+		var row = e.target;
 
 		if (is_null(row) || (row.tagName.toLowerCase() !== 'li') || !isset('id',row)) {
 			return true;
@@ -382,7 +383,8 @@ var CSuggest = Class.create({
 
 	suggestBlur: function(e) {
 		if (this.mouseOverSuggest) {
-			Event.stop(e);
+			e.preventDefault();
+			e.stopPropagation();
 		}
 		else {
 			this.hideSuggests(e);
@@ -391,13 +393,13 @@ var CSuggest = Class.create({
 
 	// highLight
 	removeHighLight: function() {
-		$$('li.suggest-hover').each(function(hlRow) {
-			hlRow.className = '';
+		jQuery('li.suggest-hover').each(function() {
+			this.className = '';
 		});
 	},
 
 	highLightSuggest: function() {
-		var row = $('line_' + this.hlIndex);
+		var row = document.getElementById('line_' + this.hlIndex);
 
 		if (!is_null(row)) {
 			row.className = 'suggest-hover';
@@ -409,7 +411,7 @@ var CSuggest = Class.create({
 			this.dom.input.value = this.userNeedle;
 		}
 		else {
-			this.dom.input.value = $('line_' + this.hlIndex).readAttribute('needle');
+			this.dom.input.value = document.getElementById('line_' + this.hlIndex).getAttribute('needle');
 		}
 	},
 
@@ -426,7 +428,6 @@ var CSuggest = Class.create({
 	showSuggests: function() {
 		if (is_null(this.dom.suggest)) {
 			this.dom.suggest = document.createElement('ul');
-			this.dom.suggest = $(this.dom.suggest);
 
 			var doc_body = document.getElementsByTagName('body')[0];
 
@@ -521,7 +522,7 @@ var CSuggest = Class.create({
 			this.dom.sugtab.remove();
 		}
 
-		this.dom.sugtab = $(sugTab);
+		this.dom.sugtab = sugTab;
 		this.dom.suggest.appendChild(this.dom.sugtab);
 
 		if (count == 0) {
@@ -530,4 +531,4 @@ var CSuggest = Class.create({
 
 		this.suggestCount = count;
 	}
-});
+};

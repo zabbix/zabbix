@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,13 +20,7 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
-#ifdef _WINDOWS
-#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
-typedef int	ssize_t;
-#	else
-typedef long	ssize_t;
-#	endif
-#endif
+#include "zbxtypes.h"
 
 #ifdef _WINDOWS
 #	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))

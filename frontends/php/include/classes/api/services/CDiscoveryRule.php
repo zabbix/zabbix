@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -295,12 +295,10 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
-		$json = new CJson();
-
 		foreach ($result as &$item) {
 			if (array_key_exists('query_fields', $item)) {
-				$query_fields = ($item['query_fields'] !== '') ? $json->decode($item['query_fields'], true) : [];
-				$item['query_fields'] = $json->hasError() ? [] : $query_fields;
+				$query_fields = ($item['query_fields'] !== '') ? json_decode($item['query_fields'], true) : [];
+				$item['query_fields'] = json_last_error() ? [] : $query_fields;
 			}
 
 			if (array_key_exists('headers', $item)) {
@@ -310,6 +308,7 @@ class CDiscoveryRule extends CItemGeneral {
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}
+		unset($item);
 
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
@@ -328,12 +327,11 @@ class CDiscoveryRule extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items);
-		$json = new CJson();
 
 		foreach ($items as &$item) {
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $item)) {
-					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
 				}
 
 				if (array_key_exists('headers', $item)) {
@@ -425,8 +423,6 @@ class CDiscoveryRule extends CItemGeneral {
 			]
 		];
 
-		$json = new CJson();
-
 		// set the default values required for updating
 		foreach ($items as &$item) {
 			$type_change = (array_key_exists('type', $item) && $item['type'] != $db_items[$item['itemid']]['type']);
@@ -467,7 +463,7 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
 				}
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
@@ -692,12 +688,11 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'preservekeys' => true
 		]);
-		$json = new CJson();
 
 		foreach ($tpl_items as &$item) {
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
 				}
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
@@ -2019,7 +2014,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 			if ($this->outputIsRequested('error', $options['output'])) {
 				/*
-				 * SQL func COALESCE use for template items because they dont have record
+				 * SQL func COALESCE use for template items because they don't have record
 				 * in item_rtdata table and DBFetch convert null to '0'
 				 */
 				$sqlParts = $this->addQuerySelect(dbConditionCoalesce('ir.error', '', 'error'), $sqlParts);

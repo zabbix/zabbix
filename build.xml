@@ -49,6 +49,11 @@
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
 	</target>
 
+	<target name="init-integration">
+		<!-- Copy agent2 configuration file -->
+		<copy overwrite="true" file="src/go/conf/zabbix_agent2.conf" tofile="conf/zabbix_agent2.conf"/>
+	</target>
+
 	<target name="make-dbschema">
 		<!-- Create database schema -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
@@ -69,6 +74,7 @@
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
+			<arg line="--enable-agent2"/>
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
 		</exec>
@@ -96,7 +102,7 @@
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="-c 'create database ${dbname}'"/>
+			<arg line="-c 'create database ${dbname} ENCODING = UTF8 TEMPLATE = template0'"/>
 		</exec>
 		<exec executable="psql" input="database/postgresql/schema.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -138,7 +144,7 @@
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="-c 'create database ${dbname}_proxy'"/>
+			<arg line="-c 'create database ${dbname}_proxy ENCODING = UTF8 TEMPLATE = template0'"/>
 		</exec>
 		<exec executable="psql" input="database/postgresql/schema.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -172,7 +178,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-postgresql" depends="create-configs,make-binaries-postgresql,init-server-postgresql,init-proxy-postgresql">
+	<target name="init-integration-postgresql" depends="create-configs,init-integration,make-binaries-postgresql,init-server-postgresql,init-proxy-postgresql">
 		<exec executable="psql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
@@ -191,6 +197,7 @@
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
+			<arg line="--enable-agent2"/>
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 		</exec>
@@ -278,7 +285,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,make-binaries-mysql,init-server-mysql,init-proxy-mysql">
+	<target name="init-integration-mysql" depends="create-configs,init-integration,make-binaries-mysql,init-server-mysql,init-proxy-mysql">
 		<exec executable="mysql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>

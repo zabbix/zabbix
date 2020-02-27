@@ -1,8 +1,8 @@
-// +build linux,amd64
+// +build linux
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ import (
 	"os"
 	"syscall"
 	"time"
+
+	"golang.org/x/sys/unix"
 )
 
 // mocked os functionality
@@ -39,8 +41,6 @@ type MockOs interface {
 
 type fileTime struct {
 	ModTime time.Time
-	acTime  int64
-	chTime  int64
 }
 
 type mockOs struct {
@@ -102,8 +102,12 @@ func (o *mockOs) Stat(name string) (os.FileInfo, error) {
 		fs.modTime = o.ftimes[name].ModTime
 		fs.name = name
 		fs.size = int64(len(data))
-		fs.sys.Atim.Sec = o.ftimes[name].acTime
-		fs.sys.Ctim.Sec = o.ftimes[name].chTime
+		a, err := unix.TimeToTimespec(o.ftimes[name].ModTime)
+		if err != nil {
+			return nil, err
+		}
+		fs.sys.Atim.Sec = a.Sec
+		fs.sys.Ctim.Sec = a.Sec
 
 		return &fs, nil
 	}
@@ -133,8 +137,6 @@ func (o *mockOs) MockFile(path string, data []byte) {
 	o.files[path] = data
 	var ft fileTime
 	ft.ModTime = time.Now()
-	ft.acTime = ft.ModTime.Unix()
-	ft.chTime = ft.ModTime.Unix()
 	o.ftimes[path] = ft
 }
 

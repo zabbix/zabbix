@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,10 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();
 			CProfiler::getInstance()->show();
-			makeDebugButton()->show();
+
+			(new CButton(null))
+				->addClass(ZBX_STYLE_BTN_DEBUG)
+				->show();
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -971,9 +971,10 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	DBbegin();
 
-	if (SUCCEED != (ret = DBlock_hostid(hostid)))
+	if (SUCCEED != (ret = DBlock_hostid(hostid)) ||
+			SUCCEED != (ret = DBlock_graphid(parent_graphid)))
 	{
-		/* the host was removed while processing lld rule */
+		/* the host or graph prototype was removed while processing lld rule */
 		DBrollback();
 		goto out;
 	}

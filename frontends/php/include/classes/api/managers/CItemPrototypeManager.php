@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,14 @@ class CItemPrototypeManager {
 		} while ($dep_itemids);
 
 		$del_itemids = array_keys($del_itemids);
+
+		// Lock item prototypes before delete to prevent server from adding new LLD elements.
+		DBselect(
+			'SELECT NULL'.
+			' FROM items i'.
+			' WHERE '.dbConditionInt('i.itemid', $del_itemids).
+			' FOR UPDATE'
+		);
 
 		// Deleting graph prototypes, which will remain without item prototypes.
 		$db_graphs = DBselect(

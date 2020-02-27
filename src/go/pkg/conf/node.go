@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,20 +27,25 @@ import (
 
 // Node structure is used to store parsed conf file parameters or parameter components.
 type Node struct {
-	name        string
+	Name  string
+	Nodes []interface{}
+	Line  int
+
 	used        bool
-	values      [][]byte
-	nodes       []*Node
 	parent      *Node
-	line        int
 	level       int
 	includeFail bool
 }
 
+type Value struct {
+	Value []byte
+	Line  int
+}
+
 // get returns child node by name
 func (n *Node) get(name string) (node *Node) {
-	for _, child := range n.nodes {
-		if child.name == name {
+	for _, v := range n.Nodes {
+		if child, ok := v.(*Node); ok && child.Name == name {
 			return child
 		}
 	}
@@ -61,41 +66,44 @@ func (n *Node) add(name []byte, value []byte, lineNum int) {
 
 	if node = n.get(key); node == nil {
 		node = &Node{
-			name:   string(key),
+			Name:   string(key),
 			used:   false,
-			values: make([][]byte, 0),
-			nodes:  make([]*Node, 0),
+			Nodes:  make([]interface{}, 0),
 			parent: n,
-			line:   lineNum}
-		n.nodes = append(n.nodes, node)
+			Line:   lineNum}
+		n.Nodes = append(n.Nodes, node)
 	}
 
 	if split != -1 {
 		node.add(name[split+1:], value, lineNum)
 	} else {
-		node.values = append(node.values, value)
+		node.Nodes = append(node.Nodes, &Value{Value: value, Line: lineNum})
 	}
 }
 
 // checkUsage checks if all conf nodes were recognized.
 // This is done by recursively checking 'used' flag for all nodes.
 func (n *Node) checkUsage() (err error) {
-	for _, node := range n.nodes {
-		if !node.used {
-			return node.newError("unknown parameter")
-		}
-		if err = node.checkUsage(); err != nil {
-			return
+	for _, v := range n.Nodes {
+		if child, ok := v.(*Node); ok {
+			if !child.used {
+				return child.newError("unknown parameter")
+			}
+			if err = child.checkUsage(); err != nil {
+				return
+			}
 		}
 	}
 	return
 }
 
 // markUsed marks node and its children as used
-func (n *Node) markUsed(v bool) {
-	n.used = v
-	for _, child := range n.nodes {
-		child.markUsed(v)
+func (n *Node) markUsed(used bool) {
+	n.used = used
+	for _, v := range n.Nodes {
+		if child, ok := v.(*Node); ok {
+			child.markUsed(used)
+		}
 	}
 }
 
@@ -103,9 +111,11 @@ func (n *Node) markUsed(v bool) {
 // metadata 'optional' tag is set. Otherwise error is returned.
 func (n *Node) getValue(meta *Meta) (value *string, err error) {
 	if n != nil {
-		count := len(n.values)
-		if count > 0 {
-			tmp := string(n.values[count-1])
+		var tmp string
+		for _, v := range n.Nodes {
+			if val, ok := v.(*Value); ok {
+				tmp = string(val.Value)
+			}
 			value = &tmp
 		}
 	}
@@ -132,11 +142,11 @@ func (n *Node) newError(format string, a ...interface{}) (err error) {
 	var name string
 	for parent := n; parent.parent != nil; parent = parent.parent {
 		if name == "" {
-			name = parent.name
+			name = parent.Name
 		} else {
-			name = parent.name + "." + name
+			name = parent.Name + "." + name
 		}
 	}
 	desc := fmt.Sprintf(format, a...)
-	return fmt.Errorf("invalid parameter %s at line %d: %s", name, n.line, desc)
+	return fmt.Errorf("invalid parameter %s at line %d: %s", name, n.Line, desc)
 }

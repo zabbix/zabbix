@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $form_list = (new CFormList());
 
@@ -84,16 +88,15 @@ $form = (new CForm())
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => require 'app/views/popup.mediatypetest.edit.js.php',
+	'script_inline' => $this->readJsFile('popup.mediatypetest.edit.js.php'),
 	'body' => (new CDiv([$data['errors'], $form]))->toString(),
 	'buttons' => [
 		[
 			'title' => _('Test'),
-			'class' => 'submit-test-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'enabled' => $data['enabled'],
-			'action' => 'mediatypeTestSend("'.$form->getName().'");'
+			'action' => 'return mediatypeTestSend(overlay);'
 		]
 	]
 ];
@@ -103,4 +106,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

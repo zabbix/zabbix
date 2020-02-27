@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -528,6 +528,7 @@ static void am_remove_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 	zbx_free(mediatype->passwd);
 	zbx_free(mediatype->script);
 	zbx_free(mediatype->script_bin);
+	zbx_free(mediatype->error);
 
 	zbx_binary_heap_destroy(&mediatype->queue);
 	zbx_hashset_remove_direct(&manager->mediatypes, mediatype);
@@ -1027,9 +1028,7 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 	return *alerter;
 }
 
-#if defined(HAVE_IBM_DB2)
-#	define ZBX_DATABASE_TYPE "IBM DB2"
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 #	define ZBX_DATABASE_TYPE "MySQL"
 #elif defined(HAVE_ORACLE)
 #	define ZBX_DATABASE_TYPE "Oracle"

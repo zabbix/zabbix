@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -710,6 +710,7 @@ int	DCget_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to,
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_last_sync_time(void);
+void	DCconfig_wait_sync(void);
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
 int	DCconfig_get_proxypoller_nextcheck(void);
 
@@ -759,6 +760,8 @@ int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
+
+unsigned int	DCget_internal_action_count(void);
 
 /* global configuration support */
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0

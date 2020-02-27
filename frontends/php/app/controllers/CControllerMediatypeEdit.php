@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,8 @@ class CControllerMediatypeEdit extends CController {
 			'attempt_interval' =>		'db media_type.attempt_interval',
 			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
-			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML
+			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
+			'message_templates' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -93,6 +94,7 @@ class CControllerMediatypeEdit extends CController {
 					'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
 					'event_menu_url', 'event_menu_name', 'parameters', 'description'
 				],
+				'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
 			]);
@@ -141,13 +143,15 @@ class CControllerMediatypeEdit extends CController {
 			'event_menu_name' => $db_defaults['event_menu_name'],
 			'parameters' => [
 				['name' => 'URL', 'value'=> ''],
+				['name' => 'HTTPProxy', 'value'=> ''],
 				['name' => 'To', 'value' => '{ALERT.SENDTO}'],
 				['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
 				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
 			],
 			'description' => '',
 			'form_refresh' => 0,
-			'content_type' => $db_defaults['content_type']
+			'content_type' => $db_defaults['content_type'],
+			'message_templates' => []
 		];
 
 		// get values from the dabatase
@@ -166,6 +170,7 @@ class CControllerMediatypeEdit extends CController {
 			$data['exec_path'] = $this->mediatype['exec_path'];
 			$data['content_type'] = $this->mediatype['content_type'];
 			$data['description'] = $this->mediatype['description'];
+			$data['message_templates'] = $this->mediatype['message_templates'];
 
 			$this->mediatype['exec_params'] = explode("\n", $this->mediatype['exec_params']);
 			foreach ($this->mediatype['exec_params'] as $exec_param) {
@@ -198,6 +203,7 @@ class CControllerMediatypeEdit extends CController {
 					$data['event_menu_url'] = $this->mediatype['event_menu_url'];
 					$data['event_menu_name'] = $this->mediatype['event_menu_name'];
 					$data['parameters'] = $this->mediatype['parameters'];
+					CArrayHelper::sort($data['parameters'], ['name']);
 					break;
 			}
 
@@ -211,6 +217,7 @@ class CControllerMediatypeEdit extends CController {
 			'form_refresh', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 			'event_menu_name', 'description'
 		]);
+		$data['exec_params'] = array_values($data['exec_params']);
 
 		if ($this->hasInput('form_refresh')) {
 			$data['parameters'] = [];
@@ -223,7 +230,11 @@ class CControllerMediatypeEdit extends CController {
 				$name = next($parameters['name']);
 				$value = next($parameters['value']);
 			}
+
+			$data['message_templates'] = $this->getInput('message_templates', []);
 		}
+
+		CArrayHelper::sort($data['message_templates'], ['eventsource', 'recovery']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

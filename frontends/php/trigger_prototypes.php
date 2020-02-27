@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -530,9 +530,8 @@ if ((getRequest('action') === 'triggerprototype.massupdateform' || hasRequest('m
 	$data['action'] = 'triggerprototype.massupdate';
 	$data['hostid'] = $discoveryRule['hostid'];
 
-	$triggersView = new CView('configuration.trigger.prototype.massupdate', $data);
-	$triggersView->render();
-	$triggersView->show();
+	// Render view.
+	echo (new CView('configuration.trigger.prototype.massupdate', $data))->getOutput();
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = getTriggerFormData([
@@ -563,16 +562,15 @@ elseif (isset($_REQUEST['form'])) {
 		'hostid' => $discoveryRule['hostid'],
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
-		'tags' => $tags,
+		'tags' => array_values($tags),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 	]);
 
-	$triggersView = new CView('configuration.trigger.prototype.edit', $data);
-	$triggersView->render();
-	$triggersView->show();
+	// render view
+	echo (new CView('configuration.trigger.prototype.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
@@ -604,11 +602,22 @@ else {
 
 	order_result($data['triggers'], $sortField, $sortOrder);
 
-	// paging
-	$url = (new CUrl('trigger_prototypes.php'))
-		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$data['paging'] = getPagingLine($data['triggers'], $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['triggers'], $sortOrder,
+		(new CUrl('trigger_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	);
 
 	$data['triggers'] = API::TriggerPrototype()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid', 'recovery_mode',
@@ -668,10 +677,8 @@ else {
 
 	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	// render view
-	$triggersView = new CView('configuration.trigger.prototype.list', $data);
-	$triggersView->render();
-	$triggersView->show();
+	// Render view.
+	echo (new CView('configuration.trigger.prototype.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

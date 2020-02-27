@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,25 +19,17 @@
 **/
 
 
-// reset the LC_CTYPE locale so that case transformation functions would work correctly
-// it is also required for PHP to work with the Turkish locale (https://bugs.php.net/bug.php?id=18556)
-// WARNING: this must be done before executing any other code, otherwise code execution could fail!
-// this will be unnecessary in PHP 5.5
-setlocale(LC_CTYPE, [
-	'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
-]);
-
-require_once dirname(__FILE__).'/classes/core/Z.php';
+require_once dirname(__FILE__).'/classes/core/APP.php';
 
 try {
-	Z::getInstance()->run(ZBase::EXEC_MODE_DEFAULT);
+	APP::getInstance()->run(APP::EXEC_MODE_DEFAULT);
 }
 catch (DBException $e) {
-	(new CView('general.warning', [
+	echo (new CView('general.warning', [
 		'header' => 'Database error',
 		'messages' => [$e->getMessage()],
 		'theme' => ZBX_DEFAULT_THEME
-	]))->render();
+	]))->getOutput();
 
 	exit;
 }
@@ -48,21 +40,21 @@ catch (ConfigFileException $e) {
 			exit;
 
 		case CConfigFile::CONFIG_ERROR:
-			(new CView('general.warning', [
+			echo (new CView('general.warning', [
 				'header' => 'Configuration file error',
 				'messages' => [$e->getMessage()],
 				'theme' => ZBX_DEFAULT_THEME
-			]))->render();
+			]))->getOutput();
 
 			exit;
 	}
 }
 catch (Exception $e) {
-	(new CView('general.warning', [
+	echo (new CView('general.warning', [
 		'header' => $e->getMessage(),
 		'messages' => [],
 		'theme' => ZBX_DEFAULT_THEME
-	]))->render();
+	]))->getOutput();
 
 	exit;
 }

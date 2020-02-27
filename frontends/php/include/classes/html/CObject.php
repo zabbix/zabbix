@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,7 +82,10 @@ class CObject {
 
 function unpack_object(&$item) {
 	$res = '';
-	if (is_object($item)) {
+	if ($item instanceof CPartial) {
+		$res = $item->getOutput();
+	}
+	elseif (is_object($item)) {
 		$res = $item->toString(false);
 	}
 	elseif (is_array($item)) {

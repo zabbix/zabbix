@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ type Connection struct {
 	conn      net.Conn
 	tlsConfig *tls.Config
 	state     int
+	compress  bool
 }
 
 type Listener struct {
@@ -55,7 +56,7 @@ type Listener struct {
 }
 
 func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...interface{}) (c *Connection, err error) {
-	c = &Connection{state: connStateConnect}
+	c = &Connection{state: connStateConnect, compress: true}
 	d := net.Dialer{Timeout: timeout, LocalAddr: *localAddr}
 	c.conn, err = d.Dial("tcp", address)
 
@@ -86,23 +87,30 @@ func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...in
 	return
 }
 
-func write(w io.Writer, data []byte) error {
-	var b bytes.Buffer
-	var zb bytes.Buffer
-	var err error
+func (c *Connection) write(w io.Writer, data []byte) (err error) {
+	var buf bytes.Buffer
+	flags := tcpProtocol
+	if c.compress {
+		z := zlib.NewWriter(&buf)
+		if _, err = z.Write(data); err != nil {
+			return
+		}
+		z.Close()
+		flags |= zlibCompress
+	} else {
+		buf.Write(data)
+	}
 
-	z := zlib.NewWriter(&zb)
-	z.Write(data)
-	z.Close()
-	b.Grow(zb.Len() + headerSize)
-	b.Write([]byte{'Z', 'B', 'X', 'D', tcpProtocol | zlibCompress})
-	if err = binary.Write(&b, binary.LittleEndian, uint32(zb.Len())); nil != err {
+	var b bytes.Buffer
+	b.Grow(buf.Len() + headerSize)
+	b.Write([]byte{'Z', 'B', 'X', 'D', flags})
+	if err = binary.Write(&b, binary.LittleEndian, uint32(buf.Len())); nil != err {
 		return err
 	}
 	if err = binary.Write(&b, binary.LittleEndian, uint32(len(data))); nil != err {
 		return err
 	}
-	b.Write(zb.Bytes())
+	b.Write(buf.Bytes())
 	_, err = w.Write(b.Bytes())
 
 	return err
@@ -115,14 +123,15 @@ func (c *Connection) Write(data []byte, timeout time.Duration) error {
 			return err
 		}
 	}
-	return write(c.conn, data)
+
+	return c.write(c.conn, data)
 }
 
 func (c *Connection) WriteString(s string, timeout time.Duration) error {
 	return c.Write([]byte(s), timeout)
 }
 
-func read(r io.Reader, pending []byte) ([]byte, error) {
+func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 	const maxRecvDataSize = 128 * 1048576
 	var total int
 	var b [2048]byte
@@ -182,7 +191,7 @@ func read(r io.Reader, pending []byte) ([]byte, error) {
 
 	if int(expectedSize) == total-headerSize {
 		if 0 != (flags & zlibCompress) {
-			return uncompress(s[headerSize:total], reservedSize)
+			return c.uncompress(s[headerSize:total], reservedSize)
 		}
 		return s[headerSize:total], nil
 	}
@@ -212,12 +221,12 @@ func read(r io.Reader, pending []byte) ([]byte, error) {
 	}
 
 	if 0 != (flags & zlibCompress) {
-		return uncompress(s[:total], reservedSize)
+		return c.uncompress(s[:total], reservedSize)
 	}
 	return s[:total], nil
 }
 
-func uncompress(data []byte, expLen uint32) ([]byte, error) {
+func (c *Connection) uncompress(data []byte, expLen uint32) ([]byte, error) {
 	var b bytes.Buffer
 
 	b.Grow(int(expLen))
@@ -258,7 +267,7 @@ func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {
 			if c.tlsConfig.Accept&tls.ConnUnencrypted == 0 {
 				return nil, errors.New("cannot accept unencrypted connection")
 			}
-			return read(c.conn, b)
+			return c.read(c.conn, b)
 		}
 		if c.tlsConfig.Accept&(tls.ConnPSK|tls.ConnCert) == 0 {
 			return nil, errors.New("cannot accept encrypted connection")
@@ -270,7 +279,7 @@ func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {
 		c.conn = tlsConn
 	}
 
-	return read(c.conn, nil)
+	return c.read(c.conn, nil)
 }
 
 func (c *Connection) RemoteIP() string {
@@ -309,6 +318,10 @@ func (c *Connection) Close() (err error) {
 		err = c.conn.Close()
 	}
 	return
+}
+
+func (c *Connection) SetCompress(compress bool) {
+	c.compress = compress
 }
 
 func (c *Listener) Close() (err error) {

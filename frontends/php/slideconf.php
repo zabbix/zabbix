@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -344,9 +344,7 @@ if (hasRequest('form')) {
 	unset($slide);
 
 	// render view
-	$slideshowView = new CView('monitoring.slideconf.edit', $data);
-	$slideshowView->render();
-	$slideshowView->show();
+	echo (new CView('monitoring.slideconf.edit', $data))->getOutput();
 }
 else {
 	CProfile::delete('web.slides.elementid');
@@ -421,12 +419,23 @@ else {
 
 	order_result($data['slides'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['slides'], $sortOrder, new CUrl('slideconf.php'));
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['slides'], $sortOrder, new CUrl('slideconf.php'));
 
 	// render view
-	$slideshowView = new CView('monitoring.slideconf.list', $data);
-	$slideshowView->render();
-	$slideshowView->show();
+	echo (new CView('monitoring.slideconf.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

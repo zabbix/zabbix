@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ $fields = [
 	'templates'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'linked_templates'	=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'add_templates'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'add_template' 		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
 	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
@@ -110,8 +109,6 @@ if (getRequest('templateid')) {
 	}
 }
 
-$templateIds = getRequest('templates', []);
-
 $tags = getRequest('tags', []);
 foreach ($tags as $key => $tag) {
 	// remove empty new tag lines
@@ -129,25 +126,20 @@ foreach ($tags as $key => $tag) {
 	}
 }
 
-// remove inherited macros data (actions: 'add', 'update' and 'form')
-if (hasRequest('macros')) {
-	$_REQUEST['macros'] = cleanInheritedMacros($_REQUEST['macros']);
+// Remove inherited macros data (actions: 'add', 'update' and 'form').
+$macros = cleanInheritedMacros(getRequest('macros', []));
 
-	// remove empty new macro lines
-	foreach ($_REQUEST['macros'] as $idx => $macro) {
-		if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
-				&& $macro['description'] === '') {
-			unset($_REQUEST['macros'][$idx]);
-		}
+// Remove empty new macro lines.
+foreach ($macros as $idx => $macro) {
+	if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
+			&& $macro['description'] === '') {
+		unset($macros[$idx]);
 	}
 }
 
 /*
  * Actions
  */
-if (hasRequest('add_template') && hasRequest('add_templates')) {
-	$_REQUEST['templates'] = array_merge($templateIds, $_REQUEST['add_templates']);
-}
 if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 	$unlinkTemplates = [];
 
@@ -422,11 +414,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$groups = array_merge($groups, $new_groupid['groupids']);
 		}
 
-		// linked templates
-		$linkedTemplates = getRequest('templates', []);
+		// Linked templates.
 		$templates = [];
-		foreach ($linkedTemplates as $linkedTemplateId) {
-			$templates[] = ['templateid' => $linkedTemplateId];
+
+		foreach (array_merge(getRequest('templates', []), getRequest('add_templates', [])) as $templateid) {
+			$templates[] = ['templateid' => $templateid];
 		}
 
 		$templatesClear = getRequest('clear_templates', []);
@@ -439,7 +431,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'name' => getRequest('visiblename', ''),
 			'groups' => zbx_toObject($groups, 'groupid'),
 			'templates' => $templates,
-			'macros' => getRequest('macros', []),
+			'macros' => $macros,
 			'tags' => $tags,
 			'description' => getRequest('description', '')
 		];
@@ -681,11 +673,13 @@ elseif (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
 		'templateid' => getRequest('templateid', 0),
-		'linked_templates' => getRequest('templates', []),
+		'linked_templates' => [],
+		'add_templates' => [],
 		'original_templates' => [],
-		'parent_templates' => [],
 		'tags' => $tags,
-		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
+		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
+		'readonly' => false,
+		'macros' => $macros
 	];
 
 	if ($data['templateid'] != 0) {
@@ -699,13 +693,13 @@ elseif (hasRequest('form')) {
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
 
-		$data['original_templates'] = [];
 		foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
 			$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
 		}
 
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
+			$data['macros'] = $data['dbTemplate']['macros'];
 		}
 	}
 
@@ -722,23 +716,52 @@ elseif (hasRequest('form')) {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
-	$templateIds = getRequest('templates', hasRequest('form_refresh') ? [] : $data['original_templates']);
+	// Add already linked and new templates.
+	$templates = [];
+	$request_linked_templates = getRequest('templates', hasRequest('form_refresh') ? [] : $data['original_templates']);
+	$request_add_templates = getRequest('add_templates', []);
 
-	// Get linked templates.
-	$data['linkedTemplates'] = API::Template()->get([
-		'output' => ['templateid', 'name'],
-		'templateids' => $templateIds,
-		'preservekeys' => true
-	]);
+	if ($request_linked_templates || $request_add_templates) {
+		$templates = API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => array_merge($request_linked_templates, $request_add_templates),
+			'preservekeys' => true
+		]);
+
+		$data['linked_templates'] = array_intersect_key($templates, array_flip($request_linked_templates));
+		CArrayHelper::sort($data['linked_templates'], ['name']);
+
+		$data['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
+
+		foreach ($data['add_templates'] as &$template) {
+			$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
+		}
+		unset($template);
+	}
 
 	$data['writable_templates'] = API::Template()->get([
 		'output' => ['templateid'],
-		'templateids' => $templateIds,
+		'templateids' => array_keys($data['linked_templates']),
 		'editable' => true,
 		'preservekeys' => true
 	]);
 
-	CArrayHelper::sort($data['linkedTemplates'], ['name']);
+	// Add inherited macros to template macros.
+	if ($data['show_inherited_macros']) {
+		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(array_keys($templates)));
+	}
+
+	// Sort only after inherited macros are added. Otherwise the list will look chaotic.
+	$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
+
+	// The empty inputs will not be shown if there are inherited macros, for example.
+	if (!$data['macros']) {
+		$macro = ['macro' => '', 'value' => '', 'description' => ''];
+		if ($data['show_inherited_macros']) {
+			$macro['type'] = ZBX_PROPERTY_OWN;
+		}
+		$data['macros'][] = $macro;
+	}
 
 	$groups = [];
 
@@ -803,6 +826,12 @@ elseif (hasRequest('form')) {
 		}
 	}
 	CArrayHelper::sort($data['groups_ms'], ['name']);
+
+	// This data is used in common.template.edit.js.php.
+	$data['macros_tab'] = [
+		'linked_templates' => array_map('strval', array_keys($data['linked_templates'])),
+		'add_templates' => array_map('strval', array_keys($data['add_templates']))
+	];
 
 	$view = new CView('configuration.template.edit', $data);
 }
@@ -889,10 +918,22 @@ else {
 	}
 	order_result($templates, $sortField, $sortOrder);
 
-	$url = (new CUrl('templates.php'))
-		->setArgument('groupid', getRequest('groupid', 0));
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$paging = getPagingLine($templates, $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$paging = CPagerHelper::paginate($page_num, $templates, $sortOrder,
+		(new CUrl('templates.php'))->setArgument('groupid', getRequest('groupid', 0))
+	);
 
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
@@ -955,6 +996,7 @@ else {
 		'pageFilter' => $pageFilter,
 		'templates' => $templates,
 		'paging' => $paging,
+		'page' => $page_num,
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
@@ -971,7 +1013,6 @@ else {
 	$view = new CView('configuration.template.list', $data);
 }
 
-$view->render();
-$view->show();
+echo $view->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

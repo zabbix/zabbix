@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $action = 'screenedit.php?form=update&screenid='.getRequest('screenid');
 if (isset($_REQUEST['screenitemid'])) {
 	$action .= '&screenitemid='.getRequest('screenitemid');
@@ -29,7 +33,7 @@ $form = (new CForm('post', $action))
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('screenid', getRequest('screenid'));
 
-if ($data['screen']['templateid'] != 0) {
+if (array_key_exists('templateid', $data['screen'])) {
 	$form->addVar('templateid', $data['screen']['templateid']);
 }
 
@@ -81,7 +85,7 @@ else {
 
 // append resource types to form list
 $screenResources = screen_resources();
-if ($this->data['screen']['templateid']) {
+if (array_key_exists('templateid', $data['screen'])) {
 	unset(
 		$screenResources[SCREEN_RESOURCE_DATA_OVERVIEW], $screenResources[SCREEN_RESOURCE_ACTIONS],
 		$screenResources[SCREEN_RESOURCE_EVENTS], $screenResources[SCREEN_RESOURCE_HOST_INFO],
@@ -140,7 +144,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 					'srcfld2' => 'name',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid'
-				], $this->data['screen']['templateid'] ? [
+				], array_key_exists('templateid', $data['screen']) ? [
 					'templated_hosts' => '1',
 					'hostid' => $data['screen']['templateid']
 				] : [
@@ -198,7 +202,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 						'srcfld2' => 'name',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid'
-					], $this->data['screen']['templateid'] ? [
+					], array_key_exists('templateid', $data['screen']) ? [
 						'templated_hosts' => '1',
 						'hostid' => $data['screen']['templateid']
 					] : [
@@ -260,9 +264,9 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 					'dstfld1' => 'resourceid',
 					'webitems' => true,
 					'numeric' => true,
-					'hostid' => $data['screen']['templateid'],
-					'real_hosts' => ($data['screen']['templateid'] == 0),
-					'with_simple_graph_items' => ($data['screen']['templateid'] == 0)
+					'hostid' => array_key_exists('templateid', $data['screen']) ? $data['screen']['templateid'] : 0,
+					'real_hosts' => !array_key_exists('templateid', $data['screen']),
+					'with_simple_graph_items' => !array_key_exists('templateid', $data['screen'])
 				]
 			]
 		]))
@@ -294,11 +298,11 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 		$caption = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 	}
 
-	if ($this->data['screen']['templateid']) {
+	if (array_key_exists('templateid', $data['screen'])) {
 		$selectButton = (new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'item_prototypes',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -315,7 +319,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 		$selectButton = (new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'item_prototypes',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -373,7 +377,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'sysmaps',
 					'srcfld1' => 'sysmapid',
 					'srcfld2' => 'name',
@@ -427,8 +431,8 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 						'srcfld1' => 'itemid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
-						'hostid' => $data['screen']['templateid'],
-						'real_hosts' => ($data['screen']['templateid'] == 0),
+						'hostid' => array_key_exists('templateid', $data['screen']) ? $data['screen']['templateid'] : 0,
+						'real_hosts' => !array_key_exists('templateid', $data['screen']),
 						'webitems' => true
 					]
 				],
@@ -634,7 +638,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 		(new CButton('application_select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic", '.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'applications',
 					'srcfld1' => 'name',
 					'dstfrm' => $form->getName(),
@@ -738,8 +742,8 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 						'srcfld1' => 'itemid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
-						'hostid' => $data['screen']['templateid'],
-						'real_hosts' => ($data['screen']['templateid'] == 0),
+						'hostid' => array_key_exists('templateid', $data['screen']) ? $data['screen']['templateid'] : 0,
+						'real_hosts' => !array_key_exists('templateid', $data['screen']),
 						'webitems' => true
 					]
 				]
@@ -855,7 +859,7 @@ $resourcesWithDynamic = [
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 ];
-if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, $resourcesWithDynamic)) {
+if (!array_key_exists('templateid', $this->data['screen']) && in_array($resourceType, $resourcesWithDynamic)) {
 	$screenFormList->addRow(_('Dynamic item'), (new CCheckBox('dynamic'))->setChecked($dynamic == 1));
 }
 
@@ -879,4 +883,4 @@ else {
 	));
 }
 
-return $form;
+$form->show();

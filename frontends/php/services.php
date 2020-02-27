@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -294,7 +294,7 @@ if (hasRequest('form')) {
 	else {
 		$new_service_time = getRequest('new_service_time');
 
-		if ($new_service_time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
+		if ($new_service_time && $new_service_time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
 			$data['new_service_time_from'] = hasRequest('new_service_time_from')
 				? getRequest('new_service_time_from')
 				: (new DateTime('today'))->format(ZBX_DATE_TIME);
@@ -332,9 +332,7 @@ if (hasRequest('form')) {
 	}
 
 	// render view
-	$servicesView = new CView('configuration.services.edit', $data);
-	$servicesView->render();
-	$servicesView->show();
+	echo (new CView('configuration.services.edit', $data))->getOutput();
 }
 else {
 	// services
@@ -363,9 +361,7 @@ else {
 	$data = ['tree' => $tree];
 
 	// render view
-	$servicesView = new CView('configuration.services.list', $data);
-	$servicesView->render();
-	$servicesView->show();
+	echo (new CView('configuration.services.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

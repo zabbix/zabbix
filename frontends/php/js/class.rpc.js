@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,32 +36,33 @@ var RPC = {
 	}
 };
 
-RPC.Base = Class.create({
-	'userParams':	{},		// user OPtions
-	'callid':		0,		// rpc request id
+RPC.Base = function(userParams) {
+	this.userParams = {
+		'method': null,
+		'params': {},
+		'notification': 0,
+		'request': {},
+		'onSuccess': function() {},
+		'onFailure': function() {}
+	};
 
-	initialize: function(userParams) {
-		this.userParams = {
-			'method': null,
-			'params': {},
-			'notification': 0,
-			'request': {},
-			'onSuccess': function() {},
-			'onFailure': function() {}
-		};
+	var params = this.userParams;
 
-		Object.extend(this.userParams, userParams || {});
-
-		this.callid = RPC.callid();
+	if (userParams && typeof userParams === 'object') {
+		Object.keys(userParams).forEach(function (key) {
+			params[key] = userParams[key];
+		});
 	}
-});
 
-RPC.Call = Class.create(RPC.Base, {
-	initialize: function($super, userParams) {
-		$super(userParams);
-		this.call();
-	},
+	this.callid = RPC.callid();
+};
 
+RPC.Call = function (userParams) {
+	RPC.Base.call(this, userParams);
+	this.call();
+};
+
+RPC.Call.prototype = {
 	call: function() {
 		var header = {
 			'Content-type': 'application/json-rpc'
@@ -74,22 +75,28 @@ RPC.Call = Class.create(RPC.Base, {
 		};
 
 		var request = {
-			'requestHeaders': header
+			'method': 'POST',
+			'headers': header
 		};
 
 		if (this.userParams.notification == 0) {
 			body.id = this.callid;
-			request.onSuccess = this.processRespond.bind(this);
-			request.onFailure = this.processError.bind(this);
+			request.success = this.processRespond.bind(this);
+			request.error = this.processError.bind(this);
 		}
 
-		Object.extend(request, this.userParams.request);
-		request.postBody = Object.toJSON(body),
+		var params = this.userParams;
+		if (typeof this.userParams.request === 'object') {
+			Object.keys(params.request).forEach(function (key) {
+				request[key] = params.request[key];
+			});
+		}
+		request.data = JSON.stringify(body),
 
-		new Ajax.Request(RPC.rpcurl(), request);
+		new jQuery.ajax(RPC.rpcurl(), request);
 	},
 
-	processRespond: function(resp){
+	processRespond: function(_, _, resp){
 		var isError = this.processError(resp);
 		if (isError) {
 			return false;
@@ -124,4 +131,5 @@ RPC.Call = Class.create(RPC.Base, {
 
 		return false;
 	}
-});
+};
+

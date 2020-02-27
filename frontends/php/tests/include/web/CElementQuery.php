@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CElement.php';
 require_once dirname(__FILE__).'/CElementCollection.php';
+require_once dirname(__FILE__).'/elements/CNullElement.php';
 require_once dirname(__FILE__).'/elements/CFormElement.php';
 require_once dirname(__FILE__).'/elements/CTableElement.php';
 require_once dirname(__FILE__).'/elements/CTableRowElement.php';
@@ -310,7 +311,7 @@ class CElementQuery implements IWaitable {
 		}
 		catch (NoSuchElementException $exception) {
 			if (!$should_exist) {
-				return null;
+				return new CNullElement(array_merge($this->options, ['parent' => $parent, 'by' => $this->by]));
 			}
 
 			throw $exception;
@@ -370,7 +371,7 @@ class CElementQuery implements IWaitable {
 		$target = $this;
 
 		return function () use ($target) {
-			return $target->one()->isClickable();
+			return $target->one(false)->isClickable();
 		};
 	}
 
@@ -381,7 +382,7 @@ class CElementQuery implements IWaitable {
 		$driver = static::getDriver();
 
 		return function () use ($driver) {
-			return $driver->executeScript('return document.readyState;') == 'complete';
+			return $driver->executeScript('return document.readyState === \'complete\' && (window.jQuery||{active:0}).active === 0;');
 		};
 	}
 
@@ -392,7 +393,7 @@ class CElementQuery implements IWaitable {
 		$target = $this;
 
 		return function () use ($target) {
-			return $target->one();
+			return $target->one(false)->isValid();
 		};
 	}
 
@@ -403,7 +404,12 @@ class CElementQuery implements IWaitable {
 		$target = $this;
 
 		return function () use ($target, $text) {
-			return (strpos($target->one()->getText(), $text) !== false);
+			$element = $target->one(false);
+			if (!$element->isValid()) {
+				return false;
+			}
+
+			return (strpos($element->getText(), $text) !== false);
 		};
 	}
 
@@ -414,7 +420,10 @@ class CElementQuery implements IWaitable {
 		$target = $this;
 
 		return function () use ($target, $attributes) {
-			$element = $target->one();
+			$element = $target->one(false);
+			if (!$element->isValid()) {
+				return false;
+			}
 
 			foreach ($attributes as $key => $value) {
 				if (is_numeric($key) && $element->getAttribute($value) === null) {
@@ -436,12 +445,7 @@ class CElementQuery implements IWaitable {
 		$target = $this;
 
 		return function () use ($target) {
-			$element = $target->one(false);
-			if ($element === null) {
-				return false;
-			}
-
-			return $element->isVisible();
+			return $target->one(false)->isVisible();
 		};
 	}
 
@@ -452,7 +456,7 @@ class CElementQuery implements IWaitable {
 	 * @param string       $prefix    xpath prefix
 	 * @param array|string $class     element classes to look for
 	 *
-	 * @return CElement|null
+	 * @return CElement|CNullElement
 	 */
 	public static function getInputElement($target, $prefix = './', $class = null) {
 		$classes = [
@@ -508,11 +512,12 @@ class CElementQuery implements IWaitable {
 				$xpaths[] = $prefix.$selector;
 			}
 
-			if (($element = $target->query('xpath', implode('|', $xpaths))->cast($class)->one(false)) !== null) {
+			$element = $target->query('xpath', implode('|', $xpaths))->cast($class)->one(false);
+			if ($element->isValid()) {
 				return $element;
 			}
 		}
 
-		return null;
+		return new CNullElement(['locator' => 'input element']);
 	}
 }

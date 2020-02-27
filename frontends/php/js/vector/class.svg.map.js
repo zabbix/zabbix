@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -683,9 +683,15 @@ SVGMapElement.prototype.updateImage = function() {
 			height: this.height
 		};
 
-	if (this.options.actions !== null && this.options.actions !== 'null') {
-		options['data-menu-popup'] = this.options.actions;
-		options['style'] = 'cursor: pointer';
+	if (this.options.actions !== null && this.options.actions !== 'null'
+			&& typeof this.options.actions !== 'undefined') {
+		var actions = JSON.parse(this.options.actions);
+
+		// 4 - SYSMAP_ELEMENT_TYPE_IMAGE. Don't draw context menu and hand cursor for image elements with no links.
+		if (actions.data.elementtype != 4 || actions.data.urls.length != 0) {
+			options['data-menu-popup'] = this.options.actions;
+			options['style'] = 'cursor: pointer';
+		}
 	}
 
 	if (typeof this.options.icon !== 'undefined') {

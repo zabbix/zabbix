@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Zabbix
-# Copyright (C) 2001-2019 Zabbix SIA
+# Copyright (C) 2001-2020 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -45,7 +45,7 @@ my %c = (
 
 $c{"before"} = "/*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,41 +67,16 @@ $c{"before"} = "/*
 
 const ZBX_TABLE\ttables[] = {
 
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_SHORTTEXT_LEN	2048
 #else
 #	define ZBX_TYPE_SHORTTEXT_LEN	65535
 #endif
 
-#if defined(HAVE_IBM_DB2)
-#	define ZBX_TYPE_LONGTEXT_LEN	2048
-#	define ZBX_TYPE_TEXT_LEN	2048
-#else
-#	define ZBX_TYPE_LONGTEXT_LEN	0
-#	define ZBX_TYPE_TEXT_LEN	65535
-#endif
+#define ZBX_TYPE_LONGTEXT_LEN	0
+#define ZBX_TYPE_TEXT_LEN	65535
 
 ";
-
-my %ibm_db2 = (
-	"type"		=>	"sql",
-	"database"	=>	"ibm_db2",
-	"before"	=>	"",
-	"after"		=>	"",
-	"table_options"	=>	"",
-	"t_bigint"	=>	"bigint",
-	"t_text"	=>	"varchar(2048)",
-	"t_double"	=>	"decfloat(16)",
-	"t_id"		=>	"bigint",
-	"t_image"	=>	"blob",
-	"t_integer"	=>	"integer",
-	"t_longtext"	=>	"varchar(2048)",
-	"t_nanosec"	=>	"integer",
-	"t_serial"	=>	"bigint",
-	"t_shorttext"	=>	"varchar(2048)",
-	"t_time"	=>	"integer",
-	"t_varchar"	=>	"varchar"
-);
 
 my %mysql = (
 	"type"		=>	"sql",
@@ -422,10 +397,6 @@ sub process_field
 				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;${eol}\n";
 				$sequences = "${sequences}END;${eol}\n/${eol}\n";
 			}
-			elsif ($output{"database"} eq "ibm_db2")
-			{
-				$row = "$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
-			}
 		}
 
 		my $references = "";
@@ -485,22 +456,9 @@ sub process_field
 			$name = "`${name}`";
 		}
 
-		if ($output{"database"} eq "ibm_db2")
-		{
-			@text_fields = ('blob');
-			$default = "" if (grep /$output{$type_short}/, @text_fields);
-		}
-
 		if ($default ne "")
 		{
-			if ($output{"database"} eq "ibm_db2")
-			{
-				$default = "WITH DEFAULT $default";
-			}
-			else
-			{
-				$default = "DEFAULT $default";
-			}
+			$default = "DEFAULT $default";
 		}
 
 		printf "${ltab}%-*s %-*s %-*s ${row}${references}", $szcol1, $name, $szcol2, $type_2, $szcol3, $default;
@@ -540,10 +498,22 @@ sub process_index
 			{
 				s/,/`,`/g;
 			}
-			print "CREATE${unique} INDEX `${table_name}_$name` ON `$table_name` (`$fields`);${eol}\n";
+
+			my $quote_index = "`$fields`";
+
+			for ($quote_index)
+			{
+				s/\)`/\)/g;
+				s/\(/`\(/g;
+			}
+			print "CREATE${unique} INDEX `${table_name}_$name` ON `$table_name` ($quote_index);${eol}\n";
 		}
 		else
 		{
+			for ($fields)
+			{
+				s/\(\d+\)//g;
+			}
 			print "CREATE${unique} INDEX ${table_name}_$name ON $table_name ($fields);${eol}\n";
 		}
 	}
@@ -643,7 +613,7 @@ EOF
 
 sub usage
 {
-	print "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3|timescaledb]\n";
+	print "Usage: $0 [c|mysql|oracle|postgresql|sqlite3|timescaledb]\n";
 	print "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
@@ -707,7 +677,6 @@ sub main
 	$fkeys_suffix = "";
 
 	if ($format eq 'c')			{ %output = %c; }
-	elsif ($format eq 'ibm_db2')		{ %output = %ibm_db2; }
 	elsif ($format eq 'mysql')		{ %output = %mysql; }
 	elsif ($format eq 'oracle')		{ %output = %oracle; }
 	elsif ($format eq 'postgresql')		{ %output = %postgresql; }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class CWidgetFormProblems extends CWidgetForm {
 
 		$this->fields[$field_severities->getName()] = $field_severities;
 
-		// Tag evalype (And/Or).
+		// Tag evaltype (And/Or).
 		$field_evaltype = (new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
 			TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 			TAG_EVAL_TYPE_OR => _('Or')
@@ -209,7 +209,7 @@ class CWidgetFormProblems extends CWidgetForm {
 			->setAction(
 				'jQuery(":checkbox[name=show_timeline]")'.
 					'.filter(":disabled").prop("checked", true).end()'.
-					'.prop("disabled", !'.CJs::encodeJson($sort_with_enabled_show_timeline).'[this.value])'.
+					'.prop("disabled", !'.json_encode($sort_with_enabled_show_timeline).'[this.value])'.
 					'.filter(":disabled").prop("checked", false)'
 			);
 

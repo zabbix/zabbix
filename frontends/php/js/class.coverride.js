@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2020 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ jQuery(function ($) {
 
 							item.clickCallback = function(e) {
 								var args = [$obj];
-								$(this).data('args').each(function(a) {args.push(a)});
+								$(this).data('args').forEach(function(a) {args.push(a)});
 								methods[$(this).data('callback')].apply($obj, args);
 
 								// Remove menu only after .data() has been read from <a>.
@@ -155,9 +155,10 @@ jQuery(function ($) {
 			});
 
 			if (option_to_edit) {
+				var key = Object.keys(menu)[0];
 				sections.push({
-					label: Object.keys(menu)[0],
-					items: getMenuPopupItems($obj, Object.values(menu)[0].items, trigger_elmnt)
+					label: key,
+					items: getMenuPopupItems($obj, menu[key].items, trigger_elmnt)
 				});
 			}
 			else {
@@ -259,7 +260,7 @@ jQuery(function ($) {
 		 *  - changes if specified option of type {option} is already set for given $override.
 		 *
 		 * @param object $override       Object of current override.
-		 * @param string option          String of ovverride option to set (e.g. color, type etc).
+		 * @param string option          String of override option to set (e.g. color, type etc).
 		 * @param string value           Value of option. Can be NULL for options 'color' and 'timeshift'.
 		 */
 		addOverride: function($override, option, value) {

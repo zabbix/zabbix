@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,14 +23,8 @@ function init_mbstrings() {
 	$res = true;
 	$res &= extension_loaded('mbstring');
 
-	if (version_compare(PHP_VERSION, '5.6', '<')) {
-		ini_set('mbstring.internal_encoding', 'UTF-8');
-		$res &= (ini_get('mbstring.internal_encoding') === 'UTF-8');
-	}
-	else {
-		ini_set('default_charset', 'UTF-8');
-		$res &= (ini_get('default_charset') === 'UTF-8');
-	}
+	ini_set('default_charset', 'UTF-8');
+	$res &= (ini_get('default_charset') === 'UTF-8');
 
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 	$res &= (ini_get('mbstring.detect_order') === 'UTF-8, ISO-8859-1, JIS, SJIS');
@@ -87,19 +81,20 @@ function getLocales() {
 }
 
 /**
- * Get URL for support link by language.
+ * Get support URL for specified language.
  *
- * @param string $language  Language 2 char ISO639-1 code.
+ * @param string $language  ISO639-1 code or null for English support URL.
  *
  * @return string
  */
-function getSupportUrl($language) {
+function getSupportUrl($language = null) {
 	$urls = [
-		'ru' => 'https://www.zabbix.com/ru/support/',
-		'ja' => 'https://www.zabbix.com/jp/support/'
+		'ja' => 'https://www.zabbix.com/jp/support',
+		'ru' => 'https://www.zabbix.com/ru/support',
+		'zh' => 'https://www.zabbix.com/cn/support'
 	];
 
-	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support/';
+	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support';
 }
 
 /**
@@ -110,7 +105,7 @@ function getSupportUrl($language) {
  * @return array A list of possible locale names.
  */
 function zbx_locale_variants($language) {
-	if (strtolower(substr(PHP_OS, 0, 3)) === 'win') {
+	if (stripos(PHP_OS, 'WIN') === 0) {
 		return zbx_locale_variants_win($language);
 	}
 

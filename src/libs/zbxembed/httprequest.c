@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -299,6 +299,26 @@ static duk_ret_t	es_httprequest_delete(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
+ * Function: es_httprequest_set_proxy                                         *
+ *                                                                            *
+ * Purpose: CurlHttpRequest.SetProxy method                                   *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_set_proxy(duk_context *ctx)
+{
+	zbx_es_httprequest_t	*request;
+	CURLcode		err;
+
+	if (NULL == (request = es_httprequest(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, duk_to_string(ctx, 0), err);
+
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: es_httprequest_status                                            *
  *                                                                            *
  * Purpose: CurlHttpRequest.Status method                                     *
@@ -329,6 +349,7 @@ static const duk_function_list_entry	httprequest_methods[] = {
 	{"Post", es_httprequest_post, 2},
 	{"Delete", es_httprequest_delete, 2},
 	{"Status", es_httprequest_status, 0},
+	{"SetProxy", es_httprequest_set_proxy, 1},
 	{NULL, NULL, 0}
 };
 

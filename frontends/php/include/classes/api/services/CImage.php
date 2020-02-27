@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,18 +31,23 @@ class CImage extends CApiService {
 	/**
 	 * Get images data
 	 *
-	 * @param array  $options
-	 * @param array  $options['itemids']
-	 * @param array  $options['hostids']
-	 * @param array  $options['groupids']
-	 * @param array  $options['triggerids']
-	 * @param array  $options['imageids']
-	 * @param bool   $options['status']
-	 * @param bool   $options['editable']
-	 * @param bool   $options['count']
-	 * @param string $options['pattern']
-	 * @param int    $options['limit']
-	 * @param string $options['order']
+	 * @param array   $options
+	 * @param array   $options['imageids']
+	 * @param array   $options['sysmapids']
+	 * @param array   $options['filter']
+	 * @param array   $options['search']
+	 * @param bool    $options['searchByAny']
+	 * @param bool    $options['startSearch']
+	 * @param bool    $options['excludeSearch']
+	 * @param bool    $options['searchWildcardsEnabled']
+	 * @param array   $options['output']
+	 * @param int     $options['select_image']
+	 * @param bool    $options['editable']
+	 * @param bool    $options['countOutput']
+	 * @param bool    $options['preservekeys']
+	 * @param string  $options['sortfield']
+	 * @param string  $options['sortorder']
+	 * @param int     $options['limit']
 	 *
 	 * @return array|boolean image data as array or false if error
 	 */
@@ -219,22 +224,6 @@ class CImage extends CApiService {
 					$lob->free();
 					oci_free_statement($stmt);
 				break;
-				case ZBX_DB_DB2:
-					$stmt = db2_prepare($DB['DB'], 'INSERT INTO images ('.implode(' ,', array_keys($values)).',image)'.
-						' VALUES ('.implode(',', $values).', ?)');
-
-					if (!$stmt) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-					}
-
-					$variable = $image['image'];
-					if (!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-					}
-					if (!db2_execute($stmt)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-					}
-				break;
 				case ZBX_DB_MYSQL:
 						$values['image'] = zbx_dbstr($image['image']);
 						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
@@ -321,23 +310,6 @@ class CImage extends CApiService {
 						$row['IMAGE']->truncate();
 						$row['IMAGE']->save($image['image']);
 						$row['IMAGE']->free();
-						break;
-
-					case ZBX_DB_DB2:
-						$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.zbx_dbstr($image['imageid']));
-
-						if (!$stmt) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-						}
-
-						// not unused, db2_bind_param requires variable name as string
-						$variable = $image['image'];
-						if (!db2_bind_param($stmt, 1, 'variable', DB2_PARAM_IN, DB2_BINARY)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-						}
-						if (!db2_execute($stmt)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-						}
 						break;
 				}
 			}

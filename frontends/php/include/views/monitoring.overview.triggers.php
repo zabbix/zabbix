@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 zbx_add_post_js('jqBlink.blink();');
 
@@ -71,7 +75,7 @@ if ($blink_period > 0) {
 }
 
 // header right
-$web_layout_mode = CView::getLayoutMode();
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $submenu_source = [
 	SHOW_TRIGGERS => _('Trigger overview'),
@@ -116,7 +120,7 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -124,28 +128,24 @@ $widget = (new CWidget())
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	// filter
-	$filter = $data['filter'];
-	$filterFormView = new CView('common.filter.trigger', [
+	$widget->addItem(new CPartial('common.filter.trigger', [
 		'filter' => [
-			'showTriggers' => $filter['showTriggers'],
-			'ackStatus' => $filter['ackStatus'],
-			'showSeverity' => $filter['showSeverity'],
-			'statusChange' => $filter['statusChange'],
-			'statusChangeDays' => $filter['statusChangeDays'],
-			'txtSelect' => $filter['txtSelect'],
-			'application' => $filter['application'],
-			'inventory' => $filter['inventory'],
-			'show_suppressed' => $filter['show_suppressed'],
+			'showTriggers' => $data['filter']['showTriggers'],
+			'ackStatus' => $data['filter']['ackStatus'],
+			'showSeverity' => $data['filter']['showSeverity'],
+			'statusChange' => $data['filter']['statusChange'],
+			'statusChangeDays' => $data['filter']['statusChangeDays'],
+			'txtSelect' => $data['filter']['txtSelect'],
+			'application' => $data['filter']['application'],
+			'inventory' => $data['filter']['inventory'],
+			'show_suppressed' => $data['filter']['show_suppressed'],
 			'hostId' => $data['hostid'],
 			'groupId' => $data['groupid']
 		],
 		'config' => $data['config'],
 		'profileIdx' => $data['profileIdx'],
 		'active_tab' => $data['active_tab']
-	]);
-	$filterForm = $filterFormView->render();
-
-	$widget->addItem($filterForm);
+	]));
 }
 
 // data table
@@ -160,4 +160,4 @@ else {
 
 $widget->addItem($dataTable);
 
-return $widget;
+$widget->show();

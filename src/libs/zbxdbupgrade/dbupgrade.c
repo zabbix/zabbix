@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,17 +40,13 @@ zbx_db_version_t;
 #	define ZBX_DROP_FK		" drop constraint"
 #endif
 
-#if defined(HAVE_IBM_DB2)
-#	define ZBX_DB_ALTER_COLUMN	" alter column"
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_ALTER_COLUMN	" alter"
 #else
 #	define ZBX_DB_ALTER_COLUMN	" modify"
 #endif
 
-#if defined(HAVE_IBM_DB2)
-#	define ZBX_DB_SET_TYPE		" set data type"
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_SET_TYPE		" type"
 #else
 #	define ZBX_DB_SET_TYPE		""
@@ -58,7 +54,7 @@ zbx_db_version_t;
 
 /* NOTE: Do not forget to sync changes in ZBX_TYPE_*_STR defines for Oracle with zbx_oracle_column_type()! */
 
-#if defined(HAVE_IBM_DB2) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 #	define ZBX_TYPE_ID_STR		"bigint"
 #elif defined(HAVE_MYSQL)
 #	define ZBX_TYPE_ID_STR		"bigint unsigned"
@@ -74,10 +70,7 @@ zbx_db_version_t;
 #	define ZBX_TYPE_CHAR_STR	"varchar"
 #endif
 
-#if defined(HAVE_IBM_DB2)
-#	define ZBX_TYPE_FLOAT_STR	"decfloat(16)"
-#	define ZBX_TYPE_UINT_STR	"bigint"
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 #	define ZBX_TYPE_FLOAT_STR	"double(16,4)"
 #	define ZBX_TYPE_UINT_STR	"bigint unsigned"
 #elif defined(HAVE_ORACLE)
@@ -88,17 +81,13 @@ zbx_db_version_t;
 #	define ZBX_TYPE_UINT_STR	"numeric(20)"
 #endif
 
-#if defined(HAVE_IBM_DB2)
-#	define ZBX_TYPE_SHORTTEXT_STR	"varchar(2048)"
-#elif defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_SHORTTEXT_STR	"nvarchar2(2048)"
 #else
 #	define ZBX_TYPE_SHORTTEXT_STR	"text"
 #endif
 
-#if defined(HAVE_IBM_DB2)
-#	define ZBX_TYPE_TEXT_STR	"varchar(2048)"
-#elif defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_TEXT_STR	"nclob"
 #else
 #	define ZBX_TYPE_TEXT_STR	"text"
@@ -254,13 +243,8 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBrename_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
 		const char *new_name)
 {
-#ifdef HAVE_IBM_DB2
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename table " ZBX_FS_SQL_NAME " to " ZBX_FS_SQL_NAME,
-			table_name, new_name);
-#else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table " ZBX_FS_SQL_NAME " rename to " ZBX_FS_SQL_NAME,
 			table_name, new_name);
-#endif
 }
 
 static void	DBdrop_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name)
@@ -279,6 +263,18 @@ static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s default '%s'", field->name, field->default_value);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s set default '%s'", field->name, field->default_value);
+#endif
+}
+
+static void	DBdrop_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
+
+#if defined(HAVE_MYSQL)
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s drop default", field->name);
 #endif
 }
 
@@ -381,12 +377,7 @@ static void	DBdrop_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
 		const char *old_name, const char *new_name, const char *fields, int unique)
 {
-#if defined(HAVE_IBM_DB2)
-	ZBX_UNUSED(table_name);
-	ZBX_UNUSED(fields);
-	ZBX_UNUSED(unique);
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename index %s to %s", old_name, new_name);
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 	DBcreate_index_sql(sql, sql_alloc, sql_offset, table_name, new_name, fields, unique);
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 	DBdrop_index_sql(sql, sql_alloc, sql_offset, table_name, old_name);
@@ -417,19 +408,6 @@ static void	DBdrop_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_of
 			table_name, table_name, id);
 }
 
-static int	DBreorg_table(const char *table_name)
-{
-#ifdef HAVE_IBM_DB2
-	if (ZBX_DB_OK <= DBexecute("call sysproc.admin_cmd ('reorg table %s')", table_name))
-		return SUCCEED;
-
-	return FAIL;
-#else
-	ZBX_UNUSED(table_name);
-	return SUCCEED;
-#endif
-}
-
 int	DBcreate_table(const ZBX_TABLE *table)
 {
 	char	*sql = NULL;
@@ -455,7 +433,7 @@ int	DBrename_table(const char *table_name, const char *new_name)
 	DBrename_table_sql(&sql, &sql_alloc, &sql_offset, table_name, new_name);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = DBreorg_table(new_name);
+		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -487,7 +465,7 @@ int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
 	DBadd_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = DBreorg_table(table_name);
+		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -503,7 +481,7 @@ int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIE
 	DBrename_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name, field);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = DBreorg_table(table_name);
+		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -565,7 +543,7 @@ int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZB
 	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = DBreorg_table(table_name);
+		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -581,7 +559,7 @@ int	DBset_not_null(const char *table_name, const ZBX_FIELD *field)
 	DBset_not_null_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = DBreorg_table(table_name);
+		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -597,7 +575,23 @@ int	DBset_default(const char *table_name, const ZBX_FIELD *field)
 	DBset_default_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = DBreorg_table(table_name);
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	DBdrop_default(const char *table_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = FAIL;
+
+	DBdrop_default_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -613,7 +607,7 @@ int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field)
 	DBdrop_not_null_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = DBreorg_table(table_name);
+		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -629,7 +623,7 @@ int	DBdrop_field(const char *table_name, const char *field_name)
 	DBdrop_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = DBreorg_table(table_name);
+		ret = SUCCEED;
 
 	zbx_free(sql);
 

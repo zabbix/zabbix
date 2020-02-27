@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -419,9 +419,7 @@ if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRe
 	$data['action'] = 'graph.masscopyto';
 
 	// render view
-	$graphView = new CView('configuration.copy.elements', $data);
-	$graphView->render();
-	$graphView->show();
+	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
@@ -612,9 +610,7 @@ elseif (isset($_REQUEST['form'])) {
 	}
 
 	// render view
-	$graphView = new CView('configuration.graph.edit', $data);
-	$graphView->render();
-	$graphView->show();
+	echo (new CView('configuration.graph.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -657,11 +653,24 @@ else {
 		order_result($data['graphs'], $sortField, $sortOrder);
 	}
 
-	$url = (new CUrl('graphs.php'))
-		->setArgument('groupid', $pageFilter->groupid)
-		->setArgument('hostid', $data['hostid']);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$data['paging'] = getPagingLine($data['graphs'], $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['graphs'], $sortOrder,
+		(new CUrl('graphs.php'))
+			->setArgument('groupid', $pageFilter->groupid)
+			->setArgument('hostid', $data['hostid'])
+	);
 
 	if ($data['pageFilter']->hostsSelected) {
 		// Get graphs after paging.
@@ -690,9 +699,7 @@ else {
 	);
 
 	// render view
-	$graphView = new CView('configuration.graph.list', $data);
-	$graphView->render();
-	$graphView->show();
+	echo (new CView('configuration.graph.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

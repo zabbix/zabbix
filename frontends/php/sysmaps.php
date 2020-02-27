@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -371,9 +371,7 @@ if (hasRequest('form')) {
 	order_result($data['iconMaps'], 'name');
 
 	// render view
-	$mapView = new CView('monitoring.sysmap.edit', $data);
-	$mapView->render();
-	$mapView->show();
+	echo (new CView('monitoring.sysmap.edit', $data))->getOutput();
 }
 else {
 	CProfile::delete('web.maps.sysmapid');
@@ -418,8 +416,20 @@ else {
 
 	order_result($data['maps'], $sortField, $sortOrder);
 
-	// paging
-	$data['paging'] = getPagingLine($data['maps'], $sortOrder, new CUrl('sysmaps.php'));
+	// pager
+	if (hasRequest('page')) {
+		$data['page'] = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$data['page'] = 1;
+	}
+	else {
+		$data['page'] = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $data['page']);
+
+	$data['paging'] = CPagerHelper::paginate($data['page'], $data['maps'], $sortOrder, new CUrl('sysmaps.php'));
 
 	if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 		$editable_maps = API::Map()->get([
@@ -436,9 +446,7 @@ else {
 	}
 
 	// render view
-	$mapView = new CView('monitoring.sysmap.list', $data);
-	$mapView->render();
-	$mapView->show();
+	echo (new CView('monitoring.sysmap.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ if (hasRequest('screenid')) {
 	}
 	else {
 		$screens = API::Screen()->get([
-			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid', 'userid', 'private'],
+			'output' => ['screenid', 'name', 'hsize', 'vsize', 'userid', 'private'],
 			'selectUsers' => ['userid', 'permission'],
 			'selectUserGroups' => ['usrgrpid', 'permission'],
 			'screenids' => getRequest('screenid'),
@@ -291,7 +291,7 @@ if (hasRequest('form')) {
 	$userids[$current_userid] = true;
 	$user_groupids = [];
 
-	if (!hasRequest('templateid') && (!array_key_exists('templateid', $screen) || !$screen['templateid'])) {
+	if (!hasRequest('templateid') && !array_key_exists('templateid', $screen)) {
 		if (!hasRequest('screenid') || hasRequest('form_refresh')) {
 			// Screen owner.
 			$screen_owner = getRequest('userid', $current_userid);
@@ -347,7 +347,6 @@ if (hasRequest('form')) {
 			$data['screen']['private'] = getRequest('private', PRIVATE_SHARING);
 			$data['screen']['users'] = getRequest('users', []);
 			$data['screen']['userGroups'] = getRequest('userGroups', []);
-			$data['screen']['templateid'] = null;
 		}
 	}
 	else {
@@ -359,9 +358,7 @@ if (hasRequest('form')) {
 	$data['form_refresh'] = getRequest('form_refresh');
 
 	// render view
-	$screenView = new CView('monitoring.screen.edit', $data);
-	$screenView->render();
-	$screenView->show();
+	echo (new CView('monitoring.screen.edit', $data))->getOutput();
 }
 else {
 	CProfile::delete('web.screens.elementid');
@@ -437,13 +434,23 @@ else {
 	}
 	order_result($data['screens'], $sortField, $sortOrder);
 
-	// paging
-	$data['paging'] = getPagingLine($data['screens'], $sortOrder, new CUrl('screenconf.php'));
+	// pager
+	if (hasRequest('page')) {
+		$data['page'] = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$data['page'] = 1;
+	}
+	else {
+		$data['page'] = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $data['page']);
+
+	$data['paging'] = CPagerHelper::paginate($data['page'], $data['screens'], $sortOrder, new CUrl('screenconf.php'));
 
 	// render view
-	$screenView = new CView('monitoring.screen.list', $data);
-	$screenView->render();
-	$screenView->show();
+	echo (new CView('monitoring.screen.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

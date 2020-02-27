@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ function condition_type2str($type) {
 		CONDITION_TYPE_PROXY => _('Proxy'),
 		CONDITION_TYPE_EVENT_TYPE => _('Event type'),
 		CONDITION_TYPE_HOST_METADATA => _('Host metadata'),
-		CONDITION_TYPE_EVENT_TAG => _('Tag'),
+		CONDITION_TYPE_EVENT_TAG => _('Tag name'),
 		CONDITION_TYPE_EVENT_TAG_VALUE => _('Tag value')
 	];
 
@@ -88,7 +88,7 @@ function discovery_object2str($object = null) {
  *
  * For action condition types such as: hosts, host groups, templates, proxies, triggers, discovery rules
  * and discovery checks, action condition values contain IDs. All unique IDs are first collected and then queried.
- * For other action condition types values are returned as they are or converted using simple string convertion
+ * For other action condition types values are returned as they are or converted using simple string conversion
  * functions according to action condition type.
  *
  * @param array $actions							array of actions
@@ -330,7 +330,7 @@ function actionConditionValueToString(array $actions, array $config) {
  */
 function getConditionDescription($condition_type, $operator, $value, $value2) {
 	if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
-		$description = [_('Tag')];
+		$description = [_('Value of tag')];
 		$description[] = ' ';
 		$description[] = italic(CHtml::encode($value2));
 		$description[] = ' ';
@@ -339,6 +339,9 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 		return ($operator == CONDITION_OPERATOR_YES)
 			? [_('Problem is suppressed')]
 			: [_('Problem is not suppressed')];
+	}
+	elseif ($condition_type == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
+		return $value ? _('Event is acknowledged') : _('Event is not acknowledged');
 	}
 	else {
 		$description = [condition_type2str($condition_type)];
@@ -417,15 +420,15 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 					case OPERATION_TYPE_GROUP_ADD:
 					case OPERATION_TYPE_GROUP_REMOVE:
-						foreach ($operation['groupids'] as $groupid) {
-							$groupids[$groupid] = true;
+						foreach ($operation['opgroup'] as $groupid) {
+							$groupids[$groupid['groupid']] = true;
 						}
 						break;
 
 					case OPERATION_TYPE_TEMPLATE_ADD:
 					case OPERATION_TYPE_TEMPLATE_REMOVE:
-						foreach ($operation['templateids'] as $templateid) {
-							$templateids[$templateid] = true;
+						foreach ($operation['optemplate'] as $templateid) {
+							$templateids[$templateid['templateid']] = true;
 						}
 						break;
 				}
@@ -540,7 +543,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 		]);
 	}
 
-	// format the HTML ouput
+	// Format the HTML output.
 	foreach ($actions as $i => $action) {
 		if ($type == ACTION_OPERATION) {
 			foreach ($action['operations'] as $j => $operation) {
@@ -650,9 +653,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 					case OPERATION_TYPE_GROUP_REMOVE:
 						$host_group_list = [];
 
-						foreach ($operation['groupids'] as $groupid) {
-							if (array_key_exists($groupid, $host_groups)) {
-								$host_group_list[] = $host_groups[$groupid]['name'];
+						foreach ($operation['opgroup'] as $groupid) {
+							if (array_key_exists($groupid['groupid'], $host_groups)) {
+								$host_group_list[] = $host_groups[$groupid['groupid']]['name'];
 							}
 						}
 
@@ -672,9 +675,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 					case OPERATION_TYPE_TEMPLATE_REMOVE:
 						$template_list = [];
 
-						foreach ($operation['templateids'] as $templateid) {
-							if (array_key_exists($templateid, $templates)) {
-								$template_list[] = $templates[$templateid]['name'];
+						foreach ($operation['optemplate'] as $templateid) {
+							if (array_key_exists($templateid['templateid'], $templates)) {
+								$template_list[] = $templates[$templateid['templateid']]['name'];
 							}
 						}
 
@@ -808,22 +811,18 @@ function getActionOperationDescriptions(array $actions, $type) {
 /**
  * Gathers action operation script details and returns the HTML items representing action operation with hint.
  *
- * @param array  $operations								Array of action operations or recovery operations.
- * @param string $operation['operationtype']				Action operation type.
- *															Possible values: OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
- *															OPERATION_TYPE_ACK_MESSAGE and OPERATION_TYPE_RECOVERY_MESSAGE
- * @param string $operation['opcommand']['type']			Action operation command type.
- *															Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
- *															ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
- *															and ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
- * @param string $operation['opmessage']['default_msg']		'1' to show default message (optional)
- * @param array  $defaultMessage							Array containing default subject and message set via action.
- * @param string $defaultMessage['subject']					Default subject.
- * @param string $defaultMessage['message']					Default message text.
+ * @param array  $operations                      Array of action operations.
+ * @param string $operation['operationtype']      Action operation type.
+ *                                                Possible values: OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
+ *                                                OPERATION_TYPE_ACK_MESSAGE and OPERATION_TYPE_RECOVERY_MESSAGE
+ * @param string $operation['opcommand']['type']  Action operation command type.
+ *                                                Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
+ *                                                ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+ *                                                and ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
  *
- * @return array											Returns an array of action operation hints.
+ * @return array  Returns an array of action operation hints.
  */
-function getActionOperationHints(array $operations, array $defaultMessage) {
+function getActionOperationHints(array $operations) {
 	$result = [];
 	$scriptids = [];
 	$scripts = [];
@@ -846,107 +845,59 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 	foreach ($operations as $key => $operation) {
 		$result[$key] = [];
 
-		switch ($operation['operationtype']) {
-			case OPERATION_TYPE_MESSAGE:
-				// show default entered action subject and message or show custom subject and message for each operation
-				$subject = (isset($operation['opmessage']['default_msg']) && $operation['opmessage']['default_msg'])
-					? $defaultMessage['subject']
-					: $operation['opmessage']['subject'];
+		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
+			switch ($operation['opcommand']['type']) {
+				case ZBX_SCRIPT_TYPE_IPMI:
+					$result[$key][] = [bold(_('Run IPMI command').': '), BR(),
+						italic(zbx_nl2br($operation['opcommand']['command']))
+					];
+					break;
 
-				$message = (isset($operation['opmessage']['default_msg']) && $operation['opmessage']['default_msg'])
-					? $defaultMessage['message']
-					: $operation['opmessage']['message'];
+				case ZBX_SCRIPT_TYPE_SSH:
+					$result[$key][] = [bold(_('Run SSH commands').': '), BR(),
+						italic(zbx_nl2br($operation['opcommand']['command']))
+					];
+					break;
 
-				$result_hint = [];
+				case ZBX_SCRIPT_TYPE_TELNET:
+					$result[$key][] = [bold(_('Run TELNET commands').': '), BR(),
+						italic(zbx_nl2br($operation['opcommand']['command']))
+					];
+					break;
 
-				if (trim($subject)) {
-					$result_hint = [bold($subject), BR(), BR()];
-				}
-
-				if (trim($message)) {
-					$result_hint[] = zbx_nl2br($message);
-				}
-
-				if ($result_hint) {
-					$result[$key][] = $result_hint;
-				}
-				break;
-
-			case OPERATION_TYPE_COMMAND:
-				switch ($operation['opcommand']['type']) {
-					case ZBX_SCRIPT_TYPE_IPMI:
-						$result[$key][] = [bold(_('Run IPMI command').': '), BR(),
-							italic(zbx_nl2br($operation['opcommand']['command']))
+				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+					if ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
+						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix agent')).': '),
+							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
 						];
-						break;
-
-					case ZBX_SCRIPT_TYPE_SSH:
-						$result[$key][] = [bold(_('Run SSH commands').': '), BR(),
-							italic(zbx_nl2br($operation['opcommand']['command']))
+					}
+					elseif ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY) {
+						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server (proxy)')).': '),
+							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
 						];
-						break;
-
-					case ZBX_SCRIPT_TYPE_TELNET:
-						$result[$key][] = [bold(_('Run TELNET commands').': '), BR(),
-							italic(zbx_nl2br($operation['opcommand']['command']))
+					}
+					else {
+						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server')).': '),
+							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
 						];
-						break;
+					}
+					break;
 
-					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-						if ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
-							$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix agent')).': '),
-								BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-							];
-						}
-						elseif ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY) {
-							$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server (proxy)')).': '),
-								BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-							];
-						}
-						else {
-							$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server')).': '),
-								BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-							];
-						}
-						break;
+				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
+					$scriptId = $operation['opcommand']['scriptid'];
 
-					case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-						$scriptId = $operation['opcommand']['scriptid'];
-
-						if (isset($scripts[$scriptId])) {
-							$result[$key][] = [bold(_('Run global script').': '),
-								italic($scripts[$scriptId]['name'])
-							];
-						}
-						break;
-
-					default:
-						$result[$key][] = [bold(_('Run commands').': '), BR(),
-							italic(zbx_nl2br($operation['opcommand']['command']))
+					if (isset($scripts[$scriptId])) {
+						$result[$key][] = [bold(_('Run global script').': '),
+							italic($scripts[$scriptId]['name'])
 						];
-				}
-				break;
+					}
+					break;
 
-			case OPERATION_TYPE_ACK_MESSAGE:
-			case OPERATION_TYPE_RECOVERY_MESSAGE:
-				$result_hint = [];
-				$message = (array_key_exists('default_msg', $operation['opmessage'])
-					&& $operation['opmessage']['default_msg'])
-					? $defaultMessage
-					: $operation['opmessage'];
-
-				if (trim($message['subject'])) {
-					$result_hint = [bold($message['subject']), BR(), BR()];
-				}
-
-				if (trim($message['message'])) {
-					$result_hint[] = zbx_nl2br($message['message']);
-				}
-
-				if ($result_hint) {
-					$result[$key][] = $result_hint;
-				}
-				break;
+				default:
+					$result[$key][] = [bold(_('Run commands').': '), BR(),
+						italic(zbx_nl2br($operation['opcommand']['command']))
+					];
+			}
 		}
 	}
 
@@ -986,7 +937,7 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_DSERVICE_TYPE,
 		CONDITION_TYPE_DUPTIME
 	];
-	$conditions[EVENT_SOURCE_AUTO_REGISTRATION] = [
+	$conditions[EVENT_SOURCE_AUTOREGISTRATION] = [
 		CONDITION_TYPE_HOST_NAME,
 		CONDITION_TYPE_HOST_METADATA,
 		CONDITION_TYPE_PROXY
@@ -1060,7 +1011,7 @@ function getAllowedOperations($eventsource) {
 		];
 	}
 
-	if ($eventsource == EVENT_SOURCE_AUTO_REGISTRATION) {
+	if ($eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
 		$operations[ACTION_OPERATION] = [
 			OPERATION_TYPE_MESSAGE,
 			OPERATION_TYPE_COMMAND,

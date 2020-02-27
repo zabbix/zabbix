@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	*/
 	public function testFormAdministrationGeneralOtherParams_CheckLayout($allValues) {
 
-		$this->zbxTestLogin('adm.other.php');
+		$this->zbxTestLogin('zabbix.php?action=miscconfig.edit');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 		$this->zbxTestAssertElementValue('refresh_unsupported', $allValues['refresh_unsupported']);
@@ -67,7 +67,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	// checking possible values in the drop-down "Group for discovered hosts"
 	public function testFormAdministrationGeneralOtherParams_CheckHostGroupsLayout() {
 
-		$this->zbxTestLogin('adm.other.php');
+		$this->zbxTestLogin('zabbix.php?action=miscconfig.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
@@ -82,7 +82,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	// checking possible values in the drop-down "User group for database down message"
 	public function testFormAdministrationGeneralOtherParams_CheckUserGroupLayout() {
 
-		$this->zbxTestLogin('adm.other.php');
+		$this->zbxTestLogin('zabbix.php?action=miscconfig.edit');
 
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
@@ -99,7 +99,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralOtherParams_OtherParams() {
-		$this->zbxTestLogin('adm.other.php');
+		$this->zbxTestLogin('zabbix.php?action=miscconfig.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');

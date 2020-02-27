@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,9 @@
 #include "zbxserver.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
+
+#define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
+#define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin"
 
 typedef struct
 {
@@ -500,11 +503,7 @@ static size_t	get_string_field_size(unsigned char type)
  ******************************************************************************/
 char	*DBdyn_escape_string_len(const char *src, size_t length)
 {
-#if HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
-	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
-#else
 	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
-#endif
 }
 
 /******************************************************************************
@@ -533,8 +532,6 @@ static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx
 
 #if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
 	return zbx_db_dyn_escape_string(src, get_string_field_size(field->type), length, flag);
-#elif HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
-	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, flag);
 #else
 	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, flag);
 #endif
@@ -717,7 +714,8 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host"))
+			0 == strcmp(tablename, "autoreg_host") ||
+			0 == strcmp(tablename, "event_suppress"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
@@ -1282,7 +1280,7 @@ static int	DBregister_host_active(void)
 			" from actions"
 			" where eventsource=%d"
 				" and status=%d",
-			EVENT_SOURCE_AUTO_REGISTRATION,
+			EVENT_SOURCE_AUTOREGISTRATION,
 			ACTION_STATUS_ACTIVE);
 
 	if (NULL == DBfetch(result))
@@ -1400,8 +1398,8 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 					break;
 				}
 
-				/* process with auto registration if the connection type was forced and */
-				/* is different from the last registered connection type                */
+				/* process with autoregistration if the connection type was forced and */
+				/* is different from the last registered connection type               */
 				if (ZBX_CONN_DEFAULT != autoreg_host->flag)
 				{
 					unsigned short	port;
@@ -1478,7 +1476,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	zbx_uint64_t		autoreg_hostid = 0;
+	zbx_uint64_t		autoreg_hostid;
 	zbx_db_insert_t		db_insert;
 	int			i, create = 0, update = 0;
 	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;
@@ -1574,7 +1572,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
 		ts.sec = autoreg_host->now;
-		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
+		zbx_add_event(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
 				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
 	}
 
@@ -1859,15 +1857,7 @@ int	DBtable_exists(const char *table_name)
 
 	table_name_esc = DBdyn_escape_string(table_name);
 
-#if defined(HAVE_IBM_DB2)
-	/* publib.boulder.ibm.com/infocenter/db2luw/v9r7/topic/com.ibm.db2.luw.admin.cmd.doc/doc/r0001967.html */
-	result = DBselect(
-			"select 1"
-			" from syscat.tables"
-			" where tabschema=user"
-				" and lower(tabname)='%s'",
-			table_name_esc);
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 	result = DBselect("show tables like '%s'", table_name_esc);
 #elif defined(HAVE_ORACLE)
 	result = DBselect(
@@ -1910,10 +1900,7 @@ int	DBtable_exists(const char *table_name)
 int	DBfield_exists(const char *table_name, const char *field_name)
 {
 	DB_RESULT	result;
-#if defined(HAVE_IBM_DB2)
-	char		*table_name_esc, *field_name_esc;
-	int		ret;
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 	char		*field_name_esc;
 	int		ret;
 #elif defined(HAVE_ORACLE)
@@ -1928,25 +1915,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	int		ret = FAIL;
 #endif
 
-#if defined(HAVE_IBM_DB2)
-	table_name_esc = DBdyn_escape_string(table_name);
-	field_name_esc = DBdyn_escape_string(field_name);
-
-	result = DBselect(
-			"select 1"
-			" from syscat.columns"
-			" where tabschema=user"
-				" and lower(tabname)='%s'"
-				" and lower(colname)='%s'",
-			table_name_esc, field_name_esc);
-
-	zbx_free(field_name_esc);
-	zbx_free(table_name_esc);
-
-	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
-
-	DBfree_result(result);
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 	field_name_esc = DBdyn_escape_string(field_name);
 
 	result = DBselect("show columns from %s like '%s'",
@@ -2029,15 +1998,7 @@ int	DBindex_exists(const char *table_name, const char *index_name)
 	table_name_esc = DBdyn_escape_string(table_name);
 	index_name_esc = DBdyn_escape_string(index_name);
 
-#if defined(HAVE_IBM_DB2)
-	result = DBselect(
-			"select 1"
-			" from syscat.indexes"
-			" where tabschema=user"
-				" and lower(tabname)='%s'"
-				" and lower(indname)='%s'",
-			table_name_esc, index_name_esc);
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 	result = DBselect(
 			"show index from %s"
 			" where key_name='%s'",
@@ -2135,6 +2096,215 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 	zbx_free(sql);
 
 	return ret;
+}
+
+static void	zbx_warn_char_set(const char *db_name, const char *char_set)
+{
+	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_SUPPORTED_DB_CHARACTER_SET "\" character set."
+			" Database \"%s\" has default character set \"%s\"", db_name, char_set);
+}
+
+static void	zbx_warn_no_charset_info(const char *db_name)
+{
+	zabbix_log(LOG_LEVEL_WARNING, "Cannot get database \"%s\" character set", db_name);
+}
+
+void	DBcheck_character_set(void)
+{
+#if defined(HAVE_MYSQL)
+	char		*database_name_esc;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	result = DBselect(
+			"SELECT default_character_set_name, default_collation_name "
+			"FROM information_schema.SCHEMATA "
+			"WHERE schema_name = '%s'", database_name_esc);
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zbx_warn_no_charset_info(CONFIG_DBNAME);
+	}
+	else
+	{
+		char	*char_set = row[0];
+		char	*collation = row[1];
+
+		if (0 != strcasecmp(char_set, ZBX_SUPPORTED_DB_CHARACTER_SET))
+			zbx_warn_char_set(CONFIG_DBNAME, char_set);
+
+		if (0 != zbx_strncasecmp(collation, ZBX_SUPPORTED_DB_COLLATION, sizeof(ZBX_SUPPORTED_DB_COLLATION)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation."
+					" Database \"%s\" has default collation \"%s\"", ZBX_SUPPORTED_DB_COLLATION,
+					CONFIG_DBNAME, collation);
+		}
+	}
+
+	DBfree_result(result);
+
+	result = DBselect(
+			"SELECT COUNT(*) "
+			"FROM information_schema.`COLUMNS` "
+			"WHERE table_schema = '%s' AND data_type IN ('text', 'varchar', 'longtext') AND "
+			"(character_set_name != '%s' OR collation_name != '%s')",
+			database_name_esc, ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" tables", CONFIG_DBNAME);
+	}
+	else if (0 != strcmp("0", row[0]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "character set name or collation name that is not supported by Zabbix"
+				" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "only character set \"%s\" and collation \"%s\" should be used in "
+				"database", ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
+	}
+
+	DBfree_result(result);
+	DBclose();
+	zbx_free(database_name_esc);
+#elif defined(HAVE_ORACLE)
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	result = DBselect(
+			"SELECT parameter, value "
+			"FROM NLS_DATABASE_PARAMETERS "
+			"WHERE parameter IN ('NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET')");
+
+	if (NULL == result)
+	{
+		zbx_warn_no_charset_info(CONFIG_DBNAME);
+	}
+	else
+	{
+		while (NULL != (row = DBfetch(result)))
+		{
+			const char	*parameter = row[0];
+			const char	*value = row[1];
+
+			if (NULL == parameter || NULL == value)
+			{
+				continue;
+			}
+			else if (0 == strcasecmp("NLS_CHARACTERSET", parameter) ||
+					(0 == strcasecmp("NLS_NCHAR_CHARACTERSET", parameter)))
+			{
+				if (0 != strcasecmp(ZBX_SUPPORTED_DB_CHARACTER_SET, value))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
+							" \"%s\". Zabbix supports only \"%s\" character set",
+							CONFIG_DBNAME, parameter, value,
+							ZBX_SUPPORTED_DB_CHARACTER_SET);
+				}
+			}
+		}
+	}
+
+	DBfree_result(result);
+	DBclose();
+#elif defined(HAVE_POSTGRESQL)
+#define OID_LENGTH_MAX		20
+
+	char		*database_name_esc = NULL;
+	char		*schema_name_esc = NULL;
+	char		oid[OID_LENGTH_MAX] = "";
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
+	schema_name_esc = (NULL != CONFIG_DBSCHEMA) ? DBdyn_escape_string(CONFIG_DBSCHEMA) : strdup("public");
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	result = DBselect(
+			"SELECT pg_encoding_to_char(encoding) FROM pg_database WHERE datname = '%s'",
+			database_name_esc);
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zbx_warn_no_charset_info(CONFIG_DBNAME);
+		goto out;
+	}
+	else if (strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
+	{
+		zbx_warn_char_set(CONFIG_DBNAME, row[0]);
+		goto out;
+
+	}
+
+	DBfree_result(result);
+
+	result = DBselect(
+			"SELECT oid FROM pg_namespace "
+			"WHERE nspname = '%s'",
+			schema_name_esc);
+
+	if (NULL == result || NULL == (row = DBfetch(result)) || 0 >= zbx_strlcpy(oid, row[0], sizeof(oid)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields", CONFIG_DBNAME);
+		goto out;
+	}
+
+	DBfree_result(result);
+
+	result = DBselect(
+			"SELECT COUNT(*) "
+			"FROM pg_attribute AS a "
+			"LEFT JOIN pg_class AS c ON c.relfilenode = a.attrelid "
+			"LEFT JOIN pg_collation AS l ON l.oid = a.attcollation "
+			"WHERE atttypid IN (25,1043) AND c.relnamespace = %s AND c.relam = 0 "
+			"AND l.collname != 'default'",
+			oid);
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields", CONFIG_DBNAME);
+	}
+	else if (0 != strcmp("0", row[0]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "database has %s fields with unsupported character set. Zabbix supports"
+				" only \"%s\" character set", row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
+	}
+
+	DBfree_result(result);
+
+	result = DBselect("show client_encoding");
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" client encoding", CONFIG_DBNAME);
+	}
+	else if (0 != strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "client_encoding for database \"%s\" is \"%s\". Zabbix supports only"
+				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
+	}
+
+	DBfree_result(result);
+
+	result = DBselect("show server_encoding");
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" server encoding", CONFIG_DBNAME);
+	}
+	else if (0 != strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "server_encoding for database \"%s\" is \"%s\". Zabbix supports only"
+				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
+	}
+out:
+	DBfree_result(result);
+	DBclose();
+	zbx_free(schema_name_esc);
+	zbx_free(database_name_esc);
+#endif
 }
 
 #ifdef HAVE_ORACLE
@@ -3078,9 +3248,6 @@ void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int fiel
 #if defined(HAVE_ORACLE)
 			field->chars_num = field_len;
 			field->bytes_num = 4000;
-#elif defined(HAVE_IBM_DB2)
-			field->chars_num = -1;
-			field->bytes_num = field_len;
 #else
 			field->chars_num = field_len;
 			field->bytes_num = -1;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,13 +87,11 @@ if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
 
 $messages = clear_messages();
 
-(new CView('general.login', [
+echo (new CView('general.login', [
 	'http_login_url' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
 		? (new CUrl('index_http.php'))->setArgument('request', getRequest('request'))
 		: '',
 	'guest_login_url' => CWebUser::isGuestAllowed() ? (new CUrl())->setArgument('enter', ZBX_GUEST_USER) : '',
 	'autologin' => $autologin == 1,
-	'error' => hasRequest('enter') && $messages ? array_pop($messages) : null
-]))
-	->disableJsLoader()
-	->render();
+	'error' => (hasRequest('enter') && $messages) ? array_pop($messages) : null
+]))->getOutput();

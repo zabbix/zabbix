@@ -1,8 +1,34 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
 <script type="text/x-jquery-tmpl" id="scenario-step-row-templated">
 	<?= (new CRow([
 			'',
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
-			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
+			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),
 			'#{timeout}',
 			(new CSpan('#{url_short}'))->setHint('#{url}', '', true, 'word-break: break-all;')
 				->setAttribute('data-hintbox', '#{enabled_hint}'),
@@ -17,7 +43,7 @@
 	<?= (new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
-			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
+			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),
 			'#{timeout}',
 			(new CSpan('#{url_short}'))->setHint('#{url}', '', true, 'word-break: break-all;')
 				->setAttribute('data-hintbox', '#{enabled_hint}'),
@@ -70,14 +96,14 @@
 			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
 			ZBX_POSTTYPE_RAW:                    <?= ZBX_POSTTYPE_RAW ?>,
 			msg: {
-				data_not_encoded:           <?= CJs::encodeJson(_('Data is not properly encoded.')) ?>,
-				name_filed_length_exceeded: <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')) ?>,
-				value_without_name:         <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')) ?>,
-				failed_to_parse_url:        <?= CJs::encodeJson(_('Failed to parse URL.')) ?>,
-				ok:                         <?= CJs::encodeJson(_('Ok')) ?>,
-				error:                      <?= CJs::encodeJson(_('Error')) ?>,
-				url_not_encoded_properly:   <?= CJs::encodeJson(_('URL is not properly encoded.')) ?>,
-				cannot_convert_post_data:    <?= CJs::encodeJson(_('Cannot convert POST data:')) ?>
+				data_not_encoded:           <?= json_encode(_('Data is not properly encoded.')) ?>,
+				name_filed_length_exceeded: <?= json_encode(_('Name of the form field should not exceed 255 characters.')) ?>,
+				value_without_name:         <?= json_encode(_('Values without names are not allowed in form fields.')) ?>,
+				failed_to_parse_url:        <?= json_encode(_('Failed to parse URL.')) ?>,
+				ok:                         <?= json_encode(_('Ok')) ?>,
+				error:                      <?= json_encode(_('Error')) ?>,
+				url_not_encoded_properly:   <?= json_encode(_('URL is not properly encoded.')) ?>,
+				cannot_convert_post_data:   <?= json_encode(_('Cannot convert POST data:')) ?>
 			}
 		};
 
@@ -87,9 +113,8 @@
 		).html());
 
 		window.httpconf.pair_row_template = new Template(jQuery('#scenario-pair-row').html());
-		window.httpconf.scenario = new Scenario(
-			$('#scenarioTab'), <?= CJs::encodeJson($this->data['scenario_tab_data']) ?>);
-		window.httpconf.steps = new Steps($('#stepTab'), <?= CJs::encodeJson(array_values($data['steps'])) ?>);
+		window.httpconf.scenario = new Scenario($('#scenarioTab'), <?= json_encode($this->data['scenario_tab_data']) ?>);
+		window.httpconf.steps = new Steps($('#stepTab'), <?= json_encode(array_values($data['steps'])) ?>);
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 
 		window.httpconf.$form = $('#httpForm').on('submit', function(e) {
@@ -110,7 +135,7 @@
 	 * Implementation of jQuery.val for radio buttons. Use this methon within scoped jQuery object;
 	 * Use with jQuery collection of input nodes.
 	 *
-	 * @param {string}  Check button by value. Read value if no param is given.
+	 * @param {string} value  Check button by value. Read value if no param is given.
 	 *
 	 * @return {string}
 	 */
@@ -119,7 +144,7 @@
 			return this.filter(':checked').val();
 		}
 		this.filter('[value="' + value + '"]').get(0).checked = true;
-	};
+	}
 
 	/**
 	 * Returns common $.sortable options.
@@ -131,7 +156,7 @@
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			containment: 'parent',
-			cursor: IE ? 'move' : 'grabbing',
+			cursor: 'grabbing',
 			handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
 			tolerance: 'pointer',
 			opacity: 0.6,
@@ -549,9 +574,9 @@
 		this.new_stepid = 0;
 		this.sort_index = [];
 
-		steps.forEach(function(step) {
-			this.data[step.httpstepid] = new Step(step);
-			this.sort_index.push(step.httpstepid);
+		steps.forEach(function(step, no) {
+			this.data[no + 1] = new Step(step);
+			this.sort_index.push(no + 1);
 		}.bind(this));
 
 		this.$container = jQuery('.httpconf-steps-dynamic-row', $tab);
@@ -564,10 +589,8 @@
 
 		this.steps_dynamic_rows = new DynamicRows(this.$container, {
 			add_before: this.$container.find('.element-table-add').closest('tr')[0],
-			template: httpconf.step_row_template,
-			data_index: 'httpstepid'
+			template: httpconf.step_row_template
 		});
-
 
 		if (!httpconf.templated) {
 			this.$container.sortable(sortableOpts());
@@ -668,19 +691,6 @@
 	};
 
 	/**
-	 * Adds or updates newly created step data with Steps object.
-	 *
-	 * @param {object} data  Step data, that holds accurate httpstepid filed.
-	 */
-	Steps.prototype.addStep = function(data) {
-		if (this.sort_index.indexOf(data.httpstepid) == -1) {
-			this.sort_index.push(data.httpstepid);
-		}
-
-		this.steps[data.httpstepid] = new Step(data);
-	};
-
-	/**
 	 * Used to validate step names with server, on PopUp form validate event.
 	 *
 	 * @return {array}  Array of strings.
@@ -688,8 +698,8 @@
 	Steps.prototype.getStepNames = function() {
 		var names = [];
 
-		for (var httpstepid in this.data) {
-			names.push(this.data[httpstepid].data.name);
+		for (var no in this.data) {
+			names.push(this.data[no].data.name);
 		}
 
 		return names;
@@ -698,10 +708,10 @@
 	/**
 	 * This method hydrates the parsed html PopUp form with data from specific step.
 	 *
-	 * @param {integer} httpstepid
+	 * @param {int} no  Step index.
 	 */
-	Steps.prototype.onStepOverlayReadyCb = function(httpstepid) {
-		var step_ref = this.data[httpstepid] ? this.data[httpstepid] : this.new_step;
+	Steps.prototype.onStepOverlayReadyCb = function(no) {
+		var step_ref = this.data[no] ? this.data[no] : this.new_step;
 		this.edit_form = new StepEditForm(jQuery('#http_step'), step_ref);
 	};
 
@@ -711,8 +721,8 @@
 	Steps.prototype.openNew = function() {
 		this.new_stepid -= 1;
 
-		this.new_step = new Step({httpstepid: this.new_stepid});
-		this.new_step.open(this.$container.find('.element-table-add'));
+		this.new_step = new Step({httpstepid: 0, no: this.new_stepid});
+		this.new_step.open(this.new_stepid, this.$container.find('.element-table-add'));
 	};
 
 	/**
@@ -720,7 +730,7 @@
 	 */
 	Steps.prototype.renderData = function() {
 		this.sort_index.forEach(function(data_index) {
-			this.steps_dynamic_rows.addRow(this.data[data_index].data);
+			this.steps_dynamic_rows.addRow(this.data[data_index].data, data_index);
 		}.bind(this));
 
 		this.onSortOrderChange();
@@ -729,11 +739,11 @@
 	/**
 	 * Opens popup for a step.
 	 *
-	 * @param {integer} httpstepid
+	 * @param {integer} no
 	 */
-	Steps.prototype.open = function(httpstepid) {
-		this.data[httpstepid]
-			.open(this.$container.find('[data-index="' + httpstepid + '"] a'));
+	Steps.prototype.open = function(no) {
+		this.data[no]
+			.open(no, this.$container.find('[data-index="' + no + '"] a'));
 	};
 
 	/**
@@ -764,10 +774,12 @@
 	 * Opens step popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
+	 * @param {int}  no       Step index.
 	 * @param {Node} refocus  A node to set focus to, when popup is closed.
 	 */
-	Step.prototype.open = function(refocus) {
+	Step.prototype.open = function(no, refocus) {
 		return PopUp('popup.httpstep', {
+			no:               no,
 			httpstepid:       this.data.httpstepid,
 			templated:        httpconf.templated,
 			name:             this.data.name,
@@ -978,7 +990,7 @@
 			}
 
 			var malformed = (fields.length > 2),
-				non_printable_chars = (/%[01]/.match(fields[0]) || /%[01]/.match(fields[1]));
+				non_printable_chars = (fields[0].match(/%[01]/) || fields[1].match(/%[01]/));
 
 			if (malformed || non_printable_chars) {
 				throw httpconf.msg.data_not_encoded;
@@ -1048,10 +1060,11 @@
 	/**
 	 * This method is bound via popup button attribute. It posts serialized version of current form to be validated.
 	 * Note that we do not bother posting dynamic fields, since they are not validated at this point.
+	 *
+	 * @param {Overlay} overlay
 	 */
-	StepEditForm.prototype.validate = function() {
-		var url = new Curl(this.$form.attr('action')),
-			dialogueid = this.$form.closest('[data-dialogueid]').attr('data-dialogueid');
+	StepEditForm.prototype.validate = function(overlay) {
+		var url = new Curl(this.$form.attr('action'));
 
 		this.$form.trimValues(['#step_name', '#url', '#timeout', '#required', '#status_codes']);
 
@@ -1060,27 +1073,31 @@
 
 		var curr_pairs = this.stepPairsData();
 
-		return jQuery.ajax({
+		overlay.setLoading();
+		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
 			data: this.$form.serialize(),
 			dataType: 'json',
 			type: 'post'
+		})
+		.always(function() {
+			overlay.unsetLoading();
 		})
 		.done(function(ret) {
 			if (typeof ret.errors !== 'undefined') {
 				return jQuery(ret.errors).insertBefore(this.$form);
 			}
 
-			if (!httpconf.steps.data[ret.params.httpstepid]) {
-				httpconf.steps.sort_index.push(ret.params.httpstepid);
-				httpconf.steps.data[ret.params.httpstepid] = this.step;
+			if (!httpconf.steps.data[ret.params.no]) {
+				httpconf.steps.sort_index.push(ret.params.no);
+				httpconf.steps.data[ret.params.no] = this.step;
 			}
 
 			ret.params.pairs = curr_pairs;
-			httpconf.steps.data[ret.params.httpstepid].update(ret.params);
+			httpconf.steps.data[ret.params.no].update(ret.params);
 			httpconf.steps.renderData();
 
-			overlayDialogueDestroy(dialogueid);
+			overlayDialogueDestroy(overlay.dialogueid);
 		}.bind(this));
 	};
 </script>

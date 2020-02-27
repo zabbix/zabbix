@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -553,7 +553,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Key');
 		$this->zbxTestAssertVisibleId('key');
-		$this->zbxTestAssertAttribute("//input[@id='key']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='key']", 'maxlength', 2048);
 		$this->zbxTestAssertAttribute("//input[@id='key']", 'size', 20);
 		if (!isset($templateid)) {
 			$this->zbxTestAssertElementPresentId('keyButton');
@@ -1933,6 +1933,17 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// IPMI sensor is optional if item key is ipmi.get
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent with ipmi.get',
+					'key' => 'ipmi.get',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1963,9 +1974,9 @@ class testFormItem extends CLegacyWebTest {
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
 					'key' => 'item-ipmi-agent-error',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "IPMI sensor": cannot be empty.'
+						'Incorrect value for field "ipmi_sensor": cannot be empty.'
 					]
 				]
 			],
@@ -1975,8 +1986,7 @@ class testFormItem extends CLegacyWebTest {
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent with spaces',
 					'key' => 'item-ipmi-agent-spaces',
-					'ipmi_sensor' => 'ipmi_sensor',
-					'ipmiSpaces' => true,
+					'ipmi_sensor' => '  ipmi_sensor   ',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -2145,8 +2155,8 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if (isset($data['ipmi_sensor'])) {
-				$this->zbxTestInputType('ipmi_sensor', $data['ipmi_sensor']);
-				$ipmi_sensor = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
+			$this->zbxTestInputType('ipmi_sensor', $data['ipmi_sensor']);
+			$ipmi_sensor = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 		}
 
 		if (isset($data['allowed_hosts'])) {
@@ -2322,12 +2332,12 @@ class testFormItem extends CLegacyWebTest {
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 				$this->assertEquals($ipmi_sensor, $ipmiValue);
-				}
 			}
 		}
+	}
 
 	public function testFormItem_HousekeeperUpdate() {
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit&ddreset=1');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
@@ -2343,7 +2353,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
 		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
 
-		$this->zbxTestOpen('adm.gui.php');
+		$this->zbxTestOpen('zabbix.php?action=gui.edit&ddreset=1');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global');
@@ -2364,7 +2374,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickWait('trends_mode_hint');
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
 
-		$this->zbxTestOpen('adm.gui.php');
+		$this->zbxTestOpen('zabbix.php?action=gui.edit&ddreset=1');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestInputType('hk_history', 90);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,11 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/MacrosTrait.php';
 
 class testPageReportsAudit extends CLegacyWebTest {
+
+	use MacrosTrait;
 
 	private $actions = [
 		-1 => 'All',
@@ -65,7 +68,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	];
 
 	public function testPageReportsAudit_CheckLayout() {
-		$this->zbxTestLogin('auditlogs.php');
+		$this->zbxTestLogin('zabbix.php?action=auditlog.list');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
 
@@ -74,9 +77,9 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestExpandFilterTab();
 		$this->zbxTestAssertElementPresentId('alias');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
-		$this->zbxTestAssertElementPresentId('btn1');
+		$this->zbxTestAssertElementPresentId('select_user');
 
-		$this->zbxTestDropdownHasOptions('action', $this->actions);
+		$this->zbxTestDropdownHasOptions('auditlog_action', $this->actions);
 		$this->zbxTestDropdownHasOptions('resourcetype', $this->resourcetypes);
 	}
 
@@ -164,20 +167,62 @@ class testPageReportsAudit extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider auditActions
-	*/
+	 * @dataProvider auditActions
+	 */
 	public function testPageReportsAudit_Filter($action, $resourcetype) {
-		$this->zbxTestLogin('auditlogs.php');
+		$this->zbxTestLogin('zabbix.php?action=auditlog.list');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
 
 		$this->zbxTestExpandFilterTab();
 		$this->zbxTestInputType('alias', '');
-		$this->zbxTestDropdownSelect('action', $this->actions[$action]);
+		$this->zbxTestDropdownSelect('auditlog_action', $this->actions[$action]);
 		$this->zbxTestDropdownSelect('resourcetype', $this->resourcetypes[$resourcetype]);
 
 		$this->zbxTestClickXpathWait("//form[@name='zbx_filter']//button[@name='filter_set']");
 		$this->zbxTestCheckHeader('Audit log');
 	}
 
+	/**
+	 * @backup-once globalmacro
+	 */
+	public function testPageReportsAudit_UpdateMacroDescription() {
+		// Update Macro description.
+		$this->page->login()->open('zabbix.php?action=macros.edit');
+		$form = $this->query('name:macrosForm')->asForm()->one();
+
+		$macros = [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'description' => 'New Updated Description'
+			]
+		];
+
+		$this->fillMacros($macros);
+		$form->submit();
+		$message = CMessageElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($message->isGood());
+		$this->assertEquals('Macros updated', $message->getTitle());
+
+		// Check Audit record about global macro update.
+		$this->page->open('zabbix.php?action=auditlog.list');
+		$this->query('button:Reset')->waitUntilVisible()->one()->click();
+		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
+		// Get first row data.
+		$row = $rows->get(0);
+
+		$audit = [
+			'User' => 'Admin',
+			'Resource' => 'Macro',
+			'Action' => 'Update',
+			'ID' => 11,
+			'Details' => "globalmacro.description: Test description 1 => New Updated Description"
+		];
+
+		foreach ($audit as $column => $value) {
+			$text = $row->getColumnData($column, $value);
+			$this->assertEquals($value, $text);
+		}
+	}
 }

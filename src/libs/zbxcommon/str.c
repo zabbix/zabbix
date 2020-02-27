@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,14 @@
 #include "threads.h"
 #include "module.h"
 
-#include "../zbxcrypto/tls.h"
+#include "zbxcrypto.h"
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>
 #endif
 
 static const char	copyright_message[] =
-	"Copyright (C) 2019 Zabbix SIA\n"
+	"Copyright (C) 2020 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -1574,7 +1574,7 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 	return "unknown";
 }
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {
 	typedef struct
@@ -1747,7 +1747,7 @@ void	zbx_strupper(char *str)
 		*str = toupper(*str);
 }
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #include "log.h"
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 {
@@ -2017,6 +2017,30 @@ size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen)
 	}
 
 	return sz;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_charcount_utf8_nbytes                                        *
+ *                                                                            *
+ * Purpose: calculates number of chars in utf8 text limited by maxlen bytes   *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen)
+{
+	size_t	n = 0;
+
+	maxlen = zbx_strlen_utf8_nbytes(text, maxlen);
+
+	while ('\0' != *text && maxlen > 0)
+	{
+		if (0x80 != (0xc0 & *text++))
+			n++;
+
+		maxlen--;
+	}
+
+	return n;
 }
 
 /******************************************************************************
@@ -5349,4 +5373,137 @@ int	zbx_str_extract(const char *text, size_t len, char **value)
 fail:
 	zbx_free(tmp);
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_truncate_itemkey                                             *
+ *                                                                            *
+ * Purpose: check the item key characters length and, if the length exceeds   *
+ *          max allowable characters length, truncate the item key, while     *
+ *          maintaining the right square bracket                              *
+ *                                                                            *
+ * Parameters: key      - [IN] item key for processing                        *
+ *             char_max - [IN] item key max characters length                 *
+ *             buf      - [IN/OUT] buffer for short version of item key       *
+ *             buf_len  - [IN] buffer size for short version of item key      *
+ *                                                                            *
+ * Return value: The item key that does not exceed passed length              *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len)
+{
+#	define ZBX_SUFFIX	"..."
+#	define ZBX_BSUFFIX	"[...]"
+
+	size_t	key_byte_count, key_char_total;
+	int	is_bracket = 0;
+	char	*bracket_l;
+
+	if (char_max >= (key_char_total = zbx_strlen_utf8(key)))
+		return key;
+
+	if (NULL != (bracket_l = strchr(key, '[')))
+		is_bracket = 1;
+
+	if (char_max < ZBX_CONST_STRLEN(ZBX_SUFFIX) + 2 * is_bracket)	/* [...] or ... */
+		return key;
+
+	if (0 != is_bracket)
+	{
+		size_t	key_char_count, param_char_count, param_byte_count;
+
+		key_char_count = zbx_charcount_utf8_nbytes(key, bracket_l - key);
+		param_char_count = key_char_total - key_char_count;
+
+		if (param_char_count <= ZBX_CONST_STRLEN(ZBX_BSUFFIX))
+		{
+			if (char_max < param_char_count + ZBX_CONST_STRLEN(ZBX_SUFFIX))
+				return key;
+
+			key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - param_char_count -
+					ZBX_CONST_STRLEN(ZBX_SUFFIX));
+			param_byte_count = 1 + zbx_strlen_utf8_nchars(bracket_l, key_char_count);
+
+			if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX) + param_byte_count - 1)
+				return key;
+
+			key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
+			key_byte_count += zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
+			zbx_strlcpy_utf8(&buf[key_byte_count], bracket_l, param_byte_count);
+
+			return buf;
+		}
+
+		if (key_char_count + ZBX_CONST_STRLEN(ZBX_BSUFFIX) > char_max)
+		{
+			if (char_max <= ZBX_CONST_STRLEN(ZBX_SUFFIX) + ZBX_CONST_STRLEN(ZBX_BSUFFIX))
+				return key;
+
+			key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - ZBX_CONST_STRLEN(ZBX_SUFFIX) -
+					ZBX_CONST_STRLEN(ZBX_BSUFFIX));
+
+			if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX) + ZBX_CONST_STRLEN(ZBX_BSUFFIX))
+				return key;
+
+			key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
+			key_byte_count += zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
+			zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_BSUFFIX, sizeof(ZBX_BSUFFIX));
+
+			return buf;
+		}
+	}
+
+	key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - (ZBX_CONST_STRLEN(ZBX_SUFFIX) + is_bracket));
+
+	if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX) + is_bracket)
+		return key;
+
+	key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
+	zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
+
+	if (0 != is_bracket)
+		zbx_strlcpy_utf8(&buf[key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX)], "]", sizeof("]"));
+
+	return buf;
+
+#	undef ZBX_SUFFIX
+#	undef ZBX_BSUFFIX
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_truncate_value                                               *
+ *                                                                            *
+ * Purpose: check the value characters length and, if the length exceeds      *
+ *          max allowable characters length, truncate the value               *
+ *                                                                            *
+ * Parameters: val      - [IN] value for processing                           *
+ *             char_max - [IN] value max characters length                    *
+ *             buf      - [IN/OUT] buffer for short version of value          *
+ *             buf_len  - [IN] buffer size for short version of value         *
+ *                                                                            *
+ * Return value: The value that does not exceed passed length                 *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len)
+{
+#	define ZBX_SUFFIX	"..."
+
+	size_t	key_byte_count;
+
+	if (char_max >= zbx_strlen_utf8(val))
+		return val;
+
+	key_byte_count = 1 + zbx_strlen_utf8_nchars(val, char_max - ZBX_CONST_STRLEN(ZBX_SUFFIX));
+
+	if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX))
+		return val;
+
+	key_byte_count = zbx_strlcpy_utf8(buf, val, key_byte_count);
+	zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
+
+	return buf;
+
+#	undef ZBX_SUFFIX
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,15 +19,22 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('layout.mode.js');
 
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
+
 (new CWidget())
 	->setTitle(_('Maps'))
-	->setWebLayoutMode(CView::getLayoutMode())
+	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
@@ -54,7 +61,7 @@ $this->addJsFile('layout.mode.js');
 				'elname' => 'sysmapid',
 				'elid' => $data['map']['sysmapid']
 			]))
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]))

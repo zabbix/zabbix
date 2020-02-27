@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,6 +47,8 @@ function getSystemStatusData(array $filter) {
 	$filter_ext_ack = array_key_exists('ext_ack', $filter)
 		? $filter['ext_ack']
 		: EXTACK_OPTION_ALL;
+	$filter_evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
+	$filter_tags = array_key_exists('tags', $filter) ? $filter['tags'] : [];
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 		if ($filter_hostids === null) {
@@ -113,6 +115,8 @@ function getSystemStatusData(array $filter) {
 		'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged', 'severity'],
 		'groupids' => array_keys($data['groups']),
 		'hostids' => $filter_hostids,
+		'evaltype' => $filter_evaltype,
+		'tags' => $filter_tags,
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'suppressed' => false,
@@ -434,11 +438,10 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
  * @param array  $data['groups'][]['stats'][]['problems']
  * @param int    $data['groups'][]['stats'][]['count_unack']
  * @param array  $data['groups'][]['stats'][]['problems_unack']
- * @param array  $severity_names
  *
  * @return array
  */
-function getSystemStatusTotals(array $data, array $severity_names) {
+function getSystemStatusTotals(array $data) {
 	$groups_totals = [
 		0 => [
 			'groupid' => 0,
@@ -446,12 +449,11 @@ function getSystemStatusTotals(array $data, array $severity_names) {
 		]
 	];
 
-	foreach (array_reverse($severity_names) as $key => $value) {
-		$i = explode('_', $key)[2];
-		$groups_totals[0]['stats'][$i] = [
-			'count' => $data['stats'][$i]['count'],
+	foreach ($data['stats'] as $severity => $value) {
+		$groups_totals[0]['stats'][$severity] = [
+			'count' => $value['count'],
 			'problems' => [],
-			'count_unack' => $data['stats'][$i]['count_unack'],
+			'count_unack' => $value['count_unack'],
 			'problems_unack' => []
 		];
 	}
@@ -675,6 +677,14 @@ function make_status_of_zbx() {
 					(new CRow([$req['name'], $req['current'], $req['error']]))->addClass(ZBX_STYLE_RED)
 				);
 			}
+		}
+
+		$db = DB::getDbBackend();
+
+		if (!$db->checkEncoding()) {
+			$table->addRow(
+				(new CRow((new CCol($db->getWarning()))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
+			);
 		}
 	}
 

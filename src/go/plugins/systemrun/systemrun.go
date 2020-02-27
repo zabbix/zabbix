@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,16 +23,16 @@ import (
 	"fmt"
 	"time"
 
+	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxcmd"
 )
 
 type Options struct {
-	Timeout              int `conf:"optional,range=1:30"`
-	Capacity             int `conf:"optional,range=1:100"`
-	LogRemoteCommands    int `conf:"optional,range=0:1,default=0"`
-	EnableRemoteCommands int `conf:"optional,range=0:1,default=0"`
+	Timeout           int `conf:"optional,range=1:30"`
+	Capacity          int `conf:"optional,range=1:100"`
+	LogRemoteCommands int `conf:"optional,range=0:1,default=0"`
 }
 
 // Plugin -
@@ -59,10 +59,6 @@ func (p *Plugin) Validate(options interface{}) error {
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if p.options.EnableRemoteCommands != 1 {
-		return nil, fmt.Errorf("Remote commands are not enabled.")
-	}
-
 	if len(params) > 2 {
 		return nil, fmt.Errorf("Too many parameters.")
 	}
@@ -71,7 +67,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Invalid first parameter.")
 	}
 
-	if p.options.LogRemoteCommands == 1 {
+	if p.options.LogRemoteCommands == 1 && ctx.ClientID() != agent.LocalChecksClientID {
 		p.Warningf("Executing command:'%s'", params[0])
 	} else {
 		p.Debugf("Executing command:'%s'", params[0])

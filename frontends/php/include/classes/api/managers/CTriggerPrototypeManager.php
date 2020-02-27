@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,6 +52,14 @@ class CTriggerPrototypeManager {
 		} while ($parent_triggerids);
 
 		$del_triggerids = array_keys($del_triggerids);
+
+		// Lock trigger prototypes before delete to prevent server from adding new LLD elements.
+		DBselect(
+			'SELECT NULL'.
+			' FROM triggers t'.
+			' WHERE '.dbConditionInt('t.triggerid', $del_triggerids).
+			' FOR UPDATE'
+		);
 
 		// Deleting discovered triggers.
 		$del_discovered_triggerids = DBfetchColumn(DBselect(

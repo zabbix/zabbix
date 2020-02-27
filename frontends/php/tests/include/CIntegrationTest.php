@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ class CIntegrationTest extends CAPITest {
 	const COMPONENT_SERVER	= 'server';
 	const COMPONENT_PROXY	= 'proxy';
 	const COMPONENT_AGENT	= 'agentd';
+	const COMPONENT_AGENT2	= 'agent2';
 
 	// Zabbix component port constants.
 	const AGENT_PORT_SUFFIX = '50';
@@ -174,7 +175,7 @@ class CIntegrationTest extends CAPITest {
 		self::$suite_hosts = $result['hosts'];
 		self::$suite_configuration = self::getDefaultComponentConfiguration();
 
-		foreach ([self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT] as $component) {
+		foreach (self::getComponents() as $component) {
 			if (!array_key_exists($component, $result['configuration'])) {
 				continue;
 			}
@@ -223,7 +224,7 @@ class CIntegrationTest extends CAPITest {
 		$this->case_hosts = array_diff($result['hosts'], self::$suite_hosts);
 		self::$case_configuration = self::$suite_configuration;
 
-		foreach ([self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT] as $component) {
+		foreach (self::getComponents() as $component) {
 			if (!array_key_exists($component, $result['configuration'])) {
 				continue;
 			}
@@ -296,9 +297,25 @@ class CIntegrationTest extends CAPITest {
 			}
 		}
 
-		self::setHostStatus(self::$suite_hosts, HOST_STATUS_NOT_MONITORED);
+		if (self::$suite_hosts) {
+			global $DB;
+			DBconnect($error);
+			self::setHostStatus(self::$suite_hosts, HOST_STATUS_NOT_MONITORED);
+			DBclose();
+		}
 
 		parent::onAfterTestSuite();
+	}
+
+	/**
+	 * Get list of possible component names.
+	 *
+	 * @return array
+	 */
+	private static function getComponents() {
+		return [
+			self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT, self::COMPONENT_AGENT2
+		];
 	}
 
 	/**
@@ -309,7 +326,7 @@ class CIntegrationTest extends CAPITest {
 	 * @throws Exception    on invalid component name
 	 */
 	private static function validateComponent($component) {
-		if (!in_array($component, [self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT])) {
+		if (!in_array($component, self::getComponents())) {
 			throw new Exception('Unknown component name "'.$component.'".');
 		}
 	}
@@ -438,6 +455,11 @@ class CIntegrationTest extends CAPITest {
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
+			],
+			self::COMPONENT_AGENT2 => [
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.log',
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
 			]
 		];
 
@@ -476,7 +498,9 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		if (file_put_contents(PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf', $config) === false) {
-			throw new Exception('Failed to create configuration file for component "'.$component.'": '.PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf.');
+			throw new Exception('Failed to create configuration file for component "'.$component.'": '.
+					PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf.'
+			);
 		}
 	}
 
@@ -496,7 +520,8 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::clearLog($component);
-		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['-c', $config]);
+		$suffix = ($component === self::COMPONENT_AGENT2) ? ' > /dev/null 2>&1 &' : '';
+		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['-c', $config], $suffix);
 		self::waitForStartup($component);
 	}
 
@@ -539,7 +564,7 @@ class CIntegrationTest extends CAPITest {
 	protected function getClient($component) {
 		self::validateComponent($component);
 
-		if ($component === self::COMPONENT_AGENT) {
+		if ($component === self::COMPONENT_AGENT || $component === self::COMPONENT_AGENT2) {
 			throw new Exception('There is no client available for Zabbix Agent.');
 		}
 
@@ -556,7 +581,7 @@ class CIntegrationTest extends CAPITest {
 	protected function getActiveComponent() {
 		$components = [];
 		foreach (array_merge(self::$suite_components, $this->case_components) as $component) {
-			if ($component !== self::COMPONENT_AGENT) {
+			if ($component !== self::COMPONENT_AGENT && $component !== self::COMPONENT_AGENT2) {
 				$components[] = $component;
 			}
 		}
@@ -749,7 +774,7 @@ class CIntegrationTest extends CAPITest {
 			throw $exception;
 		}
 
-		$this->fail('Data requested from '.$method.' API is not present withing specified interval. Params used:'.
+		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
 				"\n".json_encode($params)
 		);
 	}

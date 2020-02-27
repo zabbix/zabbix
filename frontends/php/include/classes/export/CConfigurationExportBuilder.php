@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,6 +86,11 @@ class CConfigurationExportBuilder {
 					continue;
 				}
 
+				if (array_key_exists('export', $val)) {
+					$store[$tag] = call_user_func($val['export'], $row);
+					continue;
+				}
+
 				if (($is_indexed_array || $is_array) && $has_data) {
 					$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
 					if ($is_required || $temp_store) {
@@ -94,22 +99,17 @@ class CConfigurationExportBuilder {
 					continue;
 				}
 
-				if (array_key_exists('export', $val)) {
-					$store[$tag] = call_user_func($val['export'], $row);
+				if (array_key_exists('in', $val)) {
+					if (!array_key_exists($value, $val['in'])) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
+							_s('unexpected constant value "%1$s"', $value)
+						));
+					}
+
+					$store[$tag] = $val['in'][$value];
 				}
 				else {
-					if (array_key_exists('in', $val)) {
-						if (!array_key_exists($value, $val['in'])) {
-							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
-								_s('unexpected constant value "%1$s"', $value)
-							));
-						}
-
-						$store[$tag] = $val['in'][$value];
-					}
-					else {
-						$store[$tag] = $value;
-					}
+					$store[$tag] = $value;
 				}
 			}
 
@@ -418,6 +418,17 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($media_types, ['name']);
 
 		foreach ($media_types as $media_type) {
+			$message_templates = [];
+
+			foreach ($media_type['message_templates'] as $message_template) {
+				$message_templates[] = [
+					'event_source' => $message_template['eventsource'],
+					'operation_mode' => $message_template['recovery'],
+					'subject' => $message_template['subject'],
+					'message' => $message_template['message']
+				];
+			}
+
 			$result[] = [
 				'name' => $media_type['name'],
 				'type' => $media_type['type'],
@@ -447,7 +458,8 @@ class CConfigurationExportBuilder {
 				'show_event_menu' => $media_type['show_event_menu'],
 				'event_menu_url' => $media_type['event_menu_url'],
 				'event_menu_name' => $media_type['event_menu_name'],
-				'description' => $media_type['description']
+				'description' => $media_type['description'],
+				'message_templates' => $message_templates
 			];
 		}
 
@@ -1322,7 +1334,7 @@ class CConfigurationExportBuilder {
 			$link['selementpos1'] = $flipped_selements[$link['selementid1']];
 			$link['selementpos2'] = $flipped_selements[$link['selementid2']];
 
-			// Sort selements positons asc.
+			// Sort selements by position asc.
 			if ($link['selementpos2'] < $link['selementpos1']) {
 				zbx_swap($link['selementpos1'], $link['selementpos2']);
 			}

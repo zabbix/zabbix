@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,6 +107,35 @@ void	load_user_parameters(char **lines)
 		}
 		*p = ',';
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: load_key_access_rule                                             *
+ *                                                                            *
+ * Purpose: Adds key access rule from configuration                           *
+ *                                                                            *
+ * Parameters: value - [IN] key access rule parameter value                   *
+ *             cfg   - [IN] configuration parameter information               *
+ *                                                                            *
+ * Return value: SUCCEED - successful execution                               *
+ *               FAIL    - failed to add rule                                 *
+ *                                                                            *
+ * Author: Andrejs Tumilovics                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	load_key_access_rule(const char *value, struct cfg_line *cfg)
+{
+	zbx_key_access_rule_type_t	rule_type;
+
+	if (0 == strcmp(cfg->parameter, "AllowKey"))
+		rule_type = ZBX_KEY_ACCESS_ALLOW;
+	else if (0 == strcmp(cfg->parameter, "DenyKey"))
+		rule_type = ZBX_KEY_ACCESS_DENY;
+	else
+		return FAIL;
+
+	return add_key_access_rule(value, rule_type);
 }
 
 #ifdef _WINDOWS

@@ -1,0 +1,114 @@
+test case: "#0 condition 1.1"
+in:
+  key: "0123456789[]"
+  key_len: 5
+  buf_len: 6
+out:
+  key: "01..."
+---
+test case: "#1 condition 1.2"
+in:
+  key: "0123456789[]"
+  key_len: 10
+  buf_len: 11
+out:
+  key: "0123456..."
+---
+test case: "#2 condition 4.1"
+in:
+  key: "aaaaabbbbbccccc"
+  key_len: 15
+  buf_len: 16
+out:
+  key: "aaaaabbbbbccccc"
+---
+test case: "#3 condition 4.2"
+in:
+  key: "aaaaabbbbbccccc"
+  key_len: 16
+  buf_len: 17
+out:
+  key: "aaaaabbbbbccccc"
+---
+test case: "#4 condition 4.3"
+in:
+  key: "aaaaabbbbbccccc"
+  key_len: 14
+  buf_len: 15
+out:
+  key: "aaaaabbbbbc..."
+---
+test case: "#5 condition 4.4"
+in:
+  key: "aaaaabbbbbccccc"
+  key_len: 2
+  buf_len: 3
+out:
+  key: "aaaaabbbbbccccc"
+---
+test case: "#6 condition 4.5"
+in:
+  key: "aaaaabbbbbccccc"
+  key_len: 3
+  buf_len: 4
+out:
+  key: "..."
+---
+
+
+test case: "#0 ru condition 1.1"
+in:
+  key: "фывапролдж[]"
+  key_len: 5
+  buf_len: 8
+out:
+  key: "фы..."
+---
+test case: "#1 ru condition 1.2"
+in:
+  key: "фывапролдж[]"
+  key_len: 10
+  buf_len: 18
+out:
+  key: "фывапро..."
+---
+
+test case: "#2 ru condition 4.1"
+in:
+  key: "фывапролдж"
+  key_len: 10
+  buf_len: 0
+out:
+  key: "фывапролдж"
+---
+test case: "#3 ru condition 4.2"
+in:
+  key: "фывапролдж"
+  key_len: 11
+  buf_len: 0
+out:
+  key: "фывапролдж"
+---
+test case: "#4 ru condition 4.3"
+in:
+  key: "фывапролдж"
+  key_len: 9
+  buf_len: 16
+out:
+  key: "фывапр..."
+---
+test case: "#5 ru condition 4.4"
+in:
+  key: "фывапролдж"
+  key_len: 2
+  buf_len: 0
+out:
+  key: "фывапролдж"
+---
+test case: "#6 ru condition 4.5"
+in:
+  key: "фывапролдж"
+  key_len: 3
+  buf_len: 4
+out:
+  key: "..."

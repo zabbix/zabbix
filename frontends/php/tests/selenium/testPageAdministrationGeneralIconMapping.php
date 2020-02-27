@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	public function testPageAdministrationGeneralIconMapping_CheckLayout(){
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit&ddreset=1');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
 		$strings = [];

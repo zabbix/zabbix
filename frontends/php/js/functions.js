@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,17 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-function getIdFromNodeId(id) {
-	if (typeof(id) == 'string') {
-		var reg = /logtr([0-9])/i;
-		id = parseInt(id.replace(reg, '$1'));
-	}
-	if (typeof(id) == 'number') {
-		return id;
-	}
-	return null;
-}
 
 function check_target(e, type) {
 	// If type is expression.
@@ -108,27 +97,29 @@ var graphs = {
 };
 
 function cloneRow(elementid, count) {
-	if (typeof(cloneRow.count) == 'undefined') {
+	if (typeof(cloneRow.count) === 'undefined') {
 		cloneRow.count = count;
 	}
 	cloneRow.count++;
 
-	var tpl = new Template($(elementid).cloneNode(true).wrap('div').innerHTML);
+	var element = $('#' + elementid),
+		tpl = new Template($('<div>').append(element.clone(true)).html()),
+		entry = jQuery(tpl.evaluate({'id' : cloneRow.count}));
 
-	var emptyEntry = tpl.evaluate({'id' : cloneRow.count});
-
-	var newEntry = $(elementid).insert({'before' : emptyEntry}).previousSibling;
-
-	$(newEntry).descendants().each(function(e) {
-		e.removeAttribute('disabled');
+	entry.find('*').each(function() {
+		jQuery(this).removeAttr('disabled');
 	});
-	newEntry.setAttribute('id', 'entry_' + cloneRow.count);
-	newEntry.style.display = '';
+
+	entry.attr('id', 'entry_' + cloneRow.count);
+	entry[0].style.display = '';
+	entry.insertBefore(element.parent().children(':last-child'));
 }
 
 function testUserSound(idx) {
-	var sound = $(idx).options[$(idx).selectedIndex].value;
-	var repeat = $('messages_sounds.repeat').options[$('messages_sounds.repeat').selectedIndex].value;
+	var element = document.getElementById(idx);
+	var sound = element.options[element.selectedIndex].value;
+	element = document.getElementById('messages_sounds.repeat');
+	var repeat = element.options[element.selectedIndex].value;
 
 	if (repeat == 1) {
 		AudioControl.playOnce(sound);
@@ -137,7 +128,7 @@ function testUserSound(idx) {
 		AudioControl.playLoop(sound, repeat);
 	}
 	else {
-		AudioControl.playLoop(sound, $('messages_timeout').value);
+		AudioControl.playLoop(sound, document.getElementById('messages_timeout').value);
 	}
 }
 
@@ -187,45 +178,6 @@ function validateNumericBox(obj, allowempty, allownegative) {
 }
 
 /**
- * Validates and formats input element containing a part of date.
- *
- * @param object {obj}       Input element value of which is being validated.
- * @param int {min}          Minimal allowed value (inclusive).
- * @param int {max}          Maximum allowed value (inclusive).
- * @param int {paddingSize}  Number of zeros used for padding.
- */
-function validateDatePartBox(obj, min, max, paddingSize) {
-	if (obj != null) {
-		min = min ? min : 0;
-		max = max ? max : 59;
-		paddingSize = paddingSize ? paddingSize : 2;
-
-		var paddingZeros = [];
-		for (var i = 0; i != paddingSize; i++) {
-			paddingZeros.push('0');
-		}
-		paddingZeros = paddingZeros.join('');
-
-		var currentValue = obj.value.toString();
-
-		if (/^[0-9]+$/.match(currentValue)) {
-			var intValue = parseInt(currentValue, 10);
-
-			if (intValue < min || intValue > max) {
-				obj.value = paddingZeros;
-			}
-			else if (currentValue.length < paddingSize) {
-				var paddedValue = paddingZeros + obj.value;
-				obj.value = paddedValue.substring(paddedValue.length - paddingSize);
-			}
-		}
-		else {
-			obj.value = paddingZeros;
-		}
-	}
-}
-
-/**
  * Translates the given string.
  *
  * @param {String} str
@@ -249,7 +201,7 @@ function getUniqueId() {
 }
 
 /**
- * Color palette object used for geting different colors from color palette.
+ * Color palette object used for getting different colors from color palette.
  */
 var colorPalette = (function() {
 	'use strict';
@@ -485,12 +437,17 @@ function stripslashes(str) {
  * Function to remove preloader and moves focus to IU element that was clicked to open it.
  *
  * @param string   id			Preloader identifier.
- * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayPreloaderDestroy(id, xhr) {
+function overlayPreloaderDestroy(id) {
 	if (typeof id !== 'undefined') {
-		if (typeof xhr !== 'undefined') {
-			xhr.abort();
+
+		var overlay = overlays_stack.getById(id)
+		if (!overlay) {
+			return;
+		}
+		if (typeof overlay.xhr !== 'undefined') {
+			overlay.xhr.abort();
+			delete overlay.xhr;
 		}
 
 		jQuery('#' + id).remove();
@@ -502,12 +459,21 @@ function overlayPreloaderDestroy(id, xhr) {
  * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
  *
  * @param string   dialogueid	Dialogue identifier to identify dialogue.
- * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayDialogueDestroy(dialogueid, xhr) {
+function overlayDialogueDestroy(dialogueid) {
 	if (typeof dialogueid !== 'undefined') {
-		if (typeof xhr !== 'undefined') {
-			xhr.abort();
+		var overlay = overlays_stack.getById(dialogueid)
+		if (!overlay) {
+			return;
+		}
+
+		if (typeof overlay.xhr !== 'undefined') {
+			overlay.xhr.abort();
+			delete overlay.xhr;
+		}
+
+		if (overlay instanceof Overlay) {
+			overlay.unmount();
 		}
 
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
@@ -523,20 +489,6 @@ function overlayDialogueDestroy(dialogueid, xhr) {
 }
 
 /**
- * Get unused overlay dialog id.
- *
- * @return {string}
- */
-function getOverlayDialogueId() {
-	var dialogueid = Math.random().toString(36).substring(7);
-	while (jQuery('[data-dialogueid="' + dialogueid + '"]').length) {
-		dialogueid = Math.random().toString(36).substring(7);
-	}
-
-	return dialogueid;
-}
-
-/**
  * Display modal window.
  *
  * @param {object} params                                   Modal window params.
@@ -549,277 +501,36 @@ function getOverlayDialogueId() {
  * @param {string} params.buttons[]['title']                Text on the button.
  * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
  *                                                          on click.
- * @param {string} params.buttons[]['class']	(optional)  Button class.
- * @param {bool}   params.buttons[]['cancel']	(optional)  It means what this button has cancel action.
- * @param {bool}   params.buttons[]['focused']	(optional)  Focus this button.
- * @param {bool}   params.buttons[]['enabled']	(optional)  Should the button be enabled? Default: true.
- * @param {bool}   params.buttons[]['keepOpen']	(optional)  Prevent dialogue closing, if button action returned false.
+ * @param {string} params.buttons[]['class']    (optional)  Button class.
+ * @param {bool}   params.buttons[]['cancel']   (optional)  It means what this button has cancel action.
+ * @param {bool}   params.buttons[]['focused']  (optional)  Focus this button.
+ * @param {bool}   params.buttons[]['enabled']  (optional)  Should the button be enabled? Default: true.
+ * @param {bool}   params.buttons[]['keepOpen'] (optional)  Prevent dialogue closing, if button action returned false.
  * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
  *                                                          or create a new one if value is not set.
  * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
- * @param {object} trigger_elmnt				(optional)  UI element which triggered opening of overlay dialogue.
- * @param {object} xhr							(optional)  XHR request used to load content. Used to abort loading.
+ * @param {object} trigger_elmnt                (optional)  UI element which triggered opening of overlay dialogue.
  *
- * @return {bool}
+ * @return {Overlay}
  */
-function overlayDialogue(params, trigger_elmnt, xhr) {
-	if (!jQuery('[data-dialogueid]').length) {
-		jQuery('body').data('overflow', jQuery('body').css('overflow'));
-		jQuery('body').css('overflow', 'hidden');
+function overlayDialogue(params, trigger_elmnt) {
+	params.element = params.element || trigger_elmnt;
+	params.type = params.type || 'popup';
+
+	var overlay = overlays_stack.getById(params.dialogueid);
+
+	if (!overlay) {
+		overlay = new Overlay(params.type, params.dialogueid);
 	}
 
-	var button_focused = null,
-		cancel_action = null,
-		submit_btn = null,
-		overlay_dialogue = null,
-		headerid = '',
-		overlay_bg = null,
-		overlay_dialogue_footer = jQuery('<div>', {
-			class: 'overlay-dialogue-footer'
-		});
+	overlay.setProperties(params);
+	overlay.mount();
+	overlay.recoverFocus();
+	overlay.containFocus();
 
-	if (typeof params.dialogueid === 'undefined') {
-		params.dialogueid = getOverlayDialogueId();
-	}
+	addToOverlaysStack(overlay);
 
-	if (typeof params.script_inline !== 'undefined') {
-		overlay_dialogue_footer.append(jQuery('<script>').text(params.script_inline));
-	}
-
-	headerid = 'dashbrd-widget-head-title-'+params.dialogueid;
-
-	if (jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]').length) {
-		overlay_dialogue = jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]');
-		overlay_bg = jQuery('.overlay-bg[data-dialogueid="' + params.dialogueid + '"]') || null;
-
-		jQuery(overlay_dialogue)
-			.attr('class', 'overlay-dialogue modal')
-			.unbind('keydown')
-			.empty();
-	}
-	else {
-		overlay_dialogue = jQuery('<div>', {
-			'id': 'overlay_dialogue',
-			'class': 'overlay-dialogue modal',
-			'data-dialogueid': params.dialogueid,
-			'role': 'dialog',
-			'aria-modal': 'true',
-			'aria-labeledby': headerid
-		});
-
-		overlay_bg = jQuery('<div>', {
-			'id': 'overlay_bg',
-			'class': 'overlay-bg',
-			'data-dialogueid': params.dialogueid
-		})
-			.appendTo('body');
-
-		jQuery(overlay_dialogue).appendTo('body');
-	}
-
-	var center_overlay_dialog = function() {
-			var body = jQuery('.overlay-dialogue-body', overlay_dialogue),
-				body_scroll_height = body[0].scrollHeight,
-				body_height = body.height();
-
-			if (body_height != Math.floor(body_height)) {
-				// The body height is often about a half pixel less than the height.
-				body_height = Math.floor(body_height) + 1;
-			}
-
-			// A fix for IE and Edge to stop popup width flickering when having vertical scrollbar.
-			body.css('overflow-y', body_scroll_height > body_height ? 'scroll' : 'hidden');
-
-			overlay_dialogue.css({
-				'left': Math.round((jQuery(window).width() - jQuery(overlay_dialogue).outerWidth()) / 2) + 'px',
-				'top': overlay_dialogue.hasClass('sticked-to-top')
-					? ''
-					: Math.round((jQuery(window).height() - jQuery(overlay_dialogue).outerHeight()) / 2) + 'px'
-			});
-		},
-		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
-		body_mutation_observer = new body_mutation_observer(function(mutation) {
-			center_overlay_dialog();
-		});
-
-	if (typeof params.footer !== 'undefined') {
-		overlay_dialogue_footer.append(params.footer);
-	}
-
-	jQuery.each(params.buttons, function(index, obj) {
-		if (typeof obj.action === 'string') {
-			obj.action = new Function(obj.action);
-		}
-
-		var button = jQuery('<button>', {
-			type: 'button',
-			text: obj.title
-		}).click(function(e) {
-			if (obj.action() !== false) {
-				cancel_action = null;
-
-				if (!('keepOpen' in obj) || obj.keepOpen === false) {
-					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
-				}
-			}
-
-			e.preventDefault();
-		});
-
-		if (!submit_btn && ('isSubmit' in obj) && obj.isSubmit === true) {
-			submit_btn = button;
-		}
-
-		if ('class' in obj) {
-			button.addClass(obj.class);
-		}
-
-		if ('enabled' in obj && obj.enabled === false) {
-			button.prop('disabled', true);
-		}
-
-		if ('focused' in obj && obj.focused === true) {
-			button_focused = button;
-		}
-
-		if ('cancel' in obj && obj.cancel === true) {
-			cancel_action = obj.action;
-		}
-
-		overlay_dialogue_footer.append(button);
-	});
-
-	jQuery(overlay_dialogue)
-		.append(
-			jQuery('<button>', {
-				class: 'overlay-close-btn',
-				title: t('S_CLOSE')
-			})
-				.click(function(e) {
-					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
-					e.preventDefault();
-				})
-		)
-		.append(
-			jQuery('<div>', {
-				class: 'dashbrd-widget-head'
-			}).append(jQuery('<h4 id="'+headerid+'">').text(params.title))
-		)
-		.append(params.controls ? jQuery('<div>').addClass('overlay-dialogue-controls').html(params.controls) : null)
-		.append(
-			jQuery('<div>', {
-				class: 'overlay-dialogue-body'
-			})
-				.append(params.content)
-				.each(function() {
-					body_mutation_observer.observe(this, {childList: true, subtree: true});
-				})
-				.find('form')
-					.attr('aria-labeledby', headerid)
-				.end()
-		)
-		.append(overlay_dialogue_footer)
-		.append(typeof params.debug !== 'undefined' ? params.debug : null);
-
-	jQuery(overlay_bg).on('remove', function(event) {
-		body_mutation_observer.disconnect();
-		if (cancel_action !== null) {
-			cancel_action();
-		}
-
-		setTimeout(function() {
-			jQuery(overlay_bg).off('remove'); // Remove to avoid repeated execution.
-			overlayDialogueDestroy(params.dialogueid, xhr);
-		});
-
-		return false;
-	});
-
-	if (submit_btn) {
-		jQuery('.overlay-dialogue-body form', overlay_dialogue).on('submit', function(event) {
-			event.preventDefault();
-			submit_btn.trigger('click');
-		});
-	}
-
-	if (typeof trigger_elmnt !== 'undefined') {
-		addToOverlaysStack(params.dialogueid, trigger_elmnt, 'popup', xhr);
-	}
-
-	if (typeof params.class !== 'undefined') {
-		overlay_dialogue.addClass(params.class);
-	}
-
-	center_overlay_dialog();
-
-	jQuery(window).resize(function() {
-		if (jQuery('#overlay_dialogue').length) {
-			center_overlay_dialog();
-		}
-	});
-
-	if (button_focused !== null) {
-		button_focused.focus();
-	}
-
-	// Don't focus element in overlay, if button is already focused.
-	overlayDialogueOnLoad(!button_focused, jQuery('.overlay-dialogue[data-dialogueid="'+params.dialogueid+'"]'));
-}
-
-/**
- * Actions to perform, when overlay UI element is created, as well as, when data in overlay was changed.
- *
- * @param {bool}	focus		Focus first focusable element in overlay.
- * @param {object}	overlay		Overlay object.
- */
-function overlayDialogueOnLoad(focus, overlay) {
-	if (focus) {
-		if (jQuery('[autofocus=autofocus]:focusable', overlay).length) {
-			jQuery('[autofocus=autofocus]:focusable', overlay).first().focus();
-		}
-		else if (jQuery('.overlay-dialogue-body form :focusable', overlay).length) {
-			jQuery('.overlay-dialogue-body form :focusable', overlay).first().focus();
-		}
-		else {
-			jQuery(':focusable:first', overlay).focus();
-		}
-	}
-
-	var focusable = jQuery(':focusable', overlay);
-
-	if (focusable.length > 1) {
-		var first_focusable = focusable.filter(':first'),
-			last_focusable = focusable.filter(':last');
-
-		first_focusable
-			.off('keydown')
-			.on('keydown', function(e) {
-				// TAB and SHIFT
-				if (e.which == 9 && e.shiftKey) {
-					last_focusable.focus();
-					return false;
-				}
-			});
-
-		last_focusable
-			.off('keydown')
-			.on('keydown', function(e) {
-				// TAB and not SHIFT
-				if (e.which == 9 && !e.shiftKey) {
-					first_focusable.focus();
-					return false;
-				}
-			});
-	}
-	else {
-		focusable
-			.off('keydown')
-			.on('keydown', function(e) {
-				if (e.which == 9) {
-					return false;
-				}
-			});
-	}
+	return overlay;
 }
 
 /**
@@ -954,7 +665,7 @@ function parseUrlString(url) {
 				pair.push('');
 
 				try {
-					if (/%[01]/.match(pair[0]) || /%[01]/.match(pair[1]) ) {
+					if (pair[0].match(/%[01]/) || pair[1].match(/%[01]/)) {
 						// Non-printable characters in URL.
 						throw null;
 					}
@@ -992,7 +703,7 @@ function parseUrlString(url) {
  * @param {bool}         show_close_box  Show close button.
  * @param {bool}         show_details    Show details on opening.
  *
- * @return {string}
+ * @return {jQuery}
  */
 function makeMessageBox(type, messages, title, show_close_box, show_details) {
 	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},

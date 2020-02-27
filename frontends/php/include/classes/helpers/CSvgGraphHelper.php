@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -566,7 +566,7 @@ class CSvgGraphHelper {
 
 				unset($data_set['hosts'], $data_set['items']);
 
-				// The bigger transparency level, the less visibile the metric is.
+				// The bigger transparency level, the less visible the metric is.
 				$data_set['transparency'] = 10 - (int) $data_set['transparency'];
 
 				$data_set['timeshift'] = ($data_set['timeshift'] !== '')
@@ -650,7 +650,7 @@ class CSvgGraphHelper {
 					: null;
 
 				if (array_key_exists('transparency', $override)) {
-					// The bigger transparency level, the less visibile the metric is.
+					// The bigger transparency level, the less visible the metric is.
 					$override['transparency'] = 10 - (int) $override['transparency'];
 				}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,9 @@ if (!$data['alias'] || $data['users']) {
 	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
 	// paging
-	$data['paging'] = getPagingLine($data['alerts'], ZBX_SORT_DOWN, new CUrl('auditacts.php'));
+	$data['paging'] = CPagerHelper::paginate(getRequest('page', 1), $data['alerts'], ZBX_SORT_DOWN,
+		new CUrl('auditacts.php')
+	);
 
 	// get users
 	if (!$data['alias']) {
@@ -147,8 +149,6 @@ if ($data['alerts']) {
 }
 
 // render view
-$auditView = new CView('administration.auditacts.list', $data);
-$auditView->render();
-$auditView->show();
+echo (new CView('administration.auditacts.list', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

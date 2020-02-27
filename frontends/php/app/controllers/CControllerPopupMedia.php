@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class CControllerPopupMedia extends CController {
 			'mediatypeid' =>	'db media_type.mediatypeid',
 			'sendto' =>			'string',
 			'sendto_emails'	=>	'array',
-			'period' =>			'string',
+			'period' =>			'time_periods',
 			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
 			'severity' =>		'',
 			'add' =>			'in 1'
@@ -53,7 +53,7 @@ class CControllerPopupMedia extends CController {
 			}
 
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
 			);
 		}
 
@@ -110,11 +110,6 @@ class CControllerPopupMedia extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
 			}
 
-			$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
-			if ($time_period_parser->parse($page_options['period']) != CParser::PARSE_SUCCESS) {
-				error(_s('Field "%1$s" is not correct: %2$s', _('When active'), _('a time period is expected')));
-			}
-
 			if (($messages = getMessages()) !== null) {
 				$output['errors'] = $messages->toString();
 			}
@@ -139,7 +134,7 @@ class CControllerPopupMedia extends CController {
 			}
 
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
 			);
 		}
 		else {

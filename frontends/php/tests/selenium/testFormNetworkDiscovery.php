@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -326,10 +326,10 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestTextPresent($data['name']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM drules WHERE name='.zbx_dbstr($data['name'])));
-		$cheks = 'SELECT NULL FROM dchecks WHERE druleid IN ('.
+		$checks = 'SELECT NULL FROM dchecks WHERE druleid IN ('.
 				'SELECT druleid FROM drules WHERE name='.zbx_dbstr($data['name']).
 				')';
-		$this->assertEquals(count($data['checks']), CDBHelper::getCount($cheks));
+		$this->assertEquals(count($data['checks']), CDBHelper::getCount($checks));
 	}
 
 	public function getUpdateValidationData() {
@@ -558,9 +558,10 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					switch ($key) {
 						case 'check_action':
 							$action = $value;
+							$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay-bg'));
 							$this->zbxTestClickButtonText($action);
 							if ($action !== 'Remove') {
-								$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('overlay_dialogue'));
+								COverlayDialogElement::find()->one()->waitUntilReady();
 							}
 							break;
 						case 'type':
@@ -606,7 +607,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					$button = ($action === 'Add') ? 'Add' : 'Update';
 					$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="'.$button.'"]');
 					if (!array_key_exists('error_in_checks', $data)) {
-						$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+						$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay-bg'));
 					}
 				}
 			}

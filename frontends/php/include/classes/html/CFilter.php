@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -320,7 +320,7 @@ class CFilter extends CDiv {
 	/**
 	 * Add tab.
 	 *
-	 * @param string|CTag $header    Tab header title string or CTag contaier.
+	 * @param string|CTag $header    Tab header title string or CTag container.
 	 * @param array       $body      Array of body elements.
 	 *
 	 * @return CFilter
@@ -340,7 +340,7 @@ class CFilter extends CDiv {
 	private function getJS() {
 		$id = '#'.$this->getId();
 
-		$js = 'jQuery("'.$id.'").tabs('.CJs::encodeJson($this->tabs_options).').show();';
+		$js = 'jQuery("'.$id.'").tabs('.json_encode($this->tabs_options).').show();';
 
 		if ($this->idx !== null && $this->idx !== '') {
 			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {'.

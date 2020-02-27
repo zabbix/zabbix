@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2019 Zabbix SIA
+-- Copyright (C) 2001-2020 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ FIELD		|userid		|t_id		|	|NOT NULL	|0
 FIELD		|alias		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|surname	|t_varchar(100)	|''	|NOT NULL	|0
-FIELD		|passwd		|t_varchar(32)	|''	|NOT NULL	|0
+FIELD		|passwd		|t_varchar(60)	|''	|NOT NULL	|0
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|autologout	|t_varchar(32)	|'15m'	|NOT NULL	|0
@@ -214,7 +214,7 @@ TABLE|dchecks|dcheckid|ZBX_DATA
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0
 FIELD		|druleid	|t_id		|	|NOT NULL	|ZBX_PROXY		|1|drules
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|key_		|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY
@@ -301,7 +301,7 @@ FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_oid	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|delay		|t_varchar(1024)|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|history	|t_varchar(255)	|'90d'	|NOT NULL	|0
 FIELD		|trends		|t_varchar(255)	|'365d'	|NOT NULL	|0
@@ -354,7 +354,7 @@ FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|verify_peer	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-UNIQUE		|1		|hostid,key_
+INDEX		|1		|hostid,key_(1021)
 INDEX		|3		|status
 INDEX		|4		|templateid
 INDEX		|5		|valuemapid
@@ -408,12 +408,21 @@ FIELD		|event_menu_name|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 UNIQUE		|1		|name
 
-TABLE|media_type_param|mediatype_paramid|0
+TABLE|media_type_param|mediatype_paramid|ZBX_DATA
 FIELD		|mediatype_paramid|t_id		|	|NOT NULL	|0
 FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0			|1|media_type
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(2048)|''	|NOT NULL	|0
 INDEX		|1		|mediatypeid
+
+TABLE|media_type_message|mediatype_messageid|ZBX_DATA
+FIELD		|mediatype_messageid|t_id	|	|NOT NULL	|0
+FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0			|1|media_type
+FIELD		|eventsource	|t_integer	|	|NOT NULL	|0
+FIELD		|recovery	|t_integer	|	|NOT NULL	|0
+FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|message	|t_shorttext	|''	|NOT NULL	|0
+UNIQUE		|1		|mediatypeid,eventsource,recovery
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0
@@ -452,14 +461,8 @@ FIELD		|eventsource	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|esc_period	|t_varchar(255)	|'1h'	|NOT NULL	|0
-FIELD		|def_shortdata	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|def_longdata	|t_shorttext	|''	|NOT NULL	|0
-FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|r_longdata	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|pause_suppressed|t_integer	|'1'	|NOT NULL	|0
-FIELD		|ack_shortdata	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|ack_longdata	|t_shorttext	|''	|NOT NULL	|0
 INDEX		|1		|eventsource,status
 UNIQUE		|2		|name
 
@@ -476,7 +479,7 @@ INDEX		|1		|actionid
 
 TABLE|opmessage|operationid|ZBX_DATA
 FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
-FIELD		|default_msg	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|default_msg	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|message	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|mediatypeid	|t_id		|	|NULL		|0			|2|media_type	|		|RESTRICT
@@ -1138,12 +1141,13 @@ FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|details	|t_varchar(128) |'0'	|NOT NULL	|0
+FIELD		|note		|t_varchar(128) |''	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
-FIELD		|resourceid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|resourceid	|t_id		|	|NULL		|0
 FIELD		|resourcename	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|userid,clock
 INDEX		|2		|clock
+INDEX		|3		|resourcetype,resourceid
 
 TABLE|auditlog_details|auditdetailid|0
 FIELD		|auditdetailid	|t_id		|	|NOT NULL	|0
@@ -1326,7 +1330,7 @@ TABLE|item_discovery|itemdiscoveryid|ZBX_TEMPLATE
 FIELD		|itemdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|parent_itemid	|t_id		|	|NOT NULL	|0			|2|items	|itemid
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|itemid,parent_itemid
@@ -1563,6 +1567,19 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|parent_taskid	|t_id		|	|NOT NULL	|0			|-|task		|taskid
 FIELD		|info		|t_shorttext	|''	|NOT NULL	|0
 
+TABLE|task_data|taskid|0
+FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
+FIELD		|type	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|data	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|parent_taskid	|t_id		|	|NOT NULL	|0			|-|task		|taskid
+
+TABLE|task_result|taskid|0
+FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|parent_taskid	|t_id		|	|NOT NULL	|0			|-|task		|taskid
+FIELD		|info		|t_shorttext	|''	|NOT NULL	|0
+INDEX		|1		|parent_taskid
+
 TABLE|task_acknowledge|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
 FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
@@ -1702,7 +1719,14 @@ FIELD		|tls_psk_identity|t_varchar(128)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|tls_psk	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|tls_psk_identity
 
+TABLE|module|moduleid|
+FIELD		|moduleid	|t_id		|	|NOT NULL	|0
+FIELD		|id		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|relative_path	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|config		|t_shorttext	|''	|NOT NULL	|0
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4050000	|4050000
+ROW		|4050042	|4050042

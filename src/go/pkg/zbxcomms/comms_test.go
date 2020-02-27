@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,9 +97,10 @@ func (t mockRead) Read(p []byte) (n int, err error) {
 }
 
 func TestReceive(t *testing.T) {
+	var c Connection
 	for _, result := range results {
 		t.Run("test", func(t *testing.T) {
-			data, err := read(m, nil)
+			data, err := c.read(m, nil)
 			if err == nil {
 				if result.failed {
 					t.Errorf("Expcted error while got success")

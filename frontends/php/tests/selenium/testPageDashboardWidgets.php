@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form->getField('Type')->getValue());
 		$form->submit();
-		$form->parents('xpath://div[contains(@class, "overlay-dialogue")]')->one()->waitUntilNotVisible();
 		// Check that widget type isn't changed in frontend and in DB.
 		$this->checkLastSelectedWidgetType();
 
@@ -56,7 +55,6 @@ class testPageDashboardWidgets extends CWebTest {
 		];
 		$form->fill($data);
 		$form->submit();
-		$form->parents('xpath://div[contains(@class, "overlay-dialogue")]')->one()->waitUntilNotVisible();
 		$this->checkLastSelectedWidgetType();
 
 		// Add widget with current default type "Action log".
@@ -78,6 +76,7 @@ class testPageDashboardWidgets extends CWebTest {
 	 */
 	private function checkLastSelectedWidgetType($type = 'Action log', $db_type = null) {
 		$dashboard = CDashboardElement::find()->one();
+		$this->query('id:overlay-bg')->waitUntilNotVisible();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$this->assertEquals($type, $form->getField('Type')->getValue());
@@ -113,6 +112,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form->getField('Type')->getValue());
 		$form->submit();
+		$this->page->waitUntilReady();
 		// Check that widget type is still remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
@@ -149,7 +149,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Expected table values.
 		$expected = [
 			'Host group for tag permissions'	=> 1,
-			'Zabbix servers'					=> 17,
+			'Zabbix servers'					=> 19,
 			'ZBX6648 All Triggers'				=> 1,
 			'ZBX6648 Disabled Triggers'			=> 1,
 			'ZBX6648 Enabled Triggers'			=> 1
@@ -179,8 +179,10 @@ class testPageDashboardWidgets extends CWebTest {
 
 		// Create a new dashboard.
 		$this->query('button:Create dashboard')->one()->click();
+		$this->page->waitUntilReady();
+
 		// Wait until overlay dialog is visible and ready.
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Check title of a dialog.
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
@@ -209,7 +211,8 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 
 		$this->query('button:Create dashboard')->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
+		$this->page->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
 		$configuration = $dialog->asForm();
@@ -231,8 +234,8 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $overlay->asForm();
 		// Set type to "Clock".
 		$form->getField('Type')->asDropdown()->select('Clock');
-		// Wait until form is reloaded.
-		$form->waitUntilReloaded();
+		// Wait until overlay is reloaded.
+		$overlay->waitUntilReady();
 		// Set name of widget.
 		$form->getField('Name')->type('Clock test');
 		$form->submit();

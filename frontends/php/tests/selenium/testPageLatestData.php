@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageLatestData extends CLegacyWebTest {
 	public function testPageLatestData_CheckLayout() {
-		$this->zbxTestLogin('latest.php');
-		$this->zbxTestCheckTitle('Latest data [refreshed every 30 sec.]');
+		$this->zbxTestLogin('zabbix.php?action=latest.view');
+		$this->zbxTestCheckTitle('Latest data');
 		$this->zbxTestCheckHeader('Latest data');
 		$this->zbxTestTextPresent(['Host groups', 'Hosts', 'Application', 'Name', 'Show items without data', 'Show details']);
 		$this->zbxTestTextPresent('Filter');
@@ -32,8 +32,8 @@ class testPageLatestData extends CLegacyWebTest {
 
 	// Check that no real host or template names displayed
 	public function testPageLatestData_NoHostNames() {
-		$this->zbxTestLogin('latest.php');
-		$this->zbxTestCheckTitle('Latest data [refreshed every 30 sec.]');
+		$this->zbxTestLogin('zabbix.php?action=latest.view');
+		$this->zbxTestCheckTitle('Latest data');
 		$this->zbxTestCheckNoRealHostnames();
 	}
 
@@ -88,7 +88,7 @@ class testPageLatestData extends CLegacyWebTest {
 	 */
 	public function testPageLatestData_checkItemDescription($data) {
 		// Open Latest data for host 'testPageHistory_CheckLayout'
-		$this->page->login()->open('latest.php?hostids%5B%5D=15003&application=&select=&show_without_data=1&filter_set=1');
+		$this->page->login()->open('zabbix.php?action=latest.view&filter_hostids%5B%5D=15003&filter_application=&filter_select=&filter_show_without_data=1&filter_set=1');
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Find rows from the data provider and click on the description icon if such should persist.

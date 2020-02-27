@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,13 +60,9 @@ class CAjaxResponse {
 	 * Output ajax response. If any error was added, 'result' is false, otherwise true.
 	 */
 	public function send() {
-		$json = new CJson();
-
-		if ($this->_result) {
-			echo $json->encode(['result' => true, 'data' => $this->_data]);
-		}
-		else {
-			echo $json->encode(['result' => false, 'errors' => $this->_errors]);
-		}
+		echo json_encode($this->_result
+			? ['result' => true, 'data' => $this->_data]
+			: ['result' => false, 'errors' => $this->_errors]
+		);
 	}
 }

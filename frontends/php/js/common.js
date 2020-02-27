@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-jQuery.noConflict();
 
 /**
  * jQuery based publish/subscribe handler.
@@ -44,7 +42,7 @@ jQuery.noConflict();
 	};
 }(jQuery));
 
-var overlays_stack = [];
+var overlays_stack = new OverlayCollection();
 
 function isset(key, obj) {
 	return (is_null(key) || is_null(obj)) ? false : (typeof(obj[key]) != 'undefined');
@@ -110,9 +108,25 @@ function is_array(obj) {
 	return (obj != null) && (typeof obj == 'object') && ('splice' in obj) && ('join' in obj);
 }
 
+/**
+ * Get elements existing exclusively in one of both arrays.
+ * @deprecated
+ *
+ * @param {Array} arr
+ *
+ * @returns {Array}
+ */
+Array.prototype.xor = function(arr) {
+	var merged_arr = this.concat(arr);
+
+	return merged_arr.filter(function(e) {
+		return (merged_arr.indexOf(e) === merged_arr.lastIndexOf(e));
+	});
+};
+
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
-	element = $(element);
+	element = $(element)[0];
 
 	if (element.addEventListener) {
 		element.addEventListener(eventname, expression, bubbling);
@@ -152,48 +166,7 @@ function cancelEvent(e) {
 	e.stopPropagation();
 	e.preventDefault();
 
-	if (IE) {
-		e.cancelBubble = true;
-		e.returnValue = false;
-	}
-
 	return false;
-}
-
-function add_variable(o_el, s_name, x_value, s_formname, o_document) {
-	var form;
-
-	if (!o_document) {
-		o_document = document;
-	}
-
-	if (s_formname) {
-		if (!(form = o_document.forms[s_formname])) {
-			throw "Missing form with name '" + s_formname + "'.";
-		}
-	}
-	else if (o_el) {
-		if (!(form = o_el.form)) {
-			throw "Missing form in 'o_el' object";
-		}
-	}
-	else {
-		if (!(form = this.form)) {
-			throw "Missing form in 'this' object";
-		}
-	}
-
-	var o_variable = o_document.createElement('input');
-	if (!o_variable) {
-		throw "Can't create element";
-	}
-	o_variable.type = 'hidden';
-	o_variable.name = s_name;
-	o_variable.id = s_name;
-	o_variable.value = x_value;
-	form.appendChild(o_variable);
-
-	return true;
 }
 
 function checkAll(form_name, chkMain, shkName) {
@@ -205,24 +178,6 @@ function checkAll(form_name, chkMain, shkName) {
 	chkbxRange.saveSessionStorage(shkName);
 
 	return true;
-}
-
-function checkLocalAll(form_name, chkMain, chkName) {
-	var frmForm = document.forms[form_name];
-	var checkboxes = $$('input[name=' + chkName + ']');
-
-	for (var i = 0; i < checkboxes.length; i++) {
-		if (isset('type', checkboxes[i]) && checkboxes[i].type == 'checkbox') {
-			checkboxes[i].checked = frmForm.elements[chkMain].checked;
-		}
-	}
-
-	return true;
-}
-
-function close_window() {
-	window.setTimeout('window.close();', 500); // solve bug for Internet Explorer
-	return false;
 }
 
 function Confirm(msg) {
@@ -294,8 +249,6 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 }
 
 function getDimensions(obj) {
-	obj = $(obj);
-
 	var dim = {
 		left:		0,
 		top:		0,
@@ -336,7 +289,6 @@ function getDimensions(obj) {
 }
 
 function getPosition(obj) {
-	obj = $(obj);
 	var pos = {top: 0, left: 0};
 
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
@@ -348,10 +300,6 @@ function getPosition(obj) {
 				obj = obj.offsetParent;
 				pos.left += obj.offsetLeft;
 				pos.top += obj.offsetTop;
-
-				if (IE && obj.offsetParent.toString() == 'unknown') {
-					break;
-				}
 			}
 		} catch(e) {
 		}
@@ -367,98 +315,55 @@ function get_bodywidth() {
 	return (w2 < w) ? w2 : w;
 }
 
-function get_cursor_position(e) {
-	e = e || window.event;
-	var cursor = {x: 0, y: 0};
-
-	if (e.pageX || e.pageY) {
-		cursor.x = e.pageX;
-		cursor.y = e.pageY;
-	}
-	else {
-		var de = document.documentElement;
-		var b = document.body;
-		cursor.x = e.clientX + (de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
-		cursor.y = e.clientY + (de.scrollTop || b.scrollTop) - (de.clientTop || 0);
-	}
-
-	return cursor;
-}
-
-function get_scroll_pos() {
-	var scrOfX = 0, scrOfY = 0;
-
-	// netscape compliant
-	if (typeof(window.pageYOffset) == 'number') {
-		scrOfY = window.pageYOffset;
-		scrOfX = window.pageXOffset;
-	}
-	// DOM compliant
-	else if (document.body && (document.body.scrollLeft || document.body.scrollTop)) {
-		scrOfY = document.body.scrollTop;
-		scrOfX = document.body.scrollLeft;
-	}
-	// IE6 standards compliant mode
-	else if (document.documentElement && (document.documentElement.scrollLeft || document.documentElement.scrollTop)) {
-		scrOfY = document.documentElement.scrollTop;
-		scrOfX = document.documentElement.scrollLeft;
-	}
-
-	return [scrOfX, scrOfY];
-}
-
-function openWinCentered(url, name, width, height, params) {
-	var top = Math.ceil((screen.height - height) / 2),
-		left = Math.ceil((screen.width - width) / 2);
-
-	if (params.length > 0) {
-		params = ', ' + params;
-	}
-
-	var windowObj = window.open(new Curl(url).getUrl(), name,
-		'width=' + width + ', height=' + height + ', top=' + top + ', left=' + left + params
-	);
-	windowObj.focus();
-}
-
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action			Popup controller related action.
- * @param {array} options			Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid		(optional) id of overlay dialogue.
- * @param {object} trigger_elmnt	(optional) UI element which was clicked to open overlay dialogue.
+ * @param {string} action         Popup controller related action.
+ * @param {array}  options        (optional) Array with key/value pairs that will be used as query for popup request.
+ * @param {string} dialogueid     (optional) id of overlay dialogue.
+ * @param {object} trigger_elmnt  (optional) UI element which was clicked to open overlay dialogue.
  *
- * @returns false
+ * @returns {Overlay}
  */
 function PopUp(action, options, dialogueid, trigger_elmnt) {
-	var ovelay_properties = {
-		'title': '',
-		'content': jQuery('<div>')
-			.css({'height': '68px'})
-			.append(jQuery('<div>')
-				.addClass('preloader-container')
-				.append(jQuery('<div>').addClass('preloader'))
-			),
-		'class': 'modal-popup',
-		'buttons': [],
-		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
-	};
+	var overlay = overlays_stack.getById(dialogueid);
+	if (!overlay) {
+		var wide_popup_actions = ['popup.generic', 'popup.scriptexec', 'dashboard.share.edit',
+				'dashboard.properties.edit', 'popup.services', 'popup.media', 'popup.preproctest.edit',
+				'popup.triggerexpr', 'popup.httpstep', 'popup.testtriggerexpr', 'popup.triggerwizard'
+			],
+			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.action.recovery',
+				'popup.action.acknowledge', 'popup.action.operation', 'popup.condition.operations',
+				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
+				'popup.mediatype.message'
+			],
+			dialogue_class = '';
 
-	var url = new Curl('zabbix.php');
-	url.setArgument('action', action);
+		if (wide_popup_actions.indexOf(action) !== -1) {
+			dialogue_class = ' modal-popup-generic';
+		}
+		else if (medium_popup_actions.indexOf(action) !== -1) {
+			dialogue_class = ' modal-popup-medium';
+		}
 
-	jQuery.ajax({
-		url: url.getUrl(),
-		type: 'post',
-		dataType: 'json',
-		data: options,
-		beforeSend: function(jqXHR) {
-			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
-		},
-		success: function(resp) {
+		overlay = overlayDialogue({
+			'dialogueid': dialogueid,
+			'title': '',
+			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
+			'class': 'modal-popup' + dialogue_class,
+			'buttons': [],
+			'element': trigger_elmnt,
+			'type': 'popup'
+		});
+	}
+
+	overlay
+		.load(action, options)
+		.then(function(resp) {
 			if (typeof resp.errors !== 'undefined') {
-				ovelay_properties['content'] = resp.errors;
+				overlay.setProperties({
+					content: resp.errors
+				});
 			}
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
@@ -470,65 +375,47 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
 				});
 
-				ovelay_properties['title'] = resp.header;
-				ovelay_properties['content'] = resp.body;
-				ovelay_properties['controls'] = resp.controls;
-				ovelay_properties['buttons'] = buttons;
-
-				if (typeof resp.debug !== 'undefined') {
-					ovelay_properties['debug'] = resp.debug;
-				}
-
-				if (typeof resp.script_inline !== 'undefined') {
-					ovelay_properties['script_inline'] = resp.script_inline;
-				}
+				overlay.setProperties({
+					title: resp.header,
+					content: resp.body,
+					controls: resp.controls,
+					buttons: buttons,
+					debug: resp.debug,
+					script_inline: resp.script_inline
+				});
 			}
 
-			overlayDialogue(ovelay_properties);
-		}
-	});
+			overlay.recoverFocus();
+			overlay.containFocus();
+		});
 
-	return false;
+	addToOverlaysStack(overlay);
+
+	return overlay;
 }
 
 /**
  * Function to add details about overlay UI elements in global overlays_stack variable.
  *
- * @param {string} id       Unique overlay element identifier.
- * @param {object} element  UI element which must be focused when overlay UI element will be closed.
- * @param {object} type     Type of overlay UI element.
- * @param {object} xhr      (optional) XHR request used to load content. Used to abort loading. Currently used with
- *                          type 'popup' only.
+ * @param {string|Overlay} id       Unique overlay element identifier or Overlay object.
+ * @param {object} element          UI element which must be focused when overlay UI element will be closed.
+ * @param {object} type             Type of overlay UI element.
+ * @param {object} xhr              (optional) XHR request used to load content. Used to abort loading. Currently used
+ *                                  with type 'popup' only.
  */
 function addToOverlaysStack(id, element, type, xhr) {
-	var index = null,
-		id = id.toString();
-
-	jQuery(overlays_stack).each(function(i, item) {
-		if (item.dialogueid === id) {
-			index = i;
-			return;
-		}
-	});
-
-	if (index === null) {
-		// Add new overlay.
-		overlays_stack.push({
-			dialogueid: id,
+	if (id instanceof Overlay) {
+		overlays_stack.pushUnique(id);
+	}
+	else {
+		overlays_stack.pushUnique({
+			dialogueid: id.toString(),
 			element: element,
 			type: type,
 			xhr: xhr
 		});
 	}
-	else {
-		overlays_stack[index]['element'] = element;
 
-		// Move existing overlay to the end of array.
-		overlays_stack.push(overlays_stack[index]);
-		overlays_stack.splice(index, 1);
-	}
-
-	// Only one instance of handler should be present at any time.
 	jQuery(document)
 		.off('keydown', closeDialogHandler)
 		.on('keydown', closeDialogHandler);
@@ -537,12 +424,12 @@ function addToOverlaysStack(id, element, type, xhr) {
 // Keydown handler. Closes last opened overlay UI element.
 function closeDialogHandler(event) {
 	if (event.which == 27) { // ESC
-		var dialog = overlays_stack[overlays_stack.length - 1];
+		var dialog = overlays_stack.end();
 		if (typeof dialog !== 'undefined') {
 			switch (dialog.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(dialog.dialogueid, dialog.xhr);
+					overlayDialogueDestroy(dialog.dialogueid);
 					break;
 
 				// Close overlay hintbox.
@@ -557,7 +444,7 @@ function closeDialogHandler(event) {
 
 				// Close context menu preloader.
 				case 'preloader':
-					overlayPreloaderDestroy(dialog.dialogueid, dialog.xhr);
+					overlayPreloaderDestroy(dialog.dialogueid);
 					break;
 
 				// Close overlay time picker.
@@ -597,24 +484,9 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
 		return_focus = true;
 	}
 
-	jQuery(overlays_stack).each(function(i, item) {
-		if (item.dialogueid === dialogueid) {
-			overlay = item,
-			index = i;
-			return;
-		}
-	});
-
-	var result = null;
-
-	if (overlay) {
-		// Focus UI element that was clicked to open an overlay.
-		if (return_focus) {
-			jQuery(overlay.element).focus();
-		}
-
-		// Remove dialogue from the stack.
-		result = overlays_stack.splice(index, 1)[0];
+	overlay = overlays_stack.removeById(dialogueid);
+	if (overlay && return_focus) {
+		jQuery(overlay.element).focus();
 	}
 
 	// Remove event listener.
@@ -622,8 +494,7 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
 		jQuery(document).off('keydown', closeDialogHandler);
 	}
 
-	// Return the removed layer.
-	return result;
+	return overlay;
 }
 
 /**
@@ -717,14 +588,14 @@ function addValues(frame, values, submit_parent) {
  * @param {string} parentid		parent id
  */
 function addSelectedValues(form, object, parentid) {
-	form = $(form);
+	form = document.getElementById(form);
 
 	if (typeof parentid === 'undefined') {
 		var parentid = null;
 	}
 
 	var data = {object: object, values: [], parentId: parentid};
-	var chk_boxes = form.getInputs('checkbox');
+	var chk_boxes = jQuery(form).find('input[type="checkbox"]');
 
 	for (var i = 0; i < chk_boxes.length; i++) {
 		if (chk_boxes[i].checked && (chk_boxes[i].name.indexOf('all_') < 0)) {
@@ -780,24 +651,26 @@ function add_media(formname, media, mediatypeid, sendto, period, active, severit
 /**
  * Send trigger expression form data to server for validation before adding it to trigger expression field.
  *
- * @param {string} formname		form name that is sent to server for validation
- * @param {string} dialogueid	(optional) id of overlay dialogue.
+ * @param {Overlay} overlay
  */
-function validate_trigger_expression(formname, dialogueid) {
-	var form = window.document.forms[formname],
-		url = new Curl(jQuery(form).attr('action')),
-		dialogueid = dialogueid || null;
+function validate_trigger_expression(overlay) {
+	var $form = overlay.$dialogue.find('form'),
+		url = new Curl($form.attr('action'));
 
 	url.setArgument('add', 1);
 
-	jQuery.ajax({
+	overlay.setLoading();
+	overlay.xhr = jQuery.ajax({
 		url: url.getUrl(),
-		data: jQuery(form).serialize(),
+		data: $form.serialize(),
+		complete: function() {
+			overlay.unsetLoading();
+		},
 		success: function(ret) {
-			jQuery(window.document.forms[formname]).parent().find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(window.document.forms[formname]));
+				jQuery(ret.errors).insertBefore($form);
 			}
 			else {
 				var form = window.document.forms[ret.dstfrm];
@@ -812,17 +685,15 @@ function validate_trigger_expression(formname, dialogueid) {
 					jQuery(obj).val(ret.expression);
 				}
 
-				if (dialogueid) {
-					overlayDialogueDestroy(dialogueid);
-				}
+				overlayDialogueDestroy(overlay.dialogueid);
 			}
 		},
 		dataType: 'json',
-		type: 'post'
+		type: 'POST'
 	});
 }
 
-function redirect(uri, method, needle, invert_needle, add_sid) {
+function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
 	method = (method || 'get').toLowerCase();
 	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
 
@@ -843,7 +714,7 @@ function redirect(uri, method, needle, invert_needle, add_sid) {
 
 		var args = url.getArguments();
 		for (var key in args) {
-			if (empty(args[key])) {
+			if (!allow_empty && empty(args[key])) {
 				continue;
 			}
 
@@ -907,23 +778,6 @@ function showHideVisible(obj) {
 	}
 	else {
 		obj.style.visibility = 'visible';
-	}
-}
-
-function showHideByName(name, style) {
-	if (typeof(style) == 'undefined') {
-		style = 'none';
-	}
-
-	var objs = $$('[name=' + name + ']');
-
-	if (empty(objs)) {
-		throw 'showHideByName(): Object not found.';
-	}
-
-	for (var i = 0; i < objs.length; i++) {
-		var obj = objs[i];
-		obj.style.display = style;
 	}
 }
 
@@ -1038,3 +892,21 @@ function submitFormWithParam(form_name, input_name, input_value) {
 	document.forms[form_name].appendChild(input);
 	jQuery(document.forms[form_name]).trigger('submit');
 }
+
+if (typeof Element.prototype.remove === 'undefined') {
+	Element.prototype.remove = function() {
+		this.parentNode.removeChild(this);
+		return this;
+	};
+}
+
+/**
+ * @deprecated use native bind method
+ */
+Function.prototype.bindAsEventListener = function (context) {
+	var method = this, args = Array.prototype.slice.call(arguments, 1);
+
+	return function(event) {
+		return method.apply(context, [event || window.event].concat(args));
+	};
+};

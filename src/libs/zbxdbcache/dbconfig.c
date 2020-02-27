@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2275,7 +2275,6 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 		return;
 
 	pair.first = dep_itemid;
-	pair.second = 0;
 	if (FAIL == (index = zbx_vector_uint64_pair_search(&masteritem->dep_itemids, pair,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 	{
@@ -3655,8 +3654,16 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(actionid, row[0]);
 		action = (zbx_dc_action_t *)DCfind_id(&config->actions, actionid, sizeof(zbx_dc_action_t), &found);
 
+		ZBX_STR2UCHAR(action->eventsource, row[1]);
+		ZBX_STR2UCHAR(action->evaltype, row[2]);
+
+		DCstrpool_replace(found, &action->formula, row[3]);
+
 		if (0 == found)
 		{
+			if (EVENT_SOURCE_INTERNAL == action->eventsource)
+				config->internal_actions++;
+
 			zbx_vector_ptr_create_ext(&action->conditions, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
 
@@ -3664,11 +3671,6 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 
 			action->opflags = ZBX_ACTION_OPCLASS_NONE;
 		}
-
-		ZBX_STR2UCHAR(action->eventsource, row[1]);
-		ZBX_STR2UCHAR(action->evaltype, row[2]);
-
-		DCstrpool_replace(found, &action->formula, row[3]);
 	}
 
 	/* remove deleted actions */
@@ -3676,6 +3678,9 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 	{
 		if (NULL == (action = (zbx_dc_action_t *)zbx_hashset_search(&config->actions, &rowid)))
 			continue;
+
+		if (EVENT_SOURCE_INTERNAL == action->eventsource)
+			config->internal_actions--;
 
 		zbx_strpool_release(action->formula);
 		zbx_vector_ptr_destroy(&action->conditions);
@@ -5526,12 +5531,19 @@ void	DCsync_configuration(unsigned char mode)
 
 		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
+out:
+	if (0 == sync_in_progress)
+	{
+		/* non recoverable database error is encountered */
+		THIS_SHOULD_NEVER_HAPPEN;
+		START_SYNC;
+	}
 
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
 	FINISH_SYNC;
-out:
+
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
 	zbx_dbsync_clear(&hosts_sync);
@@ -6041,6 +6053,8 @@ int	init_configuration_cache(char **error)
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
+
+	config->internal_actions = 0;
 
 	/* maintenance data are used only when timers are defined (server) */
 	if (0 != CONFIG_TIMER_FORKS)
@@ -9228,6 +9242,14 @@ int	DCconfig_get_last_sync_time(void)
 	return config->sync_ts;
 }
 
+void	DCconfig_wait_sync(void)
+{
+	struct timespec	ts = {0, 1e8};
+
+	while (0 == config->sync_ts)
+		nanosleep(&ts, NULL);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_proxypoller_hosts                                   *
@@ -10504,6 +10526,28 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __func__, hosts->num_data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_internal_action_count                                      *
+ *                                                                            *
+ * Purpose: get number of enabled internal actions                            *
+ *                                                                            *
+ * Return value: number of enabled internal actions                           *
+ *                                                                            *
+ ******************************************************************************/
+unsigned int	DCget_internal_action_count(void)
+{
+	unsigned int count;
+
+	RDLOCK_CACHE;
+
+	count = config->internal_actions;
+
+	UNLOCK_CACHE;
+
+	return count;
 }
 
 /******************************************************************************

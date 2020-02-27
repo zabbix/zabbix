@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -168,7 +168,7 @@ static int	get_housekeeper_period(double time_slept)
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
-	int	records, start, sleeptime = 0;
+	int	records, start, sleeptime;
 	double	sec, time_slept, time_now;
 	char	sleeptext[25];
 

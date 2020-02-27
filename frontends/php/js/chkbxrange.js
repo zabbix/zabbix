@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ var chkbxRange = {
 	 */
 	handleClick: function(e) {
 		e = e || window.event;
-		var checkbox = Event.element(e);
+		var checkbox = e.target;
 
 		PageRefresh.restart();
 
@@ -327,7 +327,9 @@ var chkbxRange = {
 			form = footerButton.closest('form'),
 			confirmText = footerButton.attr('confirm');
 		if (confirmText && !confirm(confirmText)) {
-			Event.stop(e);
+			e.preventDefault();
+			e.stopPropagation();
+
 			return false;
 		}
 

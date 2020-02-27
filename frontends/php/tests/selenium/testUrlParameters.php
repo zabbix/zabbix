@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -584,57 +584,54 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Latest data [refreshed every 30 sec.]',
+				'title' => 'Latest data',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'latest.php?groupid=4&hostid=50009',
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=4&filter_hostids[]=50009',
 						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'latest.php?groupids[]=9999999&hostids[]=50009',
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=9999999&filter_hostids[]=50009',
+						'text_present' => 'Latest data'
+					],
+					[
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=4&filter_hostids[]=9999999',
+						'text_present' => 'Latest data'
+					],
+					[
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=abc&filter_hostids[]=abc',
 						'text_not_present' => 'Latest data',
+						'fatal_error' => true,
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_groupids" field.',
+							'Incorrect value for "filter_hostids" field.'
 						]
 					],
 					[
-						'url' => 'latest.php?groupids[]=4&hostids[]=9999999',
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=&filter_hostids[]=',
 						'text_not_present' => 'Latest data',
+						'fatal_error' => true,
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_groupids" field.',
+							'Incorrect value for "filter_hostids" field.'
 						]
 					],
 					[
-						'url' => 'latest.php?groupids[]=abc&hostids[]=abc',
+						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=-1&filter_hostids[]=-1',
 						'text_not_present' => 'Latest data',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupids" is not integer.',
-							'Field "hostids" is not integer.'
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_groupids" field.',
+							'Incorrect value for "filter_hostids" field.'
 						]
 					],
 					[
-						'url' => 'latest.php?groupids[]=&hostids[]=',
-						'text_not_present' => 'Latest data',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupids" is not integer.',
-							'Field "hostids" is not integer.'
-						]
-					],
-					[
-						'url' => 'latest.php?groupids[]=-1&hostids[]=-1',
-						'text_not_present' => 'Latest data',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value for "groupids" field.',
-							'Incorrect value for "hostids" field.'
-						]
-					],
-					[
-						'url' => 'latest.php',
+						'url' => 'zabbix.php?action=latest.view',
 						'text_present' => 'Latest data'
 					]
 				]
@@ -1129,7 +1126,12 @@ class testUrlParameters extends CLegacyWebTest {
 	public function testUrlParameters_UrlLoad($title, $check_server_name, $server_name_on_page, $test_cases) {
 		foreach ($test_cases as $test_case) {
 			$this->zbxTestLogin($test_case['url'], $server_name_on_page);
-			$this->zbxTestCheckTitle($title, $check_server_name);
+			if (array_key_exists('fatal_error', $test_case)) {
+				$this->zbxTestCheckTitle('Fatal error, please report to the Zabbix team', false);
+			}
+			else {
+				$this->zbxTestCheckTitle($title, $check_server_name);
+			}
 			$this->zbxTestTextPresent($test_case['text_present']);
 			if (isset($test_case['text_not_present'])) {
 				$this->zbxTestHeaderNotPresent($test_case['text_not_present']);

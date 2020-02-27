@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,13 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.mediatype.edit.js.php');
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('multilineinput.js');
+
+$this->includeJsFile('administration.mediatype.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Media types'));
 
@@ -259,6 +264,33 @@ $mediatype_formlist
 	);
 $tabs->addTab('mediaTab', _('Media type'), $mediatype_formlist);
 
+// Message templates tab.
+$message_templates_formlist = (new CFormList('messageTemplatesFormlist'))
+	->addRow(null,
+		(new CDiv(
+			(new CTable())
+				->addStyle('width: 100%;')
+				->setHeader([
+					_('Message type'),
+					_('Template'),
+					_('Actions')
+				])
+				->setFooter(
+					(new CRow(
+						(new CCol(
+							(new CSimpleButton(_('Add')))
+								->setAttribute('data-action', 'add')
+								->addClass(ZBX_STYLE_BTN_LINK)
+						))->setColSpan(3)
+					))->setId('message-templates-footer')
+				)
+		))
+			->setId('message-templates')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
+$tabs->addTab('messageTemplatesTab', _('Message templates'), $message_templates_formlist);
+
 // media options tab
 $max_sessions = ($data['maxsessions'] > 1) ? $data['maxsessions'] : 0;
 if ($data['type'] == MEDIA_TYPE_SMS) {
@@ -306,7 +338,10 @@ $mediaOptionsForm = (new CFormList('options'))
 $tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm);
 
 // append buttons to form
-$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list'))->setId('cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'mediatype.list')
+	->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
+))->setId('cancel');
 
 if ($data['mediatypeid'] == 0) {
 	$addButton = (new CSubmitButton(_('Add'), 'action', 'mediatype.create'))->setId('add');

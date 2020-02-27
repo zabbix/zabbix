@@ -513,6 +513,22 @@ out:
   return: SUCCEED
   value: 5
 ---
+test case: Query $.bad.path.first().length()
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.bad.path.first().length()
+out:
+  return: FAIL
+---
+test case: Query $.[?(@.ElementName == "test")].values.first().length()
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.[?(@.ElementName == "test")].values.first().length()
+out:
+  return: FAIL
+---
 test case: Query $.length() from ["a", "b"] 
 in:
   data: '["a", "b"]'

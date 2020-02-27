@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,6 @@ $fields = [
 									null
 								],
 	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'add_template' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	'add_templates' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'templates_rem' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
 	'clear_templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
@@ -248,10 +247,10 @@ foreach ($tags as $key => $tag) {
 	}
 }
 
-// remove inherited macros data (actions: 'add', 'update' and 'form')
+// Remove inherited macros data (actions: 'add', 'update' and 'form').
 $macros = cleanInheritedMacros(getRequest('macros', []));
 
-// remove empty new macro lines
+// Remove empty new macro lines.
 foreach ($macros as $idx => $macro) {
 	if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
 			&& $macro['description'] === '') {
@@ -262,10 +261,6 @@ foreach ($macros as $idx => $macro) {
 /*
  * Actions
  */
-if (hasRequest('add_template') && hasRequest('add_templates')) {
-	$_REQUEST['templates'] = getRequest('templates', []);
-	$_REQUEST['templates'] = array_merge($_REQUEST['templates'], $_REQUEST['add_templates']);
-}
 if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 	$_REQUEST['clear_templates'] = getRequest('clear_templates', []);
 
@@ -603,11 +598,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			];
 		}
 		else {
-			// templates
+			// Linked templates.
 			$templates = [];
 
-			foreach (getRequest('templates', []) as $templateId) {
-				$templates[] = ['templateid' => $templateId];
+			foreach (array_merge(getRequest('templates', []), getRequest('add_templates', [])) as $templateid) {
+				$templates[] = ['templateid' => $templateid];
 			}
 
 			// interfaces
@@ -977,6 +972,7 @@ elseif (hasRequest('form')) {
 
 		// Templates
 		'templates' => getRequest('templates', []),
+		'add_templates' => [],
 		'clear_templates' => getRequest('clear_templates', []),
 		'original_templates' => [],
 		'linked_templates' => [],
@@ -1144,6 +1140,8 @@ elseif (hasRequest('form')) {
 		$groups = getRequest('groups', []);
 	}
 
+	$data['readonly'] = ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
+
 	if ($data['hostid'] != 0) {
 		// get items that populate host inventory fields
 		$data['inventory_items'] = API::Item()->get([
@@ -1188,13 +1186,17 @@ elseif (hasRequest('form')) {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
-	// macros
+	// Add inherited macros to host macros.
 	if ($data['show_inherited_macros']) {
-		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros($data['templates']));
+		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(
+			array_merge($data['templates'], getRequest('add_templates', []))
+		));
 	}
+
+	// Sort only after inherited macros are added. Otherwise the list will look chaotic.
 	$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 
-	if (!$data['macros'] && $data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	if (!$data['macros'] && !$data['readonly']) {
 		$macro = ['macro' => '', 'value' => '', 'description' => ''];
 		if ($data['show_inherited_macros']) {
 			$macro['type'] = ZBX_PROPERTY_OWN;
@@ -1252,20 +1254,41 @@ elseif (hasRequest('form')) {
 	}
 	CArrayHelper::sort($data['groups_ms'], ['name']);
 
-	if ($data['templates']) {
-		$data['linked_templates'] = API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $data['templates']
-		]);
-		CArrayHelper::sort($data['linked_templates'], ['name']);
+	// Add already linked and new templates.
+	$request_add_templates = getRequest('add_templates', []);
 
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => $data['templates'],
-			'editable' => true,
+	if ($data['templates'] || $request_add_templates) {
+		$templates = API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => array_merge($data['templates'], $request_add_templates),
 			'preservekeys' => true
 		]);
+
+		$data['linked_templates'] = array_intersect_key($templates, array_flip($data['templates']));
+		CArrayHelper::sort($data['linked_templates'], ['name']);
+
+		$data['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
+
+		foreach ($data['add_templates'] as &$template) {
+			$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
+		}
+		unset($template);
+
+		if ($data['templates']) {
+			$data['writable_templates'] = API::Template()->get([
+				'output' => ['templateid'],
+				'templateids' => $data['templates'],
+				'editable' => true,
+				'preservekeys' => true
+			]);
+		}
 	}
+
+	// This data is used in common.template.edit.js.php.
+	$data['macros_tab'] = [
+		'linked_templates' => array_map('strval', array_keys($data['linked_templates'])),
+		'add_templates' => array_map('strval', array_keys($data['add_templates']))
+	];
 
 	$hostView = new CView('configuration.host.edit', $data);
 }
@@ -1328,10 +1351,22 @@ else {
 	}
 	order_result($hosts, $sortField, $sortOrder);
 
-	$url = (new CUrl('hosts.php'))
-		->setArgument('groupid', $pageFilter->groupid);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$pagingLine = getPagingLine($hosts, $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$pagingLine = CPagerHelper::paginate($page_num, $hosts, $sortOrder,
+		(new CUrl('hosts.php'))->setArgument('groupid', $pageFilter->groupid)
+	);
 
 	$hosts = API::Host()->get([
 		'output' => API_OUTPUT_EXTEND,
@@ -1436,6 +1471,7 @@ else {
 		'pageFilter' => $pageFilter,
 		'hosts' => $hosts,
 		'paging' => $pagingLine,
+		'page' => $page_num,
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
@@ -1454,7 +1490,6 @@ else {
 	$hostView = new CView('configuration.host.list', $data);
 }
 
-$hostView->render();
-$hostView->show();
+echo $hostView->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

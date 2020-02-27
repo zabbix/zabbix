@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-01-14T07:19:05Z</date>
+    <media_types>
+        <media_type>
+            <name>Slack</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>zabbix_url</name>
+                    <value>{$ZABBIX.URL}</value>
+                </parameter>
+                <parameter>
+                    <name>bot_token</name>
+                    <value>&lt;PLACE YOUR KEY HERE&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>channel</name>
+                    <value>{ALERT.SENDTO}</value>
+                </parameter>
+                <parameter>
+                    <name>slack_mode</name>
+                    <value>alarm</value>
+                </parameter>
+                <parameter>
+                    <name>slack_as_user</name>
+                    <value>true</value>
+                </parameter>
+                <parameter>
+                    <name>slack_endpoint</name>
+                    <value>https://slack.com/api/</value>
+                </parameter>
+                <parameter>
+                    <name>event_tags</name>
+                    <value>{EVENT.TAGS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_name</name>
+                    <value>{EVENT.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>event_nseverity</name>
+                    <value>{EVENT.NSEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>event_ack_status</name>
+                    <value>{EVENT.ACK.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_value</name>
+                    <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_status</name>
+                    <value>{EVENT.UPDATE.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_date</name>
+                    <value>{EVENT.DATE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_time</name>
+                    <value>{EVENT.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>event_severity</name>
+                    <value>{EVENT.SEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>event_opdata</name>
+                    <value>{EVENT.OPDATA}</value>
+                </parameter>
+                <parameter>
+                    <name>event_id</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_message</name>
+                    <value>{EVENT.UPDATE.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>trigger_id</name>
+                    <value>{TRIGGER.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>trigger_description</name>
+                    <value>{TRIGGER.DESCRIPTION}</value>
+                </parameter>
+                <parameter>
+                    <name>host_name</name>
+                    <value>{HOST.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>host_ip</name>
+                    <value>{HOST.IP}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_date</name>
+                    <value>{EVENT.UPDATE.DATE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_time</name>
+                    <value>{EVENT.UPDATE.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>event_recovery_date</name>
+                    <value>{EVENT.RECOVERY.DATE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_recovery_time</name>
+                    <value>{EVENT.RECOVERY.TIME}</value>
+                </parameter>
+            </parameters>
+            <script>var SEVERITY_COLORS = [&#13;
+	'#97AAB3', '#7499FF', '#FFC859',&#13;
+	'#FFA059', '#E97659', '#E45959'&#13;
+	];&#13;
+&#13;
+var RESOLVE_COLOR = '#009900';&#13;
+&#13;
+var SLACK_MODE_HANDLERS = {&#13;
+	alarm: handlerAlarm,&#13;
+	event: handlerEvent&#13;
+};&#13;
+&#13;
+var EVENT_STATUS = {&#13;
+	PROBLEM: 'PROBLEM',&#13;
+	UPDATE: 'UPDATE',&#13;
+	RESOLVE: 'OK'&#13;
+}&#13;
+&#13;
+if (!String.prototype.format) {&#13;
+ 	String.prototype.format = function() {&#13;
+   		var args = arguments;&#13;
+   		return this.replace(/{(\d+)}/g, function(match, number) { &#13;
+			return number in args&#13;
+				? args[number]&#13;
+				: match&#13;
+			;&#13;
+		});&#13;
+	};&#13;
+}&#13;
+&#13;
+function isEventProblem(params) {&#13;
+	return params.event_value == 1&#13;
+		&amp;&amp; params.event_update_status == 0&#13;
+		;&#13;
+}&#13;
+&#13;
+function isEventUpdate(params) {&#13;
+	return params.event_value == 1&#13;
+		&amp;&amp; params.event_update_status == 1&#13;
+		// &amp;&amp; params.event_ack_status == 'Yes'&#13;
+		;&#13;
+}&#13;
+&#13;
+function isEventResolve(params) {&#13;
+	return params.event_value == 0;&#13;
+}&#13;
+&#13;
+function getPermalink(channelId, messageTimestamp) {&#13;
+	var req = new CurlHttpRequest();&#13;
+	req.AddHeader('Content-Type: application/x-www-form-urlencoded; charset=utf-8');&#13;
+&#13;
+	var resp = JSON.parse(req.Get(&#13;
+		'{0}?token={1}&amp;channel={2}&amp;message_ts={3}'.format(&#13;
+			Slack.getPermalink,&#13;
+			params.bot_token,&#13;
+			channelId,&#13;
+			messageTimestamp&#13;
+			)&#13;
+		));&#13;
+	&#13;
+	if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+		throw resp.error;&#13;
+	}&#13;
+&#13;
+	return resp.permalink;&#13;
+}&#13;
+&#13;
+function createProblemURL(zabbixURL, triggerId, eventId) {&#13;
+	var problemURL = '{0}/tr_events.php?triggerid={1}&amp;eventid={2}'&#13;
+		.format(&#13;
+			zabbixURL.replace(/\/+$/, ''),&#13;
+			triggerId,&#13;
+			eventId&#13;
+		);&#13;
+&#13;
+	return problemURL&#13;
+}&#13;
+&#13;
+function getTagValue(eventTags, key) {&#13;
+	var pattern = new RegExp('(' + key + ':.+)');&#13;
+	var tagValue = eventTags&#13;
+		.split(',')&#13;
+		.filter(function (v) {return v.match(pattern)})&#13;
+		.map(function (v) {return v.split(':')[1]})[0]&#13;
+		|| 0;&#13;
+&#13;
+	return tagValue;&#13;
+}&#13;
+&#13;
+function handlerAlarm(params) {&#13;
+	var fields = {&#13;
+		channel: params.channel,&#13;
+		as_user: params.slack_as_user,&#13;
+	}&#13;
+&#13;
+	if (isEventProblem(params)) {&#13;
+		fields.attachments = [&#13;
+			createMessage(&#13;
+				EVENT_STATUS.PROBLEM,&#13;
+				SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
+				params.event_date,&#13;
+				params.event_time,&#13;
+				createProblemURL(params.zabbix_url, params.trigger_id, params.event_id)&#13;
+				)&#13;
+			];&#13;
+&#13;
+		var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
+		if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+			throw resp.error;&#13;
+		}&#13;
+&#13;
+		result.tags.__message_ts = resp.ts;&#13;
+		result.tags.__channel_id = resp.channel;&#13;
+		result.tags.__channel_name = params.channel;&#13;
+		result.tags.__message_link = getPermalink(resp.channel, resp.ts);&#13;
+	&#13;
+	} else if (isEventUpdate(params)) {&#13;
+		fields.thread_ts = getTagValue(params.event_tags, 'message_ts');&#13;
+		fields.attachments = [&#13;
+			createMessage(&#13;
+				EVENT_STATUS.UPDATE,&#13;
+				SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
+				params.event_update_date,&#13;
+				params.event_update_time,&#13;
+				createProblemURL(params.zabbix_url, params.trigger_id, params.event_id),&#13;
+				true,&#13;
+				params.event_update_message&#13;
+				)&#13;
+			];&#13;
+&#13;
+		var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
+		if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+			throw resp.error;&#13;
+		}&#13;
+&#13;
+	} else if (isEventResolve(params)) {&#13;
+		fields.channel = getTagValue(params.event_tags, 'channel_id');&#13;
+		fields.text = '';&#13;
+		fields.ts = getTagValue(params.event_tags, 'message_ts');&#13;
+		fields.attachments = [&#13;
+			createMessage(&#13;
+				EVENT_STATUS.RESOLVE,&#13;
+				RESOLVE_COLOR,&#13;
+				params.event_date,&#13;
+				params.event_time,&#13;
+				createProblemURL(params.zabbix_url, params.trigger_id, params.event_id)&#13;
+				)&#13;
+			];&#13;
+&#13;
+		var resp = JSON.parse(req.Post(Slack.chatUpdate, JSON.stringify(fields)));&#13;
+		if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+			throw resp.error;&#13;
+		}&#13;
+	}&#13;
+}&#13;
+&#13;
+function handlerEvent(params) {&#13;
+	var fields = {&#13;
+		channel: params.channel,&#13;
+		as_user: params.slack_as_user&#13;
+	}&#13;
+&#13;
+	if (isEventProblem(params)) {&#13;
+		fields.attachments = [&#13;
+			createMessage(&#13;
+				EVENT_STATUS.PROBLEM,&#13;
+				SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
+				params.event_date,&#13;
+				params.event_time,&#13;
+				createProblemURL(params.zabbix_url, params.trigger_id, params.event_id)&#13;
+				)&#13;
+			];&#13;
+&#13;
+		var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
+		if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+			throw resp.error;&#13;
+		}&#13;
+&#13;
+		result.tags.__channel_name = params.channel;&#13;
+		result.tags.__message_link = getPermalink(resp.channel, resp.ts);&#13;
+	&#13;
+	} else if (isEventUpdate(params)) {&#13;
+		fields.attachments = [&#13;
+			createMessage(&#13;
+				EVENT_STATUS.UPDATE,&#13;
+				SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
+				params.event_update_date,&#13;
+				params.event_update_time,&#13;
+				createProblemURL(params.zabbix_url, params.trigger_id, params.event_id),&#13;
+				false,&#13;
+				params.event_update_message&#13;
+				)&#13;
+			];&#13;
+		&#13;
+		var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
+		if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+			throw resp.error;&#13;
+		}&#13;
+&#13;
+	} else if (isEventResolve(params)) {&#13;
+		fields.attachments = [&#13;
+			createMessage(&#13;
+				EVENT_STATUS.RESOLVE,&#13;
+				RESOLVE_COLOR,&#13;
+				params.event_recovery_date,&#13;
+				params.event_recovery_time,&#13;
+				createProblemURL(params.zabbix_url, params.trigger_id, params.event_id)&#13;
+				)&#13;
+			];&#13;
+&#13;
+		var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
+		if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+			throw resp.error;&#13;
+		}&#13;
+	}&#13;
+}	&#13;
+&#13;
+function createMessage(&#13;
+	status,&#13;
+	eventSeverityColor,&#13;
+	eventDate,&#13;
+	eventTime,&#13;
+	problemURL,&#13;
+	isShort,&#13;
+	messageText&#13;
+	) {&#13;
+	var message = {&#13;
+		'fallback': '{0}: {1}'.format(status, params.event_name),&#13;
+		'title': '{0}: {1}'.format(status, params.event_name),&#13;
+		'color': eventSeverityColor,&#13;
+		'title_link': problemURL,&#13;
+		'pretext': messageText || '',&#13;
+		&#13;
+		'fields': [&#13;
+			{&#13;
+				'title': 'Host',&#13;
+				'value': '{0} [{1}]'.format(params.host_name, params.host_ip),&#13;
+				'short': true&#13;
+			},&#13;
+			{&#13;
+				'title': 'Event time',&#13;
+				'value': '{0} {1}'.format(eventDate, eventTime),&#13;
+				'short': true&#13;
+			},&#13;
+			{&#13;
+				'title': 'Severity',&#13;
+				'value': params.event_severity,&#13;
+				'short': true&#13;
+			},&#13;
+			{&#13;
+				'title': 'Opdata',&#13;
+				'value': params.event_opdata,&#13;
+				'short': true&#13;
+			}&#13;
+		],&#13;
+	};&#13;
+&#13;
+	if (!isShort) {&#13;
+		message['actions'] = [&#13;
+			{&#13;
+                &quot;type&quot;: &quot;button&quot;,&#13;
+                &quot;text&quot;: &quot;Open in Zabbix&quot;,&#13;
+                &quot;url&quot;: problemURL&#13;
+            }&#13;
+		];&#13;
+&#13;
+		message.fields.push(&#13;
+			{&#13;
+				'title': 'Event tags',&#13;
+				'value': params.event_tags.replace(/__.+?:(.+?,|.+)/g, '') || 'None',&#13;
+				'short': true&#13;
+			},&#13;
+			{&#13;
+				'title': 'Trigger description',&#13;
+				'value': params.trigger_description,&#13;
+				'short': true&#13;
+			}&#13;
+			)&#13;
+	}&#13;
+&#13;
+	return message;&#13;
+}&#13;
+&#13;
+try {&#13;
+	var params = JSON.parse(value),&#13;
+		req = new CurlHttpRequest(),&#13;
+		fields = {},&#13;
+		result = {tags: {}};&#13;
+&#13;
+&#13;
+	req.AddHeader('Content-Type: application/json; charset=utf-8');&#13;
+	req.AddHeader('Authorization: Bearer ' + params.bot_token)&#13;
+&#13;
+	var Slack = {&#13;
+		postMessage: params.slack_endpoint + 'chat.postMessage',&#13;
+		getPermalink: params.slack_endpoint + 'chat.getPermalink',&#13;
+		chatUpdate: params.slack_endpoint + 'chat.update'&#13;
+	}&#13;
+&#13;
+	params.slack_mode = params.slack_mode.toLowerCase();&#13;
+	params.slack_mode = params.slack_mode in SLACK_MODE_HANDLERS&#13;
+		? params.slack_mode&#13;
+		: 'alarm';&#13;
+&#13;
+	SLACK_MODE_HANDLERS[params.slack_mode](params);&#13;
+	return JSON.stringify(result);&#13;
+&#13;
+} catch (error) {&#13;
+	Zabbix.Log(3, 'Slack notification failed : ' + error);&#13;
+	throw 'Slack notification failed : ' + error;&#13;
+}</script>
+            <process_tags>YES</process_tags>
+            <show_event_menu>YES</show_event_menu>
+            <event_menu_url>{EVENT.TAGS.__message_link}</event_menu_url>
+            <event_menu_name>Open in Slack: {EVENT.TAGS.__channel_name}</event_menu_name>
+        </media_type>
+    </media_types>
+</zabbix_export>

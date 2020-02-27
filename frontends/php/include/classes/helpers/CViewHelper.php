@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,16 +20,16 @@
 
 
 /**
- * A helper class for generating HTML snippets.
+ * A helper class for CView related tasks.
  */
 class CViewHelper {
 
 	/**
-	 * Generates </a>&nbsp;<sup>num</sup>" to be used in tables. Null is returned if equal to zero.
+	 * Generate </a>&nbsp;<sup>num</sup>" to be used in tables. Null is returned if equal to zero.
 	 *
 	 * @static
 	 *
-	 * @param integer $num
+	 * @param int $num
 	 *
 	 * @return mixed
 	 */
@@ -39,5 +39,27 @@ class CViewHelper {
 		}
 
 		return [SPACE, new CSup($num)];
+	}
+
+	/**
+	 * Save web layout mode into user's profile.
+	 *
+	 * @static
+	 *
+	 * @param int $layout_mode  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_FULLSCREEN | ZBX_LAYOUT_KIOSKMODE
+	 */
+	public static function saveLayoutMode($layout_mode) {
+		CProfile::update('web.layout.mode', $layout_mode, PROFILE_TYPE_INT);
+	}
+
+	/**
+	 * Load web layout mode from user's profile.
+	 *
+	 * @static
+	 *
+	 * @return int  Stored web layout mode (ZBX_LAYOUT_NORMAL by default).
+	 */
+	public static function loadLayoutMode() {
+		return (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 	}
 }

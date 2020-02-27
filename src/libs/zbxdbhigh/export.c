@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@ static FILE	*trends_file;
 static char	*problems_file_name;
 static FILE	*problems_file;
 static char	*export_dir;
-
-#define ZBX_EXPORT_WAIT_FAIL 10
 
 int	zbx_is_export_enabled(void)
 {
@@ -111,53 +109,93 @@ void	zbx_problems_export_init(const char *process_name, int process_num)
 	}
 }
 
-static	void	file_write(const char *buf, size_t count, FILE **file, const char *name)
+static void	file_write(const char *buf, size_t count, FILE **file, const char *name)
 {
-	size_t	ret;
+#define ZBX_LOGGING_SUSPEND_TIME	10
 
-	if (CONFIG_EXPORT_FILE_SIZE <= count + ftell(*file) + 1)
+	static time_t	last_log_time = 0;
+	time_t		now;
+	char		log_str[MAX_STRING_LEN];
+	long		file_offset;
+	size_t		log_str_offset = 0;
+
+	if (NULL == *file && (NULL == (*file = fopen(name, "a"))))
+	{
+		log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
+				name, zbx_strerror(errno));
+		goto error;
+	}
+
+	if (-1 == (file_offset = ftell(*file)))
+	{
+		log_str_offset = zbx_snprintf(log_str, sizeof(log_str),
+				"cannot get current position in export file '%s': %s", name, zbx_strerror(errno));
+		goto error;
+	}
+
+	if (CONFIG_EXPORT_FILE_SIZE <= count + (size_t)file_offset + 1)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
 		strscpy(filename_old, name);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
-		remove(filename_old);
-		zbx_fclose(*file);
 
-		while (0 != rename(name, filename_old))
+		if (0 == access(filename_old, F_OK) && 0 != remove(filename_old))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot rename export file '%s': %s: retrying in %d seconds",
-					name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
-			sleep(ZBX_EXPORT_WAIT_FAIL);
+			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot remove export file '%s': %s",
+					filename_old, zbx_strerror(errno));
+			goto error;
 		}
 
-		while (NULL == (*file = fopen(name, "a")))
+		if (0 != fclose(*file))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot open export file '%s': %s: retrying in %d seconds",
-					name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
-			sleep(ZBX_EXPORT_WAIT_FAIL);
+			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot close export file %s': %s",
+					name, zbx_strerror(errno));
+			*file = NULL;
+			goto error;
+		}
+		*file = NULL;
+
+		if (0 != rename(name, filename_old))
+		{
+			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot rename export file '%s': %s",
+					name, zbx_strerror(errno));
+			goto error;
+		}
+
+		if (NULL == (*file = fopen(name, "a")))
+		{
+			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
+					name, zbx_strerror(errno));
+			goto error;
 		}
 	}
 
-	while (0 < count)
+	if (count != fwrite(buf, 1, count, *file) || '\n' != fputc('\n', *file))
 	{
-		if (count != (ret = (fwrite(buf, 1, count, *file))))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot write to export file '%s': %s: retrying in %d seconds",
-					name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
-			sleep(ZBX_EXPORT_WAIT_FAIL);
-		}
-
-		buf += ret;
-		count -= ret;
+		log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot write to export file '%s': %s",
+				name, zbx_strerror(errno));
+		goto error;
 	}
 
-	while ('\n' != fputc('\n', *file))
+	return;
+error:
+	if (NULL != *file && 0 != fclose(*file))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot write to export file '%s': %s: retrying in %d seconds",
-				name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
-		sleep(ZBX_EXPORT_WAIT_FAIL);
+		zbx_snprintf(log_str + log_str_offset, sizeof(log_str) - log_str_offset,
+				"; cannot close export file %s': %s", name, zbx_strerror(errno));
 	}
+
+	*file = NULL;
+	now = time(NULL);
+
+	if (ZBX_LOGGING_SUSPEND_TIME < now - last_log_time)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s", log_str);
+		last_log_time = now;
+	}
+
+#undef ZBX_LOGGING_SUSPEND_TIME
 }
 
 void	zbx_problems_export_write(const char *buf, size_t count)
@@ -175,29 +213,26 @@ void	zbx_trends_export_write(const char *buf, size_t count)
 	file_write(buf, count, &trends_file, trends_file_name);
 }
 
+static void	zbx_flush(FILE *file, const char *file_name)
+{
+	if (0 != fflush(file))
+		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file_name, zbx_strerror(errno));
+}
+
 void	zbx_problems_export_flush(void)
 {
-	if (0 != fflush(problems_file))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot flush export file '%s': %s", problems_file_name,
-				zbx_strerror(errno));
-	}
+	if (NULL != problems_file)
+		zbx_flush(problems_file, problems_file_name);
 }
 
 void	zbx_history_export_flush(void)
 {
-	if (0 != fflush(history_file))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", history_file_name,
-				zbx_strerror(errno));
-	}
+	if (NULL != history_file)
+		zbx_flush(history_file, history_file_name);
 }
 
 void	zbx_trends_export_flush(void)
 {
-	if (0 != fflush(trends_file))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", trends_file_name,
-				zbx_strerror(errno));
-	}
+	if (NULL != trends_file)
+		zbx_flush(trends_file, trends_file_name);
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,15 @@ type Accessor interface {
 	Name() string
 	Capacity() int
 	SetCapacity(capactity int)
+}
+
+type Logger interface {
+	Tracef(format string, args ...interface{})
+	Debugf(format string, args ...interface{})
+	Warningf(format string, args ...interface{})
+	Infof(format string, args ...interface{})
+	Errf(format string, args ...interface{})
+	Critf(format string, args ...interface{})
 }
 
 type Base struct {

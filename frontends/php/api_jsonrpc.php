@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,13 +46,13 @@ if (!isset($allowed_content[$content_type])) {
 	return;
 }
 
-require_once dirname(__FILE__).'/include/classes/core/Z.php';
+require_once dirname(__FILE__).'/include/classes/core/APP.php';
 
 header('Content-Type: application/json');
 $data = $http_request->body();
 
 try {
-	Z::getInstance()->run(ZBase::EXEC_MODE_API);
+	APP::getInstance()->run(APP::EXEC_MODE_API);
 
 	$apiClient = API::getWrapper()->getClient();
 
@@ -64,7 +64,7 @@ try {
 }
 catch (Exception $e) {
 	// decode input json request to get request's id
-	$jsonData = CJs::decodeJson($data);
+	$jsonData = json_decode($data, true);
 
 	$response = [
 		'jsonrpc' => '2.0',
@@ -76,5 +76,5 @@ catch (Exception $e) {
 		'id' => (isset($jsonData['id']) ? $jsonData['id'] : null)
 	];
 
-	echo CJs::encodeJson($response);
+	echo json_encode($response);
 }

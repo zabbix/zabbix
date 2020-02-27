@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,8 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						$values = [''];
 					}
 
-					foreach ($values as $value) {
+					foreach ($values as $i => $value) {
+						$i += 1;
 						$this->zbxTestClickButtonMultiselect('new_tag_filter_groupids_');
 						$this->zbxTestLaunchOverlayDialog('Host groups');
 						$this->zbxTestClickLinkTextWait($hostgroup);
@@ -68,6 +69,8 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						}
 
 						$this->zbxTestClickXpath("//ul[@id='tagFilterFormList']//button[text()='Add']");
+						$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
+						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath)	);
 					}
 				}
 			}
@@ -177,7 +180,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//a[@class='top-nav-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[contains(@class, "is-loading")]'));
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText('//h4[text()="Problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
 
@@ -281,7 +284,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//a[@class='top-nav-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[contains(@class, "is-loading")]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
 
 		// Check problem displaying on Problem page
@@ -293,6 +296,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		foreach ($data['trigger_names'] as $name) {
 			// Select trigger
 			$this->zbxTestClickButtonMultiselect('filter_triggerids_');
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestLaunchOverlayDialog('Triggers');
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
@@ -380,7 +384,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//a[@class='top-nav-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[contains(@class, "is-loading")]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
 
 		// Check problem displaying on Problem page

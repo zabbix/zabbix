@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/common.template.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Templates'));
@@ -28,6 +32,7 @@ if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
 }
 
 $divTabs = new CTabView();
+
 if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
@@ -35,14 +40,13 @@ if (!hasRequest('form_refresh')) {
 $host = getRequest('template_name', '');
 $visiblename = getRequest('visiblename', '');
 $newgroup = getRequest('newgroup', '');
-$templateIds = getRequest('templates', []);
+$templateids = getRequest('templates', []);
 $clear_templates = getRequest('clear_templates', []);
-$macros = getRequest('macros', []);
 
 $frm_title = _('Template');
 
 if ($data['templateid'] != 0) {
-	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
+	$frm_title .= SPACE.' ['.$data['dbTemplate']['name'].']';
 }
 $frmHost = (new CForm())
 	->setId('templatesForm')
@@ -55,29 +59,24 @@ if ($data['templateid'] != 0) {
 }
 
 if ($data['templateid'] != 0 && !hasRequest('form_refresh')) {
-	$host = $this->data['dbTemplate']['host'];
-	$visiblename = $this->data['dbTemplate']['name'];
+	$host = $data['dbTemplate']['host'];
+	$visiblename = $data['dbTemplate']['name'];
 
-	// display empty visible name if equal to host name
+	// Display empty visible name if equal to host name.
 	if ($visiblename === $host) {
 		$visiblename = '';
 	}
 
-	$macros = $this->data['dbTemplate']['macros'];
-	$templateIds = $this->data['original_templates'];
+	$templateids = $data['original_templates'];
 }
-
-if ($data['show_inherited_macros']) {
-	$macros = mergeInheritedMacros($macros, getInheritedMacros($templateIds));
-}
-$macros = array_values(order_macros($macros, 'macro'));
 
 $clear_templates = array_intersect($clear_templates, array_keys($data['original_templates']));
-$clear_templates = array_diff($clear_templates, array_keys($templateIds));
-natcasesort($templateIds);
+$clear_templates = array_diff($clear_templates, array_keys($templateids));
+
+natcasesort($templateids);
+
 $frmHost->addVar('clear_templates', $clear_templates);
 
-// TEMPLATE WIDGET {
 $templateList = (new CFormList('hostlist'))
 	->addRow(
 		(new CLabel(_('Template name'), 'template_name'))->setAsteriskMark(),
@@ -337,11 +336,8 @@ if ($data['form'] === 'full_clone') {
 $cloneOrFullClone = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
 
 $divTabs->addTab('templateTab', _('Template'), $templateList);
-// FULL CLONE }
 
-// } TEMPLATE WIDGET
-
-// TEMPLATES{
+// templates
 $tmplList = new CFormList();
 
 $disableids = [];
@@ -350,8 +346,8 @@ $linkedTemplateTable = (new CTable())
 	->setHeader([_('Name'), _('Action')])
 	->addStyle('width: 100%;');
 
-foreach ($data['linkedTemplates'] as $template) {
-	$tmplList->addItem((new CVar('templates[]', $template['templateid']))->removeId());
+foreach ($data['linked_templates'] as $template) {
+	$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
 	if (array_key_exists($template['templateid'], $data['writable_templates'])) {
 		$template_link = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
@@ -384,57 +380,62 @@ foreach ($data['linkedTemplates'] as $template) {
 	$disableids[] = $template['templateid'];
 }
 
-$linkedTemplateTable->addRow([
-	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.generic",'.CJs::encodeJson([
-			'dstfrm' => $frmHost->getName(),
-			'dstfld1' =>  $frmHost->getName(),
+$add_templates_ms = (new CMultiSelect([
+	'name' => 'add_templates[]',
+	'object_name' => 'templates',
+	'data' => $data['add_templates'],
+	'popup' => [
+		'parameters' => [
 			'srctbl' => 'templates',
 			'srcfld1' => 'hostid',
-			'templated_hosts' => '1',
-			'popup_type' => 'templates',
-			'multiselect' => 1,
+			'srcfld2' => 'host',
+			'dstfrm' => $frmHost->getName(),
+			'dstfld1' => 'add_templates_',
 			'excludeids' => ($data['templateid'] == 0) ? [] : [$data['templateid']],
 			'disableids' => $disableids
-		]).', null, this);')
-		->addClass(ZBX_STYLE_BTN_LINK)
-]);
+		]
+	]
+]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-$tmplList->addRow(_('Linked templates'),
-	(new CDiv($linkedTemplateTable))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
+$tmplList
+	->addRow(_('Linked templates'),
+		(new CDiv($linkedTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	)
+	->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
+		(new CDiv(
+			(new CTable())->addRow([$add_templates_ms])
+		))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
-// } TEMPLATES
 
 // tags
-$tags_view = new CView('configuration.tags.tab', [
+$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 	'source' => 'template',
 	'tags' => $data['tags'],
-	'readonly' => false
-]);
-$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
+	'readonly' => $data['readonly']
+]));
 
 // macros
-if (!$macros) {
-	$macro = ['macro' => '', 'value' => '', 'description' => ''];
-	if ($data['show_inherited_macros']) {
-		$macro['type'] = ZBX_PROPERTY_OWN;
-	}
-	$macros[] = $macro;
-}
+$divTabs->addTab('macroTab', _('Macros'),
+	(new CFormList('macrosFormList'))
+		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+			->addValue(_('Template macros'), 0)
+			->addValue(_('Inherited and template macros'), 1)
+			->setModern(true)
+		)
+		->addRow(null, new CPartial('hostmacros.list.html', [
+			'macros' => $data['macros'],
+			'show_inherited_macros' => $data['show_inherited_macros'],
+			'readonly' => $data['readonly']
+		]), 'macros_container')
+);
 
-$macrosView = new CView('hostmacros', [
-	'macros' => $macros,
-	'show_inherited_macros' => $data['show_inherited_macros'],
-	'is_template' => true,
-	'readonly' => false
-]);
-$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
-
-// Footer
+// footer
 if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
@@ -463,4 +464,4 @@ $frmHost->addItem($divTabs);
 
 $widget->addItem($frmHost);
 
-return $widget;
+$widget->show();

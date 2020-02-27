@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #include "common.h"
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	/* the ZBXEndThread function is implemented in service.c file */
 	void	CALLBACK ZBXEndThread(ULONG_PTR dwParam);
 
@@ -82,7 +82,7 @@ typedef struct
 	int		process_num;
 	unsigned char	process_type;
 	void		*args;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	ZBX_THREAD_ENTRY_POINTER(entry);
 #endif
 }

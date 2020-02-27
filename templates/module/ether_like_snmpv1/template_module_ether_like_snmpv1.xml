@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>4.4</version>
+   <date>2015-12-30T14:41:30Z</date>
+   <groups>
+      <group>
+         <name>Templates/Modules</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Module EtherLike-MIB SNMPv1</template>
+         <name>Template Module EtherLike-MIB SNMPv1</name>
+         <description>Template EtherLike-MIB (duplex control only)&#13;
+&#13;
+MIBs used:&#13;
+EtherLike-MIB&#13;
+&#13;
+Template tooling version used: 0.34</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Network interfaces</name>
+            </application>
+         </applications>
+         <discovery_rules>
+            <discovery_rule>
+               <name>EtherLike-MIB Discovery</name>
+               <type>SNMPV1</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.10.7.2.1.19,{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2]</snmp_oid>
+               <key>net.if.duplex.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#IFOPERSTATUS}</macro>
+                        <value>1</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>(2|3)</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): Duplex status</name>
+                     <type>SNMPV1</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}</snmp_oid>
+                     <key>net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <description>MIB: EtherLike-MIB&#13;
+The current mode of operation of the MAC&#13;
+entity.  'unknown' indicates that the current&#13;
+duplex mode could not be determined.&#13;
+&#13;
+Management control of the duplex mode is&#13;
+accomplished through the MAU MIB.  When&#13;
+an interface does not support autonegotiation,&#13;
+or when autonegotiation is not enabled, the&#13;
+duplex mode is controlled using&#13;
+ifMauDefaultType.  When autonegotiation is&#13;
+supported and enabled, duplex mode is controlled&#13;
+using ifMauAutoNegAdvertisedBits.  In either&#13;
+case, the currently operating duplex mode is&#13;
+reflected both in this object and in ifMauType.&#13;
+&#13;
+Note that this object provides redundant&#13;
+information with ifMauType.  Normally, redundant&#13;
+objects are discouraged.  However, in this&#13;
+instance, it allows a management application to&#13;
+determine the duplex status of an interface&#13;
+without having to know every possible value of&#13;
+ifMauType.  This was felt to be sufficiently&#13;
+valuable to justify the redundancy.&#13;
+Reference: [IEEE 802.3 Std.], 30.3.1.1.32,aDuplexStatus.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>EtherLike-MIB::dot3StatsDuplexStatus</name>
+                     </valuemap>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=2</expression>
+                           <name>Interface {#IFNAME}({#IFALIAS}): In half-duplex mode</name>
+                           <priority>WARNING</priority>
+                           <description>Please check autonegotiation settings and cabling</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+            </discovery_rule>
+         </discovery_rules>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>EtherLike-MIB::dot3StatsDuplexStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>halfDuplex</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>fullDuplex</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

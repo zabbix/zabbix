@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,17 +114,17 @@ ZBX_LocalStorage.prototype.addKey = function(relative_key) {
  */
 ZBX_LocalStorage.prototype.freeSession = function(store, sessionid) {
 	var len = store.length,
-		mathces = [],
+		matches = [],
 		abs_key;
 
 	for (var i = 0; i < len; i++) {
 		abs_key = store.key(i);
 		if (abs_key.match('^' + sessionid)) {
-			mathces.push(abs_key);
+			matches.push(abs_key);
 		}
 	}
 
-	mathces.forEach(function(abs_key) {
+	matches.forEach(function(abs_key) {
 		store.removeItem(abs_key);
 	});
 };
@@ -196,20 +196,6 @@ ZBX_LocalStorage.prototype.ensureKey = function(key) {
 };
 
 /**
- * We have our own `stringify` because Prototype.js defines Array.prototype.toJSON method. Which then is invoked
- * by native `JSON.stringify` method, producing unexpected results when serializing an array object. Since Prototype.js
- * itself depends on it's implementation, it is decided to not delete `Array.prototype.toJSON` field as it would not be
- * safe. Prototype.js provides `Object.prototype.toJSON` method we could proxy through.
- *
- * @param {mixed} value
- *
- * @return {string} Valid JSON string.
- */
-ZBX_LocalStorage.stringify = function(value) {
-	return window.Prototype ? Object.toJSON(value) : JSON.stringify(value);
-};
-
-/**
  * This whole design of signed payloads exists only because of IE11.
  *
  * @param {mixed} value
@@ -217,7 +203,7 @@ ZBX_LocalStorage.stringify = function(value) {
  * @return {string}
  */
 ZBX_LocalStorage.prototype.wrap = function(value) {
-	return ZBX_LocalStorage.stringify({
+	return JSON.stringify({
 		payload: value,
 		signature: ZBX_LocalStorage.signature
 	});
@@ -330,7 +316,7 @@ ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 		value = this.unwrap(event.newValue);
 	}
 	catch(e) {
-		// If value could not be unwraped, it has not originated from this class.
+		// If value could not be unwrapped, it has not originated from this class.
 		return;
 	}
 
@@ -347,7 +333,7 @@ ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 };
 
 /**
- * Writes an underlaying value.
+ * Writes an underlying value.
  *
  * @param {string} key
  * @param {string} value
@@ -389,13 +375,13 @@ ZBX_LocalStorage.prototype.flushKeyWrite = function(abs_key) {
 
 	key_last_write[abs_key] = +new Date;
 
-	localStorage.setItem(ZBX_LocalStorage.defines.KEY_LAST_WRITE, ZBX_LocalStorage.stringify(key_last_write));
+	localStorage.setItem(ZBX_LocalStorage.defines.KEY_LAST_WRITE, JSON.stringify(key_last_write));
 
 	this.key_last_write = key_last_write;
 };
 
 /**
- * Fetches underlaying value. A copy of default value is returned if key has no data.
+ * Fetches underlying value. A copy of default value is returned if key has no data.
  *
  * @param {string} key
  *

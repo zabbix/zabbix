@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -203,7 +203,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 				$this->zbxTestClickButtonMultiselect('groupids_');
 				$this->zbxTestLaunchOverlayDialog('Host groups');
 				$this->zbxTestClickLinkTextWait($filter['host_group']);
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
 				$this->zbxTestMultiselectAssertSelected('groupids_', $filter['host_group']);
 			}
 
@@ -214,8 +214,9 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 					'ZBX6648 All Triggers', 'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers']
 				);
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-				$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="'.$filter['host'].'"]');
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
+				$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//a[text()="'.
+						$filter['host'].'"]');
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
 				$this->zbxTestMultiselectAssertSelected('hostids_', $filter['host']);
 			}
 

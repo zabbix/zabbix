@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$script_inline .=
 				'var widget = jQuery(".dashbrd-grid-container")'.
 						'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
-				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.CJs::encodeJson($graph_options).', widget[0]);';
+				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.json_encode($graph_options).', widget[0]);';
 		}
 
 		if ($initial_load) {

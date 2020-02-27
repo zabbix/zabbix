@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class CScreenHistory extends CScreenBase {
 	public $graphid = 0;
 
 	/**
-	 * String containing page file name with extension.
+	 * String containing base URL for pager.
 	 *
 	 * @var string
 	 */
@@ -107,7 +107,7 @@ class CScreenHistory extends CScreenBase {
 		// optional
 		$this->itemids = array_key_exists('itemids', $options) ?  $options['itemids'] : [];
 		$this->plaintext = isset($options['plaintext']) ? $options['plaintext'] : false;
-		$this->page_file = array_key_exists('pageFile', $options) ? $options['pageFile'] : '';
+		$this->page_file = array_key_exists('pageFile', $options) ? $options['pageFile'] : null;
 
 		if (!$this->itemids && array_key_exists('graphid', $options)) {
 			$itemids = API::Item()->get([
@@ -218,7 +218,7 @@ class CScreenHistory extends CScreenBase {
 
 					if (in_array($items[$history_row['itemid']]['value_type'],
 							[ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
-						$value = '"'.str_replace('"', '""', htmlspecialchars($value, ENT_NOQUOTES)).'"';
+						$value = '"'.$value.'"';
 					}
 					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 						sscanf($value, '%f', $value);
@@ -228,8 +228,8 @@ class CScreenHistory extends CScreenBase {
 						' '.$value;
 
 					if (count($items) > 1) {
-						$row .= ' "'.str_replace('"', '""', $items[$history_row['itemid']]['hosts'][0]['name'].
-							NAME_DELIMITER.$items[$history_row['itemid']]['name_expanded']).'"';
+						$row .= ' "'.$items[$history_row['itemid']]['hosts'][0]['name'].NAME_DELIMITER.
+							$items[$history_row['itemid']]['name_expanded'].'"';
 					}
 					$output[] = $row;
 				}
@@ -440,9 +440,11 @@ class CScreenHistory extends CScreenBase {
 					}
 				}
 
-				$url = (new CUrl($this->page_file))->formatGetArguments();
 				// Array $history_data will be modified according page and rows on page.
-				$pagination = getPagingLine($history_data, [], $url);
+				$pagination = CPagerHelper::paginate($this->page, $history_data, ZBX_SORT_UP,
+					new CUrl($this->page_file)
+				);
+
 				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader($table_header);
 
 				foreach ($history_data as $history_data_row) {
@@ -502,11 +504,13 @@ class CScreenHistory extends CScreenBase {
 			if ($this->mode == SCREEN_MODE_JS) {
 				$timeControlData['dynamic'] = 0;
 
-				return 'timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).', '.CJs::encodeJson($timeControlData).');';
+				return 'timeControl.addObject("'.$this->getDataId().'", '.json_encode($this->timeline).', '.
+					json_encode($timeControlData).');';
 			}
-			else {
-				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).', '.CJs::encodeJson($timeControlData).');');
-			}
+
+			zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.json_encode($this->timeline).', '.
+				json_encode($timeControlData).');'
+			);
 		}
 
 		if ($this->mode != SCREEN_MODE_JS) {
@@ -519,7 +523,7 @@ class CScreenHistory extends CScreenBase {
 			];
 
 			if ($this->action == HISTORY_VALUES) {
-				$flickerfreeData['page'] = getPageNumber();
+				$flickerfreeData['page'] = $this->page;
 			}
 
 			if ($this->graphid != 0) {

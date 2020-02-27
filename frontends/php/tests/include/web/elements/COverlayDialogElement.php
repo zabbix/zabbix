@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ class COverlayDialogElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function waitUntilReady() {
-		$this->query('class:preloader')->waitUntilNotPresent();
+		$this->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 
 		return $this;
 	}
@@ -36,7 +36,7 @@ class COverlayDialogElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('xpath://div[@class="overlay-dialogue modal modal-popup"]'))->asOverlayDialog();
+		return (new CElementQuery('xpath://div[contains(@class, "overlay-dialogue modal modal-popup")]'))->asOverlayDialog();
 	}
 
 	/**

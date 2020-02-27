@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'fullscreen':
-			switch (CView::getLayoutMode()) {
+			switch ($params['mode']) {
 				case ZBX_LAYOUT_KIOSKMODE:
 					$icon = (new CButton(null, '&nbsp;'))
 						->setTitle(_('Normal view'))
@@ -757,25 +757,74 @@ function makePageFooter($with_version = true) {
  * @return array  Menu definition for CWidget::setTitleSubmenu.
  */
 function getAdministrationGeneralSubmenu() {
+	$gui_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'gui.edit')
+		->getUrl();
+
 	$autoreg_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'autoreg.edit')
+		->getUrl();
+
+	$housekeeping_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'housekeeping.edit')
+		->getUrl();
+
+	$image_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'image.list')
+		->getUrl();
+
+	$iconmap_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'iconmap.list')
+		->getUrl();
+
+	$regex_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'regex.list')
+		->getUrl();
+
+	$macros_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'macros.edit')
+		->getUrl();
+
+	$valuemap_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'valuemap.list')
+		->getUrl();
+
+	$workingtime_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'workingtime.edit')
+		->getUrl();
+
+	$trigseverity_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'trigseverity.edit')
+		->getUrl();
+
+	$trigdisplay_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'trigdisplay.edit')
+		->getUrl();
+
+	$modules_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'module.list')
+		->getUrl();
+
+	$miscconfig_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
 
 	return [
 		'main_section' => [
 			'items' => [
-				'adm.gui.php' => _('GUI'),
-				$autoreg_url => _('Auto registration'),
-				'adm.housekeeper.php' => _('Housekeeping'),
-				'adm.images.php' => _('Images'),
-				'adm.iconmapping.php' => _('Icon mapping'),
-				'adm.regexps.php' => _('Regular expressions'),
-				'adm.macros.php' => _('Macros'),
-				'adm.valuemapping.php' => _('Value mapping'),
-				'adm.workingtime.php' => _('Working time'),
-				'adm.triggerseverities.php' => _('Trigger severities'),
-				'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-				'adm.other.php' => _('Other')
+				$gui_url          => _('GUI'),
+				$autoreg_url      => _('Autoregistration'),
+				$housekeeping_url => _('Housekeeping'),
+				$image_url        => _('Images'),
+				$iconmap_url      => _('Icon mapping'),
+				$regex_url        => _('Regular expressions'),
+				$macros_url       => _('Macros'),
+				$valuemap_url     => _('Value mapping'),
+				$workingtime_url  => _('Working time'),
+				$trigseverity_url => _('Trigger severities'),
+				$trigdisplay_url  => _('Trigger displaying options'),
+				$modules_url      => _('Modules'),
+				$miscconfig_url   => _('Other')
 			]
 		]
 	];
@@ -950,24 +999,6 @@ function makeWarningIcon($error) {
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
 		->setHint($error);
-}
-
-/**
- * Renders a debug button
- *
- * @return CButton
- */
-function makeDebugButton() {
-	return (new CDiv(
-		(new CLink(_('Debug'), '#debug'))
-			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
-				"this.state = (this.state == 'none' ? 'block' : 'none');".
-				"jQuery(this)".
-					".text(this.state == 'none' ? ".CJs::encodeJson(_('Debug'))." : ".CJs::encodeJson(_('Hide debug')).")".
-					".blur();".
-				"showHideByName('zbx_debug_info', this.state);"
-			)
-	))->addClass(ZBX_STYLE_BTN_DEBUG);
 }
 
 /**

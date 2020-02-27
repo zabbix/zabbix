@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +30,7 @@ $page['scripts'] = ['layout.mode.js'];
 $hostId = getRequest('hostid', 0);
 
 if ($hostId > 0) {
-	CView::$has_web_layout_mode = true;
-	$page['web_layout_mode'] = CView::getLayoutMode();
+	$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -46,6 +45,8 @@ $fields = [
 	'filter_field' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_field_value' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_exact' =>		[T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null],
+	// actions
+	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS,
 								IN('"name","pr_macaddress_a","pr_name","pr_os","pr_serialno_a","pr_tag","pr_type"'),
@@ -129,9 +130,7 @@ if ($hostId > 0) {
 	}
 
 	// view generation
-	$hostinventoriesView = new CView('inventory.host.view', $data);
-	$hostinventoriesView->render();
-	$hostinventoriesView->show();
+	echo (new CView('inventory.host.view', $data))->getOutput();
 }
 else {
 	$data = [
@@ -257,14 +256,24 @@ else {
 		}
 	}
 
-	$url = (new CUrl('hostinventories.php'))
-		->setArgument('groupid', $data['pageFilter']->groupid);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$data['paging'] = getPagingLine($data['hosts'], $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
 
-	$hostinventoriesView = new CView('inventory.host.list', $data);
-	$hostinventoriesView->render();
-	$hostinventoriesView->show();
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['hosts'], $sortOrder,
+		(new CUrl('hostinventories.php'))->setArgument('groupid', $data['pageFilter']->groupid)
+	);
+
+	echo (new CView('inventory.host.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

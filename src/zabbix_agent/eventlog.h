@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef ZABBIX_EVENTLOG_H
 #define ZABBIX_EVENTLOG_H
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 #	error "This module is only available for Windows OS"
 #endif
 
@@ -181,20 +181,17 @@ typedef enum	_EVT_VARIANT_TYPE
 EVT_VARIANT_TYPE;
 
 
-typedef int 		(*zbx_process_value_t)(const char *server, unsigned short port, const char *host,
-			const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime,
-			unsigned long *timestamp, const char *source, unsigned short *severity,
-			unsigned long *logeventid, unsigned char flags);
+
 int			process_eventslog(const char *server, unsigned short port, const char *eventlog_name,
 			zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity,
 			const char *key_source, const char *key_logeventid, int rate,
-			zbx_process_value_t cb_process_value, ZBX_ACTIVE_METRIC *metric,
+			zbx_process_value_func_t cb_process_value, ZBX_ACTIVE_METRIC *metric,
 			zbx_uint64_t *lastlogsize_sent, char **error);
 int			process_eventslog6(const char *server, unsigned short port, const char *fl_source,
 			EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID,
 			zbx_uint64_t LastID, zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity,
 			const char *key_source, const char *key_logeventid, int rate,
-			zbx_process_value_t cb_process_value, ZBX_ACTIVE_METRIC *metric,
+			zbx_process_value_func_t cb_process_value, ZBX_ACTIVE_METRIC *metric,
 			zbx_uint64_t *lastlogsize_sent, char **error);
 int			initialize_eventlog6(const char *source, zbx_uint64_t *lastlogsize, zbx_uint64_t *FirstID,
 			zbx_uint64_t *LastID, EVT_HANDLE *render_context, EVT_HANDLE *query, char **error);
@@ -208,13 +205,13 @@ EVT_HANDLE WINAPI	EvtOpenPublisherMetadata(EVT_HANDLE Session, const wchar_t *Pu
 BOOL WINAPI		EvtGetLogInfo( EVT_HANDLE Log, EVT_LOG_PROPERTY_ID PropertyId, DWORD PropertyValueBufferSize,
 			PEVT_VARIANT PropertyValueBuffer,	__out PDWORD PropertyValueBufferUsed);
 BOOL WINAPI		EvtRender(EVT_HANDLE Context, EVT_HANDLE Fragment, DWORD Flags, DWORD BufferSize,
-			__out_bcount_part_opt(BufferSize, *BufferUsed) PVOID Buffer, __out PDWORD BufferUsed,
-			__out PDWORD PropertyCount);
+			PVOID Buffer, PDWORD BufferUsed, PDWORD PropertyCount);
 BOOL WINAPI		EvtNext(EVT_HANDLE ResultSet, DWORD EventsSize, PEVT_HANDLE Events, DWORD Timeout, DWORD Flags,
 			__out PDWORD Returned);
 BOOL WINAPI		EvtClose(EVT_HANDLE Object);
 BOOL WINAPI		EvtFormatMessage(EVT_HANDLE PublisherMetadata, EVT_HANDLE Event, DWORD MessageId,
-			DWORD ValueCount, PEVT_VARIANT Values, DWORD Flags, DWORD BufferSize,
-			__out_ecount_part_opt(BufferSize, *BufferUsed) wchar_t *Buffer, __out PDWORD BufferUsed);
+			DWORD ValueCount, PEVT_VARIANT Values, DWORD Flags, DWORD BufferSize, wchar_t *Buffer,
+			PDWORD BufferUsed);
+
 #endif	/* ZABBIX_EVENTLOG_H */
 

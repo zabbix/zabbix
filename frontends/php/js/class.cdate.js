@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-var CDate = Class.create();
+var CDate = function () {
+	this.tmpDate = new Date();
+
+	this.clientDate = (arguments.length > 0)
+		? new Date(arguments[0])
+		: new Date();
+	this.calcTZdiff(this.clientDate.getTime());
+	this.serverDate = new Date(this.clientDate.getTime() - this.tzDiff * 1000);
+};
 
 CDate.prototype = {
 	server:		0,			// getTime uses clients :0, or servers time :1
@@ -25,16 +33,6 @@ CDate.prototype = {
 	clientDate:	null,	// clients(JS, Browser) date object
 	serverDate:	null,	// servers(PHP, Unix) date object
 	tmpDate:	null,		// inner usage
-
-	initialize: function() {
-		this.tmpDate = new Date();
-
-		this.clientDate = (arguments.length > 0)
-			? new Date(arguments[0])
-			: new Date();
-		this.calcTZdiff(this.clientDate.getTime());
-		this.serverDate = new Date(this.clientDate.getTime() - this.tzDiff * 1000);
-	},
 
 	calcTZdiff: function(time) {
 		var ddTZOffset;
@@ -303,4 +301,4 @@ CDate.prototype = {
 		this.serverDate.setTime(arg - this.tzDiff * 1000);
 		this.clientDate.setTime(arg);
 	}
-}
+};

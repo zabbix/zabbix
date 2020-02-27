@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,6 @@ class CJsonExportWriter extends CExportWriter {
 	 * @return string
 	 */
 	public function write(array $array) {
-		return (new CJson())->encode($array, [], false, false);
+		return json_encode($array, JSON_UNESCAPED_SLASHES);
 	}
 }

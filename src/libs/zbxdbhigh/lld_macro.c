@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,8 +60,7 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro
 	result = DBselect(
 			"select lld_macro,path"
 			" from lld_macro_path"
-			" where itemid=" ZBX_FS_UI64
-			" order by lld_macro",
+			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -85,7 +84,9 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zbx_vector_ptr_sort(lld_macro_paths, zbx_lld_macro_paths_compare);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

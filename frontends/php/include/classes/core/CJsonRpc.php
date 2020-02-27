@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 class CJsonRpc {
 
 	const VERSION = '2.0';
-
-	public $json;
 
 	/**
 	 * API client to use for making requests.
@@ -47,12 +45,11 @@ class CJsonRpc {
 	public function __construct(CApiClient $apiClient, $data) {
 		$this->apiClient = $apiClient;
 
-		$this->json = new CJson();
 		$this->initErrors();
 
 		$this->_error = false;
 		$this->_response = [];
-		$this->_jsonDecoded = $this->json->decode($data, true);
+		$this->_jsonDecoded = json_decode($data, true);
 	}
 
 	/**
@@ -61,14 +58,14 @@ class CJsonRpc {
 	 * @return string JSON encoded value
 	 */
 	public function execute() {
-		if ($this->json->hasError()) {
+		if (json_last_error()) {
 			$this->jsonError(null, '-32700', null, null, true);
-			return $this->json->encode($this->_response[0], [], false, false);
+			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
 		}
 
-		if (!is_array($this->_jsonDecoded) || $this->_jsonDecoded == []) {
+		if (!is_array($this->_jsonDecoded) || $this->_jsonDecoded === []) {
 			$this->jsonError(null, '-32600', null, null, true);
-			return $this->json->encode($this->_response[0], [], false, false);
+			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
 		}
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
@@ -94,10 +91,10 @@ class CJsonRpc {
 		if (is_array($this->_jsonDecoded)
 				&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)) {
 			// Return response as encoded batch if $this->_jsonDecoded is associative array.
-			return $this->json->encode($this->_response, [], false, false);
+			return json_encode($this->_response, JSON_UNESCAPED_SLASHES);
 		}
 
-		return $this->json->encode($this->_response[0], [], false, false);
+		return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
 	}
 
 	public function validate($call) {

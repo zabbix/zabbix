@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ package file
 //size_t call_iconv(iconv_t cd, char *inbuf, size_t *inbytesleft, char *outbuf, size_t *outbytesleft) {
 //   return iconv(cd, &inbuf, inbytesleft, &outbuf, outbytesleft);
 // }
+//
+// #cgo windows LDFLAGS: -liconv
 import "C"
 
 import (

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,19 +66,32 @@ class CPage {
 	 * Web driver and CElementQuery initialization.
 	 */
 	public function __construct() {
-		$options = new ChromeOptions();
-		$options->addArguments([
-			'--no-sandbox',
-			'--enable-font-antialiasing=false',
-			'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT
-		]);
+		$capabilities = DesiredCapabilities::chrome();
+		if (defined('PHPUNIT_BROWSER_NAME')) {
+			$capabilities->setBrowserName(PHPUNIT_BROWSER_NAME);
+		}
 
-		$this->driver = RemoteWebDriver::create('http://localhost:4444/wd/hub',
-				DesiredCapabilities::chrome()->setCapability(ChromeOptions::CAPABILITY, $options)
+		if (!defined('PHPUNIT_BROWSER_NAME') || PHPUNIT_BROWSER_NAME === 'chrome') {
+			$options = new ChromeOptions();
+			$options->addArguments([
+				'--no-sandbox',
+				'--enable-font-antialiasing=false',
+				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT
+			]);
+
+			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
+		}
+
+		$this->driver = RemoteWebDriver::create('http://'.
+				(defined('PHPUNIT_DRIVER_ADDRESS') ? PHPUNIT_DRIVER_ADDRESS : 'localhost').
+				':4444/wd/hub', $capabilities
+		);
+
+		$this->driver->manage()->window()->setSize(
+				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
 		);
 
 		CElementQuery::setPage($this);
-		$this->setViewport(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT);
 	}
 
 	/**
@@ -100,7 +113,7 @@ class CPage {
 		$this->driver->manage()->deleteAllCookies();
 		try {
 			$this->driver->executeScript('sessionStorage.clear();');
-		} catch (Exception $exeption) {
+		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
 
@@ -257,7 +270,9 @@ class CPage {
 
 		try {
 			// Screenshot is 1px smaller to ensure that scroll is still present.
-			$this->height = (int)$this->driver->executeScript('return document.documentElement.getHeight();') - 1;
+			$this->height = (int)$this->driver->executeScript(
+					'return window.getComputedStyle(document.documentElement)["height"];'
+			) - 1;
 
 			if ($this->height > self::DEFAULT_PAGE_HEIGHT) {
 				$this->setViewport(self::DEFAULT_PAGE_WIDTH, $this->height);
@@ -280,9 +295,14 @@ class CPage {
 		}
 
 		if (isset($this->height) && $this->height > self::DEFAULT_PAGE_HEIGHT) {
-			$this->setViewport(self::DEFAULT_PAGE_WIDTH,
-				self::DEFAULT_PAGE_HEIGHT
-			);
+			try {
+				CommandExecutor::executeCustom($this->driver, [
+					'cmd' => 'Emulation.clearDeviceMetricsOverride',
+					'params' => ['clear' => true]
+				]);
+			} catch (Exception $exception) {
+				// Code is not missing here.
+			}
 
 			$this->height = self::DEFAULT_PAGE_HEIGHT;
 		}
@@ -423,5 +443,16 @@ class CPage {
 	 */
 	public function getDriver() {
 		return $this->driver;
+	}
+
+	/**
+	 * Remove focus from the element.
+	 */
+	public function removeFocus() {
+		try {
+			$this->driver->executeScript('document.activeElement.blur();');
+		} catch (Exception $ex) {
+			// Code is not missing here.
+		}
 	}
 }

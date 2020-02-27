@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ $fields = [
 	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,			null,	null],
 	// sort and sortorder
@@ -199,9 +200,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// render view
-	$applicationView = new CView('configuration.application.edit', $data);
-	$applicationView->render();
-	$applicationView->show();
+	echo (new CView('configuration.application.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -296,17 +295,27 @@ else {
 		$data['applications'] = [];
 	}
 
-	// get paging
-	$url = (new CUrl('applications.php'))
-		->setArgument('groupid', $data['groupid'])
-		->setArgument('hostid', $data['hostid']);
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
 
-	$data['paging'] = getPagingLine($data['applications'], $sortOrder, $url);
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['applications'], $sortOrder,
+		(new CUrl('applications.php'))
+			->setArgument('groupid', $data['groupid'])
+			->setArgument('hostid', $data['hostid'])
+	);
 
 	// render view
-	$applicationView = new CView('configuration.application.list', $data);
-	$applicationView->render();
-	$applicationView->show();
+	echo (new CView('configuration.application.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

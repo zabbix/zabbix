@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,8 +118,9 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	if _, ok := p.impl.(plugin.Exporter); ok {
 		var tacc exporterTaskAccessor
 
-		if c.id != 0 {
+		if c.id > agent.ActiveChecksClientID {
 			var task *exporterTask
+
 			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
 				return err
 			}
@@ -200,7 +201,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	}
 
 	// Watcher plugins are not supported by direct requests
-	if c.id != 0 {
+	if c.id > agent.ActiveChecksClientID {
 		// handle Watcher interface
 		if _, ok := p.impl.(plugin.Watcher); ok {
 			if info.watcher == nil {
@@ -221,7 +222,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	}
 
 	// handle configurator interface for inactive plugins
-	if _, ok := p.impl.(plugin.Configurator); ok && agent.Options.Plugins != nil {
+	if _, ok := p.impl.(plugin.Configurator); ok {
 		if p.refcount == 0 {
 			task := &configuratorTask{
 				taskBase: taskBase{plugin: p, active: true},
@@ -263,10 +264,10 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	}
 
 	var expiry time.Time
-	// Direct requests are handled by special client with id 0. Such requests have
-	// day+hour (to keep once per day checks without expiring) expiry time before
-	// used plugins are released.
-	if c.id != 0 {
+	// Direct requests are handled by special client with id <= ActiveChecksClientID.
+	// Such requests have day+hour (to keep once per day checks without expiring)
+	// expiry time before used plugins are released.
+	if c.id > agent.ActiveChecksClientID {
 		expiry = now
 	} else {
 		expiry = now.Add(-time.Hour * 25)
@@ -277,7 +278,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 		if info, ok := c.pluginsInfo[p]; ok {
 			if info.used.Before(expiry) {
 				// perform empty watch task before closing
-				if c.id != 0 {
+				if c.id > agent.ActiveChecksClientID {
 					if _, ok := p.impl.(plugin.Watcher); ok {
 						task := &watcherTask{
 							taskBase: taskBase{plugin: p, active: true},
@@ -299,7 +300,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 				delete(c.pluginsInfo, p)
 				p.refcount--
 				// TODO: define uniform time format
-				if c.id != 0 {
+				if c.id > agent.ActiveChecksClientID {
 					log.Debugf("[%d] released unused plugin %s", c.id, p.name())
 				} else {
 					log.Debugf("[%d] released plugin %s as not used since %s", c.id, p.name(),

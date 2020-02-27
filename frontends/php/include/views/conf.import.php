@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 include dirname(__FILE__).'/js/conf.import.js.php';
 
@@ -63,12 +67,12 @@ foreach ($titles as $key => $title) {
 		}
 
 		if ($key === 'images') {
-			$cbExist->onClick('updateWarning(this, '.CJs::encodeJson(_('Images for all maps will be updated!')).')');
+			$cbExist->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).')');
 		}
 
 		if ($key === 'valueMaps') {
 			$cbExist->onClick(
-				'updateWarning(this, '.CJs::encodeJson(_('Value mappings for value maps will be updated!')).')'
+				'updateWarning(this, '.json_encode(_('Value mappings for value maps will be updated!')).')'
 			);
 		}
 	}
@@ -91,6 +95,12 @@ foreach ($titles as $key => $title) {
 		if ($key !== 'maps' && $key !== 'screens' && $user_type != USER_TYPE_SUPER_ADMIN
 				&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
 			$cbDeleted->setAttribute('disabled', 'disabled');
+		}
+
+		if ($key === 'templateLinkage') {
+			$cbDeleted->onClick('updateWarning(this, '.json_encode(
+				_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
+			).')');
 		}
 	}
 
@@ -123,10 +133,11 @@ $tab_view->setFooter(makeFormFooter(
 
 $form = (new CForm('post', null, 'multipart/form-data'))
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('backurl', $data['backurl'])
+	->addVar('rules_preset', $data['rules_preset'])
 	->addItem($tab_view);
 
 // widget
-return (new CWidget())
+(new CWidget())
 	->setTitle(_('Import'))
-	->addItem($form);
+	->addItem($form)
+	->show();

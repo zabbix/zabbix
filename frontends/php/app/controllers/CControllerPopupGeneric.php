@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ class CControllerPopupGeneric extends CController {
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
+			ITEM_TYPE_IPMI,
 			ITEM_TYPE_SNMPTRAP,
 			ITEM_TYPE_DB_MONITOR,
 			ITEM_TYPE_JMX
@@ -406,7 +407,7 @@ class CControllerPopupGeneric extends CController {
 			}
 
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
 			);
 		}
 
@@ -991,7 +992,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'scripts':
 				$options = [
-					'output' => API_OUTPUT_EXTEND,
+					'output' => ['scriptid', 'name', 'type', 'execute_on', 'command'],
 					'preservekeys' => true
 				];
 				if ($hostid === null) {

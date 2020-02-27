@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widget = (new CWidget())
 	->setTitle(_('Host groups'))
@@ -54,7 +58,9 @@ $hostGroupTable = (new CTableInfo())
 			(new CCheckBox('all_groups'))
 				->onClick("checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'],
+			(new CUrl('hostgroups.php'))->getUrl()
+		),
 		_('Hosts'),
 		_('Templates'),
 		_('Members'),
@@ -160,4 +166,4 @@ $hostGroupForm->addItem([
 // append form to widget
 $widget->addItem($hostGroupForm);
 
-return $widget;
+$widget->show();

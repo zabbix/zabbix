@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ var agt = navigator.userAgent.toLowerCase(),
 
 // redirect outdated browser to warning page
 if (document.cookie.indexOf('browserwarning_ignore') < 0) {
-	if (IE6 || IE7 || IE8 || IE9 || IE10 || KQ) {
+	if (IE || KQ) {
 		window.location.replace('browserwarning.php');
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -261,7 +261,7 @@ class CUser extends CApiService {
 		}
 
 		$locales = array_keys(getLocales());
-		$themes = THEME_DEFAULT.','.implode(',', array_keys(Z::getThemes()));
+		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
@@ -298,7 +298,9 @@ class CUser extends CApiService {
 			 * If user is created without a password (e.g. for GROUP_GUI_ACCESS_LDAP), store an empty string
 			 * as his password in database.
 			 */
-			$user['passwd'] = (array_key_exists('passwd', $user)) ? md5($user['passwd']) : '';
+			$user['passwd'] = array_key_exists('passwd', $user)
+				? password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])
+				: '';
 		}
 		unset($user);
 
@@ -367,7 +369,7 @@ class CUser extends CApiService {
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
 		$locales = array_keys(getLocales());
-		$themes = THEME_DEFAULT.','.implode(',', array_keys(Z::getThemes()));
+		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias']], 'fields' => [
 			'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -440,7 +442,7 @@ class CUser extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set password for user "guest".'));
 				}
 
-				$user['passwd'] = md5($user['passwd']);
+				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
 			}
 		}
 		unset($user);
@@ -632,7 +634,7 @@ class CUser extends CApiService {
 	 * @param array|string  $users[]['user_medias'][]['sendto']       Address where to send the alert.
 	 * @param array         $db_mediatypes                            List of available media types.
 	 *
-	 * @throws APIException if e-mail is not valid or exeeds maximum DB field length.
+	 * @throws APIException if e-mail is not valid or exceeds maximum DB field length.
 	 */
 	private function validateMediaRecipients(array $users, array $db_mediatypes) {
 		if ($db_mediatypes) {
@@ -676,7 +678,7 @@ class CUser extends CApiService {
 
 						/*
 						 * If media type is email, validate each given string against email pattern.
-						 * Additionally, total lenght of emails must be checked, because all media type emails are
+						 * Additionally, total length of emails must be checked, because all media type emails are
 						 * separated by newline and stored as a string in single database field. Newline characters
 						 * consumes extra space, so additional validation must be made.
 						 */
@@ -1190,7 +1192,7 @@ class CUser extends CApiService {
 					break;
 
 				case ZBX_AUTH_INTERNAL:
-					if (md5($user['password']) !== $db_user['passwd']) {
+					if (!self::verifyPassword($user['password'], $db_user)) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Login name or password is incorrect.'));
 					}
 					break;
@@ -1229,12 +1231,36 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-		$db_user = $this->createSession($user, $db_user);
+		$db_user = self::createSession($user['user'], $db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
 
 		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
+	}
+
+	/**
+	 * @param string $password           User-specified password.
+	 * @param array  $db_user            Saved user profile.
+	 * @param string $db_user['passwd']  Saved password hash.
+	 * @param int    $db_user['userid']  User id.
+	 *
+	 * @return bool
+	 */
+	private static function verifyPassword($password, array $db_user) {
+		if (strlen($db_user['passwd']) > ZBX_MD5_SIZE) {
+			return password_verify($password, $db_user['passwd']);
+		}
+		elseif (hash_equals($db_user['passwd'], md5($password))) {
+			DB::update('users', [
+				'values' => ['passwd' => password_hash($password, PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])],
+				'where' => ['userid' => $db_user['userid']]
+			]);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -1257,10 +1283,7 @@ class CUser extends CApiService {
 		);
 
 		unset($db_user['passwd']);
-		$db_user = $this->createSession([
-			'user' => $alias,
-			'password' => mt_rand()
-		], $db_user);
+		$db_user = self::createSession($alias, $db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1458,15 +1481,13 @@ class CUser extends CApiService {
 	/**
 	 * Initialize session for user. Returns user data array with valid sessionid.
 	 *
-	 * @param array  $user              Authentication credentials.
-	 * @param string $user['user']      User alias value.
-	 * @param string $user['password']  User password, is used in sessionid generation.
-	 * @param array  $db_user           User data from database.
+	 * @param string $alias    User alias value.
+	 * @param array  $db_user  User data from database.
 	 *
 	 * @return array
 	 */
-	private function createSession($user, $db_user) {
-		$db_user['sessionid'] = md5(microtime().md5($user['password']).$user['user'].mt_rand());
+	private static function createSession($alias, $db_user) {
+		$db_user['sessionid'] = md5(microtime().$alias.mt_rand());
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],

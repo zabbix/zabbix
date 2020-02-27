@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class CControllerDashboardPropertiesCheck extends CController {
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData([
-					'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
 				]))->disableView()
 			);
 		}
@@ -82,7 +82,7 @@ class CControllerDashboardPropertiesCheck extends CController {
 		}
 
 		$this->setResponse(
-			(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
 		);
 	}
 }

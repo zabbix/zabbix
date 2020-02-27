@@ -1,3 +1,29 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
 <script type="text/x-jquery-tmpl" id="tag-row-tmpl">
 	<?= (new CRow([
 		(new CTextBox('tags[#{rowNum}][tag]'))
@@ -23,21 +49,68 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		$(function() {
-			$('#maintenance_type').change(function() {
-				var maintenance_type = $('input[name=maintenance_type]:checked', $(this)).val();
-				if (maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>) {
-					$('#tags input, #tags button').prop('disabled', true);
-					$('#tags input[name$="[tag]"], #tags input[name$="[value]"]').removeAttr('placeholder');
-				}
-				else {
-					$('#tags input, #tags button').prop('disabled', false);
-					$('#tags input[name$="[tag]"]').attr('placeholder', <?= CJs::encodeJson(_('tag')) ?>);
-					$('#tags input[name$="[value]"]').attr('placeholder', <?= CJs::encodeJson(_('value')) ?>);
-				}
-			});
+		$('#maintenance_type').change(function() {
+			var maintenance_type = $('input[name=maintenance_type]:checked', $(this)).val();
+			if (maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>) {
+				$('#tags input, #tags button').prop('disabled', true);
+				$('#tags input[name$="[tag]"], #tags input[name$="[value]"]').removeAttr('placeholder');
+			}
+			else {
+				$('#tags input, #tags button').prop('disabled', false);
+				$('#tags input[name$="[tag]"]').attr('placeholder', <?= json_encode(_('tag')) ?>);
+				$('#tags input[name$="[value]"]').attr('placeholder', <?= json_encode(_('value')) ?>);
+			}
+		});
 
-			$('#tags').dynamicRows({template: '#tag-row-tmpl'});
+		$('#tags').dynamicRows({template: '#tag-row-tmpl'});
+
+		// Maintenance periods.
+		$('#maintenance_periods').on('click', '[data-action]', function() {
+			var btn = $(this),
+				rows = $('#maintenance_periods table > tbody > tr'),
+				params;
+
+			switch (btn.data('action')) {
+				case 'remove':
+					btn.closest('tr').remove();
+					break;
+
+				case 'edit':
+					var row = btn.closest('tr');
+
+					params = {
+						update: 1,
+						index: row.find('[type="hidden"]:first').attr('name').match(/\[(\d+)\]/)[1]
+					};
+
+					row.find('input[type="hidden"]').each(function() {
+						var $input = $(this),
+							name = $input.attr('name').match(/\[([^\]]+)]$/);
+
+						if (name) {
+							params[name[1]] = $input.val();
+						}
+					});
+
+					PopUp("popup.maintenance.period", params, null, btn);
+					break;
+
+				case 'add':
+					var index = 0;
+
+					rows.each(function(_, row) {
+						index = Math.max(index,
+							parseInt($(this).find('[type="hidden"]:first').attr('name').match(/\[(\d+)\]/)[1])
+						);
+					});
+
+					params = {
+						index: index + 1
+					}
+
+					PopUp("popup.maintenance.period", params, null, btn);
+					break;
+			}
 		});
 	});
 </script>

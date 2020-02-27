@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -220,7 +220,7 @@ var cookie = {
  *                             If a negative value is specified (e.g. a date in the past), the cookie will be deleted.
  *                             If set to null or omitted, the cookie will be a session cookie and will not be retained
  *                             when the browser exits.
- * @option String path The value of the path atribute of the cookie (default: path of page that created the cookie).
+ * @option String path The value of the path attribute of the cookie (default: path of page that created the cookie).
  * @option String domain The value of the domain attribute of the cookie (default: domain of page that created the cookie).
  * @option Boolean secure If true, the secure attribute of the cookie will be set and the cookie transmission will
  *                        require a secure protocol (like HTTPS).

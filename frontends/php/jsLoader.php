@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,6 @@ $availableJScripts = [
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
 	// vendors
-	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
 	// classes
@@ -75,7 +74,6 @@ $availableJScripts = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
-	'class.promise.js' => '',
 	'class.localstorage.js' => '',
 	'class.notifications.js' => '',
 	'class.notification.js' => '',
@@ -91,6 +89,8 @@ $availableJScripts = [
 	'class.csvggraph.js' => '',
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
+	'class.overlaycollection.js' => '',
+	'class.overlay.js' => '',
 	'class.cverticalaccordion.js' => '',
 	'class.mapWidget.js' => '',
 	'class.svg.canvas.js' => 'vector/',
@@ -98,11 +98,14 @@ $availableJScripts = [
 	'class.cviewswitcher.js' => '',
 	'class.pmaster.js' => '',
 	'class.rpc.js' => '',
+	'class.template.js' => '',
 	'init.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
+	'popup.condition.common.js' => 'pages/',
+	'popup.operation.common.js' => 'pages/'
 ];
 
 $tranStrings = [
@@ -211,6 +214,7 @@ $tranStrings = [
 		'S_PROBLEM_ON' => _('Problem on'),
 		'S_RESOLVED' => _('Resolved'),
 		'S_MUTE' => _('Mute'),
+		'S_CANNOT_SUPPORT_NOTIFICATION_AUDIO' => _('Cannot support notification audio for this device.'),
 		'S_UNMUTE' => _('Unmute'),
 		'S_CLEAR' => _('Clear'),
 		'S_SNOOZE' => _('Snooze')
@@ -297,6 +301,10 @@ $tranStrings = [
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
 		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
 	],
+	'init.js' => [
+		'Debug' => _('Debug'),
+		'Hide debug' => _('Hide debug')
+	],
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found')
@@ -321,24 +329,26 @@ $tranStrings = [
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel')
-	],
+	]
 ];
 
 $js = '';
 if (empty($_GET['files'])) {
 
 	$files = [
-		'prototype.js',
 		'jquery.js',
 		'jquery-ui.js',
 		'common.js',
 		'class.cdebug.js',
+		'class.overlaycollection.js',
+		'class.overlay.js',
 		'class.cdate.js',
 		'class.cookie.js',
 		'class.curl.js',
 		'class.rpc.js',
 		'class.bbcode.js',
 		'class.csuggest.js',
+		'class.template.js',
 		'main.js',
 		'chkbxrange.js',
 		'functions.js',
@@ -354,7 +364,6 @@ if (empty($_GET['files'])) {
 			$js .= 'window.ZBX_SESSION_NAME = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
 		}
 
-		$files[] = 'class.promise.js';
 		$files[] = 'class.localstorage.js';
 		$files[] = 'class.browsertab.js';
 		$files[] = 'class.notification.collection.js';
@@ -382,19 +391,6 @@ foreach ($files as $file) {
 	}
 }
 
-if (in_array('prototype.js', $files)) {
-	// This takes care of the Array toJSON incompatibility with JSON.stringify.
-	$js .=
-		'var _json_stringify = JSON.stringify;'.
-		'JSON.stringify = function(value) {'.
-			'var _array_tojson = Array.prototype.toJSON,'.
-				'ret;'.
-			'delete Array.prototype.toJSON;'.
-			'ret = _json_stringify(value);'.
-			'Array.prototype.toJSON = _array_tojson;'.
-			'return ret;'.
-		'};';
-}
 
 $etag = md5($js);
 /**

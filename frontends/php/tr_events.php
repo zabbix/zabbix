@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,9 +30,7 @@ $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
 $page['type'] = detect_page_type();
 $page['scripts'] = ['layout.mode.js'];
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -200,7 +198,7 @@ $event_tab = (new CDiv([
 	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $page['web_layout_mode']]))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	)

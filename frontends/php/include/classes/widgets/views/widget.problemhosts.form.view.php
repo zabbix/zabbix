@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 );
 
 $scripts = [];
+$jq_templates = [];
 
 // Host groups.
 $field_groupids = CWidgetHelper::getGroup($fields['groupids'],
@@ -65,6 +66,14 @@ $form_list->addRow(
 	CWidgetHelper::getSeverities($fields['severities'], $data['config'])
 );
 
+// Tags.
+$form_list->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']));
+
+// Tags filter list.
+$form_list->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
+$scripts[] = $fields['tags']->getJavascript();
+$jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
+
 // Show suppressed problems.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 	CWidgetHelper::getCheckBox($fields['show_suppressed'])
@@ -83,5 +92,6 @@ $form->addItem($form_list);
 
 return [
 	'form' => $form,
-	'scripts' => $scripts
+	'scripts' => $scripts,
+	'jq_templates' => $jq_templates
 ];

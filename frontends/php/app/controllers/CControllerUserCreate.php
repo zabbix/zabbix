@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,15 +23,15 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
-		$themes = array_keys(Z::getThemes());
+		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
 		$fields = [
 			'alias' =>			'required|db users.alias|not_empty',
 			'name' =>			'db users.name',
 			'surname' =>		'db users.surname',
-			'password1' =>		'required|db users.passwd',
-			'password2' =>		'required|db users.passwd',
+			'password1' =>		'required|string',
+			'password2' =>		'required|string',
 			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
 			'user_groups' =>	'required|array_id|not_empty',
 			'user_medias' =>	'array',
@@ -102,11 +102,17 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		$result = (bool) API::User()->create($user);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('zabbix.php?action=user.list&uncheck=1');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'user.list')
+				->setArgument('page', CPagerHelper::loadPage('user.list', null))
+			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('User added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=user.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'user.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add user'));
 		}

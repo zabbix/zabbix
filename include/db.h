@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ struct	_DC_TRIGGER;
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 #	define TRIGGER_COMMENTS_LEN	2048
 #else
 #	define TRIGGER_COMMENTS_LEN	65535
@@ -106,7 +106,7 @@ struct	_DC_TRIGGER;
 #define INTERFACE_PORT_LEN_MAX		(INTERFACE_PORT_LEN + 1)
 
 #define ITEM_NAME_LEN			255
-#define ITEM_KEY_LEN			255
+#define ITEM_KEY_LEN			2048
 #define ITEM_DELAY_LEN			1024
 #define ITEM_HISTORY_LEN		255
 #define ITEM_TRENDS_LEN			255
@@ -157,7 +157,7 @@ struct	_DC_TRIGGER;
 #define ITEM_SSL_CERT_FILE_LEN_MAX	(ITEM_SSL_CERT_FILE_LEN + 1)
 #define ITEM_SSL_KEY_FILE_LEN		255
 #define ITEM_SSL_KEY_FILE_LEN_MAX	(ITEM_SSL_KEY_FILE_LEN + 1)
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#if defined(HAVE_ORACLE)
 #	define ITEM_PARAM_LEN		2048
 #	define ITEM_DESCRIPTION_LEN	2048
 #	define ITEM_POSTS_LEN		2048
@@ -170,13 +170,8 @@ struct	_DC_TRIGGER;
 #endif
 
 #define HISTORY_STR_VALUE_LEN		255
-#ifdef HAVE_IBM_DB2
-#	define HISTORY_TEXT_VALUE_LEN	2048
-#	define HISTORY_LOG_VALUE_LEN	2048
-#else
-#	define HISTORY_TEXT_VALUE_LEN	65535
-#	define HISTORY_LOG_VALUE_LEN	65535
-#endif
+#define HISTORY_TEXT_VALUE_LEN		65535
+#define HISTORY_LOG_VALUE_LEN		65535
 
 #define HISTORY_LOG_SOURCE_LEN		64
 #define HISTORY_LOG_SOURCE_LEN_MAX	(HISTORY_LOG_SOURCE_LEN + 1)
@@ -339,6 +334,7 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
 #define ZBX_FLAGS_DB_EVENT_NO_ACTION		0x0002
+#define ZBX_FLAGS_DB_EVENT_RECOVER		0x0004
 	zbx_uint64_t		flags;
 }
 DB_EVENT;
@@ -454,12 +450,6 @@ typedef struct
 {
 	zbx_uint64_t	actionid;
 	char		*name;
-	char		*shortdata;
-	char		*longdata;
-	char		*r_shortdata;
-	char		*r_longdata;
-	char		*ack_shortdata;
-	char		*ack_longdata;
 	int		esc_period;
 	unsigned char	eventsource;
 	unsigned char	pause_suppressed;
@@ -653,11 +643,17 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 #define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
 #define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
 #define DBlock_dcheckid(dcheckid, druleid)	DBlock_record("dchecks", dcheckid, "druleid", druleid)
+#define DBlock_graphid(id)			DBlock_record("graphs", id, NULL, 0)
 #define DBlock_hostids(ids)			DBlock_records("hosts", ids)
+#define DBlock_triggerids(ids)			DBlock_records("triggers", ids)
+#define DBlock_itemids(ids)			DBlock_records("items", ids)
+#define DBlock_group_prototypeids(ids)		DBlock_records("group_prototype", ids)
 
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
+
+void	DBcheck_character_set(void);
 
 /* bulk insert support */
 

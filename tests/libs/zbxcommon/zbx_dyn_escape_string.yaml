@@ -1,0 +1,15 @@
+---
+test case: double quotes
+in:
+  data: '-"value"-'
+  escape_chars: '\"'
+out:
+  result: '-\"value\"-'
+---
+test case: backslash
+in:
+  data: '\value\'
+  escape_chars: '\"'
+out:
+  result: '\\value\\'
+...

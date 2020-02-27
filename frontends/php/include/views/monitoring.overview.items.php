@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 // hint table
 $help_hint = (new CList())
 	->addClass(ZBX_STYLE_NOTIF_BODY)
@@ -34,7 +38,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 // header right
-$web_layout_mode = CView::getLayoutMode();
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $submenu_source = [
 	SHOW_TRIGGERS => _('Trigger overview'),
@@ -79,7 +83,7 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -100,7 +104,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					(new CButton('application_name', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->onClick('return PopUp("popup.generic",'.
-							CJs::encodeJson([
+							json_encode([
 								'srctbl' => 'applications',
 								'srcfld1' => 'name',
 								'dstfrm' => 'zbx_filter',
@@ -132,4 +136,4 @@ else {
 
 $widget->addItem($table);
 
-return $widget;
+$widget->show();

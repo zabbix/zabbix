@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,8 @@ class CControllerMediatypeUpdate extends CController {
 			'attempt_interval' =>		'db media_type.attempt_interval',
 			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
-			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML
+			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
+			'message_templates' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -105,6 +106,7 @@ class CControllerMediatypeUpdate extends CController {
 			'description'
 		]);
 		$mediatype['status'] = $this->getInput('status', MEDIA_TYPE_STATUS_ACTIVE);
+		$mediatype['message_templates'] = $this->getInput('message_templates', []);
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
@@ -163,11 +165,17 @@ class CControllerMediatypeUpdate extends CController {
 		$result = API::Mediatype()->update($mediatype);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.list&uncheck=1');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'mediatype.list')
+				->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
+			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Media type updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'mediatype.edit')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update media type'));
 		}

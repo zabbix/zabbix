@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,13 +84,15 @@ $scripts[] =
 	'function onGraphConfigChange() {'.
 		// Update graph preview.
 		'var $preview = jQuery("#svg-graph-preview"),'.
+			'$preview_container = $preview.parent(),'.
+			'preview_data = $preview_container.data(),'.
 			'$form = jQuery("#'.$form->getId().'"),'.
 			'url = new Curl("zabbix.php"),'.
 			'data = {'.
 				'uniqueid: 0,'.
 				'preview: 1,'.
-				'content_width: $preview.width(),'.
-				'content_height: $preview.height() - 10'.
+				'content_width: Math.floor($preview.width()),'.
+				'content_height: Math.floor($preview.height()) - 10'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
 
@@ -129,12 +131,29 @@ $scripts[] =
 		'}'.
 		'data.fields = JSON.stringify(form_fields);'.
 
-		'jQuery.ajax({'.
+		'if (preview_data.xhr) {'.
+			'preview_data.xhr.abort();'.
+		'}'.
+
+		'if (preview_data.timeoutid) {'.
+			'clearTimeout(preview_data.timeoutid);'.
+		'}'.
+
+		'preview_data.timeoutid = setTimeout(function() {'.
+			'$preview_container.addClass("is-loading");'.
+		'}, 1000);'.
+
+		'preview_data.xhr = jQuery.ajax({'.
 			'url: url.getUrl(),'.
 			'method: "POST",'.
 			'data: data,'.
 			'dataType: "json",'.
 			'success: function(r) {'.
+				'if (preview_data.timeoutid) {'.
+					'clearTimeout(preview_data.timeoutid);'.
+				'}'.
+				'$preview_container.removeClass("is-loading");'.
+
 				'$form.prev(".msg-bad").remove();'.
 				'if (typeof r.messages !== "undefined") {'.
 					'jQuery(r.messages).insertBefore($form);'.
@@ -144,6 +163,7 @@ $scripts[] =
 				'}'.
 			'}'.
 		'});'.
+		'$preview_container.data(preview_data);'.
 	'}';
 
 $scripts[] =
@@ -260,7 +280,7 @@ $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 $tab_overrides = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['or']), CWidgetHelper::getGraphOverride($fields['or'], $form_name));
 
-$scripts[] = CWidgetHelper::getGraphOverrideJavascript($fields['or'], $form_name);
+$scripts[] = CWidgetHelper::getGraphOverrideJavascript($fields['or']);
 $jq_templates['overrides-row'] = CWidgetHelper::getGraphOverrideTemplate($fields['or'], $form_name);
 
 // Create CTabView.
@@ -273,15 +293,27 @@ $form_tabs = (new CTabView())
 	->addTab('problems',  _('Problems'), $tab_problems)
 	->addTab('overrides',  _('Overrides'), $tab_overrides)
 	->addClass('graph-widget-config-tabs') // Add special style used for graph widget tabs only.
-	->onTabChange('jQuery.colorpicker("hide");')
+	->onTabChange('jQuery.colorpicker("hide");jQuery(window).trigger("resize");')
 	->setSelected(0);
 
 // Add CTabView to form.
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
-
 $scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, select, .multiselect", onGraphConfigChange);';
-$scripts[] = 'onGraphConfigChange();';
+$scripts[] =
+	'jQuery(function($) {'.
+		'onGraphConfigChange();'.
+		'$(".overlay-dialogue").on("overlay-dialogue-resize", function(event, size_new, size_old) {'.
+			'if (jQuery("#svg-graph-preview").length) {'.
+				'if (size_new.width != size_old.width) {'.
+					'onGraphConfigChange();'.
+				'}'.
+			'}'.
+			'else {'.
+				'$(".overlay-dialogue").off("overlay-dialogue-resize");'.
+			'}'.
+		'});'.
+	'});';
 
 return [
 	'form' => $form,

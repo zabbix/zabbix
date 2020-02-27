@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widgets = [];
 
@@ -97,12 +101,17 @@ foreach ($data['hosts'] as $hostid => $host) {
 		$name,
 		make_decoration($interface['ip'], $data['search']),
 		make_decoration($interface['dns'], $data['search']),
-		new CLink(_('Latest data'), 'latest.php?filter_set=1&hostids[]='.$hostid),
+		new CLink(_('Latest data'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'latest.view')
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
+		),
 		new CLink(_('Problems'),
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'problem.view')
-			->setArgument('filter_hostids[]', $hostid)
-			->setArgument('filter_set', '1')
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'problem.view')
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
 		),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
 		new CLink(_('Screens'), 'host_screen.php?hostid='.$hostid),
@@ -159,11 +168,17 @@ foreach ($data['groups'] as $groupid => $group) {
 
 	$table->addRow([
 		$group['editable'] ? new CLink($caption, 'hostgroups.php?form=update&'.$link) : new CSpan($caption),
-		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$groupid),
-		new CLink(_('Problems'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'problem.view')
-			->setArgument('filter_groupids[]', $groupid)
-			->setArgument('filter_set', '1')
+		new CLink(_('Latest data'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'latest.view')
+				->setArgument('filter_groupids[]', $groupid)
+				->setArgument('filter_set', '1')
+		),
+		new CLink(_('Problems'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'problem.view')
+				->setArgument('filter_groupids[]', $groupid)
+				->setArgument('filter_set', '1')
 		),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
 		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),

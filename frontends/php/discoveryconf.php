@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -322,9 +322,7 @@ if (isset($_REQUEST['form'])) {
 	order_result($data['proxies'], 'host');
 
 	// render view
-	$discoveryView = new CView('configuration.discovery.edit', $data);
-	$discoveryView->render();
-	$discoveryView->show();
+	echo (new CView('configuration.discovery.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -393,13 +391,23 @@ else {
 		order_result($data['drules'], $sortField, $sortOrder);
 	}
 
-	// get paging
-	$data['paging'] = getPagingLine($data['drules'], $sortOrder, new CUrl('discoveryconf.php'));
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['drules'], $sortOrder, new CUrl('discoveryconf.php'));
 
 	// render view
-	$discoveryView = new CView('configuration.discovery.list', $data);
-	$discoveryView->render();
-	$discoveryView->show();
+	echo (new CView('configuration.discovery.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

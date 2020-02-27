@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2282,7 +2282,9 @@ static int	jsonpath_apply_functions(const struct zbx_json_parse *jp_root, const 
 		else
 			zbx_vector_str_clear(&input);
 
-		zbx_vector_str_append(&input, *output);
+		if (NULL != *output)
+			zbx_vector_str_append(&input, *output);
+
 		*output = NULL;
 		clear_input_contents = 1;
 
@@ -2367,9 +2369,6 @@ void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath)
 		jsonpath_segment_clear(&jsonpath->segments[i]);
 
 	zbx_free(jsonpath->segments);
-	jsonpath->segments_num = 0;
-	jsonpath->segments_alloc = 0;
-	jsonpath->definite = 0;
 }
 
 /******************************************************************************
@@ -2493,7 +2492,7 @@ int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char *
 	int			path_depth = 0, ret = SUCCEED;
 	zbx_vector_str_t	objects;
 
-	if (SUCCEED != zbx_jsonpath_compile(path, &jsonpath))
+	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
 		return FAIL;
 
 	zbx_vector_str_create(&objects);

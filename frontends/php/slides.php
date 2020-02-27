@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,9 +30,7 @@ $page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.pmaster.js
 	'flickerfreescreen.js', 'layout.mode.js'
 ];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
@@ -78,7 +76,10 @@ if (!$data['screen']) {
 	else {
 		// Redirect to slide show list.
 		ob_end_clean();
-		redirect('slideconf.php');
+		redirect((new CUrl('slideconf.php'))
+			->setArgument('page', CPagerHelper::loadPage('slideconf.php', null))
+			->getUrl()
+		);
 	}
 }
 
@@ -143,7 +144,7 @@ if (hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) {
 		$delay = timeUnitToSeconds(($screen['delay'] === '0') ? $data['screen']['delay'] : $screen['delay']);
 
 		$js = 'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.
-				CJs::encodeJson($delay * $widgetRefreshRate).
+				json_encode($delay * $widgetRefreshRate).
 			');'.
 			"\n".
 			'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].restartDoll();';
@@ -212,8 +213,6 @@ show_messages();
 $data['refreshMultiplier'] = CProfile::get('web.slides.rf_rate.'.WIDGET_SLIDESHOW, 1, $data['elementId']);
 
 // render view
-$slidesView = new CView('monitoring.slides', $data);
-$slidesView->render();
-$slidesView->show();
+echo (new CView('monitoring.slides', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
