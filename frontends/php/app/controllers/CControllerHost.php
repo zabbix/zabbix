@@ -215,8 +215,6 @@ abstract class CControllerHost extends CController {
 		}
 		unset($host);
 
-		$tags = makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
-
 		$maintenances = [];
 
 		if ($maintenanceids) {
@@ -226,6 +224,8 @@ abstract class CControllerHost extends CController {
 				'preservekeys' => true
 			]);
 		}
+
+		$tags = makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 
 		foreach ($hosts as &$host) {
 			$host['tags'] = $tags[$host['hostid']];
