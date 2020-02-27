@@ -158,6 +158,7 @@ class CControllerHostView extends CControllerHost {
 				'operator' => CProfile::get('web.host.filter.tags.operator', null, $i)
 			];
 		}
+		CArrayHelper::sort($filter_tags, ['tag', 'value', 'operator']);
 
 		$filter = [
 			'name' => CProfile::get('web.host.filter.name', ''),
