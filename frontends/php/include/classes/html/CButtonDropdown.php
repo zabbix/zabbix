@@ -19,7 +19,7 @@
 **/
 
 
-class CButtonDropdown extends CTag {
+class CButtonDropdown extends CDiv {
 
 	/**
 	 * Default CSS class name for HTML root element.
@@ -42,6 +42,20 @@ class CButtonDropdown extends CTag {
 	];
 
 	/**
+	 * Element value.
+	 *
+	 * @var string
+	 */
+	protected $value;
+
+	/**
+	 * Element name.
+	 *
+	 * @var string
+	 */
+	protected $name = '';
+
+	/**
 	 * CButtonDropdown constructor.
 	 *
 	 * @param string $name
@@ -58,8 +72,14 @@ class CButtonDropdown extends CTag {
 	public function __construct(string $name, string $value, array $options) {
 		$this->options = array_merge($this->options, $options);
 
-		parent::__construct('div', true);
+		parent::__construct();
 
+		$this->name = $name;
+
+		$this->value = $value;
+	}
+
+	public function toString($destroy = true) {
 		$this
 			->setId(uniqid('btn-dropdown-'))
 			->addClass(self::ZBX_STYLE_CLASS)
@@ -71,7 +91,7 @@ class CButtonDropdown extends CTag {
 					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, self::ZBX_STYLE_BTN_TOGGLE,
 						$this->options['active_class']
 					]))
-					->setId(zbx_formatDomId($name.'[btn]'))
+					->setId(zbx_formatDomId($this->name.'[btn]'))
 					->setMenuPopup([
 						'type' => 'dropdown',
 						'data' => [
@@ -79,6 +99,8 @@ class CButtonDropdown extends CTag {
 						]
 					])
 			)
-			->addItem((new CInput('hidden', $name, $value))->addClass(self::ZBX_STYLE_BTN_VALUE));
+			->addItem((new CInput('hidden', $this->name, $this->value))->addClass(self::ZBX_STYLE_BTN_VALUE));
+
+		return parent::toString($destroy);
 	}
 }

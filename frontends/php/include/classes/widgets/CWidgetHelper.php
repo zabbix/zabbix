@@ -406,7 +406,7 @@ class CWidgetHelper {
 			$severities[$severity] = getSeverityName($severity, $config);
 		}
 
-		return self::getCheckBoxList($field, $severities);
+		return self::getCheckBoxList($field, $severities)->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
 	}
 
 	/**

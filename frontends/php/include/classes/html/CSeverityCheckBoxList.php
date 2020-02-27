@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -17,17 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SYSINFO_COMMON_H
-#define ZABBIX_SYSINFO_COMMON_H
 
-#include "sysinfo.h"
+class CSeverityCheckBoxList extends CCheckBoxList {
+	/**
+	 * Create check box list with severities.
+	 *
+	 * @param string $name  Field name in form.
+	 */
+	public function __construct($name) {
+		parent::__construct($name);
 
-extern ZBX_METRIC	parameters_common[];
-extern ZBX_METRIC	parameters_common_local[];
-
-int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	EXECUTE_STR(const char *command, AGENT_RESULT *result);
-int	EXECUTE_DBL(const char *command, AGENT_RESULT *result);
-int	EXECUTE_INT(const char *command, AGENT_RESULT *result);
-
-#endif
+		$this->setOptions(CSeverity::getSeverities());
+		$this->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
+	}
+}

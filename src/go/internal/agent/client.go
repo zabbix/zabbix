@@ -19,9 +19,15 @@
 
 package agent
 
-import "sync/atomic"
+import (
+	"sync/atomic"
+)
 
-var lastClientID uint64
+const ActiveChecksClientID = 100
+const PassiveChecksClientID = 1
+const LocalChecksClientID = 0
+
+var lastClientID uint64 = ActiveChecksClientID
 
 // Internal client id assigned to each active server and unique passive bulk request.
 // Single checks (internal and old style passive checks) has built-in client id 0.

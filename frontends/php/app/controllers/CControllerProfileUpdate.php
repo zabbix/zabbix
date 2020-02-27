@@ -34,7 +34,7 @@ class CControllerProfileUpdate extends CController {
 			switch ($this->getInput('idx')) {
 				case 'web.actionconf.filter.active':
 				case 'web.auditacts.filter.active':
-				case 'web.auditlogs.filter.active':
+				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
 				case 'web.graphs.filter.active':
 				case 'web.correlation.filter.active':
