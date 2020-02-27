@@ -21,7 +21,7 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* tcp://localhost:11211  
 *Limits:*
 - Must match the URI format.
-- The only supported schemas: "tcp" and "unix".
+- The only supported schemas are "tcp" and "unix".
   
 *Examples:*
 - tcp://127.0.0.1:11211
@@ -51,12 +51,12 @@ different URIs).
 can be either a Uri or a session name) — they will be just ignored. 
 
 - If you pass a Uri as the connString, and this connection requires authentication, you must use the
-Plugins.Memcached.User and Plugins.Memcached.Password parameters (the 1st level options) in the configuration file.
-In other words, once defined this parameter will be used for authenticating all connections where the connString is 
+Plugins.Memcached.User and Plugins.Memcached.Password parameters (the 1st level parameters) in the configuration file.
+In other words, once defined these parameters will be used for authenticating all connections where the connString is 
 represented by Uri. 
 
-- If you want to use different credentials for different Memcached instances, you should create named session in the config 
-for each instance and should define a session-level password.
+- If you want to use different credentials for different Memcached instances, you should create named session in the 
+config for each instance and should define a session-level password.
  
 #### Named sessions
 Named sessions allow you to define specific parameters for each Memcached instance. Currently, there are supported only 
@@ -70,7 +70,7 @@ E.g: if you have two instances: "Memcached1" and "Memcached2", you need to add t
     Plugins.Memcached.Sessions.Memcached2.User=<UserForMemcached2>   
     Plugins.Memcached.Sessions.Memcached2.Password=<PasswordForMemcached2>  
     
-Then you are able to use these names as a connStrings in keys instead of URIs, e.g:
+Then you can use these names as connStrings in keys instead of URIs, e.g:
 
     memcached.stats[Memcached1]
     memcached.stats[Memcached2]
@@ -91,7 +91,7 @@ There are 4 levels of parameters overwriting:
 
 **memcached.stats[connString][,type]** — Returns an output of the "stats" command serialized to JSON.  
 *Params:*  
-type — Type of stats. Supported: items, sizes, slabs, settings. Empty by default (general statistics).  
+type — One of supported stat types: items, sizes, slabs, settings. Empty by default (returns general statistics).  
 
 
 ## Troubleshooting

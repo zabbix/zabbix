@@ -21,6 +21,7 @@ package memcached
 
 import (
 	"time"
+
 	"zabbix.com/pkg/plugin"
 )
 
@@ -40,11 +41,11 @@ var maxParams = map[string]int{
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
-	connMgr *connManager
+	connMgr *ConnManager
 	options PluginOptions
 }
 
-type handler func(conn mcClient, params []string) (res interface{}, err error)
+type handler func(conn MCClient, params []string) (res interface{}, err error)
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin
@@ -58,23 +59,23 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	// The first param can be either a URI or a session identifier
 	if len(params) > 0 && len(params[0]) > 0 {
-		if isLooksLikeUri(params[0]) {
+		if isLooksLikeURI(params[0]) {
 			// Use the URI defined as key's parameter
-			uri, err = newUriWithCreds(params[0], p.options.User, p.options.Password)
+			uri, err = newURIWithCreds(params[0], p.options.User, p.options.Password)
 		} else {
 			if _, ok := p.options.Sessions[params[0]]; !ok {
 				return nil, errorUnknownSession
 			}
 			// Use a pre-defined session
-			uri, err = newUriWithCreds(
-				p.options.Sessions[params[0]].Uri,
+			uri, err = newURIWithCreds(
+				p.options.Sessions[params[0]].URI,
 				p.options.Sessions[params[0]].User,
 				p.options.Sessions[params[0]].Password,
 			)
 		}
 	} else {
-		// Use the default URI if the first param is omitted.
-		uri, err = newUriWithCreds(p.options.Uri, p.options.User, p.options.Password)
+		// Use the default URI if the first param is omitted
+		uri, err = newURIWithCreds(p.options.URI, p.options.User, p.options.Password)
 	}
 
 	if err != nil {
@@ -108,6 +109,7 @@ func (p *Plugin) Start() {
 
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
+	p.connMgr = nil
 }
 
 // init registers metrics.

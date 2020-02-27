@@ -19,16 +19,27 @@
 
 package memcached
 
-const (
-	pingFailed = 0
-	pingOk     = 1
+import (
+	"testing"
 )
 
-// pingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
-func (p *Plugin) pingHandler(conn MCClient, params []string) (interface{}, error) {
-	if err := conn.NoOp(); err != nil {
-		return pingFailed, nil
+func Test_zabbixError_Error(t *testing.T) {
+	tests := []struct {
+		name string
+		e    zabbixError
+		want string
+	}{
+		{
+			"ZabbixError stringify",
+			zabbixError("foobar"),
+			"foobar",
+		},
 	}
-
-	return pingOk, nil
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.Error(); got != tt.want {
+				t.Errorf("zabbixError.Error() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

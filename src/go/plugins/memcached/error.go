@@ -26,7 +26,7 @@ func (e zabbixError) Error() string { return string(e) }
 const (
 	errorInvalidParams     = zabbixError("Invalid parameters.")
 	errorCannotFetchData   = zabbixError("Cannot fetch data.")
-	errorCannotMarshalJson = zabbixError("Cannot marshal JSON.")
+	errorCannotMarshalJSON = zabbixError("Cannot marshal JSON.")
 	errorUnsupportedMetric = zabbixError("Unsupported metric.")
 	errorEmptyResult       = zabbixError("Empty result.")
 	errorUnknownSession    = zabbixError("Unknown session.")

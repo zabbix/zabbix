@@ -24,16 +24,21 @@ import (
 	"strings"
 )
 
-var supportedKeys = map[string]bool{"items": true, "sizes": true, "slabs": true, "settings": true}
-
 // statsHandler gets an output of 'stats <type>' command, parses it and returns it in the JSON format.
-func (p *Plugin) statsHandler(conn mcClient, params []string) (interface{}, error) {
+func (p *Plugin) statsHandler(conn MCClient, params []string) (interface{}, error) {
 	statsType := ""
 
 	if len(params) > 1 {
-		if supportedKeys[params[1]] {
+		switch params[1] {
+		case "items":
+			fallthrough
+		case "sizes":
+			fallthrough
+		case "slabs":
+			fallthrough
+		case "settings":
 			statsType = strings.ToLower(params[1])
-		} else {
+		default:
 			return nil, errorInvalidParams
 		}
 	}
@@ -47,7 +52,7 @@ func (p *Plugin) statsHandler(conn mcClient, params []string) (interface{}, erro
 	jsonRes, err := json.Marshal(stats)
 	if err != nil {
 		p.Errf(err.Error())
-		return nil, errorCannotMarshalJson
+		return nil, errorCannotMarshalJSON
 	}
 
 	return string(jsonRes), nil

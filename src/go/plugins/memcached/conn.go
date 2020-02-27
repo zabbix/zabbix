@@ -21,31 +21,36 @@ package memcached
 
 import (
 	"context"
-	"github.com/alimy/mc/v2"
 	"sync"
 	"time"
+
+	"github.com/alimy/mc/v2"
 	"zabbix.com/pkg/log"
 )
 
-type mcClient interface {
+const poolSize = 1
+
+type MCClient interface {
 	Stats(key string) (mc.McStats, error)
 	NoOp() error
 }
 
-type mcConn struct {
+type MCConn struct {
 	client         mc.Client
 	lastTimeAccess time.Time
 }
 
 // Stats wraps the mc.Client.StatsWithKey function.
-func (c *mcConn) Stats(key string) (stats mc.McStats, err error) {
-	res, err := c.client.StatsWithKey(key)
+func (conn *MCConn) Stats(key string) (stats mc.McStats, err error) {
+	res, err := conn.client.StatsWithKey(key)
 	if err != nil {
 		return nil, err
 	}
+
 	if len(res) == 0 {
 		return nil, errorEmptyResult
 	}
+
 	if len(res) > 1 {
 		panic("unexpected result")
 	}
@@ -55,36 +60,35 @@ func (c *mcConn) Stats(key string) (stats mc.McStats, err error) {
 		break
 	}
 
-	return
+	return stats, err
 }
 
 // NoOp wraps the mc.Client.NoOp function.
-func (c *mcConn) NoOp() error {
-	return c.client.NoOp()
+func (conn *MCConn) NoOp() error {
+	return conn.client.NoOp()
 }
 
 // updateAccessTime updates the last time a connection was accessed.
-func (r *mcConn) updateAccessTime() {
-	r.lastTimeAccess = time.Now()
+func (conn *MCConn) updateAccessTime() {
+	conn.lastTimeAccess = time.Now()
 }
 
 // Thread-safe structure for manage connections.
-type connManager struct {
+type ConnManager struct {
 	sync.Mutex
 	connMutex   sync.Mutex
-	connections map[URI]*mcConn
+	connections map[URI]*MCConn
 	keepAlive   time.Duration
 	timeout     time.Duration
 	Destroy     context.CancelFunc
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(keepAlive, timeout time.Duration) *connManager {
-
+func NewConnManager(keepAlive, timeout time.Duration) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	connMgr := &connManager{
-		connections: make(map[URI]*mcConn),
+	connMgr := &ConnManager{
+		connections: make(map[URI]*MCConn),
 		keepAlive:   keepAlive,
 		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
@@ -96,7 +100,7 @@ func NewConnManager(keepAlive, timeout time.Duration) *connManager {
 }
 
 // closeUnused closes each connection that has not been accessed at least within the keepalive interval.
-func (c *connManager) closeUnused() {
+func (c *ConnManager) closeUnused() {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -110,7 +114,7 @@ func (c *connManager) closeUnused() {
 }
 
 // closeAll closes all existed connections.
-func (c *connManager) closeAll() {
+func (c *ConnManager) closeAll() {
 	c.connMutex.Lock()
 	for uri, conn := range c.connections {
 		conn.client.Quit()
@@ -120,20 +124,24 @@ func (c *connManager) closeAll() {
 }
 
 // housekeeper repeatedly checks for unused connections and close them.
-func (c *connManager) housekeeper(ctx context.Context) {
-	for range time.Tick(10 * time.Second) {
+func (c *ConnManager) housekeeper(ctx context.Context) {
+	ticker := time.NewTicker(10 * time.Second)
+
+	for {
 		select {
 		case <-ctx.Done():
+			ticker.Stop()
 			c.closeAll()
+
 			return
-		default:
+		case <-ticker.C:
 			c.closeUnused()
 		}
 	}
 }
 
 // create creates a new connection with a given URI and password.
-func (c *connManager) create(uri URI) *mcConn {
+func (c *ConnManager) create(uri URI) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -153,14 +161,14 @@ func (c *connManager) create(uri URI) *mcConn {
 			Failover:           true,
 			ConnectionTimeout:  c.timeout,
 			DownRetryDelay:     60 * time.Second,
-			PoolSize:           1,
+			PoolSize:           poolSize,
 			TcpKeepAlive:       true,
 			TcpKeepAlivePeriod: c.keepAlive,
 			TcpNoDelay:         true,
 		},
 	)
 
-	c.connections[uri] = &mcConn{
+	c.connections[uri] = &MCConn{
 		client:         *client,
 		lastTimeAccess: time.Now(),
 	}
@@ -171,7 +179,7 @@ func (c *connManager) create(uri URI) *mcConn {
 }
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *connManager) get(uri URI) *mcConn {
+func (c *ConnManager) get(uri URI) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -184,7 +192,7 @@ func (c *connManager) get(uri URI) *mcConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *connManager) GetConnection(uri URI) (conn *mcConn) {
+func (c *ConnManager) GetConnection(uri URI) (conn *MCConn) {
 	c.Lock()
 	defer c.Unlock()
 

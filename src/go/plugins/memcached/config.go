@@ -21,13 +21,14 @@ package memcached
 
 import (
 	"fmt"
+
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 )
 
 type Session struct {
 	// URI is a connection string consisting of a network scheme, a host address and a port or a path to a Unix-socket.
-	Uri string `conf:"optional"`
+	URI string `conf:"name=Uri,optional"`
 
 	// Password to send to protected Memcached server.
 	Password string `conf:"optional"`
@@ -38,7 +39,7 @@ type Session struct {
 
 type PluginOptions struct {
 	// URI is the default connection string.
-	Uri string `conf:"default=tcp://localhost:11211"`
+	URI string `conf:"name=Uri,default=tcp://localhost:11211"`
 
 	// Password is the default password.
 	Password string `conf:"optional"`
@@ -62,54 +63,58 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
+
 	if p.options.Timeout == 0 {
 		p.options.Timeout = global.Timeout
 	}
 
 	for _, session := range p.options.Sessions {
-		if session.Uri == "" {
-			session.Uri = p.options.Uri
+		if session.URI == "" {
+			session.URI = p.options.URI
 		}
 	}
 }
 
 // https://github.com/memcached/memcached/blob/master/sasl_defs.c#L26
-const MaxEntryLen = 256
+const MaxEntryLen = 252
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
 func (p *Plugin) Validate(options interface{}) error {
-	var opts PluginOptions
-	var err error
+	var (
+		opts PluginOptions
+		err  error
+	)
 
 	err = conf.Unmarshal(options, &opts)
 	if err != nil {
 		return err
 	}
 
-	err = validateUri(opts.Uri)
+	err = validateURI(opts.URI)
 	if err != nil {
 		return err
 	}
 
-	if len(opts.Password)+len(opts.User) > (MaxEntryLen - 4) {
-		return fmt.Errorf("credentials cannot be longer than %d characters", MaxEntryLen-4)
+	if len(opts.Password+opts.User) > MaxEntryLen {
+		return fmt.Errorf("credentials cannot be longer than %d characters", MaxEntryLen)
 	}
 
-	uri := opts.Uri
+	uri := opts.URI
+
 	for name, session := range opts.Sessions {
-		if session.Uri != "" {
-			uri = session.Uri
+		if session.URI != "" {
+			uri = session.URI
 		}
 
-		err = validateUri(uri)
+		err = validateURI(uri)
 		if err != nil {
 			return fmt.Errorf("invalid parameters for session '%s': %s", name, err.Error())
 		}
 
-		if len(session.Password)+len(session.User) > (MaxEntryLen - 4) {
+		if len(session.Password+session.User) > MaxEntryLen {
 			return fmt.Errorf("invalid parameters for session '%s': credentials cannot be longer than %d characters",
-				name, MaxEntryLen-4)
+				name, MaxEntryLen)
 		}
 	}
 
