@@ -665,7 +665,7 @@ static int	DBpatch_4050043(void)
 	const char *profile = "web.problem.filter.severities";
 
 	result = DBselect(
-			"select profileid,userid,idx,idx2,value_int"
+			"select profileid,userid,idx,value_int"
 			" from profiles p"
 			" where idx='web.problem.filter.severity'");
 
@@ -673,7 +673,7 @@ static int	DBpatch_4050043(void)
 	{
 		ZBX_DBROW2UINT64(profileid, row[0]);
 		ZBX_DBROW2UINT64(userid, row[1]);
-		idx = DBdyn_escape_string(row[2]);
+		idx = DBdyn_escape_string(profile);
 		idx2 = 0;
 		value_int = atoi(row[3]);
 
