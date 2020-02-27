@@ -90,7 +90,6 @@ class CMacroValue extends CDiv {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-
 		$dropdown_options = [
 			'title' => _('Change type'),
 			'active_class' => ($this->values['type'] == ZBX_MACRO_TYPE_TEXT) ? ZBX_STYLE_ICON_TEXT : ZBX_STYLE_ICON_SECRET_TEXT,
