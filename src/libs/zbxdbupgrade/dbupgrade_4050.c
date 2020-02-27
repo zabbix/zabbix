@@ -662,15 +662,12 @@ static int	DBpatch_4050043(void)
 	int		ret = SUCCEED, res, i, k, value_int;
 	char		*idx;
 
-	const char	*profiles[] = {
-			"web.problem.filter.severity",
-			"web.problem.filter.severities"
-		};
+	const char *profile = "web.problem.filter.severities";
 
 	result = DBselect(
 			"select profileid,userid,idx,idx2,value_int"
 			" from profiles p",
-			" where where idx='%s'", profiles[0]);
+			" where where idx='web.problem.filter.severity'");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -681,7 +678,7 @@ static int	DBpatch_4050043(void)
 		value_int = atoi(row[3]);
 
 		res = DBexecute("update profiles set idx='%s'"
-				" where profileid=" ZBX_FS_UI64, profiles[1], profileid);
+				" where profileid=" ZBX_FS_UI64, profile, profileid);
 
 		if (ZBX_DB_OK > res)
 		{
