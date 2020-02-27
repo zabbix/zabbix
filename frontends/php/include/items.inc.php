@@ -1008,15 +1008,19 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
  *
  * @return array
  */
-function getDataOverviewCellData(array $db_hosts, array $db_items, array $items_by_name, int $show_suppressed): array {
+function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$items_by_name, int $show_suppressed): array {
 	$visible_items = [];
-	foreach ($items_by_name as $name => $hostid_to_itemid) {
-		foreach ($hostid_to_itemid as $hostid => $itemid) {
-			$visible_items[$itemid] = $db_items[$itemid];
+	foreach ($items_by_name as $hostid_to_itemids) {
+		foreach ($hostid_to_itemids as $itemid) {
+			$visible_items[$itemid] = [
+				'value_type' => $db_items[$itemid]['value_type'],
+				'itemid' => $db_items[$itemid]['itemid']
+			];
 		}
 	}
 
 	$history = Manager::History()->getLastValues($visible_items, 1, ZBX_HISTORY_PERIOD);
+
 	$db_triggers = getTriggersWithActualSeverity([
 		'output' => ['triggerid', 'priority', 'value'],
 		'selectItems' => ['itemid'],
@@ -1034,16 +1038,16 @@ function getDataOverviewCellData(array $db_hosts, array $db_items, array $items_
 		}
 	}
 
-	foreach ($items_by_name as $name => $hostid_to_itemid) {
-		$row = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
+	foreach ($items_by_name as $name => $hostid_to_itemids) {
 		foreach ($db_hosts as $host) {
-			if (!array_key_exists($host['hostid'], $hostid_to_itemid)) {
-				$row[] = new CCol();
+			if (!array_key_exists($host['hostid'], $hostid_to_itemids)) {
 				continue;
 			}
 
-			$itemid = $hostid_to_itemid[$host['hostid']];
-			$visible_items[$itemid]['value'] = array_key_exists($itemid, $history) ? $history[$itemid][0]['value'] : null;
+			$itemid = $hostid_to_itemids[$host['hostid']];
+			$visible_items[$itemid]['value'] = array_key_exists($itemid, $history)
+				? $history[$itemid][0]['value']
+				: null;
 			$trigger = null;
 
 			if (array_key_exists($itemid, $itemid_to_triggerids)) {
@@ -1051,8 +1055,9 @@ function getDataOverviewCellData(array $db_hosts, array $db_items, array $items_
 				$max_priority_triggerid = -1;
 				foreach ($itemid_to_triggerids[$itemid] as $triggerid) {
 					$trigger = $db_triggers[$triggerid];
+
 					// Bump lower priority triggers of value "true" ahead of triggers with value "false".
-					$multiplier = $trigger['value'] == TRIGGER_VALUE_TRUE ? TRIGGER_SEVERITY_COUNT : 0;
+					$multiplier = ($trigger['value'] == TRIGGER_VALUE_TRUE) ? TRIGGER_SEVERITY_COUNT : 0;
 					if ($trigger['priority'] + $multiplier > $max_priority) {
 						$max_priority_triggerid = $triggerid;
 						$max_priority = $trigger['priority'] + $multiplier;
@@ -1076,6 +1081,7 @@ function getDataOverviewCellData(array $db_hosts, array $db_items, array $items_
  */
 function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
 	$config = select_config();
+
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
@@ -1090,8 +1096,8 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'applicationids' => $applicationids,
 			'monitored' => true,
 			'webitems' => true,
-			'preservekeys' => true,
-			'limit' => $config['search_limit']
+			'limit' => $config['search_limit'],
+			'preservekeys' => true
 		]);
 	}
 	else {
@@ -1101,8 +1107,8 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'groupids' => $groupids,
 			'monitored' => true,
 			'webitems' => true,
-			'preservekeys' => true,
-			'limit' => $config['search_limit']
+			'limit' => $config['search_limit'],
+			'preservekeys' => true
 		]);
 	}
 
@@ -1183,9 +1189,10 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 	}
 
 	$hidden_items_cnt = count(array_splice($items_by_name, ZBX_MAX_TABLE_COLUMNS));
+
 	$itemids = [];
-	foreach ($items_by_name as $name => $hostid_to_itemid) {
-		foreach ($hostid_to_itemid as $hostid => $itemid) {
+	foreach ($items_by_name as $hostid_to_itemid) {
+		foreach ($hostid_to_itemid as $itemid) {
 			$itemids[] = $itemid;
 		}
 	}
@@ -1195,7 +1202,9 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 	$db_hosts_ctn = count($db_hosts);
 	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
 
-	return [$db_items, $db_hosts, $items_by_name, $hidden_items_cnt || ($db_hosts_ctn > count($db_hosts))];
+	$has_hidden_data = ($hidden_items_cnt || ($db_hosts_ctn > count($db_hosts)));
+
+	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
 }
 
 /**
@@ -1223,7 +1232,9 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	$items_by_name_ctn = count($items_by_name);
 	$items_by_name = array_slice($items_by_name, 0, ZBX_MAX_TABLE_COLUMNS, true);
 
-	return [$db_items, $db_hosts, $items_by_name, $hidden_db_hosts_cnt || ($items_by_name_ctn > count($items_by_name))];
+	$has_hidden_data = ($hidden_db_hosts_cnt || ($items_by_name_ctn > count($items_by_name)));
+
+	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
 }
 
 /**

@@ -185,6 +185,7 @@ if ($type == SHOW_TRIGGERS) {
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter['groupids'],
+			'with_monitored_triggers' => true,
 			'preservekeys' => true
 		]), ['groupid' => 'id'])
 		: [];
@@ -195,6 +196,8 @@ if ($type == SHOW_TRIGGERS) {
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
 			'hostids' => $filter['hostids'],
+			'monitored_hosts' => true,
+			'with_monitored_triggers' => true,
 			'preservekeys' => true
 		]), ['hostid' => 'id'])
 		: [];

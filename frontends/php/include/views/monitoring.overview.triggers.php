@@ -133,10 +133,10 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			'txtSelect' => $data['filter']['txtSelect'],
 			'application' => $data['filter']['application'],
 			'inventory' => $data['filter']['inventory'],
-			'show_suppressed' => $data['filter']['show_suppressed']
+			'show_suppressed' => $data['filter']['show_suppressed'],
+			'groups' => $data['filter']['groupids'],
+			'hosts' => $data['filter']['hostids']
 		],
-		'ms_groups' => $data['filter']['groupids'],
-		'ms_hosts' => $data['filter']['hostids'],
 		'config' => $data['config'],
 		'profileIdx' => $data['profileIdx'],
 		'active_tab' => $data['active_tab']

@@ -62,27 +62,28 @@ $widget = (new CWidget())
 		]
 	])
 	->setWebLayoutMode($web_layout_mode)
-	->setControls(new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem(new CInput('hidden', 'type', $this->data['type']))
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Hosts location'), 'view_style'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
-						STYLE_TOP => _('Top'),
-						STYLE_LEFT => _('Left')
-					])
-				])
-			),
+	->setControls(
 		(new CTag('nav', true, (new CList())
+			->addItem((new CForm('get'))
+				->cleanItems()
+				->setAttribute('aria-label', _('Main filter'))
+				->addItem(new CInput('hidden', 'type', $data['type']))
+				->addItem((new CList())
+					->addItem([
+						new CLabel(_('Hosts location'), 'view_style'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						new CComboBox('view_style', $data['view_style'], 'submit()', [
+							STYLE_TOP => _('Top'),
+							STYLE_LEFT => _('Left')
+						])
+					])
+				)
+			)
 			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
-	]));
+	);
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	// filter
@@ -95,7 +96,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					(new CMultiSelect([
 						'multiple' => true,
 						'name' => 'filter_groupids[]',
-						'object_name' => 'group',
+						'object_name' => 'hostGroup',
 						'data' => $data['filter']['groupids'],
 						'popup' => [
 							'parameters' => [

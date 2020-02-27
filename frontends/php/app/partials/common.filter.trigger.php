@@ -46,8 +46,8 @@ $column1 = (new CFormList())
 		(new CMultiSelect([
 			'multiple' => true,
 			'name' => 'filter_groupids[]',
-			'object_name' => 'group',
-			'data' => $data['ms_groups'],
+			'object_name' => 'hostGroup',
+			'data' => $data['filter']['groups'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
@@ -63,13 +63,15 @@ $column1 = (new CFormList())
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => 'hosts',
-			'data' => $data['ms_hosts'],
+			'data' => $data['filter']['hosts'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'filter_hostids_'
+					'dstfld1' => 'filter_hostids_',
+					'monitored_hosts' => true,
+					'with_monitored_triggers' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

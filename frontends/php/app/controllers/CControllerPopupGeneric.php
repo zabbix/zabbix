@@ -935,6 +935,10 @@ class CControllerPopupGeneric extends CController {
 					$options['with_items'] = true;
 				}
 
+				if ($this->hasInput('with_monitored_triggers')) {
+					$options['with_monitored_triggers'] = true;
+				}
+
 				if ($this->hasInput('normal_only')) {
 					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 				}

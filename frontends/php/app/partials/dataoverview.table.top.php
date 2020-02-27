@@ -35,15 +35,15 @@ foreach ($data['db_hosts'] as $host) {
 
 $table->setHeader($headings);
 
-foreach ($data['items_by_name'] as $name => $hostid_to_itemid) {
+foreach ($data['items_by_name'] as $name => $hostid_to_itemids) {
 	$row = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 
 	foreach ($data['db_hosts'] as $hostid => $host) {
-		if (!array_key_exists($host['hostid'], $hostid_to_itemid)) {
+		if (!array_key_exists($host['hostid'], $hostid_to_itemids)) {
 			$row[] = new CCol();
 		}
 		else {
-			$itemid = $hostid_to_itemid[$host['hostid']];
+			$itemid = $hostid_to_itemids[$host['hostid']];
 			$item = $data['visible_items'][$itemid];
 			$row[] = getItemDataOverviewCell($item, $item['trigger']);
 		}
@@ -59,6 +59,5 @@ if ($data['has_hidden_data']) {
 			->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
 	]);
 }
-
 
 echo $table;

@@ -282,6 +282,7 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('with_monitored_triggers', $parameters) && $parameters['with_monitored_triggers']) {
 					$popup_parameters['with_monitored_triggers'] = '1';
 					$autocomplete_parameters['monitored'] = true;
+					$autocomplete_parameters['with_monitored_triggers'] = true;
 				}
 
 				if (array_key_exists('with_monitored_items', $parameters) && $parameters['with_monitored_items']) {
