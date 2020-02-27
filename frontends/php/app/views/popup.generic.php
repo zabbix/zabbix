@@ -111,6 +111,12 @@ elseif ($empty_btn) {
 if ($data['popup_type'] === 'help_items') {
 	$cmb_types = new CComboBox('itemtype', $options['itemtype'], 'javascript: reloadPopup(this.form);');
 
+	$header_form
+		->addVar('srctbl', $data['popup_type'])
+		->addVar('srcfld1', $options['srcfld1'])
+		->addVar('dstfrm', $options['dstfrm'])
+		->addVar('dstfld1', $options['dstfld1']);
+
 	foreach (CControllerPopupGeneric::ALLOWED_ITEM_TYPES as $type) {
 		$cmb_types->addItem($type, item_type2str($type));
 	}
