@@ -599,17 +599,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
 #endif
 
-#if !(defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL))
-	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT, "MySQL or Postgresql"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCertFile", CONFIG_DB_TLS_CERT_FILE, "MySQL or Postgresql"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSKeyFile", CONFIG_DB_TLS_KEY_FILE, "MySQL or Postgresql"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCAFile", CONFIG_DB_TLS_CA_FILE, "MySQL or Postgresql"));
-#endif
+	err |= (FAIL == zbx_db_validate_config_features());
 
-#if !defined(HAVE_MYSQL)
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher", CONFIG_DB_TLS_CIPHER, "MySQL"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13, "MySQL"));
-#endif
 	if (0 != err)
 		exit(EXIT_FAILURE);
 }

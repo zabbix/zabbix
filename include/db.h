@@ -482,6 +482,7 @@ void	DBdeinit(void);
 int	DBconnect(int flag);
 void	DBclose(void);
 
+int	zbx_db_validate_config_features(void);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 void	zbx_db_validate_config(void);
 #endif
