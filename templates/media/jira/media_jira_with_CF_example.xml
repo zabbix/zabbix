@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-02-19T15:13:46Z</date>
+    <date>2020-02-27T02:21:48Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -273,23 +273,25 @@ var Jira = {&#13;
         }&#13;
 &#13;
         Jira.request('put', 'issue/' + Jira.params.issue_key, Jira.addCustomFields(data, fields));&#13;
-&#13;
-        if (update.status == 1) {&#13;
-            Jira.commentIssue(update);&#13;
-        }&#13;
+        Jira.commentIssue(update);&#13;
     },&#13;
 &#13;
     commentIssue: function(update) {&#13;
         var data = {};&#13;
 &#13;
-        data.body = update.user + ' ' + update.action + '.';&#13;
-&#13;
-        if (update.message) {&#13;
-            data.body += '\nMessage: {quote}' + update.message + '{quote}';&#13;
+        if (typeof update === 'string') {&#13;
+            data.body = update;&#13;
+            Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
         }&#13;
+        else if (update.status == 1) {&#13;
+            data.body = update.user + ' ' + update.action + '.';&#13;
 &#13;
-        Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
+            if (update.message) {&#13;
+                data.body += '\nMessage: {quote}' + update.message + '{quote}';&#13;
+            }&#13;
 &#13;
+            Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
+        }&#13;
     }&#13;
 };&#13;
 &#13;
@@ -298,6 +300,14 @@ try {&#13;
         fields = {},&#13;
         jira = {},&#13;
         update = {};&#13;
+&#13;
+    if (!(params.event_value == 0 || params.event_value == 1)) {&#13;
+        throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    if (!(params.event_update_status == 0 || params.event_update_status == 1)) {&#13;
+        throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
+    }&#13;
 &#13;
     Object.keys(params)&#13;
         .forEach(function (key) {&#13;
@@ -329,7 +339,9 @@ try {&#13;
         if (!(jira.issue_key.startsWith(jira.project_key))) {&#13;
             throw new Error('Incorrect Issue key given: ' + jira.issue_key);&#13;
         }&#13;
-        Jira.updateIssue(params.summary, fields, update);&#13;
+        Jira.updateIssue(params.summary, fields,&#13;
+            ((params.event_value == 0 &amp;&amp; !(Object.keys(fields).length))&#13;
+                ? params.alert_message : update));&#13;
 &#13;
         return 'OK';&#13;
     }&#13;
