@@ -666,8 +666,8 @@ static int	DBpatch_4050043(void)
 
 	result = DBselect(
 			"select profileid,userid,idx,idx2,value_int"
-			" from profiles p",
-			" where where idx='web.problem.filter.severity'");
+			" from profiles p"
+			" where idx='web.problem.filter.severity'");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -688,9 +688,9 @@ static int	DBpatch_4050043(void)
 
 		for (k = value_int + 1; k < 6; k++)
 		{
-			if (ZBX_DB_OK > DBexecute("insert into profiles (userid,idx,idx2,value_id,value_int,type)"
-					" values (" ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",0,%d,2)",
-					userid, idx, ++idx2, k))
+			if (ZBX_DB_OK > DBexecute("insert into profiles (profileid,userid,idx,idx2,value_id,value_int,type)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",0,%d,2)",
+					DBget_maxid("profiles"), userid, idx, ++idx2, k))
 			{
 				ret = FAIL;
 				break;
