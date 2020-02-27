@@ -5201,11 +5201,11 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
-			'details' => [
+			'note' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
-				'default' => '0',
+				'default' => '',
 			],
 			'ip' => [
 				'null' => false,
@@ -5214,10 +5214,9 @@ return [
 				'default' => '',
 			],
 			'resourceid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			],
 			'resourcename' => [
 				'null' => false,
