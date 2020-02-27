@@ -94,7 +94,7 @@ foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	$widget->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'host.view')))
-		->setProfile('web.host.filter')
+		->setProfile('web.hostsmon.filter')
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'host.view'))->removeId())
 		->addFilterTab(_('Filter'), [

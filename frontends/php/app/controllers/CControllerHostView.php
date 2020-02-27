@@ -83,29 +83,29 @@ class CControllerHostView extends CControllerHost {
 	}
 
 	protected function doAction(): void {
-		$sort = $this->getInput('sort', CProfile::get('web.host.sort', 'name'));
-		$sortorder = $this->getInput('sortorder', CProfile::get('web.host.sortorder', ZBX_SORT_UP));
-		$active_tab = CProfile::get('web.host.filter.active', 1);
-		CProfile::update('web.host.filter.active', $active_tab, PROFILE_TYPE_INT);
+		$sort = $this->getInput('sort', CProfile::get('web.hostsmon.sort', 'name'));
+		$sortorder = $this->getInput('sortorder', CProfile::get('web.hostsmon.sortorder', ZBX_SORT_UP));
+		$active_tab = CProfile::get('web.hostsmon.filter.active', 1);
+		CProfile::update('web.hostsmon.filter.active', $active_tab, PROFILE_TYPE_INT);
 
-		CProfile::update('web.host.sort', $sort, PROFILE_TYPE_STR);
-		CProfile::update('web.host.sortorder', $sortorder, PROFILE_TYPE_STR);
+		CProfile::update('web.hostsmon.sort', $sort, PROFILE_TYPE_STR);
+		CProfile::update('web.hostsmon.sortorder', $sortorder, PROFILE_TYPE_STR);
 
 		// filter
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.host.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::updateArray('web.host.filter.groupids', $this->getInput('filter_groupids', []),
+			CProfile::update('web.hostsmon.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::updateArray('web.hostsmon.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
 			);
 
-			CProfile::update('web.host.filter.ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.host.filter.dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.host.filter.port', $this->getInput('filter_port', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hostsmon.filter.ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hostsmon.filter.dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hostsmon.filter.port', $this->getInput('filter_port', ''), PROFILE_TYPE_STR);
 
 			$severities = $this->getInput('filter_severities', []);
-			CProfile::updateArray('web.host.filter.severities', $severities, PROFILE_TYPE_INT);
+			CProfile::updateArray('web.hostsmon.filter.severities', $severities, PROFILE_TYPE_INT);
 
-			CProfile::update('web.host.filter.status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.hostsmon.filter.status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
 
 			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
 
@@ -119,64 +119,64 @@ class CControllerHostView extends CControllerHost {
 				$filter_tags['operators'][] = $filter_tag['operator'];
 			}
 
-			CProfile::update('web.host.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
+			CProfile::update('web.hostsmon.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 				PROFILE_TYPE_INT
 			);
-			CProfile::updateArray('web.host.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
-			CProfile::updateArray('web.host.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
-			CProfile::updateArray('web.host.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+			CProfile::updateArray('web.hostsmon.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+			CProfile::updateArray('web.hostsmon.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+			CProfile::updateArray('web.hostsmon.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 
 
-			CProfile::update('web.host.filter.show_suppressed',
+			CProfile::update('web.hostsmon.filter.show_suppressed',
 				$this->getInput('filter_show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE), PROFILE_TYPE_INT
 			);
-			CProfile::update('web.host.filter.maintenance_status',
+			CProfile::update('web.hostsmon.filter.maintenance_status',
 				$this->getInput('filter_maintenance_status', HOST_MAINTENANCE_STATUS_ON), PROFILE_TYPE_INT
 			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			CProfile::delete('web.host.filter.name');
-			CProfile::deleteIdx('web.host.filter.groupids');
-			CProfile::delete('web.host.filter.ip');
-			CProfile::delete('web.host.filter.dns');
-			CProfile::delete('web.host.filter.port');
-			CProfile::deleteIdx('web.host.filter.severities');
-			CProfile::delete('web.host.filter.status');
-			CProfile::delete('web.host.filter.show_suppressed');
-			CProfile::delete('web.host.filter.maintenance_status');
-			CProfile::delete('web.host.filter.evaltype');
-			CProfile::deleteIdx('web.host.filter.tags.tag');
-			CProfile::deleteIdx('web.host.filter.tags.value');
-			CProfile::deleteIdx('web.host.filter.tags.operator');
+			CProfile::delete('web.hostsmon.filter.name');
+			CProfile::deleteIdx('web.hostsmon.filter.groupids');
+			CProfile::delete('web.hostsmon.filter.ip');
+			CProfile::delete('web.hostsmon.filter.dns');
+			CProfile::delete('web.hostsmon.filter.port');
+			CProfile::deleteIdx('web.hostsmon.filter.severities');
+			CProfile::delete('web.hostsmon.filter.status');
+			CProfile::delete('web.hostsmon.filter.show_suppressed');
+			CProfile::delete('web.hostsmon.filter.maintenance_status');
+			CProfile::delete('web.hostsmon.filter.evaltype');
+			CProfile::deleteIdx('web.hostsmon.filter.tags.tag');
+			CProfile::deleteIdx('web.hostsmon.filter.tags.value');
+			CProfile::deleteIdx('web.hostsmon.filter.tags.operator');
 		}
 
 		$filter_tags = [];
-		foreach (CProfile::getArray('web.host.filter.tags.tag', []) as $i => $tag) {
+		foreach (CProfile::getArray('web.hostsmon.filter.tags.tag', []) as $i => $tag) {
 			$filter_tags[] = [
 				'tag' => $tag,
-				'value' => CProfile::get('web.host.filter.tags.value', null, $i),
-				'operator' => CProfile::get('web.host.filter.tags.operator', null, $i)
+				'value' => CProfile::get('web.hostsmon.filter.tags.value', null, $i),
+				'operator' => CProfile::get('web.hostsmon.filter.tags.operator', null, $i)
 			];
 		}
 		CArrayHelper::sort($filter_tags, ['tag', 'value', 'operator']);
 
 		$filter = [
-			'name' => CProfile::get('web.host.filter.name', ''),
-			'groupids' => CProfile::getArray('web.host.filter.groupids', []),
-			'ip' => CProfile::get('web.host.filter.ip', ''),
-			'dns' => CProfile::get('web.host.filter.dns', ''),
-			'port' => CProfile::get('web.host.filter.port', ''),
-			'status' => CProfile::get('web.host.filter.status', -1),
-			'evaltype' => CProfile::get('web.host.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+			'name' => CProfile::get('web.hostsmon.filter.name', ''),
+			'groupids' => CProfile::getArray('web.hostsmon.filter.groupids', []),
+			'ip' => CProfile::get('web.hostsmon.filter.ip', ''),
+			'dns' => CProfile::get('web.hostsmon.filter.dns', ''),
+			'port' => CProfile::get('web.hostsmon.filter.port', ''),
+			'status' => CProfile::get('web.hostsmon.filter.status', -1),
+			'evaltype' => CProfile::get('web.hostsmon.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 			'tags' => $filter_tags,
-			'severities' => CProfile::getArray('web.host.filter.severities', []),
-			'show_suppressed' => CProfile::get('web.host.filter.show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
-			'maintenance_status' => CProfile::get('web.host.filter.maintenance_status', HOST_MAINTENANCE_STATUS_ON),
+			'severities' => CProfile::getArray('web.hostsmon.filter.severities', []),
+			'show_suppressed' => CProfile::get('web.hostsmon.filter.show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
+			'maintenance_status' => CProfile::get('web.hostsmon.filter.maintenance_status', HOST_MAINTENANCE_STATUS_ON),
 			'page' => $this->hasInput('page') ? $this->getInput('page') : null
 		];
 
 		$refresh_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.view.refresh')
+			->setArgument('action', 'host.hostsmon.refresh')
 			->setArgument('filter_name', $filter['name'])
 			->setArgument('filter_groupids', $filter['groupids'])
 			->setArgument('filter_ip', $filter['ip'])
