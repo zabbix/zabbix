@@ -545,8 +545,8 @@ class testFormItemTest extends CWebTest {
 				foreach ($elements as $name => $selector) {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
-				$proxy = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid IN '
-					. '(SELECT proxy_hostid FROM hosts WHERE host = "Test item host")');
+				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN "
+					. "(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
 				// Check interface and proxy fields.
 				switch ($data['fields']['Type']) {
 					case 'Zabbix agent':

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Host groups'))
 	->setControls((new CTag('nav', true, (new CList())
@@ -162,4 +166,4 @@ $hostGroupForm->addItem([
 // append form to widget
 $widget->addItem($hostGroupForm);
 
-return $widget;
+$widget->show();

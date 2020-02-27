@@ -278,8 +278,12 @@ class CScreenProblem extends CScreenBase {
 					$options['time_from'] = time() - $filter['age'] * SEC_PER_DAY + 1;
 				}
 			}
-			if (array_key_exists('severity', $filter) && $filter['severity'] != TRIGGER_SEVERITY_NOT_CLASSIFIED) {
-				$options['severities'] = range($filter['severity'], TRIGGER_SEVERITY_COUNT - 1);
+			if (array_key_exists('severity', $filter) && $filter['severity']) {
+				$options['severities'] = $filter['severity'];
+			}
+			else {
+				$filter['severity'] = null;
+				$options['severities'] = range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
 			}
 			if (array_key_exists('severities', $filter)) {
 				$filter_severities = implode(',', $filter['severities']);

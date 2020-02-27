@@ -105,8 +105,6 @@ $data['backurl'] = (new CUrl('screenconf.php'))
 	->setArgument('page', CPagerHelper::loadPage('screenconf.php', null))
 	->getUrl();
 
-$view = new CView('conf.import', $data);
-$view->render();
-$view->show();
+echo (new CView('conf.import', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

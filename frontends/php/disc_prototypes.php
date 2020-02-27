@@ -1306,9 +1306,7 @@ if (isset($_REQUEST['form'])) {
 
 	// render view
 	if (!$has_errors) {
-		$itemView = new CView('configuration.item.prototype.edit', $data);
-		$itemView->render();
-		$itemView->show();
+		echo (new CView('configuration.item.prototype.edit', $data))->getOutput();
 	}
 }
 elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massupdateform') || hasRequest('massupdate'))
@@ -1553,9 +1551,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
 	}
 
-	$view = (new CView('configuration.item.prototype.massupdate', $data))
-		->render()
-		->show();
+	echo (new CView('configuration.item.prototype.massupdate', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -1622,9 +1618,7 @@ else {
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	// render view
-	$itemView = new CView('configuration.item.prototype.list', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.item.prototype.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
