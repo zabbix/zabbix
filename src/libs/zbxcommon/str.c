@@ -5523,3 +5523,30 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
 
 #	undef ZBX_SUFFIX
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_print_double                                                 *
+ *                                                                            *
+ * Purpose: converts double value to string and truncates insignificant       *
+ *          precision                                                         *
+ *                                                                            *
+ * Parameters: val      - [IN] double value to be converted                   *
+ *                                                                            *
+ * Return value: converted value                                              *
+ *                                                                            *
+ * Comments: Returns a pointer to the STATIC buffer holding converted value.  *
+ *           Subsequent calls of this function will override previous results.*
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_print_double(double val)
+{
+	static char	val_str[ZBX_MAX_DOUBLE_LEN + 1];
+
+	zbx_snprintf(val_str, ZBX_MAX_DOUBLE_LEN + 1, "%.15g", val);
+
+	if (atof(val_str) != val)
+		zbx_snprintf(val_str, ZBX_MAX_DOUBLE_LEN + 1, ZBX_FS_DBL64, val);
+
+	return val_str;
+}

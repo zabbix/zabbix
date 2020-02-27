@@ -306,12 +306,7 @@ void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *val
 void	zbx_history_value_print(char *buffer, size_t size, const history_value_t *value, int value_type)
 {
 	if (ITEM_VALUE_TYPE_FLOAT == value_type)
-	{
-		zbx_snprintf(buffer, size, "%.15g", value->dbl);
-
-		if (atof(buffer) != value->dbl)
-			zbx_snprintf(buffer, size, ZBX_FS_DBL64, value->dbl);
-	}
+		zbx_snprintf(buffer, size, "%s", zbx_print_double(value->dbl));
 	else
 		zbx_history_value2str(buffer, size, value, value_type);
 }

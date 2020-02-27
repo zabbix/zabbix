@@ -810,7 +810,7 @@ void	test_parameter(const char *key)
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
 
 		if (0 != ISSET_DBL(&result))
-			printf(" [d|" ZBX_FS_DBL64 "]", result.dbl);
+			printf(" [d|%s]", zbx_print_double(result.dbl));
 
 		if (0 != ISSET_STR(&result))
 			printf(" [s|%s]", result.str);

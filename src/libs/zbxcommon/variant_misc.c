@@ -48,8 +48,8 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, in
 			{
 				if (FAIL == (ret = zbx_validate_value_dbl(value->data.dbl, dbl_precision)))
 				{
-					*errmsg = zbx_dsprintf(NULL, "Value " ZBX_FS_DBL64 " is too small or too large.",
-							value->data.dbl);
+					*errmsg = zbx_dsprintf(NULL, "Value %s is too small or too large.",
+							zbx_print_double(value->data.dbl));
 				}
 			}
 			break;

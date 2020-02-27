@@ -1136,6 +1136,8 @@ int	ip_in_list(const char *list, const char *ip);
 const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len);
 const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len);
 
+char	*zbx_print_double(double val);
+
 /* IP range support */
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1
