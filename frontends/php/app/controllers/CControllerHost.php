@@ -155,38 +155,38 @@ abstract class CControllerHost extends CController {
 		]);
 
 		$problems = API::Problem()->get([
-			'output' => ['objectid', 'severity'],
+			'output' => ['eventid', 'objectid', 'severity'],
 			'objectids' => array_keys($triggers),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'suppressed' => ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false
 		]);
 
-		foreach ($hosts as $key => &$host) {
-			CArrayHelper::sort($host['interfaces'], [
-				['field' => 'main', 'order' => ZBX_SORT_DOWN]
-			]);
+		// Group all problems per host per severity.
+		$host_problems = [];
+		foreach ($problems as $problem) {
+			foreach ($triggers[$problem['objectid']]['hosts'] as $trigger_host) {
+				$host_problems[$trigger_host['hostid']][$problem['severity']][$problem['eventid']] = true;
+			}
+		}
+
+		foreach ($hosts as &$host) {
+			CArrayHelper::sort($host['interfaces'], [['field' => 'main', 'order' => ZBX_SORT_DOWN]]);
 
 			if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 				$maintenanceids[$host['maintenanceid']] = true;
 			}
 
-			for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
-				$host['problem_count'][$severity] = 0;
+			// Fill empty arrays for hosts without problems.
+			if (!array_key_exists($host['hostid'], $host_problems)) {
+				$host_problems[$host['hostid']] = [];
 			}
 
 			// Count the number of problems (as value) per severity (as key).
-			foreach ($problems as $key => $problem) {
-				foreach ($triggers[$problem['objectid']]['hosts'] as $trigger_host) {
-					if (bccomp($trigger_host['hostid'], $host['hostid']) == 0) {
-						for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED;
-								$severity--) {
-							if ($severity == $problem['severity']) {
-								$host['problem_count'][$severity]++;
-							}
-						}
-					}
-				}
+			for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
+				$host['problem_count'][$severity] = array_key_exists($severity, $host_problems[$host['hostid']])
+						? count($host_problems[$host['hostid']][$severity])
+						: 0;
 			}
 
 			// Merge host tags with template tags, and skip duplicate tags and values.
