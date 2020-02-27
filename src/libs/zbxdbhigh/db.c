@@ -78,7 +78,8 @@ int	zbx_db_validate_config_features(void)
 #endif
 
 #if !defined(HAVE_MYSQL_TLS_CIPHERSUITES)
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13, "MySQL"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13, "MySQL library that supports"
+			" this parameter"));
 #endif
 
 	return 0 != err ? FAIL : SUCCEED;
