@@ -823,7 +823,6 @@ function downloadSvgImage($dom_node, file_name) {
 
 	jQuery.map(['background-color', 'font-family', 'font-size', 'color'], function (key) {
 		$clone.css(key, $container.css(key));
-		console.log(`set ${key} to `+$container.css(key));
 	});
 
 	canvas.width = $dom_node.width()

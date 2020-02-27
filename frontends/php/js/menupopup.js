@@ -517,6 +517,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	var menu = getMenuPopupRefresh(options, trigger_elmnt),
 		widget_actions = [],
 		widget = jQuery('.dashbrd-grid-container').dashboardGrid('getWidgetsBy', 'widgetid', options.widgetName).pop(),
+		widgetid = widget.widgetid,
 		loading = !widget['ready'] || widget['content_body'].find('.is-loading').length > 0;
 
 	if ('download' in options) {
@@ -536,7 +537,9 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
 			},
 			refreshCallback: function(widget) {
-				this.disabled = !options.download;
+				if (widget['widgetid'] == widgetid && options.download) {
+					this.disabled = !widget['ready'];
+				}
 			}
 		});
 	}

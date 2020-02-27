@@ -205,6 +205,13 @@
 				}
 			});
 
+		$div.on('load.image', function() {
+			// Call refreshCallback handler for expanded popup menu items.
+			if ($div.find('[data-expanded="true"][data-menu-popup]').length) {
+				$div.find('[data-expanded="true"][data-menu-popup]').menuPopup('refresh', widget);
+			}
+		});
+
 		return $div;
 	}
 
@@ -2170,11 +2177,6 @@
 					options = {};
 				}
 
-				// Call refreshCallback handler for expanded popup menu items.
-				if ($obj.find('[data-expanded="true"][data-menu-popup]').length) {
-					$obj.find('[data-expanded="true"][data-menu-popup]').menuPopup('refresh', widget);
-				}
-
 				if (widget['iterator']) {
 					updateIteratorCallback($obj, data, widget, response, options);
 				}
@@ -2201,6 +2203,11 @@
 				if (!widget['iterator']) {
 					// Update the widget, if it was resized before it was fully loaded.
 					resizeWidget($obj, data, widget);
+				}
+
+				// Call refreshCallback handler for expanded popup menu items.
+				if ($obj.find('[data-expanded="true"][data-menu-popup]').length) {
+					$obj.find('[data-expanded="true"][data-menu-popup]').menuPopup('refresh', widget);
 				}
 			})
 			.fail(function() {
@@ -3632,7 +3639,7 @@
 			var widgets_found = [];
 			this.each(function() {
 				var	$this = $(this),
-						data = $this.data('dashboardGrid');
+					data = $this.data('dashboardGrid');
 
 				$.each(data['widgets'], function(index, widget) {
 					if (typeof widget[key] !== 'undefined' && widget[key] === value) {
