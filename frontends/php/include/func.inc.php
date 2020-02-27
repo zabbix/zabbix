@@ -633,7 +633,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
  * @param bool   $options['ignore_milliseconds']
  * @param int    $options['precision']
  * @param int    $options['decimals']
- * @param bool   $options['exact_decimals']
+ * @param bool   $options['decimals_exact']
  *
  * @return string
  */
@@ -661,7 +661,7 @@ function convertUnits(array $options) {
 		'ignore_milliseconds' => false,
 		'precision' => null,
 		'decimals' => null,
-		'exact_decimals' => false
+		'decimals_exact' => false
 	];
 
 	$value = $options['value'] !== null ? $options['value'] : 0;
@@ -692,9 +692,9 @@ function convertUnits(array $options) {
 	$do_convert = $units !== '' || $options['convert'] == ITEM_CONVERT_NO_UNITS;
 
 	if (in_array($units, $blacklist) || !$do_convert || $value_abs < 1) {
-		$result = ($options['decimals'] !== null)
-			? formatFloat($value, $options['precision'], $options['decimals'], $options['exact_decimals'])
-			: formatFloat($value, $options['precision'], ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
+		$result = formatFloat($value, $options['precision'], $options['decimals'] ?? ZBX_UNITS_ROUNDOFF_UNSUFFIXED,
+			$options['decimals_exact']
+		);
 
 		$result .= ($units === '' ? '' : ' '.$units);
 
@@ -729,15 +729,11 @@ function convertUnits(array $options) {
 		$unit_divisor = $power_table[8]['divisor'][$unit_base];
 	}
 
-	$result_value = $value / $unit_divisor;
-	$result_units = $unit_prefix.$units;
+	$result = formatFloat($value / $unit_divisor, $options['precision'], $options['decimals'] ??
+		($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED), $options['decimals_exact']
+	);
 
-	$result = ($options['decimals'] !== null)
-		? formatFloat($result_value, $options['precision'], $options['decimals'], $options['exact_decimals'])
-		: formatFloat($result_value, $options['precision'], $result_units === ''
-			? ZBX_UNITS_ROUNDOFF_UNSUFFIXED
-			: ZBX_UNITS_ROUNDOFF_SUFFIXED
-		);
+	$result_units = ($result == 0 ? '' : $unit_prefix).$units;
 
 	$result .= ($result_units === '' ? '' : ' '.$result_units);
 
@@ -1352,11 +1348,11 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  * @param string    $number          Valid number in decimal or scientific notation.
  * @param int|null  $precision       Max number of significant digits to take into account.
  * @param int|null  $decimals        Max number of first non-zero decimals decimals to display.
- * @param bool      $exact_decimals  Use exact number decimals instead of first non-zero ones.
  *
  * @return string
  */
-function formatFloat(string $number, int $effective_decimals, ?int $precision): string {
+
+function formatFloat(string $number, ?int $precision, ?int $decimals, bool $exact = false): string {
 	$number = (float) $number;
 
 	if ($number == 0) {
@@ -1375,30 +1371,58 @@ function formatFloat(string $number, int $effective_decimals, ?int $precision): 
 		$precision = PHP_FLOAT_DIG;
 	}
 
-	// Trim extra precision.
-	$number = sprintf('%.'.($precision - 1).'E', $number);
-	[$mantissa, $exponent] = explode('E', $number);
-
-	$significant_digits = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
-
-	if ($exponent >= 0) {
-		if ($exponent >= $precision) {
-			return $number;
-		}
-		elseif ($exponent + 1 >= $significant_digits) {
-			return sprintf('%d', $number);
-		}
-		else {
-			return sprintf('%.'.$effective_decimals.'f', $number);
-		}
+	if ($decimals === null) {
+		$decimals = 0;
 	}
-//    if ()
 
-	elseif (-$exponent <= 3 + ceil(log10(-$exponent))) {
-		return sprintf('%.'.($effective_decimals - $exponent - 1).'f', $number) . 'X';
+	$exponent = floor(log10($number));
+
+	if ($exponent < 0) {
+		for ($i = 1; $i >= 0; $i--) {
+			$test = round($number, $decimals - $exponent - $i);
+			$test_number = sprintf('%.'.($precision - 1).'E', $test);
+			$test_digits = ($precision == 1)
+				? 1
+				: strlen(rtrim(explode('E', $test_number)[0], '0')) - ($test_number[0] === '-' ? 2 : 1);
+
+			if ($test_digits - $exponent <= $precision) {
+				break;
+			}
+		}
+		$number = $test_number;
+		$digits = $test_digits;
 	}
 	else {
-		return sprintf('%.'.$effective_decimals.'E', $number);
+		if ($exponent >= $precision) {
+			$number = round($number, $decimals - $exponent);
+		}
+		else {
+			$number = round($number, min($decimals, $precision - $exponent - 1));
+		}
+
+		$number = sprintf('%.'.($precision - 1).'E', $number);
+		$digits = ($precision == 1) ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
+	}
+
+	if ($number == 0) {
+		return '0';
+	}
+
+	$exponent = floor(log10($number));
+
+	if ($exponent < 0) {
+		if ($digits - $exponent <= ($exact ? min($decimals + 1, $precision) : $precision)) {
+			return sprintf('%.'.($exact ? $decimals : $digits - $exponent - 1).'f', $number);
+		}
+		else {
+			return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+		}
+	}
+	elseif ($exponent >= $precision) {
+		return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+	}
+	else {
+		return sprintf('%.'.($exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals))).'f', $number);
 	}
 }
 

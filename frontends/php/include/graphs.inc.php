@@ -882,10 +882,23 @@ function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_
 			}
 		}
 
-		for ($range = floor(log(PHP_FLOAT_MAX, 2)), $base = 0; $base <= $range; $base++) {
+		$binary_range = 80;
+
+		for ($base = 0; $base <= $binary_range; $base++) {
 			$base_interval = pow(2, $base);
 			if ($base_interval != INF && $base_interval != -INF) {
 				$base_intervals['1024'][] = $base_interval;
+			}
+		}
+
+		$binary_max = pow(2, $binary_range);
+
+		for ($range = floor(log10(PHP_FLOAT_MAX)), $base = floor(log10($binary_max)); $base <= $range; $base++) {
+			foreach ([1, 2, 5] as $multiplier) {
+				$base_interval = $binary_max * pow(10, $base) * $multiplier;
+				if ($base_interval > $binary_max && $base_interval != INF && $base_interval != -INF) {
+					$base_intervals['1024'][] = $base_interval;
+				}
 			}
 		}
 
@@ -899,10 +912,10 @@ function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_
 	if ($scale_min >= $scale_max) {
 		if ($scale_max > 0) {
 			if ($calc_min) {
-				$scale_min = ($scale_max > 0) ? 0 : ($scale_max == 0) ? -1 : $scale_max * 1.25;
+				$scale_min = $scale_max > 0 ? 0 : ($scale_max == 0 ? -1 : $scale_max * 1.25);
 			}
 			elseif ($calc_max) {
-				$scale_max = ($scale_min < 0) ? 0 : ($scale_min == 0) ? 1 : $scale_min * 0.25;
+				$scale_max = $scale_min < 0 ? 0 : ($scale_min == 0 ? 1 : $scale_min * 1.25);
 			}
 			else {
 				return false;
@@ -910,10 +923,10 @@ function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_
 		}
 		else {
 			if ($calc_max) {
-				$scale_max = ($scale_min < 0) ? 0 : ($scale_min == 0) ? 1 : $scale_min * 1.25;
+				$scale_max = $scale_min < 0 ? 0 : ($scale_min == 0 ? 1 : $scale_min * 1.25);
 			}
 			elseif ($calc_min) {
-				$scale_min = ($scale_max > 0) ? 0 : ($scale_max == 0) ? -1 : $scale_max * 1.25;
+				$scale_min = $scale_max > 0 ? 0 : ($scale_max == 0 ? -1 : $scale_max * 1.25);
 			}
 			else {
 				return false;

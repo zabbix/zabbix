@@ -1190,17 +1190,14 @@ class CLineGraphDraw extends CGraphDraw {
 					if ($precision_required > $precision) {
 						$precision = 2;
 						$decimals = 1;
-						$exact_decimals = false;
 					}
 					else {
 						$decimals = min($precision - 1, getNumDecimals($this->intervals[$side]));
-						$exact_decimals = true;
 					}
 				}
 				else {
 					$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED + 1;
 					$decimals = min($precision - 1, getNumDecimals($this->intervals[$side]));
-					$exact_decimals = true;
 				}
 			}
 			else {
@@ -1208,9 +1205,8 @@ class CLineGraphDraw extends CGraphDraw {
 					$power = 0;
 				}
 
-				$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED + 1;
-				$decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED;
-				$exact_decimals = true;
+				$precision = ZBX_UNITS_ROUNDOFF_UNSUFFIXED;
+				$decimals = 0;
 			}
 
 			$rows = [
@@ -1243,8 +1239,7 @@ class CLineGraphDraw extends CGraphDraw {
 					'power' => $power,
 					'ignore_milliseconds' => $ignore_milliseconds,
 					'precision' => $precision,
-					'decimals' => $decimals,
-					'exact_decimals' => $exact_decimals
+					'decimals' => $decimals
 				]);
 
 				$pos_X = ($side == GRAPH_YAXIS_SIDE_LEFT)
