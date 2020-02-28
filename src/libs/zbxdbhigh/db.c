@@ -57,29 +57,34 @@ int	zbx_db_validate_config_features(void)
 	int	err = 0;
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))
-	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT, "MySQL or Postgresql"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCAFile", CONFIG_DB_TLS_CONNECT, "MySQL or Postgresql"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCertFile", CONFIG_DB_TLS_CERT_FILE, "MySQL or Postgresql"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSKeyFile", CONFIG_DB_TLS_KEY_FILE, "MySQL or Postgresql"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT, "PostgreSQL or MySQL library"
+			" version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCAFile", CONFIG_DB_TLS_CONNECT,"PostgreSQL or MySQL library"
+			" version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCertFile", CONFIG_DB_TLS_CERT_FILE, "PostgreSQL or MySQL library"
+			" version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSKeyFile", CONFIG_DB_TLS_KEY_FILE, "PostgreSQL or MySQL library"
+			" version that support TLS"));
 #endif
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_POSTGRESQL))
 	if (NULL != CONFIG_DB_TLS_CONNECT && 0 == strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 	{
 		zbx_error("\"DBTLSConnect\" configuration parameter value '%s' cannot be used: Zabbix %s was compiled"
-			" without %s", ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, get_program_type_string(program_type),
-			"MySQL or PostgreSQL library version that supports this value");
+			" without PostgreSQL or MySQL library version that support this value",
+			ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, get_program_type_string(program_type));
 		err |= FAIL;
 	}
 #endif
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS))
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher", CONFIG_DB_TLS_CIPHER, "MySQL"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCipher", CONFIG_DB_TLS_CIPHER, "MySQL library that support"
+			" configuration of cipher"));
 #endif
 
 #if !defined(HAVE_MYSQL_TLS_CIPHERSUITES)
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13, "MySQL library that supports"
-			" this parameter"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13, "MySQL library that support"
+			" configuration of TLSv1.3 ciphersuites"));
 #endif
 
 	return 0 != err ? FAIL : SUCCEED;
