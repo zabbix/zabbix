@@ -190,7 +190,7 @@
 					}
 				})
 				.on('afteradd.dynamicRows', function() {
-					$('.input-group').macroValue();
+					jQuery('.input-group').macroValue();
 				});
 
 			initMacroFields($parent);
