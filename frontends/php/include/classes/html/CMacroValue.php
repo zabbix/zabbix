@@ -71,6 +71,8 @@ class CMacroValue extends CDiv {
 
 		$this->values = $macro;
 		$this->name = $name;
+
+		$this->setId(uniqid('macro-value-'));
 	}
 
 	/**
@@ -116,7 +118,6 @@ class CMacroValue extends CDiv {
 		// Macro value input group.
 		$this
 			->addClass(self::ZBX_STYLE_INPUT_GROUP)
-			->setId(uniqid('macro-value-'))
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 			->addItem([
 				$value_input,
