@@ -350,8 +350,10 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	if (ITEM_VALUE_TYPE_UINT64 == dc_item->value_type && 0 > value)
 	{
+		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
+
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [%s] is not suitable for value type [%s].",
-				zbx_print_double(value),
+				zbx_print_double(buffer, sizeof(buffer), value),
 				zbx_item_value_type_string((zbx_item_value_type_t)dc_item->value_type)));
 		ret = NOTSUPPORTED;
 		goto clean;

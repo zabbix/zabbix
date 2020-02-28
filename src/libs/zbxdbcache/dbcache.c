@@ -1604,7 +1604,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 	switch (h->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(value, sizeof(value), "%s", zbx_print_double(h->value.dbl));
+			zbx_print_double(value, sizeof(value), h->value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, h->value.ui64);
@@ -1829,9 +1829,10 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 			case ITEM_VALUE_TYPE_FLOAT:
 				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, CONFIG_DOUBLE_PRECISION))
 				{
+					char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 					dc_history_set_error(hdata, zbx_dsprintf(NULL,
 							"Value %s is too small or too large.",
-							zbx_print_double(hdata->value.dbl)));
+							zbx_print_double(buffer, sizeof(buffer), hdata->value.dbl)));
 				}
 				break;
 		}

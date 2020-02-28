@@ -806,11 +806,13 @@ void	test_parameter(const char *key)
 
 	if (SUCCEED == process(key, PROCESS_WITH_ALIAS, &result))
 	{
+		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
+
 		if (0 != ISSET_UI64(&result))
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
 
 		if (0 != ISSET_DBL(&result))
-			printf(" [d|%s]", zbx_print_double(result.dbl));
+			printf(" [d|%s]", zbx_print_double(buffer, sizeof(buffer), result.dbl));
 
 		if (0 != ISSET_STR(&result))
 			printf(" [s|%s]", result.str);

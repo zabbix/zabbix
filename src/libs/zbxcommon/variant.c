@@ -212,14 +212,14 @@ static int	variant_to_ui64(zbx_variant_t *value)
 
 static int	variant_to_str(zbx_variant_t *value)
 {
-	char	*value_str;
+	char	*value_str, buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
 	switch (value->type)
 	{
 		case ZBX_VARIANT_STR:
 			return SUCCEED;
 		case ZBX_VARIANT_DBL:
-			value_str = zbx_strdup(NULL, zbx_print_double(value->data.dbl));
+			value_str = zbx_strdup(NULL, zbx_print_double(buffer, sizeof(buffer), value->data.dbl));
 			del_zeros(value_str);
 			break;
 		case ZBX_VARIANT_UI64:
@@ -294,7 +294,7 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 	switch (value->type)
 	{
 		case ZBX_VARIANT_DBL:
-			zbx_snprintf(buffer, sizeof(buffer), "%s", zbx_print_double(value->data.dbl));
+			zbx_print_double(buffer, sizeof(buffer), value->data.dbl);
 			del_zeros(buffer);
 			return buffer;
 		case ZBX_VARIANT_UI64:
