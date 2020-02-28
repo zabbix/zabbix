@@ -669,6 +669,17 @@ static int	DBpatch_4050043(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (0 == (value_int = atoi(row[2])))
+		{
+			if (ZBX_DB_OK > DBexecute("delete from profiles where profileid=" ZBX_FS_UI64, profileid))
+			{
+				ret = FAIL;
+				break;
+			}
+
+			continue;
+		}
+
 		ZBX_DBROW2UINT64(profileid, row[0]);
 
 		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s'"
@@ -679,7 +690,6 @@ static int	DBpatch_4050043(void)
 		}
 
 		ZBX_DBROW2UINT64(userid, row[1]);
-		value_int = atoi(row[2]);
 		idx2 = 0;
 
 		for (i = value_int + 1; i < 6; i++)
