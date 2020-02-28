@@ -167,6 +167,19 @@ class CHostImporter extends CImporter {
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
 								&& $dbInterface['main'] == $interface['main']) {
+
+							// Check SNMP additional fields.
+							if ($dbInterface['type'] == INTERFACE_TYPE_SNMP) {
+								// Get fields that we can compare.
+								$array_diff = array_intersect_key($dbInterface['details'], $interface['details']);
+								foreach (array_keys($array_diff) as $key) {
+									// Check field equality.
+									if ($dbInterface['details'][$key] != $interface['details'][$key]) {
+										continue 2;
+									}
+								}
+							}
+
 							$refName = $interface['interface_ref'];
 							$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
 						}
