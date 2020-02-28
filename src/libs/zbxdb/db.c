@@ -308,6 +308,7 @@ static int	is_recoverable_mysql_error(void)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
+		case CR_SSL_CONNECTION_ERROR:
 #ifdef ER_CONNECTION_KILLED
 		case ER_CONNECTION_KILLED:
 #endif
@@ -445,7 +446,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (NULL != tls_connect)
 	{
-		if 0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 		{
 			my_bool	enforce_tls = 1;
 

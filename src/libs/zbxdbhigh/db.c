@@ -47,6 +47,7 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
 
 static int	connection_failure;
+extern unsigned char	program_type;
 
 void	DBclose(void)
 {
