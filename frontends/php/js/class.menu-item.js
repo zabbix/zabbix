@@ -40,7 +40,7 @@ class CMenuItem extends CBaseComponent {
 			this._submenu = new CMenu(this._node.querySelector('.submenu'));
 		}
 
-		this._control = this._node.querySelector('a');
+		this._submenu_toggle = this._node.querySelector('a');
 
 		this._is_expanded = this._node.classList.contains('is-expanded');
 		this._is_selected = this._node.classList.contains('is-selected');
@@ -48,12 +48,14 @@ class CMenuItem extends CBaseComponent {
 
 	focusControl() {
 		this._control.focus();
+		// this._submenu_toggle.focus();
 
 		return this;
 	}
 
 	blurControl() {
 		this._control.blur();
+		// this._submenu_toggle.blur();
 
 		return this;
 	}
@@ -113,20 +115,11 @@ class CMenuItem extends CBaseComponent {
 			}
 		};
 
-		this._control.addEventListener('focus', this._events.focus);
-
-		if (this.hasSubmenu()) {
-			this._control.addEventListener('click', this._events.click);
-			this._submenu.on('focus', this._events.focus);
-		}
-	}
-
-	/**
-	 * Unregister all DOM events.
-	 */
-	destroy() {
-		this._control.removeEventListener('focus', this._events.focus);
-		this._control.removeEventListener('click', this._events.click);
-		this._submenu.off('focus', this._events.focus);
+		// this._control.addEventListener('focus', this._events.focus);
+		//
+		// if (this.hasSubmenu()) {
+		// 	this._control.addEventListener('click', this._events.click);
+		// 	this._submenu.on('focus', this._events.focus);
+		// }
 	}
 }

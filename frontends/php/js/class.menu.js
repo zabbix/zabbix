@@ -45,7 +45,6 @@ class CMenu extends CBaseComponent {
 
 	collapseAll(excluded_item = null) {
 		for (const item of this._items) {
-			// console.log(item, excluded_item, item !== excluded_item, item.hasSubmenu())
 			if (item !== excluded_item && item.hasSubmenu()) {
 				item.collapseSubmenu();
 			}
@@ -102,18 +101,6 @@ class CMenu extends CBaseComponent {
 				item.on('expand', this._events.expand);
 			}
 			item.on('focus', this._events.focus);
-		}
-	}
-
-	/**
-	 * Unregister all DOM events.
-	 */
-	destroy() {
-		for (const item of this._items) {
-			if (item.hasSubmenu()) {
-				item.off('expand', this._events.expand);
-			}
-			item.off('focus', this._events.focus);
 		}
 	}
 }

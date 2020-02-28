@@ -24,21 +24,17 @@ class CBaseComponent {
 		this._node = node;
 	}
 
-	hasClass(class_name) {
-
-	}
-
-	on(type, listener, options = false) {
-		this._node.addEventListener(type, listener, options);
+	on(types, listener, options = false) {
+		types.split(' ').forEach((t) => this._node.addEventListener(t, listener, options));
 		return this;
 	}
 
-	one(type, listener, options = false) {
-		return this.on(type, listener, Object.assign({once: true}, options));
+	one(types, listener, options = false) {
+		return this.on(types, listener, Object.assign({once: true}, options));
 	}
 
-	off(type, listener, options = false) {
-		this._node.removeEventListener(type, listener, options);
+	off(types, listener, options = false) {
+		types.split(' ').forEach((t) => this._node.removeEventListener(t, listener, options));
 		return this;
 	}
 
