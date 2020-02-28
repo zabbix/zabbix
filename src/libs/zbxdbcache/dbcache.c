@@ -1830,6 +1830,7 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, CONFIG_DOUBLE_PRECISION))
 				{
 					char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
+
 					dc_history_set_error(hdata, zbx_dsprintf(NULL,
 							"Value %s is too small or too large.",
 							zbx_print_double(buffer, sizeof(buffer), hdata->value.dbl)));
