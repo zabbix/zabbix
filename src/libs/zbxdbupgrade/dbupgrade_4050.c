@@ -659,46 +659,40 @@ static int	DBpatch_4050043(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	profileid, userid, idx2;
-	int		ret = SUCCEED, res, i, k, value_int;
-	char		*idx;
-
-	const char *profile = "web.problem.filter.severities";
+	int		ret = SUCCEED, value_int, i;
+	const char	*profile = "web.problem.filter.severities";
 
 	result = DBselect(
-			"select profileid,userid,idx,value_int"
-			" from profiles p"
+			"select profileid,userid,value_int"
+			" from profiles"
 			" where idx='web.problem.filter.severity'");
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_DBROW2UINT64(profileid, row[0]);
-		ZBX_DBROW2UINT64(userid, row[1]);
-		idx = DBdyn_escape_string(profile);
-		idx2 = 0;
-		value_int = atoi(row[3]);
 
-		res = DBexecute("update profiles set idx='%s'"
-				" where profileid=" ZBX_FS_UI64, profile, profileid);
-
-		if (ZBX_DB_OK > res)
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s'"
+				" where profileid=" ZBX_FS_UI64, profile, profileid))
 		{
 			ret = FAIL;
 			break;
 		}
 
-		for (k = value_int + 1; k < 6; k++)
+		ZBX_DBROW2UINT64(userid, row[1]);
+		value_int = atoi(row[2]);
+		idx2 = 0;
+
+		for (i = value_int + 1; i < 6; i++)
 		{
-			if (ZBX_DB_OK > DBexecute("insert into profiles (profileid,userid,idx,idx2,value_id,value_int,type)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",0,%d,2)",
-					DBget_maxid("profiles"), userid, idx, ++idx2, k))
+			if (ZBX_DB_OK > DBexecute("insert into profiles (profileid,userid,idx,idx2,value_id,value_int,"
+					"type) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",0,%d,2)",
+					DBget_maxid("profiles"), userid, profile, ++idx2, i))
 			{
 				ret = FAIL;
 				break;
 			}
 		}
-		zbx_free(idx);
 	}
-
 	DBfree_result(result);
 
 	return ret;
