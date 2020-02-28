@@ -635,7 +635,7 @@ func TestTaskCreate(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -657,7 +657,7 @@ func TestTaskCreate(t *testing.T) {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.pluginQueue))
 	}
 
-	checkExporterTasks(t, manager, agent.ActiveChecksClientID+1, items)
+	checkExporterTasks(t, manager, agent.MaxBuiltinClientID+1, items)
 }
 
 func TestTaskUpdate(t *testing.T) {
@@ -687,7 +687,7 @@ func TestTaskUpdate(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -725,7 +725,7 @@ func TestTaskUpdate(t *testing.T) {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.pluginQueue))
 	}
 
-	checkExporterTasks(t, manager, agent.ActiveChecksClientID+1, items)
+	checkExporterTasks(t, manager, agent.MaxBuiltinClientID+1, items)
 }
 
 func TestTaskUpdateInvalidInterval(t *testing.T) {
@@ -748,7 +748,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -811,7 +811,7 @@ func TestTaskDelete(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -847,7 +847,7 @@ func TestTaskDelete(t *testing.T) {
 		t.Errorf("Expected %d tasks queued while got %d", 0, len(manager.plugins["debug3"].tasks))
 	}
 
-	checkExporterTasks(t, manager, agent.ActiveChecksClientID+1, items)
+	checkExporterTasks(t, manager, agent.MaxBuiltinClientID+1, items)
 }
 
 func TestSchedule(t *testing.T) {
@@ -877,7 +877,7 @@ func TestSchedule(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -930,7 +930,7 @@ func TestScheduleCapacity(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -980,7 +980,7 @@ func TestScheduleUpdate(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1043,7 +1043,7 @@ func TestCollectorSchedule(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1092,7 +1092,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1165,7 +1165,7 @@ func TestRunner(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1275,7 +1275,7 @@ func TestWatcher(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1363,7 +1363,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1416,7 +1416,7 @@ func TestRunnerWatcher(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1503,7 +1503,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1520,7 +1520,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 		})
 	}
 	manager.update(&update)
-	update.clientID = agent.ActiveChecksClientID + 2
+	update.clientID = agent.MaxBuiltinClientID + 2
 	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
@@ -1532,7 +1532,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
-	update.clientID = agent.ActiveChecksClientID + 1
+	update.clientID = agent.MaxBuiltinClientID + 1
 	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
@@ -1563,7 +1563,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1580,35 +1580,35 @@ func TestMultiRunnerWatcher(t *testing.T) {
 		})
 	}
 	manager.update(&update)
-	update.clientID = agent.ActiveChecksClientID + 2
+	update.clientID = agent.MaxBuiltinClientID + 2
 	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
-	update.clientID = agent.ActiveChecksClientID + 1
+	update.clientID = agent.MaxBuiltinClientID + 1
 	manager.update(&update)
-	update.clientID = agent.ActiveChecksClientID + 2
+	update.clientID = agent.MaxBuiltinClientID + 2
 	update.requests = update.requests[:0]
 	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
-	update.clientID = agent.ActiveChecksClientID + 1
+	update.clientID = agent.MaxBuiltinClientID + 1
 	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:1]
-	update.clientID = agent.ActiveChecksClientID + 2
+	update.clientID = agent.MaxBuiltinClientID + 2
 	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
-	update.clientID = agent.ActiveChecksClientID + 1
+	update.clientID = agent.MaxBuiltinClientID + 1
 	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
@@ -1733,7 +1733,7 @@ func TestConfigurator(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: agent.ActiveChecksClientID + 1,
+		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}

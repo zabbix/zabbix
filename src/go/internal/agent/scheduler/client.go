@@ -142,7 +142,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	if _, ok := p.impl.(plugin.Exporter); ok {
 		var tacc exporterTaskAccessor
 
-		if c.id > agent.ActiveChecksClientID {
+		if c.id > agent.MaxBuiltinClientID {
 			var task *exporterTask
 
 			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
@@ -228,7 +228,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	}
 
 	// handle Watcher interface (not supported by single passive check or internal requests)
-	if _, ok := p.impl.(plugin.Watcher); ok && c.id > agent.ActiveChecksClientID {
+	if _, ok := p.impl.(plugin.Watcher); ok && c.id > agent.MaxBuiltinClientID {
 		if info.watcher == nil {
 			info.watcher = &watcherTask{
 				taskBase: taskBase{plugin: p, active: true},
@@ -295,7 +295,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	// Direct requests are handled by special clients with id <= ActiveChecksClientID.
 	// Such requests have day+hour (to keep once per day checks without expiring)
 	// expiry time before used plugins are released.
-	if c.id > agent.ActiveChecksClientID {
+	if c.id > agent.MaxBuiltinClientID {
 		expiry = now
 	} else {
 		expiry = now.Add(-time.Hour * 25)
@@ -307,7 +307,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 			if info.used.Before(expiry) {
 				// perform empty watch task before releasing plugin, so it could
 				// release internal resources allocated to monitor this client
-				if _, ok := p.impl.(plugin.Watcher); ok && c.id > agent.ActiveChecksClientID {
+				if _, ok := p.impl.(plugin.Watcher); ok && c.id > agent.MaxBuiltinClientID {
 					task := &watcherTask{
 						taskBase: taskBase{plugin: p, active: true},
 						requests: make([]*plugin.Request, 0),
@@ -328,7 +328,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 				delete(c.pluginsInfo, p)
 				p.refcount--
 				// TODO: define uniform time format
-				if c.id > agent.ActiveChecksClientID {
+				if c.id > agent.MaxBuiltinClientID {
 					log.Debugf("[%d] released unused plugin %s", c.id, p.name())
 				} else {
 					log.Debugf("[%d] released plugin %s as not used since %s", c.id, p.name(),

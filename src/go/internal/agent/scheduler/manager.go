@@ -190,7 +190,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 
 		if err != nil {
-			if c.id > agent.ActiveChecksClientID {
+			if c.id > agent.MaxBuiltinClientID {
 				if tacc, ok := c.exporters[r.Itemid]; ok {
 					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
 					tacc.task().deactivate()
