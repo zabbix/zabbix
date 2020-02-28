@@ -53,6 +53,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.exportTime(params)
 	case "vfs.file.regexp":
 		return p.exportRegexp(params)
+	case "vfs.file.regmatch":
+		return p.exportRegmatch(params)
 	case "vfs.file.md5sum":
 		return p.exportMd5sum(params)
 	default:
@@ -85,5 +87,6 @@ func init() {
 		"vfs.file.time", "Returns file time information.",
 		"vfs.file.size", "Returns file size.",
 		"vfs.file.regexp", "Find string in a file.",
+		"vfs.file.regmatch", "Find string in a file.",
 		"vfs.file.md5sum", "Returns MD5 checksum of file.")
 }

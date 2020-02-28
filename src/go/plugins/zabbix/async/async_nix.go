@@ -36,7 +36,6 @@ func getMetrics() []string {
 		"system.sw.os", "Operating system information.",
 		"system.swap.in", "Swap in (from device into memory) statistics.",
 		"system.swap.out", "Swap out (from memory onto device) statistics.",
-		"vfs.file.regmatch", "Find string in a file.",
 		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
 	}
 }
