@@ -180,7 +180,7 @@ class CSidebar extends CBaseComponent {
 
 				// if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 				// 	this._is_focused = this._node.contains(document.activeElement);
-				//
+
 				// 	if (this._is_focused) {
 				// 		this.open();
 				// 	}
@@ -233,10 +233,10 @@ class CSidebar extends CBaseComponent {
 
 		// document.addEventListener('focusin', this._events.focus);
 		// document.addEventListener('focusout', this._events.focus);
-		//
+
 		// this.on('mouseenter', this._events.mouseenter);
 		// this.on('mouseleave', this._events.mouseleave);
-		//
+
 		for (const el of this._node.querySelectorAll('.js-sidebar-mode')) {
 			el.addEventListener('click', this._events.viewmodechange);
 		}

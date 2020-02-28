@@ -116,7 +116,7 @@ class CMenuItem extends CBaseComponent {
 		};
 
 		// this._control.addEventListener('focus', this._events.focus);
-		//
+
 		// if (this.hasSubmenu()) {
 		// 	this._control.addEventListener('click', this._events.click);
 		// 	this._submenu.on('focus', this._events.focus);
