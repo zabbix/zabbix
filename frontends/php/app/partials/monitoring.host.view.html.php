@@ -66,10 +66,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	// Fill the severity icons by problem count and style, and calculate the total number of problems.
 	foreach ($host['problem_count'] as $severity => $count) {
-		$total_problem_count += $count;
-
 		if (($count > 0 && $data['filter']['severities'] && in_array($severity, $data['filter']['severities']))
 				|| (!$data['filter']['severities'] && $count > 0)) {
+			$total_problem_count += $count;
+
 			$problems_div->addItem((new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
 				->addClass(getSeverityStatusStyle($severity))
@@ -116,6 +116,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
 					->setArgument('filter_set', '1')
+					->setArgument('filter_severities', $data['filter']['severities'])
 					->setArgument('filter_hostids', [$host['hostid']])
 			),
 			CViewHelper::showNum($total_problem_count)
