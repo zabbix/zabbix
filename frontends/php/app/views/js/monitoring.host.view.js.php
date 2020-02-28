@@ -49,8 +49,8 @@
 	jQuery(function($) {
 		$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
 
-		$('#filter_maintenance_status').click(function() {
-			$('#filter_show_suppressed').prop('disabled', $(this).prop('checked') == false);
+		$('#filter_maintenance_status').on('change', function() {
+			$('#filter_show_suppressed').prop('disabled', !this.checked);
 		});
 
 		function hostPage() {
