@@ -595,14 +595,11 @@ class CControllerPopupGeneric extends CController {
 				])
 				: [];
 
-			$groups = CArrayHelper::renameObjectsKeys($groups, ['groupid' => 'id']);
-			$this->groupids = zbx_objectValues($groups, 'id');
-
 			$filter['groups'] = [
 				'multiple' => false,
 				'name' => 'popup_host_group',
 				'object_name' => 'hostGroup',
-				'data' => array_values($groups),
+				'data' => CArrayHelper::renameObjectsKeys($groups, ['groupid' => 'id']),
 				'selectedLimit' => 1,
 				'popup' => [
 					'parameters' => [
@@ -711,6 +708,12 @@ class CControllerPopupGeneric extends CController {
 
 		$this->page_options = $this->getPageOptions();
 
+		// Make control filters. Must be called bedore extending groupids.
+		$filters = $this->makeFilters();
+
+		// Select subgroups.
+		$this->groupids = getSubGroups($this->groupids);
+
 		// Load results.
 		$records = $this->fetchResults();
 		$this->applyExcludedids($records);
@@ -720,7 +723,7 @@ class CControllerPopupGeneric extends CController {
 		$data = [
 			'title' => $popup['title'],
 			'popup_type' => $this->source_table,
-			'filter' => $this->makeFilters(),
+			'filter' => $filters,
 			'form' => array_key_exists('form', $popup) ? $popup['form'] : null,
 			'options' => $this->page_options + ['hostid' => reset($this->hostids)],
 			'multiselect' => $this->getInput('multiselect', 0),
@@ -1140,9 +1143,7 @@ class CControllerPopupGeneric extends CController {
 			case 'drules':
 				$records = API::DRule()->get([
 					'output' => ['druleid', 'name'],
-					'filter' => ['status' => DRULE_STATUS_ACTIVE],
-					'preservekeys' => true,
-					'limit' => 10
+					'filter' => ['status' => DRULE_STATUS_ACTIVE]
 				]);
 
 				CArrayHelper::sort($records, ['name']);
@@ -1152,8 +1153,7 @@ class CControllerPopupGeneric extends CController {
 			case 'dchecks':
 				$records = API::DRule()->get([
 					'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports'],
-					'output' => ['druleid', 'name'],
-					'limit' => 10
+					'output' => ['druleid', 'name']
 				]);
 
 				CArrayHelper::sort($records, ['name']);
