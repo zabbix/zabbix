@@ -71,6 +71,7 @@ if ($data['has_dynamic_widgets']) {
 						'srctbl' => 'hosts',
 						'srcfld1' => 'hostid',
 						'dstfld1' => 'dynamic_hostid',
+						'dstfrm' => 'headerForm',
 						'monitored_hosts' => 1,
 						'with_items' => 1
 					]
