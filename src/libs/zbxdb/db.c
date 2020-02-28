@@ -433,7 +433,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 #if defined(HAVE_MYSQL_TLS_CIPHERSUITES)
-	if (ZBX_DB_OK == ret && NULL != cipher_13 && 0 != mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13)
+	if (ZBX_DB_OK == ret && NULL != cipher_13 && 0 != mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_TLS_CIPHERSUITES option.");
 		ret = ZBX_DB_FAIL;
