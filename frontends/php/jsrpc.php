@@ -146,6 +146,7 @@ switch ($data['method']) {
 					'with_monitored_triggers' => array_key_exists('with_monitored_triggers', $data)
 						? $data['with_monitored_triggers']
 						: null,
+					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
 				];
@@ -176,6 +177,7 @@ switch ($data['method']) {
 					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
 					'with_items' => array_key_exists('with_items', $data) ? $data['with_items'] : null,
 					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
+					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => $config['search_limit']

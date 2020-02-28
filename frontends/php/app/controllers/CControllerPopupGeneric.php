@@ -890,7 +890,8 @@ class CControllerPopupGeneric extends CController {
 					'groupids' => $this->groupids ? $this->groupids : null,
 					'real_hosts' => $this->hasInput('real_hosts') ? '1' : null,
 					'with_httptests' => $this->hasInput('with_httptests') ? '1' : null,
-					'with_items' => $this->hasInput('with_items') ? true : null
+					'with_items' => $this->hasInput('with_items') ? true : null,
+					'with_triggers' => $this->hasInput('with_triggers') ? true : null
 				];
 
 				if ($this->hasInput('with_monitored_items')) {
@@ -919,7 +920,8 @@ class CControllerPopupGeneric extends CController {
 
 			case 'host_groups':
 				$options += [
-					'output' => ['groupid', 'name']
+					'output' => ['groupid', 'name'],
+					'with_triggers' => $this->hasInput('with_triggers') ? true : null
 				];
 
 				if (array_key_exists('real_hosts', $this->page_options)) {
