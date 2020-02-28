@@ -273,8 +273,7 @@ if ($data['admin']) {
 
 		$discovery_link_url = (new CUrl('host_discovery.php'))->setArgument('hostid', $templateid);
 		$discovery_link = $template['editable']
-			? [new CLink(_('Discovery'), $discovery_link_url), $discovery_count
-			]
+			? [new CLink(_('Discovery'), $discovery_link_url), $discovery_count]
 			: [_('Discovery'), $discovery_count];
 
 		$httptests_link = $template['editable']

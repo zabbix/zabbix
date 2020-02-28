@@ -1355,7 +1355,7 @@ function isReadableTemplates(array $templateids) {
 }
 
 /**
- * Check if user has read permissions for hosts or templates.
+ * Check if user has write permissions for hosts or templates.
  *
  * @param array $hostids
  *

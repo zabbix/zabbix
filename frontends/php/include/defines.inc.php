@@ -50,7 +50,7 @@ define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
-// Applied to tables with variable count of columns. Columns above this limit will be truncated and noted with ellipsis.
+// Applied to tables with variable count of columns. Columns above this limit will be truncated.
 define('ZBX_MAX_TABLE_COLUMNS', 50);
 define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 
