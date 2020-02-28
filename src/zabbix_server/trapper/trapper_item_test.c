@@ -32,7 +32,7 @@ static void	dump_item(const DC_ITEM *item)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "key:'%s'", item->key);
 	zabbix_log(LOG_LEVEL_TRACE, "  type: %u", item->type);
-	zabbix_log(LOG_LEVEL_TRACE, "  type: %u", item->snmp_version);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmp_version: %u", item->snmp_version);
 	zabbix_log(LOG_LEVEL_TRACE, "  value_type: %u", item->value_type);
 	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3_securitylevel: %u", item->snmpv3_securitylevel);
 	zabbix_log(LOG_LEVEL_TRACE, "  authtype: %u", item->authtype);
