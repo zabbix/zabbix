@@ -52,6 +52,7 @@ void	DBclose(void)
 {
 	zbx_db_close();
 }
+
 int	zbx_db_validate_config_features(void)
 {
 	int	err = 0;
