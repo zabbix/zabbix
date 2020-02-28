@@ -121,7 +121,7 @@
 						->setModern(true),
 					'row_snmpv3_privprotocol_#{iface.interfaceid}'
 				)
-				->addRow((new CLabel(_('Privacy passphrase'), 'interfaces[#{iface.interfaceid}][details][privpassphrase]'))->setAsteriskMark(),
+				->addRow(new CLabel(_('Privacy passphrase'), 'interfaces[#{iface.interfaceid}][details][privpassphrase]'),
 					(new CTextBox('interfaces[#{iface.interfaceid}][details][privpassphrase]', '#{iface.details.privpassphrase}', false, DB::getFieldLength('interface_snmp', 'privpassphrase')))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAriaRequired(),
