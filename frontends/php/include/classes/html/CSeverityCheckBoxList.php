@@ -22,16 +22,20 @@
 class CSeverityCheckBoxList extends CCheckBoxList {
 
 	/**
+	 * Number of columns.
+	 */
+	protected const COLUMNS = 3;
+
+	/**
 	 * Create check box list with severities.
 	 *
 	 * @param string  $name      Field name in form.
-	 * @param int     $max_rows  Number of rows.
 	 */
-	public function __construct(string $name, int $max_rows = 2) {
+	public function __construct(string $name) {
 		parent::__construct($name);
 
 		$this
-			->setOptions(self::getOrderedSeverities(false, $max_rows))
+			->setOptions(self::getOrderedSeverities())
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3);
 	}
@@ -41,20 +45,19 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	 *
 	 * @static
 	 *
-	 * @param bool $only_names  Return only name as array value.
-	 * @param int  $max_rows    Number of rows.
-	 *
 	 * @return array
 	 */
-	public static function getOrderedSeverities(bool $only_names = false, int $max_rows = 2): array {
-
-		$severities = self::getSeverities();
+	public static function getOrderedSeverities(): array {
+		$severities = getSeverities();
 		$severities_count = count($severities);
 		$ordered = [];
+		$max_rows = (int) ceil($severities_count / self::COLUMNS);
 
 		foreach (range(0, $max_rows - 1) as $row) {
 			for ($i = TRIGGER_SEVERITY_NOT_CLASSIFIED; $i < $severities_count; $i += $max_rows) {
-				$ordered[$row + $i] = ($only_names) ? $severities[$row + $i]['name'] : $severities[$row + $i];
+				if (array_key_exists($row + $i, $severities)) {
+					$ordered[$row + $i] = $severities[$row + $i];
+				}
 			}
 		}
 
@@ -62,23 +65,13 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	}
 
 	/**
-	 * Generate array with severities options.
+	 * With setter.
 	 *
-	 * @static
-	 *
-	 * @return array
+	 * @return CSeverityCheckBoxList
 	 */
-	public static function getSeverities(): array {
-		$config = select_config();
-		$severities = [];
-		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-			$severities[] = [
-				'name' => getSeverityName($severity, $config),
-				'value' => $severity,
-				'style' => getSeverityStyle($severity)
-			];
-		}
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
 
-		return $severities;
+		return $this;
 	}
 }

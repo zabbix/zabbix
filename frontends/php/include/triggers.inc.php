@@ -154,6 +154,26 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 }
 
 /**
+ * Generate array with severities options.
+ *
+ * @static
+ *
+ * @return array
+ */
+function getSeverities() {
+	$config = select_config();
+	$severities = [];
+	foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
+		$severities[] = [
+			'name' => getSeverityName($severity, $config),
+			'value' => $severity
+		];
+	}
+
+	return $severities;
+}
+
+/**
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
  * @param int         $severity       Trigger, Event or Problem severity.

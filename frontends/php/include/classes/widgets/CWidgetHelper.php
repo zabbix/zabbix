@@ -395,13 +395,13 @@ class CWidgetHelper {
 
 	/**
 	 * @param CWidgetFieldSeverities $field
-	 * @param int                    $max_row  Number of rows.
 	 *
-	 * @return CList
+	 * @return CSeverityCheckBoxList
 	 */
-	public static function getSeverities($field, $max_row = 2) {
-		return self::getCheckBoxList($field, CSeverityCheckBoxList::getOrderedSeverities(true, $max_row))
-			->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
+	public static function getSeverities($field) {
+		return (new CSeverityCheckBoxList($field->getName()))
+			->setChecked($field->getValue())
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	/**
