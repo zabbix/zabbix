@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widget = (new CWidget())->setTitle(_('Item prototypes'));
 
@@ -77,7 +81,7 @@ if (!$readonly) {
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",jQuery.extend('.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'help_items',
 				'srcfld1' => 'key',
 				'dstfrm' => $form->getName(),
@@ -118,7 +122,7 @@ elseif (!$readonly) {
 	$query_fields_data[] = ['name' => '', 'value' => ''];
 }
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
-$query_fields->items = [CJs::encodeJson($query_fields_data)];
+$query_fields->items = [json_encode($query_fields_data)];
 
 $form_list
 	->addRow(
@@ -210,7 +214,7 @@ elseif (!$readonly) {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [CJs::encodeJson($headers_data)];
+$headers->items = [json_encode($headers_data)];
 
 $form_list
 	->addRow(
@@ -376,7 +380,7 @@ if (!$readonly) {
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'items',
 				'srcfld1' => 'itemid',
 				'srcfld2' => 'name',
@@ -393,7 +397,7 @@ if (!$readonly) {
 	$master_item[] = (new CButton('button', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'item_prototypes',
 				'srcfld1' => 'itemid',
 				'srcfld2' => 'name',
@@ -512,11 +516,8 @@ $form_list
 	->addRow(_('Port'),
 		(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_port'
 	)
-	->addRow(
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setAsteriskMark(),
-		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
+	->addRow(_('IPMI sensor'),
+		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_ipmi_sensor'
 	)
 	// Append authentication method to form list.
@@ -783,6 +784,7 @@ if ($data['itemid'] != 0) {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
+			(new CSimpleButton(_('Test')))->setId('test_item'),
 			(new CButtonDelete(_('Delete item prototype?'),
 				url_params(['form', 'itemid', 'parent_discoveryid'])
 			))->setEnabled(!$readonly),
@@ -793,7 +795,7 @@ if ($data['itemid'] != 0) {
 else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_params(['parent_discoveryid']))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_params(['parent_discoveryid']))]
 	));
 }
 
@@ -802,4 +804,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.prototype.edit.js.php';
 
-return $widget;
+$widget->show();

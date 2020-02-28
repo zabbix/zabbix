@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import (
 	"time"
 	"unsafe"
 
+	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
@@ -63,7 +64,7 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if ctx == nil || ctx.ClientID() == 0 {
+	if ctx == nil || ctx.ClientID() <= agent.ActiveChecksClientID {
 		return nil, fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, key)
 	}
 	meta := ctx.Meta()

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,5 +59,37 @@ class OracleDbBackend extends DbBackend {
 		$sql .= ' END;';
 
 		return $sql;
+	}
+
+	/**
+	 * Check database and table fields encoding.
+	 *
+	 * @return bool
+	 */
+	public function checkEncoding() {
+		return $this->checkDatabaseEncoding();
+	}
+
+	/**
+	 * Check database schema encoding. On error will set warning message.
+	 *
+	 * @return bool
+	 */
+	protected function checkDatabaseEncoding() {
+		$db_params = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
+			' WHERE '.dbConditionString('parameter', ['NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET']).
+				' AND value!='.zbx_dbstr(ZBX_DB_DEFAULT_CHARSET)
+		));
+
+		foreach ($db_params as $db_param) {
+			if ($db_param['value'] != ZBX_DB_DEFAULT_CHARSET) {
+				$this->setWarning((_s('Incorrect parameter "%1$s" value: %2$s.',
+					$db_param['parameter'], _s('"%1$s" instead "%2$s"', $db_param['value'], ZBX_DB_DEFAULT_CHARSET)
+				)));
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

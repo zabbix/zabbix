@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -521,7 +521,7 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	}, this);
 
 	this.offset = 0;
-	this.element = this.canvas.createElement('g', null, parent);
+	this.element = this.canvas.createElement('g', {}, parent);
 
 	var parse_links = attributes['parse-links'],
 		size;
@@ -549,8 +549,8 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	this.width = Math.ceil(size.width);
 	this.height = Math.ceil(size.height + size.y);
 
-	// Workaround for IE/EDGE for proper text height calculation.
-	if ((IE || ED) && this.lines.length > 0
+	// Workaround for EDGE for proper text height calculation.
+	if (ED && this.lines.length > 0
 			&& typeof attributes['font-size'] !== 'undefined' && parseInt(attributes['font-size']) > 16) {
 		this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
 	}

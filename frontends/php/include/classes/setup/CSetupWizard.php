@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -333,7 +333,7 @@ class CSetupWizard extends CForm {
 	function stage5() {
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
-		$config_file_name = Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
+		$config_file_name = APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($config_file_name);
 		$config->config = [
 			'DB' => [
@@ -413,7 +413,7 @@ class CSetupWizard extends CForm {
 
 		$error = '';
 
-		// during setup set debug to false to avoid displaying unwanted PHP errors in messages
+		// During setup set debug to false to avoid displaying unwanted PHP errors in messages.
 		if (!$result = DBconnect($error)) {
 			error($error);
 		}
@@ -427,6 +427,13 @@ class CSetupWizard extends CForm {
 			if ($result) {
 				$result = DBexecute('CREATE TABLE zabbix_installation_test (test_row INTEGER)');
 				$result &= DBexecute('DROP TABLE zabbix_installation_test');
+			}
+
+			$db = DB::getDbBackend();
+
+			if (!$db->checkEncoding()) {
+				error($db->getWarning());
+				return false;
 			}
 		}
 
@@ -497,7 +504,7 @@ class CSetupWizard extends CForm {
 				// make zabbix.conf.php downloadable
 				header('Content-Type: application/x-httpd-php');
 				header('Content-Disposition: attachment; filename="'.basename(CConfigFile::CONFIG_FILE_PATH).'"');
-				$config = new CConfigFile(Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
+				$config = new CConfigFile(APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
 				$config->config = [
 					'DB' => [
 						'TYPE' => $this->getConfig('DB_TYPE'),

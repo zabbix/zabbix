@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1116,9 +1116,17 @@ class CConfigurationExport {
 				'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name',
 				'description', 'parameters'
 			],
+			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);
+
+		foreach ($this->data['mediaTypes'] as &$media_type) {
+			if ($media_type['type'] == MEDIA_TYPE_WEBHOOK) {
+				CArrayHelper::sort($media_type['parameters'], ['name']);
+			}
+		}
+		unset($media_type);
 	}
 
 	/**

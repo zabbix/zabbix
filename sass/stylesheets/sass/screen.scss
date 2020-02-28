@@ -553,7 +553,9 @@ ul.top-nav-icons {
 	border-bottom: 1px solid $ui-border-color;
 
 	> div {
-		overflow: hidden;
+		&:first-child {
+			overflow: hidden;
+		}
 
 		&:last-child {
 			flex-shrink: 0;
@@ -3630,8 +3632,7 @@ $form-icon-btn: (
 	}
 
 	.debug-output {
-		margin: 10px 10px 0;
-		max-height: 300px;
+		max-height: none;
 		border-color: $table-border-color;
 	}
 
@@ -4335,7 +4336,6 @@ $form-icon-btn: (
 	}
 
 	.debug-output {
-		margin: 10px 10px 0;
 		max-height: 300px;
 		border-color: $table-border-color;
 	}
@@ -4558,6 +4558,7 @@ $form-icon-btn: (
 	&.modal {
 		position: fixed;
 		overflow: hidden;
+		margin: 0 10px;
 
 		.overlay-dialogue-body {
 			overflow: auto;
@@ -4606,6 +4607,10 @@ $form-icon-btn: (
 	&.modal-popup {
 		max-width: 1024px;
 
+		&.modal-popup-medium {
+			min-width: 450px;
+		}
+
 		&.modal-popup-generic {
 			min-width: 650px;
 		}
@@ -4633,7 +4638,7 @@ $form-icon-btn: (
 		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
-		z-index: 1000;
+		z-index: 4;
 	}
 
 	.list-table {
@@ -4901,6 +4906,15 @@ $form-icon-btn: (
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
+
+	// for IE11
+	textarea {
+		white-space: pre-wrap;
+	}
+
+	.debug-output {
+		margin: 10px 0 0;
+	}
 }
 
 .overlay-dialogue-footer {
@@ -5229,7 +5243,7 @@ $form-icon-btn: (
 
 .svg-graph-preview {
 	margin-top: 10px;
-	width: 960px;
+	min-width: 960px;
 	height: 300px;
 	position: relative;
 
@@ -5240,7 +5254,7 @@ $form-icon-btn: (
 		left: 0;
 		right: 0;
 		top: 0;
-		z-index: 999;
+		z-index: 3; // More than z-index of form controls, less than z-index of .msg-*.
 	}
 }
 
@@ -5356,22 +5370,46 @@ $form-icon-btn: (
 	display: none;
 	max-height: 600px;
 	overflow-y: auto;
-	padding: 11px;
-	margin: 10px 13px 0;
-	background-color: $lighter-yellow !important;
+	padding: 10px;
+	margin: 10px;
+	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
 }
 
+// ZBX_STYLE_BTN_DEBUG
 .btn-debug {
 	position: fixed;
-	bottom: 13px;
-	right: 13px;
+	bottom: 10px;
+	right: 15px;
 	z-index: 15000;
-	padding: 4px 11px;
-	border: 1px solid $ui-border-color;
-	background-color: rgba($body-bg-color, .8);
-	border-radius: 2px;
+	color: $btn-form-font-color;
+	background-color: $btn-form-bg-color;
+	border-color: $btn-form-border-color;
+	opacity: 0;
+	transition: opacity .2s ease-out;
+
+	&.visible {
+		opacity: 0.75;
+	}
+
+	&:hover {
+		color: $btn-form-font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $btn-form-border-color;
+	}
+
+	&:focus {
+		color: $btn-form-font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
+	&:active {
+		color: $btn-form-font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $form-border-focus-color;
+	}
 }
 
 .overlay-descr {
@@ -6238,7 +6276,7 @@ a.overlay-close-btn {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 1;
+		z-index: 5; // More than z-index of .msg-*.
 	}
 
 	&::after {
@@ -6256,7 +6294,7 @@ a.overlay-close-btn {
 		left: 0;
 		right: 0;
 		animation: is-loading-kf .6s infinite linear;
-		z-index: 1;
+		z-index: 5; // More than z-index of .msg-*.
 		content: '';
 	}
 
@@ -6323,8 +6361,12 @@ span {
 .overlay-dialogue.modal .overlay-dialogue-body {
 
 	&.is-loading {
-		position: relative;
 		overflow: hidden;
+
+		&:before {
+			top: 42px;
+			bottom: 42px;
+		}
 	}
 }
 
@@ -6347,7 +6389,7 @@ span {
 $browser-logos: (
 	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
 	ff: url(../img/browser-sprite.png) no-repeat -66px 0,
-	ie: url(../img/browser-sprite.png) no-repeat 0 -66px,
+	ed: url(../img/browser-sprite.png) no-repeat 0 -66px,
 	opera: url(../img/browser-sprite.png) no-repeat -66px -66px,
 	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
 );
@@ -6355,7 +6397,7 @@ $browser-logos: (
 // Dynamically generated classes for the browser logo:
 //  .browser-logo-chrome
 //  .browser-logo-ff
-//  .browser-logo-ie
+//  .browser-logo-ed
 //  .browser-logo-opera
 //  .browser-logo-safari
 @each $browser, $bgimage in $browser-logos {
@@ -7196,7 +7238,7 @@ svg {
 	color: $input-placeholder-color;
 }
 
-:placeholder-shown {
+::placeholder {
 	color: $input-placeholder-color;
 }
 
@@ -7504,6 +7546,7 @@ $range-input-width: 31px;
 	font-size: 0;
 }
 
+.item-test-popup-value-row,
 .preproc-test-popup-value-row {
 	display: flex;
 

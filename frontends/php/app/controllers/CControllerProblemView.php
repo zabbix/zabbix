@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,11 +26,6 @@ class CControllerProblemView extends CController {
 	}
 
 	protected function checkInput() {
-		$severities = [];
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severities[] = $severity;
-		}
-
 		$fields = [
 			'action' =>					'string',
 			'sort' =>					'in clock,host,severity,name',
@@ -45,7 +40,7 @@ class CControllerProblemView extends CController {
 			'filter_application' =>		'string',
 			'filter_triggerids' =>		'array_id',
 			'filter_name' =>			'string',
-			'filter_severity' =>		'in '.implode(',', $severities),
+			'filter_severity' =>		'array',
 			'filter_age_state' =>		'in 1',
 			'filter_age' =>				'int32',
 			'filter_inventory' =>		'array',
@@ -134,8 +129,8 @@ class CControllerProblemView extends CController {
 				PROFILE_TYPE_ID
 			);
 			CProfile::update('web.problem.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.problem.filter.severity',
-				$this->getInput('filter_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED), PROFILE_TYPE_INT
+			CProfile::updateArray('web.problem.filter.severity', $this->getInput('filter_severity', []),
+				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.problem.filter.age_state', $this->getInput('filter_age_state', 0), PROFILE_TYPE_INT);
 			CProfile::update('web.problem.filter.age', $this->getInput('filter_age', 14), PROFILE_TYPE_INT);
@@ -206,7 +201,7 @@ class CControllerProblemView extends CController {
 			CProfile::delete('web.problem.filter.application');
 			CProfile::deleteIdx('web.problem.filter.triggerids');
 			CProfile::delete('web.problem.filter.name');
-			CProfile::delete('web.problem.filter.severity');
+			CProfile::deleteIdx('web.problem.filter.severity');
 			CProfile::delete('web.problem.filter.age_state');
 			CProfile::delete('web.problem.filter.age');
 			CProfile::deleteIdx('web.problem.filter.inventory.field');
@@ -257,12 +252,6 @@ class CControllerProblemView extends CController {
 		}
 		unset($filter_trigger);
 
-		$config = select_config();
-		$severities = [];
-		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-			$severities[] = getSeverityName($severity, $config);
-		}
-
 		$inventories = [];
 		foreach (getHostInventories() as $inventory) {
 			$inventories[$inventory['db_field']] = $inventory['title'];
@@ -309,8 +298,7 @@ class CControllerProblemView extends CController {
 				'triggerids' => $filter_triggerids,
 				'triggers' => $filter_triggers,
 				'name' => CProfile::get('web.problem.filter.name', ''),
-				'severity' => CProfile::get('web.problem.filter.severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-				'severities' => $severities,
+				'severity' => CProfile::getArray('web.problem.filter.severity', []),
 				'age_state' => CProfile::get('web.problem.filter.age_state', 0),
 				'age' => CProfile::get('web.problem.filter.age', 14),
 				'inventories' => $inventories,
@@ -345,8 +333,6 @@ class CControllerProblemView extends CController {
 		else {
 			$data['profileIdx'] = 'web.problem.filter';
 		}
-
-		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));

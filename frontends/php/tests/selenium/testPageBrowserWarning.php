@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class testPageBrowserWarning extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('You are using an outdated browser.', false);
 		$this->zbxTestTextPresent('You are using an outdated browser.');
 		$this->zbxTestTextPresent([
-			'Google Chrome', 'Mozilla Firefox', 'Internet Explorer', 'Opera browser', 'Apple Safari'
+			'Google Chrome', 'Mozilla Firefox', 'Microsoft Edge', 'Opera browser', 'Apple Safari'
 		]);
 	}
 }

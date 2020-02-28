@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widget = (new CWidget())
 	->setTitle(_('Applications'))
@@ -136,4 +140,4 @@ $form->addItem([
 // append form to widget
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

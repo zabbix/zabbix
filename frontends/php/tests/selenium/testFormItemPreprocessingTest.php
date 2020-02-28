@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -301,6 +301,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	private function openPreprocessing($data) {
 		$this->page->login()->open('items.php?form=create&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->fill(['Key' => 'test.key']);
 		$form->selectTab('Preprocessing');
 	}
 
@@ -314,7 +315,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	 */
 	private function checkTestOverlay($data, $selector, $prev_enabled, $id = null) {
 		$this->query($selector)->waitUntilPresent()->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilPresent()->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_BAD:
@@ -334,7 +335,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 
 			case TEST_GOOD:
 				$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
-				$this->assertEquals('Test item preprocessing', $dialog->getTitle());
+				$this->assertEquals('Test item', $dialog->getTitle());
 
 				$time = $dialog->query('id:time')->one();
 				$this->assertTrue($time->getAttribute('readonly') !== null);
@@ -365,7 +366,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	}
 
 	private function chooseDialogActions($data){
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilPresent()->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
 		switch ($data['action']) {
 			case 'Test':

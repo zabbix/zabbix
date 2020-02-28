@@ -61,15 +61,15 @@ INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_de
 INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (29,29,'asdf',4,',',1);
 
 -- trigger actions
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata, ack_longdata) VALUES (10,'Simple action',0,0,0,'60s','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', '');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata, ack_longdata) VALUES (11,'Trigger action 1',0,0,0,'1h','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', '');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata, ack_longdata) VALUES (12,'Trigger action 2',0,0,0,'60s','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}','Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}','Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}{TRIGGER.URL}', '');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata, ack_longdata) VALUES (13,'Trigger action 3',0,0,0,'60s','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}','Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}','Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}{TRIGGER.URL}', '');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata, ack_longdata) VALUES (14,'Trigger action 4',0,0,1,'60s','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}','Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}','Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}{TRIGGER.URL}', '');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (10,'Simple action',0,0,0,'60s');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (11,'Trigger action 1',0,0,0,'1h');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (12,'Trigger action 2',0,0,0,'60s');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (13,'Trigger action 3',0,0,0,'60s');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (14,'Trigger action 4',0,0,1,'60s');
 
--- auto-registration actions
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata, ack_longdata) VALUES (9,'Autoregistration action 1',2,0,0,'1h','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}','','', '');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata, ack_longdata) VALUES (15,'Autoregistration action 2',2,0,1,'1h','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}','','', '');
+-- autoregistration actions
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (9,'Autoregistration action 1',2,0,0,'1h');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (15,'Autoregistration action 2',2,0,1,'1h');
 
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (500, 9, 22, 3, 'DB2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (501, 9, 22, 2, 'MySQL');
@@ -300,12 +300,12 @@ INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VA
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (1,0,1,0,0,1,43200,184200,1294760340);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (2,2,2,0,0,1,43200,93780,0);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (3,3,2,0,85,1,85800,300,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (4,4,0,1365,0,15,37500,183840,0);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (4,4,1,1365,0,15,37500,183840,0);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (5,4,1,2730,85,0,84600,1800,0);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (6,0,1,0,0,1,43200,184200,1294760340);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (7,2,2,0,0,1,43200,93780,0);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (8,3,2,0,85,1,85800,300,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,0,1365,0,15,37500,183840,0);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,1,1365,0,15,37500,183840,0);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (10,4,1,2730,85,0,84600,1800,0);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (11,0,1,0,0,1,43200,90000,1534950000);
 
@@ -406,269 +406,269 @@ INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{
 -- Adding records into Auditlog
 
 -- add user
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid) VALUES (500, 1, 1411543800, 0, 0, 'User alias [Admin] name [Admin] surname [Admin]', '192.168.3.38', 0);
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid) VALUES (500, 1, 1411543800, 0, 0, 'User alias [Admin] name [Admin] surname [Admin]', '192.168.3.38', 0);
 -- update user
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid) VALUES (501, 1, 1411543800, 1, 0, 'User alias [Admin2] name [Admin2] surname [Admin2]', '192.168.3.38', 0);
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid) VALUES (501, 1, 1411543800, 1, 0, 'User alias [Admin2] name [Admin2] surname [Admin2]', '192.168.3.38', 0);
 -- delete user
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid) VALUES (502, 1, 1411543800, 2, 0, 'User alias [Admin2] name [Admin2] surname [Admin2]', '192.168.3.38', 0);
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid) VALUES (502, 1, 1411543800, 2, 0, 'User alias [Admin2] name [Admin2] surname [Admin2]', '192.168.3.38', 0);
 -- can check also block user (enable,disable)
 
 -- add host
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (503, 1, 1411543800, 0, 4, '0', '192.168.3.32', 10054, 'H1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (503, 1, 1411543800, 0, 4, '0', '192.168.3.32', 10054, 'H1');
 
 -- update host
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (504, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10054, 'H1 updated');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (504, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10054, 'H1 updated');
 
 -- delete host
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (505, 1, 1411543800, 2, 4, '0', '192.168.3.32', 10054, 'H1 updated');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (505, 1, 1411543800, 2, 4, '0', '192.168.3.32', 10054, 'H1 updated');
 
 -- enable host, hosts.status: 1 => 0
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (506, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10054, 'H1 updated');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (506, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10054, 'H1 updated');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (500, 506, 'hosts', 'status', '1', '0');
 
 -- disable host, hosts.status: 0 => 1
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (507, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10054, 'H1 updated');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (507, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10054, 'H1 updated');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (501, 507, 'hosts', 'status', '0', '1');
 
 -- add hostgroup
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (508, 1, 1411543800, 0, 14, '0', '192.168.3.32', 6, 'HG1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (508, 1, 1411543800, 0, 14, '0', '192.168.3.32', 6, 'HG1');
 
 -- update hostgroup
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (509, 1, 1411543800, 1, 14, '0', '192.168.3.32', 6, 'HG1 updated');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (509, 1, 1411543800, 1, 14, '0', '192.168.3.32', 6, 'HG1 updated');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (502, 509, 'groups', 'name', 'HG1', 'HG1 updated');
 
 -- delete hostgroup
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (510, 1, 1411543800, 2, 14, '0', '192.168.3.32', 6, 'HG1 updated');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (510, 1, 1411543800, 2, 14, '0', '192.168.3.32', 6, 'HG1 updated');
 
 -- add item
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (511, 1, 1411543800, 0, 15, '0', '192.168.3.32', 22500, 'Item added');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (511, 1, 1411543800, 0, 15, '0', '192.168.3.32', 22500, 'Item added');
 
 -- update item
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (512, 1, 1411543800, 1, 15, '0', '192.168.3.32', 22500, 'Item updated');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (512, 1, 1411543800, 1, 15, '0', '192.168.3.32', 22500, 'Item updated');
 
 -- disable item
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (513, 1, 1411543800, 1, 15, '0', '192.168.3.32', 22500, 'H1 updated:test_item');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (513, 1, 1411543800, 1, 15, '0', '192.168.3.32', 22500, 'H1 updated:test_item');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (503, 513, 'items', 'status', '0', '1');
 
 -- enable item
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (514, 1, 1411543800, 1, 15, '0', '192.168.3.32', 22500, 'H1 updated:test_item');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (514, 1, 1411543800, 1, 15, '0', '192.168.3.32', 22500, 'H1 updated:test_item');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (504, 514, 'items', 'status', '1', '0');
 
 -- delete item
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (515, 1, 1411543800, 2, 15, 'Item [agent.version] [22500] Host [H1]', '192.168.3.32', 22500, 'Item deleted');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (515, 1, 1411543800, 2, 15, 'Item [agent.version] [22500] Host [H1]', '192.168.3.32', 22500, 'Item deleted');
 
 -- add trigger
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (516, 1, 1411543800, 0, 13, '0', '192.168.3.32', 13000, 'Trigger1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (516, 1, 1411543800, 0, 13, '0', '192.168.3.32', 13000, 'Trigger1');
 
 -- update trigger
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (517, 1, 1411543800, 0, 13, '0', '192.168.3.32', 13000, 'Trigger1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (517, 1, 1411543800, 0, 13, '0', '192.168.3.32', 13000, 'Trigger1');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (505, 517, '', 'description', 'Trigger1', 'Trigger1 updated');
 
 -- disable trigger
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (518, 1, 1411543800, 1, 13, '0', '192.168.3.32', 13000, 'H1 updated:Trigger1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (518, 1, 1411543800, 1, 13, '0', '192.168.3.32', 13000, 'H1 updated:Trigger1');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (506, 518, 'triggers', 'status', '0', '1');
 
 -- enable trigger
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (519, 1, 1411543800, 1, 13, '0', '192.168.3.32', 13000, 'H1 updated:Trigger1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (519, 1, 1411543800, 1, 13, '0', '192.168.3.32', 13000, 'H1 updated:Trigger1');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (507, 519, 'triggers', 'status', '1', '0');
 
 -- TODO: delete trigger
 
 -- add action
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (520, 1, 1411543800, 0, 5, 'Name: Action1', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (520, 1, 1411543800, 0, 5, 'Name: Action1', '192.168.3.32', 0, '');
 
 -- update action
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (521, 1, 1411543800, 1, 5, 'Name: Action1 updated', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (521, 1, 1411543800, 1, 5, 'Name: Action1 updated', '192.168.3.32', 0, '');
 
 -- disable action
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (522, 1, 1411543800, 1, 5, 'Actions [11] disabled', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (522, 1, 1411543800, 1, 5, 'Actions [11] disabled', '192.168.3.32', 0, '');
 
 -- enable action
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (523, 1, 1411543800, 1, 5, 'Actions [11] enabled', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (523, 1, 1411543800, 1, 5, 'Actions [11] enabled', '192.168.3.32', 0, '');
 
 -- delete action
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (524, 1, 1411543800, 2, 5, 'Actions [11] deleted', '192.168.3.32', 11, 'Action deleted');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (524, 1, 1411543800, 2, 5, 'Actions [11] deleted', '192.168.3.32', 11, 'Action deleted');
 
 -- add application
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (525, 1, 1411543800, 0, 12, 'Application [App1 ] [177]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (525, 1, 1411543800, 0, 12, 'Application [App1 ] [177]', '192.168.3.32', 0, '');
 
 -- update application
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (526, 1, 1411543800, 1, 12, 'Application [App1 updated ] []', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (526, 1, 1411543800, 1, 12, 'Application [App1 updated ] []', '192.168.3.32', 0, '');
 
 -- disable application  (work in the same way as update app- disable all items on this host), such records do not exist at this moment
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (527, 1, 1411543800, 1, 12, '0', '192.168.3.32', 22165, 'test_item');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (527, 1, 1411543800, 1, 12, '0', '192.168.3.32', 22165, 'test_item');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (508, 527, 'items', 'status', '0', '1');
 
 -- enable application (work in the same way as update app- disable all items on this host), such records do not exist at this moment
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (528, 1, 1411543800, 1, 12, '0', '192.168.3.32', 22165, 'test_item');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (528, 1, 1411543800, 1, 12, '0', '192.168.3.32', 22165, 'test_item');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (509, 528, 'items', 'status', '1', '0');
 
 -- delete application
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (529, 1, 1411543800, 2, 12, 'Application [App1] from host [H1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (529, 1, 1411543800, 2, 12, 'Application [App1] from host [H1]', '192.168.3.32', 0, '');
 
 -- add graph
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (530, 1, 1411543800, 0, 6, 'Graph [graph1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (530, 1, 1411543800, 0, 6, 'Graph [graph1]', '192.168.3.32', 0, '');
 
 -- update graph
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (531, 1, 1411543800, 1, 6, 'Graph [graph1 updated]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (531, 1, 1411543800, 1, 6, 'Graph [graph1 updated]', '192.168.3.32', 0, '');
 
 -- delete graph, no records in the DB for this operation
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (532, 1, 1411543800, 2, 6, 'Graph ID [386] Graph [graph1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (532, 1, 1411543800, 2, 6, 'Graph ID [386] Graph [graph1]', '192.168.3.32', 0, '');
 
 -- add image
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (533, 1, 1411543800, 0, 16, 'Image [1image] added', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (533, 1, 1411543800, 0, 16, 'Image [1image] added', '192.168.3.32', 0, '');
 
 -- update image
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (534, 1, 1411543800, 1, 16, 'Image [1image] updated', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (534, 1, 1411543800, 1, 16, 'Image [1image] updated', '192.168.3.32', 0, '');
 
 -- delete image
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (535, 1, 1411543800, 2, 16, 'Image [1image] updated', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (535, 1, 1411543800, 2, 16, 'Image [1image] updated', '192.168.3.32', 0, '');
 
 -- add globalmacro
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (536, 1, 1411543800, 0, 29, '0', '192.168.3.32', 9, '{$B}&nbsp;&rArr;&nbsp;abcd');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (536, 1, 1411543800, 0, 29, '0', '192.168.3.32', 9, '{$B}&nbsp;&rArr;&nbsp;abcd');
 
 -- update globalmacro
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (537, 1, 1411543800, 1, 29, '0', '192.168.3.32', 9, '{$B}&nbsp;&rArr;&nbsp;xyz');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (537, 1, 1411543800, 1, 29, '0', '192.168.3.32', 9, '{$B}&nbsp;&rArr;&nbsp;xyz');
 
 -- delete globalmacro
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (538, 1, 1411543800, 2, 29, '0', '192.168.3.32', 9, 'Array&nbsp;&rArr;&nbsp;xyz');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (538, 1, 1411543800, 2, 29, '0', '192.168.3.32', 9, 'Array&nbsp;&rArr;&nbsp;xyz');
 
 -- add valuemap
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (539, 1, 1411543800, 0, 17, 'Value map [testvaluemap1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (539, 1, 1411543800, 0, 17, 'Value map [testvaluemap1]', '192.168.3.32', 0, '');
 
 -- update valuemap
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (540, 1, 1411543800, 1, 17, '0', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (540, 1, 1411543800, 1, 17, '0', '192.168.3.32', 0, '');
 
 -- delete valuemap
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (541, 1, 1411543800, 2, 17, '0', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (541, 1, 1411543800, 2, 17, '0', '192.168.3.32', 0, '');
 
 -- add maint period
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (542, 1, 1411543800, 0, 27, 'Name: Maintenance1', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (542, 1, 1411543800, 0, 27, 'Name: Maintenance1', '192.168.3.32', 0, '');
 
 -- update maint period
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (543, 1, 1411543800, 1, 27, 'Name: Maintenance2', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (543, 1, 1411543800, 1, 27, 'Name: Maintenance2', '192.168.3.32', 0, '');
 
 -- delete maint period
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (544, 1, 1411543800, 2, 27, 'Id [3] Name [Maintenance2]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (544, 1, 1411543800, 2, 27, 'Id [3] Name [Maintenance2]', '192.168.3.32', 0, '');
 
 -- add service
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (545, 1, 1411543800, 0, 18, 'Name [service1] id [1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (545, 1, 1411543800, 0, 18, 'Name [service1] id [1]', '192.168.3.32', 0, '');
 
 -- update service
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (546, 1, 1411543800, 1, 18, 'Name [service1] id [1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (546, 1, 1411543800, 1, 18, 'Name [service1] id [1]', '192.168.3.32', 0, '');
 
 -- delete service
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (547, 1, 1411543800, 2, 18, 'Name [service1] id [1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (547, 1, 1411543800, 2, 18, 'Name [service1] id [1]', '192.168.3.32', 0, '');
 
 -- add DRule
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (548, 1, 1411543800, 0, 23, '[10] drule1', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (548, 1, 1411543800, 0, 23, '[10] drule1', '192.168.3.32', 0, '');
 
 -- update DRule
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (549, 1, 1411543800, 1, 23, '[10] drule1-new', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (549, 1, 1411543800, 1, 23, '[10] drule1-new', '192.168.3.32', 0, '');
 
 -- delete DRule
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (550, 1, 1411543800, 2, 23, 'Discovery rule [10] drule1-new deleted', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (550, 1, 1411543800, 2, 23, 'Discovery rule [10] drule1-new deleted', '192.168.3.32', 0, '');
 
 -- disable DRule
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (551, 1, 1411543800, 1, 23, 'Discovery rule [10] disabled', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (551, 1, 1411543800, 1, 23, 'Discovery rule [10] disabled', '192.168.3.32', 0, '');
 
 -- enable DRule
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (552, 1, 1411543800, 1, 23, 'Discovery rule [10] enabled', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (552, 1, 1411543800, 1, 23, 'Discovery rule [10] enabled', '192.168.3.32', 0, '');
 
 -- add map
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (553, 1, 1411543800, 0, 19, 'Test Map1', '192.168.3.32', 20, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (553, 1, 1411543800, 0, 19, 'Test Map1', '192.168.3.32', 20, '');
 
 -- update map
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (554, 1, 1411543800, 1, 19, 'Test Map2', '192.168.3.32', 20, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (554, 1, 1411543800, 1, 19, 'Test Map2', '192.168.3.32', 20, '');
 
 -- delete map
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (555, 1, 1411543800, 2, 19, '0', '192.168.3.32', 20, 'Test Map2');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (555, 1, 1411543800, 2, 19, '0', '192.168.3.32', 20, 'Test Map2');
 
 -- add media type
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (556, 1, 1411543800, 0, 3, 'Media type [Media1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (556, 1, 1411543800, 0, 3, 'Media type [Media1]', '192.168.3.32', 0, '');
 
 -- update media type
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (557, 1, 1411543800, 1, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (557, 1, 1411543800, 1, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
 
 -- disable media type
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (558, 1, 1411543800, 1, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (558, 1, 1411543800, 1, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
 
 -- enable media type
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (559, 1, 1411543800, 1, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (559, 1, 1411543800, 1, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
 
 -- delete media type
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (560, 1, 1411543800, 2, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (560, 1, 1411543800, 2, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
 
 -- add proxy
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (564, 1, 1411543800, 0, 26, '[test_proxy1] [10054]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (564, 1, 1411543800, 0, 26, '[test_proxy1] [10054]', '192.168.3.32', 0, '');
 
 -- update proxy
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (565, 1, 1411543800, 1, 26, '[test_proxy2] [10054]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (565, 1, 1411543800, 1, 26, '[test_proxy2] [10054]', '192.168.3.32', 0, '');
 
 -- disable proxy - this will disable all hosts that are monitored by this proxy
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (566, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10053, 'Test host');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (566, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10053, 'Test host');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (510, 566, 'hosts', 'status', '0', '1');
 
 -- enable proxy - this will enable all hosts that are monitored by this proxy
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (567, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10053, 'Test host');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (567, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10053, 'Test host');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (511, 567, 'hosts', 'status', '1', '0');
 
 -- delete proxy
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (568, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10053, 'Test host');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (568, 1, 1411543800, 1, 4, '0', '192.168.3.32', 10053, 'Test host');
 
 -- add web scenario
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (569, 1, 1411543800, 0, 22, 'Web scenario [Scenario1] [1] Host [Test host]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (569, 1, 1411543800, 0, 22, 'Web scenario [Scenario1] [1] Host [Test host]', '192.168.3.32', 0, '');
 
 -- update web scenario
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (570, 1, 1411543800, 1, 22, 'Web scenario [Scenario1] [1] Host [Test host]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (570, 1, 1411543800, 1, 22, 'Web scenario [Scenario1] [1] Host [Test host]', '192.168.3.32', 0, '');
 
 -- disable scenario
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (571, 1, 1411543800, 6, 22, 'Web scenario [Scenario1] [1] Host [Test host] disabled', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (571, 1, 1411543800, 6, 22, 'Web scenario [Scenario1] [1] Host [Test host] disabled', '192.168.3.32', 0, '');
 
 -- enable scenario
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (572, 1, 1411543800, 5, 22, 'Web scenario [Scenario1] [1] Host [Test host] activated', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (572, 1, 1411543800, 5, 22, 'Web scenario [Scenario1] [1] Host [Test host] activated', '192.168.3.32', 0, '');
 
 -- delete scenario
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (573, 1, 1411543800, 2, 22, 'Web scenario [Scenario1] [1] Host [Test host]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (573, 1, 1411543800, 2, 22, 'Web scenario [Scenario1] [1] Host [Test host]', '192.168.3.32', 0, '');
 
 -- add screen
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (574, 1, 1411543800, 0, 20, 'Name [screen1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (574, 1, 1411543800, 0, 20, 'Name [screen1]', '192.168.3.32', 0, '');
 
 -- update screen
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (575, 1, 1411543800, 1, 20, 'Name [screen1]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (575, 1, 1411543800, 1, 20, 'Name [screen1]', '192.168.3.32', 0, '');
 
 -- delete screen
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (576, 1, 1411543800, 2, 20, '0', '192.168.3.32', 24, 'screen1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (576, 1, 1411543800, 2, 20, '0', '192.168.3.32', 24, 'screen1');
 
 -- add script
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (577, 1, 1411543800, 0, 25, 'Name [script1] id [4]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (577, 1, 1411543800, 0, 25, 'Name [script1] id [4]', '192.168.3.32', 0, '');
 
 -- update script
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (578, 1, 1411543800, 1, 25, 'Name [script1] id [4]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (578, 1, 1411543800, 1, 25, 'Name [script1] id [4]', '192.168.3.32', 0, '');
 
 -- delete script
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (579, 1, 1411543800, 2, 25, 'Script [4]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (579, 1, 1411543800, 2, 25, 'Script [4]', '192.168.3.32', 0, '');
 
 -- add slideshow
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (580, 1, 1411543800, 0, 24, 'Name Slideshow_4', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (580, 1, 1411543800, 0, 24, 'Name Slideshow_4', '192.168.3.32', 0, '');
 
 -- update slideshow
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (581, 1, 1411543800, 1, 24, 'Name Slideshow_4', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (581, 1, 1411543800, 1, 24, 'Name Slideshow_4', '192.168.3.32', 0, '');
 
 -- delete slideshow
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (582, 1, 1411543800, 2, 24, 'Name Slideshow_4', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (582, 1, 1411543800, 2, 24, 'Name Slideshow_4', '192.168.3.32', 0, '');
 
 -- add template
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (583, 1, 1411543800, 0, 30, '', '192.168.3.32', 10055, 'Test_template1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (583, 1, 1411543800, 0, 30, '', '192.168.3.32', 10055, 'Test_template1');
 
 -- update template
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (584, 1, 1411543800, 1, 30, '', '192.168.3.32', 10055, 'Test_template1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (584, 1, 1411543800, 1, 30, '', '192.168.3.32', 10055, 'Test_template1');
 
 -- delete template
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (585, 1, 1411543800, 2, 30, '0', '192.168.3.32', 10055, 'Test_template1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (585, 1, 1411543800, 2, 30, '0', '192.168.3.32', 10055, 'Test_template1');
 
 -- updating record "Configuration of Zabbix" in the auditlog
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (700, 1, 1411543800, 1, 2, 'Default theme "originalblue".; Event acknowledges "1".; Dr...', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (700, 1, 1411543800, 1, 2, 'Default theme "originalblue".; Event acknowledges "1".; Dr...', '192.168.3.32', 0, '');
 
 -- adding test data to the 'alerts' table for testing Audit->Actions report
 INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES (1, 0, 0, 13545, 1329724790, 1, 0, 0);
@@ -2280,7 +2280,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 105, 1, 'ds.hosts.0.0', 0, 'Host*');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90009, 105, 1, 'ds.items.0.0', 0, 'Available memory');
 -- widget "Test cases for update"
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 104, 1, 'ds.axisy.0', 0, '1');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 104, 0, 'ds.axisy.0', 1, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 104, 0, 'ds.pointsize.0', 4, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 104, 0, 'ds.transparency.0', 6, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90014, 104, 0, 'ds.type.0', 1, '');
@@ -2308,8 +2308,25 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (104, 'Dashboard for Problems by severity', 1, 1);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (106, 104, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (107, 104, 'problemsbysv', 'Reference PBS widget to delete', 0, 5, 12, 5);
-INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (108, 104, 'problemsbysv', 'Totals reference widget', 12, 0, 12, 5);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (108, 104, 'problemsbysv', 'Totals reference widget', 12, 0, 6, 3);
 INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (108, 136, 0, 'show_type', 1);
-INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (109, 104, 'problemsbysv', 'Totals reference PBS widget to delete',12, 5, 12, 5);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (109, 104, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
 INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (109, 137, 0, 'show_type', 1);
 INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (109, 138, 0, 'layout', 1);
+
+-- testFormItemTest
+INSERT INTO hosts (hostid, proxy_hostid, host, name, status, available, description) VALUES (99136, 20000, 'Test item host', 'Test item host', 0, 0,'Test item host for testing items');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (100999, 99136, 4);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55070, 99136, 1, '127.0.0.1', 'Test1', '1', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55071, 99136, 2, '127.0.0.2', 'Test2', '1', '161', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55072, 99136, 3, '127.0.0.3', 'Test3', '1', '623', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55073, 99136, 4, '127.0.0.4', 'Test4', '1', '12345', '1');
+
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99142, 0, 99136, 'Master item', '', 'master', 55070, 0, '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99294, 0, 99136, 'Test discovery rule', '', 'test', 55070, 1, '', '', '');
+
+INSERT INTO hosts (hostid, host, name, status, available, description) VALUES (99137, 'Test Item Template', 'Test Item Template', 3, 0,'Template for testing items');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99982, 99137, 4);
+
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99183, 2, 99137, 'Master item', '', 'master', NULL, 0, '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99349, 0, 99137, 'Test discovery rule', '', 'test', NULL, 1, '', '', '');

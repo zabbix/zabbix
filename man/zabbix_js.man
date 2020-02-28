@@ -1,0 +1,91 @@
+.\" Start URL macro. Copied from an-ext.tmac for portability
+.de UR
+.  ds m1 \\$1\"
+.  nh
+.  if \\n(mH \{\
+.    \" Start diversion in a new environment.
+.    do ev URL-div
+.    do di URL-div
+.  \}
+..
+.\" End URL macro. Copied from an-ext.tmac for portability
+.de UE
+.  ie \\n(mH \{\
+.    br
+.    di
+.    ev
+.
+.    \" Has there been one or more input lines for the link text?
+.    ie \\n(dn \{\
+.      do HTML-NS "<a href=""\\*(m1"">"
+.      \" Yes, strip off final newline of diversion and emit it.
+.      do chop URL-div
+.      do URL-div
+\c
+.      do HTML-NS </a>
+.    \}
+.    el \
+.      do HTML-NS "<a href=""\\*(m1"">\\*(m1</a>"
+\&\\$*\"
+.  \}
+.  el \
+\\*(la\\*(m1\\*(ra\\$*\"
+.
+.  hy \\n(HY
+..
+.TH ZABBIX_JS 1 "2019\-01\-29" Zabbix
+.SH NAME
+zabbix_js \- Zabbix JS utility
+.SH SYNOPSIS
+.B zabbix_js \-s
+.I script\-file
+.B \-p
+.I input\-param
+.RB [ \-l
+.IR log\-level ]
+.RB [ \-t
+.IR timeout ]
+.br
+.B zabbix_js \-s
+.I script\-file
+.B \-i
+.I input\-file
+.RB [ \-l
+.IR log\-level ]
+.RB [ \-t
+.IR timeout ]
+.br
+.B zabbix_js \-h
+.br
+.B zabbix_js \-V
+.SH DESCRIPTION
+.B zabbix_js
+is a command line utility that can be used for embedded script testing.
+.SH OPTIONS
+.IP "\fB\-s\fR, \fB\-\-script\fR \fIscript\-file\fR"
+Specify the file name of the script to execute. If '-' is specified as file name, the script will be read from stdin.
+.IP "\fB\-p\fR, \fB\-\-param\fR \fIinput\-param\fR"
+Specify the input parameter.
+.IP "\fB\-i\fR, \fB\-\-input\fR \fIinput\-file\fR"
+Specify the file name of the input parameter. If '-' is specified as file name, the input will be read from stdin.
+.IP "\fB\-l\fR, \fB\-\-loglevel\fR \fIlog\-level\fR"
+Specify the log level.
+.IP "\fB\-t\fR, \fB\-\-timeout\fR \fItimeout\fR"
+Specify the timeout in seconds.
+.IP "\fB\-h\fR, \fB\-\-help\fR"
+Display this help and exit.
+.IP "\fB\-V\fR, \fB\-\-version\fR"
+Output version information and exit.
+.SH "EXAMPLES"
+\fBzabbix_js \-s script-file.js \-p example \fR
+.SH "SEE ALSO"
+.UR https://www.zabbix.com/manuals
+Documentation
+.UE
+.PP
+.BR zabbix_agentd (8),
+.BR zabbix_proxy (8),
+.BR zabbix_sender (1),
+.BR zabbix_server (8),
+.BR zabbix_get (1),
+.BR zabbix_agent2 (8)

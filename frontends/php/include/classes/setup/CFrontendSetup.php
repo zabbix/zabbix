@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
  */
 class CFrontendSetup {
 
-	const MIN_PHP_VERSION = '5.4.0';
+	const MIN_PHP_VERSION = '7.2.0';
 	const MIN_PHP_MEMORY_LIMIT = '134217728'; // 128 * ZBX_MEBIBYTE;
 	const MIN_PHP_POST_MAX_SIZE = '16777216'; // 16 * ZBX_MEBIBYTE;
 	const MIN_PHP_UPLOAD_MAX_FILESIZE = '2097152'; // 2 * ZBX_MEBIBYTE;
@@ -71,11 +71,6 @@ class CFrontendSetup {
 		if (extension_loaded('mbstring')) {
 			$result[] = $this->checkPhpMbstringFuncOverload();
 		}
-
-		// check for deprecated PHP 5.6.0 option 'always_populate_raw_post_data'
-		if (version_compare(PHP_VERSION, '5.6', '>=') && version_compare(PHP_VERSION, '7.0', '<')) {
-			$result[] = $this->checkPhpAlwaysPopulateRawPostData();
-		}
 		$result[] = $this->checkPhpSockets();
 		$result[] = $this->checkPhpGd();
 		$result[] = $this->checkPhpGdPng();
@@ -101,14 +96,14 @@ class CFrontendSetup {
 	 * @return array
 	 */
 	public function checkPhpVersion() {
-		$check = version_compare(phpversion(), self::MIN_PHP_VERSION, '>=');
+		$check = version_compare(PHP_VERSION, self::MIN_PHP_VERSION, '>=');
 
 		return [
 			'name' => _('PHP version'),
-			'current' => phpversion(),
+			'current' => PHP_VERSION,
 			'required' => self::MIN_PHP_VERSION,
 			'result' => $check ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required PHP version is %s.', self::MIN_PHP_VERSION)
+			'error' => _s('Minimum required PHP version is %1$s.', self::MIN_PHP_VERSION)
 		];
 	}
 
@@ -349,27 +344,6 @@ class CFrontendSetup {
 	}
 
 	/**
-	 * Checks for PHP option always_populate_raw_post_data. As of PHP version 5.6.0 this option is deprecated.
-	 * In case this option is not set or is enabled, PHP will throw E_DEPRECATED error. This option should be set to -1
-	 * ini php.ini and cannot be set at runtime.
-	 *
-	 * See: http://php.net/manual/en/ini.core.php#ini.always-populate-raw-post-data
-	 *
-	 * @return array
-	 */
-	public function checkPhpAlwaysPopulateRawPostData() {
-		$current = ini_get('always_populate_raw_post_data');
-
-		return [
-			'name' => _s('PHP option "%1$s"', 'always_populate_raw_post_data'),
-			'current' => ($current != -1) ? _('on') : _('off'),
-			'required' => _('off'),
-			'result' => ($current != -1) ? self::CHECK_FATAL : self::CHECK_OK,
-			'error' => _s('PHP option "%1$s" must be set to "%2$s"', 'always_populate_raw_post_data', -1)
-		];
-	}
-
-	/**
 	 * Checks for PHP sockets extension.
 	 *
 	 * @return array
@@ -441,10 +415,8 @@ class CFrontendSetup {
 	 */
 	public function checkPhpGdJpeg() {
 		if (is_callable('gd_info')) {
-			$gdInfo = gd_info();
-
-			// check for PHP prior 5.3.0, it returns 'JPG Support' key.
-			$current = isset($gdInfo['JPG Support']) ? $gdInfo['JPG Support'] : $gdInfo['JPEG Support'];
+			$gd_info = gd_info();
+			$current = $gd_info['JPEG Support'];
 		}
 		else {
 			$current = false;

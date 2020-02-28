@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,6 @@ class CHtml {
 	 * @return string
 	 */
 	public static function serialize(array $data) {
-		return self::encode(CJs::encodeJson($data));
+		return self::encode(json_encode($data));
 	}
 }

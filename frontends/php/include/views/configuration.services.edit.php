@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,11 @@
 **/
 
 
-include('include/views/js/configuration.services.edit.js.php');
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('configuration.services.edit.js.php');
 
 $service = $this->data['service'];
 
@@ -62,7 +66,7 @@ $servicesFormList->addRow((new CLabel(_('Parent service'), 'parent_name'))->setA
 	(new CButton('select_parent', _x('Change', 'verb')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.services",jQuery.extend('.
-			CJs::encodeJson($parent_service_popup_options).
+			json_encode($parent_service_popup_options).
 				',{parentid: this.form.parentid.value}), null, this);'
 		)
 ]);
@@ -90,7 +94,7 @@ $servicesFormList->addRow(_('Trigger'), [
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'triggers',
 				'srcfld1' => 'triggerid',
 				'srcfld2' => 'description',
@@ -154,7 +158,7 @@ $servicesDependenciesFormList->addRow(
 		$servicesChildTable,
 		(new CButton('add_child_service', _('Add')))
 			->onClick('return PopUp("popup.services",jQuery.extend('.
-				CJs::encodeJson($dep_service_popup_options).
+				json_encode($dep_service_popup_options).
 					',{parentid: this.form.parentid.value}), null, this);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
@@ -368,4 +372,4 @@ $servicesForm->addItem($servicesTab);
 // append form to widget
 $widget->addItem($servicesForm);
 
-return $widget;
+$widget->show();

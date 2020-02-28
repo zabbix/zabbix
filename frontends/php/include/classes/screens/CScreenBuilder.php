@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -462,8 +462,9 @@ class CScreenBuilder {
 						&& (isset($_REQUEST['form']) && $_REQUEST['form'] == 'update')
 						&& ((isset($_REQUEST['x']) && $_REQUEST['x'] == $c && isset($_REQUEST['y']) && $_REQUEST['y'] == $r)
 								|| (isset($_REQUEST['screenitemid']) && bccomp($_REQUEST['screenitemid'], $screenitem['screenitemid']) == 0))) {
-					$screenView = new CView('monitoring.screen.constructor.edit', ['screen' => $this->screen]);
-					$item = $screenView->render();
+					$item = new CObject(
+						(new CView('monitoring.screen.constructor.edit', ['screen' => $this->screen]))->getOutput()
+					);
 					$isEditForm = true;
 				}
 				// screen cell

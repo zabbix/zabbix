@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@ package com.zabbix.gateway;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.concurrent.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,7 @@ import org.slf4j.LoggerFactory;
 public class JavaGateway
 {
 	private static final Logger logger = LoggerFactory.getLogger(JavaGateway.class);
+	public static final Map<String, Long> iterativeObjects = Collections.synchronizedMap(new HashMap<String, Long>());
 
 	public static void main(String[] args)
 	{

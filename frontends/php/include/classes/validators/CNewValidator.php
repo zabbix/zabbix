@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ class CNewValidator {
 
 				case 'json':
 					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || CJs::decodeJson($this->input[$field]) === null) {
+						if (!is_string($this->input[$field]) || json_decode($this->input[$field]) === null) {
 							$this->addError($fatal,
 								_s('Incorrect value for field "%1$s": %2$s.', $field, _('JSON string is expected'))
 							);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -300,7 +300,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestClick('resetDefaults');
-		$this->zbxTestClickXpath("//div[@id='overlay_dialogue']//button[text()='Reset defaults']");
+		$this->zbxTestClickXpath("//div[contains(@class, 'overlay-dialogue modal')]//button[text()='Reset defaults']");
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'Trigger displaying options']);
 

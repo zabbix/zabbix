@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,6 +145,8 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 				'name' => $filter_problem
 			],
 			'severities' => $filter_severities,
+			'evaltype' => $fields['evaltype'],
+			'tags' => $fields['tags'],
 			'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
 			'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 		]);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class CPagerHelper {
 		);
 
 		$start = ($data['page'] - 1) * $data['rows_per_page'];
-		$end = $start + $data['rows_per_page'];
+		$end = min($data['num_rows'], $start + $data['rows_per_page']);
 		$offset = ($sort_order == ZBX_SORT_DOWN) ? $data['offset_down'] : $data['offset_up'];
 
 		// Trim given rows for the current page.

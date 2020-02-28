@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,15 +34,16 @@ require_once __DIR__.'/../../include/db.inc.php';
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
 
-$autoloader = new CAutoloader([
+$autoloader = new CAutoloader;
+$autoloader->addNamespace('', [
 	__DIR__.'/../../include/classes',
-	__DIR__.'/../../include/classes/core',
-	__DIR__.'/../../include/classes/helpers',
-	__DIR__.'/../../include/classes/db',
 	__DIR__.'/../../include/classes/api',
 	__DIR__.'/../../include/classes/api/clients',
 	__DIR__.'/../../include/classes/api/helpers',
 	__DIR__.'/../../include/classes/api/wrappers',
+	__DIR__.'/../../include/classes/core',
+	__DIR__.'/../../include/classes/helpers',
+	__DIR__.'/../../include/classes/db',
 	__DIR__.'/../../include/classes/parsers',
 	__DIR__.'/../../include/classes/parsers/results',
 	__DIR__.'/../../include/classes/validators',
@@ -69,4 +70,5 @@ $autoloader = new CAutoloader([
 	__DIR__.'/include/classes/parsers',
 	__DIR__.'/include/classes/import/converters'
 ]);
+$autoloader->addNamespace('Core', [__DIR__.'/../../include/classes/core']);
 $autoloader->register();

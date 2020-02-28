@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 // Overview tab.
 $overviewFormList = new CFormList();
@@ -218,11 +222,14 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel(url_param('groupid'))]));
 
-return (new CWidget())
+$web_layout_mode = CViewHelper::loadLayoutMode();
+
+(new CWidget())
 	->setTitle(_('Host inventory'))
-	->setWebLayoutMode(CView::getLayoutMode())
-	->setControls((new CList())->addItem(get_icon('fullscreen')))
+	->setWebLayoutMode($web_layout_mode)
+	->setControls((new CList())->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode])))
 	->addItem((new CForm())
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem($hostInventoriesTab)
-	);
+	)
+	->show();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,13 +54,13 @@ class testPageActions extends CLegacyWebTest {
 	private $event_sources = [
 		EVENT_SOURCE_TRIGGERS => 'Trigger actions',
 		EVENT_SOURCE_DISCOVERY => 'Discovery actions',
-		EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
+		EVENT_SOURCE_AUTOREGISTRATION => 'Autoregistration actions',
 		EVENT_SOURCE_INTERNAL => 'Internal actions'
 	];
 
 	private function calculateHash($actionid) {
-		$this->sqlHashAction = 'SELECT actionid,name,eventsource,evaltype,status,def_shortdata,def_longdata,r_shortdata,'
-				. 'r_longdata,formula,pause_suppressed 	 FROM actions WHERE actionid='.$actionid;
+		$this->sqlHashAction = 'SELECT actionid,name,eventsource,evaltype,status,formula,pause_suppressed FROM actions '
+				. 'WHERE actionid='.$actionid;
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 		$this->sqlHashConditions = 'SELECT * FROM conditions WHERE actionid='.$actionid.' AND actionid>2  ORDER BY conditionid';
 		$this->oldHashConditions = CDBHelper::getHash($this->sqlHashConditions);
@@ -141,7 +141,7 @@ class testPageActions extends CLegacyWebTest {
 		return [
 			[EVENT_SOURCE_TRIGGERS],
 			[EVENT_SOURCE_DISCOVERY],
-			[EVENT_SOURCE_AUTO_REGISTRATION],
+			[EVENT_SOURCE_AUTOREGISTRATION],
 			[EVENT_SOURCE_INTERNAL]
 		];
 	}
@@ -323,7 +323,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->assertEquals($this->oldHashAction, CDBHelper::getHash($this->sqlHashAction));
 	}
 
-	/*
+	/**
 	 * Debug button sometimes overlaps action link and impossible to click on it.
 	 */
 	public static function setDebugMode($value) {

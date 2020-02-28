@@ -1,6 +1,6 @@
 #
 # Zabbix
-# Copyright (C) 2001-2019 Zabbix SIA
+# Copyright (C) 2001-2020 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ AC_DEFUN([LIBXML2_CHECK_CONFIG],
         [
 If you want to use XML library:
 AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
-    [use libxml2 client library @<:@default=no@:>@, optionally specify path to xml2-config]
+    [use libxml2 client library @<:@default=no@:>@, see PKG_CONFIG_PATH environment variable to specify .pc file location]
         )],
         [
         if test "$withval" = "no"; then
@@ -34,7 +34,6 @@ AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
             want_libxml2="yes"
         else
             want_libxml2="yes"
-            LIBXML2_CONFIG="$withval"
         fi
         ],
         [want_libxml2="no"]
@@ -50,14 +49,14 @@ AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
     dnl
 
     if test "$want_libxml2" = "yes"; then
+        AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+        PKG_PROG_PKG_CONFIG()
 
-        AC_PATH_PROG([LIBXML2_CONFIG], [xml2-config], [])
+        if test -x "$PKG_CONFIG"; then
 
-        if test -x "$LIBXML2_CONFIG"; then
+            LIBXML2_CFLAGS="`$PKG_CONFIG --cflags libxml-2.0`"
 
-            LIBXML2_CFLAGS="`$LIBXML2_CONFIG --cflags`"
-
-            _full_libxml2_libs="`$LIBXML2_CONFIG --libs`"
+            _full_libxml2_libs="`$PKG_CONFIG --libs libxml-2.0`"
 
             for i in $_full_libxml2_libs; do
                 case $i in
@@ -109,7 +108,7 @@ AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
             unset _save_libxml2_ldflags
             unset _save_libxml2_cflags
 
-            LIBXML2_VERSION=`$LIBXML2_CONFIG --version`
+            LIBXML2_VERSION=`$PKG_CONFIG --version libxml-2.0`
 
             AC_DEFINE([HAVE_LIBXML2], [1], [Define to 1 if libxml2 libraries are available])
 

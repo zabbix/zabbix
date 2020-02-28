@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -530,9 +530,8 @@ if ((getRequest('action') === 'triggerprototype.massupdateform' || hasRequest('m
 	$data['action'] = 'triggerprototype.massupdate';
 	$data['hostid'] = $discoveryRule['hostid'];
 
-	$triggersView = new CView('configuration.trigger.prototype.massupdate', $data);
-	$triggersView->render();
-	$triggersView->show();
+	// Render view.
+	echo (new CView('configuration.trigger.prototype.massupdate', $data))->getOutput();
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = getTriggerFormData([
@@ -570,9 +569,8 @@ elseif (isset($_REQUEST['form'])) {
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 	]);
 
-	$triggersView = new CView('configuration.trigger.prototype.edit', $data);
-	$triggersView->render();
-	$triggersView->show();
+	// render view
+	echo (new CView('configuration.trigger.prototype.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
@@ -679,10 +677,8 @@ else {
 
 	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	// render view
-	$triggersView = new CView('configuration.trigger.prototype.list', $data);
-	$triggersView->render();
-	$triggersView->show();
+	// Render view.
+	echo (new CView('configuration.trigger.prototype.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

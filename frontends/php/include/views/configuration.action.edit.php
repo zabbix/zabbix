@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
@@ -125,7 +129,7 @@ $action_tab->addRow(_('Type of calculation'), [
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.condition.actions",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.condition.actions",'.json_encode([
 			'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
 			'source' => $data['eventsource']
 		]).', null, this);')
@@ -153,14 +157,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	);
 }
 
-$operation_tab
-	->addRow(_('Default subject'),
-		(new CTextBox('def_shortdata', $data['action']['def_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('Default message'),
-		(new CTextArea('def_longdata', $data['action']['def_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
-
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operation_tab->addRow(_('Pause operations for suppressed problems'),
 		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
@@ -181,12 +177,7 @@ else {
 if ($data['action']['operations']) {
 	$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_OPERATION);
 
-	$default_message = [
-		'subject' => $data['action']['def_shortdata'],
-		'message' => $data['action']['def_longdata']
-	];
-
-	$action_operation_hints = getActionOperationHints($data['action']['operations'], $default_message);
+	$action_operation_hints = getActionOperationHints($data['action']['operations']);
 
 	$simple_interval_parser = new CSimpleIntervalParser();
 
@@ -250,7 +241,7 @@ if ($data['action']['operations']) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('return PopUp("popup.action.operation",'.CJs::encodeJson([
+							->onClick('return PopUp("popup.action.operation",'.json_encode([
 								'type' => ACTION_OPERATION,
 								'source' => $data['eventsource'],
 								'actionid' => $data['actionid'],
@@ -276,7 +267,7 @@ if ($data['action']['operations']) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('return PopUp("popup.action.operation",'.CJs::encodeJson([
+							->onClick('return PopUp("popup.action.operation",'.json_encode([
 								'type' => ACTION_OPERATION,
 								'source' => $data['eventsource'],
 								'actionid' => $data['actionid'],
@@ -302,7 +293,7 @@ if ($data['action']['operations']) {
 
 $operations_table->addRow(
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.action.operation",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.action.operation",'.json_encode([
 			'type' => ACTION_OPERATION,
 			'source' => $data['eventsource'],
 		]).', null, this);')
@@ -315,24 +306,8 @@ $operation_tab->addRow(_('Operations'),
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
-// Append tabs to form.
-$action_tabs = (new CTabView())
-	->addTab('actionTab', _('Action'), $action_tab)
-	->addTab('operationTab', _('Operations'), $operation_tab);
-
-$bottom_note = _('At least one operation must exist.');
-
 // Recovery operation tab.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$bottom_note = _('At least one operation or recovery operation must exist.');
-	$recovery_tab = (new CFormList())
-		->addRow(_('Default subject'),
-			(new CTextBox('r_shortdata', $data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-		->addRow(_('Default message'),
-			(new CTextArea('r_longdata', $data['action']['r_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		);
-
 	// Create operation table.
 	$operations_table = (new CTable())->setAttribute('style', 'width: 100%;');
 	$operations_table->setHeader([_('Details'), _('Action')]);
@@ -340,12 +315,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	if ($data['action']['recovery_operations']) {
 		$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_RECOVERY_OPERATION);
 
-		$default_message = [
-			'subject' => $data['action']['r_shortdata'],
-			'message' => $data['action']['r_longdata']
-		];
-
-		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations'], $default_message);
+		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations']);
 
 		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
@@ -376,7 +346,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('return PopUp("popup.action.recovery",'.CJs::encodeJson([
+							->onClick('return PopUp("popup.action.recovery",'.json_encode([
 								'type' => ACTION_RECOVERY_OPERATION,
 								'source' => $data['eventsource'],
 								'actionid' => $data['actionid'],
@@ -402,7 +372,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 	$operations_table->addRow(
 		(new CSimpleButton(_('Add')))
-			->onClick('return PopUp("popup.action.recovery",'.CJs::encodeJson([
+			->onClick('return PopUp("popup.action.recovery",'.json_encode([
 				'type' => ACTION_RECOVERY_OPERATION,
 				'source' => $data['eventsource'],
 				'actionid' => getRequest('actionid'),
@@ -410,27 +380,16 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
-	$recovery_tab->addRow(_('Operations'),
+	$operation_tab->addRow(_('Recovery operations'),
 		(new CDiv($operations_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
-
-	$action_tabs->addTab('recoveryOperationTab', _('Recovery operations'), $recovery_tab);
 }
 
 // Acknowledge operations
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$bottom_note = _('At least one operation, recovery operation or update operation must exist.');
 	$action_formname = $actionForm->getName();
-
-	$acknowledge_tab = (new CFormList())
-		->addRow(_('Default subject'),
-			(new CTextBox('ack_shortdata', $data['action']['ack_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-		->addRow(_('Default message'),
-			(new CTextArea('ack_longdata', $data['action']['ack_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		);
 
 	$operations_table = (new CTable())->setAttribute('style', 'width: 100%;');
 	$operations_table->setHeader([_('Details'), _('Action')]);
@@ -438,12 +397,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	if ($data['action']['ack_operations']) {
 		$operation_descriptions = getActionOperationDescriptions([$data['action']], ACTION_ACKNOWLEDGE_OPERATION);
 
-		$default_message = [
-			'subject' => $data['action']['ack_shortdata'],
-			'message' => $data['action']['ack_longdata']
-		];
-
-		$operation_hints = getActionOperationHints($data['action']['ack_operations'], $default_message);
+		$operation_hints = getActionOperationHints($data['action']['ack_operations']);
 
 		foreach ($data['action']['ack_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION])) {
@@ -472,7 +426,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('return PopUp("popup.action.acknowledge",'.CJs::encodeJson([
+							->onClick('return PopUp("popup.action.acknowledge",'.json_encode([
 								'type' => ACTION_ACKNOWLEDGE_OPERATION,
 								'source' => $data['eventsource'],
 								'actionid' => $data['actionid'],
@@ -498,7 +452,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 
 	$operations_table->addRow(
 		(new CSimpleButton(_('Add')))
-			->onClick('return PopUp("popup.action.acknowledge",'.CJs::encodeJson([
+			->onClick('return PopUp("popup.action.acknowledge",'.json_encode([
 				'type' => ACTION_ACKNOWLEDGE_OPERATION,
 				'source' => $data['eventsource'],
 				'actionid' => getRequest('actionid'),
@@ -506,14 +460,17 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
-	$acknowledge_tab->addRow(_('Operations'),
+	$operation_tab->addRow(_('Update operations'),
 		(new CDiv($operations_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
-
-	$action_tabs->addTab('acknowledgeTab', _('Update operations'), $acknowledge_tab);
 }
+
+// Append tabs to form.
+$action_tabs = (new CTabView())
+	->addTab('actionTab', _('Action'), $action_tab)
+	->addTab('operationTab', _('Operations'), $operation_tab);
 
 if (!hasRequest('form_refresh')) {
 	$action_tabs->setSelected(0);
@@ -545,7 +502,7 @@ $action_tabs->setFooter([
 		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addItem([
 			new CDiv(''),
-			(new CDiv((new CLabel($bottom_note))->setAsteriskMark()))
+			(new CDiv((new CLabel(_('At least one operation must exist.')))->setAsteriskMark()))
 				->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 		]),
 	makeFormFooter($form_buttons[0], $form_buttons[1])
@@ -555,4 +512,4 @@ $actionForm->addItem($action_tabs);
 // Append form to widget.
 $widget->addItem($actionForm);
 
-return $widget;
+$widget->show();

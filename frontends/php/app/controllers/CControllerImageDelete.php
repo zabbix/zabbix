@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,6 @@ class CControllerImageDelete extends CController {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $this->getInput('imagetype'))
-				->getUrl()
 			);
 			$response->setMessageOk(_('Image deleted'));
 		}
@@ -71,7 +70,6 @@ class CControllerImageDelete extends CController {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'image.edit')
 				->setArgument('imageid', $this->getInput('imageid'))
-				->getUrl()
 			);
 			$response->setMessageError(_('Cannot delete image'));
 		}

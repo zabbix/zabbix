@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -233,6 +233,13 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				zbx_signal_process_by_pid(ZBX_RTC_GET_DATA(flags), flags);
 			else
 				zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags), flags);
+			break;
+		case ZBX_RTC_SNMP_CACHE_RELOAD:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_UNREACHABLE, ZBX_RTC_GET_DATA(flags), flags);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_POLLER, ZBX_RTC_GET_DATA(flags), flags);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TRAPPER, ZBX_RTC_GET_DATA(flags), flags);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_DISCOVERER, ZBX_RTC_GET_DATA(flags), flags);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TASKMANAGER, ZBX_RTC_GET_DATA(flags), flags);
 			break;
 	}
 #endif

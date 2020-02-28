@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "sysinfo.h"
 
 extern ZBX_METRIC	parameters_common[];
+extern ZBX_METRIC	parameters_common_local[];
 
 int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	EXECUTE_STR(const char *command, AGENT_RESULT *result);

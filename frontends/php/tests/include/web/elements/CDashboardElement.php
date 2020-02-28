@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,7 +134,10 @@ class CDashboardElement extends CElement {
 
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
 			$controls->query('id:dashbrd-cancel')->one()->click(true);
-			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
+
+			if (!$controls->isStalled()) {
+				$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
+			}
 		}
 
 		return $this;

@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,10 @@
 
 package win32
 
-import "syscall"
+import (
+	"fmt"
+	"syscall"
+)
 
 func mustLoadLibrary(name string) Hlib {
 	if handle, err := syscall.LoadLibrary(name); err != nil {
@@ -33,7 +36,7 @@ func mustLoadLibrary(name string) Hlib {
 
 func (h Hlib) mustGetProcAddress(name string) uintptr {
 	if addr, err := syscall.GetProcAddress(syscall.Handle(h), name); err != nil {
-		panic(err.Error())
+		panic(fmt.Sprintf("Failed to get function %s: %s", name, err.Error()))
 	} else {
 		return addr
 	}

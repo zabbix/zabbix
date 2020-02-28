@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $discoveryRule = $data['discovery_rule'];
 $hostPrototype = $data['host_prototype'];
@@ -75,7 +79,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
 
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
+	zbx_add_post_js('hostInterfacesManager.add('.json_encode(array_values($parentHost['interfaces'])).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// Zabbix agent interfaces
@@ -347,11 +351,11 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 				->addValue(_('Inherited and host macros'), 1)
 				->setModern(true)
 			)
-			->addRow(null, new CObject((new CView('hostmacros.list.html', [
+			->addRow(null, new CPartial('hostmacros.list.html', [
 				'macros' => $data['macros'],
 				'show_inherited_macros' => $data['show_inherited_macros'],
 				'readonly' => $data['readonly']
-			]))->getOutput()), 'macros_container')
+			]), 'macros_container')
 	);
 }
 
@@ -445,4 +449,4 @@ else {
 $frmHost->addItem($divTabs);
 $widget->addItem($frmHost);
 
-return $widget;
+$widget->show();

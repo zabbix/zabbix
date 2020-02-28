@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,21 +69,31 @@ class CSeverity extends CRadioButtonList {
 	}
 
 	public function toString($destroy = true) {
-		$config = select_config();
-
-		$severities = [
-			TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
-			TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
-		];
-
 		if ($this->options['all']) {
 			$this->addValue(_('all'), -1);
 		}
 
-		foreach ($severities as $severity) {
-			$this->addValue(getSeverityName($severity, $config), $severity, getSeverityStyle($severity));
+		foreach (self::getSeverities() as $severity) {
+			$this->addValue($severity['name'], $severity['value'], $severity['style']);
 		}
 
 		return parent::toString($destroy);
+	}
+
+	/**
+	 * Generate array with severities options.
+	 */
+	public static function getSeverities() {
+		$config = select_config();
+		$severities = [];
+		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
+			$severities[] = [
+				'name' => getSeverityName($severity, $config),
+				'value' => $severity,
+				'style' => getSeverityStyle($severity)
+			];
+		}
+
+		return $severities;
 	}
 }

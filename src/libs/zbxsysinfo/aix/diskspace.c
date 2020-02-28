@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 #include "log.h"
+#include "zbxalgo.h"
+#include "inodes.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
@@ -45,6 +47,7 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 	if (0 != ZBX_STATFS(fs, &s))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s", zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG,"%s failed with error: %s",__func__, *error);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -237,6 +240,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
+	sz *= 2;
 	vms = zbx_malloc(vms, (size_t)sz);
 
 	/* get the list of mounted filesystems */
@@ -252,8 +256,10 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	for (i = 0, vm = vms; i < rc; i++)
 	{
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "{#FSNAME}", (char *)vm + vm->vmt_data[VMT_STUB].vmt_off, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, "{#FSTYPE}", zbx_get_vfs_name_by_type(vm->vmt_gfstype), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, (char *)vm + vm->vmt_data[VMT_STUB].vmt_off,
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, zbx_get_vfs_name_by_type(vm->vmt_gfstype),
+				ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 
 		/* go to the next vmount structure */
@@ -271,4 +277,135 @@ error:
 	zbx_free(vms);
 
 	return ret;
+}
+
+static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int			rc, sz, i, ret = SYSINFO_RET_FAIL;
+	struct vmount		*vms = NULL, *vm;
+	struct zbx_json		j;
+	zbx_uint64_t		total, not_used, used;
+	zbx_uint64_t		itotal, inot_used, iused;
+	double			pfree, pused;
+	double			ipfree, ipused;
+	char 			*error;
+	zbx_vector_ptr_t	mntpoints;
+	zbx_mpoint_t		*mntpoint;
+	char 			*mpoint;
+
+	/* check how many bytes to allocate for the mounted filesystems */
+	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_vector_ptr_create(&mntpoints);
+
+	sz *= 2;
+	vms = zbx_malloc(vms, (size_t)sz);
+
+	/* get the list of mounted filesystems */
+	/* return code is number of filesystems returned */
+	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vms)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		goto out;
+	}
+	for (i = 0, vm = vms; i < rc; i++)
+	{
+		mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
+
+		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused, &error))
+		{
+			zbx_free(error);
+			continue;
+		}
+		if (SYSINFO_RET_OK != get_fs_inode_stat(mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused, "pused",
+				&error))
+		{
+			zbx_free(error);
+			continue;
+		}
+
+		mntpoint = (zbx_mpoint_t *)zbx_malloc(NULL, sizeof(zbx_mpoint_t));
+		zbx_strlcpy(mntpoint->fsname, mpoint, MAX_STRING_LEN);
+		zbx_strlcpy(mntpoint->fstype, zbx_get_vfs_name_by_type(vm->vmt_gfstype), MAX_STRING_LEN);
+		mntpoint->bytes.total = total;
+		mntpoint->bytes.used = used;
+		mntpoint->bytes.not_used = not_used;
+		mntpoint->bytes.pfree = pfree;
+		mntpoint->bytes.pused = pused;
+		mntpoint->inodes.total = itotal;
+		mntpoint->inodes.used = iused;
+		mntpoint->inodes.not_used = inot_used;
+		mntpoint->inodes.pfree = ipfree;
+		mntpoint->inodes.pused = ipused;
+
+		zbx_vector_ptr_append(&mntpoints, mntpoint);
+
+		/* go to the next vmount structure */
+		vm = (struct vmount *)((char *)vm + vm->vmt_length);
+	}
+
+	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vms)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		goto out;
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0, vm = vms; i < rc; i++)
+	{
+		int idx;
+
+		mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
+
+		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, mpoint, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+		{
+			mntpoint = (zbx_mpoint_t *)mntpoints.values[idx];
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mntpoint->fsname, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mntpoint->fstype, ZBX_JSON_TYPE_STRING);
+			zbx_json_addobject(&j, ZBX_SYSINFO_TAG_BYTES);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mntpoint->bytes.total);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mntpoint->bytes.not_used);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mntpoint->bytes.used);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->bytes.pfree);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->bytes.pused);
+			zbx_json_close(&j);
+			zbx_json_addobject(&j, ZBX_SYSINFO_TAG_INODES);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mntpoint->inodes.total);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mntpoint->inodes.not_used);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mntpoint->inodes.used);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
+			zbx_json_close(&j);
+			zbx_json_close(&j);
+		}
+
+		/* go to the next vmount structure */
+		vm = (struct vmount *)((char *)vm + vm->vmt_length);
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+
+	ret = SYSINFO_RET_OK;
+out:
+	zbx_free(vms);
+	zbx_vector_ptr_clear_ext(&mntpoints, (zbx_clean_func_t)zbx_mpoints_free);
+	zbx_vector_ptr_destroy(&mntpoints);
+
+	return ret;
+}
+
+int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
+
 }

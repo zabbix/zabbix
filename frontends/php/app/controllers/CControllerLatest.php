@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,6 +124,8 @@ abstract class CControllerLatest extends CController {
 				]);
 			}
 
+			$config = select_config();
+
 			$items = API::Item()->get([
 				'hostids' => array_keys($hosts),
 				'output' => ['itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
@@ -136,6 +138,7 @@ abstract class CControllerLatest extends CController {
 				'filter' => [
 					'status' => [ITEM_STATUS_ACTIVE]
 				],
+				'limit' => $config['search_limit'] + 1,
 				'preservekeys' => true
 			]);
 

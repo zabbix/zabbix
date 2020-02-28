@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -358,9 +358,7 @@ if (hasRequest('form')) {
 	$data['form_refresh'] = getRequest('form_refresh');
 
 	// render view
-	$screenView = new CView('monitoring.screen.edit', $data);
-	$screenView->render();
-	$screenView->show();
+	echo (new CView('monitoring.screen.edit', $data))->getOutput();
 }
 else {
 	CProfile::delete('web.screens.elementid');
@@ -452,9 +450,7 @@ else {
 	$data['paging'] = CPagerHelper::paginate($data['page'], $data['screens'], $sortOrder, new CUrl('screenconf.php'));
 
 	// render view
-	$screenView = new CView('monitoring.screen.list', $data);
-	$screenView->render();
-	$screenView->show();
+	echo (new CView('monitoring.screen.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

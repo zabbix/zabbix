@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,11 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
+/**
+ * @var CView $this
+ */
+
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $historyWidget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
@@ -94,7 +98,9 @@ if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	]));
 }
 
-$action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_icon('fullscreen')]);
+$action_list
+	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
+	->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
 
 $header['right']->addItem($action_list);
 
@@ -271,4 +277,4 @@ else {
 	}
 }
 
-return $historyWidget;
+$historyWidget->show();

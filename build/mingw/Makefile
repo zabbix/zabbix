@@ -27,7 +27,7 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo_system.o \
 	$(OUTPUTDIR)\eventlog.o
 
-CFLAGS := $(CFLAGS) -O2 -g -DUNICODE -DHAVE_STDINT_H=1 -I$(TOPDIR)\include -I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw
+CFLAGS := $(CFLAGS) -O2 -g -DUNICODE -DHAVE_STDINT_H=1 -I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include
 GOPATH := $(GOPATH);$(TOPDIR)\go
 TAGS :=
 
@@ -139,7 +139,7 @@ $(TARGETBIN): $(OBJS) .FORCE
 	set GOLDFLAGS=%GOLDFLAGS% -X $(PKG).compileTime=%BUILD_TIME%
 	cd $(MODULEDIR)
 
-	go build -mod vendor -tags "$(TAGS)" -ldflags="%GOLDFLAGS%" -o $(TARGETBIN) zabbix.com/cmd/zabbix_agent2
+	go build -tags "$(TAGS)" -ldflags="%GOLDFLAGS%" -o $(TARGETBIN) zabbix.com/cmd/zabbix_agent2
 
 clean:
 	go clean -cache

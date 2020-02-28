@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,11 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
+
 <script type="text/x-jquery-tmpl" id="hostInterfaceRow">
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
 	<td class="interface-drag-control <?= ZBX_STYLE_TD_DRAG_ICON ?>">
@@ -198,7 +202,7 @@
 				.hover(
 					function (event) {
 						hintBox.showHint(event, this,
-							<?= CJs::encodeJson(_('Interface is used by items that require this type of the interface.')) ?>
+							<?= json_encode(_('Interface is used by items that require this type of the interface.')) ?>
 						);
 					},
 					function () {
@@ -423,7 +427,7 @@
 						});
 
 						bulkLabel.append(jQuery('<span>'));
-						bulkLabel.append(<?= CJs::encodeJson(_('Use bulk requests')) ?>);
+						bulkLabel.append(<?= json_encode(_('Use bulk requests')) ?>);
 
 						bulkItem.append(bulkLabel);
 						bulkList.append(bulkItem);

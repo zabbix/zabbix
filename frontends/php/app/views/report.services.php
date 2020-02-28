@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,14 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('layout.mode.js');
-$web_layout_mode = CView::getLayoutMode();
+
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
 
 $widget = (new CWidget())
 	->setTitle(_('Service availability report').': '.$data['service']['name'])
@@ -58,7 +64,7 @@ $widget->setControls(new CList([
 		->addVar('serviceid', $data['service']['serviceid'])
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem($controls),
-	(new CTag('nav', true, get_icon('fullscreen')))
+	(new CTag('nav', true, get_icon('fullscreen', ['mode' => $web_layout_mode])))
 		->setAttribute('aria-label', _('Content controls'))
 ]));
 

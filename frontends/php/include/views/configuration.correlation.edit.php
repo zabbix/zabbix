@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/configuration.correlation.edit.js.php';
 
@@ -90,7 +94,7 @@ if ($data['correlation']['filter']['conditions']) {
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.condition.event.corr",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.condition.event.corr",'.json_encode([
 			'type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR
 		]).', null, this);')
 		->addClass(ZBX_STYLE_BTN_LINK)
@@ -177,4 +181,4 @@ $form->addItem($correlation_tabs);
 
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

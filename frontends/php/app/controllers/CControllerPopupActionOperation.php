@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class CControllerPopupActionOperation extends CControllerPopupOperationCommon {
 	protected function getCheckInputs() {
 		return [
 			'type' =>			'required|in '.ACTION_OPERATION,
-			'source' =>			'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL]),
+			'source' =>			'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL]),
 			'operationtype' =>	'in '.implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE, OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE, OPERATION_TYPE_HOST_ENABLE, OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY]),
 			'actionid' =>		'string',
 			'update' =>			'in 1',

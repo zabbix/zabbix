@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,20 @@
 **/
 
 
-var CTree = Class.create();
+var CTree = function(name, nodes) {
+	this.name = name;
+	this.nodes = nodes;
+
+	if ((tree_init = cookie.read(name)) != null) {
+		var nodes = tree_init.split(this.cookie_delimiter);
+
+		for (var i = 0, size = nodes.length; i < size; i++) {
+			this.onStartSetStatus(nodes[i]);
+		}
+
+		this.onStartOpen(nodes);
+	}
+};
 
 CTree.prototype = {
 	name: null,
@@ -28,21 +41,6 @@ CTree.prototype = {
 	 * Must be synced with class.cookie.js for consistency.
 	 */
 	cookie_delimiter: '.',
-
-	initialize: function(name, nodes) {
-		this.name = name;
-		this.nodes = nodes;
-
-		if ((tree_init = cookie.read(name)) != null) {
-			var nodes = tree_init.split(this.cookie_delimiter);
-
-			for (var i = 0, size = nodes.length; i < size; i++) {
-				this.onStartSetStatus(nodes[i]);
-			}
-
-			this.onStartOpen(nodes);
-		}
-	},
 
 	getNodeStatus: function(id) {
 		return (empty(this.nodes[id]) || this.nodes[id].status == 'close') ? 'close' : 'open';

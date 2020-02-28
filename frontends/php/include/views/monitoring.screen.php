@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,11 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
+/**
+ * @var CView $this
+ */
+
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
@@ -95,7 +99,7 @@ $controls
 			'elid' => $data['screen']['screenid']
 		]
 	))
-	->addItem(get_icon('fullscreen'));
+	->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
 
 $widget->setControls((new CTag('nav', true, (new CList())
 	->addItem((new CForm('get'))
@@ -129,4 +133,4 @@ $widget->addItem((new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FO
 
 CScreenBuilder::insertScreenStandardJs($screenBuilder->timeline);
 
-return $widget;
+$widget->show();

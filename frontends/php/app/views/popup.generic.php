@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $output = [
 	'header' => $data['title'],
@@ -358,6 +362,7 @@ switch ($data['popup_type']) {
 	case 'help_items':
 		foreach ($data['table_records'] as $item) {
 			$action = get_window_opener($options['dstfrm'], $options['dstfld1'], $item[$options['srcfld1']]);
+			$action .= 'updateItemTestBtn();';
 			$action .= $options['srcfld2']
 				? get_window_opener($options['dstfrm'], $options['dstfld2'], $item[$options['srcfld2']])
 				: '';
@@ -464,8 +469,8 @@ switch ($data['popup_type']) {
 						: null,
 					(new CLink($item['name_expanded'], 'javascript:void(0);'))
 						->onClick('javascript: addValue('.
-							CJs::encodeJson($options['reference']).', '.
-							CJs::encodeJson($item['itemid']).', '.
+							json_encode($options['reference']).', '.
+							json_encode($item['itemid']).', '.
 							$options['parentid'].
 							');'.$js_action_onclick),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
@@ -516,14 +521,14 @@ switch ($data['popup_type']) {
 			$table->addRow([
 				// Multiselect checkbox.
 				$data['multiselect']
-					? new CCheckBox('item['.CJs::encodeJson($graph[$options['srcfld1']]).']', $graph['graphid'])
+					? new CCheckBox('item['.json_encode($graph[$options['srcfld1']]).']', $graph['graphid'])
 					: null,
 
 				// Clickable graph name.
 				(new CLink($graph['name'], 'javascript:void(0);'))
 					->onClick('javascript: addValue('.
-						CJs::encodeJson($options['reference']).', '.
-						CJs::encodeJson($graph['graphid']).', '.
+						json_encode($options['reference']).', '.
+						json_encode($graph['graphid']).', '.
 						$options['parentid'].
 						');'.$js_action_onclick
 					),
@@ -662,4 +667,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

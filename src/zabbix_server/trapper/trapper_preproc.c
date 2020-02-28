@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -238,7 +238,19 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 	for (i = 0; i < values_num; i++)
 	{
 		zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_preproc_result_free);
-		if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], &steps, &results, &history,
+
+		if (0 == steps.values_num)
+		{
+			zbx_variant_t	value;
+
+			result = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t));
+
+			result->error = NULL;
+			zbx_variant_set_str(&value, values[i]);
+			zbx_variant_copy(&result->value, &value);
+			zbx_vector_ptr_append(&results, result);
+		}
+		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], &steps, &results, &history,
 				&preproc_error, error))
 		{
 			goto out;
@@ -265,33 +277,39 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 		zbx_json_addstring(json, ZBX_PROTO_TAG_PREVIOUS, "true", ZBX_JSON_TYPE_INT);
 
 	zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
-	for (i = 0; i < results.values_num; i++)
+	if (0 != steps.values_num)
 	{
-		result = (zbx_preproc_result_t *)results.values[i];
-
-		zbx_json_addobject(json, NULL);
-
-		if (NULL != result->error)
-			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->error, ZBX_JSON_TYPE_STRING);
-
-		if (ZBX_PREPROC_FAIL_DEFAULT != result->action)
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_ACTION, result->action);
-
-		if (i == results.values_num - 1 && NULL != result->error)
+		for (i = 0; i < results.values_num; i++)
 		{
-			if (ZBX_PREPROC_FAIL_SET_ERROR == result->action)
-				zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, preproc_error, ZBX_JSON_TYPE_STRING);
-		}
+			result = (zbx_preproc_result_t *)results.values[i];
 
-		if (ZBX_VARIANT_NONE != result->value.type)
-		{
-			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value),
-					ZBX_JSON_TYPE_STRING);
-		}
-		else if (NULL == result->error || ZBX_PREPROC_FAIL_DISCARD_VALUE == result->action)
-			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
+			zbx_json_addobject(json, NULL);
 
-		zbx_json_close(json);
+			if (NULL != result->error)
+				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->error, ZBX_JSON_TYPE_STRING);
+
+			if (ZBX_PREPROC_FAIL_DEFAULT != result->action)
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_ACTION, result->action);
+
+			if (i == results.values_num - 1 && NULL != result->error)
+			{
+				if (ZBX_PREPROC_FAIL_SET_ERROR == result->action)
+				{
+					zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, preproc_error,
+							ZBX_JSON_TYPE_STRING);
+				}
+			}
+
+			if (ZBX_VARIANT_NONE != result->value.type)
+			{
+				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value),
+						ZBX_JSON_TYPE_STRING);
+			}
+			else if (NULL == result->error || ZBX_PREPROC_FAIL_DISCARD_VALUE == result->action)
+				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
+
+			zbx_json_close(json);
+		}
 	}
 	zbx_json_close(json);
 

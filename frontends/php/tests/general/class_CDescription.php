@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../../conf/zabbix.conf.php';
 require_once dirname(__FILE__).'/../../include/func.inc.php';
 require_once dirname(__FILE__).'/../../include/db.inc.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
-require_once dirname(__FILE__).'/../../include/classes/core/Z.php';
+require_once dirname(__FILE__).'/../../include/classes/core/APP.php';
 
 function error($error) {
 	echo "\nError reported: $error\n";
@@ -35,8 +35,8 @@ function error($error) {
 class class_CDescription extends PHPUnit_Framework_TestCase {
 
 	public static function setUpBeforeClass() {
-		$z = new Z();
-		$z->run();
+		$app = new App();
+		$app->run();
 		DBconnect($error);
 	}
 

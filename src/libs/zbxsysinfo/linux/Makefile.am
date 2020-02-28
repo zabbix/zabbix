@@ -12,6 +12,7 @@ libspecsysinfo_a_SOURCES = \
 	hardware.c \
 	hardware.h \
 	inodes.c \
+	inodes.h \
 	kernel.c \
 	linux.c \
 	memory.c \

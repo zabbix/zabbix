@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,11 +28,10 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'depth' => 'ge 0|le '.WIDGET_NAVIGATION_TREE_MAX_DEPTH,
-			'map_mapid' => 'db sysmaps.sysmapid',
+			'name' => 'required|string|not_empty',
+			'sysmapid' => 'db sysmaps.sysmapid',
 			'add_submaps' => 'in 0,1',
-			'map_name' => 'required|not_empty|string',
-			'mapid' => 'int32'
+			'depth' => 'ge 1|le '.WIDGET_NAVIGATION_TREE_MAX_DEPTH
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,7 +43,7 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 				$output['errors'][] = $messages->toString();
 			}
 
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 
 		return $ret;
@@ -55,96 +54,73 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$add_submaps = $this->getInput('add_submaps', 0);
-		$map_item_name = $this->getInput('map_name', '');
-		$mapid = $this->getInput('mapid', 0);
-		$map_mapid = $this->getInput('map_mapid', 0);
-		$submaps = [];
+		$sysmapid = $this->getInput('sysmapid', 0);
+		$add_submaps = (int) $this->getInput('add_submaps', 0);
+		$depth = (int) $this->getInput('depth', 1);
 
-		if ($map_mapid) {
-			$maps = API::Map()->get([
+		if ($sysmapid != 0) {
+			$sysmaps = API::Map()->get([
 				'output' => [],
-				'sysmapids' => $map_mapid
+				'sysmapids' => $sysmapid
 			]);
 
-			if (!$maps) {
-				$map_mapid = 0;
+			if (!$sysmaps) {
+				$sysmapid = 0;
 			}
 		}
 
-		$maps_relations = [];
+		$all_sysmapids = [];
+		$hierarchy = [];
 
-		if ($map_mapid != 0 && $add_submaps == 1) {
+		if ($sysmapid != 0 && $add_submaps == 1) {
 			// Recursively select submaps.
-			$maps_found = [$map_mapid];
-			$maps_resolved = [];
+			$sysmapids = [];
+			$sysmapids[$sysmapid] = true;
 
-			while ($diff = array_diff($maps_found, $maps_resolved)) {
-				$submaps = API::Map()->get([
-					'sysmapids' => $diff,
-					'preservekeys' => true,
+			do {
+				if ($depth++ > WIDGET_NAVIGATION_TREE_MAX_DEPTH) {
+					break;
+				}
+
+				$sysmaps = API::Map()->get([
 					'output' => ['sysmapid'],
-					'selectSelements' => ['elements', 'elementtype', 'permission']
+					'selectSelements' => ['elements', 'elementtype', 'permission'],
+					'sysmapids' => array_keys($sysmapids),
+					'preservekeys' => true
 				]);
 
-				$maps_resolved = array_merge($maps_resolved, $diff);
+				$all_sysmapids += $sysmapids;
+				$sysmapids = [];
 
-				foreach ($submaps as $submap) {
-					foreach ($submap['selements'] as $selement) {
+				foreach ($sysmaps as $sysmap) {
+					foreach ($sysmap['selements'] as $selement) {
 						if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
 								&& $selement['permission'] >= PERM_READ) {
-							$element = reset($selement['elements']);
-							if ($element !== false) {
-								$maps_relations[$submap['sysmapid']][] = $element['sysmapid'];
+							$element = $selement['elements'][0];
+							$hierarchy[$sysmap['sysmapid']][] = $element['sysmapid'];
 
-								$maps_depth = $this->getInput('depth', 0) + 1;
-								$base_mapid = $submap['sysmapid'];
-
-								/*
-								 * Looking for parent mapid simply walking back through the hierarchy and counting steps
-								 * in $maps_depth.
-								 */
-								while (array_key_exists($base_mapid, $maps_relations)) {
-									foreach ($maps_relations as $next_base_mapid => $list) {
-										if (in_array($base_mapid, $list)) {
-											$base_mapid = $next_base_mapid;
-											$maps_depth++;
-											continue 2;
-										}
-									}
-
-									// not found
-									$base_mapid = null;
-								}
-
-								if (WIDGET_NAVIGATION_TREE_MAX_DEPTH >= $maps_depth) {
-									$maps_found[] = $element['sysmapid'];
-								}
+							if (!array_key_exists($element['sysmapid'], $all_sysmapids)) {
+								$sysmapids[$element['sysmapid']] = true;
 							}
 						}
 					}
 				}
 			}
-
-			// Get names and ids of all submaps.
-			$submaps = API::Map()->get([
-				'output' => ['sysmapid', 'name'],
-				'sysmapids' => array_keys(array_flip($maps_found)),
-				'preservekeys' => true,
-			]);
-
-			unset($submap);
+			while ($sysmapids);
 		}
 
-		// prepare output
-		$output = [
-			'map_name' => $map_item_name,
-			'map_mapid' => $map_mapid,
-			'map_id' => $mapid,
-			'hierarchy' => $maps_relations,
-			'submaps' => $submaps
-		];
-
-		echo (new CJson())->encode($output);
+		// Prepare output.
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([
+			'name' => $this->getInput('name'),
+			'sysmapid' => $sysmapid,
+			'hierarchy' => $hierarchy,
+			'submaps' => $all_sysmapids
+				? API::Map()->get([
+					'output' => ['sysmapid', 'name'],
+					'sysmapids' => array_keys($all_sysmapids),
+					'preservekeys' => true
+				])
+				: []
+		])]));
 	}
 }

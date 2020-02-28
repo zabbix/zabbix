@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +30,7 @@ $page['scripts'] = ['layout.mode.js'];
 $hostId = getRequest('hostid', 0);
 
 if ($hostId > 0) {
-	CView::$has_web_layout_mode = true;
-	$page['web_layout_mode'] = CView::getLayoutMode();
+	$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -131,9 +130,7 @@ if ($hostId > 0) {
 	}
 
 	// view generation
-	$hostinventoriesView = new CView('inventory.host.view', $data);
-	$hostinventoriesView->render();
-	$hostinventoriesView->show();
+	echo (new CView('inventory.host.view', $data))->getOutput();
 }
 else {
 	$data = [
@@ -276,9 +273,7 @@ else {
 		(new CUrl('hostinventories.php'))->setArgument('groupid', $data['pageFilter']->groupid)
 	);
 
-	$hostinventoriesView = new CView('inventory.host.list', $data);
-	$hostinventoriesView->render();
-	$hostinventoriesView->show();
+	echo (new CView('inventory.host.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,12 +28,18 @@
 
 #include "../../zabbix_server/scripts/scripts.h"
 #include "taskmanager.h"
+#include "../../zabbix_server/trapper/trapper_item_test.h"
+#include "../../zabbix_server/poller/checks_snmp.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+
+#ifdef HAVE_NETSNMP
+static volatile sig_atomic_t	snmp_cache_reload_requested;
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -54,7 +60,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	zbx_uint64_t	parent_taskid, hostid;
+	zbx_uint64_t	parent_taskid, hostid, alertid;
 	zbx_tm_task_t	*task = NULL;
 	int		ret = FAIL;
 	zbx_script_t	script;
@@ -62,7 +68,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	DC_HOST		host;
 
 	result = DBselect("select command_type,execute_on,port,authtype,username,password,publickey,privatekey,"
-					"command,parent_taskid,hostid"
+					"command,parent_taskid,hostid,alertid"
 				" from task_remote_command"
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
@@ -100,22 +106,34 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	script.privatekey = row[7];
 	script.command = row[8];
 
-	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type && ZBX_SCRIPT_EXECUTE_ON_PROXY == script.execute_on)
+	if (ZBX_SCRIPT_EXECUTE_ON_PROXY == script.execute_on)
 	{
-		if (0 == CONFIG_ENABLE_REMOTE_COMMANDS)
-		{
-			task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
-					"Remote commands are not enabled");
-			goto finish;
-		}
+		/* always wait for execution result when executing on Zabbix proxy */
+		alertid = 0;
 
-		if (1 == CONFIG_LOG_REMOTE_COMMANDS)
-			zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", script.command);
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", script.command);
+		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
+		{
+			if (0 == CONFIG_ENABLE_REMOTE_COMMANDS)
+			{
+				task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
+						"Remote commands are not enabled");
+				goto finish;
+			}
+
+			if (1 == CONFIG_LOG_REMOTE_COMMANDS)
+				zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", script.command);
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", script.command);
+		}
+	}
+	else
+	{
+		/* only wait for execution result when executed on Zabbix agent if it's not automatic alert but */
+		/* manually initiated command through frontend                                                  */
+		ZBX_DBROW2UINT64(alertid, row[11]);
 	}
 
-	if (SUCCEED != (ret = zbx_script_execute(&script, &host, &info, error, sizeof(error))))
+	if (SUCCEED != (ret = zbx_script_execute(&script, &host, 0 == alertid ? &info : NULL, error, sizeof(error))))
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	else
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
@@ -196,6 +214,75 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_execute_data                                                  *
+ *                                                                            *
+ * Purpose: process data task                                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the data task was executed                         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_tm_task_t		*task = NULL;
+	int			ret = FAIL;
+	char			*info = NULL;
+	zbx_uint64_t		parent_taskid;
+	struct zbx_json_parse	jp_data;
+
+	result = DBselect("select parent_taskid,data,type"
+				" from task_data"
+				" where taskid=" ZBX_FS_UI64,
+				taskid);
+
+	if (NULL == (row = DBfetch(result)))
+		goto finish;
+
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
+	ZBX_STR2UINT64(parent_taskid, row[0]);
+
+	if (0 != ttl && clock + ttl < now)
+	{
+		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "The task has been expired.");
+		goto finish;
+	}
+
+	if (ZBX_TM_DATA_TYPE_TEST_ITEM != atoi(row[2]))
+	{
+		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task.");
+		goto finish;
+	}
+
+	if (SUCCEED != (ret = zbx_json_brackets_open(row[1], &jp_data)))
+		info = zbx_strdup(NULL, zbx_json_strerror());
+	else
+		ret = zbx_trapper_item_test_run(&jp_data, 0, &info);
+
+	task->data = zbx_tm_data_result_create(parent_taskid, ret, info);
+
+	zbx_free(info);
+finish:
+	DBfree_result(result);
+
+	DBbegin();
+
+	if (NULL != task)
+	{
+		zbx_tm_save_task(task);
+		zbx_tm_task_free(task);
+	}
+
+	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+
+	DBcommit();
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_process_tasks                                                 *
  *                                                                            *
  * Purpose: process task manager tasks depending on task type                 *
@@ -217,9 +304,9 @@ static int	tm_process_tasks(int now)
 	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
 				" where status=%d"
-					" and type in (%d, %d)"
+					" and type in (%d, %d, %d)"
 				" order by taskid",
-			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_TASK_CHECK_NOW);
+			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_TASK_CHECK_NOW, ZBX_TM_TASK_DATA);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -236,6 +323,10 @@ static int	tm_process_tasks(int now)
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
 				zbx_vector_uint64_append(&check_now_taskids, taskid);
+				break;
+			case ZBX_TM_TASK_DATA:
+				if (SUCCEED == tm_execute_data(taskid, clock, ttl, now))
+					processed_num++;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -267,6 +358,16 @@ static void	tm_remove_old_tasks(int now)
 	DBcommit();
 }
 
+static void	zbx_taskmanager_sigusr_handler(int flags)
+{
+#ifdef HAVE_NETSNMP
+	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+		snmp_cache_reload_requested = 1;
+#else
+	ZBX_UNUSED(flags);
+#endif
+}
+
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
 	static int	cleanup_time = 0;
@@ -280,6 +381,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
+#ifdef HAVE_NETSNMP
+	zbx_init_snmp();
+#endif
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
@@ -293,12 +397,22 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
+	zbx_set_sigusr_handler(zbx_taskmanager_sigusr_handler);
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_sleep_loop(sleeptime);
 
 		sec1 = zbx_time();
 		zbx_update_env(sec1);
+
+#ifdef HAVE_NETSNMP
+		if (1 == snmp_cache_reload_requested)
+		{
+			zbx_clear_cache_snmp();
+			snmp_cache_reload_requested = 0;
+		}
+#endif
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 

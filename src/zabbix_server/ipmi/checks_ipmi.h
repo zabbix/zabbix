@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,9 @@ void	zbx_free_ipmi_handler(void);
 
 int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
 		unsigned char privilege, const char *username, const char *password, const char *sensor, char **value);
+
+int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
+		unsigned char privilege, const char *username, const char *password, char **value);
 
 int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len);
 

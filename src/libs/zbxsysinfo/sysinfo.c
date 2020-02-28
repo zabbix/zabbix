@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ extern ZBX_METRIC	parameter_hostname;
 #endif
 
 static ZBX_METRIC	*commands = NULL;
+static ZBX_METRIC	*commands_local = NULL;
 zbx_vector_ptr_t	key_access_rules;
 
 #define ZBX_COMMAND_ERROR		0
@@ -105,6 +106,32 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	return ZBX_COMMAND_WITH_PARAMS;
 }
 
+
+static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error, size_t max_error_len)
+{
+	int		i = 0;
+
+	while (NULL != (*metrics)[i].key)
+	{
+		if (0 == strcmp((*metrics)[i].key, metric->key))
+		{
+			zbx_snprintf(error, max_error_len, "key \"%s\" already exists", metric->key);
+			return FAIL;	/* metric already exists */
+		}
+		i++;
+	}
+
+	(*metrics)[i].key = zbx_strdup(NULL, metric->key);
+	(*metrics)[i].flags = metric->flags;
+	(*metrics)[i].function = metric->function;
+	(*metrics)[i].test_param = (NULL == metric->test_param ? NULL : zbx_strdup(NULL, metric->test_param));
+
+	*metrics = (ZBX_METRIC *)zbx_realloc(*metrics, (i + 2) * sizeof(ZBX_METRIC));
+	memset(&(*metrics)[i + 1], 0, sizeof(ZBX_METRIC));
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: add_metric                                                       *
@@ -114,27 +141,19 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
  ******************************************************************************/
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 {
-	int	i = 0;
+	return add_to_metrics(&commands, metric, error, max_error_len);
+}
 
-	while (NULL != commands[i].key)
-	{
-		if (0 == strcmp(commands[i].key, metric->key))
-		{
-			zbx_snprintf(error, max_error_len, "key \"%s\" already exists", metric->key);
-			return FAIL;	/* metric already exists */
-		}
-		i++;
-	}
-
-	commands[i].key = zbx_strdup(NULL, metric->key);
-	commands[i].flags = metric->flags;
-	commands[i].function = metric->function;
-	commands[i].test_param = (NULL == metric->test_param ? NULL : zbx_strdup(NULL, metric->test_param));
-
-	commands = (ZBX_METRIC *)zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
-	memset(&commands[i + 1], 0, sizeof(ZBX_METRIC));
-
-	return SUCCEED;
+/******************************************************************************
+ *                                                                            *
+ * Function: add_metric_local                                                 *
+ *                                                                            *
+ * Purpose: registers a new item key as local into the system                 *
+ *                                                                            *
+ ******************************************************************************/
+int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len)
+{
+	return add_to_metrics(&commands_local, metric, error, max_error_len);
 }
 
 #if !defined(__MINGW32__)
@@ -182,6 +201,8 @@ void	init_metrics(void)
 
 	commands = (ZBX_METRIC *)zbx_malloc(commands, sizeof(ZBX_METRIC));
 	commands[0].key = NULL;
+	commands_local = (ZBX_METRIC *)zbx_malloc(commands_local, sizeof(ZBX_METRIC));
+	commands_local[0].key = NULL;
 
 #ifdef WITH_AGENT_METRICS
 	for (i = 0; NULL != parameters_agent[i].key; i++)
@@ -198,6 +219,15 @@ void	init_metrics(void)
 	for (i = 0; NULL != parameters_common[i].key; i++)
 	{
 		if (SUCCEED != add_metric(&parameters_common[i], error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	for (i = 0; NULL != parameters_common_local[i].key; i++)
+	{
+		if (SUCCEED != add_metric_local(&parameters_common_local[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -251,6 +281,19 @@ void	free_metrics(void)
 		zbx_free(commands);
 	}
 
+	if (NULL != commands_local)
+	{
+		int	i;
+
+		for (i = 0; NULL != commands_local[i].key; i++)
+		{
+			zbx_free(commands_local[i].key);
+			zbx_free(commands_local[i].test_param);
+		}
+
+		zbx_free(commands_local);
+	}
+
 	free_key_access_rules();
 }
 
@@ -301,9 +344,8 @@ void finalize_key_access_rules_configuration(void)
 		/* if there are only AllowKey rules defined, add DenyKey=* for proper whitelist configuration */
 		if (0 < allow_rules && 0 == deny_rules)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "adding DenyKey=* rule for proper whitelist configuration");
-			add_key_access_rule("*", ZBX_KEY_ACCESS_DENY);
-			deny_rules++;
+			zabbix_log(LOG_LEVEL_CRIT, "\"AllowKey\" without \"DenyKey\" rules are meaningless");
+			exit(EXIT_FAILURE);
 		}
 		else
 		{
@@ -1001,10 +1043,22 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		goto notsupported;
 	}
 
-	for (command = commands; NULL != command->key; command++)
+	if (0 != (flags & PROCESS_LOCAL_COMMAND))
 	{
-		if (0 == strcmp(command->key, request.key))
-			break;
+		for (command = commands_local; NULL != command->key; command++)
+		{
+			if (0 == strcmp(command->key, request.key))
+				break;
+		}
+	}
+
+	if (NULL == command || NULL == command->key)
+	{
+		for (command = commands; NULL != command->key; command++)
+		{
+			if (0 == strcmp(command->key, request.key))
+				break;
+		}
 	}
 
 	/* item key not found */
@@ -1914,3 +1968,19 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	return WAIT_OBJECT_0 == rc ? metric_args.agent_ret : SYSINFO_RET_FAIL;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mpoints_free                                                 *
+ *                                                                            *
+ * Purpose: frees previously allocated mount-point structure                  *
+ *                                                                            *
+ * Parameters: mpoint - [IN] pointer to structure from vector                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
+{
+	zbx_free(mpoint);
+}

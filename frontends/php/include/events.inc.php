@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,19 +33,15 @@ function eventSource($source = null) {
 	$sources = [
 		EVENT_SOURCE_TRIGGERS => _('trigger'),
 		EVENT_SOURCE_DISCOVERY => _('discovery'),
-		EVENT_SOURCE_AUTO_REGISTRATION => _('auto registration'),
+		EVENT_SOURCE_AUTOREGISTRATION => _('autoregistration'),
 		EVENT_SOURCE_INTERNAL => _x('internal', 'event source')
 	];
 
 	if ($source === null) {
 		return $sources;
 	}
-	elseif (isset($sources[$source])) {
-		return $sources[$source];
-	}
-	else {
-		return _('Unknown');
-	}
+
+	return array_key_exists($source, $sources) ?  $sources[$source] : _('Unknown');
 }
 
 /**
@@ -63,7 +59,7 @@ function eventObject($object = null) {
 		EVENT_OBJECT_TRIGGER => _('trigger'),
 		EVENT_OBJECT_DHOST => _('discovered host'),
 		EVENT_OBJECT_DSERVICE => _('discovered service'),
-		EVENT_OBJECT_AUTOREGHOST => _('auto-registered host'),
+		EVENT_OBJECT_AUTOREGHOST => _('autoregistered host'),
 		EVENT_OBJECT_ITEM => _('item'),
 		EVENT_OBJECT_LLDRULE => _('low-level discovery rule')
 	];
@@ -89,7 +85,7 @@ function eventSourceObjects() {
 		['source' => EVENT_SOURCE_TRIGGERS, 'object' => EVENT_OBJECT_TRIGGER],
 		['source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DHOST],
 		['source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DSERVICE],
-		['source' => EVENT_SOURCE_AUTO_REGISTRATION, 'object' => EVENT_OBJECT_AUTOREGHOST],
+		['source' => EVENT_SOURCE_AUTOREGISTRATION, 'object' => EVENT_OBJECT_AUTOREGHOST],
 		['source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_TRIGGER],
 		['source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_ITEM],
 		['source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_LLDRULE]

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerGuiUpdate extends CController {
 
 	protected function checkInput() {
-		$themes = array_keys(Z::getThemes());
+		$themes = array_keys(APP::getThemes());
 		$fields = [
 			'default_theme'           => 'required|in '.implode(',', $themes).'|db config.default_theme',
 			'dropdown_first_entry'    => 'required|db config.dropdown_first_entry|in '.ZBX_DROPDOWN_FIRST_NONE.','.ZBX_DROPDOWN_FIRST_ALL,

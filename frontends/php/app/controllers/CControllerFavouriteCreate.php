@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,8 +59,8 @@ class CControllerFavouriteCreate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$data['main_block'] = '$("addrm_fav").title = "'._('Remove from favourites').'";'."\n".
-				'$("addrm_fav").onclick = function() { rm4favorites("'.$object.'", "'.$objectid.'"); }'."\n".
+			$data['main_block'] = 'document.getElementById("addrm_fav").title = "'._('Remove from favourites').'";'."\n".
+				'document.getElementById("addrm_fav").onclick = function() { rm4favorites("'.$object.'", "'.$objectid.'"); }'."\n".
 				'switchElementClass("addrm_fav", "btn-add-fav", "btn-remove-fav");';
 		}
 		else {

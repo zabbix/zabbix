@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1158,8 +1158,6 @@ static void	correlate_event_by_global_rules(DB_EVENT *event, zbx_problem_state_t
 	const char		*delim = "";
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		eventid, correlationid, objectid;
-	DB_RESULT		result;
-	DB_ROW			row;
 
 	zbx_vector_ptr_create(&corr_old);
 	zbx_vector_ptr_create(&corr_new);
@@ -1227,6 +1225,9 @@ static void	correlate_event_by_global_rules(DB_EVENT *event, zbx_problem_state_t
 
 	if (0 != corr_old.values_num)
 	{
+		DB_RESULT	result;
+		DB_ROW		row;
+
 		/* Process correlations that matches new event and either uses old events in conditions */
 		/* or has operations involving old events.                                              */
 
@@ -2063,6 +2064,9 @@ static void	recover_event(zbx_uint64_t eventid, int source, int object, zbx_uint
 		return;
 	}
 
+	if (EVENT_SOURCE_INTERNAL == source)
+		event->flags |= ZBX_FLAGS_DB_EVENT_RECOVER;
+
 	recovery_local.eventid = eventid;
 
 	if (NULL != zbx_hashset_search(&event_recovery, &recovery_local))
@@ -2182,6 +2186,39 @@ out:
 	zbx_vector_uint64_destroy(&lldruleids);
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_uint64_destroy(&triggerids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_internal_events_without_actions                          *
+ *                                                                            *
+ * Purpose: do not generate unnecessary internal events if there are no       *
+ *          internal actions and no problem recovery from when actions were   *
+ *          enabled                                                           *
+ *                                                                            *
+ * Parameters: internal_problem_events - [IN/OUT] problem events to process   *
+ * Parameters: internal_ok_events      - [IN/OUT] recovery events to process  *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_problem_events,
+		zbx_vector_ptr_t *internal_ok_events)
+{
+	DB_EVENT	*event;
+	int		i;
+
+	if (0 != DCget_internal_action_count())
+		return;
+
+	for (i = 0; i < internal_problem_events->values_num; i++)
+		((DB_EVENT *)internal_problem_events->values[i])->flags = ZBX_FLAGS_DB_EVENT_UNSET;
+
+	for (i = 0; i < internal_ok_events->values_num; i++)
+	{
+		event = (DB_EVENT *)internal_ok_events->values[i];
+
+		if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_RECOVER))
+			event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
+	}
 }
 
 /******************************************************************************
@@ -2638,7 +2675,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 {
 	int			i, processed_num = 0;
 	zbx_uint64_t		eventid;
-	zbx_vector_ptr_t	internal_ok_events, trigger_events, internal_events;
+	zbx_vector_ptr_t	internal_problem_events, internal_ok_events, trigger_events, internal_events;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events.values_num);
 
@@ -2647,6 +2684,8 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 	if (0 != events.values_num)
 	{
+		zbx_vector_ptr_create(&internal_problem_events);
+		zbx_vector_ptr_reserve(&internal_problem_events, events.values_num);
 		zbx_vector_ptr_create(&internal_ok_events);
 		zbx_vector_ptr_reserve(&internal_ok_events, events.values_num);
 
@@ -2677,15 +2716,21 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 					case EVENT_OBJECT_TRIGGER:
 						if (TRIGGER_STATE_NORMAL == event->value)
 							zbx_vector_ptr_append(&internal_ok_events, event);
+						else
+							zbx_vector_ptr_append(&internal_problem_events, event);
 						zbx_vector_ptr_append(&internal_events, event);
 						break;
 					case EVENT_OBJECT_ITEM:
 						if (ITEM_STATE_NORMAL == event->value)
 							zbx_vector_ptr_append(&internal_ok_events, event);
+						else
+							zbx_vector_ptr_append(&internal_problem_events, event);
 						break;
 					case EVENT_OBJECT_LLDRULE:
 						if (ITEM_STATE_NORMAL == event->value)
 							zbx_vector_ptr_append(&internal_ok_events, event);
+						else
+							zbx_vector_ptr_append(&internal_problem_events, event);
 						break;
 				}
 			}
@@ -2696,6 +2741,9 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 		if (0 != internal_ok_events.values_num)
 			process_internal_ok_events(&internal_ok_events);
+
+		if (0 != internal_problem_events.values_num || 0 != internal_ok_events.values_num)
+			process_internal_events_without_actions(&internal_problem_events, &internal_ok_events);
 
 		if (0 != trigger_events.values_num)
 		{
@@ -2711,6 +2759,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 		zbx_vector_ptr_destroy(&trigger_events);
 		zbx_vector_ptr_destroy(&internal_ok_events);
+		zbx_vector_ptr_destroy(&internal_problem_events);
 		zbx_vector_ptr_destroy(&internal_events);
 	}
 

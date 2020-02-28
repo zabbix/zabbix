@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,13 +119,6 @@
 
 				overlay.appendTo($(options.appendTo));
 
-				if ($(options.appendTo).prop('tagName') !== 'BODY') {
-					$(options.appendTo).on('remove', function() {
-						overlay.remove();
-						overlay = null;
-					});
-				}
-
 				methods.hide();
 			},
 			/**
@@ -139,6 +132,7 @@
 				});
 				colorbox = null;
 				input = null;
+				removeFromOverlaysStack('color_picker');
 			},
 			/**
 			 * Show colorpicker for specific element.
@@ -163,7 +157,9 @@
 				});
 
 				addToOverlaysStack('color_picker', target, 'color_picker');
-				overlayDialogueOnLoad(true, overlay);
+
+				Overlay.prototype.recoverFocus.call({'$dialogue': overlay});
+				Overlay.prototype.containFocus.call({'$dialogue': overlay});
 			},
 			/**
 			 * Set color as background color value of colorbox and as value for input.
@@ -216,7 +212,7 @@
 		/**
 		 * Initialize colorpicker overlay if it is not initialized.
 		 */
-		if (!overlay) {
+		if (!overlay || !$('#color_picker').length) {
 			methods.init(options);
 		}
 

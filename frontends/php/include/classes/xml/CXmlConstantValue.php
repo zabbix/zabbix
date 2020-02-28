@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -285,4 +285,13 @@ class CXmlConstantValue {
 
 	const CONTENT_TYPE_TEXT = SMTP_MESSAGE_FORMAT_PLAIN_TEXT;
 	const CONTENT_TYPE_HTML = SMTP_MESSAGE_FORMAT_HTML;
+
+	const EVENT_SOURCE_TRIGGERS = EVENT_SOURCE_TRIGGERS;
+	const EVENT_SOURCE_DISCOVERY = EVENT_SOURCE_DISCOVERY;
+	const EVENT_SOURCE_AUTOREGISTRATION = EVENT_SOURCE_AUTOREGISTRATION;
+	const EVENT_SOURCE_INTERNAL = EVENT_SOURCE_INTERNAL;
+
+	const OPERATION_MODE_PROBLEM = ACTION_OPERATION;
+	const OPERATION_MODE_RECOVERY = ACTION_RECOVERY_OPERATION;
+	const OPERATION_MODE_UPDATE = ACTION_ACKNOWLEDGE_OPERATION;
 }

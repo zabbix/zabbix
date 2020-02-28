@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class CControllerDashboardPropertiesEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$errors = CJs::encodeJson(['errors' => [getMessages()->toString()]]);
+			$errors = json_encode(['errors' => [getMessages()->toString()]]);
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => $errors]))->disableView()
 			);
@@ -98,7 +98,7 @@ class CControllerDashboardPropertiesEdit extends CController {
 		else {
 			error(_('No permissions to referred object or it does not exist!'));
 
-			$errors = CJs::encodeJson(['errors' => [getMessages()->toString()]]);
+			$errors = json_encode(['errors' => [getMessages()->toString()]]);
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => $errors]))->disableView()
 			);

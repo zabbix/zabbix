@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,11 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
+/**
+ * @var CView $this
+ */
+
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $screen_widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
@@ -57,7 +61,7 @@ else {
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem((new CList())
 					->addItem($screen_combobox)
-					->addItem(get_icon('fullscreen'))
+					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))
@@ -88,4 +92,4 @@ else {
 	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);
 }
 
-return $screen_widget;
+$screen_widget->show();

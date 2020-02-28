@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1013,7 +1013,6 @@ else {
 	$view = new CView('configuration.template.list', $data);
 }
 
-$view->render();
-$view->show();
+echo $view->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

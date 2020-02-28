@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -378,7 +378,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		$this->fields[$field_problem_name->getName()] = $field_problem_name;
 
-		// Problem tag evalype (And/Or).
+		// Problem tag evaltype (And/Or).
 		$field_evaltype = (new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
 			TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 			TAG_EVAL_TYPE_OR => _('Or')

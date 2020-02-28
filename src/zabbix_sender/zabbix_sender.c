@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,10 +39,11 @@ const char	syslog_app_name[] = "zabbix_sender";
 
 const char	*usage_message[] = {
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "-k key", "-o value", NULL,
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-r]", "-i input-file", NULL,
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-N]", "[-r]", "-i input-file",
+	NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "-k key", "-o value",
 	NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-r]",
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-N]", "[-r]",
 	"-i input-file", NULL,
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect cert", "--tls-ca-file CA-file",
@@ -52,7 +53,7 @@ const char	*usage_message[] = {
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert", "--tls-ca-file CA-file",
 	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "[-T]",
-	"[-r]", "-i input-file", NULL,
+	"[-N]", "[-r]", "-i input-file", NULL,
 	"[-v]", "-c config-file [-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
 	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "-k key",
@@ -60,15 +61,15 @@ const char	*usage_message[] = {
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
 	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "[-T]",
-	"[-r]", "-i input-file", NULL,
+	"[-N]", "[-r]", "-i input-file", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "-k key", "-o value", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "[-T]", "[-r]", "-i input-file", NULL,
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "[-T]", "[-N]", "[-r]", "-i input-file", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "-k key", "-o value", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "[-T]", "[-r]", "-i input-file", NULL,
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "[-T]", "[-N]", "[-r]", "-i input-file", NULL,
 #endif
 	"-h", NULL,
 	"-V", NULL,
@@ -117,6 +118,10 @@ const char	*help_message[] = {
 	"                             <host> <key> <timestamp> <value>. This can be used",
 	"                             with --input-file option. Timestamp should be",
 	"                             specified in Unix timestamp format",
+	"",
+	"  -N --with-ns               Each line of file contains whitespace delimited:",
+	"                             <host> <key> <timestamp> <ns> <value>. This can be used",
+	"                             with --with-timestamps option",
 	"",
 	"  -r --real-time             Send metrics one by one as soon as they are",
 	"                             received. This can be used when reading from",
@@ -214,6 +219,7 @@ static struct zbx_option	longopts[] =
 	{"value",			1,	NULL,	'o'},
 	{"input-file",			1,	NULL,	'i'},
 	{"with-timestamps",		0,	NULL,	'T'},
+	{"with-ns",			0,	NULL,	'N'},
 	{"real-time",			0,	NULL,	'r'},
 	{"verbose",			0,	NULL,	'v'},
 	{"help",			0,	NULL,	'h'},
@@ -231,7 +237,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:I:z:p:s:k:o:Ti:rvhV";
+static char	shortopts[] = "c:I:z:p:s:k:o:TNi:rvhV";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -239,6 +245,7 @@ static int	CONFIG_LOG_LEVEL = LOG_LEVEL_CRIT;
 
 static char	*INPUT_FILE = NULL;
 static int	WITH_TIMESTAMPS = 0;
+static int	WITH_NS = 0;
 static int	REAL_TIME = 0;
 
 static char	*CONFIG_SOURCE_IP = NULL;
@@ -831,6 +838,9 @@ static void	parse_commandline(int argc, char **argv)
 			case 'T':
 				WITH_TIMESTAMPS = 1;
 				break;
+			case 'N':
+				WITH_NS = 1;
+				break;
 			case 'r':
 				REAL_TIME = 1;
 				break;
@@ -940,131 +950,179 @@ static void	parse_commandline(int argc, char **argv)
 
 	/* check for mutually exclusive options    */
 
-	/* Allowed option combinations.                             */
-	/* Option 'v' is always optional.                           */
-	/*   c  z  s  k  o  i  T  r  p  I opt_mask comment          */
-	/* ------------------------------ -------- -------          */
-	/*   -  z  -  -  -  i  -  -  -  -  0x110   !c i             */
-	/*   -  z  -  -  -  i  -  -  -  I  0x111                    */
-	/*   -  z  -  -  -  i  -  -  p  -  0x112                    */
-	/*   -  z  -  -  -  i  -  -  p  I  0x113                    */
-	/*   -  z  -  -  -  i  -  r  -  -  0x114                    */
-	/*   -  z  -  -  -  i  -  r  -  I  0x115                    */
-	/*   -  z  -  -  -  i  -  r  p  -  0x116                    */
-	/*   -  z  -  -  -  i  -  r  p  I  0x117                    */
-	/*   -  z  -  -  -  i  T  -  -  -  0x118                    */
-	/*   -  z  -  -  -  i  T  -  -  I  0x119                    */
-	/*   -  z  -  -  -  i  T  -  p  -  0x11a                    */
-	/*   -  z  -  -  -  i  T  -  p  I  0x11b                    */
-	/*   -  z  -  -  -  i  T  r  -  -  0x11c                    */
-	/*   -  z  -  -  -  i  T  r  -  I  0x11d                    */
-	/*   -  z  -  -  -  i  T  r  p  -  0x11e                    */
-	/*   -  z  -  -  -  i  T  r  p  I  0x11f                    */
-	/*   -  z  s  -  -  i  -  -  -  -  0x190                    */
-	/*   -  z  s  -  -  i  -  -  -  I  0x191                    */
-	/*   -  z  s  -  -  i  -  -  p  -  0x192                    */
-	/*   -  z  s  -  -  i  -  -  p  I  0x193                    */
-	/*   -  z  s  -  -  i  -  r  -  -  0x194                    */
-	/*   -  z  s  -  -  i  -  r  -  I  0x195                    */
-	/*   -  z  s  -  -  i  -  r  p  -  0x196                    */
-	/*   -  z  s  -  -  i  -  r  p  I  0x197                    */
-	/*   -  z  s  -  -  i  T  -  -  -  0x198                    */
-	/*   -  z  s  -  -  i  T  -  -  I  0x199                    */
-	/*   -  z  s  -  -  i  T  -  p  -  0x19a                    */
-	/*   -  z  s  -  -  i  T  -  p  I  0x19b                    */
-	/*   -  z  s  -  -  i  T  r  -  -  0x19c                    */
-	/*   -  z  s  -  -  i  T  r  -  I  0x19d                    */
-	/*   -  z  s  -  -  i  T  r  p  -  0x19e                    */
-	/*   -  z  s  -  -  i  T  r  p  I  0x19f                    */
-	/*                                                          */
-	/*   -  z  s  k  o  -  -  -  -  -  0x1e0   !c !i            */
-	/*   -  z  s  k  o  -  -  -  -  I  0x1e1                    */
-	/*   -  z  s  k  o  -  -  -  p  -  0x1e2                    */
-	/*   -  z  s  k  o  -  -  -  p  I  0x1e3                    */
-	/*                                                          */
-	/*   c  -  -  -  -  i  -  -  -  -  0x210   c i              */
-	/*   c  -  -  -  -  i  -  -  -  I  0x211                    */
-	/*   c  -  -  -  -  i  -  -  p  -  0x212                    */
-	/*   c  -  -  -  -  i  -  -  p  I  0x213                    */
-	/*   c  -  -  -  -  i  -  r  -  -  0x214                    */
-	/*   c  -  -  -  -  i  -  r  -  I  0x215                    */
-	/*   c  -  -  -  -  i  -  r  p  -  0x216                    */
-	/*   c  -  -  -  -  i  -  r  p  I  0x217                    */
-	/*   c  -  -  -  -  i  T  -  -  -  0x218                    */
-	/*   c  -  -  -  -  i  T  -  -  I  0x219                    */
-	/*   c  -  -  -  -  i  T  -  p  -  0x21a                    */
-	/*   c  -  -  -  -  i  T  -  p  I  0x21b                    */
-	/*   c  -  -  -  -  i  T  r  -  -  0x21c                    */
-	/*   c  -  -  -  -  i  T  r  -  I  0x21d                    */
-	/*   c  -  -  -  -  i  T  r  p  -  0x21e                    */
-	/*   c  -  -  -  -  i  T  r  p  I  0x21f                    */
-	/*                                                          */
-	/*   c  -  -  k  o  -  -  -  -  -  0x260   c !i             */
-	/*   c  -  -  k  o  -  -  -  -  I  0x261                    */
-	/*   c  -  -  k  o  -  -  -  p  -  0x262                    */
-	/*   c  -  -  k  o  -  -  -  p  I  0x263                    */
-	/*   c  -  s  k  o  -  -  -  -  -  0x2e0                    */
-	/*   c  -  s  k  o  -  -  -  -  I  0x2e1                    */
-	/*   c  -  s  k  o  -  -  -  p  -  0x2e2                    */
-	/*   c  -  s  k  o  -  -  -  p  I  0x2e3                    */
-	/*                                                          */
-	/*   c  -  s  -  -  i  -  -  -  -  0x290   c i (continues)  */
-	/*   c  -  s  -  -  i  -  -  -  I  0x291                    */
-	/*   c  -  s  -  -  i  -  -  p  -  0x292                    */
-	/*   c  -  s  -  -  i  -  -  p  I  0x293                    */
-	/*   c  -  s  -  -  i  -  r  -  -  0x294                    */
-	/*   c  -  s  -  -  i  -  r  -  I  0x295                    */
-	/*   c  -  s  -  -  i  -  r  p  -  0x296                    */
-	/*   c  -  s  -  -  i  -  r  p  I  0x297                    */
-	/*   c  -  s  -  -  i  T  -  -  -  0x298                    */
-	/*   c  -  s  -  -  i  T  -  -  I  0x299                    */
-	/*   c  -  s  -  -  i  T  -  p  -  0x29a                    */
-	/*   c  -  s  -  -  i  T  -  p  I  0x29b                    */
-	/*   c  -  s  -  -  i  T  r  -  -  0x29c                    */
-	/*   c  -  s  -  -  i  T  r  -  I  0x29d                    */
-	/*   c  -  s  -  -  i  T  r  p  -  0x29e                    */
-	/*   c  -  s  -  -  i  T  r  p  I  0x29f                    */
-	/*   c  z  -  -  -  i  -  -  -  -  0x310                    */
-	/*   c  z  -  -  -  i  -  -  -  I  0x311                    */
-	/*   c  z  -  -  -  i  -  -  p  -  0x312                    */
-	/*   c  z  -  -  -  i  -  -  p  I  0x313                    */
-	/*   c  z  -  -  -  i  -  r  -  -  0x314                    */
-	/*   c  z  -  -  -  i  -  r  -  I  0x315                    */
-	/*   c  z  -  -  -  i  -  r  p  -  0x316                    */
-	/*   c  z  -  -  -  i  -  r  p  I  0x317                    */
-	/*   c  z  -  -  -  i  T  -  -  -  0x318                    */
-	/*   c  z  -  -  -  i  T  -  -  I  0x319                    */
-	/*   c  z  -  -  -  i  T  -  p  -  0x31a                    */
-	/*   c  z  -  -  -  i  T  -  p  I  0x31b                    */
-	/*   c  z  -  -  -  i  T  r  -  -  0x31c                    */
-	/*   c  z  -  -  -  i  T  r  -  I  0x31d                    */
-	/*   c  z  -  -  -  i  T  r  p  -  0x31e                    */
-	/*   c  z  -  -  -  i  T  r  p  I  0x31f                    */
-	/*   c  z  s  -  -  i  -  -  -  -  0x390                    */
-	/*   c  z  s  -  -  i  -  -  -  I  0x391                    */
-	/*   c  z  s  -  -  i  -  -  p  -  0x392                    */
-	/*   c  z  s  -  -  i  -  -  p  I  0x393                    */
-	/*   c  z  s  -  -  i  -  r  -  -  0x394                    */
-	/*   c  z  s  -  -  i  -  r  -  I  0x395                    */
-	/*   c  z  s  -  -  i  -  r  p  -  0x396                    */
-	/*   c  z  s  -  -  i  -  r  p  I  0x397                    */
-	/*   c  z  s  -  -  i  T  -  -  -  0x398                    */
-	/*   c  z  s  -  -  i  T  -  -  I  0x399                    */
-	/*   c  z  s  -  -  i  T  -  p  -  0x39a                    */
-	/*   c  z  s  -  -  i  T  -  p  I  0x39b                    */
-	/*   c  z  s  -  -  i  T  r  -  -  0x39c                    */
-	/*   c  z  s  -  -  i  T  r  -  I  0x39d                    */
-	/*   c  z  s  -  -  i  T  r  p  -  0x39e                    */
-	/*   c  z  s  -  -  i  T  r  p  I  0x39f                    */
-	/*                                                          */
-	/*   c  z  -  k  o  -  -  -  -  -  0x360   c !i (continues) */
-	/*   c  z  -  k  o  -  -  -  -  I  0x361                    */
-	/*   c  z  -  k  o  -  -  -  p  -  0x362                    */
-	/*   c  z  -  k  o  -  -  -  p  I  0x363                    */
-	/*   c  z  s  k  o  -  -  -  -  -  0x3e0                    */
-	/*   c  z  s  k  o  -  -  -  -  I  0x3e1                    */
-	/*   c  z  s  k  o  -  -  -  p  -  0x3e2                    */
-	/*   c  z  s  k  o  -  -  -  p  I  0x3e3                    */
+	/* Allowed option combinations.                                */
+	/* Option 'v' is always optional.                              */
+	/*   c  z  s  k  o  i  N  T  r  p  I opt_mask comment          */
+	/* --------------------------------- -------- -------          */
+	/*   -  z  -  -  -  i  -  -  -  -  -  0x220   !c i             */
+	/*   -  z  -  -  -  i  -  -  -  -  I  0x221                    */
+	/*   -  z  -  -  -  i  -  -  -  p  -  0x222                    */
+	/*   -  z  -  -  -  i  -  -  -  p  I  0x223                    */
+	/*   -  z  -  -  -  i  -  -  r  -  -  0x224                    */
+	/*   -  z  -  -  -  i  -  -  r  -  I  0x225                    */
+	/*   -  z  -  -  -  i  -  -  r  p  -  0x226                    */
+	/*   -  z  -  -  -  i  -  -  r  p  I  0x227                    */
+	/*   -  z  -  -  -  i  -  T  -  -  -  0x228                    */
+	/*   -  z  -  -  -  i  -  T  -  -  I  0x229                    */
+	/*   -  z  -  -  -  i  -  T  -  p  -  0x22a                    */
+	/*   -  z  -  -  -  i  -  T  -  p  I  0x22b                    */
+	/*   -  z  -  -  -  i  -  T  r  -  -  0x22c                    */
+	/*   -  z  -  -  -  i  -  T  r  -  I  0x22d                    */
+	/*   -  z  -  -  -  i  -  T  r  p  -  0x22e                    */
+	/*   -  z  -  -  -  i  -  T  r  p  I  0x22f                    */
+	/*   -  z  -  -  -  i  N  T  -  -  -  0x238                    */
+	/*   -  z  -  -  -  i  N  T  -  -  I  0x239                    */
+	/*   -  z  -  -  -  i  N  T  -  p  -  0x23a                    */
+	/*   -  z  -  -  -  i  N  T  -  p  I  0x23b                    */
+	/*   -  z  -  -  -  i  N  T  r  -  -  0x23c                    */
+	/*   -  z  -  -  -  i  N  T  r  -  I  0x23d                    */
+	/*   -  z  -  -  -  i  N  T  r  p  -  0x23e                    */
+	/*   -  z  -  -  -  i  N  T  r  p  I  0x23f                    */
+	/*   -  z  s  -  -  i  -  -  -  -  -  0x320                    */
+	/*   -  z  s  -  -  i  -  -  -  -  I  0x321                    */
+	/*   -  z  s  -  -  i  -  -  -  p  -  0x322                    */
+	/*   -  z  s  -  -  i  -  -  -  p  I  0x323                    */
+	/*   -  z  s  -  -  i  -  -  r  -  -  0x324                    */
+	/*   -  z  s  -  -  i  -  -  r  -  I  0x325                    */
+	/*   -  z  s  -  -  i  -  -  r  p  -  0x326                    */
+	/*   -  z  s  -  -  i  -  -  r  p  I  0x327                    */
+	/*   -  z  s  -  -  i  -  T  -  -  -  0x328                    */
+	/*   -  z  s  -  -  i  -  T  -  -  I  0x329                    */
+	/*   -  z  s  -  -  i  -  T  -  p  -  0x32a                    */
+	/*   -  z  s  -  -  i  -  T  -  p  I  0x32b                    */
+	/*   -  z  s  -  -  i  -  T  r  -  -  0x32c                    */
+	/*   -  z  s  -  -  i  -  T  r  -  I  0x32d                    */
+	/*   -  z  s  -  -  i  -  T  r  p  -  0x32e                    */
+	/*   -  z  s  -  -  i  -  T  r  p  I  0x32f                    */
+	/*   -  z  s  -  -  i  N  T  -  -  -  0x338                    */
+	/*   -  z  s  -  -  i  N  T  -  -  I  0x339                    */
+	/*   -  z  s  -  -  i  N  T  -  p  -  0x33a                    */
+	/*   -  z  s  -  -  i  N  T  -  p  I  0x33b                    */
+	/*   -  z  s  -  -  i  N  T  r  -  -  0x33c                    */
+	/*   -  z  s  -  -  i  N  T  r  -  I  0x33d                    */
+	/*   -  z  s  -  -  i  N  T  r  p  -  0x33e                    */
+	/*   -  z  s  -  -  i  N  T  r  p  I  0x33f                    */
+	/*                                                             */
+	/*   -  z  s  k  o  -  -  -  -  -  -  0x3c0   !c !i            */
+	/*   -  z  s  k  o  -  -  -  -  -  I  0x3c1                    */
+	/*   -  z  s  k  o  -  -  -  -  p  -  0x3c2                    */
+	/*   -  z  s  k  o  -  -  -  -  p  I  0x3c3                    */
+	/*                                                             */
+	/*   c  -  -  -  -  i  -  -  -  -  -  0x420   c i              */
+	/*   c  -  -  -  -  i  -  -  -  -  I  0x421                    */
+	/*   c  -  -  -  -  i  -  -  -  p  -  0x422                    */
+	/*   c  -  -  -  -  i  -  -  -  p  I  0x423                    */
+	/*   c  -  -  -  -  i  -  -  r  -  -  0x424                    */
+	/*   c  -  -  -  -  i  -  -  r  -  I  0x425                    */
+	/*   c  -  -  -  -  i  -  -  r  p  -  0x426                    */
+	/*   c  -  -  -  -  i  -  -  r  p  I  0x427                    */
+	/*   c  -  -  -  -  i  -  T  -  -  -  0x428                    */
+	/*   c  -  -  -  -  i  -  T  -  -  I  0x429                    */
+	/*   c  -  -  -  -  i  -  T  -  p  -  0x42a                    */
+	/*   c  -  -  -  -  i  -  T  -  p  I  0x42b                    */
+	/*   c  -  -  -  -  i  -  T  r  -  -  0x42c                    */
+	/*   c  -  -  -  -  i  -  T  r  -  I  0x42d                    */
+	/*   c  -  -  -  -  i  -  T  r  p  -  0x42e                    */
+	/*   c  -  -  -  -  i  -  T  r  p  I  0x42f                    */
+	/*   c  -  -  -  -  i  N  T  -  -  -  0x438                    */
+	/*   c  -  -  -  -  i  N  T  -  -  I  0x439                    */
+	/*   c  -  -  -  -  i  N  T  -  p  -  0x43a                    */
+	/*   c  -  -  -  -  i  N  T  -  p  I  0x43b                    */
+	/*   c  -  -  -  -  i  N  T  r  -  -  0x43c                    */
+	/*   c  -  -  -  -  i  N  T  r  -  I  0x43d                    */
+	/*   c  -  -  -  -  i  N  T  r  p  -  0x43e                    */
+	/*   c  -  -  -  -  i  N  T  r  p  I  0x43f                    */
+	/*                                                             */
+	/*   c  -  -  k  o  -  -  -  -  -  -  0x4c0   c !i             */
+	/*   c  -  -  k  o  -  -  -  -  -  I  0x4c1                    */
+	/*   c  -  -  k  o  -  -  -  -  p  -  0x4c2                    */
+	/*   c  -  -  k  o  -  -  -  -  p  I  0x4c3                    */
+	/*   c  -  s  k  o  -  -  -  -  -  -  0x5c0                    */
+	/*   c  -  s  k  o  -  -  -  -  -  I  0x5c1                    */
+	/*   c  -  s  k  o  -  -  -  -  p  -  0x5c2                    */
+	/*   c  -  s  k  o  -  -  -  -  p  I  0x5c3                    */
+	/*                                                             */
+	/*   c  -  s  -  -  i  -  -  -  -  -  0x520   c i (continues)  */
+	/*   c  -  s  -  -  i  -  -  -  -  I  0x521                    */
+	/*   c  -  s  -  -  i  -  -  -  p  -  0x522                    */
+	/*   c  -  s  -  -  i  -  -  -  p  I  0x523                    */
+	/*   c  -  s  -  -  i  -  -  r  -  -  0x524                    */
+	/*   c  -  s  -  -  i  -  -  r  -  I  0x525                    */
+	/*   c  -  s  -  -  i  -  -  r  p  -  0x526                    */
+	/*   c  -  s  -  -  i  -  -  r  p  I  0x527                    */
+	/*   c  -  s  -  -  i  -  T  -  -  -  0x528                    */
+	/*   c  -  s  -  -  i  -  T  -  -  I  0x529                    */
+	/*   c  -  s  -  -  i  -  T  -  p  -  0x52a                    */
+	/*   c  -  s  -  -  i  -  T  -  p  I  0x52b                    */
+	/*   c  -  s  -  -  i  -  T  r  -  -  0x52c                    */
+	/*   c  -  s  -  -  i  -  T  r  -  I  0x52d                    */
+	/*   c  -  s  -  -  i  -  T  r  p  -  0x52e                    */
+	/*   c  -  s  -  -  i  -  T  r  p  I  0x52f                    */
+	/*   c  -  s  -  -  i  N  T  -  -  -  0x538                    */
+	/*   c  -  s  -  -  i  N  T  -  -  I  0x539                    */
+	/*   c  -  s  -  -  i  N  T  -  p  -  0x53a                    */
+	/*   c  -  s  -  -  i  N  T  -  p  I  0x53b                    */
+	/*   c  -  s  -  -  i  N  T  r  -  -  0x53c                    */
+	/*   c  -  s  -  -  i  N  T  r  -  I  0x53d                    */
+	/*   c  -  s  -  -  i  N  T  r  p  -  0x53e                    */
+	/*   c  -  s  -  -  i  N  T  r  p  I  0x53f                    */
+	/*   c  z  -  -  -  i  -  -  -  -  -  0x620                    */
+	/*   c  z  -  -  -  i  -  -  -  -  I  0x621                    */
+	/*   c  z  -  -  -  i  -  -  -  p  -  0x622                    */
+	/*   c  z  -  -  -  i  -  -  -  p  I  0x623                    */
+	/*   c  z  -  -  -  i  -  -  r  -  -  0x624                    */
+	/*   c  z  -  -  -  i  -  -  r  -  I  0x625                    */
+	/*   c  z  -  -  -  i  -  -  r  p  -  0x626                    */
+	/*   c  z  -  -  -  i  -  -  r  p  I  0x627                    */
+	/*   c  z  -  -  -  i  -  T  -  -  -  0x628                    */
+	/*   c  z  -  -  -  i  -  T  -  -  I  0x629                    */
+	/*   c  z  -  -  -  i  -  T  -  p  -  0x62a                    */
+	/*   c  z  -  -  -  i  -  T  -  p  I  0x62b                    */
+	/*   c  z  -  -  -  i  -  T  r  -  -  0x62c                    */
+	/*   c  z  -  -  -  i  -  T  r  -  I  0x62d                    */
+	/*   c  z  -  -  -  i  -  T  r  p  -  0x62e                    */
+	/*   c  z  -  -  -  i  -  T  r  p  I  0x62f                    */
+	/*   c  z  -  -  -  i  N  T  -  -  -  0x638                    */
+	/*   c  z  -  -  -  i  N  T  -  -  I  0x639                    */
+	/*   c  z  -  -  -  i  N  T  -  p  -  0x63a                    */
+	/*   c  z  -  -  -  i  N  T  -  p  I  0x63b                    */
+	/*   c  z  -  -  -  i  N  T  r  -  -  0x63c                    */
+	/*   c  z  -  -  -  i  N  T  r  -  I  0x63d                    */
+	/*   c  z  -  -  -  i  N  T  r  p  -  0x63e                    */
+	/*   c  z  -  -  -  i  N  T  r  p  I  0x63f                    */
+	/*   c  z  s  -  -  i  -  -  -  -  -  0x720                    */
+	/*   c  z  s  -  -  i  -  -  -  -  I  0x721                    */
+	/*   c  z  s  -  -  i  -  -  -  p  -  0x722                    */
+	/*   c  z  s  -  -  i  -  -  -  p  I  0x723                    */
+	/*   c  z  s  -  -  i  -  -  r  -  -  0x724                    */
+	/*   c  z  s  -  -  i  -  -  r  -  I  0x725                    */
+	/*   c  z  s  -  -  i  -  -  r  p  -  0x726                    */
+	/*   c  z  s  -  -  i  -  -  r  p  I  0x727                    */
+	/*   c  z  s  -  -  i  -  T  -  -  -  0x728                    */
+	/*   c  z  s  -  -  i  -  T  -  -  I  0x729                    */
+	/*   c  z  s  -  -  i  -  T  -  p  -  0x72a                    */
+	/*   c  z  s  -  -  i  -  T  -  p  I  0x72b                    */
+	/*   c  z  s  -  -  i  -  T  r  -  -  0x72c                    */
+	/*   c  z  s  -  -  i  -  T  r  -  I  0x72d                    */
+	/*   c  z  s  -  -  i  -  T  r  p  -  0x72e                    */
+	/*   c  z  s  -  -  i  -  T  r  p  I  0x72f                    */
+	/*   c  z  s  -  -  i  N  T  -  -  -  0x738                    */
+	/*   c  z  s  -  -  i  N  T  -  -  I  0x739                    */
+	/*   c  z  s  -  -  i  N  T  -  p  -  0x73a                    */
+	/*   c  z  s  -  -  i  N  T  -  p  I  0x73b                    */
+	/*   c  z  s  -  -  i  N  T  r  -  -  0x73c                    */
+	/*   c  z  s  -  -  i  N  T  r  -  I  0x73d                    */
+	/*   c  z  s  -  -  i  N  T  r  p  -  0x73e                    */
+	/*   c  z  s  -  -  i  N  T  r  p  I  0x73f                    */
+	/*                                                             */
+	/*   c  z  -  k  o  -  -  -  -  -  -  0x6c0   c !i (continues) */
+	/*   c  z  -  k  o  -  -  -  -  -  I  0x6c1                    */
+	/*   c  z  -  k  o  -  -  -  -  p  -  0x6c2                    */
+	/*   c  z  -  k  o  -  -  -  -  p  I  0x6c3                    */
+	/*   c  z  s  k  o  -  -  -  -  -  -  0x7c0                    */
+	/*   c  z  s  k  o  -  -  -  -  -  I  0x7c1                    */
+	/*   c  z  s  k  o  -  -  -  -  p  -  0x7c2                    */
+	/*   c  z  s  k  o  -  -  -  -  p  I  0x7c3                    */
 
 	if (0 == opt_count['c'] + opt_count['z'])
 	{
@@ -1075,16 +1133,18 @@ static void	parse_commandline(int argc, char **argv)
 	}
 
 	if (0 < opt_count['c'])
-		opt_mask |= 0x200;
+		opt_mask |= 0x400;
 	if (0 < opt_count['z'])
-		opt_mask |= 0x100;
+		opt_mask |= 0x200;
 	if (0 < opt_count['s'])
-		opt_mask |= 0x80;
+		opt_mask |= 0x100;
 	if (0 < opt_count['k'])
-		opt_mask |= 0x40;
+		opt_mask |= 0x80;
 	if (0 < opt_count['o'])
-		opt_mask |= 0x20;
+		opt_mask |= 0x40;
 	if (0 < opt_count['i'])
+		opt_mask |= 0x20;
+	if (0 < opt_count['N'])
 		opt_mask |= 0x10;
 	if (0 < opt_count['T'])
 		opt_mask |= 0x08;
@@ -1097,20 +1157,26 @@ static void	parse_commandline(int argc, char **argv)
 
 	if (
 			(0 == opt_count['c'] && 1 == opt_count['i'] &&	/* !c i */
-					!((0x110 <= opt_mask && opt_mask <= 0x11f) ||
-					(0x190 <= opt_mask && opt_mask <= 0x19f))) ||
+					!((0x220 <= opt_mask && opt_mask <= 0x22f) ||
+					(0x238 <= opt_mask && opt_mask <= 0x23f) ||
+					(0x320 <= opt_mask && opt_mask <= 0x32f) ||
+					(0x338 <= opt_mask && opt_mask <= 0x33f))) ||
 			(0 == opt_count['c'] && 0 == opt_count['i'] &&	/* !c !i */
-					!(0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
+					!(0x3c0 <= opt_mask && opt_mask <= 0x3c3)) ||
 			(1 == opt_count['c'] && 1 == opt_count['i'] &&	/* c i */
-					!((0x210 <= opt_mask && opt_mask <= 0x21f) ||
-					(0x310 <= opt_mask && opt_mask <= 0x31f) ||
-					(0x290 <= opt_mask && opt_mask <= 0x29f) ||
-					(0x390 <= opt_mask && opt_mask <= 0x39f))) ||
+					!((0x420 <= opt_mask && opt_mask <= 0x42f) ||
+					(0x438 <= opt_mask && opt_mask <= 0x43f) ||
+					(0x620 <= opt_mask && opt_mask <= 0x62f) ||
+					(0x638 <= opt_mask && opt_mask <= 0x63f) ||
+					(0x520 <= opt_mask && opt_mask <= 0x52f) ||
+					(0x538 <= opt_mask && opt_mask <= 0x53f) ||
+					(0x720 <= opt_mask && opt_mask <= 0x72f) ||
+					(0x738 <= opt_mask && opt_mask <= 0x73f))) ||
 			(1 == opt_count['c'] && 0 == opt_count['i'] &&	/* c !i */
-					!((0x260 <= opt_mask && opt_mask <= 0x263) ||
-					(0x2e0 <= opt_mask && opt_mask <= 0x2e3) ||
-					(0x360 <= opt_mask && opt_mask <= 0x363) ||
-					(0x3e0 <= opt_mask && opt_mask <= 0x3e3))))
+					!((0x4c0 <= opt_mask && opt_mask <= 0x4c3) ||
+					(0x5c0 <= opt_mask && opt_mask <= 0x5c3) ||
+					(0x6c0 <= opt_mask && opt_mask <= 0x6c3) ||
+					(0x7c0 <= opt_mask && opt_mask <= 0x7c3))))
 	{
 		zbx_error("too few or mutually exclusive options used");
 		usage();
@@ -1178,7 +1244,7 @@ static char	*zbx_fgets_alloc(char **buffer, size_t *buffer_alloc, FILE *fp)
 int	main(int argc, char **argv)
 {
 	char			*error = NULL;
-	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp;
+	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = NULL;
 
 	progname = get_program_name(argv[0]);
@@ -1295,7 +1361,7 @@ int	main(int argc, char **argv)
 			size_t		key_value_alloc = 0;
 			const char	*p;
 
-			/* line format: <hostname> <key> [<timestamp>] <value> */
+			/* line format: <hostname> <key> [<timestamp>] [<ns>] <value> */
 
 			total_count++; /* also used as inputline */
 
@@ -1352,6 +1418,28 @@ int	main(int argc, char **argv)
 					ret = FAIL;
 					break;
 				}
+
+				if (1 == WITH_NS)
+				{
+					if ('\0' == *p || NULL == (p = get_string(p, clock, sizeof(clock))) ||
+							'\0' == *clock)
+					{
+						zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Nanoseconds' required",
+								total_count);
+						ret = FAIL;
+						break;
+					}
+
+					if (FAIL == is_uint_n_range(clock, sizeof(clock), &ns, sizeof(ns),
+							0LL, 999999999LL))
+					{
+						zabbix_log(LOG_LEVEL_WARNING,
+								"[line %d] invalid 'Nanoseconds' value detected",
+								total_count);
+						ret = FAIL;
+						break;
+					}
+				}
 			}
 
 			if (key_value_alloc != in_line_alloc)
@@ -1381,8 +1469,15 @@ int	main(int argc, char **argv)
 			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
+
 			if (1 == WITH_TIMESTAMPS)
+			{
 				zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_CLOCK, timestamp);
+
+				if (1 == WITH_NS)
+					zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_NS, ns);
+			}
+
 			zbx_json_close(&sendval_args->json);
 
 			succeed_count++;

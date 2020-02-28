@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "symbols.h"
-#	include "comms.h"	/* ssize_t */
+#	include "zbxtypes.h"	/* ssize_t */
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the initial part of the file to calculate MD5 sum for */

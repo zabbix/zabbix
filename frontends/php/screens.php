@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,9 +35,7 @@ $page['scripts'] = [
 	'layout.mode.js'
 ];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
@@ -141,8 +139,6 @@ else {
 ob_end_flush();
 
 // render view
-$screenView = new CView('monitoring.screen', $data);
-$screenView->render();
-$screenView->show();
+echo (new CView('monitoring.screen', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

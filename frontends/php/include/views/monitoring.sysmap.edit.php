@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/monitoring.sysmap.edit.js.php';
 
@@ -243,7 +247,7 @@ foreach ($data['sysmap']['urls'] as $url) {
 			new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types()),
 			(new CCol(
 				(new CButton(null, _('Remove')))
-					->onClick('$("urlEntry_'.$i.'").remove();')
+					->onClick('$("#urlEntry_'.$i.'").remove();')
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('urlEntry_'.$i)
@@ -261,7 +265,7 @@ $template_url_link = (new CTextBox('urls[#{id}][url]', ''))
 $template_url_etype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types());
 $template_url_etype->setAttribute('disabled', 'disabled');
 $template_remove_button = (new CButton(null, _('Remove')))
-	->onClick('$("entry_#{id}").remove();')
+	->onClick('$("#entry_#{id}").remove();')
 	->addClass(ZBX_STYLE_BTN_LINK);
 $template_url_row = (new CRow([
 	$template_url_label,
@@ -296,7 +300,7 @@ $user_group_shares_table = (new CTable())
 
 $add_user_group_btn = ([(new CButton(null, _('Add')))
 	->onClick('return PopUp("popup.generic",'.
-		CJs::encodeJson([
+		json_encode([
 			'srctbl' => 'usrgrp',
 			'srcfld1' => 'usrgrpid',
 			'srcfld2' => 'name',
@@ -332,7 +336,7 @@ $user_shares_table = (new CTable())
 
 $add_user_btn = ([(new CButton(null, _('Add')))
 	->onClick('return PopUp("popup.generic",'.
-		CJs::encodeJson([
+		json_encode([
 			'srctbl' => 'users',
 			'srcfld1' => 'userid',
 			'srcfld2' => 'fullname',
@@ -408,4 +412,4 @@ $form->addItem($tabs);
 // Append form to widget.
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

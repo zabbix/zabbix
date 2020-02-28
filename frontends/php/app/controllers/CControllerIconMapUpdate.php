@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,15 +58,17 @@ class CControllerIconMapUpdate extends CController {
 
 		$result = (bool) API::IconMap()->update($iconmap);
 
-		$url = new CUrl('zabbix.php');
-
 		if ($result) {
-			$response = new CControllerResponseRedirect($url->setArgument('action', 'iconmap.list'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'iconmap.list')
+			);
 			$response->setMessageOk(_('Icon map updated'));
 		}
 		else {
-			$url->setArgument('iconmapid', $iconmap['iconmapid']);
-			$response = new CControllerResponseRedirect($url->setArgument('action', 'iconmap.edit'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'iconmap.edit')
+				->setArgument('iconmapid', $iconmap['iconmapid'])
+			);
 			$form_data = $this->getInputAll();
 			if (!array_key_exists('mappings', $form_data['iconmap'])) {
 				$form_data['iconmap']['mappings'] = [];

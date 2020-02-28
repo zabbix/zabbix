@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 $widget = (new CWidget())->setTitle(_('Items'));
 
@@ -95,7 +99,7 @@ if (!$readonly) {
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",jQuery.extend('.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'help_items',
 				'srcfld1' => 'key',
 				'dstfrm' => $form->getName(),
@@ -137,7 +141,7 @@ elseif (!$readonly) {
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
-$query_fields->items = [CJs::encodeJson($query_fields_data)];
+$query_fields->items = [json_encode($query_fields_data)];
 
 $form_list
 	->addRow(
@@ -228,7 +232,7 @@ elseif (!$readonly) {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [CJs::encodeJson($headers_data)];
+$headers->items = [json_encode($headers_data)];
 
 $form_list
 	// Append ITEM_TYPE_HTTPAGENT Headers fields to form list.
@@ -421,6 +425,7 @@ if ($data['interfaces']) {
 			$data['interfaces'] = zbx_toHash($data['interfaces'], 'interfaceid');
 			$interface = $data['interfaces'][$data['interfaceid']];
 
+			$form->addVar('selectedInterfaceId', $data['interfaceid']);
 			$form_list->addRow((new CLabel(_('Host interface'), 'interface'))->setAsteriskMark(),
 				(new CTextBox('interface',
 					$interface['useip']
@@ -577,11 +582,8 @@ $form_list
 		(new CTextBox('port', $data['port'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'row_port'
 	)
-	->addRow(
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setAsteriskMark(),
-		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
+	->addRow(_('IPMI sensor'),
+		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_ipmi_sensor'
 	);
 
@@ -965,12 +967,14 @@ if ($data['itemid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Check now')))
+		$buttons[] = (new CSubmit('check_now', _('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
 			);
 	}
+
+	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 
 	if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$buttons[] = new CButtonQMessage(
@@ -989,7 +993,7 @@ if ($data['itemid'] != 0) {
 else {
 	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('hostid'))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('hostid'))]
 	));
 }
 
@@ -998,4 +1002,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 
-return $widget;
+$widget->show();

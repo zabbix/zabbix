@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ extern int		server_num, process_num;
  *                                                                            *
  * Function: proxy_data_sender                                                *
  *                                                                            *
- * Purpose: collects host availability, history, discovery, auto registration *
+ * Purpose: collects host availability, history, discovery, autoregistration  *
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/

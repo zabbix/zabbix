@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -524,7 +524,7 @@ ZBX_Notifications.prototype.renderAudio = function() {
  * @param {string} resource  A value for 'action' parameter.
  * @param {object} params    Form data to be send.
  *
- * @return {Promise}  For IE11 ZBX_Promise poly-fill is returned.
+ * @return {Promise}
  */
 ZBX_Notifications.prototype.fetch = function(resource, params) {
 	return new Promise(function(resolve, reject) {

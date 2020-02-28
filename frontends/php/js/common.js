@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-jQuery.noConflict();
 
 /**
  * jQuery based publish/subscribe handler.
@@ -112,6 +110,7 @@ function is_array(obj) {
 
 /**
  * Get elements existing exclusively in one of both arrays.
+ * @deprecated
  *
  * @param {Array} arr
  *
@@ -127,7 +126,7 @@ Array.prototype.xor = function(arr) {
 
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
-	element = $(element);
+	element = $(element)[0];
 
 	if (element.addEventListener) {
 		element.addEventListener(eventname, expression, bubbling);
@@ -166,11 +165,6 @@ function cancelEvent(e) {
 
 	e.stopPropagation();
 	e.preventDefault();
-
-	if (IE) {
-		e.cancelBubble = true;
-		e.returnValue = false;
-	}
 
 	return false;
 }
@@ -255,8 +249,6 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 }
 
 function getDimensions(obj) {
-	obj = $(obj);
-
 	var dim = {
 		left:		0,
 		top:		0,
@@ -297,7 +289,6 @@ function getDimensions(obj) {
 }
 
 function getPosition(obj) {
-	obj = $(obj);
 	var pos = {top: 0, left: 0};
 
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
@@ -309,10 +300,6 @@ function getPosition(obj) {
 				obj = obj.offsetParent;
 				pos.left += obj.offsetLeft;
 				pos.top += obj.offsetTop;
-
-				if (IE && obj.offsetParent.toString() == 'unknown') {
-					break;
-				}
 			}
 		} catch(e) {
 		}
@@ -331,36 +318,52 @@ function get_bodywidth() {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action			Popup controller related action.
- * @param {array} options			Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid		(optional) id of overlay dialogue.
- * @param {object} trigger_elmnt	(optional) UI element which was clicked to open overlay dialogue.
+ * @param {string} action         Popup controller related action.
+ * @param {array}  options        (optional) Array with key/value pairs that will be used as query for popup request.
+ * @param {string} dialogueid     (optional) id of overlay dialogue.
+ * @param {object} trigger_elmnt  (optional) UI element which was clicked to open overlay dialogue.
  *
- * @returns false
+ * @returns {Overlay}
  */
 function PopUp(action, options, dialogueid, trigger_elmnt) {
-	var ovelay_properties = {
-		'title': '',
-		'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
-		'class': 'modal-popup' + ((action === 'popup.generic') ? ' modal-popup-generic' : ''),
-		'buttons': [],
-		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
-	};
+	var overlay = overlays_stack.getById(dialogueid);
+	if (!overlay) {
+		var wide_popup_actions = ['popup.generic', 'popup.scriptexec', 'dashboard.share.edit',
+				'dashboard.properties.edit', 'popup.services', 'popup.media', 'popup.preproctest.edit',
+				'popup.triggerexpr', 'popup.httpstep', 'popup.testtriggerexpr', 'popup.triggerwizard'
+			],
+			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.action.recovery',
+				'popup.action.acknowledge', 'popup.action.operation', 'popup.condition.operations',
+				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
+				'popup.mediatype.message'
+			],
+			dialogue_class = '';
 
-	var url = new Curl('zabbix.php');
-	url.setArgument('action', action);
+		if (wide_popup_actions.indexOf(action) !== -1) {
+			dialogue_class = ' modal-popup-generic';
+		}
+		else if (medium_popup_actions.indexOf(action) !== -1) {
+			dialogue_class = ' modal-popup-medium';
+		}
 
-	jQuery.ajax({
-		url: url.getUrl(),
-		type: 'post',
-		dataType: 'json',
-		data: options,
-		beforeSend: function(jqXHR) {
-			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
-		},
-		success: function(resp) {
+		overlay = overlayDialogue({
+			'dialogueid': dialogueid,
+			'title': '',
+			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
+			'class': 'modal-popup' + dialogue_class,
+			'buttons': [],
+			'element': trigger_elmnt,
+			'type': 'popup'
+		});
+	}
+
+	overlay
+		.load(action, options)
+		.then(function(resp) {
 			if (typeof resp.errors !== 'undefined') {
-				ovelay_properties['content'] = resp.errors;
+				overlay.setProperties({
+					content: resp.errors
+				});
 			}
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
@@ -372,46 +375,47 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
 				});
 
-				ovelay_properties['title'] = resp.header;
-				ovelay_properties['content'] = resp.body;
-				ovelay_properties['controls'] = resp.controls;
-				ovelay_properties['buttons'] = buttons;
-
-				if (typeof resp.debug !== 'undefined') {
-					ovelay_properties['debug'] = resp.debug;
-				}
-
-				if (typeof resp.script_inline !== 'undefined') {
-					ovelay_properties['script_inline'] = resp.script_inline;
-				}
+				overlay.setProperties({
+					title: resp.header,
+					content: resp.body,
+					controls: resp.controls,
+					buttons: buttons,
+					debug: resp.debug,
+					script_inline: resp.script_inline
+				});
 			}
 
-			overlayDialogue(ovelay_properties);
-		}
-	});
+			overlay.recoverFocus();
+			overlay.containFocus();
+		});
 
-	return false;
+	addToOverlaysStack(overlay);
+
+	return overlay;
 }
 
 /**
  * Function to add details about overlay UI elements in global overlays_stack variable.
  *
- * @param {string} id       Unique overlay element identifier.
- * @param {object} element  UI element which must be focused when overlay UI element will be closed.
- * @param {object} type     Type of overlay UI element.
- * @param {object} xhr      (optional) XHR request used to load content. Used to abort loading. Currently used with
- *                          type 'popup' only.
+ * @param {string|Overlay} id       Unique overlay element identifier or Overlay object.
+ * @param {object} element          UI element which must be focused when overlay UI element will be closed.
+ * @param {object} type             Type of overlay UI element.
+ * @param {object} xhr              (optional) XHR request used to load content. Used to abort loading. Currently used
+ *                                  with type 'popup' only.
  */
 function addToOverlaysStack(id, element, type, xhr) {
+	if (id instanceof Overlay) {
+		overlays_stack.pushUnique(id);
+	}
+	else {
+		overlays_stack.pushUnique({
+			dialogueid: id.toString(),
+			element: element,
+			type: type,
+			xhr: xhr
+		});
+	}
 
-	overlays_stack.pushUnique({
-		dialogueid: id.toString(),
-		element: element,
-		type: type,
-		xhr: xhr
-	});
-
-	// Only one instance of handler should be present at any time.
 	jQuery(document)
 		.off('keydown', closeDialogHandler)
 		.on('keydown', closeDialogHandler);
@@ -584,14 +588,14 @@ function addValues(frame, values, submit_parent) {
  * @param {string} parentid		parent id
  */
 function addSelectedValues(form, object, parentid) {
-	form = $(form);
+	form = document.getElementById(form);
 
 	if (typeof parentid === 'undefined') {
 		var parentid = null;
 	}
 
 	var data = {object: object, values: [], parentId: parentid};
-	var chk_boxes = form.getInputs('checkbox');
+	var chk_boxes = jQuery(form).find('input[type="checkbox"]');
 
 	for (var i = 0; i < chk_boxes.length; i++) {
 		if (chk_boxes[i].checked && (chk_boxes[i].name.indexOf('all_') < 0)) {
@@ -647,24 +651,26 @@ function add_media(formname, media, mediatypeid, sendto, period, active, severit
 /**
  * Send trigger expression form data to server for validation before adding it to trigger expression field.
  *
- * @param {string} formname		form name that is sent to server for validation
- * @param {string} dialogueid	(optional) id of overlay dialogue.
+ * @param {Overlay} overlay
  */
-function validate_trigger_expression(formname, dialogueid) {
-	var form = window.document.forms[formname],
-		url = new Curl(jQuery(form).attr('action')),
-		dialogueid = dialogueid || null;
+function validate_trigger_expression(overlay) {
+	var $form = overlay.$dialogue.find('form'),
+		url = new Curl($form.attr('action'));
 
 	url.setArgument('add', 1);
 
-	jQuery.ajax({
+	overlay.setLoading();
+	overlay.xhr = jQuery.ajax({
 		url: url.getUrl(),
-		data: jQuery(form).serialize(),
+		data: $form.serialize(),
+		complete: function() {
+			overlay.unsetLoading();
+		},
 		success: function(ret) {
-			jQuery(window.document.forms[formname]).parent().find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(window.document.forms[formname]));
+				jQuery(ret.errors).insertBefore($form);
 			}
 			else {
 				var form = window.document.forms[ret.dstfrm];
@@ -679,13 +685,11 @@ function validate_trigger_expression(formname, dialogueid) {
 					jQuery(obj).val(ret.expression);
 				}
 
-				if (dialogueid) {
-					overlayDialogueDestroy(dialogueid);
-				}
+				overlayDialogueDestroy(overlay.dialogueid);
 			}
 		},
 		dataType: 'json',
-		type: 'post'
+		type: 'POST'
 	});
 }
 
@@ -774,23 +778,6 @@ function showHideVisible(obj) {
 	}
 	else {
 		obj.style.visibility = 'visible';
-	}
-}
-
-function showHideByName(name, style) {
-	if (typeof(style) == 'undefined') {
-		style = 'none';
-	}
-
-	var objs = $$('[name=' + name + ']');
-
-	if (empty(objs)) {
-		throw 'showHideByName(): Object not found.';
-	}
-
-	for (var i = 0; i < objs.length; i++) {
-		var obj = objs[i];
-		obj.style.display = style;
 	}
 }
 
@@ -905,3 +892,21 @@ function submitFormWithParam(form_name, input_name, input_value) {
 	document.forms[form_name].appendChild(input);
 	jQuery(document.forms[form_name]).trigger('submit');
 }
+
+if (typeof Element.prototype.remove === 'undefined') {
+	Element.prototype.remove = function() {
+		this.parentNode.removeChild(this);
+		return this;
+	};
+}
+
+/**
+ * @deprecated use native bind method
+ */
+Function.prototype.bindAsEventListener = function (context) {
+	var method = this, args = Array.prototype.slice.call(arguments, 1);
+
+	return function(event) {
+		return method.apply(context, [event || window.event].concat(args));
+	};
+};

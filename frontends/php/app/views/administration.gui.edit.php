@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,17 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('GUI'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $gui_tab = (new CFormList())
 	->addRow(_('Default theme'),
-		(new CComboBox('default_theme', $data['default_theme'], null, Z::getThemes()))
+		(new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes()))
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Dropdown first entry'), [

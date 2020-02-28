@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'fullscreen':
-			switch (CView::getLayoutMode()) {
+			switch ($params['mode']) {
 				case ZBX_LAYOUT_KIOSKMODE:
 					$icon = (new CButton(null, '&nbsp;'))
 						->setTitle(_('Normal view'))
@@ -801,6 +801,10 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
 
+	$modules_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'module.list')
+		->getUrl();
+
 	$miscconfig_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
@@ -809,7 +813,7 @@ function getAdministrationGeneralSubmenu() {
 		'main_section' => [
 			'items' => [
 				$gui_url          => _('GUI'),
-				$autoreg_url      => _('Auto registration'),
+				$autoreg_url      => _('Autoregistration'),
 				$housekeeping_url => _('Housekeeping'),
 				$image_url        => _('Images'),
 				$iconmap_url      => _('Icon mapping'),
@@ -819,6 +823,7 @@ function getAdministrationGeneralSubmenu() {
 				$workingtime_url  => _('Working time'),
 				$trigseverity_url => _('Trigger severities'),
 				$trigdisplay_url  => _('Trigger displaying options'),
+				$modules_url      => _('Modules'),
 				$miscconfig_url   => _('Other')
 			]
 		]
@@ -994,24 +999,6 @@ function makeWarningIcon($error) {
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
 		->setHint($error);
-}
-
-/**
- * Renders a debug button
- *
- * @return CButton
- */
-function makeDebugButton() {
-	return (new CDiv(
-		(new CLink(_('Debug'), '#debug'))
-			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
-				"this.state = (this.state == 'none' ? 'block' : 'none');".
-				"jQuery(this)".
-					".text(this.state == 'none' ? ".CJs::encodeJson(_('Debug'))." : ".CJs::encodeJson(_('Hide debug')).")".
-					".blur();".
-				"showHideByName('zbx_debug_info', this.state);"
-			)
-	))->addClass(ZBX_STYLE_BTN_DEBUG);
 }
 
 /**

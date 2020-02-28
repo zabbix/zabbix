@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ import (
 	"time"
 
 	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/alias"
+	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/glexpr"
@@ -36,14 +38,27 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
+const (
+	// number of seconds to wait for plugins to finish during scheduler shutdown
+	shutdownTimeout = 5
+	// inactive shutdown value
+	shutdownInactive = -1
+)
+
+// Manager implements Scheduler interface and manages plugin interface usage.
 type Manager struct {
 	input       chan interface{}
 	plugins     map[string]*pluginAgent
 	pluginQueue pluginHeap
 	clients     map[uint64]*client
-	aliases     []keyAlias
+	aliases     *alias.Manager
+	// number of active tasks (running in their own goroutines)
+	activeTasksNum int
+	// number of seconds left on shutdown timer
+	shutdownSeconds int
 }
 
+// updateRequest contains list of metrics monitored by a client and additional client configuration data.
 type updateRequest struct {
 	clientID           uint64
 	sink               plugin.ResultWriter
@@ -52,6 +67,7 @@ type updateRequest struct {
 	expressions        []*glexpr.Expression
 }
 
+// queryRequest contains status/debug query request.
 type queryRequest struct {
 	command string
 	sink    chan string
@@ -61,13 +77,18 @@ type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, expressions []*glexpr.Expression,
 		requests []*plugin.Request)
 	FinishTask(task performer)
-	PerformTask(key string, timeout time.Duration) (result string, err error)
+	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
 	Query(command string) (status string)
 }
 
+// cleanupClient performs deactivation of plugins the client is not using anymore.
+// It's called after client update and once per hour for the client associated to
+// single passive checks.
 func (m *Manager) cleanupClient(c *client, now time.Time) {
+	// get a list of plugins the client stopped using
 	released := c.cleanup(m.plugins, now)
 	for _, p := range released {
+		// check if the plugin is used by other clients
 		if p.refcount != 0 {
 			continue
 		}
@@ -112,8 +133,27 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 	}
 }
 
+// processUpdateRequest processes client update request. It's being used for multiple requests
+// (active checks on a server) and also for direct requets (single passive and internal checks).
 func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	log.Debugf("[%d] processing update request (%d requests)", update.clientID, len(update.requests))
+
+	// immediately fail direct checks and ignore bulk requests when shutting down
+	if m.shutdownSeconds != shutdownInactive {
+		if update.clientID == 0 {
+			if len(update.requests) == 1 {
+				update.sink.Write(&plugin.Result{
+					Itemid: update.requests[0].Itemid,
+					Error:  errors.New("Cannot obtain item value during shutdown process."),
+					Ts:     now,
+				})
+			} else {
+				log.Warningf("[%d] direct checks can contain only single request while received %d requests",
+					update.clientID, len(update.requests))
+			}
+		}
+		return
+	}
 
 	var c *client
 	var ok bool
@@ -132,11 +172,17 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 
 	for _, r := range update.requests {
 		var key string
+		var params []string
 		var err error
 		var p *pluginAgent
-		r.Key = m.getAlias(r.Key)
-		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
-			if p, ok = m.plugins[key]; !ok {
+
+		r.Key = m.aliases.Get(r.Key)
+		if key, params, err = itemutil.ParseKey(r.Key); err == nil {
+			p, ok = m.plugins[key]
+			if ok {
+				ok = keyaccess.CheckRules(key, params)
+			}
+			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
 				err = c.addRequest(p, r, update.sink, now)
@@ -144,7 +190,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 
 		if err != nil {
-			if c.id != 0 {
+			if c.id > agent.MaxBuiltinClientID {
 				if tacc, ok := c.exporters[r.Itemid]; ok {
 					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
 					tacc.task().deactivate()
@@ -165,6 +211,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	m.cleanupClient(c, now)
 }
 
+// processQueue processes queued plugins/tasks
 func (m *Manager) processQueue(now time.Time) {
 	seconds := now.Unix()
 	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
@@ -174,18 +221,21 @@ func (m *Manager) processQueue(now time.Time) {
 			}
 
 			heap.Pop(&m.pluginQueue)
-
 			if !p.hasCapacity() {
+				// plugin has no free capacity for the next task, keep the plugin out of queue
+				// until active tasks finishes and the required capacity is released
 				continue
 			}
 
+			// take the task out of plugin tasks queue and perform it
+			m.activeTasksNum++
 			p.reserveCapacity(p.popTask())
 			task.perform(m)
 
+			// if the plugin has capacity for the next task put it back into plugin queue
 			if !p.hasCapacity() {
 				continue
 			}
-
 			heap.Push(&m.pluginQueue, p)
 		} else {
 			// plugins with empty task queue should not be in Manager queue
@@ -194,7 +244,9 @@ func (m *Manager) processQueue(now time.Time) {
 	}
 }
 
+// processFinishRequest handles finished tasks
 func (m *Manager) processFinishRequest(task performer) {
+	m.activeTasksNum--
 	p := task.getPlugin()
 	p.releaseCapacity(task)
 	if p.active() && task.isActive() && task.isRecurring() {
@@ -227,6 +279,29 @@ func (m *Manager) rescheduleQueue(now time.Time) {
 	m.pluginQueue = queue
 }
 
+// deactivatePlugins removes all tasks and creates stopper tasks for active runner plugins
+func (m *Manager) deactivatePlugins() {
+	m.shutdownSeconds = shutdownTimeout
+
+	m.pluginQueue = make(pluginHeap, 0, len(m.pluginQueue))
+	for _, p := range m.plugins {
+		if p.refcount != 0 {
+			p.tasks = make(performerHeap, 0)
+			if _, ok := p.impl.(plugin.Runner); ok {
+				task := &stopperTask{
+					taskBase: taskBase{plugin: p, active: true},
+				}
+				p.enqueueTask(task)
+				heap.Push(&m.pluginQueue, p)
+				p.refcount = 0
+				log.Debugf("created final stopper task for plugin %s", p.name())
+			}
+			p.refcount = 0
+		}
+	}
+}
+
+// run() is the main worker loop running in own goroutine until stopped
 func (m *Manager) run() {
 	defer log.PanicHook()
 	log.Debugf("starting manager")
@@ -251,22 +326,33 @@ run:
 			}
 			lastTick = now
 			m.processQueue(now)
-			// cleanup plugins used by passive checks
-			if now.Sub(cleaned) >= time.Hour {
-				if passive, ok := m.clients[0]; ok {
-					m.cleanupClient(passive, now)
+			if m.shutdownSeconds != shutdownInactive {
+				m.shutdownSeconds--
+				if m.shutdownSeconds == 0 {
+					break run
 				}
-				// remove inactive clients
-				for _, client := range m.clients {
-					if len(client.pluginsInfo) == 0 {
-						delete(m.clients, client.ID())
+			} else {
+				// cleanup plugins used by passive checks
+				if now.Sub(cleaned) >= time.Hour {
+					if passive, ok := m.clients[0]; ok {
+						m.cleanupClient(passive, now)
 					}
+					// remove inactive clients
+					for _, client := range m.clients {
+						if len(client.pluginsInfo) == 0 {
+							delete(m.clients, client.ID())
+						}
+					}
+					cleaned = now
 				}
-				cleaned = now
 			}
 		case u := <-m.input:
 			if u == nil {
-				break run
+				m.deactivatePlugins()
+				if m.activeTasksNum+len(m.pluginQueue) == 0 {
+					break run
+				}
+				m.processQueue(time.Now())
 			}
 			switch v := u.(type) {
 			case *updateRequest:
@@ -274,6 +360,9 @@ run:
 				m.processQueue(time.Now())
 			case performer:
 				m.processFinishRequest(v)
+				if m.shutdownSeconds != shutdownInactive && m.activeTasksNum+len(m.pluginQueue) == 0 {
+					break run
+				}
 				m.processQueue(time.Now())
 			case *queryRequest:
 				if response, err := m.processQuery(v); err != nil {
@@ -285,7 +374,7 @@ run:
 		}
 	}
 	log.Debugf("manager has been stopped")
-	monitor.Unregister()
+	monitor.Unregister(monitor.Scheduler)
 }
 
 type pluginCapacity struct {
@@ -297,6 +386,7 @@ func (m *Manager) init() {
 	m.pluginQueue = make(pluginHeap, 0, len(plugin.Metrics))
 	m.clients = make(map[uint64]*client)
 	m.plugins = make(map[string]*pluginAgent)
+	m.shutdownSeconds = shutdownInactive
 
 	metrics := make([]*plugin.Metric, 0, len(plugin.Metrics))
 
@@ -334,7 +424,7 @@ func (m *Manager) init() {
 			pagent = &pluginAgent{
 				impl:         metric.Plugin,
 				tasks:        make(performerHeap, 0),
-				capacity:     capacity,
+				maxCapacity:  capacity,
 				usedCapacity: 0,
 				index:        -1,
 				refcount:     0,
@@ -363,7 +453,7 @@ func (m *Manager) init() {
 	}
 }
 func (m *Manager) Start() {
-	monitor.Register()
+	monitor.Register(monitor.Scheduler)
 	go m.run()
 }
 
@@ -399,12 +489,13 @@ func (r resultWriter) PersistSlotsAvailable() int {
 	return 1
 }
 
-func (m *Manager) PerformTask(key string, timeout time.Duration) (result string, err error) {
+func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error) {
 	var lastLogsize uint64
 	var mtime int
 
 	w := make(resultWriter, 1)
-	m.UpdateTasks(0, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+
+	m.UpdateTasks(clientID, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
 
 	select {
 	case r := <-w:
@@ -445,8 +536,9 @@ func (m *Manager) validatePlugins(options *agent.AgentOptions) (err error) {
 	return
 }
 
-func (m *Manager) configure(options *agent.AgentOptions) error {
-	return m.loadAlias(options)
+func (m *Manager) configure(options *agent.AgentOptions) (err error) {
+	m.aliases, err = alias.NewManager(options)
+	return
 }
 
 func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1088,7 +1088,7 @@ class CSvgGraph extends CSvg {
 
 			$container->addItem(
 				(new CSvgGraphAnnotation($draw_type))
-					->setInformation(CJs::encodeJson($info))
+					->setInformation(json_encode($info))
 					->setSize(min($x2 - $x1, $this->canvas_width), $this->canvas_height)
 					->setPosition(max($x1, $this->canvas_x), $this->canvas_y)
 					->setColor($this->color_annotation)

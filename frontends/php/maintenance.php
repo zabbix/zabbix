@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -308,9 +308,7 @@ if (!empty($data['form'])) {
 	CArrayHelper::sort($data['groups_ms'], ['name']);
 
 	// render view
-	$maintenanceView = new CView('configuration.maintenance.edit', $data);
-	$maintenanceView->render();
-	$maintenanceView->show();
+	echo (new CView('configuration.maintenance.edit', $data))->getOutput();
 }
 else {
 	// get maintenances
@@ -409,9 +407,7 @@ else {
 	$data['pageFilter'] = $pageFilter;
 
 	// render view
-	$maintenanceView = new CView('configuration.maintenance.list', $data);
-	$maintenanceView->render();
-	$maintenanceView->show();
+	echo (new CView('configuration.maintenance.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

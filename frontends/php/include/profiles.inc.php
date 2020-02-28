@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ function update_config($config) {
 			'min' => SEC_PER_DAY,
 			'max' => 25 * SEC_PER_YEAR,
 			'allow_zero' => false,
-			'message' => _('Invalid auto-registration data storage period: %1$s.')
+			'message' => _('Invalid autoregistration data storage period: %1$s.')
 		],
 		'hk_services' => [
 			'min' => SEC_PER_DAY,
@@ -218,7 +218,7 @@ function update_config($config) {
 			);
 		}
 		if (array_key_exists('hk_events_autoreg', $config)) {
-			$msg[] = _s('Auto-registration event and alert data storage period "%1$s".',
+			$msg[] = _s('Autoregistration event and alert data storage period "%1$s".',
 				$config['hk_events_autoreg']
 			);
 		}

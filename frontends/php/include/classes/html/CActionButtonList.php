@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ class CActionButtonList extends CObject {
 						'if (!$_form.data("action")) {'.
 							'$_form.data("action", $_form.attr("action"));'.
 						'}'.
-						'$_form.attr("action", '.CJs::encodeJson($button_data['redirect']).');'
+						'$_form.attr("action", '.json_encode($button_data['redirect']).');'
 					);
 			}
 			else {
@@ -129,8 +129,8 @@ class CActionButtonList extends CObject {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-		zbx_add_post_js('chkbxRange.pageGoName = '.CJs::encodeJson($this->checkboxes_name).';');
-		zbx_add_post_js('chkbxRange.prefix = '.CJs::encodeJson($this->name_prefix).';');
+		zbx_add_post_js('chkbxRange.pageGoName = '.json_encode($this->checkboxes_name).';');
+		zbx_add_post_js('chkbxRange.prefix = '.json_encode($this->name_prefix).';');
 
 		$this->items[] = (new CDiv([$this->getSelectedCountElement(), $this->buttons]))
 			->setId('action_buttons')

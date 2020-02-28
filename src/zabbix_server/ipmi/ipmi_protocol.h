@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,30 +26,25 @@
 
 #define ZBX_IPC_SERVICE_IPMI	"ipmi"
 
-/* poller -> manager */
 #define ZBX_IPC_IPMI_REGISTER		1
 #define ZBX_IPC_IPMI_VALUE_RESULT	2
 #define ZBX_IPC_IPMI_COMMAND_RESULT	3
 
-/* manager -> poller */
 #define ZBX_IPC_IPMI_VALUE_REQUEST	101
 #define ZBX_IPC_IPMI_COMMAND_REQUEST	102
 #define ZBX_IPC_IPMI_CLEANUP_REQUEST	103
 
-/* client -> manager */
 #define ZBX_IPC_IPMI_SCRIPT_REQUEST	201
 
-/* manager -> client */
 #define ZBX_IPC_IPMI_SCRIPT_RESULT	301
-
 
 zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objectid, const char *addr,
 		unsigned short port, signed char authtype, unsigned char privilege, const char *username,
-		const char *password, const char *sensor, int command);
+		const char *password, const char *sensor, int command, const char *key);
 
 void	zbx_ipmi_deserialize_request(const unsigned char *data, zbx_uint64_t *objectid, char **addr,
 		unsigned short *port, signed char *authtype, unsigned char *privilege, char **username, char **password,
-		char **sensor, int *command);
+		char **sensor, int *command, char **key);
 
 void	zbx_ipmi_deserialize_request_objectid(const unsigned char *data, zbx_uint64_t *objectid);
 

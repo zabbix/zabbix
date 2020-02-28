@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,12 +84,12 @@ else {
 	error(_('Login name or password is incorrect.'));
 }
 
-(new CView('general.warning', [
+echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => zbx_objectValues(clear_messages(), 'message'),
 	'buttons' => [
 		(new CButton('login', _('Login')))->onClick('document.location = '.
-			CJs::encodeJson($redirect_to->getUrl()).';')
+			json_encode($redirect_to->getUrl()).';')
 	],
 	'theme' => getUserTheme(CWebUser::$data)
-]))->render();
+]))->getOutput();

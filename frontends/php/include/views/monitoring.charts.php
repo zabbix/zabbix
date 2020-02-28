@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
+
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $controls = (new CForm('get'))
 	->cleanItems()
@@ -53,10 +59,8 @@ if ($this->data['graphid']) {
 	);
 }
 
-$content_control->addItem(get_icon('fullscreen'));
+$content_control->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
 $content_control = (new CTag('nav', true, $content_control))->setAttribute('aria-label', _('Content controls'));
-
-$web_layout_mode = CView::getLayoutMode();
 
 $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
@@ -115,4 +119,4 @@ else {
 	$chartsWidget->addItem(new CTableInfo());
 }
 
-return $chartsWidget;
+$chartsWidget->show();

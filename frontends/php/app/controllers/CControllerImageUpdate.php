@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,12 +100,11 @@ class CControllerImageUpdate extends CController {
 		$image = $this->uploadImage($error);
 
 		if ($error) {
-			$url = (new CUrl('zabbix.php'))
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'image.edit')
 				->setArgument('imagetype', $this->getInput('imagetype'))
-				->setArgument('imageid', $this->getInput('imageid'));
-
-			$response = new CControllerResponseRedirect($url);
+				->setArgument('imageid', $this->getInput('imageid'))
+			);
 			error($error);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update image'));
@@ -135,16 +134,14 @@ class CControllerImageUpdate extends CController {
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $this->getInput('imagetype'))
 			);
-
 			$response->setMessageOk(_('Image updated'));
 		}
 		else {
-			$url = (new CUrl('zabbix.php'))
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'image.edit')
 				->setArgument('imagetype', $this->getInput('imagetype'))
-				->setArgument('imageid', $this->getInput('imageid'));
-
-			$response = new CControllerResponseRedirect($url);
+				->setArgument('imageid', $this->getInput('imageid'))
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update image'));
 		}

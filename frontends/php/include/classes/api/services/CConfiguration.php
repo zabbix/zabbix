@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ class CConfiguration extends CApiService {
 
 		$data = (new CXmlValidator)->validate($data, $params['format']);
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2'] as $version) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4'] as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -179,6 +179,9 @@ class CConfiguration extends CApiService {
 
 		// Normalize array keys.
 		$data = (new CArrayKeysImportConverter($schema))->convert($data);
+
+		// Transform converter.
+		$data = (new CTransformImportConverter($schema))->convert($data);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);

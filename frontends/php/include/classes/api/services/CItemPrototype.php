@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -284,12 +284,10 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
-		$json = new CJson();
-
 		foreach ($result as &$item) {
 			if (array_key_exists('query_fields', $item)) {
-				$query_fields = ($item['query_fields'] !== '') ? $json->decode($item['query_fields'], true) : [];
-				$item['query_fields'] = $json->hasError() ? [] : $query_fields;
+				$query_fields = ($item['query_fields'] !== '') ? json_decode($item['query_fields'], true) : [];
+				$item['query_fields'] = json_last_error() ? [] : $query_fields;
 			}
 
 			if (array_key_exists('headers', $item)) {
@@ -373,15 +371,14 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($items as &$item) {
 			unset($item['itemid']);
 		}
+		unset($item);
 
 		$this->validateDependentItems($items);
-
-		$json = new CJson();
 
 		foreach ($items as &$item) {
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $item)) {
-					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
 				}
 
 				if (array_key_exists('headers', $item)) {
@@ -777,8 +774,6 @@ class CItemPrototype extends CItemGeneral {
 			]
 		];
 
-		$json = new CJson();
-
 		foreach ($items as &$item) {
 			$type_change = ($item['type'] != $db_items[$item['itemid']]['type']);
 
@@ -813,7 +808,7 @@ class CItemPrototype extends CItemGeneral {
 				}
 
 				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
 				}
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
@@ -912,15 +907,13 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		$json = new CJson();
-
 		foreach ($tpl_items as &$tpl_item) {
 			$tpl_item['applications'] = zbx_objectValues($tpl_item['applications'], 'applicationid');
 
 			if ($tpl_item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $tpl_item) && is_array($tpl_item['query_fields'])) {
 					$tpl_item['query_fields'] = $tpl_item['query_fields']
-						? $json->encode($tpl_item['query_fields'])
+						? json_encode($tpl_item['query_fields'])
 						: '';
 				}
 

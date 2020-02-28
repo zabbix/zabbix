@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
@@ -133,7 +137,7 @@ $expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.CJs::encodeJson($popup_options).
+		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.json_encode($popup_options).
 			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}), null, this);'
 		)
 		->setEnabled(!$readonly)
@@ -251,7 +255,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
-									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
+									' if (confirm('.json_encode(_('Delete expression?')).')) {'.
 										' delete_expression("'.$e['id'] .'", '.TRIGGER_EXPRESSION.');'.
 										' document.forms["'.$triggersForm->getName().'"].submit();'.
 									' }'
@@ -335,7 +339,7 @@ $recovery_expression_row = [
 	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
-			CJs::encodeJson($popup_options).
+			json_encode($popup_options).
 				',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}), null, this);'
 		)
 		->setEnabled(!$readonly)
@@ -450,7 +454,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
-									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
+									' if (confirm('.json_encode(_('Delete expression?')).')) {'.
 										' delete_expression("'.$e['id'] .'", '.TRIGGER_RECOVERY_EXPRESSION.');'.
 										' document.forms["'.$triggersForm->getName().'"].submit();'.
 									' }'
@@ -555,16 +559,13 @@ if (!$data['form_refresh']) {
 }
 $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
 
-/*
- * Tags tab
- */
-$tags_view = new CView('configuration.tags.tab', [
+// tags
+$triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 	'source' => 'trigger',
 	'tags' => $data['tags'],
 	'show_inherited_tags' => $data['show_inherited_tags'],
 	'readonly' => $discovered_trigger
-]);
-$triggersTab->addTab('tags-tab', _('Tags'), $tags_view->render());
+]));
 
 /*
  * Dependencies tab
@@ -604,7 +605,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 			? null
 			: (new CButton('bnt1', _('Add')))
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
+					json_encode([
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',
 						'reference' => 'deptrigger',
@@ -645,4 +646,4 @@ $triggersForm->addItem($triggersTab);
 
 $widget->addItem($triggersForm);
 
-return $widget;
+$widget->show();

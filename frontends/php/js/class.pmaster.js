@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,38 +26,38 @@ function initPMaster(pmid, args) {
 	}
 }
 
-var CPMaster = Class.create({
+var CPMaster = function(pmid, obj4upd) {
+	this.pmasterid = pmid;
+
+	var doll = [];
+	for (var id in obj4upd) {
+		if (typeof(obj4upd[id]) != 'undefined' && !is_null(obj4upd[id])) {
+			doll = obj4upd[id];
+
+			if (typeof(doll['frequency']) == 'undefined') {
+				doll['frequency'] = 60;
+			}
+			if (typeof(doll['url']) == 'undefined') {
+				doll['url'] = location.href;
+			}
+			if (typeof(doll['counter']) == 'undefined') {
+				doll['counter'] = 0;
+			}
+			if (typeof(doll['darken']) == 'undefined') {
+				doll['darken'] = 0;
+			}
+			if (typeof(doll['params']) == 'undefined') {
+				doll['params'] = [];
+			}
+
+			this.addStartDoll(id, doll.frequency, doll.url, doll.counter, doll.darken, doll.params);
+		}
+	}
+};
+
+CPMaster.prototype = {
 	pmasterid:	0,	// pmasters reference id
 	dolls:		[],	// list of updated objects
-
-	initialize: function(pmid, obj4upd) {
-		this.pmasterid = pmid;
-
-		var doll = [];
-		for (var id in obj4upd) {
-			if (typeof(obj4upd[id]) != 'undefined' && !is_null(obj4upd[id])) {
-				doll = obj4upd[id];
-
-				if (typeof(doll['frequency']) == 'undefined') {
-					doll['frequency'] = 60;
-				}
-				if (typeof(doll['url']) == 'undefined') {
-					doll['url'] = location.href;
-				}
-				if (typeof(doll['counter']) == 'undefined') {
-					doll['counter'] = 0;
-				}
-				if (typeof(doll['darken']) == 'undefined') {
-					doll['darken'] = 0;
-				}
-				if (typeof(doll['params']) == 'undefined') {
-					doll['params'] = [];
-				}
-
-				this.addStartDoll(id, doll.frequency, doll.url, doll.counter, doll.darken, doll.params);
-			}
-		}
-	},
 
 	addStartDoll: function(domid, frequency, url, counter, darken, params) {
 		this.addDoll(domid, frequency, url, counter, darken, params);
@@ -123,9 +123,23 @@ var CPMaster = Class.create({
 		}
 		this.dolls = [];
 	}
-});
+};
 
-var CDoll = Class.create({
+var CDoll = function(obj4update) {
+		this._domid = obj4update.domid;
+		this._domobj = jQuery('#'+this._domid);
+		this._domobj_header = jQuery('#'+this._domid+'_header');
+		this._domobj_footer = jQuery('#'+this._domid+'_footer');
+		this.url(obj4update.url);
+		this.frequency(obj4update.frequency);
+		this.lastupdate(obj4update.lastupdate);
+		this.darken(obj4update.darken);
+		this.counter(obj4update.counter);
+		this.params(obj4update.params);
+		this.ready(obj4update.ready);
+	};
+
+CDoll.prototype = {
 	_pmasterid:		0,		// PMasters id to which doll belongs
 	_domobj:		null,	// DOM obj body for update
 	_domobj_header:	null,	// DOM obj header for update
@@ -140,44 +154,40 @@ var CDoll = Class.create({
 	_params:		'',
 	_status:		false,
 	_ready:			false,
-	pexec:			null,	// PeriodicalExecuter object
+	timer:			null,	// timer object
+	updating:		false,
 	min_freq:		5,		// seconds
 
-	initialize: function(obj4update) {
-		this._domid = obj4update.domid;
-		this._domobj = jQuery('#'+this._domid);
-		this._domobj_header = jQuery('#'+this._domid+'_header');
-		this._domobj_footer = jQuery('#'+this._domid+'_footer');
-		this.url(obj4update.url);
-		this.frequency(obj4update.frequency);
-		this.lastupdate(obj4update.lastupdate);
-		this.darken(obj4update.darken);
-		this.counter(obj4update.counter);
-		this.params(obj4update.params);
-		this.ready(obj4update.ready);
-	},
-
 	startDoll: function() {
-		if (is_null(this.pexec)) {
+		if (this.timer === null) {
 			this.lastupdate(0);
-			this.pexec = new PeriodicalExecuter(this.check4Update.bind(this), this._frequency);
+
+			var doll = this;
+			this.timer = setInterval(function () {
+				if (!doll.updating) {
+					try {
+						doll.updating = true;
+						doll.check4Update();
+						doll.updating = false;
+					} catch(e) {
+						doll.updating = false;
+						throw e;
+					}
+				}
+			}, this._frequency * 1000);
 			this.check4Update();
 		}
 	},
 
 	restartDoll: function() {
-		if (!is_null(this.pexec)) {
-			this.pexec.stop();
-			this.pexec = null;
-		}
-
-		this.pexec = new PeriodicalExecuter(this.check4Update.bind(this), this._frequency);
+		this.stopDoll();
+		this.startDoll();
 	},
 
 	stopDoll: function() {
-		if (!is_null(this.pexec)) {
-			this.pexec.stop();
-			this.pexec = null;
+		if (this.timer !== null) {
+			clearInterval(this.timer);
+			this.timer = null;
 		}
 	},
 
@@ -272,7 +282,7 @@ var CDoll = Class.create({
 		this._ready = false;
 
 		if (this._counter == 1) {
-			this.pexec.stop();
+			this.stopDoll();
 		}
 		if (this._darken) {
 			this.setDarken();
@@ -282,18 +292,18 @@ var CDoll = Class.create({
 		url.setArgument('upd_counter', this.counter());
 		url.setArgument('pmasterid', this.pmasterid());
 
-		new Ajax.Request(url.getUrl(), {
+		new jQuery.ajax(url.getUrl(), {
 				'method': 'post',
-				'parameters': this._params,
-				'onSuccess': this.onSuccess.bind(this),
-				'onFailure': this.onFailure.bind(this)
+				'data': this._params,
+				'success': this.onSuccess.bind(this),
+				'error': this.onFailure.bind(this)
 			}
 		);
 
 		this._counter--;
 	},
 
-	onSuccess: function(resp) {
+	onSuccess: function(_, _, resp) {
 		this.rmwDarken();
 
 		var headers = resp.getAllResponseHeaders();
@@ -319,13 +329,11 @@ var CDoll = Class.create({
 		}
 
 		this._ready = true;
-		this.notify(true, this._pmasterid, this._domid, this._lastupdate, this.counter());
 	},
 
 	onFailure: function(resp) {
 		this.rmwDarken();
 		this._ready = true;
-		this.notify(false, this._pmasterid, this._domid, this._lastupdate, this.counter());
 	},
 
 	setDarken: function() {
@@ -343,13 +351,10 @@ var CDoll = Class.create({
 		obj_params.height = this._domobj.offsetHeight;
 		obj_params.width = this._domobj.offsetWidth;
 
-		Element.extend(this._domdark);
-		this._domdark.setStyle({
-			'top': obj_params.top + 'px',
-			'left': obj_params.left + 'px',
-			'width': obj_params.width + 'px',
-			'height': obj_params.height + 'px'
-		});
+		this._domdark.style.top = obj_params.top + 'px';
+		this._domdark.style.left = obj_params.left + 'px';
+		this._domdark.style.width = obj_params.width + 'px';
+		this._domdark.style.height = obj_params.height + 'px';
 	},
 
 	rmwDarken: function() {
@@ -360,5 +365,4 @@ var CDoll = Class.create({
 			this._domdark = null;
 		}
 	}
-
-});
+};

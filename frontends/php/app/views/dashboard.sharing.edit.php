@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm('post'))->setName('dashboard_sharing_form');
 
 $table_user_groups = (new CTable())
@@ -27,7 +32,7 @@ $table_user_groups = (new CTable())
 			(new CCol(
 				(new CButton(null, _('Add')))
 					->onClick('return PopUp("popup.generic",'.
-						CJs::encodeJson([
+						json_encode([
 							'srctbl' => 'usrgrp',
 							'srcfld1' => 'usrgrpid',
 							'srcfld2' => 'name',
@@ -48,7 +53,7 @@ $table_users = (new CTable())
 			(new CCol(
 				(new CButton(null, _('Add')))
 					->onClick('return PopUp("popup.generic",'.
-						CJs::encodeJson([
+						json_encode([
 							'srctbl' => 'users',
 							'srcfld1' => 'userid',
 							'srcfld2' => 'fullname',
@@ -91,7 +96,7 @@ $form
 $output = [
 	'header' => _('Dashboard sharing'),
 	'body' => $form->toString(),
-	'script_inline' => 
+	'script_inline' =>
 		'jQuery(document).ready(function($) {'.
 			'$("[name='.$form->getName().']").fillDashbrdSharingForm('.json_encode($data['dashboard']).');'.
 		'});',
@@ -99,7 +104,7 @@ $output = [
 		[
 			'title' => _('Update'),
 			'isSubmit' => true,
-			'action' => 'return dashbrdConfirmSharing();'
+			'action' => 'return dashbrdConfirmSharing(overlay);'
 		]
 	]
 ];
@@ -109,4 +114,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

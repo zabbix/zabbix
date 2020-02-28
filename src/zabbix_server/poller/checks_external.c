@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  * Author: Mike Nestor, rewritten by Alexander Vladishev                      *
  *                                                                            *
  ******************************************************************************/
-int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	char		error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;

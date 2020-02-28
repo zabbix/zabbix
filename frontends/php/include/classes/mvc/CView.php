@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,316 +19,199 @@
 **/
 
 
+/**
+ * Class for rendering views.
+ */
 class CView {
 
 	/**
-	 * Name of the template file without extension, for example 'configuration.item.edit'.
+	 * Directory list of MVC views ordered by search priority.
+	 *
+	 * @static
+	 *
+	 * @var array
+	 */
+	private static $directories = ['local/app/views', 'app/views', 'include/views'];
+
+	/**
+	 * Indicates support of web layout modes.
+	 *
+	 * @var boolean
+	 */
+	private $layout_modes_enabled = false;
+
+	/**
+	 * View name.
 	 *
 	 * @var string
 	 */
-	private $filePath;
+	private $name;
 
 	/**
-	 * Hash of 'variable_name'=>'variable_value' to be used inside template.
+	 * Data provided for view.
 	 *
 	 * @var array
 	 */
 	private $data;
 
 	/**
-	 * Actual template object being shown.
-	 *
-	 * @var CTag
-	 */
-	private $template;
-
-	/**
-	 * Scripts on page.
+	 * Directory where the view file was found.
 	 *
 	 * @var string
-	 *
-	 * @deprecated
 	 */
-	private $scripts;
+	private $directory;
 
 	/**
-	 * Javascript code for inclusions on page.
+	 * List of JavaScript files for inclusion into a HTML page using <script src="...">.
 	 *
 	 * @var array
 	 */
-	private $jsIncludePost = [];
+	private $js_files = [];
 
 	/**
-	 * Javascript files for inclusions on page, pre-processed by PHP.
+	 * Create a view based on view name and data.
 	 *
-	 * @var array
+	 * @param string $name  View name to search for.
+	 * @param array  $data  Accessible data within the view.
+	 *
+	 * @throws InvalidArgumentException if view name not valid.
+	 * @throws RuntimeException if view not found or not readable.
 	 */
-	private $jsIncludeFiles = [];
-
-	/**
-	 * Javascript files for inclusions on page, included as <script src="..."></script>.
-	 *
-	 * @var array
-	 */
-	private $jsFiles = [];
-
-	/**
-	 * Don't include jsLoader to the page.
-	 *
-	 * @static
-	 *
-	 * @var bool
-	 */
-	public static $js_loader_disabled = false;
-
-	/**
-	 * Directories where views are stored, ordered by priority include/views should be removed once fully move to MVC.
-	 *
-	 * @static
-	 *
-	 * @var array
-	 */
-	static $viewsDir = ['local/app/views', 'app/views', 'include/views'];
-
-	/**
-	 * Web layout mode enabled flag.
-	 *
-	 * @static
-	 *
-	 * @var boolean
-	 */
-	static $has_web_layout_mode = false;
-
-	/**
-	 * Creates a new view based on provided template file.
-	 *
-	 * @param string $view  Name of a view, located under include/views.
-	 * @param array  $data  Deprecated parameter, use set() and get() methods for passing variables to views.
-	 *
-	 * @throws Exception if file does not exist.
-	 *
-	 * @example $scriptForm = new CView('administration.script.edit');
-	 */
-	public function __construct($view, $data = []) {
-		$this->assign($view);
-		$this->data = $data;
-	}
-
-	/**
-	 * Search file and assigns path to the view file.
-	 *
-	 * @param string $view  Name of the template file without extension.
-	 *
-	 * @throws Exception if invalid filename or file does not exist.
-	 */
-	public function assign($view) {
-		if (!preg_match("/^[a-z\.]+$/", $view)) {
-			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and ".".', $view));
+	public function __construct($name, array $data = []) {
+		if (!preg_match('/^[a-z]+(\/[a-z]+)*(\.[a-z]+)*$/', $name)) {
+			throw new InvalidArgumentException(sprintf('Invalid view name: "%s".', $name));
 		}
 
-		$found = false;
-		foreach (self::$viewsDir as $dir) {
-			$this->filePath = $dir.'/'.$view.'.php';
-			if (file_exists($this->filePath)) {
-				$found = true;
+		$file_path = null;
+
+		foreach (self::$directories as $directory) {
+			$file_path = $directory.'/'.$name.'.php';
+			if (is_file($file_path)) {
+				$this->directory = $directory;
 				break;
 			}
 		}
 
-		if ($found == false) {
-			throw new Exception(_s('File provided to a view does not exist. Tried to find "%s".', $this->filePath));
+		if ($this->directory === null) {
+			throw new RuntimeException(_s('View not found: "%s".', $name));
 		}
-	}
 
-	/**
-	 * Assign value to a named variable.
-	 *
-	 * @param string $var
-	 * @param mixed  $value
-	 *
-	 * @example set('hostName','Host ABC')
-	 */
-	public function set($var, $value) {
-		$this->data[$var] = $value;
-	}
-
-	/**
-	 * Get value by variable name.
-	 *
-	 * @param string $var
-	 *
-	 * @return mixed|string  Variable value. Returns empty string if the variable is not defined.
-	 *
-	 * @example get('hostName')
-	 *
-	 * @deprecated use $data instead
-	 */
-	public function get($var) {
-		return isset($this->data[$var]) ? $this->data[$var] : '';
-	}
-
-	/**
-	 * Get variable of type array by variable name.
-	 *
-	 * @param string $var
-	 *
-	 * @return array  Variable value. Returns empty array if the variable is not defined or not an array.
-	 *
-	 * @example getArray('hosts')
-	 *
-	 * @deprecated use $data instead
-	 */
-	public function getArray($var) {
-		return isset($this->data[$var]) && is_array($this->data[$var]) ? $this->data[$var] : [];
-	}
-
-	/**
-	 * Load and execute view.
-	 * TODO It outputs JavaScript code immediately, should be done in show() or processed separately.
-	 *
-	 * @deprecated  Will not be supported when we fully move to MVC.
-	 *
-	 * @throws Exception if cannot include view file.
-	 *
-	 * @return object  GUI object.
-	 */
-	public function render() {
-		// $data this variable will be used in included file
-		$data = $this->data;
-		ob_start();
-		$this->template = include($this->filePath);
-		if ($this->template === false) {
-			throw new Exception(_s('Cannot include view file "%s".', $this->filePath));
+		if (!is_readable($file_path)) {
+			throw new RuntimeException(_s('View not readable: "%s".', $file_path));
 		}
-		$this->scripts = ob_get_clean();
 
-		/* TODO It is for output of JS code. Should be moved to show() method. */
-		echo $this->scripts;
-		return $this->template;
+		$this->name = $name;
+		$this->data = $data;
 	}
 
 	/**
-	 * The method outputs HTML code based on rendered template. It calls render() if not called already.
+	 * Render view and return the output.
+	 * Note: view should only output textual content like HTML, JSON, scripts or similar.
 	 *
-	 * @deprecated  Will not be supported when we fully move to MVC.
+	 * @throws RuntimeException if view not found, not readable or returned false.
 	 *
-	 * @throws Exception if view is not rendered.
+	 * @return string
 	 */
-	public function show() {
-		if (!isset($this->template)) {
-			throw new Exception(_('View is not rendered.'));
-		}
-		$this->template->show();
-	}
-
-	/**
-	* The method returns HTML/JSON/CVS/etc text based on rendered template.
-	* show() and render() should be made deprecated. View should only output text, no objects, nothing.
-	*/
 	public function getOutput() {
 		$data = $this->data;
+
+		$file_path = $this->directory.'/'.$this->name.'.php';
+
 		ob_start();
-		include($this->filePath);
+
+		if ((include $file_path) === false) {
+			ob_end_clean();
+
+			throw new RuntimeException(_s('Cannot render view: "%s".', $file_path));
+		}
+
 		return ob_get_clean();
 	}
 
 	/**
-	 * Include Java Script code to be executed after page load.
+	 * Get the contents of a PHP-preprocessed JavaScript file.
+	 * Notes:
+	 *   - JavaScript file will be searched in the "js" subdirectory of the view file.
+	 *   - A copy of $data variable will be available for using within the file.
 	 *
-	 * @param string $js  Java Script code.
+	 * @param string $file_name
+	 *
+	 * @throws RuntimeException if the file not found, not readable or returned false.
+	 *
+	 * @return string
 	 */
-	public function addPostJS($js) {
-		$this->jsIncludePost[] = $js;
-	}
+	public function readJsFile($file_name) {
+		$data = $this->data;
 
-	/**
-	 * Include Java Script file required for the view into HTML.
-	 *
-	 * @param string $filename  Name of java Script file, will be pre-processed by PHP.
-	 */
-	public function includeJSfile($filename) {
-		$this->jsIncludeFiles[] = $filename;
-	}
+		$file_path = $this->directory.'/js/'.$file_name;
 
-	/**
-	 * Add Java Script file required for the view as <script src="..."></script>.
-	 *
-	 * @param string $filename  Name of java Script file.
-	 */
-	public function addJsFile($filename) {
-		$this->jsFiles[] = $filename;
-	}
-
-	/**
-	 * Get content of all Java Script code.
-	 *
-	 * @return string  Java Script code.
-	 */
-	public function getPostJS() {
-		if ($this->jsIncludePost) {
-			return get_js(implode("\n", $this->jsIncludePost));
-		}
-
-		return '';
-	}
-
-	/**
-	 * Get content of all included Java Script files.
-	 *
-	 * @throws Exception if cannot include JS file.
-	 *
-	 * @return string  Empty string or content of included JS files.
-	 */
-	public function getIncludedJS() {
 		ob_start();
-		foreach ($this->jsIncludeFiles as $filename) {
-			if((include $filename) === false) {
-				throw new Exception(_s('Cannot include JS file "%s".', $filename));
-			}
+
+		if ((include $file_path) === false) {
+			ob_end_clean();
+
+			throw new RuntimeException(_s('Cannot read file: "%s".', $file_path));
 		}
+
 		return ob_get_clean();
 	}
 
 	/**
-	 * Get content of all included Java Script files.
+	 * Include a PHP-preprocessed JavaScript file inline.
+	 * Notes:
+	 *   - JavaScript file will be searched in the "js" subdirectory of the view file.
+	 *   - A copy of $data variable will be available for using within the file.
 	 *
-	 * @return array|string  Empty string or array of path of included JS files.
+	 * @param string $file_name
+	 *
+	 * @throws RuntimeException if the file not found, not readable or returned false.
 	 */
-	public function getAddedJS() {
-		return $this->jsFiles;
+	public function includeJsFile($file_name) {
+		echo $this->readJsFile($file_name);
 	}
 
 	/**
-	 * Return layout mode setting.
+	 * Add a native JavaScript file to this view.
 	 *
-	 * @return int
+	 * @param string $src
 	 */
-	public static function getLayoutMode() {
-		if (self::$has_web_layout_mode) {
-			return (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+	public function addJsFile($src) {
+		$this->js_files[] = $src;
+	}
+
+	/**
+	 * Get list of native JavaScript files added to this view.
+	 *
+	 * @return array
+	 */
+	public function getJsFiles() {
+		return $this->js_files;
+	}
+
+	/**
+	 * Enable support of web layout modes.
+	 */
+	public function enableLayoutModes() {
+		$this->layout_modes_enabled = true;
+	}
+
+	/**
+	 * Get current layout mode if layout modes were enabled for this view, or ZBX_LAYOUT_NORMAL otherwise.
+	 *
+	 * @return int  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_FULLSCREEN | ZBX_LAYOUT_KIOSKMODE
+	 */
+	public function getLayoutMode() {
+		return $this->layout_modes_enabled ? CViewHelper::loadLayoutMode() : ZBX_LAYOUT_NORMAL;
+	}
+
+	/**
+	 * Register custom directory of MVC views. The last registered will have the first priority.
+	 *
+	 * @param string $directory
+	 */
+	public static function registerDirectory($directory) {
+		if (!in_array($directory, self::$directories)) {
+			array_unshift(self::$directories, $directory);
 		}
-		else {
-			return ZBX_LAYOUT_NORMAL;
-		}
-	}
-
-	/**
-	 * Update layout mode setting
-	 *
-	 * @param int $layout_mode  Possible values ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_FULLSCREEN|ZBX_LAYOUT_KIOSKMODE.
-	 */
-	public static function setLayoutMode($layout_mode) {
-		CProfile::update('web.layout.mode', $layout_mode, PROFILE_TYPE_INT);
-	}
-
-	/**
-	 * Don't include jsLoader to the page.
-	 *
-	 * @return CView
-	 */
-	public function disableJsLoader() {
-		self::$js_loader_disabled = true;
-
-		return $this;
 	}
 }

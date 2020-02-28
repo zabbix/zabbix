@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,11 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.housekeeping.edit.js.php');
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('administration.housekeeping.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Housekeeping'))
@@ -64,7 +68,7 @@ $house_keeper_tab = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Auto-registration data storage period'), 'hk_events_autoreg'))
+		(new CLabel(_('Autoregistration data storage period'), 'hk_events_autoreg'))
 			->setAsteriskMark(),
 		(new CTextBox('hk_events_autoreg', $data['hk_events_autoreg']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,15 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/FilterTrait.php';
 
 /**
  * @backup widget
  * @backup profiles
  */
 class testProblemsBySeverityWidget extends CWebTest {
+
+	use FilterTrait;
 
 	/*
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -48,6 +51,34 @@ class testProblemsBySeverityWidget extends CWebTest {
 					'check' => [
 						'pop-up' => true,
 						'disabled' => true
+					]
+				]
+			],
+			// Host groups: 4 tags with Or operator, at least one of them should be present.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'HG: Four Or tags in filter',
+						'Tags' => 'Or'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => ''],
+						['name' => 'server', 'operator' => 'Contains', 'value' => ''],
+						['name' => 'Alpha', 'operator' => 'Contains', 'value' => ''],
+						['name' => 'Delta', 'operator' => 'Contains', 'value' => '']
+					],
+					'expected' => [
+						'Group to check triggers filtering' => [
+							'Average' => '1',
+						],
+						'Host group for tag permissions' => [
+							'Not classified' => '2'
+						],
+						'Zabbix servers' => [
+							'Average' => '1',
+							'Warning' => '4'
+						]
 					]
 				]
 			],
@@ -273,6 +304,26 @@ class testProblemsBySeverityWidget extends CWebTest {
 					'check' => [
 						'pop-up' => true,
 						'disabled' => true
+					]
+				]
+			],
+			// Totals: widget with 3 tags set up in tag filter with Or operator.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Totals: Four Or tags in filter',
+						'Show' => 'Totals',
+						'Tags' => 'Or'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
+						['name' => 'Alpha', 'operator' => 'Contains', 'value' => ''],
+						['name' => 'Delta', 'operator' => 'Equals', 'value' => 'd']
+					],
+					'expected' => [
+						'Average' => '1',
+						'Warning' => '3'
 					]
 				]
 			],
@@ -648,7 +699,6 @@ class testProblemsBySeverityWidget extends CWebTest {
 						],
 						'Severity' => ['Disaster', 'High', 'Average', 'Warning', 'Information', 'Not classified']
 					],
-
 					'expected' => [],
 					'check' => [
 						'empty' => true
@@ -705,7 +755,6 @@ class testProblemsBySeverityWidget extends CWebTest {
 						'Problem display' => 'Unacknowledged only',
 						'Show operational data' => 'Separately',
 						'Show timeline' => false
-
 					],
 					'expected' => [
 						'Disaster' => '1',
@@ -861,6 +910,309 @@ class testProblemsBySeverityWidget extends CWebTest {
 						'disabled' => true
 					]
 				]
+			],
+			// Host groups: Use tag filter option with a single tag that is equal to a certain value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'HG: Single tag filter equals value'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc']
+					],
+					'check' => [
+						'pop-up' => true,
+						'disabled' => true
+					],
+					'expected' => [
+						'Zabbix servers' => [
+							'Average' => '1',
+							'Warning' => '1'
+						]
+					]
+				]
+			],
+			// Host groups: Display all problems that have a certain tag.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'HG: Single tag filter with empty value'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => '']
+					],
+					'expected' => [
+						'Host group for tag permissions' => [
+							'Not classified' => '2'
+						],
+						'Zabbix servers' => [
+							'Average' => '1',
+							'Warning' => '1'
+						]
+					]
+				]
+			],
+			// Host groups: Show all problems that have 2 speciffic tags, one of them contains a speciffic value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'HG: Two And/Or tags in filter'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
+						['name' => 'Database', 'operator' => 'Contains', 'value' => '']
+					],
+					'expected' => [
+						'Zabbix servers' => [
+							'Average' => '1'
+						]
+					]
+				]
+			],
+			// Host groups: Show all problems that have at least one of 2 speciffic tags, one of them contains a value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'HG: Two Or tags in filter',
+						'Tags' => 'Or'
+					],
+					'check' => [
+						'pop-up' => true
+					],
+					'tags' => [
+						['name' => 'service', 'operator' => 'Contains', 'value' => 'abc'],
+						['name' => 'Street', 'operator' => 'Contains', 'value' => '']
+					],
+					'expected' => [
+						'Group to check triggers filtering' => [
+							'Average' => '1'
+						],
+						'Zabbix servers' => [
+							'Average' => '1'
+						]
+					]
+				]
+			],
+			// Host groups: 2 tags with And/Or operator, one of them contains a value and the other is equal to a value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'HG: Two And/Or tags in filter 2'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
+						['name' => 'Tag5', 'operator' => 'Equals', 'value' => '5']
+					],
+					'expected' => [
+						'Zabbix servers' => [
+							'Average' => '1'
+						]
+					]
+				]
+			],
+			// Host groups: 2 tags with Or operator, one of them contains a value and the other is equal to a value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'HG: Two Or tags in filter 2',
+						'Tags' => 'Or'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
+						['name' => 'Tag5', 'operator' => 'Equals', 'value' => '5']
+					],
+					'expected' => [
+						'Zabbix servers' => [
+							'Average' => '1',
+							'Warning' => '1'
+						]
+					]
+				]
+			],
+			// Host groups: 2 tags with Or operator, both of them equal to speciffic values.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Two Or tags in filter 3',
+						'Tags' => 'Or'
+					],
+					'tags' => [
+						['name' => 'Alpha', 'operator' => 'Equals', 'value' => 'a'],
+						['name' => 'Delta', 'operator' => 'Equals', 'value' => 't']
+					],
+					'expected' => [
+						'Zabbix servers' => [
+							'Warning' => '3'
+						]
+					]
+				]
+			],
+			// Host groups: A tag that doesn't exist.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'HG: Widget with a non-existing tag in filter'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'zabbix']
+					],
+					'expected' => []
+				]
+			],
+			// Totals: Use tag filter option with a single tag that is equal to a certain value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Totals: Single tag filter equals value',
+						'Show' => 'Totals'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc']
+					],
+					'check' => [
+						'pop-up' => true,
+						'disabled' => true,
+						'rows' => 1
+					],
+					'expected' => [
+						'Average' => '1',
+						'Warning' => '1',
+					]
+				]
+			],
+			// Totals: Display all problems that have a certain tag.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Totals: Single tag filter with empty value',
+						'Show' => 'Totals'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => '']
+					],
+					'expected' => [
+						'Average' => '1',
+						'Warning' => '1',
+						'Not classified' => '2'
+					]
+				]
+			],
+			// Totals: Show all problems that have 2 speciffic tags, one of them contains a speciffic value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Totals: Two And/Or tags in filter',
+						'Show' => 'Totals'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
+						['name' => 'Database', 'operator' => 'Contains', 'value' => '']
+					],
+					'expected' => [
+						'Average' => '1'
+					]
+				]
+			],
+			// Totals: Show all problems that have at least one of 2 speciffic tags, one of them contains a value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Totals: Two Or tags in filter',
+						'Show' => 'Totals',
+						'Tags' => 'Or'
+					],
+					'check' => [
+						'pop-up' => true,
+						'rows' => 3
+					],
+					'tags' => [
+						['name' => 'service', 'operator' => 'Contains', 'value' => 'abc'],
+						['name' => 'Street', 'operator' => 'Contains', 'value' => '']
+					],
+					'expected' => [
+						'Average' => '2'
+					]
+				]
+			],
+			// Totals: 2 tags with And/Or operator, one of them contains a value and the other is equal to a value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Totals: Two And/Or tags in filter 2',
+						'Show' => 'Totals'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
+						['name' => 'Tag5', 'operator' => 'Equals', 'value' => '5']
+					],
+					'expected' => [
+							'Average' => '1'
+					]
+				]
+			],
+			// Totals: 2 tags with Or operator, one of them contains a value and the other is equal to a value.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Totals: Two Or tags in filter 2',
+						'Show' => 'Totals',
+						'Tags' => 'Or'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
+						['name' => 'Tag5', 'operator' => 'Equals', 'value' => '5']
+					],
+					'expected' => [
+						'Average' => '1',
+						'Warning' => '1'
+					]
+				]
+			],
+			// Totals: 2 tags with Or operator, both of them equal to speciffic values.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Totals: Two Or tags in filter 3',
+						'Show' => 'Totals',
+						'Tags' => 'Or'
+					],
+					'tags' => [
+						['name' => 'Alpha', 'operator' => 'Equals', 'value' => 'a'],
+						['name' => 'Delta', 'operator' => 'Equals', 'value' => 't']
+					],
+					'expected' => [
+						'Warning' => '3'
+					]
+				]
+			],
+			// Totals: A tag that doesn't exist.
+			[
+				[
+					'fields' => [
+						'Type' => 'Problems by severity',
+						'Name' => 'Totals: Widget with a non-existing tag in filter',
+						'Show' => 'Totals'
+					],
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Contains', 'value' => 'zabbix']
+					],
+					'expected' => []
+				]
 			]
 		];
 	}
@@ -915,7 +1267,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$dashboard->edit();
 		$form = $dashboard->getWidget('Reference widget')->edit();
 		$form->submit();
-		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->query('id:overlay-bg')->waitUntilNotVisible();
 
 		$widget = $dashboard->getWidget('Reference widget');
 		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
@@ -1034,6 +1386,8 @@ class testProblemsBySeverityWidget extends CWebTest {
 
 	private function fillFormAndSaveDashboard($dashboard, $form, $data, $header) {
 		$form->fill($data['fields']);
+		COverlayDialogElement::find()->one()->waitUntilReady();
+
 		if (CTestArrayHelper::get($data, 'check.disabled', false)) {
 			if (CTestArrayHelper::get($data['fields'], 'Show', 'Host groups') === 'Totals') {
 				$this->assertTrue($form->getField('Layout')->isEnabled());
@@ -1044,8 +1398,12 @@ class testProblemsBySeverityWidget extends CWebTest {
 				$this->assertTrue($form->getField('Layout')->isEnabled(false));
 			}
 		}
+		if (CTestArrayHelper::get($data,'tags',false)) {
+			$this->setFilterSelector('id:tags_table_tags');
+			$this->setTags($data['tags']);
+		}
 		$form->submit();
-		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->query('id:overlay-bg')->waitUntilNotVisible();
 		$widget = $dashboard->getWidget($header);
 		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();

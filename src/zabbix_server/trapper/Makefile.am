@@ -14,4 +14,6 @@ libzbxtrapper_a_SOURCES = \
 	trapper.c \
 	trapper.h \
 	trapper_preproc.c \
-	trapper_preproc.h
+	trapper_preproc.h \
+	trapper_item_test.c \
+	trapper_item_test.h

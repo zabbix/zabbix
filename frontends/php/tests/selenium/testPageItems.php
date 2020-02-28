@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ class testPageItems extends CLegacyWebTest {
 			);
 		}
 
-		$this->zbxTestAssertElementText("//button[@value='item.masscheck_now'][@disabled]", 'Check now');
+		$this->zbxTestAssertElementText("//button[@value='item.masscheck_now'][@disabled]", 'Execute now');
 
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history', 'Delete');
@@ -90,7 +90,7 @@ class testPageItems extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');
-		$this->zbxTestClickButtonText('Check now');
+		$this->zbxTestClickButtonText('Execute now');
 
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot send request');

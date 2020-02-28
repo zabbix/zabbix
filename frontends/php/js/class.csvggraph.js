@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2020 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -117,10 +117,12 @@ jQuery(function ($) {
 
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
-			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
+			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0', graph.parent());
 			data.isHintBoxFrozen = true;
 			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
-			overlayDialogueOnLoad(true, graph.hintBoxItem);
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				$('.dashbrd-grid-container')
@@ -343,7 +345,7 @@ jQuery(function ($) {
 
 					label = label.join(',').split(',');
 
-					var direction = (IE || ED) // IE11 & Edge transforms 'd' attribute.
+					var direction = ED // Edge transforms 'd' attribute.
 							? direction_string.substr(1).replace(/([ML])\s(\d+)\s(\d+)/g, '$1$2\,$3').split(' ')
 							: direction_string.substr(1).split(' '),
 						index = direction.length,
@@ -424,7 +426,7 @@ jQuery(function ($) {
 			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + mouse_distance)
 				? e.clientX + mouse_distance - offset.left
 				: e.clientX - mouse_distance - hbox.outerWidth() - offset.left,
-			t = e.pageY - offset.top - graph.parent().scrollTop(),
+			t = e.pageY - offset.top,
 			t = page_bottom >= t + offset.top + hbox.outerHeight() + mouse_distance
 				? t + mouse_distance
 				: t - mouse_distance - hbox.outerHeight();

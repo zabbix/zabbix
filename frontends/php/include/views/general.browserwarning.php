@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
 <!DOCTYPE html>
 <html>
@@ -55,8 +58,8 @@
 						<a target="_blank" href="http://www.mozilla.org/firefox">Mozilla Firefox</a>
 					</li>
 					<li>
-						<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie"><div class="<?= ZBX_STYLE_BROWSER_LOGO_IE ?>"></div></a>
-						<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie">Internet Explorer</a>
+						<a target="_blank" href="https://www.microsoft.com/en-us/edge"><div class="<?= ZBX_STYLE_BROWSER_LOGO_ED ?>"></div></a>
+						<a target="_blank" href="https://www.microsoft.com/en-us/edge">Microsoft Edge</a>
 					</li>
 					<li>
 						<a target="_blank" href="http://www.opera.com/download"><div class="<?= ZBX_STYLE_BROWSER_LOGO_OPERA ?>"></div></a>

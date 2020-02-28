@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -400,10 +400,8 @@ if (hasRequest('form')) {
 		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))
 	];
 
-	// render view
-	$itemView = new CView('configuration.host.prototype.edit', $data);
-	$itemView->render();
-	$itemView->show();
+	// Render view.
+	echo (new CView('configuration.host.prototype.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -484,9 +482,7 @@ else {
 	}
 
 	// render view
-	$itemView = new CView('configuration.host.prototype.list', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.host.prototype.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

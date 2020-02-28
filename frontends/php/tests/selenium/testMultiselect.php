@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,10 +20,27 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
+/**
+ * @browsers chrome
+ *
+ * @on-before disableDebugMode
+ * @on-after enableDebugMode
+ */
 class testMultiselect extends CWebTest {
 
-	public function testMultiselect_disableDebugMode() {
-		DBexecute('UPDATE usrgrp SET debug_mode=0 WHERE usrgrpid=7');
+	/*
+	 * Debug button sometimes changes pages layout.
+	 */
+	public static function setDebugMode($value) {
+		DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($value).' WHERE usrgrpid=7');
+	}
+
+	public function disableDebugMode() {
+		self::setDebugMode(0);
+	}
+
+	public static function enableDebugMode() {
+		self::setDebugMode(1);
 	}
 
 	public function testMultiselect_SuggestExisting() {
@@ -73,17 +90,21 @@ class testMultiselect extends CWebTest {
 	}
 
 	public function testMultiselect_SuggestInOverlay() {
+		$widget = 'Plain text';
+
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->query('button:Create dashboard')->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilVisible()
-			->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
 		$dialog->close();
 		$dashboard = CDashboardElement::find()->one();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
-		$form->getField('Type')->asDropdown()->select('Plain text');
-		$form->invalidate();
+		$widget_type = $form->getField('Type')->asDropdown()->getText();
+		if($widget_type !== $widget){
+			$form->getField('Type')->asDropdown()->select($widget);
+			$form->waitUntilReloaded();
+		}
 		$element = $form->getField('Items')->query('tag:input')->one();
 		$element->type('Zab');
 		$this->query('class:multiselect-suggest')->waitUntilVisible();

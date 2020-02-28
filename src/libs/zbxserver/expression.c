@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2958,6 +2958,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					get_event_value(m, event, &replace_to, userid);
 				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_ID);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -3252,6 +3257,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to, userid);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_ID);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
@@ -3558,7 +3568,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 			}
-			else if (0 == indexed_macro && EVENT_SOURCE_AUTO_REGISTRATION == c_event->source)
+			else if (0 == indexed_macro && EVENT_SOURCE_AUTOREGISTRATION == c_event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -3690,6 +3700,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					get_event_value(m, event, &replace_to, userid);
 				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_ID);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_HOST);
@@ -3817,6 +3831,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to, userid);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_ID);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{

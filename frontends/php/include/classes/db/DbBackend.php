@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
  * Abstract database backend class.
  */
 abstract class DbBackend {
+
+	protected $warning;
 
 	protected $error;
 
@@ -107,5 +109,30 @@ abstract class DbBackend {
 	 */
 	public function getError() {
 		return $this->error;
+	}
+
+	/**
+	 * Check database and table fields encoding.
+	 *
+	 * @return bool
+	 */
+	abstract public function checkEncoding();
+
+	/**
+	 * Set warning message.
+	 *
+	 * @param string $message
+	 */
+	public function setWarning($message) {
+		$this->warning = $message;
+	}
+
+	/**
+	 * Get warning message.
+	 *
+	 * @return mixed
+	 */
+	public function getWarning() {
+		return $this->warning;
 	}
 }

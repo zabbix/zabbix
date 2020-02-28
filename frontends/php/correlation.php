@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -425,9 +425,7 @@ if (hasRequest('form')) {
 	$data['correlation']['operations'] = $checked;
 
 	// Render view.
-	$correlationView = new CView('configuration.correlation.edit', $data);
-	$correlationView->render();
-	$correlationView->show();
+	echo (new CView('configuration.correlation.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -493,9 +491,7 @@ else {
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['correlations'], $sortOrder, new CUrl('correlation.php'));
 
 	// Render view.
-	$correlationView = new CView('configuration.correlation.list', $data);
-	$correlationView->render();
-	$correlationView->show();
+	echo (new CView('configuration.correlation.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

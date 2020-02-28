@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ class testPageDashboardWidgets extends CWebTest {
 	 */
 	private function checkLastSelectedWidgetType($type = 'Action log', $db_type = null) {
 		$dashboard = CDashboardElement::find()->one();
-		$this->query('id:overlay_bg')->waitUntilNotVisible();
+		$this->query('id:overlay-bg')->waitUntilNotVisible();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$this->assertEquals($type, $form->getField('Type')->getValue());
@@ -149,7 +149,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Expected table values.
 		$expected = [
 			'Host group for tag permissions'	=> 1,
-			'Zabbix servers'					=> 18,
+			'Zabbix servers'					=> 19,
 			'ZBX6648 All Triggers'				=> 1,
 			'ZBX6648 Disabled Triggers'			=> 1,
 			'ZBX6648 Enabled Triggers'			=> 1
@@ -179,8 +179,10 @@ class testPageDashboardWidgets extends CWebTest {
 
 		// Create a new dashboard.
 		$this->query('button:Create dashboard')->one()->click();
+		$this->page->waitUntilReady();
+
 		// Wait until overlay dialog is visible and ready.
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Check title of a dialog.
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
@@ -209,7 +211,8 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 
 		$this->query('button:Create dashboard')->one()->click();
-		$dialog = $this->query('id:overlay_dialogue')->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
+		$this->page->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
 		$configuration = $dialog->asForm();

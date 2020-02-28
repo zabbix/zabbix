@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,16 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $output = [
-	'body' => (new CView('monitoring.latest.view.html', $data))->getOutput()
+	'body' => (new CPartial('monitoring.latest.view.html', $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

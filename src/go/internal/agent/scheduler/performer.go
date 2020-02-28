@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-// performer interface is implemented by task to
+// performer interface provides common access to plugin tasks
 type performer interface {
 	// returns the task plugin
 	getPlugin() *pluginAgent

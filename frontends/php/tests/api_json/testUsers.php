@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -970,12 +970,12 @@ class testUsers extends CAPITest {
 					],
 					'user_medias' => [
 						[
-							'mediatypeid' => '10',
+							'mediatypeid' => '1234',
 							'sendto' => 'api@zabbix.com'
 						]
 					],
 				],
-				'expected_error' => 'Media type with ID "10" is not available.'
+				'expected_error' => 'Media type with ID "1234" is not available.'
 			],
 			// Check user media, sendto.
 			[

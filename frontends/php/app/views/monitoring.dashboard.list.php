@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,17 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
 $this->addJsFile('layout.mode.js');
 
-$web_layout_mode = CView::getLayoutMode();
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
 
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
@@ -37,7 +42,7 @@ $widget = (new CWidget())
 					->setArgument('new', '1')
 					->getUrl()
 			))
-		->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	);

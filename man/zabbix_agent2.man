@@ -44,11 +44,13 @@ zabbix_agent2 \- Zabbix agent 2
 .B zabbix_agent2
 .RB [ \-c
 .IR config\-file ]
+.RB [ \-v ]
 .B \-p
 .br
 .B zabbix_agent2
 .RB [ \-c
 .IR config\-file ]
+.RB [ \-v ]
 .B \-t
 .I item\-key
 .br
@@ -138,6 +140,8 @@ Unsigned integer.
 .IP "\fB\-t\fR, \fB\-\-test\fR \fIitem\-key\fR"
 Test single item and exit.
 See \fB\-\-print\fR for output description.
+.IP "\fB\-v\fR, \fB\-\-verbose\fR"
+Enable verbose output when test item or print known items.
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"
@@ -151,10 +155,11 @@ Default location of Zabbix agent 2 configuration file (if not modified during co
 Documentation
 .UE
 .PP
-.BR zabbix_agent (8),
-.BR zabbix_get (8),
+.BR zabbix_agentd (8),
+.BR zabbix_get (1),
 .BR zabbix_proxy (8),
-.BR zabbix_sender (8),
-.BR zabbix_server (8)
+.BR zabbix_sender (1),
+.BR zabbix_server (8),
+.BR zabbix_js (1)
 .SH AUTHOR
 Zabbix LLC

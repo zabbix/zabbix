@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,8 +98,6 @@ class CControllerWebView extends CController {
 			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
 			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
 		]);
-
-		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Web monitoring'));

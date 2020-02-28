@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -213,7 +213,7 @@ zbx_item_authtype_t;
 /* event sources */
 #define EVENT_SOURCE_TRIGGERS		0
 #define EVENT_SOURCE_DISCOVERY		1
-#define EVENT_SOURCE_AUTO_REGISTRATION	2
+#define EVENT_SOURCE_AUTOREGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
 #define EVENT_SOURCE_COUNT		4
 
@@ -431,6 +431,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HOUSEKEEPER_EXECUTE	"housekeeper_execute"
 #define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
 #define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
+#define ZBX_SNMP_CACHE_RELOAD	"snmp_cache_reload"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -899,6 +900,7 @@ zbx_task_t;
 #define ZBX_RTC_LOG_LEVEL_DECREASE	2
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
 #define ZBX_RTC_CONFIG_CACHE_RELOAD	8
+#define ZBX_RTC_SNMP_CACHE_RELOAD	9
 
 typedef enum
 {
@@ -1229,6 +1231,15 @@ int	__zbx_open(const char *pathname, int flags);
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
 
+typedef struct
+{
+	zbx_fs_time_t	modification_time;	/* time of last modification */
+	zbx_fs_time_t	access_time;		/* time of last access */
+	zbx_fs_time_t	change_time;		/* time of last status change */
+}
+zbx_file_time_t;
+
+int	zbx_get_file_time(const char *path, zbx_file_time_t *time);
 void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);

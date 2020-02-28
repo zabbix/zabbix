@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,9 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'hide_empty_groups' => $fields['hide_empty_groups'],
 			'show_opdata' => $fields['show_opdata'],
 			'ext_ack' => $fields['ext_ack'],
-			'show_timeline' => $fields['show_timeline']
+			'show_timeline' => $fields['show_timeline'],
+			'evaltype' => $fields['evaltype'],
+			'tags' => $fields['tags']
 		];
 
 		$data = getSystemStatusData($filter);

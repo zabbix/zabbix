@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
 
@@ -58,13 +62,7 @@ $filter_column1 = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Severity'),
-		(new CCheckBoxList('filter_priority'))
-			->setOptions($data['config_priorities'])
-			->setChecked($data['filter_priority'])
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass(ZBX_STYLE_COLUMNS_3)
-	)
+	->addRow(_('Severity'),	(new CSeverityCheckBoxList('filter_priority'))->setChecked($data['filter_priority']))
 	->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter_state']))
 			->addValue(_('all'), -1)
@@ -343,4 +341,4 @@ $triggers_form->addItem([
 // append form to widget
 $widget->addItem($triggers_form);
 
-return $widget;
+$widget->show();

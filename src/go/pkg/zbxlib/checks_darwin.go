@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 */
@@ -103,6 +104,8 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		return unsafe.Pointer(C.VFS_FS_INODE)
 	case "vfs.fs.size":
 		return unsafe.Pointer(C.VFS_FS_SIZE)
+	case "vfs.fs.get":
+		return unsafe.Pointer(C.VFS_FS_GET)
 	case "vm.memory.size":
 		return unsafe.Pointer(C.VM_MEMORY_SIZE)
 

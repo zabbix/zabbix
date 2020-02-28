@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,18 +19,23 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
 
-$this->includeJSfile('app/views/monitoring.latest.view.js.php');
+$this->includeJsFile('monitoring.latest.view.js.php');
 
-$web_layout_mode = CView::getLayoutMode();
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
 
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
-		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen'))))
+		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -80,7 +85,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					(new CButton('application_name', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->onClick('return PopUp("popup.generic",'.
-							CJs::encodeJson([
+							json_encode([
 								'srctbl' => 'applications',
 								'srcfld1' => 'name',
 								'dstfrm' => 'zbx_filter',
@@ -104,18 +109,16 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	);
 }
 
-$widget->addItem((new CView('monitoring.latest.view.html', array_intersect_key($data, array_flip([
+$widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data, array_flip([
 	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set',
 	'paging'
-]))))->getOutput());
+]))));
 
 $widget->show();
 
 // Initialize page refresh only if the filter is sufficient for data selection.
 if ($data['filter_set']) {
-	$this->addPostJS(
-		'jQuery(function($) {'.
-			'latest_page.start();'.
-		'});'
-	);
+	(new CScriptTag('latest_page.start();'))
+		->setOnDocumentReady()
+		->show();
 }

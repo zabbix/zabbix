@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testFormUserProfile extends CLegacyWebTest {
 
-	public function testFormProfile_SimpleUpdate() {
+	public function testFormUserProfile_SimpleUpdate() {
 		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,type,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
@@ -37,7 +37,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 	}
 
-	public function testFormProfile_Cancel() {
+	public function testFormUserProfile_Cancel() {
 		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,type,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
@@ -88,7 +88,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	/**
 	 * @dataProvider passwords
 	 */
-	public function testFormProfile_PasswordChange($data) {
+	public function testFormUserProfile_PasswordChange($data) {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
@@ -113,7 +113,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		}
 	}
 
-	public function testFormProfile_ThemeChange() {
+	public function testFormUserProfile_ThemeChange() {
 		$sqlHashUsers = "select * from users where alias<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
@@ -200,7 +200,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	/**
 	 * @dataProvider refresh
 	 */
-	public function testFormProfile_RefreshTime($data) {
+	public function ttestFormUserProfile_RefreshTime($data) {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
@@ -307,7 +307,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	/**
 	 * @dataProvider autologout
 	 */
-	public function testFormProfile_AutologoutTime($data) {
+	public function testFormUserProfile_AutologoutTime($data) {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
@@ -424,7 +424,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	/**
 	 * @dataProvider messaging
 	 */
-	public function testFormProfile_MessagesTimeout($data) {
+	public function testFormUserProfile_MessagesTimeout($data) {
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestTabSwitch('Messaging');
@@ -482,7 +482,7 @@ class testFormUserProfile extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => '',
-				'error_msg' => 'Incorrect value for field "sendto_emails": cannot be empty.'
+				'error_msg' => 'Incorrect value for field "sendto": cannot be empty.'
 			]],
 			[[
 				'expected' => TEST_BAD,
@@ -526,7 +526,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	/**
 	 * @dataProvider media
 	 */
-	public function testFormProfile_Media($data) {
+	public function testFormUserProfile_Media($data) {
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestTabSwitch('Media');
@@ -538,7 +538,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('send_to', $data) & !array_key_exists('type', $data)) {
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto_emails_0"]', $data['send_to']);
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto"]', $data['send_to']);
 		}
 		else {
 			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto"]', $data['send_to']);
@@ -553,7 +553,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestWaitForPageToLoad();
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay-bg']"));
 				$this->zbxTestClickWait('update');
 				$this->zbxTestCheckHeader('Global view');
 				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";

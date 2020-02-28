@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,7 @@
 (function($) {
 	'use strict';
 
-	function setDisabled(e) {
-		if ($(this)[0] !== e.target) {
-			return;
-		}
-
-		var obj = e.data;
-
-		obj.options.disabled = (e.type === 'disable');
+	function updateProperties(obj, $elm) {
 		obj.$hidden.prop('disabled', obj.options.disabled ? true : null);
 		obj.$input
 			.prop('disabled', obj.options.disabled ? true : null)
@@ -38,9 +31,33 @@
 			.prop('disabled', obj.options.disabled ? true : null)
 			.prop('title', obj.options.disabled ? '' : obj.options.hint);
 
-		$(this)
+		$elm
 			.toggleClass('multilineinput-readonly', (obj.options.readonly && !obj.options.disabled))
 			.toggleClass('multilineinput-disabled', obj.options.disabled);
+	}
+
+	function setDisabled(e) {
+		if ($(this)[0] !== e.target) {
+			return;
+		}
+
+		var obj = e.data,
+			$elm = $(this);
+
+		obj.options.disabled = (e.type === 'disable');
+		updateProperties(obj, $elm);
+	}
+
+	function setReadOnly(e) {
+		if ($(this)[0] !== e.target) {
+			return;
+		}
+
+		var obj = e.data,
+			$elm = $(this);
+
+		obj.options.readonly = (e.type === 'readonly');
+		updateProperties(obj, $elm);
 	}
 
 	function openModal(e) {
@@ -208,6 +225,7 @@
 					.data('multilineInput', obj)
 					.append(obj.$hidden, obj.$input, obj.$button)
 					.on('disable enable', obj, setDisabled)
+					.on('readonly readwrite', obj, setReadOnly)
 					.trigger(obj.options.disabled ? 'disable' : 'enable');
 
 				methods.value.call($this, obj.options.value);
@@ -241,7 +259,17 @@
 		enable: function() {
 			return this.each(function() {
 				$(this).trigger('enable');
-			})
+			});
+		},
+		setReadOnly: function() {
+			return this.each(function() {
+				$(this).trigger('readonly');
+			});
+		},
+		unsetReadOnly: function() {
+			return this.each(function() {
+				$(this).trigger('readwrite');
+			});
 		},
 		destroy: function() {}
 	};

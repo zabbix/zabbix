@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 require_once dirname(__FILE__).'/js/common.template.edit.js.php';
@@ -103,7 +107,7 @@ if ($data['readonly']) {
 	foreach ($data['interfaces'] as $interface) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');');
+	zbx_add_post_js('hostInterfacesManager.add('.json_encode($data['interfaces']).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	$hostList->addVar('interfaces', $data['interfaces']);
@@ -188,7 +192,7 @@ if ($data['readonly']) {
 // Interfaces for normal hosts.
 else {
 	zbx_add_post_js($data['interfaces']
-		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
+		? 'hostInterfacesManager.add('.json_encode($data['interfaces']).');'
 		: 'hostInterfacesManager.addNew("agent");');
 
 	$hostList->addRow('',
@@ -686,21 +690,16 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 		)
 );
 
-/*
- * Tags
- */
+// tags
 if (!$data['readonly']) {
-	$tags_view = new CView('configuration.tags.tab', [
+	$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 		'source' => 'host',
 		'tags' => $data['tags'],
 		'readonly' => false
-	]);
-	$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
+	]));
 }
 
-/*
- * Macros
- */
+// macros
 $divTabs->addTab('macroTab', _('Macros'),
 	(new CFormList('macrosFormList'))
 		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
@@ -708,11 +707,11 @@ $divTabs->addTab('macroTab', _('Macros'),
 			->addValue(_('Inherited and host macros'), 1)
 			->setModern(true)
 		)
-		->addRow(null, new CObject((new CView('hostmacros.list.html', [
+		->addRow(null, new CPartial('hostmacros.list.html', [
 			'macros' => $data['macros'],
 			'show_inherited_macros' => $data['show_inherited_macros'],
 			'readonly' => $data['readonly']
-		]))->getOutput()), 'macros_container')
+		]), 'macros_container')
 );
 
 $inventoryFormList = new CFormList('inventorylist');
@@ -855,4 +854,4 @@ else {
 $frmHost->addItem($divTabs);
 $widget->addItem($frmHost);
 
-return $widget;
+$widget->show();

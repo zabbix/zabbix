@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 if ($data['uncheck']) {
 	uncheckTableRows('mediatype');
@@ -131,7 +135,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		->onClick('return PopUp("popup.mediatypetest.edit",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.mediatypetest.edit",'.json_encode([
 			'mediatypeid' => $mediaType['mediatypeid']
 		]).', "mediatypetest_edit", this);');
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import (
 
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
+	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/version"
 )
@@ -66,6 +67,7 @@ func Start(taskManager scheduler.Scheduler, confFilePath string) (err error) {
 		log.Debugf("%s", err.Error())
 	}()
 
+	monitor.Register(monitor.Input)
 	return nil
 }
 
@@ -79,4 +81,6 @@ func Stop() {
 	} else {
 		log.Debugf("status listener has been stopped")
 	}
+
+	monitor.Unregister(monitor.Input)
 }

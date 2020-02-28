@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -624,15 +624,18 @@ class CMacrosResolverHelper {
 	 * @param string $data['steps'][]['params']                  Preprocessing step parameters.
 	 * @param string $data['steps'][]['error_handler_params]     Preprocessing steps error handle parameters.
 	 * @param string $data['delay']                              Update interval value.
-	 * @param string $data['hostids']                            Hostid for which tested item belongs to.
-	 * @param bool   $support_lldmacros                          Enable or disable LLD macro selection.
+	 * @param array  $data['supported_macros']                   Supported macros.
+	 * @param array  $data['texts_support_macros']               List of texts potentially could contain macros.
+	 * @param array  $data['texts_support_user_macros']          List of texts potentially could contain user macros.
+	 * @param array  $data['texts_support_lld_macros']           List of texts potentially could contain LLD macros.
+	 * @param int    $data['hostids']                            Hostid for which tested item belongs to.
 	 *
 	 * @return array
 	 */
-	public static function extractMacrosFromPreprocessingSteps(array $data, $support_lldmacros) {
+	public static function extractItemTestMacros(array $data) {
 		self::init();
 
-		return self::$macrosResolver->extractMacrosFromPreprocessingSteps($data, $support_lldmacros);
+		return self::$macrosResolver->extractItemTestMacros($data);
 	}
 
 	/**

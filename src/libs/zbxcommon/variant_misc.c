@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,9 +68,9 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 
 	if (FAIL == ret && NULL == *errmsg)
 	{
-		*errmsg = zbx_dsprintf(NULL, "Value \"%s\" of type \"%s\" is not suitable for value type \"%s\"",
-				zbx_variant_value_desc(value), zbx_variant_type_desc(value),
-				zbx_item_value_type_string(value_type));
+		*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value type \"%s\". Value \"%s\"",
+				zbx_variant_type_desc(value), zbx_item_value_type_string(value_type),
+				zbx_variant_value_desc(value));
 	}
 
 	return ret;

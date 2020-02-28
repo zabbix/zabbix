@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -263,6 +263,18 @@ static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s default '%s'", field->name, field->default_value);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s set default '%s'", field->name, field->default_value);
+#endif
+}
+
+static void	DBdrop_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
+
+#if defined(HAVE_MYSQL)
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s drop default", field->name);
 #endif
 }
 
@@ -561,6 +573,22 @@ int	DBset_default(const char *table_name, const ZBX_FIELD *field)
 	int	ret = FAIL;
 
 	DBset_default_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	DBdrop_default(const char *table_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = FAIL;
+
+	DBdrop_default_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;

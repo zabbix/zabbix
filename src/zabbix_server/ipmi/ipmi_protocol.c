@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,18 +28,19 @@
 
 zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objectid, const char *addr,
 		unsigned short port, signed char authtype, unsigned char privilege, const char *username,
-		const char *password, const char *sensor, int command)
+		const char *password, const char *sensor, int command, const char *key)
 {
 	unsigned char	*ptr;
-	zbx_uint32_t	data_len, addr_len, username_len, password_len, sensor_len;
+	zbx_uint32_t	data_len, addr_len, username_len, password_len, sensor_len, key_len;
 
 	addr_len = strlen(addr) + 1;
 	username_len = strlen(username) + 1;
 	password_len = strlen(password) + 1;
 	sensor_len = strlen(sensor) + 1;
+	key_len = NULL != key ? strlen(key) + 1 : 0;
 
 	data_len = sizeof(zbx_uint64_t) + sizeof(short) + sizeof(char) * 2 + addr_len + username_len + password_len +
-			sensor_len + sizeof(zbx_uint32_t) * 4 + sizeof(int);
+			sensor_len + key_len + sizeof(zbx_uint32_t) * 5 + sizeof(int);
 
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr = *data;
@@ -51,14 +52,15 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objec
 	ptr += zbx_serialize_str(ptr, username, username_len);
 	ptr += zbx_serialize_str(ptr, password, password_len);
 	ptr += zbx_serialize_str(ptr, sensor, sensor_len);
-	(void)zbx_serialize_int(ptr, command);
+	ptr += zbx_serialize_int(ptr, command);
+	(void)zbx_serialize_str(ptr, key, key_len);
 
 	return data_len;
 }
 
 void	zbx_ipmi_deserialize_request(const unsigned char *data, zbx_uint64_t *objectid, char **addr,
 		unsigned short *port, signed char *authtype, unsigned char *privilege, char **username, char **password,
-		char **sensor, int *command)
+		char **sensor, int *command, char **key)
 {
 	zbx_uint32_t	value_len;
 
@@ -70,7 +72,8 @@ void	zbx_ipmi_deserialize_request(const unsigned char *data, zbx_uint64_t *objec
 	data += zbx_deserialize_str(data, username, value_len);
 	data += zbx_deserialize_str(data, password, value_len);
 	data += zbx_deserialize_str(data, sensor, value_len);
-	(void)zbx_deserialize_int(data, command);
+	data += zbx_deserialize_int(data, command);
+	(void)zbx_deserialize_str(data, key, value_len);
 }
 
 void	zbx_ipmi_deserialize_request_objectid(const unsigned char *data, zbx_uint64_t *objectid)
@@ -84,7 +87,7 @@ zbx_uint32_t	zbx_ipmi_serialize_result(unsigned char **data, const zbx_timespec_
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len, value_len;
 
-	value_len = (NULL != value ? strlen(value)  + 1 : 0);
+	value_len = NULL != value ? strlen(value) + 1 : 0;
 
 	data_len = value_len + sizeof(zbx_uint32_t) + sizeof(int) * 3;
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);

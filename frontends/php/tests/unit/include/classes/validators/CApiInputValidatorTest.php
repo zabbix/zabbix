@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1579,6 +1579,30 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 					['host' => 'host 2', 'name' => 'host 2'],
 					['host' => 'host 3', 'name' => 'host 3'],
 					['host' => 'host 4', 'name' => 'host 4']
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => []],
+				[
+					5 => [],
+					102 => []
+				],
+				'/',
+				[
+					5 => [],
+					102 => []
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => []],
+				[
+					5 => [],
+					102 => []
+				],
+				'/',
+				[
+					[],
+					[]
 				]
 			],
 			[

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
@@ -241,7 +245,7 @@ $itemForm->addItem([
 		[
 			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
 			'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')],
-			'item.masscheck_now' => ['name' => _('Check now')],
+			'item.masscheck_now' => ['name' => _('Execute now')],
 			'item.massclearhistory' => ['name' => _('Clear history'),
 				'confirm' => _('Delete history of selected items?')
 			],
@@ -256,4 +260,4 @@ $itemForm->addItem([
 // append form to widget
 $widget->addItem($itemForm);
 
-return $widget;
+$widget->show();

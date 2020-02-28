@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,15 +50,15 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		// Add "One time only" maintenance period.
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
+		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Add"]');
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
 		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr/td','One time only');
 
 		// Add "Daily" maintenance period.
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Daily');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Add"]');
 		$this->page->waitUntilReady();
 		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[2]/td','Daily');
 
@@ -68,7 +68,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Weekly');
 		$this->zbxTestCheckboxSelect('days_1');
 		$this->zbxTestCheckboxSelect('days_64');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Add"]');
 		$this->page->waitUntilReady();
 		// Check weekly period in frontend.
 		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[3]/td','Weekly');
@@ -82,7 +82,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Monthly');
 		$this->zbxTestCheckboxSelect('months_1');
 		$this->zbxTestCheckboxSelect('months_1024');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Add"]');
 		$this->page->waitUntilReady();
 		// Check monthly period in frontend.
 		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[4]/td','Monthly');
@@ -176,8 +176,8 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//td[contains(text(), "Weekly")]/..//button[text()="Edit"]');
 		$this->zbxTestCheckboxSelect('days_4');
 		$this->zbxTestCheckboxSelect('days_16');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Apply"]');
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
+		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Apply"]');
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
 		$this->zbxTestWaitForPageToLoad();
 		$text = $this->query('xpath://div[@id="maintenance_periods"]//tbody/tr[2]/td[2]')->waitUntilVisible()->one()->getText();
 		$this->assertRegexp('/Monday/', $text);
@@ -190,8 +190,8 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('months_256');
 		$this->zbxTestClickXpath('//ul[@id="month_date_type"]//label[contains(text(), "Day of week")]');
 		$this->zbxTestCheckboxSelect('monthly_days_4');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Apply"]');
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
+		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Apply"]');
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
 		$this->zbxTestWaitForPageToLoad();
 		$text = $this->query('xpath://div[@id="maintenance_periods"]//tbody/tr[3]/td[2]')->waitUntilVisible()->one()->getText();
 		$this->assertRegexp('/Wednesday/', $text);
