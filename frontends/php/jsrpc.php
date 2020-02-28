@@ -147,6 +147,7 @@ switch ($data['method']) {
 						? $data['with_monitored_triggers']
 						: null,
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
+					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
 				];
