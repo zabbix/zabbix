@@ -15,14 +15,14 @@ $sidebar-padding: 12px;
 		padding: $sidebar-padding;
 	}
 
-	.sidebar-navigation {
+	.sidebar-nav {
 		display: flex;
 		flex-direction: column;
 		flex: 1;
+	}
 
-		.navigation-user {
-			margin-top: auto;
-		}
+	.nav-user {
+		margin-top: auto;
 	}
 
 	.scrollable {
@@ -36,10 +36,10 @@ $sidebar-padding: 12px;
 		}
 	}
 
-	.button-sidebar-hide,
-	.button-sidebar-show,
-	.button-sidebar-compact,
-	.button-sidebar-expand {
+	.button-hide,
+	.button-show,
+	.button-compact,
+	.button-expand {
 		position: absolute;
 		top: $sidebar-padding;
 		width: 24px;
@@ -59,23 +59,23 @@ $sidebar-padding: 12px;
 		}
 	}
 
-	.button-sidebar-hide {
+	.button-hide {
 		right: $sidebar-padding;
 		background-position: -540px -568px;
 	}
 
-	.button-sidebar-show {
+	.button-show {
 		display: none;
 		right: $sidebar-padding;
 		background-position: -570px -568px;
 	}
 
-	.button-sidebar-compact {
+	.button-compact {
 		right: 24px + $sidebar-padding;
 		background-position: -540px -544px;
 	}
 
-	.button-sidebar-expand {
+	.button-expand {
 		display: none;
 		right: 24px + $sidebar-padding;
 		background-position: -540px -520px;
@@ -116,13 +116,13 @@ $sidebar-padding: 12px;
 			margin-left: $sidebar-compact-width;
 		}
 
-		.button-sidebar-compact,
-		.button-sidebar-show {
+		.button-compact,
+		.button-show {
 			display: none;
 		}
 
-		.button-sidebar-expand,
-		.button-sidebar-hide {
+		.button-expand,
+		.button-hide {
 			display: inline-block;
 		}
 
@@ -159,10 +159,10 @@ $sidebar-padding: 12px;
 				}
 			}
 
-			.button-sidebar-compact,
-			.button-sidebar-expand,
-			.button-sidebar-hide,
-			.button-sidebar-show {
+			.button-compact,
+			.button-expand,
+			.button-hide,
+			.button-show {
 				opacity: 0;
 			}
 
@@ -193,19 +193,23 @@ $sidebar-padding: 12px;
 	}
 
 	&.is-hidden {
-		.button-sidebar-show {
+		.button-show {
 			display: inline-block;
 		}
 
-		.button-sidebar-compact,
-		.button-sidebar-expand,
-		.button-sidebar-hide {
+		.button-compact,
+		.button-expand,
+		.button-hide {
+			display: none;
+		}
+
+		&.focus-off {
 			display: none;
 		}
 
 		& + .wrapper {
 
-			.sidebar-toggle-nav {
+			.sidebar-nav-toggle {
 				display: block;
 			}
 		}
@@ -216,12 +220,12 @@ $sidebar-padding: 12px;
 	}
 }
 
-.sidebar-toggle-nav {
+.sidebar-nav-toggle {
 	display: none;
 	flex-shrink: 0;
 	margin-right: 10px;
 
-	.sidebar-toggle {
+	.button-toggle {
 		width: 24px;
 		height: 24px;
 		background: url(../img/icon-sprite.svg) no-repeat -540px -592px;

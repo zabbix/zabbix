@@ -156,6 +156,7 @@ $menu-main-icons: (
 				a {
 					background: $menu-main-submenu-selected-bg-color;
 					border-left-color: $menu-main-submenu-selected-border-color;
+					color: $menu-main-submenu-selected-color;
 
 					&:hover,
 					&:focus {

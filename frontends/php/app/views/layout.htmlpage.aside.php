@@ -47,16 +47,16 @@ $search = (new CForm('get', 'zabbix.php'))
 		(new CDiv([
 			$logo,
 			(new CButton(null, _('Collapse sidebar')))
-				->addClass('button-sidebar-compact js-sidebar-mode')
+				->addClass('button-compact js-sidebar-mode')
 				->setAttribute('title', _('Collapse sidebar')),
 			(new CButton(null, _('Expand sidebar')))
-				->addClass('button-sidebar-expand js-sidebar-mode')
+				->addClass('button-expand js-sidebar-mode')
 				->setAttribute('title', _('Expand sidebar')),
 			(new CButton(null, _('Hide sidebar')))
-				->addClass('button-sidebar-hide js-sidebar-mode')
+				->addClass('button-hide js-sidebar-mode')
 				->setAttribute('title', _('Hide sidebar')),
 			(new CButton(null, _('Show sidebar')))
-				->addClass('button-sidebar-show js-sidebar-mode')
+				->addClass('button-show js-sidebar-mode')
 				->setAttribute('title', _('Show sidebar')),
 			$search
 		]))->addClass('sidebar-header')
@@ -64,14 +64,15 @@ $search = (new CForm('get', 'zabbix.php'))
 	->addItem(
 		(new CDiv([
 			(new CTag('nav', true, APP::Component()->get('menu.main')->addClass('menu-main')))
+				->addClass('nav-main')
 				->setAttribute('role', 'navigation')
 				->setAttribute('aria-label', _('Main navigation')),
 			(new CTag('nav', true, APP::Component()->get('menu.user')->addClass('menu-user')))
-				->addClass('navigation-user')
+				->addClass('nav-user')
 				->setAttribute('role', 'navigation')
 				->setAttribute('aria-label', _('User menu'))
 		]))
-			->addClass('sidebar-navigation')
+			->addClass('sidebar-nav')
 			->addClass('scrollable')
 	)
 	->show();

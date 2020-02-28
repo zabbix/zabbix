@@ -111,11 +111,11 @@ class CWidget {
 	private function createTopHeader() {
 		$divs = [
 			(new CTag('nav', true, (new CButton(null, _('Show sidebar')))
-				->setId('sidebar-toggle')
-				->addClass('sidebar-toggle')
+				->setId('sidebar-button-toggle')
+				->addClass('button-toggle')
 				->setAttribute('title', _('Show sidebar'))
 			))
-				->addClass('sidebar-toggle-nav')
+				->addClass('sidebar-nav-toggle')
 				->setAttribute('role', 'navigation')
 				->setAttribute('aria-label', _('Sidebar control'))
 		];

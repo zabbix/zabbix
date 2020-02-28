@@ -18,6 +18,10 @@
 **/
 
 
+/**
+ * Supported events:
+ *   focus  - triggered, if any of the item is focused
+ */
 class CMenu extends CBaseComponent {
 
 	constructor(node) {
@@ -25,6 +29,11 @@ class CMenu extends CBaseComponent {
 
 		this._items = [];
 
+		this.init();
+		this.registerEvents();
+	}
+
+	init() {
 		for (const el of this._node.childNodes) {
 			this._items.push(new CMenuItem(el));
 		}
@@ -32,13 +41,12 @@ class CMenu extends CBaseComponent {
 		if (this._node.classList.contains('submenu')) {
 			this._node.style.maxHeight = this._node.scrollHeight + 'px';
 		}
-
-		this.handleEvents();
 	}
 
 	collapseAll(excluded_item = null) {
 		for (const item of this._items) {
-			if (item !== excluded_item) {
+			// console.log(item, excluded_item, item !== excluded_item, item.hasSubmenu())
+			if (item !== excluded_item && item.hasSubmenu()) {
 				item.collapseSubmenu();
 			}
 		}
@@ -48,11 +56,13 @@ class CMenu extends CBaseComponent {
 
 	expandSelected() {
 		for (const item of this._items) {
-			if (item.isSelected()) {
-				item.expandSubmenu();
-			}
-			else {
-				item.collapseSubmenu();
+			if (item.hasSubmenu()) {
+				if (item.isSelected()) {
+					item.expandSubmenu();
+				}
+				else {
+					item.collapseSubmenu();
+				}
 			}
 		}
 
@@ -61,23 +71,49 @@ class CMenu extends CBaseComponent {
 
 	focusSelected() {
 		for (const item of this._items) {
-			if (item.isSelected()) {
-				item.focus();
+			if (item.hasSubmenu()) {
+				item.getSubmenu().focusSelected();
+			}
+			else if (item.isSelected()) {
+				item.focusControl();
 			}
 		}
 
 		return this;
 	}
 
-	handleEvents() {
+	/**
+	 * Register all DOM events.
+	 */
+	registerEvents() {
 		this._events = {
+
+			focus: () => {
+				this.trigger('focus');
+			},
+
 			expand: (e) => {
 				this.collapseAll(e.detail.targetObj);
 			}
-		}
+		};
 
 		for (const item of this._items) {
-			item.on('expand', this._events.expand);
+			if (item.hasSubmenu()) {
+				item.on('expand', this._events.expand);
+			}
+			item.on('focus', this._events.focus);
+		}
+	}
+
+	/**
+	 * Unregister all DOM events.
+	 */
+	destroy() {
+		for (const item of this._items) {
+			if (item.hasSubmenu()) {
+				item.off('expand', this._events.expand);
+			}
+			item.off('focus', this._events.focus);
 		}
 	}
 }

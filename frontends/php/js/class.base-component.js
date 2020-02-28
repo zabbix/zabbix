@@ -24,13 +24,17 @@ class CBaseComponent {
 		this._node = node;
 	}
 
+	hasClass(class_name) {
+
+	}
+
 	on(type, listener, options = false) {
 		this._node.addEventListener(type, listener, options);
 		return this;
 	}
 
 	one(type, listener, options = false) {
-		return this.on(type, listener, {...options, ...{once: true}});
+		return this.on(type, listener, Object.assign({once: true}, options));
 	}
 
 	off(type, listener, options = false) {
@@ -39,7 +43,7 @@ class CBaseComponent {
 	}
 
 	trigger(type, options = {}) {
-		this._node.dispatchEvent(new CustomEvent(type, {detail: {...{targetObj: this}, ...options}}));
+		this._node.dispatchEvent(new CustomEvent(type, {detail: Object.assign({targetObj: this}, options)}));
 		return this;
 	}
 };

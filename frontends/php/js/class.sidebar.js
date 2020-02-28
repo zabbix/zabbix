@@ -18,9 +18,11 @@
 **/
 
 
-const SIDEBAR_VIEW_MODE_FULL = 0;
+const SIDEBAR_VIEW_MODE_FULL    = 0;
 const SIDEBAR_VIEW_MODE_COMPACT = 1;
-const SIDEBAR_VIEW_MODE_HIDDEN = 2;
+const SIDEBAR_VIEW_MODE_HIDDEN  = 2;
+
+const SIDEBAR_MIN_WIDTH         = 200;
 
 /**
  * Supported events:
@@ -37,18 +39,19 @@ class CSidebar extends CBaseComponent {
 		this._is_opened = false;
 
 		this.init();
-		this.handleEvents();
+		this.registerEvents();
 	}
 
 	init() {
-		this.setViewMode((this._node.classList.contains('is-compact'))
+		this._control_show = document.getElementById('sidebar-button-toggle');
+
+		this._view_mode = this._node.classList.contains('is-compact')
 			? SIDEBAR_VIEW_MODE_COMPACT
 			: (this._node.classList.contains('is-hidden'))
 				? SIDEBAR_VIEW_MODE_HIDDEN
-				: SIDEBAR_VIEW_MODE_FULL
-		);
+				: SIDEBAR_VIEW_MODE_FULL;
 
-		let max_width = 200;  // Minimum sidebar width for the full view mode
+		let max_width = SIDEBAR_MIN_WIDTH;
 
 		for (const menu of this._node.querySelectorAll('nav > ul')) {
 			const position = window.getComputedStyle(menu).position;
@@ -57,6 +60,62 @@ class CSidebar extends CBaseComponent {
 			menu.style.position = position;
 		}
 		this._node.style.maxWidth = max_width + 'px';
+		this._node.classList.add('focus-off');
+
+		this.setViewMode(this._view_mode);
+	}
+
+	open() {
+		if (!this._is_opened) {
+			clearTimeout(this._timer);
+			this._is_opened = true;
+
+			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
+				ZABBIX.MenuMain.expandSelected();
+				this._node.classList.add('is-opened');
+			}
+
+			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+				this._node.classList.remove('focus-off');
+				this._timer = setTimeout(() => {
+					this._node.classList.add('is-opened');
+				}, 0);
+
+				document.addEventListener('keyup', this._events.escape);
+			}
+
+			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
+				this.trigger('open');
+			}
+		}
+
+		return this;
+	}
+
+	close() {
+		if (this._is_opened) {
+			this._is_opened = false;
+			this._node.classList.remove('is-opened');
+
+			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
+				console.log('here');
+				ZABBIX.MenuMain.collapseAll();
+			}
+
+			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+				this._timer = setTimeout(() => {
+					this._node.classList.add('focus-off');
+				}, 500);
+
+				document.removeEventListener('keyup', this._events.escape);
+			}
+
+			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
+				this.trigger('close');
+			}
+		}
+
+		return this;
 	}
 
 	/**
@@ -71,50 +130,9 @@ class CSidebar extends CBaseComponent {
 		this._node.classList.toggle('is-hidden', view_mode === SIDEBAR_VIEW_MODE_HIDDEN);
 
 		if (this._view_mode !== view_mode) {
+			console.info('setViewMode: Event triggered');
 			this._view_mode = view_mode;
-			this.trigger('viewmodechange', {view_mode: this._view_mode });
-		}
-
-		return this;
-	}
-
-	open() {
-		if (!this._is_opened) {
-			clearTimeout(this._timer);
-
-			this._is_opened = true;
-			this._node.classList.add('is-opened');
-
-			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
-				ZABBIX.MenuMain.expandSelected();
-			}
-
-			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
-				this._node.classList.add('hidden');
-			}
-
-			this.trigger('open');
-		}
-
-		return this;
-	}
-
-	close() {
-		if (this._is_opened) {
-			this._is_opened = false;
-			this._node.classList.remove('is-opened');
-
-			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
-				ZABBIX.MenuMain.collapseAll();
-
-				if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
-					this._timer = setTimeout(() => {
-						this._node.classList.remove('hidden');
-					}, 500);
-				}
-
-				this.trigger('close');
-			}
+			this.trigger('viewmodechange', {view_mode: this._view_mode});
 		}
 
 		return this;
@@ -123,7 +141,7 @@ class CSidebar extends CBaseComponent {
 	/**
 	 * Register all DOM events.
 	 */
-	handleEvents() {
+	registerEvents() {
 		this._events = {
 
 			mouseenter: () => {
@@ -145,7 +163,6 @@ class CSidebar extends CBaseComponent {
 					this._is_focused = this._node.contains(document.activeElement);
 
 					if (this._is_focused) {
-						document.addEventListener('keyup', this._events.escape);
 						this.open();
 					}
 					else {
@@ -156,19 +173,17 @@ class CSidebar extends CBaseComponent {
 
 			escape: (e) => {
 				if (e.key === 'Escape') {
-					document.removeEventListener('keyup', this._events.escape);
 					this.close();
 				}
 			},
 
 			toggle: (e) => {
 				if (!this._is_opened) {
-					e.target.blur();
-					document.addEventListener('keyup', this._events.escape);
 					this.open();
+
+					ZABBIX.MenuMain.focusSelected();
 				}
 				else {
-					document.removeEventListener('keyup', this._events.escape);
 					this.close();
 				}
 
@@ -176,9 +191,9 @@ class CSidebar extends CBaseComponent {
 			},
 
 			viewmodechange: (e) => {
-				if (e.target.classList.contains('button-sidebar-compact')) {
+				if (e.target.classList.contains('button-compact')) {
 					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
-				} else if (e.target.classList.contains('button-sidebar-hide')) {
+				} else if (e.target.classList.contains('button-hide')) {
 					this.setViewMode(SIDEBAR_VIEW_MODE_HIDDEN);
 				} else {
 					this.setViewMode(SIDEBAR_VIEW_MODE_FULL);
@@ -191,13 +206,30 @@ class CSidebar extends CBaseComponent {
 		document.addEventListener('focusin', this._events.focus);
 		document.addEventListener('focusout', this._events.focus);
 
-		this._node.addEventListener('mouseenter', this._events.mouseenter);
-		this._node.addEventListener('mouseleave', this._events.mouseleave);
+		this.on('mouseenter', this._events.mouseenter);
+		this.on('mouseleave', this._events.mouseleave);
 
 		for (const el of this._node.querySelectorAll('.js-sidebar-mode')) {
 			el.addEventListener('click', this._events.viewmodechange);
 		}
 
-		document.getElementById('sidebar-toggle').addEventListener('click', this._events._toggle);
+		this._control_show.addEventListener('click', this._events.toggle);
+	}
+
+	/**
+	 * Unregister all DOM events.
+	 */
+	destroy() {
+		document.removeEventListener('focusin', this._events.focus);
+		document.removeEventListener('focusout', this._events.focus);
+
+		this.off('mouseenter', this._events.mouseenter);
+		this.off('mouseleave', this._events.mouseleave);
+
+		for (const el of this._node.querySelectorAll('.js-sidebar-mode')) {
+			el.removeEventListener('click', this._events.viewmodechange);
+		}
+
+		this._control_show.removeEventListener('click', this._events.toggle);
 	}
 }

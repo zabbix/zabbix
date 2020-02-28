@@ -18,66 +18,115 @@
 **/
 
 
+/**
+ * Supported events:
+ *   collapse  - submenu is collapsed
+ *   expand    - submenu is expanded
+ *   focus     - control is focused
+ */
 class CMenuItem extends CBaseComponent {
 
 	constructor(node) {
 		super(node);
 
-		this._submenu = node.classList.contains('has-submenu') ? new CMenu(node.querySelector('.submenu')) : null;
-		this._toggle = node.querySelector('a');
+		this._submenu = null;
+
+		this.init();
+		this.registerEvents();
+	}
+
+	init() {
+		if (this._node.classList.contains('has-submenu')) {
+			this._submenu = new CMenu(this._node.querySelector('.submenu'));
+		}
+
+		this._control = this._node.querySelector('a');
 
 		this._is_expanded = this._node.classList.contains('is-expanded');
 		this._is_selected = this._node.classList.contains('is-selected');
-
-		this.handleEvents();
 	}
 
-	collapseSubmenu() {
-		this._node.classList.remove('is-expanded');
-
-		if (this._is_expanded) {
-			this.trigger('collapse');
-			this._is_expanded = false;
-		}
+	focusControl() {
+		this._control.focus();
 
 		return this;
 	}
 
-	expandSubmenu() {
-		let is_expanded = this._node.classList.toggle('is-expanded', this.hasSubmenu());
-
-		if (is_expanded && !this._is_expanded) {
-			this.trigger('expand');
-			this._is_expanded = true;
-		}
+	blurControl() {
+		this._control.blur();
 
 		return this;
-	}
-
-	focus() {
-		this._toggle.focus();
-	}
-
-	hasSubmenu() {
-		return this._submenu !== null;
 	}
 
 	isSelected() {
 		return this._is_selected;
 	}
 
-	handleEvents() {
+	getSubmenu() {
+		return this._submenu;
+	}
+
+	hasSubmenu() {
+		return this._submenu !== null;
+	}
+
+	expandSubmenu() {
+		let is_expanded = this._node.classList.toggle('is-expanded', this.hasSubmenu());
+
+		if (is_expanded && !this._is_expanded) {
+			this._is_expanded = true;
+			this.trigger('expand');
+		}
+
+		return this;
+	}
+
+	collapseSubmenu() {
+		this._node.classList.remove('is-expanded');
+
+		if (this._is_expanded) {
+			this._is_expanded = false;
+			this.trigger('collapse');
+		}
+
+		return this;
+	}
+
+	/**
+	 * Register all DOM events.
+	 */
+	registerEvents() {
 		this._events = {
 
-			expand: (e) => {
-				if (this.hasSubmenu()) {
+			click: (e) => {
+				if (!this._is_expanded) {
 					this.expandSubmenu();
 					e.preventDefault();
 				}
+			},
+
+			focus: () => {
+				if (this.hasSubmenu() && !this._is_expanded) {
+					this.expandSubmenu();
+				}
+				this.trigger('focus');
 			}
 		};
 
-		this._toggle.addEventListener('click', this._events.expand);
-		this._toggle.addEventListener('focus', this._events.expand);
+		this._control.addEventListener('focus', this._events.focus);
+
+		if (this.hasSubmenu()) {
+			this._control.addEventListener('click', this._events.click);
+			this._submenu.on('focus', this._events.focus);
+		}
+	}
+
+	/**
+	 * Unregister all DOM events.
+	 */
+	destroy() {
+		this._control.removeEventListener('focus', this._events.focus);
+		this._control.removeEventListener('click', this._events.click);
+		this._submenu.off('focus', this._events.focus);
 	}
 }
