@@ -117,7 +117,7 @@ class CControllerMapView extends CController {
 
 		$config = select_config();
 		$severities_dropdown = [];
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity ++) {
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severity_name = getSeverityName($severity, $config);
 
 			$severities_dropdown[$severity] = ($severity == $map['severity_min'])
@@ -128,7 +128,7 @@ class CControllerMapView extends CController {
 		$response = new CControllerResponseData([
 			'map' => $map,
 			'severity_min' => $severity_min,
-			'severities_dropdown' => $severities_dropdown
+			'severities' => $severities_dropdown
 		]);
 
 		$response->setTitle(_('Network maps'));

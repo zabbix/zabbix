@@ -45,7 +45,7 @@ $web_layout_mode = $this->getLayoutMode();
 				->addItem([
 					new CLabel(_('Minimum severity'), 'severity_min'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('severity_min', $data['severity_min'], 'javascript: submit();', $data['severities_dropdown'])
+					new CComboBox('severity_min', $data['severity_min'], 'javascript: submit();', $data['severities'])
 				])
 			),
 		(new CTag('nav', true, (new CList())
