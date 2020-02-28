@@ -71,7 +71,8 @@ if ($data['has_dynamic_widgets']) {
 						'srctbl' => 'hosts',
 						'srcfld1' => 'hostid',
 						'dstfld1' => 'dynamic_hostid',
-						'monitored_hosts' => 1
+						'monitored_hosts' => 1,
+						'with_items' => 1
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
