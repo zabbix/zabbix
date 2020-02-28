@@ -223,9 +223,7 @@ void zbx_odbc_connection_string_append(char **connection_str, const char *attrib
 	if (NULL == value)
 		return;
 
-	len = strlen(*connection_str);
-
-	if (0 < len)
+	if (0 < (len = strlen(*connection_str)))
 		last = (*connection_str)[len-1];
 
 	*connection_str = zbx_dsprintf(*connection_str, "%s%s%s=%s", *connection_str, ';' == last ? "" : ";",
