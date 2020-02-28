@@ -91,6 +91,9 @@
 		.dynamicRows({template: '#macro-row-tmpl'})
 		.on('click', 'button.element-table-add', function() {
 			initMacroFields(jQuery(document.getElementById('tbl_macros')));
+		})
+		.on('afteradd.dynamicRows', function() {
+			$('.input-group').macroValue();
 		});
 
 	initMacroFields(jQuery(document.getElementById('tbl_macros')));

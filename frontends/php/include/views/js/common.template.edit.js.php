@@ -188,6 +188,9 @@
 							.attr({'aria-haspopup': 'true'});
 						jQuery('#macros_' + macro_num + '_change').text(<?= json_encode(_('Remove')) ?>);
 					}
+				})
+				.on('afteradd.dynamicRows', function() {
+					$('.input-group').macroValue();
 				});
 
 			initMacroFields($parent);
