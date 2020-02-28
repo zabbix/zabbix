@@ -73,7 +73,7 @@ int	zbx_db_validate_config_features(void)
 		zbx_error("\"DBTLSConnect\" configuration parameter value '%s' cannot be used: Zabbix %s was compiled"
 			" without PostgreSQL or MySQL library version that support this value",
 			ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, get_program_type_string(program_type));
-		err |= FAIL;
+		err |= 1;
 	}
 #endif
 
