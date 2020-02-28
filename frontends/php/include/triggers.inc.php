@@ -156,8 +156,6 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 /**
  * Generate array with severities options.
  *
- * @static
- *
  * @return array
  */
 function getSeverities() {
@@ -166,7 +164,8 @@ function getSeverities() {
 	foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
 		$severities[] = [
 			'name' => getSeverityName($severity, $config),
-			'value' => $severity
+			'value' => $severity,
+			'style' => getSeverityStyle($severity)
 		];
 	}
 

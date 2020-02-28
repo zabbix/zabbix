@@ -24,7 +24,7 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	/**
 	 * Number of columns.
 	 */
-	protected const COLUMNS = 3;
+	private const COLUMNS = 3;
 
 	/**
 	 * Create check box list with severities.
@@ -35,7 +35,7 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 		parent::__construct($name);
 
 		$this
-			->setOptions(self::getOrderedSeverities())
+			->setOptions($this->getOrderedSeverities())
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3);
 	}
@@ -43,11 +43,9 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	/**
 	 * Generate array with data for severities options ordered for showing by rows.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
-	public static function getOrderedSeverities(): array {
+	private function getOrderedSeverities(): array {
 		$severities = getSeverities();
 		$severities_count = count($severities);
 		$ordered = [];
@@ -62,16 +60,5 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 		}
 
 		return $ordered;
-	}
-
-	/**
-	 * With setter.
-	 *
-	 * @return CSeverityCheckBoxList
-	 */
-	public function setWidth($value) {
-		$this->addStyle('width: '.$value.'px;');
-
-		return $this;
 	}
 }

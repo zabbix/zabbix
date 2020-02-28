@@ -93,4 +93,15 @@ class CCheckBoxList extends CList {
 
 		return parent::toString($destroy);
 	}
+
+	/**
+	 * With setter.
+	 *
+	 * @return CSeverityCheckBoxList
+	 */
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+
+		return $this;
+	}
 }
