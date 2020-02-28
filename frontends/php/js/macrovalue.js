@@ -38,7 +38,8 @@
 		var $this = $(this),
 			$container = $this.closest('.input-group'),
 			$input_container = $('.input-secret, .textarea-flexible', $container),
-			$input = $('.input-secret input[type=password], .textarea-flexible', $container);
+			$input = $('.input-secret input[type=password], .textarea-flexible', $container),
+			$dropdown_value = $('.dropdown-value', $container);
 
 		$input_container.replaceWith(
 			$('<div>')
@@ -63,6 +64,10 @@
 				}).text(t('Set new value')))
 				.inputSecret()
 		);
+
+		$dropdown_value
+			.val(ZBX_MACRO_TYPE_SECRET)
+			.trigger('change');
 
 		$('.btn-dropdown-container button', $container)
 			.addClass(['btn-alt', 'btn-dropdown-toggle', 'icon-secret'].join(' '));
