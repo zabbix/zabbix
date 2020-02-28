@@ -81,10 +81,10 @@ if (!$data['screen']) {
 
 // Save dynamic item hostid.
 if (hasRequest('hostid')) {
-	CProfile::update('web.screens.hostid', getRequest('hostid'), PROFILE_TYPE_ID);
+	CProfile::update('web.slides.hostid', getRequest('hostid'), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('reset')) {
-	CProfile::delete('web.screens.hostid');
+	CProfile::delete('web.slides.hostid');
 }
 
 CProfile::update('web.slides.elementid', $data['elementId'], PROFILE_TYPE_ID);
@@ -184,7 +184,7 @@ $data['active_tab'] = CProfile::get('web.slides.filter.active', 1);
 // Dynamic item host selector.
 if (check_dynamic_items($data['elementId'], 1)) {
 	$data['has_dynamic_widgets'] = true;
-	$hostid = getRequest('hostid', CProfile::get('web.screens.hostid', 0));
+	$hostid = getRequest('hostid', CProfile::get('web.slides.hostid', 0));
 	$data['host'] = ($hostid > 0)
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
