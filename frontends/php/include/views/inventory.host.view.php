@@ -149,9 +149,7 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 				->setArgument('filter_hostids', [$data['host']['hostid']])
 		),
-		new CLink(_('Screens'),
-			'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid')
-		)
+		new CLink(_('Screens'), (new CUrl('host_screen.php'))->setArgument('hostid', $data['host']['hostid']))
 	])
 );
 
@@ -183,7 +181,7 @@ if ($data['rwHost']) {
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 	);
 	$discoveryLink = new CLink(_('Discovery'),
-		'host_discovery.php?hostid='.$data['host']['hostid'].url_param('groupid')
+		(new CUrl('host_discovery.php'))->setArgument('hostid',$data['host']['hostid'])
 	);
 	$webLink = new CLink(_('Web'), (new CUrl('httpconf.php'))
 			->setArgument('filter_set', '1')
@@ -239,9 +237,8 @@ if (!$inventoryValues) {
 $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 
 // append tabs and form
-$hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel(url_param('groupid'))]));
+$hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel()]));
 
-//$this->enableLayoutModes();
 $web_layout_mode = CViewHelper::loadLayoutMode();
 
 (new CWidget())

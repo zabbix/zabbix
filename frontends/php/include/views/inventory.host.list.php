@@ -95,7 +95,7 @@ foreach ($this->data['hosts'] as $host) {
 	$hostGroups = implode(', ', $hostGroups);
 
 	$row = [
-		(new CLink($host['name'], '?hostid='.$host['hostid'].url_param('groupid')))
+		(new CLink($host['name'], (new CUrl('hostinventories.php'))->setArgument('hostid', $host['hostid'])))
 			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null),
 		$hostGroups,
 		zbx_str2links($host['inventory']['name']),
