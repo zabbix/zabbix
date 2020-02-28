@@ -163,7 +163,6 @@ class CSidebar extends CBaseComponent {
 			},
 
 			focusin: (e) => {
-				// console.log('focusin', e);
 				if (e.relatedTarget === null) {
 					this._is_focused = true;
 					this.open();
@@ -171,7 +170,6 @@ class CSidebar extends CBaseComponent {
 			},
 
 			focusout: (e) => {
-				// console.log('focusout', e);
 				if (e.relatedTarget === null) {
 					this._is_focused = false;
 					this.close();
