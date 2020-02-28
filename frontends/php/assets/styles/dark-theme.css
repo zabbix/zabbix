@@ -3104,7 +3104,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   resize: none;
   word-break: break-all;
   height: 24px;
-  line-height: 14px; }
+  line-height: 14px;
+  white-space: break-spaces; }
 
 .btn-back-map-container {
   text-align: left;
