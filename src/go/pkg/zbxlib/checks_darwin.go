@@ -45,7 +45,6 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -94,8 +93,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		return unsafe.Pointer(C.VFS_DIR_COUNT)
 	case "vfs.dir.size":
 		return unsafe.Pointer(C.VFS_DIR_SIZE)
-	case "vfs.file.md5sum":
-		return unsafe.Pointer(C.VFS_FILE_MD5SUM)
 	case "vfs.file.regmatch":
 		return unsafe.Pointer(C.VFS_FILE_REGMATCH)
 	case "vfs.fs.discovery":
