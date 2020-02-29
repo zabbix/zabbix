@@ -1026,7 +1026,7 @@ function calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated,
 	$units_length = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
 	$precision = $units_length == 0 ? $precision_max : max(1, $precision_max - $units_length - ($min < 0 ? 1 : 0));
 
-	$decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED;
+	$decimals = min(ZBX_UNITS_ROUNDOFF_SUFFIXED, $precision - 1);
 	$decimals_exact = false;
 
 	$power_interval = $interval / pow($unit_base, $power);
