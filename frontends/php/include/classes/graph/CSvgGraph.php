@@ -98,13 +98,15 @@ class CSvgGraph extends CSvg {
 	protected $left_y_max = null;
 	protected $left_y_units = null;
 	protected $left_y_is_binary = false;
+	protected $left_y_power = 1;
 	protected $left_y_empty = true;
 
 	protected $right_y_show = false;
 	protected $right_y_min = null;
 	protected $right_y_max = null;
 	protected $right_y_units = null;
-	protected $right_y_binary = false;
+	protected $right_y_is_binary = false;
+	protected $right_y_power = 1;
 	protected $right_y_empty = true;
 
 	protected $right_y_zero = null;
@@ -135,7 +137,7 @@ class CSvgGraph extends CSvg {
 	 */
 	protected $max_yaxis_width = 120;
 
-	protected $cell_height_min = 40;
+	protected $cell_height_min = 30;
 
 	protected $offset_top;
 	protected $time_from;
@@ -533,54 +535,56 @@ class CSvgGraph extends CSvg {
 		$rows_min = (int) max(1, floor($this->canvas_height / $this->cell_height_min / 2));
 		$rows_max = (int) max(1, floor($this->canvas_height / $this->cell_height_min));
 
-		$calc_min = $this->left_y_min === null;
-		$calc_max = $this->left_y_max === null;
+		$this->left_y_min_calculated = $this->left_y_min === null;
+		$this->left_y_max_calculated = $this->left_y_max === null;
 
-		if ($calc_min) {
+		if ($this->left_y_min_calculated) {
 			$this->left_y_min = $this->min_value_left ? : 0;
 		}
-		if ($calc_max) {
+		if ($this->left_y_max_calculated) {
 			$this->left_y_max = $this->max_value_left ? : 1;
 		}
 
-		$this->left_y_is_binary = in_array($this->left_y_units, ['B', 'Bps']);
+		$this->left_y_is_binary = $this->left_y_units === 'B' || $this->left_y_units === 'Bps';
 
-		$result = calculateGraphScale($this->left_y_min, $this->left_y_max, $this->left_y_is_binary,
-			$calc_min, $calc_max, $rows_min, $rows_max
+		$result = calculateGraphScaleExtremes($this->left_y_min, $this->left_y_max, $this->left_y_is_binary,
+			$this->left_y_min_calculated, $this->left_y_max_calculated, $rows_min, $rows_max
 		);
 
 		[
 			'min' => $this->left_y_min,
 			'max' => $this->left_y_max,
-			'interval' => $this->left_y_interval
+			'interval' => $this->left_y_interval,
+			'power' => $this->left_y_power
 		] = $result;
 
 		// Calculate vertical scale parameters for right side.
 
-		if ($calc_min && $calc_max) {
+		if ($this->left_y_min_calculated && $this->left_y_max_calculated) {
 			$rows_min = $rows_max = $result['rows'];
 		}
 
-		$calc_min = $this->right_y_min === null;
-		$calc_max = $this->right_y_max === null;
+		$this->right_y_min_calculated = $this->right_y_min === null;
+		$this->right_y_max_calculated = $this->right_y_max === null;
 
-		if ($calc_min) {
+		if ($this->right_y_min_calculated) {
 			$this->right_y_min = $this->min_value_right ? : 0;
 		}
-		if ($calc_max) {
+		if ($this->right_y_max_calculated) {
 			$this->right_y_max = $this->max_value_right ? : 1;
 		}
 
-		$this->right_y_is_binary = in_array($this->right_y_units, ['B', 'Bps']);
+		$this->right_y_is_binary = $this->right_y_units === 'B' || $this->right_y_units === 'Bps';
 
-		$result = calculateGraphScale($this->right_y_min, $this->right_y_max, $this->right_y_is_binary,
-			$calc_min, $calc_max, $rows_min, $rows_max
+		$result = calculateGraphScaleExtremes($this->right_y_min, $this->right_y_max, $this->right_y_is_binary,
+			$this->right_y_min_calculated, $this->right_y_max_calculated, $rows_min, $rows_max
 		);
 
 		[
 			'min' => $this->right_y_min,
 			'max' => $this->right_y_max,
-			'interval' => $this->right_y_interval
+			'interval' => $this->right_y_interval,
+			'power' => $this->right_y_power
 		] = $result;
 
 		// Define canvas dimensions and offsets, except canvas height and bottom offset.
@@ -629,74 +633,47 @@ class CSvgGraph extends CSvg {
 	protected function getValuesGridWithPosition($side, $empty_set = false) {
 		$min = 0;
 		$max = 1;
+		$min_calculated = true;
+		$max_calculated = true;
 		$interval = 1;
-		$is_binary = false;
 		$units = '';
+		$is_binary = false;
+		$power = 1;
 
 		if (!$empty_set) {
 			if ($side === GRAPH_YAXIS_SIDE_LEFT) {
 				$min = $this->left_y_min;
 				$max = $this->left_y_max;
+				$min_calculated = $this->left_y_min_calculated;
+				$max_calculated = $this->left_y_max_calculated;
 				$interval = $this->left_y_interval;
-				$is_binary = $this->left_y_is_binary;
 				$units = $this->left_y_units;
+				$is_binary = $this->left_y_is_binary;
+				$power = $this->left_y_power;
 			}
 			elseif ($side === GRAPH_YAXIS_SIDE_RIGHT) {
 				$min = $this->right_y_min;
 				$max = $this->right_y_max;
+				$min_calculated = $this->right_y_min_calculated;
+				$max_calculated = $this->right_y_max_calculated;
 				$interval = $this->right_y_interval;
-				$is_binary = $this->right_y_is_binary;
 				$units = $this->right_y_units;
+				$is_binary = $this->right_y_is_binary;
+				$power = $this->right_y_power;
 			}
 		}
 
-		$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
+		$relative_values = calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated, $interval, $units,
+			$is_binary, $power, 15
+		);
 
-		$power = (int) min(8, max(0,
-			floor(log(abs($min), $unit_base)),
-			floor(log(abs($max), $unit_base))
-		));
+		$absolute_values = [];
 
-		$units_length = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
-		$precision = $units_length == 0 ? 15 : max(1, 15 - $units_length - ($min < 0 ? 1 : 0));
-		$decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED;
-		$decimals_exact = false;
-
-		$power_interval = $interval / pow($unit_base, $power);
-		if ($power_interval < 1) {
-			$precision_required = 1 - floor(log10($power_interval));
-			if ($precision_required <= $precision) {
-				$decimals = min(getNumDecimals($power_interval), $precision - 1);
-				$decimals_exact = true;
-			}
-			else {
-				$precision = 4;
-			}
+		foreach ($relative_values as ['relative_pos' => $relative_pos, 'value' => $value]) {
+			$absolute_values[(int) round($this->canvas_height * $relative_pos)] = $value;
 		}
 
-		$rows = $this->getValueGrid($min, $max, $interval);
-
-		$ignore_milliseconds = $min <= 1 || $max >= 1;
-
-		$grid_values = [];
-
-		foreach ($rows as $value) {
-			$relative_pos = (int) round($this->canvas_height * ($value - $min) / ($max - $min));
-
-			$grid_values[$relative_pos] = convertUnits([
-				'value' => $value,
-				'units' => $units,
-				'unit_base' => $unit_base,
-				'convert' => ITEM_CONVERT_NO_UNITS,
-				'power' => $power,
-				'ignore_milliseconds' => $ignore_milliseconds,
-				'precision' => $precision,
-				'decimals' => $decimals,
-				'decimals_exact' => $decimals_exact
-			]);
-		}
-
-		return $grid_values;
+		return $absolute_values;
 	}
 
 	/**

@@ -865,46 +865,58 @@ function find_period_end($periods, $time, $max_time) {
 	return -1;
 }
 
-function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_max, $rows_min, $rows_max) {
-	static $base_intervals = [];
+/**
+* Calculate best graph scale interval for given arguments.
+*
+* @param float $min        Minimum extreme of the scale.
+* @param float $max        Maximum extreme of the scale.
+* @param bool  $is_binary  Is the scale binary (use 1024 base for units)?
+* @param int   $power      Scale power.
+* @param int   $rows       Number of scale rows.
+* @param int   $steps      Number of times to search for the next suitable interval.
+*/
+function yieldGraphScaleInterval($min, $max, $is_binary, $power, $rows) {
+	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
 
-	if (!$base_intervals) {
-		for ($range = floor(log10(PHP_FLOAT_MAX)), $base = -$range; $base <= $range; $base++) {
-			foreach ([1, 2, 5] as $multiplier) {
-				$base_interval = pow(10, $base) * $multiplier;
-				if ($base_interval != 0 && $base_interval != INF && $base_interval != -INF) {
-					$base_intervals['1000'][] = $base_interval;
+	$interval = truncateFloat(($max - $min) / $rows / pow($unit_base, $power));
 
-					if ($base_interval < 1) {
-						$base_intervals['1024'][] = $base_interval;
-					}
+	while (true) {
+		if ($is_binary && $interval >= 1) {
+			$result = pow(2, ceil(log($interval, 2)));
+		}
+		else {
+			$exponent = floor(log10($interval));
+
+			foreach ([2, 5, 10] as $multiply) {
+				$candidate =  truncateFloat(pow(10, $exponent) * $multiply);
+				if ($candidate >= $interval) {
+					$result = $candidate;
+
+					break;
 				}
 			}
 		}
 
-		$binary_range = 80;
+		yield $result * pow($unit_base, $power);
 
-		for ($base = 0; $base <= $binary_range; $base++) {
-			$base_interval = pow(2, $base);
-			if ($base_interval != INF && $base_interval != -INF) {
-				$base_intervals['1024'][] = $base_interval;
-			}
-		}
-
-		$binary_max = pow(2, $binary_range);
-
-		for ($range = floor(log10(PHP_FLOAT_MAX / $binary_max)), $base = 0; $base <= $range; $base++) {
-			foreach ([1, 2, 5] as $multiplier) {
-				$base_interval = $binary_max * pow(10, $base) * $multiplier;
-				if ($base_interval > $binary_max && $base_interval != INF && $base_interval != -INF) {
-					$base_intervals['1024'][] = $base_interval;
-				}
-			}
-		}
+		$interval = $result * 1.5;
 	}
+}
 
-	$scale_min = $data_min;
-	$scale_max = $data_max;
+/**
+* Calculate best graph scale extremes for given arguments.
+*
+* @param float $data_min   Minimum extreme of the graph.
+* @param float $data_max   Maximum extreme of the graph.
+* @param bool  $is_binary  Is the scale binary (use 1024 base for units)?
+* @param bool  $calc_min   Should scale minimum be calculated?
+* @param bool  $calc_max   Should scale maximum be calculated?
+* @param int   $rows_min   Minimum number of scale rows.
+* @param int   $rows_max   Maximum number of scale rows.
+*/
+function calculateGraphScaleExtremes($data_min, $data_max, $is_binary, $calc_min, $calc_max, $rows_min, $rows_max) {
+	$scale_min = truncateFloat($data_min);
+	$scale_max = truncateFloat($data_max);
 
 	if ($scale_min >= $scale_max) {
 		if ($scale_max > 0) {
@@ -931,6 +943,8 @@ function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_
 		}
 	}
 
+	$power = (int) min(8, max(0, floor(log(abs($scale_max), $is_binary ? ZBX_KIBIBYTE : 1000))));
+
 	$best_result_value = null;
 	$best_result = [
 		'min' => $scale_min,
@@ -942,8 +956,13 @@ function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_
 	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
 		$clearance_min = $rows * 0.05;
 		$clearance_max = $rows * 0.1;
+		$steps = 1;
 
-		foreach ($base_intervals[$is_binary ? '1024' : '1000'] as $interval) {
+		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows, $steps) as $interval) {
+			if ($interval == INF) {
+				break;
+			}
+
 			if ($calc_min) {
 				$min = floor($scale_min / $interval) * $interval;
 				if ($min != 0 && ($scale_min - $min) / $interval < $clearance_min) {
@@ -963,6 +982,9 @@ function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_
 				$max = $scale_max;
 			}
 
+			$min = truncateFloat($min);
+			$max = truncateFloat($max);
+
 			if ($min > $scale_min || $max < $scale_max) {
 				continue;
 			}
@@ -979,21 +1001,103 @@ function calculateGraphScale($data_min, $data_max, $is_binary, $calc_min, $calc_
 				'min' => $min,
 				'max' => $max,
 				'interval' => $interval,
-				'rows' => $rows
+				'rows' => $rows,
+				'power' => $power,
 			];
 
-			$result_value = ($max - $min) / $interval / $rows;
-			if ($result_value < 1) {
-				$result_value = 1 / $result_value;
-			}
-			$result_value += ($scale_min - $min) / $interval + ($max - $scale_max) / $interval;
+			$result_value = ($scale_min - $min) / $interval + ($max - $scale_max) / $interval;
 
 			if ($best_result_value === null || $result_value < $best_result_value) {
 				$best_result_value = $result_value;
 				$best_result = $result;
 			}
+
+			break;
 		}
 	}
 
 	return $best_result;
+}
+
+function calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated, $interval, $units, $is_binary, $power,
+		$precision_max) {
+	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
+
+	$units_length = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
+	$precision = $units_length == 0 ? $precision_max : max(1, $precision_max - $units_length - ($min < 0 ? 1 : 0));
+
+	$decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED;
+	$decimals_exact = false;
+
+	$power_interval = $interval / pow($unit_base, $power);
+
+	if ($power_interval < 1) {
+		$decimals = getNumDecimals($power_interval);
+		$decimals_exact = true;
+
+		if ($decimals > $precision - 1) {
+			$decimals = $precision - 1;
+			$decimals_exact = false;
+		}
+	}
+
+	$rows = [];
+
+	$clearance = 0.5;
+	for ($row_index = 0;; $row_index++) {
+		$value = ceil($min / $interval + $row_index + $clearance) * $interval;
+
+		if ($value > $max - $interval * $clearance) {
+			break;
+		}
+
+		$rows[] = $value;
+	}
+
+	$ignore_milliseconds = $min <= 1 || $max >= 1;
+
+	$options = [
+		'units' => $units,
+		'unit_base' => $unit_base,
+		'convert' => ITEM_CONVERT_NO_UNITS,
+		'power' => $power,
+		'ignore_milliseconds' => $ignore_milliseconds
+	];
+	$options_fixed = $options + [
+		'precision' => $precision_max,
+		'decimals' => $precision_max - 1,
+		'decimals_exact' => false
+	];
+	$options_calculated = $options + [
+		'precision' => $precision,
+		'decimals' => $decimals,
+		'decimals_exact' => $decimals_exact
+	];
+
+	$scale_values = [];
+
+	$scale_values[] = [
+		'relative_pos' => 0,
+		'value' => convertUnits([
+			'value' => $min,
+		] + ($min_calculated ? $options_calculated : $options_fixed))
+	];
+
+	foreach ($rows as $value) {
+		$scale_values[] = [
+			'relative_pos' => ($value - $min) / ($max - $min),
+			'value' => convertUnits([
+				'value' => $value,
+			] + $options_calculated)
+		];
+	}
+
+	$scale_values[] = [
+		'relative_pos' => 1,
+		'value' => convertUnits([
+			'value' => $max,
+		] + ($max_calculated ? $options_calculated : $options_fixed))
+	];
+
+	return $scale_values;
 }

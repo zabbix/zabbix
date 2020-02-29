@@ -638,19 +638,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
  * @return string
  */
 function convertUnits(array $options) {
-	static $power_table = [];
-
-	if (!$power_table) {
-		foreach (['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $power => $prefix) {
-			$power_table[] = [
-				'prefix' => $prefix,
-				'divisor' => [
-					'1000' => pow(1000, $power),
-					ZBX_KIBIBYTE => pow(ZBX_KIBIBYTE, $power)
-				]
-			];
-		}
-	}
+	static $power_table = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
 
 	$options += [
 		'value' => 0,
@@ -701,19 +689,19 @@ function convertUnits(array $options) {
 		return $result;
 	}
 
-	$unit_base = (string) $options['unit_base'];
-	if ($unit_base !== '1000' && $unit_base !== (string) ZBX_KIBIBYTE) {
-		$unit_base = in_array($units, ['B', 'Bps']) ? (string) ZBX_KIBIBYTE : '1000';
+	$unit_base = $options['unit_base'];
+	if ($unit_base != 1000 && $unit_base != ZBX_KIBIBYTE) {
+		$unit_base = ($units === 'B' || $units === 'Bps') ? ZBX_KIBIBYTE : 1000;
 	}
 
-	$unit_prefix = '';
-	$unit_divisor = 1;
-
 	if ($options['power'] === null) {
-		foreach ($power_table as $power => $data) {
-			if ($value_abs >= $data['divisor'][$unit_base]) {
-				$unit_prefix = $data['prefix'];
-				$unit_divisor = $data['divisor'][$unit_base];
+		$unit_power = 1;
+		$unit_prefix = '';
+
+		foreach ($power_table as $power => $prefix) {
+			if ($value_abs >= pow($unit_base, $power)) {
+				$unit_power = $power;
+				$unit_prefix = $prefix;
 			}
 			else {
 				break;
@@ -721,15 +709,15 @@ function convertUnits(array $options) {
 		}
 	}
 	elseif (array_key_exists($options['power'], $power_table) && $value_abs != 0) {
-		$unit_prefix = $power_table[$options['power']]['prefix'];
-		$unit_divisor = $power_table[$options['power']]['divisor'][$unit_base];
+		$unit_power = $options['power'];
+		$unit_prefix = $power_table[$unit_power];
 	}
 	else {
-		$unit_prefix = $power_table[8]['prefix'];
-		$unit_divisor = $power_table[8]['divisor'][$unit_base];
+		$unit_power = count($power_table);
+		$unit_prefix = $power_table[$unit_power];
 	}
 
-	$result = formatFloat($value / $unit_divisor, $options['precision'], $options['decimals'] ??
+	$result = formatFloat($value / pow($unit_base, $unit_power), $options['precision'], $options['decimals'] ??
 		($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED), $options['decimals_exact']
 	);
 
@@ -1382,9 +1370,6 @@ function formatFloat(string $number, int $precision = null, int $decimals = null
 	}
 
 	$exponent = floor(log10(abs($number)));
-	if ($number < 0) {
-		$exponent = -$exponent;
-	}
 
 	if ($exponent < 0) {
 		for ($i = 1; $i >= 0; $i--) {
@@ -1418,9 +1403,6 @@ function formatFloat(string $number, int $precision = null, int $decimals = null
 	}
 
 	$exponent = floor(log10(abs($number)));
-	if ($number < 0) {
-		$exponent = -$exponent;
-	}
 
 	if ($exponent < 0) {
 		if ($digits - $exponent <= ($exact ? min($decimals + 1, $precision) : $precision)) {
@@ -1438,6 +1420,17 @@ function formatFloat(string $number, int $precision = null, int $decimals = null
 			$decimal_point, ' '
 		);
 	}
+}
+
+/**
+* Truncate float to the amount of significant digits, to allow safe float comparison.
+*
+* @param mixed $number
+*
+* @return float
+*/
+function truncateFloat($number): float {
+	return (float) sprintf('%.'.(PHP_FLOAT_DIG - 1).'E', $number);
 }
 
 /**

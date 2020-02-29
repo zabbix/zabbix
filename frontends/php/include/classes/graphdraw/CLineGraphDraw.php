@@ -67,6 +67,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->cell_height_min = 30;
 
 		$this->intervals = [];
+		$this->power = [];
 
 		$this->drawItemsLegend = false; // draw items legend
 		$this->drawExLegend = false; // draw percentile and triggers legend
@@ -1126,12 +1127,12 @@ class CLineGraphDraw extends CGraphDraw {
 		foreach ($this->getVerticalScalesInUse() as $side_index => $side) {
 			$units = null;
 			$units_long = '';
-			$unit_base = 1000;
+			$is_binary = false;
 
 			for ($i = 0; $i < $this->num; $i++) {
 				if ($this->items[$i]['yaxisside'] == $side) {
 					if ($this->items[$i]['units'] === 'B' || $this->items[$i]['units'] === 'Bps') {
-						$unit_base = ZBX_KIBIBYTE;
+						$is_binary = true;
 					}
 
 					if ($units === null) {
@@ -1172,70 +1173,21 @@ class CLineGraphDraw extends CGraphDraw {
 				);
 			}
 
-			$power = (int) min(8, max(0,
-				floor(log(abs($this->m_minY[$side]), $unit_base)),
-				floor(log(abs($this->m_maxY[$side]), $unit_base))
-			));
-
-			$units_length = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
-			$precision = $units_length == 0 ? 8 : max(1, 8 - $units_length - ($this->m_minY[$side] < 0 ? 1 : 0));
-			$decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED;
-			$decimals_exact = false;
-
-			$power_interval = $this->intervals[$side] / pow($unit_base, $power);
-			if ($power_interval < 1) {
-				$precision_required = 1 - floor(log10($power_interval));
-				if ($precision_required <= $precision) {
-					$decimals = min(getNumDecimals($power_interval), $precision - 1);
-					$decimals_exact = true;
-				}
-				else {
-					$precision = 4;
-				}
-			}
-
-			$rows = [
-				['value' => $this->m_minY[$side], 'draw_line' => false],
-				['value' => $this->m_maxY[$side], 'draw_line' => $side_index == 0]
-			];
-
-			$clearance = 0.5;
-			for ($row_index = 0;; $row_index++) {
-				$value = ceil($this->m_minY[$side] / $this->intervals[$side] + $row_index + $clearance)
-					* $this->intervals[$side];
-
-				if ($value > $this->m_maxY[$side] - $this->intervals[$side] * $clearance) {
-					break;
-				}
-
-				$rows[] = ['value' => $value, 'draw_line' => $side_index == 0];
-			}
-
-			$ignore_milliseconds = $this->m_minY[$side] <= 1 || $this->m_maxY[$side] >= 1;
+			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
+				$this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED, $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED,
+				$this->intervals[$side], $units, $is_binary, $this->power[$side], 8
+			);
 
 			$line_color = $this->getColor($this->graphtheme['gridcolor'], 0);
 
-			foreach ($rows as $row) {
-				$value_converted = convertUnits([
-					'value' => $row['value'],
-					'units' => $units,
-					'unit_base' => $unit_base,
-					'convert' => ITEM_CONVERT_NO_UNITS,
-					'power' => $power,
-					'ignore_milliseconds' => $ignore_milliseconds,
-					'precision' => $precision,
-					'decimals' => $decimals,
-					'decimals_exact' => $decimals_exact
-				]);
-
+			foreach ($scale_values as ['relative_pos' => $relative_pos, 'value' => $value]) {
 				$pos_X = ($side == GRAPH_YAXIS_SIDE_LEFT)
-					? $this->shiftXleft - imageTextSize(8, 0, $value_converted)['width'] - 9
+					? $this->shiftXleft - imageTextSize(8, 0, $value)['width'] - 9
 					: $this->sizeX + $this->shiftXleft + 12;
 
-				$pos_Y = $this->shiftY + $this->sizeY - $this->sizeY
-					/ ($this->m_maxY[$side] - $this->m_minY[$side]) * ($row['value'] - $this->m_minY[$side]);
+				$pos_Y = $this->shiftY + $this->sizeY * (1 - $relative_pos);
 
-				if ($row['draw_line']) {
+				if ($side_index == 0 && $relative_pos > 0) {
 					dashedLine($this->im, $this->shiftXleft, $pos_Y, $this->shiftXleft + $this->sizeX, $pos_Y,
 						$line_color
 					);
@@ -1248,7 +1200,7 @@ class CLineGraphDraw extends CGraphDraw {
 					$pos_X,
 					$pos_Y + 4,
 					$this->getColor($this->graphtheme['textcolor'], 0),
-					$value_converted
+					$value
 				);
 			}
 
@@ -1890,7 +1842,7 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 
-			$result = calculateGraphScale($min, $max, $is_binary, $calc_min, $calc_max, $rows_min, $rows_max);
+			$result = calculateGraphScaleExtremes($min, $max, $is_binary, $calc_min, $calc_max, $rows_min, $rows_max);
 
 			if ($result === false) {
 				show_error_message(_('Y axis MAX value must be greater than Y axis MIN value.'));
@@ -1900,7 +1852,8 @@ class CLineGraphDraw extends CGraphDraw {
 			[
 				'min' => $this->m_minY[$side],
 				'max' => $this->m_maxY[$side],
-				'interval' => $this->intervals[$side]
+				'interval' => $this->intervals[$side],
+				'power' => $this->power[$side]
 			] = $result;
 
 			if ($calc_min && $calc_max) {
