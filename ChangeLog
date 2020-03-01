@@ -73,8 +73,13 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 Changes for 4.4.7rc1
 
 New features:
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
+...G...... [ZBXNEXT-5781] improved agent2 metric testing (-t) and printing (-p) by adding full plugin interface support and verbose testing option (wiper)
 
 Bug fixes:
+..F....... [ZBX-17269] fixed undefined indexes in history page (Ivo)
+........S. [ZBX-17342] dump memory statistics and items with most values when value cache is fully used (vso)
+.......PS. [ZBX-16926] fix INT_MAX error when compiling on SunOS/Joyent/Solaris (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.6
