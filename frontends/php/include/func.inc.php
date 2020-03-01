@@ -1331,23 +1331,21 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 }
 
 /**
- * Format floating-point number for displaying.
+ * Format floating-point number in best possible way for displaying.
  *
- * @param string    $number          Valid number in decimal or scientific notation.
- * @param int|null  $precision       Max number of significant digits to take into account.
- * @param int|null  $decimals        Max number of first non-zero decimals decimals to display.
+ * @param string   $number     Valid number in decimal or scientific notation.
+ * @param int|null $precision  Max number of significant digits to take into account. Default: PHP_FLOAT_DIG.
+ * @param int|null $decimals   Max number of first non-zero decimals decimals to display. Default: 0.
+ * @param bool     $exact      Display exaclty this number of decimals instead of first non-zeros.
  *
  * @return string
  */
-
-function formatFloat(string $number, int $precision = null, int $decimals = null, bool $exact = false): string {
+function formatFloat(float $number, int $precision = null, int $decimals = null, bool $exact = false): string {
 	static $decimal_point;
 
 	if ($decimal_point === null) {
 		$decimal_point = localeconv()['decimal_point'];
 	}
-
-	$number = (float) $number;
 
 	if ($number == 0) {
 		return '0';
@@ -1369,6 +1367,8 @@ function formatFloat(string $number, int $precision = null, int $decimals = null
 		$decimals = 0;
 	}
 
+	$number_original = $number;
+
 	$exponent = floor(log10(abs($number)));
 
 	if ($exponent < 0) {
@@ -1388,7 +1388,9 @@ function formatFloat(string $number, int $precision = null, int $decimals = null
 	}
 	else {
 		if ($exponent >= $precision) {
-			$number = round($number, $decimals - $exponent);
+			if (round($number, $precision - $exponent - 1) != $number) {
+				$number = round($number, $decimals - $exponent);
+			}
 		}
 		else {
 			$number = round($number, min($decimals, $precision - $exponent - 1));
@@ -1412,7 +1414,7 @@ function formatFloat(string $number, int $precision = null, int $decimals = null
 			return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 		}
 	}
-	elseif ($exponent >= $precision) {
+	elseif ($exponent >= $precision && ($number != $number_original || $exponent - $precision > 2)) {
 		return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 	}
 	else {
@@ -1429,7 +1431,7 @@ function formatFloat(string $number, int $precision = null, int $decimals = null
 *
 * @return float
 */
-function truncateFloat($number): float {
+function truncateFloat(float $number): float {
 	return (float) sprintf('%.'.(PHP_FLOAT_DIG - 1).'E', $number);
 }
 
@@ -1440,7 +1442,7 @@ function truncateFloat($number): float {
  *
  * @return int
  */
-function getNumDecimals($number): int {
+function getNumDecimals(float $number): int {
 	[$mantissa, $exponent] = explode('E', sprintf('%.'.(PHP_FLOAT_DIG - 1).'E', $number));
 
 	$significant_size = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);

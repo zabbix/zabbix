@@ -866,7 +866,7 @@ function find_period_end($periods, $time, $max_time) {
 }
 
 /**
-* Calculate best graph scale interval for given arguments.
+* Yield suitable graph scale intervals.
 *
 * @param float $min        Minimum extreme of the scale.
 * @param float $max        Maximum extreme of the scale.
@@ -904,7 +904,7 @@ function yieldGraphScaleInterval($min, $max, $is_binary, $power, $rows) {
 }
 
 /**
-* Calculate best graph scale extremes for given arguments.
+* Calculate graph scale extremes.
 *
 * @param float $data_min   Minimum extreme of the graph.
 * @param float $data_max   Maximum extreme of the graph.
@@ -1019,12 +1019,25 @@ function calculateGraphScaleExtremes($data_min, $data_max, $is_binary, $calc_min
 	return $best_result;
 }
 
-function calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated, $interval, $units, $is_binary, $power,
-		$precision_max) {
+/**
+* Calculate graph scale intermediate values.
+*
+* @param float  $min             Minimum extreme of the scale.
+* @param float  $max             Maximum extreme of the scale.
+* @param bool   $min_calculated  Is minimum extreme of the scale calculated?
+* @param bool   $max_calculated  Is maximum extreme of the scale calculated?
+* @param float  $interval        Scale interval.
+* @param string $units           Scale units.
+* @param bool   $is_binary       Is the scale binary (use 1024 base for units)?
+* @param int    $power           Scale power.
+* @param int    $precision_max   Maximum precision to use for the scale.
+*/
+function calculateGraphScaleValues(float $min, float $max, bool $min_calculated, bool $max_calculated, float $interval,
+		string $units, bool $is_binary, int $power, int $precision_max): array {
 	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
 
 	$units_length = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
-	$precision = $units_length == 0 ? $precision_max : max(1, $precision_max - $units_length - ($min < 0 ? 1 : 0));
+	$precision = max(3, $units_length == 0 ? $precision_max : ($precision_max - $units_length - ($min < 0 ? 1 : 0)));
 
 	$decimals = min(ZBX_UNITS_ROUNDOFF_SUFFIXED, $precision - 1);
 	$decimals_exact = false;
