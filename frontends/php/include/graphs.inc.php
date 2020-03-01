@@ -874,9 +874,9 @@ function find_period_end($periods, $time, $max_time) {
 * @param int   $power      Scale power.
 * @param int   $rows       Number of scale rows.
 *
-* @return float
+* @return iterable
 */
-function yieldGraphScaleInterval(float $min, float $max, bool $is_binary, int $power, int $rows): float {
+function yieldGraphScaleInterval(float $min, float $max, bool $is_binary, int $power, int $rows): iterable {
 	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
 
 	$interval = truncateFloat(($max - $min) / $rows / pow($unit_base, $power));

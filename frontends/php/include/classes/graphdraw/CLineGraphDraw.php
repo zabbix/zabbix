@@ -704,10 +704,10 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	/********************************************************************************************************/
-	// DRAW ELEMENTS
-	/********************************************************************************************************/
-	public function drawXYAxis() {
+	/**
+	* Draw X and Y axis.
+	*/
+	private function drawXYAxis() {
 		$gbColor = $this->getColor($this->graphtheme['gridbordercolor'], 0);
 
 		if ($this->yaxis[GRAPH_YAXIS_SIDE_LEFT]) {

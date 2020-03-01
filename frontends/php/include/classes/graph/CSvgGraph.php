@@ -626,7 +626,8 @@ class CSvgGraph extends CSvg {
 	 * Get array of X points with labels, for grid and X/Y axes. Array key is Y coordinate for SVG, value is label with
 	 * axis units.
 	 *
-	 * @param int $side  Type of X axis: GRAPH_YAXIS_SIDE_RIGHT, GRAPH_YAXIS_SIDE_LEFT
+	 * @param int  $side       Type of Y axis: GRAPH_YAXIS_SIDE_RIGHT, GRAPH_YAXIS_SIDE_LEFT
+	 * @param bool $empty_set  Return defaults for empty side.
 	 *
 	 * @return array
 	 */
@@ -721,34 +722,6 @@ class CSvgGraph extends CSvg {
 				->setTextColor($this->text_color)
 				->setLineColor($this->grid_color)
 		);
-	}
-
-	/**
-	 * Calculate array of points between $min and $max value.
-	 *
-	 * @param int $min  Minimum value.
-	 * @param int $max  Maximum value.
-	 *
-	 * @return $array
-	 */
-	public static function getValueGrid($min, $max, $interval) {
-		$rows = [
-			$min,
-			$max
-		];
-
-		$clearance = 0.5;
-		for ($row_index = 0;; $row_index++) {
-			$value = ceil($min / $interval + $row_index + $clearance) * $interval;
-
-			if ($value > $max - $interval * $clearance) {
-				break;
-			}
-
-			$rows[] = $value;
-		}
-
-		return $rows;
 	}
 
 	/**
