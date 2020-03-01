@@ -183,7 +183,7 @@ class CTriggerExpression {
 		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->lld_macro_function_parser = new CLLDMacroFunctionParser;
 		$this->user_macro_parser = new CUserMacroParser();
-		$this->number_parser = new CNumberParser();
+		$this->number_parser = new CNumberParser(['with_suffix' => true]);
 	}
 
 	/**

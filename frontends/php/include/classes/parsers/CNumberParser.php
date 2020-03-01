@@ -25,6 +25,15 @@
 class CNumberParser extends CParser {
 
 	/**
+	* Parser options.
+	*
+	* @var array
+	*/
+	private $options = [
+		'with_suffix' => false
+	];
+
+	/**
 	 * Parsed number without time or byte suffix.
 	 *
 	 * @var string
@@ -52,6 +61,10 @@ class CNumberParser extends CParser {
 	 */
 	private static $suffix_multipliers = ZBX_BYTE_SUFFIX_MULTIPLIERS + ZBX_TIME_SUFFIX_MULTIPLIERS;
 
+	public function __construct(array $options = []) {
+		$this->options = array_replace($this->options, array_intersect_key($options, $this->options));
+	}
+
 	/**
 	 * Parse number with optional time or byte suffix.
 	 *
@@ -70,7 +83,11 @@ class CNumberParser extends CParser {
 
 		$fragment = substr($source, $pos);
 
-		if (!preg_match('/^'.ZBX_PREG_NUMBER.'(?<suffix>['.self::$suffixes.'])?/', $fragment, $matches)) {
+		$pattern = $this->options['with_suffix']
+			? '/^'.ZBX_PREG_NUMBER.'(?<suffix>['.self::$suffixes.'])?/'
+			: '/^'.ZBX_PREG_NUMBER.'/';
+
+		if (!preg_match($pattern, $fragment, $matches)) {
 			return self::PARSE_FAIL;
 		}
 

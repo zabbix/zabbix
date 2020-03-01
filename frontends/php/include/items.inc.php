@@ -1373,7 +1373,7 @@ function getItemFunctionalValue($item, $function, $parameter) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
-	$number_parser = new CNumberParser();
+	$number_parser = new CNumberParser(['with_suffix' => true]);
 
 	if ($number_parser->parse($parameter) != CParser::PARSE_SUCCESS) {
 		return UNRESOLVED_MACRO_STRING;

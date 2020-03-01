@@ -494,7 +494,7 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateNumSuffix($param) {
-		return ((new CNumberParser())->parse($param) == CParser::PARSE_SUCCESS);
+		return ((new CNumberParser(['with_suffix' => true]))->parse($param) == CParser::PARSE_SUCCESS);
 	}
 
 	/**

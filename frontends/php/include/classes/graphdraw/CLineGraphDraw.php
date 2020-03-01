@@ -424,7 +424,7 @@ class CLineGraphDraw extends CGraphDraw {
 			return;
 		}
 
-		$number_parser = new CNumberParser();
+		$number_parser = new CNumberParser(['with_suffix' => true]);
 
 		$max = 3;
 		$cnt = 0;

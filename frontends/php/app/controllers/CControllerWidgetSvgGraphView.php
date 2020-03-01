@@ -55,7 +55,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$initial_load = $this->getInput('initial_load', 1);
 		$script_inline = '';
 
-		$parser = new CNumberParser();
+		$parser = new CNumberParser(['with_suffix' => true]);
 		$lefty_min = $parser->parse($fields['lefty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
 		$lefty_max = $parser->parse($fields['lefty_max']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
 		$righty_min = $parser->parse($fields['righty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
