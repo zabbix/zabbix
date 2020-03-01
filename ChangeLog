@@ -1,10 +1,20 @@
 Changes for 5.0.0beta1
 
 New features:
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
+...G...... [ZBXNEXT-5781] improved agent2 metric testing (-t) and printing (-p) by adding full plugin interface support and verbose testing option (wiper)
+.......PS. [ZBXNEXT-3940] added functionality to flush SNMP connections cache (arimdjonoks)
+.D.G...... [ZBXNEXT-1561] added nanoseconds option for zabbix_sender; thanks to Vladimir for the patch (asestakovs)
+...G...... [ZBXNEXT-5604] added option to suppress logging of system.run[] if embedded in agent configuration file (akozlovs)
+A.F.I..... [ZBXNEXT-4584] implemented auditlog API (gcalenko, Sasha)
 ........S. [ZBXNEXT-1797] added HOST.ID macro support to notifications (atumilovics)
 ..F....... [ZBXNEXT-5725] added ability to select specific severities in Monitoring->Problems (vasilijs)
 
 Bug fixes:
+..F....... [ZBX-17269] fixed undefined indexes in history page (Ivo)
+........S. [ZBX-17342] dump memory statistics and items with most values when value cache is fully used (vso)
+.......PS. [ZBX-16928] upgraded Duktape version from 2.3.0 to 2.4.0 (wiper)
+.......PS. [ZBX-16926] fix INT_MAX error when compiling on SunOS/Joyent/Solaris (arimdjonoks)
 .......PS. [ZBX-17295] fixed IPMI sensor LLD JSON output (akozlovs)
 ..F....... [ZBX-17222] fixed unlimited data selection in Latest data view (averza)
 
