@@ -1135,8 +1135,12 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.19rc1
 
 New features:
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 
 Bug fixes:
+..F....... [ZBX-17269] fixed undefined indexes in history page (Ivo)
+........S. [ZBX-17342] dump memory statistics and items with most values when value cache is fully used (vso)
+.......PS. [ZBX-16926] fix INT_MAX error when compiling on SunOS/Joyent/Solaris (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.18
