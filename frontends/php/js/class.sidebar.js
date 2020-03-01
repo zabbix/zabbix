@@ -162,35 +162,26 @@ class CSidebar extends CBaseComponent {
 				}
 			},
 
-			focusin: (e) => {
-				if (e.relatedTarget === null) {
-					this._is_focused = true;
-					this.open();
+			focus: (e) => {
+				if (!this._node.contains(e.relatedTarget)) {
+					this._is_focused = (e.type === 'focusin');
+
+					if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
+						if (this._is_focused) {
+							this.open();
+							document.addEventListener('keydown', this._events.escape);
+						}
+						else {
+							this.close();
+							document.removeEventListener('keydown', this._events.escape);
+						}
+					}
 				}
-			},
-
-			focusout: (e) => {
-				if (e.relatedTarget === null) {
-					this._is_focused = false;
-					this.close();
-				}
-
-
-				// if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
-				// 	this._is_focused = this._node.contains(document.activeElement);
-
-				// 	if (this._is_focused) {
-				// 		this.open();
-				// 	}
-				// 	else {
-				// 		this.close();
-				// 	}
-				// }
 			},
 
 			escape: (e) => {
 				if (e.key === 'Escape') {
-					document.querySelector('.btn-kiosk').focus();
+					document.querySelector('[autofocus="autofocus"]').focus();
 				}
 			},
 
@@ -225,15 +216,7 @@ class CSidebar extends CBaseComponent {
 			this.on('mouseleave', this._events.mouseleave);
 		}
 
-		this.on('focusin', this._events.focusin);
-		this.on('focusout', this._events.focusout);
-
-
-		// document.addEventListener('focusin', this._events.focus);
-		// document.addEventListener('focusout', this._events.focus);
-
-		// this.on('mouseenter', this._events.mouseenter);
-		// this.on('mouseleave', this._events.mouseleave);
+		this.on('focusin focusout', this._events.focus);
 
 		for (const el of this._node.querySelectorAll('.js-sidebar-mode')) {
 			el.addEventListener('click', this._events.viewmodechange);
