@@ -1844,7 +1844,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$result = calculateGraphScaleExtremes($min, $max, $is_binary, $calc_min, $calc_max, $rows_min, $rows_max);
 
-			if ($result === false) {
+			if ($result === null) {
 				show_error_message(_('Y axis MAX value must be greater than Y axis MIN value.'));
 				exit;
 			}

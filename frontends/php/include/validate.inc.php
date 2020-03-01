@@ -26,8 +26,8 @@ function unset_request($key) {
 /**
  * Validation expression for min/max number range.
  *
- * @param int $min
- * @param int $max
+ * @param int    $min
+ * @param int    $max
  * @param string $var
  */
 function BETWEEN($min, $max, $var = '') {
@@ -35,11 +35,11 @@ function BETWEEN($min, $max, $var = '') {
 }
 
 /**
- * Validation expression for min/max range as well as max number of digits after the decimal point.
+ * Validation expression for min/max range and max number of digits after the decimal point.
  *
- * @param int $min
- * @param int $max
- * @param int $scale
+ * @param int    $min
+ * @param int    $max
+ * @param int    $scale
  * @param string $var
  */
 function BETWEEN_DBL($min, $max, $scale, $var = '') {

@@ -873,9 +873,10 @@ function find_period_end($periods, $time, $max_time) {
 * @param bool  $is_binary  Is the scale binary (use 1024 base for units)?
 * @param int   $power      Scale power.
 * @param int   $rows       Number of scale rows.
-* @param int   $steps      Number of times to search for the next suitable interval.
+*
+* @return float
 */
-function yieldGraphScaleInterval($min, $max, $is_binary, $power, $rows) {
+function yieldGraphScaleInterval(float $min, float $max, bool $is_binary, int $power, int $rows): float {
 	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
 
 	$interval = truncateFloat(($max - $min) / $rows / pow($unit_base, $power));
@@ -913,8 +914,11 @@ function yieldGraphScaleInterval($min, $max, $is_binary, $power, $rows) {
 * @param bool  $calc_max   Should scale maximum be calculated?
 * @param int   $rows_min   Minimum number of scale rows.
 * @param int   $rows_max   Maximum number of scale rows.
+*
+* @return array|null
 */
-function calculateGraphScaleExtremes($data_min, $data_max, $is_binary, $calc_min, $calc_max, $rows_min, $rows_max) {
+function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_binary, bool $calc_min, bool $calc_max,
+		int $rows_min, int $rows_max): ?array {
 	$scale_min = truncateFloat($data_min);
 	$scale_max = truncateFloat($data_max);
 
@@ -927,7 +931,7 @@ function calculateGraphScaleExtremes($data_min, $data_max, $is_binary, $calc_min
 				$scale_max = $scale_min < 0 ? 0 : ($scale_min == 0 ? 1 : $scale_min * 1.25);
 			}
 			else {
-				return false;
+				return null;
 			}
 		}
 		else {
@@ -938,7 +942,7 @@ function calculateGraphScaleExtremes($data_min, $data_max, $is_binary, $calc_min
 				$scale_min = $scale_max > 0 ? 0 : ($scale_max == 0 ? -1 : $scale_max * 1.25);
 			}
 			else {
-				return false;
+				return null;
 			}
 		}
 	}
@@ -1031,6 +1035,8 @@ function calculateGraphScaleExtremes($data_min, $data_max, $is_binary, $calc_min
 * @param bool   $is_binary       Is the scale binary (use 1024 base for units)?
 * @param int    $power           Scale power.
 * @param int    $precision_max   Maximum precision to use for the scale.
+*
+* @return array
 */
 function calculateGraphScaleValues(float $min, float $max, bool $min_calculated, bool $max_calculated, float $interval,
 		string $units, bool $is_binary, int $power, int $precision_max): array {
