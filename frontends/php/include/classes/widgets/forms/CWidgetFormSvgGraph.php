@@ -485,7 +485,13 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 				? $number_parser->calcValue()
 				: '';
 
-			if ($lefty_min !== '' && $lefty_max !== '' && $lefty_min >= $lefty_max) {
+			if (abs($lefty_min) == NAN) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Min'), _('a number is too large'));
+			}
+			elseif (abs($lefty_max) == NAN) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Max'), _('a number is too large'));
+			}
+			elseif ($lefty_min !== '' && $lefty_max !== '' && $lefty_min >= $lefty_max) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
@@ -501,7 +507,17 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 				? $number_parser->calcValue()
 				: '';
 
-			if ($righty_min !== '' && $righty_max !== '' && $righty_min >= $righty_max) {
+			if (abs($righty_min) == NAN) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Min'),
+					_('a number is too large')
+				);
+			}
+			elseif (abs($righty_max) == NAN) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Max'),
+					_('a number is too large')
+				);
+			}
+			elseif ($righty_min !== '' && $righty_max !== '' && $righty_min >= $righty_max) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);

@@ -1188,7 +1188,7 @@ class CApiInputValidator {
 
 		$value = $number_parser->calcValue();
 
-		if ($value == NAN || abs($value) == INF) {
+		if (abs($value) == INF) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 
 			return false;

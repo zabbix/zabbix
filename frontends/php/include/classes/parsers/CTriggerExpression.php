@@ -675,12 +675,17 @@ class CTriggerExpression {
 			return false;
 		}
 
+		$value = $this->number_parser->calcValue();
+		if (abs($value) == INF) {
+			return false;
+		}
+
 		$token_data = [
 			'suffix' => $this->number_parser->getSuffix()
 		];
 
 		if ($this->options['calc_constant_values']) {
-			$token_data['calc_value'] = $this->number_parser->calcValue();
+			$token_data['calc_value'] = $value;
 		}
 
 		$this->result->addToken(
