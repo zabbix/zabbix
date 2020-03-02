@@ -105,9 +105,10 @@
 						maxlength: $input.attr('maxlength')
 					})
 					.text($input.is(':disabled') ? '' : $input.val())
-					.textareaFlexible()
 					.on('focus blur', btnUndoFocusEventHandle)
 			);
+
+			$('.textarea-flexible', $container).textareaFlexible();
 		}
 		else {
 			$textarea.replaceWith(
