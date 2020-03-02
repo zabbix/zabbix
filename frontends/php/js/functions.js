@@ -807,13 +807,14 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
  */
 function downloadSvgImage($dom_node, file_name) {
 	var canvas = document.createElement('canvas'),
-		labels = $dom_node.next(),
+		labels = $dom_node.next('.svg-graph-legend'),
 		$clone = $dom_node.clone(),
 		$container = $dom_node.closest('.dashbrd-grid-widget-content'),
 		image = new Image,
 		a = document.createElement('a'),
 		style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style'),
 		$labels_clone,
+		labels_height = labels.length ? labels.height() : 0,
 		context2d;
 
 	// Clone only svg graph styles.
@@ -826,7 +827,7 @@ function downloadSvgImage($dom_node, file_name) {
 	});
 
 	canvas.width = $dom_node.width()
-	canvas.height = $dom_node.height() + labels.height();
+	canvas.height = $dom_node.height() + labels_height;
 	context2d = canvas.getContext('2d');
 	image.onload = function() {
 		context2d.drawImage(image, 0, 0);
@@ -839,9 +840,9 @@ function downloadSvgImage($dom_node, file_name) {
 	$labels_clone = jQuery(document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject'))
 		.attr({
 			x: 0,
-			y: canvas.height - labels.height(),
+			y: canvas.height - labels_height,
 			width: canvas.width,
-			height: labels.height()
+			height: labels_height
 		})
 		.append(jQuery(document.createElementNS('http://www.w3.org/1999/xhtml', 'div'))
 			.append(style)
