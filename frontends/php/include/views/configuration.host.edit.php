@@ -839,7 +839,7 @@ if ($data['hostid'] != 0) {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete selected host'), url_param('form').url_param('hostid')),
+			new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid')),
 			new CButtonCancel()
 		]
 	));
