@@ -162,9 +162,15 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_DBL) {
-		if ((new CNumberParser())->parse($var) != CParser::PARSE_SUCCESS) {
+		$number_parser = new CNumberParser();
+
+		if ($number_parser->parse($var) != CParser::PARSE_SUCCESS) {
 			$error = true;
 			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is expected'));
+		}
+		elseif (abs($number_parser->calcValue()) == INF) {
+			$error = true;
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too large'));
 		}
 	}
 	elseif ($type == T_ZBX_STR) {
