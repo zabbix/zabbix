@@ -204,8 +204,7 @@ footer {
   margin-top: auto; }
 
 output {
-  display: flex;
-  flex-direction: column; }
+  display: block; }
 
 header {
   display: flex;
@@ -765,6 +764,7 @@ footer {
     margin-left: 10px; }
 
 .msg-global-footer {
+  flex-direction: column;
   position: fixed;
   bottom: 0;
   z-index: 10000;

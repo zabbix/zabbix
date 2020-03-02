@@ -207,6 +207,7 @@
 }
 
 .msg-global-footer {
+	flex-direction: column;
 	position: fixed;
 	bottom: 0;
 	z-index: 10000;
