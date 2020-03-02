@@ -90,6 +90,7 @@ $form_list
 		(new CCheckBoxList('days'))
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setOptions($days_weekly),
 		'row_timeperiod_dayofweek'
 	)
@@ -97,6 +98,7 @@ $form_list
 		(new CCheckBoxList('months'))
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setOptions($months),
 		'row_timeperiod_months'
 	)
