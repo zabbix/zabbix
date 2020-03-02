@@ -29,13 +29,13 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	/**
 	 * Create check box list with severities.
 	 *
-	 * @param string  $name      Field name in form.
+	 * @param string $name  Field name in form.
 	 */
 	public function __construct(string $name) {
 		parent::__construct($name);
 
 		$this
-			->setOptions($this->getOrderedSeverities())
+			->setOptions($this->getSeverities())
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3);
 	}
@@ -45,14 +45,14 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	 *
 	 * @return array
 	 */
-	private function getOrderedSeverities(): array {
+	private function getSeverities(): array {
+		$ordered = [];
 		$severities = getSeverities();
 		$severities_count = count($severities);
-		$ordered = [];
 		$max_rows = (int) ceil($severities_count / self::COLUMNS);
 
 		foreach (range(0, $max_rows - 1) as $row) {
-			for ($i = TRIGGER_SEVERITY_NOT_CLASSIFIED; $i < $severities_count; $i += $max_rows) {
+			for ($i = 0; $i < $severities_count; $i += $max_rows) {
 				if (array_key_exists($row + $i, $severities)) {
 					$ordered[$row + $i] = $severities[$row + $i];
 				}

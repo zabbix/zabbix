@@ -156,17 +156,25 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 /**
  * Generate array with severities options.
  *
+ * @param bool $style  True - include style option.
+ *
  * @return array
  */
-function getSeverities() {
-	$config = select_config();
+function getSeverities($style = false) {
 	$severities = [];
+	$config = select_config();
+
 	foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-		$severities[] = [
+		$options = [
 			'name' => getSeverityName($severity, $config),
-			'value' => $severity,
-			'style' => getSeverityStyle($severity)
+			'value' => $severity
 		];
+
+		if ($style) {
+			$options['style'] = getSeverityStyle($severity);
+		}
+
+		$severities[] = $options;
 	}
 
 	return $severities;
