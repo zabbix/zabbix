@@ -957,12 +957,14 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	poller_type = *(unsigned char *)((zbx_thread_args_t *)args)->args;
 	process_type = ((zbx_thread_args_t *)args)->process_type;
-
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 #ifdef HAVE_NETSNMP
 	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 		zbx_init_snmp();
