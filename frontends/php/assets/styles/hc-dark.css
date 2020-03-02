@@ -452,7 +452,7 @@ footer {
   right: 0;
   z-index: 1000;
   min-width: 16px;
-  padding: 0 5px;
+  padding: 0 10px;
   color: #cacaca;
   background-color: #383838;
   border: 1px solid #666666;
@@ -461,10 +461,12 @@ footer {
   .search-suggest li {
     display: block;
     height: inherit;
-    padding: .4em 5px;
+    padding: .4em 0;
     margin: 0 -5px;
+    overflow: hidden;
     color: #ffffff;
     line-height: normal;
+    word-break: break-word;
     cursor: pointer;
     transition: background-color .2s ease-out; }
     .search-suggest li.suggest-hover {
