@@ -40,7 +40,7 @@ class CControllerProblemView extends CController {
 			'filter_application' =>		'string',
 			'filter_triggerids' =>		'array_id',
 			'filter_name' =>			'string',
-			'filter_severity' =>		'array',
+			'filter_severities' =>		'array',
 			'filter_age_state' =>		'in 1',
 			'filter_age' =>				'int32',
 			'filter_inventory' =>		'array',
@@ -129,7 +129,7 @@ class CControllerProblemView extends CController {
 				PROFILE_TYPE_ID
 			);
 			CProfile::update('web.problem.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::updateArray('web.problem.filter.severities', $this->getInput('filter_severity', []),
+			CProfile::updateArray('web.problem.filter.severities', $this->getInput('filter_severities', []),
 				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.problem.filter.age_state', $this->getInput('filter_age_state', 0), PROFILE_TYPE_INT);
@@ -298,7 +298,7 @@ class CControllerProblemView extends CController {
 				'triggerids' => $filter_triggerids,
 				'triggers' => $filter_triggers,
 				'name' => CProfile::get('web.problem.filter.name', ''),
-				'severity' => CProfile::getArray('web.problem.filter.severities', []),
+				'severities' => CProfile::getArray('web.problem.filter.severities', []),
 				'age_state' => CProfile::get('web.problem.filter.age_state', 0),
 				'age' => CProfile::get('web.problem.filter.age', 14),
 				'inventories' => $inventories,
