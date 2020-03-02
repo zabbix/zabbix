@@ -21,21 +21,23 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v4"
 )
 
 const (
-	keyPostgresPing    = "pgsql.ping"
-	postgresPingFailed = 0
-	postgresPingOk     = 1
+	keyPostgresPing     = "pgsql.ping"
+	postgresPingUnknown = -1
+	postgresPingFailed  = 0
+	postgresPingOk      = 1
 )
 
 // pingHandler executes 'SELECT 1 as pingOk' commands and returns pingOK if a connection is alive or postgresPingFailed otherwise.
 func (p *Plugin) pingHandler(conn *postgresConn, params []string) (interface{}, error) {
-	var pingOK int64 = -1
+	var pingOK int64 = postgresPingUnknown
 
-	err := conn.postgresPool.QueryRow(context.Background(), "SELECT 1 as pingOk").Scan(&pingOK)
+	err := conn.postgresPool.QueryRow(context.Background(), fmt.Sprintf("SELECT %d as pingOk", postgresPingOk)).Scan(&pingOK)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
@@ -44,7 +46,7 @@ func (p *Plugin) pingHandler(conn *postgresConn, params []string) (interface{}, 
 		p.Errf(err.Error())
 		return nil, errorCannotFetchData
 	}
-	if pingOK != 1 {
+	if pingOK != postgresPingOk {
 		p.Errf(string(errorPostgresPing))
 		return postgresPingFailed, errorPostgresPing
 	}

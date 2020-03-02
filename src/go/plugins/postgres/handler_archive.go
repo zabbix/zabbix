@@ -1,4 +1,4 @@
-/* /*
+/*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
 **
@@ -34,20 +34,20 @@ const (
 func (p *Plugin) archiveHandler(conn *postgresConn, params []string) (interface{}, error) {
 	var archiveCountJSON, archiveSizeJSON string
 	var err error
-	queryArchiveCount := `SELECT row_to_json(T) 
+	queryArchiveCount := `SELECT row_to_json(T)
 							FROM (
-									SELECT archived_count, failed_count 
+									SELECT archived_count, failed_count
 								   	  FROM pg_stat_archiver
 								) T;`
 
-	queryArchiveSize := `SELECT row_to_json(T) 
-							FROM ( 
+	queryArchiveSize := `SELECT row_to_json(T)
+							FROM (
 									SELECT count(name) AS count_files ,
 									coalesce(sum((pg_stat_file('./pg_wal/' || rtrim(ready.name,'.ready'))).size),0) AS size_files
 									FROM (
-										SELECT name 
-										  FROM pg_ls_dir('./pg_wal/archive_status') name 
-										  WHERE right( name,6)= '.ready'  
+										SELECT name
+										  FROM pg_ls_dir('./pg_wal/archive_status') name
+										  WHERE right( name,6)= '.ready'
 										 ) ready
 								) T;`
 
