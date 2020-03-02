@@ -123,6 +123,7 @@ $form_list
 		(new CCheckBoxList('monthly_days'))
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setOptions($days_monthly),
 		'row_timeperiod_week_days'
 	)
