@@ -674,6 +674,8 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers, int $
 		$trigger_name = $trigger['description'];
 		$triggerid = $trigger['triggerid'];
 
+		CArrayHelper::sort($trigger['hosts'], ['name']);
+
 		foreach ($trigger['hosts'] as $host) {
 			$host_name = $host['name'];
 			$hostid = $host['hostid'];
@@ -693,8 +695,8 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers, int $
 			$triggers_by_name[$trigger_name][$hostid] = $triggerid;
 			$hosts_by_name[$host_name] = $hostid;
 
-			$exceeded_trigs = count($triggers_by_name) > $limit;
-			$exceeded_hosts = count($hosts_by_name) > $limit;
+			$exceeded_trigs = (count($triggers_by_name) > $limit);
+			$exceeded_hosts = (count($hosts_by_name) > $limit);
 
 			if ($exceeded_hosts || $exceeded_trigs) {
 				$hosts_by_name = array_slice($hosts_by_name, 0, $limit, true);
@@ -730,20 +732,19 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 	$host_options = [
 		'output' => ['hostid', 'name'],
 		'groupids' => $groupids ? $groupids : null,
-		'preservekeys' => true,
 		'sortfield' => 'name',
-		'sortorder' => 'ASC'
+		'sortorder' => ZBX_SORT_UP,
+		'preservekeys' => true
 	] + $host_options;
 
 	$trigger_options = [
 		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
 		'selectHosts' => ['hostid', 'name'],
+		'selectDependencies' => ['triggerid'],
 		'monitored' => true,
 		'sortfield' => 'description',
-		'selectDependencies' => ['triggerid'],
-		'preservekeys' => true,
-		'sortfield' => 'description',
-		'sortorder' => 'ASC',
+		'sortorder' => ZBX_SORT_UP,
+		'preservekeys' => true
 	] + $trigger_options;
 
 	$problem_options += [
@@ -766,7 +767,7 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 	do {
 		if (!$exhausted_hosts) {
 			$db_hosts = API::Host()->get(['limit' => $limit + 1] + $host_options);
-			$exhausted_hosts = count($db_hosts) < $limit;
+			$exhausted_hosts = (count($db_hosts) < $limit);
 
 			if ($application !== '') {
 				$applications = API::Application()->get([
@@ -781,7 +782,7 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 
 		if (!$exhausted_triggers) {
 			$db_triggers = getTriggersWithActualSeverity([
-				'applicationids' => $application !== '' ? $applicationids : null,
+				'applicationids' => ($application !== '') ? $applicationids : null,
 				'hostids' => array_keys($db_hosts),
 				'limit' => $limit + 1
 			]+ $trigger_options, $problem_options);
@@ -792,10 +793,9 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 				$dependencies = getTriggerDependencies($db_triggers);
 			}
 
-			$exhausted_triggers = count($db_triggers) < $limit;
+			$exhausted_triggers = (count($db_triggers) < $limit);
 		}
 
-		CArrayHelper::sort($db_hosts, ['name']);
 		CArrayHelper::sort($db_triggers, ['description']);
 
 		list($triggers_by_name, $hosts_by_name, $exceeded_hosts, $exceeded_trigs) = getTriggersOverviewTableData(
@@ -808,6 +808,8 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 
 		$limit += $limit;
 	} while (!($exhausted_triggers && $exhausted_hosts));
+
+	CArrayHelper::sort($db_hosts, ['name']);
 
 	return [$db_hosts, $db_triggers, $dependencies, $triggers_by_name, $hosts_by_name, $exceeded_hosts, $exceeded_trigs
 	];
