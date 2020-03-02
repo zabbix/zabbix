@@ -564,13 +564,36 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (is_int($data) || (is_string($data) && preg_match('/^'.ZBX_PREG_NUMBER.'$/', $data))) {
-			$data = (float) $data;
+		if (is_int($data) || is_float($data)) {
+			$value = (float) $data;
 		}
-		elseif (!is_float($data)) {
+		elseif (is_string($data)) {
+			$number_parser = new CNumberParser();
+
+			if ($number_parser->parse($data) == CParser::PARSE_SUCCESS) {
+				$value = (float) $number_parser->getMatch();
+			}
+			else {
+				$value = NAN;
+			}
+		}
+		else {
+			$value = NAN;
+		}
+
+		if (is_nan($value)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a floating point value is expected'));
+
 			return false;
 		}
+
+		if (is_infinite($value)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+
+			return false;
+		}
+
+		$data = $value;
 
 		return true;
 	}

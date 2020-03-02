@@ -641,7 +641,7 @@ function convertUnits(array $options) {
 	static $power_table = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
 
 	$options += [
-		'value' => 0,
+		'value' => '',
 		'units' => '',
 		'convert' => ITEM_CONVERT_WITH_UNITS,
 		'power' => null,
@@ -652,7 +652,12 @@ function convertUnits(array $options) {
 		'decimals_exact' => false
 	];
 
-	$value = $options['value'] !== null ? $options['value'] : 0;
+	$value = $options['value'] !== null ? $options['value'] : '';
+
+	if (!is_numeric($value)) {
+		return $value;
+	}
+
 	$units = $options['units'] !== null ? $options['units'] : '';
 
 	if ($units === 'unixtime') {
@@ -1341,12 +1346,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  * @return string
  */
 function formatFloat(float $number, int $precision = null, int $decimals = null, bool $exact = false): string {
-	static $decimal_point;
-
-	if ($decimal_point === null) {
-		$decimal_point = localeconv()['decimal_point'];
-	}
-
 	if ($number == 0) {
 		return '0';
 	}
@@ -1418,9 +1417,7 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 		return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 	}
 	else {
-		return number_format($number, $exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)),
-			$decimal_point, ' '
-		);
+		return sprintf('%.'.($exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals))).'f', $number);
 	}
 }
 

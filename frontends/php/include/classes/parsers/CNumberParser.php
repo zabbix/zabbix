@@ -30,6 +30,7 @@ class CNumberParser extends CParser {
 	* @var array
 	*/
 	private $options = [
+		'with_minus' => true,
 		'with_suffix' => false
 	];
 
@@ -88,6 +89,10 @@ class CNumberParser extends CParser {
 			: '/^'.ZBX_PREG_NUMBER.'/';
 
 		if (!preg_match($pattern, $fragment, $matches)) {
+			return self::PARSE_FAIL;
+		}
+
+		if ($matches['number'][0] === '-' && !$this->options['with_minus']) {
 			return self::PARSE_FAIL;
 		}
 

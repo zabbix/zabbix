@@ -2128,7 +2128,7 @@ function evalExpressionData($expression, $replace_function_macros) {
 				break;
 		}
 
-		$eval_expression .= $value;
+		$eval_expression .= ' '.$value;
 	}
 
 	// Execute expression.
