@@ -30,11 +30,6 @@ class CControllerHostViewRefresh extends CControllerHost {
 	}
 
 	protected function checkInput(): bool {
-		$severities = [];
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severities[] = $severity;
-		}
-
 		$fields = [
 			'sort' =>						'in name,status',
 			'sortorder' =>					'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
@@ -56,12 +51,23 @@ class CControllerHostViewRefresh extends CControllerHost {
 
 		$ret = $this->validateInput($fields);
 
+		// Validate tags filter.
 		if ($ret && $this->hasInput('filter_tags')) {
 			foreach ($this->getInput('filter_tags') as $filter_tag) {
 				if (count($filter_tag) != 3
 						|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
 						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
 						|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
+					$ret = false;
+					break;
+				}
+			}
+		}
+
+		// Validate severity checkbox filter.
+		if ($ret && $this->hasInput('filter_severities')) {
+			foreach ($this->getInput('filter_severities') as $severity) {
+				if (!in_array($severity, range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))) {
 					$ret = false;
 					break;
 				}
