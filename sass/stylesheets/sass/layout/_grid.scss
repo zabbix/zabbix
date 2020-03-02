@@ -21,6 +21,13 @@ aside
 	flex-direction: column;
 	overflow: auto;
 	position: relative;
+
+	&.layout-kioskmode {
+
+		main {
+			padding: 10px;
+		}
+	}
 }
 
 header,

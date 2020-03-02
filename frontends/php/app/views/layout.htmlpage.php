@@ -66,18 +66,6 @@ function local_generateHeader($data) {
 	]);
 	echo $pageHeader->getOutput();
 
-//	if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
-//		global $ZBX_SERVER_NAME;
-
-//		$pageMenu = new CView('layout.htmlpage.aside', [
-//			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : ''
-//		]);
-//		echo $pageMenu->getOutput();
-//	}
-
-//	echo '<div class="wrapper'.
-//		(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">';
-
 	// if a user logs in after several unsuccessful attempts, display a warning
 	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 		$attempt_ip = CProfile::get('web.login.attempt.ip', '');

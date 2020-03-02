@@ -187,6 +187,8 @@ aside
   flex-direction: column;
   overflow: auto;
   position: relative; }
+  .wrapper.layout-kioskmode main {
+    padding: 10px; }
 
 header,
 footer {

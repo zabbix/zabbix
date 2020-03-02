@@ -243,7 +243,8 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORM
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	echo '<div class="'.ZBX_STYLE_LAYOUT_WRAPPER.'">'."\n";
+	echo '<div class="'.ZBX_STYLE_LAYOUT_WRAPPER.
+		(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">'."\n";
 }
 
 // if a user logs in after several unsuccessful attempts, display a warning
