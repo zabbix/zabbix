@@ -1322,7 +1322,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	zbx_init_snmp();
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 	find_psk_in_cache = DCget_psk_by_identity;
 #endif
