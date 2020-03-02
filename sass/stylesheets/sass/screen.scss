@@ -5151,6 +5151,11 @@ $form-icon-btn: (
 			padding: 6px 5px;
 			border: 0;
 			border-bottom: 1px solid $table-border-color;
+
+			&.list-table-footer {
+				color: $font-alt-color;
+				text-align: right;
+			}
 		}
 	}
 

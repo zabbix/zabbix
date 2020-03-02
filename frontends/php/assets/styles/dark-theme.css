@@ -3300,6 +3300,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 6px 5px;
       border: 0;
       border-bottom: 1px solid #383838; }
+      .screen-table .list-table td.list-table-footer {
+        color: #737373;
+        text-align: right; }
   .screen-table .dashbrd-widget {
     margin: 0;
     border: 0; }
