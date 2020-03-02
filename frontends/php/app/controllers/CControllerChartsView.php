@@ -57,37 +57,37 @@ class CControllerChartsView extends CControllerCharts {
 
 	protected function doAction() {
 		if ($this->hasInput('filter_rst')) {
-			CProfile::deleteIdx('web.graphs.filter.search_type');
-			CProfile::deleteIdx('web.graphs.filter.graphids');
-			CProfile::deleteIdx('web.graphs.filter.graph_patterns');
+			CProfile::deleteIdx('web.charts.filter.search_type');
+			CProfile::deleteIdx('web.charts.filter.graphids');
+			CProfile::deleteIdx('web.charts.filter.graph_patterns');
 		}
 		elseif ($this->hasInput('filter_set')) {
-			CProfile::update('web.graphs.filter.search_type',
+			CProfile::update('web.charts.filter.search_type',
 				$this->getInput('filter_search_type', ZBX_SEARCH_TYPE_STRICT), PROFILE_TYPE_INT
 			);
-			CProfile::updateArray('web.graphs.filter.graphids', $this->getInput('filter_graphids', []),
+			CProfile::updateArray('web.charts.filter.graphids', $this->getInput('filter_graphids', []),
 				PROFILE_TYPE_ID
 			);
-			CProfile::updateArray('web.graphs.filter.graph_patterns', $this->getInput('filter_graph_patterns', []),
+			CProfile::updateArray('web.charts.filter.graph_patterns', $this->getInput('filter_graph_patterns', []),
 				PROFILE_TYPE_STR
 			);
-			CProfile::updateArray('web.graphs.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
+			CProfile::updateArray('web.charts.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
 		}
 
 		$filter_search_type = (int) $this->getInput('filter_search_type',
-			CProfile::get('web.graphs.filter.search_type', ZBX_SEARCH_TYPE_STRICT)
+			CProfile::get('web.charts.filter.search_type', ZBX_SEARCH_TYPE_STRICT)
 		);
 
-		$filter_graphids = $this->getInput('filter_graphids', CProfile::getArray('web.graphs.filter.graphids', []));
+		$filter_graphids = $this->getInput('filter_graphids', CProfile::getArray('web.charts.filter.graphids', []));
 
 		$filter_graph_patterns = $this->getInput('filter_graph_patterns',
-			CProfile::getArray('web.graphs.filter.graph_patterns', [])
+			CProfile::getArray('web.charts.filter.graph_patterns', [])
 		);
 
-		$filter_hostids = $this->getInput('filter_hostids', CProfile::getArray('web.graphs.filter.hostids', []));
+		$filter_hostids = $this->getInput('filter_hostids', CProfile::getArray('web.charts.filter.hostids', []));
 
 		$timeselector_options = [
-			'profileIdx' => 'web.graphs.filter',
+			'profileIdx' => 'web.charts.filter',
 			'profileIdx2' => 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
@@ -102,7 +102,7 @@ class CControllerChartsView extends CControllerCharts {
 			'ms_graphs' => [],
 			'ms_graph_patterns' => [],
 			'timeline' => getTimeSelectorPeriod($timeselector_options),
-			'active_tab' => CProfile::get('web.graphs.filter.active', 1),
+			'active_tab' => CProfile::get('web.charts.filter.active', 1),
 			'filter_search_type' => $filter_search_type,
 			'filter_hostids' => $filter_hostids,
 			'filter_graphids' => $filter_graphids,

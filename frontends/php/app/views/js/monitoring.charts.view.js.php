@@ -139,7 +139,7 @@
 			this.curl.setArgument('height', this.dimensions.graphHeight);
 			var width = document.body.clientWidth - (this.dimensions.shiftXright + this.dimensions.shiftXleft + 23);
 			this.curl.setArgument('width', Math.max(1000, width));
-			this.curl.setArgument('profileIdx', 'web.graphs.filter');
+			this.curl.setArgument('profileIdx', 'web.charts.filter');
 			this.curl.setArgument('_', (+new Date).toString(34));
 
 			var unsetLoading = this.setLoading(delay_loading);

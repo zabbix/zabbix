@@ -51,7 +51,7 @@ class CControllerChartsViewJson extends CControllerCharts {
 
 	protected function doAction() {
 		$timeselector_options = [
-			'profileIdx' => 'web.graphs.filter',
+			'profileIdx' => 'web.charts.filter',
 			'profileIdx2' => 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
