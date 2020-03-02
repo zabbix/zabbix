@@ -135,7 +135,7 @@ class CView {
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
 	 * @param string $file_name
-	 * @param array $data
+	 * @param array  $data
 	 *
 	 * @throws RuntimeException if the file not found, not readable or returned false.
 	 *
@@ -164,7 +164,7 @@ class CView {
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
 	 * @param string $file_name
-	 * @param array $data
+	 * @param array  $data
 	 *
 	 * @throws RuntimeException if the file not found, not readable or returned false.
 	 */
