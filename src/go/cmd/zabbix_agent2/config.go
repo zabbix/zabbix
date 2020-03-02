@@ -42,7 +42,7 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 			hostnameItem = options.HostnameItem
 		}
 
-		options.Hostname, err = taskManager.PerformTask(hostnameItem, time.Second*time.Duration(options.Timeout))
+		options.Hostname, err = taskManager.PerformTask(hostnameItem, time.Second*time.Duration(options.Timeout), agent.LocalChecksClientID)
 		if err != nil {
 			if len(options.HostnameItem) == 0 {
 				return fmt.Errorf("cannot get system hostname using \"%s\" item as default for \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
@@ -78,7 +78,7 @@ func updateHostInterface(taskManager scheduler.Scheduler, options *agent.AgentOp
 			log.Warningf("both \"HostInterface\" and \"HostInterfaceItem\" configuration parameter defined, using \"HostInterface\"")
 		}
 	} else if len(options.HostInterfaceItem) > 0 {
-		options.HostInterface, err = taskManager.PerformTask(options.HostInterfaceItem, time.Duration(options.Timeout)*time.Second)
+		options.HostInterface, err = taskManager.PerformTask(options.HostInterfaceItem, time.Duration(options.Timeout)*time.Second, agent.LocalChecksClientID)
 		if err != nil {
 			return fmt.Errorf("cannot get host interface: %s", err)
 		}

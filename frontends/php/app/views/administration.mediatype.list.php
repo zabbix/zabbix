@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if ($data['uncheck']) {
 	uncheckTableRows('mediatype');
 }
@@ -131,7 +135,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		->onClick('return PopUp("popup.mediatypetest.edit",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.mediatypetest.edit",'.json_encode([
 			'mediatypeid' => $mediaType['mediatypeid']
 		]).', "mediatypetest_edit", this);');
 

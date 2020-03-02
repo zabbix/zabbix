@@ -32,6 +32,15 @@ type Accessor interface {
 	SetCapacity(capactity int)
 }
 
+type Logger interface {
+	Tracef(format string, args ...interface{})
+	Debugf(format string, args ...interface{})
+	Warningf(format string, args ...interface{})
+	Infof(format string, args ...interface{})
+	Errf(format string, args ...interface{})
+	Critf(format string, args ...interface{})
+}
+
 type Base struct {
 	name     string
 	capacity int

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Working time'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());

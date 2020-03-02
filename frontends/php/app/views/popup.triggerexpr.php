@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 // Create form.
 $expression_form = (new CForm())
 	->cleanItems()
@@ -64,7 +68,7 @@ $item = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).', null, this);')
+		->onClick('return PopUp("popup.generic",'.json_encode($popup_options).', null, this);')
 ];
 
 if ($data['parent_discoveryid'] !== '') {
@@ -72,7 +76,7 @@ if ($data['parent_discoveryid'] !== '') {
 	$item[] = (new CButton('select', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+			json_encode([
 				'srctbl' => 'item_prototypes',
 				'srcfld1' => 'itemid',
 				'srcfld2' => 'name',
@@ -205,4 +209,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

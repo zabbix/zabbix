@@ -35,7 +35,7 @@ class CControllerWidgetNavTreeItemEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode('')]));
 		}
 
 		return $ret;

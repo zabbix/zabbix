@@ -1158,8 +1158,6 @@ static void	correlate_event_by_global_rules(DB_EVENT *event, zbx_problem_state_t
 	const char		*delim = "";
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		eventid, correlationid, objectid;
-	DB_RESULT		result;
-	DB_ROW			row;
 
 	zbx_vector_ptr_create(&corr_old);
 	zbx_vector_ptr_create(&corr_new);
@@ -1227,6 +1225,9 @@ static void	correlate_event_by_global_rules(DB_EVENT *event, zbx_problem_state_t
 
 	if (0 != corr_old.values_num)
 	{
+		DB_RESULT	result;
+		DB_ROW		row;
+
 		/* Process correlations that matches new event and either uses old events in conditions */
 		/* or has operations involving old events.                                              */
 

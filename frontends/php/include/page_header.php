@@ -49,13 +49,6 @@ switch ($page['type']) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
-	case PAGE_TYPE_XML:
-		header('Content-Type: text/xml');
-		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', true);
-		}
-		break;
 	case PAGE_TYPE_JS:
 		header('Content-Type: application/javascript; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
@@ -84,20 +77,6 @@ switch ($page['type']) {
 	case PAGE_TYPE_TEXT_RETURN_JSON:
 	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', true);
-		}
-		break;
-	case PAGE_TYPE_TEXT_FILE:
-		header('Content-Type: text/plain; charset=UTF-8');
-		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', true);
-		}
-		break;
-	case PAGE_TYPE_CSV:
-		header('Content-Type: text/csv; charset=UTF-8');
-		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
@@ -183,7 +162,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		);
 
 	// Show GUI messages in pages with menus and in fullscreen mode.
-	if (CView::$js_loader_disabled !== true) {
+	if (!defined('ZBX_PAGE_NO_JSLOADER')) {
 		$pageHeader->addJsFile((new CUrl('jsLoader.php'))
 			->setArgument('ver', ZABBIX_VERSION)
 			->setArgument('lang', CWebUser::$data['lang'])
@@ -240,7 +219,7 @@ if ($page['type'] == PAGE_TYPE_HTML && (CSession::keyExists('messageOk') || CSes
 }
 
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
-	$pageMenu = new CView('layout.htmlpage.menu', [
+	$page_menu = new CPartial('layout.htmlpage.menu', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 		'menu' => APP::Component()->get('menu.main'),
 		'user' => [
@@ -251,7 +230,7 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORM
 		],
 		'support_url' => getSupportUrl(CWebUser::getLang())
 	]);
-	echo $pageMenu->getOutput();
+	echo $page_menu->getOutput();
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {

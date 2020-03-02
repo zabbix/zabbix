@@ -1,3 +1,29 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
 <script type="text/x-jquery-tmpl" id="scenario-step-row-templated">
 	<?= (new CRow([
 			'',
@@ -70,14 +96,14 @@
 			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
 			ZBX_POSTTYPE_RAW:                    <?= ZBX_POSTTYPE_RAW ?>,
 			msg: {
-				data_not_encoded:           <?= CJs::encodeJson(_('Data is not properly encoded.')) ?>,
-				name_filed_length_exceeded: <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')) ?>,
-				value_without_name:         <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')) ?>,
-				failed_to_parse_url:        <?= CJs::encodeJson(_('Failed to parse URL.')) ?>,
-				ok:                         <?= CJs::encodeJson(_('Ok')) ?>,
-				error:                      <?= CJs::encodeJson(_('Error')) ?>,
-				url_not_encoded_properly:   <?= CJs::encodeJson(_('URL is not properly encoded.')) ?>,
-				cannot_convert_post_data:    <?= CJs::encodeJson(_('Cannot convert POST data:')) ?>
+				data_not_encoded:           <?= json_encode(_('Data is not properly encoded.')) ?>,
+				name_filed_length_exceeded: <?= json_encode(_('Name of the form field should not exceed 255 characters.')) ?>,
+				value_without_name:         <?= json_encode(_('Values without names are not allowed in form fields.')) ?>,
+				failed_to_parse_url:        <?= json_encode(_('Failed to parse URL.')) ?>,
+				ok:                         <?= json_encode(_('Ok')) ?>,
+				error:                      <?= json_encode(_('Error')) ?>,
+				url_not_encoded_properly:   <?= json_encode(_('URL is not properly encoded.')) ?>,
+				cannot_convert_post_data:   <?= json_encode(_('Cannot convert POST data:')) ?>
 			}
 		};
 
@@ -87,9 +113,8 @@
 		).html());
 
 		window.httpconf.pair_row_template = new Template(jQuery('#scenario-pair-row').html());
-		window.httpconf.scenario = new Scenario(
-			$('#scenarioTab'), <?= CJs::encodeJson($this->data['scenario_tab_data']) ?>);
-		window.httpconf.steps = new Steps($('#stepTab'), <?= CJs::encodeJson(array_values($data['steps'])) ?>);
+		window.httpconf.scenario = new Scenario($('#scenarioTab'), <?= json_encode($this->data['scenario_tab_data']) ?>);
+		window.httpconf.steps = new Steps($('#stepTab'), <?= json_encode(array_values($data['steps'])) ?>);
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 
 		window.httpconf.$form = $('#httpForm').on('submit', function(e) {
@@ -110,7 +135,7 @@
 	 * Implementation of jQuery.val for radio buttons. Use this methon within scoped jQuery object;
 	 * Use with jQuery collection of input nodes.
 	 *
-	 * @param {string}  Check button by value. Read value if no param is given.
+	 * @param {string} value  Check button by value. Read value if no param is given.
 	 *
 	 * @return {string}
 	 */
@@ -119,7 +144,7 @@
 			return this.filter(':checked').val();
 		}
 		this.filter('[value="' + value + '"]').get(0).checked = true;
-	};
+	}
 
 	/**
 	 * Returns common $.sortable options.
@@ -131,7 +156,7 @@
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			containment: 'parent',
-			cursor: IE ? 'move' : 'grabbing',
+			cursor: 'grabbing',
 			handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
 			tolerance: 'pointer',
 			opacity: 0.6,
@@ -965,7 +990,7 @@
 			}
 
 			var malformed = (fields.length > 2),
-				non_printable_chars = (/%[01]/.match(fields[0]) || /%[01]/.match(fields[1]));
+				non_printable_chars = (fields[0].match(/%[01]/) || fields[1].match(/%[01]/));
 
 			if (malformed || non_printable_chars) {
 				throw httpconf.msg.data_not_encoded;

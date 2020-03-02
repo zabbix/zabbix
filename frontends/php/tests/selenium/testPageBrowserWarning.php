@@ -28,7 +28,7 @@ class testPageBrowserWarning extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('You are using an outdated browser.', false);
 		$this->zbxTestTextPresent('You are using an outdated browser.');
 		$this->zbxTestTextPresent([
-			'Google Chrome', 'Mozilla Firefox', 'Internet Explorer', 'Opera browser', 'Apple Safari'
+			'Google Chrome', 'Mozilla Firefox', 'Microsoft Edge', 'Opera browser', 'Apple Safari'
 		]);
 	}
 }

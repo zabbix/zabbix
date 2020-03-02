@@ -1901,7 +1901,6 @@ class testGraphWidget extends CWebTest {
 			switch ($tab) {
 				case 'Problems':
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
-
 					if (array_key_exists('tags', $data['Problems'])) {
 						$this->setFilterSelector('id:tags_table_tags');
 						$this->setTags($data['Problems']['tags']);
