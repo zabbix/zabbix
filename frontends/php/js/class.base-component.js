@@ -24,6 +24,31 @@ class CBaseComponent {
 		this._node = node;
 	}
 
+	/**
+	 * CSS Classes.
+	 */
+
+	addClass(class_name) {
+		this._node.classList.add(class_name);
+		return this;
+	}
+
+	removeClass(class_name) {
+		this._node.classList.remove(class_name);
+		return this;
+	}
+
+	toggleClass(class_name, force) {
+		return this._node.classList.toggle(class_name, force);
+	}
+
+	hasClass(class_name) {
+		return this._node.classList.contains(class_name);
+	}
+
+	/**
+	 * Events.
+	 */
 	on(types, listener, options = false) {
 		types.split(' ').forEach((t) => this._node.addEventListener(t, listener, options));
 		return this;

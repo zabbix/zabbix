@@ -14,16 +14,26 @@
 		&:focus + .search-icon {
 			opacity: 1;
 		}
+
+		&:hover + .search-icon {
+			background-position: -570px -616px;
+		}
 	}
 
 	.search-icon {
 		position: absolute;
-		top: 6px;
-		right: 4px;
-		width: 12px;
-		height: 12px;
-		background: url(../img/icon-sprite.svg) no-repeat -90px -12px;
+		top: 0;
+		right: -1px;
+		width: 24px;
+		height: 24px;
+		background: url(../img/icon-sprite.svg) no-repeat -540px -616px;
 		opacity: .75;
+		transform: scale(.8);
+		cursor: pointer;
+
+		&:hover {
+			background-position: -570px -616px;
+		}
 	}
 }
 

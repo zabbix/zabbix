@@ -18,46 +18,36 @@
 **/
 
 
-/**
- * Supported events:
- *   collapse  - submenu is collapsed
- *   expand    - submenu is expanded
- *   focus     - control is focused
- */
+const MENUITEM_EVENT_COLLAPSE = 'collapse';
+const MENUITEM_EVENT_EXPAND   = 'expand';
+const MENUITEM_EVENT_FOCUS    = 'focus';
+
 class CMenuItem extends CBaseComponent {
 
 	constructor(node) {
 		super(node);
-
-		this._submenu = null;
 
 		this.init();
 		this.registerEvents();
 	}
 
 	init() {
-		if (this._node.classList.contains('has-submenu')) {
+		this._toggle = this._node.querySelector('a');
+
+		if (this.hasClass('has-submenu')) {
 			this._submenu = new CMenu(this._node.querySelector('.submenu'));
 		}
 
-		this._submenu_toggle = this._node.querySelector('a');
-
-		this._is_expanded = this._node.classList.contains('is-expanded');
-		this._is_selected = this._node.classList.contains('is-selected');
+		this._is_expanded = this.hasClass('is-expanded');
+		this._is_selected = this.hasClass('is-selected');
 	}
 
-	focusControl() {
-		this._control.focus();
-		// this._submenu_toggle.focus();
-
-		return this;
+	focus() {
+		this._toggle.focus();
 	}
 
-	blurControl() {
-		this._control.blur();
-		// this._submenu_toggle.blur();
-
-		return this;
+	blur() {
+		this._toggle.blur();
 	}
 
 	isSelected() {
@@ -69,26 +59,25 @@ class CMenuItem extends CBaseComponent {
 	}
 
 	hasSubmenu() {
-		return this._submenu !== null;
+		return typeof this._submenu !== 'undefined';
 	}
 
 	expandSubmenu() {
-		let is_expanded = this._node.classList.toggle('is-expanded', this.hasSubmenu());
-
-		if (is_expanded && !this._is_expanded) {
+		if (!this._is_expanded && this.toggleClass('is-expanded', this.hasSubmenu())) {
 			this._is_expanded = true;
-			this.trigger('expand');
+			this.trigger(MENUITEM_EVENT_EXPAND);
 		}
 
 		return this;
 	}
 
 	collapseSubmenu() {
-		this._node.classList.remove('is-expanded');
+		this.removeClass('is-expanded');
+		this.blur();
 
 		if (this._is_expanded) {
 			this._is_expanded = false;
-			this.trigger('collapse');
+			this.trigger(MENUITEM_EVENT_COLLAPSE);
 		}
 
 		return this;
@@ -103,23 +92,23 @@ class CMenuItem extends CBaseComponent {
 			click: (e) => {
 				if (!this._is_expanded) {
 					this.expandSubmenu();
-					e.preventDefault();
 				}
+				e.preventDefault();
 			},
 
 			focus: () => {
 				if (this.hasSubmenu() && !this._is_expanded) {
 					this.expandSubmenu();
 				}
-				this.trigger('focus');
+				this.trigger(MENUITEM_EVENT_FOCUS);
 			}
 		};
 
-		// this._control.addEventListener('focus', this._events.focus);
+		if (this.hasSubmenu()) {
+			this._toggle.addEventListener('click', this._events.click);
+			this._toggle.addEventListener('focus', this._events.focus);
 
-		// if (this.hasSubmenu()) {
-		// 	this._control.addEventListener('click', this._events.click);
-		// 	this._submenu.on('focus', this._events.focus);
-		// }
+			this._submenu.on(MENU_EVENT_FOCUS, this._events.focus);
+		}
 	}
 }

@@ -18,28 +18,23 @@
 **/
 
 
-const SIDEBAR_VIEW_MODE_FULL    = 0;
-const SIDEBAR_VIEW_MODE_COMPACT = 1;
-const SIDEBAR_VIEW_MODE_HIDDEN  = 2;
+const SIDEBAR_VIEW_MODE_FULL       = 0;
+const SIDEBAR_VIEW_MODE_COMPACT    = 1;
+const SIDEBAR_VIEW_MODE_HIDDEN     = 2;
 
-const SIDEBAR_MIN_WIDTH         = 200;
+const SIDEBAR_MIN_WIDTH            = 200;
+const SIDEBAR_HOVER_DELAY          = 1000;
 
-const SIDEBAR_HOVER_DELAY       = 1000;
+const SIDEBAR_EVENT_BLUR           = 'blur';
+const SIDEBAR_EVENT_CLOSE          = 'close';
+const SIDEBAR_EVENT_FOCUS          = 'focus';
+const SIDEBAR_EVENT_OPEN           = 'open';
+const SIDEBAR_EVENT_VIEWMODECHANGE = 'viewmodechange';
 
-/**
- * Supported events:
- *   close
- *   open
- *   viewmodechange
- */
 class CSidebar extends CBaseComponent {
 
 	constructor(node) {
 		super(node);
-
-		this._is_focused = false;
-		this._is_opened = false;
-		this._view_mode = SIDEBAR_VIEW_MODE_FULL;
 
 		this.init();
 		this.registerEvents();
@@ -48,13 +43,8 @@ class CSidebar extends CBaseComponent {
 	init() {
 		this._sidebar_toggle = document.getElementById('sidebar-button-toggle');
 
-		if (this._node.classList.contains('is-compact')) {
-			this._view_mode = SIDEBAR_VIEW_MODE_COMPACT;
-		}
-		else if (this._node.classList.contains('is-hidden')) {
-			this._view_mode = SIDEBAR_VIEW_MODE_HIDDEN;
-			this._node.classList.add('focus-off');
-		}
+		this._is_focused = false;
+		this._is_opened = false;
 
 		let max_width = SIDEBAR_MIN_WIDTH;
 		for (const menu of this._node.querySelectorAll('nav > ul')) {
@@ -65,6 +55,14 @@ class CSidebar extends CBaseComponent {
 		}
 		this._node.style.maxWidth = max_width + 'px';
 
+		this._view_mode = SIDEBAR_VIEW_MODE_FULL;
+		if (this.hasClass('is-compact')) {
+			this._view_mode = SIDEBAR_VIEW_MODE_COMPACT;
+		}
+		else if (this.hasClass('is-hidden')) {
+			this._view_mode = SIDEBAR_VIEW_MODE_HIDDEN;
+			this.addClass('focus-off');
+		}
 		this.setViewMode(this._view_mode);
 	}
 
@@ -73,26 +71,20 @@ class CSidebar extends CBaseComponent {
 			this._is_opened = true;
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
-				this._node.classList.add('is-opened');
 				ZABBIX.MenuMain.expandSelected();
 			}
 
-			// if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
-			// 	this._node.classList.remove('focus-off');
-			// 	this._timer = setTimeout(() => {
-			// 		this._node.classList.add('is-opened');
-			// 	}, 0);
-			// }
+			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+				this.removeClass('focus-off');
+				ZABBIX.MenuMain.focusSelected();
+			}
 
-		// 		document.addEventListener('keyup', this._events.escape);
-		// 	}
-
-			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT || this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
 				document.addEventListener('keyup', this._events.escape);
 			}
 
-			clearTimeout(this._timer);
-			this.trigger('open');
+			setTimeout(() => this.addClass('is-opened'), 0);
+			this.trigger(SIDEBAR_EVENT_OPEN);
 		}
 
 		return this;
@@ -101,25 +93,26 @@ class CSidebar extends CBaseComponent {
 	close() {
 		if (this._is_opened) {
 			this._is_opened = false;
-			this._node.classList.remove('is-opened');
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 				ZABBIX.MenuMain.collapseAll();
 			}
 
-		// 	if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
-		// 		this._timer = setTimeout(() => {
-		// 			this._node.classList.add('focus-off');
-		// 		}, SIDEBAR_OPEN_DELAY);
+			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+				this._timer = setTimeout(() => this.addClass('focus-off'), 300);
+			}
 
-		// 		document.removeEventListener('keyup', this._events.escape);
-		// 	}
+			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
+				const active_element = document.activeElement;
+				if (active_element.parentElement.classList.contains('has-submenu')) {
+					active_element.blur();
+				}
 
-			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT || this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
 				document.removeEventListener('keyup', this._events.escape);
 			}
 
-			this.trigger('close');
+			this.removeClass('is-opened');
+			this.trigger(SIDEBAR_EVENT_CLOSE);
 		}
 
 		return this;
@@ -133,12 +126,12 @@ class CSidebar extends CBaseComponent {
 	 * @returns {CSidebar}
 	 */
 	setViewMode(view_mode) {
-		this._node.classList.toggle('is-compact', view_mode === SIDEBAR_VIEW_MODE_COMPACT);
-		this._node.classList.toggle('is-hidden', view_mode === SIDEBAR_VIEW_MODE_HIDDEN);
+		this.toggleClass('is-compact', view_mode === SIDEBAR_VIEW_MODE_COMPACT);
+		this.toggleClass('is-hidden', view_mode === SIDEBAR_VIEW_MODE_HIDDEN);
 
 		if (this._view_mode !== view_mode) {
 			this._view_mode = view_mode;
-			this.trigger('viewmodechange', {view_mode: this._view_mode});
+			this.trigger(SIDEBAR_EVENT_VIEWMODECHANGE, {view_mode: this._view_mode});
 		}
 
 		return this;
@@ -151,14 +144,13 @@ class CSidebar extends CBaseComponent {
 		this._events = {
 
 			mouseenter: () => {
+				clearTimeout(this._timer);
 				this.open();
 			},
 
 			mouseleave: () => {
-				if (!this._is_focused) {
-					this._timer = setTimeout(() => {
-						this.close();
-					}, SIDEBAR_HOVER_DELAY);
+				if (!this._is_focused || document.activeElement.parentElement.classList.contains('has-submenu')) {
+					this._timer = setTimeout(() => this.close(), SIDEBAR_HOVER_DELAY);
 				}
 			},
 
@@ -166,30 +158,28 @@ class CSidebar extends CBaseComponent {
 				if (!this._node.contains(e.relatedTarget)) {
 					this._is_focused = (e.type === 'focusin');
 
-					if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
+					if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
 						if (this._is_focused) {
 							this.open();
-							document.addEventListener('keydown', this._events.escape);
 						}
 						else {
 							this.close();
-							document.removeEventListener('keydown', this._events.escape);
 						}
+
+						this.trigger(this._is_focused ? SIDEBAR_EVENT_FOCUS : SIDEBAR_EVENT_BLUR);
 					}
 				}
 			},
 
 			escape: (e) => {
 				if (e.key === 'Escape') {
-					document.querySelector('[autofocus="autofocus"]').focus();
+					this.close();
 				}
 			},
 
 			toggle: (e) => {
 				if (!this._is_opened) {
 					this.open();
-
-					// ZABBIX.MenuMain.focusSelected();
 				}
 				else {
 					this.close();
@@ -198,23 +188,69 @@ class CSidebar extends CBaseComponent {
 				e.preventDefault();
 			},
 
+			expand: () => {
+				let timer;
+				this.on('mouseleave', () => {
+					timer = setTimeout(() => {
+						ZABBIX.MenuMain
+							.expandSelected()
+							.focusSelected();
+					}, MENU_EXPAND_SELECTED_DELAY);
+				});
+
+				this.on('mouseenter', () => {
+					clearTimeout(timer);
+				});
+			},
+
 			viewmodechange: (e) => {
 				if (e.target.classList.contains('button-compact')) {
 					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
-				} else if (e.target.classList.contains('button-hide')) {
+				}
+				else if (e.target.classList.contains('button-hide')) {
 					this.setViewMode(SIDEBAR_VIEW_MODE_HIDDEN);
-				} else {
+				}
+				else {
 					this.setViewMode(SIDEBAR_VIEW_MODE_FULL);
 				}
 
+				this._events._update(this._view_mode);
+
 				e.preventDefault();
+			},
+
+			/**
+			 * Update event listeners based on view mode.
+			 *
+			 * @param view_mode
+			 *
+			 * @private
+			 */
+			_update: (view_mode) => {
+				if (view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
+					this.on('mouseenter', this._events.mouseenter);
+					this.on('mouseleave', this._events.mouseleave);
+				}
+				else {
+					this.off('mouseenter', this._events.mouseenter);
+					this.off('mouseleave', this._events.mouseleave);
+				}
+
+				if (view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+					this._sidebar_toggle.addEventListener('click', this._events.toggle);
+				}
+				else {
+					this._sidebar_toggle.removeEventListener('click', this._events.toggle);
+				}
+
+				if ([SIDEBAR_VIEW_MODE_FULL, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
+					ZABBIX.MenuMain.on('expand', this._events.expand);
+				}
+				else {
+					ZABBIX.MenuMain.off('expand', this._events.expand);
+				}
 			}
 		};
-
-		if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
-			this.on('mouseenter', this._events.mouseenter);
-			this.on('mouseleave', this._events.mouseleave);
-		}
 
 		this.on('focusin focusout', this._events.focus);
 
@@ -222,6 +258,6 @@ class CSidebar extends CBaseComponent {
 			el.addEventListener('click', this._events.viewmodechange);
 		}
 
-		this._sidebar_toggle.addEventListener('click', this._events.toggle);
+		this._events._update(this._view_mode);
 	}
 }

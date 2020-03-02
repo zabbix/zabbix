@@ -167,12 +167,18 @@ $sidebar-padding: 12px;
 			}
 
 			.form-search {
+				position: relative;
+
 				.search {
+					padding: 0 12px;
 					opacity: 0;
 				}
 
 				.search-icon {
-					transform: scale(1.6);
+					top: 0;
+					right: 0;
+					opacity: 1;
+					transform: scale(1);
 				}
 			}
 

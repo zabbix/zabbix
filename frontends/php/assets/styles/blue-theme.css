@@ -360,10 +360,16 @@ footer {
     .sidebar.is-compact:not(.is-opened) .button-hide,
     .sidebar.is-compact:not(.is-opened) .button-show {
       opacity: 0; }
-    .sidebar.is-compact:not(.is-opened) .form-search .search {
-      opacity: 0; }
-    .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
-      transform: scale(1.6); }
+    .sidebar.is-compact:not(.is-opened) .form-search {
+      position: relative; }
+      .sidebar.is-compact:not(.is-opened) .form-search .search {
+        padding: 0 12px;
+        opacity: 0; }
+      .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
+        top: 0;
+        right: 0;
+        opacity: 1;
+        transform: scale(1); }
     .sidebar.is-compact:not(.is-opened) nav a {
       color: transparent; }
       .sidebar.is-compact:not(.is-opened) nav a::after {
@@ -414,14 +420,20 @@ footer {
     border-radius: 3px; }
     .form-search .search:focus + .search-icon {
       opacity: 1; }
+    .form-search .search:hover + .search-icon {
+      background-position: -570px -616px; }
   .form-search .search-icon {
     position: absolute;
-    top: 6px;
-    right: 4px;
-    width: 12px;
-    height: 12px;
-    background: url(../img/icon-sprite.svg) no-repeat -90px -12px;
-    opacity: .75; }
+    top: 0;
+    right: -1px;
+    width: 24px;
+    height: 24px;
+    background: url(../img/icon-sprite.svg) no-repeat -540px -616px;
+    opacity: .75;
+    transform: scale(0.8);
+    cursor: pointer; }
+    .form-search .search-icon:hover {
+      background-position: -570px -616px; }
 
 .search-suggest {
   position: absolute;

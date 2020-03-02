@@ -18,27 +18,28 @@
 **/
 
 
-/**
- * Supported events:
- *   focus  - triggered, if any of the item is focused
- */
+const MENU_EXPAND_SELECTED_DELAY = 5000;
+
+const MENU_EVENT_BLUR            = 'blur';
+const MENU_EVENT_EXPAND          = 'expand';
+const MENU_EVENT_FOCUS           = 'focus';
+
 class CMenu extends CBaseComponent {
 
 	constructor(node) {
 		super(node);
-
-		this._items = [];
 
 		this.init();
 		this.registerEvents();
 	}
 
 	init() {
+		this._items = [];
 		for (const el of this._node.childNodes) {
 			this._items.push(new CMenuItem(el));
 		}
 
-		if (this._node.classList.contains('submenu')) {
+		if (this.hasClass('submenu')) {
 			this._node.style.maxHeight = this._node.scrollHeight + 'px';
 		}
 	}
@@ -74,7 +75,7 @@ class CMenu extends CBaseComponent {
 				item.getSubmenu().focusSelected();
 			}
 			else if (item.isSelected()) {
-				item.focusControl();
+				item.focus();
 			}
 		}
 
@@ -87,20 +88,24 @@ class CMenu extends CBaseComponent {
 	registerEvents() {
 		this._events = {
 
-			focus: () => {
-				this.trigger('focus');
+			focus: (e) => {
+				if (!this._node.contains(e.relatedTarget)) {
+					this.trigger((e.type === 'focusin') ? MENU_EVENT_FOCUS : MENU_EVENT_BLUR);
+				}
 			},
 
 			expand: (e) => {
 				this.collapseAll(e.detail.targetObj);
+				this.trigger(MENU_EVENT_EXPAND, {menu_item: e.detail.targetObj});
 			}
 		};
 
+		this.on('focusin focusout', this._events.focus);
+
 		for (const item of this._items) {
 			if (item.hasSubmenu()) {
-				item.on('expand', this._events.expand);
+				item.on(MENUITEM_EVENT_EXPAND, this._events.expand);
 			}
-			item.on('focus', this._events.focus);
 		}
 	}
 }
