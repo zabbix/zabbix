@@ -413,10 +413,6 @@ class CWidgetHelper {
 	public static function getCheckBoxList($field, array $list) {
 		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
-		if ($field->getOrientation() == CWidgetFieldCheckBoxList::ORIENTATION_HORIZONTAL) {
-			$checkbox_list->addClass(ZBX_STYLE_HOR_LIST);
-		}
-
 		foreach ($list as $key => $label) {
 			$checkbox_list->addItem(
 				(new CCheckBox($field->getName().'[]', $key))
