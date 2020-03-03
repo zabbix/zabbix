@@ -22,6 +22,7 @@ package com.zabbix.gateway;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
+import java.util.List;
 import javax.management.AttributeList;
 
 import javax.management.InstanceNotFoundException;
@@ -30,7 +31,9 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.MalformedObjectNameException;
 import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.TabularDataSupport;
+import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
 
@@ -180,9 +183,18 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("attributeName:'{}'", realAttributeName);
 			logger.trace("fieldNames:'{}'", fieldNames);
 
+			Object dataObject = mbsc.getAttribute(objectName, realAttributeName);
+
+			if (dataObject instanceof TabularData)
+			{
+				logger.trace("'{}' contains tabular data", attributeName);
+
+				return getTabularDataAttributeValues((TabularData)dataObject);
+			}
+
 			try
 			{
-				return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
+				return getPrimitiveAttributeValue(dataObject, fieldNames);
 			}
 			catch (InstanceNotFoundException e)
 			{
@@ -290,6 +302,39 @@ class JMXItemChecker extends ItemChecker
 		}
 		else
 			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
+	}
+
+	private String getTabularDataAttributeValues(TabularData data) throws JSONException
+	{
+		JSONArray values = new JSONArray();
+
+		for (Object key : data.keySet())
+		{
+				List<?> keyList = (List<?>) key;
+
+				if (keyList != null && !keyList.isEmpty())
+					values.put(getCompositeDataAttributeValues(data.get(keyList.toArray())));
+		}
+
+		return values.toString();
+	}
+
+	private JSONObject getCompositeDataAttributeValues(CompositeData compData) throws JSONException
+	{
+		JSONObject value = new JSONObject();
+		CompositeType compType = compData.getCompositeType();
+
+		for (String key : compType.keySet())
+		{
+			Object data = compData.get(key);
+
+			if (data instanceof CompositeData)
+				value.put(key, getCompositeDataAttributeValues((CompositeData)data));
+			else
+				value.put(key, data);
+		}
+
+		return value;
 	}
 
 	private void discoverAttributes(JSONArray counters, ObjectName filter, boolean propertiesAsMacros) throws Exception
@@ -515,7 +560,21 @@ class JMXItemChecker extends ItemChecker
 						attrPath + "." + key, comp.get(key), propertiesAsMacros);
 			}
 		}
-		else if (attribute instanceof TabularDataSupport || attribute.getClass().isArray())
+		else if (attribute instanceof TabularData)
+		{
+			logger.trace("found attribute of a tabular type: {}", attribute.getClass());
+
+			JSONObject counter = new JSONObject();
+
+			counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
+			counter.put("{#JMXOBJ}", name);
+			counter.put("{#JMXATTR}", attrPath);
+			counter.put("{#JMXTYPE}", attribute.getClass().getName());
+			counter.put("{#JMXVALUE}", getTabularDataAttributeValues((TabularData)attribute));
+
+			counters.put(counter);
+		}
+		else if (attribute.getClass().isArray())
 		{
 			logger.trace("found attribute of a known, unsupported type: {}", attribute.getClass());
 		}
