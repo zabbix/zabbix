@@ -90,7 +90,7 @@ function local_generateSidebar($data) {
 	if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 		global $ZBX_SERVER_NAME;
 
-		echo (new CView('layout.htmlpage.aside', [
+		echo (new CPartial('layout.htmlpage.aside', [
 			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : ''
 		]))->getOutput()."\n";
 	}
@@ -129,7 +129,7 @@ function local_showMessage() {
 local_generateHeader($data);
 local_generateSidebar($data);
 echo '<div class="'.ZBX_STYLE_LAYOUT_WRAPPER.
-	(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">';
+	($data['web_layout_mode'] === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">';
 local_showMessage();
 echo $data['main_block'];
 local_generateFooter($data);

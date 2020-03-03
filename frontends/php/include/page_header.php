@@ -215,7 +215,7 @@ if ($page['type'] == PAGE_TYPE_HTML && (CSession::keyExists('messageOk') || CSes
 }
 
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
-	$page_menu = new CPartial('layout.htmlpage.aside', [
+	echo (new CPartial('layout.htmlpage.aside', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 		'menu' => APP::Component()->get('menu.main'),
 		'user' => [
@@ -225,13 +225,12 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORM
 			'surname' => CWebUser::$data['surname']
 		],
 		'support_url' => getSupportUrl(CWebUser::getLang())
-	]);
-	echo $page_menu->getOutput();
+	]))->getOutput();
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	echo '<div class="'.ZBX_STYLE_LAYOUT_WRAPPER.
-		(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">'."\n";
+		($page['web_layout_mode'] === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">'."\n";
 }
 
 // if a user logs in after several unsuccessful attempts, display a warning
