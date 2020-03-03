@@ -86,6 +86,7 @@ function item_type2str($type = null) {
 		ITEM_TYPE_ZABBIX => _('Zabbix agent'),
 		ITEM_TYPE_ZABBIX_ACTIVE => _('Zabbix agent (active)'),
 		ITEM_TYPE_SIMPLE => _('Simple check'),
+		ITEM_TYPE_SNMP => _('SNMP agent'),
 		ITEM_TYPE_SNMPTRAP => _('SNMP trap'),
 		ITEM_TYPE_INTERNAL => _('Zabbix internal'),
 		ITEM_TYPE_TRAPPER => _('Zabbix trapper'),
@@ -99,8 +100,7 @@ function item_type2str($type = null) {
 		ITEM_TYPE_JMX => _('JMX agent'),
 		ITEM_TYPE_CALCULATED => _('Calculated'),
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
-		ITEM_TYPE_DEPENDENT => _('Dependent item'),
-		ITEM_TYPE_SNMP => _('SNMP agent')
+		ITEM_TYPE_DEPENDENT => _('Dependent item')
 	];
 
 	if ($type === null) {
