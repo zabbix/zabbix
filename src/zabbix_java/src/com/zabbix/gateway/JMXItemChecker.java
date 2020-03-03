@@ -189,7 +189,7 @@ class JMXItemChecker extends ItemChecker
 			{
 				logger.trace("'{}' contains tabular data", attributeName);
 
-				return getTabularDataAttributeValues((TabularData)dataObject);
+				return getTabularData((TabularData)dataObject);
 			}
 
 			try
@@ -304,7 +304,7 @@ class JMXItemChecker extends ItemChecker
 			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
 	}
 
-	private String getTabularDataAttributeValues(TabularData data) throws JSONException
+	private String getTabularData(TabularData data) throws JSONException
 	{
 		JSONArray values = new JSONArray();
 
@@ -313,13 +313,13 @@ class JMXItemChecker extends ItemChecker
 				List<?> keyList = (List<?>) key;
 
 				if (keyList != null && !keyList.isEmpty())
-					values.put(getCompositeDataAttributeValues(data.get(keyList.toArray())));
+					values.put(getCompositeDataValues(data.get(keyList.toArray())));
 		}
 
 		return values.toString();
 	}
 
-	private JSONObject getCompositeDataAttributeValues(CompositeData compData) throws JSONException
+	private JSONObject getCompositeDataValues(CompositeData compData) throws JSONException
 	{
 		JSONObject value = new JSONObject();
 		CompositeType compType = compData.getCompositeType();
@@ -329,7 +329,7 @@ class JMXItemChecker extends ItemChecker
 			Object data = compData.get(key);
 
 			if (data instanceof CompositeData)
-				value.put(key, getCompositeDataAttributeValues((CompositeData)data));
+				value.put(key, getCompositeDataValues((CompositeData)data));
 			else
 				value.put(key, data);
 		}
@@ -570,7 +570,7 @@ class JMXItemChecker extends ItemChecker
 			counter.put("{#JMXOBJ}", name);
 			counter.put("{#JMXATTR}", attrPath);
 			counter.put("{#JMXTYPE}", attribute.getClass().getName());
-			counter.put("{#JMXVALUE}", getTabularDataAttributeValues((TabularData)attribute));
+			counter.put("{#JMXVALUE}", getTabularData((TabularData)attribute));
 
 			counters.put(counter);
 		}
