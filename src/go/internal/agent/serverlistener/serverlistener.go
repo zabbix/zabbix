@@ -86,7 +86,7 @@ func (sl *ServerListener) run() {
 	}
 
 	log.Debugf("listener has been stopped")
-	monitor.Unregister()
+	monitor.Unregister(monitor.Input)
 
 }
 
@@ -105,7 +105,7 @@ func (sl *ServerListener) Start() (err error) {
 	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf("%s:%d", sl.bindIP, sl.options.ListenPort), sl.tlsConfig); err != nil {
 		return
 	}
-	monitor.Register()
+	monitor.Register(monitor.Input)
 	go sl.run()
 	return
 }

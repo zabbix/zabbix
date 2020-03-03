@@ -278,7 +278,7 @@ func (c *ResultCache) run() {
 		}
 	}
 	log.Debugf("[%d] result cache has been stopped", c.clientID)
-	monitor.Unregister()
+	monitor.Unregister(monitor.Output)
 }
 
 func newToken() string {
@@ -299,7 +299,8 @@ func (c *ResultCache) init() {
 }
 
 func (c *ResultCache) Start() {
-	monitor.Register()
+	// register with secondary group to stop result cache after other components are stopped
+	monitor.Register(monitor.Output)
 	go c.run()
 }
 
