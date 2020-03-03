@@ -50,6 +50,7 @@ $widget = (new CWidget())
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_groups_',
+								'templated_hosts' => true,
 								'editable' => 1
 							]
 						]
