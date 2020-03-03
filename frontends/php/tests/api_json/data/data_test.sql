@@ -952,3 +952,15 @@ INSERT INTO history_text (itemid, clock, value, ns) VALUES
 (133762, 1549350998, '1', 450920469),
 (133762, 1549350999, '2', 882825407),
 (133762, 1549351001, '3', 242835912);
+
+-- Adding records into Auditlog
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (9000, 1, 1582269000, 1, 4, '', '127.0.0.1', 10054, 'H1 updated');
+INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (9000, 9000, 'hosts', 'status', '0', '1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (9001, 1, 1582270260, 1, 4, '', '127.0.0.1', 10054, 'H1 updated');
+INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (9001, 9001, 'hosts', 'status', '0', '1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (9003, 1, 1582269120, 0, 6, 'Graph [graph1]', '::1', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (9004, 4, 1582269180, 0, 19, 'Name [Audit Map]', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (9005, 1, 1582269240, 1, 14, '', '192.168.3.32', 6, 'HG1 updated');
+INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (9005, 9005, 'groups', 'name', 'HG1', 'HG1 updated');
+
+

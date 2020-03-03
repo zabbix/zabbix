@@ -968,14 +968,6 @@ else {
 		}
 	}
 
-	$config_priorities = [];
-	foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-		$config_priorities[] = [
-			'name' => getSeverityName($severity, $config),
-			'value' => $severity
-		];
-	}
-
 	$single_selected_hostid = 0;
 	if (count($filter_hostids) == 1) {
 		$single_selected_hostid = reset($filter_hostids);
@@ -986,7 +978,7 @@ else {
 
 	$data = [
 		'config' => $config,
-		'config_priorities' => $config_priorities,
+		'config_priorities' => CSeverity::getSeverities(),
 		'triggers' => $triggers,
 		'profileIdx' => 'web.triggers.filter',
 		'active_tab' => $active_tab,

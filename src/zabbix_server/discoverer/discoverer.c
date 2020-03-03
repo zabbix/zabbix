@@ -37,6 +37,10 @@ extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
+#ifdef HAVE_NETSNMP
+static volatile sig_atomic_t	snmp_cache_reload_requested;
+#endif
+
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
 /******************************************************************************
@@ -858,6 +862,16 @@ static int	get_minnextcheck(void)
 	return res;
 }
 
+static void	zbx_discoverer_sigusr_handler(int flags)
+{
+#ifdef HAVE_NETSNMP
+	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+		snmp_cache_reload_requested = 1;
+#else
+	ZBX_UNUSED(flags);
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: discoverer_thread                                                *
@@ -878,6 +892,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 #ifdef HAVE_NETSNMP
 	zbx_init_snmp();
 #endif
@@ -885,7 +901,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
@@ -893,10 +909,20 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	zbx_set_sigusr_handler(zbx_discoverer_sigusr_handler);
+
 	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
+
+#ifdef HAVE_NETSNMP
+		if (1 == snmp_cache_reload_requested)
+		{
+			zbx_clear_cache_snmp();
+			snmp_cache_reload_requested = 0;
+		}
+#endif
 
 		if (0 != sleeptime)
 		{

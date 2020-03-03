@@ -40,6 +40,21 @@ type Plugin struct {
 
 var impl Plugin
 
+func (p *Plugin) exportSystemTcpListen(params []string) (result interface{}, err error) {
+	if len(params) > 1 {
+		return nil, errors.New("Too many parameters.")
+	}
+	if len(params) == 0 || params[0] == "" {
+		return nil, errors.New("Invalid first parameter.")
+	}
+	port, err := strconv.ParseUint(params[0], 10, 16)
+	if err != nil {
+		return nil, errors.New("Invalid first parameter.")
+	}
+
+	return exportSystemTcpListen(uint16(port))
+}
+
 func (p *Plugin) exportNetTcpPort(params []string) (result int, err error) {
 	if len(params) > 2 {
 		err = errors.New(errorTooManyParams)
@@ -74,15 +89,12 @@ func (p *Plugin) exportNetTcpPort(params []string) (result int, err error) {
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
+	case "net.tcp.listen":
+		return p.exportSystemTcpListen(params)
 	case "net.tcp.port":
 		return p.exportNetTcpPort(params)
 	default:
 		/* SHOULD_NEVER_HAPPEN */
 		return nil, errors.New(errorUnsupportedMetric)
 	}
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "TCP",
-		"net.tcp.port", "Checks if it is possible to make TCP connection to specified port.")
 }

@@ -110,33 +110,6 @@ static int	DBpatch_4050012(void)
 	return DBmodify_field_type("users", &field, NULL);
 }
 
-static int	DBpatch_4050013(void)
-{
-	int		i;
-	const char	*values[] = {
-			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
-			"web.usergrps.php.sort", "web.usergroup.sort",
-			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
-			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
-			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
-			"web.latest.php.sort", "web.latest.sort",
-			"web.latest.php.sortorder", "web.latest.sortorder",
-			"web.paging.lastpage", "web.pager.entity",
-			"web.paging.page", "web.pager.page"
-		};
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	for (i = 0; i < (int)ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static int	DBpatch_4050014(void)
 {
 	DB_ROW		row;
@@ -608,6 +581,94 @@ static int	DBpatch_4050035(void)
 
 static int	DBpatch_4050036(void)
 {
+	const ZBX_FIELD	field = {"note", "0", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("auditlog", "details", &field);
+}
+
+static int	DBpatch_4050037(void)
+{
+	const ZBX_FIELD	field = {"note", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("auditlog", &field);
+}
+
+static int	DBpatch_4050038(void)
+{
+	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
+}
+
+static int	DBpatch_4050039(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
+			"web.usergrps.php.sort", "web.usergroup.sort",
+			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
+			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
+			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
+			"web.latest.php.sort", "web.latest.sort",
+			"web.latest.php.sortorder", "web.latest.sortorder",
+			"web.paging.lastpage", "web.pager.entity",
+			"web.paging.page", "web.pager.page",
+			"web.auditlogs.filter.active", "web.auditlog.filter.active",
+			"web.auditlogs.filter.action", "web.auditlog.filter.action",
+			"web.auditlogs.filter.alias", "web.auditlog.filter.alias",
+			"web.auditlogs.filter.resourcetype", "web.auditlog.filter.resourcetype",
+			"web.auditlogs.filter.from", "web.auditlog.filter.from",
+			"web.auditlogs.filter.to", "web.auditlog.filter.to"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050040(void)
+{
+	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_default("auditlog", &field);
+}
+
+static int	DBpatch_4050041(void)
+{
+	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("auditlog", &field);
+}
+
+static int	DBpatch_4050042(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update auditlog set resourceid=null where resourceid=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050043(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.screens.graphid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050044(void)
+{
 	const ZBX_TABLE table =
 		{"interface_snmp", "interfaceid", 0,
 			{
@@ -630,7 +691,7 @@ static int	DBpatch_4050036(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050037(void)
+static int	DBpatch_4050045(void)
 {
 	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -1079,7 +1140,7 @@ static int	DBpatch_items_type_update(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_4050038                                                  *
+ * Function: DBpatch_4050046                                                  *
  *                                                                            *
  * Purpose: migration snmp data from 'items' table to 'interface_snmp' new    *
  *          table linked with 'interface' table, except interface links for   *
@@ -1089,7 +1150,7 @@ static int	DBpatch_items_type_update(void)
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	DBpatch_4050038(void)
+static int	DBpatch_4050046(void)
 {
 	zbx_vector_dbu_interface_t	new_ifs;
 	zbx_vector_dbu_snmp_if_t	snmp_ifs, snmp_new_ifs, snmp_def_ifs;
@@ -1322,7 +1383,7 @@ static int	DBpatch_interface_discovery_save(zbx_vector_uint64_pair_t *if_links)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_4050039                                                  *
+ * Function: DBpatch_4050047                                                  *
  *                                                                            *
  * Purpose: recovery links between the interfaceid of discovered host and     *
  *          parent interfaceid from parent host                               *
@@ -1331,7 +1392,7 @@ static int	DBpatch_interface_discovery_save(zbx_vector_uint64_pair_t *if_links)
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	DBpatch_4050039(void)
+static int	DBpatch_4050047(void)
 {
 	zbx_vector_dbu_interface_t	new_ifs;
 	zbx_vector_dbu_snmp_if_t	snmp_new_ifs;
@@ -1368,52 +1429,52 @@ static int	DBpatch_4050039(void)
 	return ret;
 }
 
-static int	DBpatch_4050040(void)
+static int	DBpatch_4050048(void)
 {
 	return DBdrop_field("interface", "bulk");
 }
 
-static int	DBpatch_4050041(void)
+static int	DBpatch_4050049(void)
 {
 	return DBdrop_field("items", "snmp_community");
 }
 
-static int	DBpatch_4050042(void)
+static int	DBpatch_4050050(void)
 {
 	return DBdrop_field("items", "snmpv3_securityname");
 }
 
-static int	DBpatch_4050043(void)
+static int	DBpatch_4050051(void)
 {
 	return DBdrop_field("items", "snmpv3_securitylevel");
 }
 
-static int	DBpatch_4050044(void)
+static int	DBpatch_4050052(void)
 {
 	return DBdrop_field("items", "snmpv3_authpassphrase");
 }
 
-static int	DBpatch_4050045(void)
+static int	DBpatch_4050053(void)
 {
 	return DBdrop_field("items", "snmpv3_privpassphrase");
 }
 
-static int	DBpatch_4050046(void)
+static int	DBpatch_4050054(void)
 {
 	return DBdrop_field("items", "snmpv3_authprotocol");
 }
 
-static int	DBpatch_4050047(void)
+static int	DBpatch_4050055(void)
 {
 	return DBdrop_field("items", "snmpv3_privprotocol");
 }
 
-static int	DBpatch_4050048(void)
+static int	DBpatch_4050056(void)
 {
 	return DBdrop_field("items", "snmpv3_contextname");
 }
 
-static int	DBpatch_4050049(void)
+static int	DBpatch_4050057(void)
 {
 	return DBdrop_field("items", "port");
 }
@@ -1433,7 +1494,6 @@ DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
 DBPATCH_ADD(4050011, 0, 1)
 DBPATCH_ADD(4050012, 0, 1)
-DBPATCH_ADD(4050013, 0, 1)
 DBPATCH_ADD(4050014, 0, 1)
 DBPATCH_ADD(4050015, 0, 1)
 DBPATCH_ADD(4050016, 0, 1)
@@ -1469,5 +1529,13 @@ DBPATCH_ADD(4050046, 0, 1)
 DBPATCH_ADD(4050047, 0, 1)
 DBPATCH_ADD(4050048, 0, 1)
 DBPATCH_ADD(4050049, 0, 1)
+DBPATCH_ADD(4050050, 0, 0)
+DBPATCH_ADD(4050051, 0, 0)
+DBPATCH_ADD(4050052, 0, 0)
+DBPATCH_ADD(4050053, 0, 0)
+DBPATCH_ADD(4050054, 0, 0)
+DBPATCH_ADD(4050055, 0, 0)
+DBPATCH_ADD(4050056, 0, 0)
+DBPATCH_ADD(4050057, 0, 0)
 
 DBPATCH_END()
