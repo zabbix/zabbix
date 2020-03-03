@@ -177,17 +177,6 @@ elseif ($data['graphids']) {
 	}
 	else {
 		$table->setId('charts');
-
-		$this->includeJsFile('monitoring.charts.view.js.php', [
-			'charts' => $data['charts'],
-			'timeline' => $data['timeline'],
-			'config' => [
-				'refresh_interval' => (int) CWebUser::getRefresh(),
-				'refresh_list' => $data['filter_search_type'] == ZBX_SEARCH_TYPE_PATTERN,
-				'filter_graph_patterns' => $data['filter_graph_patterns'],
-				'filter_hostids' => $data['filter_hostids']
-			]
-		]);
 	}
 
 	$widget->addItem($table);
@@ -197,3 +186,14 @@ else {
 }
 
 $widget->show();
+
+$this->includeJsFile('monitoring.charts.view.js.php', [
+	'charts' => $data['charts'],
+	'timeline' => $data['timeline'],
+	'config' => [
+		'refresh_interval' => (int) CWebUser::getRefresh(),
+		'refresh_list' => $data['filter_search_type'] == ZBX_SEARCH_TYPE_PATTERN,
+		'filter_graph_patterns' => $data['filter_graph_patterns'],
+		'filter_hostids' => $data['filter_hostids']
+	]
+]);
