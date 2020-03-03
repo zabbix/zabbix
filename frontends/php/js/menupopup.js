@@ -320,7 +320,7 @@ function getMenuPopupMapElementTrigger(options) {
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_triggerids[]', options.triggerids);
 	if (typeof options.severity_min !== 'undefined') {
-		problems_url.setArgument('filter_severities', options.severity_min);
+		problems_url.setArgument('filter_severities[]', options.severity_min);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('filter_show_suppressed', '1');
