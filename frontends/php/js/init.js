@@ -242,7 +242,7 @@ jQuery(function($) {
 				return {
 					of: $obj,
 					my: 'left top',
-					at: 'left bottom'
+					at: 'left top+24'
 				};
 
 			case 'submenu':
