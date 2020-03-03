@@ -394,6 +394,12 @@ class CHostInterface extends CApiService {
 			$this->checkSnmpCommunity($interface);
 
 			$this->checkSnmpBulk($interface);
+
+			$this->checkSnmpSecurityLevel($interface);
+
+			$this->checkSnmpAuthProtocol($interface);
+
+			$this->checkSnmpPrivProtocol($interface);
 		}
 		unset($interface);
 	}
@@ -987,6 +993,51 @@ class CHostInterface extends CApiService {
 							|| ($interface['details']['bulk'] != SNMP_BULK_DISABLED
 							&& $interface['details']['bulk'] != SNMP_BULK_ENABLED))))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect bulk value for interface.'));
+		}
+	}
+
+	/**
+	 * Check SNMP Security level field.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if "secuirtylevel" value is incorrect.
+	 */
+	protected function checkSnmpSecurityLevel(array $interface) {
+		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('securitylevel', $interface['details'])
+					&& !in_array($interface['details']['securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
+						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
+		}
+	}
+
+	/**
+	 * Check SNMP Auth protocol.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if "authprotocol" value is incorrect.
+	 */
+	protected function checkSnmpAuthProtocol(array $interface) {
+		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('authprotocol', $interface['details'])
+					&& !in_array($interface['details']['authprotocol'], [ITEM_AUTHPROTOCOL_MD5,
+						ITEM_AUTHPROTOCOL_SHA]))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
+		}
+	}
+
+	/**
+	 * Check SNMP Priv protocol.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if "privprotocol" value is incorrect.
+	 */
+	protected function checkSnmpPrivProtocol(array $interface) {
+		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('privprotocol', $interface['details'])
+					&& !in_array($interface['details']['privprotocol'], [ITEM_PRIVPROTOCOL_DES,
+						ITEM_PRIVPROTOCOL_AES]))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
 		}
 	}
 
