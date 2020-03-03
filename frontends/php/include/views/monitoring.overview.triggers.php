@@ -134,8 +134,8 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			'application' => $data['filter']['application'],
 			'inventory' => $data['filter']['inventory'],
 			'show_suppressed' => $data['filter']['show_suppressed'],
-			'groups' => $data['filter']['groupids'],
-			'hosts' => $data['filter']['hostids']
+			'groups' => $data['filter']['groups'],
+			'hosts' => $data['filter']['hosts']
 		],
 		'config' => $data['config'],
 		'profileIdx' => $data['profileIdx'],

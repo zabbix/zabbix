@@ -97,7 +97,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 						'multiple' => true,
 						'name' => 'filter_groupids[]',
 						'object_name' => 'hostGroup',
-						'data' => $data['filter']['groupids'],
+						'data' => $data['filter']['groups'],
 						'popup' => [
 							'parameters' => [
 								'srctbl' => 'host_groups',
@@ -114,7 +114,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 						'multiple' => true,
 						'name' => 'filter_hostids[]',
 						'object_name' => 'hosts',
-						'data' => $data['filter']['hostids'],
+						'data' => $data['filter']['hosts'],
 						'popup' => [
 							'parameters' => [
 								'srctbl' => 'hosts',

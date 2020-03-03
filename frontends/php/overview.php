@@ -181,7 +181,7 @@ if ($type == SHOW_TRIGGERS) {
 		'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
 	];
 
-	$filter['groupids'] = $filter['groupids']
+	$filter['groups'] = $filter['groupids']
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter['groupids'],
@@ -190,9 +190,9 @@ if ($type == SHOW_TRIGGERS) {
 		]), ['groupid' => 'id'])
 		: [];
 
-	$groupids = $filter['groupids'] ? getSubGroups(array_keys($filter['groupids'])) : [];
+	$groupids = $filter['groups'] ? getSubGroups(array_keys($filter['groups'])) : [];
 
-	$filter['hostids'] = $filter['hostids']
+	$filter['hosts'] = $filter['hostids']
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
 			'hostids' => $filter['hostids'],
@@ -202,6 +202,8 @@ if ($type == SHOW_TRIGGERS) {
 		]), ['hostid' => 'id'])
 		: [];
 
+	unset($filter['groupids'], $filter['hostids']);
+
 	$host_options = [];
 	if ($filter['inventory']) {
 		$host_options['searchInventory'] = [];
@@ -210,7 +212,7 @@ if ($type == SHOW_TRIGGERS) {
 		}
 	}
 	if ($filter['hostids']) {
-		$host_options['hostids'] = array_keys($filter['hostids']);
+		$host_options['hostids'] = array_keys($filter['hosts']);
 	}
 
 	list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
@@ -232,7 +234,7 @@ else {
 		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE)
 	];
 
-	$data['filter']['groupids'] = $data['filter']['groupids']
+	$data['filter']['groups'] = $data['filter']['groupids']
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $data['filter']['groupids'],
@@ -240,7 +242,7 @@ else {
 		]), ['groupid' => 'id'])
 		: [];
 
-	$data['filter']['hostids'] = $data['filter']['hostids']
+	$data['filter']['hosts'] = $data['filter']['hostids']
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
 			'hostids' => $data['filter']['hostids'],
@@ -248,8 +250,10 @@ else {
 		]), ['hostid' => 'id'])
 		: [];
 
-	$groupids = $data['filter']['groupids'] ? getSubGroups(array_keys($data['filter']['groupids'])) : null;
-	$hostids = $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null;
+	unset($data['filter']['groupids'], $data['filter']['hostids']);
+
+	$groupids = $data['filter']['groups'] ? getSubGroups(array_keys($data['filter']['groups'])) : null;
+	$hostids = $data['filter']['hosts'] ? array_keys($data['filter']['hosts']) : null;
 
 	if ($data['view_style'] == STYLE_TOP) {
 		list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop($groupids, $hostids,
