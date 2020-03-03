@@ -816,7 +816,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_FLOAT],
 				'.23E11',
 				'/1/float',
-				0.23E+11,
+				'Invalid parameter "/1/float": a floating point value is expected.',
 			],
 			[
 				['type' => API_FLOATS],
@@ -1825,25 +1825,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_NUMERIC],
-				'-9223372036854775809',
+				'-1.23E+500',
 				'/1/numeric',
 				'Invalid parameter "/1/numeric": a number is too large.'
 			],
 			[
 				['type' => API_NUMERIC],
-				'9223372036854775808',
-				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
-			],
-			[
-				['type' => API_NUMERIC],
-				'-9223372036854775808.000001',
-				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
-			],
-			[
-				['type' => API_NUMERIC],
-				'9223372036854775807.000001',
+				'1.23E+500',
 				'/1/numeric',
 				'Invalid parameter "/1/numeric": a number is too large.'
 			],
@@ -1941,7 +1929,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'8388608T',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
+				'8388608T'
 			],
 			[
 				['type' => API_SCRIPT_NAME, 'length' => 23],
