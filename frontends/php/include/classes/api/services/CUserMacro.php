@@ -485,6 +485,7 @@ class CUserMacro extends CApiService {
 			$this->checkMacro($hostmacro);
 			$this->checkUnsupportedFields('hostmacro', $hostmacro,
 				_s('Wrong fields for macro "%1$s".', $hostmacro['macro']));
+			$this->checkMacroType($hostmacro);
 		}
 
 		$this->checkDuplicateMacros($hostmacros);
@@ -556,6 +557,7 @@ class CUserMacro extends CApiService {
 			$this->checkUnsupportedFields('hostmacro', $hostmacro,
 				_s('Wrong fields for macro "%1$s".', $hostmacro['macro'])
 			);
+			$this->checkMacroType($hostmacro);
 		}
 
 		$this->checkDuplicateMacros($hostmacros);
@@ -717,6 +719,18 @@ class CUserMacro extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Invalid macro "%1$s": %2$s.', $macro['macro'], $user_macro_parser->getError())
 			);
+		}
+	}
+
+	/**
+	 * Validate the "type" field.
+	 *
+	 * @param array $macro
+	 */
+	protected function checkMacroType(array $macro) {
+		if (array_key_exists('type', $macro) && $macro['type'] != ZBX_MACRO_TYPE_TEXT
+				&& $macro['type'] != ZBX_MACRO_TYPE_SECRET) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid type for macro "%1$s".', $macro['macro']));
 		}
 	}
 
