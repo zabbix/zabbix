@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-02-27T02:21:48Z</date>
+    <date>2020-03-03T12:12:14Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -44,6 +44,10 @@
                     <value>{EVENT.VALUE}</value>
                 </parameter>
                 <parameter>
+                    <name>event_source</name>
+                    <value>{EVENT.SOURCE}</value>
+                </parameter>
+                <parameter>
                     <name>event_update_action</name>
                     <value>{EVENT.UPDATE.ACTION}</value>
                 </parameter>
@@ -65,7 +69,7 @@
                 </parameter>
                 <parameter>
                     <name>&lt;'URL' CUSTOMFIELD FOR EVENT URL&gt;</name>
-                    <value>{$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&amp;eventid={EVENT.ID}</value>
+                    <value>{$ZABBIX.URL}//tr_events.php?triggerid={TRIGGER.ID}&amp;eventid={EVENT.ID}</value>
                 </parameter>
                 <parameter>
                     <name>&lt;'STRING' CUSTOMFIELD FOR HOST\IP&gt;</name>
@@ -301,11 +305,15 @@ try {&#13;
         jira = {},&#13;
         update = {};&#13;
 &#13;
-    if (!(params.event_value == 0 || params.event_value == 1)) {&#13;
+    if (params.event_value !== '0' &amp;&amp; params.event_value !== '1') {&#13;
         throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
-    if (!(params.event_update_status == 0 || params.event_update_status == 1)) {&#13;
+    if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) !== -1) {&#13;
+        throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
+    }&#13;
+&#13;
+    if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
         throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
@@ -324,7 +332,10 @@ try {&#13;
 &#13;
     Jira.setParams(jira);&#13;
 &#13;
-    if (params.event_value == 1 &amp;&amp; update.status == 0) {&#13;
+    if (params.event_source != 0 &amp;&amp; params.event_value == 1) {&#13;
+        Jira.createIssue(params.summary, params.alert_message);&#13;
+    }&#13;
+    else if (params.event_value == 1 &amp;&amp; update.status == 0 &amp;&amp; !jira.issue_key.startsWith(jira.project_key)) {&#13;
         var key = Jira.createIssue(params.summary,&#13;
             (Object.keys(fields).length ? params.trigger_description : params.alert_message), fields);&#13;
 &#13;
@@ -336,11 +347,11 @@ try {&#13;
         });&#13;
     }&#13;
     else {&#13;
-        if (!(jira.issue_key.startsWith(jira.project_key))) {&#13;
+        if (!jira.issue_key.startsWith(jira.project_key)) {&#13;
             throw new Error('Incorrect Issue key given: ' + jira.issue_key);&#13;
         }&#13;
         Jira.updateIssue(params.summary, fields,&#13;
-            ((params.event_value == 0 &amp;&amp; !(Object.keys(fields).length))&#13;
+            ((params.event_value == 0 &amp;&amp; !Object.keys(fields).length)&#13;
                 ? params.alert_message : update));&#13;
 &#13;
         return 'OK';&#13;
@@ -351,6 +362,7 @@ catch (error) {&#13;
     throw 'Sending failed: ' + error;&#13;
 }</script>
             <process_tags>YES</process_tags>
+            <show_event_menu>YES</show_event_menu>
             <event_menu_url>{EVENT.TAGS.__zbx_jira_issuelink}</event_menu_url>
             <event_menu_name>Jira: {EVENT.TAGS.__zbx_jira_issuekey}</event_menu_name>
         </media_type>
