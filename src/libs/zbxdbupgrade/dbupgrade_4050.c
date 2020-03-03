@@ -654,6 +654,17 @@ static int	DBpatch_4050042(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4050043(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.screens.graphid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -697,5 +708,6 @@ DBPATCH_ADD(4050039, 0, 1)
 DBPATCH_ADD(4050040, 0, 1)
 DBPATCH_ADD(4050041, 0, 1)
 DBPATCH_ADD(4050042, 0, 1)
+DBPATCH_ADD(4050043, 0, 0)
 
 DBPATCH_END()
