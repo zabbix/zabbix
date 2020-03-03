@@ -553,7 +553,8 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// snmp oid
-			if ($fullItem['type'] == ITEM_TYPE_SNMP && $fullItem['snmp_oid'] === '') {
+			if ($fullItem['type'] == ITEM_TYPE_SNMP && (!array_key_exists('snmp_oid', $fullItem)
+						|| $fullItem['snmp_oid'] === '')) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP OID specified.'));
 			}
 
