@@ -28,11 +28,11 @@
 	$(function() {
 		/**
 		 * On timeselector change only existing list of charts is updated.
-		 * If user has page refresh configured:
-		 * - In case of pattern, the list itself is updated.
-		 * - Else each chart is updated.
-		 * Also each page refresh update is counted since last update (regardless if it was initiated by timeselector).
 		 * Loading indicator is delayed for 3 seconds if refresh was instantiated by page refresh interval.
+		 *
+		 * Next chart update is scheduled since previous request completed.
+		 * In case of pattern select, next list update is scheduled since previous list update request completed and
+		 * each of list items (charts) has completed their individual request.
 		 */
 		var data = JSON.parse('<?= json_encode($data) ?>'),
 			$table = $('#charts'),
@@ -178,7 +178,7 @@
 		}
 
 		/**
-		 * Update listed charts.
+		 * Update currently listed charts.
 		 *
 		 * @param {number} delay_loading  (optional) Add loader only when request exceeds this many seconds.
 		 */
