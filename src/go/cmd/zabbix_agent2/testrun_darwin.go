@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package main
 
-func CheckMetrics() {
+func checkMetrics() {
 	metrics := []string{
 		`agent.hostname`,
 		`agent.ping`,
@@ -95,6 +95,6 @@ func CheckMetrics() {
 	}
 
 	for _, metric := range metrics {
-		_ = CheckMetric(metric, true)
+		_ = checkMetric(metric)
 	}
 }

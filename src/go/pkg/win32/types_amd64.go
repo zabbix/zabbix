@@ -1,3 +1,5 @@
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -17,28 +19,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package cpucollector
+package win32
 
-
-import (
-	"errors"
+const (
+	ARRAY_MAX = 1 << 49
 )
-
-func (p *Plugin) collect() (err error) {
-	return errors.New("Not implemented")
-}
-
-func (p *Plugin) numCPU() int {
-	// TODO: implementation
-	return 0
-}
-
-func (p *Plugin) getStateIndex(state string) (index int, err error) {
-	switch state {
-	case "", "system":
-		index = stateSystem
-	default:
-		err = errors.New("unsupported state")
-	}
-	return 0, errors.New("Not implemented")
-}

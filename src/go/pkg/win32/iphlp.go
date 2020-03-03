@@ -34,6 +34,7 @@ var (
 	getIfTable2    uintptr
 	freeMibTable   uintptr
 	getIpAddrTable uintptr
+	getTcpTable    uintptr
 )
 
 func init() {
@@ -42,6 +43,7 @@ func init() {
 	getIfTable2 = hIphlp.mustGetProcAddress("GetIfTable2")
 	freeMibTable = hIphlp.mustGetProcAddress("FreeMibTable")
 	getIpAddrTable = hIphlp.mustGetProcAddress("GetIpAddrTable")
+	getTcpTable = hIphlp.mustGetProcAddress("GetTcpTable")
 }
 
 func GetIfTable2() (table *MIB_IF_TABLE2, err error) {
@@ -61,6 +63,21 @@ func FreeMibTable(table *MIB_IF_TABLE2) {
 func GetIpAddrTable(table *MIB_IPADDRTABLE, sizeIn uint32, order bool) (sizeOut uint32, err error) {
 	sizeOut = sizeIn
 	ret, _, syserr := syscall.Syscall(getIpAddrTable, 3, uintptr(unsafe.Pointer(table)),
+		uintptr(unsafe.Pointer(&sizeOut)), bool2uintptr(order))
+
+	if ret != windows.NO_ERROR {
+		if syscall.Errno(ret) != syscall.ERROR_INSUFFICIENT_BUFFER {
+			return 0, syserr
+		}
+	}
+	return
+}
+
+// GetTcpTable calls win32 GetTcpTable function. Check if the returned size was less or equal to input size
+// to determine if the buffer was large enough for the address table.
+func GetTcpTable(table *MIB_TCPTABLE, sizeIn uint32, order bool) (sizeOut uint32, err error) {
+	sizeOut = sizeIn
+	ret, _, syserr := syscall.Syscall(getTcpTable, 3, uintptr(unsafe.Pointer(table)),
 		uintptr(unsafe.Pointer(&sizeOut)), bool2uintptr(order))
 
 	if ret != windows.NO_ERROR {

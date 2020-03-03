@@ -51,6 +51,10 @@ extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsi
 
 extern int	CONFIG_CONFSYNCER_FORKS;
 
+#ifdef HAVE_NETSNMP
+static volatile sig_atomic_t	snmp_cache_reload_requested;
+#endif
+
 typedef struct
 {
 	zbx_counter_value_t	online;
@@ -1290,6 +1294,16 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts)
 	process_trap(sock, sock->buffer, ts);
 }
 
+static void	zbx_trapper_sigusr_handler(int flags)
+{
+#ifdef HAVE_NETSNMP
+	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+		snmp_cache_reload_requested = 1;
+#else
+	ZBX_UNUSED(flags);
+#endif
+}
+
 ZBX_THREAD_ENTRY(trapper_thread, args)
 {
 	double		sec = 0.0;
@@ -1303,12 +1317,14 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
 #ifdef HAVE_NETSNMP
 	zbx_init_snmp();
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 	find_psk_in_cache = DCget_psk_by_identity;
 #endif
@@ -1323,8 +1339,17 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		DCsync_configuration(ZBX_DBSYNC_INIT);
 	}
 
+	zbx_set_sigusr_handler(zbx_trapper_sigusr_handler);
+
 	while (ZBX_IS_RUNNING())
 	{
+#ifdef HAVE_NETSNMP
+		if (1 == snmp_cache_reload_requested)
+		{
+			zbx_clear_cache_snmp();
+			snmp_cache_reload_requested = 0;
+		}
+#endif
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
 
