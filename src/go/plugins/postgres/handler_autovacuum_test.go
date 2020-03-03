@@ -29,7 +29,7 @@ import (
 )
 
 func TestPlugin_autovacuumHandler(t *testing.T) {
-	sharedPool, err := newConnPool(t)
+	sharedPool, err := getConnPool(t)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +47,7 @@ func TestPlugin_autovacuumHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			fmt.Sprintf("connectionsHandler should return json with data if OK "),
+			fmt.Sprintf("autovacuumHandler should return count of autovacuum workers if OK "),
 			&impl,
 			args{conn: sharedPool},
 			false,
@@ -56,9 +56,9 @@ func TestPlugin_autovacuumHandler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			_, err := tt.p.connectionsHandler(tt.args.conn, tt.args.params)
+			_, err := tt.p.autovacuumHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.connectionsHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Plugin.autovacuumHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 

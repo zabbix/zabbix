@@ -23,16 +23,35 @@ package postgres
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"testing"
 
+	log "github.com/sirupsen/logrus"
 	"zabbix.com/pkg/plugin"
 )
+
+// TestMain does the before and after setup
+func TestMain(m *testing.M) {
+	var confPath string
+	var stopDB func()
+	log.Infoln("[TestMain] About to start PostgreSQL...")
+
+	confPath, stopDB = startPostgreSQL()
+	log.Infoln("[TestMain] PostgreSQL started!")
+	log.Infof("[TestMain] conf path  = %v", confPath)
+
+	code := m.Run()
+
+	log.Infoln("[TestMain] Cleaning up...")
+	stopDB()
+	os.Exit(code)
+}
 
 func TestPlugin_pingHandler(t *testing.T) {
 	var pingOK int64 = 1
 	// create pool or aquare conn from old pool for test
-	sharedPool, err := newConnPool(t)
+	sharedPool, err := getConnPool(t)
 	if err != nil {
 		t.Fatal(err)
 	}

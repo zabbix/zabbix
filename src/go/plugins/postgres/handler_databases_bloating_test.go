@@ -29,7 +29,7 @@ import (
 )
 
 func TestPlugin_databasesBloatingHandler(t *testing.T) {
-	sharedPool, err := newConnPool(t)
+	sharedPool, err := getConnPool(t)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -30,7 +30,7 @@ import (
 
 func TestPlugin_transactionHandler(t *testing.T) {
 	// create pool or aquare conn from old pool
-	sharedPool, err := newConnPool(t)
+	sharedPool, err := getConnPool(t)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +69,7 @@ func TestPlugin_transactionHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.transactionsHandler(tt.args.conn, tt.args.params)
+			_, err := tt.p.transactionsHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.pingTransactions() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -80,11 +80,11 @@ func TestPlugin_transactionHandler(t *testing.T) {
 			}
 			if (err == errorCannotParseData) != tt.wantErr {
 				t.Errorf("Plugin.pingHandler() failed with %v", errorCannotParseData)
-			} */
+			}
 			if len(got.(string)) == 0 && err != errorCannotParseData {
 				t.Errorf("Plugin.pingTransactions() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
+			} */
 
 		})
 	}

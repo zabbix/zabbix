@@ -1,3 +1,5 @@
+// +build postgres_tests
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -31,7 +33,7 @@ func Test_connManager_create(t *testing.T) {
 	type args struct {
 		cid string
 	}
-	sharedPool, err := NewConnPool(t)
+	sharedPool, err := getConnPool(t)
 	if err != nil {
 		t.Fatal(err)
 	}
