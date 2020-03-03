@@ -277,7 +277,7 @@ try {&#13;
         throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
-    if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) !== -1) {&#13;
+    if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {&#13;
         throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
     }&#13;
 &#13;
