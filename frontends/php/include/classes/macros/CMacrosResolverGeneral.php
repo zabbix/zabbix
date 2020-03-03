@@ -987,32 +987,34 @@ class CMacrosResolverGeneral {
 			do {
 				$hostids = array_keys($hostids);
 
-				$db_host_macros = DBselect(
-					'SELECT hm.hostid,hm.macro,hm.value'.
-					' FROM hostmacro hm'.
-					' WHERE '.dbConditionInt('hm.hostid', $hostids)
-				);
-				while ($db_host_macro = DBfetch($db_host_macros)) {
+				$db_host_macros = API::UserMacro()->get([
+					'output' => ['macro', 'value', 'type'],
+					'hostids' => $hostids
+				]);
+
+				foreach ($db_host_macros as $db_host_macro) {
 					if ($user_macro_parser->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
 						continue;
 					}
 
+					$hostid = $db_host_macro['hostmacroid'];
 					$macro = $user_macro_parser->getMacro();
 					$context = $user_macro_parser->getContext();
+					$value = self::getMacroValue($db_host_macro);
 
-					if (!array_key_exists($db_host_macro['hostid'], $host_macros)) {
-						$host_macros[$db_host_macro['hostid']] = [];
+					if (!array_key_exists($hostid, $host_macros)) {
+						$host_macros[$hostid] = [];
 					}
 
-					if (!array_key_exists($macro, $host_macros[$db_host_macro['hostid']])) {
-						$host_macros[$db_host_macro['hostid']][$macro] = ['value' => null, 'contexts' => []];
+					if (!array_key_exists($macro, $host_macros[$hostid])) {
+						$host_macros[$hostid][$macro] = ['value' => null, 'contexts' => []];
 					}
 
 					if ($context === null) {
-						$host_macros[$db_host_macro['hostid']][$macro]['value'] = $db_host_macro['value'];
+						$host_macros[$hostid][$macro]['value'] = $value;
 					}
 					else {
-						$host_macros[$db_host_macro['hostid']][$macro]['contexts'][$context] = $db_host_macro['value'];
+						$host_macros[$hostid][$macro]['contexts'][$context] = $value;
 					}
 				}
 
