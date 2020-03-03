@@ -587,12 +587,6 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (is_infinite($value)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
-
-			return false;
-		}
-
 		$data = $value;
 
 		return true;
@@ -1181,6 +1175,8 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateNumeric($rule, &$data, $path, &$error) {
+		global $DB_HISTORY_FLOAT_IEEE754;
+
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
 		if (is_int($data)) {
@@ -1211,10 +1207,29 @@ class CApiInputValidator {
 
 		$value = $number_parser->calcValue();
 
-		if (abs($value) == INF) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+		if ($DB_HISTORY_FLOAT_IEEE754 === true) {
+			if (abs($value) < ZBX_FLOAT_MIN) {
+				$error = _s('Field "%1$s" is not correct: %2$s', $path, _('a number is too small'));
 
-			return false;
+				return false;
+			}
+			elseif (abs($value) > ZBX_FLOAT_MAX) {
+				$error = _s('Field "%1$s" is not correct: %2$s', $path, _('a number is too large'));
+
+				return false;
+			}
+		}
+		else {
+			if (ceil(log10(abs($value))) > 16) {
+				$error = _s('Field "%1$s" is not correct: %2$s', $path, _('a number is too large'));
+
+				return false;
+			}
+			elseif ($value != round($value, 4)) {
+				$error = _s('Field "%1$s" is not correct: %2$s', $path, _('a number has too many fractional digits'));
+
+				return false;
+			}
 		}
 
 		// Remove leading zeros.

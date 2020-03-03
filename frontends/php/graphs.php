@@ -460,8 +460,8 @@ elseif (isset($_REQUEST['form'])) {
 		$data['height'] = $graph['height'];
 		$data['ymin_type'] = $graph['ymin_type'];
 		$data['ymax_type'] = $graph['ymax_type'];
-		$data['yaxismin'] = sprintf('%.'.PHP_FLOAT_DIG.'G', $graph['yaxismin']);
-		$data['yaxismax'] = sprintf('%.'.PHP_FLOAT_DIG.'G', $graph['yaxismax']);
+		$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
+		$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
 		$data['ymin_itemid'] = $graph['ymin_itemid'];
 		$data['ymax_itemid'] = $graph['ymax_itemid'];
 		$data['show_work_period'] = $graph['show_work_period'];

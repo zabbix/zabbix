@@ -44,6 +44,12 @@ define('ZBX_MAX_PERIOD',		63158400); // the maximum period for the time bar cont
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_UINT64',		'18446744073709551615');
+
+// Double precision 64-bit float.
+define('ZBX_FLOAT_DIG', PHP_FLOAT_DIG);
+define('ZBX_FLOAT_MIN', PHP_FLOAT_MIN);
+define('ZBX_FLOAT_MAX', PHP_FLOAT_MAX);
+
 define('ZBX_MAX_DATE',			ZBX_MAX_INT32); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
 define('ZBX_PERIOD_DEFAULT_TO',		'now');

@@ -1,4 +1,24 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
 return [
 	'users' => [
 		'key' => 'userid',
@@ -3142,13 +3162,11 @@ return [
 			'yaxismin' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'yaxismax' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '100',
 			],
 			'templateid' => [
@@ -3191,13 +3209,11 @@ return [
 			'percent_left' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'percent_right' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'ymin_type' => [
@@ -3658,7 +3674,6 @@ return [
 			'goodsla' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '99.9',
 			],
 			'sortorder' => [
@@ -4671,7 +4686,6 @@ return [
 			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'ns' => [
@@ -5055,19 +5069,16 @@ return [
 			'value_min' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_avg' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_max' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 		],

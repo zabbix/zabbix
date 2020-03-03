@@ -503,7 +503,7 @@ function convertUnitsUptime($value) {
 	}
 
 	// Is original value precise enough for showing detailed data?
-	if (strlen($value_abs) <= PHP_FLOAT_DIG) {
+	if (strlen($value_abs) <= ZBX_FLOAT_DIG) {
 		if ($days != 0) {
 			$result .= ', ';
 		}
@@ -552,7 +552,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		$parts['years'] = $start === null ? 1 : $parts['years'] + 1;
 		$start = 0;
 	}
-	elseif ($start === null || ceil(log10($parts['years'])) <= PHP_FLOAT_DIG) {
+	elseif ($start === null || ceil(log10($parts['years'])) <= ZBX_FLOAT_DIG) {
 		if ($v > 0) {
 			$parts['months'] = $v;
 			$value_abs_int -= $v * SEC_PER_MONTH;
@@ -1343,7 +1343,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  * Format floating-point number in best possible way for displaying.
  *
  * @param string   $number     Valid number in decimal or scientific notation.
- * @param int|null $precision  Max number of significant digits to take into account. Default: PHP_FLOAT_DIG.
+ * @param int|null $precision  Max number of significant digits to take into account. Default: ZBX_FLOAT_DIG.
  * @param int|null $decimals   Max number of first non-zero decimals decimals to display. Default: 0.
  * @param bool     $exact      Display exaclty this number of decimals instead of first non-zeros.
  *
@@ -1363,7 +1363,7 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 	}
 
 	if ($precision === null) {
-		$precision = PHP_FLOAT_DIG;
+		$precision = ZBX_FLOAT_DIG;
 	}
 
 	if ($decimals === null) {
@@ -1433,7 +1433,7 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 * @return float
 */
 function truncateFloat(float $number): float {
-	return (float) sprintf('%.'.(PHP_FLOAT_DIG - 1).'E', $number);
+	return (float) sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number);
 }
 
 /**
@@ -1444,7 +1444,7 @@ function truncateFloat(float $number): float {
  * @return int
  */
 function getNumDecimals(float $number): int {
-	[$mantissa, $exponent] = explode('E', sprintf('%.'.(PHP_FLOAT_DIG - 1).'E', $number));
+	[$mantissa, $exponent] = explode('E', sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number));
 
 	$significant_size = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
 

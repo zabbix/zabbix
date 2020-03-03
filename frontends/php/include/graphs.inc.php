@@ -1083,8 +1083,8 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		'ignore_milliseconds' => $ignore_milliseconds
 	];
 	$options_fixed = $options + [
-		'precision' => $precision_max,
-		'decimals' => $precision_max - 1,
+		'precision' => $precision,
+		'decimals' => $precision - 1,
 		'decimals_exact' => false
 	];
 	$options_calculated = $options + [

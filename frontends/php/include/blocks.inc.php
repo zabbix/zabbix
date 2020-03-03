@@ -665,7 +665,7 @@ function make_status_of_zbx() {
 		]);
 	}
 
-	// check requirements
+	// Check requirements.
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		foreach ((new CFrontendSetup())->checkRequirements() as $req) {
 			if ($req['result'] == CFrontendSetup::CHECK_FATAL) {
@@ -674,6 +674,17 @@ function make_status_of_zbx() {
 				);
 			}
 		}
+	}
+
+	// Warn if database history tables have not been upgraded.
+	global $DB_HISTORY_FLOAT_IEEE754;
+
+	if ($DB_HISTORY_FLOAT_IEEE754 !== true) {
+		$table->addRow([
+			_('Database history tables upgraded'),
+			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
+			''
+		]);
 	}
 
 	return $table;
