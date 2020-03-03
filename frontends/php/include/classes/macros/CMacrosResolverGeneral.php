@@ -988,7 +988,7 @@ class CMacrosResolverGeneral {
 				$hostids = array_keys($hostids);
 
 				$db_host_macros = API::UserMacro()->get([
-					'output' => ['macro', 'value', 'type'],
+					'output' => ['macro', 'value', 'type', 'hostid'],
 					'hostids' => $hostids
 				]);
 
@@ -997,7 +997,7 @@ class CMacrosResolverGeneral {
 						continue;
 					}
 
-					$hostid = $db_host_macro['hostmacroid'];
+					$hostid = $db_host_macro['hostid'];
 					$macro = $user_macro_parser->getMacro();
 					$context = $user_macro_parser->getContext();
 					$value = self::getMacroValue($db_host_macro);
