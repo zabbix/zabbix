@@ -141,8 +141,8 @@ class CView {
 	 *
 	 * @return string
 	 */
-	public function readJsFile(string $file_name, array $data = null) {
-		$data = $data === null ? $this->data : $data;
+	public function readJsFile(string $file_name, ?array $data = null): string {
+		$data = ($data === null) ? $this->data : $data;
 
 		$file_path = $this->directory.'/js/'.$file_name;
 
