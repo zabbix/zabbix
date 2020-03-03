@@ -334,6 +334,8 @@ try {&#13;
 &#13;
     if (params.event_source != 0 &amp;&amp; params.event_value == 1) {&#13;
         Jira.createIssue(params.summary, params.alert_message);&#13;
+&#13;
+        return 'OK';&#13;
     }&#13;
     else if (params.event_value == 1 &amp;&amp; update.status == 0 &amp;&amp; !jira.issue_key.startsWith(jira.project_key)) {&#13;
         var key = Jira.createIssue(params.summary,&#13;
