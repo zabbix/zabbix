@@ -211,7 +211,7 @@ if ($type == SHOW_TRIGGERS) {
 			$host_options['searchInventory'][$field['field']][] = $field['value'];
 		}
 	}
-	if ($filter['hostids']) {
+	if ($filter['hosts']) {
 		$host_options['hostids'] = array_keys($filter['hosts']);
 	}
 
