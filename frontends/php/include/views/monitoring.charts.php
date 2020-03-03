@@ -19,6 +19,12 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
+$web_layout_mode = CViewHelper::loadLayoutMode();
+
 $controls = (new CForm('get'))
 	->cleanItems()
 	->setAttribute('aria-label', _('Main filter'))
@@ -53,10 +59,8 @@ if ($this->data['graphid']) {
 	);
 }
 
-$content_control->addItem(get_icon('kioskmode'));
+$content_control->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 $content_control = (new CTag('nav', true, $content_control))->setAttribute('aria-label', _('Content controls'));
-
-$web_layout_mode = CView::getLayoutMode();
 
 $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
@@ -115,4 +119,4 @@ else {
 	$chartsWidget->addItem(new CTableInfo());
 }
 
-return $chartsWidget;
+$chartsWidget->show();

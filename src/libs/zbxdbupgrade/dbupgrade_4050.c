@@ -108,33 +108,6 @@ static int	DBpatch_4050012(void)
 	return DBmodify_field_type("users", &field, NULL);
 }
 
-static int	DBpatch_4050013(void)
-{
-	int		i;
-	const char	*values[] = {
-			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
-			"web.usergrps.php.sort", "web.usergroup.sort",
-			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
-			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
-			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
-			"web.latest.php.sort", "web.latest.sort",
-			"web.latest.php.sortorder", "web.latest.sortorder",
-			"web.paging.lastpage", "web.pager.entity",
-			"web.paging.page", "web.pager.page"
-		};
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	for (i = 0; i < (int)ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static int	DBpatch_4050014(void)
 {
 	DB_ROW		row;
@@ -537,7 +510,7 @@ static int	DBpatch_4050028(void)
 				{"id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"relative_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"config", "", NULL, NULL, 2048, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"config", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -546,7 +519,142 @@ static int	DBpatch_4050028(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4050029(void)
+static int	DBpatch_4050030(void)
+{
+	return SUCCEED;
+}
+
+static int	DBpatch_4050031(void)
+{
+	const ZBX_TABLE table =
+			{"task_data", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050032(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_data", 1, &field);
+}
+
+static int	DBpatch_4050033(void)
+{
+	const ZBX_TABLE	table =
+			{"task_result", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4050034(void)
+{
+	return DBcreate_index("task_result", "task_result_1", "parent_taskid", 0);
+}
+
+static int	DBpatch_4050035(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_result", 1, &field);
+}
+
+static int	DBpatch_4050036(void)
+{
+	const ZBX_FIELD	field = {"note", "0", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("auditlog", "details", &field);
+}
+
+static int	DBpatch_4050037(void)
+{
+	const ZBX_FIELD	field = {"note", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("auditlog", &field);
+}
+
+static int	DBpatch_4050038(void)
+{
+	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
+}
+
+static int	DBpatch_4050039(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.usergroup.filter_users_status", "web.usergroup.filter_user_status",
+			"web.usergrps.php.sort", "web.usergroup.sort",
+			"web.usergrps.php.sortorder", "web.usergroup.sortorder",
+			"web.adm.valuemapping.php.sortorder", "web.valuemap.list.sortorder",
+			"web.adm.valuemapping.php.sort", "web.valuemap.list.sort",
+			"web.latest.php.sort", "web.latest.sort",
+			"web.latest.php.sortorder", "web.latest.sortorder",
+			"web.paging.lastpage", "web.pager.entity",
+			"web.paging.page", "web.pager.page",
+			"web.auditlogs.filter.active", "web.auditlog.filter.active",
+			"web.auditlogs.filter.action", "web.auditlog.filter.action",
+			"web.auditlogs.filter.alias", "web.auditlog.filter.alias",
+			"web.auditlogs.filter.resourcetype", "web.auditlog.filter.resourcetype",
+			"web.auditlogs.filter.from", "web.auditlog.filter.from",
+			"web.auditlogs.filter.to", "web.auditlog.filter.to"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050040(void)
+{
+	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_default("auditlog", &field);
+}
+
+static int	DBpatch_4050041(void)
+{
+	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("auditlog", &field);
+}
+
+static int	DBpatch_4050042(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update auditlog set resourceid=null where resourceid=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050043(void)
 {
 	if (ZBX_DB_OK > DBexecute("update profiles set value_int=1 where idx='web.layout.mode' and value_int=2"))
 		return FAIL;
@@ -569,7 +677,6 @@ DBPATCH_ADD(4050006, 0, 1)
 DBPATCH_ADD(4050007, 0, 1)
 DBPATCH_ADD(4050011, 0, 1)
 DBPATCH_ADD(4050012, 0, 1)
-DBPATCH_ADD(4050013, 0, 1)
 DBPATCH_ADD(4050014, 0, 1)
 DBPATCH_ADD(4050015, 0, 1)
 DBPATCH_ADD(4050016, 0, 1)
@@ -585,6 +692,19 @@ DBPATCH_ADD(4050025, 0, 1)
 DBPATCH_ADD(4050026, 0, 1)
 DBPATCH_ADD(4050027, 0, 1)
 DBPATCH_ADD(4050028, 0, 1)
-DBPATCH_ADD(4050029, 0, 1)
+DBPATCH_ADD(4050030, 0, 1)
+DBPATCH_ADD(4050031, 0, 1)
+DBPATCH_ADD(4050032, 0, 1)
+DBPATCH_ADD(4050033, 0, 1)
+DBPATCH_ADD(4050034, 0, 1)
+DBPATCH_ADD(4050035, 0, 1)
+DBPATCH_ADD(4050036, 0, 1)
+DBPATCH_ADD(4050037, 0, 1)
+DBPATCH_ADD(4050038, 0, 1)
+DBPATCH_ADD(4050039, 0, 1)
+DBPATCH_ADD(4050040, 0, 1)
+DBPATCH_ADD(4050041, 0, 1)
+DBPATCH_ADD(4050042, 0, 1)
+DBPATCH_ADD(4050043, 0, 1)
 
 DBPATCH_END()

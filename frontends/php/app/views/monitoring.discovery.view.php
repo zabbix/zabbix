@@ -19,16 +19,25 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('multiselect.js');
 
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
+
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))
-	->setWebLayoutMode(CView::getLayoutMode())
-	->setControls(
-		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode'))))
+	->setWebLayoutMode($web_layout_mode)
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'discovery.view')))

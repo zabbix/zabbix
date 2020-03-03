@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 // Overview tab.
 $overviewFormList = new CFormList();
 
@@ -218,11 +222,14 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel(url_param('groupid'))]));
 
-return (new CWidget())
+$web_layout_mode = CViewHelper::loadLayoutMode();
+
+(new CWidget())
 	->setTitle(_('Host inventory'))
-	->setWebLayoutMode(CView::getLayoutMode())
-	->setControls((new CList())->addItem(get_icon('kioskmode')))
+	->setWebLayoutMode($web_layout_mode)
+	->setControls((new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode])))
 	->addItem((new CForm())
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem($hostInventoriesTab)
-	);
+	)
+	->show();

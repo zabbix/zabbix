@@ -198,3 +198,5 @@ bin/zabbix_sender
 etc/agent.conf
 sbin/zabbix_agent2
 etc/zabbix_agent2.conf
+bin/win32
+bin/win64

@@ -1057,14 +1057,14 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 	time_t		now;
 	signed char	ipmi_authtype;
 	unsigned char	ipmi_privilege;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	ZBX_DC_PSK	*psk_i, psk_i_local;
 	zbx_ptr_pair_t	*psk_owner, psk_owner_local;
 	zbx_hashset_t	psk_owners;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 #endif
 	now = time(NULL);
@@ -1137,7 +1137,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		DCstrpool_replace(found, &host->tls_issuer, row[31]);
 		DCstrpool_replace(found, &host->tls_subject, row[32]);
 
@@ -1542,7 +1542,7 @@ done:
 		zbx_strpool_release(host->snmp_error);
 		zbx_strpool_release(host->ipmi_error);
 		zbx_strpool_release(host->jmx_error);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_strpool_release(host->tls_issuer);
 		zbx_strpool_release(host->tls_subject);
 
@@ -1564,7 +1564,7 @@ done:
 		zbx_hashset_remove_direct(&config->hosts, host);
 	}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_destroy(&psk_owners);
 #endif
 
@@ -3654,8 +3654,16 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(actionid, row[0]);
 		action = (zbx_dc_action_t *)DCfind_id(&config->actions, actionid, sizeof(zbx_dc_action_t), &found);
 
+		ZBX_STR2UCHAR(action->eventsource, row[1]);
+		ZBX_STR2UCHAR(action->evaltype, row[2]);
+
+		DCstrpool_replace(found, &action->formula, row[3]);
+
 		if (0 == found)
 		{
+			if (EVENT_SOURCE_INTERNAL == action->eventsource)
+				config->internal_actions++;
+
 			zbx_vector_ptr_create_ext(&action->conditions, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
 
@@ -3663,11 +3671,6 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 
 			action->opflags = ZBX_ACTION_OPCLASS_NONE;
 		}
-
-		ZBX_STR2UCHAR(action->eventsource, row[1]);
-		ZBX_STR2UCHAR(action->evaltype, row[2]);
-
-		DCstrpool_replace(found, &action->formula, row[3]);
 	}
 
 	/* remove deleted actions */
@@ -3675,6 +3678,9 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 	{
 		if (NULL == (action = (zbx_dc_action_t *)zbx_hashset_search(&config->actions, &rowid)))
 			continue;
+
+		if (EVENT_SOURCE_INTERNAL == action->eventsource)
+			config->internal_actions--;
 
 		zbx_strpool_release(action->formula);
 		zbx_vector_ptr_destroy(&action->conditions);
@@ -5411,7 +5417,7 @@ void	DCsync_configuration(unsigned char mode)
 				config->hosts_h.num_data, config->hosts_h.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_p    : %d (%d slots)", __func__,
 				config->hosts_p.num_data, config->hosts_p.num_slots);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() psks       : %d (%d slots)", __func__,
 				config->psks.num_data, config->psks.num_slots);
 #endif
@@ -5841,7 +5847,7 @@ static int	__config_regexp_compare(const void *d1, const void *d2)
 	return r1->name == r2->name ? 0 : strcmp(r1->name, r2->name);
 }
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 static zbx_hash_t	__config_psk_hash(const void *data)
 {
 	const ZBX_DC_PSK	*psk_i = (const ZBX_DC_PSK *)data;
@@ -5988,7 +5994,7 @@ int	init_configuration_cache(char **error)
 
 	CREATE_HASHSET_EXT(config->strpool, 100, __config_strpool_hash, __config_strpool_compare);
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	CREATE_HASHSET_EXT(config->psks, 0, __config_psk_hash, __config_psk_compare);
 #endif
 
@@ -6047,6 +6053,8 @@ int	init_configuration_cache(char **error)
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
+
+	config->internal_actions = 0;
 
 	/* maintenance data are used only when timers are defined (server) */
 	if (0 != CONFIG_TIMER_FORKS)
@@ -6164,7 +6172,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	strscpy(dst_host->jmx_error, src_host->jmx_error);
 	dst_host->tls_connect = src_host->tls_connect;
 	dst_host->tls_accept = src_host->tls_accept;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	strscpy(dst_host->tls_issuer, src_host->tls_issuer);
 	strscpy(dst_host->tls_subject, src_host->tls_subject);
 
@@ -6256,7 +6264,7 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
 
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
@@ -6268,7 +6276,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -6310,7 +6318,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 		return FAIL;
 	}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
 		/* simplified match, not compliant with RFC 4517, 4518 */
@@ -6329,7 +6337,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (NULL != dc_host->tls_dc_psk)
@@ -6360,7 +6368,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	return SUCCEED;
 }
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: DCget_psk_by_identity                                            *
@@ -9179,7 +9187,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 
 		dst_proxy->tls_connect = host->tls_connect;
 		dst_proxy->tls_accept = host->tls_accept;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		strscpy(dst_proxy->tls_issuer, host->tls_issuer);
 		strscpy(dst_proxy->tls_subject, host->tls_subject);
 
@@ -9202,7 +9210,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 		*dst_proxy->host = '\0';
 		*dst_proxy->proxy_address = '\0';
 		dst_proxy->tls_connect = ZBX_TCP_SEC_TLS_PSK;	/* set PSK to deliberately fail in this case */
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		*dst_proxy->tls_psk_identity = '\0';
 		*dst_proxy->tls_psk = '\0';
 #endif
@@ -10518,6 +10526,28 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __func__, hosts->num_data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_internal_action_count                                      *
+ *                                                                            *
+ * Purpose: get number of enabled internal actions                            *
+ *                                                                            *
+ * Return value: number of enabled internal actions                           *
+ *                                                                            *
+ ******************************************************************************/
+unsigned int	DCget_internal_action_count(void)
+{
+	unsigned int count;
+
+	RDLOCK_CACHE;
+
+	count = config->internal_actions;
+
+	UNLOCK_CACHE;
+
+	return count;
 }
 
 /******************************************************************************

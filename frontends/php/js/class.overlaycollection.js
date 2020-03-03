@@ -90,6 +90,21 @@ OverlayCollection.prototype.removeById = function(id) {
 };
 
 /**
+ * Get unused overlay id.
+ *
+ * @return {string}
+ */
+OverlayCollection.prototype.getNextId = function() {
+	var overlayid = Math.random().toString(36).substring(7);
+
+	while (this.stack.indexOf(overlayid) !== -1) {
+		overlayid = Math.random().toString(36).substring(7);
+	}
+
+	return overlayid;
+};
+
+/**
  * Retrieves overlay Z-index by ID.
  *
  * @param {string} id  Overlay object identifier.

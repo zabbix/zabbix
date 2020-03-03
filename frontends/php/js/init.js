@@ -80,10 +80,6 @@ jQuery(function($) {
 		});
 	}
 
-	if (IE) {
-		setTimeout(function () { $('[autofocus]').focus(); }, 10);
-	}
-
 	/**
 	 * Change combobox color according selected option.
 	 */
@@ -371,4 +367,52 @@ jQuery(function($) {
 
 	// Initialize hintBox event handlers.
 	hintBox.bindEvents();
+
+	/**
+	 * @param {boolean} preserve_state  Preserve current state of the debug button.
+	 *
+	 * @returns {boolean} false
+	 */
+	function debug_click_handler(preserve_state) {
+		var $button = $(this),
+			visible = sessionStorage.getItem('debug-info-visible') === '1';
+
+		if (preserve_state !== true) {
+			visible = !visible;
+
+			sessionStorage.setItem('debug-info-visible', visible ? '1' : '0');
+		}
+
+		$button.text(visible ? t('Hide debug') : t('Debug'));
+
+		var style = $button.data('debug-info-style');
+		if (style) {
+			style.sheet.deleteRule(0);
+		}
+		else {
+			style = document.createElement('style');
+			$button.data('debug-info-style', style);
+			document.head.appendChild(style);
+		}
+
+		// ZBX_STYLE_DEBUG_OUTPUT
+		style.sheet.insertRule('.debug-output { display: ' + (visible ? 'block' : 'none') + '; }', 0);
+
+		if (preserve_state !== true) {
+			$.publish('debug.click', {
+				visible: visible
+			});
+		}
+
+		return false;
+	}
+
+	// Initialize ZBX_STYLE_BTN_DEBUG debug button and debug info state.
+	$('.btn-debug').each(function(index, button) {
+		$(button)
+			.on('click', debug_click_handler)
+			.addClass('visible');
+
+		debug_click_handler.call(button, true);
+	});
 });

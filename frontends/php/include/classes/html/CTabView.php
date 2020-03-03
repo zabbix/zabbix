@@ -142,9 +142,9 @@ class CTabView extends CDiv {
 
 		if ($this->selectedTab !== null) {
 			$create_event = 'create: function() {'.
-				'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", '.CJs::encodeJson($this->selectedTab).');'.
+				'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", '.json_encode($this->selectedTab).');'.
 			'},';
-			$active_tab = 'active: '.CJs::encodeJson($this->selectedTab).',';
+			$active_tab = 'active: '.json_encode($this->selectedTab).',';
 		}
 		else {
 			$active_tab = 'active: function() {'.
@@ -152,7 +152,7 @@ class CTabView extends CDiv {
 			'}(),';
 		}
 
-		$disabled_tabs = ($this->disabledTabs === null) ? '' : 'disabled: '.CJs::encodeJson($this->disabledTabs).',';
+		$disabled_tabs = ($this->disabledTabs === null) ? '' : 'disabled: '.json_encode($this->disabledTabs).',';
 
 		return
 			'jQuery("#'.$this->id.'").tabs({'.

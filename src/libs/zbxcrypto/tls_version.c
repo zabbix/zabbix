@@ -19,20 +19,12 @@
 
 #include "common.h"
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #include "zbxcrypto.h"
 #include "tls.h"
 
-#if defined(HAVE_POLARSSL)
-#	include <polarssl/entropy.h>
-#	include <polarssl/ctr_drbg.h>
-#	include <polarssl/ssl.h>
-#	include <polarssl/error.h>
-#	include <polarssl/debug.h>
-#	include <polarssl/oid.h>
-#	include <polarssl/version.h>
-#elif defined(HAVE_GNUTLS)
+#if defined(HAVE_GNUTLS)
 #	include <gnutls/gnutls.h>
 #	include <gnutls/x509.h>
 #elif defined(HAVE_OPENSSL)
@@ -51,9 +43,7 @@
  ******************************************************************************/
 void	zbx_tls_version(void)
 {
-#if defined(HAVE_POLARSSL)
-	printf("Compiled with %s\n", POLARSSL_VERSION_STRING_FULL);
-#elif defined(HAVE_GNUTLS)
+#if defined(HAVE_GNUTLS)
 	printf("Compiled with GnuTLS %s\nRunning with GnuTLS %s\n", GNUTLS_VERSION, gnutls_check_version(NULL));
 #elif defined(HAVE_OPENSSL)
 	printf("This product includes software developed by the OpenSSL Project\n"

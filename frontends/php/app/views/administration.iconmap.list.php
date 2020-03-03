@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Icon mapping'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())

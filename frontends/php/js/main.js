@@ -73,7 +73,7 @@ var PageRefresh = {
 
 		this.delayLeft -= 1000;
 		if (this.delayLeft < 0) {
-			if (IE || ED) {
+			if (ED) {
 				sessionStorage.scrollTop = jQuery(window).scrollTop();
 			}
 
@@ -197,36 +197,26 @@ var AudioControl = {
 	playOnce: function(name) {
 		this.stop();
 
-		if (IE) {
-			this.create(name, false);
+		var obj = jQuery('#audio');
+
+		if (obj.length > 0 && obj.data('name') === name) {
+			obj.trigger('play');
 		}
 		else {
-			var obj = jQuery('#audio');
-
-			if (obj.length > 0 && obj.data('name') === name) {
-				obj.trigger('play');
-			}
-			else {
-				this.create(name, false);
-			}
+			this.create(name, false);
 		}
 	},
 
 	playLoop: function(name, delay) {
 		this.stop();
 
-		if (IE) {
-			this.create(name, true);
+		var obj = jQuery('#audio');
+
+		if (obj.length > 0 && obj.data('name') === name) {
+			obj.trigger('play');
 		}
 		else {
-			var obj = jQuery('#audio');
-
-			if (obj.length > 0 && obj.data('name') === name) {
-				obj.trigger('play');
-			}
-			else {
-				this.create(name, true);
-			}
+			this.create(name, true);
 		}
 
 		AudioControl.loop(new Date().getTime() + delay * 1000);
@@ -238,67 +228,29 @@ var AudioControl = {
 		if (obj !== null) {
 			clearTimeout(AudioControl.timeoutHandler);
 
-			if (IE) {
-				obj.setAttribute('loop', false);
-				obj.setAttribute('playcount', 0);
-
-				try {
-					obj.stop();
-				}
-				catch (e) {
-					setTimeout(
-						function() {
-							try {
-								document.getElementById('audio').stop();
-							}
-							catch (e) {
-							}
-						},
-						100
-					);
-				}
-			}
-			else {
-				jQuery(obj).trigger('pause');
-			}
+			jQuery(obj).trigger('pause');
 		}
 	},
 
 	create: function(name, loop) {
-		if (IE) {
-			jQuery('#audio').remove();
+		var obj = jQuery('#audio');
 
-			jQuery('body').append(jQuery('<embed>', {
+		if (obj.length == 0 || obj.data('name') !== name) {
+			obj.remove();
+
+			var audioOptions = {
 				id: 'audio',
 				'data-name': name,
 				src: 'audio/' + name,
-				enablejavascript: true,
-				autostart: true,
-				loop: true,
-				playcount: loop ? 9999999 : 1,
-				height: 0
-			}));
-		}
-		else {
-			var obj = jQuery('#audio');
+				preload: 'auto',
+				autoplay: true
+			};
 
-			if (obj.length == 0 || obj.data('name') !== name) {
-				obj.remove();
-
-				var audioOptions = {
-					id: 'audio',
-					'data-name': name,
-					src: 'audio/' + name,
-					preload: 'auto',
-					autoplay: true
-				};
-
-				if (loop) {
-					audioOptions.loop = true;
-				}
-
-				jQuery('body').append(jQuery('<audio>', audioOptions));
+			if (loop) {
+				audioOptions.loop = true;
 			}
+
+			jQuery('body').append(jQuery('<audio>', audioOptions));
 		}
 	}
 };
@@ -510,7 +462,8 @@ var hintBox = {
 		target.hintBoxItem.show();
 
 		if (target.isStatic) {
-			overlayDialogueOnLoad(true, target.hintBoxItem);
+			Overlay.prototype.recoverFocus.call({'$dialogue': target.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': target.hintBoxItem});
 		}
 	},
 
@@ -580,8 +533,7 @@ var hintBox = {
 
 		target.hintBoxItem.css({
 			top: top + 'px',
-			left: left + 'px',
-			zIndex: 1001
+			left: left + 'px'
 		});
 	},
 
@@ -970,15 +922,10 @@ jQuery(function ($) {
 
 				var css = {};
 
-				if (IE9) {
-					css['-ms-transform-origin'] = transform;
-				}
-				else {
-					css['transform-origin'] = transform;
-					css['-webkit-transform-origin'] = transform;
-					css['-moz-transform-origin'] = transform;
-					css['-o-transform-origin'] = transform;
-				}
+				css['transform-origin'] = transform;
+				css['-webkit-transform-origin'] = transform;
+				css['-moz-transform-origin'] = transform;
+				css['-o-transform-origin'] = transform;
 
 				var divInner = $('<div>', {
 					'class': 'vertical_rotation_inner'
@@ -1007,7 +954,7 @@ jQuery(function ($) {
 		});
 	};
 
-	if ((IE || ED) && typeof sessionStorage.scrollTop !== 'undefined') {
+	if (ED && typeof sessionStorage.scrollTop !== 'undefined') {
 		$(window).scrollTop(sessionStorage.scrollTop);
 		sessionStorage.removeItem('scrollTop');
 	}

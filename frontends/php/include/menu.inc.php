@@ -131,7 +131,7 @@ function getMainMenu(): CMenu {
 				)
 				->insertAfter(_('Triggers top 100'),
 					(new CMenuItem(_('Audit')))
-						->setUrl(new CUrl('auditlogs.php'), 'auditlogs.php')
+						->setAction('auditlog.list')
 				)
 				->insertAfter(_('Audit'),
 					(new CMenuItem(_('Action log')))

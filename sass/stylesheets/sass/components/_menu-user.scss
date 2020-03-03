@@ -2,7 +2,7 @@ $menu-user-icons: (
 		support: -247px -48px,
 		share: -90px -84px,
 		help: -90px -48px,
-		guest: -241px -104px,
+		guest: -247px -156px,
 		profile: -90px -120px,
 		signout: -90px -156px
 ) !default;
@@ -40,11 +40,11 @@ $menu-user-icons: (
 		line-height: 16px;
 	}
 
-	a {
+	a,
+	span {
 		position: relative;
 		display: block;
 		padding: 12px 12px 12px 48px;
-		color: $menu-user-color;
 		font-size: 12px;
 		white-space: nowrap;
 
@@ -62,6 +62,10 @@ $menu-user-icons: (
 				transition: opacity $ui-transition-duration ease-out;
 			}
 		}
+	}
+
+	a {
+		color: $menu-user-color;
 
 		&:hover,
 		&:focus {
@@ -72,5 +76,9 @@ $menu-user-icons: (
 				opacity: 1;
 			}
 		}
+	}
+
+	span {
+		color: $menu-user-disabled-color;
 	}
 }

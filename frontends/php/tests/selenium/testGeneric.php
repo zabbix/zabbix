@@ -102,7 +102,7 @@ class testGeneric extends CLegacyWebTest {
 			['zabbix.php?action=user.edit',		'Configuration of users'],
 			['zabbix.php?action=mediatype.list',					'Configuration of media types'],
 			['zabbix.php?action=script.list',						'Configuration of scripts'],
-			['auditlogs.php',					'Audit log'],
+			['zabbix.php?action=auditlog.list',					'Audit log'],
 			['auditacts.php',					'Action log'],
 
 			['queue.php',						'Queue [refreshed every 30 sec.]'],

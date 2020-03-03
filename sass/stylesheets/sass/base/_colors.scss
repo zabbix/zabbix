@@ -1,24 +1,18 @@
 // Notification & alert
-// TODO: Naming
 $red: #e33734 !default;
 $light-red: #ed9898 !default;
-//$lighter-red: #fccacf !default;
 
-// TODO: Naming
 $orange: #f24f1d !default;
 
-// TODO: Naming
 $yellow: #fad634 !default;
 $dark-yellow: #e99003 !default;
 $light-yellow: #fcf39d !default;
 $lighter-yellow: #fcf7c2 !default;
 
-// TODO: Naming
 $green: #429e47 !default;
 $light-green: #a5d6a7 !default;
 $lighter-green: #c5e3c6 !default;
 
-// TODO: Naming
 $blue: #1e87e3 !default;
 
 $alt-red: #e45959;
@@ -46,10 +40,6 @@ $sidebar-scrollbar-track-color: rgba(#87d1ff, .55) !default;
 $sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85) !default;
 
 // Main
-//$main-nav-bg-color: #ffffff !default;
-//$main-subnav-bg-color: #0a466a !default;
-//$main-subnav-bg-selected-color: #026dab !default;
-//$main-color: #0275b8 !default;
 $font-color: #1f2c33 !default;
 $font-selected-color: #ffffff !default;
 $font-alt-color: #768d99 !default;
@@ -78,19 +68,15 @@ $menu-main-submenu-selected-border-color: #87d1ff !default;
 
 $menu-user-color: #cedae1 !default;
 $menu-user-hover-color: #ffffff !default;
+$menu-user-disabled-color: #768d99 !default;
 
 // UI
 $ui-bg-color: #ffffff !default;
 $ui-border-color: #dfe4e7 !default;
-// TODO: naming...
 $ui-bg-selected-color: #768d99 !default;
-// TODO: naming...
 $ui-hover-color: #e8f5ff !default;
-// TODO: naming
 $ui-placeholder-background-color: $body-bg-color !default;
-// TODO: naming
 $ui-highlighted-parent-background-color: lighten($body-bg-color, 4%) !default;
-// TODO: naming
 $ui-sortable-helper-background-color: $ui-bg-color !default;
 $ui-sortable-helper-border-color: $ui-border-color !default;
 
@@ -116,10 +102,6 @@ $form-disabled-border-color: #ccd5d9 !default;
 $form-search-bg-color: #092637 !default;
 $form-search-border-color: #010a0f !default;
 
-//$scrollbar-track-color: #ebebeb !default;
-//$scrollbar-thumb-color: #ccd5d9 !default;
-//$scrollbar-thumb-color-darken: 5% !default;
-
 $input-placeholder-color: #9d9d9d !default;
 
 // Error messages
@@ -137,7 +119,6 @@ $btn-border-color: #0275b8 !default;
 
 $btn-alt-font-color: #0275b8 !default;
 $btn-alt-bg-color: transparent !default;
-//$btn-alt-border-color: $btn-bg-color !default;
 
 $btn-form-font-color: #1f2c33 !default;
 $btn-form-bg-color: $form-bg-color !default;
@@ -148,11 +129,8 @@ $btn-disabled-font-color: #acbbc2 !default;
 $btn-disabled-bg-color: #ebebeb !default;
 $btn-disabled-border-color: #ccd5d9 !default;
 
-// TODO: naming
 $btn-back-map-background-color: rgba(255, 255, 255, .8) !default;
-// TODO: naming
 $btn-back-text-color: #0275b8 !default;
-// TODO: naming
 $btn-back-background-hover: $form-bg-color !default;
 
 // Links
@@ -163,18 +141,9 @@ $link-visited-color: $link-color !default;
 
 $link-alt-underline-color: #768d99 !default;
 
-//$link-main-nav-color: rgba(#1f2c33, .8) !default;
-//$link-main-nav-hover-color: rgba(#1f2c33, 1) !default;
-//$link-main-nav-active-color: rgba(#1f2c33, 1) !default;
-//$link-main-nav-visited-color: rgba(#1f2c33, .8) !default;
-
-// TODO: legacy?
 $link-main-subnav-color: rgba(#ffffff, .8) !default;
-// TODO: legacy?
 $link-main-subnav-hover-color: rgba(#ffffff, 1) !default;
-// TODO: legacy?
 $link-main-subnav-active-color: rgba(#ffffff, 1) !default;
-// TODO: legacy?
 $link-main-subnav-visited-color: rgba(#ffffff, .8) !default;
 
 // Analog clock

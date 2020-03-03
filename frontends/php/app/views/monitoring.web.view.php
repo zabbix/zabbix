@@ -19,13 +19,20 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
 
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
+
 (new CWidget())
 	->setTitle(_('Web monitoring'))
-	->setWebLayoutMode(CView::getLayoutMode())
+	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CList([
 		(new CForm('get'))
 			->cleanItems()
@@ -43,7 +50,7 @@ $this->addJsFile('layout.mode.js');
 					$data['pageFilter']->getHostsCB()
 				])
 			),
-		(new CTag('nav', true, get_icon('kioskmode')))
+		(new CTag('nav', true, get_icon('kioskmode', ['mode' => $web_layout_mode])))
 			->setAttribute('aria-label', _('Content controls'))
 		])))
 	->addItem(

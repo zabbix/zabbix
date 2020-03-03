@@ -395,12 +395,6 @@ class ZBase {
 				}
 			}
 
-			// reset the LC_CTYPE locale so that case transformation functions would work correctly
-			// it is also required for PHP to work with the Turkish locale (https://bugs.php.net/bug.php?id=18556)
-			// WARNING: this must be done before executing any other code, otherwise code execution could fail!
-			// this will be unnecessary in PHP 5.5
-			setlocale(LC_CTYPE, $defaultLocales);
-
 			if (!$locale_found && $user_data['lang'] != 'en_GB' && $user_data['lang'] != 'en_gb') {
 				error('Locale for language "'.$user_data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
@@ -465,7 +459,8 @@ class ZBase {
 
 			foreach (array_reverse($modules) as $module) {
 				if (is_subclass_of($module, CModule::class)) {
-					array_unshift(CView::$viewsDir, $module->getDir().'/views');
+					CView::registerDirectory($module->getDir().'/views');
+					CPartial::registerDirectory($module->getDir().'/partials');
 				}
 			}
 
@@ -551,10 +546,9 @@ class ZBase {
 				],
 				'main_block' => '',
 				'javascript' => [
-					'files' => [],
-					'pre' => '',
-					'post' => ''
-				]
+					'files' => []
+				],
+				'web_layout_mode' => ZBX_LAYOUT_NORMAL
 			];
 
 			if ($router->getView() !== null && $response->isViewEnabled()) {
@@ -563,10 +557,9 @@ class ZBase {
 				$layout_data = array_replace($layout_data_defaults, [
 					'main_block' => $view->getOutput(),
 					'javascript' => [
-						'files' => $view->getAddedJS(),
-						'pre' => $view->getIncludedJS(),
-						'post' => $view->getPostJS()
-					]
+						'files' => $view->getJsFiles()
+					],
+					'web_layout_mode' => $view->getLayoutMode()
 				]);
 			}
 			else {
@@ -584,7 +577,7 @@ class ZBase {
 	 */
 	private function setLayoutModeByUrl() {
 		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
-			CView::setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
+			CViewHelper::saveLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 		}
 
 		// Remove $_GET arguments to prevent CUrl from generating URL with 'kiosk' arguments.

@@ -104,6 +104,7 @@ const char	*help_message[] = {
 	"                                 target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
 	"                                 target is not specified",
+	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
@@ -272,7 +273,7 @@ char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /* the following TLS parameters are not used in server, they are defined for linking with tls.c */
 char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL;
@@ -571,7 +572,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (SUCCEED != zbx_validate_log_parameters(task))
 		err = 1;
 
-#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	err |= (FAIL == check_cfg_feature_str("TLSCAFile", CONFIG_TLS_CA_FILE, "TLS support"));
 	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", CONFIG_TLS_CRL_FILE, "TLS support"));
 	err |= (FAIL == check_cfg_feature_str("TLSCertFile", CONFIG_TLS_CERT_FILE, "TLS support"));
@@ -777,7 +778,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
 
 	zbx_validate_config(task);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_validate_config();
 #endif
 }
@@ -951,17 +952,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #else
 #	define ODBC_FEATURE_STATUS	" NO"
 #endif
-#ifdef HAVE_SSH2
-#	define SSH2_FEATURE_STATUS	"YES"
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
+#	define SSH_FEATURE_STATUS	"YES"
 #else
-#	define SSH2_FEATURE_STATUS	" NO"
+#	define SSH_FEATURE_STATUS	" NO"
 #endif
 #ifdef HAVE_IPV6
 #	define IPV6_FEATURE_STATUS	"YES"
 #else
 #	define IPV6_FEATURE_STATUS	" NO"
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	define TLS_FEATURE_STATUS	"YES"
 #else
 #	define TLS_FEATURE_STATUS	" NO"
@@ -977,14 +978,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "VMware monitoring:         " VMWARE_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       " SMTP_AUTH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "SSH2 support:              " SSH2_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:               " SSH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:               " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
@@ -1070,6 +1071,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
+	DBcheck_character_set();
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
@@ -1092,7 +1094,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_parent();
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");

@@ -69,7 +69,7 @@ class CLegacyAction extends CAction {
 		}
 
 		if ($user_type != USER_TYPE_SUPER_ADMIN) {
-			$denied = array_merge($denied, ['auditlogs.php', 'auditacts.php', 'correlation.php', 'queue.php']);
+			$denied = array_merge($denied, ['auditacts.php', 'correlation.php', 'queue.php']);
 		}
 
 		return !in_array($this->getAction(), $denied);

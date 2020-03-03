@@ -147,7 +147,7 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 	return FAIL;
 }
 
-int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	AGENT_REQUEST	request;
 	vmfunc_t	vmfunc;

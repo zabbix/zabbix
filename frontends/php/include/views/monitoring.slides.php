@@ -19,7 +19,11 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
+/**
+ * @var CView $this
+ */
+
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
@@ -94,7 +98,7 @@ $widget->setControls((new CList([
 		)
 		->addItem($favourite_icon)
 		->addItem($refresh_icon)
-		->addItem(get_icon('kioskmode'))
+		->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 	))
 		->setAttribute('aria-label', _('Content controls'))
 ])));
@@ -114,4 +118,4 @@ $widget
 
 require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
 
-return $widget;
+$widget->show();

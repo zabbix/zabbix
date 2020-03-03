@@ -117,8 +117,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonMultiselect('filter_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//select/option[text()="Templates"]');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="Template Module ICMP Ping"]');
+		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//select/option[text()="Templates"]');
+		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//a[text()="Template Module ICMP Ping"]');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMPv1']");

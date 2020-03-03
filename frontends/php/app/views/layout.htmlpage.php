@@ -19,10 +19,11 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+ 
 function local_generateHeader($data) {
-	// only needed for zbx_construct_menu
-	global $page;
-
 	header('Content-Type: text/html; charset=UTF-8');
 	header('X-Content-Type-Options: nosniff');
 	header('X-XSS-Protection: 1; mode=block');
@@ -51,7 +52,7 @@ function local_generateHeader($data) {
 		header('X-Frame-Options: '.$x_frame_options);
 	}
 
-	$pageHeader = new CView('layout.htmlpage.header', [
+	echo (new CPartial('layout.htmlpage.header', [
 		'javascript' => [
 			'files' => $data['javascript']['files']
 		],
@@ -63,8 +64,7 @@ function local_generateHeader($data) {
 			'theme' => CWebUser::$data['theme']
 		],
 		'web_layout_mode' => $data['web_layout_mode']
-	]);
-	echo $pageHeader->getOutput();
+	]))->getOutput();
 
 	// if a user logs in after several unsuccessful attempts, display a warning
 	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
@@ -97,7 +97,7 @@ function local_generateSidebar($data) {
 }
 
 function local_generateFooter($data) {
-	echo (new CView('layout.htmlpage.footer', [
+	echo (new CPartial('layout.htmlpage.footer', [
 		'user' => [
 			'alias' => CWebUser::$data['alias'],
 			'debug_mode' => CWebUser::$data['debug_mode']
@@ -126,16 +126,12 @@ function local_showMessage() {
 	}
 }
 
-$data['web_layout_mode'] = CView::getLayoutMode();
-
 local_generateHeader($data);
 local_generateSidebar($data);
 echo '<div class="'.ZBX_STYLE_LAYOUT_WRAPPER.
 	(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">';
 local_showMessage();
-echo $data['javascript']['pre'];
 echo $data['main_block'];
-echo $data['javascript']['post'];
 local_generateFooter($data);
 show_messages();
 makeServerStatusOutput()->show();

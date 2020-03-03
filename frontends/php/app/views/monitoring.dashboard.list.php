@@ -19,12 +19,17 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
 $this->addJsFile('layout.mode.js');
 
-$web_layout_mode = CView::getLayoutMode();
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
 
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
@@ -37,7 +42,7 @@ $widget = (new CWidget())
 					->setArgument('new', '1')
 					->getUrl()
 			))
-		->addItem(get_icon('kioskmode'))
+		->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	);

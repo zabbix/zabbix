@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
 <!DOCTYPE html>
 <html>
@@ -54,10 +57,6 @@
 						<li>
 							<a target="_blank" href="http://www.mozilla.org/firefox"><div class="<?= ZBX_STYLE_BROWSER_LOGO_FF ?>"></div></a>
 							<a target="_blank" href="http://www.mozilla.org/firefox">Mozilla Firefox</a>
-						</li>
-						<li>
-							<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie"><div class="<?= ZBX_STYLE_BROWSER_LOGO_IE ?>"></div></a>
-							<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie">Internet Explorer</a>
 						</li>
 						<li>
 							<a target="_blank" href="http://www.opera.com/download"><div class="<?= ZBX_STYLE_BROWSER_LOGO_OPERA ?>"></div></a>
