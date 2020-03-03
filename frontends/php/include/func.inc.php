@@ -700,31 +700,35 @@ function convertUnits(array $options) {
 	}
 
 	if ($options['power'] === null) {
-		$unit_power = 1;
-		$unit_prefix = '';
+		$result = null;
+		$unit_prefix = null;
 
 		foreach ($power_table as $power => $prefix) {
-			if ($value_abs >= pow($unit_base, $power)) {
-				$unit_power = $power;
-				$unit_prefix = $prefix;
-			}
-			else {
+			$result = formatFloat($value / pow($unit_base, $power), $options['precision'],
+				$options['decimals'] ?? ($prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
+				$options['decimals_exact']
+			);
+			$unit_prefix = $prefix;
+
+			if (abs($result) < $unit_base) {
 				break;
 			}
 		}
 	}
-	elseif (array_key_exists($options['power'], $power_table) && $value_abs != 0) {
-		$unit_power = $options['power'];
-		$unit_prefix = $power_table[$unit_power];
-	}
 	else {
-		$unit_power = count($power_table);
-		$unit_prefix = $power_table[$unit_power];
-	}
+		if (array_key_exists($options['power'], $power_table) && $value_abs != 0) {
+			$unit_power = $options['power'];
+			$unit_prefix = $power_table[$unit_power];
+		}
+		else {
+			$unit_power = count($power_table);
+			$unit_prefix = $power_table[$unit_power];
+		}
 
-	$result = formatFloat($value / pow($unit_base, $unit_power), $options['precision'], $options['decimals'] ??
-		($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED), $options['decimals_exact']
-	);
+		$result = formatFloat($value / pow($unit_base, $unit_power), $options['precision'], $options['decimals'] ??
+			($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED), $options['decimals_exact']
+		);
+	}
 
 	$result_units = ($result == 0 ? '' : $unit_prefix).$units;
 
@@ -1368,7 +1372,7 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 
 	$number_original = $number;
 
-	$exponent = floor(log10(abs($number)));
+	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
 
 	if ($exponent < 0) {
 		for ($i = 1; $i >= 0; $i--) {
@@ -1403,7 +1407,7 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 		return '0';
 	}
 
-	$exponent = floor(log10(abs($number)));
+	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
 
 	if ($exponent < 0) {
 		if ($digits - $exponent <= ($exact ? min($decimals + 1, $precision) : $precision)) {
