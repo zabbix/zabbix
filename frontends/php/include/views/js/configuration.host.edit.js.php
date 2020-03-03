@@ -123,8 +123,7 @@
 				)
 				->addRow(new CLabel(_('Privacy passphrase'), 'interfaces[#{iface.interfaceid}][details][privpassphrase]'),
 					(new CTextBox('interfaces[#{iface.interfaceid}][details][privpassphrase]', '#{iface.details.privpassphrase}', false, DB::getFieldLength('interface_snmp', 'privpassphrase')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAriaRequired(),
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 					'row_snmpv3_privpassphrase_#{iface.interfaceid}'
 				)
 				->addRow('', (new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))->setLabel(_('Use bulk requests'), 'interfaces[#{iface.interfaceid}][details][bulk]'),
