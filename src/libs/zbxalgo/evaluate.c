@@ -186,7 +186,7 @@ static void varToDouble(zbx_variant_t * result, int *unknown_idx)
 		else
 		{
 			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
-				     " expected numeric token at \"%s\".", result->data.str);
+					" expected numeric token at \"%s\".", result->data.str);
 			result_double_value = ZBX_INFINITY;
 		}
 
@@ -512,7 +512,6 @@ static zbx_variant_t	evaluate_term5(int *unknown_idx)
 static zbx_variant_t	evaluate_term4(int *unknown_idx)
 {
 	char	op;
-	//	double	result, operand;
 	zbx_variant_t	result, operand;
 
 	int	res_idx = -5, oper_idx = -6;	/* set invalid values to catch errors */
@@ -642,10 +641,6 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 
 		operand = evaluate_term4(&oper_idx);
 
-		// we have now result and operand
-		// if both of them are strings - do something special
-		// else if either of them is a string - cast it
-		// proceed as previously
 		if (ZBX_VARIANT_STR == result.type && ZBX_VARIANT_STR == operand.type)
 		{
 			int res = strcmp(result.data.str, operand.data.str);
@@ -869,8 +864,6 @@ static zbx_variant_t	evaluate_term1(int *unknown_idx)
 
 	return result;
 }
-
-//save end
 
 /******************************************************************************
  *                                                                            *
