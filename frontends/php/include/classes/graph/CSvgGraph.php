@@ -665,7 +665,7 @@ class CSvgGraph extends CSvg {
 		}
 
 		$relative_values = calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated, $interval, $units,
-			$is_binary, $power, 15
+			$is_binary, $power, 14
 		);
 
 		$absolute_values = [];
