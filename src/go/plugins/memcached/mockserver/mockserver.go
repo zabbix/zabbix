@@ -21,6 +21,14 @@ const (
 	UNKNOWN_COMMAND = 0x81
 )
 
+const debug = false
+
+func printDebug(format string, v ...interface{}) {
+	if debug {
+		log.Printf(format, v...)
+	}
+}
+
 type MCRequest = gomemcached.MCRequest
 type MCResponse = gomemcached.MCResponse
 
@@ -79,7 +87,7 @@ func (s *MockServer) dispatch(input chan chanReq) {
 	// TODO: stop goroutine
 	for {
 		req := <-input
-		log.Printf("Got a request: %s", req.req)
+		printDebug("Got a request: %s", req.req)
 		req.res <- s.handle(req.req, req.w)
 	}
 }
@@ -103,18 +111,18 @@ func (s *MockServer) ListenAndServe() {
 	go s.dispatch(reqChannel)
 	rh := &reqHandler{reqChannel}
 
-	log.Printf("Listening on %s", s.listener.Addr())
+	printDebug("Listening on %s", s.listener.Addr())
 	for {
 		conn, err := s.listener.Accept()
 		select {
 		case <-s.ctx.Done():
-			log.Print("Server stopped")
+			printDebug("Server stopped")
 			return
 		default:
 			if err != nil {
-				log.Printf("Error accepting from %s", s.listener)
+				printDebug("Error accepting from %s", s.listener)
 			} else {
-				log.Printf("Got a connection from %v", conn.RemoteAddr())
+				printDebug("Got a connection from %v", conn.RemoteAddr())
 				go handleIO(conn, rh)
 			}
 		}

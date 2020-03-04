@@ -27,6 +27,8 @@ import (
 
 const pluginName = "Memcached"
 
+const hkInterval = 10
+
 const (
 	keyStats = "memcached.stats"
 	keyPing  = "memcached.ping"
@@ -104,6 +106,7 @@ func (p *Plugin) Start() {
 	p.connMgr = NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
 		time.Duration(p.options.Timeout)*time.Second,
+		time.Duration(hkInterval)*time.Second,
 	)
 }
 

@@ -362,3 +362,48 @@ func Test_isLooksLikeURI(t *testing.T) {
 		})
 	}
 }
+
+func TestURI_User(t *testing.T) {
+	tests := []struct {
+		name string
+		u    *URI
+		want string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.u.User(); got != tt.want {
+				t.Errorf("URI.User() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_newURIWithCreds(t *testing.T) {
+	type args struct {
+		uri      string
+		user     string
+		password string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes URI
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRes, err := newURIWithCreds(tt.args.uri, tt.args.user, tt.args.password)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("newURIWithCreds() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("newURIWithCreds() = %v, want %v", gotRes, tt.wantRes)
+			}
+		})
+	}
+}
