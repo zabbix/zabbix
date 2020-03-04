@@ -481,7 +481,7 @@ class CHostInterface extends CApiService {
 		$snmp_interfaces = [];
 		foreach ($interfaceIds as $key => $id) {
 			if ($interfaces[$key]['type'] == INTERFACE_TYPE_SNMP) {
-				$snmp_interfaces[$key] = ['interfaceid' => $id] + $interfaces[$key]['details'];
+				$snmp_interfaces[] = ['interfaceid' => $id] + $interfaces[$key]['details'];
 			}
 		}
 
@@ -524,7 +524,7 @@ class CHostInterface extends CApiService {
 		]);
 		DB::delete('interface_snmp', ['interfaceid' => array_column($interfaces, 'interfaceid')]);
 
-		$snmp_data = [];
+		$snmp_interfaces = [];
 		foreach ($interfaces as $interface) {
 			$interfaceid = $interface['interfaceid'];
 
@@ -545,14 +545,10 @@ class CHostInterface extends CApiService {
 
 			$this->checkSnmpInput([$interface]);
 
-			$snmp_data[] = ['type' => INTERFACE_TYPE_SNMP, 'details' => $interface['details']
-				+ $db_interfaces[$interface['interfaceid']]['details']] + $db_interfaces[$interface['interfaceid']
-			];
+			$snmp_interfaces[] = ['interfaceid' => $interfaceid] + $interface['details'];
 		}
 
-		foreach ($snmp_data as $interface) {
-			$this->createSnmpInterfaceDetails([$interface['details'] + ['interfaceid' => $interface['interfaceid']]]);
-		}
+		$this->createSnmpInterfaceDetails($snmp_interfaces);
 
 		return ['interfaceids' => array_column($interfaces, 'interfaceid')];
 	}
