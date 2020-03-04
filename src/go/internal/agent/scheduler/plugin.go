@@ -25,16 +25,24 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
+// pluginAgent manages plugin usage
 type pluginAgent struct {
-	impl         plugin.Accessor
-	tasks        performerHeap
-	capacity     int
+	// the plugin
+	impl plugin.Accessor
+	// queue of tasks to perform
+	tasks performerHeap
+	// maximum plugin capacity
+	maxCapacity int
+	// used plugin capacity
 	usedCapacity int
-	index        int
-	// refcount us used to track plugin usage by request batches
+	// index in plugin queue
+	index int
+	// refcount us used to track plugin usage by clients
 	refcount int
 }
 
+// peekTask() returns next task in the queue without removing it from queue or nil
+// if the queue is empty.
 func (p *pluginAgent) peekTask() performer {
 	if len(p.tasks) == 0 {
 		return nil
@@ -42,6 +50,8 @@ func (p *pluginAgent) peekTask() performer {
 	return p.tasks[0]
 }
 
+// peekTask() returns next task in the queue and removes it from queue.
+// nil is returned for empty queues.
 func (p *pluginAgent) popTask() performer {
 	if len(p.tasks) == 0 {
 		return nil
@@ -72,7 +82,7 @@ func (p *pluginAgent) queued() bool {
 }
 
 func (p *pluginAgent) hasCapacity() bool {
-	return len(p.tasks) != 0 && p.capacity-p.usedCapacity >= p.tasks[0].getWeight()
+	return len(p.tasks) != 0 && p.maxCapacity-p.usedCapacity >= p.tasks[0].getWeight()
 }
 
 func (p *pluginAgent) active() bool {

@@ -61,6 +61,7 @@ const char	*usage_message[] = {};
 const char	*help_message[] = {};
 
 ZBX_METRIC	parameters_common[] = {NULL};
+ZBX_METRIC	parameters_common_local[] = {NULL};
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 

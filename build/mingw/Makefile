@@ -27,7 +27,7 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo_system.o \
 	$(OUTPUTDIR)\eventlog.o
 
-CFLAGS := $(CFLAGS) -O2 -g -DUNICODE -DHAVE_STDINT_H=1 -I$(TOPDIR)\include -I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw
+CFLAGS := $(CFLAGS) -O2 -g -DUNICODE -DHAVE_STDINT_H=1 -I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include
 GOPATH := $(GOPATH);$(TOPDIR)\go
 TAGS :=
 
