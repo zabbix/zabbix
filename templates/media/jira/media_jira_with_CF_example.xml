@@ -1,47 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-03-03T12:12:14Z</date>
+    <version>5.0</version>
+    <date>2020-03-04T12:27:42Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
             <type>WEBHOOK</type>
             <parameters>
                 <parameter>
-                    <name>jira_url</name>
-                    <value>&lt;PLACE YOUR JIRA URL&gt;</value>
+                    <name>&lt;'DATETIME' CUSTOMFIELD FOR EVENT RECOVERY TIME&gt;</name>
+                    <value>{EVENT.RECOVERY.DATE}T{EVENT.RECOVERY.TIME}</value>
                 </parameter>
                 <parameter>
-                    <name>jira_user</name>
-                    <value>&lt;PLACE LOGIN&gt;</value>
+                    <name>&lt;'DATETIME' CUSTOMFIELD FOR EVENT TIME&gt;</name>
+                    <value>{EVENT.DATE}T{EVENT.TIME}</value>
                 </parameter>
                 <parameter>
-                    <name>jira_password</name>
-                    <value>&lt;PLACE PASSWORD OF TOKEN&gt;</value>
+                    <name>&lt;'NUMBER' CUSTOMFIELD FOR EVENT.ID&gt;</name>
+                    <value>{EVENT.ID}</value>
                 </parameter>
                 <parameter>
-                    <name>jira_project_key</name>
-                    <value>&lt;PLACE PROJECT KEY&gt;</value>
+                    <name>&lt;'NUMBER' CUSTOMFIELD FOR TRIGGER.ID&gt;</name>
+                    <value>{TRIGGER.ID}</value>
                 </parameter>
                 <parameter>
-                    <name>jira_issue_type</name>
-                    <value>&lt;PLACE ISSUETYPE NAME&gt;</value>
+                    <name>&lt;'STRING' CUSTOMFIELD FOR HOST\IP&gt;</name>
+                    <value>{HOST.HOST} [{HOST.IP}]</value>
                 </parameter>
                 <parameter>
-                    <name>summary</name>
-                    <value>[{EVENT.STATUS}] {EVENT.NAME}</value>
+                    <name>&lt;'STRING' CUSTOMFIELD FOR OPERATIONAL DATA&gt;</name>
+                    <value>{EVENT.OPDATA}</value>
                 </parameter>
                 <parameter>
-                    <name>trigger_description</name>
-                    <value>{TRIGGER.DESCRIPTION}</value>
+                    <name>&lt;'STRING' CUSTOMFIELD FOR SEVERITY&gt;</name>
+                    <value>{EVENT.SEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>&lt;'URL' CUSTOMFIELD FOR EVENT URL&gt;</name>
+                    <value>{$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&amp;eventid={EVENT.ID}</value>
                 </parameter>
                 <parameter>
                     <name>alert_message</name>
                     <value>{ALERT.MESSAGE}</value>
                 </parameter>
                 <parameter>
-                    <name>event_value</name>
-                    <value>{EVENT.VALUE}</value>
+                    <name>alert_subject</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>event_recovery_value</name>
+                    <value>{EVENT.RECOVERY.VALUE}</value>
                 </parameter>
                 <parameter>
                     <name>event_source</name>
@@ -64,42 +72,43 @@
                     <value>{USER.FULLNAME}</value>
                 </parameter>
                 <parameter>
+                    <name>event_value</name>
+                    <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
                     <name>jira_issue_key</name>
                     <value>{EVENT.TAGS.__zbx_jira_issuekey}</value>
                 </parameter>
                 <parameter>
-                    <name>&lt;'URL' CUSTOMFIELD FOR EVENT URL&gt;</name>
-                    <value>{$ZABBIX.URL}//tr_events.php?triggerid={TRIGGER.ID}&amp;eventid={EVENT.ID}</value>
+                    <name>jira_issue_type</name>
+                    <value>&lt;PLACE ISSUETYPE NAME&gt;</value>
                 </parameter>
                 <parameter>
-                    <name>&lt;'STRING' CUSTOMFIELD FOR HOST\IP&gt;</name>
-                    <value>{HOST.HOST} [{HOST.IP}]</value>
+                    <name>jira_password</name>
+                    <value>&lt;PLACE PASSWORD OF TOKEN&gt;</value>
                 </parameter>
                 <parameter>
-                    <name>&lt;'NUMBER' CUSTOMFIELD FOR EVENT.ID&gt;</name>
-                    <value>{EVENT.ID}</value>
+                    <name>jira_project_key</name>
+                    <value>&lt;PLACE PROJECT KEY&gt;</value>
                 </parameter>
                 <parameter>
-                    <name>&lt;'NUMBER' CUSTOMFIELD FOR TRIGGER.ID&gt;</name>
-                    <value>{TRIGGER.ID}</value>
+                    <name>jira_url</name>
+                    <value>&lt;PLACE YOUR JIRA URL&gt;</value>
                 </parameter>
                 <parameter>
-                    <name>&lt;'DATETIME' CUSTOMFIELD FOR EVENT RECOVERY TIME&gt;</name>
-                    <value>{EVENT.RECOVERY.DATE}T{EVENT.RECOVERY.TIME}</value>
+                    <name>jira_user</name>
+                    <value>&lt;PLACE LOGIN&gt;</value>
                 </parameter>
                 <parameter>
-                    <name>&lt;'STRING' CUSTOMFIELD FOR OPERATIONAL DATA&gt;</name>
-                    <value>{EVENT.OPDATA}</value>
+                    <name>summary</name>
+                    <value>[{EVENT.STATUS}] {EVENT.NAME}</value>
                 </parameter>
                 <parameter>
-                    <name>&lt;'STRING' CUSTOMFIELD FOR SEVERITY&gt;</name>
-                    <value>{EVENT.SEVERITY}</value>
-                </parameter>
-                <parameter>
-                    <name>&lt;'DATETIME' CUSTOMFIELD FOR EVENT TIME&gt;</name>
-                    <value>{EVENT.DATE}T{EVENT.TIME}</value>
+                    <name>trigger_description</name>
+                    <value>{TRIGGER.DESCRIPTION}</value>
                 </parameter>
             </parameters>
+            <status>DISABLED</status>
             <attempts>1</attempts>
             <attempt_interval>5s</attempt_interval>
             <script>var Base64={_keyStr:&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&quot;,encode:function(r){var t,e,a,o,h,n,C,c=&quot;&quot;,i=0;for(r=Base64._utf8_encode(r);i&lt;r.length;)o=(t=r.charCodeAt(i++))&gt;&gt;2,h=(3&amp;t)&lt;&lt;4|(e=r.charCodeAt(i++))&gt;&gt;4,n=(15&amp;e)&lt;&lt;2|(a=r.charCodeAt(i++))&gt;&gt;6,C=63&amp;a,isNaN(e)?(n=64,C=64):isNaN(a)&amp;&amp;(C=64),c=c+this._keyStr.charAt(o)+this._keyStr.charAt(h)+this._keyStr.charAt(n)+this._keyStr.charAt(C);return c},_utf8_encode:function(r){r=r.replace(/\r\n/g,&quot;\n&quot;);for(var t=&quot;&quot;,e=0;e&lt;r.length;e++){var a=r.charCodeAt(e);a&lt;128?t+=String.fromCharCode(a):a&gt;127&amp;&amp;a&lt;2048?(t+=String.fromCharCode(a&gt;&gt;6|192),t+=String.fromCharCode(63&amp;a|128)):(t+=String.fromCharCode(a&gt;&gt;12|224),t+=String.fromCharCode(a&gt;&gt;6&amp;63|128),t+=String.fromCharCode(63&amp;a|128))}return t}};function btoa(s){return Base64.encode(s);}&#13;
@@ -305,12 +314,13 @@ try {&#13;
         jira = {},&#13;
         update = {};&#13;
 &#13;
-    if (params.event_value !== '0' &amp;&amp; params.event_value !== '1') {&#13;
-        throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
-    }&#13;
-&#13;
     if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {&#13;
         throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
+    }&#13;
+&#13;
+    if (params.event_value !== '0' &amp;&amp; params.event_value !== '1'&#13;
+        &amp;&amp; (params.event_source === '0' || params.event_source === '3')) {&#13;
+        throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
     if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
@@ -332,8 +342,8 @@ try {&#13;
 &#13;
     Jira.setParams(jira);&#13;
 &#13;
-    if (params.event_source != 0 &amp;&amp; params.event_value == 1) {&#13;
-        Jira.createIssue(params.summary, params.alert_message);&#13;
+    if (params.event_source != 0 &amp;&amp; params.event_recovery_value !== '0') {&#13;
+        Jira.createIssue(params.alert_subject, params.alert_message);&#13;
 &#13;
         return 'OK';&#13;
     }&#13;
