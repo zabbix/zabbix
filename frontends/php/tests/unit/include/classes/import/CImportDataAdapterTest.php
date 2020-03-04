@@ -19,7 +19,7 @@
 **/
 
 
-class CImportDataAdapterTest extends PHPUnit\Framework\TestCase {
+class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Cached XMl sources
