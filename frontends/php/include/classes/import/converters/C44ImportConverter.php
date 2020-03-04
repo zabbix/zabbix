@@ -174,26 +174,22 @@ class C44ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Get next interface key.
+	 * Remapping interface array keys.
 	 *
 	 * @param array $interfaces
 	 *
-	 * @return string
+	 * @return array
 	 */
-	protected function getInterfaceKey(array $interfaces): string {
-		// Check zero element.
-		if (!array_key_exists('interface', $interfaces)) {
-			return 'interface';
-		}
+	protected function remapInterfaceKeys(array $interfaces): array {
+		$data = [];
+		$number = 0;
 
-		// Check for next missed element.
-		$number = 1;
-		while (true) {
-			if (!array_key_exists('interface'.$number, $interfaces)) {
-				return 'interface'.$number;
-			}
+		foreach ($interfaces as $interface) {
+			$data['interface'. (($number > 0) ? $number : '')] = $interface;
 			$number++;
 		}
+
+		return $data;
 	}
 
 	/**
@@ -506,9 +502,11 @@ class C44ImportConverter extends CConverter {
 			// Add all new interfaces to host interfaces.
 			foreach ($new_interfaces as $values) {
 				foreach($values as $value) {
-					$host['interfaces'][$this->getInterfaceKey($host['interfaces'])] = $value;
+					$host['interfaces'][] = $value;
 				}
 			}
+
+			$host['interfaces'] = $this->remapInterfaceKeys($host['interfaces']);
 
 			// Set proper default field for interfaces.
 			if (array_key_exists('interfaces', $host)) {
