@@ -522,9 +522,12 @@ class JMXItemChecker extends ItemChecker
 	private void getAttributeFields(JSONArray counters, ObjectName name, String descr, String attrPath,
 			Object attribute, boolean propertiesAsMacros) throws NoSuchMethodException, JSONException
 	{
-		if (isPrimitiveAttributeType(attribute))
+		boolean isPrimitieve = isPrimitiveAttributeType(attribute);
+
+		if (isPrimitieve || attribute instanceof TabularData)
 		{
-			logger.trace("found attribute of a primitive type: {}", attribute.getClass());
+			logger.trace("found attribute of a {} type: {}",
+				(isPrimitieve ? "primitive" : "tabular"), attribute.getClass());
 
 			JSONObject counter = new JSONObject();
 
@@ -534,7 +537,10 @@ class JMXItemChecker extends ItemChecker
 				counter.put("{#JMXOBJ}", name);
 				counter.put("{#JMXATTR}", attrPath);
 				counter.put("{#JMXTYPE}", attribute.getClass().getName());
-				counter.put("{#JMXVALUE}", attribute.toString());
+				if (isPrimitieve)
+					counter.put("{#JMXVALUE}", attribute.toString());
+				else
+					counter.put("{#JMXVALUE}", getTabularData((TabularData)attribute));
 			}
 			else
 			{
@@ -542,7 +548,10 @@ class JMXItemChecker extends ItemChecker
 				counter.put("object", name);
 				counter.put("description", null == descr ? name + "," + attrPath : descr);
 				counter.put("type", attribute.getClass().getName());
-				counter.put("value", attribute.toString());
+				if (isPrimitieve)
+					counter.put("value", attribute.toString());
+				else
+					counter.put("value", getTabularData((TabularData)attribute));
 			}
 
 			counters.put(counter);
@@ -559,20 +568,6 @@ class JMXItemChecker extends ItemChecker
 				getAttributeFields(counters, name, comp.getCompositeType().getDescription(key),
 						attrPath + "." + key, comp.get(key), propertiesAsMacros);
 			}
-		}
-		else if (attribute instanceof TabularData)
-		{
-			logger.trace("found attribute of a tabular type: {}", attribute.getClass());
-
-			JSONObject counter = new JSONObject();
-
-			counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
-			counter.put("{#JMXOBJ}", name);
-			counter.put("{#JMXATTR}", attrPath);
-			counter.put("{#JMXTYPE}", attribute.getClass().getName());
-			counter.put("{#JMXVALUE}", getTabularData((TabularData)attribute));
-
-			counters.put(counter);
 		}
 		else if (attribute.getClass().isArray())
 		{
