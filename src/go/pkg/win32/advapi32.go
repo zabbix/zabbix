@@ -1,3 +1,5 @@
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -17,22 +19,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package win32
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/net/netif"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/system/cpu"
-	_ "zabbix.com/plugins/system/swap"
-	_ "zabbix.com/plugins/system/uptime"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/vfs/file"
-	_ "zabbix.com/plugins/vfs/fs"
-	_ "zabbix.com/plugins/windows/eventlog"
-	_ "zabbix.com/plugins/windows/perfmon"
-	_ "zabbix.com/plugins/windows/services"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
+	"syscall"
+	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
+
+var (
+	hAdvapi32 Hlib
+
+	getServiceKeyName uintptr
+)
+
+func init() {
+	hAdvapi32 = mustLoadLibrary("advapi32.dll")
+
+	getServiceKeyName = hAdvapi32.mustGetProcAddress("GetServiceKeyNameW")
+}
+
+func GetServiceKeyName(h syscall.Handle, displayName string) (name string, err error) {
+	wdn, err := windows.UTF16FromString(displayName)
+	if err != nil {
+		return
+	}
+	b := make([]uint16, 4096)
+	size := uint32(len(b))
+	ret, _, syserr := syscall.Syscall6(getServiceKeyName, 4, uintptr(h), uintptr(unsafe.Pointer(&wdn[0])),
+		uintptr(unsafe.Pointer(&b[0])), uintptr(unsafe.Pointer(&size)), 0, 0)
+	if ret == 0 {
+		return "", syserr
+	}
+	return windows.UTF16ToString(b), nil
+}

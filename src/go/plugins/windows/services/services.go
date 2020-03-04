@@ -17,22 +17,4 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
-
-import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/net/netif"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/system/cpu"
-	_ "zabbix.com/plugins/system/swap"
-	_ "zabbix.com/plugins/system/uptime"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/vfs/file"
-	_ "zabbix.com/plugins/vfs/fs"
-	_ "zabbix.com/plugins/windows/eventlog"
-	_ "zabbix.com/plugins/windows/perfmon"
-	_ "zabbix.com/plugins/windows/services"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-)
+package services
