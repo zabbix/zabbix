@@ -22,7 +22,6 @@ package com.zabbix.gateway;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
-import java.util.List;
 import javax.management.AttributeList;
 
 import javax.management.InstanceNotFoundException;
@@ -31,7 +30,6 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.MalformedObjectNameException;
 import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
@@ -308,13 +306,8 @@ class JMXItemChecker extends ItemChecker
 	{
 		JSONArray values = new JSONArray();
 
-		for (Object key : data.keySet())
-		{
-				List<?> keyList = (List<?>) key;
-
-				if (keyList != null && !keyList.isEmpty())
-					values.put(getCompositeDataValues(data.get(keyList.toArray())));
-		}
+		for (Object value : data.values())
+			values.put(getCompositeDataValues((CompositeData)value));
 
 		return values.toString();
 	}
@@ -322,9 +315,8 @@ class JMXItemChecker extends ItemChecker
 	private JSONObject getCompositeDataValues(CompositeData compData) throws JSONException
 	{
 		JSONObject value = new JSONObject();
-		CompositeType compType = compData.getCompositeType();
 
-		for (String key : compType.keySet())
+		for (String key : compData.getCompositeType().keySet())
 		{
 			Object data = compData.get(key);
 
