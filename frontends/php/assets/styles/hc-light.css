@@ -221,7 +221,7 @@ header {
   align-items: center;
   height: 45px;
   padding: 0 10px;
-  background: #ffffff;
+  background: #f3f3f3;
   border-bottom: 1px solid #9f9f9f; }
   header > div {
     overflow: hidden; }
@@ -283,7 +283,7 @@ footer {
   flex-direction: column;
   width: max-content;
   max-width: 480px;
-  background: #0a466a;
+  background: #000000;
   transition: max-width 0.3s, transform 0.3s ease-out;
   will-change: max-width;
   transform: translate3d(0, 0, 0); }
@@ -353,10 +353,6 @@ footer {
   .sidebar.is-compact .button-expand,
   .sidebar.is-compact .button-hide {
     display: inline-block; }
-  .sidebar.is-compact .is-selected > a, .sidebar.is-compact .is-selected > a:hover, .sidebar.is-compact .is-selected > a:focus {
-    background: #0a3c5b;
-    border-color: #87d1ff;
-    color: #ffffff; }
   .sidebar.is-compact:not(.is-opened) {
     max-width: 48px !important; }
     .sidebar.is-compact:not(.is-opened) .scrollable .scrollbar-track {
@@ -406,7 +402,7 @@ footer {
   .sidebar-nav-toggle .button-toggle {
     width: 24px;
     height: 24px;
-    background: url(../img/icon-sprite.svg) no-repeat -540px -592px;
+    background: url(../img/icon-sprite.svg) no-repeat -600px -592px;
     border: none;
     border-radius: 0;
     text-indent: -9999px;
@@ -425,12 +421,12 @@ footer {
     width: 100%;
     padding-right: 20px;
     color: #ffffff;
-    background: #092637;
-    border: 1px solid #010a0f;
+    background: #000000;
+    border: 1px solid #ffffff;
     border-radius: 3px; }
-    .form-search .search:focus + .search-icon {
+    .form-search .search:focus ~ .search-icon {
       opacity: 1; }
-    .form-search .search:hover + .search-icon {
+    .form-search .search:hover ~ .search-icon {
       background-position: -570px -616px; }
   .form-search .search-icon {
     position: absolute;
@@ -438,10 +434,11 @@ footer {
     right: -1px;
     width: 24px;
     height: 24px;
-    background: url(../img/icon-sprite.svg) no-repeat -540px -616px;
-    opacity: .75;
+    background: url(../img/icon-sprite.svg) no-repeat -570px -616px;
+    opacity: 0.75;
     transform: scale(0.8);
-    cursor: pointer; }
+    cursor: pointer;
+    transition: opacity 3s; }
     .form-search .search-icon:hover {
       background-position: -570px -616px; }
 
@@ -478,97 +475,104 @@ footer {
   background: url(../img/icon-sprite.svg) no-repeat; }
 
 .icon-dashboard::before {
-  background-position: -540px -664px; }
+  background-position: -570px -664px; }
 
 .icon-problems::before {
-  background-position: -540px -688px; }
+  background-position: -570px -688px; }
 
 .icon-monitoring::before {
-  background-position: -540px -712px; }
+  background-position: -570px -712px; }
 
 .icon-inventory::before {
-  background-position: -540px -736px; }
+  background-position: -570px -736px; }
 
 .icon-reports::before {
-  background-position: -540px -760px; }
+  background-position: -570px -760px; }
 
 .icon-configuration::before {
-  background-position: -540px -784px; }
+  background-position: -570px -784px; }
 
 .icon-administration::before {
-  background-position: -540px -808px; }
+  background-position: -570px -808px; }
 
-.menu-main > li > a::before {
-  position: absolute;
-  top: 7px;
-  left: 9px; }
-.menu-main > li > a:hover::before, .menu-main > li > a:focus::before {
-  background-position-x: -570px; }
-.menu-main li {
+.menu-main > li {
   line-height: 16px; }
-  .menu-main li.is-selected > a {
-    background: #0a3c5b;
-    border-left-color: #87d1ff; }
-  .menu-main li.has-submenu > a::after {
+  .menu-main > li.is-selected > a {
+    background: #000000;
+    border-left-color: #f3f3f3;
+    color: #ffffff; }
+  .menu-main > li.is-expanded > a, .menu-main > li.is-expanded > a:focus {
+    background: #f3f3f3;
+    border-left-color: transparent;
+    color: #000000; }
+  .menu-main > li:not(.is-expanded) .submenu {
+    max-height: 0 !important; }
+  .menu-main > li > a {
+    color: #ffffff; }
+    .menu-main > li > a::before {
+      position: absolute;
+      top: 7px;
+      left: 9px; }
+    .menu-main > li > a:hover, .menu-main > li > a:focus {
+      background: #000000;
+      border-left-color: #ffffff;
+      color: #ffffff; }
+      .menu-main > li > a:hover::before, .menu-main > li > a:focus::before {
+        background-position-x: -570px; }
+  .menu-main > li.has-submenu > a::after {
     content: '';
     position: absolute;
     top: 19px;
     right: 14px;
     width: 6px;
     height: 4px;
-    background: url(../img/icon-sprite.svg) no-repeat -549px -434px;
+    background: url(../img/icon-sprite.svg) no-repeat -606px -434px;
     transform: rotate(0deg);
     transition: transform 0.3s, opacity 0.3s; }
-  .menu-main li.has-submenu > a:hover::after, .menu-main li.has-submenu > a:focus::after {
+  .menu-main > li.has-submenu > a:hover::after, .menu-main > li.has-submenu > a:focus::after {
     background-position: -606px -434px; }
-  .menu-main li.has-submenu.is-expanded > a {
-    background: #092637;
-    border-left-color: transparent; }
-    .menu-main li.has-submenu.is-expanded > a::after {
-      background-position: -606px -434px;
-      transform: rotate(-180deg); }
-  .menu-main li:not(.is-expanded) .submenu {
-    max-height: 0 !important; }
+  .menu-main > li.has-submenu.is-expanded > a::after {
+    background-position: -606px -434px;
+    transform: rotate(-180deg); }
 .menu-main a {
   position: relative;
   display: block;
   padding: 12px 34px 12px 44px;
   font-size: 14px;
   line-height: inherit;
-  color: #ebeef0;
   white-space: nowrap;
   border-left: 3px solid transparent;
   transition: color 0.3s, border-color 0.3s, background-color 0.3s; }
   .menu-main a:active, .menu-main a:hover, .menu-main a:link, .menu-main a:visited {
     border-bottom: 0; }
-  .menu-main a:hover, .menu-main a:focus {
-    background: #092637;
-    border-color: #ffffff;
-    color: #ffffff; }
 .menu-main .submenu {
   position: relative;
   padding-left: 24px;
   overflow: hidden;
-  background: #051620;
+  background: #0d0d0d;
   transition: max-height 0.3s ease;
   will-change: max-height;
   transform: translate3d(0, 0, 0); }
   .menu-main .submenu li {
     line-height: 14px; }
     .menu-main .submenu li.is-selected a {
-      background: #0b2d42;
-      border-left-color: #87d1ff;
-      color: #ffffff; }
+      background: #f3f3f3;
+      border-left-color: #949494;
+      color: #000000; }
       .menu-main .submenu li.is-selected a:hover, .menu-main .submenu li.is-selected a:focus {
-        background: #092637; }
+        background: #000000;
+        color: #ffffff; }
     .menu-main .submenu li:not(:last-child) {
-      border-bottom: 1px solid #051620; }
+      border-bottom: 1px solid #0d0d0d; }
   .menu-main .submenu a {
     padding: 8px 12px 8px 20px;
     font-size: 12px;
-    background: #0e354d; }
+    background: #333333;
+    color: #f4f4f4; }
     .menu-main .submenu a:hover, .menu-main .submenu a:focus {
-      background: #092637; }
+      background: #000000;
+      border-left-color: #ffffff;
+      color: #ffffff; }
   .menu-main .submenu::before, .menu-main .submenu::after {
     content: '';
     position: absolute;
@@ -627,7 +631,7 @@ footer {
   .menu-user a {
     color: #cedae1; }
     .menu-user a:hover, .menu-user a:focus {
-      border-bottom: none;
+      border-bottom: 0;
       color: #ffffff; }
       .menu-user a:hover::before, .menu-user a:focus::before {
         opacity: 1; }
@@ -5229,6 +5233,36 @@ table.preprocessing-test-results .rel-container {
   background: #97aab3; }
 .host-avail-widget .host-avail-total {
   background: transparent; }
+
+.form-search .search:focus {
+  background: #ffffff;
+  color: #000000; }
+  .form-search .search:focus ~ .search-icon {
+    background-position-x: -600px; }
+
+.sidebar.is-compact:not(.is-opened) .form-search .search-icon {
+  background-position-x: -570px;
+  opacity: 1; }
+.sidebar.is-compact:not(.is-opened) .menu-main > li.is-selected > a {
+  background: #f3f3f3;
+  border-left-color: transparent; }
+  .sidebar.is-compact:not(.is-opened) .menu-main > li.is-selected > a::before {
+    background-position-x: -600px; }
+
+.menu-main > li.is-expanded > a:hover::before {
+  background-position-x: -570px; }
+.menu-main > li.is-expanded > a::before {
+  background-position-x: -600px; }
+
+.menu-user a {
+  padding-left: 45px;
+  border-left: 3px solid transparent; }
+  .menu-user a::before {
+    left: 17px; }
+  .menu-user a:link, .menu-user a:visited {
+    border-bottom: 0; }
+  .menu-user a:hover, .menu-user a:focus {
+    border-color: #ffffff; }
 
 .logo:focus div,
 .logo:focus img {

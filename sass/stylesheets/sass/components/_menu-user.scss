@@ -69,7 +69,7 @@ $menu-user-icons: (
 
 		&:hover,
 		&:focus {
-			border-bottom: none;
+			border-bottom: 0;
 			color: $menu-user-hover-color;
 
 			&::before {

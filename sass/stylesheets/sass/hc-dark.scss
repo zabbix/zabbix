@@ -23,6 +23,19 @@ $disabled-bg-color: #000000;
 $disabled-item-color: #b5b5b5;
 $disabled-item-bg-color: #383838;
 
+// Layout
+$header-bg-color: #070707;
+$sidebar-bg-color: #ffffff;
+
+$scrollbar-track-color: rgba(#acbbc2, .55);
+$scrollbar-thumb-color: rgba(#878787, .85);
+$scrollbar-thumb-color-darken: 5% !default;
+
+$sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
+$sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
+
+$sidebar-toggle-bg-position: -630px -592px;
+
 // Main
 $font-color: #ffffff;
 $font-selected-color: #ffffff;
@@ -31,6 +44,52 @@ $body-bg-color: #111111;
 $overlay-bg-color: #222222;
 
 // Main menu
+$menu-main-color: #000000;
+$menu-main-hover-color: #000000;
+$menu-main-hover-bg-color: #ffffff;
+$menu-main-hover-border-color: #000000;
+$menu-main-selected-color: #000000;
+$menu-main-selected-bg-color: #ffffff;
+$menu-main-selected-border-color: #0c0c0c;
+$menu-main-expanded-color: #ffffff;
+$menu-main-expanded-bg-color: #0c0c0c;
+
+$menu-main-submenu-color: #0c0c0c;
+$menu-main-submenu-bg-color: #cccccc;
+$menu-main-submenu-border-color: #f3f3f3;
+$menu-main-submenu-hover-color: #000000;
+$menu-main-submenu-hover-bg-color: #ffffff;
+$menu-main-submenu-hover-border-color: #000000;
+$menu-main-submenu-selected-color: #ffffff;
+$menu-main-submenu-selected-bg-color: #0c0c0c;
+$menu-main-submenu-selected-border-color: #787878;
+
+$menu-main-icons-opacity: 1;
+
+$menu-main-arrow-bg-position: -606px -434px;
+
+$menu-user-color: #131619;
+$menu-user-hover-color: #000000;
+$menu-user-disabled-color: $disabled-item-color;
+
+$menu-main-icons: (
+		dashboard: -600px -664px,
+		problems: -600px -688px,
+		monitoring: -600px -712px,
+		inventory: -600px -736px,
+		reports: -600px -760px,
+		configuration: -600px -784px,
+		administration: -600px -808px
+);
+
+$menu-user-icons: (
+		support: -247px -84px,
+		share: -168px -84px,
+		help: -168px -84px,
+		guest: -247px -156px,
+		profile: -168px -120px,
+		signout: -168px -156px
+) !default;
 
 // UI
 $ui-bg-color: #000000;
@@ -63,6 +122,11 @@ $form-disabled-border-color: #5a5a5a;
 $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #999999;
 $scrollbar-thumb-color-darken: 30%;
+
+$form-search-bg-color: #000000;
+$form-search-border-color: #000000;
+$form-search-icon-bg-position: -570px -616px;
+$form-search-icon-hover-bg-position: -570px -616px;
 
 $input-placeholder-color: #bbbbbb;
 
@@ -140,6 +204,120 @@ $multiselect-selected-bg-color: #222222;
 
 // Important! @import string should come after variables.
 @import 'screen.scss';
+
+// components/form-search
+.form-search {
+	.search:focus {
+		background: #ffffff;
+		color: #000000;
+
+		& ~ .search-icon {
+			background-position-x: -600px;
+		}
+	}
+}
+
+// layout/sidebar
+.sidebar {
+	.button-hide {
+		background-position: -600px -568px;
+	}
+
+	.button-show {
+		background-position: -630px -568px;
+	}
+
+	.button-compact {
+		background-position: -570px -544px;
+	}
+
+	.button-expand {
+		background-position: -570px -520px;
+	}
+
+	&.is-compact:not(.is-opened) {
+		.form-search {
+			.search-icon {
+				background-position-x: -570px;
+				opacity: 1;
+			}
+		}
+
+		.menu-main {
+			& > li {
+				&.is-selected {
+					> a {
+						background: $menu-main-expanded-bg-color;
+						border-left-color: $menu-main-expanded-border-color;
+
+						&::before {
+							background-position-x: -570px;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// components/menu-main
+.menu-main {
+	& > li {
+		&.is-expanded {
+			& > a {
+				&:hover {
+					&::before {
+						background-position-x: -600px;
+					}
+				}
+				&::before {
+					background-position-x: -570px;
+				}
+			}
+		}
+
+		&.has-submenu {
+			& > a {
+				&,
+				&:hover {
+					&::after {
+						background-position-x: -579px;
+					}
+				}
+			}
+		}
+
+		& > a {
+			&:hover {
+				&::before {
+					background-position-x: -600px;
+				}
+			}
+		}
+	}
+}
+
+// components/menu-user
+.menu-user {
+	a {
+		padding-left: 45px;
+		border-left: 3px solid transparent;
+
+		&::before {
+			left: 17px;
+		}
+
+		&:link,
+		&:visited {
+			border-bottom: 0;
+		}
+
+		&:hover,
+		&:focus {
+			border-color: #000000;
+		}
+	}
+}
 
 .logo {
 	&:focus {

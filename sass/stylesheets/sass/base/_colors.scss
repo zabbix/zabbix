@@ -53,16 +53,22 @@ $overlay-bg-color: #ffffff !default;
 
 // Main menu
 $menu-main-color: #ebeef0 !default;
-$menu-main-hover-bg-color: #092637 !default;
 $menu-main-hover-color: #ffffff !default;
+$menu-main-hover-bg-color: #092637 !default;
 $menu-main-hover-border-color: #ffffff !default;
 $menu-main-selected-color: #ffffff !default;
 $menu-main-selected-bg-color: #0a3c5b !default;
 $menu-main-selected-border-color: #87d1ff !default;
+$menu-main-expanded-color: #ffffff !default;
+$menu-main-expanded-bg-color: #092637 !default;
+$menu-main-expanded-border-color: transparent !default;
 
+$menu-main-submenu-color: #ebeef0 !default;
 $menu-main-submenu-bg-color: #0e354d !default;
 $menu-main-submenu-border-color: #051620 !default;
+$menu-main-submenu-hover-color: #ffffff !default;
 $menu-main-submenu-hover-bg-color: #092637 !default;
+$menu-main-submenu-hover-border-color: #ffffff !default;
 $menu-main-submenu-selected-color: #ffffff !default;
 $menu-main-submenu-selected-bg-color: #0b2d42 !default;
 $menu-main-submenu-selected-border-color: #87d1ff !default;
@@ -100,6 +106,7 @@ $form-disabled-font-color: #acbbc2 !default;
 $form-disabled-bg-color: #ebebeb !default;
 $form-disabled-border-color: #ccd5d9 !default;
 
+$form-search-color: #ffffff !default;
 $form-search-bg-color: #092637 !default;
 $form-search-border-color: #010a0f !default;
 

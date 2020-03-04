@@ -128,18 +128,6 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 			display: inline-block;
 		}
 
-		.is-selected {
-			& > a {
-				&,
-				&:hover,
-				&:focus {
-					background: $menu-main-selected-bg-color;
-					border-color: $menu-main-selected-border-color;
-					color: $menu-main-selected-color;
-				}
-			}
-		}
-
 		&:not(.is-opened) {
 			max-width: $sidebar-compact-width !important;
 

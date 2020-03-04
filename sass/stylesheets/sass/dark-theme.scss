@@ -30,7 +30,7 @@ $scrollbar-thumb-color-darken: 5%;
 $sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
 $sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
 
-$sidebar-toggle-bg-position: -570px -592px;
+$sidebar-toggle-bg-position: -630px -592px;
 
 // Main
 $font-color: #f2f2f2;
@@ -40,11 +40,13 @@ $body-bg-color: #0e1012;
 $overlay-bg-color: #000000;
 
 // Main menu
-$menu-main-color: #ffffff;
+$menu-main-color: #f2f2f2;
 $menu-main-hover-bg-color: #0e0e0e;
-$menu-main-selected-bg-color: #222222;
+$menu-main-selected-bg-color: #202020;
 $menu-main-selected-border-color: #c5c5c5;
+$menu-main-expanded-bg-color: #0d0d0d;
 
+$menu-main-submenu-color: #f2f2f2;
 $menu-main-submenu-bg-color: #2b2b2b;
 $menu-main-submenu-border-color: #0d0f11;
 $menu-main-submenu-hover-bg-color: #0e0e0e;
@@ -54,7 +56,6 @@ $menu-main-submenu-selected-border-color: #c5c5c5;
 $menu-main-icons-opacity: .75;
 
 $menu-main-arrow-bg-position: -606px -434px;
-$menu-main-arrow-hover-bg-position: -606px -434px;
 
 $menu-main-icons: (
 		dashboard: -570px -664px,

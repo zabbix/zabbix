@@ -21,6 +21,19 @@ $disabled-bg-color: #f0f0f0;
 $disabled-item-color: #ffffff;
 $disabled-item-bg-color: #9f9f9f;
 
+// Layout
+$header-bg-color: #f3f3f3;
+$sidebar-bg-color: #000000;
+
+$scrollbar-track-color: rgba(#acbbc2, .55);
+$scrollbar-thumb-color: rgba(#878787, .85);
+$scrollbar-thumb-color-darken: 5% !default;
+
+$sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
+$sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
+
+$sidebar-toggle-bg-position: -600px -592px;
+
 // Main
 $font-color: #000000;
 $font-selected-color: #ffffff;
@@ -29,6 +42,39 @@ $body-bg-color: #ffffff;
 $overlay-bg-color: #000000;
 
 // Main menu
+$menu-main-color: #ffffff;
+$menu-main-hover-bg-color: #000000;
+$menu-main-selected-bg-color: #000000;
+$menu-main-selected-border-color: #f3f3f3;
+$menu-main-expanded-color: #000000;
+$menu-main-expanded-bg-color: #f3f3f3;
+
+$menu-main-submenu-color: #f4f4f4;
+$menu-main-submenu-bg-color: #333333;
+$menu-main-submenu-border-color: #0d0d0d;
+$menu-main-submenu-hover-color: #ffffff;
+$menu-main-submenu-hover-bg-color: #000000;
+$menu-main-submenu-selected-color: #000000;
+$menu-main-submenu-selected-bg-color: #f3f3f3;
+$menu-main-submenu-selected-border-color: #949494;
+
+$menu-main-icons-opacity: 1;
+
+$menu-main-arrow-bg-position: -606px -434px;
+
+$menu-user-color: #cedae1;
+$menu-user-hover-color: #ffffff;
+$menu-user-disabled-color: $disabled-item-color;
+
+$menu-main-icons: (
+		dashboard: -570px -664px,
+		problems: -570px -688px,
+		monitoring: -570px -712px,
+		inventory: -570px -736px,
+		reports: -570px -760px,
+		configuration: -570px -784px,
+		administration: -570px -808px
+);
 
 // UI
 $ui-bg-color: #ffffff;
@@ -61,6 +107,11 @@ $form-disabled-border-color: #9f9f9f;
 $scrollbar-track-color: #999999;
 $scrollbar-thumb-color: #f9f9f9;
 $scrollbar-thumb-color-darken: 30%;
+
+$form-search-bg-color: #000000;
+$form-search-border-color: #ffffff;
+$form-search-icon-bg-position: -570px -616px;
+$form-search-icon-hover-bg-position: -570px -616px;
 
 $input-placeholder-color: #777777;
 
@@ -138,6 +189,85 @@ $multiselect-selected-bg-color: #777777;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
+
+// components/form-search
+.form-search {
+	.search:focus {
+		background: #ffffff;
+		color: #000000;
+
+		& ~ .search-icon {
+			background-position-x: -600px;
+		}
+	}
+}
+
+// layout/sidebar
+.sidebar {
+	&.is-compact:not(.is-opened) {
+		.form-search {
+			.search-icon {
+				background-position-x: -570px;
+				opacity: 1;
+			}
+		}
+
+		.menu-main {
+			& > li {
+				&.is-selected {
+					> a {
+						background: $menu-main-expanded-bg-color;
+						border-left-color: $menu-main-expanded-border-color;
+
+						&::before {
+							background-position-x: -600px;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// components/menu-main
+.menu-main {
+	& > li {
+		&.is-expanded {
+			& > a {
+				&:hover {
+					&::before {
+						background-position-x: -570px;
+					}
+				}
+				&::before {
+					background-position-x: -600px;
+				}
+			}
+		}
+	}
+}
+
+// components/menu-user
+.menu-user {
+	a {
+		padding-left: 45px;
+		border-left: 3px solid transparent;
+
+		&::before {
+			left: 17px;
+		}
+
+		&:link,
+		&:visited {
+			border-bottom: 0;
+		}
+
+		&:hover,
+		&:focus {
+			border-color: #ffffff;
+		}
+	}
+}
 
 .logo {
 	&:focus {
