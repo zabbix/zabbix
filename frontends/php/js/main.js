@@ -103,78 +103,7 @@ var PageRefresh = {
 };
 
 /*
- * Main menu
- */
-/* TODO: Legacy
-var MMenu = {
-	def_label:		null,
-	sub_active: 	false,
-	timeout_reset:	null,
-	timeout_change:	null,
-
-	init: function() {
-		// Detects when none of the selected elements are focused.
-		var elems = jQuery('.top-nav a, .top-subnav a').on('keydown', function(event) {
-			clearTimeout(this.timeout_reset);
-
-			if (event.which == 9) {
-				setTimeout(function() {
-					if (elems.toArray().indexOf(document.querySelector(':focus')) == -1) {
-						clearTimeout(this.timeout_reset);
-						this.timeout_reset = setTimeout(function() {
-							if (elems.toArray().indexOf(document.querySelector(':focus')) == -1){
-								MMenu.showSubMenu(MMenu.def_label)
-							}
-						}, 2500);
-					}
-				});
-			}
-		});
-	},
-
-	mouseOver: function(show_label) {
-		clearTimeout(this.timeout_reset);
-		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
-		PageRefresh.restart();
-	},
-
-	keyUp: function(show_label, event) {
-		if (event.which == 13) {
-			clearTimeout(this.timeout_reset);
-			this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
-			PageRefresh.restart();
-		}
-	},
-
-	submenu_mouseOver: function() {
-		clearTimeout(this.timeout_reset);
-		clearTimeout(this.timeout_change);
-		PageRefresh.restart();
-	},
-
-	mouseOut: function() {
-		clearTimeout(this.timeout_change);
-		this.timeout_reset = setTimeout('MMenu.showSubMenu("' + this.def_label + '")', 2500);
-	},
-
-	showSubMenu: function(show_label, focus_subitem) {
-		var sub_menu = jQuery('#sub_' + show_label),
-			top_menu = jQuery('#' + show_label),
-			focus_subitem = focus_subitem || false;
-
-		if (sub_menu) {
-			top_menu.addClass('selected').siblings().removeClass('selected');
-			sub_menu.show().siblings('.top-subnav').hide();
-
-			if (focus_subitem) {
-				jQuery('li:first > a', sub_menu).focus();
-			}
-		}
-	}
-};
-*/
-/*
- * Audio control system
+ * Audio control system.
  */
 var AudioControl = {
 

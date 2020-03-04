@@ -50,7 +50,6 @@ if (isset($_GET['lang'])) {
 $availableJScripts = [
 	'common.js' => '',
 	'dashboard.grid.js' => '',
-	'menu.main.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -64,7 +63,6 @@ $availableJScripts = [
 	'chkbxrange.js' => '',
 	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
-	'scrollable.js' => '',
 	'textareaflexible.js' => '',
 	// vendors
 	'jquery.js' => 'vendors/',
@@ -364,10 +362,8 @@ if (empty($_GET['files'])) {
 		'main.js',
 		'chkbxrange.js',
 		'functions.js',
-		'menu.main.js',
 		'menupopup.js',
-		'init.js',
-		'scrollable.js'
+		'init.js'
 	];
 
 	// load frontend messaging only for some pages

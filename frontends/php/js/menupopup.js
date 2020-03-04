@@ -1047,7 +1047,7 @@ jQuery(function($) {
 				}
 			}
 
-			$('body').append($menu_popup);
+			$('.wrapper').append($menu_popup);
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
 			$menu_popup.add('.menu-popup', $menu_popup).css('display', 'none');
