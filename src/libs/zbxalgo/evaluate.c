@@ -73,7 +73,7 @@ static int	is_operator_delimiter(char c)
 	return ' ' == c || '(' == c || '\r' == c || '\n' == c || '\t' == c || ')' == c || '\0' == c ? SUCCEED : FAIL;
 }
 
-static char*	evaluate_string()
+static void	evaluate_string(zbx_variant_t *res)
 {
 	const char *p0 = ptr;
 	const char *prev = ptr;
@@ -81,13 +81,34 @@ static char*	evaluate_string()
 	int firstIter = 1;
 	int prev_escape_is_binded = 0;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "EVALUATE_STRING: ->%s<-",p0);
+	
 	while('"' != *ptr || ((!prev_prev_is_escape || !prev_escape_is_binded) && ('\\' == *prev) && ('"' == *ptr)))
 	{
-		if (prev_escape_is_binded)
-			prev_escape_is_binded = 0;
-		else if (!firstIter && '\\'==*prev && '\\'==*ptr)
-			prev_escape_is_binded = 1;
+		//zabbix_log(LOG_LEVEL_INFORMATION, "EVALUATE PTR: ->%c<-",*ptr);
+		zabbix_log(LOG_LEVEL_INFORMATION, "PPP PTR: ->%s<-",ptr);
+		zabbix_log(LOG_LEVEL_INFORMATION, "PPP PREV: ->%s<-",prev);
 
+		
+		if (prev_escape_is_binded)
+		{
+			prev_escape_is_binded = 0;
+		}
+		else if (!firstIter && '\\'==*prev && '\\'==*ptr)
+		{
+			prev_escape_is_binded = 1;
+		}
+		else if (!firstIter && '\\'==*prev && ('\\'!=*ptr && '\"'!=*ptr))
+		{
+			//zbx_strlcpy(buffer, "HUJ.", max_buffer_len);
+			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression: unescaped character at \"%s\"", ptr);
+
+			
+			zabbix_log(LOG_LEVEL_INFORMATION, "CRITICAL ERROR!!!!!!!!");
+			zbx_variant_set_dbl(res, ZBX_INFINITY);
+			return;
+		}
+		
 		if (firstIter)
 			firstIter = 0;
 		else
@@ -95,22 +116,68 @@ static char*	evaluate_string()
 
 		prev = ptr;
 		ptr++;
+
 	}
 
 	int len = ptr-p0;
 
-	char * res = malloc(len+1);
+	char * res_temp = zbx_malloc(NULL, len+1);
 	int x;
 
 	for (x = 0; x < len; x++)
 	{
-		*(res+x) = *(p0+x);
+		*(res_temp+x) = *(p0+x);
 	}
 
-	*(res+x) = '\0';
+	*(res_temp+x) = '\0';
 
-	return res;
+	zabbix_log(LOG_LEVEL_INFORMATION, "s: ->%s<-",res_temp);
+	zbx_variant_set_str(res, res_temp);
+
 }
+
+/* static char*	evaluate_string() */
+/* { */
+/* 	const char *p0 = ptr; */
+/* 	const char *prev = ptr; */
+/* 	int prev_prev_is_escape = 0; */
+/* 	int firstIter = 1; */
+/* 	int prev_escape_is_binded = 0; */
+
+/* 	zabbix_log(LOG_LEVEL_INFORMATION, "EVALUATE_STRING: ->%s<-",p0); */
+	
+/* 	while('"' != *ptr || ((!prev_prev_is_escape || !prev_escape_is_binded) && ('\\' == *prev) && ('"' == *ptr))) */
+/* 	{ */
+/* 		//zabbix_log(LOG_LEVEL_INFORMATION, "EVALUATE PTR: ->%c<-",*ptr); */
+
+/* 		if (prev_escape_is_binded) */
+/* 			prev_escape_is_binded = 0; */
+/* 		else if (!firstIter && '\\'==*prev && '\\'==*ptr) */
+/* 			prev_escape_is_binded = 1; */
+
+/* 		if (firstIter) */
+/* 			firstIter = 0; */
+/* 		else */
+/* 			prev_prev_is_escape=('\\'==*prev); */
+
+/* 		prev = ptr; */
+/* 		ptr++; */
+/* 	} */
+
+/* 	int len = ptr-p0; */
+
+/* 	char * res = zbx_malloc(NULL, len+1); */
+/* 	int x; */
+
+/* 	for (x = 0; x < len; x++) */
+/* 	{ */
+/* 		*(res+x) = *(p0+x); */
+/* 	} */
+
+/* 	*(res+x) = '\0'; */
+
+/* 	return res; */
+/* } */
 
 
 
@@ -162,7 +229,7 @@ static double	evaluate_number(int *unknown_idx)
 }
 
 
-static void varToDouble(zbx_variant_t * result, int *unknown_idx)
+static void varToDouble(zbx_variant_t *result, int *unknown_idx)
 {
 	if (ZBX_VARIANT_STR == result->type)
 	{
@@ -195,16 +262,16 @@ static void varToDouble(zbx_variant_t * result, int *unknown_idx)
 	}
 }
 
-static zbx_variant_t	evaluate_term1(int *unknown_idx);
+static zbx_variant_t*	evaluate_term1(int *unknown_idx);
 
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate a suffixed number or a parenthesized expression          *
  *                                                                            *
  ******************************************************************************/
-static zbx_variant_t	evaluate_term9(int *unknown_idx)
+static zbx_variant_t*	evaluate_term9(int *unknown_idx)
 {
-	zbx_variant_t	result;
+	zbx_variant_t*	res;
 
 	while (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr)
 		ptr++;
@@ -212,19 +279,22 @@ static zbx_variant_t	evaluate_term9(int *unknown_idx)
 	if ('\0' == *ptr)
 	{
 		zbx_strlcpy(buffer, "Cannot evaluate expression: unexpected end of expression.", max_buffer_len);
-		zbx_variant_set_dbl(&result, ZBX_INFINITY);
-		return result;
+		res = zbx_malloc(NULL, sizeof(zbx_variant_t));
+		zbx_variant_set_dbl(res, ZBX_INFINITY);
+		goto ret;
 	}
 
 	if ('(' == *ptr)
 	{
 		ptr++;
 
-		result = evaluate_term1(unknown_idx);
+		res = evaluate_term1(unknown_idx);
 
-		if (ZBX_VARIANT_DBL == result.type && ZBX_INFINITY == result.data.dbl)
-			return result;
-
+		if (ZBX_VARIANT_DBL == res->type && ZBX_INFINITY == res->data.dbl)
+		  {
+			goto ret;
+		  }
+		  
 		/* if evaluate_term1() returns ZBX_UNKNOWN then continue as with regular number */
 
 		if (')' != *ptr)
@@ -232,38 +302,46 @@ static zbx_variant_t	evaluate_term9(int *unknown_idx)
 			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
 					" expected closing parenthesis at \"%s\".", ptr);
 
-			zbx_variant_set_dbl(&result, ZBX_INFINITY);
+			zbx_variant_clear(res);
+			zbx_variant_set_dbl(res, ZBX_INFINITY);
 
-			return result;
+			goto ret;
 		}
 
 		ptr++;
 	}
 	else
 	{
+		res = zbx_malloc(NULL, sizeof(zbx_variant_t));
 		if ('"' == *ptr)
 		{
 			ptr++;
 
-			zbx_variant_set_str(&result, evaluate_string());
+			evaluate_string(res);
 
+			if (ZBX_VARIANT_DBL == res->type && ZBX_INFINITY == res->data.dbl)
+			  {
+				  return;
+			  }
+
+			
 			if ('"' != *ptr)
 			{
 				zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
-						" expected closing parenthesis at \"%s\".", ptr);
+						" expected closing quote at \"%s\".", ptr);
 			}
 
 			ptr++;
 		}
 		else
 		{
-			zbx_variant_set_dbl(&result, evaluate_number(unknown_idx));
+			zbx_variant_set_dbl(res, evaluate_number(unknown_idx));
 
-			if (ZBX_INFINITY == result.data.dbl)
+			if (ZBX_INFINITY == res->data.dbl)
 			{
 				zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
 						" expected numeric token at \"%s\".", ptr);
-				return result;
+				goto ret;
 			}
 		}
 	}
@@ -271,7 +349,8 @@ static zbx_variant_t	evaluate_term9(int *unknown_idx)
 	while ('\0' != *ptr && (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr))
 		ptr++;
 
-	return result;
+ret:
+	return res;
 }
 
 /******************************************************************************
@@ -283,9 +362,9 @@ static zbx_variant_t	evaluate_term9(int *unknown_idx)
  * -Unknown ->  Unknown                                                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_variant_t	evaluate_term8(int *unknown_idx)
+static zbx_variant_t*	evaluate_term8(int *unknown_idx)
 {
-	zbx_variant_t	result;
+	zbx_variant_t *res;
 
 	while (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr)
 		ptr++;
@@ -294,19 +373,19 @@ static zbx_variant_t	evaluate_term8(int *unknown_idx)
 	{
 		ptr++;
 
-		result = evaluate_term9(unknown_idx);
+		res = evaluate_term9(unknown_idx);
 
-		varToDouble(&result, unknown_idx);
+		varToDouble(res, unknown_idx);
 
-		if (ZBX_UNKNOWN == result.data.dbl || ZBX_INFINITY == result.data.dbl)
-			return result;
-
-		result.data.dbl = -result.data.dbl;
+		if (ZBX_UNKNOWN == res->data.dbl || ZBX_INFINITY == res->data.dbl)
+			goto ret;
+		  
+		res->data.dbl = -res->data.dbl;
 	}
 	else
-		result = evaluate_term9(unknown_idx);
-
-	return result;
+		res = evaluate_term9(unknown_idx);
+ret:
+	return res;
 }
 
 /******************************************************************************
@@ -318,9 +397,9 @@ static zbx_variant_t	evaluate_term8(int *unknown_idx)
  * not Unknown ->  Unknown                                                    *
  *                                                                            *
  ******************************************************************************/
-static zbx_variant_t	evaluate_term7(int *unknown_idx)
+static zbx_variant_t*	evaluate_term7(int *unknown_idx)
 {
-	zbx_variant_t	result;
+	zbx_variant_t*	res;
 
 	while (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr)
 		ptr++;
@@ -328,18 +407,19 @@ static zbx_variant_t	evaluate_term7(int *unknown_idx)
 	if ('n' == ptr[0] && 'o' == ptr[1] && 't' == ptr[2] && SUCCEED == is_operator_delimiter(ptr[3]))
 	{
 		ptr += 3;
-		result = evaluate_term8(unknown_idx);
-		varToDouble(&result,unknown_idx);
+		res = evaluate_term8(unknown_idx);
+		varToDouble(res, unknown_idx);
 
-		if (ZBX_UNKNOWN == result.data.dbl || ZBX_INFINITY == result.data.dbl)
-			return result;
-
-		result.data.dbl = (SUCCEED == zbx_double_compare(result.data.dbl, 0.0) ? 1.0 : 0.0);
+		if (ZBX_UNKNOWN == res->data.dbl || ZBX_INFINITY == res->data.dbl)
+			goto ret;
+		  
+		res->data.dbl = (SUCCEED == zbx_double_compare(res->data.dbl, 0.0) ? 1.0 : 0.0);
 	}
 	else
-		result = evaluate_term8(unknown_idx);
+		res = evaluate_term8(unknown_idx);
 
-	return result;
+ret:
+	return res;
 }
 
 /******************************************************************************
@@ -358,21 +438,21 @@ static zbx_variant_t	evaluate_term7(int *unknown_idx)
  *     1.2 / Unknown  ->  Unknown                                             *
  *                                                                            *
  ******************************************************************************/
-static zbx_variant_t	evaluate_term6(int *unknown_idx)
+static zbx_variant_t*	evaluate_term6(int *unknown_idx)
 {
 	char	op;
-	zbx_variant_t	result;
-	zbx_variant_t	operand;
+	zbx_variant_t *res;
+	zbx_variant_t *operand;
 	int	res_idx = -1, oper_idx = -2;	/* set invalid values to catch errors */
 
-	result = evaluate_term7(&res_idx);
+	res = evaluate_term7(&res_idx);
 
-	if (ZBX_VARIANT_DBL == result.type)
+	if (ZBX_VARIANT_DBL == res->type)
 	{
-		if (ZBX_INFINITY == result.data.dbl)
-			return result;
+		if (ZBX_INFINITY == res->data.dbl)
+			goto ret;
 
-		if (ZBX_UNKNOWN == result.data.dbl)
+		if (ZBX_UNKNOWN == res->data.dbl)
 			*unknown_idx = res_idx;
 	}
 
@@ -380,7 +460,7 @@ static zbx_variant_t	evaluate_term6(int *unknown_idx)
 
 	while ('*' == *ptr || '/' == *ptr)
 	{
-		varToDouble(&result,unknown_idx);
+		varToDouble(res, unknown_idx);
 
 		op = *ptr++;
 
@@ -388,52 +468,64 @@ static zbx_variant_t	evaluate_term6(int *unknown_idx)
 		/* Even if 1st operand is Unknown we evaluate 2nd operand too to catch fatal errors in it. */
 
 		operand = evaluate_term7(&oper_idx);
-		varToDouble(&operand,unknown_idx);
+		varToDouble(operand, unknown_idx);
 
-		if (ZBX_INFINITY == operand.data.dbl)
-			return operand;
+		if (ZBX_INFINITY == operand->data.dbl)
+		{
+			zbx_variant_clear(res);
+		  	zbx_variant_set_dbl(res, ZBX_INFINITY);
+			zbx_variant_clear(operand);
+			zbx_free(operand);
+			goto ret;
+		}
 
 		if ('*' == op)
 		{
-			if (ZBX_UNKNOWN == operand.data.dbl)		/* (anything) * Unknown */
+			if (ZBX_UNKNOWN == operand->data.dbl)		/* (anything) * Unknown */
 			{
 				*unknown_idx = oper_idx;
 				res_idx = oper_idx;
-				result.data.dbl = ZBX_UNKNOWN;
+				res->data.dbl = ZBX_UNKNOWN;
 			}
-			else if (ZBX_UNKNOWN == operand.data.dbl)		/* Unknown * known */
+			else if (ZBX_UNKNOWN == operand->data.dbl)		/* Unknown * known */
 				*unknown_idx = res_idx;
 			else
-				result.data.dbl *= operand.data.dbl;
+				res->data.dbl *= operand->data.dbl;
 		}
 		else
 		{
 			/* catch division by 0 even if 1st operand is Unknown */
 
-			if (ZBX_UNKNOWN != operand.data.dbl && SUCCEED == zbx_double_compare(operand.data.dbl, 0.0))
+			if (ZBX_UNKNOWN != operand->data.dbl && SUCCEED == zbx_double_compare(operand->data.dbl, 0.0))
 			{
 				zbx_strlcpy(buffer, "Cannot evaluate expression: division by zero.", max_buffer_len);
-				zbx_variant_clear(&result);
-				zbx_variant_set_dbl(&result, ZBX_INFINITY);
-				return result;
+				zbx_variant_clear(res);
+				zbx_variant_set_dbl(res, ZBX_INFINITY);
+				zbx_variant_clear(operand);
+				zbx_free(operand);
+				goto ret;
 			}
 
-			if (ZBX_UNKNOWN == operand.data.dbl)		/* (anything) / Unknown */
+			if (ZBX_UNKNOWN == operand->data.dbl)		/* (anything) / Unknown */
 			{
 				*unknown_idx = oper_idx;
 				res_idx = oper_idx;
-				result.data.dbl = ZBX_UNKNOWN;
+				res->data.dbl = ZBX_UNKNOWN;
 			}
-			else if (ZBX_UNKNOWN == result.data.dbl)		/* Unknown / known */
+			else if (ZBX_UNKNOWN == res->data.dbl)		/* Unknown / known */
 			{
 				*unknown_idx = res_idx;
 			}
 			else
-				result.data.dbl /= operand.data.dbl;
+				res->data.dbl /= operand->data.dbl;
 		}
+
+		zbx_variant_clear(operand);
+		zbx_free(operand);
 	}
 
-	return result;
+ret:
+	return res;
 }
 
 /******************************************************************************
@@ -445,21 +537,25 @@ static zbx_variant_t	evaluate_term6(int *unknown_idx)
  * Unknown +/- Unknown  ->  Unknown                                           *
  *                                                                            *
  ******************************************************************************/
-static zbx_variant_t	evaluate_term5(int *unknown_idx)
+static zbx_variant_t*	evaluate_term5(int *unknown_idx)
 {
 	char	op;
-	zbx_variant_t	result, operand;
+	zbx_variant_t *res;
+	zbx_variant_t *operand;
 
 	int	res_idx = -3, oper_idx = -4;	/* set invalid values to catch errors */
 
-	result = evaluate_term6(&res_idx);
+	res = evaluate_term6(&res_idx);
 
-	if (ZBX_VARIANT_DBL == result.type)
+	if (ZBX_VARIANT_DBL == res->type)
 	{
-		if (ZBX_INFINITY == result.data.dbl)
-			return result;
+		if (ZBX_INFINITY == res->data.dbl)
+		  {
+			  zabbix_log(LOG_LEVEL_INFORMATION, "IIIIII");
+			goto ret;
+		  }
 
-		if (ZBX_UNKNOWN == result.data.dbl)
+		if (ZBX_UNKNOWN == res->data.dbl)
 			*unknown_idx = res_idx;
 	}
 
@@ -467,37 +563,49 @@ static zbx_variant_t	evaluate_term5(int *unknown_idx)
 
 	while ('+' == *ptr || '-' == *ptr)
 	{
-		varToDouble(&result,unknown_idx);
+		varToDouble(res, unknown_idx);
 		op = *ptr++;
 
 		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurs */
 
 		operand = evaluate_term6(&oper_idx);
-		varToDouble(&operand,unknown_idx);
+		varToDouble(operand, unknown_idx);
 
-		if (ZBX_INFINITY == operand.data.dbl)
-			return operand;
+		if (ZBX_INFINITY == operand->data.dbl)
+		{
+			zbx_variant_clear(res);
+			zbx_variant_set_dbl(res, ZBX_INFINITY);
+			zbx_variant_clear(operand);
+			zbx_free(operand);
+			zabbix_log(LOG_LEVEL_INFORMATION, "IIIIII22222");
 
-		if (ZBX_UNKNOWN == operand.data.dbl)		/* (anything) +/- Unknown */
+			goto ret;
+		}
+			
+		if (ZBX_UNKNOWN == operand->data.dbl)		/* (anything) +/- Unknown */
 		{
 			*unknown_idx = oper_idx;
 			res_idx = oper_idx;
-			result.data.dbl = ZBX_UNKNOWN;
+			res->data.dbl = ZBX_UNKNOWN;
 		}
-		else if (ZBX_UNKNOWN == result.data.dbl)		/* Unknown +/- known */
+		else if (ZBX_UNKNOWN == res->data.dbl)		/* Unknown +/- known */
 		{
 			*unknown_idx = res_idx;
 		}
 		else
 		{
 			if ('+' == op)
-				result.data.dbl += operand.data.dbl;
+				res->data.dbl += operand->data.dbl;
 			else
-				result.data.dbl -= operand.data.dbl;
+				res->data.dbl -= operand->data.dbl;
 		}
+		zbx_variant_clear(operand);
+		zbx_free(operand);
 	}
+	zabbix_log(LOG_LEVEL_INFORMATION, "IIIIII3333");
 
-	return result;
+ ret:	
+	return res;
 }
 
 /******************************************************************************
@@ -509,20 +617,21 @@ static zbx_variant_t	evaluate_term5(int *unknown_idx)
  * Unknown < Unknown  ->  Unknown                                             *
  *                                                                            *
  ******************************************************************************/
-static zbx_variant_t	evaluate_term4(int *unknown_idx)
+static zbx_variant_t*	evaluate_term4(int *unknown_idx)
 {
 	char	op;
-	zbx_variant_t	result, operand;
+	zbx_variant_t *res;
+	zbx_variant_t *operand;
 
 	int	res_idx = -5, oper_idx = -6;	/* set invalid values to catch errors */
 
-	result = evaluate_term5(&res_idx);
-	if (ZBX_VARIANT_DBL == result.type)
+	res = evaluate_term5(&res_idx);
+	if (ZBX_VARIANT_DBL == res->type)
 	{
-		if (ZBX_INFINITY == result.data.dbl)
-			return result;
-
-		if (ZBX_UNKNOWN == result.data.dbl)
+		if (ZBX_INFINITY == res->data.dbl)
+			goto ret;
+		  
+		if (ZBX_UNKNOWN == res->data.dbl)
 			*unknown_idx = res_idx;
 	}
 
@@ -547,44 +656,53 @@ static zbx_variant_t	evaluate_term4(int *unknown_idx)
 		else
 			break;
 
-		varToDouble(&result,unknown_idx);
+		varToDouble(res,unknown_idx);
 
-		if (ZBX_INFINITY == result.data.dbl)
-			return result;
+		if (ZBX_INFINITY == res->data.dbl)
+			goto ret;
 
 		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurs */
 
 		operand = evaluate_term5(&oper_idx);
 
-		varToDouble(&operand,unknown_idx);
+		varToDouble(operand, unknown_idx);
 
-		if (ZBX_INFINITY == operand.data.dbl)
-			return operand;
-
-		if (ZBX_UNKNOWN == operand.data.dbl)		/* (anything) < Unknown */
+		if (ZBX_INFINITY == operand->data.dbl)
+		{
+			zbx_variant_clear(res);
+			zbx_variant_set_dbl(res, ZBX_INFINITY);
+			zbx_variant_clear(operand);
+			zbx_free(operand);
+			goto ret;
+		}
+		
+		if (ZBX_UNKNOWN == operand->data.dbl)		/* (anything) < Unknown */
 		{
 			*unknown_idx = oper_idx;
 			res_idx = oper_idx;
-			result.data.dbl = ZBX_UNKNOWN;
+			res->data.dbl = ZBX_UNKNOWN;
 		}
-		else if (ZBX_UNKNOWN == result.data.dbl)		/* Unknown < known */
+		else if (ZBX_UNKNOWN == res->data.dbl)		/* Unknown < known */
 		{
 			*unknown_idx = res_idx;
 		}
 		else
 		{
 			if ('<' == op)
-				result.data.dbl = (result.data.dbl < operand.data.dbl - ZBX_DOUBLE_EPSILON);
+				res->data.dbl = (res->data.dbl < operand->data.dbl - ZBX_DOUBLE_EPSILON);
 			else if ('l' == op)
-				result.data.dbl = (result.data.dbl <= operand.data.dbl + ZBX_DOUBLE_EPSILON);
+				res->data.dbl = (res->data.dbl <= operand->data.dbl + ZBX_DOUBLE_EPSILON);
 			else if ('g' == op)
-				result.data.dbl = (result.data.dbl >= operand.data.dbl - ZBX_DOUBLE_EPSILON);
+				res->data.dbl = (res->data.dbl >= operand->data.dbl - ZBX_DOUBLE_EPSILON);
 			else
-				result.data.dbl = (result.data.dbl > operand.data.dbl + ZBX_DOUBLE_EPSILON);
+				res->data.dbl = (res->data.dbl > operand->data.dbl + ZBX_DOUBLE_EPSILON);
 		}
-	}
 
-	return result;
+		zbx_variant_clear(operand);
+		zbx_free(operand);
+	}
+ret:
+	return res;
 }
 
 /******************************************************************************
@@ -599,25 +717,26 @@ static zbx_variant_t	evaluate_term4(int *unknown_idx)
  * Unknown <> Unknown  ->  Unknown                                            *
  *                                                                            *
  ******************************************************************************/
-static zbx_variant_t	evaluate_term3(int *unknown_idx)
+static zbx_variant_t*	evaluate_term3(int *unknown_idx)
 {
 	char	op;
-	zbx_variant_t	result, operand;
+	zbx_variant_t *res;
+	zbx_variant_t *operand;
 
 	int	res_idx = -7, oper_idx = -8;	/* set invalid values to catch errors */
 
-	result = evaluate_term4(&res_idx);
+	res = evaluate_term4(&res_idx);
 
-	if (ZBX_VARIANT_DBL == result.type)
+	if (ZBX_VARIANT_DBL == res->type)
 	{
-		if (ZBX_INFINITY == result.data.dbl)
+		if (ZBX_INFINITY == res->data.dbl)
 		{
-			varToDouble(&result,unknown_idx);
-			result.data.dbl = ZBX_INFINITY;
-			return result;
+			varToDouble(res, unknown_idx);
+			res->data.dbl = ZBX_INFINITY;
+			goto ret;
 		}
 
-		if (ZBX_UNKNOWN == result.data.dbl)
+		if (ZBX_UNKNOWN == res->data.dbl)
 			*unknown_idx = res_idx;
 	}
 
@@ -641,52 +760,71 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 
 		operand = evaluate_term4(&oper_idx);
 
-		if (ZBX_VARIANT_STR == result.type && ZBX_VARIANT_STR == operand.type)
+		if (ZBX_VARIANT_STR == res->type && ZBX_VARIANT_STR == operand->type)
 		{
-			int res = strcmp(result.data.str, operand.data.str);
+			zabbix_log(LOG_LEVEL_INFORMATION, "RESULT_STR: ->%s<-, OPERAND: ->%s<-", res->data.str, operand->data.str);
+			int res_temp = strcmp(res->data.str, operand->data.str);
 
 			if ('=' == op)
-				res = res == 0 ? 1 : 0;
+				res_temp = res_temp == 0 ? 1 : 0;
 			else
-				res = res != 0 ? 1: 0;
+				res_temp = res_temp != 0 ? 1: 0;
 
-			result.type = ZBX_VARIANT_DBL;
-			result.data.dbl = res;
+			/* res->type = ZBX_VARIANT_DBL; */
+			/* res->data.dbl = res_temp; */
+			zbx_variant_clear(res);
+			zbx_variant_set_dbl(res, res_temp);
 		}
 		else
 		{
-			varToDouble(&operand,unknown_idx);
+			varToDouble(operand, unknown_idx);
 
-			if (ZBX_INFINITY == operand.data.dbl)
-				return operand;
+			if (ZBX_INFINITY == operand->data.dbl)
+			{
+				zbx_variant_clear(res);
+			  	zbx_variant_set_dbl(res, ZBX_INFINITY);
+				zbx_variant_clear(operand);
+				zbx_free(operand);
+				goto ret;
+			}
 
-			varToDouble(&result, unknown_idx);
+			varToDouble(res, unknown_idx);
 
-			if (ZBX_INFINITY == result.data.dbl)
-				return result;
+			if (ZBX_INFINITY == res->data.dbl)
+			{
+			  	zbx_variant_clear(operand);
+				zbx_free(operand);
+				goto ret;
+			}
 
-			if (ZBX_UNKNOWN == operand.data.dbl)
+			zabbix_log(LOG_LEVEL_INFORMATION, "RESULT_DBL: ->%d<-, OPERAND: ->%d<-", res->data.dbl, operand->data.dbl);
+
+			
+			if (ZBX_UNKNOWN == operand->data.dbl)
 			{
 				*unknown_idx = oper_idx;
 				res_idx = oper_idx;
-				result.data.dbl = ZBX_UNKNOWN;
+				res->data.dbl = ZBX_UNKNOWN;
 			}
-			else if (ZBX_UNKNOWN == result.data.dbl)
+			else if (ZBX_UNKNOWN == res->data.dbl)
 			{
 				*unknown_idx = res_idx;
 			}
 			else if  ('=' == op)
 			{
-				result.data.dbl = (SUCCEED == zbx_double_compare(result.data.dbl, operand.data.dbl));
+				res->data.dbl = (SUCCEED == zbx_double_compare(res->data.dbl, operand->data.dbl));
 			}
 			else
 			{
-				result.data.dbl = (SUCCEED != zbx_double_compare(result.data.dbl, operand.data.dbl));
+				res->data.dbl = (SUCCEED != zbx_double_compare(res->data.dbl, operand->data.dbl));
 			}
 		}
+		zbx_variant_clear(operand);
+		zbx_free(operand);
 	}
 
-	return result;
+ret:
+	return res;
 }
 
 /******************************************************************************
@@ -700,20 +838,21 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
  *  Unknown and Unknown  -> Unknown                                           *
  *                                                                            *
  ******************************************************************************/
-static zbx_variant_t	evaluate_term2(int *unknown_idx)
+static zbx_variant_t*	evaluate_term2(int *unknown_idx)
 {
-	zbx_variant_t	result, operand;
+	zbx_variant_t *res;
+	zbx_variant_t *operand;
 
 	int	res_idx = -9, oper_idx = -10;	/* set invalid values to catch errors */
 
-	result = evaluate_term3(&res_idx);
+	res = evaluate_term3(&res_idx);
 
-	if (ZBX_VARIANT_DBL == result.type)
+	if (ZBX_VARIANT_DBL == res->type)
 	{
-		if (ZBX_INFINITY == result.data.dbl)
-			return result;
+		if (ZBX_INFINITY == res->data.dbl)
+			goto ret;
 
-		if (ZBX_UNKNOWN == result.data.dbl)
+		if (ZBX_UNKNOWN == res->data.dbl)
 			*unknown_idx = res_idx;
 	}
 
@@ -722,53 +861,62 @@ static zbx_variant_t	evaluate_term2(int *unknown_idx)
 	while ('a' == ptr[0] && 'n' == ptr[1] && 'd' == ptr[2] && SUCCEED == is_operator_delimiter(ptr[3]))
 	{
 		ptr += 3;
-		varToDouble(&result,unknown_idx);
+		varToDouble(res, unknown_idx);
 
-		if (ZBX_INFINITY == result.data.dbl)
-			return result;
+		if (ZBX_INFINITY == res->data.dbl)
+			goto ret;
 
 		operand = evaluate_term3(&oper_idx);
-		varToDouble(&operand,unknown_idx);
+		varToDouble(operand, unknown_idx);
 
-		if (ZBX_INFINITY == operand.data.dbl)
-			return operand;
-
-		if (ZBX_UNKNOWN == result.data.dbl)
+		if (ZBX_INFINITY == operand->data.dbl)
 		{
-			if (ZBX_UNKNOWN == operand.data.dbl)				/* Unknown and Unknown */
+			zbx_variant_clear(res);
+			zbx_variant_set_dbl(res, ZBX_INFINITY);
+			zbx_variant_clear(operand);
+			zbx_free(operand);
+			goto ret;
+		}
+
+		if (ZBX_UNKNOWN == res->data.dbl)
+		{
+			if (ZBX_UNKNOWN == operand->data.dbl)				/* Unknown and Unknown */
 			{
 				*unknown_idx = oper_idx;
 				res_idx = oper_idx;
-				result.data.dbl = ZBX_UNKNOWN;
+				res->data.dbl = ZBX_UNKNOWN;
 			}
-			else if (SUCCEED == zbx_double_compare(operand.data.dbl, 0.0))	/* Unknown and 0 */
+			else if (SUCCEED == zbx_double_compare(operand->data.dbl, 0.0))	/* Unknown and 0 */
 			{
-				result.data.dbl = 0.0;
+				res->data.dbl = 0.0;
 			}
 			else							/* Unknown and 1 */
 				*unknown_idx = res_idx;
 		}
-		else if (ZBX_UNKNOWN == operand.data.dbl)
+		else if (ZBX_UNKNOWN == operand->data.dbl)
 		{
-			if (SUCCEED == zbx_double_compare(result.data.dbl, 0.0))		/* 0 and Unknown */
+			if (SUCCEED == zbx_double_compare(res->data.dbl, 0.0))		/* 0 and Unknown */
 			{
-				result.data.dbl = 0.0;
+				res->data.dbl = 0.0;
 			}
 			else							/* 1 and Unknown */
 			{
 				*unknown_idx = oper_idx;
 				res_idx = oper_idx;
-				result.data.dbl = ZBX_UNKNOWN;
+				res->data.dbl = ZBX_UNKNOWN;
 			}
 		}
 		else
 		{
-			result.data.dbl = (SUCCEED != zbx_double_compare(result.data.dbl, 0.0) &&
-					SUCCEED != zbx_double_compare(operand.data.dbl, 0.0));
+			res->data.dbl = (SUCCEED != zbx_double_compare(res->data.dbl, 0.0) &&
+					SUCCEED != zbx_double_compare(operand->data.dbl, 0.0));
 		}
-	}
 
-	return result;
+		zbx_variant_clear(operand);
+		zbx_free(operand);
+	}
+ret:
+	return res;
 }
 
 /******************************************************************************
@@ -782,29 +930,31 @@ static zbx_variant_t	evaluate_term2(int *unknown_idx)
  *  Unknown or Unknown  -> Unknown                                            *
  *                                                                            *
  ******************************************************************************/
-static zbx_variant_t	evaluate_term1(int *unknown_idx)
+static zbx_variant_t*	evaluate_term1(int *unknown_idx)
 {
-	zbx_variant_t	result, operand;
+	zbx_variant_t *res;
+	zbx_variant_t *operand;
 	int	res_idx = -11, oper_idx = -12;	/* set invalid values to catch errors */
 
 	level++;
-
+	zabbix_log(LOG_LEVEL_INFORMATION, "level: %d", level);
 	if (32 < level)
 	{
+	  	zabbix_log(LOG_LEVEL_INFORMATION, "level BREACHED");
 		zbx_strlcpy(buffer, "Cannot evaluate expression: nesting level is too deep.", max_buffer_len);
-		result.type = ZBX_VARIANT_DBL;
-		result.data.dbl = ZBX_INFINITY;
-		return result;
+		res = zbx_malloc(NULL, sizeof(zbx_variant_t));
+		zbx_variant_set_dbl(res, ZBX_INFINITY);
+		goto ret;
 	}
 
-	result = evaluate_term2(&res_idx);
+	res = evaluate_term2(&res_idx);
 
-	if (ZBX_VARIANT_DBL == result.type)
+	if (ZBX_VARIANT_DBL == res->type)
 	{
-		if (ZBX_INFINITY == result.data.dbl)
-			return result;
+		if (ZBX_INFINITY == res->data.dbl)
+			goto ret;
 
-		if (ZBX_UNKNOWN == result.data.dbl)
+		if (ZBX_UNKNOWN == res->data.dbl)
 			*unknown_idx = res_idx;
 	}
 
@@ -813,56 +963,64 @@ static zbx_variant_t	evaluate_term1(int *unknown_idx)
 	while ('o' == ptr[0] && 'r' == ptr[1] && SUCCEED == is_operator_delimiter(ptr[2]))
 	{
 		ptr += 2;
-		varToDouble(&result,unknown_idx);
+		varToDouble(res, unknown_idx);
 
-		if (ZBX_INFINITY==result.data.dbl)
-			return result;
+		if (ZBX_INFINITY == res->data.dbl)
+			goto ret;
 
 		operand = evaluate_term2(&oper_idx);
 
-		varToDouble(&operand,unknown_idx);
+		varToDouble(operand, unknown_idx);
 
-		if (ZBX_INFINITY==operand.data.dbl)
-			return operand;
-
-		if (ZBX_UNKNOWN == result.data.dbl)
+		if (ZBX_INFINITY == operand->data.dbl)
 		{
-			if (ZBX_UNKNOWN == operand.data.dbl)				/* Unknown or Unknown */
+			zbx_variant_clear(res);
+			zbx_variant_set_dbl(res, ZBX_INFINITY);
+			zbx_variant_clear(operand);
+			zbx_free(operand);
+			goto ret;
+		}
+
+		if (ZBX_UNKNOWN == res->data.dbl)
+		{
+			if (ZBX_UNKNOWN == operand->data.dbl)				/* Unknown or Unknown */
 			{
 				*unknown_idx = oper_idx;
 				res_idx = oper_idx;
-				result.data.dbl = ZBX_UNKNOWN;
+				res->data.dbl = ZBX_UNKNOWN;
 			}
-			else if (SUCCEED != zbx_double_compare(operand.data.dbl, 0.0))	/* Unknown or 1 */
+			else if (SUCCEED != zbx_double_compare(operand->data.dbl, 0.0))	/* Unknown or 1 */
 			{
-				result.data.dbl = 1;
+				res->data.dbl = 1;
 			}
 			else							/* Unknown or 0 */
 				*unknown_idx = res_idx;
 		}
-		else if (ZBX_UNKNOWN == operand.data.dbl)
+		else if (ZBX_UNKNOWN == operand->data.dbl)
 		{
-			if (SUCCEED != zbx_double_compare(result.data.dbl, 0.0))		/* 1 or Unknown */
+			if (SUCCEED != zbx_double_compare(res->data.dbl, 0.0))		/* 1 or Unknown */
 			{
-				result.data.dbl = 1;
+				res->data.dbl = 1;
 			}
 			else							/* 0 or Unknown */
 			{
 				*unknown_idx = oper_idx;
 				res_idx = oper_idx;
-				result.data.dbl = ZBX_UNKNOWN;
+				res->data.dbl = ZBX_UNKNOWN;
 			}
 		}
 		else
 		{
-			result.data.dbl = (SUCCEED != zbx_double_compare(result.data.dbl, 0.0) ||
-					SUCCEED != zbx_double_compare(operand.data.dbl, 0.0));
+			res->data.dbl = (SUCCEED != zbx_double_compare(res->data.dbl, 0.0) ||
+					SUCCEED != zbx_double_compare(operand->data.dbl, 0.0));
 		}
+		zbx_variant_clear(operand);
+		zbx_free(operand);
 	}
 
 	level--;
-
-	return result;
+ret:
+	return res;
 }
 
 /******************************************************************************
@@ -877,26 +1035,31 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 					/* to catch errors */
 	ptr = expression;
 	level = 0;
-
 	buffer = error;
 	max_buffer_len = max_error_len;
 
-	zbx_variant_t res = evaluate_term1(&unknown_idx);
+	zbx_variant_t *res = evaluate_term1(&unknown_idx);
 
-	if (ZBX_VARIANT_STR == res.type)
+	if (ZBX_VARIANT_STR == res->type)
 	{
-		if (0 == strlen(res.data.str))
+		if (0 == strlen(res->data.str))
 		{
 			zbx_strlcpy(buffer, "Cannot evaluate expression: unexpected end of expression.", max_buffer_len);
-			zbx_variant_set_dbl(&res, ZBX_INFINITY);
+			zbx_variant_clear(res);
+			zbx_variant_set_dbl(res, ZBX_INFINITY);
 		}
 		else
 		{
-			varToDouble(&res,&unknown_idx);
+			varToDouble(res, &unknown_idx);
 		}
 	}
-	*value = res.data.dbl;
 
+	*value = res->data.dbl;
+	zabbix_log(LOG_LEVEL_INFORMATION,"after term1 clear res");
+
+	zbx_variant_clear(res);
+	zbx_free(res);
+	
 	if ('\0' != *ptr && ZBX_INFINITY != *value)
 	{
 		zbx_snprintf(error, max_error_len, "Cannot evaluate expression: unexpected token at \"%s\".", ptr);
@@ -978,10 +1141,12 @@ int	evaluate_unknown(const char *expression, double *value, char *error, size_t 
 
 	buffer = error;
 	max_buffer_len = max_error_len;
-	zbx_variant_t res = evaluate_term1(&unknown_idx);
-	varToDouble(&res,&unknown_idx);
-	*value = res.data.dbl;
-
+	zbx_variant_t* res = evaluate_term1(&unknown_idx);
+	varToDouble(res, &unknown_idx);
+	*value = res->data.dbl;
+	zbx_variant_clear(res);
+	zbx_free(res);
+	
 	if ('\0' != *ptr && ZBX_INFINITY != *value)
 	{
 		zbx_snprintf(error, max_error_len, "Cannot evaluate expression: unexpected token at \"%s\".", ptr);

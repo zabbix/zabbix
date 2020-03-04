@@ -21,6 +21,13 @@ out:
   value: 0
   return: 'SUCCEED'
 ---
+test case: 'strings comparison, single bracket'
+in:
+  expression: '"ccc"=("ccc"'
+out:
+  error: 'Cannot evaluate expression: expected closing parenthesis at "".'
+  return: 'FAIL'
+---
 test case: 'strings comparison'
 in:
   expression: '"ccc"="ccc"'
@@ -53,8 +60,8 @@ test case: 'strings null terminators'
 in:
   expression: '"\0"="\0"'
 out:
-  value: 1
-  return: 'SUCCEED'
+  error: 'Cannot evaluate expression: unescaped character at "0"="\0""'
+  return: 'FAIL'
 ---
 test case: 'strings are quotes 1'
 in:
@@ -136,6 +143,13 @@ out:
 test case: 'strings comparison, empty operands 2'
 in:
   expression: '("\0")<>("\0")'
+out:
+  error: 'Cannot evaluate expression: unescaped character at "0")<>("\0")"'
+  return: 'FAIL'
+---
+test case: 'strings comparison, empty operands 3'
+in:
+  expression: '("\\0")<>("\\0")'
 out:
   value: 0
   return: 'SUCCEED'
@@ -857,23 +871,23 @@ out:
 ---
 test case: 'term 2 and str and not_castable_str'
 in:
-  expression: '"1" and "\t"'
+  expression: '"1" and "\\t"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\t".'
+  error: 'Cannot evaluate expression: expected numeric token at "\\t".'
   return: 'FAIL'
 ---
 test case: 'term 2 and not_castable_str and int'
 in:
-  expression: '"\t" and 1'
+  expression: '"\\t" and 1'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\t".'
+  error: 'Cannot evaluate expression: expected numeric token at "\\t".'
   return: 'FAIL'
 ---
 test case: 'term 2 and not_castable_str and not_castable_str'
 in:
-  expression: '"\t" and "\t"'
+  expression: '"\\t" and "\\t"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\t".'
+  error: 'Cannot evaluate expression: expected numeric token at "\\t".'
   return: 'FAIL'
 ---
 test case: 'term 2 and str and int 1'
@@ -922,23 +936,30 @@ out:
 ---
 test case: 'term 1 or str and not_castable_str'
 in:
-  expression: '"1" or "\n"'
+  expression: '"1" or "\\n"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\n".'
+  error: 'Cannot evaluate expression: expected numeric token at "\\n".'
   return: 'FAIL'
 ---
 test case: 'term 1 or not_castable_str and int'
 in:
-  expression: '"\n\n\n" and 1'
+  expression: '"\\n\\n\\n" and 1'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\n\n\n".'
+  error: 'Cannot evaluate expression: expected numeric token at "\\n\\n\\n".'
   return: 'FAIL'
 ---
-test case: 'term 1 or not_castable_str and not_castable_str'
+test case: 'term 1 or not_castable_str and not_castable_str 1'
 in:
-  expression: '"\n" and "\n"'
+  expression: '"\\n" and "\\n"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\n".'
+  error: 'Cannot evaluate expression: expected numeric token at "\\n".'
+  return: 'FAIL'
+---
+test case: 'term 1 or not_castable_str and not_castable_str 2'
+in:
+  expression: '"\\n" and "\\n"'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "\\n".'
   return: 'FAIL'
 ---
 test case: 'term 1 or str and int 1'

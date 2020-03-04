@@ -4936,12 +4936,15 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *unknown_msgs)
 {
 	DC_ITEM			*items = NULL;
-	char			value[MAX_BUFFER_LEN], *error = NULL;
+	//char			value[MAX_BUFFER_LEN], *error = NULL;
+	char		        *error = NULL;
 	int			i;
 	zbx_func_t		*func;
 	zbx_vector_uint64_t	itemids;
 	int			*errcodes = NULL;
 	zbx_hashset_iter_t	iter;
+
+	char *value = zbx_malloc(NULL, MAX_BUFFER_LEN);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() funcs_num:%d", __func__, funcs->num_data);
 
@@ -5011,7 +5014,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			ret_unknown = 1;
 		}
 
-		if (0 == ret_unknown && SUCCEED != evaluate_function(value, &items[i], func->function,
+		if (0 == ret_unknown && SUCCEED != evaluate_function(&value, &items[i], func->function,
 				func->parameter, &func->timespec, &error))
 		{
 			/* compose and store error message for future use */
