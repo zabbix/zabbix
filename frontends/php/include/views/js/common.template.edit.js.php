@@ -35,7 +35,7 @@
 					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					new CMacroValue(['type' => ZBX_MACRO_TYPE_TEXT, 'value' => ''], 'macros[#{rowNum}]', ['add_post_js' => false])
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
@@ -79,7 +79,7 @@
 						->setAttribute('placeholder', '{$MACRO}')
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					new CMacroValue(['type' => ZBX_MACRO_TYPE_TEXT, 'value' => ''], 'macros[#{rowNum}]', ['add_post_js' => false])
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
@@ -243,7 +243,7 @@
 	 * @returns {array}        List of all host macros in the form.
 	 */
 	function getMacros($form) {
-		var $macros = $form.find('input[name^="macros"], textarea[name^="macros"]'),
+		var $macros = $form.find('input[name^="macros"], textarea[name^="macros"]').not(':disabled'),
 			macros = {};
 
 		// Find the correct macro inputs and prepare to submit them via AJAX. matches[1] - index, matches[2] field name.

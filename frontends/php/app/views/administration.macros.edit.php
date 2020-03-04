@@ -48,7 +48,11 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 
-	$macro_value = new CMacroValue($macro, 'macros['.$i.']');
+	$macro_value = new CMacroValue($macro['type'], 'macros['.$i.']');
+
+	if (array_key_exists('value', $macro)) {
+		$macro_value->setAttribute('value', $macro['value']);
+	}
 
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -88,6 +92,7 @@ $tab_view->setFooter(makeFormFooter($save_button));
 
 $form = (new CForm())
 	->setName('macrosForm')
+	->disablePasswordAutofill()
 	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'macros.update')->getUrl())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem($tab_view);

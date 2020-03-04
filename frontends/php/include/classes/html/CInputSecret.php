@@ -19,7 +19,7 @@
 **/
 
 
-class CInputSecret extends CTag {
+class CInputSecret extends CInput {
 
 	/**
 	 * Default CSS class name for HTML root element.
@@ -32,46 +32,26 @@ class CInputSecret extends CTag {
 	public const ZBX_STYLE_BTN_CHANGE = 'btn-change';
 
 	/**
-	 * Options array.
+	 * Add initialization javascript code.
 	 *
-	 * @var array
+	 * @var bool
 	 */
-	protected $options = [
-		'disabled' => false,
-		'add_post_js' => true
-	];
+	protected $add_post_js;
 
 	/**
 	 * CInputSecret constructor.
 	 *
-	 * @param string      $name
-	 * @param string      $placeholder
-	 * @param array       $options
-	 * @param bool        $options['disabled']
-	 * @param bool        $options['add_post_js']
+	 * @param string $name           Input element name attribute.
+	 * @param string $value          Input element value attribute.
+	 * @param bool   $add_post_js    Add initialization javascript, default true.
 	 */
-	public function __construct(string $name, string $placeholder = '', array $options = []) {
-		$this->options = array_merge($this->options, $options);
+	public function __construct(string $name, string $value = null, $add_post_js = true) {
+		$this->add_post_js = $add_post_js;
+		$this->setAttribute('name', $name);
+		$this->setId(uniqid('input-secret-'));
 
-		parent::__construct('div', true);
-
-		$input = (new CPassBox($name, ZBX_MACRO_SECRET_MASK))
-			->setAttribute('placeholder', $placeholder)
-			->setEnabled(false);
-
-		$change_btn = (new CButton(null, _('Set new value')))
-			->addClass(self::ZBX_STYLE_BTN_CHANGE)
-			->setId(zbx_formatDomId($name.'[btn]'))
-			->setEnabled(!$this->options['disabled']);
-
-		$this
-			->setId(uniqid('input-secret-'))
-			->addClass(self::ZBX_STYLE_CLASS)
-			->addItem($input)
-			->addItem($change_btn);
-
-		if ($this->options['add_post_js']) {
-			zbx_add_post_js($this->getPostJS());
+		if ($value !== null) {
+			$this->setAttribute('value', $value);
 		}
 	}
 
@@ -82,5 +62,32 @@ class CInputSecret extends CTag {
 	 */
 	public function getPostJS(): string {
 		return 'jQuery("#'.$this->getId().'").inputSecret();';
+	}
+
+	public function toString($destroy = true) {
+		$node = (new CDiv())
+			->setId($this->getId())
+			->addClass(self::ZBX_STYLE_CLASS);
+		$name = $this->getAttribute('name');
+
+		if ($this->getAttribute('value') !== null) {
+			$node->addItem((new CVar($name, $this->getAttribute('value')))->removeId());
+		}
+
+		$node->addItem([
+			(new CPassBox($name, ZBX_MACRO_SECRET_MASK))
+				->setAttribute('disabled', 'disabled')
+				->setAttribute('autocomplete', 'off'),
+			(new CButton(null, _('Set new value')))
+				->addClass(self::ZBX_STYLE_BTN_CHANGE)
+				->setId(zbx_formatDomId($name.'[btn]'))
+				->setAttribute('disabled', $this->getAttribute('disabled'))
+		]);
+
+		if ($this->add_post_js) {
+			zbx_add_post_js($this->getPostJS());
+		}
+
+		return $node->toString(true);
 	}
 }

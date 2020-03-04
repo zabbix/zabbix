@@ -33,7 +33,7 @@
 					->setAttribute('placeholder', '{$MACRO}')
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				new CMacroValue(['type' => ZBX_MACRO_TYPE_TEXT, 'value' => ''], 'macros[#{rowNum}]', ['add_post_js' => false])
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
@@ -53,50 +53,26 @@
 </script>
 
 <script type="text/javascript">
-	function initMacroFields($parent) {
-		jQuery('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $parent).not('.initialized-field').each(function() {
-			var $obj = jQuery(this);
+	let table = jQuery('#tbl_macros');
 
-			$obj.addClass('initialized-field');
-
-			if ($obj.hasClass('macro')) {
-				$obj.on('change keydown', function(e) {
-					if (e.type === 'change' || e.which === 13) {
-						macroToUpperCase(this);
-						$obj.textareaFlexible();
-					}
-				});
-			}
-
-			$obj.textareaFlexible();
-		});
-	}
-
-	function macroToUpperCase(element) {
-		var macro = jQuery(element).val(),
-			end = macro.indexOf(':');
-
-		if (end == -1) {
-			jQuery(element).val(macro.toUpperCase());
-		}
-		else {
-			var macro_part = macro.substr(0, end),
-				context_part = macro.substr(end, macro.length);
-
-			jQuery(element).val(macro_part.toUpperCase() + context_part);
-		}
-	}
-
-	jQuery(document.getElementById('tbl_macros'))
+	table
 		.dynamicRows({template: '#macro-row-tmpl'})
-		.on('click', 'button.element-table-add', function() {
-			initMacroFields(jQuery(document.getElementById('tbl_macros')));
-		})
 		.on('afteradd.dynamicRows', function() {
-			jQuery('.input-group').macroValue();
-		});
+			jQuery('.input-group', table).macroValue();
+		})
+		.find('.input-group').macroValue();
 
-	initMacroFields(jQuery(document.getElementById('tbl_macros')));
+	table
+		.on('change keydown', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>.macro', function(e) {
+			if (e.type === 'change' || e.which === 13) {
+				jQuery(this)
+					.val(jQuery(this).val().replace(/([^:]+)/, function(val) {
+						return val.toUpperCase('$1');
+					}))
+					.textareaFlexible();
+			}
+		})
+		.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 
 	class MassUpdateMacros {
 

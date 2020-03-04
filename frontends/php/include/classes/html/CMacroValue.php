@@ -19,12 +19,12 @@
 **/
 
 
-class CMacroValue extends CDiv {
+class CMacroValue extends CInput {
 
 	/**
 	 * Container class.
 	 */
-	public const ZBX_STYLE_INPUT_GROUP = 'input-group';
+	public const ZBX_STYLE_INPUT_GROUP = 'input-group macro-value';
 
 	/**
 	 * Button class for undo.
@@ -32,28 +32,11 @@ class CMacroValue extends CDiv {
 	public const ZBX_STYLE_BTN_UNDO = 'btn-undo';
 
 	/**
-	 * Options array.
+	 * Add element initialization javascript.
 	 *
-	 * @var array
+	 * @var bool
 	 */
-	protected $options = [
-		'readonly' => false,
-		'add_post_js' => true
-	];
-
-	/**
-	 * Values array.
-	 *
-	 * @var array
-	 */
-	protected $values = [];
-
-	/**
-	 * Element name.
-	 *
-	 * @var string
-	 */
-	protected $name = '';
+	public $add_post_js = true;
 
 	/**
 	 * Class constructor.
@@ -64,14 +47,10 @@ class CMacroValue extends CDiv {
 	 * @param bool   $options['readonly']
 	 * @param bool   $options['add_post_js']
 	 */
-	public function __construct(array $macro, string $name, array $options = []) {
-		$this->options = array_merge($this->options, $options);
+	public function __construct(string $type, string $name, string $value = null, $add_post_js = true) {
+		parent::__construct($type, $name, $value);
 
-		parent::__construct();
-
-		$this->values = $macro;
-		$this->name = $name;
-
+		$this->add_post_js = $add_post_js;
 		$this->setId(uniqid('macro-value-'));
 	}
 
@@ -92,46 +71,45 @@ class CMacroValue extends CDiv {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-		$dropdown_options = [
-			'title' => _('Change type'),
-			'active_class' => ($this->values['type'] == ZBX_MACRO_TYPE_TEXT) ? ZBX_STYLE_ICON_TEXT : ZBX_STYLE_ICON_SECRET_TEXT,
-			'disabled' => $this->options['readonly'],
-			'items' => [
-				['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_STYLE_ICON_TEXT],
-				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_SECRET_TEXT]
-			]
-		];
+		$name = $this->getAttribute('name');
+		$value_type = $this->getAttribute('type');
+		$value = $this->getAttribute('value');
+		$node = (new CDiv())
+			->addClass(self::ZBX_STYLE_INPUT_GROUP)
+			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);
 
-		$value_input = ($this->values['type'] == ZBX_MACRO_TYPE_TEXT)
-			? (new CTextAreaFlexible($this->name.'[value]', CMacrosResolverGeneral::getMacroValue($this->values),
-				['add_post_js' => $this->options['add_post_js']]
-			))
+		if ($value_type == ZBX_MACRO_TYPE_TEXT) {
+			$class = ZBX_STYLE_ICON_TEXT;
+			$node->addItem((new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setAttribute('placeholder', _('value'))
-			: new CInputSecret($this->name.'[value]', _('value'), ['disabled' => $this->options['readonly'],
-				'add_post_js' => $this->options['add_post_js']
+				->setReadonly($this->getAttribute('readonly'))
+			);
+		}
+		else {
+			$class = ZBX_STYLE_ICON_SECRET_TEXT;
+			$node->addItem([
+				(new CInputSecret($name.'[value]', $value, $this->add_post_js))
+					->setAttribute('placeholder', _('value')),
+				(new CButton(null))
+					->setAttribute('title', _('Revert changes'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass(self::ZBX_STYLE_BTN_UNDO)
 			]);
-
-		if ($this->values['type'] == ZBX_MACRO_TYPE_TEXT && $this->options['readonly']) {
-			$value_input->setAttribute('readonly', 'readonly');
 		}
 
-		// Macro value input group.
-		$this
-			->addClass(self::ZBX_STYLE_INPUT_GROUP)
-			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-			->addItem([
-				$value_input,
-				($this->values['type'] == ZBX_MACRO_TYPE_SECRET)
-					? (new CButton(null))
-						->setAttribute('title', _('Revert changes'))
-						->addClass(ZBX_STYLE_BTN_ALT)
-						->addClass(self::ZBX_STYLE_BTN_UNDO)
-					: null,
-				new CButtonDropdown($this->name.'[type]', (string) $this->values['type'], $dropdown_options)
-			]);
+		$node->addItem((new CButtonDropdown($name.'[type]',  $value_type, [
+				['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_STYLE_ICON_TEXT],
+				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_SECRET_TEXT]
+			]))
+				->addClass($class)
+				->setAttribute('disabled', $this->getAttribute('disabled'))
+				->setAttribute('title', _('Change type'))
+		);
 
-		zbx_add_post_js($this->getPostJS());
+		if ($this->add_post_js) {
+			zbx_add_post_js($this->getPostJS());
+		}
 
-		return parent::toString($destroy);
+		return $node->toString(true);
 	}
 }

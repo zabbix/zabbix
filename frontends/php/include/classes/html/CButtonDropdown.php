@@ -19,7 +19,7 @@
 **/
 
 
-class CButtonDropdown extends CDiv {
+class CButtonDropdown extends CButton {
 
 	/**
 	 * Default CSS class name for HTML root element.
@@ -33,74 +33,53 @@ class CButtonDropdown extends CDiv {
 	public const ZBX_STYLE_BTN_VALUE = 'dropdown-value';
 
 	/**
-	 * Options array.
+	 * Dropdown items array.
 	 *
 	 * @var array
 	 */
-	protected $options = [
-		'disabled' => false
-	];
+	public $dropdown_items = [];
 
 	/**
-	 * Element value.
+	 * Create CButtonDropdown instance.
 	 *
-	 * @var string
+	 * @param string $name                Element name.
+	 * @param string $value               Element selected value.
+	 * @param array  $items               Dropdown items.
+	 * @param string $items[]['label']    Dropdown item label.
+	 * @param string $items[]['value']    Dropdown item value.
+	 * @param string $items[]['class']    Dropdown css class to be used for CButtonDropdown when item is selected.
 	 */
-	protected $value;
+	public function __construct(string $name, $value = null, array $items = []) {
+		parent::__construct($name, '');
 
-	/**
-	 * Element name.
-	 *
-	 * @var string
-	 */
-	protected $name = '';
+		$this->setId(uniqid('btn-dropdown-'));
+		$this->addClass(ZBX_STYLE_BTN_ALT);
+		$this->addClass(self::ZBX_STYLE_BTN_TOGGLE);
+		$this->dropdown_items = $items;
 
-	/**
-	 * CButtonDropdown constructor.
-	 *
-	 * @param string $name
-	 * @param string $value
-	 * @param array  $options
-	 * @param string $options['title']           aria-label title
-	 * @param string $options['active_class']
-	 * @param bool   $options['disabled']        (optional)
-	 * @param array  $options['items']
-	 * @param string $options['items']['label']
-	 * @param string $options['items']['value']
-	 * @param string $options['items']['class']
-	 */
-	public function __construct(string $name, string $value, array $options) {
-		$this->options = array_merge($this->options, $options);
-
-		parent::__construct();
-
-		$this->name = $name;
-
-		$this->value = $value;
+		if ($value !== null) {
+			$this->setAttribute('value', $value);
+		}
 	}
 
 	public function toString($destroy = true) {
-		$this
-			->setId(uniqid('btn-dropdown-'))
+		$name = $this->getAttribute('name');
+		$node = (new CDiv())
+			->setId($this->getId())
 			->addClass(self::ZBX_STYLE_CLASS)
-			->addItem(
-				(new CButton(null))
-					->setAttribute('aria-label', $this->options['title'])
-					// In setMenuPopup is check for disabled attribute. Its why we set disabled before setMenuPopup.
-					->setEnabled(!$this->options['disabled'])
-					->addClass(implode(' ', [ZBX_STYLE_BTN_ALT, self::ZBX_STYLE_BTN_TOGGLE,
-						$this->options['active_class']
-					]))
-					->setId(zbx_formatDomId($this->name.'[btn]'))
-					->setMenuPopup([
-						'type' => 'dropdown',
-						'data' => [
-							'items' => $this->options['items']
-						]
-					])
-			)
-			->addItem((new CInput('hidden', $this->name, $this->value))->addClass(self::ZBX_STYLE_BTN_VALUE));
+			->addItem((new CButton(null))
+				->setAttribute('aria-label', $this->getAttribute('title'))
+				->setAttribute('disabled', $this->getAttribute('disabled'))
+				->addClass($this->getAttribute('class'))
+				->setId(zbx_formatDomId($name.'[btn]'))
+				->setMenuPopup([
+					'type' => 'dropdown',
+					'data' => ['items' => $this->dropdown_items]
+				]))
+			->addItem((new CInput('hidden', $name, $this->getAttribute('value')))
+				->addClass(self::ZBX_STYLE_BTN_VALUE)
+		);
 
-		return parent::toString($destroy);
+		return $node->toString(true);
 	}
 }

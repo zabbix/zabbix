@@ -91,7 +91,11 @@ else {
 			$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
 		}
 
-		$macro_value = new CMacroValue($macro, 'macros['.$i.']', ['readonly' => $readonly, 'add_post_js' => false]);
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly($readonly);
+
+		if (array_key_exists('value', $macro)) {
+			$macro_value->setAttribute('value', $macro['value']);
+		}
 
 		$row = [
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
