@@ -1048,6 +1048,9 @@ class CHostInterface extends CApiService {
 	 * Check SNMP Security level field.
 	 *
 	 * @param array $interface
+	 * @param array $interface['details']
+	 * @param array $interface['details']['version']        SNMP version
+	 * @param array $interface['details']['securitylevel']  SNMP security level
 	 *
 	 * @throws APIException if "secuirtylevel" value is incorrect.
 	 */
@@ -1060,9 +1063,12 @@ class CHostInterface extends CApiService {
 	}
 
 	/**
-	 * Check SNMP Auth protocol.
+	 * Check SNMP authentication  protocol.
 	 *
 	 * @param array $interface
+	 * @param array $interface['details']
+	 * @param array $interface['details']['version']       SNMP version
+	 * @param array $interface['details']['authprotocol']  SNMP authentication protocol
 	 *
 	 * @throws APIException if "authprotocol" value is incorrect.
 	 */
@@ -1075,16 +1081,18 @@ class CHostInterface extends CApiService {
 	}
 
 	/**
-	 * Check SNMP Priv protocol.
+	 * Check SNMP Privacy protocol.
 	 *
 	 * @param array $interface
+	 * @param array $interface['details']
+	 * @param array $interface['details']['version']       SNMP version
+	 * @param array $interface['details']['privprotocol']  SNMP privacy protocol
 	 *
 	 * @throws APIException if "privprotocol" value is incorrect.
 	 */
 	protected function checkSnmpPrivProtocol(array $interface) {
 		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('privprotocol', $interface['details'])
-					&& !in_array($interface['details']['privprotocol'], [ITEM_PRIVPROTOCOL_DES,
-						ITEM_PRIVPROTOCOL_AES]))) {
+				&& !in_array($interface['details']['privprotocol'], [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES]))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
 		}
 	}
