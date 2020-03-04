@@ -154,6 +154,33 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 }
 
 /**
+ * Generate array with severities options.
+ *
+ * @param bool $style  True - include style option.
+ *
+ * @return array
+ */
+function getSeverities($style = false) {
+	$severities = [];
+	$config = select_config();
+
+	foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
+		$options = [
+			'name' => getSeverityName($severity, $config),
+			'value' => $severity
+		];
+
+		if ($style) {
+			$options['style'] = getSeverityStyle($severity);
+		}
+
+		$severities[] = $options;
+	}
+
+	return $severities;
+}
+
+/**
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
  * @param int         $severity       Trigger, Event or Problem severity.
