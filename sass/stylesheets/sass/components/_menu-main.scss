@@ -1,3 +1,8 @@
+$menu-main-icons-opacity: 1 !default;
+
+$menu-main-arrow-bg-position: -549px -434px !default;
+$menu-main-arrow-hover-bg-position: -606px -434px !default;
+
 $menu-main-icons: (
 		dashboard: -540px -664px,
 		problems: -540px -688px,
@@ -14,6 +19,10 @@ $menu-main-icons: (
 		width: 24px;
 		height: 24px;
 		background: url(../img/icon-sprite.svg) no-repeat;
+
+		@if $menu-main-icons-opacity < 1 {
+			opacity: $menu-main-icons-opacity;
+		}
 	}
 }
 
@@ -31,6 +40,10 @@ $menu-main-icons: (
 
 		&::before {
 			background-position: $bg-position;
+
+			@if $ui-transitions and $menu-main-icons-opacity < 1 {
+				transition: opacity $ui-transition-duration;
+			}
 		}
 	}
 }
@@ -50,6 +63,9 @@ $menu-main-icons: (
 			&:focus {
 				&::before {
 					background-position-x: -570px;
+					@if $menu-main-icons-opacity < 1 {
+						opacity: 1;
+					}
 				}
 			}
 		}
@@ -66,7 +82,6 @@ $menu-main-icons: (
 		}
 
 		&.has-submenu {
-
 			& > a {
 				&::after {
 					content: '';
@@ -75,8 +90,11 @@ $menu-main-icons: (
 					right: 14px;
 					width: 6px;
 					height: 4px;
-					background: url(../img/icon-sprite.svg) no-repeat -549px -434px;
+					background: url(../img/icon-sprite.svg) no-repeat $menu-main-arrow-bg-position;
 					transform: rotate(0deg);
+					@if $menu-main-icons-opacity < 1 {
+						opacity: $menu-main-icons-opacity;
+					}
 
 					@if $ui-transitions {
 						transition: transform $ui-transition-duration,
@@ -87,7 +105,10 @@ $menu-main-icons: (
 				&:hover,
 				&:focus {
 					&::after {
-						background-position-x: -606px;
+						background-position: $menu-main-arrow-hover-bg-position;
+						@if $menu-main-icons-opacity < 1 {
+							opacity: 1;
+						}
 					}
 				}
 			}
@@ -98,8 +119,12 @@ $menu-main-icons: (
 					border-left-color: transparent;
 
 					&::after {
-						background-position-x: -606px;
+						background-position: $menu-main-arrow-hover-bg-position;
 						transform: rotate(-180deg);
+
+						@if $menu-main-icons-opacity < 1 {
+							opacity: 1;
+						}
 					}
 				}
 			}

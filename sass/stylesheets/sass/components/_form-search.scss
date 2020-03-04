@@ -1,3 +1,6 @@
+$form-search-icon-bg-position: -540px -616px !default;
+$form-search-icon-hover-bg-position: -570px -616px !default;
+
 .form-search {
 	position: relative;
 	margin-top: 12px;
@@ -26,13 +29,13 @@
 		right: -1px;
 		width: 24px;
 		height: 24px;
-		background: url(../img/icon-sprite.svg) no-repeat -540px -616px;
+		background: url(../img/icon-sprite.svg) no-repeat $form-search-icon-bg-position;
 		opacity: .75;
 		transform: scale(.8);
 		cursor: pointer;
 
 		&:hover {
-			background-position: -570px -616px;
+			background-position: $form-search-icon-hover-bg-position;
 		}
 	}
 }

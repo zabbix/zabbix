@@ -2,6 +2,8 @@ $sidebar-width: auto;
 $sidebar-compact-width: 48px;
 $sidebar-padding: 12px;
 
+$sidebar-toggle-bg-position: -540px -592px !default;
+
 .sidebar {
 	position: relative;
 	z-index: 998;
@@ -177,7 +179,6 @@ $sidebar-padding: 12px;
 				.search-icon {
 					top: 0;
 					right: 0;
-					opacity: 1;
 					transform: scale(1);
 				}
 			}
@@ -234,7 +235,7 @@ $sidebar-padding: 12px;
 	.button-toggle {
 		width: 24px;
 		height: 24px;
-		background: url(../img/icon-sprite.svg) no-repeat -540px -592px;
+		background: url(../img/icon-sprite.svg) no-repeat $sidebar-toggle-bg-position;
 		border: none;
 		border-radius: 0;
 		text-indent: -9999px;

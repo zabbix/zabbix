@@ -19,16 +19,52 @@ $disabled-bg-color: #2b2b2b;
 $disabled-item-color: #808080;
 $disabled-item-bg-color: #383838;
 
+// Layout
+$header-bg-color: #2b2b2b;
+$sidebar-bg-color: #454545;
+
+$scrollbar-track-color: rgba(#acbbc2, .55);
+$scrollbar-thumb-color: rgba(#878787, .85);
+$scrollbar-thumb-color-darken: 5%;
+
+$sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
+$sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
+
+$sidebar-toggle-bg-position: -570px -592px;
+
 // Main
-$main-nav-bg-color: #2b2b2b;
-$main-subnav-bg-color: #454545;
-$main-subnav-bg-selected-color: #2e2e2e;
-$main-color: #2d3135;
 $font-color: #f2f2f2;
 $font-selected-color: #f2f2f2;
 $font-alt-color: #737373;
 $body-bg-color: #0e1012;
 $overlay-bg-color: #000000;
+
+// Main menu
+$menu-main-color: #ffffff;
+$menu-main-hover-bg-color: #0e0e0e;
+$menu-main-selected-bg-color: #222222;
+$menu-main-selected-border-color: #c5c5c5;
+
+$menu-main-submenu-bg-color: #2b2b2b;
+$menu-main-submenu-border-color: #0d0f11;
+$menu-main-submenu-hover-bg-color: #0e0e0e;
+$menu-main-submenu-selected-bg-color: #1c1c1c;
+$menu-main-submenu-selected-border-color: #c5c5c5;
+
+$menu-main-icons-opacity: .75;
+
+$menu-main-arrow-bg-position: -606px -434px;
+$menu-main-arrow-hover-bg-position: -606px -434px;
+
+$menu-main-icons: (
+		dashboard: -570px -664px,
+		problems: -570px -688px,
+		monitoring: -570px -712px,
+		inventory: -570px -736px,
+		reports: -570px -760px,
+		configuration: -570px -784px,
+		administration: -570px -808px
+);
 
 // UI
 $ui-bg-color: #2b2b2b;
@@ -60,6 +96,9 @@ $form-disabled-border-color: #3d3d3d;
 
 $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #383838;
+
+$form-search-bg-color: #191919;
+$form-search-icon-bg-position: -570px -616px;
 
 // Error messages
 $msg-bad-color: darken(desaturate($red, 10%), 20%);

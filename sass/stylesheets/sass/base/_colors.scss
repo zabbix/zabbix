@@ -36,6 +36,11 @@ $teal: #0f998b;
 // Layout
 $header-bg-color: #ffffff !default;
 $sidebar-bg-color: #0a466a !default;
+
+$scrollbar-track-color: rgba(#acbbc2, .55) !default;
+$scrollbar-thumb-color: rgba(#878787, .85) !default;
+$scrollbar-thumb-color-darken: 5% !default;
+
 $sidebar-scrollbar-track-color: rgba(#87d1ff, .55) !default;
 $sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85) !default;
 
@@ -45,10 +50,6 @@ $font-selected-color: #ffffff !default;
 $font-alt-color: #768d99 !default;
 $body-bg-color: #ebeef0 !default;
 $overlay-bg-color: #ffffff !default;
-
-$scrollbar-track-color: rgba(#acbbc2, .55) !default;
-$scrollbar-thumb-color: rgba(#878787, .85) !default;
-$scrollbar-thumb-color-darken: 5% !default;
 
 // Main menu
 $menu-main-color: #ebeef0 !default;
@@ -63,12 +64,12 @@ $menu-main-submenu-bg-color: #0e354d !default;
 $menu-main-submenu-border-color: #051620 !default;
 $menu-main-submenu-hover-bg-color: #092637 !default;
 $menu-main-submenu-selected-color: #ffffff !default;
-$menu-main-submenu-selected-bg-color: #0e354d !default;
+$menu-main-submenu-selected-bg-color: #0b2d42 !default;
 $menu-main-submenu-selected-border-color: #87d1ff !default;
 
 $menu-user-color: #cedae1 !default;
 $menu-user-hover-color: #ffffff !default;
-$menu-user-disabled-color: #768d99 !default;
+$menu-user-disabled-color: $disabled-item-color !default;
 
 // UI
 $ui-bg-color: #ffffff !default;
