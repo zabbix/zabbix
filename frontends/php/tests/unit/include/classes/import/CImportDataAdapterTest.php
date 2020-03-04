@@ -19,7 +19,7 @@
 **/
 
 
-class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
+class CImportDataAdapterTest extends PHPUnit\Framework\TestCase {
 
 	/**
 	 * Cached XMl sources
@@ -195,11 +195,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					[
 						'macro' => '{$MACRO}',
 						'value' => '2',
+						'type' => '0',
 						'description' => ''
 					],
 					[
 						'macro' => '{$SNMP_COMMUNITY}',
 						'value' => '1',
+						'type' => '0',
 						'description' => ''
 					]
 				],
@@ -289,11 +291,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					[
 						'macro' => '{$MACRO}',
 						'value' => '2',
+						'type' => '0',
 						'description' => ''
 					],
 					[
 						'macro' => '{$SNMP_COMMUNITY}',
 						'value' => '1',
+						'type' => '0',
 						'description' => ''
 					]
 				],
@@ -2186,11 +2190,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						[
 							'value' => '21',
 							'macro' => '{$PORT.FTP}',
+							'type' => '0',
 							'description' => ''
 						],
 						[
 							'value' => '22',
 							'macro' => '{$PORT.SSH}',
+							'type' => '0',
 							'description' => ''
 						]
 					],
@@ -2722,6 +2728,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						[
 							'value' => '23',
 							'macro' => '{#VALUE}',
+							'type' => '0',
 							'description' => ''
 						]
 					],
