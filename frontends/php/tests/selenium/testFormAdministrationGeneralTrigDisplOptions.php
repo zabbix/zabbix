@@ -300,7 +300,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestClick('resetDefaults');
-		$this->zbxTestClickXpath("//div[@id='overlay_dialogue']//button[text()='Reset defaults']");
+		$this->zbxTestClickXpath("//div[contains(@class, 'overlay-dialogue modal')]//button[text()='Reset defaults']");
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'Trigger displaying options']);
 

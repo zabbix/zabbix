@@ -149,7 +149,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$script_inline .=
 				'var widget = jQuery(".dashbrd-grid-container")'.
 						'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
-				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.CJs::encodeJson($graph_options).', widget[0]);';
+				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.json_encode($graph_options).', widget[0]);';
 		}
 
 		if ($initial_load) {

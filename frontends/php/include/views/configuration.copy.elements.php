@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle($data['title']);
 
 // append host summary to widget header
@@ -79,4 +83,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.copy.elements.js.php';
 
-return $widget;
+$widget->show();

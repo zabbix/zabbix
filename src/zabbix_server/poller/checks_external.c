@@ -40,7 +40,7 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  * Author: Mike Nestor, rewritten by Alexander Vladishev                      *
  *                                                                            *
  ******************************************************************************/
-int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	char		error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;

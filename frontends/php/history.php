@@ -27,9 +27,7 @@ $page['file'] = 'history.php';
 $page['title'] = _('History');
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
+$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 if (hasRequest('plaintext')) {
 	define('ZBX_PAGE_NO_MENU', true);
@@ -115,7 +113,7 @@ $data = [
 	'active_tab' => CProfile::get('web.item.graph.filter.active', 1)
 ];
 
-if ($data['action'] != HISTORY_BATCH_GRAPH && is_array($itemids)) {
+if ($data['action'] != HISTORY_BATCH_GRAPH && $itemids) {
 	$data['profileIdx2'] = reset($itemids);
 }
 
@@ -127,8 +125,6 @@ updateTimeSelectorPeriod([
 ]);
 
 // render view
-$historyView = new CView('monitoring.history', $data);
-$historyView->render();
-$historyView->show();
+echo (new CView('monitoring.history', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

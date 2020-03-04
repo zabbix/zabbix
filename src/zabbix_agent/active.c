@@ -598,7 +598,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 	else if (NULL != CONFIG_HOST_METADATA_ITEM)
 	{
-		process_config_item(&json,CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA);
+		process_config_item(&json, CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA);
 	}
 
 	if (NULL != CONFIG_HOST_INTERFACE)
@@ -607,7 +607,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 	else if (NULL != CONFIG_HOST_INTERFACE_ITEM)
 	{
-		process_config_item(&json,CONFIG_HOST_INTERFACE_ITEM, HOST_INTERFACE_LEN, ZBX_PROTO_TAG_INTERFACE);
+		process_config_item(&json, CONFIG_HOST_INTERFACE_ITEM, HOST_INTERFACE_LEN, ZBX_PROTO_TAG_INTERFACE);
 	}
 
 	if (NULL != CONFIG_LISTEN_IP)
@@ -632,7 +632,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 			tls_arg1 = NULL;
 			tls_arg2 = NULL;
 			break;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		case ZBX_TCP_SEC_TLS_CERT:
 			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
 			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
@@ -827,7 +827,7 @@ static int	send_buffer(const char *host, unsigned short port)
 			tls_arg1 = NULL;
 			tls_arg2 = NULL;
 			break;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		case ZBX_TCP_SEC_TLS_CERT:
 			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
 			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
@@ -1303,7 +1303,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	session_token = zbx_create_token(0);
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
 	init_active_metrics();

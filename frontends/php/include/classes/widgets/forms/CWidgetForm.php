@@ -31,7 +31,7 @@ class CWidgetForm {
 	protected $data;
 
 	public function __construct($data, $type) {
-		$this->data = CJs::decodeJson($data);
+		$this->data = json_decode($data, true);
 
 		$this->fields = [];
 

@@ -19,7 +19,11 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.image.edit.js.php');
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('administration.image.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Images'))

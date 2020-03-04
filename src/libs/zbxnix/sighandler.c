@@ -40,7 +40,7 @@ static void	log_fatal_signal(int sig, siginfo_t *siginfo, void *context)
 
 static void	exit_with_failure(void)
 {
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free_on_signal();
 #endif
 	_exit(EXIT_FAILURE);
@@ -131,7 +131,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					SIG_CHECKED_FIELD(siginfo, si_uid),
 					SIG_CHECKED_FIELD(siginfo, si_code));
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			zbx_tls_free_on_signal();
 #endif
 			zbx_on_exit(SUCCEED);
@@ -159,7 +159,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
 				SIG_CHECKED_FIELD(siginfo, si_pid), SIG_CHECKED_FIELD(siginfo, si_status));
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_free_on_signal();
 #endif
 		zbx_on_exit(FAIL);

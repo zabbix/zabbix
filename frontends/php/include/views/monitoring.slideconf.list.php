@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Slide shows'))
 	->setTitleSubmenu([
@@ -106,4 +110,4 @@ $form->addItem([
 // append form to widget
 $widget->addItem($form);
 
-return $widget;
+$widget->show();

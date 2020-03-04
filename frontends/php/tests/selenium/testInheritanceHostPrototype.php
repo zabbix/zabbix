@@ -324,7 +324,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			foreach ($data['groups'] as $group) {
 				$this->zbxTestClickButtonMultiselect('group_links_');
 				$this->zbxTestLaunchOverlayDialog('Host groups');
-				$this->zbxTestClickXpath('//div[@id="overlay_dialogue"]//a[text()="'.$group.'"]');
+				$this->zbxTestClickXpath('//div[contains(@class, "overlay-dialogue modal")]//a[text()="'.$group.'"]');
 			}
 		}
 
