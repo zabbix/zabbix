@@ -313,7 +313,7 @@ class CHostInterface extends CApiService {
 					$interface['type'] = INTERFACE_TYPE_UNKNOWN;
 				}
 				elseif (!isset($interface['type'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 				}
 			}
 
@@ -386,7 +386,7 @@ class CHostInterface extends CApiService {
 			}
 
 			if (!array_key_exists('details', $interface)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			$this->checkSnmpVersion($interface);
@@ -447,7 +447,7 @@ class CHostInterface extends CApiService {
 	protected function createSnmpInterfaceDetails(array $interfaces) {
 		if (count($interfaces)) {
 			if (count(array_column($interfaces, 'interfaceid')) != count($interfaces)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			$interfaces = $this->sanitizeSnmpFields($interfaces);
@@ -1007,7 +1007,7 @@ class CHostInterface extends CApiService {
 	protected function checkSnmpVersion(array $interface) {
 		if (!array_key_exists('version', $interface['details'])
 				|| !in_array($interface['details']['version'], [SNMP_V1, SNMP_V2C, SNMP_V3])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 	}
 
@@ -1022,7 +1022,7 @@ class CHostInterface extends CApiService {
 		if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
 				&& (!array_key_exists('community', $interface['details'])
 					|| $interface['details']['community'] === '')) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 	}
 
@@ -1058,7 +1058,7 @@ class CHostInterface extends CApiService {
 		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('securitylevel', $interface['details'])
 					&& !in_array($interface['details']['securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 	}
 
@@ -1076,7 +1076,7 @@ class CHostInterface extends CApiService {
 		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('authprotocol', $interface['details'])
 					&& !in_array($interface['details']['authprotocol'], [ITEM_AUTHPROTOCOL_MD5,
 						ITEM_AUTHPROTOCOL_SHA]))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 	}
 
@@ -1093,7 +1093,7 @@ class CHostInterface extends CApiService {
 	protected function checkSnmpPrivProtocol(array $interface) {
 		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('privprotocol', $interface['details'])
 				&& !in_array($interface['details']['privprotocol'], [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES]))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to method.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to function.'));
 		}
 	}
 
