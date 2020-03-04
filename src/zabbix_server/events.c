@@ -222,6 +222,8 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
+		unsigned char		old_macro_env;
+
 		if (TRIGGER_VALUE_PROBLEM == value)
 			event->severity = trigger_priority;
 
@@ -236,6 +238,12 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 		event->trigger.value = trigger_value;
 		event->trigger.opdata = zbx_strdup(NULL, trigger_opdata);
 		event->name = zbx_strdup(NULL, trigger_description);
+
+		/* Event name and tags are easily accessible in frontend, so non-secure */
+		/* macro environment is set to expand secret user macros into ******.   */
+		/* Note that this can mess up trigger/global correlation, so using      */
+		/* secret macros in tags is not recommended.                            */
+		old_macro_env = zbx_dc_set_macro_env(ZBX_MACRO_ENV_NONSECURE);
 
 		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&event->trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
@@ -261,6 +269,7 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 		}
 
 		zbx_vector_ptr_destroy(&item_tags);
+		zbx_dc_set_macro_env(old_macro_env);
 	}
 	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
 		event->name = zbx_strdup(NULL, error);
