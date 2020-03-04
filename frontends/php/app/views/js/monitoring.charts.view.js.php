@@ -45,11 +45,16 @@
 			);
 
 		/**
+		 * @var {number}  App will only show loading indicator, if loading takes more than DELAY_LOADING seconds.
+		 */
+		Chart.DELAY_LOADING = 3;
+
+		/**
 		 * Represents chart, it can be refreshed.
 		 *
-		 * @param {object} chart  Chart object prepared in server.
+		 * @param {object} chart     Chart object prepared in server.
 		 * @param {object} timeline  Timeselector data.
-		 * @param {jQuery} $tmpl  Template object to be used for new chart $el.
+		 * @param {jQuery} $tmpl     Template object to be used for new chart $el.
 		 */
 		function Chart(chart, timeline, $tmpl) {
 			this.$el = $tmpl.clone();
@@ -68,15 +73,14 @@
 			this.curl.setArgument('graphid', chart.chartid);
 
 			this.use_sbox = !!chart.sbox;
-			this.refresh_interval = 0;
 		}
 
 		/**
-		 * Set loading state for chart.
+		 * Set visual indicator of "loading state".
 		 *
 		 * @param {number} delay_loading  (optional) Add loader only when request exceeds this many seconds.
 		 *
-		 * @return {function}
+		 * @return {function}  Function that would cancel scheduled indicator or remove existing.
 		 */
 		Chart.prototype.setLoading = function(delay_loading) {
 			delay_loading = delay_loading || 0;
@@ -92,7 +96,7 @@
 		};
 
 		/**
-		 * Unset loading state.
+		 * Remove visual indicator of "loading state".
 		 */
 		Chart.prototype.unsetLoading = function() {
 			this.$img.parent().removeClass('is-loading');
@@ -129,7 +133,7 @@
 		/**
 		 * Update chart.
 		 *
-		 * @param {number} delay_loading  (optional) Add loader only when request exceeds this many seconds.
+		 * @param {number} delay_loading  (optional) Add "loading indicator" only when request exceeds delay.
 		 *
 		 * @return {Promise}
 		 */
@@ -137,23 +141,20 @@
 			this.curl.setArgument('from', this.timeline.from);
 			this.curl.setArgument('to', this.timeline.to);
 			this.curl.setArgument('height', this.dimensions.graphHeight);
-			var width = document.body.clientWidth - (this.dimensions.shiftXright + this.dimensions.shiftXleft + 23);
+			const width = document.body.clientWidth - (this.dimensions.shiftXright + this.dimensions.shiftXleft + 23);
 			this.curl.setArgument('width', Math.max(1000, width));
 			this.curl.setArgument('profileIdx', 'web.charts.filter');
 			this.curl.setArgument('_', (+new Date).toString(34));
 
-			var unsetLoading = this.setLoading(delay_loading);
+			const unsetLoading = this.setLoading(delay_loading);
 
-			var promise = new Promise(function(resolve, reject) {
-				this.$img.one('error', reject.bind(this));
-				this.$img.one('load', resolve.bind(this));
-			}.bind(this));
+			var promise = new Promise((resolve, reject) => {
+				this.$img.one('error', e => reject(this));
+				this.$img.one('load', e => resolve(this));
+			});
 
-			promise.finally(unsetLoading.bind(this));
-
-			promise.then(function() {
-				this.refreshSbox();
-			}.bind(this));
+			promise.finally(unsetLoading);
+			promise.then(_ => this.refreshSbox());
 
 			this.$img.attr('src', this.curl.getUrl());
 
@@ -161,7 +162,26 @@
 		};
 
 		/**
-		 * @param {jQuery} $el  A container where charts are maintained.
+		 * @param {number} seconds  Seconds to wait before reschedule. Zero seconds will pause schedule.
+		 * @param {number} delay_loading  (optional) Add "loading indicator" only when request exceeds delay.
+		 */
+		Chart.prototype.scheduleRefresh = function(seconds, delay_loading) {
+			if (this._timeoutid) {
+				clearTimeout(this._timeoutid);
+			}
+
+			if (!seconds) {
+				return;
+			}
+
+			this.refresh(delay_loading)
+				.finally(_ => {
+					this._timeoutid = setTimeout(_ => this.scheduleRefresh(seconds), seconds * 1000);
+				});
+		}
+
+		/**
+		 * @param {jQuery} $el       A container where charts are maintained.
 		 * @param {object} timeline  Timecontrol object.
 		 * @param {object} config
 		 */
@@ -180,21 +200,51 @@
 		/**
 		 * Update currently listed charts.
 		 *
-		 * @param {number} delay_loading  (optional) Add loader only when request exceeds this many seconds.
+		 * @return {Promise}  Resolves once all charts are refreshed.
 		 */
-		ChartList.prototype.updateCharts = function(delay_loading) {
-			this.charts.forEach(function(chart) {
+		ChartList.prototype.updateCharts = function() {
+			const updates = [];
+
+			for (const chart of this.charts) {
 				chart.timeline = this.timeline;
-				chart.refresh(delay_loading);
-			}.bind(this));
+
+				const update = chart.refresh()
+					.catch(e => chart.setLoading());
+
+				updates.push(update);
+			}
+
+			return Promise.all(updates);
 		};
 
 		/**
-		 * Update list, then update listed charts.
+		 * Fetches, then sets new list, then updates each chart.
 		 *
-		 * @param {number} delay_loading  (optional) Add loader only when request exceeds this many seconds.
+		 * @param {number} delay_loading  (optional) Add "loading indicator" only when request exceeds delay.
+		 *
+		 * @return {Promise}  Resolves once list is fetched and each of new charts is fetched.
 		 */
-		ChartList.prototype.updateList = function(delay_loading) {
+		ChartList.prototype.updateListAndCharts = function(delay_loading) {
+			return this.fetchList()
+				.then(list => {
+					this.setCharts(list);
+					return this.charts;
+				})
+				.then(new_charts => {
+					const loading_charts = [];
+					for (const chart of new_charts) {
+						loading_charts.push(chart.refresh(delay_loading));
+					}
+					return Promise.all(loading_charts)
+				});
+		}
+
+		/**
+		 * Fetches new list of charts.
+		 *
+		 * @return {Promise}
+		 */
+		ChartList.prototype.fetchList = function() {
 			// Timeselector.
 			this.curl.setArgument('from', this.timeline.from);
 			this.curl.setArgument('to', this.timeline.to);
@@ -203,35 +253,41 @@
 			this.curl.setArgument('filter_hostids', this.config.filter_hostids);
 			this.curl.setArgument('filter_graph_patterns', this.config.filter_graph_patterns);
 
-			$.getJSON(this.curl.getUrl())
-				.then(function(resp) {
-						this.timeline = resp.timeline;
-						this.setCharts(resp.charts);
-						this.updateCharts(delay_loading);
-					}.bind(this))
-				.catch(console.error);
+			return fetch(this.curl.getUrl())
+				.then(resp => resp.json())
+				.then(resp_obj => {
+					this.timeline = resp_obj.timeline;
+					return resp_obj.charts;
+				});
 		};
 
 		/**
-		 * Clears refresh interval.
+		 * Update app state according with configuration. Either update individual chart item schedulers or refetch
+		 * list and update list scheduler.
+		 *
+		 * @param {number} delay_loading  (optional) Add "loading indicator" only when request exceeds delay.
 		 */
-		ChartList.prototype.stopRefreshInterval = function() {
-			if (this._refreshid) {
-				clearInterval(this._refreshid);
-			}
-		};
+		ChartList.prototype.refresh = function(delay_loading) {
+			const {refresh_interval, refresh_list} = this.config;
 
-		/**
-		 * Starts refresh interval according with page refresh config (no initial refresh).
-		 */
-		ChartList.prototype.startRefreshInterval = function() {
-			this.stopRefreshInterval();
-
-			if (this.config.refresh_list && this.config.refresh_interval) {
-				this._refreshid = setInterval(this.updateList.bind(this, 3), this.config.refresh_interval * 1000);
+			if (this._timeoutid) {
+				clearTimeout(this._timeoutid);
 			}
-			else if (this.config.refresh_interval) {
-				this._refreshid = setInterval(this.updateCharts.bind(this, 3), this.config.refresh_interval * 1000);
+
+			if (refresh_list) {
+				for (const chart of this.charts) {
+					chart.scheduleRefresh(0);
+				}
+
+				this.updateListAndCharts(delay_loading)
+					.finally(_ => {
+						this._timeoutid = setTimeout(_ => this.refresh(Chart.DELAY_LOADING), refresh_interval * 1000);
+					});
+			}
+			else {
+				for (const chart of this.charts) {
+					chart.scheduleRefresh(refresh_interval, delay_loading);
+				}
 			}
 		};
 
@@ -276,7 +332,7 @@
 			}
 
 			if (this._prev_width != width) {
-				this._resize_timeoutid = setTimeout(this.updateCharts.bind(this), 500);
+				this._resize_timeoutid = setTimeout(_ => this.updateCharts(), 500);
 			}
 
 			this._prev_width = width;
@@ -286,9 +342,8 @@
 
 		window.addEventListener('resize', app.onWindowResize.bind(app));
 
-		app.startRefreshInterval();
 		app.setCharts(data.charts);
-		app.updateCharts();
+		app.refresh();
 
 		$.subscribe('timeselector.rangeupdate', function(e, data) {
 			app.timeline = data;
