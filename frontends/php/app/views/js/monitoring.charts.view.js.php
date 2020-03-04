@@ -148,13 +148,13 @@
 
 			const unsetLoading = this.setLoading(delay_loading);
 
-			var promise = new Promise((resolve, reject) => {
-				this.$img.one('error', e => reject(this));
-				this.$img.one('load', e => resolve(this));
-			});
-
-			promise.finally(unsetLoading);
-			promise.then(_ => this.refreshSbox());
+			const promise = new Promise((resolve, reject) => {
+					this.$img.one('error', e => reject());
+					this.$img.one('load', e => resolve());
+				})
+				.catch(_ => this.setLoading())
+				.finally(unsetLoading)
+				.then(_ => this.refreshSbox());
 
 			this.$img.attr('src', this.curl.getUrl());
 
@@ -207,11 +207,7 @@
 
 			for (const chart of this.charts) {
 				chart.timeline = this.timeline;
-
-				const update = chart.refresh()
-					.catch(e => chart.setLoading());
-
-				updates.push(update);
+				updates.push(chart.refresh());
 			}
 
 			return Promise.all(updates);
@@ -262,7 +258,7 @@
 		};
 
 		/**
-		 * Update app state according with configuration. Either update individual chart item schedulers or refetch
+		 * Update app state according with configuration. Either update individual chart item schedulers or re-fetch
 		 * list and update list scheduler.
 		 *
 		 * @param {number} delay_loading  (optional) Add "loading indicator" only when request exceeds delay.
@@ -281,12 +277,27 @@
 
 				this.updateListAndCharts(delay_loading)
 					.finally(_ => {
-						this._timeoutid = setTimeout(_ => this.refresh(Chart.DELAY_LOADING), refresh_interval * 1000);
+						if (refresh_interval) {
+							this._timeoutid = setTimeout(_ => this.refresh(Chart.DELAY_LOADING),
+								refresh_interval * 1000
+							);
+						}
+					})
+					.catch(_ => {
+						for (const chart of this.charts) {
+							chart.setLoading();
+						}
 					});
 			}
 			else {
 				for (const chart of this.charts) {
-					chart.scheduleRefresh(refresh_interval, delay_loading);
+					if (refresh_interval) {
+						chart.scheduleRefresh(refresh_interval, delay_loading);
+					}
+					else {
+						chart.scheduleRefresh(0);
+						chart.refresh(delay_loading);
+					}
 				}
 			}
 		};
