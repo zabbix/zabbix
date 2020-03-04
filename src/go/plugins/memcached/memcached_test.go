@@ -22,12 +22,9 @@ package memcached
 import (
 	"reflect"
 	"testing"
+
 	"zabbix.com/pkg/plugin"
 )
-
-func TestRedis(t *testing.T) {
-	return
-}
 
 func TestPlugin_Export(t *testing.T) {
 	type args struct {
@@ -37,6 +34,7 @@ func TestPlugin_Export(t *testing.T) {
 	}
 
 	impl.Configure(&plugin.GlobalOptions{}, nil)
+	impl.Start()
 
 	tests := []struct {
 		name       string
@@ -79,4 +77,6 @@ func TestPlugin_Export(t *testing.T) {
 			}
 		})
 	}
+
+	impl.Stop()
 }

@@ -29,7 +29,7 @@ func (p *Plugin) statsHandler(conn MCClient, params []string) (interface{}, erro
 	statsType := ""
 
 	if len(params) > 1 {
-		switch params[1] {
+		switch strings.ToLower(params[1]) {
 		case "items":
 			fallthrough
 		case "sizes":

@@ -40,6 +40,20 @@ type MCConn struct {
 	lastTimeAccess time.Time
 }
 
+// stubConn for testing
+type stubConn struct {
+	NoOpFunc  func() error
+	StatsFunc func(key string) (mc.McStats, error)
+}
+
+func (c *stubConn) Stats(key string) (mc.McStats, error) {
+	return c.StatsFunc(key)
+}
+
+func (c *stubConn) NoOp() error {
+	return c.NoOpFunc()
+}
+
 // Stats wraps the mc.Client.StatsWithKey function.
 func (conn *MCConn) Stats(key string) (stats mc.McStats, err error) {
 	res, err := conn.client.StatsWithKey(key)

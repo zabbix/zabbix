@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/alimy/mc/v2 v2.0.3
+	github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/mediocregopher/radix/v3 v3.4.2

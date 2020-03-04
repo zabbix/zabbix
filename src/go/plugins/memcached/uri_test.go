@@ -79,8 +79,8 @@ func TestURI_Addr(t *testing.T) {
 		},
 		{
 			"Should return socket from URI structure",
-			fields{socket: "unix:///var/run/redis.sock"},
-			"unix:///var/run/redis.sock",
+			fields{socket: "unix:///var/run/memcached.sock"},
+			"unix:///var/run/memcached.sock",
 		},
 	}
 	for _, tt := range tests {
@@ -269,8 +269,8 @@ func Test_parseURI(t *testing.T) {
 		},
 		{
 			"Parse URI with unix scheme",
-			args{"unix:///var/run/redis.sock"},
-			URI{scheme: "unix", socket: "/var/run/redis.sock"},
+			args{"unix:///var/run/memcached.sock"},
+			URI{scheme: "unix", socket: "/var/run/memcached.sock"},
 			false,
 		},
 		{
@@ -345,7 +345,7 @@ func Test_isLooksLikeURI(t *testing.T) {
 		},
 		{
 			"Should return true if it is URI with unix scheme",
-			args{"unix:/var/run/redis.sock"},
+			args{"unix:/var/run/memcached.sock"},
 			true,
 		},
 		{
