@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-04T12:27:42Z</date>
+    <date>2020-03-04T12:41:21Z</date>
     <media_types>
         <media_type>
             <name>Jira</name>
@@ -76,9 +76,6 @@
                     <value>{TRIGGER.DESCRIPTION}</value>
                 </parameter>
             </parameters>
-            <status>DISABLED</status>
-            <attempts>1</attempts>
-            <attempt_interval>5s</attempt_interval>
             <script>var Base64={_keyStr:&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&quot;,encode:function(r){var t,e,a,o,h,n,C,c=&quot;&quot;,i=0;for(r=Base64._utf8_encode(r);i&lt;r.length;)o=(t=r.charCodeAt(i++))&gt;&gt;2,h=(3&amp;t)&lt;&lt;4|(e=r.charCodeAt(i++))&gt;&gt;4,n=(15&amp;e)&lt;&lt;2|(a=r.charCodeAt(i++))&gt;&gt;6,C=63&amp;a,isNaN(e)?(n=64,C=64):isNaN(a)&amp;&amp;(C=64),c=c+this._keyStr.charAt(o)+this._keyStr.charAt(h)+this._keyStr.charAt(n)+this._keyStr.charAt(C);return c},_utf8_encode:function(r){r=r.replace(/\r\n/g,&quot;\n&quot;);for(var t=&quot;&quot;,e=0;e&lt;r.length;e++){var a=r.charCodeAt(e);a&lt;128?t+=String.fromCharCode(a):a&gt;127&amp;&amp;a&lt;2048?(t+=String.fromCharCode(a&gt;&gt;6|192),t+=String.fromCharCode(63&amp;a|128)):(t+=String.fromCharCode(a&gt;&gt;12|224),t+=String.fromCharCode(a&gt;&gt;6&amp;63|128),t+=String.fromCharCode(63&amp;a|128))}return t}};function btoa(s){return Base64.encode(s);}&#13;
 // All the code above this line should be removed after ZBXNEXT-5734 is done.&#13;
 &#13;
