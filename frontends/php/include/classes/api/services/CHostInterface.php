@@ -1052,7 +1052,7 @@ class CHostInterface extends CApiService {
 	 * @param array $interface['details']['version']        SNMP version
 	 * @param array $interface['details']['securitylevel']  SNMP security level
 	 *
-	 * @throws APIException if "secuirtylevel" value is incorrect.
+	 * @throws APIException if "securitylevel" value is incorrect.
 	 */
 	protected function checkSnmpSecurityLevel(array $interface) {
 		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('securitylevel', $interface['details'])
