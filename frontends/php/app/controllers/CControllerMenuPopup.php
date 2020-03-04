@@ -162,6 +162,7 @@ class CControllerMenuPopup extends CController {
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
 					$menu_data['severity_min'] = $data['severity_min'];
+					$menu_data['severity_max'] = TRIGGER_SEVERITY_COUNT - 1;
 				}
 				if (array_key_exists('show_suppressed', $data)) {
 					$menu_data['show_suppressed'] = $data['show_suppressed'];
@@ -395,6 +396,7 @@ class CControllerMenuPopup extends CController {
 						];
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severity_min'] = $data['severity_min'];
+							$menu_data['severity_max'] = TRIGGER_SEVERITY_COUNT - 1;
 						}
 						if ($db_map['show_suppressed']) {
 							$menu_data['show_suppressed'] = true;
@@ -432,6 +434,7 @@ class CControllerMenuPopup extends CController {
 						];
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severity_min'] = $data['severity_min'];
+							$menu_data['severity_max'] = TRIGGER_SEVERITY_COUNT - 1;
 						}
 						if ($db_map['show_suppressed']) {
 							$menu_data['show_suppressed'] = true;

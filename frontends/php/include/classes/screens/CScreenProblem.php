@@ -159,7 +159,6 @@ class CScreenProblem extends CScreenBase {
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
 	 * @param int    $filter['age']                   (optional) usable together with 'age_state' and only for
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
-	 * @param int    $filter['severity']              (optional)
 	 * @param array  $filter['severities']            (optional)
 	 * @param int    $filter['unacknowledged']        (optional)
 	 * @param array  $filter['tags']                  (optional)
@@ -277,13 +276,6 @@ class CScreenProblem extends CScreenBase {
 						&& $filter['age_state'] == 1) {
 					$options['time_from'] = time() - $filter['age'] * SEC_PER_DAY + 1;
 				}
-			}
-			if (array_key_exists('severity', $filter) && $filter['severity']) {
-				$options['severities'] = $filter['severity'];
-			}
-			else {
-				$filter['severity'] = null;
-				$options['severities'] = range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
 			}
 			if (array_key_exists('severities', $filter)) {
 				$filter_severities = implode(',', $filter['severities']);
