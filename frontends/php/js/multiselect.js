@@ -89,18 +89,18 @@ jQuery(function($) {
 		/**
 		 * Insert outside data
 		 *
-		 * @param object    Multiselect value object.
-		 * @param bool      (optional) Either to trigger element on-change event once data added. True by default.
+		 * @param {array} items           Multiselect value object.
+		 * @param {bool}  trigger_change  (optional) Either to trigger element on-change event once data added. True by default.
 		 *
 		 * @return jQuery
 		 */
-		addData: function(items, triggerChange) {
+		addData: function(items, trigger_change) {
 			return this.each(function() {
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
 
-				if (typeof triggerChange !== 'boolean') {
-					triggerChange = true;
+				if (typeof trigger_change !== 'boolean') {
+					trigger_change = true;
 				}
 
 				if (ms.options.selectedLimit == 1) {
@@ -113,7 +113,7 @@ jQuery(function($) {
 					addSelected($obj, items[i]);
 				}
 
-				triggerChange && $obj.trigger('change', ms);
+				trigger_change && $obj.trigger('change', ms);
 			});
 		},
 
