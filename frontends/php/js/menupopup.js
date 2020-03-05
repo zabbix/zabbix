@@ -149,7 +149,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_hostids[]', options.hostid);
 			if (typeof options.severity_min !== 'undefined') {
-				url.setArgument('filter_severities[]', getSeverities(options.severity_min, options.severity_max));
+				url.setArgument('filter_severities[]', options.severities);
 			}
 			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 				url.setArgument('filter_show_suppressed', '1');
@@ -272,7 +272,7 @@ function getMenuPopupMapElementGroup(options) {
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_groupids[]', options.groupid);
 	if (typeof options.severity_min !== 'undefined') {
-		problems_url.setArgument('filter_severities[]', getSeverities(options.severity_min, options.severity_max));
+		problems_url.setArgument('filter_severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('filter_show_suppressed', '1');
@@ -320,7 +320,7 @@ function getMenuPopupMapElementTrigger(options) {
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_triggerids[]', options.triggerids);
 	if (typeof options.severity_min !== 'undefined') {
-		problems_url.setArgument('filter_severities[]', getSeverities(options.severity_min, options.severity_max));
+		problems_url.setArgument('filter_severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('filter_show_suppressed', '1');
@@ -344,24 +344,6 @@ function getMenuPopupMapElementTrigger(options) {
 	}
 
 	return sections;
-}
-
-/**
- * Generate severities array.
- *
- * @param {int} from
- * @param {int} to
- *
- * @return array
- */
-function getSeverities(from, to) {
-	var severities = [];
-
-	for (i = from; i <= to; i++) {
-		severities.push(i);
-	}
-
-	return severities;
 }
 
 /**

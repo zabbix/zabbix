@@ -96,4 +96,19 @@ class CSeverity extends CRadioButtonList {
 
 		return $severities;
 	}
+
+	/**
+	 * Generate array with severity values from minimal.
+	 *
+	 * @param int $min Minimal severity.
+	 *
+	 * @return array
+	 */
+	public static function getSeverityRange($min = TRIGGER_SEVERITY_NOT_CLASSIFIED) {
+		return array_values(array_filter(array_column(self::getSeverities(), 'value'),
+			function($value) use ($min) {
+				return $value >= $min;
+			}
+		));
+	}
 }
