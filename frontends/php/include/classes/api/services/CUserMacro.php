@@ -301,6 +301,11 @@ class CUserMacro extends CApiService {
 				}
 			}
 
+			if (array_key_exists('type', $globalmacro) && $globalmacro['type'] != $db_globalmacro['type']
+					&& $db_globalmacro['type'] = ZBX_MACRO_TYPE_SECRET) {
+				$upd_globalmacro += ['value' => ''];
+			}
+
 			if ($upd_globalmacro) {
 				$upd_globalmacros[] = [
 					'values'=> $upd_globalmacro,
@@ -575,10 +580,21 @@ class CUserMacro extends CApiService {
 		$hostmacros = zbx_toArray($hostmacros);
 
 		$this->validateUpdate($hostmacros);
-
+		$db_macros = DB::select('hostmacro', [
+			'output' => ['hostmacroid', 'type'],
+			'filter' => ['hostmacroid' => array_column($hostmacros, 'hostmacroid')],
+			'preservekeys' => true
+		]);
 		$data = [];
 
 		foreach ($hostmacros as $macro) {
+			$db_macro = $db_macros[$macro['hostmacroid']];
+
+			if (array_key_exists('type', $macro) && $macro['type'] != $db_macro['type']
+					&& $db_macro['type'] = ZBX_MACRO_TYPE_SECRET) {
+				$macro += ['value' => ''];
+			}
+
 			$hostmacroid = $macro['hostmacroid'];
 			unset($macro['hostmacroid']);
 
@@ -590,7 +606,7 @@ class CUserMacro extends CApiService {
 
 		DB::update('hostmacro', $data);
 
-		return ['hostmacroids' => zbx_objectValues($hostmacros, 'hostmacroid')];
+		return ['hostmacroids' => array_column($hostmacros, 'hostmacroid')];
 	}
 
 	/**
