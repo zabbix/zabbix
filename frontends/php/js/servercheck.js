@@ -106,9 +106,10 @@ jQuery(function($) {
 		},
 
 		updateWidth: function() {
+			let $wrapper = $('.wrapper');
 			this.$elem.css({
-				left: ($('.sidebar').width() || 0) + 10,
-				width: ($('.wrapper').width() || 0) - 20
+				left: $wrapper.offset().left + 10,
+				width: $wrapper.width() - 20
 			});
 		}
 	};
