@@ -4936,7 +4936,6 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *unknown_msgs)
 {
 	DC_ITEM			*items = NULL;
-	//char			value[MAX_BUFFER_LEN], *error = NULL;
 	char		        *error = NULL;
 	int			i;
 	zbx_func_t		*func;
@@ -5060,6 +5059,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 
 	zbx_free(errcodes);
 	zbx_free(items);
+	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -5185,7 +5185,7 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  *                                                                            *
  * Purpose: substitute expression functions with their values                 *
  *                                                                            *
- * Parameters: triggers - [IN] vector of DC_TRIGGGER pointers, sorted by      *
+ * Parameters: triggers - [IN] vector of DC_TRIGGER pointers, sorted by      *
  *                             triggerids                                     *
  *             unknown_msgs - vector for storing messages for NOTSUPPORTED    *
  *                            items and failed functions                      *

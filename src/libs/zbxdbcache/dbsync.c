@@ -80,7 +80,7 @@ static void	dbsync_strfree(char *str)
 	}
 }
 
-/* macro valie validators */
+/* macro value validators */
 
 /******************************************************************************
  *                                                                            *
@@ -2115,8 +2115,7 @@ static char	**dbsync_trigger_preproc_row(char **row)
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
 	{
-		row[2] = zbx_dc_expand_user_macros(row[2], hostids.values, hostids.values_num,
-				dbsync_numeric_validator);
+		row[2] = zbx_dc_expand_user_macros(row[2], hostids.values, hostids.values_num, NULL);
 	}
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))

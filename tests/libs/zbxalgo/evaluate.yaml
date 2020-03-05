@@ -209,6 +209,20 @@ in:
 out:
   value: 2621440
   return: 'SUCCEED'
+---
+test case: 'unicode 1'
+in:
+  expression: '"//etc//пельмень_номер_1"="//etc//пельмень_номер_1"'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'unicode 2'
+in:
+  expression: '"пельмень номер 1"="просто пельмень"'
+out:
+  value: 0
+  return: 'SUCCEED'
 
 # '-' operator tests
 ---
@@ -692,7 +706,7 @@ out:
 
 #  '=' and '<>' operator tests
 ---
-test case: 'term 3 = str and string 1'
+test case: 'term 3 = str and str 1'
 in:
   expression: '"3"="3"'
 out:
@@ -1840,19 +1854,19 @@ out:
   error: 'Cannot evaluate expression: expected numeric token at "1and 1".'
   return: 'FAIL'
 ---
-test case: 'Invalid expression "1and 1" string 1'
+test case: 'Invalid expression "1and 1" str 1'
 in:
   expression: '1and "1"'
 out:
   error: 'Cannot evaluate expression: expected numeric token at "1and "1"".'
   return: 'FAIL'
 ---
-test case: 'Invalid expression "1and 1" string 2'
+test case: 'Invalid expression "1and 1" str 2'
 in:
   expression: '"1"and 1'
 out:
-  value: 1
-  return: 'SUCCEED'
+  error: 'Cannot evaluate expression: unexpected token at "and 1".'
+  return: 'FAIL'
 ---
 test case: 'Invalid expression "1or 1"'
 in:
@@ -1861,7 +1875,7 @@ out:
   error: 'Cannot evaluate expression: expected numeric token at "1or 1".'
   return: 'FAIL'
 ---
-test case: 'Invalid expression "1or 1" string'
+test case: 'Invalid expression "1or 1" str'
 in:
   expression: '1or "1"'
 out:
@@ -1873,6 +1887,13 @@ in:
   expression: '1 or1'
 out:
   error: 'Cannot evaluate expression: unexpected token at "or1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1or 1" str'
+in:
+  expression: '"1"or 1'
+out:
+  error: 'Cannot evaluate expression: unexpected token at "or 1".'
   return: 'FAIL'
 ---
 test case: 'Invalid expression "1 or1" string'

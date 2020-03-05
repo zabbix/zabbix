@@ -1133,60 +1133,25 @@ static int	evaluate_LAST(char **value, DC_ITEM *item, const char *parameters, co
 	{
 		if (arg1 <= values.values_num)
 		{
-		  //char	x[MAX_BUFFER_LEN];
-		  	//char **z = NULL;
-			//		  	zbx_history_value2str_dyn(z, MAX_BUFFER_LEN, &values.values[arg1 - 1].value, item->value_type);
-			//*value = zbx_malloc(*value,MAX_BUFFER_LEN);
 			zbx_history_value2str(*value, MAX_BUFFER_LEN, &values.values[arg1 - 1].value, item->value_type);
 
-			
 			if (ITEM_VALUE_TYPE_STR == item->value_type ||
-				ITEM_VALUE_TYPE_TEXT == item->value_type ||
-				ITEM_VALUE_TYPE_LOG == item->value_type)
+					ITEM_VALUE_TYPE_TEXT == item->value_type ||
+					ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
-			
-			char* x2 = zbx_dyn_escape_string(*value,"\\");
-			zabbix_log(LOG_LEVEL_INFORMATION, "X2_BADGER: ->%s<-",x2 );
 
-			char* x3 = zbx_dyn_escape_string(x2,"\"");
-			zabbix_log(LOG_LEVEL_INFORMATION, "X3_BADGER: ->%s<-",x3 );
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "X4 strlen: ->%d<-",(strlen(x3)));
-			zabbix_log(LOG_LEVEL_INFORMATION, "X4 strlen2: ->%d<-",(strlen(x3)+2));
-
-			
-			zbx_free(*value);
-			*value = zbx_malloc(*value,strlen(x3)+3);
-			  /* zabbix_log(LOG_LEVEL_INFORMATION, "XZ1: ->%c<-", x3[0]); */
-			  /* zabbix_log(LOG_LEVEL_INFORMATION, "XZ2: ->%c<-", x3[1]); */
-			  /* zabbix_log(LOG_LEVEL_INFORMATION, "XZ3: ->%c<-", x3[2]); */
-			  /* zabbix_log(LOG_LEVEL_INFORMATION, "XZ4: ->%c<-", x3[3]); */
-
-				
-			  (*value)[0] = '"';
-			  int x = zbx_strlcpy((*value)+1,x3,strlen(x3)+1);
-			/* zabbix_log(LOG_LEVEL_INFORMATION, "XX0: ->%d<-",x); */
-
-			/*   zabbix_log(LOG_LEVEL_INFORMATION, "XX1: ->%c<-", (*value)[0]); */
-			/*   zabbix_log(LOG_LEVEL_INFORMATION, "XX2: ->%c<-", (*value)[1]); */
-			/*   zabbix_log(LOG_LEVEL_INFORMATION, "XX3: ->%c<-", (*value)[2]); */
-			/*   zabbix_log(LOG_LEVEL_INFORMATION, "XX4: ->%c<-", (*value)[3]); */
-
-			  
-			/*   zabbix_log(LOG_LEVEL_INFORMATION, "X5: ->%s<-", *value); */
-
-
-			  (*value)[strlen(x3)+1]='"';
-			  (*value)[strlen(x3)+2]='\0';
-			zbx_free(x2);
-			zbx_free(x3);
-
+				char* x2 = zbx_dyn_escape_string(*value,"\\");
+				char* x3 = zbx_dyn_escape_string(x2,"\"");
+				zbx_free(*value);
+				*value = zbx_malloc(NULL,strlen(x3)+3);
+				(*value)[0] = '"';
+				int x = zbx_strlcpy((*value)+1,x3,strlen(x3)+1);
+				(*value)[strlen(x3)+1]='"';
+				(*value)[strlen(x3)+2]='\0';
+				zbx_free(x2);
+				zbx_free(x3);
 			}
 
-			
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_VALUE: ->%s<-", *value);
-						
 			ret = SUCCEED;
 		}
 		else
@@ -2702,12 +2667,9 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __func__,
 			item->host.host, item->key_orig, function, parameter);
 
-	//*value = '\0';
-
 	if (0 == strcmp(function, "last"))
 	{
 		ret = evaluate_LAST(value, item, parameter, ts, error);
-		zabbix_log(LOG_LEVEL_INFORMATION, "EVALUATE_LAST: ITEM: ->%s<- :   ->%s<-",item->key_orig, *value);
 	}
 	else if (0 == strcmp(function, "prev"))
 	{
@@ -2832,6 +2794,8 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 	}
 	else
 	{
+		*value = zbx_malloc(NULL, 1);
+		*value = '\0';
 		*error = zbx_strdup(*error, "function is not supported");
 		ret = FAIL;
 	}
@@ -3268,7 +3232,6 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 {
 	zbx_host_key_t	host_key = {(char *)host, (char *)key};
 	DC_ITEM		item;
-	//char		value[MAX_BUFFER_LEN], *error = NULL;
 	char		*value = NULL, *error = NULL;
 	int		ret, errcode;
 	zbx_timespec_t	ts;
@@ -3316,10 +3279,11 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	}
 
 	DCconfig_clean_items(&item, &errcode, 1);
-	zbx_free(value);
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __func__, zbx_result_string(ret), value);
+
+	zbx_free(value);
 
 	return ret;
 }

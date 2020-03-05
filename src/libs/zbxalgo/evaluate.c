@@ -284,6 +284,8 @@ static zbx_variant_t*	evaluate_term9(int *unknown_idx)
 		goto ret;
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "PPPPPP: ->%c<-",*ptr);
+	
 	if ('(' == *ptr)
 	{
 		ptr++;
@@ -332,6 +334,21 @@ static zbx_variant_t*	evaluate_term9(int *unknown_idx)
 			}
 
 			ptr++;
+
+			//
+			// We do not really need to do this check.
+			// The only reason we do it is to keep it consistent with
+			// numeric tokens, where operators are not allowed after them: 123and.
+			// Check below ensure that '"123"and' expression will fail as well.
+			//
+			if (FAIL == is_operator_delimiter(*ptr) && FAIL==is_number_delimiter(*ptr))
+			{
+				zbx_variant_clear(res);
+				zbx_variant_set_dbl(res, ZBX_INFINITY);
+				zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
+						" unexpected token at \"%s\".", ptr);
+			}
+
 		}
 		else
 		{
@@ -349,7 +366,7 @@ static zbx_variant_t*	evaluate_term9(int *unknown_idx)
 	while ('\0' != *ptr && (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr))
 		ptr++;
 
-ret:
+ ret:
 	return res;
 }
 
@@ -577,7 +594,6 @@ static zbx_variant_t*	evaluate_term5(int *unknown_idx)
 			zbx_variant_set_dbl(res, ZBX_INFINITY);
 			zbx_variant_clear(operand);
 			zbx_free(operand);
-			zabbix_log(LOG_LEVEL_INFORMATION, "IIIIII22222");
 
 			goto ret;
 		}
@@ -1032,7 +1048,10 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 		zbx_vector_ptr_t *unknown_msgs)
 {
 	int	unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
-					/* to catch errors */
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "EVALUATE EXPRESSION: ->%s<-", expression);
+	  
+	/* to catch errors */
 	ptr = expression;
 	level = 0;
 	buffer = error;
@@ -1141,7 +1160,7 @@ int	evaluate_unknown(const char *expression, double *value, char *error, size_t 
 
 	buffer = error;
 	max_buffer_len = max_error_len;
-	zbx_variant_t* res = evaluate_term1(&unknown_idx);
+	zbx_variant_t *res = evaluate_term1(&unknown_idx);
 	varToDouble(res, &unknown_idx);
 	*value = res->data.dbl;
 	zbx_variant_clear(res);

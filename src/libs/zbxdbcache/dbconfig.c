@@ -9611,9 +9611,21 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 		if (NULL != value)
 		{
+			char *x1 = zbx_dyn_escape_string(value, "\\");
+			char* x2 = zbx_dyn_escape_string(x1, "\"");
+
+			zbx_free(x1);
+			zbx_free(value);
+			value = zbx_malloc(NULL,strlen(x2)+3);
+
+			value[0] = '"';
+			zbx_strlcpy(value+1,x2,strlen(x2)+1);
+			value[strlen(x2)+1] ='"';
+			value[strlen(x2)+2]='\0';
+			zbx_free(x2);
+
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
 			zbx_free(value);
-
 		}
 		else
 		{
@@ -9660,7 +9672,7 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
 	out = zbx_dc_expand_user_macros(expression, hostids.values, hostids.values_num,
-			dc_expression_user_macro_validator);
+					dc_expression_user_macro_validator);
 
 	if (NULL != strstr(out, "{$"))
 	{
