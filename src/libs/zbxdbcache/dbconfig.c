@@ -9611,18 +9611,20 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 		if (NULL != value)
 		{
-			char *x1 = zbx_dyn_escape_string(value, "\\");
-			char* x2 = zbx_dyn_escape_string(x1, "\"");
-
-			zbx_free(x1);
+			int	escape_quote_escaped_value_len;
+			char	*escape_escaped_value = zbx_dyn_escape_string(value, "\\");
 			zbx_free(value);
-			value = zbx_malloc(NULL,strlen(x2)+3);
 
+			char	*escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value, "\"");
+			zbx_free(escape_escaped_value);
+			escape_quote_escaped_value_len = strlen(escape_quote_escaped_value);
+
+			value = zbx_malloc(NULL, escape_quote_escaped_value_len + 3);
 			value[0] = '"';
-			zbx_strlcpy(value+1,x2,strlen(x2)+1);
-			value[strlen(x2)+1] ='"';
-			value[strlen(x2)+2]='\0';
-			zbx_free(x2);
+			zbx_strlcpy(value + 1,escape_quote_escaped_value, escape_quote_escaped_value_len + 1);
+			value[escape_quote_escaped_value_len + 1] ='"';
+			value[escape_quote_escaped_value_len + 2] = '\0';
+			zbx_free(escape_quote_escaped_value);
 
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
 			zbx_free(value);

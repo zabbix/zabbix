@@ -956,7 +956,6 @@ static int	evaluate_SUM(char **value, DC_ITEM *item, const char *parameters, con
 			result.ui64 += values.values[i].value.ui64;
 	}
 
-	//zbx_history_value2str_dyn(value, MAX_BUFFER_LEN, &result, item->value_type);
 	zbx_history_value2str(*value, MAX_BUFFER_LEN, &result, item->value_type);
 	ret = SUCCEED;
 out:
@@ -1093,7 +1092,6 @@ out:
 static int	evaluate_LAST(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
-
 	int				arg1 = 1, ret = FAIL;
 	zbx_value_type_t		arg1_type = ZBX_VALUE_NVALUES;
 	zbx_vector_history_record_t	values;
@@ -1139,17 +1137,21 @@ static int	evaluate_LAST(char **value, DC_ITEM *item, const char *parameters, co
 					ITEM_VALUE_TYPE_TEXT == item->value_type ||
 					ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
-
-				char* x2 = zbx_dyn_escape_string(*value,"\\");
-				char* x3 = zbx_dyn_escape_string(x2,"\"");
+				int	escape_quote_escaped_value_len;
+				char*	escape_escaped_value = zbx_dyn_escape_string(*value,"\\");
 				zbx_free(*value);
-				*value = zbx_malloc(NULL,strlen(x3)+3);
+
+				char*	escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value,"\"");
+				zbx_free(escape_escaped_value);
+				escape_quote_escaped_value_len = strlen(escape_quote_escaped_value);
+
+				*value = zbx_malloc(NULL, escape_quote_escaped_value_len + 3);
 				(*value)[0] = '"';
-				int x = zbx_strlcpy((*value)+1,x3,strlen(x3)+1);
-				(*value)[strlen(x3)+1]='"';
-				(*value)[strlen(x3)+2]='\0';
-				zbx_free(x2);
-				zbx_free(x3);
+				zbx_strlcpy((*value) + 1, escape_quote_escaped_value,
+						escape_quote_escaped_value_len + 1);
+				(*value)[escape_quote_escaped_value_len + 1] = '"';
+				(*value)[escape_quote_escaped_value_len + 2] = '\0';
+				zbx_free(escape_quote_escaped_value);
 			}
 
 			ret = SUCCEED;
@@ -1270,7 +1272,6 @@ static int	evaluate_MIN(char **value, DC_ITEM *item, const char *parameters, con
 			}
 		}
 
-		//		zbx_history_value2str_dyn(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
 		zbx_history_value2str(*value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
 
 		ret = SUCCEED;
@@ -1385,7 +1386,7 @@ static int	evaluate_MAX(char **value, DC_ITEM *item, const char *parameters, con
 					index = i;
 			}
 		}
-		//zbx_history_value2str_dyn(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
+
 		zbx_history_value2str(*value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
 
 		ret = SUCCEED;
@@ -1512,7 +1513,6 @@ static int	evaluate_PERCENTILE(char **value, DC_ITEM *item, const char *paramete
 		else
 			index = (int)ceil(values.values_num * (percentage / 100));
 
-		//zbx_history_value2str_dyn(value, MAX_BUFFER_LEN, &values.values[index - 1].value, item->value_type);
 		zbx_history_value2str(*value, MAX_BUFFER_LEN, &values.values[index - 1].value, item->value_type);
 
 		ret = SUCCEED;
@@ -1640,7 +1640,6 @@ static int	evaluate_DELTA(char **value, DC_ITEM *item, const char *parameters, c
 			result.dbl = values.values[index_max].value.dbl - values.values[index_min].value.dbl;
 		}
 
-		//zbx_history_value2str_dyn(value, MAX_BUFFER_LEN, &result, item->value_type);
 		zbx_history_value2str(*value, MAX_BUFFER_LEN, &result, item->value_type);
 
 		ret = SUCCEED;
@@ -1761,13 +1760,13 @@ static int	evaluate_ABSCHANGE(char **value, DC_ITEM *item, const zbx_timespec_t 
 	}
 
 	switch (item->value_type)
-	{		
+	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_DBL,
 					fabs(values.values[0].value.dbl - values.values[1].value.dbl));
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-		  	/* to avoid overflow */
+			/* to avoid overflow */
 			if (values.values[0].value.ui64 >= values.values[1].value.ui64)
 			{
 				zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_UI64,
