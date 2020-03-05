@@ -40,7 +40,6 @@ $fields = [
 	'hostids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'groupids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'applications' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'groupid' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
 	'clone_hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,
 									'isset({form}) && {form} == "full_clone"'
