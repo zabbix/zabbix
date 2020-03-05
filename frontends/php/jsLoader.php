@@ -127,7 +127,6 @@ $tranStrings = [
 		'Add a new widget' => _('Add a new widget'),
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
-		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
 		'Previous page' => _('Previous page'),
 		'Next page' => _('Next page'),
 		'Widget is too small for the specified number of columns and rows.' =>
@@ -299,7 +298,8 @@ $tranStrings = [
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
-		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
+		'Download image' => _('Download image')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),
