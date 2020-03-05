@@ -302,7 +302,7 @@ class CUserMacro extends CApiService {
 			}
 
 			if (array_key_exists('type', $globalmacro) && $globalmacro['type'] != $db_globalmacro['type']
-					&& $db_globalmacro['type'] = ZBX_MACRO_TYPE_SECRET) {
+					&& $db_globalmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
 				$upd_globalmacro += ['value' => ''];
 			}
 
@@ -591,7 +591,7 @@ class CUserMacro extends CApiService {
 			$db_macro = $db_macros[$macro['hostmacroid']];
 
 			if (array_key_exists('type', $macro) && $macro['type'] != $db_macro['type']
-					&& $db_macro['type'] = ZBX_MACRO_TYPE_SECRET) {
+					&& $db_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
 				$macro += ['value' => ''];
 			}
 
