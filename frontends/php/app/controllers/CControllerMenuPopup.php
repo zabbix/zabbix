@@ -161,7 +161,6 @@ class CControllerMenuPopup extends CController {
 				$menu_data['showScreens'] = (bool) $db_host['screens'];
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
-					$menu_data['severity_min'] = $data['severity_min'];
 					$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');
 				}
 				if (array_key_exists('show_suppressed', $data)) {
@@ -395,7 +394,6 @@ class CControllerMenuPopup extends CController {
 							'groupid' => $selement['elements'][0]['groupid']
 						];
 						if (array_key_exists('severity_min', $data)) {
-							$menu_data['severity_min'] = $data['severity_min'];
 							$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');
 						}
 						if ($db_map['show_suppressed']) {
@@ -433,7 +431,6 @@ class CControllerMenuPopup extends CController {
 							'triggerids' => zbx_objectValues($selement['elements'], 'triggerid')
 						];
 						if (array_key_exists('severity_min', $data)) {
-							$menu_data['severity_min'] = $data['severity_min'];
 							$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');
 						}
 						if ($db_map['show_suppressed']) {

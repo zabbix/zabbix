@@ -82,7 +82,7 @@ function getMenuPopupHistory(options) {
  * @param {bool}   options['showScreens']        Link to host screen page.
  * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
  * @param {bool}   options['hasGoTo']            "Go to" block in popup.
- * @param {int}    options['severities']         (optional)
+ * @param {array}  options['severities']         (optional)
  * @param {bool}   options['show_suppressed']    (optional)
  * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
@@ -256,7 +256,7 @@ function getMenuPopupMapElementSubmap(options) {
  * Get menu popup host group map element section data.
  *
  * @param {string} options['groupid']
- * @param {int}    options['severities']         (optional)
+ * @param {array}  options['severities']         (optional)
  * @param {bool}   options['show_suppressed']    (optional)
  * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
@@ -305,7 +305,7 @@ function getMenuPopupMapElementGroup(options) {
  * Get menu popup trigger map element section data.
  *
  * @param {array}  options['triggerids']
- * @param {int}    options['severities']       (optional)
+ * @param {array}  options['severities']       (optional)
  * @param {bool}   options['show_suppressed']  (optional)
  * @param {array}  options['urls']             (optional)
  * @param {string} options['url'][]['label']
