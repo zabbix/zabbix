@@ -595,12 +595,12 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		$all_triggerid_to_selementids = [];
 
 		foreach ([$triggerIdToSelementIds, $subSysmapTriggerIdToSelementIds] as $triggerid_to_selementids) {
-			foreach ($triggerid_to_selementids as $triggerid => $selementid) {
+			foreach ($triggerid_to_selementids as $triggerid => $selementids) {
 				if (!array_key_exists($triggerid, $all_triggerid_to_selementids)) {
-					$all_triggerid_to_selementids[$triggerid] = $selementid;
+					$all_triggerid_to_selementids[$triggerid] = $selementids;
 				}
 				else {
-					$all_triggerid_to_selementids[$triggerid] += $selementid;
+					$all_triggerid_to_selementids[$triggerid] += $selementids;
 				}
 			}
 		}
