@@ -89,7 +89,8 @@ jQuery(function($) {
 		/**
 		 * Insert outside data
 		 *
-		 * @param object    multiselect value object
+		 * @param object    Multiselect value object.
+		 * @param bool      (optional) Either to trigger element on-change event once data added. True by default.
 		 *
 		 * @return jQuery
 		 */
