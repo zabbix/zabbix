@@ -28,9 +28,6 @@ class CScreenDataOverview extends CScreenBase {
 	 */
 	public function get() {
 		$groupid = $this->screenitem['resourceid'];
-		if (!$this->screenitem['elements']) {
-			$this->screenitem['elements'] = ZBX_DEFAULT_WIDGET_LINES;
-		}
 
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
