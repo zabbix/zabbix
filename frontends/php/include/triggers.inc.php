@@ -1889,6 +1889,8 @@ function makeExpression(array $expressionTree, $level = 0, $operator = null) {
 function get_item_function_info($expr) {
 	$rule_float = [_('Numeric (float)'), 'preg_match("/^'.ZBX_PREG_NUMBER.'$/", {})'];
 	$rule_int = [_('Numeric (integer)'), 'preg_match("/^'.ZBX_PREG_INT.'$/", {})'];
+	$rule_str = [_('String'), 'preg_match("/^".*"$/", {})'];
+	$rule_any = [_('Any'), 'preg_match("/^.*$/", {})'];
 	$rule_0or1 = [_('0 or 1'), IN('0,1')];
 	$rules = [
 		// Every nested array should have two elements: label, validation.
@@ -1921,10 +1923,10 @@ function get_item_function_info($expr) {
 			ITEM_VALUE_TYPE_STR => $rule_int,
 			ITEM_VALUE_TYPE_LOG => $rule_int
 		],
-		'string_as_float' => [
-			ITEM_VALUE_TYPE_TEXT => $rule_float,
-			ITEM_VALUE_TYPE_STR => $rule_float,
-			ITEM_VALUE_TYPE_LOG => $rule_float
+		'string' => [
+			ITEM_VALUE_TYPE_TEXT => $rule_str,
+			ITEM_VALUE_TYPE_STR => $rule_str,
+			ITEM_VALUE_TYPE_LOG => $rule_str
 		],
 		'log_as_uint' => [
 			ITEM_VALUE_TYPE_LOG => $rule_int
@@ -1960,7 +1962,7 @@ function get_item_function_info($expr) {
 		'forecast' => $rules['numeric_as_float'],
 		'fuzzytime' => $rules['numeric_as_0or1'],
 		'iregexp' => $rules['string_as_0or1'],
-		'last' => $rules['numeric'] + $rules['string_as_float'],
+		'last' => $rules['numeric'] + $rules['string'],
 		'logeventid' => $rules['log_as_0or1'],
 		'logseverity' => $rules['log_as_uint'],
 		'logsource' => $rules['log_as_0or1'],
@@ -1969,7 +1971,7 @@ function get_item_function_info($expr) {
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'now' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'percentile' => $rules['numeric'],
-		'prev' => $rules['numeric'] + $rules['string_as_float'],
+		'prev' => $rules['numeric'] + $rules['string'],
 		'regexp' => $rules['string_as_0or1'],
 		'str' => $rules['string_as_0or1'],
 		'strlen' => $rules['string_as_uint'],
@@ -1998,8 +2000,8 @@ function get_item_function_info($expr) {
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO)):
 			$result = [
 				'type' => T_ZBX_STR,
-				'value_type' => $rule_float[0],
-				'validation' => $rule_float[1]
+				'value_type' => $rule_any[0],
+				'validation' => $rule_any[1]
 			];
 			break;
 
@@ -2075,14 +2077,14 @@ function get_item_function_info($expr) {
 /**
  * Substitute macros in the expression with the given values and evaluate its result.
  *
- * @param string $expression                a trigger expression
- * @param array  $replaceFunctionMacros     an array of macro - value pairs
+ * @param string $expression                A trigger expression.
+ * @param array  $replace_function_macros   An array of macro - value pairs.
  *
- * @return bool     the calculated value of the expression
+ * @return bool  The calculated value of the expression.
  */
-function evalExpressionData($expression, $replaceFunctionMacros) {
+function evalExpressionData($expression, $replace_function_macros) {
 	// Sort by longest array key which in this case contains macros.
-	uksort($replaceFunctionMacros, function ($key1, $key2) {
+	uksort($replace_function_macros, function ($key1, $key2) {
 		$s1 = strlen($key1);
 		$s2 = strlen($key2);
 
@@ -2093,48 +2095,69 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 		return ($s1 > $s2) ? -1 : 1;
 	});
 
-	// replace function macros with their values
-	$expression = str_replace(array_keys($replaceFunctionMacros), array_values($replaceFunctionMacros), $expression);
+	$values = [];
+	foreach ($replace_function_macros as $key => &$value) {
+		if ($value['value_type'] === _('String') || $value['value_type'] === _('Any')) {
+			$value['value'] = str_replace('\\', '\\\\', $value['value']);
+			$value['value'] = str_replace('"', '\"', $value['value']);
+			$value['value'] = '"'.$value['value'].'"';
+		}
+		$values[$key] = $value['value'];
+	}
+	unset($value);
 
+	// Replace function macros with their values.
+	$expression = str_replace(array_keys($values), array_values($values), $expression);
 	$parser = new CTriggerExpression();
-	$parseResult = $parser->parse($expression);
+	$parse_result = $parser->parse($expression);
 
-	// The $replaceFunctionMacros array may contain string values which after substitution
-	// will result in an invalid expression. In such cases we should just return false.
-	if (!$parseResult) {
+	/*
+	 * The $replaceFunctionMacros array may contain string values which after substitution will result in an invalid
+	 * expression. In such cases we should just return false.
+	 */
+	if (!$parse_result) {
 		return false;
 	}
 
-	// turn the expression into valid PHP code
-	$evStr = '';
-	$replaceOperators = ['not' => '!', '=' => '=='];
-	foreach ($parseResult->getTokens() as $token) {
+	// Turn the expression into valid PHP code.
+	$eval_str = '';
+	$replace_operators = ['not' => '!', '=' => '=='];
+
+	foreach ($parse_result->getTokens() as $token) {
 		$value = $token['value'];
 
 		switch ($token['type']) {
 			case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
-				// replace specific operators with their PHP analogues
-				if (isset($replaceOperators[$token['value']])) {
-					$value = $replaceOperators[$token['value']];
+				// Replace specific operators with their PHP analogues.
+				if (isset($replace_operators[$token['value']])) {
+					$value = $replace_operators[$token['value']];
 				}
-
 				break;
+
 			case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
-				// convert numeric values with suffixes
+				// Convert numeric values with suffixes.
 				if ($token['data']['suffix'] !== null) {
 					$value = convert($value);
 				}
 
 				$value = '((float) "'.$value.'")';
+				break;
 
+			case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+				// Check if string contains a valid suffix and try to convert. Otherwise leave original quoted value.
+				if (preg_match('/[\-+]?([.][0-9]+|[0-9]+[.]?[0-9]*)['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']/',
+						$token['data']['string'],
+						$match)) {
+					$value = convert($token['data']['string']);
+				}
 				break;
 		}
 
-		$evStr .= ' '.$value;
+		$eval_str .= ' '.$value;
 	}
 
-	// execute expression
-	eval('$result = ('.trim($evStr).');');
+	// Execute expression.
+	eval('$result = ('.trim($eval_str).');');
 
 	return $result;
 }

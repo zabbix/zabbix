@@ -18,8 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CTriggerExpression {
-	// for parsing of trigger expression
+	// For parsing of trigger expression.
 	const STATE_AFTER_OPEN_BRACE = 1;
 	const STATE_AFTER_BINARY_OPERATOR = 2;
 	const STATE_AFTER_LOGICAL_OPERATOR = 3;
@@ -523,7 +524,7 @@ class CTriggerExpression {
 	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
 	private function parseConstant() {
-		if ($this->parseFunctionMacro() || $this->parseNumber()
+		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseString()
 				|| $this->parseUsing($this->user_macro_parser, CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)
 				|| $this->parseUsing($this->macro_parser, CTriggerExprParserResult::TOKEN_TYPE_MACRO)) {
 			return true;
@@ -703,6 +704,80 @@ class CTriggerExpression {
 		);
 
 		$this->pos = $j - 1;
+
+		return true;
+	}
+
+	/**
+	 * Parses a quoted string constant in the trigger expression and moves a current position ($this->pos) on a last
+	 * symbol of the string.
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseString() {
+		$pos = $this->pos;
+
+		// Must start with a double quote.
+		if ($this->expression[$pos] !== '"') {
+			return false;
+		}
+
+		$str = '';
+		$pos++;
+		$quote = true;
+		$slash = false;
+		$p = $pos;
+
+		while (isset($this->expression[$p])) {
+			if ($this->expression[$p] === '\\') {
+				if ($slash) {
+					if ($this->expression[$p - 1] === '\\') {
+						// Escaped slash, next tiem start over again.
+						$slash = false;
+					}
+				}
+				else {
+					// First slash.
+					$slash = true;
+				}
+			}
+
+			if (!$quote) {
+				break;
+			}
+
+			if ($this->expression[$p] === '"') {
+				if ($this->expression[$p - 1] === '\\' && $slash) {
+					$str .= $this->expression[$p];
+					$p++;
+					$slash = false;
+					continue;
+				}
+
+				$quote = false;
+			}
+
+			$str .= $this->expression[$p];
+			$p++;
+		}
+
+		// Unclosed quote or unescaped slash.
+		if ($quote || $slash) {
+			return false;
+		}
+
+		$pos = $p;
+		$len = $pos - $this->pos;
+
+		$str = substr($str, 0, -1);
+		$str = str_replace('\"', '"', $str);
+		$str = str_replace('\\\\', '\\', $str);
+
+		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_STRING,
+			substr($this->expression, $this->pos, $len), $this->pos, $len, ['string' => $str]
+		);
+
+		$this->pos = $pos - 1;
 
 		return true;
 	}

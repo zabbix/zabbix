@@ -74,8 +74,12 @@ class CControllerPopupTestTriggerExpr extends CController {
 						->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 				);
 				$fname = 'test_data_'.md5($token['value']);
-				$this->macros_data[$token['value']] = array_key_exists($fname, $_REQUEST) ? $_REQUEST[$fname] : '';
 				$info = get_item_function_info($token['value']);
+
+				$this->macros_data[$token['value']] = [
+					'value_type' => $info['value_type'],
+					'value' => array_key_exists($fname, $_REQUEST) ? $_REQUEST[$fname] : ''
+				];
 
 				if (!is_array($info) && array_key_exists($info, $this->defined_error_phrases)) {
 					$this->allowed_testing = false;
@@ -91,19 +95,19 @@ class CControllerPopupTestTriggerExpr extends CController {
 					if (substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN) {
 						$end = strlen($validation) - COMBO_PATTERN_LENGTH - 4;
 						$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, $end));
-						$control = new CComboBox($fname, $this->macros_data[$token['value']]);
+						$control = new CComboBox($fname, $this->macros_data[$token['value']]['value']);
 
 						foreach ($vals as $v) {
 							$control->addItem($v, $v);
 						}
 					}
 					else {
-						$control = (new CTextBox($fname, $this->macros_data[$token['value']]))
+						$control = (new CTextBox($fname, $this->macros_data[$token['value']]['value']))
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 					}
 
-					$this->fields[$fname] = [$info['type'], O_OPT, null, $info['validation'],
-						'isset({test_expression})', $token['value']
+					$this->fields[$fname] = [$info['type'], O_OPT, null, $validation, 'isset({test_expression})',
+						$token['value']
 					];
 
 					$row->addItem($info['value_type']);
