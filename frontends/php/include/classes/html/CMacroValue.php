@@ -41,12 +41,12 @@ class CMacroValue extends CInput {
 	/**
 	 * Class constructor.
 	 *
-	 * @param int    $type           Macro type one of ZBX_MACRO_TYPE_SECRET or ZBX_MACRO_TYPE_TEXT value.
-	 * @param string $name           Macro input name.
-	 * @param string $value          Macro value, null when value will not be set.
-	 * @param bool   $add_post_js    Add element initialization javascript.
+	 * @param int    $type         Macro type one of ZBX_MACRO_TYPE_SECRET or ZBX_MACRO_TYPE_TEXT value.
+	 * @param string $name         Macro input name.
+	 * @param string $value        Macro value, null when value will not be set.
+	 * @param bool   $add_post_js  Add element initialization javascript.
 	 */
-	public function __construct(string $type, string $name, string $value = null, $add_post_js = true) {
+	public function __construct(string $type, string $name, string $value = null, bool $add_post_js = true) {
 		parent::__construct($type, $name, $value);
 
 		$this->add_post_js = $add_post_js;

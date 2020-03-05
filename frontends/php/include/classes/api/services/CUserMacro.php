@@ -580,8 +580,9 @@ class CUserMacro extends CApiService {
 		$hostmacros = zbx_toArray($hostmacros);
 
 		$this->validateUpdate($hostmacros);
+
 		$db_macros = DB::select('hostmacro', [
-			'output' => ['hostmacroid', 'type'],
+			'output' => ['type'],
 			'filter' => ['hostmacroid' => array_column($hostmacros, 'hostmacroid')],
 			'preservekeys' => true
 		]);
