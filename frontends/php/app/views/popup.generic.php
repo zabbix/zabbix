@@ -76,7 +76,7 @@ if (array_key_exists('groups', $data['filter'])) {
 			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
 				'var groups = jQuery(this).multiSelect("getData").map(i => i.id),'.
 					'new_opts = jQuery.extend(e.data.overlay.options, {groupid: groups.length ? groups[0]: []});'.
-				'e.data.overlay.reload(new_opts);'.
+				'PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);'.
 			'});'.
 		'});';
 }
@@ -99,7 +99,7 @@ if (array_key_exists('hosts', $data['filter'])) {
 			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
 				'var hosts = jQuery(this).multiSelect("getData").map(i => i.id),'.
 					'new_opts = jQuery.extend(e.data.overlay.options, {hostid: hosts.length ? hosts[0]: []});'.
-				'e.data.overlay.reload(new_opts);'.
+				'PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);'.
 			'});'.
 		'});';
 }
