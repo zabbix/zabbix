@@ -22,6 +22,7 @@ package postgres
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"os"
@@ -46,19 +47,22 @@ func сreateConnection(connString string) error {
 	if err != nil {
 		return err
 	}
-	sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: "100006"}
+	versionPG, err := GetPostgresVersion(newConn)
+	if err != nil {
+		log.Panicf("[сreateConnection] cannot get Postgres version: %s", err.Error())
+	}
+	sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: versionPG}
 	return nil
 }
 
-func waitForDBMSAndCreateConfig(pool *dockertest.Pool, resource *dockertest.Resource, connString string) (confPath string, cleaner func()) {
-	// Port forwarding always works, thus net.Dial can't be used here.
+func waitForPostgresAndCreateConfig(pool *dockertest.Pool, resource *dockertest.Resource, connString string) (confPath string, cleaner func()) {
 	attempt := 0
 	ok := false
 	for attempt < 20 {
 		attempt++
 		conn, err := pgx.Connect(context.Background(), connString)
 		if err != nil {
-			log.Infof("[waitForDBMSAndCreateConfig] pgx.Connect failed: %v, waiting... (attempt %d)", err, attempt)
+			log.Infof("[waitForPostgresAndCreateConfig] pgx.Connect failed: %v, waiting... (attempt %d)", err, attempt)
 			time.Sleep(1 * time.Second)
 			continue
 		}
@@ -70,7 +74,7 @@ func waitForDBMSAndCreateConfig(pool *dockertest.Pool, resource *dockertest.Reso
 
 	if !ok {
 		_ = pool.Purge(resource)
-		log.Panicf("[waitForDBMSAndCreateConfig] couldn't connect to PostgreSQL")
+		log.Panicf("[waitForPostgresAndCreateConfig] couldn't connect to PostgreSQL")
 	} else {
 		log.Infoln("[TestMain] creating sharedConn of type *postgresConn")
 		сreateConnection(connString)
@@ -84,7 +88,7 @@ db:url: {{.ConnString}}
 `)
 	if err != nil {
 		_ = pool.Purge(resource)
-		log.Panicf("[waitForDBMSAndCreateConfig] template.Parse failed: %v", err)
+		log.Panicf("[waitForPostgresAndCreateConfig] template.Parse failed: %v", err)
 	}
 
 	configArgs := struct {
@@ -96,53 +100,52 @@ db:url: {{.ConnString}}
 	err = tmpl.Execute(&configBuff, configArgs)
 	if err != nil {
 		_ = pool.Purge(resource)
-		log.Panicf("[waitForDBMSAndCreateConfig] tmpl.Execute failed: %v", err)
+		log.Panicf("[waitForPostgresAndCreateConfig] tmpl.Execute failed: %v", err)
 	}
 
 	confFile, err := ioutil.TempFile("", "config.*.yaml")
 	if err != nil {
 		_ = pool.Purge(resource)
-		log.Panicf("[waitForDBMSAndCreateConfig] ioutil.TempFile failed: %v", err)
+		log.Panicf("[waitForPostgresAndCreateConfig] ioutil.TempFile failed: %v", err)
 	}
 
-	log.Infof("[waitForDBMSAndCreateConfig] confFile.Name = %s", confFile.Name())
+	log.Infof("[waitForPostgresAndCreateConfig] confFile.Name = %s", confFile.Name())
 
 	_, err = confFile.WriteString(configBuff.String())
 	if err != nil {
 		_ = pool.Purge(resource)
-		log.Panicf("[waitForDBMSAndCreateConfig] confFile.WriteString failed: %v", err)
+		log.Panicf("[waitForPostgresAndCreateConfig] confFile.WriteString failed: %v", err)
 	}
 
 	err = confFile.Close()
 	if err != nil {
 		_ = pool.Purge(resource)
-		log.Panicf("[waitForDBMSAndCreateConfig] confFile.Close failed: %v", err)
+		log.Panicf("[waitForPostgresAndCreateConfig] confFile.Close failed: %v", err)
 	}
 
 	cleanerFunc := func() {
 		// purge the container
 		err := pool.Purge(resource)
 		if err != nil {
-			log.Panicf("[waitForDBMSAndCreateConfig] pool.Purge failed: %v", err)
+			log.Panicf("[waitForPostgresAndCreateConfig] pool.Purge failed: %v", err)
 		}
 
 		err = os.Remove(confFile.Name())
 		if err != nil {
-			log.Panicf("[waitForDBMSAndCreateConfig] os.Remove failed: %v", err)
+			log.Panicf("[waitForPostgresAndCreateConfig] os.Remove failed: %v", err)
 		}
 	}
 
 	return confFile.Name(), cleanerFunc
 }
 
-func startPostgreSQL() (confPath string, cleaner func()) {
+func startPostgreSQL(versionPG uint32) (confPath string, cleaner func()) {
 	pool, err := dockertest.NewPool("")
 	if err != nil {
 		log.Panicf("[startPostgreSQL] dockertest.NewPool failed: %v", err)
 	}
-
 	resource, err := pool.Run(
-		"postgres", "11",
+		"postgres", fmt.Sprint(versionPG),
 		[]string{
 			"POSTGRES_DB=test_agent2",
 			"POSTGRES_PASSWORD=this_is_postgres",
@@ -153,5 +156,5 @@ func startPostgreSQL() (confPath string, cleaner func()) {
 	}
 
 	connString := "postgres://postgres:this_is_postgres@" + resource.GetHostPort("5432/tcp") + "/test_agent2"
-	return waitForDBMSAndCreateConfig(pool, resource, connString)
+	return waitForPostgresAndCreateConfig(pool, resource, connString)
 }

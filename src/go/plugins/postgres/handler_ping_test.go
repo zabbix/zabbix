@@ -35,16 +35,23 @@ import (
 func TestMain(m *testing.M) {
 	var confPath string
 	var stopDB func()
+	var code int
 	log.Infoln("[TestMain] About to start PostgreSQL...")
+	versionsPG := []uint32{10, 11, 12}
+	for _, versionPG := range versionsPG {
+		confPath, stopDB = startPostgreSQL(versionPG)
+		log.Infoln("[TestMain] PostgreSQL started!")
+		log.Infof("[TestMain] conf path  = %v", confPath)
 
-	confPath, stopDB = startPostgreSQL()
-	log.Infoln("[TestMain] PostgreSQL started!")
-	log.Infof("[TestMain] conf path  = %v", confPath)
+		code = m.Run()
+		if code != 0 {
+			log.Panicf("failed on PostgreSQL version %v", versionPG)
+			os.Exit(code)
+		}
+		log.Infoln("[TestMain] Cleaning up...")
+		stopDB()
 
-	code := m.Run()
-
-	log.Infoln("[TestMain] Cleaning up...")
-	stopDB()
+	}
 	os.Exit(code)
 }
 

@@ -130,7 +130,7 @@ func (c *connManager) create(connString string) (conn *postgresConn, err error) 
 		return nil, errorCannotConvertPostgresVersionInt
 	}
 
-	if version < 90000 {
+	if version < 100000 {
 		c.log.Errf("[%s] current PG version is not supported : %s", versionPG, errorUnsupportePostgresVersion)
 		return nil, errorUnsupportePostgresVersion
 	}
