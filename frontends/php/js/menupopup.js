@@ -256,7 +256,7 @@ function getMenuPopupMapElementSubmap(options) {
  * Get menu popup host group map element section data.
  *
  * @param {string} options['groupid']
- * @param {int}    options['severity_min']       (optional)
+ * @param {int}    options['severities']       (optional)
  * @param {bool}   options['show_suppressed']    (optional)
  * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
@@ -271,7 +271,7 @@ function getMenuPopupMapElementGroup(options) {
 
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_groupids[]', options.groupid);
-	if (typeof options.severity_min !== 'undefined') {
+	if (typeof options.severities !== 'undefined') {
 		problems_url.setArgument('filter_severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
@@ -305,7 +305,7 @@ function getMenuPopupMapElementGroup(options) {
  * Get menu popup trigger map element section data.
  *
  * @param {array}  options['triggerids']
- * @param {int}    options['severity_min']     (optional)
+ * @param {int}    options['severities']     (optional)
  * @param {bool}   options['show_suppressed']  (optional)
  * @param {array}  options['urls']             (optional)
  * @param {string} options['url'][]['label']
@@ -319,7 +319,7 @@ function getMenuPopupMapElementTrigger(options) {
 
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_triggerids[]', options.triggerids);
-	if (typeof options.severity_min !== 'undefined') {
+	if (typeof options.severities !== 'undefined') {
 		problems_url.setArgument('filter_severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
