@@ -162,6 +162,8 @@
 		};
 
 		/**
+		 * Start or pause timeout based Chart refresh.
+		 *
 		 * @param {number} seconds  Seconds to wait before reschedule. Zero seconds will pause schedule.
 		 * @param {number} delay_loading  (optional) Add "loading indicator" only when request exceeds delay.
 		 */
@@ -178,7 +180,7 @@
 				.finally(_ => {
 					this._timeoutid = setTimeout(_ => this.scheduleRefresh(seconds), seconds * 1000);
 				});
-		}
+		};
 
 		/**
 		 * @param {jQuery} $el       A container where charts are maintained.
@@ -233,7 +235,7 @@
 					}
 					return Promise.all(loading_charts)
 				});
-		}
+		};
 
 		/**
 		 * Fetches new list of charts.
@@ -303,7 +305,7 @@
 		};
 
 		/**
-		 * Constructs new charts and removes missing, reorders existing charts. Does not call "update" on any of charts.
+		 * Constructs new charts and removes missing, reorders existing charts.
 		 *
 		 * @param {array} raw_charts
 		 */
