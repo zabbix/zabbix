@@ -673,6 +673,9 @@ static int	DBpatch_4050044(void)
 	int		ret = SUCCEED, value_int, i;
 	const char	*profile = "web.problem.filter.severities";
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	result = DBselect(
 			"select profileid,userid,value_int"
 			" from profiles"
