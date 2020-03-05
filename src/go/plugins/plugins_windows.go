@@ -32,6 +32,7 @@ import (
 	_ "zabbix.com/plugins/vfs/fs"
 	_ "zabbix.com/plugins/windows/eventlog"
 	_ "zabbix.com/plugins/windows/perfmon"
+	_ "zabbix.com/plugins/windows/services"
 	_ "zabbix.com/plugins/zabbix/async"
 	_ "zabbix.com/plugins/zabbix/stats"
 )

@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,20 +17,4 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-class CWidgetFieldCheckBoxList extends CWidgetField {
-
-	public function __construct($name, $label) {
-		parent::__construct($name, $label);
-
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-		$this->setDefault([]);
-		$this->setValidationRules(['type' => API_INTS32]);
-	}
-
-	public function setValue($value) {
-		$this->value = (array) $value;
-
-		return $this;
-	}
-}
+package services

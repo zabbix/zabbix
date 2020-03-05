@@ -1,4 +1,5 @@
-<?php
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,20 +19,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+package win32
 
-class CWidgetFieldCheckBoxList extends CWidgetField {
+import (
+	"syscall"
+	"unsafe"
 
-	public function __construct($name, $label) {
-		parent::__construct($name, $label);
+	"golang.org/x/sys/windows"
+)
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-		$this->setDefault([]);
-		$this->setValidationRules(['type' => API_INTS32]);
+var (
+	hAdvapi32 Hlib
+
+	getServiceKeyName uintptr
+)
+
+func init() {
+	hAdvapi32 = mustLoadLibrary("advapi32.dll")
+
+	getServiceKeyName = hAdvapi32.mustGetProcAddress("GetServiceKeyNameW")
+}
+
+func GetServiceKeyName(h syscall.Handle, displayName string) (name string, err error) {
+	wdn, err := windows.UTF16FromString(displayName)
+	if err != nil {
+		return
 	}
-
-	public function setValue($value) {
-		$this->value = (array) $value;
-
-		return $this;
+	b := make([]uint16, 4096)
+	size := uint32(len(b))
+	ret, _, syserr := syscall.Syscall6(getServiceKeyName, 4, uintptr(h), uintptr(unsafe.Pointer(&wdn[0])),
+		uintptr(unsafe.Pointer(&b[0])), uintptr(unsafe.Pointer(&size)), 0, 0)
+	if ret == 0 {
+		return "", syserr
 	}
+	return windows.UTF16ToString(b), nil
 }
