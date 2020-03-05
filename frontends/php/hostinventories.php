@@ -174,93 +174,85 @@ else {
 		]), ['groupid' => 'id'])
 		: [];
 
-	/**
+	$filter_groupids = $data['filter']['groups'] ? array_keys($data['filter']['groups']) : null;
+	if ($filter_groupids) {
+		$filter_groupids = getSubGroups($filter_groupids);
+	}
+
+	// Checking if correct inventory field is specified for filter.
+	$supported_inventory_fields = zbx_toHash(getHostInventories(), 'db_field');
+	if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== ''
+			&& !array_key_exists($data['filter']['field'], $supported_inventory_fields)) {
+		error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filter']['field']));
+		$filter_set = false;
+	}
+	else {
+		$filter_set = true;
+	}
+
+	/*
 	 * Select data
 	 */
-	if ($data['filter']['groups']) {
-		// which inventory fields we will need for displaying
-		$requiredInventoryFields = [
-			'name',
-			'type',
-			'os',
-			'serialno_a',
-			'tag',
-			'macaddress_a'
+	if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== '' && $filter_set) {
+		$options = [
+			'output' => ['hostid', 'name', 'status'],
+			'selectInventory' => ['name', 'type', 'os', 'serialno_a', 'tag', 'macaddress_a', $data['filter']['field']],
+			'selectGroups' => API_OUTPUT_EXTEND,
+			'groupids' => $filter_groupids,
+			'filter' => ['inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]]
 		];
 
-		// checking if correct inventory field is specified for filter
-		$possibleInventoryFields = getHostInventories();
-		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
+		if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== '') {
+			$options['searchInventory'] = [
+				$data['filter']['field'] => [$data['filter']['fieldValue']]
+			];
+		}
+
+		$data['hosts'] = API::Host()->get($options);
+
+		// filter exact matches
 		if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== ''
-				&& !isset($possibleInventoryFields[$data['filter']['field']])) {
-			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filter']['field']));
+				&& $data['filter']['exact'] != 0) {
+			$needle = mb_strtolower($data['filter']['fieldValue']);
+
+			foreach ($data['hosts'] as $num => $host) {
+				$haystack = mb_strtolower($data['hosts'][$num]['inventory'][$data['filter']['field']]);
+
+				if ($haystack !== $needle) {
+					unset($data['hosts'][$num]);
+				}
+			}
+		}
+
+		$sort_fields = [
+			'pr_name' => 'name',
+			'pr_type' => 'type',
+			'pr_os' => 'os',
+			'pr_serialno_a' => 'serialno_a',
+			'pr_tag' => 'tag',
+			'pr_macaddress_a' => 'macaddress_a'
+		];
+
+		if (array_key_exists($sortField, $sort_fields)) {
+			// copying an inventory field into the upper array level for sorting
+			foreach ($data['hosts'] as &$host) {
+				$host[$sortField] = $host['inventory'][$sort_fields[$sortField]];
+			}
+			unset($host);
+		}
+
+		$limit = $data['config']['search_limit'] + 1;
+
+		order_result($data['hosts'], $sortField, $sortOrder);
+
+		if ($sortOrder == ZBX_SORT_UP) {
+			$data['hosts'] = array_slice($data['hosts'], 0, $limit);
 		}
 		else {
-			// if we are filtering by field, this field is also required
-			if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== '') {
-				$requiredInventoryFields[] = $data['filter']['field'];
-			}
-
-			$options = [
-				'output' => ['hostid', 'name', 'status'],
-				'selectInventory' => $requiredInventoryFields,
-				'selectGroups' => API_OUTPUT_EXTEND,
-				'groupids' => array_keys($data['filter']['groups']),
-				'filter' => ['inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]]
-			];
-
-			if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== '') {
-				$options['searchInventory'] = [
-					$data['filter']['field'] => [$data['filter']['fieldValue']]
-				];
-			}
-
-			$data['hosts'] = API::Host()->get($options);
-
-			// filter exact matches
-			if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== ''
-					&& $data['filter']['exact'] != 0) {
-				$needle = mb_strtolower($data['filter']['fieldValue']);
-
-				foreach ($data['hosts'] as $num => $host) {
-					$haystack = mb_strtolower($data['hosts'][$num]['inventory'][$data['filter']['field']]);
-
-					if ($haystack !== $needle) {
-						unset($data['hosts'][$num]);
-					}
-				}
-			}
-
-			$sort_fields = [
-				'pr_name' => 'name',
-				'pr_type' => 'type',
-				'pr_os' => 'os',
-				'pr_serialno_a' => 'serialno_a',
-				'pr_tag' => 'tag',
-				'pr_macaddress_a' => 'macaddress_a'
-			];
-
-			if (array_key_exists($sortField, $sort_fields)) {
-				// copying an inventory field into the upper array level for sorting
-				foreach ($data['hosts'] as &$host) {
-					$host[$sortField] = $host['inventory'][$sort_fields[$sortField]];
-				}
-				unset($host);
-			}
-
-			$limit = $data['config']['search_limit'] + 1;
-
-			order_result($data['hosts'], $sortField, $sortOrder);
-
-			if ($sortOrder == ZBX_SORT_UP) {
-				$data['hosts'] = array_slice($data['hosts'], 0, $limit);
-			}
-			else {
-				$data['hosts'] = array_slice($data['hosts'], -$limit, $limit);
-			}
-
-			order_result($data['hosts'], $sortField, $sortOrder);
+			$data['hosts'] = array_slice($data['hosts'], -$limit, $limit);
 		}
+
+		order_result($data['hosts'], $sortField, $sortOrder);
 	}
 
 	// pager
