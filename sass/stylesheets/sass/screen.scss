@@ -4847,8 +4847,9 @@ $form-icon-btn: (
 	overflow: hidden;
 	resize: none;
 	word-break: break-all;
-	white-space: normal;
 	height: 24px;
+	line-height: 14px;
+	white-space: break-spaces;
 }
 
 // Map widget back to parent button.
@@ -4911,11 +4912,6 @@ $form-icon-btn: (
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
-
-	// for IE11
-	textarea {
-		white-space: pre-wrap;
-	}
 
 	.debug-output {
 		margin: 10px 0 0;

@@ -17,48 +17,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package cpucollector
+package cpu
 
 import (
 	"encoding/json"
 	"errors"
 	"strconv"
-
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-	cpus []*cpuUnit
-}
+const pluginName = "Cpu"
 
 var impl Plugin
 
 const (
-	maxHistory = 60*15 + 1
+	maxHistory = 60*15 + 2
 )
 
 const (
 	cpuStatusOffline = 1 << iota
 	cpuStatusOnline
 )
-const (
-	stateUser = iota
-	stateNice
-	stateSystem
-	stateIdle
-	stateIowait
-	stateIrq
-	stateSoftirq
-	stateSteal
-	stateGcpu
-	stateGnice
-)
 
 var cpuStatuses [3]string = [3]string{"", "offline", "online"}
 
+type cpuCounter int
 type historyIndex int
 
 func (h historyIndex) inc() historyIndex {
@@ -85,24 +67,16 @@ func (h historyIndex) sub(value historyIndex) historyIndex {
 	return h
 }
 
-type cpuStats struct {
-	counters [10]uint64
-}
-
 type cpuUnit struct {
 	index      int
 	head, tail historyIndex
-	history    [maxHistory]cpuStats
+	history    [maxHistory]cpuCounters
 	status     int
 }
 
 type cpuDiscovery struct {
 	Number int    `json:"{#CPU.NUMBER}"`
 	Status string `json:"{#CPU.STATUS}"`
-}
-
-func (p *Plugin) Collect() (err error) {
-	return p.collect()
 }
 
 func (p *Plugin) Period() int {
@@ -144,133 +118,76 @@ func (p *Plugin) getCpuNum(params []string) (result interface{}, err error) {
 	}
 
 	var num int
-	for _, cpu := range p.cpus {
-		if cpu.status&mask != 0 {
+	for i := 1; i < len(p.cpus); i++ {
+		if p.cpus[i].status&mask != 0 {
 			num++
 		}
 	}
 	return num, nil
 }
 
-func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
-	index := 0
-	state := stateUser
-	statRange := historyIndex(60)
+func periodByMode(mode string) (period historyIndex) {
+	switch mode {
+	case "", "avg1":
+		return 60
+	case "avg5":
+		return 60 * 5
+	case "avg15":
+		return 60 * 15
+	default:
+		return -1
+	}
+}
 
+func indexByCpu(cpu string) (index int) {
+	if cpu == "" || cpu == "all" {
+		return 0
+	}
+	if i, err := strconv.ParseInt(cpu, 10, 32); err != nil {
+		return -1
+	} else {
+		return int(i) + 1
+	}
+}
+
+func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
+	var index int
+	var counter cpuCounter
+	period := historyIndex(60)
 	switch len(params) {
 	case 3: // mode parameter
-		switch params[2] {
-		case "", "avg1":
-			statRange = 60
-		case "avg5":
-			statRange = 60 * 5
-		case "avg15":
-			statRange = 60 * 15
-		default:
+		if period = periodByMode(params[2]); period < 0 {
 			return nil, errors.New("Invalid third parameter.")
 		}
-
 		fallthrough
 	case 2: // type parameter
-		if state, err = p.getStateIndex(params[1]); err != nil {
+		if counter = counterByType(params[1]); counter == counterUnknown {
 			return nil, errors.New("Invalid second parameter.")
 		}
 		fallthrough
 	case 1: // cpu number or all;
-		if params[0] != "" && params[0] != "all" {
-			if i, err := strconv.ParseInt(params[0], 10, 32); err != nil {
-				return nil, errors.New("Invalid first parameter.")
-			} else {
-				index = int(i) + 1
-			}
+		if index = indexByCpu(params[0]); index < 0 || index >= len(p.cpus) {
+			return nil, errors.New("Invalid first parameter.")
 		}
 	case 0:
 	default:
 		return nil, errors.New("Too many parameters.")
 	}
 
-	if index < 0 || index >= len(p.cpus) {
-		return nil, errors.New("Invalid first parameter.")
-	}
 	cpu := p.cpus[index]
 	if cpu.status == cpuStatusOffline {
 		return nil, errors.New("CPU is offline.")
 	}
-	if cpu.head == cpu.tail {
-		log.Debugf("no collected data for CPU %d", index-1)
-		return nil, nil
-	}
-
-	var tail, head *cpuStats
-	totalnum := cpu.tail - cpu.head
-	if totalnum < 0 {
-		totalnum += maxHistory
-	}
-	if totalnum < 2 {
-		// need at least two samples to calculate utilization
-		return
-	}
-	if totalnum < statRange {
-		statRange = totalnum
-	}
-	tail = &cpu.history[cpu.tail.dec()]
-	if totalnum > 1 {
-		head = &cpu.history[cpu.tail.sub(statRange)]
-	} else {
-		head = &cpuStats{}
-	}
-
-	var counter, total uint64
-	for i := 0; i < len(tail.counters); i++ {
-		if tail.counters[i] > head.counters[i] {
-			total += tail.counters[i] - head.counters[i]
-		}
-	}
-	if total == 0 {
-		return 0, nil
-	}
-
-	if tail.counters[state] > head.counters[state] {
-		counter = tail.counters[state] - head.counters[state]
-	}
-
-	return float64(counter) * 100 / float64(total), nil
+	return cpu.counterAverage(counter, period), nil
 }
 
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if p.cpus == nil || p.cpus[0].head == p.cpus[0].tail {
-		// no data gathered yet
-		return
-	}
-	switch key {
-	case "system.cpu.discovery":
-		return p.getCpuDiscovery(params)
-	case "system.cpu.num":
-		return p.getCpuNum(params)
-	case "system.cpu.util":
-		return p.getCpuUtil(params)
-	default:
-		return nil, plugin.UnsupportedMetricError
-	}
-}
-
-func (p *Plugin) Start() {
-	impl.cpus = make([]*cpuUnit, impl.numCPU()+1)
-	for i := 0; i < len(impl.cpus); i++ {
-		impl.cpus[i] = &cpuUnit{
+func (p *Plugin) newCpus(num int) (cpus []*cpuUnit) {
+	cpus = make([]*cpuUnit, num+1)
+	for i := 0; i < len(cpus); i++ {
+		cpus[i] = &cpuUnit{
 			index:  i - 1,
 			status: cpuStatusOffline,
 		}
 	}
-}
-
-func (p *Plugin) Stop() {
-	impl.cpus = nil
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "CpuCollector",
-		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
-		"system.cpu.num", "Number of CPUs.",
-		"system.cpu.util", "CPU utilisation percentage.")
+	return
 }

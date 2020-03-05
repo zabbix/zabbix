@@ -45,7 +45,21 @@
 				'mask': 'dashbrd-grid-widget-mask',
 				'hidden_header': 'dashbrd-grid-widget-hidden-header'
 			},
+			widget_actions = {
+				'widgetType': widget['type'],
+				'widgetName': widget['widgetid'],
+				'currentRate': widget['rf_rate'],
+				'multiplier': '0'
+			},
 			classes = widget['iterator'] ? iterator_classes : widget_classes;
+
+		if ('graphid' in widget['fields']) {
+			widget_actions['graphid'] = widget['fields']['graphid'];
+		}
+
+		if ('itemid' in widget['fields']) {
+			widget_actions['itemid'] = widget['fields']['itemid'];
+		}
 
 		widget['content_header'] = $('<div>', {'class': classes['head']})
 			.append($('<h4>').text((widget['header'] !== '')
@@ -104,14 +118,10 @@
 							$('<button>', {
 								'type': 'button',
 								'class': 'btn-widget-action',
-								'title': t('Adjust widget refresh interval'),
+								'title': t('Actions'),
 								'data-menu-popup': JSON.stringify({
-									'type': 'refresh',
-									'data': {
-										'widgetName': widget['widgetid'],
-										'currentRate': widget['rf_rate'],
-										'multiplier': '0'
-									}
+									'type': 'widget_actions',
+									'data': widget_actions
 								}),
 								'attr': {
 									'aria-haspopup': true
@@ -194,6 +204,13 @@
 					leaveWidget($obj, data, widget);
 				}
 			});
+
+		$div.on('load.image', function() {
+			// Call refreshCallback handler for expanded popup menu items.
+			if ($div.find('[data-expanded="true"][data-menu-popup]').length) {
+				$div.find('[data-expanded="true"][data-menu-popup]').menuPopup('refresh', widget);
+			}
+		});
 
 		return $div;
 	}
@@ -2186,6 +2203,11 @@
 					// Update the widget, if it was resized before it was fully loaded.
 					resizeWidget($obj, data, widget);
 				}
+
+				// Call refreshCallback handler for expanded popup menu items.
+				if ($obj.find('[data-expanded="true"][data-menu-popup]').length) {
+					$obj.find('[data-expanded="true"][data-menu-popup]').menuPopup('refresh', widget);
+				}
 			})
 			.fail(function() {
 				// TODO: gentle message about failed update of widget content
@@ -3634,7 +3656,7 @@
 			var widgets_found = [];
 			this.each(function() {
 				var	$this = $(this),
-						data = $this.data('dashboardGrid');
+					data = $this.data('dashboardGrid');
 
 				$.each(data['widgets'], function(index, widget) {
 					if (typeof widget[key] !== 'undefined' && widget[key] === value) {

@@ -525,7 +525,7 @@ class CMacrosResolverHelper {
 	 *
 	 * @return string
 	 */
-	public static function resolveMapLabelMacros($label, $replaceHosts = null) {
+	public static function resolveMapLabelMacros($label, array $replaceHosts = []) {
 		self::init();
 
 		return self::$macrosResolver->resolveMapLabelMacros($label, $replaceHosts);

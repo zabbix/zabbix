@@ -23,19 +23,25 @@ import (
 	"sync"
 )
 
-var waitGroup sync.WaitGroup
+const (
+	Input = iota
+	Scheduler
+	Output
+)
+
+var waitGroup [3]sync.WaitGroup
 
 // ServiceStarted must be called by internal services at start
-func Register() {
-	waitGroup.Add(1)
+func Register(group int) {
+	waitGroup[group].Add(1)
 }
 
 // ServiceStopped must be called by internal services at exit
-func Unregister() {
-	waitGroup.Done()
+func Unregister(group int) {
+	waitGroup[group].Done()
 }
 
 // WaitForServices waits until all started services are stopped
-func Wait() {
-	waitGroup.Wait()
+func Wait(group int) {
+	waitGroup[group].Wait()
 }

@@ -141,7 +141,7 @@ if ($user_type == USER_TYPE_SUPER_ADMIN) {
 				'action' => 'report.status'
 			])
 			->insertAfter(_('Triggers top 100'), _('Audit'), [
-				'action' => 'auditlogs.php'
+				'action' => 'auditlog.list'
 			])
 			->insertAfter(_('Audit'), _('Action log'), [
 				'action' => 'auditacts.php'
