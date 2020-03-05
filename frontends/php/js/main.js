@@ -18,6 +18,9 @@
 **/
 
 
+// Global constants.
+const UI_TRANSITION_DURATION = 300;
+
 // Array indexOf method for javascript<1.6 compatibility
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (searchElement) {

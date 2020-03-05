@@ -99,7 +99,7 @@ class CSidebar extends CBaseComponent {
 			}
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
-				this._timer = setTimeout(() => this.addClass('focus-off'), 300);
+				this._opened_timer = setTimeout(() => this.addClass('focus-off'), UI_TRANSITION_DURATION);
 			}
 
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
@@ -144,13 +144,13 @@ class CSidebar extends CBaseComponent {
 		this._events = {
 
 			mouseenter: () => {
-				clearTimeout(this._timer);
+				clearTimeout(this._opened_timer);
 				this.open();
 			},
 
 			mouseleave: () => {
 				if (!this._is_focused || document.activeElement.parentElement.classList.contains('has-submenu')) {
-					this._timer = setTimeout(() => this.close(), SIDEBAR_HOVER_DELAY);
+					this._opened_timer = setTimeout(() => this.close(), SIDEBAR_HOVER_DELAY);
 				}
 			},
 
@@ -188,23 +188,27 @@ class CSidebar extends CBaseComponent {
 				e.preventDefault();
 			},
 
-			expand: () => {
-				let timer;
-				this.on('mouseleave', () => {
-					timer = setTimeout(() => {
-						ZABBIX.MenuMain
-							.expandSelected()
-							.focusSelected();
-					}, MENU_EXPAND_SELECTED_DELAY);
-				});
+			expandSelected: () => {
+				this._expand_timer = setTimeout(() => {
+					ZABBIX.MenuMain
+						.expandSelected()
+						.focusSelected();
+				}, MENU_EXPAND_SELECTED_DELAY);
+			},
 
-				this.on('mouseenter', () => {
-					clearTimeout(timer);
-				});
+			cancelExpandSelected: () => {
+				clearTimeout(this._expand_timer);
+			},
+
+			expand: () => {
+				this.on('mouseleave', this._events.expandSelected);
+				this.on('mouseenter', this._events.cancelExpandSelected);
 			},
 
 			viewmodechange: (e) => {
 				if (e.target.classList.contains('button-compact')) {
+					ZABBIX.MenuMain.collapseAll();
+					clearTimeout(this._expand_timer);
 					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
 				}
 				else if (e.target.classList.contains('button-hide')) {
@@ -248,6 +252,8 @@ class CSidebar extends CBaseComponent {
 				}
 				else {
 					ZABBIX.MenuMain.off('expand', this._events.expand);
+					this.off('mouseleave', this._events.expandSelected);
+					this.off('mouseenter', this._events.cancelExpandSelected);
 				}
 			}
 		};
