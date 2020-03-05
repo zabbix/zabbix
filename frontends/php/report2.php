@@ -372,7 +372,8 @@ else {
 			->addRow(_('Template group'), $filter_groupid_combobox)
 			->addRow(_('Template'), $filter_hostid_combobox)
 			->addRow(_('Template trigger'), $tpl_triggerid_combobox)
-			->addRow(_('Host group'), $hostgroupid_combobox);
+			->addRow(_('Host group'), $hostgroupid_combobox)
+			->addVar('filter_set', '1');
 	}
 	// Report by host.
 	else {
