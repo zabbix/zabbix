@@ -100,7 +100,7 @@ class CSeverity extends CRadioButtonList {
 	/**
 	 * Generate array with severity values from minimal.
 	 *
-	 * @param int $min Minimal severity.
+	 * @param int $min  Minimal severity.
 	 *
 	 * @return array
 	 */
