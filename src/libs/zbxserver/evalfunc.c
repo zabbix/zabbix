@@ -3238,7 +3238,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __func__, host, key, function, parameter);
 
 	value = zbx_malloc(value, MAX_BUFFER_LEN);
-	
+
 	DCconfig_get_items_by_keys(&item, &host_key, &errcode, 1);
 
 	zbx_timespec(&ts);
