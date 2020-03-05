@@ -55,7 +55,7 @@ trait MacrosTrait {
 				],
 				$value_column => [
 					'name' => 'value',
-					'selector' => 'xpath:./textarea',
+					'selector' => 'xpath:./div/textarea',
 					'class' => 'CElement'
 				],
 				'Description' => [

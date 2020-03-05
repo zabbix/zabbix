@@ -443,7 +443,7 @@ abstract class testFormMacros extends CWebTest {
 			$macro = [];
 			$row = $table->getRow($i);
 			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
-			$macro['value'] = $row->query('xpath:./td[3]/textarea')->one()->getValue();
+			$macro['value'] = $row->query('xpath:./td[2]/div/textarea')->one()->getValue();
 			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
 
 			$macros['frontend'][] = $macro;
