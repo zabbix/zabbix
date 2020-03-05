@@ -60,7 +60,7 @@ if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		access_deny();
 	}
 	if (getRequest('filter_hostids') && !isReadableTemplates([getRequest('filter_hostids')])) {
-		//access_deny();
+		access_deny();
 	}
 	if (getRequest('tpl_triggerid')) {
 		$trigger = API::Trigger()->get([
@@ -118,14 +118,20 @@ elseif (hasRequest('filter_rst')) {
 // Get filter values.
 $data['filter'] = ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE)
 	? [
-		'groups' => getRequest('filter_groups', CProfile::get($key_prefix.'.groupid', 0)), // 'Template group' field.
-		'hostids' => getRequest('filter_hostids', CProfile::get($key_prefix.'.hostid', 0)), // 'Template' field.
-		'tpl_triggerid' => getRequest('tpl_triggerid', CProfile::get($key_prefix.'.tpl_triggerid', 0)), // 'Template trigger' field.
-		'hostgroupid' => getRequest('hostgroupid', CProfile::get($key_prefix.'.hostgroupid', 0)) // 'Host group' field.
+		// 'Template group' field.
+		'groups' => getRequest('filter_groups', CProfile::get($key_prefix.'.groupid', 0)),
+		// 'Template' field.
+		'hostids' => getRequest('filter_hostids', CProfile::get($key_prefix.'.hostid', 0)),
+		// 'Template trigger' field.
+		'tpl_triggerid' => getRequest('tpl_triggerid', CProfile::get($key_prefix.'.tpl_triggerid', 0)),
+		// 'Host group' field.
+		'hostgroupid' => getRequest('hostgroupid', CProfile::get($key_prefix.'.hostgroupid', 0))
 	]
 	: [
-		'groups' => CProfile::getArray($key_prefix.'.groupids', getRequest('filter_groups', [])), // 'Host groups' field.
-		'hostids' => CProfile::getArray($key_prefix.'.hostids', getRequest('filter_hostids', [])) // 'Hosts' field.
+		// 'Host groups' field.
+		'groups' => CProfile::getArray($key_prefix.'.groupids', getRequest('filter_groups', [])),
+		// 'Hosts' field.
+		'hostids' => CProfile::getArray($key_prefix.'.hostids', getRequest('filter_hostids', []))
 	];
 
 // Get time selector filter values.
