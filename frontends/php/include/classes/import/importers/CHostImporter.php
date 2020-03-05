@@ -146,8 +146,8 @@ class CHostImporter extends CImporter {
 
 		// create interfaces cache interface_ref->interfaceid
 		$dbInterfaces = API::HostInterface()->get([
-			'hostids' => $this->processedHostIds,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'hostids' => $this->processedHostIds
 		]);
 
 		foreach ($hosts as $host) {
@@ -161,8 +161,8 @@ class CHostImporter extends CImporter {
 
 					foreach ($dbInterfaces as $dbInterface) {
 						if ($hostId == $dbInterface['hostid']
-								&& $dbInterface['ip'] == $interface['ip']
-								&& $dbInterface['dns'] == $interface['dns']
+								&& $dbInterface['ip'] === $interface['ip']
+								&& $dbInterface['dns'] === $interface['dns']
 								&& $dbInterface['useip'] == $interface['useip']
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
