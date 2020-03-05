@@ -73,6 +73,14 @@ zbx_libxml_error_t;
 #define ZBX_REQUEST_ITEM_LOG_NSEVERITY	206
 #define ZBX_REQUEST_ITEM_LOG_EVENTID	207
 
+static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen);
+
+static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
+		char *error, size_t maxerrlen);
+
 /******************************************************************************
  *                                                                            *
  * Function: get_N_functionid                                                 *
@@ -910,7 +918,7 @@ int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **r
 		return FAIL;
 
 	key = zbx_strdup(NULL, dc_item->key_orig);
-	substitute_key_macros(&key, NULL, dc_item, NULL, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	substitute_key_macros_impl(&key, NULL, dc_item, NULL, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 	if (NULL != name)
 	{
@@ -2746,7 +2754,7 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error
 	else
 	{
 		*replace_to = zbx_strdup(*replace_to, event->trigger.opdata);
-		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, replace_to,
+		substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, replace_to,
 				MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 	}
 
@@ -2755,14 +2763,14 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_simple_macros                                         *
+ * Function: substitute_simple_macros_impl                                    *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
@@ -3104,7 +3112,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
-					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros_impl(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
 							maxerrlen);
 				}
@@ -3151,7 +3159,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
-					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros_impl(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
 							maxerrlen);
 				}
@@ -3179,7 +3187,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.url);
-					substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
@@ -3352,7 +3360,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
-					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros_impl(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error,
 							maxerrlen);
 				}
@@ -3383,7 +3391,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.description);
-					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros_impl(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
 							maxerrlen);
 				}
@@ -3410,7 +3418,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.url);
-					substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
@@ -4650,7 +4658,7 @@ zbx_trigger_func_position_t;
  ******************************************************************************/
 static int	expand_trigger_macros(DB_EVENT *event, DC_TRIGGER *trigger, char *error, size_t maxerrlen)
 {
-	if (FAIL == substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	if (FAIL == substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			&trigger->expression, MACRO_TYPE_TRIGGER_EXPRESSION, error, maxerrlen))
 	{
 		return FAIL;
@@ -4658,7 +4666,7 @@ static int	expand_trigger_macros(DB_EVENT *event, DC_TRIGGER *trigger, char *err
 
 	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
 	{
-		if (FAIL == substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		if (FAIL == substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&trigger->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, error, maxerrlen))
 		{
 			return FAIL;
@@ -5381,7 +5389,7 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, const str
 	/* extract key and substitute macros */
 	*dot = '\0';
 	key = zbx_strdup(key, *data + token->data.simple_macro.key.l);
-	substitute_key_macros(&key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	substitute_key_macros_impl(&key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	*dot = '.';
 
 	zbx_strcpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, key);
@@ -5760,7 +5768,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 		unquote_key_param(*param);
 
 	if (NULL == jp_row)
-		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL, NULL,
+		substitute_simple_macros_impl(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL, NULL,
 				param, macro_type, NULL, 0);
 	else
 		substitute_lld_macros(param, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
@@ -5776,7 +5784,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_key_macros                                            *
+ * Function: substitute_key_macros_impl                                       *
  *                                                                            *
  * Purpose: safely substitutes macros in parameters of an item key and OID    *
  *                                                                            *
@@ -5809,8 +5817,9 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, int macro_type, char *error, size_t maxerrlen)
+static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
+		char *error, size_t maxerrlen)
 {
 	replace_key_param_data_t	replace_key_param_data;
 	int				key_type, ret;
@@ -5903,7 +5912,7 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 			char	*key = NULL, *host = NULL;
 
 			if (SUCCEED != parse_host_key(param, &host, &key) ||
-					SUCCEED != substitute_key_macros(&key, NULL, NULL, jp_row, lld_macro_paths,
+					SUCCEED != substitute_key_macros_impl(&key, NULL, NULL, jp_row, lld_macro_paths,
 							MACRO_TYPE_ITEM_KEY, NULL, 0))
 			{
 				zbx_snprintf(error, max_error_len, "Invalid first parameter \"%s\"", param);
@@ -6055,7 +6064,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 
 				if (NULL != item)
 				{
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
+					substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
 							NULL, &value_tmp, MACRO_TYPE_HTTP_XML, NULL, 0);
 				}
 				else
@@ -6077,7 +6086,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 
 				if (NULL != item)
 				{
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
+					substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
 							NULL, &value_tmp, MACRO_TYPE_HTTP_RAW, NULL, 0);
 				}
 				else
@@ -6101,7 +6110,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 
 					if (NULL != item)
 					{
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host,
+						substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host,
 								item, NULL, NULL, &value_tmp, MACRO_TYPE_HTTP_XML,
 								NULL, 0);
 					}
@@ -6126,7 +6135,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_macros_xml                                            *
+ * Function: substitute_macros_xml_impl                                       *
  *                                                                            *
  * Purpose: substitute simple or LLD macros in XML text nodes, attributes of  *
  *          a node or in CDATA section, validate XML                          *
@@ -6140,7 +6149,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
  * Return value: SUCCEED or FAIL if XML validation has failed                 *
  *                                                                            *
  ******************************************************************************/
-int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+static int	substitute_macros_xml_impl(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen)
 {
 #ifndef HAVE_LIBXML2
@@ -6283,20 +6292,104 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_substitute_notification_macros                               *
+ * Function: substitute_simple_macros_secure                                  *
  *                                                                            *
- * Purpose: wrap substitute_simple_macros with nonsecure macro environment    *
+ * Purpose: substitute_simple_macros with non-secure user macro environment   *
+ *          (default setting)                                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_substitute_notification_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const DB_ACKNOWLEDGE *ack, char **data, int macro_type)
+int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
+{
+	return substitute_simple_macros_impl(actionid, event, r_event, userid, hostid, dc_host, dc_item, alert, ack,
+			data, macro_type, error, maxerrlen);
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_simple_macros_secure                                  *
+ *                                                                            *
+ * Purpose:substitute_simple_macros with secure user macro environment        *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_simple_macros_secure(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
 	unsigned char	old_macro_env;
 	int		ret;
 
-	old_macro_env = zbx_dc_set_macro_env(ZBX_MACRO_ENV_NONSECURE);
-	ret = substitute_simple_macros(actionid, event, r_event, userid, NULL, NULL, NULL, NULL, ack,
-			data, macro_type, NULL, 0);
+	old_macro_env = zbx_dc_set_macro_env(ZBX_MACRO_ENV_SECURE);
+	ret = substitute_simple_macros_impl(actionid, event, r_event, userid, hostid, dc_host, dc_item, alert, ack,
+			data, macro_type, error, maxerrlen);
+	zbx_dc_set_macro_env(old_macro_env);
+	return ret;
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_xml                                            *
+ *                                                                            *
+ * substitute_macros_xml with non-secure user macro environment               *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen)
+{
+	return substitute_macros_xml_impl(data, item, jp_row, lld_macro_paths, error, maxerrlen);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_xml_secure                                     *
+ *                                                                            *
+ * substitute_macros_xml with secure user macro environment                   *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_macros_xml_secure(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen)
+{
+	unsigned char	old_macro_env;
+	int		ret;
+
+	old_macro_env = zbx_dc_set_macro_env(ZBX_MACRO_ENV_SECURE);
+	ret = substitute_macros_xml_impl(data, item, jp_row, lld_macro_paths, error, maxerrlen);
+	zbx_dc_set_macro_env(old_macro_env);
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_key_macros                                            *
+ *                                                                            *
+ * substitute_key_macros with non-secure user macro environment               *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, int macro_type, char *error, size_t maxerrlen)
+{
+	return substitute_key_macros_impl(data, hostid, dc_item, jp_row, lld_macro_paths, macro_type, error, maxerrlen);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_key_macros_secure                                     *
+ *                                                                            *
+ * substitute_key_macros with secure user macro environment                   *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_key_macros_secure(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
+		char *error, size_t maxerrlen)
+{
+	unsigned char	old_macro_env;
+	int		ret;
+
+	old_macro_env = zbx_dc_set_macro_env(ZBX_MACRO_ENV_SECURE);
+	ret = substitute_key_macros_impl(data, hostid, dc_item, jp_row, lld_macro_paths, macro_type, error, maxerrlen);
 	zbx_dc_set_macro_env(old_macro_env);
 	return ret;
 }

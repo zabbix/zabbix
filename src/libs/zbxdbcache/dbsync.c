@@ -2094,7 +2094,7 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
 static char	**dbsync_trigger_preproc_row(char **row)
 {
 	zbx_vector_uint64_t	hostids, functionids;
-	unsigned char		flags = 0, old_macro_env;
+	unsigned char		flags = 0;
 
 
 	/* return the original row if user macros are not used in target columns */
@@ -2118,10 +2118,6 @@ static char	**dbsync_trigger_preproc_row(char **row)
 
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	/* expand user macros */
-
-	old_macro_env = zbx_dc_set_macro_env(ZBX_MACRO_ENV_NONSECURE);
-
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
 	{
 		row[2] = zbx_dc_expand_user_macros(row[2], hostids.values, hostids.values_num,
@@ -2133,8 +2129,6 @@ static char	**dbsync_trigger_preproc_row(char **row)
 		row[11] = zbx_dc_expand_user_macros(row[11], hostids.values, hostids.values_num,
 				dbsync_numeric_validator);
 	}
-
-	zbx_dc_set_macro_env(old_macro_env);
 
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_vector_uint64_destroy(&hostids);

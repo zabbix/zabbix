@@ -393,8 +393,10 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	message = (NULL == cancel_error ? zbx_strdup(NULL, msg) :
 			zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\n%s", cancel_error, msg));
 
-	zbx_substitute_notification_macros(&actionid, event, r_event, &userid, ack, &subject, macro_type);
-	zbx_substitute_notification_macros(&actionid, event, r_event, &userid, ack, &message, macro_type);
+	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
+			&subject, macro_type, NULL, 0);
+	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
+			&message, macro_type, NULL, 0);
 
 	if (0 == mediatypeid)
 	{
@@ -1058,10 +1060,10 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		{
 			script.command = zbx_strdup(script.command, row[12]);
 			script.command_orig = zbx_strdup(script.command_orig, row[12]);
-			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
+			substitute_simple_macros_secure(&actionid, event, r_event, NULL, NULL,
 					NULL, NULL, NULL, ack, &script.command, macro_type, NULL, 0);
-			zbx_substitute_notification_macros(&actionid, event, r_event, NULL, ack, &script.command_orig,
-					macro_type);
+			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
+					NULL, NULL, NULL, ack, &script.command_orig, macro_type, NULL, 0);
 		}
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
@@ -1195,7 +1197,7 @@ static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event,
 
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
 				ack, &name, message_type, NULL, 0);
-		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
+		substitute_simple_macros_secure(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
 				ack, &value, message_type, NULL, 0);
 
 		zbx_json_addstring(&json, name, value, ZBX_JSON_TYPE_STRING);

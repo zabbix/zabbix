@@ -95,7 +95,8 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_maintenance_precache_nested_groups(void);
 
-static unsigned char	macro_env = ZBX_MACRO_ENV_SECURE;
+/* by default the macro environment is non-secure and all secret macros are masked with ****** */
+static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
 
 /******************************************************************************
  *                                                                            *
