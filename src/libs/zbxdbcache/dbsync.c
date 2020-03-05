@@ -3476,7 +3476,6 @@ static char	**dbsync_item_pp_preproc_row(char **row)
 
 	zbx_uint64_t	hostid;
 	unsigned int	flags = 0;
-	unsigned char	old_macro_env;
 
 	if (SUCCEED == dbsync_check_row_macros(row, 3))
 		flags |= ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM;
@@ -3488,17 +3487,11 @@ static char	**dbsync_item_pp_preproc_row(char **row)
 	{
 		ZBX_STR2UINT64(hostid, row[5]);
 
-		/* user macros used in item preprocessing can be easily accessed/viewed - */
-		/* so its deemed non-secure environment and secret macros are masked      */
-		old_macro_env = zbx_dc_set_macro_env(ZBX_MACRO_ENV_NONSECURE);
-
 		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM))
 			row[3] = zbx_dc_expand_user_macros(row[3], &hostid, 1, NULL);
 
 		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM))
 			row[7] = zbx_dc_expand_user_macros(row[7], &hostid, 1, NULL);
-
-		zbx_dc_set_macro_env(old_macro_env);
 	}
 
 	return row;

@@ -675,7 +675,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 	if (SUCCEED != is_time_suffix(buffer, &delay, ZBX_LENGTH_UNLIMITED))
 	{
-		err_str = zbx_strdup(err_str, "invalid update interval value");
+		err_str = zbx_dsprintf(err_str, "update interval \"%s\" is invalid", buffer);
 		lastfailedstep = -1;
 		goto httptest_error;
 	}
@@ -758,12 +758,12 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		if (SUCCEED != is_time_suffix(buffer, &db_httpstep.timeout, ZBX_LENGTH_UNLIMITED))
 		{
-			err_str = zbx_strdup(err_str, "invalid timeout value");
+			err_str = zbx_dsprintf(err_str, "timeout \"%s\" is invalid", buffer);
 			goto httpstep_error;
 		}
 		else if (db_httpstep.timeout < 1 || SEC_PER_HOUR < db_httpstep.timeout)
 		{
-			err_str = zbx_strdup(err_str, "timeout value is out of 1-3600 seconds bounds");
+			err_str = zbx_dsprintf(err_str, "timeout \"%s\" is out of 1-3600 seconds bounds", buffer);
 			goto httpstep_error;
 		}
 

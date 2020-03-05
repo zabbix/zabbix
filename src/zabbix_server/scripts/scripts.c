@@ -57,14 +57,14 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 
 	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
 	{
-		zbx_strlcpy(error, "Invalid agent interface port value.", max_error_len);
+		zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item.interface.port_orig);
 		goto fail;
 	}
 
 	param = zbx_strdup(param, command);
 	if (SUCCEED != (ret = quote_key_param(&param, 0)))
 	{
-		zbx_strlcpy(error, "Cannot prepare command to be executed with system.run key.", max_error_len);
+		zbx_snprintf(error, max_error_len, "Invalid param [%s]", param);
 		goto fail;
 	}
 
@@ -357,7 +357,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 
 			if ('\0' != *script->port && SUCCEED != (ret = is_ushort(script->port, NULL)))
 			{
-				zbx_strlcpy(error, "Invalid port value.", max_error_len);
+				zbx_snprintf(error, max_error_len, "Invalid port number \"%s\"", script->port);
 				goto out;
 			}
 
