@@ -53,26 +53,26 @@
 </script>
 
 <script type="text/javascript">
-	let table = jQuery('#tbl_macros');
+	const table = jQuery('#tbl_macros');
 
 	table
 		.dynamicRows({template: '#macro-row-tmpl'})
 		.on('afteradd.dynamicRows', function() {
 			jQuery('.input-group', table).macroValue();
 		})
-		.find('.input-group').macroValue();
+		.find('.input-group')
+		.macroValue();
 
 	table
-		.on('change keydown', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>.macro', function(e) {
-			if (e.type === 'change' || e.which === 13) {
+		.on('change keydown', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>.macro', function(event) {
+			if (event.type === 'change' || event.which === 13) {
 				jQuery(this)
-					.val(jQuery(this).val().replace(/([^:]+)/, function(val) {
-						return val.toUpperCase('$1');
-					}))
+					.val(jQuery(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')))
 					.textareaFlexible();
 			}
 		})
-		.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
+		.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+		.textareaFlexible();
 
 	class MassUpdateMacros {
 
