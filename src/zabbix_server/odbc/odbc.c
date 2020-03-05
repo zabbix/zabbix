@@ -215,7 +215,7 @@ static void	zbx_log_odbc_connection_info(const char *function, SQLHDBC hdbc)
  *             value          - [IN] attribute value                          *
  *                                                                            *
  ******************************************************************************/
-void zbx_odbc_connection_string_append(char **connection_str, const char *attribute, const char *value)
+static void zbx_odbc_connection_string_append(char **connection_str, const char *attribute, const char *value)
 {
 	size_t	len;
 	char	last = '\0';
@@ -287,21 +287,21 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *connection
 					{
 						char	*connection_str;
 
-						connection_str = (char*)connection;
+						connection_str = NULL;
 
 						if (NULL != user || NULL != pass)
 						{
 							connection_str = zbx_strdup(NULL, connection);
 							zbx_odbc_connection_string_append(&connection_str, "UID", user);
 							zbx_odbc_connection_string_append(&connection_str, "PWD", pass);
+							connection = connection_str;
 						}
 
 						rc = SQLDriverConnect(data_source->hdbc, NULL,
-								(SQLCHAR *)connection_str, SQL_NTS, NULL, 0, NULL,
+								(SQLCHAR *)connection, SQL_NTS, NULL, 0, NULL,
 								SQL_DRIVER_NOPROMPT);
 
-						if (connection_str != connection)
-							zbx_free(connection_str);
+						zbx_free(connection_str);
 					}
 					else
 					{
