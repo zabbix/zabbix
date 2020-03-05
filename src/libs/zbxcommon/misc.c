@@ -2089,9 +2089,7 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 fail:
 	if (NULL != error)
 	{
-		*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
-				(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)),
-				interval_str);
+		*error = zbx_dsprintf(*error, "Invalid %s interval.", interval_type);
 	}
 
 	flexible_interval_free(flexible);

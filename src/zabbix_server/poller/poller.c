@@ -522,8 +522,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
-					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
-								items[i].interface.port_orig));
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid port value."));
 					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
