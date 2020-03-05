@@ -92,12 +92,17 @@ $table = (new CTableInfo())->setHeader([
 	make_sorting_header(_('Host count'), 'host_count', $sortField, $sortOrder),
 ]);
 
+$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+if ($filter_groupids) {
+	$filter_groupids = getSubGroups($filter_groupids);
+}
+
 // To show a report, we will need a host group and a field to aggregate.
-if ($filter['groups'] && $filter['groupby'] !== '') {
+if ($filter['groupby'] !== '') {
 	$hosts = API::Host()->get([
 		'output' => ['hostid', 'name'],
 		'selectInventory' => [$filter['groupby']], // only one field is required
-		'groupids' => array_keys($filter['groups']),
+		'groupids' => $filter_groupids,
 		'filter' => [
 			'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
 		]
