@@ -193,7 +193,7 @@ else {
 	/*
 	 * Select data
 	 */
-	if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== '' && $filter_set) {
+	if ($data['filter']['field'] !== '' && $filter_set) {
 		$options = [
 			'output' => ['hostid', 'name', 'status'],
 			'selectInventory' => ['name', 'type', 'os', 'serialno_a', 'tag', 'macaddress_a', $data['filter']['field']],
@@ -202,7 +202,7 @@ else {
 			'filter' => ['inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]]
 		];
 
-		if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== '') {
+		if ($data['filter']['fieldValue'] !== '') {
 			$options['searchInventory'] = [
 				$data['filter']['field'] => [$data['filter']['fieldValue']]
 			];
@@ -211,8 +211,7 @@ else {
 		$data['hosts'] = API::Host()->get($options);
 
 		// filter exact matches
-		if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== ''
-				&& $data['filter']['exact'] != 0) {
+		if ($data['filter']['fieldValue'] !== '' && $data['filter']['exact'] != 0) {
 			$needle = mb_strtolower($data['filter']['fieldValue']);
 
 			foreach ($data['hosts'] as $num => $host) {
