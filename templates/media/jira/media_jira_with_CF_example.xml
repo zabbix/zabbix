@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-06T11:14:37Z</date>
+    <date>2020-03-06T11:56:40Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -329,7 +329,24 @@ try {&#13;
         fields = {},&#13;
         jira = {},&#13;
         update = {},&#13;
-        result = {tags: {}};&#13;
+        result = {tags: {}},&#13;
+        requiredParams = ['alert_subject', 'summary', 'event_recovery_value', 'event_source', 'event_value'];&#13;
+&#13;
+    Object.keys(params)&#13;
+        .forEach(function (key) {&#13;
+            if (key.startsWith('jira_')) {&#13;
+                jira[key.substring(5)] = params[key];&#13;
+            }&#13;
+            else if (key.startsWith('customfield_')) {&#13;
+                fields[key] = params[key];&#13;
+            }&#13;
+            else if (key.startsWith('event_update_')) {&#13;
+                update[key.substring(13)] = params[key];&#13;
+            }&#13;
+            else if (requiredParams.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
+                throw 'Parameter ' + key + 'can\'t be empty.';&#13;
+            }&#13;
+        });&#13;
 &#13;
     if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {&#13;
         throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
@@ -349,19 +366,6 @@ try {&#13;
     if (params.event_source !== '0' &amp;&amp; params.event_recovery_value === '0') {&#13;
         throw 'Recovery operations are supported only for trigger-based actions.';&#13;
     }&#13;
-&#13;
-    Object.keys(params)&#13;
-        .forEach(function (key) {&#13;
-            if (key.startsWith('jira_')) {&#13;
-                jira[key.substring(5)] = params[key];&#13;
-            }&#13;
-            else if (key.startsWith('customfield_')) {&#13;
-                fields[key] = params[key];&#13;
-            }&#13;
-            else if (key.startsWith('event_update_')) {&#13;
-                update[key.substring(13)] = params[key];&#13;
-            }&#13;
-        });&#13;
 &#13;
     Jira.setParams(jira);&#13;
 &#13;
