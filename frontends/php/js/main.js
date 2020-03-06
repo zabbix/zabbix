@@ -307,7 +307,7 @@ var hintBox = {
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
 			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
-			appendTo = appendTo || 'body';
+			appendTo = appendTo || '.wrapper';
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
@@ -400,73 +400,62 @@ var hintBox = {
 	},
 
 	positionHint: function(e, target) {
-		var wWidth = jQuery(window).width(),
-			wHeight = jQuery(window).height(),
-			scrollTop = jQuery(window).scrollTop(),
-			scrollLeft = jQuery(window).scrollLeft(),
-			hint_width = jQuery(target.hintBoxItem).outerWidth(),
-			hint_height = jQuery(target.hintBoxItem).outerHeight(),
-			top, left;
-
-		// uses stored clientX on afterload positioning when there is no event
 		if (e.clientX) {
 			target.clientX = e.clientX;
 			target.clientY = e.clientY;
 		}
 
-		// doesn't fit in the screen horizontally
-		if (hint_width + 10 > wWidth) {
-			left = scrollLeft + 2;
+		var $host = target.hintBoxItem.parent(),
+			host_offset = $host.offset(),
+			// Usable area relative to host.
+			host_x_min = $host.scrollLeft(),
+			host_x_max = Math.min($host[0].scrollWidth,
+				$(window).width() + $(window).scrollLeft() - host_offset.left + $host.scrollLeft()
+			),
+			host_y_min = $host.scrollTop(),
+			host_y_max = Math.min($host[0].scrollHeight,
+				$(window).height() + $(window).scrollTop() - host_offset.top + $host.scrollTop()
+			),
+			// Event coordinates relative to host.
+			event_x = target.clientX - host_offset.left + $host.scrollLeft(),
+			event_y = target.clientY - host_offset.top + $host.scrollTop(),
+			event_offset = 10,
+			// Hint box width and height.
+			hint_width = target.hintBoxItem.outerWidth(),
+			hint_height = target.hintBoxItem.outerHeight(),
+			// Fix width and height since browsers tend to reduce hintbox size when horizontal scrollbar is active.
+			css = {
+				width: target.hintBoxItem.width(),
+				height: target.hintBoxItem.height()
+			};
+
+		if (event_x + event_offset + hint_width <= host_x_max) {
+			css.left = event_x + event_offset;
 		}
-		// 10px to right if fit
-		else if (wWidth - target.clientX - 10 > hint_width) {
-			left = scrollLeft + target.clientX + 10;
-		}
-		// 10px from screen right side
 		else {
-			left = scrollLeft + wWidth - 10 - hint_width;
+			css.right = -$host.scrollLeft();
 		}
 
-		// 10px below if fit
-		if (wHeight - target.clientY - hint_height - 10 > 0) {
-			top = scrollTop + target.clientY + 10;
+		if (event_y + event_offset + hint_height <= host_y_max) {
+			css.top = event_y + event_offset;
 		}
-		// 10px above if fit
-		else if (target.clientY - hint_height - 10 > 0) {
-			top = scrollTop + target.clientY - hint_height - 10;
+		else if (event_y - event_offset - hint_height >= host_y_min) {
+			css.top = event_y - event_offset - hint_height;
 		}
-		// 10px below as fallback
 		else {
-			top = scrollTop + target.clientY + 10;
-		}
+			css.top = Math.max(host_y_min, Math.min(host_y_max - hint_height, event_y + event_offset));
 
-		// fallback if doesn't fit vertically but could fit if aligned to right or left
-		if ((top - scrollTop + hint_height > wHeight)
-				&& (target.clientX - 10 > hint_width || wWidth - target.clientX - 10 > hint_width)) {
+			if (css.right !== undefined) {
+				delete css.right;
 
-			// align to left if fit
-			if (wWidth - target.clientX - 10 > hint_width) {
-				left = scrollLeft + target.clientX + 10;
-			}
-			// align to right
-			else {
-				left = scrollLeft + target.clientX - hint_width - 10;
-			}
-
-			// 10px from bottom if fit
-			if (wHeight - 10 > hint_height) {
-				top = scrollTop + wHeight - hint_height - 10;
-			}
-			// 10px from top
-			else {
-				top = scrollTop + 10;
+				css.left = ((event_x - event_offset - hint_width >= host_x_min)
+					? event_x - event_offset - hint_width
+					: event_x + event_offset
+				);
 			}
 		}
 
-		target.hintBoxItem.css({
-			top: top + 'px',
-			left: left + 'px'
-		});
+		target.hintBoxItem.css(css);
 	},
 
 	hideHint: function(target, hideStatic) {

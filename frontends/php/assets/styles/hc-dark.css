@@ -184,7 +184,6 @@ body {
 
 body {
   display: flex;
-  min-width: 1200px;
   overflow: hidden; }
 
 aside
@@ -202,13 +201,15 @@ aside
 
 header,
 footer {
-  flex-shrink: 0; }
+  flex-shrink: 0;
+  min-width: 1200px; }
 
 header {
   margin-bottom: 10px; }
 
 main {
-  padding: 0 10px; }
+  padding: 0 10px;
+  min-width: 1200px; }
 
 footer {
   margin-top: auto; }

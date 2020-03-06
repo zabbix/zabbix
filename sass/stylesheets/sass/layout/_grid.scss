@@ -5,13 +5,11 @@ body {
 
 body {
 	display: flex;
-	min-width: 1200px;
 	overflow: hidden;
 }
 
 aside
-.wrapper,
-{
+.wrapper {
 	box-sizing: border-box;
 }
 
@@ -33,6 +31,7 @@ aside
 header,
 footer {
 	flex-shrink: 0;
+	min-width: 1200px;
 }
 
 header {
@@ -41,6 +40,7 @@ header {
 
 main {
 	padding: 0 10px;
+	min-width: 1200px;
 }
 
 footer {
