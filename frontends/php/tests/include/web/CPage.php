@@ -299,6 +299,7 @@ class CPage {
 
 			if ($this->height > self::DEFAULT_PAGE_HEIGHT || $this->width > self::DEFAULT_PAGE_WIDTH) {
 				$this->setViewport(max([
+					// Add 20px to page width when vertical scroll presents.
 					$this->width + (int)$size[2], self::DEFAULT_PAGE_WIDTH]),
 					max([$this->height, self::DEFAULT_PAGE_HEIGHT
 				]));
