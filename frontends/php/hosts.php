@@ -336,6 +336,31 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 		$_REQUEST['clone_hostid'] = $_REQUEST['hostid'];
 	}
 
+	if ($macros) {
+		$has_secret_macros = false;
+		foreach ($macros as &$macro) {
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				$has_secret_macros = true;
+
+				$macro['value'] = '';
+				$macro['type'] = ZBX_MACRO_TYPE_TEXT;
+			}
+		}
+		unset($macro);
+
+		if ($has_secret_macros) {
+			$msg = [
+				'type' => 'error',
+				'message' => _('This host contains macros with type "Secret text". The value and type of these macros was reseted.'),
+				'src' => ''
+			];
+
+			echo makeMessageBox(false, [$msg], null, true, false)
+				->removeAttribute('class')
+				->addClass(ZBX_STYLE_MSG_WARNING);
+		}
+	}
+
 	unset($_REQUEST['hostid'], $_REQUEST['flags']);
 }
 elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && hasRequest('masssave')) {

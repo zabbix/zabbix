@@ -193,6 +193,31 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		$_REQUEST['groups'] = $groups;
 	}
 
+	if ($macros) {
+		$has_secret_macros = false;
+		foreach ($macros as &$macro) {
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				$has_secret_macros = true;
+
+				$macro['value'] = '';
+				$macro['type'] = ZBX_MACRO_TYPE_TEXT;
+			}
+		}
+		unset($macro);
+
+		if ($has_secret_macros) {
+			$msg = [
+				'type' => 'error',
+				'message' => _('This template contains macros with type "Secret text". The value and type of these macros was reseted.'),
+				'src' => ''
+			];
+
+			echo makeMessageBox(false, [$msg], null, true, false)
+				->removeAttribute('class')
+				->addClass(ZBX_STYLE_MSG_WARNING);
+		}
+	}
+
 	if (hasRequest('clone')) {
 		unset($_REQUEST['templateid']);
 	}
