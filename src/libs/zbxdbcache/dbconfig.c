@@ -9611,21 +9611,6 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 		if (NULL != value)
 		{
-			int	escape_quote_escaped_value_len;
-			char	*escape_escaped_value = zbx_dyn_escape_string(value, "\\");
-			zbx_free(value);
-
-			char	*escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value, "\"");
-			zbx_free(escape_escaped_value);
-			escape_quote_escaped_value_len = strlen(escape_quote_escaped_value);
-
-			value = zbx_malloc(NULL, escape_quote_escaped_value_len + 3);
-			value[0] = '"';
-			zbx_strlcpy(value + 1,escape_quote_escaped_value, escape_quote_escaped_value_len + 1);
-			value[escape_quote_escaped_value_len + 1] ='"';
-			value[escape_quote_escaped_value_len + 2] = '\0';
-			zbx_free(escape_quote_escaped_value);
-
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
 			zbx_free(value);
 		}
@@ -9643,7 +9628,6 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 	}
 
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
-
 	return str;
 }
 
