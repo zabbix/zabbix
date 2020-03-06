@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-06T08:36:43Z</date>
+    <date>2020-03-06T11:14:37Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -127,6 +127,25 @@ var Jira = {&#13;
 &#13;
             Jira.params.url += 'rest/api/latest/';&#13;
         }&#13;
+    },&#13;
+&#13;
+    escapeMarkup: function (str) {&#13;
+        var i = str.length,&#13;
+            buffer = [],&#13;
+            chars = [123, 124, 125, 126, 128, 150, 95, 92, 91, 93, 94, 60, 62, 63, 33, 35, 43, 42, 38];&#13;
+&#13;
+        while (i--) {&#13;
+            var charCode = str[i].charCodeAt();&#13;
+&#13;
+            if ((chars.indexOf(charCode) !== -1)) {&#13;
+                buffer[i] = '&amp;#' + charCode + ';';&#13;
+            }&#13;
+            else {&#13;
+                buffer[i] = str[i];&#13;
+            }&#13;
+        }&#13;
+&#13;
+        return buffer.join('');&#13;
     },&#13;
 &#13;
     addCustomFields: function (data, fields) {&#13;
@@ -297,7 +316,7 @@ var Jira = {&#13;
             data.body = update.user + ' ' + update.action + '.';&#13;
 &#13;
             if (update.message) {&#13;
-                data.body += '\nMessage: {quote}' + update.message + '{quote}';&#13;
+                data.body += '\nMessage: {quote}' + Jira.escapeMarkup(update.message) + '{quote}';&#13;
             }&#13;
 &#13;
             Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
