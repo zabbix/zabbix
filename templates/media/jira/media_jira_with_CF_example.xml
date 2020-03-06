@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-06T06:24:23Z</date>
+    <date>2020-03-06T06:55:49Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -309,7 +309,8 @@ try {&#13;
     var params = JSON.parse(value),&#13;
         fields = {},&#13;
         jira = {},&#13;
-        update = {};&#13;
+        update = {},&#13;
+        result = {tags: {}};&#13;
 &#13;
     if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {&#13;
         throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
@@ -344,20 +345,16 @@ try {&#13;
     // Create issue for non trigger-based events.&#13;
     if (params.event_source !== '0' &amp;&amp; params.event_recovery_value !== '0') {&#13;
         Jira.createIssue(params.alert_subject, params.alert_message);&#13;
-&#13;
-        return 'OK';&#13;
     }&#13;
     // Create issue for trigger-based events.&#13;
     else if (params.event_value === '1' &amp;&amp; update.status === '0' &amp;&amp; !jira.issue_key.startsWith(jira.project_key)) {&#13;
         var key = Jira.createIssue(params.summary,&#13;
             (Object.keys(fields).length ? params.trigger_description : params.alert_message), fields);&#13;
 &#13;
-        return JSON.stringify({&#13;
-            tags: {&#13;
-                __zbx_jira_issuekey: key,&#13;
-                __zbx_jira_issuelink: params.jira_url + (params.jira_url.endsWith('/') ? '' : '/') + 'browse/' + key&#13;
-            }&#13;
-        });&#13;
+&#13;
+        result.tags.__zbx_jira_issuekey = key;&#13;
+        result.tags.__zbx_jira_issuelink = params.jira_url +&#13;
+            (params.jira_url.endsWith('/') ? '' : '/') + 'browse/' + key;&#13;
     }&#13;
     // Update created issue for trigger-based event.&#13;
     else {&#13;
@@ -367,9 +364,9 @@ try {&#13;
         Jira.updateIssue(params.summary, fields,&#13;
             ((params.event_value === '0' &amp;&amp; !Object.keys(fields).length)&#13;
                 ? params.alert_message : update));&#13;
-&#13;
-        return 'OK';&#13;
     }&#13;
+&#13;
+    return JSON.stringify(result);&#13;
 }&#13;
 catch (error) {&#13;
     Zabbix.Log(3, '[ Jira Webhook ] ERROR: ' + error);&#13;
