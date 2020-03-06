@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-04T12:41:23Z</date>
+    <date>2020-03-06T05:27:24Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -293,7 +293,7 @@ var Jira = {&#13;
             data.body = update;&#13;
             Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
         }&#13;
-        else if (update.status == 1) {&#13;
+        else if (update.status === '1') {&#13;
             data.body = update.user + ' ' + update.action + '.';&#13;
 &#13;
             if (update.message) {&#13;
@@ -339,12 +339,12 @@ try {&#13;
 &#13;
     Jira.setParams(jira);&#13;
 &#13;
-    if (params.event_source != 0 &amp;&amp; params.event_recovery_value !== '0') {&#13;
+    if (params.event_source !== '0' &amp;&amp; params.event_recovery_value !== '0') {&#13;
         Jira.createIssue(params.alert_subject, params.alert_message);&#13;
 &#13;
         return 'OK';&#13;
     }&#13;
-    else if (params.event_value == 1 &amp;&amp; update.status == 0 &amp;&amp; !jira.issue_key.startsWith(jira.project_key)) {&#13;
+    else if (params.event_value === '1' &amp;&amp; update.status === '0' &amp;&amp; !jira.issue_key.startsWith(jira.project_key)) {&#13;
         var key = Jira.createIssue(params.summary,&#13;
             (Object.keys(fields).length ? params.trigger_description : params.alert_message), fields);&#13;
 &#13;
@@ -360,7 +360,7 @@ try {&#13;
             throw new Error('Incorrect Issue key given: ' + jira.issue_key);&#13;
         }&#13;
         Jira.updateIssue(params.summary, fields,&#13;
-            ((params.event_value == 0 &amp;&amp; !Object.keys(fields).length)&#13;
+            ((params.event_value === '0' &amp;&amp; !Object.keys(fields).length)&#13;
                 ? params.alert_message : update));&#13;
 &#13;
         return 'OK';&#13;
