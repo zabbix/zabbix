@@ -715,69 +715,20 @@ class CTriggerExpression {
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseString() {
-		$pos = $this->pos;
-
-		// Must start with a double quote.
-		if ($this->expression[$pos] !== '"') {
+		if (!preg_match('/^"([^"\\\\]|\\\\["\\\\])*"/', substr($this->expression, $this->pos), $matches)) {
 			return false;
 		}
 
-		$str = '';
-		$pos++;
-		$quote = true;
-		$slash = false;
-		$p = $pos;
+		$len = strlen($matches[0]);
 
-		while (isset($this->expression[$p])) {
-			if ($this->expression[$p] === '\\') {
-				if ($slash) {
-					if ($this->expression[$p - 1] === '\\') {
-						// Escaped slash, next tiem start over again.
-						$slash = false;
-					}
-				}
-				else {
-					// First slash.
-					$slash = true;
-				}
-			}
+		$str = substr($matches[0], 1, -1);
+		$str = strtr($str, ['\\"' => '"', '\\\\' => '\\']);
 
-			if (!$quote) {
-				break;
-			}
-
-			if ($this->expression[$p] === '"') {
-				if ($this->expression[$p - 1] === '\\' && $slash) {
-					$str .= $this->expression[$p];
-					$p++;
-					$slash = false;
-					continue;
-				}
-
-				$quote = false;
-			}
-
-			$str .= $this->expression[$p];
-			$p++;
-		}
-
-		// Unclosed quote or unescaped slash.
-		if ($quote || $slash) {
-			return false;
-		}
-
-		$pos = $p;
-		$len = $pos - $this->pos;
-
-		$str = substr($str, 0, -1);
-		$str = str_replace('\"', '"', $str);
-		$str = str_replace('\\\\', '\\', $str);
-
-		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_STRING,
-			substr($this->expression, $this->pos, $len), $this->pos, $len, ['string' => $str]
+		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_STRING, $matches[0], $this->pos, $len,
+			['string' => $str]
 		);
 
-		$this->pos = $pos - 1;
+		$this->pos += $len - 1;
 
 		return true;
 	}

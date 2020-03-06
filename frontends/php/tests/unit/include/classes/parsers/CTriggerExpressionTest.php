@@ -3206,10 +3206,10 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			['{host:key.last()}=""', null, true],
 			['{host:key.last()}=" "', null, true],
 			['{host:key.last()}="\"abc\""', null, true],
-			['{host:key.last()}="\"a\\bc\""', null, true],
+			['{host:key.last()}="\"a\\bc\""', null, false],
 			['{host:key.last()}= "\"abc" ', null, true],
 			['{host:key.last()}="\\\"', null, true], // Actually looks like {host:key.last()}="\\"
-			['{host:key.last()}="\\ \""', null, true],
+			['{host:key.last()}="\\ \""', null, false],
 			['{host:key.last()}=" "      ', null, true],
 			['"abc"="abc"', null, true],
 			['    "abc"  =   "abc"   ', null, true],
