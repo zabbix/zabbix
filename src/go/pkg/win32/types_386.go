@@ -24,3 +24,34 @@ package win32
 const (
 	ARRAY_MAX = 1 << 31
 )
+
+type PROCESS_MEMORY_COUNTERS_EX struct {
+	Cb                         uint32
+	PageFaultCount             uint32
+	PeakWorkingSetSize         uint32
+	WorkingSetSize             uint32
+	QuotaPeakPagedPoolUsage    uint32
+	QuotaPagedPoolUsage        uint32
+	QuotaPeakNonPagedPoolUsage uint32
+	QuotaNonPagedPoolUsage     uint32
+	PagefileUsage              uint32
+	PeakPagefileUsage          uint32
+	PrivateUsage               uint32
+}
+
+type PERFORMANCE_INFORMATION struct {
+	Cb                uint32
+	CommitTotal       uint32
+	CommitLimit       uint32
+	CommitPeak        uint32
+	PhysicalTotal     uint32
+	PhysicalAvailable uint32
+	SystemCache       uint32
+	KernelTotal       uint32
+	KernelPaged       uint32
+	KernelNonpaged    uint32
+	PageSize          uint32
+	HandleCount       uint32
+	ProcessCount      uint32
+	ThreadCount       uint32
+}
