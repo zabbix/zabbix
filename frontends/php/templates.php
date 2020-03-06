@@ -239,7 +239,7 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 
 			if ($mass_update_macros == ZBX_ACTION_ADD || $mass_update_macros == ZBX_ACTION_REPLACE
 					|| $mass_update_macros == ZBX_ACTION_REMOVE) {
-				$options['selectMacros'] = ['macro', 'value', 'type', 'description'];
+				$options['selectMacros'] = ['hostmacroid', 'macro'];
 			}
 		}
 
@@ -286,6 +286,9 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 			$new_values['description'] = getRequest('description');
 		}
 
+		$template_macros_add = [];
+		$template_macros_update = [];
+		$template_macros_remove = [];
 		foreach ($templates as &$template) {
 			if (array_key_exists('groups', $visible)) {
 				if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
@@ -371,62 +374,56 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 						if ($macros) {
 							$update_existing = getRequest('macros_add', 0);
 
-							$new_macros = array_values($template['macros']);
-
 							foreach ($macros as $macro) {
-								foreach ($new_macros as &$template_macro) {
+								foreach ($template['macros'] as $template_macro) {
 									if ($macro['macro'] === $template_macro['macro']) {
 										if ($update_existing) {
-											$template_macro = $macro;
+											$macro['hostmacroid'] = $template_macro['hostmacroid'];
+											$template_macros_update[] = $macro;
 										}
 
 										continue 2;
 									}
 								}
-								unset($template_macro);
 
-								$new_macros[] = $macro;
+								$macro['hostid'] = $template['templateid'];
+								$template_macros_add[] = $macro;
 							}
-
-							$template['macros'] = $new_macros;
 						}
 						break;
 
-					case ZBX_ACTION_REPLACE:
+					case ZBX_ACTION_REPLACE: // In Macros its update.
 						if ($macros) {
 							$add_missing = getRequest('macros_update', 0);
 
-							$new_macros = array_values($template['macros']);
-
 							foreach ($macros as $macro) {
-								foreach ($new_macros as &$template_macro) {
+								foreach ($template['macros'] as $template_macro) {
 									if ($macro['macro'] === $template_macro['macro']) {
-										$template_macro = $macro;
+										$macro['hostmacroid'] = $template_macro['hostmacroid'];
+										$template_macros_update[] = $macro;
 
 										continue 2;
 									}
 								}
-								unset($template_macro);
 
 								if ($add_missing) {
-									$new_macros[] = $macro;
+									$macro['hostid'] = $template['templateid'];
+									$template_macros_add[] = $macro;
 								}
 							}
-
-							$template['macros'] = $new_macros;
 						}
-					break;
+						break;
 
 					case ZBX_ACTION_REMOVE:
-						if ($macros && $template['macros']) {
+						if ($macros) {
 							$except_selected = getRequest('macros_remove', 0);
 
 							$macro_names = array_column($macros, 'macro');
 
-							foreach ($template['macros'] as $key => $value) {
-								if (($except_selected && !in_array($value['macro'], $macro_names))
-										|| (!$except_selected && in_array($value['macro'], $macro_names))) {
-									unset($template['macros'][$key]);
+							foreach ($template['macros'] as $template_macro) {
+								if ((!$except_selected && in_array($template_macro['macro'], $macro_names))
+										|| ($except_selected && !in_array($template_macro['macro'], $macro_names))) {
+									$template_macros_remove[] = $template_macro['hostmacroid'];
 								}
 							}
 						}
@@ -440,6 +437,10 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 						$template['macros'] = [];
 						break;
 				}
+
+				if ($mass_update_macros != ZBX_ACTION_REMOVE_ALL) {
+					unset($template['macros']);
+				}
 			}
 
 			unset($template['parentTemplates']);
@@ -450,6 +451,22 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 
 		if (!API::Template()->update($templates)) {
 			throw new Exception();
+		}
+
+		/**
+		 * Mass update of macros is manual. Because Host->update() call UserMacro->replaceMacros,
+		 * and all value of secret macros clearing.
+		 */
+		if ($template_macros_remove) {
+			API::UserMacro()->delete($template_macros_remove);
+		}
+
+		if ($template_macros_add) {
+			API::UserMacro()->create($template_macros_add);
+		}
+
+		if ($template_macros_update) {
+			API::UserMacro()->update($template_macros_update);
 		}
 
 		DBend(true);

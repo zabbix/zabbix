@@ -384,7 +384,7 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 
 			if ($mass_update_macros == ZBX_ACTION_ADD || $mass_update_macros == ZBX_ACTION_REPLACE
 					|| $mass_update_macros == ZBX_ACTION_REMOVE) {
-				$options['selectMacros'] = ['macro', 'value', 'type', 'description'];
+				$options['selectMacros'] = ['hostmacroid', 'macro'];
 			}
 		}
 
@@ -467,6 +467,9 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			}
 		}
 
+		$host_macros_add = [];
+		$host_macros_update = [];
+		$host_macros_remove = [];
 		foreach ($hosts as &$host) {
 			if (array_key_exists('groups', $visible)) {
 				if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
@@ -558,62 +561,56 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 						if ($macros) {
 							$update_existing = getRequest('macros_add', 0);
 
-							$new_macros = array_values($host['macros']);
-
 							foreach ($macros as $macro) {
-								foreach ($new_macros as &$host_macro) {
+								foreach ($host['macros'] as $host_macro) {
 									if ($macro['macro'] === $host_macro['macro']) {
 										if ($update_existing) {
-											$host_macro = $macro;
+											$macro['hostmacroid'] = $host_macro['hostmacroid'];
+											$host_macros_update[] = $macro;
 										}
 
 										continue 2;
 									}
 								}
-								unset($host_macro);
 
-								$new_macros[] = $macro;
+								$macro['hostid'] = $host['hostid'];
+								$host_macros_add[] = $macro;
 							}
-
-							$host['macros'] = $new_macros;
 						}
 						break;
 
-					case ZBX_ACTION_REPLACE:
+					case ZBX_ACTION_REPLACE: // In Macros its update.
 						if ($macros) {
 							$add_missing = getRequest('macros_update', 0);
 
-							$new_macros = array_values($host['macros']);
-
 							foreach ($macros as $macro) {
-								foreach ($new_macros as &$host_macro) {
+								foreach ($host['macros'] as $host_macro) {
 									if ($macro['macro'] === $host_macro['macro']) {
-										$host_macro = $macro;
+										$macro['hostmacroid'] = $host_macro['hostmacroid'];
+										$host_macros_update[] = $macro;
 
 										continue 2;
 									}
 								}
-								unset($host_macro);
 
 								if ($add_missing) {
-									$new_macros[] = $macro;
+									$macro['hostid'] = $host['hostid'];
+									$host_macros_add[] = $macro;
 								}
 							}
-
-							$host['macros'] = $new_macros;
 						}
 						break;
 
 					case ZBX_ACTION_REMOVE:
-						if ($macros && $host['macros']) {
+						if ($macros) {
 							$except_selected = getRequest('macros_remove', 0);
 
 							$macro_names = array_column($macros, 'macro');
 
-							foreach ($host['macros'] as $key => $value) {
-								if (($except_selected && !in_array($value['macro'], $macro_names))
-										|| (!$except_selected && in_array($value['macro'], $macro_names))) {
-									unset($host['macros'][$key]);
+							foreach ($host['macros'] as $host_macro) {
+								if ((!$except_selected && in_array($host_macro['macro'], $macro_names))
+										|| ($except_selected && !in_array($host_macro['macro'], $macro_names))) {
+									$host_macros_remove[] = $host_macro['hostmacroid'];
 								}
 							}
 						}
@@ -627,6 +624,10 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 						$host['macros'] = [];
 						break;
 				}
+
+				if ($mass_update_macros != ZBX_ACTION_REMOVE_ALL) {
+					unset($host['macros']);
+				}
 			}
 
 			unset($host['parentTemplates']);
@@ -637,6 +638,22 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 
 		if (!API::Host()->update($hosts)) {
 			throw new Exception();
+		}
+
+		/**
+		 * Mass update of macros is manual. Because Host->update() call UserMacro->replaceMacros,
+		 * and all value of secret macros clearing.
+		 */
+		if ($host_macros_remove) {
+			API::UserMacro()->delete($host_macros_remove);
+		}
+
+		if ($host_macros_add) {
+			API::UserMacro()->create($host_macros_add);
+		}
+
+		if ($host_macros_update) {
+			API::UserMacro()->update($host_macros_update);
 		}
 
 		DBend(true);
