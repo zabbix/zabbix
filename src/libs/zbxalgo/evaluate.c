@@ -73,11 +73,17 @@ static int	is_operator_delimiter(char c)
 	return ' ' == c || '(' == c || '\r' == c || '\n' == c || '\t' == c || ')' == c || '\0' == c ? SUCCEED : FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate a quoted string like "/etc/passwd"                       *
+ * Characters '\' and '"' are expected to be escaped or parsing fails         *
+ *                                                                            *
+ ******************************************************************************/
 static void	evaluate_string(zbx_variant_t *res)
 {
 	const char	*p0 = ptr, *prev = ptr;
 	char		*res_temp = NULL;
-	int		prev_prev_is_escape = 0, prev_escape_is_binded = 0, first_iter = 1, i = 0, len = 0;
+	int		prev_prev_is_escape = 0, prev_escape_is_binded = 0, first_iter = 1, i = 0, str_len = 0;
 
 	while ('"' != *ptr || ((!prev_prev_is_escape || !prev_escape_is_binded) && ('\\' == *prev) && ('"' == *ptr)))
 	{
@@ -85,7 +91,7 @@ static void	evaluate_string(zbx_variant_t *res)
 		{
 			prev_escape_is_binded = 0;
 		}
-		else if (!first_iter && '\\'==*prev && '\\'==*ptr)
+		else if (!first_iter && '\\' == *prev && '\\'==*ptr)
 		{
 			prev_escape_is_binded = 1;
 		}
@@ -106,13 +112,13 @@ static void	evaluate_string(zbx_variant_t *res)
 		ptr++;
 	}
 
-	len = ptr-p0;
-	res_temp = zbx_malloc(NULL, len + 1);
+	str_len = ptr-p0;
+	res_temp = zbx_malloc(NULL, str_len + 1);
 
-	for (i = 0; i < len; i++)
+	for (i = 0; i < str_len; i++)
 		*(res_temp + i) = *(p0 + i);
 
-	*(res_temp + len) = '\0';
+	*(res_temp + str_len) = '\0';
 
 	zbx_variant_set_str(res, res_temp);
 }
@@ -120,7 +126,7 @@ static void	evaluate_string(zbx_variant_t *res)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate a suffixed number like "12.345K"                         *
+ * Purpose: evaluate a suffixed number like 12.345K                           *
  *                                                                            *
  ******************************************************************************/
 static double	evaluate_number(int *unknown_idx)
@@ -339,7 +345,7 @@ ret:
  ******************************************************************************/
 static zbx_variant_t*	evaluate_term7(int *unknown_idx)
 {
-	zbx_variant_t*	res = NULL;
+	zbx_variant_t	*res = NULL;
 
 	while (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr)
 		ptr++;
@@ -379,9 +385,9 @@ ret:
  ******************************************************************************/
 static zbx_variant_t*	evaluate_term6(int *unknown_idx)
 {
-	char	op;
+	char		op;
 	zbx_variant_t	*res = NULL, *operand = NULL;
-	int	res_idx = -1, oper_idx = -2;	/* set invalid values to catch errors */
+	int		res_idx = -1, oper_idx = -2;	/* set invalid values to catch errors */
 
 	res = evaluate_term7(&res_idx);
 
@@ -476,9 +482,9 @@ ret:
  ******************************************************************************/
 static zbx_variant_t*	evaluate_term5(int *unknown_idx)
 {
-	char	op;
+	char		op;
 	zbx_variant_t	*res = NULL, *operand = NULL;
-	int	res_idx = -3, oper_idx = -4;	/* set invalid values to catch errors */
+	int		res_idx = -3, oper_idx = -4;	/* set invalid values to catch errors */
 
 	res = evaluate_term6(&res_idx);
 
@@ -548,9 +554,9 @@ ret:
  ******************************************************************************/
 static zbx_variant_t*	evaluate_term4(int *unknown_idx)
 {
-	char	op;
-	zbx_variant_t	*res = NULL ,*operand = NULL;
-	int	res_idx = -5, oper_idx = -6;	/* set invalid values to catch errors */
+	char		op;
+	zbx_variant_t	*res = NULL, *operand = NULL;
+	int		res_idx = -5, oper_idx = -6;	/* set invalid values to catch errors */
 
 	res = evaluate_term5(&res_idx);
 	if (ZBX_VARIANT_DBL == res->type)
@@ -646,9 +652,9 @@ ret:
  ******************************************************************************/
 static zbx_variant_t*	evaluate_term3(int *unknown_idx)
 {
-	char	op;
+	char		op;
 	zbx_variant_t	*res = NULL, *operand = NULL;
-	int	res_idx = -7, oper_idx = -8;	/* set invalid values to catch errors */
+	int		res_idx = -7, oper_idx = -8;	/* set invalid values to catch errors */
 
 	res = evaluate_term4(&res_idx);
 
@@ -760,7 +766,7 @@ ret:
 static zbx_variant_t*	evaluate_term2(int *unknown_idx)
 {
 	zbx_variant_t	*res = NULL, *operand = NULL;
-	int	res_idx = -9, oper_idx = -10;	/* set invalid values to catch errors */
+	int		res_idx = -9, oper_idx = -10;	/* set invalid values to catch errors */
 
 	res = evaluate_term3(&res_idx);
 
@@ -850,7 +856,7 @@ ret:
 static zbx_variant_t*	evaluate_term1(int *unknown_idx)
 {
 	zbx_variant_t	*res = NULL, *operand = NULL;
-	int	res_idx = -11, oper_idx = -12;	/* set invalid values to catch errors */
+	int		res_idx = -11, oper_idx = -12;	/* set invalid values to catch errors */
 
 	level++;
 
@@ -949,6 +955,8 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 	int	unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
 					/* to catch errors */
 	zbx_variant_t	*res = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, expression);
 
 	ptr = expression;
 	level = 0;

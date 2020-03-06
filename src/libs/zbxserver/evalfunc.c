@@ -1081,7 +1081,7 @@ out:
  *                                                                            *
  * Purpose: evaluate functions 'last' and 'prev' for the item                 *
  *                                                                            *
- * Parameters: value - buffer of size MAX_BUFFER_LEN                          *
+ * Parameters: value - dynamic buffer, currently of size MAX_BUFFER_LEN       *
  *             item - item (performance metric)                               *
  *             parameters - Nth last value and time shift (optional)          *
  *                                                                            *
@@ -1138,10 +1138,10 @@ static int	evaluate_LAST(char **value, DC_ITEM *item, const char *parameters, co
 					ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
 				int	escape_quote_escaped_value_len;
-				char*	escape_escaped_value = zbx_dyn_escape_string(*value,"\\");
+				char	*escape_escaped_value = zbx_dyn_escape_string(*value, "\\");
 				zbx_free(*value);
 
-				char*	escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value,"\"");
+				char	*escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value, "\"");
 				zbx_free(escape_escaped_value);
 				escape_quote_escaped_value_len = strlen(escape_quote_escaped_value);
 
@@ -2144,7 +2144,7 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'strlen' for the item                           *
  *                                                                            *
- * Parameters: value - buffer of size MAX_BUFFER_LEN                          *
+ * Parameters: value - dynamic buffer, currently of size MAX_BUFFER_LEN       *
  *             item - item (performance metric)                               *
  *             parameters - Nth last value and time shift (optional)          *
  *                                                                            *
@@ -2168,6 +2168,7 @@ static int	evaluate_STRLEN(char **value, DC_ITEM *item, const char *parameters, 
 
 	if (SUCCEED == evaluate_LAST(value, item, parameters, ts, error))
 	{
+		/* *value after evaluate_LAST() can be of any size, even bigger than MAX_BUFFER_LEN */
 		zbx_fs_size_t x = zbx_strlen_utf8(*value);
 		zbx_free(*value);
 		*value = zbx_malloc(*value, MAX_BUFFER_LEN);
@@ -2267,7 +2268,7 @@ out:
  *                                                                            *
  * Purpose: evaluate logical bitwise function 'and' for the item              *
  *                                                                            *
- * Parameters: value - buffer of size MAX_BUFFER_LEN                          *
+ * Parameters: value - dynamic buffer, currently of size MAX_BUFFER_LEN       *
  *             item - item (performance metric)                               *
  *             parameters - up to 3 comma-separated fields:                   *
  *                            (1) same as the 1st parameter for function      *
@@ -2315,8 +2316,9 @@ static int	evaluate_BAND(char **value, DC_ITEM *item, const char *parameters, co
 
 	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, error))
 	{
+		/* value after evaluate_LAST() can be of any size, even bigger than MAX_BUFFER_LEN */
 		ZBX_STR2UINT64(last_uint64, *value);
-		zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
+		zbx_snprintf(*value, sizeof(value), ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
 		ret = SUCCEED;
 	}
 
@@ -3281,7 +3283,6 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __func__, zbx_result_string(ret), value);
-
 	zbx_free(value);
 
 	return ret;

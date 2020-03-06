@@ -4936,16 +4936,17 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *unknown_msgs)
 {
 	DC_ITEM			*items = NULL;
-	char			*error = NULL;
+	char			*value = NULL, *error = NULL;
 	int			i;
 	zbx_func_t		*func;
 	zbx_vector_uint64_t	itemids;
 	int			*errcodes = NULL;
 	zbx_hashset_iter_t	iter;
 
-	char	*value = zbx_malloc(NULL, MAX_BUFFER_LEN);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() funcs_num:%d", __func__, funcs->num_data);
+
+	/* evaluate_LAST() may need more than MAX_BUFFER_LEN, so it would reallocate more on its own */
+	value = zbx_malloc(NULL, MAX_BUFFER_LEN);
 
 	zbx_vector_uint64_create(&itemids);
 	zbx_vector_uint64_reserve(&itemids, funcs->num_data);

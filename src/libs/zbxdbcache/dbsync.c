@@ -84,26 +84,6 @@ static void	dbsync_strfree(char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: dbsync_numeric_validator                                         *
- *                                                                            *
- * Purpose: validate numeric value                                            *
- *                                                                            *
- * Parameters: value   - [IN] the value to validate                           *
- *                                                                            *
- * Return value: SUCCEED - the value contains valid numeric value             *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_numeric_validator(const char *value)
-{
-	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
-		return SUCCEED;
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dbsync_compare_uint64                                            *
  *                                                                            *
  * Purpose: compares 64 bit unsigned integer with a raw database value        *
@@ -2118,8 +2098,7 @@ static char	**dbsync_trigger_preproc_row(char **row)
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))
 	{
-		row[11] = zbx_dc_expand_user_macros(row[11], hostids.values, hostids.values_num,
-				dbsync_numeric_validator);
+		row[11] = zbx_dc_expand_user_macros(row[11], hostids.values, hostids.values_num, NULL);
 	}
 
 	zbx_vector_uint64_destroy(&functionids);
