@@ -380,8 +380,14 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'nodata' => [
-				'description' => _('nodata() - No data received during period of time T (1 - true, 0 - false)'),
-				'params' => $this->param1Sec,
+				'description' => _('nodata() - No data received during period of time T (1 - true, 0 - false), ignore proxy time delay in sending data Mode (strict - ignore proxy delay)'),
+				'params' => $this->param1Sec + [
+					'mode' => [
+						'C' => 'Mode',
+						'T' => T_ZBX_STR,
+						'A' => false
+					]
+				],
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],

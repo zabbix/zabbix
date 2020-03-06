@@ -1008,7 +1008,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'zabbix[proxy,<name>,<param>]',
-					'description' => _('Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp.')
+					'description' => _('Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds.')
 				],
 				[
 					'key' => 'zabbix[proxy_history]',
