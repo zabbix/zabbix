@@ -33,6 +33,28 @@ For more information please read the MYSQL documentation https://dev.mysql.com/d
 user=zbx_monitor
 password=<password>
 ```
+NOTE: Use systemd to start the Zabbix agent on Linux OS. 
+For example in Centos use "systemctl edit zabbix-agent.service" to set the required user to start the Zabbix agent. 
+
+Add the rule to the SELinux policy (example for Centos):
+
+# cat <<EOF > zabbix_home.te
+module zabbix_home 1.0;
+
+require {
+        type zabbix_agent_t;
+        type zabbix_var_lib_t;
+        class file { open read };
+}
+
+#============= zabbix_agent_t ==============
+
+allow zabbix_agent_t zabbix_var_lib_t:file read;
+allow zabbix_agent_t zabbix_var_lib_t:file open;
+EOF
+# checkmodule -M -m -o zabbix_home.mod zabbix_home.te
+# semodule_package -o zabbix_home.pp -m zabbix_home.mod
+# semodule -i zabbix_home.pp
 
 ## Zabbix configuration
 

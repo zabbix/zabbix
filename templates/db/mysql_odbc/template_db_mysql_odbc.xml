@@ -1165,7 +1165,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <delay>5m</delay>
                      <history>7d</history>
                      <units>B</units>
-                     <params>SELECT SUM(DATA_LENGTH + INDEX_LENGTH) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA="{#DATABASE}"</params>
+                     <params>SELECT COALESCE(SUM(DATA_LENGTH + INDEX_LENGTH),0) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA="{#DATABASE}"</params>
                      <username>{$MYSQL.USER}</username>
                      <password>{$MYSQL.PASSWORD}</password>
                      <applications>
