@@ -645,21 +645,13 @@ class CControllerPopupTriggerExpr extends CController {
 						$quoted_params[] = quoteFunctionParam($param);
 					}
 
-					if ($data['itemValueType'] == ITEM_VALUE_TYPE_TEXT
-							|| $data['itemValueType'] == ITEM_VALUE_TYPE_STR
-							|| $data['itemValueType'] == ITEM_VALUE_TYPE_LOG) {
-						$data['value'] = str_replace('\\', '\\\\', $data['value']);
-						$data['value'] = str_replace('"', '\"', $data['value']);
-						$data['value'] = '"'.$data['value'].'"';
-					}
-
 					$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
 						$item_host_data['host'],
 						$data['item_key'],
 						$function,
 						rtrim(implode(',', $quoted_params), ','),
 						$operator,
-						$data['value']
+						self::quoteConstant($data['value'])
 					);
 
 					// Validate trigger expression.
@@ -729,5 +721,30 @@ class CControllerPopupTriggerExpr extends CController {
 				]
 			));
 		}
+	}
+
+	/**
+	 * Quoting $value if it contains special characters.
+	 *
+	 * @param string $param
+	 *
+	 * @return string
+	 */
+	private static function quoteConstant(string $value): string {
+		$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+		$lld_macro_parser = new CLLDMacroParser();
+		$lld_macro_function_parser = new CLLDMacroFunctionParser;
+		$user_macro_parser = new CUserMacroParser();
+		$number_parser = new CNumberParser(['with_suffix' => true]);
+
+		if ($number_parser->parse($value) == CParser::PARSE_SUCCESS
+			|| $user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+			|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
+			|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+			|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return $value;
+		}
+
+		return '"'.strtr($value, ['\\' => '\\\\', '"' => '\\"']).'"';
 	}
 }
