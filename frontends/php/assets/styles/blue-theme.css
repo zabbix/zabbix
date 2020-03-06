@@ -176,7 +176,7 @@ body {
   display: flex;
   overflow: hidden; }
 
-aside
+aside,
 .wrapper {
   box-sizing: border-box; }
 
