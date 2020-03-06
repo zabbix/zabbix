@@ -50,13 +50,10 @@ if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
 show_messages();
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	// end of article div
-	if (!defined('ZBX_PAGE_NO_MENU')) {
-		makePageFooter()->show();
-	}
 	makeServerStatusOutput()->show();
-	echo '</div>'."\n";
+
 	insertPagePostJs();
+
 	require_once 'include/views/js/common.init.js.php';
 
 	if (in_array($page['type'], [PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML])) {
@@ -71,7 +68,11 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		}
 	}
 
-	echo '</body></html>';
+	if (!defined('ZBX_PAGE_NO_MENU')) {
+		makePageFooter()->show();
+	}
+
+	echo '</div></body></html>';
 }
 
 exit;

@@ -23,11 +23,9 @@
  * @var CPartial $this
  */
 
-show_messages();
+insertPagePostJs();
 
-if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
-	makePageFooter()->show();
-}
+require_once 'include/views/js/common.init.js.php';
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
@@ -38,6 +36,6 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 		->show();
 }
 
-insertPagePostJs();
-
-require_once 'include/views/js/common.init.js.php';
+if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
+	makePageFooter()->show();
+}

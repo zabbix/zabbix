@@ -128,11 +128,18 @@ function local_showMessage() {
 
 local_generateHeader($data);
 local_generateSidebar($data);
+
 echo '<div class="'.ZBX_STYLE_LAYOUT_WRAPPER.
 	($data['web_layout_mode'] === ZBX_LAYOUT_KIOSKMODE ? ' '.ZBX_STYLE_LAYOUT_KIOSKMODE : '').'">';
+
 local_showMessage();
+
 echo $data['main_block'];
-local_generateFooter($data);
+
 show_messages();
+
 makeServerStatusOutput()->show();
+
+local_generateFooter($data);
+
 echo '</div></body></html>';

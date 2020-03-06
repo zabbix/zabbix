@@ -3859,11 +3859,6 @@ $form-icon-btn: (
 		}
 	}
 
-	.debug-output {
-		max-height: 300px;
-		border-color: $table-border-color;
-	}
-
 	.msg-bad,
 	.msg-good,
 	.msg-warning {
@@ -4879,7 +4874,7 @@ $form-icon-btn: (
 .btn-debug {
 	position: fixed;
 	bottom: 10px;
-	right: 15px;
+	right: 35px;
 	z-index: 15000;
 	color: $btn-form-font-color;
 	background-color: $btn-form-bg-color;

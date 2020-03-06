@@ -188,6 +188,8 @@ aside,
   position: relative; }
   .wrapper.layout-kioskmode main {
     padding: 10px; }
+  .wrapper > .debug-output {
+    flex-shrink: 0; }
 
 header,
 footer {
@@ -3124,9 +3126,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border: 0; }
     .dashbrd-widget .list-table tbody tr:last-child td {
       border-bottom: 1px solid #ebeef0; }
-  .dashbrd-widget .debug-output {
-    max-height: 300px;
-    border-color: #ebeef0; }
   .dashbrd-widget .msg-bad,
   .dashbrd-widget .msg-good,
   .dashbrd-widget .msg-warning {
@@ -3795,7 +3794,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .btn-debug {
   position: fixed;
   bottom: 10px;
-  right: 15px;
+  right: 35px;
   z-index: 15000;
   color: #1f2c33;
   background-color: #ffffff;

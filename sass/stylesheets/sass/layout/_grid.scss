@@ -26,6 +26,10 @@ aside,
 			padding: 10px;
 		}
 	}
+
+	& > .debug-output {
+		flex-shrink: 0;
+	}
 }
 
 header,
