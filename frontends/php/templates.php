@@ -213,7 +213,6 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 			];
 
 			echo makeMessageBox(false, [$msg], null, true, false)
-				->removeAttribute('class')
 				->addClass(ZBX_STYLE_MSG_WARNING);
 		}
 	}

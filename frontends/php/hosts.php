@@ -356,7 +356,6 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 			];
 
 			echo makeMessageBox(false, [$msg], null, true, false)
-				->removeAttribute('class')
 				->addClass(ZBX_STYLE_MSG_WARNING);
 		}
 	}
