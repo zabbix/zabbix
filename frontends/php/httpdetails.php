@@ -184,6 +184,13 @@ CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 $widget = (new CWidget())
 	->setTitle(_('Details of web scenario').': '.$http_test_name)
 	->setWebLayoutMode($page['web_layout_mode'])
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']])))
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem($details_screen->get())
 	->addItem(new CTag('br'))
 	->addItem(
