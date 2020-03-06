@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-06T06:07:06Z</date>
+    <date>2020-03-06T06:23:47Z</date>
     <media_types>
         <media_type>
             <name>Jira</name>
@@ -347,6 +347,64 @@ catch (error) {&#13;
             <show_event_menu>YES</show_event_menu>
             <event_menu_url>{EVENT.TAGS.__zbx_jira_issuelink}</event_menu_url>
             <event_menu_name>Jira: {EVENT.TAGS.__zbx_jira_issuekey}</event_menu_name>
+            <message_templates>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Problem: {EVENT.NAME}</subject>
+                    <message>Problem started at {EVENT.TIME} on {EVENT.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Operational data: {EVENT.OPDATA}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>RECOVERY</operation_mode>
+                    <subject>Resolved: {EVENT.NAME}</subject>
+                    <message>Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>UPDATE</operation_mode>
+                    <subject>Updated problem: {EVENT.NAME}</subject>
+                    <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
+{EVENT.UPDATE.MESSAGE}&#13;
+&#13;
+Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.</message>
+                </message_template>
+                <message_template>
+                    <event_source>DISCOVERY</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}</subject>
+                    <message>Discovery rule: {DISCOVERY.RULE.NAME}&#13;
+&#13;
+Device IP: {DISCOVERY.DEVICE.IPADDRESS}&#13;
+Device DNS: {DISCOVERY.DEVICE.DNS}&#13;
+Device status: {DISCOVERY.DEVICE.STATUS}&#13;
+Device uptime: {DISCOVERY.DEVICE.UPTIME}&#13;
+&#13;
+Device service name: {DISCOVERY.SERVICE.NAME}&#13;
+Device service port: {DISCOVERY.SERVICE.PORT}&#13;
+Device service status: {DISCOVERY.SERVICE.STATUS}&#13;
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}</message>
+                </message_template>
+                <message_template>
+                    <event_source>AUTOREGISTRATION</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Autoregistration: {HOST.HOST}</subject>
+                    <message>Host name: {HOST.HOST}&#13;
+Host IP: {HOST.IP}&#13;
+Agent port: {HOST.PORT}</message>
+                </message_template>
+            </message_templates>
         </media_type>
     </media_types>
 </zabbix_export>
