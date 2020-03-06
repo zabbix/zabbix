@@ -482,15 +482,21 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 		 * and all value of secret macros clearing.
 		 */
 		if ($template_macros_remove) {
-			API::UserMacro()->delete($template_macros_remove);
+			if (!API::UserMacro()->delete($template_macros_remove)) {
+				throw new Exception();
+			}
 		}
 
 		if ($template_macros_add) {
-			API::UserMacro()->create($template_macros_add);
+			if (!API::UserMacro()->create($template_macros_add)) {
+				throw new Exception();
+			}
 		}
 
 		if ($template_macros_update) {
-			API::UserMacro()->update($template_macros_update);
+			if (!API::UserMacro()->update($template_macros_update)) {
+				throw new Exception();
+			}
 		}
 
 		DBend(true);

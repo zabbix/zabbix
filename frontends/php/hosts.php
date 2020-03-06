@@ -669,15 +669,21 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 		 * and all value of secret macros clearing.
 		 */
 		if ($host_macros_remove) {
-			API::UserMacro()->delete($host_macros_remove);
+			if (!API::UserMacro()->delete($host_macros_remove)) {
+				throw new Exception();
+			}
 		}
 
 		if ($host_macros_add) {
-			API::UserMacro()->create($host_macros_add);
+			if (!API::UserMacro()->create($host_macros_add)) {
+				throw new Exception();
+			}
 		}
 
 		if ($host_macros_update) {
-			API::UserMacro()->update($host_macros_update);
+			if (API::UserMacro()->update($host_macros_update)) {
+				throw new Exception();
+			}
 		}
 
 		DBend(true);
