@@ -108,7 +108,7 @@ class CNumberParser extends CParser {
 	/**
 	 * Calculate value of parsed number in a decimal notation.
 	 *
-	 * @return string
+	 * @return float
 	 */
 	public function calcValue(): float {
 		$number = (float) $this->number;

@@ -55,15 +55,6 @@ class CPieGraphDraw extends CGraphDraw {
 		$this->num++;
 	}
 
-	public function set3DAngle($angle = 70) {
-		if (is_numeric($angle) && $angle < 85 && $angle > 10) {
-			$this->angle3d = (int) $angle;
-		}
-		else {
-			$this->angle3d = 70;
-		}
-	}
-
 	public function switchPie3D($type = false) {
 		if ($type) {
 			$this->type = $type;
@@ -81,31 +72,6 @@ class CPieGraphDraw extends CGraphDraw {
 					break;
 				case GRAPH_TYPE_PIE:
 					$this->type = GRAPH_TYPE_3D;
-					break;
-				default:
-					$this->type = GRAPH_TYPE_PIE;
-			}
-		}
-		return $this->type;
-	}
-
-	public function switchPieExploded($type) {
-		if ($type) {
-			$this->type = $type;
-		}
-		else {
-			switch ($this->type) {
-				case GRAPH_TYPE_EXPLODED:
-					$this->type = GRAPH_TYPE_PIE;
-					break;
-				case GRAPH_TYPE_3D_EXPLODED:
-					$this->type = GRAPH_TYPE_3D;
-					break;
-				case GRAPH_TYPE_3D:
-					$this->type = GRAPH_TYPE_3D_EXPLODED;
-					break;
-				case GRAPH_TYPE_PIE:
-					$this->type = GRAPH_TYPE_EXPLODED;
 					break;
 				default:
 					$this->type = GRAPH_TYPE_PIE;

@@ -85,25 +85,27 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Add single item object to graph. If invalid 'delay' interval passed method will interrupt current request with
 	 * error message.
 	 *
-	 * @param array  $item                  Array of graph item properties.
-	 * @param string $item['itemid']        Item id.
-	 * @param string $item['type']          Item type.
-	 * @param string $item['name']          Item host display name.
-	 * @param string $item['hostname']      Item hostname.
-	 * @param string $item['key_']          Item key_ field value.
-	 * @param string $item['value_type']    Item value type.
-	 * @param string $item['history']       Item history field value.
-	 * @param string $item['trends']        Item trends field value.
-	 * @param string $item['delay']         Item delay.
-	 * @param string $item['master_itemid'] Master item id for item of type ITEM_TYPE_DEPENDENT.
-	 * @param string $item['units']         Item units value.
-	 * @param string $item['hostid']        Item host id.
-	 * @param string $item['hostname']      Item host name.
-	 * @param string $item['color']         Item presentation color.
-	 * @param int    $item['drawtype']      Item presentation draw type, could be one of GRAPH_ITEM_DRAWTYPE_* constants.
-	 * @param int    $item['yaxisside']     Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
-	 * @param int    $item['calc_fnc']      Item calculation function, could be one of CALC_FNC_* constants.
-	 * @param int    $item['calc_type']     Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or GRAPH_ITEM_SUM.
+	 * @param array  $graph_item                   Array of graph item properties.
+	 * @param string $graph_item['itemid']         Item id.
+	 * @param string $graph_item['type']           Item type.
+	 * @param string $graph_item['name']           Item host display name.
+	 * @param string $graph_item['hostname']       Item hostname.
+	 * @param string $graph_item['key_']           Item key_ field value.
+	 * @param string $graph_item['value_type']     Item value type.
+	 * @param string $graph_item['history']        Item history field value.
+	 * @param string $graph_item['trends']         Item trends field value.
+	 * @param string $graph_item['delay']          Item delay.
+	 * @param string $graph_item['master_itemid']  Master item id for item of type ITEM_TYPE_DEPENDENT.
+	 * @param string $graph_item['units']          Item units value.
+	 * @param string $graph_item['hostid']         Item host id.
+	 * @param string $graph_item['hostname']       Item host name.
+	 * @param string $graph_item['color']          Item presentation color.
+	 * @param int    $graph_item['drawtype']       Item presentation draw type, could be one of
+	 *                                             GRAPH_ITEM_DRAWTYPE_* constants.
+	 * @param int    $graph_item['yaxisside']      Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
+	 * @param int    $graph_item['calc_fnc']       Item calculation function, could be one of CALC_FNC_* constants.
+	 * @param int    $graph_item['calc_type']      Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or
+	 *                                             GRAPH_ITEM_SUM.
 	 */
 	public function addItem(array $graph_item) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
@@ -257,8 +259,8 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 
-			$item['source'] = ($item['trends'] == 0 || $time_now - $item['history'] < $this->from_time
-					&& $this->period / $this->sizeX <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)
+			$item['source'] = ($item['trends'] == 0 || (($time_now - $item['history']) < $this->from_time
+					&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))
 				? 'history'
 				: 'trends';
 

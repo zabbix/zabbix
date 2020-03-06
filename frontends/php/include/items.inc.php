@@ -1317,8 +1317,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 			'units' => $item['units']
 		]);
 	}
-	elseif ($item['value_type'] != ITEM_VALUE_TYPE_STR && $item['value_type'] != ITEM_VALUE_TYPE_TEXT
-			&& $item['value_type'] != ITEM_VALUE_TYPE_LOG) {
+	elseif (!in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG])) {
 		$value = _('Unknown value type');
 	}
 
@@ -1366,10 +1365,8 @@ function getItemFunctionalValue($item, $function, $parameter) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
-	$history_tables = [ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint'];
-
 	// Check whether item type is allowed for min, max and avg functions.
-	if (!array_key_exists($item['value_type'], $history_tables)) {
+	if ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
