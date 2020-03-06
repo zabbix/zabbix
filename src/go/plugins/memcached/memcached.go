@@ -105,10 +105,10 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 
 	switch key {
 	case keyStats:
-		handleMetric = statsHandler // memcached.stats[[uri][,user][,password][,type]]
+		handleMetric = statsHandler // memcached.stats[[connString][,user][,password][,type]]
 
 	case keyPing:
-		handleMetric = pingHandler // memcached.ping[[uri][,user][,password]]
+		handleMetric = pingHandler // memcached.ping[[connString][,user][,password]]
 
 	default:
 		return nil, errorUnsupportedMetric

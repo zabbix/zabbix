@@ -19,20 +19,13 @@
 
 package memcached
 
-//type zabbixError struct {
-//	err error
-//	wrappedErr error
-//}
-//
-//func (e zabbixError) Error() string { return e.err.Error() }
-//
-//func (e zabbixError) Unwrap() error { return e.wrappedErr }
-
 type zabbixError struct {
 	err string
 }
 
-func (e zabbixError) Error() string { return e.err }
+func (e zabbixError) Error() string {
+	return e.err
+}
 
 var (
 	errorInvalidParams     = zabbixError{"Invalid parameters."}
