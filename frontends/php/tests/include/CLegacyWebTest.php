@@ -653,7 +653,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @throws NoSuchElementException
 	 */
 	public function zbxTestContentControlButtonClickTextWait($text) {
-		$xpath = "//div[contains(@class, 'header-title')]".
+		$xpath = "//header[contains(@class, 'header-title')]".
 					"//nav[@aria-label='Content controls']".
 						"//button[text()='{$text}']";
 
@@ -684,7 +684,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @throws NoSuchElementException
 	 */
 	public function zbxTestMainFilterDropdownSelectWait($name, $value) {
-		$xpath = "//div[contains(@class, 'header-title')]".
+		$xpath = "//header[contains(@class, 'header-title')]".
 					"//form[@aria-label='Main filter']".
 						"//select[@name='{$name}']".
 							"/option[@value='{$value}']";
