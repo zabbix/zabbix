@@ -36,7 +36,7 @@ class CMacroValue extends CInput {
 	 *
 	 * @var bool
 	 */
-	public $add_post_js = true;
+	protected $add_post_js = true;
 
 	/**
 	 * Class constructor.
@@ -73,6 +73,7 @@ class CMacroValue extends CInput {
 		$name = $this->getAttribute('name');
 		$value_type = $this->getAttribute('type');
 		$value = $this->getAttribute('value');
+		$readonly = $this->getAttribute('readonly');
 		$node = (new CDiv())
 			->addClass(self::ZBX_STYLE_INPUT_GROUP)
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);
@@ -81,13 +82,14 @@ class CMacroValue extends CInput {
 			$class = ZBX_STYLE_ICON_TEXT;
 			$node->addItem((new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setAttribute('placeholder', _('value'))
-				->setReadonly($this->getAttribute('readonly'))
+				->setReadonly($readonly)
 			);
 		}
 		else {
 			$class = ZBX_STYLE_ICON_SECRET_TEXT;
 			$node->addItem([
 				(new CInputSecret($name.'[value]', $value, $this->add_post_js))
+					->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
 					->setAttribute('placeholder', _('value')),
 				(new CButton(null))
 					->setAttribute('title', _('Revert changes'))
@@ -101,7 +103,7 @@ class CMacroValue extends CInput {
 				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_SECRET_TEXT]
 			]))
 				->addClass($class)
-				->setAttribute('disabled', $this->getAttribute('disabled'))
+				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
 				->setAttribute('title', _('Change type'))
 		);
 

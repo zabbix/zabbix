@@ -71,18 +71,19 @@ class CInputSecret extends CInput {
 		$name = $this->getAttribute('name');
 
 		if ($this->getAttribute('value') !== null) {
-			$node->addItem((new CVar($name, $this->getAttribute('value')))->removeId());
+			$node->addItem((new CPassBox($name, $this->getAttribute('value')))->setAttribute('autocomplete', 'off'));
 		}
-
-		$node->addItem([
-			(new CPassBox($name, ZBX_MACRO_SECRET_MASK))
-				->setAttribute('disabled', 'disabled')
-				->setAttribute('autocomplete', 'off'),
-			(new CButton(null, _('Set new value')))
-				->addClass(self::ZBX_STYLE_BTN_CHANGE)
-				->setId(zbx_formatDomId($name.'[btn]'))
-				->setAttribute('disabled', $this->getAttribute('disabled'))
-		]);
+		else {
+			$node->addItem([
+				(new CPassBox($name, ZBX_MACRO_SECRET_MASK))
+					->setAttribute('disabled', 'disabled')
+					->setAttribute('autocomplete', 'off'),
+				(new CButton(null, _('Set new value')))
+					->setId(zbx_formatDomId($name.'[btn]'))
+					->setAttribute('disabled', $this->getAttribute('disabled'))
+					->addClass(self::ZBX_STYLE_BTN_CHANGE)
+			]);
+		}
 
 		if ($this->add_post_js) {
 			zbx_add_post_js($this->getPostJS());

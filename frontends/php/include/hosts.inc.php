@@ -1236,6 +1236,11 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 			$inherited_macro['description'] = $inherited_macro['global']['description'];
 			$inherited_macro['type'] = $inherited_macro['global']['type'];
 		}
+
+		// Secret macro value cannot be inherited.
+		if ($inherited_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+			unset($inherited_macro['value']);
+		}
 	}
 	unset($inherited_macro);
 
