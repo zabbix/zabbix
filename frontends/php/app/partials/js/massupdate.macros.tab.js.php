@@ -142,7 +142,7 @@
 					'title': <?= json_encode(_('Warning')) ?>,
 					'type': 'popup',
 					'class': 'modal-popup modal-popup-medium',
-					'content': jQuery('<span>').text(<?= json_encode(_('Please confirm your action.')) ?>),
+					'content': jQuery('<span>').text(<?= json_encode(_('Please confirm that you want to remove all macros.')) ?>),
 					'buttons': [
 						{
 							'title': <?= json_encode(_('Ok')) ?>,
