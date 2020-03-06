@@ -25,9 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"zabbix.com/plugins/memcached/mockserver"
-
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/plugins/memcached/mockserver"
 )
 
 func handleStat(req *mockserver.MCRequest, w io.Writer) (ret *mockserver.MCResponse) {
@@ -35,26 +34,26 @@ func handleStat(req *mockserver.MCRequest, w io.Writer) (ret *mockserver.MCRespo
 	ret.Status = mockserver.SUCCESS
 
 	switch string(req.Key) {
-	case "":
+	case statsTypeGeneral:
 		ret.Key = []byte("version")
 		ret.Body = []byte("1.4.15")
 		_, _ = ret.Transmit(w)
-	case "items":
+	case statsTypeItems:
 		ret.Key = []byte("items:1:number")
 		ret.Body = []byte("1")
 		_, _ = ret.Transmit(w)
-	case "slabs":
+	case statsTypeSlabs:
 		ret.Key = []byte("1:chunk_size")
 		ret.Body = []byte("96")
 		_, _ = ret.Transmit(w)
 		ret.Key = []byte("1:total_pages")
 		ret.Body = []byte("1")
 		_, _ = ret.Transmit(w)
-	case "sizes":
+	case statsTypeSizes:
 		ret.Key = []byte("96")
 		ret.Body = []byte("1")
 		_, _ = ret.Transmit(w)
-	case "settings":
+	case statsTypeSettings:
 		ret.Key = []byte("maxconns")
 		ret.Body = []byte("1024")
 		_, _ = ret.Transmit(w)
@@ -94,6 +93,7 @@ func TestPlugin_Export(t *testing.T) {
 
 	p := Plugin{}
 	p.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
+
 	p.Start()
 	defer p.Stop()
 
@@ -135,7 +135,7 @@ func TestPlugin_Export(t *testing.T) {
 		{
 			name:       "params should be passed correctly",
 			p:          &p,
-			args:       args{keyStats, []string{"tcp://" + ms.GetAddr(), "", "", "items"}, nil},
+			args:       args{keyStats, []string{"tcp://" + ms.GetAddr(), "", "", statsTypeItems}, nil},
 			wantResult: `{"items:1:number":"1"}`,
 			wantErr:    nil,
 		},
@@ -177,6 +177,7 @@ func TestPlugin_Export(t *testing.T) {
 
 func TestPlugin_Start(t *testing.T) {
 	p := Plugin{}
+
 	t.Run("Connection manager must be initialized", func(t *testing.T) {
 		p.Start()
 		if p.connMgr == nil {

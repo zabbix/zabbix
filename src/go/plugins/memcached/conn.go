@@ -98,7 +98,7 @@ type ConnManager struct {
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(keepAlive, timeout, hk_interval time.Duration) *ConnManager {
+func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
@@ -108,7 +108,7 @@ func NewConnManager(keepAlive, timeout, hk_interval time.Duration) *ConnManager 
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
 	}
 
-	go connMgr.housekeeper(ctx, hk_interval)
+	go connMgr.housekeeper(ctx, hkInterval)
 
 	return connMgr
 }

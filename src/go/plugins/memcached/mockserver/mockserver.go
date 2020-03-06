@@ -23,7 +23,7 @@ const (
 
 const debug = false
 
-func printDebug(format string, v ...interface{}) {
+func printDebugf(format string, v ...interface{}) {
 	if debug {
 		log.Printf(format, v...)
 	}
@@ -70,6 +70,7 @@ func (rh *reqHandler) HandleMessage(w io.Writer, req *MCRequest) *MCResponse {
 	}
 
 	rh.ch <- cr
+
 	return <-cr.res
 }
 
@@ -87,7 +88,7 @@ func (s *MockServer) dispatch(input chan chanReq) {
 	// TODO: stop goroutine
 	for {
 		req := <-input
-		printDebug("Got a request: %s", req.req)
+		printDebugf("Got a request: %s", req.req)
 		req.res <- s.handle(req.req, req.w)
 	}
 }
@@ -111,18 +112,19 @@ func (s *MockServer) ListenAndServe() {
 	go s.dispatch(reqChannel)
 	rh := &reqHandler{reqChannel}
 
-	printDebug("Listening on %s", s.listener.Addr())
+	printDebugf("Listening on %s", s.listener.Addr())
+
 	for {
 		conn, err := s.listener.Accept()
 		select {
 		case <-s.ctx.Done():
-			printDebug("Server stopped")
+			printDebugf("Server stopped")
 			return
 		default:
 			if err != nil {
-				printDebug("Error accepting from %s", s.listener)
+				printDebugf("Error accepting from %s", s.listener)
 			} else {
-				printDebug("Got a connection from %v", conn.RemoteAddr())
+				printDebugf("Got a connection from %v", conn.RemoteAddr())
 				go handleIO(conn, rh)
 			}
 		}

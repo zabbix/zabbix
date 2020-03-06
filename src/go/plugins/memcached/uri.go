@@ -82,6 +82,7 @@ const DefaultPort = "11211"
 // It ignores embedded credentials according to https://www.ietf.org/rfc/rfc3986.txt.
 func parseURI(uri string) (res *URI, err error) {
 	res = &URI{}
+
 	if u, err := url.Parse(uri); err == nil {
 		switch strings.ToLower(u.Scheme) {
 		case "tcp":

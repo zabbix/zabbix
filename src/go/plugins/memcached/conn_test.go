@@ -26,11 +26,7 @@ import (
 )
 
 func TestConnManager_closeUnused(t *testing.T) {
-	connMgr := NewConnManager(
-		time.Duration(1*time.Microsecond),
-		time.Duration(30*time.Second),
-		time.Duration(hkInterval)*time.Second,
-	)
+	connMgr := NewConnManager(1*time.Microsecond, 30*time.Second, hkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	uri, _ := parseURI("tcp://127.0.0.1")
@@ -45,11 +41,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 }
 
 func TestConnManager_closeAll(t *testing.T) {
-	connMgr := NewConnManager(
-		time.Duration(300*time.Second),
-		time.Duration(30*time.Second),
-		time.Duration(hkInterval)*time.Second,
-	)
+	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	uri, _ := parseURI("tcp://127.0.0.1")
@@ -65,9 +57,9 @@ func TestConnManager_closeAll(t *testing.T) {
 
 //func TestConnManager_housekeeper(t *testing.T) {
 //	connMgr := NewConnManager(
-//		time.Duration(500*time.Millisecond),
-//		time.Duration(30*time.Second),
-//		time.Duration(100*time.Millisecond),
+//		500*time.Millisecond,
+//		30*time.Second,
+//		100*time.Millisecond,
 //	)
 //
 //	uri, _ := parseURI("tcp://127.0.0.1")
@@ -84,16 +76,14 @@ func TestConnManager_closeAll(t *testing.T) {
 
 func TestConnManager_create(t *testing.T) {
 	uri, _ := parseURI("tcp://127.0.0.1")
-	connMgr := NewConnManager(
-		time.Duration(300*time.Second),
-		time.Duration(30*time.Second),
-		time.Duration(hkInterval)*time.Second,
-	)
+
+	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	type args struct {
 		uri URI
 	}
+
 	tests := []struct {
 		name      string
 		c         *ConnManager
@@ -116,6 +106,7 @@ func TestConnManager_create(t *testing.T) {
 			wantPanic: true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.wantPanic {
@@ -135,11 +126,8 @@ func TestConnManager_create(t *testing.T) {
 
 func TestConnManager_get(t *testing.T) {
 	uri, _ := parseURI("tcp://127.0.0.1")
-	connMgr := NewConnManager(
-		time.Duration(300*time.Second),
-		time.Duration(30*time.Second),
-		time.Duration(hkInterval)*time.Second,
-	)
+
+	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	t.Run("Should return nil if connection does not exist", func(t *testing.T) {
@@ -159,7 +147,6 @@ func TestConnManager_get(t *testing.T) {
 		if lastTimeAccess == got.lastTimeAccess {
 			t.Error("conn.lastTimeAccess should be updated, but it's not")
 		}
-
 	})
 }
 
@@ -167,11 +154,8 @@ func TestConnManager_GetConnection(t *testing.T) {
 	var conn *MCConn
 
 	uri, _ := parseURI("tcp://127.0.0.1")
-	connMgr := NewConnManager(
-		time.Duration(300*time.Second),
-		time.Duration(30*time.Second),
-		time.Duration(hkInterval)*time.Second,
-	)
+
+	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	t.Run("Should create connection if it does not exist", func(t *testing.T) {

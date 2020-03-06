@@ -31,18 +31,18 @@ func TestPlugin_statsHandler(t *testing.T) {
 	fakeConn := stubConn{
 		StatsFunc: func(key string) (mc.McStats, error) {
 			switch key {
-			case "":
+			case statsTypeGeneral:
 				return mc.McStats{
 					"pid":     "1234",
 					"version": "1.4.15",
 				}, nil
 
-			case "sizes":
+			case statsTypeSizes:
 				return mc.McStats{
 					"96": "1",
 				}, nil
 
-			case "settings": // generates error for tests
+			case statsTypeSettings: // generates error for tests
 				return nil, errors.New("some error")
 
 			default:
@@ -76,7 +76,7 @@ func TestPlugin_statsHandler(t *testing.T) {
 			name: "Should return error if cannot fetch data",
 			args: args{
 				conn:   &fakeConn,
-				params: []string{"settings"},
+				params: []string{statsTypeSettings},
 			},
 			want:    nil,
 			wantErr: errorCannotFetchData,
@@ -94,7 +94,7 @@ func TestPlugin_statsHandler(t *testing.T) {
 			name: "Type should be passed to stats command if specified",
 			args: args{
 				conn:   &fakeConn,
-				params: []string{"sizes"},
+				params: []string{statsTypeSizes},
 			},
 			want:    `{"96":"1"}`,
 			wantErr: nil,

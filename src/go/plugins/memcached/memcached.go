@@ -22,6 +22,7 @@ package memcached
 import (
 	"errors"
 	"time"
+
 	"zabbix.com/pkg/plugin"
 )
 
@@ -117,6 +118,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 	result, err = handleMetric(p.connMgr.GetConnection(*uri), handlerParams)
 	if err != nil {
 		p.Errf(err.Error())
+
 		if errors.As(err, &zbxErr) {
 			return nil, zbxErr
 		}
@@ -130,7 +132,7 @@ func (p *Plugin) Start() {
 	p.connMgr = NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
 		time.Duration(p.options.Timeout)*time.Second,
-		time.Duration(hkInterval)*time.Second,
+		hkInterval*time.Second,
 	)
 }
 

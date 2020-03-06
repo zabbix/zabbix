@@ -27,9 +27,17 @@ import (
 
 const statsMaxParams = 1
 
+const (
+	statsTypeGeneral  = ""
+	statsTypeItems    = "items"
+	statsTypeSizes    = "sizes"
+	statsTypeSlabs    = "slabs"
+	statsTypeSettings = "settings"
+)
+
 // statsHandler gets an output of 'stats <type>' command, parses it and returns it in the JSON format.
 func statsHandler(conn MCClient, params []string) (interface{}, error) {
-	statsType := ""
+	statsType := statsTypeGeneral
 
 	if len(params) > statsMaxParams {
 		return nil, errorInvalidParams
@@ -37,14 +45,17 @@ func statsHandler(conn MCClient, params []string) (interface{}, error) {
 
 	if len(params) > 0 {
 		switch strings.ToLower(params[0]) {
-		case "items":
+		case statsTypeItems:
 			fallthrough
-		case "sizes":
+		case statsTypeSizes:
 			fallthrough
-		case "slabs":
+		case statsTypeSlabs:
 			fallthrough
-		case "settings":
+		case statsTypeSettings:
+			fallthrough
+		case statsTypeGeneral:
 			statsType = strings.ToLower(params[0])
+
 		default:
 			return nil, errorInvalidParams
 		}
