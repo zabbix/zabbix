@@ -665,8 +665,8 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 		}
 
 		/**
-		 * Mass update of macros is manual. Because Host->update() call UserMacro->replaceMacros,
-		 * and all value of secret macros clearing.
+		 * Macros must be updated separately, since calling API::UserMacro->replaceMacros() inside
+		 * API::Template->update() results in loss of secret macro values.
 		 */
 		if ($host_macros_remove) {
 			if (!API::UserMacro()->delete($host_macros_remove)) {

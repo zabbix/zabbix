@@ -478,8 +478,8 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 		}
 
 		/**
-		 * Mass update of macros is manual. Because Host->update() call UserMacro->replaceMacros,
-		 * and all value of secret macros clearing.
+		 * Macros must be updated separately, since calling API::UserMacro->replaceMacros() inside
+		 * API::Host->update() results in loss of secret macro values.
 		 */
 		if ($template_macros_remove) {
 			if (!API::UserMacro()->delete($template_macros_remove)) {
