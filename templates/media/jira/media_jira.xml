@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-06T06:55:04Z</date>
+    <date>2020-03-06T08:36:20Z</date>
     <media_types>
         <media_type>
             <name>Jira</name>
@@ -293,6 +293,10 @@ try {&#13;
     // Check {EVENT.UPDATE.STATUS} only for Trigger-based events.&#13;
     if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
         throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    if (params.event_source !== '0' &amp;&amp; params.event_recovery_value === '0') {&#13;
+        throw 'Recovery operations are supported only for trigger-based actions.';&#13;
     }&#13;
 &#13;
     Object.keys(params)&#13;
