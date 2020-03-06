@@ -19,15 +19,26 @@
 
 package memcached
 
-type zabbixError string
+//type zabbixError struct {
+//	err error
+//	wrappedErr error
+//}
+//
+//func (e zabbixError) Error() string { return e.err.Error() }
+//
+//func (e zabbixError) Unwrap() error { return e.wrappedErr }
 
-func (e zabbixError) Error() string { return string(e) }
+type zabbixError struct {
+	err string
+}
 
-const (
-	errorInvalidParams     = zabbixError("Invalid parameters.")
-	errorCannotFetchData   = zabbixError("Cannot fetch data.")
-	errorCannotMarshalJSON = zabbixError("Cannot marshal JSON.")
-	errorUnsupportedMetric = zabbixError("Unsupported metric.")
-	errorEmptyResult       = zabbixError("Empty result.")
-	errorUnknownSession    = zabbixError("Unknown session.")
+func (e zabbixError) Error() string { return e.err }
+
+var (
+	errorInvalidParams     = zabbixError{"Invalid parameters."}
+	errorCannotFetchData   = zabbixError{"Cannot fetch data."}
+	errorCannotMarshalJSON = zabbixError{"Cannot marshal JSON."}
+	errorUnsupportedMetric = zabbixError{"Unsupported metric."}
+	errorEmptyResult       = zabbixError{"Empty result."}
+	errorUnknownSession    = zabbixError{"Unknown session."}
 )

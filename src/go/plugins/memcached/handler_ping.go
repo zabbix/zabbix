@@ -24,8 +24,14 @@ const (
 	pingOk     = 1
 )
 
+const pingMaxParams = 0
+
 // pingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
-func (p *Plugin) pingHandler(conn MCClient, params []string) (interface{}, error) {
+func pingHandler(conn MCClient, params []string) (interface{}, error) {
+	if len(params) > pingMaxParams {
+		return nil, errorInvalidParams
+	}
+
 	if err := conn.NoOp(); err != nil {
 		return pingFailed, nil
 	}

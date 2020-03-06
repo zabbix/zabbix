@@ -21,15 +21,22 @@ package memcached
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 )
 
+const statsMaxParams = 1
+
 // statsHandler gets an output of 'stats <type>' command, parses it and returns it in the JSON format.
-func (p *Plugin) statsHandler(conn MCClient, params []string) (interface{}, error) {
+func statsHandler(conn MCClient, params []string) (interface{}, error) {
 	statsType := ""
 
-	if len(params) > 1 {
-		switch strings.ToLower(params[1]) {
+	if len(params) > statsMaxParams {
+		return nil, errorInvalidParams
+	}
+
+	if len(params) > 0 {
+		switch strings.ToLower(params[0]) {
 		case "items":
 			fallthrough
 		case "sizes":
@@ -37,7 +44,7 @@ func (p *Plugin) statsHandler(conn MCClient, params []string) (interface{}, erro
 		case "slabs":
 			fallthrough
 		case "settings":
-			statsType = strings.ToLower(params[1])
+			statsType = strings.ToLower(params[0])
 		default:
 			return nil, errorInvalidParams
 		}
@@ -45,14 +52,12 @@ func (p *Plugin) statsHandler(conn MCClient, params []string) (interface{}, erro
 
 	stats, err := conn.Stats(statsType)
 	if err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotFetchData)
 	}
 
 	jsonRes, err := json.Marshal(stats)
 	if err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotMarshalJSON
+		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotMarshalJSON)
 	}
 
 	return string(jsonRes), nil

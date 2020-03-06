@@ -63,7 +63,7 @@ func (u *URI) URI() string {
 	return u.scheme + "://" + u.user + ":" + u.password + "@" + u.Addr()
 }
 
-func newURIWithCreds(uri, user, password string) (res URI, err error) {
+func newURIWithCreds(uri, user, password string) (res *URI, err error) {
 	res, err = parseURI(uri)
 
 	if err == nil {
@@ -77,22 +77,24 @@ func newURIWithCreds(uri, user, password string) (res URI, err error) {
 const DefaultPort = "11211"
 
 // parseURI splits a given URI to scheme, host:port/socket and returns a URI structure.
-// It uses DefaultPort if URI does not consist of port. The only allowed schemes are: tcp and unix.
+// It uses DefaultPort if a URI does not consist of port. The only allowed schemes are: tcp and unix.
 // If an error occurs it returns error and an empty structure.
-func parseURI(uri string) (res URI, err error) {
+// It ignores embedded credentials according to https://www.ietf.org/rfc/rfc3986.txt.
+func parseURI(uri string) (res *URI, err error) {
+	res = &URI{}
 	if u, err := url.Parse(uri); err == nil {
 		switch strings.ToLower(u.Scheme) {
 		case "tcp":
 			res.host = u.Hostname()
 			if len(res.host) == 0 {
-				return URI{}, errors.New("host is required")
+				return nil, errors.New("host is required")
 			}
 
 			port := u.Port()
 
 			if portInt, err := strconv.Atoi(port); err == nil {
 				if portInt < 1 || portInt > 65535 {
-					return URI{}, errors.New("port must be integer and must be between 1 and 65535")
+					return nil, errors.New("port must be integer and must be between 1 and 65535")
 				}
 			}
 
@@ -104,18 +106,18 @@ func parseURI(uri string) (res URI, err error) {
 
 		case "unix":
 			if len(u.Path) == 0 {
-				return URI{}, errors.New("socket is required")
+				return nil, errors.New("socket is required")
 			}
 
 			res.socket = u.Path
 
 		default:
-			return URI{}, errors.New("the only supported schemes are: tcp and unix")
+			return nil, errors.New("the only supported schemes are: tcp and unix")
 		}
 
 		res.scheme = u.Scheme
 	} else {
-		return URI{}, errors.New("failed to parse connection string")
+		return nil, errors.New("failed to parse connection string")
 	}
 
 	return res, err

@@ -20,8 +20,8 @@
 package memcached
 
 import (
+	"errors"
 	"time"
-
 	"zabbix.com/pkg/plugin"
 )
 
@@ -34,12 +34,6 @@ const (
 	keyPing  = "memcached.ping"
 )
 
-// maxParams defines the maximum number of parameters for metrics.
-var maxParams = map[string]int{
-	keyStats: 2,
-	keyPing:  1,
-}
-
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
@@ -47,61 +41,91 @@ type Plugin struct {
 	options PluginOptions
 }
 
-type handler func(conn MCClient, params []string) (res interface{}, err error)
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(conn MCClient, params []string) (res interface{}, err error)
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin
 
-// Export implements the Exporter interface.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	var (
-		uri     URI
-		handler handler
-	)
+// whereToConnect builds a URI based on key's parameters and a configuration file.
+func whereToConnect(params []string, sessions map[string]*Session, defaultURI string) (u *URI, err error) {
+	user := ""
+	if len(params) > 1 {
+		user = params[1]
+	}
+
+	password := ""
+	if len(params) > 2 {
+		password = params[2]
+	}
+
+	uri := defaultURI
 
 	// The first param can be either a URI or a session identifier
 	if len(params) > 0 && len(params[0]) > 0 {
 		if isLooksLikeURI(params[0]) {
 			// Use the URI defined as key's parameter
-			uri, err = newURIWithCreds(params[0], p.options.User, p.options.Password)
+			uri = params[0]
 		} else {
-			if _, ok := p.options.Sessions[params[0]]; !ok {
+			if _, ok := sessions[params[0]]; !ok {
 				return nil, errorUnknownSession
 			}
+
 			// Use a pre-defined session
-			uri, err = newURIWithCreds(
-				p.options.Sessions[params[0]].URI,
-				p.options.Sessions[params[0]].User,
-				p.options.Sessions[params[0]].Password,
-			)
+			uri = sessions[params[0]].URI
+			user = sessions[params[0]].User
+			password = sessions[params[0]].Password
 		}
-	} else {
-		// Use the default URI if the first param is omitted
-		uri, err = newURIWithCreds(p.options.URI, p.options.User, p.options.Password)
 	}
 
+	if len(user) > 0 || len(password) > 0 {
+		return newURIWithCreds(uri, user, password)
+	}
+
+	return parseURI(uri)
+}
+
+// Export implements the Exporter interface.
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (result interface{}, err error) {
+	var (
+		handleMetric  handlerFunc
+		handlerParams []string
+		zbxErr        zabbixError
+	)
+
+	uri, err := whereToConnect(params, p.options.Sessions, p.options.URI)
 	if err != nil {
 		return nil, err
 	}
 
+	// Extract handler related params
+	if len(params) > 3 {
+		handlerParams = params[3:]
+	}
+
 	switch key {
 	case keyStats:
-		handler = p.statsHandler // memcached.stats[[uri][,type]]
+		handleMetric = statsHandler // memcached.stats[[uri][,user][,password][,type]]
 
 	case keyPing:
-		handler = p.pingHandler // memcached.ping[[uri]]
+		handleMetric = pingHandler // memcached.ping[[uri][,user][,password]]
 
 	default:
 		return nil, errorUnsupportedMetric
 	}
 
-	if len(params) > maxParams[key] {
-		return nil, errorInvalidParams
+	result, err = handleMetric(p.connMgr.GetConnection(*uri), handlerParams)
+	if err != nil {
+		p.Errf(err.Error())
+		if errors.As(err, &zbxErr) {
+			return nil, zbxErr
+		}
 	}
 
-	return handler(p.connMgr.GetConnection(uri), params)
+	return result, nil
 }
 
+// Start implements the Runner interface and performs initialization when plugin is activated.
 func (p *Plugin) Start() {
 	p.connMgr = NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
@@ -110,12 +134,12 @@ func (p *Plugin) Start() {
 	)
 }
 
+// Stop implements the Runner interface and frees resources when plugin is deactivated.
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
 }
 
-// init registers metrics.
 func init() {
 	plugin.RegisterMetrics(&impl, pluginName,
 		keyStats, "Returns output of stats command.",

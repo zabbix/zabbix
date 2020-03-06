@@ -30,22 +30,16 @@ type Session struct {
 	// URI is a connection string consisting of a network scheme, a host address and a port or a path to a Unix-socket.
 	URI string `conf:"name=Uri,optional"`
 
-	// Password to send to protected Memcached server.
+	// Password to send to a protected Memcached server.
 	Password string `conf:"optional"`
 
-	// Username to send to protected Memcached server.
+	// Username to send to a protected Memcached server.
 	User string `conf:"optional"`
 }
 
 type PluginOptions struct {
 	// URI is the default connection string.
 	URI string `conf:"name=Uri,default=tcp://localhost:11211"`
-
-	// Password is the default password.
-	Password string `conf:"optional"`
-
-	// User is the default username.
-	User string `conf:"optional"`
 
 	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
@@ -96,10 +90,6 @@ func (p *Plugin) Validate(options interface{}) error {
 		return err
 	}
 
-	if len(opts.Password+opts.User) > MaxEntryLen {
-		return fmt.Errorf("credentials cannot be longer than %d characters", MaxEntryLen)
-	}
-
 	uri := opts.URI
 
 	for name, session := range opts.Sessions {
@@ -113,8 +103,8 @@ func (p *Plugin) Validate(options interface{}) error {
 		}
 
 		if len(session.Password+session.User) > MaxEntryLen {
-			return fmt.Errorf("invalid parameters for session '%s': credentials cannot be longer than %d characters",
-				name, MaxEntryLen)
+			return fmt.Errorf("invalid parameters for session '%s': credentials cannot be longer "+
+				"than %d characters", name, MaxEntryLen)
 		}
 	}
 
