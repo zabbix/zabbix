@@ -501,20 +501,20 @@ class CControllerPopupTriggerExpr extends CController {
 					 */
 					$tokens = $result->getTokens();
 					foreach ($tokens as $key => $token) {
-						if ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
-								&& array_key_exists($function, $this->functions)
-								&& in_array($token['value'], $this->functions[$function]['operators'])) {
-							$operator = $token['value'];
-						}
-
-						if ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
-							$value = $token['data']['string'];
-						}
-						elseif ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_NUMBER
-								|| $token['type'] == CTriggerExprParserResult::TOKEN_TYPE_MACRO
-								|| $token['type'] == CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO
-								|| $token['type'] == CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO) {
-							$value = $token['value'];
+						if ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
+							if (array_key_exists($key + 2, $tokens)
+									&& $tokens[$key + 1]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
+									&& array_key_exists($function, $this->functions)
+									&& in_array($tokens[$key + 1]['value'],
+										$this->functions[$function]['operators'])) {
+								$operator = $tokens[$key + 1]['value'];
+								$value = ($tokens[$key + 2]['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING)
+									? $tokens[$key + 2]['data']['string']
+									: $value = $tokens[$key + 2]['value'];
+							}
+							else {
+								break;
+							}
 						}
 					}
 
