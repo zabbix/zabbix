@@ -405,7 +405,7 @@ var hintBox = {
 			target.clientY = e.clientY;
 		}
 
-		var $host = target.hintBoxItem.parent(),
+		var $host = target.hintBoxItem.offsetParent(),
 			host_offset = $host.offset(),
 			// Usable area relative to host.
 			host_x_min = $host.scrollLeft(),
@@ -423,7 +423,10 @@ var hintBox = {
 			// Hint box width and height.
 			hint_width = target.hintBoxItem.outerWidth(),
 			hint_height = target.hintBoxItem.outerHeight(),
-			// Fix width and height since browsers tend to reduce hintbox size when horizontal scrollbar is active.
+			/*
+				Fix popup width and height since browsers will tend to reduce the size of the popup, if positioned further
+				than the width of window when horizontal scolling is active.
+			*/
 			css = {
 				width: target.hintBoxItem.width(),
 				height: target.hintBoxItem.height()
