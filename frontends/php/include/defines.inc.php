@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.0alpha2');
+define('ZABBIX_VERSION',		'5.0.0beta1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050038);
+define('ZABBIX_DB_VERSION',		4050046);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
 
@@ -38,7 +38,7 @@ define('ZBX_MEBIBYTE',	'1048576');
 define('ZBX_GIBIBYTE',	'1073741824');
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
-define('ZBX_MAX_PERIOD',		63158400); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400
+define('ZBX_MAX_PERIOD',		63158401); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 1
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MIN_INT64',			'-9223372036854775808');
@@ -1523,7 +1523,7 @@ define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 define('ZBX_STYLE_BOTTOM', 'bottom');
 define('ZBX_STYLE_BROWSER_LOGO_CHROME', 'browser-logo-chrome');
 define('ZBX_STYLE_BROWSER_LOGO_FF', 'browser-logo-ff');
-define('ZBX_STYLE_BROWSER_LOGO_IE', 'browser-logo-ie');
+define('ZBX_STYLE_BROWSER_LOGO_ED', 'browser-logo-ed');
 define('ZBX_STYLE_BROWSER_LOGO_OPERA', 'browser-logo-opera');
 define('ZBX_STYLE_BROWSER_LOGO_SAFARI', 'browser-logo-safari');
 define('ZBX_STYLE_BROWSER_WARNING_CONTAINER', 'browser-warning-container');

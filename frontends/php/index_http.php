@@ -84,7 +84,7 @@ else {
 	error(_('Login name or password is incorrect.'));
 }
 
-(new CView('general.warning', [
+echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => zbx_objectValues(clear_messages(), 'message'),
 	'buttons' => [
@@ -92,4 +92,4 @@ else {
 			json_encode($redirect_to->getUrl()).';')
 	],
 	'theme' => getUserTheme(CWebUser::$data)
-]))->render();
+]))->getOutput();

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Items'));
 
 $host = $data['host'];
@@ -1000,4 +1004,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 
-return $widget;
+$widget->show();

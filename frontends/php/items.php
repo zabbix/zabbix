@@ -1595,9 +1595,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 
 	// render view
 	if (!$has_errors) {
-		$itemView = new CView('configuration.item.edit', $data);
-		$itemView->render();
-		$itemView->show();
+		echo (new CView('configuration.item.edit', $data))->getOutput();
 	}
 }
 elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform') || hasRequest('massupdate'))
@@ -1808,18 +1806,14 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	}
 
 	// render view
-	$itemView = new CView('configuration.item.massupdate', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.item.massupdate', $data))->getOutput();
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('group_itemid')) {
 	$data = getCopyElementsFormData('group_itemid', _('Items'));
 	$data['action'] = 'item.masscopyto';
 
 	// render view
-	$itemView = new CView('configuration.copy.elements', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 // list of items
 else {
@@ -2165,9 +2159,7 @@ else {
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
 
 	// render view
-	$itemView = new CView('configuration.item.list', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.item.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

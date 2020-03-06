@@ -395,34 +395,25 @@ class CWidgetHelper {
 
 	/**
 	 * @param CWidgetFieldSeverities $field
-	 * @param array $config
 	 *
-	 * @return CList
+	 * @return CSeverityCheckBoxList
 	 */
-	public static function getSeverities($field, $config) {
-		$severities = [];
-
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severities[$severity] = getSeverityName($severity, $config);
-		}
-
-		return self::getCheckBoxList($field, $severities);
+	public static function getSeverities($field) {
+		return (new CSeverityCheckBoxList($field->getName()))
+			->setChecked($field->getValue())
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	/**
 	 * @param CWidgetFieldCheckBoxList $field
-	 * @param array $config
+	 * @param array                    $list  Option list array.
 	 *
 	 * @return CList
 	 */
-	public static function getCheckBoxList($field, array $config) {
+	public static function getCheckBoxList($field, array $list) {
 		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
-		if ($field->getOrientation() == CWidgetFieldCheckBoxList::ORIENTATION_HORIZONTAL) {
-			$checkbox_list->addClass(ZBX_STYLE_HOR_LIST);
-		}
-
-		foreach ($config as $key => $label) {
+		foreach ($list as $key => $label) {
 			$checkbox_list->addItem(
 				(new CCheckBox($field->getName().'[]', $key))
 					->setLabel($label)
@@ -856,7 +847,9 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
@@ -899,7 +892,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: IE ? "move" : "grabbing",'.
+				'cursor: "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.
@@ -1245,7 +1238,9 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(container[0].scrollHeight);'.
+					'container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+					));'.
 
 					'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color) {'.
 						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
@@ -1324,7 +1319,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: IE ? "move" : "grabbing",'.
+				'cursor: "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.

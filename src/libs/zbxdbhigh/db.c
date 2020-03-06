@@ -26,6 +26,9 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 
+#define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
+#define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin"
+
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
@@ -2139,6 +2142,227 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 	zbx_free(sql);
 
 	return ret;
+}
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+static void	zbx_warn_char_set(const char *db_name, const char *char_set)
+{
+	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_SUPPORTED_DB_CHARACTER_SET "\" character set."
+			" Database \"%s\" has default character set \"%s\"", db_name, char_set);
+}
+#endif
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE)
+static void	zbx_warn_no_charset_info(const char *db_name)
+{
+	zabbix_log(LOG_LEVEL_WARNING, "Cannot get database \"%s\" character set", db_name);
+}
+#endif
+
+void	DBcheck_character_set(void)
+{
+#if defined(HAVE_MYSQL)
+	char		*database_name_esc;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	result = DBselect(
+			"select default_character_set_name, default_collation_name"
+			" from information_schema.SCHEMATA"
+			" where schema_name='%s'", database_name_esc);
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zbx_warn_no_charset_info(CONFIG_DBNAME);
+	}
+	else
+	{
+		char	*char_set = row[0];
+		char	*collation = row[1];
+
+		if (0 != strcasecmp(char_set, ZBX_SUPPORTED_DB_CHARACTER_SET))
+			zbx_warn_char_set(CONFIG_DBNAME, char_set);
+
+		if (0 != zbx_strncasecmp(collation, ZBX_SUPPORTED_DB_COLLATION, sizeof(ZBX_SUPPORTED_DB_COLLATION)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation."
+					" Database \"%s\" has default collation \"%s\"", ZBX_SUPPORTED_DB_COLLATION,
+					CONFIG_DBNAME, collation);
+		}
+	}
+
+	DBfree_result(result);
+
+	result = DBselect(
+			"select count(*)"
+			" from information_schema.`COLUMNS`"
+			" where table_schema='%s'"
+				" and data_type in ('text', 'varchar', 'longtext')"
+				" and (character_set_name<>'%s' or collation_name<>'%s')",
+			database_name_esc, ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" tables", CONFIG_DBNAME);
+	}
+	else if (0 != strcmp("0", row[0]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "character set name or collation name that is not supported by Zabbix"
+				" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "only character set \"%s\" and collation \"%s\" should be used in "
+				"database", ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
+	}
+
+	DBfree_result(result);
+	DBclose();
+	zbx_free(database_name_esc);
+#elif defined(HAVE_ORACLE)
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	result = DBselect(
+			"select parameter, value"
+			" from NLS_DATABASE_PARAMETERS"
+			" where parameter in ('NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET')");
+
+	if (NULL == result)
+	{
+		zbx_warn_no_charset_info(CONFIG_DBNAME);
+	}
+	else
+	{
+		while (NULL != (row = DBfetch(result)))
+		{
+			const char	*parameter = row[0];
+			const char	*value = row[1];
+
+			if (NULL == parameter || NULL == value)
+			{
+				continue;
+			}
+			else if (0 == strcasecmp("NLS_CHARACTERSET", parameter) ||
+					(0 == strcasecmp("NLS_NCHAR_CHARACTERSET", parameter)))
+			{
+				if (0 != strcasecmp(ZBX_SUPPORTED_DB_CHARACTER_SET, value))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
+							" \"%s\". Zabbix supports only \"%s\" character set",
+							CONFIG_DBNAME, parameter, value,
+							ZBX_SUPPORTED_DB_CHARACTER_SET);
+				}
+			}
+		}
+	}
+
+	DBfree_result(result);
+	DBclose();
+#elif defined(HAVE_POSTGRESQL)
+#define OID_LENGTH_MAX		20
+
+	char		*database_name_esc = NULL;
+	char		*schema_name_esc = NULL;
+	char		oid[OID_LENGTH_MAX] = "";
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
+	schema_name_esc = (NULL != CONFIG_DBSCHEMA) ? DBdyn_escape_string(CONFIG_DBSCHEMA) : strdup("public");
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	result = DBselect(
+			"select pg_encoding_to_char(encoding)"
+			" from pg_database"
+			" where datname='%s'",
+			database_name_esc);
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zbx_warn_no_charset_info(CONFIG_DBNAME);
+		goto out;
+	}
+	else if (strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
+	{
+		zbx_warn_char_set(CONFIG_DBNAME, row[0]);
+		goto out;
+
+	}
+
+	DBfree_result(result);
+
+	result = DBselect(
+			"select oid"
+			" from pg_namespace"
+			" where nspname='%s'",
+			schema_name_esc);
+
+	if (NULL == result || NULL == (row = DBfetch(result)) || 0 >= zbx_strlcpy(oid, row[0], sizeof(oid)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields", CONFIG_DBNAME);
+		goto out;
+	}
+
+	DBfree_result(result);
+
+	result = DBselect(
+			"select count(*)"
+				" from pg_attribute as a"
+					" left join pg_class as c"
+						" on c.relfilenode=a.attrelid"
+					" left join pg_collation as l"
+						" on l.oid=a.attcollation"
+			" where atttypid in (25,1043)"
+				" and c.relnamespace=%s"
+				" and c.relam=0"
+				" and l.collname<>'default'",
+			oid);
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields", CONFIG_DBNAME);
+	}
+	else if (0 != strcmp("0", row[0]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "database has %s fields with unsupported character set. Zabbix supports"
+				" only \"%s\" character set", row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
+	}
+
+	DBfree_result(result);
+
+	result = DBselect("show client_encoding");
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" client encoding", CONFIG_DBNAME);
+	}
+	else if (0 != strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "client_encoding for database \"%s\" is \"%s\". Zabbix supports only"
+				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
+	}
+
+	DBfree_result(result);
+
+	result = DBselect("show server_encoding");
+
+	if (NULL == result || NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" server encoding", CONFIG_DBNAME);
+	}
+	else if (0 != strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "server_encoding for database \"%s\" is \"%s\". Zabbix supports only"
+				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
+	}
+out:
+	DBfree_result(result);
+	DBclose();
+	zbx_free(schema_name_esc);
+	zbx_free(database_name_esc);
+#endif
 }
 
 #ifdef HAVE_ORACLE

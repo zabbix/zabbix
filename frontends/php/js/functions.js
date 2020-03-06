@@ -97,27 +97,29 @@ var graphs = {
 };
 
 function cloneRow(elementid, count) {
-	if (typeof(cloneRow.count) == 'undefined') {
+	if (typeof(cloneRow.count) === 'undefined') {
 		cloneRow.count = count;
 	}
 	cloneRow.count++;
 
-	var tpl = new Template($(elementid).cloneNode(true).wrap('div').innerHTML);
+	var element = $('#' + elementid),
+		tpl = new Template($('<div>').append(element.clone(true)).html()),
+		entry = jQuery(tpl.evaluate({'id' : cloneRow.count}));
 
-	var emptyEntry = tpl.evaluate({'id' : cloneRow.count});
-
-	var newEntry = $(elementid).insert({'before' : emptyEntry}).previousSibling;
-
-	$(newEntry).descendants().each(function(e) {
-		e.removeAttribute('disabled');
+	entry.find('*').each(function() {
+		jQuery(this).removeAttr('disabled');
 	});
-	newEntry.setAttribute('id', 'entry_' + cloneRow.count);
-	newEntry.style.display = '';
+
+	entry.attr('id', 'entry_' + cloneRow.count);
+	entry[0].style.display = '';
+	entry.insertBefore(element.parent().children(':last-child'));
 }
 
 function testUserSound(idx) {
-	var sound = $(idx).options[$(idx).selectedIndex].value;
-	var repeat = $('messages_sounds.repeat').options[$('messages_sounds.repeat').selectedIndex].value;
+	var element = document.getElementById(idx);
+	var sound = element.options[element.selectedIndex].value;
+	element = document.getElementById('messages_sounds.repeat');
+	var repeat = element.options[element.selectedIndex].value;
 
 	if (repeat == 1) {
 		AudioControl.playOnce(sound);
@@ -126,7 +128,7 @@ function testUserSound(idx) {
 		AudioControl.playLoop(sound, repeat);
 	}
 	else {
-		AudioControl.playLoop(sound, $('messages_timeout').value);
+		AudioControl.playLoop(sound, document.getElementById('messages_timeout').value);
 	}
 }
 
@@ -663,7 +665,7 @@ function parseUrlString(url) {
 				pair.push('');
 
 				try {
-					if (/%[01]/.match(pair[0]) || /%[01]/.match(pair[1]) ) {
+					if (pair[0].match(/%[01]/) || pair[1].match(/%[01]/)) {
 						// Non-printable characters in URL.
 						throw null;
 					}
@@ -795,4 +797,74 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 	}
 
 	return $msg_box;
+}
+
+/**
+ * Download svg graph as .png image.
+ *
+ * @param {object} $dom_node    jQuery svg node to download.
+ * @param {string} file_name    File name.
+ */
+function downloadSvgImage($dom_node, file_name) {
+	var canvas = document.createElement('canvas'),
+		labels = $dom_node.next('.svg-graph-legend'),
+		$clone = $dom_node.clone(),
+		$container = $dom_node.closest('.dashbrd-grid-widget-content'),
+		image = new Image,
+		a = document.createElement('a'),
+		style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style'),
+		$labels_clone,
+		labels_height = labels.length ? labels.height() : 0,
+		context2d;
+
+	// Clone only svg graph styles.
+	style.innerText = jQuery.map(document.styleSheets[0].cssRules, function (rule) {
+		return rule.selectorText && rule.selectorText.substr(0, 5) == '.svg-' ? rule.cssText : '';
+	}).join('');
+
+	jQuery.map(['background-color', 'font-family', 'font-size', 'color'], function (key) {
+		$clone.css(key, $container.css(key));
+	});
+
+	canvas.width = $dom_node.width()
+	canvas.height = $dom_node.height() + labels_height;
+	context2d = canvas.getContext('2d');
+	image.onload = function() {
+		context2d.drawImage(image, 0, 0);
+		a.href = canvas.toDataURL('image/png');
+		a.rel = 'noopener';
+		a.download = file_name;
+		a.target = '_blank';
+		a.click();
+	}
+	$labels_clone = jQuery(document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject'))
+		.attr({
+			x: 0,
+			y: canvas.height - labels_height,
+			width: canvas.width,
+			height: labels_height
+		})
+		.append(jQuery(document.createElementNS('http://www.w3.org/1999/xhtml', 'div'))
+			.append(style)
+			.append(labels.clone())
+		);
+
+	$clone.attr('height', canvas.height + 'px').append($labels_clone);
+	image.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString($clone[0]));
+}
+
+/**
+ * Download classic graph as .png image.
+ *
+ * @param {object} $dom_node    jQuery svg node to download.
+ * @param {string} file_name    File name.
+ */
+function downloadPngImage($dom_node, file_name) {
+	var a = document.createElement('a');
+
+	a.href = $dom_node.attr('src');
+	a.rel = 'noopener';
+	a.download = file_name;
+	a.target = '_blank';
+	a.click();
 }

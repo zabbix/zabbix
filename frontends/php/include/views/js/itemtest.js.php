@@ -32,7 +32,7 @@
 		var $preprocessing = jQuery('#preprocessing'),
 			steps = [];
 
-		step_nums.each(function(num) {
+		step_nums.forEach(function(num) {
 			var type = jQuery('[name="preprocessing[' + num + '][type]"]', $preprocessing).val(),
 				error_handler = jQuery('[name="preprocessing[' + num + '][on_fail]"]').is(':checked')
 					? jQuery('[name="preprocessing[' + num + '][error_handler]"]:checked').val()
