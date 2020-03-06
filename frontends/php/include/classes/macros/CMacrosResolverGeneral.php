@@ -66,15 +66,24 @@ class CMacrosResolverGeneral {
 		// Replace whitespace with emptyness to make value search easier.
 		$expression = str_replace(" \r\n\t", '', $expression);
 
-		// Search for numeric values in expression.
+		// Search for numeric values and quoted strings in expression.
 		preg_match_all('/((?<![\)\.0-9]|[\.0-9]['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']|function)\-?'.
-				'([.][0-9]+|[0-9]+[.]?[0-9]*)['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)/', $expression, $values);
+				'([.][0-9]+|[0-9]+[.]?[0-9]*)['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?|"([^\\\\"]|\\\\["\\\\])*")/',
+			$expression,
+			$values
+		);
 
 		$macro_values = [];
 
 		foreach (array_keys($references) as $reference) {
 			$i = (int) $reference[1] - 1;
 			$macro_values[$reference] = array_key_exists($i, $values[0]) ? $values[0][$i] : '';
+
+			if ($macro_values[$reference][0] === '"') {
+				$macro_values[$reference] = substr($macro_values[$reference], 1, -1);
+				$macro_values[$reference] = str_replace('\"', '"', $macro_values[$reference]);
+				$macro_values[$reference] = str_replace('\\\\', '\\', $macro_values[$reference]);
+			}
 		}
 
 		return $macro_values;
