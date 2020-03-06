@@ -6292,9 +6292,9 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_simple_macros_secure                                  *
+ * Function: substitute_simple_macros                                         *
  *                                                                            *
- * Purpose: substitute_simple_macros with non-secure user macro environment   *
+ * Purpose: substitute_simple_macros with masked secret macros                *
  *          (default setting)                                                 *
  *                                                                            *
  ******************************************************************************/
@@ -6309,12 +6309,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_simple_macros_secure                                  *
+ * Function: substitute_simple_macros_unmasked                                *
  *                                                                            *
- * Purpose:substitute_simple_macros with secure user macro environment        *
+ * Purpose: substitute_simple_macros with unmasked secret macros              *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros_secure(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	substitute_simple_macros_unmasked(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
@@ -6333,7 +6333,7 @@ int	substitute_simple_macros_secure(zbx_uint64_t *actionid, const DB_EVENT *even
  *                                                                            *
  * Function: substitute_macros_xml                                            *
  *                                                                            *
- * substitute_macros_xml with non-secure user macro environment               *
+ * substitute_macros_xml with masked secret macros                            *
  *                                                                            *
  ******************************************************************************/
 int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
@@ -6344,12 +6344,12 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_macros_xml_secure                                     *
+ * Function: substitute_macros_xml_unmasked                                   *
  *                                                                            *
- * substitute_macros_xml with secure user macro environment                   *
+ * substitute_macros_xml with unmasked secret macros                          *
  *                                                                            *
  ******************************************************************************/
-int	substitute_macros_xml_secure(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+int	substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen)
 {
 	unsigned char	old_macro_env;
@@ -6365,7 +6365,7 @@ int	substitute_macros_xml_secure(char **data, const DC_ITEM *item, const struct 
  *                                                                            *
  * Function: substitute_key_macros                                            *
  *                                                                            *
- * substitute_key_macros with non-secure user macro environment               *
+ * substitute_key_macros with masked secret macros                            *
  *                                                                            *
  ******************************************************************************/
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, const struct zbx_json_parse *jp_row,
@@ -6376,12 +6376,12 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, c
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_key_macros_secure                                     *
+ * Function: substitute_key_macros_unmasked                                   *
  *                                                                            *
- * substitute_key_macros with secure user macro environment                   *
+ * substitute_key_macros with unmasked secret macros                          *
  *                                                                            *
  ******************************************************************************/
-int	substitute_key_macros_secure(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
+int	substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
 		char *error, size_t maxerrlen)
 {

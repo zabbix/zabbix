@@ -360,9 +360,9 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			substitute_simple_macros_secure(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					&script->username, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros_secure(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					&script->password, MACRO_TYPE_COMMON, NULL, 0);
 			break;
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
@@ -385,7 +385,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			if (SUCCEED != substitute_simple_macros_secure(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
 					NULL, &script->command, MACRO_TYPE_SCRIPT, error, max_error_len))
 			{
 				goto out;
