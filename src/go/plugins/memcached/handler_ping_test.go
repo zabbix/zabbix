@@ -24,12 +24,9 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-	"zabbix.com/pkg/plugin"
 )
 
 func TestPlugin_pingHandler(t *testing.T) {
-	impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
-
 	aliveConn := stubConn{
 		StatsFunc: nil,
 		NoOpFunc: func() error {
@@ -77,8 +74,8 @@ func TestPlugin_pingHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := impl.pingHandler(tt.args.conn, tt.args.params)
-			if err != tt.wantErr {
+			got, err := pingHandler(tt.args.conn, tt.args.params)
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("Plugin.pingHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

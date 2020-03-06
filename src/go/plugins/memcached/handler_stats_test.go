@@ -21,15 +21,13 @@ package memcached
 
 import (
 	"errors"
-	"github.com/alimy/mc/v2"
 	"reflect"
 	"testing"
-	"zabbix.com/pkg/plugin"
+
+	"github.com/alimy/mc/v2"
 )
 
 func TestPlugin_statsHandler(t *testing.T) {
-	impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
-
 	fakeConn := stubConn{
 		StatsFunc: func(key string) (mc.McStats, error) {
 			switch key {
@@ -69,7 +67,7 @@ func TestPlugin_statsHandler(t *testing.T) {
 			name: "Should return error if wrong type specified",
 			args: args{
 				conn:   &fakeConn,
-				params: []string{"", "wrong_type"},
+				params: []string{"wrong_type"},
 			},
 			want:    nil,
 			wantErr: errorInvalidParams,
@@ -78,7 +76,7 @@ func TestPlugin_statsHandler(t *testing.T) {
 			name: "Should return error if cannot fetch data",
 			args: args{
 				conn:   &fakeConn,
-				params: []string{"", "settings"},
+				params: []string{"settings"},
 			},
 			want:    nil,
 			wantErr: errorCannotFetchData,
@@ -96,7 +94,7 @@ func TestPlugin_statsHandler(t *testing.T) {
 			name: "Type should be passed to stats command if specified",
 			args: args{
 				conn:   &fakeConn,
-				params: []string{"", "sizes"},
+				params: []string{"sizes"},
 			},
 			want:    `{"96":"1"}`,
 			wantErr: nil,
@@ -105,11 +103,12 @@ func TestPlugin_statsHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := impl.statsHandler(tt.args.conn, tt.args.params)
-			if err != tt.wantErr {
+			got, err := statsHandler(tt.args.conn, tt.args.params)
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("Plugin.statsHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Plugin.statsHandler() = %v, want %v", got, tt.want)
 			}

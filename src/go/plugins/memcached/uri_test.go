@@ -185,19 +185,19 @@ func Test_newURIWithPassword(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantU   URI
+		wantU   *URI
 		wantErr bool
 	}{
 		{
 			"Should return URI structure",
 			args{"tcp://192.168.1.1:11211", "zabbix", "sEcReT"},
-			URI{scheme: "tcp", host: "192.168.1.1", port: "11211", user: "zabbix", password: "sEcReT"},
+			&URI{scheme: "tcp", host: "192.168.1.1", port: "11211", user: "zabbix", password: "sEcReT"},
 			false,
 		},
 		{
 			"Should return error if failed to parse URI",
 			args{"://", "zabbix", "sEcReT"},
-			URI{},
+			nil,
 			true,
 		},
 	}
@@ -222,67 +222,67 @@ func Test_parseURI(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantU   URI
+		wantU   *URI
 		wantErr bool
 	}{
 		{
 			"Parse URI with tcp scheme",
 			args{"tcp://localhost:11211"},
-			URI{scheme: "tcp", host: "localhost", port: "11211"},
+			&URI{scheme: "tcp", host: "localhost", port: "11211"},
 			false,
 		},
 		{
 			"Parse URI without scheme",
 			args{"localhost:11211"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail when URI without host is passed",
 			args{"tcp://:11211"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail if port is less than 1",
 			args{"tcp://localhost:0"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail if port is greater than 65535",
 			args{"tcp://localhost:99999"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail if port is not integer",
 			args{"tcp://:foo"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Parse URI without port",
 			args{"tcp://localhost"},
-			URI{scheme: "tcp", host: "localhost", port: "11211"},
+			&URI{scheme: "tcp", host: "localhost", port: "11211"},
 			false,
 		},
 		{
 			"Parse URI with unix scheme",
 			args{"unix:///var/run/memcached.sock"},
-			URI{scheme: "unix", socket: "/var/run/memcached.sock"},
+			&URI{scheme: "unix", socket: "/var/run/memcached.sock"},
 			false,
 		},
 		{
 			"Should fail if an unknown scheme is passed",
 			args{"foo://bar"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail if a wrong format URI is passed",
 			args{"!@#$%^&*()"},
-			URI{},
+			nil,
 			true,
 		},
 	}

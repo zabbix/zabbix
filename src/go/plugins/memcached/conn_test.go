@@ -34,7 +34,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 	defer connMgr.Destroy()
 
 	uri, _ := parseURI("tcp://127.0.0.1")
-	_ = connMgr.create(uri)
+	_ = connMgr.create(*uri)
 
 	t.Run("Unused connections should have been deleted", func(t *testing.T) {
 		connMgr.closeUnused()
@@ -53,7 +53,7 @@ func TestConnManager_closeAll(t *testing.T) {
 	defer connMgr.Destroy()
 
 	uri, _ := parseURI("tcp://127.0.0.1")
-	_ = connMgr.create(uri)
+	_ = connMgr.create(*uri)
 
 	t.Run("All connections should have been deleted", func(t *testing.T) {
 		connMgr.closeAll()
@@ -104,14 +104,14 @@ func TestConnManager_create(t *testing.T) {
 		{
 			name:      "Should return *MCConn",
 			c:         connMgr,
-			args:      args{uri: uri},
+			args:      args{uri: *uri},
 			want:      &MCConn{},
 			wantPanic: false,
 		},
 		{
 			name:      "Must panic if connection already exists",
 			c:         connMgr,
-			args:      args{uri: uri},
+			args:      args{uri: *uri},
 			want:      nil,
 			wantPanic: true,
 		},
@@ -143,16 +143,16 @@ func TestConnManager_get(t *testing.T) {
 	defer connMgr.Destroy()
 
 	t.Run("Should return nil if connection does not exist", func(t *testing.T) {
-		if got := connMgr.get(uri); got != nil {
+		if got := connMgr.get(*uri); got != nil {
 			t.Errorf("ConnManager.get() = %v, want <nil>", got)
 		}
 	})
 
-	conn := connMgr.create(uri)
+	conn := connMgr.create(*uri)
 	lastTimeAccess := conn.lastTimeAccess
 
 	t.Run("Should return connection if it exists", func(t *testing.T) {
-		got := connMgr.get(uri)
+		got := connMgr.get(*uri)
 		if !reflect.DeepEqual(got, conn) {
 			t.Errorf("ConnManager.get() = %v, want %v", got, conn)
 		}
@@ -175,7 +175,7 @@ func TestConnManager_GetConnection(t *testing.T) {
 	defer connMgr.Destroy()
 
 	t.Run("Should create connection if it does not exist", func(t *testing.T) {
-		got := connMgr.GetConnection(uri)
+		got := connMgr.GetConnection(*uri)
 		if reflect.TypeOf(got) != reflect.TypeOf(conn) {
 			t.Errorf("ConnManager.GetConnection() = %s, want *MCConn", reflect.TypeOf(got))
 		}
@@ -183,7 +183,7 @@ func TestConnManager_GetConnection(t *testing.T) {
 	})
 
 	t.Run("Should return previously created connection", func(t *testing.T) {
-		got := connMgr.GetConnection(uri)
+		got := connMgr.GetConnection(*uri)
 		if !reflect.DeepEqual(got, conn) {
 			t.Errorf("ConnManager.GetConnection() = %v, want %v", got, conn)
 		}
