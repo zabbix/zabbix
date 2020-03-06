@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-06T05:27:24Z</date>
+    <date>2020-03-06T06:07:24Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -315,11 +315,13 @@ try {&#13;
         throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
     }&#13;
 &#13;
+    // Check {EVENT.VALUE} for Trigger-based and Internal events.&#13;
     if (params.event_value !== '0' &amp;&amp; params.event_value !== '1'&#13;
         &amp;&amp; (params.event_source === '0' || params.event_source === '3')) {&#13;
         throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
+    // Check {EVENT.UPDATE.STATUS} only for Trigger-based events.&#13;
     if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
         throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
     }&#13;
@@ -339,11 +341,13 @@ try {&#13;
 &#13;
     Jira.setParams(jira);&#13;
 &#13;
+    // Create issue for non trigger-based events.&#13;
     if (params.event_source !== '0' &amp;&amp; params.event_recovery_value !== '0') {&#13;
         Jira.createIssue(params.alert_subject, params.alert_message);&#13;
 &#13;
         return 'OK';&#13;
     }&#13;
+    // Create issue for trigger-based events.&#13;
     else if (params.event_value === '1' &amp;&amp; update.status === '0' &amp;&amp; !jira.issue_key.startsWith(jira.project_key)) {&#13;
         var key = Jira.createIssue(params.summary,&#13;
             (Object.keys(fields).length ? params.trigger_description : params.alert_message), fields);&#13;
@@ -355,6 +359,7 @@ try {&#13;
             }&#13;
         });&#13;
     }&#13;
+    // Update created issue for trigger-based event.&#13;
     else {&#13;
         if (!jira.issue_key.startsWith(jira.project_key)) {&#13;
             throw new Error('Incorrect Issue key given: ' + jira.issue_key);&#13;
