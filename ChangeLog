@@ -1153,6 +1153,13 @@ New features:
 ....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 
 Bug fixes:
+..F....... [ZBX-17075] fixed "Problems" page validation to ignore invalid date format in filter (vasilijs)
+..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
+..F....... [ZBX-17185] fixed non-disappearing messages of failed login attempts (Ivo)
+........S. [ZBX-17322] fixed deadlock between server and frontend when updating multiple hosts (vso)
+..F.I..... [ZBX-9057] fixed duplicate entries being written into in profiles table (talbergs)
+..F....... [ZBX-17159] fixed overlay dialogue instantiation (talbergs)
+.......PS. [ZBX-17108] improved process utilization calculation (mabele)
 ..F....... [ZBX-17269] fixed undefined indexes in history page (Ivo)
 ........S. [ZBX-17342] dump memory statistics and items with most values when value cache is fully used (vso)
 .......PS. [ZBX-16926] fix INT_MAX error when compiling on SunOS/Joyent/Solaris (arimdjonoks)
