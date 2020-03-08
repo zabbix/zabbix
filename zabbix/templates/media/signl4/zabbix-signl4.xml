@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-01-29T12:59:01Z</date>
+    <media_types>
+        <media_type>
+            <name>SIGNL4 Alerting</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>Subject</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>Message</name>
+                    <value>{ALERT.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>HostName</name>
+                    <value>{HOST.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>HostIP</name>
+                    <value>{HOST.IP}</value>
+                </parameter>
+                <parameter>
+                    <name>teamsecret</name>
+                    <value>{ALERT.SENDTO}</value>
+                </parameter>
+                <parameter>
+                    <name>Severity</name>
+                    <value>{EVENT.SEVERITY}</value>
+                </parameter>
+				<parameter>
+                    <name>EventID</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+				<parameter>
+                    <name>X-S4-ExternalID</name>
+                    <value>ZabbixEventId: {EVENT.ID}</value>
+                </parameter>
+            </parameters>
+            <script>// SIGNL4 Webhook&#13;
+try {&#13;
+&#13;
+	var req = new CurlHttpRequest();&#13;
+	req.AddHeader('Content-Type: application/json');&#13;
+	 &#13;
+	Zabbix.Log(4, 'SIGNL4 webhook: ' + value);&#13;
+	&#13;
+	var params = JSON.parse(value);&#13;
+	&#13;
+	// Read and then remove the team secret&#13;
+	var teamsecret = '';&#13;
+	if ((params.teamsecret != undefined) &amp;&amp; (params.teamsecret != null)) {&#13;
+		teamsecret = params.teamsecret;&#13;
+		params.teamsecret = '';&#13;
+		delete params[teamsecret];&#13;
+	}&#13;
+	 &#13;
+	// HTTP Post&#13;
+	var resp = req.Post('https://connect.signl4.com/webhook/' + teamsecret, 'payload=' + JSON.stringify(params));&#13;
+	 &#13;
+	Zabbix.Log(4, 'response code: '+ req.Status());&#13;
+&#13;
+	if (req.Status() != 201) {&#13;
+		throw 'Response code: ' + req.Status();&#13;
+	}&#13;
+&#13;
+	result = resp;&#13;
+&#13;
+} catch (error) {&#13;
+	Zabbix.Log(4, 'SIGNL4 alert failed: ' + error);&#13;
+ &#13;
+    result = {};&#13;
+}&#13;
+&#13;
+return JSON.stringify(result);</script>
+            <description>SIGNL4 is a mobile alert notification app for powerful alerting, alert management and mobile assignment of work items. It offers alerting via app push, SMS and voice calls including escalations, tracking, and duty scheduling.&#13;
+&#13;
+Get the app at https://www.signl4.com.&#13;
+</description>
+        </media_type>
+    </media_types>
+</zabbix_export>
