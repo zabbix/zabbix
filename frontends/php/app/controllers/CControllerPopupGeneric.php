@@ -55,7 +55,7 @@ class CControllerPopupGeneric extends CController {
 	 *
 	 * @array
 	 */
-	const POPUPS_HAVING_GROUP_FILTER = ['hosts', 'templates'];
+	const POPUPS_HAVING_GROUP_FILTER = ['hosts', 'templates', 'host_templates'];
 
 	/**
 	 * Popups having host filter selector.
@@ -550,7 +550,9 @@ class CControllerPopupGeneric extends CController {
 			$host_options['with_httptests'] = 1;
 		}
 
-		if ($this->source_table === 'hosts' && !$this->hasInput('templated_hosts')) {
+		if (($this->source_table === 'hosts' || $this->source_table === 'host_templates')
+				&& !$this->hasInput('templated_hosts')
+				&& !$this->hasInput('with_hosts_and_templates')) {
 			$group_options['real_hosts'] = 1;
 		}
 		elseif ($this->source_table === 'templates') {
@@ -572,7 +574,7 @@ class CControllerPopupGeneric extends CController {
 		}
 		else {
 			$group_options['with_hosts_and_templates'] = 1;
-			$host_options['templated_hosts'] = 1;
+			$host_options['with_hosts_and_templates'] = 1;
 		}
 
 		foreach (['with_applications', 'with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
@@ -590,8 +592,7 @@ class CControllerPopupGeneric extends CController {
 			$groups = $this->groupids
 				? API::HostGroup()->get([
 					'output' => ['name', 'groupid'],
-					'groupids' => $this->groupids,
-					'real_hosts' => true
+					'groupids' => $this->groupids
 				])
 				: [];
 
@@ -890,7 +891,8 @@ class CControllerPopupGeneric extends CController {
 					'real_hosts' => $this->hasInput('real_hosts') ? '1' : null,
 					'with_httptests' => $this->hasInput('with_httptests') ? '1' : null,
 					'with_items' => $this->hasInput('with_items') ? true : null,
-					'with_triggers' => $this->hasInput('with_triggers') ? true : null
+					'with_triggers' => $this->hasInput('with_triggers') ? true : null,
+					'templated_hosts' => $this->hasInput('with_hosts_and_templates') ? true : null
 				];
 
 				if ($this->hasInput('with_monitored_items')) {

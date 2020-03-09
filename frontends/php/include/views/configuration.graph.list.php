@@ -90,7 +90,7 @@ else {
 							'data' => $data['filter']['hosts'],
 							'popup' => [
 								'parameters' => [
-									'srctbl' => 'hosts',
+									'srctbl' => 'host_templates',
 									'srcfld1' => 'hostid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_hostids_',
