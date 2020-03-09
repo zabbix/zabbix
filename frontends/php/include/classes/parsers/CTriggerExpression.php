@@ -756,11 +756,11 @@ class CTriggerExpression {
 		$number_parser = new CNumberParser(['with_suffix' => true]);
 
 		if ($number_parser->parse($value) == CParser::PARSE_SUCCESS
-			|| $user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
-			|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
-			|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
-			|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
-				return $value;
+				|| $user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+				|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
+				|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+				|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			return $value;
 		}
 
 		return '"'.strtr($value, ['\\' => '\\\\', '"' => '\\"']).'"';
