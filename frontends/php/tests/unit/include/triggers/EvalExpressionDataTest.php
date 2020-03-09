@@ -109,6 +109,26 @@ class EvalExpressionDataTest extends PHPUnit_Framework_TestCase {
 					'{host:item.last()}' => '10m'
 				]
 			],
+			[
+				'{host:item.last()} = "string value"',
+				[
+					'{host:item.last()}' => 'string value'
+				]
+			],
+			[
+				'{$A} = {$B}',
+				[
+					'{$A}' => 'string value \\',
+					'{$B}' => 'string value \\'
+				]
+			],
+			[
+				'{$A} <> {$B}',
+				[
+					'{$A}' => 'string value 1',
+					'{$B}' => 'string value 2'
+				]
+			],
 		];
 	}
 
@@ -185,6 +205,12 @@ class EvalExpressionDataTest extends PHPUnit_Framework_TestCase {
 				'{host:item.last()} = -1',
 				[
 					'{host:item.last()}' => -20
+				]
+			],
+			[
+				'{host:item.last()} = "string value"',
+				[
+					'{host:item.last()}' => 5
 				]
 			],
 			// units
