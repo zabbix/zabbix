@@ -77,10 +77,6 @@ else {
 					$inherited_macro['description']
 				);
 				$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
-				// Prevent stored password autofill.
-				$macro_cell[] = (new CPassBox('macros['.$i.']', $macro['type'], ''))
-					->addStyle('display: none')
-					->removeId();
 			}
 		}
 
