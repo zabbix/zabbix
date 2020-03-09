@@ -320,6 +320,12 @@ class JMXItemChecker extends ItemChecker
 		{
 			Object data = compData.get(key);
 
+			if (data == null)
+			{
+				value.put(key, JSONObject.NULL);
+				continue;
+			}
+
 			if (data instanceof CompositeData)
 				value.put(key, getCompositeDataValues((CompositeData)data));
 			else
