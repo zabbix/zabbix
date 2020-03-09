@@ -411,11 +411,11 @@ var hintBox = {
 			host_x_min = $host.scrollLeft(),
 			host_x_max = Math.min($host[0].scrollWidth,
 				$(window).width() + $(window).scrollLeft() - host_offset.left + $host.scrollLeft()
-			),
+			) - 1,
 			host_y_min = $host.scrollTop(),
 			host_y_max = Math.min($host[0].scrollHeight,
 				$(window).height() + $(window).scrollTop() - host_offset.top + $host.scrollTop()
-			),
+			) - 1,
 			// Event coordinates relative to host.
 			event_x = target.clientX - host_offset.left + $host.scrollLeft(),
 			event_y = target.clientY - host_offset.top + $host.scrollTop(),
