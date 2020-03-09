@@ -1202,7 +1202,8 @@ function getInheritedMacros(array $hostids) {
  *   array(
  *       '{$MACRO}' => array(
  *           'macro' => '{$MACRO}',
- *           'type' => 0x03,                        <- ZBX_PROPERTY_INHERITED, ZBX_PROPERTY_OWN or ZBX_PROPERTY_BOTH
+ *           'type' => 0,                           <- ZBX_MACRO_TYPE_TEXT or ZBX_MACRO_TYPE_SECRET
+ *           'inherited_type' => 0x03,              <- ZBX_PROPERTY_INHERITED, ZBX_PROPERTY_OWN or ZBX_PROPERTY_BOTH
  *           'value' => 'effective value',
  *           'hostmacroid' => 7532,                 <- optional
  *           'template' => array(                   <- optional
