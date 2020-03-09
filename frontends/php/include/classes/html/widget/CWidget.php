@@ -94,21 +94,27 @@ class CWidget {
 	}
 
 	public function toString() {
-		$widget = [];
+		$items = [];
 
-		if ($this->web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+		if ($this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
 			$this->addItem(
 				get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
 					->setAttribute('aria-label', _('Content controls'))
 			);
 		}
 		elseif ($this->title !== null || $this->controls !== null) {
-			$widget[] = $this->createTopHeader();
+			$items[] = $this->createTopHeader();
 		}
 
-		$tab = [$widget, new CTag('main', true, $this->body)];
+		$items[] = get_prepared_messages([
+			'with_auth_warning' => true,
+			'with_session_messages' => true,
+			'with_current_messages' => true
+		]);
 
-		return unpack_object($tab);
+		$items[] = new CTag('main', true, $this->body);
+
+		return unpack_object($items);
 	}
 
 	private function createTopHeader() {

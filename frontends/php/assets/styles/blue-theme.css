@@ -186,6 +186,8 @@ aside,
   flex-direction: column;
   overflow: auto;
   position: relative; }
+  .wrapper > header + [class^="msg-"], .wrapper > [class^="msg-"] + [class^="msg-"] {
+    margin-top: 0; }
   .wrapper.layout-kioskmode main {
     padding: 10px; }
   .wrapper > .debug-output {

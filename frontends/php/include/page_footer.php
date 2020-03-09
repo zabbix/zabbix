@@ -47,7 +47,8 @@ if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
 	DBend(false);
 }
 
-show_messages();
+// Display unexpected messages (if any) generated while processing the output.
+echo get_prepared_messages(['with_current_messages' => true]);
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	makeServerStatusOutput()->show();
