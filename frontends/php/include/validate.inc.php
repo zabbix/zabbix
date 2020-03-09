@@ -29,6 +29,8 @@ function unset_request($key) {
  * @param int    $min
  * @param int    $max
  * @param string $var
+ *
+ * @return string
  */
 function BETWEEN($min, $max, $var = '') {
 	return '({'.$var.'}>='.$min.'&&{'.$var.'}<='.$max.')&&';
@@ -41,6 +43,8 @@ function BETWEEN($min, $max, $var = '') {
  * @param int    $max
  * @param int    $scale
  * @param string $var
+ *
+ * @return string
  */
 function BETWEEN_DBL($min, $max, $scale, $var = '') {
 	return BETWEEN($min, $max, $var).'(round({'.$var.'},'.$scale.')=={'.$var.'})&&';
@@ -331,7 +335,6 @@ function check_field(&$fields, &$field, $checks) {
 		if ($validation == NOT_EMPTY) {
 			info(_s('Incorrect value for field "%1$s": %2$s.', $caption, _('cannot be empty')));
 		}
-
 		// Check for BETWEEN() or BETWEEN_SCALE function pattern and extract min, max and scale numbers.
 		elseif (preg_match('/\(\{\}>=(?<min>\d+)&&\{\}<=(?<max>\d+)\)&&(\(round\(\{\},(?<scale>\d+)\)==\{\}\)&&)?/',
 				$validation, $matches)) {
@@ -342,7 +345,7 @@ function check_field(&$fields, &$field, $checks) {
 			}
 			else {
 				info(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-					$_REQUEST[$field], $caption, $result[1], $result[2]
+					$_REQUEST[$field], $caption, $matches['min'], $matches['max']
 				));
 			}
 		}
