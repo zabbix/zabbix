@@ -721,16 +721,24 @@ class CTriggerExpression {
 
 		$len = strlen($matches[0]);
 
-		$str = substr($matches[0], 1, -1);
-		$str = strtr($str, ['\\"' => '"', '\\\\' => '\\']);
-
 		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_STRING, $matches[0], $this->pos, $len,
-			['string' => $str]
+			['string' => self::unquoteString($matches[0])]
 		);
 
 		$this->pos += $len - 1;
 
 		return true;
+	}
+
+	/**
+	 * Unquoting quoted string $value.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function unquoteString(string $value): string {
+		return strtr(substr($value, 1, -1), ['\\"' => '"', '\\\\' => '\\']);
 	}
 
 	/**
