@@ -39,6 +39,13 @@ class CMacroValue extends CInput {
 	protected $add_post_js = true;
 
 	/**
+	 * Revert button visibility.
+	 *
+	 * @var bool
+	 */
+	protected $revert_visible = true;
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param int    $type         Macro type one of ZBX_MACRO_TYPE_SECRET or ZBX_MACRO_TYPE_TEXT value.
@@ -60,6 +67,17 @@ class CMacroValue extends CInput {
 	 */
 	public function getPostJS(): string {
 		return 'jQuery("#'.$this->getId().'").macroValue();';
+	}
+
+	/**
+	 * Revert value button visibility.
+	 *
+	 * @param bool $visible  Button visibility.
+	 */
+	public function setRevertButtonVisible(bool $visible) {
+		$this->revert_visible = $visible;
+
+		return $this;
 	}
 
 	/**
@@ -95,6 +113,7 @@ class CMacroValue extends CInput {
 					->setAttribute('title', _('Revert changes'))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass(self::ZBX_STYLE_BTN_UNDO)
+					->addStyle($this->revert_visible ? 'display: inline-block;' : '')
 			]);
 		}
 

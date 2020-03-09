@@ -70,20 +70,17 @@ else {
 			}
 
 			if ($data['show_inherited_macros'] && ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED)) {
-				if (array_key_exists('template', $macro)) {
-					$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $macro['template']['value']);
-					$macro_cell[] = new CVar('macros['.$i.'][inherited][description]',
-						$macro['template']['description']
-					);
-					$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $macro['template']['type']);
-				}
-				else {
-					$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $macro['global']['value']);
-					$macro_cell[] = new CVar('macros['.$i.'][inherited][description]',
-						$macro['global']['description']
-					);
-					$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $macro['global']['type']);
-				}
+				$inherited_macro = array_key_exists('template', $macro) ? $macro['template'] : $macro['global'];
+
+				$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
+				$macro_cell[] = new CVar('macros['.$i.'][inherited][description]',
+					$inherited_macro['description']
+				);
+				$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
+				// Prevent stored password autofill.
+				$macro_cell[] = (new CPassBox('macros['.$i.']', $macro['type'], ''))
+					->addStyle('display: none')
+					->removeId();
 			}
 		}
 
@@ -92,10 +89,13 @@ else {
 		}
 
 		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly($readonly);
+		$has_value = array_key_exists('value', $macro);
 
-		if (array_key_exists('value', $macro)) {
+		if ($has_value) {
 			$macro_value->setAttribute('value', $macro['value']);
 		}
+
+		$macro_value->setRevertButtonVisible($has_value && array_key_exists('hostmacroid', $macro));
 
 		$row = [
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),

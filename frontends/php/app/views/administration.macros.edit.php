@@ -49,10 +49,13 @@ foreach ($data['macros'] as $i => $macro) {
 	}
 
 	$macro_value = new CMacroValue($macro['type'], 'macros['.$i.']');
+	$has_value = array_key_exists('value', $macro);
 
-	if (array_key_exists('value', $macro)) {
+	if ($has_value) {
 		$macro_value->setAttribute('value', $macro['value']);
 	}
+
+	$macro_value->setRevertButtonVisible($has_value && array_key_exists('globalmacroid', $macro));
 
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)

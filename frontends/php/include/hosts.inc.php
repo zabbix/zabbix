@@ -1249,6 +1249,11 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 	 * checking for contexts, since {$MACRO:} is the same as {$MACRO:""}.
 	 */
 	foreach ($host_macros as &$host_macro) {
+		// Secret macro value cannot be inherited.
+		if ($host_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+			unset($inherited_macros[$host_macro['macro']]['value']);
+		}
+
 		if (array_key_exists($host_macro['macro'], $inherited_macros)) {
 			$host_macro = array_merge($inherited_macros[$host_macro['macro']], $host_macro);
 			unset($inherited_macros[$host_macro['macro']]);

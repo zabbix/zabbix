@@ -121,7 +121,8 @@
 								type: 'password',
 								value: $textarea.val(),
 								placeholder: $textarea.attr('placeholder'),
-								maxlength: $textarea.attr('maxlength')
+								maxlength: $textarea.attr('maxlength'),
+								autocomplete: 'off'
 							})
 							.on('focus blur', btnUndoFocusEventHandle)
 					)
