@@ -95,7 +95,10 @@ class CSvgGraph extends CSvg {
 
 	protected $left_y_show = false;
 	protected $left_y_min = null;
+	protected $left_y_min_calculated = null;
 	protected $left_y_max = null;
+	protected $left_y_max_calculated = null;
+	protected $left_y_interval = null;
 	protected $left_y_units = null;
 	protected $left_y_is_binary = false;
 	protected $left_y_power = 1;
@@ -103,7 +106,10 @@ class CSvgGraph extends CSvg {
 
 	protected $right_y_show = false;
 	protected $right_y_min = null;
+	protected $right_y_min_calculated = null;
 	protected $right_y_max = null;
+	protected $right_y_max_calculated = null;
+	protected $right_y_interval = null;
 	protected $right_y_units = null;
 	protected $right_y_is_binary = false;
 	protected $right_y_power = 1;
@@ -684,10 +690,10 @@ class CSvgGraph extends CSvg {
 		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 		$this->addItem(
 			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_LEFT))
+				->setLineColor($this->grid_color)
+				->setTextColor($this->text_color)
 				->setSize($this->offset_left, $this->canvas_height)
 				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
-				->setTextColor($this->text_color)
-				->setLineColor($this->grid_color)
 		);
 	}
 
@@ -704,10 +710,10 @@ class CSvgGraph extends CSvg {
 
 		$this->addItem(
 			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))
+				->setLineColor($this->grid_color)
+				->setTextColor($this->text_color)
 				->setSize($this->offset_right, $this->canvas_height)
 				->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
-				->setTextColor($this->text_color)
-				->setLineColor($this->grid_color)
 		);
 	}
 
@@ -717,10 +723,10 @@ class CSvgGraph extends CSvg {
 	protected function drawCanvasXAxis() {
 		$this->addItem(
 			(new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
+				->setLineColor($this->grid_color)
+				->setTextColor($this->text_color)
 				->setSize($this->canvas_width, $this->xaxis_height)
 				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
-				->setTextColor($this->text_color)
-				->setLineColor($this->grid_color)
 		);
 	}
 
@@ -747,9 +753,9 @@ class CSvgGraph extends CSvg {
 		}
 
 		$this->addItem((new CSvgGraphGrid($value_points, $time_points))
+			->setColor($this->grid_color)
 			->setPosition($this->canvas_x, $this->canvas_y)
 			->setSize($this->canvas_width, $this->canvas_height)
-			->setColor($this->grid_color)
 		);
 	}
 
@@ -860,7 +866,7 @@ class CSvgGraph extends CSvg {
 	 *
 	 * @return array  Array of calculated missing data points.
 	 */
-	protected function getMissingData(array $points = [], $missingdatafunc) {
+	protected function getMissingData(array $points, $missingdatafunc) {
 		// Get average distance between points to detect gaps of missing data.
 		$prev_clock = null;
 		$points_distance = [];
