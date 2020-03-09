@@ -74,12 +74,8 @@ class CControllerPopupTestTriggerExpr extends CController {
 						->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 				);
 				$fname = 'test_data_'.md5($token['value']);
+				$this->macros_data[$token['value']] = array_key_exists($fname, $_REQUEST) ? $_REQUEST[$fname] : '';
 				$info = get_item_function_info($token['value']);
-
-				$this->macros_data[$token['value']] = [
-					'value_type' => $info['value_type'],
-					'value' => array_key_exists($fname, $_REQUEST) ? $_REQUEST[$fname] : ''
-				];
 
 				if (!is_array($info) && array_key_exists($info, $this->defined_error_phrases)) {
 					$this->allowed_testing = false;
@@ -91,12 +87,10 @@ class CControllerPopupTestTriggerExpr extends CController {
 				}
 				else {
 					if ($info['values'] !== null) {
-						$control = new CComboBox($fname, $this->macros_data[$token['value']]['value'], null,
-							$info['values']
-						);
+						$control = new CComboBox($fname, $this->macros_data[$token['value']], null, $info['values']);
 					}
 					else {
-						$control = (new CTextBox($fname, $this->macros_data[$token['value']]['value']))
+						$control = (new CTextBox($fname, $this->macros_data[$token['value']]))
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 					}
 

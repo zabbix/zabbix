@@ -732,4 +732,29 @@ class CTriggerExpression {
 
 		return true;
 	}
+
+	/**
+	 * Quoting $value if it contains a non numeric value.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function quoteString(string $value): string {
+		$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+		$lld_macro_parser = new CLLDMacroParser();
+		$lld_macro_function_parser = new CLLDMacroFunctionParser;
+		$user_macro_parser = new CUserMacroParser();
+		$number_parser = new CNumberParser(['with_suffix' => true]);
+
+		if ($number_parser->parse($value) == CParser::PARSE_SUCCESS
+			|| $user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+			|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
+			|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+			|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return $value;
+		}
+
+		return '"'.strtr($value, ['\\' => '\\\\', '"' => '\\"']).'"';
+	}
 }

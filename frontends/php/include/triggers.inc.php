@@ -2071,38 +2071,16 @@ function get_item_function_info($expr) {
  * @return bool  The calculated value of the expression.
  */
 function evalExpressionData($expression, $replace_function_macros) {
-	// Sort by longest array key which in this case contains macros.
-	uksort($replace_function_macros, function ($key1, $key2) {
-		$s1 = strlen($key1);
-		$s2 = strlen($key2);
-
-		if ($s1 == $s2) {
-			return 0;
-		}
-
-		return ($s1 > $s2) ? -1 : 1;
-	});
-
-	$values = [];
-	foreach ($replace_function_macros as $key => &$value) {
-		if ($value['value_type'] === _('String') || $value['value_type'] === _('Any')) {
-			$value['value'] = str_replace('\\', '\\\\', $value['value']);
-			$value['value'] = str_replace('"', '\"', $value['value']);
-			$value['value'] = '"'.$value['value'].'"';
-		}
-		$values[$key] = $value['value'];
+	foreach ($replace_function_macros as &$value) {
+		$value = CTriggerExpression::quoteString($value);
 	}
 	unset($value);
 
 	// Replace function macros with their values.
-	$expression = str_replace(array_keys($values), array_values($values), $expression);
+	$expression = strtr($expression, $replace_function_macros);
 	$parser = new CTriggerExpression();
 	$parse_result = $parser->parse($expression);
 
-	/*
-	 * The $replaceFunctionMacros array may contain string values which after substitution will result in an invalid
-	 * expression. In such cases we should just return false.
-	 */
 	if (!$parse_result) {
 		return false;
 	}
@@ -2129,15 +2107,6 @@ function evalExpressionData($expression, $replace_function_macros) {
 				}
 
 				$value = '((float) "'.$value.'")';
-				break;
-
-			case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-				// Check if string contains a valid suffix and try to convert. Otherwise leave original quoted value.
-				if (preg_match('/[\-+]?([.][0-9]+|[0-9]+[.]?[0-9]*)['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']/',
-						$token['data']['string'],
-						$match)) {
-					$value = convert($token['data']['string']);
-				}
 				break;
 		}
 
