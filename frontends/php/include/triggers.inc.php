@@ -1887,13 +1887,13 @@ function makeExpression(array $expressionTree, $level = 0, $operator = null) {
 }
 
 function get_item_function_info($expr) {
-	$rule_float = [_('Numeric (float)'), 'preg_match("/^'.ZBX_PREG_NUMBER.'$/", {})'];
-	$rule_int = [_('Numeric (integer)'), 'preg_match("/^'.ZBX_PREG_INT.'$/", {})'];
-	$rule_str = [_('String'), 'preg_match("/^".*"$/", {})'];
-	$rule_any = [_('Any'), 'preg_match("/^.*$/", {})'];
-	$rule_0or1 = [_('0 or 1'), IN('0,1')];
+	$rule_float = ['value_type' => _('Numeric (float)'), 'values' => null];
+	$rule_int = ['value_type' => _('Numeric (integer)'), 'values' => null];
+	$rule_str = ['value_type' => _('String'), 'values' => null];
+	$rule_any = ['value_type' => _('Any'), 'values' => null];
+	$rule_0or1 = ['value_type' => _('0 or 1'), 'values' => [0 => 0, 1 => 1]];
 	$rules = [
-		// Every nested array should have two elements: label, validation.
+		// Every nested array should have two elements: label, values.
 		'integer' => [
 			ITEM_VALUE_TYPE_UINT64 => $rule_int
 		],
@@ -1935,16 +1935,16 @@ function get_item_function_info($expr) {
 			ITEM_VALUE_TYPE_LOG => $rule_0or1
 		],
 		'date' => [
-			'any' => ['YYYYMMDD', '{}>=19700101&&{}<=99991231']
+			'any' => ['value_type' => 'YYYYMMDD', 'values' => null]
 		],
 		'time' => [
-			'any' => ['HHMMSS', 'preg_match("/^([01]?\d|2[0-3])([0-5]?\d)([0-5]?\d)$/", {})']
+			'any' => ['value_type' => 'HHMMSS', 'values' => null]
 		],
 		'day_of_month' => [
-			'any' => ['1-31', '{}>=1&&{}<=31']
+			'any' => ['value_type' => '1-31', 'values' => null]
 		],
 		'day_of_week' => [
-			'any' => ['1-7', IN('1,2,3,4,5,6,7')]
+			'any' => ['value_type' => '1-7', 'values' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7]]
 		]
 	];
 
@@ -1989,20 +1989,12 @@ function get_item_function_info($expr) {
 
 	switch (true) {
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_MACRO)):
-			$result = [
-				'type' => T_ZBX_STR,
-				'value_type' => $rule_0or1[0],
-				'validation' => $rule_0or1[1]
-			];
+			$result = $rule_0or1;
 			break;
 
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)):
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO)):
-			$result = [
-				'type' => T_ZBX_STR,
-				'value_type' => $rule_any[0],
-				'validation' => $rule_any[1]
-			];
+			$result = $rule_any;
 			break;
 
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
@@ -2059,11 +2051,7 @@ function get_item_function_info($expr) {
 				break;
 			}
 
-			$result = [
-				'type' => T_ZBX_STR,
-				'value_type' => $function[$value_type][0],
-				'validation' => $function[$value_type][1]
-			];
+			$result = $function[$value_type];
 			break;
 
 		default:

@@ -90,25 +90,17 @@ class CControllerPopupTestTriggerExpr extends CController {
 					);
 				}
 				else {
-					$validation = $info['validation'];
-
-					if (substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN) {
-						$end = strlen($validation) - COMBO_PATTERN_LENGTH - 4;
-						$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, $end));
-						$control = new CComboBox($fname, $this->macros_data[$token['value']]['value']);
-
-						foreach ($vals as $v) {
-							$control->addItem($v, $v);
-						}
+					if ($info['values'] !== null) {
+						$control = new CComboBox($fname, $this->macros_data[$token['value']]['value'], null,
+							$info['values']
+						);
 					}
 					else {
 						$control = (new CTextBox($fname, $this->macros_data[$token['value']]['value']))
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 					}
 
-					$this->fields[$fname] = [$info['type'], O_OPT, null, $validation, 'isset({test_expression})',
-						$token['value']
-					];
+					$this->fields[$fname] = 'string';
 
 					$row->addItem($info['value_type']);
 					$row->addItem($control);
@@ -120,11 +112,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = [
-			'test_expression' => 'string'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['test_expression' => 'string'] + $this->fields);
 
 		if (!$ret) {
 			$output = [];
