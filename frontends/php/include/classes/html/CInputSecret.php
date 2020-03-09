@@ -41,9 +41,9 @@ class CInputSecret extends CInput {
 	/**
 	 * CInputSecret constructor.
 	 *
-	 * @param string $name           Input element name attribute.
-	 * @param string $value          Input element value attribute.
-	 * @param bool   $add_post_js    Add initialization javascript, default true.
+	 * @param string $name         Input element name attribute.
+	 * @param string $value        Input element value attribute.
+	 * @param bool   $add_post_js  Add initialization javascript, default true.
 	 */
 	public function __construct(string $name, string $value = null, $add_post_js = true) {
 		$this->add_post_js = $add_post_js;
