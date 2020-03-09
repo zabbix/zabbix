@@ -479,7 +479,7 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 
 		/**
 		 * Macros must be updated separately, since calling API::UserMacro->replaceMacros() inside
-		 * API::Host->update() results in loss of secret macro values.
+		 * API::Template->update() results in loss of secret macro values.
 		 */
 		if ($template_macros_remove) {
 			if (!API::UserMacro()->delete($template_macros_remove)) {
