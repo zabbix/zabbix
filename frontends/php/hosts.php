@@ -259,12 +259,11 @@ foreach ($tags as $key => $tag) {
 $macros = cleanInheritedMacros(getRequest('macros', []));
 
 // Remove empty new macro lines.
-foreach ($macros as $idx => $macro) {
-	if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
-			&& $macro['description'] === '') {
-		unset($macros[$idx]);
-	}
-}
+$macros = array_filter($macros, function($macro) {
+	$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+
+	return (bool) array_filter(array_intersect_key($macro, $keys));
+});
 
 /*
  * Actions
