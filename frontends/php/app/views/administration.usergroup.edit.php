@@ -170,19 +170,18 @@ $new_tag_filter_table = (new CTable())
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'new_tag_filter_groupids_'
 				]
-			],
-			'styles' => ['margin-top' => '-.3em']
+			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		new CCol(
+		(new CCol(
 			(new CTextBox('new_tag_filter[tag]', $data['new_tag_filter']['tag']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAttribute('placeholder', _('tag'))
-		),
-		new CCol(
+		))->addStyle('vertical-align: top;'),
+		(new CCol(
 			(new CTextBox('new_tag_filter[value]', $data['new_tag_filter']['value']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAttribute('placeholder', _('value'))
-		)
+		))->addStyle('vertical-align: top;')
 	])
 	->addRow((new CCheckBox('new_tag_filter[include_subgroups]'))
 		->setChecked((bool) $data['new_tag_filter']['include_subgroups'])
