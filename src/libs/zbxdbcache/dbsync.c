@@ -2096,7 +2096,6 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	zbx_vector_uint64_t	hostids, functionids;
 	unsigned char		flags = 0;
 
-
 	/* return the original row if user macros are not used in target columns */
 
 	if (SUCCEED == dbsync_check_row_macros(row, 2))
@@ -2117,6 +2116,8 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	get_functionids(&functionids, row[11]);
 
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
+
+	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
 	{
