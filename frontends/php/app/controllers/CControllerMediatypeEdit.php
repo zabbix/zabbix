@@ -203,6 +203,7 @@ class CControllerMediatypeEdit extends CController {
 					$data['event_menu_url'] = $this->mediatype['event_menu_url'];
 					$data['event_menu_name'] = $this->mediatype['event_menu_name'];
 					$data['parameters'] = $this->mediatype['parameters'];
+					CArrayHelper::sort($data['parameters'], ['name']);
 					break;
 			}
 

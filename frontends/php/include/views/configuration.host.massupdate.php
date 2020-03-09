@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
 
 $hostWidget = (new CWidget())->setTitle(_('Hosts'));
@@ -318,4 +322,4 @@ $hostView->addItem($hostTab);
 
 $hostWidget->addItem($hostView);
 
-return $hostWidget;
+$hostWidget->show();

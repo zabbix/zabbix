@@ -18,8 +18,6 @@
 **/
 
 
-jQuery.noConflict();
-
 /**
  * jQuery based publish/subscribe handler.
  *
@@ -112,6 +110,7 @@ function is_array(obj) {
 
 /**
  * Get elements existing exclusively in one of both arrays.
+ * @deprecated
  *
  * @param {Array} arr
  *
@@ -127,7 +126,7 @@ Array.prototype.xor = function(arr) {
 
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
-	element = $(element);
+	element = $(element)[0];
 
 	if (element.addEventListener) {
 		element.addEventListener(eventname, expression, bubbling);
@@ -166,11 +165,6 @@ function cancelEvent(e) {
 
 	e.stopPropagation();
 	e.preventDefault();
-
-	if (IE) {
-		e.cancelBubble = true;
-		e.returnValue = false;
-	}
 
 	return false;
 }
@@ -255,8 +249,6 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 }
 
 function getDimensions(obj) {
-	obj = $(obj);
-
 	var dim = {
 		left:		0,
 		top:		0,
@@ -297,7 +289,6 @@ function getDimensions(obj) {
 }
 
 function getPosition(obj) {
-	obj = $(obj);
 	var pos = {top: 0, left: 0};
 
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
@@ -309,10 +300,6 @@ function getPosition(obj) {
 				obj = obj.offsetParent;
 				pos.left += obj.offsetLeft;
 				pos.top += obj.offsetTop;
-
-				if (IE && obj.offsetParent.toString() == 'unknown') {
-					break;
-				}
 			}
 		} catch(e) {
 		}
@@ -601,14 +588,14 @@ function addValues(frame, values, submit_parent) {
  * @param {string} parentid		parent id
  */
 function addSelectedValues(form, object, parentid) {
-	form = $(form);
+	form = document.getElementById(form);
 
 	if (typeof parentid === 'undefined') {
 		var parentid = null;
 	}
 
 	var data = {object: object, values: [], parentId: parentid};
-	var chk_boxes = form.getInputs('checkbox');
+	var chk_boxes = jQuery(form).find('input[type="checkbox"]');
 
 	for (var i = 0; i < chk_boxes.length; i++) {
 		if (chk_boxes[i].checked && (chk_boxes[i].name.indexOf('all_') < 0)) {
@@ -794,23 +781,6 @@ function showHideVisible(obj) {
 	}
 }
 
-function showHideByName(name, style) {
-	if (typeof(style) == 'undefined') {
-		style = 'none';
-	}
-
-	var objs = $$('[name=' + name + ']');
-
-	if (empty(objs)) {
-		throw 'showHideByName(): Object not found.';
-	}
-
-	for (var i = 0; i < objs.length; i++) {
-		var obj = objs[i];
-		obj.style.display = style;
-	}
-}
-
 /**
  * Switch element classes and return final class.
  *
@@ -922,3 +892,21 @@ function submitFormWithParam(form_name, input_name, input_value) {
 	document.forms[form_name].appendChild(input);
 	jQuery(document.forms[form_name]).trigger('submit');
 }
+
+if (typeof Element.prototype.remove === 'undefined') {
+	Element.prototype.remove = function() {
+		this.parentNode.removeChild(this);
+		return this;
+	};
+}
+
+/**
+ * @deprecated use native bind method
+ */
+Function.prototype.bindAsEventListener = function (context) {
+	var method = this, args = Array.prototype.slice.call(arguments, 1);
+
+	return function(event) {
+		return method.apply(context, [event || window.event].concat(args));
+	};
+};

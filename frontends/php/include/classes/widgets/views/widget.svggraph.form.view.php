@@ -266,7 +266,7 @@ $tab_problems = (new CFormList())
 		CWidgetHelper::getHostPatternSelect($fields['problemhosts'], $form_name)
 	)
 	->addRow(CWidgetHelper::getLabel($fields['severities']),
-		CWidgetHelper::getSeverities($fields['severities'], $data['config'])
+		CWidgetHelper::getSeverities($fields['severities'])
 	)
 	->addRow(CWidgetHelper::getLabel($fields['problem_name']), CWidgetHelper::getTextBox($fields['problem_name']))
 	->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']))
@@ -299,9 +299,21 @@ $form_tabs = (new CTabView())
 // Add CTabView to form.
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
-
 $scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, select, .multiselect", onGraphConfigChange);';
-$scripts[] = 'onGraphConfigChange();';
+$scripts[] =
+	'jQuery(function($) {'.
+		'onGraphConfigChange();'.
+		'$(".overlay-dialogue").on("overlay-dialogue-resize", function(event, size_new, size_old) {'.
+			'if (jQuery("#svg-graph-preview").length) {'.
+				'if (size_new.width != size_old.width) {'.
+					'onGraphConfigChange();'.
+				'}'.
+			'}'.
+			'else {'.
+				'$(".overlay-dialogue").off("overlay-dialogue-resize");'.
+			'}'.
+		'});'.
+	'});';
 
 return [
 	'form' => $form,

@@ -61,7 +61,7 @@ var logStat LogStat
 var logAccess sync.Mutex
 
 func CheckLogLevel(level int) bool {
-	if level != Info && (level > logLevel || Empty == level) {
+	if level != Info && level > logLevel || Empty == logLevel {
 		return false
 	}
 	return true
@@ -132,7 +132,9 @@ func Critf(format string, args ...interface{}) {
 }
 
 func Infof(format string, args ...interface{}) {
-	procLog(format, args)
+	if CheckLogLevel(Info) {
+		procLog(format, args)
+	}
 }
 
 func Warningf(format string, args ...interface{}) {

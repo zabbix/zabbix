@@ -19,7 +19,11 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
+
 <?php if (!$data['readonly']): ?>
 	<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
 		<?= (new CRow([
@@ -143,7 +147,7 @@
 							.val(jQuery('#macros_' + macroNum + '_inherited_description').val())
 							.trigger('input');
 						jQuery('#macros_' + macroNum + '_change')
-							.text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
+							.text(<?= json_encode(_x('Change', 'verb')) ?>);
 					}
 					else {
 						jQuery('#macros_' + macroNum + '_type')
@@ -154,7 +158,7 @@
 						jQuery('#macros_' + macroNum + '_description')
 							.prop('readonly', false);
 						jQuery('#macros_' + macroNum + '_change')
-							.text(<?= CJs::encodeJson(_('Remove')) ?>);
+							.text(<?= json_encode(_('Remove')) ?>);
 					}
 				});
 
@@ -231,8 +235,8 @@
 			$ms = $('#add_templates_'),
 			$show_inherited_macros = $('input[name="show_inherited_macros"]'),
 			$form = $show_inherited_macros.closest('form'),
-			linked_templates = <?= CJs::encodeJson($data['macros_tab']['linked_templates']) ?>,
-			add_templates = <?= CJs::encodeJson($data['macros_tab']['add_templates']) ?>,
+			linked_templates = <?= json_encode($data['macros_tab']['linked_templates']) ?>,
+			add_templates = <?= json_encode($data['macros_tab']['add_templates']) ?>,
 			macros_initialized = false;
 
 		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {

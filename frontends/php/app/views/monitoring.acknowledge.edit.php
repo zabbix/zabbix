@@ -19,7 +19,11 @@
 **/
 
 
-$this->includeJSfile('app/views/monitoring.acknowledge.edit.js.php');
+/**
+ * @var CView $this
+ */
+
+$this->includeJsFile('monitoring.acknowledge.edit.js.php');
 
 $form_list = (new CFormList())
 	->addRow(
@@ -67,7 +71,7 @@ $form_list
 				->setEnabled($data['problem_severity_can_be_changed']),
 			(new CSeverity(['name' => 'severity', 'value' => $data['severity']], $data['change_severity']))
 		]))
-			->addClass('hor-list')
+			->addClass(ZBX_STYLE_HOR_LIST)
 	)
 	->addRow(_('Acknowledge'),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))

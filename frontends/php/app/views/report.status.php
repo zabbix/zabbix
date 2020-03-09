@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 $widget = (new CWidget())
