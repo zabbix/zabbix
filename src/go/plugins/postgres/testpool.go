@@ -29,11 +29,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/docker/go-connections/nat"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/ory/dockertest/v3"
+	"github.com/testcontainers/testcontainers-go"
 )
 
 var sharedConn *postgresConn
@@ -55,7 +56,7 @@ func сreateConnection(connString string) error {
 	return nil
 }
 
-func waitForPostgresAndCreateConfig(pool *dockertest.Pool, resource *dockertest.Resource, connString string) (confPath string, cleaner func()) {
+func waitForPostgresAndCreateConfig(pool testcontainers.Container, ctx context.Context, connString string) (confPath string, cleaner func()) {
 	attempt := 0
 	ok := false
 	for attempt < 20 {
@@ -73,21 +74,21 @@ func waitForPostgresAndCreateConfig(pool *dockertest.Pool, resource *dockertest.
 	}
 
 	if !ok {
-		_ = pool.Purge(resource)
+		_ = pool.Terminate(ctx)
 		log.Panicf("[waitForPostgresAndCreateConfig] couldn't connect to PostgreSQL")
 	} else {
 		log.Infoln("[TestMain] creating sharedConn of type *postgresConn")
 		сreateConnection(connString)
 		log.Infoln("[TestMain] sharedConn of type *postgresConn created")
 	}
-
+	сreateConnection(connString)
 	tmpl, err := template.New("config").Parse(`
 loglevel: debug
 listen: 0.0.0.0:8080
 db:url: {{.ConnString}}
 `)
 	if err != nil {
-		_ = pool.Purge(resource)
+		_ = pool.Terminate(ctx)
 		log.Panicf("[waitForPostgresAndCreateConfig] template.Parse failed: %v", err)
 	}
 
@@ -99,13 +100,13 @@ db:url: {{.ConnString}}
 	var configBuff bytes.Buffer
 	err = tmpl.Execute(&configBuff, configArgs)
 	if err != nil {
-		_ = pool.Purge(resource)
+		_ = pool.Terminate(ctx)
 		log.Panicf("[waitForPostgresAndCreateConfig] tmpl.Execute failed: %v", err)
 	}
 
 	confFile, err := ioutil.TempFile("", "config.*.yaml")
 	if err != nil {
-		_ = pool.Purge(resource)
+		_ = pool.Terminate(ctx)
 		log.Panicf("[waitForPostgresAndCreateConfig] ioutil.TempFile failed: %v", err)
 	}
 
@@ -113,19 +114,19 @@ db:url: {{.ConnString}}
 
 	_, err = confFile.WriteString(configBuff.String())
 	if err != nil {
-		_ = pool.Purge(resource)
+		_ = pool.Terminate(ctx)
 		log.Panicf("[waitForPostgresAndCreateConfig] confFile.WriteString failed: %v", err)
 	}
 
 	err = confFile.Close()
 	if err != nil {
-		_ = pool.Purge(resource)
+		_ = pool.Terminate(ctx)
 		log.Panicf("[waitForPostgresAndCreateConfig] confFile.Close failed: %v", err)
 	}
 
 	cleanerFunc := func() {
-		// purge the container
-		err := pool.Purge(resource)
+		// Terminate the container
+		err := pool.Terminate(ctx)
 		if err != nil {
 			log.Panicf("[waitForPostgresAndCreateConfig] pool.Purge failed: %v", err)
 		}
@@ -140,7 +141,7 @@ db:url: {{.ConnString}}
 }
 
 func startPostgreSQL(versionPG uint32) (confPath string, cleaner func()) {
-	pool, err := dockertest.NewPool("")
+	/* pool, err := dockertest.NewPool("")
 	if err != nil {
 		log.Panicf("[startPostgreSQL] dockertest.NewPool failed: %v", err)
 	}
@@ -153,8 +154,47 @@ func startPostgreSQL(versionPG uint32) (confPath string, cleaner func()) {
 	)
 	if err != nil {
 		log.Panicf("[startPostgreSQL] pool.Run failed: %v", err)
+	} */
+	cport := "5432"
+	user := "postgres"
+	password := "this_is_postgres"
+	database := "test_agent2"
+
+	ctx := context.Background()
+	req := testcontainers.ContainerRequest{
+		Image:        "postgres:" + fmt.Sprint(versionPG),
+		ExposedPorts: []string{cport + "/tcp"},
+		//	WaitingFor:   wait.ForLog("database system is ready to accept connections"),
+		Env: map[string]string{
+			"POSTGRES_USER":     user,
+			"POSTGRES_PASSWORD": password,
+			"POSTGRES_DB":       database,
+		},
 	}
 
-	connString := "postgres://postgres:this_is_postgres@" + resource.GetHostPort("5432/tcp") + "/test_agent2"
-	return waitForPostgresAndCreateConfig(pool, resource, connString)
+	pg, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+	if err != nil {
+		log.Panicf("[startPostgreSQL] GenericContainer failed: %v", err)
+	}
+
+	ip, err := pg.Host(ctx)
+	if err != nil {
+		log.Panicf("[startPostgreSQL] pg.Host failed: %v", err)
+	}
+
+	port, err := pg.MappedPort(ctx, nat.Port(cport))
+	if err != nil {
+		log.Panicf("[startPostgreSQL] pg.MappedPort failed: %v", err)
+	}
+
+	log.Infof(fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		user, password, ip, port.Port(), database))
+
+	//connString := "postgres://postgres:this_is_postgres@" + resource.GetHostPort("5432/tcp") + "/test_agent2"
+	//log.Panicf("[startPostgreSQL] pg.MappedPort failed: %v", err)
+	connString := "postgres://postgres:this_is_postgres@" + ip + ":" + port.Port() + "/test_agent2"
+	return waitForPostgresAndCreateConfig(pg, ctx, connString)
 }
