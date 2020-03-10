@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-06T11:56:04Z</date>
+    <date>2020-03-10T09:16:13Z</date>
     <media_types>
         <media_type>
             <name>Jira</name>
@@ -98,22 +98,17 @@ var Jira = {&#13;
     },&#13;
 &#13;
     escapeMarkup: function (str) {&#13;
-        var i = str.length,&#13;
-            buffer = [],&#13;
-            chars = [123, 124, 125, 126, 128, 150, 95, 92, 91, 93, 94, 60, 62, 63, 33, 35, 43, 42, 38];&#13;
+        var length = str.length,&#13;
+            result = '',&#13;
+            markup = ['{', '|', '}', '~', '_', '\\', '[', ']', '^', '&lt;', '&gt;', '?', '!', '#', '+', '*', '&amp;'];&#13;
 &#13;
-        while (i--) {&#13;
-            var charCode = str[i].charCodeAt();&#13;
+        for (var i = 0; i &lt; length; i++) {&#13;
+            var char = str[i];&#13;
 &#13;
-            if ((chars.indexOf(charCode) !== -1)) {&#13;
-                buffer[i] = '&amp;#' + charCode + ';';&#13;
-            }&#13;
-            else {&#13;
-                buffer[i] = str[i];&#13;
-            }&#13;
+            result += (markup.indexOf(char) !== -1) ? ('&amp;#' + str[i].charCodeAt() + ';') : char;&#13;
         }&#13;
 &#13;
-        return buffer.join('');&#13;
+        return result;&#13;
     },&#13;
 &#13;
     addCustomFields: function (data, fields) {&#13;
@@ -298,7 +293,7 @@ try {&#13;
         jira = {},&#13;
         update = {},&#13;
         result = {tags: {}},&#13;
-        requiredParams = ['alert_subject', 'summary', 'event_recovery_value', 'event_source', 'event_value'];&#13;
+        required_params = ['alert_subject', 'summary', 'event_recovery_value', 'event_source', 'event_value'];&#13;
 &#13;
     Object.keys(params)&#13;
         .forEach(function (key) {&#13;
@@ -311,7 +306,7 @@ try {&#13;
             else if (key.startsWith('event_update_')) {&#13;
                 update[key.substring(13)] = params[key];&#13;
             }&#13;
-            else if (requiredParams.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
+            else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
                 throw 'Parameter ' + key + 'can\'t be empty.';&#13;
             }&#13;
         });&#13;
@@ -320,13 +315,13 @@ try {&#13;
         throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
     }&#13;
 &#13;
-    // Check {EVENT.VALUE} for Trigger-based and Internal events.&#13;
+    // Check {EVENT.VALUE} for trigger-based and internal events.&#13;
     if (params.event_value !== '0' &amp;&amp; params.event_value !== '1'&#13;
         &amp;&amp; (params.event_source === '0' || params.event_source === '3')) {&#13;
         throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
-    // Check {EVENT.UPDATE.STATUS} only for Trigger-based events.&#13;
+    // Check {EVENT.UPDATE.STATUS} only for trigger-based events.&#13;
     if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
         throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
     }&#13;
