@@ -5,10 +5,14 @@ $form-search-icon-hover-bg-position: -570px -616px !default;
 .form-search {
 	position: relative;
 	margin-top: 12px;
+	height: 24px;
 
 	.search {
-		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
 		width: 100%;
+		height: 24px;
 		padding-right: 20px;
 		color: $form-search-color;
 		background: $form-search-bg-color;

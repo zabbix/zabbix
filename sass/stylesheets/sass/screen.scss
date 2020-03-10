@@ -5769,12 +5769,6 @@ tr.cursor-move {
 	cursor: pointer;
 }
 
-%overflow-ellipsis {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
 .overflow-ellipsis {
 	table-layout: fixed;
 	@extend %overflow-ellipsis;
@@ -5814,12 +5808,12 @@ tr.cursor-move {
 	}
 }
 
-.server-name {
-	color: $font-alt-color;
-	float: right;
-	white-space: nowrap;
-	overflow: hidden;
-	@extend %overflow-ellipsis;
+main {
+	.server-name {
+		float: right;
+		margin: 10px;
+		color: $font-alt-color;
+	}
 }
 
 .uppercase {

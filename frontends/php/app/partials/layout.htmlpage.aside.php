@@ -39,6 +39,10 @@ $search = (new CForm('get', 'zabbix.php'))
 		(new CLabel('', 'search'))->addClass('search-icon')
 	]);
 
+$server_name = ($data['server_name'] !== '')
+	? (new CDiv($data['server_name']))->addClass(ZBX_STYLE_SERVER_NAME)
+	: null;
+
 (new CTag('aside', true))
 	->addClass('sidebar')
 	->addClass(CView::getSidebarMode() == ZBX_SIDEBAR_VIEW_MODE_COMPACT ? 'is-compact' : null)
@@ -58,6 +62,7 @@ $search = (new CForm('get', 'zabbix.php'))
 			(new CButton(null, _('Show sidebar')))
 				->addClass('button-show js-sidebar-mode')
 				->setAttribute('title', _('Show sidebar')),
+			$server_name,
 			$search
 		]))->addClass('sidebar-header')
 	)

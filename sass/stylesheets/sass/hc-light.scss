@@ -66,6 +66,9 @@ $menu-user-color: #cedae1;
 $menu-user-hover-color: #ffffff;
 $menu-user-disabled-color: $disabled-item-color;
 
+// Sidebar
+$sidebar-server-name-color: $menu-user-color;
+
 $menu-main-icons: (
 		dashboard: -570px -664px,
 		problems: -570px -688px,

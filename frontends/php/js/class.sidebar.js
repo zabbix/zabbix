@@ -46,14 +46,16 @@ class CSidebar extends CBaseComponent {
 		this._is_focused = false;
 		this._is_opened = false;
 
-		let max_width = SIDEBAR_MIN_WIDTH;
+		let max_width = 0;
 		for (const menu of this._node.querySelectorAll('nav > ul')) {
 			const position = window.getComputedStyle(menu).position;
 			menu.style.position = 'absolute';
 			max_width = Math.max(max_width, menu.clientWidth);
 			menu.style.position = position;
 		}
-		this._node.style.maxWidth = max_width + 'px';
+		this._node.style.maxWidth = Math.max(max_width, SIDEBAR_MIN_WIDTH) + 'px';
+		this._node.querySelector('.sidebar-header').style.maxWidth = max_width + 'px';
+		this._node.querySelector('.sidebar-header .server-name').style.width = 'auto';
 
 		this._view_mode = SIDEBAR_VIEW_MODE_FULL;
 		if (this.hasClass('is-compact')) {
