@@ -77,6 +77,17 @@ class CCheckBoxList extends CList {
 		return $this;
 	}
 
+	/**
+	 * Sets the width of the checkbox list.
+	 *
+	 * @return CCheckBoxList
+	 */
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+
+		return $this;
+	}
+
 	/*
 	 * @param bool $destroy
 	 *

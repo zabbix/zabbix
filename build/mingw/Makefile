@@ -1,5 +1,6 @@
 .ONESHELL:
 
+SHELL := cmd
 BUILDDIR := $(subst /,\,$(CURDIR))
 TOPDIR := $(BUILDDIR)\..\..
 OUTPUTDIR := output

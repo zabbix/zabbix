@@ -17,24 +17,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package memory
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/net/netif"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/proc"
-	_ "zabbix.com/plugins/system/cpu"
-	_ "zabbix.com/plugins/system/swap"
-	_ "zabbix.com/plugins/system/uptime"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/vfs/file"
-	_ "zabbix.com/plugins/vfs/fs"
-	_ "zabbix.com/plugins/vm/memory"
-	_ "zabbix.com/plugins/windows/eventlog"
-	_ "zabbix.com/plugins/windows/perfmon"
-	_ "zabbix.com/plugins/windows/services"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
+	"errors"
+
+	"zabbix.com/pkg/plugin"
 )
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+var impl Plugin
+
+// Export -
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if len(params) > 1 {
+		return nil, errors.New("Too many parameters.")
+	}
+
+	switch key {
+	case "vm.memory.size":
+		return p.exportVmMemorySize(params)
+	default:
+		return nil, plugin.UnsupportedMetricError
+	}
+
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, "Memory",
+		"vm.memory.size", "Returns memory size in bytes or in percentage from total.",
+	)
+}
