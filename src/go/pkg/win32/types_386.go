@@ -22,7 +22,7 @@
 package win32
 
 const (
-	ARRAY_MAX = 1 << 31
+	ARRAY_MAX = 1 << 30
 )
 
 type PROCESS_MEMORY_COUNTERS_EX struct {
