@@ -1044,6 +1044,15 @@ class CHistoryManager {
 	 * @see CHistoryManager::deleteHistory
 	 */
 	private function deleteHistoryFromSql(array $itemids) {
+		global $DB;
+		$config = select_config();
+
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
+				&&	PostgresqlDbBackend::hasChunks()) {
+			error(_('Some of the history for this item are in compressed chunks, deletion is not available'));
+			return false;
+		}
+
 		return DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemids))
 				&& DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemids))
 				&& DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemids))

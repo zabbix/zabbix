@@ -117,4 +117,20 @@ class PostgresqlDbBackend extends DbBackend {
 
 		return true;
 	}
+
+	/**
+	 * Check if history has compressed chunks.
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
+	public static function hasChunks() {
+		$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
+			' FROM timescaledb_information.compressed_hypertable_stats'.
+			' WHERE number_compressed_chunks != 0 and hypertable_name::text in ('.
+			"'history', 'history_log', 'history_str', 'history_uint', 'history_text', 'trends', 'trends_uint');"));
+
+		return (bool) $result['chunks'];
+	}
 }
