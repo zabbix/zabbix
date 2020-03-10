@@ -152,7 +152,7 @@ function update_config($config) {
 		],
 	];
 
-	if ($config['compression_status'] === 0) {
+	if (array_key_exists('compression_status', $config) && $config['compression_status'] === 0) {
 		unset($fields['compress_older']);
 		unset($config['compress_older']);
 	}
