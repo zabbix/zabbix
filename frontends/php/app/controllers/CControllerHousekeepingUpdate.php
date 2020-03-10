@@ -71,8 +71,6 @@ class CControllerHousekeepingUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$schema = DB::getSchema('config');
-
 		$config = [
 			'hk_events_mode'		=> $this->getInput('hk_events_mode', 0),
 			'hk_services_mode'		=> $this->getInput('hk_services_mode', 0),
@@ -83,7 +81,7 @@ class CControllerHousekeepingUpdate extends CController {
 			'hk_trends_mode'		=> $this->getInput('hk_trends_mode', 0),
 			'hk_trends_global'		=> $this->getInput('hk_trends_global', 0),
 			'compression_status'	=> $this->getInput('compression_status', 0),
-			'compress_older'		=> $this->getInput('compress_older', $schema['fields']['compress_older']['default'])
+			'compress_older'		=> $this->getInput('compress_older', DB::getDefault('config', 'compress_older'))
 		];
 
 		if ($config['hk_events_mode'] == 1) {
