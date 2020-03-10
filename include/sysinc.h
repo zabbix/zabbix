@@ -424,4 +424,8 @@
 #	include <stddef.h>
 #endif
 
+#ifdef HAVE_LIMITS_H
+#	include <limits.h>
+#endif
+
 #endif

@@ -60,16 +60,16 @@ class CAudit {
 	 * @param string $ip
 	 * @param int    $action        AUDIT_ACTION_*
 	 * @param int    $resourcetype  AUDIT_RESOURCE_*
-	 * @param string $details
+	 * @param string $note
 	 */
-	static public function addDetails($userid, $ip, $action, $resourcetype, $details = '') {
+	static public function addDetails($userid, $ip, $action, $resourcetype, $note = '') {
 		DB::insert('auditlog', [[
 			'userid' => $userid,
 			'clock' => time(),
 			'ip' => substr($ip, 0, 39),
 			'action' => $action,
 			'resourcetype' => $resourcetype,
-			'details' => $details
+			'note' => $note
 		]]);
 	}
 

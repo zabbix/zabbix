@@ -86,7 +86,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 					'audit' => [
 						'User' => 'Admin',
 						'Resource' => 'Autoregistration',
-						'Action' => 'Updated',
+						'Action' => 'Update',
 						'ID' => 1,
 						'Details' => [
 							'config.tls_accept: 1 => 2',
@@ -105,7 +105,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 					'audit' => [
 						'User' => 'Admin',
 						'Resource' => 'Autoregistration',
-						'Action' => 'Updated',
+						'Action' => 'Update',
 						'ID' => 1,
 						'Details' => ['config.tls_accept: 2 => 3']
 					]
@@ -120,7 +120,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 					'audit' => [
 						'User' => 'Admin',
 						'Resource' => 'Autoregistration',
-						'Action' => 'Updated',
+						'Action' => 'Update',
 						'ID' => 1,
 						'Details' => [
 							'config.tls_accept: 3 => 1',
@@ -150,7 +150,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 		$this->assertEquals('Configuration updated', $message->getTitle());
 
 		// Check Audit record about autoregistration update.
-		$this->page->open('auditlogs.php');
+		$this->page->open('zabbix.php?action=auditlog.list');
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
 		// Get first row data.
 		$row = $rows->get(0);

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TLS_TCP_ACTIVE_H
 #define ZABBIX_TLS_TCP_ACTIVE_H
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
 {
 	const char	*psk_identity;

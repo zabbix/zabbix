@@ -186,6 +186,14 @@ func main() {
 	flag.BoolVar(&printFlag, "print", printDefault, printDescription)
 	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorthand)")
 
+	var verboseFlag bool
+	const (
+		verboseDefault     = false
+		verboseDescription = "Enable verbose output for metric testing or printing"
+	)
+	flag.BoolVar(&verboseFlag, "verbose", verboseDefault, verboseDescription)
+	flag.BoolVar(&verboseFlag, "v", verboseDefault, verboseDescription+" (shorthand)")
+
 	var versionFlag bool
 	const (
 		versionDefault     = false
@@ -203,7 +211,7 @@ func main() {
 
 	flag.Parse()
 
-	var argConfig, argTest, argPrint, argVersion bool
+	var argConfig, argTest, argPrint, argVersion, argVerbose bool
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
@@ -217,6 +225,8 @@ func main() {
 			argPrint = true
 		case "V", "version":
 			argVersion = true
+		case "v", "verbose":
+			argVerbose = true
 		}
 	})
 
@@ -247,16 +257,36 @@ func main() {
 		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 			fatalExit("failed to load key access rules", err)
 		}
-
-		if argTest {
-			if err := agent.CheckMetric(testFlag, false); err != nil {
-				fatalExit("cannot execute metric", err)
-			}
+		var level int
+		if argVerbose {
+			level = log.Trace
 		} else {
-			agent.CheckMetrics()
+			level = log.Empty
+		}
+		if err := log.Open(log.Console, level, "", 0); err != nil {
+			fatalExit("cannot initialize logger", err)
 		}
 
+		var m *scheduler.Manager
+		var err error
+		if m, err = scheduler.NewManager(&agent.Options); err != nil {
+			fatalExit("cannot create scheduling manager", err)
+		}
+		m.Start()
+
+		if argTest {
+			checkMetric(m, testFlag)
+		} else {
+			checkMetrics(m)
+		}
+
+		m.Stop()
+		monitor.Wait(monitor.Scheduler)
 		os.Exit(0)
+	}
+
+	if argVerbose {
+		fatalExit("", errors.New("verbose parameter can be specified only with test or print parameters"))
 	}
 
 	if remoteCommand != "" {
@@ -395,16 +425,24 @@ func main() {
 	if agent.Options.StatusPort != 0 {
 		statuslistener.Stop()
 	}
-
 	for _, listener := range listeners {
 		listener.Stop()
 	}
 	for i := 0; i < len(serverConnectors); i++ {
-		serverConnectors[i].Stop()
+		serverConnectors[i].StopConnector()
 	}
-	manager.Stop()
+	monitor.Wait(monitor.Input)
 
-	monitor.Wait()
+	manager.Stop()
+	monitor.Wait(monitor.Scheduler)
+
+	// split shutdown in two steps to ensure that result cache is still running while manager is
+	// being stopped, because there might be pending exporters that could block if result cache
+	// is stoppped and its input channel is full.
+	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i].StopCache()
+	}
+	monitor.Wait(monitor.Output)
 
 	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())
 	log.Infof(farewell)
@@ -416,7 +454,7 @@ func main() {
 
 func fatalExit(message string, err error) {
 	if len(message) == 0 {
-		message = fmt.Sprintf("%s", err.Error())
+		message = err.Error()
 	} else {
 		message = fmt.Sprintf("%s: %s", message, err.Error())
 	}
