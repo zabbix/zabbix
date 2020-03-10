@@ -26,6 +26,8 @@ jQuery(function ($){
 		element = {
 			from: container.find('[name=from]'),
 			to: container.find('[name=to]'),
+			filter_from: container.find('[name=filter_from]'),
+			filter_to: container.find('[name=filter_to]'),
 			from_clndr: container.find('[name=from_calendar]'),
 			to_clndr: container.find('[name=to_calendar]'),
 			apply: container.find('[name=apply]'),
@@ -120,6 +122,8 @@ jQuery(function ($){
 		if ('error' in data === false) {
 			element.from.val(data.from);
 			element.to.val(data.to);
+			element.filter_from.val(data.from);
+			element.filter_to.val(data.to);
 			element.label.text(data.label);
 		}
 

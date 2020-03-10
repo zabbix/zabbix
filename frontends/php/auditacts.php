@@ -34,14 +34,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	// filter
-	'filter_rst' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'filter_set' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'alias' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
-	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null]
+	'filter_rst' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'filter_set' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'alias' =>			[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'filter_from' =>	[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
+	'filter_to' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null]
 ];
 check_fields($fields);
-validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
+validateTimeSelectorPeriod(getRequest('filter_from'), getRequest('filter_to'));
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -66,8 +66,8 @@ elseif (hasRequest('filter_rst')) {
 $timeselector_options = [
 	'profileIdx' => 'web.auditacts.filter',
 	'profileIdx2' => 0,
-	'from' => getRequest('from'),
-	'to' => getRequest('to')
+	'from' => getRequest('filter_from'),
+	'to' => getRequest('filter_to')
 ];
 updateTimeSelectorPeriod($timeselector_options);
 
