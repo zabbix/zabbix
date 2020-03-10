@@ -298,7 +298,8 @@ footer {
   will-change: max-width;
   transform: translate3d(0, 0, 0); }
   .sidebar .sidebar-header {
-    padding: 12px; }
+    padding: 12px;
+    box-sizing: border-box; }
   .sidebar .sidebar-nav {
     display: flex;
     flex-direction: column;
