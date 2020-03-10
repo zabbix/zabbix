@@ -1,3 +1,5 @@
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -17,24 +19,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package win32
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/net/netif"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/proc"
-	_ "zabbix.com/plugins/system/cpu"
-	_ "zabbix.com/plugins/system/swap"
-	_ "zabbix.com/plugins/system/uptime"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/vfs/file"
-	_ "zabbix.com/plugins/vfs/fs"
-	_ "zabbix.com/plugins/vm/memory"
-	_ "zabbix.com/plugins/windows/eventlog"
-	_ "zabbix.com/plugins/windows/perfmon"
-	_ "zabbix.com/plugins/windows/services"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
+	"syscall"
 )
+
+var (
+	hUser32 Hlib
+
+	getGuiResources uintptr
+)
+
+func init() {
+	hUser32 = mustLoadLibrary("user32.dll")
+
+	getGuiResources = hUser32.mustGetProcAddress("GetGuiResources")
+}
+
+func GetGuiResources(proc syscall.Handle, flags uint32) (num uint32) {
+	ret, _, _ := syscall.Syscall(getGuiResources, 3, uintptr(proc), uintptr(flags), 0)
+	return uint32(ret)
+}
