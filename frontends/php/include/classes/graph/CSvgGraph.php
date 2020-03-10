@@ -100,8 +100,8 @@ class CSvgGraph extends CSvg {
 	protected $left_y_max_calculated = null;
 	protected $left_y_interval = null;
 	protected $left_y_units = null;
-	protected $left_y_is_binary = false;
-	protected $left_y_power = 1;
+	protected $left_y_is_binary = null;
+	protected $left_y_power = null;
 	protected $left_y_empty = true;
 
 	protected $right_y_show = false;
@@ -111,8 +111,8 @@ class CSvgGraph extends CSvg {
 	protected $right_y_max_calculated = null;
 	protected $right_y_interval = null;
 	protected $right_y_units = null;
-	protected $right_y_is_binary = false;
-	protected $right_y_power = 1;
+	protected $right_y_is_binary = null;
+	protected $right_y_power = null;
 	protected $right_y_empty = true;
 
 	protected $right_y_zero = null;
@@ -538,7 +538,7 @@ class CSvgGraph extends CSvg {
 
 		// Calculate vertical scale parameters for left side.
 
-		$rows_min = (int) max(1, floor($this->canvas_height / $this->cell_height_min / 2));
+		$rows_min = (int) max(1, floor($this->canvas_height / $this->cell_height_min / 1.5));
 		$rows_max = (int) max(1, floor($this->canvas_height / $this->cell_height_min));
 
 		$this->left_y_min_calculated = $this->left_y_min === null;

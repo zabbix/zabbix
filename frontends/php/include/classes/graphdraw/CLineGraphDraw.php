@@ -1816,7 +1816,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$calc_min = $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED;
 		$calc_max = $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED;
 
-		$rows_min = (int) max(1, floor($this->sizeY / $this->cell_height_min / 2));
+		$rows_min = (int) max(1, floor($this->sizeY / $this->cell_height_min / 1.5));
 		$rows_max = (int) max(1, floor($this->sizeY / $this->cell_height_min));
 
 		foreach ($this->getVerticalScalesInUse() as $side_index => $side) {
