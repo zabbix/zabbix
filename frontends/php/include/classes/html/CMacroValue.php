@@ -46,6 +46,13 @@ class CMacroValue extends CInput {
 	protected $revert_visible = true;
 
 	/**
+	 * Revert button element.
+	 *
+	 * @var CTag
+	 */
+	protected $revert_button = null;
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param int    $type         Macro type one of ZBX_MACRO_TYPE_SECRET or ZBX_MACRO_TYPE_TEXT value.
@@ -70,11 +77,23 @@ class CMacroValue extends CInput {
 	}
 
 	/**
-	 * Revert value button visibility.
-	 *
-	 * @param bool $visible  Button visibility.
+	 * Allow to revert macro value.
 	 */
-	public function setRevertButtonVisible(bool $visible) {
+	public function addRevertButton() {
+		$this->revert_button = (new CButton(null))
+			->setAttribute('title', _('Revert changes'))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass(self::ZBX_STYLE_BTN_UNDO);
+
+		return $this;
+	}
+
+	/**
+	 * Set revert macro value button visibility.
+	 *
+	 * @param bool $visible  Button visibility state.
+	 */
+	public function setRevertButtonVisibility(bool $visible) {
 		$this->revert_visible = $visible;
 
 		return $this;
@@ -105,16 +124,14 @@ class CMacroValue extends CInput {
 		}
 		else {
 			$class = ZBX_STYLE_ICON_SECRET_TEXT;
-			$node->addItem([
-				(new CInputSecret($name.'[value]', $value, $this->add_post_js))
-					->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
-					->setAttribute('placeholder', _('value')),
-				(new CButton(null))
-					->setAttribute('title', _('Revert changes'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass(self::ZBX_STYLE_BTN_UNDO)
-					->addStyle($this->revert_visible ? 'display: inline-block;' : '')
-			]);
+			$node->addItem((new CInputSecret($name.'[value]', $value, $this->add_post_js))
+				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
+				->setAttribute('placeholder', _('value'))
+			);
+		}
+
+		if ($this->revert_button !== null) {
+			$node->addItem($this->revert_button->addStyle($this->revert_visible ? 'display: block' : ''));
 		}
 
 		$node->addItem((new CButtonDropdown($name.'[type]',  $value_type, [

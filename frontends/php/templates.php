@@ -136,6 +136,7 @@ foreach ($tags as $key => $tag) {
 
 // Remove inherited macros data (actions: 'add', 'update' and 'form').
 $macros = cleanInheritedMacros(getRequest('macros', []));
+
 // Remove empty new macro lines.
 $macros = array_filter($macros, function($macro) {
 	$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
