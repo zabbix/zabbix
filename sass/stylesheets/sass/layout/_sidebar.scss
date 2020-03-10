@@ -88,6 +88,10 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		width: 0;
 		margin-top: 5px;
 		color: $sidebar-server-name-color;
+
+		@if $ui-transitions {
+			transition: opacity $ui-transition-duration ease-out;
+		}
 	}
 
 	@if $ui-transitions {
@@ -165,10 +169,6 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 
 			.server-name {
 				opacity: 0;
-
-				@if $ui-transitions {
-					transition: opacity $ui-transition-duration ease-out;
-				}
 			}
 
 			.form-search {

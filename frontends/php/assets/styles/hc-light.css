@@ -346,7 +346,8 @@ footer {
   .sidebar .server-name {
     width: 0;
     margin-top: 5px;
-    color: #cedae1; }
+    color: #cedae1;
+    transition: opacity 0.3s ease-out; }
   .sidebar .logo {
     transition: width 0.3s; }
   .sidebar .form-search .search {
@@ -382,8 +383,7 @@ footer {
     .sidebar.is-compact:not(.is-opened) .button-show {
       opacity: 0; }
     .sidebar.is-compact:not(.is-opened) .server-name {
-      opacity: 0;
-      transition: opacity 0.3s ease-out; }
+      opacity: 0; }
     .sidebar.is-compact:not(.is-opened) .form-search {
       position: relative; }
       .sidebar.is-compact:not(.is-opened) .form-search .search {
