@@ -1208,25 +1208,25 @@ class CApiInputValidator {
 		$value = $number_parser->calcValue();
 
 		if ($DB_HISTORY_FLOAT_IEEE754 === true) {
-			if (abs($value) < ZBX_FLOAT_MIN) {
-				$error = _s('Field "%1$s" is not correct: %2$s', $path, _('a number is too small'));
+			if ($value != 0 && abs($value) < ZBX_FLOAT_MIN) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too small'));
 
 				return false;
 			}
 			elseif (abs($value) > ZBX_FLOAT_MAX) {
-				$error = _s('Field "%1$s" is not correct: %2$s', $path, _('a number is too large'));
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 
 				return false;
 			}
 		}
 		else {
-			if (ceil(log10(abs($value))) > 16) {
-				$error = _s('Field "%1$s" is not correct: %2$s', $path, _('a number is too large'));
+			if (abs($value) >= 1E+16) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 
 				return false;
 			}
 			elseif ($value != round($value, 4)) {
-				$error = _s('Field "%1$s" is not correct: %2$s', $path, _('a number has too many fractional digits'));
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number has too many fractional digits'));
 
 				return false;
 			}
