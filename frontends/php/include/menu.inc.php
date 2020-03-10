@@ -214,10 +214,9 @@ function getUserMenu(): CMenu {
 			->setTarget('_blank')
 	);
 
-	$user = [
-		'alias' => CWebUser::$data['alias'],
-		'name' => CWebUser::$data['name'],
-		'surname' => CWebUser::$data['surname']
+	$user = array_intersect_key(CWebUser::$data, array_flip(['alias', 'name', 'surname'])) + [
+		'name' => null,
+		'surname' => null
 	];
 
 	if (CWebUser::isGuest()) {
