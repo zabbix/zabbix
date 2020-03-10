@@ -193,9 +193,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 	}
 
 	if ($macros) {
-		$has_secret_macros = count(array_filter($macros, function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET);
-		})) > 0;
+		$has_secret_macros = in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'));
 
 		$macros = array_map(function($value) {
 			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)

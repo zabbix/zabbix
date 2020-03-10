@@ -336,9 +336,7 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 	}
 
 	if ($macros) {
-		$has_secret_macros = count(array_filter($macros, function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET);
-		})) > 0;
+		$has_secret_macros = in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'));
 
 		$macros = array_map(function($value) {
 			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
@@ -679,7 +677,7 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 		}
 
 		if ($host_macros_update) {
-			if (API::UserMacro()->update($host_macros_update)) {
+			if (!API::UserMacro()->update($host_macros_update)) {
 				throw new Exception();
 			}
 		}
