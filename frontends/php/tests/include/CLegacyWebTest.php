@@ -69,7 +69,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestLogout() {
-		$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
+		$this->query('xpath://a[@href="#signout"]')->one()->click();
 	}
 
 	public function zbxTestCheckMandatoryStrings() {
