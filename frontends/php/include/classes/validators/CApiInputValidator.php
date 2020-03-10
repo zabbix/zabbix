@@ -1208,12 +1208,7 @@ class CApiInputValidator {
 		$value = $number_parser->calcValue();
 
 		if ($DB_HISTORY_FLOAT_IEEE754 === true) {
-			if ($value != 0 && abs($value) < ZBX_FLOAT_MIN) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too small'));
-
-				return false;
-			}
-			elseif (abs($value) > ZBX_FLOAT_MAX) {
+			if (abs($value) > ZBX_FLOAT_MAX) {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 
 				return false;

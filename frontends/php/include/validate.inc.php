@@ -178,11 +178,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$value = $number_parser->calcValue();
 
 		if ($DB_HISTORY_FLOAT_IEEE754 === true) {
-			if ($value != 0 && abs($value) < ZBX_FLOAT_MIN) {
-				$error = true;
-				$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too small'));
-			}
-			elseif (abs($value) > ZBX_FLOAT_MAX) {
+			if (abs($value) > ZBX_FLOAT_MAX) {
 				$error = true;
 				$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too large'));
 			}
