@@ -22,6 +22,10 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/FilterTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
+/**
+ * @on-before disableDebugMode
+ * @on-after enableDebugMode
+ */
 class testPageTemplates extends CLegacyWebTest {
 
 	public $templateName = 'Template OS Linux by Zabbix agent';
@@ -81,7 +85,6 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->zbxTestTextPresent($name);
 		// Check if template name present on page, if not, check on second page.
 		if ($this->query('link', $name)->one(false)->isValid() === false) {
 			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
@@ -243,5 +246,20 @@ public static function getFilterByTagsData() {
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();
+	}
+
+	/**
+	 * Debug button sometimes overlaps element and impossible to click on it.
+	 */
+	public static function setDebugMode($value) {
+		DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($value).' WHERE usrgrpid=7');
+	}
+
+	public function disableDebugMode() {
+		self::setDebugMode(0);
+	}
+
+	public static function enableDebugMode() {
+		self::setDebugMode(1);
 	}
 }
