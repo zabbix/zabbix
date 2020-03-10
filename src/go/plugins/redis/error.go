@@ -21,19 +21,23 @@ package redis
 
 import "strings"
 
-type zabbixError string
+type zabbixError struct {
+	err string
+}
 
-func (e zabbixError) Error() string { return string(e) }
+func (e zabbixError) Error() string {
+	return e.err
+}
 
-const (
-	errorTooManyParameters = zabbixError("Too many parameters.")
-	errorCannotFetchData   = zabbixError("Cannot fetch data.")
-	errorCannotParseData   = zabbixError("Cannot parse data.")
-	errorCannotMarshalJson = zabbixError("Cannot marshal JSON.")
-	errorUnsupportedMetric = zabbixError("Unsupported metric.")
-	errorInvalidFormat     = zabbixError("Invalid format.")
-	errorEmptyResult       = zabbixError("Empty result.")
-	errorUnknownSession    = zabbixError("Unknown session.")
+var (
+	errorInvalidParams     = zabbixError{"Invalid parameters."}
+	errorCannotFetchData   = zabbixError{"Cannot fetch data."}
+	errorCannotParseData   = zabbixError{"Cannot parse data."}
+	errorCannotMarshalJSON = zabbixError{"Cannot marshal JSON."}
+	errorUnsupportedMetric = zabbixError{"Unsupported metric."}
+	errorInvalidFormat     = zabbixError{"Invalid format."}
+	errorEmptyResult       = zabbixError{"Empty result."}
+	errorUnknownSession    = zabbixError{"Unknown session."}
 )
 
 // formatZabbixError formats a given error text. It capitalizes the first letter and adds a dot to the end.
