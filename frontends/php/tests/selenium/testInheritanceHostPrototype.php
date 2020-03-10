@@ -61,8 +61,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				'a[contains(@href, "&hostid='.$host_prototype.'") and contains(@href, "&parent_discoveryid='.$discovery_id.'")]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-ip"]/input[@type="text"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-dns"]/input[@type="text"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
 		$interface = CDBHelper::getValue('SELECT interfaceid'.
 				' FROM interface'.
 				' WHERE hostid IN ('.
@@ -74,10 +74,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		);
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-port"]/input[@type="text"][@readonly]');
-		$this->zbxTestAssertElementText('//tr[@id="SNMPInterfacesFooter"]', 'No SNMP interfaces found.');
-		$this->zbxTestAssertElementText('//tr[@id="JMXInterfacesFooter"]', 'No JMX interfaces found.');
-		$this->zbxTestAssertElementText('//tr[@id="IPMIInterfacesFooter"]', 'No IPMI interfaces found.');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="proxy_hostid"][@readonly]');
 
 		// Check layout at Groups tab.

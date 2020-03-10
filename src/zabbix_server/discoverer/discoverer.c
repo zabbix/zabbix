@@ -214,13 +214,16 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 				switch (dcheck->type)
 				{
 					case SVC_SNMPv1:
-						item.type = ITEM_TYPE_SNMPv1;
+						item.snmp_version = ZBX_IF_SNMP_VERSION_1;
+						item.type = ITEM_TYPE_SNMP;
 						break;
 					case SVC_SNMPv2c:
-						item.type = ITEM_TYPE_SNMPv2c;
+						item.snmp_version = ZBX_IF_SNMP_VERSION_2;
+						item.type = ITEM_TYPE_SNMP;
 						break;
 					case SVC_SNMPv3:
-						item.type = ITEM_TYPE_SNMPv3;
+						item.snmp_version = ZBX_IF_SNMP_VERSION_3;
+						item.type = ITEM_TYPE_SNMP;
 						break;
 					default:
 						item.type = ITEM_TYPE_ZABBIX;
@@ -250,7 +253,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 					substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL, NULL,
 							MACRO_TYPE_SNMP_OID, NULL, 0);
 
-					if (ITEM_TYPE_SNMPv3 == item.type)
+					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
 						item.snmpv3_securityname =
 								zbx_strdup(NULL, dcheck->snmpv3_securityname);
@@ -288,7 +291,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 					zbx_free(item.snmp_community);
 					zbx_free(item.snmp_oid);
 
-					if (ITEM_TYPE_SNMPv3 == item.type)
+					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
 						zbx_free(item.snmpv3_securityname);
 						zbx_free(item.snmpv3_authpassphrase);

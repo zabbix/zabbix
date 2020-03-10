@@ -89,6 +89,7 @@ typedef struct
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	bulk;
+	unsigned char	snmp_version;
 	unsigned char	useip;
 	char		ip_orig[INTERFACE_IP_LEN_MAX];
 	char		dns_orig[INTERFACE_DNS_LEN_MAX];
@@ -146,6 +147,7 @@ typedef struct
 	zbx_uint64_t		lastlogsize;
 	zbx_uint64_t		valuemapid;
 	unsigned char		type;
+	unsigned char		snmp_version;
 	unsigned char		value_type;
 	unsigned char		state;
 	unsigned char		snmpv3_securitylevel;
