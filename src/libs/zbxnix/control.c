@@ -154,6 +154,19 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		scope = 0;
 		data = 0;
 	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
+			0 == strcmp(opt, ZBX_SNMP_CACHE_RELOAD))
+	{
+#ifdef HAVE_NETSNMP
+		command = ZBX_RTC_SNMP_CACHE_RELOAD;
+		/* Scope is ignored for SNMP. R/U pollers, trapper, discoverer and taskmanager always get targeted. */
+		scope = 0;
+		data = 0;
+#else
+		zbx_error("invalid runtime control option: no SNMP support enabled");
+		return FAIL;
+#endif
+	}
 	else
 	{
 		zbx_error("invalid runtime control option: %s", opt);

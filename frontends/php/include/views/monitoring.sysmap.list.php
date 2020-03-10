@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Maps'))
 	->setControls((new CTag('nav', true,
@@ -105,4 +109,4 @@ $sysmapForm->addItem([
 // append form to widget
 $widget->addItem($sysmapForm);
 
-return $widget;
+$widget->show();

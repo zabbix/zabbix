@@ -575,6 +575,7 @@ var timeControl = {
 			window.flickerfreeScreen.setElementProgressState(obj.id, true);
 			img = jQuery('<img/>', {id: id}).appendTo(('#'+obj.containerid)).on('load', function() {
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
+				img.closest('.dashbrd-grid-widget').trigger('load.image', {imageid: id});
 			});
 
 			var xhr = (obj.loadSBox == 0)
@@ -615,6 +616,7 @@ var timeControl = {
 				'class': img.attr('class')
 			})
 			.one('load', function() {
+				img.closest('.dashbrd-grid-widget').trigger('load.image', {imageid: img.attr('id')});
 				img.replaceWith(clone);
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
 			});

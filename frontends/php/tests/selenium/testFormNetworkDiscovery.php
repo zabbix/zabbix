@@ -558,10 +558,10 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					switch ($key) {
 						case 'check_action':
 							$action = $value;
-							$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_bg'));
+							$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay-bg'));
 							$this->zbxTestClickButtonText($action);
 							if ($action !== 'Remove') {
-								$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('overlay_dialogue'));
+								COverlayDialogElement::find()->one()->waitUntilReady();
 							}
 							break;
 						case 'type':
@@ -607,7 +607,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					$button = ($action === 'Add') ? 'Add' : 'Update';
 					$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="'.$button.'"]');
 					if (!array_key_exists('error_in_checks', $data)) {
-						$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+						$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay-bg'));
 					}
 				}
 			}

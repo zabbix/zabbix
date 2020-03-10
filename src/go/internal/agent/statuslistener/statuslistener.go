@@ -28,6 +28,7 @@ import (
 
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
+	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/version"
 )
@@ -66,6 +67,7 @@ func Start(taskManager scheduler.Scheduler, confFilePath string) (err error) {
 		log.Debugf("%s", err.Error())
 	}()
 
+	monitor.Register(monitor.Input)
 	return nil
 }
 
@@ -79,4 +81,6 @@ func Stop() {
 	} else {
 		log.Debugf("status listener has been stopped")
 	}
+
+	monitor.Unregister(monitor.Input)
 }

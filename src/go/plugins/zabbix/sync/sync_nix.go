@@ -33,7 +33,6 @@ func getMetrics() []string {
 		"system.hw.chassis", "Chassis information.",
 		"system.hw.devices", "Listing of PCI or USB devices.",
 		"system.sw.packages", "Listing of installed packages.",
-		"net.tcp.port", "Checks if it is possible to make TCP connection to specified port.",
 		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
 		"net.tcp.service.perf", "Checks performance of TCP service.",
 		"net.udp.service", "Checks if service is running and responding to UDP requests.",
@@ -44,6 +43,7 @@ func getMetrics() []string {
 		"vfs.dir.size", "Directory size (in bytes).",
 		"vfs.fs.inode", "Number or percentage of inodes.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
+		"vfs.fs.get", "List of mounted filesystems with statistics.",
 		"vm.memory.size", "Memory size in bytes or in percentage from total.",
 	}
 }
