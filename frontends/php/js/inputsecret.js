@@ -27,7 +27,7 @@
 	function enableHandle() {
 		var $btn_change = $(this),
 			$input = $btn_change.siblings('input[type=password]'),
-			$btn_undo =$btn_change
+			$btn_undo = $btn_change
 				.closest('.input-group')
 				.find('.btn-undo');
 
