@@ -187,7 +187,7 @@ class JMXItemChecker extends ItemChecker
 			{
 				logger.trace("'{}' contains tabular data", attributeName);
 
-				String value;
+				String value = new String();
 
 				if (null == (value = getTabularData((TabularData)dataObject)))
 					throw new ZabbixException("Data object type cannot be converted to string.");
@@ -307,13 +307,13 @@ class JMXItemChecker extends ItemChecker
 			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
 	}
 
-	private String getTabularData(TabularData data) throws Exception, JSONException
+	private String getTabularData(TabularData data) throws JSONException
 	{
 		JSONArray values = new JSONArray();
 
 		for (Object value : data.values())
 		{
-			JSONObject tmp;
+			JSONObject tmp = new JSONObject();
 
 			if (null == (tmp = getCompositeDataValues((CompositeData)value)))
 				return null;
