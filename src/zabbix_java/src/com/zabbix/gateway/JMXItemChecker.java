@@ -187,7 +187,12 @@ class JMXItemChecker extends ItemChecker
 			{
 				logger.trace("'{}' contains tabular data", attributeName);
 
-				return getTabularData((TabularData)dataObject);
+				String value;
+
+				if (null == (value = getTabularData((TabularData)dataObject)))
+					throw new ZabbixException("Data object type cannot be converted to string.");
+
+				return value;
 			}
 
 			try
@@ -302,12 +307,19 @@ class JMXItemChecker extends ItemChecker
 			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
 	}
 
-	private String getTabularData(TabularData data) throws JSONException
+	private String getTabularData(TabularData data) throws Exception, JSONException
 	{
 		JSONArray values = new JSONArray();
 
 		for (Object value : data.values())
-			values.put(getCompositeDataValues((CompositeData)value));
+		{
+			JSONObject tmp;
+
+			if (null == (tmp = getCompositeDataValues((CompositeData)value)))
+				return null;
+
+			values.put(tmp);
+		}
 
 		return values.toString();
 	}
@@ -321,12 +333,10 @@ class JMXItemChecker extends ItemChecker
 			Object data = compData.get(key);
 
 			if (data == null)
-			{
 				value.put(key, JSONObject.NULL);
-				continue;
-			}
-
-			if (data instanceof CompositeData)
+			else if (data.getClass().isArray())
+				return null;
+			else if (data instanceof CompositeData)
 				value.put(key, getCompositeDataValues((CompositeData)data));
 			else
 				value.put(key, data);
@@ -390,7 +400,9 @@ class JMXItemChecker extends ItemChecker
 			{
 				logger.trace("discovered attribute '{}'", attrInfo.getName());
 
-				if (null == values.get(attrInfo.getName()))
+				Object attribute;
+
+				if (null == (attribute = values.get(attrInfo.getName())))
 				{
 					logger.trace("cannot retrieve attribute value, skipping");
 					continue;
@@ -398,10 +410,29 @@ class JMXItemChecker extends ItemChecker
 
 				try
 				{
-					logger.trace("looking for attributes of primitive types");
 					String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
-					getAttributeFields(counters, name, descr, attrInfo.getName(), values.get(attrInfo.getName()),
-						propertiesAsMacros);
+
+					if (attribute instanceof TabularData)
+					{
+						logger.trace("looking for attributes of tabular types");
+
+						String value = new String();
+
+						if (null == (value = getTabularData((TabularData)attribute)))
+						{
+							logger.trace("found attribute of a known, unsupported type: {}", attribute.getClass());
+						}
+						else
+						{
+							formatPrimitiveTypeResult(counters, name, descr, attrInfo.getName(), attribute,
+								propertiesAsMacros, value);
+						}
+					}
+					else
+					{
+						logger.trace("looking for attributes of primitive types");
+						getAttributeFields(counters, name, descr, attrInfo.getName(), attribute, propertiesAsMacros);
+					}
 				}
 				catch (Exception e)
 				{
@@ -520,39 +551,10 @@ class JMXItemChecker extends ItemChecker
 	private void getAttributeFields(JSONArray counters, ObjectName name, String descr, String attrPath,
 			Object attribute, boolean propertiesAsMacros) throws NoSuchMethodException, JSONException
 	{
-		boolean isPrimitieve = isPrimitiveAttributeType(attribute);
-
-		if (isPrimitieve || attribute instanceof TabularData)
+		if (isPrimitiveAttributeType(attribute))
 		{
-			logger.trace("found attribute of a {} type: {}",
-				(isPrimitieve ? "primitive" : "tabular"), attribute.getClass());
-
-			JSONObject counter = new JSONObject();
-
-			if (propertiesAsMacros)
-			{
-				counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
-				counter.put("{#JMXOBJ}", name);
-				counter.put("{#JMXATTR}", attrPath);
-				counter.put("{#JMXTYPE}", attribute.getClass().getName());
-				if (isPrimitieve)
-					counter.put("{#JMXVALUE}", attribute.toString());
-				else
-					counter.put("{#JMXVALUE}", getTabularData((TabularData)attribute));
-			}
-			else
-			{
-				counter.put("name", attrPath);
-				counter.put("object", name);
-				counter.put("description", null == descr ? name + "," + attrPath : descr);
-				counter.put("type", attribute.getClass().getName());
-				if (isPrimitieve)
-					counter.put("value", attribute.toString());
-				else
-					counter.put("value", getTabularData((TabularData)attribute));
-			}
-
-			counters.put(counter);
+			logger.trace("found attribute of a primitive type: {}", attribute.getClass());
+			formatPrimitiveTypeResult(counters, name, descr, attrPath, attribute, propertiesAsMacros, attribute.toString());
 		}
 		else if (attribute instanceof CompositeData)
 		{
@@ -573,6 +575,31 @@ class JMXItemChecker extends ItemChecker
 		}
 		else
 			logger.trace("found attribute of an unknown, unsupported type: {}", attribute.getClass());
+	}
+
+	private void formatPrimitiveTypeResult(JSONArray counters, ObjectName name, String descr, String attrPath,
+			Object attribute, boolean propertiesAsMacros, String value) throws JSONException
+	{
+		JSONObject counter = new JSONObject();
+
+		if (propertiesAsMacros)
+		{
+			counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
+			counter.put("{#JMXOBJ}", name);
+			counter.put("{#JMXATTR}", attrPath);
+			counter.put("{#JMXTYPE}", attribute.getClass().getName());
+			counter.put("{#JMXVALUE}", value);
+		}
+		else
+		{
+			counter.put("name", attrPath);
+			counter.put("object", name);
+			counter.put("description", null == descr ? name + "," + attrPath : descr);
+			counter.put("type", attribute.getClass().getName());
+			counter.put("value", value);
+		}
+
+		counters.put(counter);
 	}
 
 	private boolean isPrimitiveAttributeType(Object obj) throws NoSuchMethodException
