@@ -38,23 +38,34 @@ For example in Centos use "systemctl edit zabbix-agent.service" to set the requi
 
 Add the rule to the SELinux policy (example for Centos):
 
+```text
 # cat <<EOF > zabbix_home.te
 module zabbix_home 1.0;
 
 require {
         type zabbix_agent_t;
         type zabbix_var_lib_t;
+        type mysqld_etc_t;
+        type mysqld_port_t;
+        type mysqld_var_run_t;
         class file { open read };
+        class tcp_socket name_connect;
+        class sock_file write;
 }
 
 #============= zabbix_agent_t ==============
 
 allow zabbix_agent_t zabbix_var_lib_t:file read;
 allow zabbix_agent_t zabbix_var_lib_t:file open;
+allow zabbix_agent_t mysqld_etc_t:file read;
+allow zabbix_agent_t mysqld_port_t:tcp_socket name_connect;
+allow zabbix_agent_t mysqld_var_run_t:sock_file write;
 EOF
 # checkmodule -M -m -o zabbix_home.mod zabbix_home.te
 # semodule_package -o zabbix_home.pp -m zabbix_home.mod
 # semodule -i zabbix_home.pp
+# restorecon -R /var/lib/zabbix
+```
 
 ## Zabbix configuration
 
