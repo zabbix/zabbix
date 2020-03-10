@@ -30,13 +30,13 @@ const (
 )
 
 // autovacuumHandler returns count of autovacuum workers if all is OK or nil otherwise.
-func (p *Plugin) autovacuumHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) autovacuumHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var countAutovacuumWorkers int64
 	var err error
-	query := `SELECT count(*) 
-				FROM pg_catalog.pg_stat_activity 
-			   WHERE query like '%%autovacuum%%' 
-				 AND state <> 'idle' 
+	query := `SELECT count(*)
+				FROM pg_catalog.pg_stat_activity
+			   WHERE query like '%%autovacuum%%'
+				 AND state <> 'idle'
 				 AND pid <> pg_catalog.pg_backend_pid()`
 
 	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&countAutovacuumWorkers)

@@ -34,7 +34,7 @@ const (
 )
 
 // pingHandler executes 'SELECT 1 as pingOk' commands and returns pingOK if a connection is alive or postgresPingFailed otherwise.
-func (p *Plugin) pingHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) pingHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var pingOK int64 = postgresPingUnknown
 
 	err := conn.postgresPool.QueryRow(context.Background(), fmt.Sprintf("SELECT %d as pingOk", postgresPingOk)).Scan(&pingOK)

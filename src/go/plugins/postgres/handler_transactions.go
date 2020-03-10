@@ -30,17 +30,17 @@ const (
 )
 
 // transactionsHandler executes select from pg_stat_activity command and returns JSON for active,idle, waiting and prepared transactions if all is OK or nil otherwise.
-func (p *Plugin) transactionsHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) transactionsHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var transactionJSON string
 
-	query := `SELECT row_to_json(T) 
+	query := `SELECT row_to_json(T)
 	        	FROM (
-					SELECT 
+					SELECT
 						coalesce(extract(epoch FROM max(CASE WHEN state = 'idle in transaction' THEN age(now(), xact_start) END)), 0) AS idle,
 	 					coalesce(extract(epoch FROM max(CASE WHEN state = 'active' THEN age(now(), xact_start) END)), 0) AS active,
 	 					coalesce(extract(epoch FROM max(CASE WHEN wait_event IS NOT NULL THEN age(now(), xact_start) END)), 0) AS waiting,
-						(SELECT coalesce(extract(epoch FROM max(age(now(), prepared))), 0) 
-						   FROM pg_prepared_xacts) AS prepared 
+						(SELECT coalesce(extract(epoch FROM max(age(now(), prepared))), 0)
+						   FROM pg_prepared_xacts) AS prepared
 	 				FROM pg_stat_activity) T;`
 
 	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&transactionJSON)

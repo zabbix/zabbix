@@ -33,16 +33,11 @@ const (
 )
 
 // dbStatHandler executes select from pg_catalog.pg_stat_database command for each database and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) dbStatHandler(conn *postgresConn, params []string) (interface{}, error) {
-	var statJSON, key, query string
+func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+	var statJSON, query string
 	var version int
 	var err error
 
-	if len(params) > 0 {
-		key = params[0]
-	} else {
-		return nil, errorEmptyParam
-	}
 	version, err = strconv.Atoi(conn.version)
 	if err != nil {
 		return nil, errorCannotConvertPostgresVersionInt
@@ -50,9 +45,9 @@ func (p *Plugin) dbStatHandler(conn *postgresConn, params []string) (interface{}
 	switch key {
 	case keyPostgresStatSum:
 		query = `
-  SELECT row_to_json (T) 
+  SELECT row_to_json (T)
     FROM  (
-      SELECT 
+      SELECT
         sum(numbackends) as numbackends
       , sum(xact_commit) as xact_commit
       , sum(xact_rollback) as xact_rollback
@@ -80,9 +75,9 @@ func (p *Plugin) dbStatHandler(conn *postgresConn, params []string) (interface{}
 
 	case keyPostgresStat:
 		query = `
-  SELECT json_object_agg(coalesce (datname,'null'), row_to_json(T)) 
+  SELECT json_object_agg(coalesce (datname,'null'), row_to_json(T))
     FROM  (
-      SELECT 
+      SELECT
         datname
       , numbackends as numbackends
       , xact_commit as xact_commit

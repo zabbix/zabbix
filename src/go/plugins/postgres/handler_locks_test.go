@@ -55,7 +55,7 @@ func TestPlugin_locksHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.locksHandler(tt.args.conn, tt.args.params)
+			got, err := tt.p.locksHandler(tt.args.conn, keyPostgresLocks, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.locksHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

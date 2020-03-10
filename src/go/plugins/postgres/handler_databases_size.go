@@ -21,7 +21,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -31,21 +30,20 @@ const (
 )
 
 // databasesSizeHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) databasesSizeHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) databasesSizeHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var countSize int64
-	var key, formatedLine string
 	// for now we are expecting only database name as a param
-	if len(params) > 0 {
-		key = params[0]
-		formatedLine = fmt.Sprintf(`SELECT pg_database_size(datname::text) 
-									  FROM pg_catalog.pg_database 
-									 WHERE datistemplate = false 
-									   AND datname = '%v';`, key)
-	} else {
-		return nil, errorEmptyParam
+	if len(params) == 0 {
+		return nil, errorFourthParam
 	}
 
-	err := conn.postgresPool.QueryRow(context.Background(), formatedLine).Scan(&countSize)
+	err := conn.postgresPool.QueryRow(context.Background(),
+		`SELECT pg_database_size(datname::text)
+		FROM pg_catalog.pg_database
+   		WHERE datistemplate = false
+			 AND datname = $1;`,
+		params[0]).Scan(&countSize)
+
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

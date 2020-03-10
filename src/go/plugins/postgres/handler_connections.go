@@ -30,10 +30,10 @@ const (
 )
 
 // connectionsHandler executes select from pg_stat_activity command and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) connectionsHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) connectionsHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var connectionsJSON string
 	var err error
-	query := `SELECT row_to_json(T) 
+	query := `SELECT row_to_json(T)
 	FROM (
 		SELECT
 			sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active,

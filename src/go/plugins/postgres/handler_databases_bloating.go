@@ -30,12 +30,12 @@ const (
 )
 
 // databasesBloatingHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) databasesBloatingHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) databasesBloatingHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var countBloating int64
 
-	query := `SELECT count(*) 
-				FROM pg_catalog.pg_stat_all_tables 
-	   		   WHERE (n_dead_tup/(n_live_tup+n_dead_tup)::float8) > 0.2 
+	query := `SELECT count(*)
+				FROM pg_catalog.pg_stat_all_tables
+	   		   WHERE (n_dead_tup/(n_live_tup+n_dead_tup)::float8) > 0.2
 		 		 AND (n_live_tup+n_dead_tup) > 50;`
 
 	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&countBloating)

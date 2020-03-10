@@ -29,10 +29,6 @@ import (
 	"zabbix.com/pkg/log"
 )
 
-const poolSize = 10
-
-const clientName = "zbx_monitor"
-
 // postgresConn holds pointer to the Pool of Postgres Instance
 type postgresConn struct {
 	postgresPool   *pgxpool.Pool

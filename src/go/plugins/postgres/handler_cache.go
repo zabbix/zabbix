@@ -30,7 +30,7 @@ const (
 )
 
 // cacheHandler finds cache hit percent and returns int64 if all is OK or nil otherwise.
-func (p *Plugin) cacheHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) cacheHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var cache float64
 	query := `SELECT round(sum(blks_hit)*100/sum(blks_hit+blks_read), 2) FROM pg_catalog.pg_stat_database;`
 

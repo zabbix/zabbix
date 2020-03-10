@@ -36,17 +36,13 @@ const (
 )
 
 // replicationHandler gets info about recovery state if all is OK or nil otherwise.
-func (p *Plugin) replicationHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var replicationResult int64
 	var status, version int
-	var query, key, stringResult string
+	var query, stringResult string
 	var inRecovery bool
 	var err error
 
-	if len(params) == 0 {
-		return nil, errorEmptyParam
-	}
-	key = params[0]
 	version, err = strconv.Atoi(conn.version)
 	if err != nil {
 		return nil, errorCannotConvertPostgresVersionInt
@@ -78,13 +74,13 @@ func (p *Plugin) replicationHandler(conn *postgresConn, params []string) (interf
 	case keyPostgresReplicationLagSec:
 		if version >= 100000 {
 			query = `SELECT
-  						CASE 
+  						CASE
     						WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
 							ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
   						END as lag`
 		} else {
 			query = `SELECT
-  						CASE 
+  						CASE
     						WHEN pg_last_xlog_receive_location() = pg_last_xlog_replay_location() THEN 0
 							ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
   						END as lag`
@@ -101,7 +97,7 @@ func (p *Plugin) replicationHandler(conn *postgresConn, params []string) (interf
 		}
 		if inRecovery {
 			if version >= 100000 {
-				query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn()) 
+				query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
 						   FROM pg_stat_wal_receiver;`
 			} else {
 				query = `SELECT pg_catalog.pg_xlog_location_diff (received_lsn, pg_last_xlog_replay_location())

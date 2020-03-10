@@ -30,13 +30,13 @@ const (
 )
 
 // walHandler executes select from directory which contains wal files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) walHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) walHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var walJSON string
-	query := `SELECT row_to_json(T) 
+	query := `SELECT row_to_json(T)
 			    FROM (
-					SELECT 
+					SELECT
 						pg_wal_lsn_diff(pg_current_wal_lsn(),'0/00000000') AS WRITE,
-						count(*) 
+						count(*)
 					FROM pg_ls_waldir() AS COUNT
 					) T;`
 

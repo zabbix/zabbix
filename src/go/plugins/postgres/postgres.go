@@ -33,27 +33,29 @@ const pluginName = "Postgres"
 
 var maxParams = map[string]int{
 
-	keyPostgresPing:                                      1,
-	keyPostgresTransactions:                              1,
-	keyPostgresConnections:                               1,
-	keyPostgresWal:                                       1,
-	keyPostgresStat:                                      2,
-	keyPostgresStatSum:                                   1,
-	keyPostgresReplicationCount:                          1,
-	keyPostgresReplicationStatus:                         1,
-	keyPostgresReplicationLagSec:                         1,
-	keyPostgresReplicationRecoveryRole:                   1,
-	keyPostgresReplicationLagB:                           1,
-	keyPostgresReplicationMasterDiscoveryApplicationName: 1,
-	keyPostgresLocks:                                     1,
-	keyPostgresOldestXid:                                 1,
-	keyPostgresUptime:                                    1,
-	keyPostgresCache:                                     1,
-	keyPostgresSizeArchive:                               1,
-	keyPostgresDiscoveryDatabases:                        2,
-	keyPostgresDatabasesBloating:                         2,
-	keyPostgresDatabasesSize:                             2,
-	keyPostgresDatabasesAge:                              2,
+	keyPostgresPing:                                      3,
+	keyPostgresTransactions:                              3,
+	keyPostgresConnections:                               3,
+	keyPostgresWal:                                       3,
+	keyPostgresStat:                                      3,
+	keyPostgresStatSum:                                   3,
+	keyPostgresReplicationCount:                          3,
+	keyPostgresReplicationStatus:                         3,
+	keyPostgresReplicationLagSec:                         3,
+	keyPostgresReplicationRecoveryRole:                   3,
+	keyPostgresReplicationLagB:                           3,
+	keyPostgresReplicationMasterDiscoveryApplicationName: 3,
+	keyPostgresLocks:                                     3,
+	keyPostgresOldestXid:                                 3,
+	keyPostgresUptime:                                    3,
+	keyPostgresCache:                                     3,
+	keyPostgresSizeArchive:                               3,
+	keyPostgresDiscoveryDatabases:                        3,
+	keyPostgresDatabasesBloating:                         3,
+	keyPostgresDatabasesSize:                             4,
+	keyPostgresDatabasesAge:                              4,
+	keyPostgresBgwriter:                                  3,
+	keyPostgresAutovacuum:                                3,
 }
 
 // Plugin inherits plugin.Base and store plugin-specific data.
@@ -63,7 +65,7 @@ type Plugin struct {
 	options PluginOptions
 }
 
-type handler func(conn *postgresConn, params []string) (res interface{}, err error)
+type requestHandler func(conn *postgresConn, key string, params []string) (res interface{}, err error)
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin
@@ -84,19 +86,61 @@ func (p *Plugin) Stop() {
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var (
 		connString string
-		handler    handler
+		handler    requestHandler
+		session    *Session
 	)
 
 	if len(params) > 0 && len(params[0]) > 0 {
-		// TODO: identify parameter by type: port,host or smth else
-		// for now expect only one parameter and expect it to be a database name
-		strPort := strconv.Itoa(int(p.options.Port))
-		databaseName := url.PathEscape(params[0])
-		connString = "postgresql://" + p.options.User + ":" + p.options.Password + "@" + p.options.Host + ":" + strPort + "/" + databaseName
+		var ok bool
+		if session, ok = p.options.Sessions[params[0]]; !ok {
+			u, err := url.Parse(params[0])
+			if err != nil {
+				return nil, fmt.Errorf("Invalid connection URI: %s", err)
+			}
+			var port uint64
+			if u.Port() != "" {
+				if port, err = strconv.ParseUint(u.Port(), 10, 16); err != nil {
+					return nil, fmt.Errorf("Invalid connection port: %s", err)
+				}
+			}
+			session = &Session{
+				Host:     u.Host,
+				Port:     uint16(port),
+				Database: u.Path,
+			}
+			if len(params) > 1 {
+				session.User = params[1]
+			}
+			if len(params) > 2 {
+				session.Password = params[2]
+			}
+		}
 	} else {
-		strPort := strconv.Itoa(int(p.options.Port))
-		connString = "postgresql://" + p.options.User + ":" + p.options.Password + "@" + p.options.Host + ":" + strPort + "/" + p.options.Database
+		if len(params) > 1 && params[1] != "" {
+			return nil, errors.New("Invalid second parameter.")
+		}
+		if len(params) > 2 && params[1] != "" {
+			return nil, errors.New("Invalid third parameter.")
+		}
+		session = &Session{
+			Host:     p.options.Host,
+			Port:     p.options.Port,
+			Database: p.options.Database,
+			User:     p.options.User,
+			Password: p.options.Password,
+		}
 	}
+
+	u := url.URL{
+		Scheme: "postgresql",
+		Host:   session.Host,
+		Path:   session.Database,
+		User:   url.UserPassword(session.User, session.Password),
+	}
+	if session.Port != 0 {
+		u.Host += fmt.Sprintf(":%d", session.Port)
+	}
+	connString = u.String()
 
 	switch key {
 	case keyPostgresDiscoveryDatabases:
@@ -132,8 +176,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyPostgresStat,
 		keyPostgresStatSum:
 		handler = p.dbStatHandler // postgres.stat[[connString][,section]]
-		params = make([]string, 1)
-		params[0] = key
 
 	case keyPostgresBgwriter:
 		handler = p.bgwriterHandler // postgres.bgwriter[[connString]]
@@ -151,8 +193,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		keyPostgresReplicationLagB,
 		keyPostgresReplicationMasterDiscoveryApplicationName:
 		handler = p.replicationHandler // postgres.replication[[connString][,section]]
-		params = make([]string, 1)
-		params[0] = key
 
 	case keyPostgresLocks:
 		handler = p.locksHandler // postgres.locks[[connString]]
@@ -174,15 +214,18 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if key == keyPostgresPing {
 			return postgresPingFailed, nil
 		}
-		p.Errf(err.Error())
-		fmt.Println(" error in get postgres if connection ", key)
-		if len(params) > 0 {
-			fmt.Print(params[0])
-		}
+		p.Errf("connection error: %s", err)
+		p.Debugf("parameters: %+v", params)
 		return nil, errors.New(formatZabbixError(err.Error()))
 	}
 
-	return handler(conn, params)
+	var handlerParams []string
+	if len(params) >= 3 {
+		handlerParams = params[3:]
+	} else {
+		handlerParams = make([]string, 0)
+	}
+	return handler(conn, key, handlerParams)
 }
 
 // init registers metrics.

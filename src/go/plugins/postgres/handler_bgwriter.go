@@ -30,12 +30,12 @@ const (
 )
 
 // bgwriterHandler executes select  with statistics from pg_stat_bgwriter and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) bgwriterHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) bgwriterHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var bgwriterJSON string
 	query := `
-  SELECT row_to_json (T) 
+  SELECT row_to_json (T)
     FROM (
-          SELECT 
+          SELECT
               checkpoints_timed
             , checkpoints_req
             , checkpoint_write_time

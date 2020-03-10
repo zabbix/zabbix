@@ -28,7 +28,7 @@ const (
 )
 
 // statHandler executes select from pg_stat_database command and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) locksHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) locksHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var locksJSON string
 	var err error
 	query := `

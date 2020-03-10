@@ -31,7 +31,7 @@ const (
 )
 
 // archiveHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) archiveHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) archiveHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var archiveCountJSON, archiveSizeJSON string
 	var err error
 	queryArchiveCount := `SELECT row_to_json(T)

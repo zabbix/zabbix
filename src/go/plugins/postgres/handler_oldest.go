@@ -30,10 +30,10 @@ const (
 )
 
 // oldestHandler gets age of the oldest xid if all is OK or nil otherwise.
-func (p *Plugin) oldestHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) oldestHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var resultXID int64
 
-	query := `SELECT greatest(max(age(backend_xmin)), max(age(backend_xid))) 
+	query := `SELECT greatest(max(age(backend_xmin)), max(age(backend_xid)))
 				FROM pg_catalog.pg_stat_activity`
 
 	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&resultXID)

@@ -21,7 +21,6 @@ package postgres
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
 	"zabbix.com/pkg/plugin"
@@ -37,8 +36,8 @@ func TestPlugin_replicationHandler(t *testing.T) {
 	impl.Configure(&plugin.GlobalOptions{}, nil)
 
 	type args struct {
-		conn   *postgresConn
-		params []string
+		conn *postgresConn
+		key  string
 	}
 	tests := []struct {
 		name    string
@@ -49,37 +48,37 @@ func TestPlugin_replicationHandler(t *testing.T) {
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.count"),
 			&impl,
-			args{conn: sharedPool, params: []string{"pgsql.replication.count"}},
+			args{conn: sharedPool, key: "pgsql.replication.count"},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.status"),
 			&impl,
-			args{conn: sharedPool, params: []string{"pgsql.replication.status"}},
+			args{conn: sharedPool, key: "pgsql.replication.status"},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.lag.sec"),
 			&impl,
-			args{conn: sharedPool, params: []string{"pgsql.replication.lag.sec"}},
+			args{conn: sharedPool, key: "pgsql.replication.lag.sec"},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.lag.b"),
 			&impl,
-			args{conn: sharedPool, params: []string{"pgsql.replication.lag.b"}},
+			args{conn: sharedPool, key: "pgsql.replication.lag.b"},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.recovery_role"),
 			&impl,
-			args{conn: sharedPool, params: []string{"pgsql.replication.recovery_role"}},
+			args{conn: sharedPool, key: "pgsql.replication.recovery_role"},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.master.discovery.application_name"),
 			&impl,
-			args{conn: sharedPool, params: []string{"pgsql.replication.master.discovery.application_name"}},
+			args{conn: sharedPool, key: "pgsql.replication.master.discovery.application_name"},
 			false,
 		},
 		{
@@ -92,13 +91,13 @@ func TestPlugin_replicationHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.replicationHandler(tt.args.conn, tt.args.params)
+			got, err := tt.p.replicationHandler(tt.args.conn, tt.args.key, []string{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.replicationHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.wantErr == false {
-				if reflect.DeepEqual(tt.args.params, []string{"pgsql.replication.status"}) || reflect.DeepEqual(tt.args.params, []string{"pgsql.replication.master.discovery.application_name"}) {
+				if tt.args.key == "pgsql.replication.status" || tt.args.key == "pgsql.replication.master.discovery.application_name" {
 					if len(got.(string)) == 0 && err != errorCannotParseData {
 						t.Errorf("Plugin.replicationTransactions() at DeepEqual error = %v, wantErr %v", err, tt.wantErr)
 						return

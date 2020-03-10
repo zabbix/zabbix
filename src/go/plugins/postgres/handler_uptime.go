@@ -30,7 +30,7 @@ const (
 )
 
 // uptimeHandler finds difference btw current time and postmaster start time and returns int64 if all is OK or nil otherwise.
-func (p *Plugin) uptimeHandler(conn *postgresConn, params []string) (interface{}, error) {
+func (p *Plugin) uptimeHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var uptime float64
 	query := `SELECT date_part('epoch', now() - pg_postmaster_start_time());`
 
