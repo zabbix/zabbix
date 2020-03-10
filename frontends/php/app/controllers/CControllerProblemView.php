@@ -40,7 +40,7 @@ class CControllerProblemView extends CController {
 			'filter_application' =>			'string',
 			'filter_triggerids' =>			'array_id',
 			'filter_name' =>				'string',
-			'filter_severity' =>			'in '.implode(',', $severities),
+			'filter_severity' =>			'array',
 			'filter_age_state' =>			'in 1',
 			'filter_age' =>					'int32',
 			'filter_inventory' =>			'array',
