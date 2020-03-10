@@ -46,7 +46,6 @@ $menu
 				'action' => 'latest.view',
 				'alias' => ['history.php', 'chart.php']
 			],
-
 			_('Screens') => [
 				'action' => 'screens.php',
 				'alias' => ['screenconf.php', 'screenedit.php', 'screen.import.php', 'slides.php', 'slideconf.php']

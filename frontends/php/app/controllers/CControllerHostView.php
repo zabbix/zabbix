@@ -87,7 +87,6 @@ class CControllerHostView extends CControllerHost {
 		$sortorder = $this->getInput('sortorder', CProfile::get('web.hostsmon.sortorder', ZBX_SORT_UP));
 		$active_tab = CProfile::get('web.hostsmon.filter.active', 1);
 		CProfile::update('web.hostsmon.filter.active', $active_tab, PROFILE_TYPE_INT);
-
 		CProfile::update('web.hostsmon.sort', $sort, PROFILE_TYPE_STR);
 		CProfile::update('web.hostsmon.sortorder', $sortorder, PROFILE_TYPE_STR);
 
@@ -97,18 +96,14 @@ class CControllerHostView extends CControllerHost {
 			CProfile::updateArray('web.hostsmon.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
 			);
-
 			CProfile::update('web.hostsmon.filter.ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hostsmon.filter.dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hostsmon.filter.port', $this->getInput('filter_port', ''), PROFILE_TYPE_STR);
-
 			$severities = $this->getInput('filter_severities', []);
 			CProfile::updateArray('web.hostsmon.filter.severities', $severities, PROFILE_TYPE_INT);
-
 			CProfile::update('web.hostsmon.filter.status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
 
 			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
-
 			foreach ($this->getInput('filter_tags', []) as $filter_tag) {
 				if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
 					continue;
@@ -125,8 +120,6 @@ class CControllerHostView extends CControllerHost {
 			CProfile::updateArray('web.hostsmon.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.hostsmon.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.hostsmon.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
-
-
 			CProfile::update('web.hostsmon.filter.show_suppressed',
 				$this->getInput('filter_show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE), PROFILE_TYPE_INT
 			);
