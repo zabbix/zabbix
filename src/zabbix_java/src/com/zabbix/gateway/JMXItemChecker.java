@@ -186,13 +186,7 @@ class JMXItemChecker extends ItemChecker
 			if (dataObject instanceof TabularData)
 			{
 				logger.trace("'{}' contains tabular data", attributeName);
-
-				String value = new String();
-
-				if (null == (value = getTabularData((TabularData)dataObject)))
-					throw new ZabbixException("Data object type cannot be converted to string.");
-
-				return value;
+				return getTabularData((TabularData)dataObject);
 			}
 
 			try
@@ -313,12 +307,10 @@ class JMXItemChecker extends ItemChecker
 
 		for (Object value : data.values())
 		{
-			JSONObject tmp = new JSONObject();
+			JSONObject tmp = getCompositeDataValues((CompositeData)value);
 
-			if (null == (tmp = getCompositeDataValues((CompositeData)value)))
-				return null;
-
-			values.put(tmp);
+			if (tmp.length() > 0)
+				values.put(tmp);
 		}
 
 		return values.toString();
@@ -333,11 +325,18 @@ class JMXItemChecker extends ItemChecker
 			Object data = compData.get(key);
 
 			if (data == null)
+			{
 				value.put(key, JSONObject.NULL);
+			}
 			else if (data.getClass().isArray())
-				return null;
+			{
+				logger.trace("found attribute of a known, unsupported type: {}", data.getClass());
+				continue;
+			}
 			else if (data instanceof CompositeData)
+			{
 				value.put(key, getCompositeDataValues((CompositeData)data));
+			}
 			else
 				value.put(key, data);
 		}
@@ -416,17 +415,8 @@ class JMXItemChecker extends ItemChecker
 					{
 						logger.trace("looking for attributes of tabular types");
 
-						String value = new String();
-
-						if (null == (value = getTabularData((TabularData)attribute)))
-						{
-							logger.trace("found attribute of a known, unsupported type: {}", attribute.getClass());
-						}
-						else
-						{
-							formatPrimitiveTypeResult(counters, name, descr, attrInfo.getName(), attribute,
-								propertiesAsMacros, value);
-						}
+						formatPrimitiveTypeResult(counters, name, descr, attrInfo.getName(), attribute,
+							propertiesAsMacros, getTabularData((TabularData)attribute));
 					}
 					else
 					{
