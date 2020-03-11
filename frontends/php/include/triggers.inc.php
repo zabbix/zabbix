@@ -2063,63 +2063,6 @@ function get_item_function_info($expr) {
 }
 
 /**
- * Substitute macros in the expression with the given values and evaluate its result.
- *
- * @param string $expression                A trigger expression.
- * @param array  $replace_function_macros   An array of macro - value pairs.
- *
- * @return bool  The calculated value of the expression.
- */
-function evalExpressionData($expression, $replace_function_macros) {
-	foreach ($replace_function_macros as &$value) {
-		$value = CTriggerExpression::quoteString($value);
-	}
-	unset($value);
-
-	// Replace function macros with their values.
-	$expression = strtr($expression, $replace_function_macros);
-	$parser = new CTriggerExpression();
-	$parse_result = $parser->parse($expression);
-
-	if (!$parse_result) {
-		return false;
-	}
-
-	// Turn the expression into valid PHP code.
-	$eval_str = '';
-	$replace_operators = ['not' => '!', '=' => '=='];
-
-	foreach ($parse_result->getTokens() as $token) {
-		$value = $token['value'];
-
-		switch ($token['type']) {
-			case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
-				// Replace specific operators with their PHP analogues.
-				if (isset($replace_operators[$token['value']])) {
-					$value = $replace_operators[$token['value']];
-				}
-				break;
-
-			case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
-				// Convert numeric values with suffixes.
-				if ($token['data']['suffix'] !== null) {
-					$value = convert($value);
-				}
-
-				$value = '((float) "'.$value.'")';
-				break;
-		}
-
-		$eval_str .= ' '.$value;
-	}
-
-	// Execute expression.
-	eval('$result = ('.trim($eval_str).');');
-
-	return $result;
-}
-
-/**
  * Converts a string representation of various time and byte measures into corresponding SI unit value.
  *
  * @param string $value  String value with byte or time suffix.
