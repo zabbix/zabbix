@@ -141,11 +141,7 @@ if ($data['form']) {
 		->setId($data['form']['id']);
 }
 
-$table_columns = [];
-
-if ($options['hostid'] == 0 && ($data['popup_type'] === 'items' || $data['popup_type'] === 'item_prototypes')) {
-	$table_columns[] = _('Host');
-}
+$table_columns = $options['show_item_hostname'] ? [_('Host')] : [];
 
 if ($data['multiselect'] && $form !== null) {
 	$ch_box = (new CColHeader(
@@ -437,7 +433,7 @@ switch ($data['popup_type']) {
 				$description->onClick($js_action.$js_action_onclick);
 
 				$table->addRow([
-					($options['hostid'] > 0) ? null : $item['hostname'],
+					$options['show_item_hostname'] ? $item['hostname'] : null,
 					$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
 					$description,
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
@@ -469,7 +465,7 @@ switch ($data['popup_type']) {
 				$host = reset($item['hosts']);
 
 				$table->addRow([
-					($options['hostid'] > 0) ? null : $host['name'],
+					$options['show_item_hostname'] ? $host['name'] : null,
 					$data['multiselect']
 						? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid'])
 						: null,

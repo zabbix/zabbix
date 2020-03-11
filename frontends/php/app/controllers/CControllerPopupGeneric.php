@@ -637,7 +637,7 @@ class CControllerPopupGeneric extends CController {
 				unset($templates);
 			}
 
-			$this->hostids = zbx_objectValues($hosts, 'id');
+			$this->hostids = array_column($hosts, 'id');
 			$filter['hosts'] = [
 				'multiple' => false,
 				'name' => 'popup_host',
@@ -698,6 +698,9 @@ class CControllerPopupGeneric extends CController {
 			}
 		}
 
+		$page_options['show_item_hostname'] = (!$this->hasInput('only_hostid') && !$this->hasInput('hostid')
+			&& ($this->source_table === 'items' || $this->source_table === 'item_prototypes'));
+
 		return $page_options;
 	}
 
@@ -726,7 +729,7 @@ class CControllerPopupGeneric extends CController {
 			'popup_type' => $this->source_table,
 			'filter' => $filters,
 			'form' => array_key_exists('form', $popup) ? $popup['form'] : null,
-			'options' => $this->page_options + ['hostid' => reset($this->hostids)],
+			'options' => $this->page_options,
 			'multiselect' => $this->getInput('multiselect', 0),
 			'table_columns' => $popup['table_columns'],
 			'table_records' => $records,
