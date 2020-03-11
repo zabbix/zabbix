@@ -25,8 +25,7 @@ require_once dirname(__FILE__).'/../traits/FilterTrait.php';
  * @backup widget
  * @backup profiles
  *
- * @on-before disableDebugMode, setDefaultWidgetType
- * @on-after enableDebugMode
+ * @on-before setDefaultWidgetType
  */
 class testGraphWidget extends CWebTest {
 
@@ -2447,20 +2446,5 @@ class testGraphWidget extends CWebTest {
 		foreach ($fields as $field) {
 			$this->assertTrue($form->getField($field)->isEnabled($enabled));
 		}
-	}
-
-	/*
-	 * Debug button sometime overlaps widget edit icon, after widget creation.
-	 */
-	public static function setDebugMode($value) {
-		DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($value).' WHERE usrgrpid=7');
-	}
-
-	public function disableDebugMode() {
-		self::setDebugMode(0);
-	}
-
-	public static function enableDebugMode() {
-		self::setDebugMode(1);
 	}
 }

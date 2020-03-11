@@ -107,8 +107,6 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_RemoveFavouriteGraphs() {
-		// Disable debug mode. Debug button overlaps delete graph icon.
-		DBexecute("UPDATE usrgrp SET debug_mode=0 WHERE usrgrpid=7");
 		$exception = null;
 
 		try {
@@ -126,8 +124,6 @@ class testPageDashboard extends CLegacyWebTest {
 			$exception = $e;
 		}
 
-		// Enable debug mode.
-		DBexecute("UPDATE usrgrp SET debug_mode=1 WHERE usrgrpid=7");
 		if ($exception !== null) {
 			throw $exception;
 		}
