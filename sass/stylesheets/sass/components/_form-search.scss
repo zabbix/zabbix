@@ -1,6 +1,6 @@
 $form-search-icon-opacity: .75 !default;
-$form-search-icon-bg-position: -540px -616px !default;
-$form-search-icon-hover-bg-position: -570px -616px !default;
+$form-search-icon-bg-position: -539px -616px !default;
+$form-search-icon-hover-bg-position: -569px -616px !default;
 
 .form-search {
 	position: relative;
@@ -13,31 +13,36 @@ $form-search-icon-hover-bg-position: -570px -616px !default;
 		left: 0;
 		width: 100%;
 		height: 24px;
+
 		padding-right: 20px;
 		color: $form-search-color;
 		background: $form-search-bg-color;
 		border: 1px solid $form-search-border-color;
 		border-radius: 3px;
 
-		&:focus ~ .search-icon {
-			opacity: 1;
-		}
-
+		&:focus ~ .search-icon,
 		&:hover ~ .search-icon {
-			background-position: $form-search-icon-hover-bg-position;
+			opacity: 1;
 		}
 	}
 
 	.search-icon {
 		position: absolute;
 		top: 0;
-		right: -1px;
+		right: 0;
 		width: 24px;
 		height: 24px;
+		padding: 0;
 		background: url(../img/icon-sprite.svg) no-repeat $form-search-icon-bg-position;
+		border: 0;
 		opacity: $form-search-icon-opacity;
 		transform: scale(.8);
 		cursor: pointer;
+
+		&:focus {
+			opacity: 1;
+			background-position: $form-search-icon-hover-bg-position;
+		}
 
 		&:hover {
 			background-position: $form-search-icon-hover-bg-position;

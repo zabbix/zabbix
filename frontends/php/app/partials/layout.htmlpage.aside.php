@@ -36,7 +36,9 @@ $search = (new CForm('get', 'zabbix.php'))
 			->setAttribute('autocomplete', 'off')
 			->addClass(ZBX_STYLE_SEARCH)
 			->setAttribute('aria-label', _('type here to search')),
-		(new CLabel('', 'search'))->addClass('search-icon')
+		(new CSubmitButton(null))
+			->addClass('search-icon')
+			->setTitle(_('Search'))
 	]);
 
 $server_name = ($data['server_name'] !== '')

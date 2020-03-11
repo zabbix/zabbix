@@ -436,23 +436,26 @@ footer {
     background: #092637;
     border: 1px solid #010a0f;
     border-radius: 3px; }
-    .form-search .search:focus ~ .search-icon {
+    .form-search .search:focus ~ .search-icon, .form-search .search:hover ~ .search-icon {
       opacity: 1; }
-    .form-search .search:hover ~ .search-icon {
-      background-position: -570px -616px; }
   .form-search .search-icon {
     position: absolute;
     top: 0;
-    right: -1px;
+    right: 0;
     width: 24px;
     height: 24px;
-    background: url(../img/icon-sprite.svg) no-repeat -540px -616px;
+    padding: 0;
+    background: url(../img/icon-sprite.svg) no-repeat -539px -616px;
+    border: 0;
     opacity: 0.75;
     transform: scale(0.8);
     cursor: pointer;
     transition: opacity 3s; }
+    .form-search .search-icon:focus {
+      opacity: 1;
+      background-position: -569px -616px; }
     .form-search .search-icon:hover {
-      background-position: -570px -616px; }
+      background-position: -569px -616px; }
 
 .search-suggest {
   position: absolute;
