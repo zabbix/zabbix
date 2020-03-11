@@ -26,10 +26,6 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-
-//#include "zbxalgo.h"
-
-
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t	error;

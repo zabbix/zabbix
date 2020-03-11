@@ -257,10 +257,9 @@ void	get_trigger_expression_constant(const char *expression, const zbx_token_ref
 	{
 		if (index < reference->index)
 		{
-			if ('\"' == expression[number.r+1])
-			{
-				number.r = number.r+1;
-			}
+			if ('\"' == expression[number.r + 1])
+				number.r = number.r + 1;
+
 			continue;
 		}
 		*length = number.r - number.l + 1;
@@ -278,6 +277,7 @@ void	get_trigger_expression_constant(const char *expression, const zbx_token_ref
 					// every slash and quote symbol must be escaped at this stage
 					THIS_SHOULD_NEVER_HAPPEN;
 				}
+
 				i++;
 			}
 
@@ -2798,7 +2798,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
-	char			c, *replace_to = NULL,  *replace = NULL, sql[64];
+	char			c, *replace_to = NULL, *replace = NULL, sql[64];
 	const char		*m;
 	int			N_functionid, indexed_macro, require_numeric, require_address, ret, res = SUCCEED,
 				pos = 0, found,
