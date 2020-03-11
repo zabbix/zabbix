@@ -9618,9 +9618,8 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 			zbx_free(escape_escaped_value);
 			escape_quote_escaped_value_len = strlen(escape_quote_escaped_value);
 
-			value = zbx_malloc(NULL, escape_quote_escaped_value_len + 2);
-			zbx_strlcpy(value ,escape_quote_escaped_value, escape_quote_escaped_value_len + 1);
-			value[escape_quote_escaped_value_len + 1] = '\0';
+			value = zbx_malloc(NULL, escape_quote_escaped_value_len + 1);
+			zbx_strlcpy(value, escape_quote_escaped_value, escape_quote_escaped_value_len + 1);
 			zbx_free(escape_quote_escaped_value);
 
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);

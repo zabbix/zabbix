@@ -1138,17 +1138,21 @@ static int	evaluate_LAST(char **value, DC_ITEM *item, const char *parameters, co
 					ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
 				int	escape_quote_escaped_value_len;
-				char	*escape_escaped_value = zbx_dyn_escape_string(*value, "\\");
+				char	*escape_escaped_value = NULL, *escape_quote_escaped_value = NULL;
+
+				escape_escaped_value = zbx_dyn_escape_string(*value, "\\");
 				zbx_free(*value);
 
-				char	*escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value, "\"");
+				escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value, "\"");
 				zbx_free(escape_escaped_value);
+
 				escape_quote_escaped_value_len = strlen(escape_quote_escaped_value);
 
 				*value = zbx_malloc(NULL, escape_quote_escaped_value_len + 3);
 				(*value)[0] = '"';
 				zbx_strlcpy((*value) + 1, escape_quote_escaped_value,
 						escape_quote_escaped_value_len + 1);
+
 				(*value)[escape_quote_escaped_value_len + 1] = '"';
 				(*value)[escape_quote_escaped_value_len + 2] = '\0';
 				zbx_free(escape_quote_escaped_value);
@@ -2795,8 +2799,8 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 	}
 	else
 	{
-		*value = zbx_malloc(NULL, 1);
-		*value = '\0';
+		*value = zbx_malloc(*value, 1);
+		(*value)[0] = '\0';
 		*error = zbx_strdup(*error, "function is not supported");
 		ret = FAIL;
 	}

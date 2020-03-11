@@ -249,11 +249,11 @@ void	get_trigger_expression_constant(const char *expression, const zbx_token_ref
 {
 	size_t		pos;
 	zbx_strloc_t	number;
-	int		index;
-	char		*tmp = NULL;
+	int		index, ii, i;
+	const char	*tmp = NULL;
 
-	for (pos = 0, index = 1; SUCCEED == zbx_number_or_string_find(expression, pos, &number)
-			; pos = number.r + 1, index++)
+	for (pos = 0, index = 1; SUCCEED == zbx_number_or_string_find(expression, pos, &number);
+			pos = number.r + 1, index++)
 	{
 		if (index < reference->index)
 		{
@@ -263,14 +263,14 @@ void	get_trigger_expression_constant(const char *expression, const zbx_token_ref
 			continue;
 		}
 		*length = number.r - number.l + 1;
-		*constant = zbx_malloc(NULL, *length+1);
+		*constant = zbx_malloc(NULL, *length + 1);
 		tmp = expression + number.l;
 
 		// unescape
-		int ii = 0;
-		for (int i =0; i < *length; ++i)
+		ii = 0;
+		for (i = 0; i < *length; ++i)
 		{
-			if ('\\' == *(tmp+i) )
+			if ('\\' == *(tmp + i))
 			{
 				if('\\' != *(tmp + i + 1) && '\"' != *(tmp + i + 1))
 				{
@@ -289,7 +289,6 @@ void	get_trigger_expression_constant(const char *expression, const zbx_token_ref
 		*length = ii;
 
 		return;
-
 	}
 
 	*length = 0;
@@ -5046,6 +5045,9 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
 			ret_unknown = 1;
 		}
+
+		zbx_free(value);
+		value = zbx_malloc(value, MAX_BUFFER_LEN);
 
 		if (0 == ret_unknown && SUCCEED != evaluate_function(&value, &items[i], func->function,
 				func->parameter, &func->timespec, &error))
