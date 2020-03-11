@@ -22,9 +22,6 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup screens
- *
- * @on-before disableDebugMode
- * @on-after enableDebugMode
  */
 class testZBX6339 extends CLegacyWebTest {
 
@@ -72,20 +69,5 @@ class testZBX6339 extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestCheckHeader('Screens');
 		$this->zbxTestTextPresent(['Screen deleted', $host]);
-	}
-
-	/**
-	 * Debug button sometimes overlaps element and impossible to click on it.
-	 */
-	public static function setDebugMode($value) {
-		DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($value).' WHERE usrgrpid=7');
-	}
-
-	public function disableDebugMode() {
-		self::setDebugMode(0);
-	}
-
-	public static function enableDebugMode() {
-		self::setDebugMode(1);
 	}
 }
