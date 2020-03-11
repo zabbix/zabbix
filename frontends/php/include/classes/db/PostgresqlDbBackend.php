@@ -130,6 +130,8 @@ class PostgresqlDbBackend extends DbBackend {
 			));
 			return false;
 		}
+
+		return true;
 	}
 
 	/**
