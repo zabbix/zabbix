@@ -32,11 +32,8 @@
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			'&rArr;',
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
-					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					->setAttribute('placeholder', _('value'))
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
@@ -56,65 +53,39 @@
 </script>
 
 <script type="text/javascript">
-	jQuery(function($) {
-		function initMacroFields($parent) {
-			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $parent).not('.initialized-field').each(function() {
-				var $obj = $(this);
+	jQuery(function() {
+		const table = jQuery('#tbl_macros');
+		let removed = 0;
 
-				$obj.addClass('initialized-field');
-
-				if ($obj.hasClass('macro')) {
-					$obj.on('change keydown', function(e) {
-						if (e.type === 'change' || e.which === 13) {
-							macroToUpperCase(this);
-							$obj.textareaFlexible();
-						}
-					});
-				}
-
-				$obj.textareaFlexible();
-			});
-		}
-
-		$('#tbl_macros')
+		table
 			.on('click', 'button.element-table-remove', function() {
 				// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
-				var macroNum = $(this).attr('id').split('_')[1];
-				if ($('#macros_' + macroNum + '_globalmacroid').length) {
-					var count = $('#update').data('removedCount') + 1;
-					$('#update').data('removedCount', count);
-				}
+				removed += jQuery('#macros_' + jQuery(this).attr('id').split('_')[1] + '_globalmacroid').length;
 			})
 			.dynamicRows({template: '#macro-row-tmpl'})
-			.on('click', 'button.element-table-add', function() {
-				initMacroFields($('#tbl_macros'));
-			});
+			.on('afteradd.dynamicRows', function() {
+				jQuery('.input-group', table).macroValue();
+			})
+			.find('.input-group')
+			.macroValue();
 
-		initMacroFields($('#tbl_macros'));
+		table
+			.on('change keydown', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>.macro', function(event) {
+				if (event.type === 'change' || event.which === 13) {
+					jQuery(this)
+						.val(jQuery(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')))
+						.textareaFlexible();
+				}
+			})
+			.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+			.textareaFlexible();
 
-		$('#update').click(function() {
-			var removedCount = $(this).data('removedCount');
-
-			if (removedCount) {
-				return confirm(<?= json_encode(_('Are you sure you want to delete')) ?> + ' ' + removedCount + ' '
+		jQuery('#update').click(function() {
+			if (removed) {
+				return confirm(<?= json_encode(_('Are you sure you want to delete')) ?> + ' ' + removed + ' '
 					+ <?= json_encode(_('macro(s)')) ?> + '?'
 				);
 			}
 		});
-
-		function macroToUpperCase(element) {
-			var macro = $(element).val(),
-				end = macro.indexOf(':');
-
-			if (end == -1) {
-				$(element).val(macro.toUpperCase());
-			}
-			else {
-				var macro_part = macro.substr(0, end),
-					context_part = macro.substr(end, macro.length);
-
-				$(element).val(macro_part.toUpperCase() + context_part);
-			}
-		}
 	});
 </script>

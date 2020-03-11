@@ -76,8 +76,6 @@ $timeline = getTimeSelectorPeriod([
 	'to' => getRequest('to')
 ]);
 
-CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
-
 $graph = new CLineGraphDraw($dbGraph['graphtype']);
 
 if (getRequest('widget_view') === '1') {

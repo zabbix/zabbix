@@ -37,6 +37,10 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
+#ifdef HAVE_NETSNMP
+static volatile sig_atomic_t	snmp_cache_reload_requested;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: tm_execute_remote_command                                        *
@@ -354,6 +358,16 @@ static void	tm_remove_old_tasks(int now)
 	DBcommit();
 }
 
+static void	zbx_taskmanager_sigusr_handler(int flags)
+{
+#ifdef HAVE_NETSNMP
+	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+		snmp_cache_reload_requested = 1;
+#else
+	ZBX_UNUSED(flags);
+#endif
+}
+
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
 	static int	cleanup_time = 0;
@@ -367,11 +381,14 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 #ifdef HAVE_NETSNMP
 	zbx_init_snmp();
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
@@ -383,12 +400,22 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
+	zbx_set_sigusr_handler(zbx_taskmanager_sigusr_handler);
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_sleep_loop(sleeptime);
 
 		sec1 = zbx_time();
 		zbx_update_env(sec1);
+
+#ifdef HAVE_NETSNMP
+		if (1 == snmp_cache_reload_requested)
+		{
+			zbx_clear_cache_snmp();
+			snmp_cache_reload_requested = 0;
+		}
+#endif
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 

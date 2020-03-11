@@ -950,7 +950,7 @@ class CTemplate extends CHostGeneral {
 			DB::delete('hostmacro', ['hostid' => $templateIds]);
 
 			$this->massAdd([
-				'hosts' => $templates,
+				'templates' => $templates,
 				'macros' => $data['macros']
 			]);
 		}

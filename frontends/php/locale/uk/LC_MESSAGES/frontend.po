@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-17 12:04+0200\n"
+"POT-Creation-Date: 2020-02-21 11:12+0200\n"
 "PO-Revision-Date: 2019-10-10 13:52+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -306,7 +306,7 @@ msgstr "1 хвилина"
 msgid "10 seconds"
 msgstr "10 секунд"
 
-#: include/views/reports.toptriggers.php:117 toptriggers.php:25
+#: include/views/reports.toptriggers.php:111 toptriggers.php:25
 msgid "100 busiest triggers"
 msgstr "100 найбільш активних тригерів"
 
@@ -397,9 +397,9 @@ msgstr[2] "Обліковий запис заблокоровано на %1$s с
 #: app/views/monitoring.widget.problems.view.php:68
 #: include/actions.inc.php:157 include/blocks.inc.php:753
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:908
-#: include/classes/screens/CScreenProblem.php:933
-#: include/classes/screens/CScreenProblem.php:1188 include/events.inc.php:255
+#: include/classes/screens/CScreenProblem.php:912
+#: include/classes/screens/CScreenProblem.php:937
+#: include/classes/screens/CScreenProblem.php:1192 include/events.inc.php:255
 #: include/events.inc.php:467
 msgid "Ack"
 msgstr "Підтверджено"
@@ -547,10 +547,10 @@ msgstr "Дію оновлено"
 #: app/views/monitoring.dashboard.view.php:89
 #: app/views/monitoring.widget.problems.view.php:69 include/blocks.inc.php:754
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:909
-#: include/classes/screens/CScreenProblem.php:934
-#: include/classes/screens/CScreenProblem.php:1189
-#: include/classes/screens/CScreenProblem.php:1250 include/events.inc.php:256
+#: include/classes/screens/CScreenProblem.php:913
+#: include/classes/screens/CScreenProblem.php:938
+#: include/classes/screens/CScreenProblem.php:1193
+#: include/classes/screens/CScreenProblem.php:1254 include/events.inc.php:256
 #: include/forms.inc.php:1249 include/menu.inc.php:123
 #: include/menu.inc.php:152 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:74
@@ -704,7 +704,7 @@ msgstr "Активно до"
 #: include/views/configuration.triggers.edit.php:354
 #: include/views/configuration.triggers.edit.php:606
 #: include/views/configuration.triggers.edit.php:639
-#: include/views/configuration.triggers.list.php:133
+#: include/views/configuration.triggers.list.php:127
 #: include/views/configuration.triggers.massupdate.php:84
 #: include/views/configuration.triggers.massupdate.php:139
 #: include/views/js/configuration.action.edit.js.php:308
@@ -1001,7 +1001,7 @@ msgstr "Та"
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.maintenance.edit.php:143
 #: include/views/configuration.template.list.php:37
-#: include/views/configuration.triggers.list.php:103
+#: include/views/configuration.triggers.list.php:97
 msgid "And/Or"
 msgstr "Та/Або"
 
@@ -1559,8 +1559,8 @@ msgstr "CERT"
 #: app/views/monitoring.widget.problems.view.php:99
 #: include/classes/graph/CSvgGraph.php:1050
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:1008
-#: include/classes/screens/CScreenProblem.php:1211 include/events.inc.php:345
+#: include/classes/screens/CScreenProblem.php:1012
+#: include/classes/screens/CScreenProblem.php:1215 include/events.inc.php:345
 #: include/events.inc.php:547
 msgid "CLOSING"
 msgstr "ЗАКРИТТЯ"
@@ -3837,7 +3837,7 @@ msgstr "Контактна інформація"
 #: include/views/configuration.maintenance.edit.php:158
 #: include/views/configuration.maintenance.edit.php:179
 #: include/views/configuration.template.list.php:50
-#: include/views/configuration.triggers.list.php:116
+#: include/views/configuration.triggers.list.php:110
 #: include/views/js/configuration.host.list.js.php:33
 #: include/views/js/configuration.maintenance.edit.js.php:33
 #: include/views/js/configuration.template.list.js.php:33
@@ -3880,7 +3880,7 @@ msgstr "Містить"
 #: include/views/configuration.maintenance.list.php:44
 #: include/views/configuration.template.list.php:128
 #: include/views/configuration.trigger.prototype.list.php:35
-#: include/views/configuration.triggers.list.php:178
+#: include/views/configuration.triggers.list.php:172
 #: include/views/monitoring.charts.php:63
 #: include/views/monitoring.history.php:220
 #: include/views/monitoring.hostscreen.php:67
@@ -3929,7 +3929,7 @@ msgstr "Координати"
 #: include/views/configuration.copy.elements.php:77
 #: include/views/configuration.graph.list.php:156
 #: include/views/configuration.item.list.php:252
-#: include/views/configuration.triggers.list.php:339 jsLoader.php:203
+#: include/views/configuration.triggers.list.php:333 jsLoader.php:203
 msgid "Copy"
 msgstr "Копіювати"
 
@@ -4163,11 +4163,11 @@ msgstr "Створити слайд-шоу"
 msgid "Create template"
 msgstr "Створити шаблон"
 
-#: include/views/configuration.triggers.list.php:172 jsLoader.php:266
+#: include/views/configuration.triggers.list.php:166 jsLoader.php:266
 msgid "Create trigger"
 msgstr "Створити тригер"
 
-#: include/views/configuration.triggers.list.php:177
+#: include/views/configuration.triggers.list.php:171
 msgid "Create trigger (select host first)"
 msgstr "Створити тригер (оберіть спочатку вузел мережі)"
 
@@ -4619,7 +4619,7 @@ msgstr "Затримується на"
 #: include/views/configuration.maintenance.list.php:116
 #: include/views/configuration.template.list.php:298
 #: include/views/configuration.trigger.prototype.list.php:169
-#: include/views/configuration.triggers.list.php:341
+#: include/views/configuration.triggers.list.php:335
 #: include/views/monitoring.screen.list.php:134
 #: include/views/monitoring.slideconf.list.php:106
 #: include/views/monitoring.sysmap.list.php:105 jsLoader.php:122
@@ -4854,7 +4854,7 @@ msgstr "Видалити вибрані шаблони?"
 msgid "Delete selected trigger prototypes?"
 msgstr "Видалити вибрані прототипи тригерів?"
 
-#: include/views/configuration.triggers.list.php:341
+#: include/views/configuration.triggers.list.php:335
 msgid "Delete selected triggers?"
 msgstr "Видалити вибрані тригери?"
 
@@ -4961,7 +4961,7 @@ msgstr "Залежний елемент даних"
 #: app/views/popup.generic.php:298 include/triggers.inc.php:2741
 #: include/views/configuration.services.edit.php:156
 #: include/views/configuration.trigger.prototype.list.php:86
-#: include/views/configuration.triggers.list.php:245
+#: include/views/configuration.triggers.list.php:239
 msgid "Depends on"
 msgstr "Залежить від"
 
@@ -5050,7 +5050,7 @@ msgstr "Розмір папки (в байтах). Повертає ціле"
 #: include/views/configuration.host.list.php:442
 #: include/views/configuration.httpconf.list.php:170
 #: include/views/configuration.item.list.php:247
-#: include/views/configuration.triggers.list.php:338
+#: include/views/configuration.triggers.list.php:332
 msgid "Disable"
 msgstr "Дезактивувати"
 
@@ -5120,7 +5120,7 @@ msgstr "Дезактивувати вибрані методи повідомл�
 msgid "Disable selected modules?"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:338
+#: include/views/configuration.triggers.list.php:332
 msgid "Disable selected triggers?"
 msgstr "Дезактивувати вибрані тригери?"
 
@@ -5176,7 +5176,7 @@ msgid "Discard value"
 msgstr "Відкинути значення"
 
 #: include/discovery.inc.php:138 include/forms.inc.php:544
-#: include/views/configuration.triggers.list.php:148
+#: include/views/configuration.triggers.list.php:142
 msgid "Discovered"
 msgstr "Виявлено"
 
@@ -5537,9 +5537,9 @@ msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Дублікат usrgrpid \"%1$s\" у групах користувачів для комплексного екрану \"%2$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:752
-#: include/classes/screens/CScreenProblem.php:907
-#: include/classes/screens/CScreenProblem.php:932
-#: include/classes/screens/CScreenProblem.php:1187 include/events.inc.php:254
+#: include/classes/screens/CScreenProblem.php:911
+#: include/classes/screens/CScreenProblem.php:936
+#: include/classes/screens/CScreenProblem.php:1191 include/events.inc.php:254
 #: include/events.inc.php:466 include/views/configuration.action.edit.php:170
 msgid "Duration"
 msgstr "Тривалість"
@@ -5772,7 +5772,7 @@ msgstr "Пустий ID комплексного екрану."
 #: include/views/configuration.host.list.php:441
 #: include/views/configuration.httpconf.list.php:169
 #: include/views/configuration.item.list.php:246
-#: include/views/configuration.triggers.list.php:337
+#: include/views/configuration.triggers.list.php:331
 msgid "Enable"
 msgstr "Активувати"
 
@@ -5860,7 +5860,7 @@ msgstr "Активувати вибрані методи повідомлень?
 msgid "Enable selected modules?"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:337
+#: include/views/configuration.triggers.list.php:331
 msgid "Enable selected triggers?"
 msgstr "Активувати вибрані тригери?"
 
@@ -5947,7 +5947,7 @@ msgstr "Англійська (en_US)"
 #: include/views/configuration.maintenance.edit.php:159
 #: include/views/configuration.maintenance.edit.php:180
 #: include/views/configuration.template.list.php:51
-#: include/views/configuration.triggers.list.php:117
+#: include/views/configuration.triggers.list.php:111
 #: include/views/js/configuration.host.list.js.php:34
 #: include/views/js/configuration.maintenance.edit.js.php:34
 #: include/views/js/configuration.template.list.js.php:34
@@ -6163,7 +6163,7 @@ msgstr "Експортувати в CSV"
 #: include/views/configuration.triggers.edit.php:208
 #: include/views/configuration.triggers.edit.php:310
 #: include/views/configuration.triggers.edit.php:406
-#: include/views/configuration.triggers.list.php:205
+#: include/views/configuration.triggers.list.php:199
 #: include/views/js/configuration.triggers.edit.js.php:47
 #: trigger_prototypes.php:40 trigger_prototypes.php:51 triggers.php:47
 #: triggers.php:58
@@ -6418,14 +6418,14 @@ msgstr "Заповнений регіон"
 #: include/views/configuration.httpconf.list.php:29
 #: include/views/configuration.maintenance.list.php:49
 #: include/views/configuration.template.list.php:77
-#: include/views/configuration.triggers.list.php:166
+#: include/views/configuration.triggers.list.php:160
 #: include/views/inventory.host.list.php:53
 #: include/views/monitoring.history.php:249
 #: include/views/monitoring.overview.items.php:97
 #: include/views/monitoring.screen.list.php:64
 #: include/views/monitoring.slideconf.list.php:52
 #: include/views/monitoring.sysmap.list.php:44
-#: include/views/reports.toptriggers.php:81 report2.php:452
+#: include/views/reports.toptriggers.php:75 report2.php:452
 msgid "Filter"
 msgstr "Фільтр"
 
@@ -6703,7 +6703,7 @@ msgstr "Градієнтна лінія"
 #: app/partials/monitoring.latest.view.html.php:374 charts.php:99
 #: include/audit.inc.php:30
 #: include/classes/macros/CMacrosResolverGeneral.php:848
-#: include/classes/screens/CScreenProblem.php:1324
+#: include/classes/screens/CScreenProblem.php:1328
 #: include/classes/widgets/CWidgetConfig.php:49
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
@@ -7160,7 +7160,7 @@ msgstr "Підсвічувати весь рядок"
 #: app/views/monitoring.acknowledge.edit.php:38
 #: app/views/monitoring.problem.view.php:100 history.php:27
 #: include/classes/macros/CMacrosResolverGeneral.php:853
-#: include/classes/screens/CScreenProblem.php:1329
+#: include/classes/screens/CScreenProblem.php:1333
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:284 include/forms.inc.php:718
@@ -7231,9 +7231,9 @@ msgstr "Вирівнювання по горизонталі"
 #: include/classes/screens/CScreenHostTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:185
 #: include/classes/screens/CScreenHttpTest.php:116
-#: include/classes/screens/CScreenProblem.php:903
-#: include/classes/screens/CScreenProblem.php:927
-#: include/classes/screens/CScreenProblem.php:1184
+#: include/classes/screens/CScreenProblem.php:907
+#: include/classes/screens/CScreenProblem.php:931
+#: include/classes/screens/CScreenProblem.php:1188
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:274
 #: include/classes/widgets/forms/CWidgetFormProblems.php:205
@@ -7249,7 +7249,7 @@ msgstr "Вирівнювання по горизонталі"
 #: include/views/configuration.httpconf.list.php:53
 #: include/views/configuration.httpconf.list.php:90
 #: include/views/configuration.item.list.php:65
-#: include/views/configuration.triggers.list.php:202
+#: include/views/configuration.triggers.list.php:196
 #: include/views/inventory.host.list.php:72
 #: include/views/inventory.host.view.php:153
 #: include/views/inventory.host.view.php:175
@@ -7259,7 +7259,7 @@ msgstr "Вирівнювання по горизонталі"
 #: include/views/monitoring.screen.constructor.edit.php:511
 #: include/views/monitoring.screen.php:84
 #: include/views/monitoring.slides.php:82
-#: include/views/reports.toptriggers.php:84 items.php:997 items.php:1412
+#: include/views/reports.toptriggers.php:78 items.php:997 items.php:1412
 #: jsLoader.php:187 queue.php:270 report2.php:435 report2.php:458
 msgid "Host"
 msgid_plural "Hosts"
@@ -7946,7 +7946,7 @@ msgstr "Недоступний елемент даних"
 msgid "Inaccessible item prototype"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:416
+#: include/classes/screens/CScreenProblem.php:420
 #: include/hostgroups.inc.php:288 include/triggers.inc.php:2372
 #: include/views/configuration.host.list.php:242
 #: include/views/inventory.host.view.php:40
@@ -9120,8 +9120,8 @@ msgstr "Індонезійська (id_ID)"
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
 #: include/blocks.inc.php:748 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:902
-#: include/classes/screens/CScreenProblem.php:926
+#: include/classes/screens/CScreenProblem.php:906
+#: include/classes/screens/CScreenProblem.php:930
 #: include/views/administration.auditacts.list.php:67
 #: include/views/configuration.application.list.php:71
 #: include/views/configuration.host.discovery.list.php:64
@@ -9133,7 +9133,7 @@ msgstr "Індонезійська (id_ID)"
 #: include/views/configuration.trigger.prototype.edit.php:384
 #: include/views/configuration.triggers.edit.php:210
 #: include/views/configuration.triggers.edit.php:408
-#: include/views/configuration.triggers.list.php:207
+#: include/views/configuration.triggers.list.php:201
 msgid "Info"
 msgstr "Інфо"
 
@@ -9146,7 +9146,7 @@ msgstr "Інформація"
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Інформація про сервіс. Повертає ціле число для параметрів state, startup; рядок - для параметрів displayname, path, user; текст - для параметра description; Особливості для state: 0 - запущений, 1 - призупинений, 2 - запускається, 3 - призупиняється, 4 - відновлюється, 5 - зупиняється, 6 - зупинений, 7 - невідомо, 255 - сервіс відсутній; Особливості для startup: 0 - автоматичний, 1 - автоматичний з затримкою, 2 - вручну, 3 - відімкнений, 4 - невідомо"
 
-#: include/views/configuration.triggers.list.php:141
+#: include/views/configuration.triggers.list.php:135
 msgid "Inherited"
 msgstr "Успадковано"
 
@@ -10839,13 +10839,13 @@ msgstr "Помітити тільки відібрані"
 msgid "Mask"
 msgstr "Маска"
 
-#: include/classes/screens/CScreenProblem.php:1165
+#: include/classes/screens/CScreenProblem.php:1169
 #: include/views/configuration.host.list.php:452
 #: include/views/configuration.item.list.php:253
 #: include/views/configuration.item.prototype.list.php:178
 #: include/views/configuration.template.list.php:297
 #: include/views/configuration.trigger.prototype.list.php:168
-#: include/views/configuration.triggers.list.php:340
+#: include/views/configuration.triggers.list.php:334
 msgid "Mass update"
 msgstr "Масове оновлення"
 
@@ -11074,7 +11074,7 @@ msgstr ""
 msgid "Message/Command"
 msgstr "Повідомлення/Команда"
 
-#: include/classes/screens/CScreenProblem.php:1243
+#: include/classes/screens/CScreenProblem.php:1247
 msgid "Messages"
 msgstr "Повідомлення"
 
@@ -11132,7 +11132,6 @@ msgstr "Мінімально необхідний розмір PHP post - %s (п
 
 #: app/partials/common.filter.trigger.php:47
 #: app/views/monitoring.map.view.php:46
-#: app/views/monitoring.problem.view.php:173
 #: include/views/monitoring.sysmap.edit.php:226
 msgid "Minimum severity"
 msgstr "Мінімальна важливість"
@@ -11472,7 +11471,7 @@ msgstr "NTLM"
 #: include/views/configuration.triggers.edit.php:86
 #: include/views/configuration.triggers.edit.php:576
 #: include/views/configuration.triggers.list.php:62
-#: include/views/configuration.triggers.list.php:203
+#: include/views/configuration.triggers.list.php:197
 #: include/views/configuration.triggers.massupdate.php:90
 #: include/views/configuration.triggers.massupdate.php:102
 #: include/views/inventory.host.list.php:74
@@ -11613,8 +11612,8 @@ msgstr "Наступний крок"
 #: app/views/popup.condition.common.php:647 include/actions.inc.php:33
 #: include/blocks.inc.php:626 include/blocks.inc.php:859
 #: include/classes/screens/CScreenHostTriggers.php:273
-#: include/classes/screens/CScreenProblem.php:1132
-#: include/classes/screens/CScreenProblem.php:1268 include/events.inc.php:179
+#: include/classes/screens/CScreenProblem.php:1136
+#: include/classes/screens/CScreenProblem.php:1272 include/events.inc.php:179
 #: include/events.inc.php:381 include/events.inc.php:606
 #: include/triggers.inc.php:1289 include/triggers.inc.php:1294
 #: include/views/configuration.host.prototype.list.php:130
@@ -11622,9 +11621,9 @@ msgstr "Наступний крок"
 #: include/views/configuration.item.prototype.list.php:106
 #: include/views/configuration.trigger.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.massupdate.php:66
-#: include/views/configuration.triggers.list.php:145
-#: include/views/configuration.triggers.list.php:152
-#: include/views/configuration.triggers.list.php:159
+#: include/views/configuration.triggers.list.php:139
+#: include/views/configuration.triggers.list.php:146
+#: include/views/configuration.triggers.list.php:153
 #: include/views/configuration.triggers.massupdate.php:68
 msgid "No"
 msgstr "Ні"
@@ -12223,7 +12222,7 @@ msgstr "Немає"
 
 #: app/views/popup.generic.php:517 include/graphs.inc.php:24
 #: include/items.inc.php:158 include/triggers.inc.php:1282
-#: include/views/configuration.triggers.list.php:75
+#: include/views/configuration.triggers.list.php:69
 #: include/views/monitoring.history.php:236
 msgid "Normal"
 msgstr "Звичайний"
@@ -12384,7 +12383,7 @@ msgstr "Кількість рядків"
 msgid "Number of slides"
 msgstr "Кількість слайдів"
 
-#: include/views/reports.toptriggers.php:84
+#: include/views/reports.toptriggers.php:78
 msgid "Number of status changes"
 msgstr "Кількість змін стану"
 
@@ -12556,7 +12555,7 @@ msgstr "Вимкн"
 #: app/views/report.services.php:72 app/views/report.services.php:73
 #: app/views/report.services.php:74 app/views/report.services.php:75
 #: include/classes/html/CTriggersInfo.php:76
-#: include/views/configuration.triggers.list.php:89
+#: include/views/configuration.triggers.list.php:83
 #: include/views/js/common.item.edit.js.php:359
 #: include/views/js/configuration.httpconf.edit.js.php:103
 #: include/views/js/conf.import.js.php:50 report2.php:458
@@ -12749,12 +12748,12 @@ msgid "Operation type"
 msgstr "Тип операції"
 
 #: app/views/monitoring.widget.problems.view.php:66 include/blocks.inc.php:751
-#: include/classes/screens/CScreenProblem.php:930
-#: include/classes/screens/CScreenProblem.php:1186 include/events.inc.php:166
+#: include/classes/screens/CScreenProblem.php:934
+#: include/classes/screens/CScreenProblem.php:1190 include/events.inc.php:166
 #: include/views/configuration.trigger.prototype.edit.php:72
 #: include/views/configuration.trigger.prototype.list.php:56
 #: include/views/configuration.triggers.edit.php:93
-#: include/views/configuration.triggers.list.php:204
+#: include/views/configuration.triggers.list.php:198
 msgid "Operational data"
 msgstr ""
 
@@ -12817,7 +12816,7 @@ msgstr "Опції"
 #: include/views/configuration.trigger.prototype.edit.php:344
 #: include/views/configuration.triggers.edit.php:172
 #: include/views/configuration.triggers.edit.php:368
-#: include/views/configuration.triggers.list.php:104
+#: include/views/configuration.triggers.list.php:98
 msgid "Or"
 msgstr "Або"
 
@@ -13136,8 +13135,8 @@ msgstr "POP"
 #: app/views/monitoring.widget.problems.view.php:99 chart5.php:199
 #: include/classes/graph/CSvgGraph.php:1045
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:1008
-#: include/classes/screens/CScreenProblem.php:1211 include/events.inc.php:345
+#: include/classes/screens/CScreenProblem.php:1012
+#: include/classes/screens/CScreenProblem.php:1215 include/events.inc.php:345
 #: include/events.inc.php:547 include/maps.inc.php:290
 #: include/maps.inc.php:374 include/maps.inc.php:467 include/maps.inc.php:555
 #: include/triggers.inc.php:234 include/views/monitoring.overview.items.php:36
@@ -13639,10 +13638,10 @@ msgstr "Рівень привілеїв"
 #: app/views/monitoring.widget.problems.view.php:62
 #: app/views/popup.mediatype.message.php:46 include/blocks.inc.php:750
 #: include/classes/helpers/CMediatypeHelper.php:45
-#: include/classes/screens/CScreenProblem.php:905
-#: include/classes/screens/CScreenProblem.php:928
-#: include/classes/screens/CScreenProblem.php:1099
-#: include/classes/screens/CScreenProblem.php:1185
+#: include/classes/screens/CScreenProblem.php:909
+#: include/classes/screens/CScreenProblem.php:932
+#: include/classes/screens/CScreenProblem.php:1103
+#: include/classes/screens/CScreenProblem.php:1189
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:60
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:60
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
@@ -13651,8 +13650,8 @@ msgstr "Рівень привілеїв"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:369
 #: include/views/configuration.item.list.php:172
 #: include/views/configuration.trigger.prototype.list.php:134
-#: include/views/configuration.triggers.list.php:90
-#: include/views/configuration.triggers.list.php:302
+#: include/views/configuration.triggers.list.php:84
+#: include/views/configuration.triggers.list.php:296
 #: include/views/js/monitoring.sysmaps.js.php:245
 msgid "Problem"
 msgstr "Проблема"
@@ -13715,7 +13714,7 @@ msgstr "Проблема, якщо всі підлеглі мають пробл
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблема, якщо хоча б у одного із підлеглих наявна проблема"
 
-#: app/controllers/CControllerProblemView.php:350
+#: app/controllers/CControllerProblemView.php:338
 #: app/partials/common.filter.trigger.php:43
 #: app/views/monitoring.problem.view.php:99
 #: app/views/monitoring.problem.view.php:351 app/views/report.services.php:72
@@ -13898,8 +13897,8 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:85
 #: include/classes/graph/CSvgGraph.php:1041
 #: include/classes/screens/CScreenEvents.php:121
-#: include/classes/screens/CScreenProblem.php:994
-#: include/classes/screens/CScreenProblem.php:1199 include/events.inc.php:350
+#: include/classes/screens/CScreenProblem.php:998
+#: include/classes/screens/CScreenProblem.php:1203 include/events.inc.php:350
 #: include/events.inc.php:533
 msgid "RESOLVED"
 msgstr "ВИРІШЕНО"
@@ -13989,10 +13988,10 @@ msgid "Recipient (descending)"
 msgstr "Отримувач (в порядку спадання)"
 
 #: app/views/administration.user.edit.php:380
-#: include/classes/screens/CScreenProblem.php:1100
+#: include/classes/screens/CScreenProblem.php:1104
 #: include/views/configuration.item.list.php:173
 #: include/views/configuration.trigger.prototype.list.php:135
-#: include/views/configuration.triggers.list.php:303
+#: include/views/configuration.triggers.list.php:297
 msgid "Recovery"
 msgstr "Відновлення"
 
@@ -14016,9 +14015,9 @@ msgstr "Операції відновлення"
 
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:900
-#: include/classes/screens/CScreenProblem.php:923
-#: include/classes/screens/CScreenProblem.php:1182 include/events.inc.php:251
+#: include/classes/screens/CScreenProblem.php:904
+#: include/classes/screens/CScreenProblem.php:927
+#: include/classes/screens/CScreenProblem.php:1186 include/events.inc.php:251
 #: include/events.inc.php:464
 msgid "Recovery time"
 msgstr "Час відновлення"
@@ -14183,7 +14182,7 @@ msgstr "Віддалена команда"
 #: include/views/configuration.triggers.edit.php:255
 #: include/views/configuration.triggers.edit.php:454
 #: include/views/configuration.triggers.edit.php:592
-#: include/views/configuration.triggers.list.php:123
+#: include/views/configuration.triggers.list.php:117
 #: include/views/configuration.triggers.massupdate.php:86
 #: include/views/configuration.triggers.massupdate.php:124
 #: include/views/js/common.item.edit.js.php:48
@@ -14391,26 +14390,26 @@ msgstr "Вирішено цим"
 
 #: app/views/monitoring.widget.problems.view.php:139
 #: include/classes/screens/CScreenHostTriggers.php:239
-#: include/classes/screens/CScreenProblem.php:1025
+#: include/classes/screens/CScreenProblem.php:1029
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "Вирішено правилом кореляції \"%1$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:142
 #: include/classes/screens/CScreenHostTriggers.php:242
-#: include/classes/screens/CScreenProblem.php:1028
+#: include/classes/screens/CScreenProblem.php:1032
 msgid "Resolved by correlation rule."
 msgstr "Вирішено правилом кореляції."
 
 #: app/views/monitoring.widget.problems.view.php:149
 #: include/classes/screens/CScreenHostTriggers.php:249
-#: include/classes/screens/CScreenProblem.php:1035
+#: include/classes/screens/CScreenProblem.php:1039
 msgid "Resolved by inaccessible user."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:148
 #: include/classes/screens/CScreenHostTriggers.php:248
-#: include/classes/screens/CScreenProblem.php:1034
+#: include/classes/screens/CScreenProblem.php:1038
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "Вирішено користувачем \"%1$s\"."
@@ -15381,14 +15380,15 @@ msgstr "Не вдалося встановити партнерів LDAP в \"Of
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/controllers/CControllerPopupGeneric.php:171
+#: app/views/monitoring.problem.view.php:173
 #: app/views/monitoring.widget.problems.view.php:64
 #: app/views/popup.condition.common.php:205
 #: app/views/popup.triggerwizard.php:87
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:258
-#: include/classes/screens/CScreenProblem.php:897
-#: include/classes/screens/CScreenProblem.php:919
-#: include/classes/screens/CScreenProblem.php:1180
+#: include/classes/screens/CScreenProblem.php:901
+#: include/classes/screens/CScreenProblem.php:923
+#: include/classes/screens/CScreenProblem.php:1184
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:69
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:69
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
@@ -15402,10 +15402,10 @@ msgstr "Не вдалося встановити партнерів LDAP в \"Of
 #: include/views/configuration.trigger.prototype.massupdate.php:50
 #: include/views/configuration.triggers.edit.php:105
 #: include/views/configuration.triggers.list.php:65
-#: include/views/configuration.triggers.list.php:200
+#: include/views/configuration.triggers.list.php:194
 #: include/views/configuration.triggers.massupdate.php:52
 #: include/views/reports.toptriggers.php:69
-#: include/views/reports.toptriggers.php:84
+#: include/views/reports.toptriggers.php:78
 msgid "Severity"
 msgstr "Важливість"
 
@@ -15419,7 +15419,7 @@ msgid "Severity changed"
 msgstr "Важливість змінено"
 
 #: include/actions.inc.php:1757
-#: include/classes/screens/CScreenProblem.php:1247
+#: include/classes/screens/CScreenProblem.php:1251
 msgid "Severity changes"
 msgstr "Зміна важливості"
 
@@ -15855,7 +15855,7 @@ msgstr "Час запуску Zabbix сервера, Unix timestamp."
 #: include/forms.inc.php:204 include/forms.inc.php:698
 #: include/views/configuration.maintenance.list.php:55
 #: include/views/configuration.maintenance.list.php:81
-#: include/views/configuration.triggers.list.php:72
+#: include/views/configuration.triggers.list.php:66
 msgid "State"
 msgstr "Стан"
 
@@ -15881,9 +15881,9 @@ msgstr "Статично"
 #: include/classes/screens/CScreenActions.php:116
 #: include/classes/screens/CScreenHttpTestDetails.php:86
 #: include/classes/screens/CScreenHttpTest.php:120
-#: include/classes/screens/CScreenProblem.php:901
-#: include/classes/screens/CScreenProblem.php:925
-#: include/classes/screens/CScreenProblem.php:1183
+#: include/classes/screens/CScreenProblem.php:905
+#: include/classes/screens/CScreenProblem.php:929
+#: include/classes/screens/CScreenProblem.php:1187
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:252 include/events.inc.php:465
@@ -15903,8 +15903,8 @@ msgstr "Статично"
 #: include/views/configuration.item.list.php:74
 #: include/views/configuration.item.list.php:144
 #: include/views/configuration.item.massupdate.php:449
-#: include/views/configuration.triggers.list.php:79
-#: include/views/configuration.triggers.list.php:206 srv_status.php:145
+#: include/views/configuration.triggers.list.php:73
+#: include/views/configuration.triggers.list.php:200 srv_status.php:145
 msgid "Status"
 msgstr "Стан"
 
@@ -16222,9 +16222,9 @@ msgstr "Значення тегу"
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/views/monitoring.problem.view.php:290
 #: app/views/monitoring.widget.problems.view.php:70 include/blocks.inc.php:755
-#: include/classes/screens/CScreenProblem.php:879
-#: include/classes/screens/CScreenProblem.php:935
-#: include/classes/screens/CScreenProblem.php:1190
+#: include/classes/screens/CScreenProblem.php:883
+#: include/classes/screens/CScreenProblem.php:939
+#: include/classes/screens/CScreenProblem.php:1194
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:78
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:78
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
@@ -16246,8 +16246,8 @@ msgstr "Значення тегу"
 #: include/views/configuration.trigger.prototype.massupdate.php:78
 #: include/views/configuration.trigger.prototype.massupdate.php:184
 #: include/views/configuration.triggers.edit.php:563
-#: include/views/configuration.triggers.list.php:140
-#: include/views/configuration.triggers.list.php:208
+#: include/views/configuration.triggers.list.php:134
+#: include/views/configuration.triggers.list.php:202
 #: include/views/configuration.triggers.massupdate.php:80
 #: include/views/configuration.triggers.massupdate.php:164
 msgid "Tags"
@@ -16664,8 +16664,8 @@ msgstr "До"
 #: include/actions.inc.php:1972 include/blocks.inc.php:730
 #: include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:856
-#: include/classes/screens/CScreenProblem.php:1181
+#: include/classes/screens/CScreenProblem.php:860
+#: include/classes/screens/CScreenProblem.php:1185
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:199
@@ -16751,7 +16751,7 @@ msgstr "До"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Для встановлення інтерфейсу вузла мережі виберіть один тип елемента даних для всіх елементів даних"
 
-#: include/classes/screens/CScreenProblem.php:749 include/func.inc.php:2519
+#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2519
 #: srv_status.php:38
 msgid "Today"
 msgstr "Сьогодні"
@@ -16873,7 +16873,7 @@ msgstr "Динаміка"
 #: include/views/configuration.triggers.massupdate.php:163
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:730
-#: include/views/reports.toptriggers.php:84 jsLoader.php:189 jsLoader.php:292
+#: include/views/reports.toptriggers.php:78 jsLoader.php:189 jsLoader.php:292
 #: services.php:355
 msgid "Trigger"
 msgstr "Тригер"
@@ -17103,7 +17103,7 @@ msgstr "Тригер оновлено"
 #: include/views/configuration.template.list.php:145
 #: include/views/configuration.template.list.php:254
 #: include/views/configuration.triggers.edit.php:28
-#: include/views/configuration.triggers.list.php:169
+#: include/views/configuration.triggers.list.php:163
 #: include/views/configuration.triggers.massupdate.php:28
 #: include/views/conf.import.php:40 include/views/inventory.host.view.php:163
 #: include/views/inventory.host.view.php:178
@@ -17394,7 +17394,7 @@ msgstr "Одиниця виміру"
 #: include/triggers.inc.php:244 include/triggers.inc.php:2217
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:230
-#: include/views/configuration.triggers.list.php:76
+#: include/views/configuration.triggers.list.php:70
 msgid "Unknown"
 msgstr "Невідомо"
 
@@ -18226,8 +18226,8 @@ msgstr "Валідація"
 #: include/views/configuration.item.prototype.massupdate.php:152
 #: include/views/configuration.template.massupdate.php:157
 #: include/views/configuration.trigger.prototype.massupdate.php:88
-#: include/views/configuration.triggers.list.php:86
-#: include/views/configuration.triggers.list.php:201
+#: include/views/configuration.triggers.list.php:80
+#: include/views/configuration.triggers.list.php:195
 #: include/views/configuration.triggers.massupdate.php:90
 #: include/views/monitoring.history.php:151
 #: include/views/monitoring.history.php:273
@@ -18593,7 +18593,7 @@ msgstr "Ширина"
 msgid "With data collection"
 msgstr "Зі збором даних"
 
-#: include/views/configuration.triggers.list.php:155
+#: include/views/configuration.triggers.list.php:149
 msgid "With dependencies"
 msgstr "З залежностями"
 
@@ -18831,8 +18831,8 @@ msgstr "Щороку"
 #: app/views/popup.condition.common.php:648 include/actions.inc.php:32
 #: include/blocks.inc.php:626 include/blocks.inc.php:859
 #: include/classes/screens/CScreenHostTriggers.php:273
-#: include/classes/screens/CScreenProblem.php:1132
-#: include/classes/screens/CScreenProblem.php:1268 include/events.inc.php:179
+#: include/classes/screens/CScreenProblem.php:1136
+#: include/classes/screens/CScreenProblem.php:1272 include/events.inc.php:179
 #: include/events.inc.php:381 include/events.inc.php:606
 #: include/triggers.inc.php:1288 include/triggers.inc.php:1293
 #: include/views/configuration.host.prototype.list.php:130
@@ -18840,14 +18840,14 @@ msgstr "Щороку"
 #: include/views/configuration.item.prototype.list.php:106
 #: include/views/configuration.trigger.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.massupdate.php:67
-#: include/views/configuration.triggers.list.php:144
-#: include/views/configuration.triggers.list.php:151
-#: include/views/configuration.triggers.list.php:158
+#: include/views/configuration.triggers.list.php:138
+#: include/views/configuration.triggers.list.php:145
+#: include/views/configuration.triggers.list.php:152
 #: include/views/configuration.triggers.massupdate.php:69
 msgid "Yes"
 msgstr "Так"
 
-#: include/classes/screens/CScreenProblem.php:757 include/func.inc.php:2513
+#: include/classes/screens/CScreenProblem.php:761 include/func.inc.php:2513
 msgid "Yesterday"
 msgstr "Вчора"
 
@@ -19146,7 +19146,7 @@ msgid "agent"
 msgstr "агент"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1873
-#: include/classes/html/CSeverity.php:80
+#: include/classes/html/CSeverity.php:73
 #: include/classes/pagefilter/CPageFilter.php:783
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
@@ -19157,12 +19157,12 @@ msgstr "агент"
 #: include/forms.inc.php:289 include/forms.inc.php:308
 #: include/forms.inc.php:324 include/graphs.inc.php:76
 #: include/views/configuration.httpconf.list.php:33
-#: include/views/configuration.triggers.list.php:74
-#: include/views/configuration.triggers.list.php:81
-#: include/views/configuration.triggers.list.php:88
-#: include/views/configuration.triggers.list.php:143
-#: include/views/configuration.triggers.list.php:150
-#: include/views/configuration.triggers.list.php:157
+#: include/views/configuration.triggers.list.php:68
+#: include/views/configuration.triggers.list.php:75
+#: include/views/configuration.triggers.list.php:82
+#: include/views/configuration.triggers.list.php:137
+#: include/views/configuration.triggers.list.php:144
+#: include/views/configuration.triggers.list.php:151
 #: include/views/js/configuration.graph.edit.js.php:81 report2.php:242
 #: report2.php:278 report2.php:313 report2.php:340 report2.php:427
 #: report4.php:91 report4.php:293
@@ -20188,7 +20188,7 @@ msgstr "наданий обліковий запис не унікальний"
 #: include/views/configuration.host.list.php:73
 #: include/views/configuration.maintenance.edit.php:176
 #: include/views/configuration.template.list.php:47
-#: include/views/configuration.triggers.list.php:113
+#: include/views/configuration.triggers.list.php:107
 #: include/views/js/configuration.host.list.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:60
@@ -20385,7 +20385,7 @@ msgstr "непідтримуваний номер версії"
 #: include/views/configuration.item.prototype.edit.php:244
 #: include/views/configuration.maintenance.edit.php:183
 #: include/views/configuration.template.list.php:54
-#: include/views/configuration.triggers.list.php:120
+#: include/views/configuration.triggers.list.php:114
 #: include/views/js/common.template.edit.js.php:41
 #: include/views/js/common.template.edit.js.php:88
 #: include/views/js/configuration.host.list.js.php:37

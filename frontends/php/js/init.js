@@ -174,8 +174,16 @@ jQuery(function($) {
 				sections = getMenuPopupItemPrototype(data);
 				break;
 
+			case 'dropdown':
+				sections = getMenuPopupDropdown(data, $obj);
+				break;
+
 			case 'submenu':
 				sections = getMenuPopupSubmenu(data);
+				break;
+
+			case 'widget_actions':
+				sections = getMenuPopupWidgetActions(data, $obj);
 				break;
 
 			default:
@@ -216,6 +224,7 @@ jQuery(function($) {
 	 */
 	function isServerRequestRequired(type) {
 		switch (type) {
+			case 'dropdown':
 			case 'submenu':
 				return false;
 
@@ -233,6 +242,14 @@ jQuery(function($) {
 	 */
 	function makeDefaultPosition($obj, data, event) {
 		switch (data.type) {
+			case 'dropdown':
+				return {
+					of: $obj,
+					my: 'left top',
+					at: 'left top+24',
+					collision: 'none'
+				};
+
 			case 'submenu':
 				return {
 					of: $obj,
