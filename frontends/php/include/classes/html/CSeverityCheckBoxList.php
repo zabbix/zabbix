@@ -35,7 +35,7 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 		parent::__construct($name);
 
 		$this
-			->setOptions($this->getSeverities())
+			->setOptions(self::getSeverities())
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3);
 	}
@@ -45,13 +45,13 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	 *
 	 * @return array
 	 */
-	private function getSeverities(): array {
+	private static function getSeverities(): array {
 		$ordered = [];
 		$severities = getSeverities();
 		$severities_count = count($severities);
 		$max_rows = (int) ceil($severities_count / self::COLUMNS);
 
-		foreach (range(0, $max_rows - 1) as $row) {
+		for ($row = 0; $row < $max_rows; $row++) {
 			for ($i = 0; $i < $severities_count; $i += $max_rows) {
 				if (array_key_exists($row + $i, $severities)) {
 					$ordered[$row + $i] = $severities[$row + $i];

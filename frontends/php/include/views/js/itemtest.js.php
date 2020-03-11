@@ -114,39 +114,11 @@
 				};
 				break;
 
-			case <?= ITEM_TYPE_SNMPV1 ?>:
-			case <?= ITEM_TYPE_SNMPV2C ?>:
-			case <?= ITEM_TYPE_SNMPV3 ?>:
+			case <?= ITEM_TYPE_SNMP ?>:
 				properties = {
 					snmp_oid: form_data['snmp_oid'],
-					snmp_community: form_data['snmp_community'],
-					useip: form_data['useip'],
-					custom_port: form_data['port'],
 					flags: form_data['flags']
 				};
-
-				if (+form_data['type'] == <?= ITEM_TYPE_SNMPV3 ?>) {
-					properties = jQuery.extend(properties, {
-						snmpv3_securityname: form_data['snmpv3_securityname'],
-						snmpv3_contextname: form_data['snmpv3_contextname'],
-						snmpv3_securitylevel: form_data['snmpv3_securitylevel']
-					});
-
-					if (properties.snmpv3_securitylevel == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>) {
-						properties = jQuery.extend(properties, {
-							snmpv3_authprotocol: form_data['snmpv3_authprotocol'],
-							snmpv3_authpassphrase: form_data['snmpv3_authpassphrase'],
-							snmpv3_privprotocol: form_data['snmpv3_privprotocol'],
-							snmpv3_privpassphrase: form_data['snmpv3_privpassphrase']
-						});
-					}
-					else if (properties.snmpv3_securitylevel == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>) {
-						properties = jQuery.extend(properties, {
-							snmpv3_authprotocol: form_data['snmpv3_authprotocol'],
-							snmpv3_authpassphrase: form_data['snmpv3_authpassphrase']
-						});
-					}
-				}
 				break;
 
 			case <?= ITEM_TYPE_INTERNAL ?>:

@@ -1695,7 +1695,7 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 	}
 	DBfree_result(result);
 
-	flush_user_msg(&user_msg, 1, event, NULL, action->actionid, ack);
+	flush_user_msg(&user_msg, 1, event, r_event, action->actionid, ack);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

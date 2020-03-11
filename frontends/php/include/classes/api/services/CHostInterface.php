@@ -150,6 +150,13 @@ class CHostInterface extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
+		if ($this->outputIsRequested('details', $options['output'])) {
+			$sqlParts['left_join']['interface_snmp'] = ['from' => 'interface_snmp his',
+				'on' => 'his.interfaceid=hi.interfaceid'
+			];
+			$sqlParts['left_table'] = 'interface';
+		}
+
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -179,6 +186,49 @@ class CHostInterface extends CApiService {
 		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
+		}
+
+		// Moving additional fields to separate object.
+		if ($this->outputIsRequested('details', $options['output'])) {
+			foreach ($result as &$value) {
+				$snmp_fields = ['version', 'bulk', 'community', 'securityname', 'securitylevel', 'authpassphrase',
+					'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
+				];
+
+				$interface_type = $value['type'];
+
+				if (!$this->outputIsRequested('type', $options['output'])) {
+					unset($value['type']);
+				}
+
+				$details = [];
+
+				// Handle SNMP related fields.
+				if ($interface_type == INTERFACE_TYPE_SNMP) {
+					foreach ($snmp_fields as $field_name) {
+						$details[$field_name] = $value[$field_name];
+						unset($value[$field_name]);
+					}
+
+					if ($details['version'] == SNMP_V1 || $details['version'] == SNMP_V2C) {
+						foreach (['securityname', 'securitylevel', 'authpassphrase', 'privpassphrase', 'authprotocol',
+								'privprotocol', 'contextname'] as $snmp_field_name) {
+							unset($details[$snmp_field_name]);
+						}
+					}
+					else {
+						unset($details['community']);
+					}
+				}
+				else {
+					foreach ($snmp_fields as $field_name) {
+						unset($value[$field_name]);
+					}
+				}
+
+				$value['details'] = $details;
+			}
+			unset($value);
 		}
 
 		return $result;
@@ -263,7 +313,7 @@ class CHostInterface extends CApiService {
 					$interface['type'] = INTERFACE_TYPE_UNKNOWN;
 				}
 				elseif (!isset($interface['type'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 				}
 			}
 
@@ -305,8 +355,6 @@ class CHostInterface extends CApiService {
 				$this->checkPort($interface);
 			}
 
-			$this->checkBulk($interface);
-
 			if ($update) {
 				$interface = $updInterface;
 			}
@@ -327,9 +375,93 @@ class CHostInterface extends CApiService {
 	}
 
 	/**
+	 * Check SNMP related inputs.
+	 *
+	 * @param array $interfaces
+	 */
+	protected function checkSnmpInput(array $interfaces) {
+		foreach ($interfaces as $interface) {
+			if (!array_key_exists('type', $interface) || $interface['type'] != INTERFACE_TYPE_SNMP) {
+				continue;
+			}
+
+			if (!array_key_exists('details', $interface)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+
+			$this->checkSnmpVersion($interface);
+
+			$this->checkSnmpCommunity($interface);
+
+			$this->checkSnmpBulk($interface);
+
+			$this->checkSnmpSecurityLevel($interface);
+
+			$this->checkSnmpAuthProtocol($interface);
+
+			$this->checkSnmpPrivProtocol($interface);
+		}
+	}
+
+	/**
+	 * Sanitize SNMP fields by version.
+	 *
+	 * @param array $interfaces
+	 *
+	 * @return array
+	 */
+	protected function sanitizeSnmpFields(array $interfaces): array {
+		$default_fields = [
+			'community' => '',
+			'securityname' => '',
+			'securitylevel' => DB::getDefault('interface_snmp', 'securitylevel'),
+			'authpassphrase' => '',
+			'privpassphrase' => '',
+			'authprotocol' => DB::getDefault('interface_snmp', 'authprotocol'),
+			'privprotocol' => DB::getDefault('interface_snmp', 'privprotocol'),
+			'contextname' => ''
+		];
+
+		foreach ($interfaces as &$interface) {
+			if ($interface['version'] == SNMP_V1 || $interface['version'] == SNMP_V2C) {
+				unset($interface['securityname'], $interface['securitylevel'], $interface['authpassphrase'],
+					$interface['privpassphrase'], $interface['authprotocol'], $interface['privprotocol'],
+					$interface['contextname']
+				);
+			}
+			else {
+				unset($interface['community']);
+			}
+
+			$interface = $interface + $default_fields;
+		}
+
+		return $interfaces;
+	}
+
+	/**
+	 * Create SNMP interfaces.
+	 *
+	 * @param array $interfaces
+	 */
+	protected function createSnmpInterfaceDetails(array $interfaces) {
+		if (count($interfaces)) {
+			if (count(array_column($interfaces, 'interfaceid')) != count($interfaces)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+
+			$interfaces = $this->sanitizeSnmpFields($interfaces);
+
+			foreach ($interfaces as $interface) {
+				DB::insert('interface_snmp', [$interface], false);
+			}
+		}
+	}
+
+	/**
 	 * Add interfaces.
 	 *
-	 * @param array $interfaces multidimensional array with Interfaces data
+	 * @param array $interfaces  multidimensional array with Interfaces data
 	 *
 	 * @return array
 	 */
@@ -337,17 +469,79 @@ class CHostInterface extends CApiService {
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
+		$this->checkSnmpInput($interfaces);
 		$this->checkMainInterfacesOnCreate($interfaces);
 
-		$interfaceIds = DB::insert('interface', $interfaces);
+		$interfaceids = DB::insert('interface', $interfaces);
 
-		return ['interfaceids' => $interfaceIds];
+		$snmp_interfaces = [];
+		foreach ($interfaceids as $key => $id) {
+			if ($interfaces[$key]['type'] == INTERFACE_TYPE_SNMP) {
+				$snmp_interfaces[] = ['interfaceid' => $id] + $interfaces[$key]['details'];
+			}
+		}
+
+		$this->createSnmpInterfaceDetails($snmp_interfaces);
+
+		return ['interfaceids' => $interfaceids];
+	}
+
+	protected function updateInterfaces(array $interfaces): bool {
+		$data = [];
+
+		foreach ($interfaces as $interface) {
+			$data[] = [
+				'values' => $interface,
+				'where' => ['interfaceid' => $interface['interfaceid']]
+			];
+		}
+
+		DB::update('interface', $data);
+
+		return true;
+	}
+
+	protected function updateInterfaceDetails(array $interfaces): bool {
+		$db_interfaces = $this->get([
+			'output' => ['type', 'details'],
+			'interfaceids' => array_column($interfaces, 'interfaceid'),
+			'preservekeys' => true
+		]);
+		DB::delete('interface_snmp', ['interfaceid' => array_column($interfaces, 'interfaceid')]);
+
+		$snmp_interfaces = [];
+		foreach ($interfaces as $interface) {
+			$interfaceid = $interface['interfaceid'];
+
+			// Check new interface type or, if interface type not present, check type from db.
+			if ((!array_key_exists('type', $interface) && $db_interfaces[$interfaceid]['type'] != INTERFACE_TYPE_SNMP)
+					|| (array_key_exists('type', $interface) && $interface['type'] != INTERFACE_TYPE_SNMP)) {
+				continue;
+			}
+			else {
+				// Type is required for SNMP validation.
+				$interface['type'] = INTERFACE_TYPE_SNMP;
+			}
+
+			// Merge details with db values or set only vaules from db.
+			$interface['details'] = array_key_exists('details', $interface)
+				? $interface['details'] + $db_interfaces[$interfaceid]['details']
+				: $db_interfaces[$interfaceid]['details'];
+
+			$this->checkSnmpInput([$interface]);
+
+			$snmp_interfaces[] = ['interfaceid' => $interfaceid] + $interface['details'];
+		}
+
+		$this->createSnmpInterfaceDetails($snmp_interfaces);
+
+		return true;
 	}
 
 	/**
 	 * Update interfaces.
 	 *
-	 * @param array $interfaces multidimensional array with Interfaces data
+	 * @param array $interfaces   multidimensional array with Interfaces data
 	 *
 	 * @return array
 	 */
@@ -357,16 +551,11 @@ class CHostInterface extends CApiService {
 		$this->checkInput($interfaces, __FUNCTION__);
 		$this->checkMainInterfacesOnUpdate($interfaces);
 
-		$data = [];
-		foreach ($interfaces as $interface) {
-			$data[] = [
-				'values' => $interface,
-				'where' => ['interfaceid' => $interface['interfaceid']]
-			];
-		}
-		DB::update('interface', $data);
+		$this->updateInterfaces($interfaces);
 
-		return ['interfaceids' => zbx_objectValues($interfaces, 'interfaceid')];
+		$this->updateInterfaceDetails($interfaces);
+
+		return ['interfaceids' => array_column($interfaces, 'interfaceid')];
 	}
 
 	/**
@@ -398,6 +587,7 @@ class CHostInterface extends CApiService {
 		$this->checkMainInterfacesOnDelete($interfaceids);
 
 		DB::delete('interface', ['interfaceid' => $interfaceids]);
+		DB::delete('interface_snmp', ['interfaceid' => $interfaceids]);
 
 		return ['interfaceids' => $interfaceids];
 	}
@@ -434,7 +624,6 @@ class CHostInterface extends CApiService {
 			$this->checkDns($interface);
 			$this->checkIp($interface);
 			$this->checkPort($interface);
-			$this->checkBulk($interface);
 
 			// check main interfaces
 			$interfacesToRemove = API::getApiService()->select($this->tableName(), [
@@ -443,8 +632,7 @@ class CHostInterface extends CApiService {
 					'hostid' => $data['hostids'],
 					'ip' => $interface['ip'],
 					'dns' => $interface['dns'],
-					'port' => $interface['port'],
-					'bulk' => $interface['bulk']
+					'port' => $interface['port']
 				]
 			]);
 			if ($interfacesToRemove) {
@@ -477,8 +665,7 @@ class CHostInterface extends CApiService {
 					'hostid' => $data['hostids'],
 					'ip' => $interface['ip'],
 					'dns' => $interface['dns'],
-					'port' => $interface['port'],
-					'bulk' => $interface['bulk']
+					'port' => $interface['port']
 				],
 				'editable' => true,
 				'preservekeys' => true
@@ -508,44 +695,49 @@ class CHostInterface extends CApiService {
 
 			$this->checkHostInterfaces($host['interfaces'], $host['hostid']);
 
-			$interfacesToDelete = API::HostInterface()->get([
+			$interfaces_delete = DB::select('interface', [
 				'output' => [],
-				'hostids' => $host['hostid'],
-				'preservekeys' => true,
-				'nopermissions' => true
+				'filter' => ['hostid' => $host['hostid']],
+				'preservekeys' => true
 			]);
 
-			$interfacesToAdd = [];
-			$interfacesToUpdate = [];
+			$interfaces_add = [];
+			$interfaces_update = [];
 
 			foreach ($host['interfaces'] as $interface) {
 				$interface['hostid'] = $host['hostid'];
 
-				if (!isset($interface['interfaceid'])) {
-					$interfacesToAdd[] = $interface;
+				if (!array_key_exists('interfaceid', $interface)) {
+					$interfaces_add[] = $interface;
 				}
-				elseif (isset($interfacesToDelete[$interface['interfaceid']])) {
-					$interfacesToUpdate[] = $interface;
-					unset($interfacesToDelete[$interface['interfaceid']]);
+				elseif (array_key_exists($interface['interfaceid'], $interfaces_delete)) {
+					$interfaces_update[] = $interface;
+					unset($interfaces_delete[$interface['interfaceid']]);
 				}
 			}
 
-			if ($interfacesToUpdate) {
-				API::HostInterface()->checkInput($interfacesToUpdate, 'update');
+			if ($interfaces_update) {
+				$this->checkInput($interfaces_update, 'update');
 
-				$data = [];
-				foreach ($interfacesToUpdate as $interface) {
-					$data[] = [
-						'values' => $interface,
-						'where' => ['interfaceid' => $interface['interfaceid']]
-					];
-				}
-				DB::update('interface', $data);
+				$this->updateInterfaces($interfaces_update);
+
+				$this->updateInterfaceDetails($interfaces_update);
 			}
 
-			if ($interfacesToAdd) {
-				$this->checkInput($interfacesToAdd, 'create');
-				$interfaceids = DB::insert('interface', $interfacesToAdd);
+			if ($interfaces_add) {
+				$this->checkInput($interfaces_add, 'create');
+				$interfaceids = DB::insert('interface', $interfaces_add);
+
+				$this->checkSnmpInput($interfaces_add);
+
+				$snmp_interfaces = [];
+				foreach ($interfaceids as $key => $id) {
+					if ($interfaces_add[$key]['type'] == INTERFACE_TYPE_SNMP) {
+						$snmp_interfaces[] = ['interfaceid' => $id] + $interfaces_add[$key]['details'];
+					}
+				}
+
+				$this->createSnmpInterfaceDetails($snmp_interfaces);
 
 				foreach ($host['interfaces'] as &$interface) {
 					if (!array_key_exists('interfaceid', $interface)) {
@@ -555,11 +747,11 @@ class CHostInterface extends CApiService {
 				unset($interface);
 			}
 
-			if ($interfacesToDelete) {
-				$this->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
+			if ($interfaces_delete) {
+				$this->delete(array_keys($interfaces_delete));
 			}
 
-			return ['interfaceids' => zbx_objectValues($host['interfaces'], 'interfaceid')];
+			return ['interfaceids' => array_column($host['interfaces'], 'interfaceid')];
 		}
 
 		return ['interfaceids' => []];
@@ -653,25 +845,6 @@ class CHostInterface extends CApiService {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
-		}
-	}
-
-	/**
-	 * Validates interface "bulk" field.
-	 * For SNMP interfaces bulk value should be either 0 (disabled) or 1 (enabled).
-	 * For other non-SNMP interfaces bulk value should be 1 (default).
-	 *
-	 * @throws APIException if bulk field is incorrect.
-	 *
-	 * @param array $interface
-	 */
-	protected function checkBulk(array $interface) {
-		if ($interface['type'] !== null && (($interface['type'] != INTERFACE_TYPE_SNMP && isset($interface['bulk'])
-				&& $interface['bulk'] != SNMP_BULK_ENABLED)
-				|| ($interface['type'] == INTERFACE_TYPE_SNMP && isset($interface['bulk'])
-					&& (zbx_empty($interface['bulk'])
-						|| ($interface['bulk'] != SNMP_BULK_DISABLED && $interface['bulk'] != SNMP_BULK_ENABLED))))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect bulk value for interface.'));
 		}
 	}
 
@@ -840,8 +1013,139 @@ class CHostInterface extends CApiService {
 		}
 	}
 
+	/**
+	 * Check if SNMP version is valid. Valid versions: SNMP_V1, SNMP_V2C, SNMP_V3.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if "version" value is incorrect.
+	 */
+	protected function checkSnmpVersion(array $interface) {
+		if (!array_key_exists('version', $interface['details'])
+				|| !in_array($interface['details']['version'], [SNMP_V1, SNMP_V2C, SNMP_V3])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		}
+	}
+
+	/**
+	 * Check SNMP community. For SNMPv1 and SNMPv2c it required.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if "community" value is incorrect.
+	 */
+	protected function checkSnmpCommunity(array $interface) {
+		if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
+				&& (!array_key_exists('community', $interface['details'])
+					|| $interface['details']['community'] === '')) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		}
+	}
+
+	/**
+	 * Validates SNMP interface "bulk" field.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if "bulk" value is incorrect.
+	 */
+	protected function checkSnmpBulk(array $interface) {
+		if ($interface['type'] !== null && (($interface['type'] != INTERFACE_TYPE_SNMP
+					&& isset($interface['details']['bulk']) && $interface['details']['bulk'] != SNMP_BULK_ENABLED)
+					|| ($interface['type'] == INTERFACE_TYPE_SNMP && isset($interface['details']['bulk'])
+						&& (zbx_empty($interface['details']['bulk'])
+							|| ($interface['details']['bulk'] != SNMP_BULK_DISABLED
+							&& $interface['details']['bulk'] != SNMP_BULK_ENABLED))))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect bulk value for interface.'));
+		}
+	}
+
+	/**
+	 * Check SNMP Security level field.
+	 *
+	 * @param array $interface
+	 * @param array $interface['details']
+	 * @param array $interface['details']['version']        SNMP version
+	 * @param array $interface['details']['securitylevel']  SNMP security level
+	 *
+	 * @throws APIException if "securitylevel" value is incorrect.
+	 */
+	protected function checkSnmpSecurityLevel(array $interface) {
+		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('securitylevel', $interface['details'])
+					&& !in_array($interface['details']['securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
+						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		}
+	}
+
+	/**
+	 * Check SNMP authentication  protocol.
+	 *
+	 * @param array $interface
+	 * @param array $interface['details']
+	 * @param array $interface['details']['version']       SNMP version
+	 * @param array $interface['details']['authprotocol']  SNMP authentication protocol
+	 *
+	 * @throws APIException if "authprotocol" value is incorrect.
+	 */
+	protected function checkSnmpAuthProtocol(array $interface) {
+		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('authprotocol', $interface['details'])
+					&& !in_array($interface['details']['authprotocol'], [ITEM_AUTHPROTOCOL_MD5,
+						ITEM_AUTHPROTOCOL_SHA]))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		}
+	}
+
+	/**
+	 * Check SNMP Privacy protocol.
+	 *
+	 * @param array $interface
+	 * @param array $interface['details']
+	 * @param array $interface['details']['version']       SNMP version
+	 * @param array $interface['details']['privprotocol']  SNMP privacy protocol
+	 *
+	 * @throws APIException if "privprotocol" value is incorrect.
+	 */
+	protected function checkSnmpPrivProtocol(array $interface) {
+		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('privprotocol', $interface['details'])
+				&& !in_array($interface['details']['privprotocol'], [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES]))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to function.'));
+		}
+	}
+
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($this->outputIsRequested('details', $options['output'])) {
+			// Select interface type to check show details array or not.
+			$sqlParts = $this->addQuerySelect('hi.type', $sqlParts);
+
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.version', SNMP_V2C, 'version'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.bulk', SNMP_BULK_ENABLED, 'bulk'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.community', '', 'community'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.securityname', '', 'securityname'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(
+				dbConditionCoalesce('his.securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'securitylevel'),
+				$sqlParts
+			);
+			$sqlParts = $this->addQuerySelect(
+				dbConditionCoalesce('his.authpassphrase', '', 'authpassphrase'),
+				$sqlParts
+			);
+			$sqlParts = $this->addQuerySelect(
+				dbConditionCoalesce('his.privpassphrase', '', 'privpassphrase'),
+				$sqlParts
+			);
+			$sqlParts = $this->addQuerySelect(
+				dbConditionCoalesce('his.authprotocol', ITEM_AUTHPROTOCOL_MD5, 'authprotocol'),
+				$sqlParts
+			);
+			$sqlParts = $this->addQuerySelect(
+				dbConditionCoalesce('his.privprotocol', ITEM_PRIVPROTOCOL_DES, 'privprotocol'),
+				$sqlParts
+			);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.contextname', '', 'contextname'), $sqlParts);
+		}
 
 		if (!$options['countOutput'] && $options['selectHosts'] !== null) {
 			$sqlParts = $this->addQuerySelect('hi.hostid', $sqlParts);

@@ -212,3 +212,19 @@ type MEMORYSTATUSEX struct {
 	AvailVirtual         uint64
 	AvailExtendedVirtual uint64
 }
+
+const (
+	GR_GDIOBJECTS       = 0
+	GR_GDIOBJECTS_PEAK  = 2
+	GR_USEROBJECTS      = 1
+	GR_USEROBJECTS_PEAK = 4
+)
+
+type IO_COUNTERS struct {
+	ReadOperationCount  uint64
+	WriteOperationCount uint64
+	OtherOperationCount uint64
+	ReadTransferCount   uint64
+	WriteTransferCount  uint64
+	OtherTransferCount  uint64
+}
