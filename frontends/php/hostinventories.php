@@ -179,10 +179,15 @@ else {
 		$filter_groupids = getSubGroups($filter_groupids);
 	}
 
+	$data['host_inventories'] = zbx_toHash(getHostInventories(true), 'db_field');
+
+	if ($data['filter']['field'] === '') {
+		$data['filter']['field'] = array_key_first($data['host_inventories']);
+	}
+
 	// Checking if correct inventory field is specified for filter.
-	$supported_inventory_fields = zbx_toHash(getHostInventories(), 'db_field');
-	if ($data['filter']['field'] !== '' && $data['filter']['fieldValue'] !== ''
-			&& !array_key_exists($data['filter']['field'], $supported_inventory_fields)) {
+	if ($data['filter']['fieldValue'] !== ''
+			&& !array_key_exists($data['filter']['field'], $data['host_inventories'])) {
 		error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filter']['field']));
 		$filter_set = false;
 	}
@@ -193,7 +198,7 @@ else {
 	/*
 	 * Select data
 	 */
-	if ($data['filter']['field'] !== '' && $filter_set) {
+	if ($filter_set) {
 		$options = [
 			'output' => ['hostid', 'name', 'status'],
 			'selectInventory' => ['name', 'type', 'os', 'serialno_a', 'tag', 'macaddress_a', $data['filter']['field']],

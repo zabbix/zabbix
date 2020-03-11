@@ -25,11 +25,10 @@
 
 $widget = (new CWidget())->setTitle(_('Host inventory'));
 
-// getting inventory fields to make a drop down
-$inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
+// Make an inventory field dropdown.
 $inventoryFieldsComboBox = (new CComboBox('filter_field', $data['filter']['field']))
 	->setAttribute('autofocus', 'autofocus');
-foreach ($inventoryFields as $inventoryField) {
+foreach ($data['host_inventories'] as $inventoryField) {
 	$inventoryFieldsComboBox->addItem($inventoryField['db_field'], $inventoryField['title']);
 }
 
