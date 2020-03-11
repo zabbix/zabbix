@@ -606,7 +606,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @throws NoSuchElementException
 	 */
 	public function zbxTestContentControlButtonClickText($text) {
-		$xpath = "//div[contains(@class, 'header-title')]".
+		$xpath = "//header[@class='header-title']".
 				"//nav[@aria-label='Content controls']".
 					"//button[text()='{$text}']";
 
