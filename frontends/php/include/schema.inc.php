@@ -3341,6 +3341,12 @@ return [
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'hostmacro' => [
@@ -3374,6 +3380,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],

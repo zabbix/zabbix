@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.0.0beta1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050057);
+define('ZABBIX_DB_VERSION',		4050059);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -1309,6 +1309,10 @@ define('DAY_IN_YEAR', 365);
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
+define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
+define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
+define('ZBX_MACRO_SECRET_MASK', '******'); // Placeholder for masked macro value.
+
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
 define('ZBX_LAYOUT_FULLSCREEN', 1);
@@ -1349,6 +1353,7 @@ define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 define('ZBX_ACTION_ADD',		0);
 define('ZBX_ACTION_REPLACE',	1);
 define('ZBX_ACTION_REMOVE',		2);
+define('ZBX_ACTION_REMOVE_ALL', 3);
 
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
@@ -1802,6 +1807,12 @@ define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 
 // Widget "Problems by severity" styles.
 define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
+
+define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
+
+// Icons.
+define('ZBX_STYLE_ICON_TEXT', 'icon-text');
+define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
 
 // Host interface styles.
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');

@@ -294,4 +294,7 @@ class CXmlConstantName {
 	const PROBLEM = 'PROBLEM';
 	const RECOVERY = 'RECOVERY';
 	const UPDATE = 'UPDATE';
+
+	const MACRO_TYPE_TEXT = 'TEXT';
+	const MACRO_TYPE_SECRET = 'SECRET_TEXT';
 }

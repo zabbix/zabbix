@@ -20,23 +20,13 @@
 
 
 /**
- * @var CView $this
+ * @var CPartial $this
  */
-
-$this->addJsFile('inputsecret.js');
-$this->addJsFile('textareaflexible.js');
-$this->addJsFile('macrovalue.js');
-
-$this->includeJsFile('administration.macros.edit.js.php');
-
-$widget = (new CWidget())
-	->setTitle(_('Macros'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $table = (new CTable())
 	->setId('tbl_macros')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->setHeader([_('Macro'), _('Value'), _('Description'), '']);
+	->setHeader([_('Macro'), _('Value'), _('Description')]);
 
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
@@ -89,21 +79,60 @@ $table->setFooter(new CCol(
 		->addClass('element-table-add')
 ));
 
-$macros_form_list = (new CFormList('macrosFormList'))->addRow($table);
+$checkbox_add = (new CDiv(
+	(new CCheckBox('macros_add'))
+		->setLabel(_('Update existing'))
+		->setChecked($data['macros_checkbox'][ZBX_ACTION_ADD])
+))
+	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
+	->setAttribute('data-type', ZBX_ACTION_ADD)
+	->addStyle('display: block;');
 
-$tab_view = (new CTabView())->addTab('macros', _('Macros'), $macros_form_list);
+$checkbox_update = (new CDiv(
+	(new CCheckBox('macros_update'))
+		->setLabel(_('Add missing'))
+		->setChecked($data['macros_checkbox'][ZBX_ACTION_REPLACE])
+))
+	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
+	->setAttribute('data-type', ZBX_ACTION_REPLACE);
 
-$save_button = (new CSubmit('update', _('Update')))->setAttribute('data-removed-count', 0);
+$checkbox_remove = (new CDiv(
+	(new CCheckBox('macros_remove'))
+		->setLabel(_('Except selected'))
+		->setChecked($data['macros_checkbox'][ZBX_ACTION_REMOVE])
+))
+	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
+	->setAttribute('data-type', ZBX_ACTION_REMOVE);
 
-$tab_view->setFooter(makeFormFooter($save_button));
+$checkbox_remove_all = (new CDiv(
+	(new CCheckBox('macros_remove_all'))
+		->setLabel(_('I confirm to remove all macros'))
+		->setChecked($data['macros_checkbox'][ZBX_ACTION_REMOVE_ALL])
+))
+	->addClass(ZBX_STYLE_CHECKBOX_BLOCK)
+	->setAttribute('data-type', ZBX_ACTION_REMOVE_ALL);
 
-$form = (new CForm())
-	->setName('macrosForm')
-	->disablePasswordAutofill()
-	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'macros.update')->getUrl())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addItem($tab_view);
+$form_list = (new CFormList('macros-form-list'))
+	->addRow(
+		(new CVisibilityBox('visible[macros]', 'macros-div', _('Original')))
+			->setLabel(_('Macros'))
+			->setChecked(array_key_exists('macros', $data['visible'])),
+		(new CDiv([
+			(new CRadioButtonList('mass_update_macros', (int) $data['macros_visible']))
+				->addValue(_('Add'), ZBX_ACTION_ADD)
+				->addValue(_('Update'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
+				->addValue(_('Remove all'), ZBX_ACTION_REMOVE_ALL)
+				->setModern(true)
+				->addStyle('margin-bottom: 10px;'),
+			$table,
+			$checkbox_add,
+			$checkbox_update,
+			$checkbox_remove,
+			$checkbox_remove_all
+		]))->setId('macros-div')
+	);
 
-$widget
-	->addItem($form)
-	->show();
+$form_list->show();
+
+$this->includeJsFile('massupdate.macros.tab.js.php');

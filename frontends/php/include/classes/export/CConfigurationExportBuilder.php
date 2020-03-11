@@ -1105,7 +1105,8 @@ class CConfigurationExportBuilder {
 		foreach ($macros as $macro) {
 			$result[] = [
 				'macro' => $macro['macro'],
-				'value' => $macro['value'],
+				'type' => $macro['type'],
+				'value' => array_key_exists('value', $macro) ? $macro['value'] : '',
 				'description' => $macro['description']
 			];
 		}

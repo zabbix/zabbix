@@ -1166,3 +1166,9 @@ td.inactive-bg {
 		}
 	}
 }
+
+// InputSecret and ButtonDropdown
+
+.btn-undo.is-focused {
+	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
+}

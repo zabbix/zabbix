@@ -720,6 +720,7 @@ FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|macro
 
 TABLE|hostmacro|hostmacroid|ZBX_TEMPLATE
@@ -728,6 +729,7 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|hostid,macro
 
 TABLE|hosts_groups|hostgroupid|ZBX_TEMPLATE
@@ -1732,4 +1734,4 @@ FIELD		|contextname	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4050057	|4050057
+ROW		|4050059	|4050059

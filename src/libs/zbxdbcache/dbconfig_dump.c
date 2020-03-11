@@ -329,9 +329,9 @@ static void	DCdump_gmacros(void)
 	for (i = 0; i < index.values_num; i++)
 	{
 		gmacro = (ZBX_DC_GMACRO *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "globalmacroid:" ZBX_FS_UI64 " macro:'%s' value:'%s' context:'%s'",
+		zabbix_log(LOG_LEVEL_TRACE, "globalmacroid:" ZBX_FS_UI64 " macro:'%s' value:'%s' context:'%s' type:%d",
 				gmacro->globalmacroid, gmacro->macro,
-				gmacro->value, ZBX_NULL2EMPTY_STR(gmacro->context));
+				gmacro->value, ZBX_NULL2EMPTY_STR(gmacro->context), gmacro->type);
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -360,8 +360,8 @@ static void	DCdump_hmacros(void)
 	{
 		hmacro = (ZBX_DC_HMACRO *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "hostmacroid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " macro:'%s' value:'%s'"
-				" context '%s'", hmacro->hostmacroid, hmacro->hostid, hmacro->macro, hmacro->value,
-				ZBX_NULL2EMPTY_STR(hmacro->context));
+				" context '%s' type:%d", hmacro->hostmacroid, hmacro->hostid, hmacro->macro,
+				hmacro->value, ZBX_NULL2EMPTY_STR(hmacro->context), hmacro->type);
 	}
 
 	zbx_vector_ptr_destroy(&index);

@@ -698,7 +698,6 @@ a.link-action {
 
 	&:focus {
 		box-shadow: 0 0 0 1px $blue;
-		transition: box-shadow .2s ease-out;
 	}
 }
 
@@ -1281,4 +1280,10 @@ td.inactive-bg {
 			transform: translateY(-50%);
 		}
 	}
+}
+
+// InputSecret and ButtonDropdown
+
+.btn-undo.is-focused {
+	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
 }
