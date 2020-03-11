@@ -721,15 +721,48 @@ class CTriggerExpression {
 
 		$len = strlen($matches[0]);
 
-		$str = substr($matches[0], 1, -1);
-		$str = strtr($str, ['\\"' => '"', '\\\\' => '\\']);
-
 		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_STRING, $matches[0], $this->pos, $len,
-			['string' => $str]
+			['string' => self::unquoteString($matches[0])]
 		);
 
 		$this->pos += $len - 1;
 
 		return true;
+	}
+
+	/**
+	 * Unquoting quoted string $value.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function unquoteString(string $value): string {
+		return strtr(substr($value, 1, -1), ['\\"' => '"', '\\\\' => '\\']);
+	}
+
+	/**
+	 * Quoting $value if it contains a non numeric value.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function quoteString(string $value): string {
+		$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+		$lld_macro_parser = new CLLDMacroParser();
+		$lld_macro_function_parser = new CLLDMacroFunctionParser;
+		$user_macro_parser = new CUserMacroParser();
+		$number_parser = new CNumberParser(['with_suffix' => true]);
+
+		if ($number_parser->parse($value) == CParser::PARSE_SUCCESS
+				|| $user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+				|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
+				|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+				|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			return $value;
+		}
+
+		return '"'.strtr($value, ['\\' => '\\\\', '"' => '\\"']).'"';
 	}
 }

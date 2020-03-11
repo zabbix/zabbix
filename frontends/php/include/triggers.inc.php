@@ -1887,13 +1887,13 @@ function makeExpression(array $expressionTree, $level = 0, $operator = null) {
 }
 
 function get_item_function_info($expr) {
-	$rule_float = [_('Numeric (float)'), 'preg_match("/^'.ZBX_PREG_NUMBER.'$/", {})'];
-	$rule_int = [_('Numeric (integer)'), 'preg_match("/^'.ZBX_PREG_INT.'$/", {})'];
-	$rule_str = [_('String'), 'preg_match("/^".*"$/", {})'];
-	$rule_any = [_('Any'), 'preg_match("/^.*$/", {})'];
-	$rule_0or1 = [_('0 or 1'), IN('0,1')];
+	$rule_float = ['value_type' => _('Numeric (float)'), 'values' => null];
+	$rule_int = ['value_type' => _('Numeric (integer)'), 'values' => null];
+	$rule_str = ['value_type' => _('String'), 'values' => null];
+	$rule_any = ['value_type' => _('Any'), 'values' => null];
+	$rule_0or1 = ['value_type' => _('0 or 1'), 'values' => [0 => 0, 1 => 1]];
 	$rules = [
-		// Every nested array should have two elements: label, validation.
+		// Every nested array should have two elements: label, values.
 		'integer' => [
 			ITEM_VALUE_TYPE_UINT64 => $rule_int
 		],
@@ -1935,16 +1935,16 @@ function get_item_function_info($expr) {
 			ITEM_VALUE_TYPE_LOG => $rule_0or1
 		],
 		'date' => [
-			'any' => ['YYYYMMDD', '{}>=19700101&&{}<=99991231']
+			'any' => ['value_type' => 'YYYYMMDD', 'values' => null]
 		],
 		'time' => [
-			'any' => ['HHMMSS', 'preg_match("/^([01]?\d|2[0-3])([0-5]?\d)([0-5]?\d)$/", {})']
+			'any' => ['value_type' => 'HHMMSS', 'values' => null]
 		],
 		'day_of_month' => [
-			'any' => ['1-31', '{}>=1&&{}<=31']
+			'any' => ['value_type' => '1-31', 'values' => null]
 		],
 		'day_of_week' => [
-			'any' => ['1-7', IN('1,2,3,4,5,6,7')]
+			'any' => ['value_type' => '1-7', 'values' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7]]
 		]
 	];
 
@@ -1989,20 +1989,12 @@ function get_item_function_info($expr) {
 
 	switch (true) {
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_MACRO)):
-			$result = [
-				'type' => T_ZBX_STR,
-				'value_type' => $rule_0or1[0],
-				'validation' => $rule_0or1[1]
-			];
+			$result = $rule_0or1;
 			break;
 
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)):
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO)):
-			$result = [
-				'type' => T_ZBX_STR,
-				'value_type' => $rule_any[0],
-				'validation' => $rule_any[1]
-			];
+			$result = $rule_any;
 			break;
 
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
@@ -2059,11 +2051,7 @@ function get_item_function_info($expr) {
 				break;
 			}
 
-			$result = [
-				'type' => T_ZBX_STR,
-				'value_type' => $function[$value_type][0],
-				'validation' => $function[$value_type][1]
-			];
+			$result = $function[$value_type];
 			break;
 
 		default:
@@ -2083,38 +2071,16 @@ function get_item_function_info($expr) {
  * @return bool  The calculated value of the expression.
  */
 function evalExpressionData($expression, $replace_function_macros) {
-	// Sort by longest array key which in this case contains macros.
-	uksort($replace_function_macros, function ($key1, $key2) {
-		$s1 = strlen($key1);
-		$s2 = strlen($key2);
-
-		if ($s1 == $s2) {
-			return 0;
-		}
-
-		return ($s1 > $s2) ? -1 : 1;
-	});
-
-	$values = [];
-	foreach ($replace_function_macros as $key => &$value) {
-		if ($value['value_type'] === _('String') || $value['value_type'] === _('Any')) {
-			$value['value'] = str_replace('\\', '\\\\', $value['value']);
-			$value['value'] = str_replace('"', '\"', $value['value']);
-			$value['value'] = '"'.$value['value'].'"';
-		}
-		$values[$key] = $value['value'];
+	foreach ($replace_function_macros as &$value) {
+		$value = CTriggerExpression::quoteString($value);
 	}
 	unset($value);
 
 	// Replace function macros with their values.
-	$expression = str_replace(array_keys($values), array_values($values), $expression);
+	$expression = strtr($expression, $replace_function_macros);
 	$parser = new CTriggerExpression();
 	$parse_result = $parser->parse($expression);
 
-	/*
-	 * The $replaceFunctionMacros array may contain string values which after substitution will result in an invalid
-	 * expression. In such cases we should just return false.
-	 */
 	if (!$parse_result) {
 		return false;
 	}
@@ -2141,15 +2107,6 @@ function evalExpressionData($expression, $replace_function_macros) {
 				}
 
 				$value = '((float) "'.$value.'")';
-				break;
-
-			case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-				// Check if string contains a valid suffix and try to convert. Otherwise leave original quoted value.
-				if (preg_match('/[\-+]?([.][0-9]+|[0-9]+[.]?[0-9]*)['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']/',
-						$token['data']['string'],
-						$match)) {
-					$value = convert($token['data']['string']);
-				}
 				break;
 		}
 
