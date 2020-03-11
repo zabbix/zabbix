@@ -775,7 +775,7 @@ class CHostInterface extends CApiService {
 		if (!preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])
 				&& $user_macro_parser->parse($interface['dns']) != CParser::PARSE_SUCCESS) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect interface DNS parameter "%s" provided.', $interface['dns'])
+				_s('Incorrect interface DNS parameter "%1$s" provided.', $interface['dns'])
 			);
 		}
 	}
@@ -819,7 +819,9 @@ class CHostInterface extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Port cannot be empty for host interface.'));
 		}
 		elseif (!validatePortNumberOrMacro($interface['port'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface port "%s" provided.', $interface['port']));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect interface port "%1$s" provided.', $interface['port'])
+			);
 		}
 	}
 

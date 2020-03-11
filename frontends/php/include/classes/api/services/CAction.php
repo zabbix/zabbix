@@ -1774,7 +1774,7 @@ class CAction extends CApiService {
 						case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 							if (!isset($operation['opcommand']['execute_on'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No execution target specified for action operation command "%s".',
+									_s('No execution target specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
 									)
 								);
@@ -1784,7 +1784,7 @@ class CAction extends CApiService {
 							if (!isset($operation['opcommand']['authtype'])
 									|| zbx_empty($operation['opcommand']['authtype'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication type specified for action operation command "%s".',
+									_s('No authentication type specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
 									)
 								);
@@ -1794,7 +1794,7 @@ class CAction extends CApiService {
 									|| !is_string($operation['opcommand']['username'])
 									|| $operation['opcommand']['username'] == '') {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication user name specified for action operation command "%s".',
+									_s('No authentication user name specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
 									)
 								);
@@ -1804,7 +1804,7 @@ class CAction extends CApiService {
 								if (!isset($operation['opcommand']['publickey'])
 										|| zbx_empty($operation['opcommand']['publickey'])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('No public key file specified for action operation command "%s".',
+										_s('No public key file specified for action operation command "%1$s".',
 											$operation['opcommand']['command']
 										)
 									);
@@ -1812,7 +1812,7 @@ class CAction extends CApiService {
 								if (!isset($operation['opcommand']['privatekey'])
 										|| zbx_empty($operation['opcommand']['privatekey'])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('No private key file specified for action operation command "%s".',
+										_s('No private key file specified for action operation command "%1$s".',
 											$operation['opcommand']['command']
 										)
 									);
@@ -1829,7 +1829,7 @@ class CAction extends CApiService {
 									|| !is_string($operation['opcommand']['username'])
 									|| $operation['opcommand']['username'] == '') {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication user name specified for action operation command "%s".',
+									_s('No authentication user name specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
 									)
 								);
@@ -1861,7 +1861,7 @@ class CAction extends CApiService {
 						if (zbx_ctype_digit($operation['opcommand']['port'])) {
 							if ($operation['opcommand']['port'] > 65535 || $operation['opcommand']['port'] < 1) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect action operation port "%s".', $operation['opcommand']['port'])
+									_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
 								);
 							}
 						}
@@ -1870,7 +1870,7 @@ class CAction extends CApiService {
 
 							if ($user_macro_parser->parse($operation['opcommand']['port']) != CParser::PARSE_SUCCESS) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect action operation port "%s".', $operation['opcommand']['port'])
+									_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
 								);
 							}
 						}
@@ -1903,15 +1903,17 @@ class CAction extends CApiService {
 					if (!$groupids && !$hostids && $withoutCurrent) {
 						if ($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('You did not specify targets for action operation global script "%s".',
+								_s('You did not specify targets for action operation global script "%1$s".',
 									$scripts[$operation['opcommand']['scriptid']]['name']
-							));
+								)
+							);
 						}
 						else {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('You did not specify targets for action operation command "%s".',
+								_s('You did not specify targets for action operation command "%1$s".',
 									$operation['opcommand']['command']
-							));
+								)
+							);
 						}
 					}
 
