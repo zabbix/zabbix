@@ -1455,7 +1455,7 @@ typedef enum
 zbx_token_search_t;
 
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
-int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc);
+int	zbx_number_or_string_find(const char *str, size_t pos, zbx_strloc_t *number_loc);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)

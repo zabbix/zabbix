@@ -9588,8 +9588,9 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		zbx_macro_value_validator_func_t validator_func)
 {
 	zbx_token_t	token;
-	int		pos = 0, len, last_pos = 0;
-	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL;
+	int		pos = 0, len, last_pos = 0, escape_quote_escaped_value_len;
+	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL, *escape_escaped_value = NULL,
+			*escape_quote_escaped_value = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
 
 	if ('\0' == *text)
@@ -9611,6 +9612,17 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 		if (NULL != value)
 		{
+			escape_escaped_value = zbx_dyn_escape_string(value, "\\");
+			zbx_free(value);
+			escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value, "\"");
+			zbx_free(escape_escaped_value);
+			escape_quote_escaped_value_len = strlen(escape_quote_escaped_value);
+
+			value = zbx_malloc(NULL, escape_quote_escaped_value_len + 2);
+			zbx_strlcpy(value ,escape_quote_escaped_value, escape_quote_escaped_value_len + 1);
+			value[escape_quote_escaped_value_len + 1] = '\0';
+			zbx_free(escape_quote_escaped_value);
+
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
 			zbx_free(value);
 		}

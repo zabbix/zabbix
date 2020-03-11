@@ -72,6 +72,9 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 
 void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
 
+void	get_trigger_expression_constant(const char *expression, const zbx_token_reference_t *reference,
+		char **constant, size_t *length);
+
 /* lld macro context */
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_NUMERIC	(ZBX_MACRO_ANY | ZBX_TOKEN_NUMERIC)

@@ -4232,7 +4232,8 @@ int	zbx_suffixed_number_parse(const char *number, int *len)
  *                                                                            *
  * Function: zbx_number_find                                                  *
  *                                                                            *
- * Purpose: finds number inside expression starting at specified position     *
+ * Purpose: finds number or a quoted string inside expression starting at     *
+ * specified position                                                         *
  *                                                                            *
  * Parameters: str        - [IN] the expression                               *
  *             pos        - [IN] the starting position                        *
@@ -4248,56 +4249,137 @@ int	zbx_suffixed_number_parse(const char *number, int *len)
  *           beginning of the expression.                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
+int	zbx_number_or_string_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 {
 	const char	*s, *e;
-	int		len;
+	int parsing_str = 0, i = 0, len;
 
 	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
 	{
-		if (0 == isdigit(*s) && ('.' != *s || 0 == isdigit(s[1])))
-			continue;
+		i++;
 
-		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
+		if ('\"'==(*s))
 		{
-			/* skip functions '{65432}' */
-			s = e;
-			continue;
+			if (!parsing_str)
+			{
+				s++;
+				number_loc->l = s-str;
+				parsing_str = 1;
+
+				if (parsing_str && '\\' == *s)
+					s++;
+
+				continue;
+			}
+			else
+			{
+				number_loc->r = s-str-1;
+				return SUCCEED;
+			}
 		}
 
-		if (SUCCEED != zbx_suffixed_number_parse(s, &len))
-			continue;
+		if (parsing_str && '\\' == (*s))
+			s++;
 
-		/* number found */
-
-		number_loc->r = s + len - str - 1;
-
-		/* check for minus before number */
-		if (s > str + pos && '-' == *(s - 1))
+		if (!parsing_str)
 		{
-			/* and make sure it's unary */
-			if (s - 1 > str)
+			if (0 == isdigit(*s) && ('.' != *s || 0 == isdigit(s[1])) && '\"' != *s)
+				continue;
+
+			if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
 			{
-				e = s - 2;
+				/* skip functions '{65432}' */
+				s = e;
+				continue;
+			}
 
-				if (e > str && NULL != strchr(ZBX_UNIT_SYMBOLS, *e))
-					e--;
+			if (SUCCEED != zbx_suffixed_number_parse(s, &len))
+				continue;
+			/* number found */
 
-				/* check that minus is not preceded by function, parentheses or (suffixed) number */
-				if ('}' != *e && ')' != *e && '.' != *e && 0 == isdigit(*e))
+			number_loc->r = s + len - str - 1;
+
+			/* check for minus before number */
+			if (s > str + pos && '-' == *(s - 1))
+			{
+				/* and make sure it's unary */
+				if (s - 1 > str)
+				{
+					e = s - 2;
+
+					if (e > str && NULL != strchr(ZBX_UNIT_SYMBOLS, *e))
+						e--;
+
+					/* check that minus is not preceded by function, parentheses or */
+					/* (suffixed) number */
+					if ('}' != *e && ')' != *e && '.' != *e && 0 == isdigit(*e))
+						s--;
+				}
+				else	/* nothing before minus, it's definitely unary */
 					s--;
 			}
-			else	/* nothing before minus, it's definitely unary */
-				s--;
+
+			number_loc->l = s - str;
+			return SUCCEED;
 		}
-
-		number_loc->l = s - str;
-
-		return SUCCEED;
 	}
-
 	return FAIL;
 }
+
+/* int	zbx_str_find(const char *str, size_t pos, zbx_strloc_t *number_loc) */
+/* { */
+/* 	const char	*s, *e; */
+/* 	int		len; */
+
+/* 	int in = 0; */
+/* 	int i = 0; */
+	
+/* 	for (s = str + pos; '\0' != *s; s++)	/\* find start of number *\/ */
+/* 	{ */
+/* 	  printf("i: %d, in: %d, c: %c \n",i++,in,*s); */
+	  
+/* 		/\* if (0 == isdigit(*s) && ('.' != *s || 0 == isdigit(s[1])) && '\"'!=(*s)) *\/ */
+/* 		/\* 	continue; *\/ */
+
+/* 	  if ('\"'!=(*s)) */
+/* 	  { */
+/* 	  	continue; */
+/* 	  } */
+/* 	  else if (in && '\"'==(*s)) */
+/* 	  { */
+/* 	    number_loc->r = s-str-1; */
+/* 	    printf("NUMBER_LOC->r , ->%d<-\n",number_loc->r); */
+
+/* 	  	return SUCCEED; */
+/* 	  } */
+/* 	  else */
+/* 	  { */
+/* 	  	s++;	     */
+/* 		number_loc->l = s-str; */
+/* 		printf("NUMBER_LOC->l , ->%d<-\n",number_loc->l); */
+/* 		in = 1; */
+/* 	  } */
+	  
+/* 		/\* if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}'))) *\/ */
+/* 		/\* { *\/ */
+/* 		/\* 	/\\* skip functions '{65432}' *\\/ *\/ */
+/* 		/\* 	s = e; *\/ */
+/* 		/\* 	continue; *\/ */
+/* 		/\* } *\/ */
+
+	  
+	  
+		
+/* 		//number_loc->r = s + len - str - 1; */
+
+
+/* 		//number_loc->l = s - str; */
+
+/* 		//return SUCCEED; */
+/* 	} */
+
+/* 	return FAIL; */
+/* } */
 
 
 /******************************************************************************

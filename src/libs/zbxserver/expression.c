@@ -244,25 +244,57 @@ static char	*get_expanded_expression(const char *expression)
  *             length     - [OUT] length of constant                          *
  *                                                                            *
  ******************************************************************************/
-static void	get_trigger_expression_constant(const char *expression, const zbx_token_reference_t *reference,
-		const char **constant, size_t *length)
+void	get_trigger_expression_constant(const char *expression, const zbx_token_reference_t *reference,
+		char **constant, size_t *length)
 {
 	size_t		pos;
 	zbx_strloc_t	number;
 	int		index;
+	char		*tmp = NULL;
 
-	for (pos = 0, index = 1; SUCCEED == zbx_number_find(expression, pos, &number); pos = number.r + 1, index++)
+	for (pos = 0, index = 1; SUCCEED == zbx_number_or_string_find(expression, pos, &number)
+			; pos = number.r + 1, index++)
 	{
 		if (index < reference->index)
+		{
+			if ('\"' == expression[number.r+1])
+			{
+				number.r = number.r+1;
+			}
 			continue;
-
+		}
 		*length = number.r - number.l + 1;
-		*constant = expression + number.l;
+		*constant = zbx_malloc(NULL, *length+1);
+		tmp = expression + number.l;
+
+		// unescape
+		int ii = 0;
+		for (int i =0; i < *length; ++i)
+		{
+			if ('\\' == *(tmp+i) )
+			{
+				if('\\' != *(tmp + i + 1) && '\"' != *(tmp + i + 1))
+				{
+					// every slash and quote symbol must be escaped at this stage
+					THIS_SHOULD_NEVER_HAPPEN;
+				}
+				i++;
+			}
+
+			(*constant)[ii] = tmp[i];
+			ii++;
+		}
+
+		(*constant)[ii] = '\0';
+		*length = ii;
+
 		return;
+
 	}
 
 	*length = 0;
-	*constant = "";
+	*constant = zbx_malloc(NULL, 1);
+	(*constant)[0] = '\0';
 }
 
 static void	DCexpand_trigger_expression(char **expression)
@@ -2766,8 +2798,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
-	char			c, *replace_to = NULL, sql[64];
-	const char		*m, *replace = NULL;
+	char			c, *replace_to = NULL,  *replace = NULL, sql[64];
+	const char		*m;
 	int			N_functionid, indexed_macro, require_numeric, require_address, ret, res = SUCCEED,
 				pos = 0, found,
 				raw_value;
@@ -4557,6 +4589,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		pos++;
 	}
 
+	zbx_free(replace);
 	zbx_free(expression);
 	zbx_vector_uint64_destroy(&hostids);
 
