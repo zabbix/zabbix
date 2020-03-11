@@ -576,18 +576,19 @@ class ZBase {
 	 * Set layout to kiosk mode if URL contains 'kiosk' arguments.
 	 */
 	private function setLayoutModeByUrl() {
-		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
-			CViewHelper::saveLayoutMode(ZBX_LAYOUT_KIOSKMODE);
-		}
+		if (hasRequest('kiosk')) {
+			CViewHelper::saveLayoutMode(getRequest('kiosk') === '1' ? ZBX_LAYOUT_KIOSKMODE : ZBX_LAYOUT_NORMAL);
 
-		// Remove $_GET arguments to prevent CUrl from generating URL with 'kiosk' arguments.
-		unset($_GET['kiosk']);
+			// Remove $_GET arguments to prevent CUrl from generating URL with 'kiosk' arguments.
+			unset($_GET['kiosk']);
+		}
 	}
 
 	/**
 	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
 	 */
 	private function initComponents() {
+
 		$this->component_registry->register('menu.main', getMainMenu());
 		$this->component_registry->register('menu.user', getUserMenu());
 	}
