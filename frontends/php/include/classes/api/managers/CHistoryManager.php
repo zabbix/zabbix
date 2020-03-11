@@ -1057,7 +1057,7 @@ class CHistoryManager {
 			$history_table = self::getTableName($value_type);
 
 			if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
-					&&	PostgresqlDbBackend::isCompressed($history_table, $trend_table)) {
+					&&	PostgresqlDbBackend::isCompressed([$history_table, $trend_table])) {
 				error(_('Some of the history for this item may be compressed, deletion is not available'));
 				return false;
 			}

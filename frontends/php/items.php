@@ -984,7 +984,7 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 		$itemId = getRequest('itemid');
 
 		$items = API::Item()->get([
-			'output' => ['key_', 'value_type'],
+			'output' => ['itemid', 'key_', 'value_type'],
 			'itemids' => [$itemId],
 			'selectHosts' => ['name'],
 			'editable' => true
