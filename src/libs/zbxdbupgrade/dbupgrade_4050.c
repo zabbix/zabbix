@@ -970,6 +970,7 @@ static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
 		snmp.contextname = zbx_strdup(NULL, "");
 		snmp.item_port = zbx_strdup(NULL, "");
 		snmp.skip = 0;
+		snmp.item_interfaceid = 0;
 
 		zbx_vector_dbu_snmp_if_append(snmp_def_ifs, snmp);
 	}
