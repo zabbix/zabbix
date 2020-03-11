@@ -81,12 +81,6 @@ func TestPlugin_replicationHandler(t *testing.T) {
 			args{conn: sharedPool, key: "pgsql.replication.master.discovery.application_name"},
 			false,
 		},
-		{
-			fmt.Sprintf("replicationHandler should not return ptr to Pool without params with key"),
-			&impl,
-			args{conn: sharedPool},
-			true,
-		},
 	}
 
 	for _, tt := range tests {

@@ -56,7 +56,7 @@ func TestPlugin_connectionsHandler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			_, err := tt.p.connectionsHandler(tt.args.conn, tt.args.params)
+			_, err := tt.p.connectionsHandler(tt.args.conn, keyPostgresConnections, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.connectionsHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

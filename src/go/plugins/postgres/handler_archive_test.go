@@ -56,7 +56,7 @@ func TestPlugin_archiveHandler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := tt.p.archiveHandler(tt.args.conn, tt.args.params)
+			got, err := tt.p.archiveHandler(tt.args.conn, keyPostgresSizeArchive, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.archiveHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -56,7 +56,7 @@ func TestPlugin_databasesAgeHandler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			_, err := tt.p.databasesAgeHandler(tt.args.conn, tt.args.params)
+			_, err := tt.p.databasesAgeHandler(tt.args.conn, keyPostgresDatabasesAge, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.databaseAgeHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

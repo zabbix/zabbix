@@ -56,7 +56,7 @@ func TestPlugin_databasesSizeHandler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			_, err := tt.p.databasesSizeHandler(tt.args.conn, tt.args.params)
+			_, err := tt.p.databasesSizeHandler(tt.args.conn, keyPostgresDatabasesSize, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.databaseSizeHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

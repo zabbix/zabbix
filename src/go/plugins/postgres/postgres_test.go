@@ -66,7 +66,7 @@ func TestPlugin_Export(t *testing.T) {
 		{
 			"Too many parameters",
 			&impl,
-			args{keyPostgresPing, []string{"param1", "param2"}, nil},
+			args{keyPostgresPing, []string{"param1", "param2", "param3", "param4"}, nil},
 			nil,
 			true,
 		},
