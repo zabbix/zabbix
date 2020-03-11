@@ -40,6 +40,13 @@ foreach ($data['macros'] as $i => $macro) {
 
 	$macro_value = new CMacroValue($macro['type'], 'macros['.$i.']');
 
+	if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+		$macro_value->addRevertButton();
+		$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
+			&& array_key_exists('globalmacroid', $macro)
+		);
+	}
+
 	if (array_key_exists('value', $macro)) {
 		$macro_value->setAttribute('value', $macro['value']);
 	}
