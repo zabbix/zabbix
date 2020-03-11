@@ -417,13 +417,22 @@ elseif (hasRequest('filter_rst')) {
 /*
  * Display
  */
-$filter = [
-	'groups' => CProfile::getArray('web.graphs.filter_groups', null),
-	'hosts' => CProfile::getArray('web.graphs.filter_hostids', null)
-];
+if (hasRequest('parent_discoveryid')) {
+	// Argument parent_discoveryid is considered as alternative filter.
+	$filter = [
+		'groups' => null,
+		'hosts' => null
+	];
+}
+else {
+	$filter = [
+		'groups' => CProfile::getArray('web.graphs.filter_groups', null),
+		'hosts' => CProfile::getArray('web.graphs.filter_hostids', null)
+	];
+}
 
 // Get host groups.
-$filter['groups'] = ($filter['groups'] && !hasRequest('parent_discoveryid'))
+$filter['groups'] = $filter['groups']
 	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
 		'groupids' => $filter['groups'],
