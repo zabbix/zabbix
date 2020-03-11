@@ -204,7 +204,7 @@
 		<?php if ($data['is_template']): ?>
 			return {'only_hostid':'<?= $data['hostid'] ?>'};
 		<?php else: ?>
-			return {'real_hosts':'1'};
+			return {'real_hosts':'1', 'hostid':'<?= $data['hostid'] ?>'};
 		<?php endif ?>
 	}
 
