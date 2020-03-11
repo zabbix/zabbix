@@ -58,7 +58,7 @@ $filter = (new CFilter(new CUrl('httpconf.php')))
 							'srcfld1' => 'hostid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_hostids_',
-							'templated_hosts' => 1,
+							'with_hosts_and_templates' => 1,
 							'editable' => 1
 						]
 					]
