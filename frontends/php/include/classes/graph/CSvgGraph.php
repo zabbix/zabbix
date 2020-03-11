@@ -645,7 +645,7 @@ class CSvgGraph extends CSvg {
 		$interval = 1;
 		$units = '';
 		$is_binary = false;
-		$power = 1;
+		$power = 0;
 
 		if (!$empty_set) {
 			if ($side === GRAPH_YAXIS_SIDE_LEFT) {
