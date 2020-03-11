@@ -7653,6 +7653,8 @@ table.preprocessing-test-results {
 	}
 }
 
+// HOST INTERFACES
+
 .interface-container {
 	border-bottom: 1px solid #cecece;
 	margin-bottom: 5px;
@@ -7691,6 +7693,7 @@ table.preprocessing-test-results {
 			align-self: center;
 
 			.interface-btn-toggle {
+				display: none;
 				@extend .btn-link;
 			}
 
@@ -7749,6 +7752,7 @@ table.preprocessing-test-results {
 	}
 
 	.interface-btn-toggle {
+		display: inline-block;
 		@extend %btn-widget;
 	}
 }

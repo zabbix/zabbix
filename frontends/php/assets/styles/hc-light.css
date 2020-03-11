@@ -5071,6 +5071,8 @@ table.preprocessing-test-results .rel-container {
       margin: 5px 5px 5px 0;
       flex: 0 1 auto;
       align-self: center; }
+      .interface-container .interface-row .interface-cell .interface-btn-toggle {
+        display: none; }
       .interface-container .interface-row .interface-cell.interface-cell-header {
         color: #768d99;
         text-align: left; }
@@ -5094,6 +5096,8 @@ table.preprocessing-test-results .rel-container {
   display: none; }
 .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .list-accordion-item-body {
   display: block; }
+.interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
+  display: inline-block; }
 
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
