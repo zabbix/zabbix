@@ -996,12 +996,12 @@ class CHistoryManager {
 	/**
 	 * Clear item history and trends by provided item IDs. History is deleted from both SQL and Elasticsearch.
 	 *
-	 * @param array $itemids    item ids to delete history for
+	 * @param array $items  Key - itemid, value - value_type.
 	 *
 	 * @return bool
 	 */
-	public function deleteHistory(array $itemids) {
-		return $this->deleteHistoryFromSql($itemids) && $this->deleteHistoryFromElasticsearch($itemids);
+	public function deleteHistory(array $items) {
+		return $this->deleteHistoryFromSql($items) && $this->deleteHistoryFromElasticsearch(array_keys($items));
 	}
 
 	/**
@@ -1043,23 +1043,32 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-	private function deleteHistoryFromSql(array $itemids) {
+	private function deleteHistoryFromSql(array $items) {
 		global $DB;
 		$config = select_config();
+		$value_types = [];
 
-		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
-				&&	PostgresqlDbBackend::hasChunks()) {
-			error(_('Some of the history for this item are in compressed chunks, deletion is not available'));
-			return false;
+		foreach ($items as $itemid => $value_type) {
+			$value_types[$value_type][] = $itemid;
 		}
 
-		return DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemids));
+		foreach ($value_types as $value_type => $itemids) {
+			$trend_table = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
+			$history_table = self::getTableName($value_type);
+
+			if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
+					&&	PostgresqlDbBackend::isCompressed($history_table, $trend_table)) {
+				error(_('Some of the history for this item are in compressed chunks, deletion is not available'));
+				return false;
+			}
+
+			if (!DBexecute('DELETE FROM '.$trend_table.' WHERE '.dbConditionInt('itemid', $itemids))
+					|| !DBexecute('DELETE FROM '.$history_table.' WHERE '.dbConditionInt('itemid', $itemids))) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**

@@ -984,7 +984,7 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 		$itemId = getRequest('itemid');
 
 		$items = API::Item()->get([
-			'output' => ['key_'],
+			'output' => ['key_', 'value_type'],
 			'itemids' => [$itemId],
 			'selectHosts' => ['name'],
 			'editable' => true
@@ -993,7 +993,7 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 		if ($items) {
 			DBstart();
 
-			$result = Manager::History()->deleteHistory([$itemId]);
+			$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
 
 			if ($result) {
 				$item = reset($items);
@@ -1407,7 +1407,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		$itemIds = getRequest('group_itemid');
 
 		$items = API::Item()->get([
-			'output' => ['itemid', 'key_'],
+			'output' => ['itemid', 'key_', 'value_type'],
 			'itemids' => $itemIds,
 			'selectHosts' => ['name'],
 			'editable' => true
@@ -1416,7 +1416,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		if ($items) {
 			DBstart();
 
-			$result = Manager::History()->deleteHistory($itemIds);
+			$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
 
 			if ($result) {
 				foreach ($items as $item) {

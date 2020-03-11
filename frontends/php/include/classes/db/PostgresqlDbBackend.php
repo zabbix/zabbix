@@ -125,11 +125,14 @@ class PostgresqlDbBackend extends DbBackend {
 	 *
 	 * @return bool
 	 */
-	public static function hasChunks() {
-		$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
+	public static function isCompressed($history_table, $trend_table) {
+		$query = sprintf('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
 			' FROM timescaledb_information.compressed_hypertable_stats'.
-			' WHERE number_compressed_chunks != 0 and hypertable_name::text in ('.
-			"'history', 'history_log', 'history_str', 'history_uint', 'history_text', 'trends', 'trends_uint');"));
+			' WHERE number_compressed_chunks != 0 and hypertable_name::text in (\'%s\', \'%s\')', $history_table,
+			$trend_table
+		);
+
+		$result = DBfetch(DBselect($query));
 
 		return (bool) $result['chunks'];
 	}
