@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-10T09:16:13Z</date>
+    <date>2020-03-11T08:04:47Z</date>
     <media_types>
         <media_type>
             <name>Jira</name>
@@ -159,8 +159,9 @@ var Jira = {&#13;
 &#13;
     request: function (method, query, data) {&#13;
         ['url', 'user', 'password', 'project_key', 'issue_type'].forEach(function (field) {&#13;
-            if (typeof Jira.params !== 'object' || typeof Jira.params[field] === 'undefined') {&#13;
-                throw new Error('Required Jira param is not set: ' + field);&#13;
+            if (typeof Jira.params !== 'object' || typeof Jira.params[field] === 'undefined'&#13;
+                || Jira.params[field] === '' ) {&#13;
+                throw new Error('Required Jira param is not set: &quot;' + field + '&quot;.');&#13;
             }&#13;
         });&#13;
 &#13;
@@ -307,7 +308,7 @@ try {&#13;
                 update[key.substring(13)] = params[key];&#13;
             }&#13;
             else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
-                throw 'Parameter ' + key + 'can\'t be empty.';&#13;
+                throw 'Parameter &quot;' + key + '&quot; can\'t be empty.';&#13;
             }&#13;
         });&#13;
 &#13;
