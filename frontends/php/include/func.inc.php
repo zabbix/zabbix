@@ -406,7 +406,6 @@ function zbx_num2bitstr($num, $rev = false) {
 		return 0;
 	}
 
-	$sbin = 0;
 	$strbin = '';
 
 	$len = 32;
@@ -2207,9 +2206,11 @@ function splitPath($path) {
 /**
  * Allocate color for an image.
  *
- * @param resource 	$image
- * @param string	$color		a hexadecimal color identifier like "1F2C33"
- * @param int 		$alpha
+ * @param resource $image
+ * @param string   $color  a hexadecimal color identifier like "1F2C33"
+ * @param int      $alpha
+ *
+ * @return int|false
  */
 function get_color($image, $color, $alpha = 0) {
 	$red = hexdec('0x'.substr($color, 0, 2));

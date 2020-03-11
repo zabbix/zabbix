@@ -311,9 +311,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$data['avg_orig'] = $data['avg'] ? zbx_avg($data['avg']) : null;
 
-			// calculate missed points
-			$first_idx = 0;
-
 			/*
 				first_idx - last existing point
 				ci - current index
