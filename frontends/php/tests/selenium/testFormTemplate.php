@@ -22,6 +22,10 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup hosts
+ *
+ * @on-before disableDebugMode
+ * @on-after enableDebugMode
+ *
  */
 class testFormTemplate extends CLegacyWebTest {
 	public $template = 'Form test template';
@@ -295,5 +299,20 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount("SELECT triggerid FROM triggers WHERE templateid='".$template['hostid']."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT httptestid FROM httptest WHERE hostid='".$template['hostid']."'"));
+	}
+
+	/**
+	 * Debug button sometimes overlaps element and impossible to click on it.
+	 */
+	public static function setDebugMode($value) {
+		DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($value).' WHERE usrgrpid=7');
+	}
+
+	public function disableDebugMode() {
+		self::setDebugMode(0);
+	}
+
+	public static function enableDebugMode() {
+		self::setDebugMode(1);
 	}
 }
