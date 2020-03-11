@@ -192,20 +192,11 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
 
-		//  Set layout mode to kiosk mody by old fullscreen link.
-		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=1', false);
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
-		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
-		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
-
 		// Set layout mode to default layout.
-		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=0');
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&kiosk=0');
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
 	}
 
 	/**
