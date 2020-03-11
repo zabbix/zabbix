@@ -486,7 +486,7 @@ article, main {
     border-left-color: #1f2c33; }
   .object-group button {
     line-height: 22px; }
-  .object-group .btn-link {
+  .object-group .btn-link, .object-group .interface-container .interface-row .interface-cell .interface-btn-toggle, .interface-container .interface-row .interface-cell .object-group .interface-btn-toggle {
     line-height: 14px; }
 
 .hor-list li {
@@ -1583,7 +1583,7 @@ button {
     background-color: #e8f5ff;
     border-color: #02659f; }
 
-.btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
+.btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active, .interface-container .interface-row .interface-cell .interface-btn-toggle {
   position: relative;
   background-color: transparent;
   border: 0;
@@ -1593,14 +1593,14 @@ button {
   font-size: inherit;
   padding: 0;
   min-height: inherit; }
-  .btn-link:focus {
+  .btn-link:focus, .interface-container .interface-row .interface-cell .interface-btn-toggle:focus {
     outline: none;
     margin-bottom: -2px !important;
     border-bottom: 2px solid rgba(2, 117, 184, 0.5);
     box-shadow: 0 0 0 0 !important; }
-  .btn-link[disabled] {
+  .btn-link[disabled], .interface-container .interface-row .interface-cell [disabled].interface-btn-toggle {
     background-color: transparent; }
-    .btn-link[disabled]:hover {
+    .btn-link[disabled]:hover, .interface-container .interface-row .interface-cell [disabled].interface-btn-toggle:hover {
       background-color: transparent; }
 
 .btn-search {
@@ -1654,10 +1654,10 @@ button {
 .btn-widget-action {
   background: url(../img/icon-sprite.svg) no-repeat -6px -618px; }
 
-.btn-widget-collapse {
+.btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle {
   background: url(../img/icon-sprite.svg) no-repeat -6px -654px; }
 
-.btn-widget-expand {
+.btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle {
   background: url(../img/icon-sprite.svg) no-repeat -6px -689px; }
 
 .btn-widget-edit {
@@ -1915,7 +1915,7 @@ button {
   .btn-dashbrd-normal.hidden {
     opacity: 0; }
 
-.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock {
+.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   width: 24px;
   height: 24px;
   margin: 2px 2px 0 0; }
@@ -1924,7 +1924,7 @@ button {
   width: 24px;
   height: 24px; }
 
-.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .btn-dashbrd-conf {
+.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle, .btn-dashbrd-conf {
   border: 0;
   min-height: 0;
   padding: 0;
@@ -1958,7 +1958,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   background-color: transparent;
   opacity: 1; }
 
-.btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-widget-delete:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .btn-dashbrd-conf:hover, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-widget-delete:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .btn-dashbrd-conf:focus, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-widget-delete:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .btn-dashbrd-conf:active {
+.btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-widget-delete:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:hover, .btn-dashbrd-conf:hover, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-widget-delete:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:focus, .btn-dashbrd-conf:focus, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-widget-delete:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:active, .btn-dashbrd-conf:active {
   background-color: transparent;
   opacity: 1; }
 
@@ -3079,8 +3079,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   overflow: hidden;
   resize: none;
   word-break: break-all;
-  white-space: normal;
-  height: 24px; }
+  height: 24px;
+  line-height: 14px;
+  white-space: break-spaces; }
 
 .btn-back-map-container {
   text-align: left;
@@ -3123,8 +3124,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .overlay-dialogue-body {
   margin: 0 0 25px;
   white-space: nowrap; }
-  .overlay-dialogue-body textarea {
-    white-space: pre-wrap; }
   .overlay-dialogue-body .debug-output {
     margin: 10px 0 0; }
 
@@ -4509,7 +4508,9 @@ svg {
     width: 100%;
     min-width: 0; }
   .preprocessing-list input[type=text]:not(:last-of-type),
-  .preprocessing-list .btn-link:not(:last-of-type) {
+  .preprocessing-list .btn-link:not(:last-of-type),
+  .preprocessing-list .interface-container .interface-row .interface-cell .interface-btn-toggle:not(:last-of-type),
+  .interface-container .interface-row .interface-cell .preprocessing-list .interface-btn-toggle:not(:last-of-type) {
     margin-right: 10px; }
   .preprocessing-list .preprocessing-list-head,
   .preprocessing-list .preprocessing-list-foot,
@@ -5206,3 +5207,52 @@ table.preprocessing-test-results .rel-container {
   /* for IE11 only. Fixed cell height if table has 100% height */
   .host-avail-widget td {
     height: 100%; } }
+.interface-container {
+  border-bottom: 1px solid #cecece;
+  margin-bottom: 5px;
+  padding: 0;
+  width: 751px; }
+  .interface-container.interface-container-header {
+    margin: 0;
+    border: 0; }
+  .interface-container:empty {
+    display: none; }
+  .interface-container .interface-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+    align-items: stretch;
+    margin-bottom: 5px;
+    width: 751px; }
+    .interface-container .interface-row.interface-row-header {
+      margin: 0; }
+    .interface-container .interface-row[data-type] .interface-cell-details {
+      display: none; }
+    .interface-container .interface-row .interface-cell {
+      margin: 5px 5px 5px 0;
+      flex: 0 1 auto;
+      align-self: center; }
+      .interface-container .interface-row .interface-cell.interface-cell-header {
+        color: #768d99;
+        text-align: left; }
+      .interface-container .interface-row .interface-cell.interface-cell-icon {
+        width: 26px; }
+      .interface-container .interface-row .interface-cell.interface-cell-type {
+        width: 36px; }
+      .interface-container .interface-row .interface-cell.interface-cell-ip {
+        width: 225px; }
+      .interface-container .interface-row .interface-cell.interface-cell-useip {
+        width: 83px; }
+      .interface-container .interface-row .interface-cell.interface-cell-dns {
+        width: 175px; }
+      .interface-container .interface-row .interface-cell.interface-cell-port {
+        width: 100px; }
+      .interface-container .interface-row .interface-cell .table-forms-td-left,
+      .interface-container .interface-row .interface-cell .table-forms-td-right {
+        padding-bottom: 0; }
+
+.interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .list-accordion-item-body {
+  display: none; }
+.interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .list-accordion-item-body {
+  display: block; }

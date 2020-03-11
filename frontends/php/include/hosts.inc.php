@@ -1423,3 +1423,60 @@ function isWritableHostTemplates(array $hostids) {
 
 	return ($count == count($hostids));
 }
+
+function getAddNewInterfaceSubmenu() {
+	return [
+		'main_section' => [
+			'items' => [
+				"javascript:hostInterfaceManager.addAgent();" => _('Agent'),
+				"javascript:hostInterfaceManager.addSnmp();" => _('SNMP'),
+				"javascript:hostInterfaceManager.addJmx();" => _('JMX'),
+				"javascript:hostInterfaceManager.addIpmi();" => _('IPMI')
+			]
+		]
+	];
+}
+
+function renderInterfaceHeaders() {
+	return (new CDiv())
+		->addClass(implode(' ', [ZBX_STYLE_HOST_INTERFACE_CONTAINER, ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER]))
+		->addItem(
+			(new CDiv())
+				->addClass(implode(' ', [ZBX_STYLE_HOST_INTERFACE_ROW, ZBX_STYLE_HOST_INTERFACE_ROW_HEADER]))
+				->addItem([
+					(new CDiv())->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_ICON])
+					),
+					(new CDiv(_('Type')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_TYPE
+						])
+					),
+					(new CDiv(_('IP address')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_IP
+						])
+					),
+					(new CDiv(_('DNS name')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_DNS
+						])
+					),
+					(new CDiv(_('Connect to')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_USEIP
+						])
+					),
+					(new CDiv(_('Port')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_PORT
+						])
+					),
+					(new CDiv(_('Default')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_ACTION
+						])
+					)
+				])
+		);
+}

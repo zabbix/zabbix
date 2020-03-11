@@ -56,11 +56,7 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 */
 import "C"
@@ -73,6 +69,14 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
 	case "system.localtime":
 		cfunc = unsafe.Pointer(C.SYSTEM_LOCALTIME)
+	case "net.dns":
+		cfunc = unsafe.Pointer(C.NET_DNS)
+	case "net.dns.record":
+		cfunc = unsafe.Pointer(C.NET_DNS_RECORD)
+	case "vfs.dir.count":
+		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
+	case "vfs.dir.size":
+		cfunc = unsafe.Pointer(C.VFS_DIR_SIZE)
 	}
 	return
 }

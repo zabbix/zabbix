@@ -182,6 +182,10 @@ jQuery(function($) {
 				sections = getMenuPopupSubmenu(data);
 				break;
 
+			case 'widget_actions':
+				sections = getMenuPopupWidgetActions(data, $obj);
+				break;
+
 			default:
 				return;
 		}

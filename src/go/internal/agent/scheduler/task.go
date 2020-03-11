@@ -42,16 +42,18 @@ const (
 	priorityStopperTaskNs
 )
 
+// exporterTaskAccessor is used by clients to track item exporter tasks .
+type exporterTaskAccessor interface {
+	task() *exporterTask
+}
+
+// taskBase implements common task properties and functionality
 type taskBase struct {
 	plugin    *pluginAgent
 	scheduled time.Time
 	index     int
 	active    bool
 	recurring bool
-}
-
-type exporterTaskAccessor interface {
-	task() *exporterTask
 }
 
 func (t *taskBase) getPlugin() *pluginAgent {
@@ -89,6 +91,7 @@ func (t *taskBase) isRecurring() bool {
 	return t.recurring
 }
 
+// collectorTask provides access to plugin Collector interaface.
 type collectorTask struct {
 	taskBase
 	seed uint64
@@ -121,11 +124,11 @@ func (t *collectorTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *collectorTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }
 
-// exporter task
-
+// exporterTask provides access to plugin Exporter interaface. It's used
+// for active check items.
 type exporterTask struct {
 	taskBase
 	item    clientItem
@@ -137,8 +140,7 @@ type exporterTask struct {
 }
 
 func (t *exporterTask) perform(s Scheduler) {
-	// cache global regexp to avoid synchronization issues when using client.GlobalRegexp() directly
-	// from performer goroutine
+	// pass item key as parameter so it can be safely updated while task is being processed in its goroutine
 	go func(itemkey string) {
 		var result *plugin.Result
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
@@ -226,8 +228,10 @@ func (t *exporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
-// directExporterTask handles direct requests to plugin Exporter interface
-
+// directExporterTask provides access to plugin Exporter interaface.
+// It's used for non-recurring exporter requests - single passive checks
+// and internal requests to obtain HostnameItem, HostMetadataItem,
+// HostInterfaceItem etc values.
 type directExporterTask struct {
 	taskBase
 	item   clientItem
@@ -242,8 +246,7 @@ func (t *directExporterTask) isRecurring() bool {
 	return !t.done
 }
 func (t *directExporterTask) perform(s Scheduler) {
-	// cache global regexp to avoid synchronization issues when using client.GlobalRegexp() directly
-	// from performer goroutine
+	// pass item key as parameter so it can be safely updated while task is being processed in its goroutine
 	go func(itemkey string) {
 		var result *plugin.Result
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
@@ -320,7 +323,7 @@ func (t *directExporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
-// starterTask
+// starterTask provides access to plugin Exporter interaface Start() method.
 type starterTask struct {
 	taskBase
 }
@@ -340,9 +343,10 @@ func (t *starterTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *starterTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }
 
+// stopperTask provides access to plugin Exporter interaface Start() method.
 type stopperTask struct {
 	taskBase
 }
@@ -362,9 +366,10 @@ func (t *stopperTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *stopperTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }
 
+// stopperTask provides access to plugin Watcher interaface.
 type watcherTask struct {
 	taskBase
 	requests []*plugin.Request
@@ -386,7 +391,7 @@ func (t *watcherTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *watcherTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }
 
 // plugin.ContextProvider interface
@@ -411,6 +416,7 @@ func (t *watcherTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
+// configuratorTask provides access to plugin Configurator interaface.
 type configuratorTask struct {
 	taskBase
 	options *agent.AgentOptions
@@ -431,5 +437,5 @@ func (t *configuratorTask) reschedule(now time.Time) (err error) {
 }
 
 func (t *configuratorTask) getWeight() int {
-	return t.plugin.capacity
+	return t.plugin.maxCapacity
 }

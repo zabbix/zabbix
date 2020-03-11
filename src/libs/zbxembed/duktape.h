@@ -1,12 +1,12 @@
 /*
- *  Duktape public API for Duktape 2.3.0.
+ *  Duktape public API for Duktape 2.4.0.
  *
  *  See the API reference for documentation on call semantics.  The exposed,
  *  supported API is between the "BEGIN PUBLIC API" and "END PUBLIC API"
  *  comments.  Other parts of the header are Duktape internal and related to
  *  e.g. platform/compiler/feature detection.
  *
- *  Git commit d7fdb67f18561a50e06bafd196c6b423af9ad6fe (v2.3.0).
+ *  Git commit d4f2cff1c592d70f58bab8e1bd85705174c02a58 (v2.4.0).
  *  Git branch master.
  *
  *  See Duktape AUTHORS.rst and LICENSE.txt for copyright and
@@ -21,7 +21,7 @@
  *  
  *  (http://opensource.org/licenses/MIT)
  *  
- *  Copyright (c) 2013-2018 by Duktape authors (see AUTHORS.rst)
+ *  Copyright (c) 2013-2019 by Duktape authors (see AUTHORS.rst)
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -100,6 +100,15 @@
  *  * Michal Kasperek (https://github.com/michalkas)
  *  * Andrew Janke (https://github.com/apjanke)
  *  * Steve Fan (https://github.com/stevefan1999)
+ *  * Edward Betts (https://github.com/edwardbetts)
+ *  * Ozhan Duz (https://github.com/webfolderio)
+ *  * Akos Kiss (https://github.com/akosthekiss)
+ *  * TheBrokenRail (https://github.com/TheBrokenRail)
+ *  * Jesse Doyle (https://github.com/jessedoyle)
+ *  * Gero Kuehn (https://github.com/dc6jgk)
+ *  * James Swift (https://github.com/phraemer)
+ *  * Luis de Bethencourt (https://github.com/luisbg)
+ *  * Ian Whyman (https://github.com/v00d00)
  *  
  *  Other contributions
  *  ===================
@@ -140,6 +149,8 @@
  *  * Neil Kolban (https://github.com/nkolban)
  *  * Wilhelm Wanecek (https://github.com/wanecek)
  *  * Andrew Janke (https://github.com/apjanke)
+ *  * Unamer (https://github.com/unamer)
+ *  * Karl Dahlke (eklhad@gmail.com)
  *  
  *  If you are accidentally missing from this list, send me an e-mail
  *  (``sami.vaarala@iki.fi``) and I'll fix the omission.
@@ -164,15 +175,15 @@
  * development snapshots have 99 for patch level (e.g. 0.10.99 would be a
  * development version after 0.10.0 but before the next official release).
  */
-#define DUK_VERSION                       20300L
+#define DUK_VERSION                       20400L
 
 /* Git commit, describe, and branch for Duktape build.  Useful for
  * non-official snapshot builds so that application code can easily log
  * which Duktape snapshot was used.  Not available in the ECMAScript
  * environment.
  */
-#define DUK_GIT_COMMIT                    "d7fdb67f18561a50e06bafd196c6b423af9ad6fe"
-#define DUK_GIT_DESCRIBE                  "v2.3.0"
+#define DUK_GIT_COMMIT                    "d4f2cff1c592d70f58bab8e1bd85705174c02a58"
+#define DUK_GIT_DESCRIBE                  "v2.4.0"
 #define DUK_GIT_BRANCH                    "master"
 
 /* External duk_config.h provides platform/compiler/OS dependent
@@ -447,18 +458,24 @@ struct duk_time_components {
  *  Macros to create Symbols as C statically constructed strings.
  *
  *  Call e.g. as DUK_HIDDEN_SYMBOL("myProperty") <=> ("\xFF" "myProperty").
+ *
  *  Local symbols have a unique suffix, caller should take care to avoid
  *  conflicting with the Duktape internal representation by e.g. prepending
  *  a '!' character: DUK_LOCAL_SYMBOL("myLocal", "!123").
  *
  *  Note that these can only be used for string constants, not dynamically
  *  created strings.
+ *
+ *  You shouldn't normally use DUK_INTERNAL_SYMBOL() at all.  It is reserved
+ *  for Duktape internal symbols only.  There are no versioning guarantees
+ *  for internal symbols.
  */
 
 #define DUK_HIDDEN_SYMBOL(x)     ("\xFF" x)
 #define DUK_GLOBAL_SYMBOL(x)     ("\x80" x)
 #define DUK_LOCAL_SYMBOL(x,uniq) ("\x81" x "\xff" uniq)
 #define DUK_WELLKNOWN_SYMBOL(x)  ("\x81" x "\xff")
+#define DUK_INTERNAL_SYMBOL(x)   ("\x82" x)
 
 /*
  *  If no variadic macros, __FILE__ and __LINE__ are passed through globals
@@ -703,6 +720,7 @@ DUK_EXTERNAL_DECL void duk_push_thread_stash(duk_context *ctx, duk_context *targ
 DUK_EXTERNAL_DECL duk_idx_t duk_push_object(duk_context *ctx);
 DUK_EXTERNAL_DECL duk_idx_t duk_push_bare_object(duk_context *ctx);
 DUK_EXTERNAL_DECL duk_idx_t duk_push_array(duk_context *ctx);
+DUK_EXTERNAL_DECL duk_idx_t duk_push_bare_array(duk_context *ctx);
 DUK_EXTERNAL_DECL duk_idx_t duk_push_c_function(duk_context *ctx, duk_c_function func, duk_idx_t nargs);
 DUK_EXTERNAL_DECL duk_idx_t duk_push_c_lightfunc(duk_context *ctx, duk_c_function func, duk_idx_t nargs, duk_idx_t length, duk_int_t magic);
 DUK_EXTERNAL_DECL duk_idx_t duk_push_thread_raw(duk_context *ctx, duk_uint_t flags);
@@ -937,6 +955,8 @@ DUK_EXTERNAL_DECL duk_context *duk_require_context(duk_context *ctx, duk_idx_t i
 DUK_EXTERNAL_DECL void duk_require_function(duk_context *ctx, duk_idx_t idx);
 #define duk_require_callable(ctx,idx) \
 	duk_require_function((ctx), (idx))
+DUK_EXTERNAL_DECL void duk_require_constructor_call(duk_context *ctx);
+DUK_EXTERNAL_DECL void duk_require_constructable(duk_context *ctx, duk_idx_t idx);
 DUK_EXTERNAL_DECL void *duk_require_heapptr(duk_context *ctx, duk_idx_t idx);
 
 /* Symbols are object coercible and covered by DUK_TYPE_MASK_STRING. */
@@ -986,6 +1006,8 @@ DUK_EXTERNAL_DECL void duk_to_primitive(duk_context *ctx, duk_idx_t idx, duk_int
 
 /* safe variants of a few coercion operations */
 DUK_EXTERNAL_DECL const char *duk_safe_to_lstring(duk_context *ctx, duk_idx_t idx, duk_size_t *out_len);
+DUK_EXTERNAL_DECL const char *duk_to_stacktrace(duk_context *ctx, duk_idx_t idx);
+DUK_EXTERNAL_DECL const char *duk_safe_to_stacktrace(duk_context *ctx, duk_idx_t idx);
 #define duk_safe_to_string(ctx,idx) \
 	duk_safe_to_lstring((ctx), (idx), NULL)
 

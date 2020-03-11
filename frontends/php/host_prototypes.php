@@ -26,7 +26,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
-$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multiselect.js', 'textareaflexible.js', 'inputsecret.js', 'macrovalue.js'];
+$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multiselect.js', 'textareaflexible.js',
+	'class.cverticalaccordion.js', 'inputsecret.js', 'macrovalue.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

@@ -25,7 +25,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of hosts');
 $page['file'] = 'hosts.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js', 'macrovalue.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
+	'inputsecret.js', 'macrovalue.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -55,7 +57,7 @@ $fields = [
 									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
 								],
 	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-									'isset({add}) || isset({update})', _('Agent or SNMP or JMX or IPMI interface')
+									'isset({add}) || isset({update})'
 								],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
@@ -747,11 +749,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				if ($interface['type'] == INTERFACE_TYPE_SNMP && !isset($interface['bulk'])) {
-					$interfaces[$key]['bulk'] = SNMP_BULK_DISABLED;
-				}
-				else {
-					$interfaces[$key]['bulk'] = SNMP_BULK_ENABLED;
+				// Proccess SNMP interface fields.
+				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+					if (!array_key_exists('details', $interface)) {
+						unset($interface[$key]);
+						continue;
+					}
+
+					$interfaces[$key]['details']['bulk'] = array_key_exists('bulk', $interface['details'])
+						? SNMP_BULK_ENABLED
+						: SNMP_BULK_DISABLED;
 				}
 
 				if ($interface['isNew']) {
@@ -1180,7 +1187,7 @@ elseif (hasRequest('form')) {
 			$data['host'] = $dbHost['host'];
 			$data['visiblename'] = $dbHost['name'];
 			$data['interfaces'] = API::HostInterface()->get([
-				'output' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'bulk'],
+				'output' => API_OUTPUT_EXTEND,
 				'selectItems' => ['type'],
 				'hostids' => [$data['hostid']],
 				'sortfield' => 'interfaceid'

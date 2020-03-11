@@ -20,15 +20,45 @@
 
 
 class CSeverityCheckBoxList extends CCheckBoxList {
+
+	/**
+	 * Number of columns.
+	 */
+	private const COLUMNS = 3;
+
 	/**
 	 * Create check box list with severities.
 	 *
 	 * @param string $name  Field name in form.
 	 */
-	public function __construct($name) {
+	public function __construct(string $name) {
 		parent::__construct($name);
 
-		$this->setOptions(CSeverity::getSeverities());
-		$this->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
+		$this
+			->setOptions(self::getSeverities())
+			->addClass(ZBX_STYLE_COLUMNS)
+			->addClass(ZBX_STYLE_COLUMNS_3);
+	}
+
+	/**
+	 * Generate array with data for severities options ordered for showing by rows.
+	 *
+	 * @return array
+	 */
+	private static function getSeverities(): array {
+		$ordered = [];
+		$severities = getSeverities();
+		$severities_count = count($severities);
+		$max_rows = (int) ceil($severities_count / self::COLUMNS);
+
+		for ($row = 0; $row < $max_rows; $row++) {
+			for ($i = 0; $i < $severities_count; $i += $max_rows) {
+				if (array_key_exists($row + $i, $severities)) {
+					$ordered[$row + $i] = $severities[$row + $i];
+				}
+			}
+		}
+
+		return $ordered;
 	}
 }
