@@ -1429,7 +1429,7 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 /**
 * Truncate float to the amount of significant digits, to allow safe float comparison.
 *
-* @param mixed $number
+* @param float $number
 *
 * @return float
 */
@@ -1440,14 +1440,14 @@ function truncateFloat(float $number): float {
 /**
  * Get number of digits after the decimal dot.
  *
- * @param mixed $number  Valid number in decimal or scientific notation.
+ * @param float $number  Valid number in decimal or scientific notation.
  *
  * @return int
  */
 function getNumDecimals(float $number): int {
 	[$mantissa, $exponent] = explode('E', sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number));
 
-	$significant_size = strlen(rtrim($mantissa, '0')) - ($number[0] === '-' ? 2 : 1);
+	$significant_size = strlen(rtrim($mantissa, '0')) - ($number < 0 ? 2 : 1);
 
 	return max(0, $significant_size - 1 - $exponent);
 }
