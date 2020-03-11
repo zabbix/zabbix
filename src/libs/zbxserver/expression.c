@@ -250,7 +250,7 @@ void	get_trigger_expression_constant(const char *expression, const zbx_token_ref
 	size_t		pos;
 	zbx_strloc_t	number;
 	int		index;
-	char		*tmp = NULL;
+	const char	*tmp = NULL;
 
 	for (pos = 0, index = 1; SUCCEED == zbx_number_or_string_find(expression, pos, &number)
 			; pos = number.r + 1, index++)

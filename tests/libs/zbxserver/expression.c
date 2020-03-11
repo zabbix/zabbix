@@ -78,7 +78,7 @@ void	zbx_mock_test_entry(void **state)
 	if (0 != strcmp(expected_result, actual_result))
 	{
 		fail_msg("Got ->%s<- instead of ->%s<- as a result.", actual_result,
-			 expected_result);
+			expected_result);
 	}
 
 	zbx_free(actual_result);
