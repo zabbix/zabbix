@@ -143,6 +143,7 @@
 				$('.dropdown-value', $(this))
 					.off('change', inputDropdownValueChangeEventHandle)
 					.on('change', inputDropdownValueChangeEventHandle);
+				$('.textarea-flexible', $(this)).textareaFlexible();
 			});
 		}
 	};

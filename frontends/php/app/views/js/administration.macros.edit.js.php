@@ -64,11 +64,7 @@
 			})
 			.dynamicRows({template: '#macro-row-tmpl'})
 			.on('afteradd.dynamicRows', function() {
-				jQuery('.input-group', table)
-					.last()
-					.macroValue()
-					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-					.textareaFlexible();
+				jQuery('.input-group', table).macroValue();
 			})
 			.find('.input-group')
 			.macroValue();
