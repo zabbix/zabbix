@@ -7656,10 +7656,16 @@ table.preprocessing-test-results {
 // HOST INTERFACES
 
 .interface-container {
-	border-bottom: 1px solid #cecece;
+	border-top: 1px solid $form-border-color;
 	margin-bottom: 5px;
 	padding: 0;
+	padding-top: 5px;
 	width: 752px;
+
+	// Hide first border.
+	&:nth-of-type(2) {
+		border-top: 0;
+	}
 
 	&.interface-container-header {
 		margin: 0;
@@ -7698,7 +7704,7 @@ table.preprocessing-test-results {
 			}
 
 			&.interface-cell-header {
-				color: #768d99;
+				color: $font-alt-color;
 				text-align: left;
 			}
 

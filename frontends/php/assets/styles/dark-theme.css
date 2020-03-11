@@ -5100,10 +5100,13 @@ table.preprocessing-test-results .rel-container {
   .host-avail-widget td {
     height: 100%; } }
 .interface-container {
-  border-bottom: 1px solid #cecece;
+  border-top: 1px solid #4f4f4f;
   margin-bottom: 5px;
   padding: 0;
+  padding-top: 5px;
   width: 752px; }
+  .interface-container:nth-of-type(2) {
+    border-top: 0; }
   .interface-container.interface-container-header {
     margin: 0;
     border: 0; }
@@ -5128,7 +5131,7 @@ table.preprocessing-test-results .rel-container {
       .interface-container .interface-row .interface-cell .interface-btn-toggle {
         display: none; }
       .interface-container .interface-row .interface-cell.interface-cell-header {
-        color: #768d99;
+        color: #737373;
         text-align: left; }
       .interface-container .interface-row .interface-cell.interface-cell-icon {
         width: 26px; }
