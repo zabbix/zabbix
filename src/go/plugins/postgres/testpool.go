@@ -128,7 +128,7 @@ db:url: {{.ConnString}}
 		// Terminate the container
 		err := pool.Terminate(ctx)
 		if err != nil {
-			log.Panicf("[waitForPostgresAndCreateConfig] pool.Purge failed: %v", err)
+			log.Panicf("[waitForPostgresAndCreateConfig] pool.Terminate failed: %v", err)
 		}
 
 		err = os.Remove(confFile.Name())
@@ -141,20 +141,7 @@ db:url: {{.ConnString}}
 }
 
 func startPostgreSQL(versionPG uint32) (confPath string, cleaner func()) {
-	/* pool, err := dockertest.NewPool("")
-	if err != nil {
-		log.Panicf("[startPostgreSQL] dockertest.NewPool failed: %v", err)
-	}
-	resource, err := pool.Run(
-		"postgres", fmt.Sprint(versionPG),
-		[]string{
-			"POSTGRES_DB=test_agent2",
-			"POSTGRES_PASSWORD=this_is_postgres",
-		},
-	)
-	if err != nil {
-		log.Panicf("[startPostgreSQL] pool.Run failed: %v", err)
-	} */
+
 	cport := "5432"
 	user := "postgres"
 	password := "this_is_postgres"
@@ -164,7 +151,6 @@ func startPostgreSQL(versionPG uint32) (confPath string, cleaner func()) {
 	req := testcontainers.ContainerRequest{
 		Image:        "postgres:" + fmt.Sprint(versionPG),
 		ExposedPorts: []string{cport + "/tcp"},
-		//	WaitingFor:   wait.ForLog("database system is ready to accept connections"),
 		Env: map[string]string{
 			"POSTGRES_USER":     user,
 			"POSTGRES_PASSWORD": password,
@@ -193,8 +179,6 @@ func startPostgreSQL(versionPG uint32) (confPath string, cleaner func()) {
 	log.Infof(fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		user, password, ip, port.Port(), database))
 
-	//connString := "postgres://postgres:this_is_postgres@" + resource.GetHostPort("5432/tcp") + "/test_agent2"
-	//log.Panicf("[startPostgreSQL] pg.MappedPort failed: %v", err)
 	connString := "postgres://postgres:this_is_postgres@" + ip + ":" + port.Port() + "/test_agent2"
 	return waitForPostgresAndCreateConfig(pg, ctx, connString)
 }
