@@ -48,6 +48,40 @@ static void	lld_hostmacro_free(zbx_lld_hostmacro_t *hostmacro)
 
 typedef struct
 {
+	char		*community;
+	char		*securityname;
+	char		*authpassphrase;
+	char		*privpassphrase;
+	char		*contextname;
+	unsigned char	securitylevel;
+	unsigned char	authprotocol;
+	unsigned char	privprotocol;
+	unsigned char	version;
+	unsigned char	bulk;
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE		__UINT64_C(0x00000001)	/* interface_snmp.type */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK		__UINT64_C(0x00000002)	/* interface_snmp.bulk */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY	__UINT64_C(0x00000004)	/* interface_snmp.community */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME	__UINT64_C(0x00000008)	/* interface_snmp.securityname */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECLEVEL	__UINT64_C(0x00000010)	/* interface_snmp.securitylevel */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS	__UINT64_C(0x00000020)	/* interface_snmp.authpassphrase */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS	__UINT64_C(0x00000040)	/* interface_snmp.privpassphrase */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPROTOCOL	__UINT64_C(0x00000080)	/* interface_snmp.authprotocol */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPROTOCOL	__UINT64_C(0x00000100)	/* interface_snmp.privprotocol */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT	__UINT64_C(0x00000200)	/* interface_snmp.contextname */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE									\
+		(ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE | ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK |		\
+		ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY | ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME |	\
+		ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECLEVEL | ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS |	\
+		ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS | ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPROTOCOL |	\
+		ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPROTOCOL | ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT)
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE		__UINT64_C(0x00000400)	/* new snmp data record*/
+	zbx_uint64_t	flags;
+
+}
+zbx_lld_interface_snmp_t;
+
+typedef struct
+{
 	zbx_uint64_t	interfaceid;
 	zbx_uint64_t	parent_interfaceid;
 	char		*ip;
@@ -58,21 +92,24 @@ typedef struct
 	unsigned char	type;
 	unsigned char	type_orig;
 	unsigned char	useip;
-	unsigned char	bulk;
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE	__UINT64_C(0x00000001)	/* interface.type field should be updated  */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN	__UINT64_C(0x00000002)	/* interface.main field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP	__UINT64_C(0x00000004)	/* interface.useip field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_IP	__UINT64_C(0x00000008)	/* interface.ip field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS	__UINT64_C(0x00000010)	/* interface.dns field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT	__UINT64_C(0x00000020)	/* interface.port field should be updated */
-#define ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK	__UINT64_C(0x00000040)	/* interface.bulk field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE								\
 		(ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE | ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN |	\
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP | ZBX_FLAG_LLD_INTERFACE_UPDATE_IP |	\
-		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT |	\
-		ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK)
+		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT)
 #define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000080)	/* interfaces which should be deleted */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE	__UINT64_C(0x00000100)	/* snmp data which should be deleted */
 	zbx_uint64_t	flags;
+	union _data
+	{
+		zbx_lld_interface_snmp_t *snmp;
+	}
+	data;
 }
 zbx_lld_interface_t;
 
@@ -81,6 +118,17 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 	zbx_free(interface->port);
 	zbx_free(interface->dns);
 	zbx_free(interface->ip);
+
+	if (INTERFACE_TYPE_SNMP == interface->type)
+	{
+		zbx_free(interface->data.snmp->community);
+		zbx_free(interface->data.snmp->securityname);
+		zbx_free(interface->data.snmp->authpassphrase);
+		zbx_free(interface->data.snmp->privpassphrase);
+		zbx_free(interface->data.snmp->contextname);
+		zbx_free(interface->data.snmp);
+	}
+
 	zbx_free(interface);
 }
 
@@ -1866,11 +1914,117 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_interface_snmp_prepare_sql                                   *
+ *                                                                            *
+ * Purpose: prepare sql for update record of interface_snmp table             *
+ *                                                                            *
+ * Parameters: interfaceid - [IN] snmp interface id;                          *
+ *             snmp        - [IN] snmp values for update                      *
+ *             sql         - [IN/OUT] sql string                              *
+ *             sql_alloc   - [IN/OUT] size of sql string                      *
+ *             sql_offset  - [IN/OUT] offset in sql string                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_interface_snmp_prepare_sql(const zbx_uint64_t interfaceid, const zbx_lld_interface_snmp_t *snmp,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	const char	*d = "";
+	char		*value_esc;
+
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update interface_snmp set ");
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "version=%d", (int)snmp->version);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sbulk=%d", d, (int)snmp->bulk);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY))
+	{
+		value_esc = DBdyn_escape_string(snmp->community);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%scommunity='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME))
+	{
+		value_esc = DBdyn_escape_string(snmp->securityname);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssecurityname='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECLEVEL))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssecuritylevel=%d", d, (int)snmp->securitylevel);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS))
+	{
+		value_esc = DBdyn_escape_string(snmp->authpassphrase);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sauthpassphrase='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS))
+	{
+		value_esc = DBdyn_escape_string(snmp->privpassphrase);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sprivpassphrase='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPROTOCOL))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sauthprotocol=%d", d, (int)snmp->authprotocol);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPROTOCOL))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sprivprotocol=%d", d, (int)snmp->privprotocol);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT))
+	{
+		value_esc = DBdyn_escape_string(snmp->contextname);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%scontextname='%s'", d, value_esc);
+		zbx_free(value_esc);
+	}
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_hosts_save                                                   *
  *                                                                            *
- * Parameters: hosts            - [IN] list of hosts;                         *
- *                                     should be sorted by hostid             *
- *             status           - [IN] initial host status                    *
+ * Parameters: parent_hostid    - [IN] parent host id                         *
+ *             hosts            - [IN] list of hosts;                         *
+ *             host_proto       - [IN] host proto                             *
+ *             proxy_hostid     - [IN] proxy host id                          *
+ *             ipmi_authtype    - [IN] ipmi authtype                          *
+ *             ipmi_privilege   - [IN] ipmi privilege                         *
+ *             ipmi_username    - [IN] ipmi username                          *
+ *             ipmi_password    - [IN] ipmi password                          *
+ *             status           - [IN] host status                            *
+ *             inventory_mode   - [IN] host inventory mode                    *
+ *             tls_connect      - [IN] tls connect                            *
+ *             tls_accept       - [IN] tls accept                             *
+ *             tls_issuer       - [IN] tls cert issuer                        *
+ *             tls_subject      - [IN] tls cert subject                       *
+ *             tls_psk_identity - [IN] tls psk identity                       *
+ *             tls_psk          - [IN] tls psk                                *
  *             del_hostgroupids - [IN] host groups which should be deleted    *
  *                                                                            *
  ******************************************************************************/
@@ -1881,18 +2035,19 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		const char *tls_psk, const zbx_vector_uint64_t *del_hostgroupids)
 {
 	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
-				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0;
+				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0,
+				new_snmp = 0, upd_snmp = 0;
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro;
 	zbx_lld_interface_t	*interface;
-	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids, del_interfaceids,
+	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids, del_interfaceids, del_snmp_ids,
 				del_hostmacroids;
 	zbx_uint64_t		hostid = 0, hostgroupid = 0, hostmacroid = 0, interfaceid = 0;
 	char			*sql1 = NULL, *sql2 = NULL, *value_esc;
 	size_t			sql1_alloc = 0, sql1_offset = 0,
 				sql2_alloc = 0, sql2_offset = 0;
 	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_hinventory, db_insert_hgroups,
-				db_insert_hmacro, db_insert_interface, db_insert_idiscovery;
+				db_insert_hmacro, db_insert_interface, db_insert_idiscovery, db_insert_snmp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1900,6 +2055,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	zbx_vector_uint64_create(&del_host_inventory_hostids);
 	zbx_vector_uint64_create(&del_interfaceids);
 	zbx_vector_uint64_create(&del_hostmacroids);
+	zbx_vector_uint64_create(&del_snmp_ids);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -1942,6 +2098,19 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				upd_interfaces++;
 			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
 				zbx_vector_uint64_append(&del_interfaceids, interface->interfaceid);
+			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE))
+				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
+
+			if (INTERFACE_TYPE_SNMP == interface->type)
+			{
+				if (0 == interface->interfaceid)
+					interface->data.snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE;
+
+				if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
+					new_snmp++;
+				else if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE))
+					upd_snmp++;
+			}
 		}
 
 		for (j = 0; j < host->new_hostmacros.values_num; j++)
@@ -1961,7 +2130,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			0 == upd_hostmacros && 0 == new_hostgroups && 0 == new_hostmacros && 0 == new_interfaces &&
 			0 == del_hostgroupids->values_num && 0 == del_hostmacroids.values_num &&
 			0 == upd_host_inventory_hostids.values_num && 0 == del_host_inventory_hostids.values_num &&
-			0 == del_interfaceids.values_num)
+			0 == del_interfaceids.values_num && 0 == new_snmp && 0 == upd_snmp &&
+			0 == del_snmp_ids.values_num)
 	{
 		goto out;
 	}
@@ -1991,7 +2161,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		zbx_db_insert_prepare(&db_insert_hinventory, "host_inventory", "hostid", "inventory_mode", NULL);
 	}
 
-	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_hostmacros)
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros)
 	{
 		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 	}
@@ -2016,10 +2186,17 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		interfaceid = DBget_maxid_num("interface", new_interfaces);
 
 		zbx_db_insert_prepare(&db_insert_interface, "interface", "interfaceid", "hostid", "type", "main",
-				"useip", "ip", "dns", "port", "bulk", NULL);
+				"useip", "ip", "dns", "port", NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "interface_discovery", "interfaceid",
 				"parent_interfaceid", NULL);
+	}
+
+	if (0 != new_snmp)
+	{
+		zbx_db_insert_prepare(&db_insert_snmp, "interface_snmp", "interfaceid", "version", "bulk", "community",
+				"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
+				"privprotocol", "contextname", NULL);
 	}
 
 	for (i = 0; i < hosts->values_num; i++)
@@ -2189,7 +2366,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 				zbx_db_insert_add_values(&db_insert_interface, interface->interfaceid, host->hostid,
 						(int)interface->type, (int)interface->main, (int)interface->useip,
-						interface->ip, interface->dns, interface->port, (int)interface->bulk);
+						interface->ip, interface->dns, interface->port);
 
 				zbx_db_insert_add_values(&db_insert_idiscovery, interface->interfaceid,
 						interface->parent_interfaceid);
@@ -2237,15 +2414,32 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sport='%s'",
 							d, value_esc);
 					zbx_free(value_esc);
-					d = ",";
-				}
-				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK))
-				{
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sbulk=%d",
-							d, (int)interface->bulk);
 				}
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
+			}
+
+			if (INTERFACE_TYPE_SNMP == interface->type)
+			{
+				if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
+				{
+					zbx_db_insert_add_values(&db_insert_snmp, interface->interfaceid,
+							(int)interface->data.snmp->version,
+							(int)interface->data.snmp->bulk,
+							interface->data.snmp->community,
+							interface->data.snmp->securityname,
+							(int)interface->data.snmp->securitylevel,
+							interface->data.snmp->authpassphrase,
+							interface->data.snmp->privpassphrase,
+							(int)interface->data.snmp->authprotocol,
+							(int)interface->data.snmp->privprotocol,
+							interface->data.snmp->contextname);
+				}
+				else if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE))
+				{
+					lld_interface_snmp_prepare_sql(interface->interfaceid, interface->data.snmp,
+							&sql1, &sql1_alloc, &sql1_offset);
+				}
 			}
 		}
 
@@ -2325,7 +2519,13 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		zbx_db_insert_clean(&db_insert_idiscovery);
 	}
 
-	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_hostmacros)
+	if (0 != new_snmp)
+	{
+		zbx_db_insert_execute(&db_insert_snmp);
+		zbx_db_insert_clean(&db_insert_snmp);
+	}
+
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros)
 	{
 		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 		DBexecute("%s", sql1);
@@ -2334,7 +2534,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids.values_num ||
 			0 != upd_host_inventory_hostids.values_num || 0 != del_host_inventory_hostids.values_num ||
-			0 != del_interfaceids.values_num)
+			0 != del_interfaceids.values_num || 0 != del_snmp_ids.values_num)
 	{
 		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 
@@ -2372,6 +2572,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
+		if (0 != del_snmp_ids.values_num)
+		{
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from interface_snmp where");
+			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "interfaceid",
+					del_snmp_ids.values, del_snmp_ids.values_num);
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
+		}
+
 		if (0 != del_interfaceids.values_num)
 		{
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from interface where");
@@ -2387,6 +2595,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	DBcommit();
 out:
+	zbx_vector_uint64_destroy(&del_snmp_ids);
 	zbx_vector_uint64_destroy(&del_interfaceids);
 	zbx_vector_uint64_destroy(&del_hostmacroids);
 	zbx_vector_uint64_destroy(&del_host_inventory_hostids);
@@ -2657,10 +2866,15 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 	zbx_lld_interface_t	*interface;
 
 	result = DBselect(
-			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,hi.bulk"
-			" from interface hi,items i"
-			" where hi.hostid=i.hostid"
-				" and i.itemid=" ZBX_FS_UI64,
+			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,"
+			"s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
+			"s.authprotocol,s.privprotocol,s.contextname"
+			" from interface hi"
+			" inner join items i"
+				" on hi.hostid=i.hostid "
+			" left join interface_snmp s"
+				" on hi.interfaceid=s.interfaceid"
+			" where i.itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -2674,7 +2888,26 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 		interface->ip = zbx_strdup(NULL, row[4]);
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
-		interface->bulk = (unsigned char)atoi(row[7]);
+
+		if (INTERFACE_TYPE_SNMP == interface->type)
+		{
+			zbx_lld_interface_snmp_t	*snmp;
+
+			snmp = (zbx_lld_interface_snmp_t *)zbx_malloc(NULL, sizeof(zbx_lld_interface_snmp_t));
+			ZBX_STR2UCHAR(snmp->version, row[7]);
+			ZBX_STR2UCHAR(snmp->bulk, row[8]);
+			snmp->community = zbx_strdup(NULL, row[9]);
+			snmp->securityname = zbx_strdup(NULL, row[10]);
+			ZBX_STR2UCHAR(snmp->securitylevel, row[11]);
+			snmp->authpassphrase = zbx_strdup(NULL, row[12]);
+			snmp->privpassphrase = zbx_strdup(NULL, row[13]);
+			ZBX_STR2UCHAR(snmp->authprotocol, row[14]);
+			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
+			snmp->contextname = zbx_strdup(NULL, row[16]);
+			interface->data.snmp = snmp;
+		}
+		else
+			interface->data.snmp = NULL;
 
 		zbx_vector_ptr_append(interfaces, interface);
 	}
@@ -2690,7 +2923,10 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
  ******************************************************************************/
 static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent_interfaceid,
 		zbx_uint64_t interfaceid, unsigned char type, unsigned char main, unsigned char useip, const char *ip,
-		const char *dns, const char *port, unsigned char bulk)
+		const char *dns, const char *port, unsigned char snmp_type, unsigned char bulk, const char *community,
+		const char *securityname, unsigned char securitylevel, const char *authpassphrase,
+		const char *privpassphrase, unsigned char authprotocol, unsigned char privprotocol,
+		const char *contextname)
 {
 	zbx_lld_interface_t	*interface = NULL;
 	int			i;
@@ -2719,7 +2955,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		interface->ip = NULL;
 		interface->dns = NULL;
 		interface->port = NULL;
-		interface->bulk = SNMP_BULK_ENABLED;
+		interface->data.snmp = NULL;
 		interface->flags = ZBX_FLAG_LLD_INTERFACE_REMOVE;
 
 		zbx_vector_ptr_append(interfaces, interface);
@@ -2731,6 +2967,12 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		{
 			interface->type_orig = type;
 			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE;
+
+			if (INTERFACE_TYPE_SNMP == type)
+				interface->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE;
+
+			if (INTERFACE_TYPE_SNMP == interface->type)
+				interface->data.snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE;
 		}
 		if (interface->main != main)
 		{
@@ -2745,8 +2987,32 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS;
 		if (0 != strcmp(interface->port, port))
 			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT;
-		if (interface->bulk != bulk)
-			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK;
+
+		if (INTERFACE_TYPE_SNMP == interface->type && interface->type == type)
+		{
+			zbx_lld_interface_snmp_t *snmp = interface->data.snmp;
+
+			if (snmp->version != snmp_type)
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE;
+			if (snmp->bulk!= bulk)
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK;
+			if (0 != strcmp(snmp->community, community))
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY;
+			if (0 != strcmp(snmp->securityname, securityname))
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME;
+			if (snmp->securitylevel!= securitylevel)
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECLEVEL;
+			if (0 != strcmp(snmp->authpassphrase, authpassphrase))
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS;
+			if (0 != strcmp(snmp->privpassphrase, privpassphrase))
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS;
+			if (snmp->authprotocol != authprotocol)
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPROTOCOL;
+			if (snmp->privprotocol != privprotocol)
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPROTOCOL;
+			if (0 != strcmp(snmp->contextname, contextname))
+				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT;
+		}
 	}
 
 	interface->interfaceid = interfaceid;
@@ -2798,8 +3064,28 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			new_interface->ip = zbx_strdup(NULL, interface->ip);
 			new_interface->dns = zbx_strdup(NULL, interface->dns);
 			new_interface->port = zbx_strdup(NULL, interface->port);
-			new_interface->bulk = interface->bulk;
 			new_interface->flags = 0x00;
+
+			if (INTERFACE_TYPE_SNMP == interface->type)
+			{
+				zbx_lld_interface_snmp_t *snmp;
+
+				snmp = (zbx_lld_interface_snmp_t *)zbx_malloc(NULL, sizeof(zbx_lld_interface_snmp_t));
+				snmp->version = interface->data.snmp->version;
+				snmp->bulk = interface->data.snmp->bulk;
+				snmp->community = zbx_strdup(NULL, interface->data.snmp->community);
+				snmp->securityname = zbx_strdup(NULL, interface->data.snmp->securityname);
+				snmp->securitylevel = interface->data.snmp->securitylevel;
+				snmp->authpassphrase = zbx_strdup(NULL, interface->data.snmp->authpassphrase);
+				snmp->privpassphrase = zbx_strdup(NULL, interface->data.snmp->privpassphrase);
+				snmp->authprotocol = interface->data.snmp->authprotocol;
+				snmp->privprotocol = interface->data.snmp->privprotocol;
+				snmp->contextname = zbx_strdup(NULL, interface->data.snmp->contextname);
+				snmp->flags = 0x00;
+				new_interface->data.snmp = snmp;
+			}
+			else
+				new_interface->data.snmp = NULL;
 
 			zbx_vector_ptr_append(&host->interfaces, new_interface);
 		}
@@ -2815,10 +3101,13 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hi.hostid,id.parent_interfaceid,hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,"
-					"hi.dns,hi.port,hi.bulk"
+					"hi.dns,hi.port,s.version,s.bulk,s.community,s.securityname,s.securitylevel,"
+					"s.authpassphrase,s.privpassphrase,s.authprotocol,s.privprotocol,s.contextname"
 				" from interface hi"
 					" left join interface_discovery id"
 						" on hi.interfaceid=id.interfaceid"
+					" left join interface_snmp s"
+						" on hi.interfaceid=s.interfaceid"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.hostid", hostids.values, hostids.values_num);
 
@@ -2828,6 +3117,8 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			unsigned char	interface_type;
+
 			ZBX_STR2UINT64(hostid, row[0]);
 			ZBX_DBROW2UINT64(parent_interfaceid, row[1]);
 			ZBX_DBROW2UINT64(interfaceid, row[2]);
@@ -2839,11 +3130,24 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			}
 
 			host = (zbx_lld_host_t *)hosts->values[i];
+			ZBX_STR2UCHAR(interface_type, row[3]);
 
-			lld_interface_make(&host->interfaces, parent_interfaceid, interfaceid,
-					(unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]),
-					(unsigned char)atoi(row[5]), row[6], row[7], row[8],
-					(unsigned char)atoi(row[9]));
+			if (INTERFACE_TYPE_SNMP == interface_type)
+			{
+				lld_interface_make(&host->interfaces, parent_interfaceid, interfaceid,
+						interface_type, (unsigned char)atoi(row[4]),
+						(unsigned char)atoi(row[5]), row[6], row[7], row[8],
+						(unsigned char)atoi(row[9]), (unsigned char)atoi(row[10]), row[11],
+						row[12], (unsigned char)atoi(row[13]), row[14], row[15],
+						(unsigned char)atoi(row[16]), (unsigned char)atoi(row[17]), row[18]);
+			}
+			else
+			{
+				lld_interface_make(&host->interfaces, parent_interfaceid, interfaceid,
+						interface_type, (unsigned char)atoi(row[4]),
+						(unsigned char)atoi(row[5]), row[6], row[7], row[8],
+						0, 0, NULL, NULL, 0, NULL, NULL,0, 0, NULL);
+			}
 		}
 		DBfree_result(result);
 	}

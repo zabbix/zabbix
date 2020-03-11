@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-03-02T13:26:58Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <hosts>
+        <host>
+            <host>SNMP host</host>
+            <name>SNMP host</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <interfaces>
+                <interface>
+                    <interface_ref>if1</interface_ref>
+                </interface>
+                <interface>
+                    <type>SNMP</type>
+                    <port>161</port>
+                    <interface_ref>if2</interface_ref>
+                </interface>
+            </interfaces>
+            <items>
+                <item>
+                    <name>Item SNMPv1 without port</name>
+                    <type>SNMPV1</type>
+                    <snmp_community>public</snmp_community>
+                    <snmp_oid>test</snmp_oid>
+                    <key>test</key>
+                    <interface_ref>if2</interface_ref>
+                </item>
+                <item>
+                    <name>Item SNMPv1 with port</name>
+                    <type>SNMPV1</type>
+                    <snmp_community>public</snmp_community>
+                    <snmp_oid>test</snmp_oid>
+                    <key>test2</key>
+                    <port>162</port>
+                    <interface_ref>if2</interface_ref>
+                </item>
+                <item>
+                    <name>Item SNMPv2 without port</name>
+                    <type>SNMPV2</type>
+                    <snmp_community>public</snmp_community>
+                    <snmp_oid>test</snmp_oid>
+                    <key>test3</key>
+                    <interface_ref>if2</interface_ref>
+                </item>
+                <item>
+                    <name>Item SNMPv2 with port</name>
+                    <type>SNMPV2</type>
+                    <snmp_community>public</snmp_community>
+                    <snmp_oid>test</snmp_oid>
+                    <key>test4</key>
+                    <port>163</port>
+                    <interface_ref>if2</interface_ref>
+                </item>
+                <item>
+                    <name>Item SNMPv3 without port</name>
+                    <type>SNMPV3</type>
+                    <snmp_oid>test</snmp_oid>
+                    <key>test5</key>
+                    <snmpv3_contextname>test</snmpv3_contextname>
+                    <snmpv3_securityname>test</snmpv3_securityname>
+                    <snmpv3_securitylevel>AUTHPRIV</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase>test</snmpv3_authpassphrase>
+                    <snmpv3_privpassphrase>test</snmpv3_privpassphrase>
+                    <interface_ref>if2</interface_ref>
+                </item>
+                <item>
+                    <name>Item SNMPv3 with port</name>
+                    <type>SNMPV3</type>
+                    <snmp_oid>test</snmp_oid>
+                    <key>test6</key>
+                    <snmpv3_contextname>test</snmpv3_contextname>
+                    <snmpv3_securityname>test</snmpv3_securityname>
+                    <snmpv3_securitylevel>AUTHPRIV</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase>test</snmpv3_authpassphrase>
+                    <snmpv3_privpassphrase>test</snmpv3_privpassphrase>
+                    <port>164</port>
+                    <interface_ref>if2</interface_ref>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Discovery Rule 1</name>
+                    <type>SNMPV1</type>
+                    <snmp_community>public</snmp_community>
+                    <snmp_oid>test</snmp_oid>
+                    <key>drule</key>
+                    <interface_ref>if2</interface_ref>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Drule Item SNMP v1</name>
+                            <type>SNMPV1</type>
+                            <snmp_community>public</snmp_community>
+                            <snmp_oid>test</snmp_oid>
+                            <key>test7</key>
+                            <interface_ref>if2</interface_ref>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Discovery Rule 2</name>
+                    <type>SNMPV2</type>
+                    <snmp_community>public</snmp_community>
+                    <snmp_oid>test</snmp_oid>
+                    <key>drule2</key>
+                    <interface_ref>if2</interface_ref>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Drule Item SNMP v2</name>
+                            <type>SNMPV2</type>
+                            <snmp_community>public</snmp_community>
+                            <snmp_oid>test</snmp_oid>
+                            <key>test8</key>
+                            <interface_ref>if2</interface_ref>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Discovery Rule 3</name>
+                    <type>SNMPV3</type>
+                    <snmp_oid>test</snmp_oid>
+                    <key>drule3</key>
+                    <snmpv3_contextname>test</snmpv3_contextname>
+                    <snmpv3_securityname>test</snmpv3_securityname>
+                    <snmpv3_securitylevel>AUTHPRIV</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase>test</snmpv3_authpassphrase>
+                    <snmpv3_privpassphrase>test</snmpv3_privpassphrase>
+                    <interface_ref>if2</interface_ref>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Drule Item SNMP v3</name>
+                            <type>SNMPV3</type>
+                            <snmp_oid>test</snmp_oid>
+                            <key>test9</key>
+                            <snmpv3_contextname>test</snmpv3_contextname>
+                            <snmpv3_securityname>test</snmpv3_securityname>
+                            <snmpv3_securitylevel>AUTHPRIV</snmpv3_securitylevel>
+                            <snmpv3_authprotocol>SHA</snmpv3_authprotocol>
+                            <snmpv3_authpassphrase>test</snmpv3_authpassphrase>
+                            <snmpv3_privpassphrase>test</snmpv3_privpassphrase>
+                            <interface_ref>if2</interface_ref>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+    </hosts>
+</zabbix_export>

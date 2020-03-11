@@ -37,5 +37,6 @@ import (
 	_ "zabbix.com/plugins/windows/perfmon"
 	_ "zabbix.com/plugins/windows/services"
 	_ "zabbix.com/plugins/zabbix/async"
+	_ "zabbix.com/plugins/zabbix/sync"
 	_ "zabbix.com/plugins/zabbix/stats"
 )
