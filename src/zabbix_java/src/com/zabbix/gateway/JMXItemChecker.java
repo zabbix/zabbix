@@ -186,7 +186,7 @@ class JMXItemChecker extends ItemChecker
 			if (dataObject instanceof TabularData)
 			{
 				logger.trace("'{}' contains tabular data", attributeName);
-				return getTabularData((TabularData)dataObject);
+				return getTabularData((TabularData)dataObject).toString();
 			}
 
 			try
@@ -301,7 +301,7 @@ class JMXItemChecker extends ItemChecker
 			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
 	}
 
-	private String getTabularData(TabularData data) throws JSONException
+	private JSONArray getTabularData(TabularData data) throws JSONException
 	{
 		JSONArray values = new JSONArray();
 
@@ -313,7 +313,7 @@ class JMXItemChecker extends ItemChecker
 				values.put(tmp);
 		}
 
-		return values.toString();
+		return values;
 	}
 
 	private JSONObject getCompositeDataValues(CompositeData compData) throws JSONException
@@ -332,6 +332,10 @@ class JMXItemChecker extends ItemChecker
 			{
 				logger.trace("found attribute of a known, unsupported type: {}", data.getClass());
 				continue;
+			}
+			else if (data instanceof TabularData)
+			{
+				value.put(key, getTabularData((TabularData)data));
 			}
 			else if (data instanceof CompositeData)
 			{
@@ -416,7 +420,7 @@ class JMXItemChecker extends ItemChecker
 						logger.trace("looking for attributes of tabular types");
 
 						formatPrimitiveTypeResult(counters, name, descr, attrInfo.getName(), attribute,
-							propertiesAsMacros, getTabularData((TabularData)attribute));
+							propertiesAsMacros, getTabularData((TabularData)attribute).toString());
 					}
 					else
 					{
