@@ -130,7 +130,7 @@ func infoHandler(conn redisClient, params []string) (interface{}, error) {
 
 	redisInfo, err := parseRedisInfo(res)
 	if err != nil {
-		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotParseData)
+		return nil, err
 	}
 
 	jsonRes, err := json.Marshal(redisInfo)

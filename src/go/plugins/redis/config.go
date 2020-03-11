@@ -27,7 +27,7 @@ import (
 
 type Session struct {
 	// URI is a connection string consisting of a network scheme, a host address and a port or a path to a Unix-socket.
-	URI string `conf:"optional"`
+	URI string `conf:"name=Uri,optional"`
 
 	// Password to send to a protected Redis server.
 	Password string `conf:"optional"`
@@ -35,7 +35,7 @@ type Session struct {
 
 type PluginOptions struct {
 	// URI is the default connection string.
-	URI string `conf:"name: Uri, default=tcp://localhost:6379"`
+	URI string `conf:"name=Uri,default=tcp://localhost:6379"`
 
 	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
