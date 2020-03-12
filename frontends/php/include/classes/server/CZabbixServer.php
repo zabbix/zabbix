@@ -339,7 +339,7 @@ class CZabbixServer {
 	 */
 	public function evaluateExpressions(array $data, string $sid) {
 		$response = $this->request([
-			'request' => 'evaluate.expressions',
+			'request' => 'expressions.evaluate',
 			'sid' => $sid,
 			'data' => $data
 		]);
