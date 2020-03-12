@@ -239,6 +239,7 @@ foreach (CProfile::getArray('web.hosts.filter.tags.tag', []) as $i => $tag) {
 		'operator' => CProfile::get('web.hosts.filter.tags.operator', null, $i)
 	];
 }
+CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
 $tags = getRequest('tags', []);
 foreach ($tags as $key => $tag) {

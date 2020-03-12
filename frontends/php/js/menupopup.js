@@ -78,8 +78,9 @@ function getMenuPopupHistory(options) {
  * @param {string} options[]['name']             Script name.
  * @param {string} options[]['scriptid']         Script ID.
  * @param {string} options[]['confirmation']     Confirmation text.
- * @param {bool}   options['showGraphs']         Link to host graphs page.
- * @param {bool}   options['showScreens']        Link to host screen page.
+ * @param {bool}   options['showGraphs']         Link to Monitoring->Hosts->Graphs page.
+ * @param {bool}   options['showScreens']        Link to Monitoring->Screen page.
+ * @param {bool}   options['showWeb']		     Link to Monitoring->Hosts->Web page.
  * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
  * @param {bool}   options['hasGoTo']            "Go to" block in popup.
  * @param {int}    options['severity_min']       (optional)
@@ -95,35 +96,25 @@ function getMenuPopupHistory(options) {
 function getMenuPopupHost(options, trigger_elmnt) {
 	var sections = [];
 
-	// scripts
-	if (typeof options.scripts !== 'undefined') {
-		sections.push({
-			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
-		});
-	}
-
 	// go to section
 	if (options.hasGoTo) {
-		// inventory
 		var	host_inventory = {
-				label: t('Host inventory')
+				label: t('Inventory')
 			},
-			// latest
 			latest_data = {
 				label: t('Latest data')
 			},
-			// problems
 			problems = {
 				label: t('Problems')
 			},
-			// graphs
 			graphs = {
 				label: t('Graphs')
 			},
-			// screens
 			screens = {
-				label: t('Host screens')
+				label: t('Screens')
+			},
+			web = {
+				label: t('Web')
 			};
 
 		// inventory link
@@ -181,15 +172,47 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			screens.url = screens_url.getUrl();
 		}
 
+		if (!options.showWeb) {
+			web.disabled = true;
+		}
+		else {
+			var web_url = new Curl('zabbix.php', false);
+			web_url.setArgument('action', 'web.view');
+			web_url.setArgument('hostid', options.hostid);
+
+			web.url = web_url.getUrl();
+		}
+
+		var items = [
+			host_inventory,
+			latest_data,
+			problems,
+			graphs,
+			screens,
+			web
+		];
+
+		if (options.showConfig) {
+			var config = {
+				label: t('Configuration')
+			};
+
+			if (options.isWriteable) {
+				var config_url = new Curl('hosts.php', false);
+				config_url.setArgument('form', 'update');
+				config_url.setArgument('hostid', options.hostid);
+				config.url = config_url.getUrl();
+			}
+			else {
+				config.disabled = true;
+			}
+
+			items.push(config);
+		}
+
 		sections.push({
-			label: t('Go to'),
-			items: [
-				host_inventory,
-				latest_data,
-				problems,
-				graphs,
-				screens
-			]
+			label: t('Host'),
+			items: items
 		});
 	}
 
@@ -198,6 +221,14 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		sections.push({
 			label: t('URLs'),
 			items: options.urls
+		});
+	}
+
+	// scripts
+	if (typeof options.scripts !== 'undefined') {
+		sections.push({
+			label: t('Scripts'),
+			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
 		});
 	}
 

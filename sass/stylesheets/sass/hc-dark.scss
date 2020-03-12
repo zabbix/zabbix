@@ -130,17 +130,6 @@ $ok-ack-fg-color: #00ff00;
 // MULTISELECT
 $multiselect-selected-bg-color: #222222;
 
-.status-na-bg,
-.status-info-bg,
-.status-warning-bg,
-.status-average-bg,
-.status-high-bg,
-.status-disaster-bg {
-	border-color: rgba($ui-bg-color, .2) !important;
-	background-color: $ui-bg-selected-color !important;
-	color: $ui-bg-color !important;
-}
-
 // Important! @import string should come after variables
 @import 'screen.scss';
 
@@ -801,6 +790,20 @@ a.link-action {
 
 // SEVERITY STATUSES
 
+.status-container {
+
+	.status-na-bg,
+	.status-info-bg,
+	.status-warning-bg,
+	.status-average-bg,
+	.status-high-bg,
+	.status-disaster-bg {
+		border-color: rgba($ui-bg-color, .2);
+		background-color: $ui-bg-selected-color;
+		color: $ui-bg-color;
+	}
+}
+
 .na-bg,
 .normal-bg,
 .info-bg,
@@ -1217,6 +1220,41 @@ td.inactive-bg {
 	}
 }
 
+.problem-icon-list {
+
+	.problem-icon-list-item {
+		background: transparent;
+		color: $font-color;
+		position: relative;
+		padding-left: 20px;
+
+		&::before {
+			content: '';
+			background-image: url(../img/icon-sprite.svg);
+			background-repeat: no-repeat;
+			border-radius: 3px;
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 17px;
+			width: 17px;
+		}
+	}
+
+	@each $severity-type, $position in (
+			na-bg: -357px -432px,
+			info-bg: -380px -432px,
+			average-bg: -403px -432px,
+			warning-bg: -426px -432px,
+			high-bg: -449px -432px,
+			disaster-bg: -472px -432px
+	) {
+		.status-#{$severity-type}::before {
+			background-position: $position;
+		}
+	}
+}
+
 // OVERRIDES
 
 .overrides-options-list {
@@ -1264,6 +1302,14 @@ td.inactive-bg {
 	.host-avail-unknown,
 	.host-avail-total {
 		background: transparent;
+	}
+}
+
+// WIDGET "NAVIGATION TREE"
+.navtree {
+
+	.tree .tree-item > .tree-row {
+		min-width: 410px;
 	}
 }
 

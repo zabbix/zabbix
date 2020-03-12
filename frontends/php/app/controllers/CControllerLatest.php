@@ -75,20 +75,15 @@ abstract class CControllerLatest extends CController {
 			$groupids = null;
 
 			if ($child_groups) {
-				$groups = $filter_groups;
+				$filter_groups += API::HostGroup()->get([
+					'output' => ['groupid'],
+					'search' => ['name' => $child_groups],
+					'startSearch' => true,
+					'searchByAny' => true,
+					'preservekeys' => true
+				]);
 
-				foreach ($child_groups as $child_group) {
-					$child_groups = API::HostGroup()->get([
-						'output' => ['groupid'],
-						'search' => ['name' => $child_group],
-						'startSearch' => true,
-						'preservekeys' => true
-					]);
-
-					$groups = array_replace($groups, $child_groups);
-				}
-
-				$groupids = array_keys($groups);
+				$groupids = array_keys($filter_groups);
 			}
 
 			$hosts = API::Host()->get([

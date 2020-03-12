@@ -710,7 +710,10 @@ class testUrlParameters extends CLegacyWebTest {
 				'test_cases' => [
 					[
 						'url' => 'charts.php?groupid=4&hostid=10084&graphid=524',
-						'text_present' => 'Graphs'
+						'text_not_present' => 'Graphs',
+						'text_present' => [
+							'No permissions to referred object or it does not exist!'
+						]
 					],
 					[
 						'url' => 'charts.php?groupid=9999999&hostid=0&graphid=0',

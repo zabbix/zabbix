@@ -1992,9 +1992,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .icon-ackn::before {
     background: url(../img/icon-sprite.svg) no-repeat -45px -693px; }
 
-.icon-none {
-  margin-left: 18px; }
-
 .icon-tree-top-bottom {
   margin: 0 12px 0 0; }
   .icon-tree-top-bottom::before {
@@ -3577,6 +3574,28 @@ a.link-action {
     .progress-bar-label span:last-child {
       right: .35em; }
 
+.status-container .status-na-bg,
+.status-container .status-info-bg,
+.status-container .status-warning-bg,
+.status-container .status-average-bg,
+.status-container .status-high-bg,
+.status-container .status-disaster-bg, .status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-disabled-bg {
+  padding: 2px 3px 1px;
+  font-size: 0.917em;
+  text-transform: uppercase;
+  text-align: center;
+  min-width: .7em;
+  line-height: 1em;
+  display: inline-block;
+  border-radius: 2px; }
+  .status-container .status-na-bg:not(:last-of-type),
+  .status-container .status-info-bg:not(:last-of-type),
+  .status-container .status-warning-bg:not(:last-of-type),
+  .status-container .status-average-bg:not(:last-of-type),
+  .status-container .status-high-bg:not(:last-of-type),
+  .status-container .status-disaster-bg:not(:last-of-type), .status-green:not(:last-of-type), .status-red:not(:last-of-type), .status-grey:not(:last-of-type), .status-dark-grey:not(:last-of-type), .status-yellow:not(:last-of-type), .status-disabled-bg:not(:last-of-type) {
+    border-right: 0; }
+
 .status-container {
   display: inline-block;
   white-space: nowrap;
@@ -3591,6 +3610,14 @@ a.link-action {
       border-radius: 2px 0 0 2px; }
     .status-container span:last-of-type:not(:only-child) {
       border-radius: 0 2px 2px 0; }
+  .status-container .status-na-bg,
+  .status-container .status-info-bg,
+  .status-container .status-warning-bg,
+  .status-container .status-average-bg,
+  .status-container .status-high-bg,
+  .status-container .status-disaster-bg {
+    border: 1px solid rgba(31, 44, 51, 0.2);
+    border-radius: 0; }
 
 .status-green {
   color: #ffffff;
@@ -3616,14 +3643,6 @@ a.link-action {
   border: 1px solid #e79e0b;
   background-color: #f1a50b; }
 
-.status-na-bg,
-.status-info-bg,
-.status-warning-bg,
-.status-average-bg,
-.status-high-bg,
-.status-disaster-bg {
-  border: 1px solid rgba(31, 44, 51, 0.2); }
-
 .status-disabled-bg {
   color: #acbbc2;
   background-color: #ebebeb;
@@ -3641,28 +3660,6 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
-
-.status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-na-bg,
-.status-info-bg,
-.status-warning-bg,
-.status-average-bg,
-.status-high-bg,
-.status-disaster-bg, .status-disabled-bg {
-  padding: 2px 3px 1px;
-  font-size: 0.917em;
-  text-transform: uppercase;
-  text-align: center;
-  min-width: .7em;
-  line-height: 1em;
-  display: inline-block;
-  border-radius: 2px; }
-  .status-green:not(:last-of-type), .status-red:not(:last-of-type), .status-grey:not(:last-of-type), .status-dark-grey:not(:last-of-type), .status-yellow:not(:last-of-type), .status-na-bg:not(:last-of-type),
-  .status-info-bg:not(:last-of-type),
-  .status-warning-bg:not(:last-of-type),
-  .status-average-bg:not(:last-of-type),
-  .status-high-bg:not(:last-of-type),
-  .status-disaster-bg:not(:last-of-type), .status-disabled-bg:not(:last-of-type) {
-    border-right: 0; }
 
 .green-bg {
   background-color: #59db8f; }
@@ -4673,22 +4670,10 @@ svg {
     padding: 8px 0; }
     .navtree .tree .tree-item > .tree-row:hover {
       background-color: #e8f5ff; }
-    .navtree .tree .tree-item > .tree-row > .problems {
+    .navtree .tree .tree-item > .tree-row > .problem-icon-list {
       float: right;
-      position: relative;
       padding-left: 10px;
-      margin-right: 10px;
-      background: inherit;
-      display: flex; }
-      .navtree .tree .tree-item > .tree-row > .problems .problems-per-item {
-        flex: 0 0 7px;
-        background: #808080;
-        color: #ffffff;
-        padding: 3px 4px 2px;
-        font-size: 12px;
-        line-height: 1;
-        border-radius: 3px;
-        margin: 0 5px 0 0; }
+      margin-right: 10px; }
     .navtree .tree .tree-item > .tree-row > .tools {
       float: right;
       position: relative;
@@ -4781,6 +4766,23 @@ svg {
   .navtree .tree .placeholder {
     background-color: #ebeef0;
     animation: fadein .5s; }
+.navtree .problem-icon-list {
+  flex-wrap: nowrap; }
+
+.problem-icon-list {
+  display: flex;
+  flex-wrap: wrap; }
+  .problem-icon-list .problem-icon-list-item {
+    border-radius: 3px;
+    color: #ffffff;
+    display: inline-block;
+    flex: 0 0 7px;
+    font-size: 12px;
+    line-height: 1;
+    padding: 3px 4px 2px;
+    margin: 1px 0; }
+    .problem-icon-list .problem-icon-list-item:not(:last-of-type) {
+      margin-right: 5px; }
 
 :-ms-input-placeholder {
   color: #9d9d9d !important; }
