@@ -50,7 +50,7 @@ $filter = (new CFilter(new CUrl('httpconf.php')))
 				(new CLabel(_('Hosts'), 'filter_hosts__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_hostids[]',
-					'object_name' => 'hosts',
+					'object_name' => 'host_templates',
 					'data' => $data['filter']['hosts'],
 					'popup' => [
 						'parameters' => [
@@ -58,7 +58,6 @@ $filter = (new CFilter(new CUrl('httpconf.php')))
 							'srcfld1' => 'hostid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_hostids_',
-							'with_hosts_and_templates' => 1,
 							'editable' => 1
 						]
 					]

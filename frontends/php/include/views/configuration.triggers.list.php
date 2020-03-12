@@ -45,7 +45,7 @@ $filter_column1 = (new CFormList())
 	->addRow((new CLabel(_('Hosts'), 'filter_hostids')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
-			'object_name' => 'hosts',
+			'object_name' => 'host_templates',
 			'data' => $data['filter_hostids_ms'],
 			'popup' => [
 				'parameters' => [
@@ -53,8 +53,7 @@ $filter_column1 = (new CFormList())
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'hostids',
 					'dstfld1' => 'filter_hostids_',
-					'editable' => true,
-					'templated_hosts' => true
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

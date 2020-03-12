@@ -222,7 +222,7 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow((new CLabel(_('Hosts'), 'filter_hostid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
-			'object_name' => 'hosts',
+			'object_name' => 'host_templates',
 			'data' => $host_filter,
 			'popup' => [
 				'parameters' => [
@@ -230,8 +230,7 @@ function getItemFilterForm(&$items) {
 					'srcfld1' => 'hostid',
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_hostids_',
-					'editable' => true,
-					'templated_hosts' => true
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)

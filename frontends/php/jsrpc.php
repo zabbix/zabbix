@@ -172,6 +172,7 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'host_templates':
 			case 'hosts':
 				$options = [
 					'output' => ['hostid', 'name'],
@@ -183,6 +184,10 @@ switch ($data['method']) {
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => $config['search_limit']
 				];
+
+				if ($data['object_name'] === 'host_templates') {
+					$options['templated_hosts'] = true;
+				}
 
 				if (array_key_exists('with_monitored_items', $data)) {
 					$options += [

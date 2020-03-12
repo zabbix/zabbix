@@ -53,11 +53,10 @@ $filter = (new CFilter(new CUrl('applications.php')))
 					'data' => $data['filter']['hosts'],
 					'popup' => [
 						'parameters' => [
-							'srctbl' => 'hosts',
+							'srctbl' => 'host_templates',
 							'srcfld1' => 'hostid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_hostids_',
-							'with_hosts_and_templates' => 1,
 							'editable' => 1
 						]
 					]

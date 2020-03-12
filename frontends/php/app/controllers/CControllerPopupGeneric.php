@@ -554,9 +554,7 @@ class CControllerPopupGeneric extends CController {
 			$host_options['with_httptests'] = 1;
 		}
 
-		if (($this->source_table === 'hosts' || $this->source_table === 'host_templates')
-				&& !$this->hasInput('templated_hosts')
-				&& !$this->hasInput('with_hosts_and_templates')) {
+		if ($this->source_table === 'hosts' && !$this->hasInput('templated_hosts')) {
 			$group_options['real_hosts'] = 1;
 		}
 		elseif ($this->source_table === 'templates') {
@@ -578,7 +576,6 @@ class CControllerPopupGeneric extends CController {
 		}
 		else {
 			$group_options['with_hosts_and_templates'] = 1;
-			$host_options['with_hosts_and_templates'] = 1;
 		}
 
 		foreach (['with_applications', 'with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
