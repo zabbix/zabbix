@@ -1046,6 +1046,10 @@ class CControllerPopupGeneric extends CController {
 					$options['filter']['value_type'] = $value_types;
 				}
 
+				if (array_key_exists('real_hosts', $this->page_options)) {
+					$options['templated'] = false;
+				}
+
 				if ($this->source_table === 'item_prototypes') {
 					$records = API::ItemPrototype()->get($options);
 				}
