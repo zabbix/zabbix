@@ -57,8 +57,9 @@ func exportSystemTcpListen(port uint16) (result interface{}, err error) {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Tcp",
+	plugin.RegisterMetrics(&impl, "TCP",
 		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
 		"net.tcp.port", "Checks if it is possible to make TCP connection to specified port.",
-	)
+		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
+		"net.tcp.service.perf", "Checks performance of TCP service.")
 }
