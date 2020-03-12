@@ -109,7 +109,7 @@ jQuery(function($) {
 			let $wrapper = $('.wrapper');
 			this.$elem.css({
 				left: $wrapper.offset().left + 10,
-				width: $wrapper.width() - 20
+				width: $wrapper[0].clientWidth - 20
 			});
 		}
 	};
