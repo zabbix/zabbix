@@ -1459,7 +1459,7 @@ static int	DBitem_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
-			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_value_print(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
 			if (0 == raw)

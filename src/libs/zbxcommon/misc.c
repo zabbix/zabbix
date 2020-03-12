@@ -2682,23 +2682,7 @@ static int	is_double_valid_syntax(const char *str)
 	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
 
-	str += len;
-
-	if ('e' == *str || 'E' == *str)		/* check exponential part */
-	{
-		str++;
-
-		if ('-' == *str || '+' == *str)	/* check exponent sign */
-			str++;
-
-		if (0 == isdigit(*str))		/* check exponent */
-			return FAIL;
-
-		while (0 != isdigit(*str))
-			str++;
-	}
-
-	return '\0' == *str ? SUCCEED : FAIL;
+	return '\0' == *(str + len) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************

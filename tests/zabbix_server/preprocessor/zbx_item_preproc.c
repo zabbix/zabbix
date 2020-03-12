@@ -224,9 +224,17 @@ void	zbx_mock_test_entry(void **state)
 				if (ZBX_VARIANT_NONE == value.type)
 					fail_msg("preprocessing result was empty value");
 
-				zbx_variant_convert(&value, ZBX_VARIANT_STR);
-				zbx_mock_assert_str_eq("processed value", zbx_mock_get_parameter_string("out.value"),
-						value.data.str);
+				if (ZBX_VARIANT_DBL == value.type)
+				{
+					zbx_mock_assert_double_eq("processed value",
+							atof(zbx_mock_get_parameter_string("out.value")), value.data.dbl);
+				}
+				else
+				{
+					zbx_variant_convert(&value, ZBX_VARIANT_STR);
+					zbx_mock_assert_str_eq("processed value", zbx_mock_get_parameter_string("out.value"),
+							value.data.str);
+				}
 			}
 			else
 			{

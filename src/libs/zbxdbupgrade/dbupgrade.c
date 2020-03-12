@@ -71,13 +71,13 @@ zbx_db_version_t;
 #endif
 
 #if defined(HAVE_MYSQL)
-#	define ZBX_TYPE_FLOAT_STR	"double(16,4)"
+#	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"bigint unsigned"
 #elif defined(HAVE_ORACLE)
-#	define ZBX_TYPE_FLOAT_STR	"number(20,4)"
+#	define ZBX_TYPE_FLOAT_STR	"binary_double"
 #	define ZBX_TYPE_UINT_STR	"number(20)"
 #elif defined(HAVE_POSTGRESQL)
-#	define ZBX_TYPE_FLOAT_STR	"numeric(16,4)"
+#	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"numeric(20)"
 #endif
 
@@ -981,6 +981,58 @@ out:
 	DBclose();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+int	DBcheck_double_type(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL;
+	const int	total_dbl_cols = 9;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+#if defined(HAVE_MYSQL)
+	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
+			" where table_schema like '%s' and column_type like 'double'", CONFIG_DBNAME);
+#elif defined(HAVE_POSTGRESQL)
+	sql = zbx_strdup(sql, "select count(*) from information_schema.columns"
+			" where data_type like 'double precision'");
+#elif defined(HAVE_ORACLE)
+	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
+			" where data_type like 'BINARY_DOUBLE'");
+#elif defined(HAVE_SQLITE3)
+	/* upgrade patch is not required for sqlite3 */
+	ret = SUCCEED;
+	goto out;
+#endif
+
+	if (NULL == (result = DBselect("%s"
+			" and ((lower(table_name) like 'graphs'"
+					" and (lower(column_name) in ('yaxismin', 'yaxismax', 'percent_left', 'percent_right')))"
+			" or (lower(table_name) like 'trends'"
+					" and (lower(column_name) in ('value_min', 'value_avg', 'value_max')))"
+			" or (lower(table_name) like 'services' and lower(column_name) like 'goodsla')"
+			" or (lower(table_name) like 'history' and lower(column_name) like 'value'))", sql)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot select records with columns information");
+		goto out;
+	}
+
+	if (NULL != (row = DBfetch(result)) && total_dbl_cols == atoi(row[0]))
+		ret = SUCCEED;
+
+	DBfree_result(result);
+out:
+	DBclose();
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
