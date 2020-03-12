@@ -36,9 +36,8 @@ $controls = [];
 $form = null;
 
 // Construct table header.
-$header_form = (new CForm())
-	->cleanItems()
-	->setId('generic-popup-form');
+$header_form = ($data['popup_type'] === 'help_items') ? (new CForm())->cleanItems() : new CDiv();
+$header_form->setId('generic-popup-form');
 
 // Make 'empty' button.
 if (in_array($data['popup_type'], ['applications', 'application_prototypes', 'triggers'])
@@ -129,7 +128,7 @@ if ($data['popup_type'] === 'help_items') {
 }
 
 if ($controls) {
-	$header_form->addItem(new CList($controls));
+	$header_form->addItem($controls);
 	$output['controls'] = $header_form->toString();
 }
 
