@@ -182,7 +182,7 @@ else {
 	$data['host_inventories'] = zbx_toHash(getHostInventories(true), 'db_field');
 
 	if ($data['filter']['field'] === '') {
-		$data['filter']['field'] = array_key_first($data['host_inventories']);
+		$data['filter']['field'] = key($data['host_inventories']);
 	}
 
 	// Checking if correct inventory field is specified for filter.
