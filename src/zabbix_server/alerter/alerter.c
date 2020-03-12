@@ -272,6 +272,8 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	zbx_es_init(&es_engine);

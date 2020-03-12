@@ -2627,12 +2627,10 @@ class testDiscoveryRule extends CAPITest {
 
 			// Get all discovery rule fields.
 			$src_items = CDBHelper::getAll(
-				'SELECT i.type,i.snmp_community,i.snmp_oid,i.name,i.key_,i.delay,i.history,i.trends,'.
-						'i.status,i.value_type,i.trapper_hosts,i.units,i.snmpv3_securityname,i.snmpv3_securitylevel,'.
-						'i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.logtimefmt,i.valuemapid,'.
+				'SELECT i.type,i.snmp_oid,i.name,i.key_,i.delay,i.history,i.trends,'.
+						'i.status,i.value_type,i.trapper_hosts,i.units,i.logtimefmt,i.valuemapid,'.
 						'i.params,i.ipmi_sensor,i.authtype,i.username,i.password,i.publickey,i.privatekey,'.
-						'i.flags,i.port,i.description,i.inventory_link,i.lifetime,i.snmpv3_authprotocol,'.
-						'i.snmpv3_privprotocol,i.snmpv3_contextname,i.jmx_endpoint,i.url,i.query_fields,i.timeout,'.
+						'i.flags,i.description,i.inventory_link,i.lifetime,i.jmx_endpoint,i.url,i.query_fields,i.timeout,'.
 						'i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,'.
 						'i.request_method,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,'.
 						'i.verify_host,i.allow_traps'.
@@ -2648,13 +2646,11 @@ class testDiscoveryRule extends CAPITest {
 			// Find same items on destination hosts.
 			foreach ($params['discoveryids'] as $itemid) {
 				$dst_items = CDBHelper::getAll(
-					'SELECT src.type,src.snmp_community,src.snmp_oid,src.name,src.key_,'.
+					'SELECT src.type,src.snmp_oid,src.name,src.key_,'.
 						'src.delay,src.history,src.trends,src.status,src.value_type,src.trapper_hosts,src.units,'.
-						'src.snmpv3_securityname,src.snmpv3_securitylevel,src.snmpv3_authpassphrase,'.
-						'src.snmpv3_privpassphrase,src.logtimefmt,src.valuemapid,src.params,'.
+						'src.logtimefmt,src.valuemapid,src.params,'.
 						'src.ipmi_sensor,src.authtype,src.username,src.password,src.publickey,src.privatekey,'.
-						'src.flags,src.port,src.description,src.inventory_link,src.lifetime,'.
-						'src.snmpv3_authprotocol,src.snmpv3_privprotocol,src.snmpv3_contextname,src.jmx_endpoint,'.
+						'src.flags,src.description,src.inventory_link,src.lifetime,src.jmx_endpoint,'.
 						'src.url,src.query_fields,src.timeout,src.posts,src.status_codes,src.follow_redirects,'.
 						'src.post_type,src.http_proxy,src.headers,src.retrieve_mode,src.request_method,'.
 						'src.ssl_cert_file,src.ssl_key_file,src.ssl_key_password,src.verify_peer,src.verify_host,'.

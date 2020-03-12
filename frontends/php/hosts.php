@@ -25,7 +25,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of hosts');
 $page['file'] = 'hosts.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
+	'inputsecret.js', 'macrovalue.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -55,7 +57,7 @@ $fields = [
 									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
 								],
 	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-									'isset({add}) || isset({update})', _('Agent or SNMP or JMX or IPMI interface')
+									'isset({add}) || isset({update})'
 								],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
@@ -63,6 +65,14 @@ $fields = [
 									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 									null
 								],
+	'mass_update_macros' => 	[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+									null
+								],
+	'macros_add' =>				[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros_update' =>			[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros_remove' =>			[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros_remove_all' =>		[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'add_templates' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'templates_rem' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
@@ -252,12 +262,11 @@ foreach ($tags as $key => $tag) {
 $macros = cleanInheritedMacros(getRequest('macros', []));
 
 // Remove empty new macro lines.
-foreach ($macros as $idx => $macro) {
-	if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
-			&& $macro['description'] === '') {
-		unset($macros[$idx]);
-	}
-}
+$macros = array_filter($macros, function($macro) {
+	$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+
+	return (bool) array_filter(array_intersect_key($macro, $keys));
+});
 
 /*
  * Actions
@@ -329,6 +338,23 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 		$_REQUEST['clone_hostid'] = $_REQUEST['hostid'];
 	}
 
+	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
+		// Reset macro type and value.
+		$macros = array_map(function($value) {
+			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
+				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
+				: $value;
+		}, $macros);
+
+		$msg = [
+			'type' => 'error',
+			'message' => _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
+			'src' => ''
+		];
+
+		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
+	}
+
 	unset($_REQUEST['hostid'], $_REQUEST['flags']);
 }
 elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && hasRequest('masssave')) {
@@ -370,6 +396,15 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			}
 
 			$tags = array_values($unique_tags);
+		}
+
+		if (array_key_exists('macros', $visible)) {
+			$mass_update_macros = getRequest('mass_update_macros', ZBX_ACTION_ADD);
+
+			if ($mass_update_macros == ZBX_ACTION_ADD || $mass_update_macros == ZBX_ACTION_REPLACE
+					|| $mass_update_macros == ZBX_ACTION_REMOVE) {
+				$options['selectMacros'] = ['hostmacroid', 'macro'];
+			}
 		}
 
 		$hosts = API::Host()->get($options);
@@ -451,6 +486,9 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			}
 		}
 
+		$host_macros_add = [];
+		$host_macros_update = [];
+		$host_macros_remove = [];
 		foreach ($hosts as &$host) {
 			if (array_key_exists('groups', $visible)) {
 				if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
@@ -536,6 +574,81 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 				}
 			}
 
+			if (array_key_exists('macros', $visible)) {
+				switch ($mass_update_macros) {
+					case ZBX_ACTION_ADD:
+						if ($macros) {
+							$update_existing = getRequest('macros_add', 0);
+
+							foreach ($macros as $macro) {
+								foreach ($host['macros'] as $host_macro) {
+									if ($macro['macro'] === $host_macro['macro']) {
+										if ($update_existing) {
+											$macro['hostmacroid'] = $host_macro['hostmacroid'];
+											$host_macros_update[] = $macro;
+										}
+
+										continue 2;
+									}
+								}
+
+								$macro['hostid'] = $host['hostid'];
+								$host_macros_add[] = $macro;
+							}
+						}
+						break;
+
+					case ZBX_ACTION_REPLACE: // In Macros its update.
+						if ($macros) {
+							$add_missing = getRequest('macros_update', 0);
+
+							foreach ($macros as $macro) {
+								foreach ($host['macros'] as $host_macro) {
+									if ($macro['macro'] === $host_macro['macro']) {
+										$macro['hostmacroid'] = $host_macro['hostmacroid'];
+										$host_macros_update[] = $macro;
+
+										continue 2;
+									}
+								}
+
+								if ($add_missing) {
+									$macro['hostid'] = $host['hostid'];
+									$host_macros_add[] = $macro;
+								}
+							}
+						}
+						break;
+
+					case ZBX_ACTION_REMOVE:
+						if ($macros) {
+							$except_selected = getRequest('macros_remove', 0);
+
+							$macro_names = array_column($macros, 'macro');
+
+							foreach ($host['macros'] as $host_macro) {
+								if ((!$except_selected && in_array($host_macro['macro'], $macro_names))
+										|| ($except_selected && !in_array($host_macro['macro'], $macro_names))) {
+									$host_macros_remove[] = $host_macro['hostmacroid'];
+								}
+							}
+						}
+						break;
+
+					case ZBX_ACTION_REMOVE_ALL:
+						if (!getRequest('macros_remove_all', 0)) {
+							throw new Exception();
+						}
+
+						$host['macros'] = [];
+						break;
+				}
+
+				if ($mass_update_macros != ZBX_ACTION_REMOVE_ALL) {
+					unset($host['macros']);
+				}
+			}
+
 			unset($host['parentTemplates']);
 
 			$host = $new_values + $host;
@@ -544,6 +657,28 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 
 		if (!API::Host()->update($hosts)) {
 			throw new Exception();
+		}
+
+		/**
+		 * Macros must be updated separately, since calling API::UserMacro->replaceMacros() inside
+		 * API::Host->update() results in loss of secret macro values.
+		 */
+		if ($host_macros_remove) {
+			if (!API::UserMacro()->delete($host_macros_remove)) {
+				throw new Exception();
+			}
+		}
+
+		if ($host_macros_add) {
+			if (!API::UserMacro()->create($host_macros_add)) {
+				throw new Exception();
+			}
+		}
+
+		if ($host_macros_update) {
+			if (!API::UserMacro()->update($host_macros_update)) {
+				throw new Exception();
+			}
 		}
 
 		DBend(true);
@@ -615,11 +750,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				if ($interface['type'] == INTERFACE_TYPE_SNMP && !isset($interface['bulk'])) {
-					$interfaces[$key]['bulk'] = SNMP_BULK_DISABLED;
-				}
-				else {
-					$interfaces[$key]['bulk'] = SNMP_BULK_ENABLED;
+				// Proccess SNMP interface fields.
+				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+					if (!array_key_exists('details', $interface)) {
+						unset($interface[$key]);
+						continue;
+					}
+
+					$interfaces[$key]['details']['bulk'] = array_key_exists('bulk', $interface['details'])
+						? SNMP_BULK_ENABLED
+						: SNMP_BULK_DISABLED;
 				}
 
 				if ($interface['isNew']) {
@@ -910,6 +1050,14 @@ if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || ha
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
 		'tags' => $tags,
+		'macros' => $macros,
+		'macros_checkbox' => [
+			ZBX_ACTION_ADD => getRequest('macros_add', '0'),
+			ZBX_ACTION_REPLACE => getRequest('macros_update', '0'),
+			ZBX_ACTION_REMOVE => getRequest('macros_remove', '0'),
+			ZBX_ACTION_REMOVE_ALL => getRequest('macros_remove_all', '0')
+		],
+		'macros_visible' => getRequest('mass_update_macros', ZBX_ACTION_ADD),
 		'status' => getRequest('status', HOST_STATUS_MONITORED),
 		'description' => getRequest('description'),
 		'proxy_hostid' => getRequest('proxy_hostid', ''),
@@ -951,6 +1099,10 @@ if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || ha
 			'templateids' => $data['templates']
 		]), ['templateid' => 'id'])
 		: [];
+
+	if (!$data['macros']) {
+		$data['macros'] = [['macro' => '', 'type' => ZBX_MACRO_TYPE_TEXT, 'value' => '', 'description' => '']];
+	}
 
 	$hostView = new CView('configuration.host.massupdate', $data);
 }
@@ -1017,7 +1169,7 @@ elseif (hasRequest('form')) {
 				],
 				'selectGroups' => ['groupid'],
 				'selectParentTemplates' => ['templateid'],
-				'selectMacros' => ['hostmacroid', 'macro', 'value', 'description'],
+				'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
 				'selectHostDiscovery' => ['parent_hostid'],
 				'selectInventory' => API_OUTPUT_EXTEND,
@@ -1036,7 +1188,7 @@ elseif (hasRequest('form')) {
 			$data['host'] = $dbHost['host'];
 			$data['visiblename'] = $dbHost['name'];
 			$data['interfaces'] = API::HostInterface()->get([
-				'output' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'bulk'],
+				'output' => API_OUTPUT_EXTEND,
 				'selectItems' => ['type'],
 				'hostids' => [$data['hostid']],
 				'sortfield' => 'interfaceid'
@@ -1198,10 +1350,12 @@ elseif (hasRequest('form')) {
 	$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 
 	if (!$data['macros'] && !$data['readonly']) {
-		$macro = ['macro' => '', 'value' => '', 'description' => ''];
+		$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
+
 		if ($data['show_inherited_macros']) {
-			$macro['type'] = ZBX_PROPERTY_OWN;
+			$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 		}
+
 		$data['macros'][] = $macro;
 	}
 

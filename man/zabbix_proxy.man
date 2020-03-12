@@ -73,6 +73,11 @@ Default configuration file (unless \fB\-c\fR option is specified) will be used t
 .RE
 .RS 4
 .TP 4
+.B snmp_cache_reload
+Reload SNMP cache.
+.RE
+.RS 4
+.TP 4
 .B housekeeper_execute
 Execute the housekeeper.
 Ignored if housekeeper is being currently executed.

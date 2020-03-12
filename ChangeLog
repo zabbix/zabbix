@@ -1,10 +1,32 @@
 Changes for 5.0.0beta1
 
 New features:
+..F....... [ZBXNEXT-5449] added support of svg graph as image download (gcalenko)
+...GI..PS. [ZBXNEXT-5716] removed mbedTLS support (Andris)
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
+...G...... [ZBXNEXT-5781] improved agent2 metric testing (-t) and printing (-p) by adding full plugin interface support and verbose testing option (wiper)
+.......PS. [ZBXNEXT-3940] added functionality to flush SNMP connections cache (arimdjonoks)
+.D.G...... [ZBXNEXT-1561] added nanoseconds option for zabbix_sender; thanks to Vladimir for the patch (asestakovs)
+...G...... [ZBXNEXT-5604] added option to suppress logging of system.run[] if embedded in agent configuration file (akozlovs)
+A.F.I..... [ZBXNEXT-4584] implemented auditlog API (gcalenko, Sasha)
 ........S. [ZBXNEXT-1797] added HOST.ID macro support to notifications (atumilovics)
 ..F....... [ZBXNEXT-5725] added ability to select specific severities in Monitoring->Problems (vasilijs)
 
 Bug fixes:
+..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
+..F....... [ZBX-17205] fixed inability to add more than one space in auto-expandable fields like macros and tags (agriscenko)
+..F....... [ZBX-17347] fixed order of setting the Severity in the columns in the filters to vertical (vasilijs)
+..F....... [ZBX-17308] fixed unreachable code notice in a generic popup (averza)
+..F....... [ZBX-17185] fixed non-disappearing messages of failed login attempts (Ivo)
+..F....... [ZBX-17180] fixed undefined index in maps for trigger elements with no permissions (vmurzins)
+........S. [ZBX-17322] fixed deadlock between server and frontend when updating multiple hosts (vso)
+..F.I..... [ZBX-9057] fixed duplicate entries being written into in profiles table (talbergs)
+..F....... [ZBX-17159] fixed overlay dialogue instantiation (talbergs)
+.......PS. [ZBX-17108] improved process utilization calculation (mabele)
+..F....... [ZBX-17269] fixed undefined indexes in history page (Ivo)
+........S. [ZBX-17342] dump memory statistics and items with most values when value cache is fully used (vso)
+.......PS. [ZBX-16928] upgraded Duktape version from 2.3.0 to 2.4.0 (wiper)
+.......PS. [ZBX-16926] fix INT_MAX error when compiling on SunOS/Joyent/Solaris (arimdjonoks)
 .......PS. [ZBX-17295] fixed IPMI sensor LLD JSON output (akozlovs)
 ..F....... [ZBX-17222] fixed unlimited data selection in Latest data view (averza)
 
@@ -73,8 +95,22 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 Changes for 4.4.7rc1
 
 New features:
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
+...G...... [ZBXNEXT-5781] improved agent2 metric testing (-t) and printing (-p) by adding full plugin interface support and verbose testing option (wiper)
 
 Bug fixes:
+..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
+..F....... [ZBX-17205] fixed inability to add more than one space in auto-expandable fields like macros and tags (agriscenko)
+..F....... [ZBX-17308] fixed unreachable code notice in a generic popup (averza)
+..F....... [ZBX-17185] fixed non-disappearing messages of failed login attempts (Ivo)
+..F....... [ZBX-17180] fixed undefined index in maps for trigger elements with no permissions (vmurzins)
+........S. [ZBX-17322] fixed deadlock between server and frontend when updating multiple hosts (vso)
+..F.I..... [ZBX-9057] fixed duplicate entries being written into in profiles table (talbergs)
+..F....... [ZBX-17159] fixed overlay dialogue instantiation (talbergs)
+.......PS. [ZBX-17108] improved process utilization calculation (mabele)
+..F....... [ZBX-17269] fixed undefined indexes in history page (Ivo)
+........S. [ZBX-17342] dump memory statistics and items with most values when value cache is fully used (vso)
+.......PS. [ZBX-16926] fix INT_MAX error when compiling on SunOS/Joyent/Solaris (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.6
@@ -1135,8 +1171,19 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.19rc1
 
 New features:
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 
 Bug fixes:
+..F....... [ZBX-17075] fixed "Problems" page validation to ignore invalid date format in filter (vasilijs)
+..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
+..F....... [ZBX-17185] fixed non-disappearing messages of failed login attempts (Ivo)
+........S. [ZBX-17322] fixed deadlock between server and frontend when updating multiple hosts (vso)
+..F.I..... [ZBX-9057] fixed duplicate entries being written into in profiles table (talbergs)
+..F....... [ZBX-17159] fixed overlay dialogue instantiation (talbergs)
+.......PS. [ZBX-17108] improved process utilization calculation (mabele)
+..F....... [ZBX-17269] fixed undefined indexes in history page (Ivo)
+........S. [ZBX-17342] dump memory statistics and items with most values when value cache is fully used (vso)
+.......PS. [ZBX-16926] fix INT_MAX error when compiling on SunOS/Joyent/Solaris (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.18

@@ -669,7 +669,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['port']         Interface port (optional).
 	 * @param int    $hosts[]['interfaces']['useip']        Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']          Interface should use DNS (optional).
-	 * @param int    $hosts[]['interfaces']['bulk']         Use bulk requests for interface (optional).
+	 * @param int    $hosts[]['interfaces']['details']      Interface additional fields (optional).
 	 * @param int    $hosts[]['proxy_hostid']               ID of the proxy that is used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']              IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']             IPMI privilege (optional).
@@ -791,7 +791,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['port']               Interface port (optional).
 	 * @param int    $hosts[]['interfaces']['useip']              Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']                Interface should use DNS (optional).
-	 * @param int    $hosts[]['interfaces']['bulk']               Use bulk requests for interface (optional).
+	 * @param int    $hosts[]['interfaces']['details']            Interface additional fields (optional).
 	 * @param int    $hosts[]['proxy_hostid']                     ID of the proxy that is used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']                    IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']                   IPMI privilege (optional).
@@ -945,7 +945,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts['fields']['useip']			Use IP. OPTIONAL
 	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
 	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
-	 * @param int    $hosts['fields']['bulk']			bulk. OPTIONAL
+	 * @param int    $hosts['fields']['details']		Details. OPTIONAL
 	 * @param int    $hosts['fields']['proxy_hostid']	Proxy Host ID. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
@@ -1042,7 +1042,7 @@ class CHost extends CHostGeneral {
 
 			if ($host_name_parser->parse($data['host']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect characters used for host name "%s".', $data['host'])
+					_s('Incorrect characters used for host name "%1$s".', $data['host'])
 				);
 			}
 
@@ -1929,7 +1929,7 @@ class CHost extends CHostGeneral {
 			// Validate "host" field.
 			if ($host_name_parser->parse($host['host']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect characters used for host name "%s".', $host['host'])
+					_s('Incorrect characters used for host name "%1$s".', $host['host'])
 				);
 			}
 
@@ -1958,14 +1958,14 @@ class CHost extends CHostGeneral {
 		$duplicate = CArrayHelper::findDuplicate($hosts, 'host');
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate host. Host with the same host name "%s" already exists in data.', $duplicate['host'])
+				_s('Duplicate host. Host with the same host name "%1$s" already exists in data.', $duplicate['host'])
 			);
 		}
 
 		$duplicate = CArrayHelper::findDuplicate($hosts, 'name');
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate host. Host with the same visible name "%s" already exists in data.', $duplicate['name'])
+				_s('Duplicate host. Host with the same visible name "%1$s" already exists in data.', $duplicate['name'])
 			);
 		}
 
@@ -2007,7 +2007,7 @@ class CHost extends CHostGeneral {
 
 		foreach ($hosts as $host) {
 			if (!array_key_exists('interfaces', $host) || !is_array($host['interfaces']) || !$host['interfaces']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
 			}
 
 			if (array_key_exists('status', $host)) {
@@ -2028,7 +2028,7 @@ class CHost extends CHostGeneral {
 				$fields = array_keys($host['inventory']);
 				foreach ($fields as $field) {
 					if (!in_array($field, $inventory_fields)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect inventory field "%s".', $field));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect inventory field "%1$s".', $field));
 					}
 				}
 			}
@@ -2053,13 +2053,13 @@ class CHost extends CHostGeneral {
 		foreach ($hosts_exists as $host_exists) {
 			if (array_key_exists($host_exists['host'], $host_names['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host with the same name "%s" already exists.', $host_exists['host'])
+					_s('Host with the same name "%1$s" already exists.', $host_exists['host'])
 				);
 			}
 
 			if (array_key_exists($host_exists['name'], $host_names['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host with the same visible name "%s" already exists.', $host_exists['name'])
+					_s('Host with the same visible name "%1$s" already exists.', $host_exists['name'])
 				);
 			}
 		}
@@ -2074,13 +2074,13 @@ class CHost extends CHostGeneral {
 		foreach ($templates_exists as $template_exists) {
 			if (array_key_exists($template_exists['host'], $host_names['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template with the same name "%s" already exists.', $template_exists['host'])
+					_s('Template with the same name "%1$s" already exists.', $template_exists['host'])
 				);
 			}
 
 			if (array_key_exists($template_exists['name'], $host_names['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template with the same visible name "%s" already exists.', $template_exists['name'])
+					_s('Template with the same visible name "%1$s" already exists.', $template_exists['name'])
 				);
 			}
 		}
@@ -2174,7 +2174,7 @@ class CHost extends CHostGeneral {
 				$fields = array_keys($host['inventory']);
 				foreach ($fields as $field) {
 					if (!in_array($field, $inventory_fields)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect inventory field "%s".', $field));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect inventory field "%1$s".', $field));
 					}
 				}
 			}
@@ -2185,20 +2185,20 @@ class CHost extends CHostGeneral {
 
 			if (array_key_exists('interfaces', $host)) {
 				if (!is_array($host['interfaces']) || !$host['interfaces']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
 				}
 			}
 
 			if (array_key_exists('host', $host)) {
 				if ($host_name_parser->parse($host['host']) != CParser::PARSE_SUCCESS) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect characters used for host name "%s".', $host['host'])
+						_s('Incorrect characters used for host name "%1$s".', $host['host'])
 					);
 				}
 
 				if (array_key_exists('host', $host_names) && array_key_exists($host['host'], $host_names['host'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Duplicate host. Host with the same host name "%s" already exists in data.', $host['host'])
+						_s('Duplicate host. Host with the same host name "%1$s" already exists in data.', $host['host'])
 					);
 				}
 
@@ -2218,7 +2218,7 @@ class CHost extends CHostGeneral {
 
 				if (array_key_exists('name', $host_names) && array_key_exists($host['name'], $host_names['name'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Duplicate host. Host with the same visible name "%s" already exists in data.', $host['name'])
+						'Duplicate host. Host with the same visible name "%1$s" already exists in data.', $host['name'])
 					);
 				}
 				$host_names['name'][$host['name']] = $host['hostid'];
@@ -2279,14 +2279,14 @@ class CHost extends CHostGeneral {
 				if (array_key_exists('host', $host_names) && array_key_exists($host_exists['host'], $host_names['host'])
 						&& bccomp($host_exists['hostid'], $host_names['host'][$host_exists['host']]) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Host with the same name "%s" already exists.', $host_exists['host'])
+						_s('Host with the same name "%1$s" already exists.', $host_exists['host'])
 					);
 				}
 
 				if (array_key_exists('name', $host_names) && array_key_exists($host_exists['name'], $host_names['name'])
 						&& bccomp($host_exists['hostid'], $host_names['name'][$host_exists['name']]) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Host with the same visible name "%s" already exists.', $host_exists['name'])
+						_s('Host with the same visible name "%1$s" already exists.', $host_exists['name'])
 					);
 				}
 			}
@@ -2304,7 +2304,7 @@ class CHost extends CHostGeneral {
 						&& array_key_exists($template_exists['host'], $host_names['host'])
 						&& bccomp($template_exists['templateid'], $host_names['host'][$template_exists['host']]) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Template with the same name "%s" already exists.', $template_exists['host'])
+						_s('Template with the same name "%1$s" already exists.', $template_exists['host'])
 					);
 				}
 
@@ -2312,7 +2312,7 @@ class CHost extends CHostGeneral {
 						&& array_key_exists($template_exists['name'], $host_names['name'])
 						&& bccomp($template_exists['templateid'], $host_names['name'][$template_exists['name']]) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Template with the same visible name "%s" already exists.', $template_exists['name'])
+						_s('Template with the same visible name "%1$s" already exists.', $template_exists['name'])
 					);
 				}
 			}

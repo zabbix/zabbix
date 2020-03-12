@@ -68,7 +68,7 @@ if ($blink_period > 0) {
 			);
 	}
 	$indic_container->addItem(
-		(new CTag('p', true, _s('Age less than %s', convertUnitsS($blink_period))))->addClass(ZBX_STYLE_GREY)
+		(new CTag('p', true, _s('Age less than %1$s', convertUnitsS($blink_period))))->addClass(ZBX_STYLE_GREY)
 	);
 
 	$help_hint->addItem($indic_container);

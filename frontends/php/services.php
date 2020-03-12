@@ -179,7 +179,7 @@ elseif (hasRequest('add_service_time') && hasRequest('new_service_time')) {
 		if (!validateDateInterval($new_service_time_from->format('Y'), $new_service_time_from->format('m'),
 				$new_service_time_from->format('d'))) {
 			$result = false;
-			error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
+			error(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('From')));
 		}
 
 		$absolute_time_parser->parse(getRequest('new_service_time_till'));
@@ -188,7 +188,7 @@ elseif (hasRequest('add_service_time') && hasRequest('new_service_time')) {
 		if (!validateDateInterval($new_service_time_till->format('Y'), $new_service_time_till->format('m'),
 				$new_service_time_till->format('d'))) {
 			$result = false;
-			error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
+			error(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
 		}
 
 		if ($result) {

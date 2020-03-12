@@ -100,21 +100,27 @@ class CJsonRpc {
 	public function validate($call) {
 		if (!isset($call['jsonrpc'])) {
 			$this->jsonError($call['id'], '-32600', _('JSON-rpc version is not specified.'), null, true);
+
 			return false;
 		}
 
 		if ($call['jsonrpc'] != self::VERSION) {
-			$this->jsonError($call['id'], '-32600', _s('Expecting JSON-rpc version 2.0, "%s" is given.', $call['jsonrpc']), null, true);
+			$this->jsonError($call['id'], '-32600',
+				_s('Expecting JSON-rpc version 2.0, "%1$s" is given.', $call['jsonrpc']), null, true
+			);
+
 			return false;
 		}
 
 		if (!isset($call['method'])) {
 			$this->jsonError($call['id'], '-32600', _('JSON-rpc method is not defined.'));
+
 			return false;
 		}
 
 		if (isset($call['params']) && !is_array($call['params'])) {
 			$this->jsonError($call['id'], '-32602', _('JSON-rpc params is not an Array.'));
+
 			return false;
 		}
 
@@ -152,7 +158,7 @@ class CJsonRpc {
 		$this->_error = true;
 
 		if (!isset($this->_error_list[$errno])) {
-			$data = _s('JSON-rpc error generation failed. No such error "%s".', $errno);
+			$data = _s('JSON-rpc error generation failed. No such error "%1$s".', $errno);
 			$errno = '-32400';
 		}
 

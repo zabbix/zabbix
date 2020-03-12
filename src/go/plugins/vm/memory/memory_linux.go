@@ -17,32 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package proc
+package memory
 
-type procQuery struct {
-	name    string
-	user    string
-	cmdline string
-}
+import "zabbix.com/pkg/plugin"
 
-const (
-	procInfoPid = 1 << iota
-	procInfoName
-	procInfoUser
-	procInfoCmdline
-)
-
-type procInfo struct {
-	pid     int64
-	name    string
-	userid  int64
-	cmdline string
-	arg0    string
-}
-
-type cpuUtil struct {
-	utime   uint64
-	stime   uint64
-	started uint64
-	err     error
+func (p *Plugin) exportVmMemorySize(params []string) (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
 }
