@@ -129,6 +129,44 @@ class CControllerPopupTestTriggerExpr extends CController {
 	protected function doAction() {
 		list($outline, $expression_html_tree) = analyzeExpression($this->expression, TRIGGER_EXPRESSION);
 
+		$message_title = null;
+		$results = [];
+
+		if ($this->allowed_testing && $this->hasInput('test_expression')) {
+			// Quoting non-numeric values.
+			foreach ($this->macros_data as &$value) {
+				$value = CTriggerExpression::quoteString($value, false);
+			}
+			unset($value);
+
+			$mapping = [];
+
+			foreach ($expression_html_tree as $e) {
+				$original_expression = $e['expression']['value'];
+				$mapping[strtr($original_expression, $this->macros_data)][] = $original_expression;
+			}
+
+			$data = ['expressions' => array_keys($mapping)];
+
+			global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+			$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
+			$response = $zabbix_server->evaluateExpressions($data, CWebUser::getSessionCookie());
+
+			if ($zabbix_server->getError()) {
+				error($zabbix_server->getError());
+				$message_title = _('Cannot evaluate expression');
+			}
+			else {
+				foreach ($response['expressions'] as $expression) {
+					foreach ($mapping[$expression['expression']] as $original_expression) {
+						unset($expression['expression']);
+						$results[$original_expression] = $expression;
+					}
+				}
+			}
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Test'),
 			'expression' => $this->expression,
@@ -137,10 +175,9 @@ class CControllerPopupTestTriggerExpr extends CController {
 			'supported_token_types' => $this->supported_token_types,
 			'defined_error_phrases' => $this->defined_error_phrases,
 			'eHTMLTree' => $expression_html_tree,
+			'results' => $results,
 			'outline' => $outline,
-			'test' => array_key_exists('test_expression', $_REQUEST),
-			'message' => getMessages(),
-			'macros_data' => $this->macros_data,
+			'message' => getMessages(false, $message_title),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
