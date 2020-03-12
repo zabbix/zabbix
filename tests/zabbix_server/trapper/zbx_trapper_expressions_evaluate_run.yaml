@@ -1,0 +1,1250 @@
+---
+test case: Empty request
+in:
+  request: |
+    {
+    }
+out:
+  return: FAIL
+---
+test case: Missing sessionid field
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "1"
+      },
+      "request": "preprocessing.test"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data field
+in:
+  request: |
+    {
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data.steps field
+in:
+  request: |
+    {
+      "data": {
+        "value_type": 0,
+        "value": "1"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data.value_type field
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value": "1"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data.value field
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data.steps[0].error_handler_params field
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "1"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data.steps[0].params field
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "1"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data.steps[0].error_handler field
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "1"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data.steps[0].type field
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0
+          }
+        ],
+        "value_type": 0,
+        "value": "1"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data.history.timestamp field
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "1",
+        "history": {
+            "value": "0"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: Missing data.history.value field
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "1",
+        "history": {
+            "timestamp": "now-1m" 
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: FAIL
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to data: 4$' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 4$"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "data: 4"
+          },
+          {
+            "result": "4"
+          },
+          {
+            "result": "8"
+          }
+        ],
+        "result": "8"
+      }
+    }
+---
+test case: 'Apply mult(2) + trim($) + regsub("data: *(.*)", \1) to data: 4$' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          },
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 4$"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "error": "/.*"
+          }
+        ],
+        "error": "/.*"
+      }
+    }
+---
+test case: 'Apply trim($) + mult(2) + regsub("data: *(.*)", \1) to data: 4$' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 4$"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "data: 4"
+          },
+          {
+            "error": "/.*"
+          }
+        ],
+        "error": "/.*"
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to data: x$' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "data: x$"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "data: x"
+          },
+          {
+            "result": "x"
+          },
+          {
+            "error": "/.*"
+          }
+        ],
+        "error": "/.*"
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to 4$ with discard on fail' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 1,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "4$"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "4"
+          },
+          {
+            "result": null,
+            "action": 1,
+            "error": "/.*"
+          }
+        ],
+        "result": null
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to 4$ with set value to 5 on fail' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "5",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 2,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "4$"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "4"
+          },
+          {
+            "result": "5",
+            "action": 2,
+            "error": "/.*"
+          },
+          {
+            "result": "10"
+          }
+        ],
+        "result": "10"
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to 4$ with set error to Validation error on fail' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "Validation error",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 3,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "4$"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "4"
+          },
+          {
+            "failed": "Validation error",
+            "action": 3,
+            "error": "/[^V][^a][^l][^i][^d].*"
+          }
+        ],
+        "error": "Validation error"
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) to data: x$ for uint value' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          }
+        ],
+        "value_type": 3,
+        "value": "data: x$"
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "data: x"
+          },
+          {
+            "result": "x"
+          }
+        ],
+        "error": "/.*"
+      }
+    }
+---
+test case: 'Apply regsub("data: *(.*)", \1) to data: x for uint value testing single step' 
+in:
+  request: |
+    {
+      "data": {
+          "steps":[
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          }
+        ],
+        "value_type": 3,
+        "value": "data: x",
+        "single": true
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "x"
+          }
+        ],
+        "result": "x"
+      }
+    }
+---
+test case: 'Apply delta() to 100, 700' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "",
+            "error_handler": 0,
+            "type": 9
+          }
+        ],
+        "value_type": 0,
+        "value": "700",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "100"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "600"
+          }
+        ],
+        "result": "600"
+      }
+    }
+---
+test case: 'Apply delta_per_second() to 100, 700' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "",
+            "error_handler": 0,
+            "type": 10
+          }
+        ],
+        "value_type": 0,
+        "value": "700",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "100"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "10"
+          }
+        ],
+        "result": "10"
+      }
+    }
+---
+test case: 'Apply mult(2) + trim($) + regsub("data: *(.*)", \1) to history data: 4$' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          },
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 4",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "data: 4$"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "previous": true,
+        "steps": [
+          {
+            "error": "/.*"
+          }
+        ],
+        "error": "/.*"
+      }
+    }
+---
+test case: 'Apply trim($) + mult(2) + regsub("data: *(.*)", \1) to history data: 4$' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 4$",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "data: 4$"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "previous": true,
+        "steps": [
+          {
+            "result": "data: 4"
+          },
+          {
+            "error": "/.*"
+          }
+        ],
+        "error": "/.*"
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history data: x$' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 4$",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "data: x$"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+      "previous": true,
+        "steps": [
+          {
+            "result": "data: x"
+          },
+          {
+            "result": "x"
+          },
+          {
+            "error": "/.*"
+          }
+        ],
+        "error": "/.*"
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history 4$ with discard on fail' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 1,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 3",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "4$"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "data: 3"
+          },
+          {
+            "result": "3"
+          },
+          {
+            "result": "6"
+          }
+        ],
+        "result": "6"
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history 4$ with set value to 5 on fail' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "5",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 2,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 3",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "4$"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "data: 3"
+          },
+          {
+            "result": "3"
+          },
+          {
+            "result": "6"
+          }
+        ],
+        "result": "6"
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history 4$ with set error to Validation error on fail' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "Validation error",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 3,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "2",
+            "error_handler": 0,
+            "type": 1
+          }
+        ],
+        "value_type": 0,
+        "value": "4$",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "4$"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "previous": true,
+        "steps": [
+          {
+            "result": "4"
+          },
+          {
+            "failed": "Validation error",
+            "action": 3,
+            "error": "/[^V][^a][^l][^i][^d].*"
+          }
+        ],
+        "error": "Validation error"
+      }
+    }
+---
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) to history data: x$ for uint value' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "",
+            "params": "$",
+            "error_handler": 0,
+            "type": 4
+          },
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          }
+        ],
+        "value_type": 3,
+        "value": "data: 1$",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "data: x$"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "previous": true,
+        "steps": [
+          {
+            "result": "data: x"
+          },
+          {
+            "result": "x"
+          }
+        ],
+        "error": "/.*"
+      }
+    }
+---
+test case: 'Apply regsub("data: *(.*)", \1) to history data: x for uint value testing single step' 
+in:
+  request: |
+    {
+      "data": {
+          "steps":[
+          {
+            "error_handler_params": "",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 0,
+            "type": 5
+          }
+        ],
+        "value_type": 3,
+        "value": "data: x",
+        "single": true,
+        "history": {
+          "timestamp": "now-1m",
+          "value": "data: x$"
+        }
+     },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "x"
+          }
+        ],
+        "result": "x"
+      }
+    }
+---
+test case: 'Apply regsub("data: *(.*)", \1) + delta() to data: 9, data:10' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "0",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 2,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "",
+            "error_handler": 0,
+            "type": 9
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 10",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "data: 9"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "10"
+          },
+          {
+            "result": "1"
+          }
+        ],
+        "result": "1"
+      }
+    }
+---
+test case: 'Apply regsub("data: *(.*)", \1) + delta() to data: 9, data:10' 
+in:
+  request: |
+    {
+      "data": {
+        "steps": [
+          {
+            "error_handler_params": "0",
+            "params": "data: *(.*)\n\\1",
+            "error_handler": 2,
+            "type": 5
+          },
+          {
+            "error_handler_params": "",
+            "params": "",
+            "error_handler": 0,
+            "type": 9
+          }
+        ],
+        "value_type": 0,
+        "value": "data: 10",
+        "history": {
+          "timestamp": "now-1m",
+          "value": "x"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "6ed71f17963a881bd010e63b01c39484"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+            "result": "10"
+          },
+          {
+            "result": "10"
+          }
+        ],
+        "result": "10"
+      }
+    }
+...
