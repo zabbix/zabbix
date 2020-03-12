@@ -40,6 +40,7 @@ $frmHost = (new CForm())
 	->setId('hostsForm')
 	->setName('hostsForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->disablePasswordAutofill()
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags'])
@@ -673,7 +674,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 		$name = $data['inventory_items'][$inventoryNo]['name_expanded'];
 
 		$link = (new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']))
-			->setTitle(_s('This field is automatically populated by item "%s".', $name));
+			->setTitle(_s('This field is automatically populated by item "%1$s".', $name));
 
 		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {

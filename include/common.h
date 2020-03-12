@@ -791,6 +791,7 @@ typedef struct
 	char		*publickey;
 	char		*privatekey;
 	char		*command;
+	char		*command_orig;
 	zbx_uint64_t	scriptid;
 	unsigned char	host_access;
 }

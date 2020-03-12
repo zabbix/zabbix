@@ -490,6 +490,7 @@ class testFormAction extends CLegacyWebTest {
 		// Open Condition overlay dialog.
 		$this->zbxTestClickXpath('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
+		COverlayDialogElement::find()->one()->waitUntilReady();
 
 		if (isset($data['new_condition_conditiontype'])) {
 			$this->zbxTestDropdownSelectWait('condition_type', $data['new_condition_conditiontype']);

@@ -787,6 +787,7 @@ class CApiInputValidator {
 	 * Boolean validator.
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['flags']  (optional) API_ALLOW_NULL
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -794,6 +795,12 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateBoolean($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
 		if (!is_bool($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a boolean is expected'));
 			return false;

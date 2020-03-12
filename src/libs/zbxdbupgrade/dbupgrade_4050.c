@@ -1479,6 +1479,20 @@ static int	DBpatch_4050057(void)
 	return DBdrop_field("items", "port");
 }
 
+static int	DBpatch_4050058(void)
+{
+	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("globalmacro", &field);
+}
+
+static int	DBpatch_4050059(void)
+{
+	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hostmacro", &field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1537,5 +1551,7 @@ DBPATCH_ADD(4050054, 0, 1)
 DBPATCH_ADD(4050055, 0, 1)
 DBPATCH_ADD(4050056, 0, 1)
 DBPATCH_ADD(4050057, 0, 1)
+DBPATCH_ADD(4050058, 0, 1)
+DBPATCH_ADD(4050059, 0, 1)
 
 DBPATCH_END()

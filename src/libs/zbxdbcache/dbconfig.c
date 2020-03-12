@@ -95,6 +95,9 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_maintenance_precache_nested_groups(void);
 
+/* by default the macro environment is non-secure and all secret macros are masked with ****** */
+static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
+
 /******************************************************************************
  *                                                                            *
  * Function: dc_strdup                                                        *
@@ -1775,6 +1778,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		}
 
 		/* store new information in macro structure */
+		ZBX_STR2UCHAR(gmacro->type, row[3]);
 		DCstrpool_replace(found, &gmacro->macro, macro);
 		DCstrpool_replace(found, &gmacro->value, row[2]);
 
@@ -1867,6 +1871,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 
 		/* store new information in macro structure */
 		hmacro->hostid = hostid;
+		ZBX_STR2UCHAR(hmacro->type, row[4]);
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);
 
@@ -9427,6 +9432,14 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	dc_get_host_macro_value(const ZBX_DC_HMACRO *macro, char **value)
+{
+	if (ZBX_MACRO_ENV_NONSECURE == macro_env && ZBX_MACRO_VALUE_SECRET == macro->type)
+		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+	else
+		*value = zbx_strdup(*value, macro->value);
+}
+
 static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
 		char **value, char **value_default)
 {
@@ -9455,13 +9468,13 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 				{
 					if (0 == zbx_strcmp_null(hmacro->context, context))
 					{
-						*value = zbx_strdup(*value, hmacro->value);
+						dc_get_host_macro_value(hmacro, value);
 						return;
 					}
 
 					/* check for the default (without parameters) macro value */
 					if (NULL == *value_default && NULL != context && NULL == hmacro->context)
-						*value_default = zbx_strdup(*value_default, hmacro->value);
+						dc_get_host_macro_value(hmacro, value_default);
 				}
 			}
 		}
@@ -9488,6 +9501,14 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 	zbx_vector_uint64_destroy(&templateids);
 }
 
+static void	dc_get_global_macro_value(const ZBX_DC_GMACRO *macro, char **value)
+{
+	if (ZBX_MACRO_ENV_NONSECURE == macro_env && ZBX_MACRO_VALUE_SECRET == macro->type)
+		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+	else
+		*value = zbx_strdup(*value, macro->value);
+}
+
 static void	dc_get_global_macro(const char *macro, const char *context, char **value, char **value_default)
 {
 	int			i;
@@ -9506,13 +9527,13 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 			{
 				if (0 == zbx_strcmp_null(gmacro->context, context))
 				{
-					*value = zbx_strdup(*value, gmacro->value);
+					dc_get_global_macro_value(gmacro, value);
 					break;
 				}
 
 				/* check for the default (without parameters) macro value */
 				if (NULL == *value_default && NULL != context && NULL == gmacro->context)
-					*value_default = zbx_strdup(*value_default, gmacro->value);
+					dc_get_global_macro_value(gmacro, value_default);
 			}
 		}
 	}
@@ -12318,6 +12339,25 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 	}
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_set_macro_env                                             *
+ *                                                                            *
+ * Purpose: sts user macro environment security level                         *
+ *                                                                            *
+ * Parameter: env - [IN] the security level (see ZBX_MACRO_ENV_* defines)     *
+ *                                                                            *
+ * Comments: The security level affects how the secret macros are resolved -  *
+ *           as they values or '******'.                                      *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	zbx_dc_set_macro_env(unsigned char env)
+{
+	unsigned char	old_env = macro_env;
+	macro_env = env;
+	return old_env;
 }
 
 #ifdef HAVE_TESTS
