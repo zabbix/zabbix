@@ -121,7 +121,6 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		position: fixed;
 		top: 0;
 		bottom: 0;
-		z-index: 10001;
 		box-shadow: 2px 0 6px $action-shadow-color;
 	}
 
@@ -176,13 +175,11 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 				position: relative;
 
 				.search {
-					padding: 0 12px;
 					opacity: 0;
 				}
 
 				.search-icon {
-					top: 0;
-					right: 0;
+					opacity: 1;
 					transform: scale(1);
 				}
 			}

@@ -126,10 +126,18 @@ $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #999999;
 $scrollbar-thumb-color-darken: 30%;
 
-$form-search-bg-color: #000000;
+// Search form
+$form-search-color: #000000;
+$form-search-bg-color: #ffffff;
 $form-search-border-color: #000000;
-$form-search-icon-bg-position: -570px -616px;
-$form-search-icon-hover-bg-position: -570px -616px;
+$form-search-focused-color: #ffffff;
+$form-search-focused-bg-color: #000000;
+$form-search-focused-border-color: #000000;
+$form-search-icon-bg-position: -600px -616px;
+$form-search-icon-opacity: 1;
+$form-search-focused-icon-bg-position: -570px -616px;
+$form-search-icon-focused-bg-position: -600px -616px;
+$form-search-focused-icon-hover-bg-position: $form-search-focused-icon-bg-position;
 
 $input-placeholder-color: #bbbbbb;
 
@@ -208,18 +216,6 @@ $multiselect-selected-bg-color: #222222;
 // Important! @import string should come after variables.
 @import 'screen.scss';
 
-// components/form-search
-.form-search {
-	.search:focus {
-		background: #ffffff;
-		color: #000000;
-
-		& ~ .search-icon {
-			background-position-x: -600px;
-		}
-	}
-}
-
 // layout/sidebar
 .sidebar {
 	.button-hide {
@@ -239,13 +235,6 @@ $multiselect-selected-bg-color: #222222;
 	}
 
 	&.is-compact:not(.is-opened) {
-		.form-search {
-			.search-icon {
-				background-position-x: -570px;
-				opacity: 1;
-			}
-		}
-
 		.menu-main {
 			& > li {
 				&.is-selected {

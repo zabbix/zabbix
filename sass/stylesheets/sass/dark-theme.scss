@@ -98,7 +98,9 @@ $form-disabled-border-color: #3d3d3d;
 $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #383838;
 
+// Search form
 $form-search-bg-color: #191919;
+$form-search-focused-border-color: $form-border-focus-color;
 $form-search-icon-bg-position: -570px -616px;
 
 // Error messages
@@ -180,6 +182,16 @@ $multiselect-selected-bg-color: #696969;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
+
+.sidebar {
+	&.is-compact:not(.is-opened) {
+		.form-search {
+			.search-icon {
+				opacity: .75;
+			}
+		}
+	}
+}
 
 // Tables.
 .list-table {

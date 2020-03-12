@@ -1,6 +1,18 @@
+$form-search-color: #ffffff !default;
+$form-search-bg-color: #092637 !default;
+$form-search-border-color: #010a0f !default;
+$form-search-focused-color: $form-search-color !default;
+$form-search-focused-bg-color: $form-search-bg-color !default;
+$form-search-focused-border-color: lighten($sidebar-bg-color, 20%) !default;
+$form-search-icon-bg-position: -540px -616px !default;
 $form-search-icon-opacity: .75 !default;
-$form-search-icon-bg-position: -539px -616px !default;
-$form-search-icon-hover-bg-position: -569px -616px !default;
+$form-search-focused-icon-bg-position: $form-search-icon-bg-position !default;
+$form-search-focused-icon-opacity: $form-search-icon-opacity !default;
+$form-search-icon-focused-bg-position: -570px -616px !default;
+$form-search-icon-focused-opacity: 1 !default;
+$form-search-focused-icon-hover-bg-position: $form-search-icon-focused-bg-position !default;
+$form-search-focused-icon-hover-opacity: $form-search-icon-focused-opacity !default;
+
 
 .form-search {
 	position: relative;
@@ -14,15 +26,26 @@ $form-search-icon-hover-bg-position: -569px -616px !default;
 		width: 100%;
 		height: 24px;
 
-		padding-right: 20px;
+		padding-right: 22px;
 		color: $form-search-color;
 		background: $form-search-bg-color;
 		border: 1px solid $form-search-border-color;
 		border-radius: 3px;
 
-		&:focus ~ .search-icon,
-		&:hover ~ .search-icon {
-			opacity: 1;
+		&:focus {
+			color: $form-search-focused-color;
+			background: $form-search-focused-bg-color;
+			border-color: $form-search-focused-border-color;
+
+			& ~ .search-icon {
+				background-position: $form-search-focused-icon-bg-position;
+				opacity: $form-search-focused-icon-opacity;
+
+				&:hover:not(:disabled) {
+					background-position: $form-search-focused-icon-hover-bg-position;
+					opacity: $form-search-focused-icon-hover-opacity;
+				}
+			}
 		}
 	}
 
@@ -33,23 +56,27 @@ $form-search-icon-hover-bg-position: -569px -616px !default;
 		width: 24px;
 		height: 24px;
 		padding: 0;
+
+		// Reset global button style.
+		background-color: transparent !important;
+
 		background: url(../img/icon-sprite.svg) no-repeat $form-search-icon-bg-position;
 		border: 0;
 		opacity: $form-search-icon-opacity;
 		transform: scale(.8);
-		cursor: pointer;
 
 		&:focus {
-			opacity: 1;
-			background-position: $form-search-icon-hover-bg-position;
+			box-shadow: 0 0 0 2px $form-search-focused-border-color;
 		}
 
-		&:hover {
-			background-position: $form-search-icon-hover-bg-position;
+		&:focus,
+		&:hover:not(:disabled) {
+			background-position: $form-search-icon-focused-bg-position;
+			opacity: $form-search-icon-focused-opacity;
 		}
 
 		@if $ui-transitions {
-			transition: opacity 3s;
+			transition: opacity $ui-transition-duration ease-out;
 		}
 	}
 }
