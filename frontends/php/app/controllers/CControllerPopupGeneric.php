@@ -839,8 +839,7 @@ class CControllerPopupGeneric extends CController {
 		// Construct API request.
 		$options = [
 			'editable' => $this->hasInput('writeonly'),
-			'preservekeys' => true,
-			'limit' => 100
+			'preservekeys' => true
 		];
 
 		$popups_support_templated_entries = ['applications', 'triggers', 'trigger_prototypes', 'graphs',
