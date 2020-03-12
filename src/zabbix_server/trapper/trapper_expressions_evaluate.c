@@ -23,10 +23,26 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 
-#include "expressions_evaluate.h"
+//#include "expressions_evaluate.h"
 /* #include "preproc.h" */
 /* #include "trapper_preproc.h" */
 /* #include "../preprocessor/preproc_history.h" */
+
+
+typedef struct
+{
+	char		*expression;
+	double	value;
+	char		error[MAX_STRING_LEN];
+}
+zbx_expressions_evaluate_result_t;
+
+static int zbx_expressions_evaluate_result_free(zbx_expressions_evaluate_result_t *result)
+{
+zbx_free(result->expression);
+// zbx_free(result->error);
+}
+
 
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions, char **error)
 {
@@ -210,7 +226,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 		goto out;
 
 	// run expressions, fill results
-	//zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_preproc_result_free);
+	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_expressions_evaluate_result_free);
 
 	if (0 == expressions.values_num)
 	{
@@ -218,7 +234,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 	  
 		result = (zbx_expressions_evaluate_result_t *)zbx_malloc(NULL, sizeof(zbx_expressions_evaluate_result_t));
 
-		result->error = NULL;
+		//result->error = NULL;
 
 		zbx_vector_ptr_append(&results, result);
 	}
@@ -233,15 +249,26 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 		for (int ii = 0; ii < expressions.values_num; ii++)
 		{
 			double expr_result;
-			char			err[MAX_STRING_LEN];
+			//char			err[MAX_STRING_LEN];
+			
 			zbx_vector_ptr_t	unknown_msgs;
 			zabbix_log(LOG_LEVEL_INFORMATION, "2222222222222, EXPR: ->%s<-",expressions.values[ii]);
-			if (SUCCEED != evaluate(&expr_result, expressions.values[ii], err, sizeof(err), &unknown_msgs))
+
+			result = (zbx_expressions_evaluate_result_t *)zbx_malloc(NULL, sizeof(zbx_expressions_evaluate_result_t));			
+			zbx_vector_ptr_append(&results, result);
+
+			result->expression = zbx_strdup(NULL, expressions.values[ii]);
+			
+			if (SUCCEED != evaluate(&expr_result, expressions.values[ii], result->error, sizeof(result->error), &unknown_msgs))
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER");
 				continue;
 			}
-			zabbix_log(LOG_LEVEL_INFORMATION, "RES: %f",expr_result);
+			result->value = expr_result;
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "RES EXPRESSION: %s", result->expression);
+			zabbix_log(LOG_LEVEL_INFORMATION, "RES expr_result: %f",expr_result);
+			zabbix_log(LOG_LEVEL_INFORMATION, "RES result_value: %f",result->value);
 		}
 	}
 
@@ -261,57 +288,48 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 
 		
-	/* zbx_json_addarray(json, ZBX_PROTO_TAG_EXPRESSIONS); */
-	/* if (0 != expressions.values_num) */
-	/* { */
-	/* 	for (i = 0; i < results.values_num; i++) */
-	/* 	{ */
-	/* 		result = (zbx_preproc_result_t *)results.values[i]; */
+	zbx_json_addarray(json, ZBX_PROTO_TAG_EXPRESSIONS);
+	if (0 != expressions.values_num)
+	{
+		for (i = 0; i < results.values_num; i++)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "RESULTS expression: ->%s<-",((zbx_expressions_evaluate_result_t *)results.values[i])->expression);
+			zabbix_log(LOG_LEVEL_INFORMATION, "RESULTS value: ->%f<-",((zbx_expressions_evaluate_result_t *)results.values[i])->value);
+			zabbix_log(LOG_LEVEL_INFORMATION, "RESULTS error: ->%s<-",((zbx_expressions_evaluate_result_t *)results.values[i])->error);
+		  
+			result = (zbx_expressions_evaluate_result_t *)results.values[i];
 
-	/* 		zbx_json_addobject(json, NULL); */
+			//zbx_json_addobject(json, NULL);
 
-	/* 		if (NULL != result->error) */
-	/* 			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->error, ZBX_JSON_TYPE_STRING); */
+			
+			zbx_json_addstring(json, ZBX_PROTO_TAG_EXPRESSION, result->expression, ZBX_JSON_TYPE_STRING);
 
-	/* 		if (ZBX_PREPROC_FAIL_DEFAULT != result->action) */
-	/* 			zbx_json_adduint64(json, ZBX_PROTO_TAG_ACTION, result->action); */
+			
+			if (NULL != result->error && 0 != strlen(result->error))
+			{
+				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->error, ZBX_JSON_TYPE_STRING);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "RESULT VALUE: %f",result->value);
+				zbx_uint64_t res = (ZBX_INFINITY == result->value || SUCCEED == zbx_double_compare(result->value, 0.0)) ? 0 : 1;
+				zabbix_log(LOG_LEVEL_INFORMATION, "RESULT VALUE2: %d",result->value);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_VALUE, res);
 
-	/* 		if (i == results.values_num - 1 && NULL != result->error) */
-	/* 		{ */
-	/* 			if (ZBX_PREPROC_FAIL_SET_ERROR == result->action) */
-	/* 			{ */
-	/* 				zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, preproc_error, */
-	/* 						ZBX_JSON_TYPE_STRING); */
-	/* 			} */
-	/* 		} */
-
-	/* 		if (ZBX_VARIANT_NONE != result->value.type) */
-	/* 		{ */
-	/* 			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value), */
-	/* 					ZBX_JSON_TYPE_STRING); */
-	/* 		} */
-	/* 		else if (NULL == result->error || ZBX_PREPROC_FAIL_DISCARD_VALUE == result->action) */
-	/* 			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL); */
-
-	/* 		zbx_json_close(json); */
-	/* 	} */
-	/* } */
+			}
+			zbx_json_close(json);
+		}
+	}
 	zbx_json_close(json);
 
-	if (NULL == evaluate_error)
-	{
-		result = (zbx_expressions_evaluate_result_t *)results.values[results.values_num - 1];
 
-		if (ZBX_VARIANT_NONE != result->value.type)
-		{
-			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value),
-					ZBX_JSON_TYPE_STRING);
-		}
-		else
-			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
-	}
-	else
-		zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, evaluate_error, ZBX_JSON_TYPE_STRING);
+	zabbix_log(LOG_LEVEL_INFORMATION, "JSON RESULT: ->%s<-",json->buffer);
+	
+	/* if (NULL == evaluate_error) */
+	/* { */
+	/* } */
+	/* else */
+	/* 	zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, evaluate_error, ZBX_JSON_TYPE_STRING); */
 
 	ret = SUCCEED;
 out:
@@ -326,8 +344,8 @@ out:
 
 	/* zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free); */
 	/* zbx_vector_ptr_destroy(&history); */
-	/* zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_preproc_result_free); */
-	/* zbx_vector_ptr_destroy(&results); */
+	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_expressions_evaluate_result_free);
+	zbx_vector_ptr_destroy(&results);
 	/* zbx_vector_ptr_clear_ext(&steps, (zbx_clean_func_t)zbx_preproc_op_free); */
 	/* zbx_vector_ptr_destroy(&steps); */
 
