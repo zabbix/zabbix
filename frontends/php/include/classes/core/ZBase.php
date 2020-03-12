@@ -184,7 +184,9 @@ class ZBase {
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')
-					->setSelectedByAction($action_name, CView::getSidebarMode() !== ZBX_SIDEBAR_VIEW_MODE_COMPACT);
+					->setSelectedByAction($action_name,
+						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+					);
 
 				CProfiler::getInstance()->start();
 

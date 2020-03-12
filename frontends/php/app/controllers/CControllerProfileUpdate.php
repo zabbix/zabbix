@@ -129,7 +129,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case 'web.sidebar.mode':
-				CView::setSidebarMode($value_int);
+				CViewHelper::saveSidebarMode($value_int);
 				break;
 
 			default:

@@ -62,4 +62,27 @@ class CViewHelper {
 	public static function loadLayoutMode() {
 		return (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 	}
+
+	/**
+	 * Save sidebar mode into user's profile.
+	 *
+	 * @static
+	 *
+	 * @param int $sidebar_mode  ZBX_SIDEBAR_VIEW_MODE_FULL | ZBX_SIDEBAR_VIEW_MODE_COMPACT
+	 *                           | ZBX_SIDEBAR_VIEW_MODE_HIDDEN
+	 */
+	public static function saveSidebarMode($sidebar_mode) {
+		CProfile::update('web.sidebar.mode', $sidebar_mode, PROFILE_TYPE_INT);
+	}
+
+	/**
+	 * Return sidebar mode setting.
+	 *
+	 * @static
+	 *
+	 * @return int  Stored sidebar mode (ZBX_SIDEBAR_VIEW_MODE_FULL by default).
+	 */
+	public static function loadSidebarMode() {
+		return (int) CProfile::get('web.sidebar.mode', ZBX_SIDEBAR_VIEW_MODE_FULL);
+	}
 }

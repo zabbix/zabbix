@@ -205,25 +205,6 @@ class CView {
 	}
 
 	/**
-	 * Return sidebar mode setting.
-	 *
-	 * @return int
-	 */
-	public static function getSidebarMode() {
-		return (int) CProfile::get('web.sidebar.mode', ZBX_SIDEBAR_VIEW_MODE_FULL);
-	}
-
-	/**
-	 * Update sidebar mode setting
-	 *
-	 * @param int $sidebar_mode  Possible values ZBX_SIDEBAR_VIEW_MODE_FULL, ZBX_SIDEBAR_VIEW_MODE_COMPACT,
-	 *                           ZBX_SIDEBAR_VIEW_MODE_HIDDEN
-	 */
-	public static function setSidebarMode($sidebar_mode) {
-		CProfile::update('web.sidebar.mode', $sidebar_mode, PROFILE_TYPE_INT);
-	}
-
-	/**
 	 * Register custom directory of MVC views. The last registered will have the first priority.
 	 *
 	 * @param string $directory

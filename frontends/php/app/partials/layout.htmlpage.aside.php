@@ -53,8 +53,8 @@ $server_name = ($data['server_name'] !== '')
 
 (new CTag('aside', true))
 	->addClass('sidebar')
-	->addClass(CView::getSidebarMode() == ZBX_SIDEBAR_VIEW_MODE_COMPACT ? 'is-compact' : null)
-	->addClass(CView::getSidebarMode() == ZBX_SIDEBAR_VIEW_MODE_HIDDEN ? 'is-hidden' : null)
+	->addClass(CViewHelper::loadSidebarMode() == ZBX_SIDEBAR_VIEW_MODE_COMPACT ? 'is-compact' : null)
+	->addClass(CViewHelper::loadSidebarMode() == ZBX_SIDEBAR_VIEW_MODE_HIDDEN ? 'is-hidden' : null)
 	->addItem(
 		(new CDiv([
 			$logo,
