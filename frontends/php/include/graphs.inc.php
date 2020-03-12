@@ -68,24 +68,6 @@ function graph_item_drawtype2str($drawtype) {
 	}
 }
 
-function graph_item_calc_fnc2str($calc_fnc) {
-	switch ($calc_fnc) {
-		case 0:
-			return _('Count');
-		case CALC_FNC_ALL:
-			return _('all');
-		case CALC_FNC_MIN:
-			return _('min');
-		case CALC_FNC_MAX:
-			return _('max');
-		case CALC_FNC_LST:
-			return _('last');
-		case CALC_FNC_AVG:
-		default:
-			return _('avg');
-	}
-}
-
 function graph_item_aggr_fnc2str($calc_fnc) {
 	switch ($calc_fnc) {
 		case GRAPH_AGGREGATE_NONE:
@@ -538,144 +520,6 @@ function get_next_color($palettetype = 0) {
 	return [$r, $g, $b];
 }
 
-function get_next_palette($palette = 0, $palettetype = 0) {
-	static $prev_color = [0, 0, 0, 0];
-
-	switch ($palette) {
-		case 0:
-			$palettes = [
-				[150, 0, 0], [0, 100, 150], [170, 180, 180], [152, 100, 0], [130, 0, 150],
-				[0, 0, 150], [200, 100, 50], [250, 40, 40], [50, 150, 150], [100, 150, 0]
-			];
-			break;
-		case 1:
-			$palettes = [
-				[0, 100, 150], [153, 0, 30], [100, 150, 0], [130, 0, 150], [0, 0, 100],
-				[200, 100, 50], [152, 100, 0], [0, 100, 0], [170, 180, 180], [50, 150, 150]
-			];
-			break;
-		case 2:
-			$palettes = [
-				[170, 180, 180], [152, 100, 0], [50, 200, 200], [153, 0, 30], [0, 0, 100],
-				[100, 150, 0], [130, 0, 150], [0, 100, 150], [200, 100, 50], [0, 100, 0]
-			];
-			break;
-		case 3:
-		default:
-			return get_next_color($palettetype);
-	}
-
-	if (isset($palettes[$prev_color[$palette]])) {
-		$result = $palettes[$prev_color[$palette]];
-	}
-	else {
-		return get_next_color($palettetype);
-	}
-
-	switch ($palettetype) {
-		case 0:
-			$diff = 0;
-			break;
-		case 1:
-			$diff = -50;
-			break;
-		case 2:
-			$diff = 50;
-			break;
-	}
-
-	foreach ($result as $n => $color) {
-		if (($color + $diff) < 0) {
-			$result[$n] = 0;
-		}
-		elseif (($color + $diff) > 255) {
-			$result[$n] = 255;
-		}
-		else {
-			$result[$n] += $diff;
-		}
-	}
-	$prev_color[$palette]++;
-
-	return $result;
-}
-
-/**
- * Draw trigger recent change markers.
- *
- * @param resource $im
- * @param int      $x
- * @param int      $y
- * @param int      $offset
- * @param string   $color
- * @param string   $marks	"t" - top, "r" - right, "b" - bottom, "l" - left
- */
-function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
-	$polygons = 5;
-	$gims = [
-		't' => [0, 0, -6, -6, -3, -9, 3, -9, 6, -6],
-		'r' => [0, 0, 6, -6, 9, -3, 9, 3, 6, 6],
-		'b' => [0, 0, 6, 6, 3, 9, -3, 9, -6, 6],
-		'l' => [0, 0, -6, 6, -9, 3, -9, -3, -6, -6]
-	];
-
-	foreach ($gims['t'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['t'][$num] = $px + $x;
-		}
-		else {
-			$gims['t'][$num] = $px + $y - $offset;
-		}
-	}
-
-	foreach ($gims['r'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['r'][$num] = $px + $x + $offset;
-		}
-		else {
-			$gims['r'][$num] = $px + $y;
-		}
-	}
-
-	foreach ($gims['b'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['b'][$num] = $px + $x;
-		}
-		else {
-			$gims['b'][$num] = $px + $y + $offset;
-		}
-	}
-
-	foreach ($gims['l'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['l'][$num] = $px + $x - $offset;
-		}
-		else {
-			$gims['l'][$num] = $px + $y;
-		}
-	}
-
-	$color = get_color($im, $color);
-	$polygon_color = get_color($im, '960000');
-
-	if (strpos($marks, 't') !== false) {
-		imagefilledpolygon($im, $gims['t'], $polygons, $color);
-		imagepolygon($im, $gims['t'], $polygons, $polygon_color);
-	}
-	if (strpos($marks, 'r') !== false) {
-		imagefilledpolygon($im, $gims['r'], $polygons, $color);
-		imagepolygon($im, $gims['r'], $polygons, $polygon_color);
-	}
-	if (strpos($marks, 'b') !== false) {
-		imagefilledpolygon($im, $gims['b'], $polygons, $color);
-		imagepolygon($im, $gims['b'], $polygons, $polygon_color);
-	}
-	if (strpos($marks, 'l') !== false) {
-		imagefilledpolygon($im, $gims['l'], $polygons, $color);
-		imagepolygon($im, $gims['l'], $polygons, $polygon_color);
-	}
-}
-
 /**
  * Draws a text on an image. Supports TrueType fonts.
  *
@@ -755,13 +599,6 @@ function dashedLine($image, $x1, $y1, $x2, $y2, $color) {
 
 	imagesetstyle($image, $style);
 	zbx_imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
-}
-
-function dashedRectangle($image, $x1, $y1, $x2, $y2, $color) {
-	dashedLine($image, $x1, $y1, $x1, $y2, $color);
-	dashedLine($image, $x1, $y2, $x2, $y2, $color);
-	dashedLine($image, $x2, $y2, $x2, $y1, $color);
-	dashedLine($image, $x2, $y1, $x1, $y1, $color);
 }
 
 function find_period_start($periods, $time) {
@@ -960,9 +797,8 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
 		$clearance_min = $rows * 0.05;
 		$clearance_max = $rows * 0.1;
-		$steps = 1;
 
-		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows, $steps) as $interval) {
+		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows) as $interval) {
 			if ($interval == INF) {
 				break;
 			}
