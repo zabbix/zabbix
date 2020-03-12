@@ -246,11 +246,13 @@ class CSidebar extends CBaseComponent {
 					this.off('mouseleave', this._events.mouseleave);
 				}
 
-				if (view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
-					this._sidebar_toggle.addEventListener('click', this._events.toggle);
-				}
-				else {
-					this._sidebar_toggle.removeEventListener('click', this._events.toggle);
+				if (this._sidebar_toggle !== null) {
+					if (view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+						this._sidebar_toggle.addEventListener('click', this._events.toggle);
+					}
+					else {
+						this._sidebar_toggle.removeEventListener('click', this._events.toggle);
+					}
 				}
 
 				if ([SIDEBAR_VIEW_MODE_FULL, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
