@@ -140,13 +140,17 @@ class CControllerPopupTestTriggerExpr extends CController {
 			unset($value);
 
 			$mapping = [];
+			$expressions = [];
 
 			foreach ($expression_html_tree as $e) {
 				$original_expression = $e['expression']['value'];
-				$mapping[strtr($original_expression, $this->macros_data)][] = $original_expression;
+				$expression = strtr($original_expression, $this->macros_data);
+
+				$mapping[$expression][] = $original_expression;
+				$expressions[] = $expression;
 			}
 
-			$data = ['expressions' => array_keys($mapping)];
+			$data = ['expressions' => array_values(array_unique($expressions))];
 
 			global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
