@@ -140,18 +140,22 @@ class CControllerPopupTestTriggerExpr extends CController {
 			unset($value);
 
 			$mapping = [];
+			$expressions = [];
 
 			foreach ($expression_html_tree as $e) {
 				$original_expression = $e['expression']['value'];
-				$mapping[strtr($original_expression, $this->macros_data)][] = $original_expression;
+				$expression = strtr($original_expression, $this->macros_data);
+
+				$mapping[$expression][] = $original_expression;
+				$expressions[] = $expression;
 			}
 
-			$data = ['expressions' => array_keys($mapping)];
+			$data = ['expressions' => array_values(array_unique($expressions))];
 
 			global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 			$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
-			$response = $zabbix_server->evaluateExpressions($data, CWebUser::getSessionCookie());
+			$response = $zabbix_server->expressionsEvaluate($data, CWebUser::getSessionCookie());
 
 			if ($zabbix_server->getError()) {
 				error($zabbix_server->getError());
