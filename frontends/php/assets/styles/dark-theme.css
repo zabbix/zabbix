@@ -362,7 +362,6 @@ footer {
     position: fixed;
     top: 0;
     bottom: 0;
-    z-index: 10001;
     box-shadow: 2px 0 6px rgba(0, 0, 0, 0.5); }
   .sidebar.is-compact + .wrapper {
     margin-left: 48px; }
@@ -391,11 +390,9 @@ footer {
     .sidebar.is-compact:not(.is-opened) .form-search {
       position: relative; }
       .sidebar.is-compact:not(.is-opened) .form-search .search {
-        padding: 0 12px;
         opacity: 0; }
       .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
-        top: 0;
-        right: 0;
+        opacity: 1;
         transform: scale(1); }
     .sidebar.is-compact:not(.is-opened) nav a {
       color: transparent; }
@@ -444,13 +441,21 @@ footer {
     left: 0;
     width: 100%;
     height: 24px;
-    padding-right: 20px;
+    padding-right: 22px;
     color: #ffffff;
     background: #191919;
     border: 1px solid #010a0f;
     border-radius: 3px; }
-    .form-search .search:focus ~ .search-icon, .form-search .search:hover ~ .search-icon {
-      opacity: 1; }
+    .form-search .search:focus {
+      color: #ffffff;
+      background: #191919;
+      border-color: #768d99; }
+      .form-search .search:focus ~ .search-icon {
+        background-position: -570px -616px;
+        opacity: 0.75; }
+        .form-search .search:focus ~ .search-icon:hover:not(:disabled) {
+          background-position: -570px -616px;
+          opacity: 1; }
   .form-search .search-icon {
     position: absolute;
     top: 0;
@@ -458,17 +463,17 @@ footer {
     width: 24px;
     height: 24px;
     padding: 0;
+    background-color: transparent !important;
     background: url(../img/icon-sprite.svg) no-repeat -570px -616px;
     border: 0;
     opacity: 0.75;
     transform: scale(0.8);
-    cursor: pointer;
-    transition: opacity 3s; }
+    transition: opacity 0.3s ease-out; }
     .form-search .search-icon:focus {
-      opacity: 1;
-      background-position: -569px -616px; }
-    .form-search .search-icon:hover {
-      background-position: -569px -616px; }
+      box-shadow: 0 0 0 2px #768d99; }
+    .form-search .search-icon:focus, .form-search .search-icon:hover:not(:disabled) {
+      background-position: -570px -616px;
+      opacity: 1; }
 
 .search-suggest {
   position: absolute;
@@ -5295,6 +5300,9 @@ table.preprocessing-test-results .rel-container {
   background: #97aab3; }
 .host-avail-widget .host-avail-total {
   background: transparent; }
+
+.sidebar.is-compact:not(.is-opened) .form-search .search-icon {
+  opacity: .75; }
 
 .list-table thead th {
   border-color: #404040; }

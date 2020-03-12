@@ -26,6 +26,14 @@ $logo = (new CLink(
 		->getUrl()
 	))->addClass(ZBX_STYLE_LOGO);
 
+$search_icon = (new CSubmitButton(null))
+	->addClass('search-icon')
+	->setTitle(_('Search'));
+
+if (getRequest('search', '') === '') {
+	$search_icon->setAttribute('disabled', '');
+}
+
 $search = (new CForm('get', 'zabbix.php'))
 	->cleanItems()
 	->addClass(ZBX_STYLE_FORM_SEARCH)
@@ -36,9 +44,7 @@ $search = (new CForm('get', 'zabbix.php'))
 			->setAttribute('autocomplete', 'off')
 			->addClass(ZBX_STYLE_SEARCH)
 			->setAttribute('aria-label', _('type here to search')),
-		(new CSubmitButton(null))
-			->addClass('search-icon')
-			->setTitle(_('Search'))
+		$search_icon
 	]);
 
 $server_name = ($data['server_name'] !== '')
@@ -81,5 +87,7 @@ $server_name = ($data['server_name'] !== '')
 		]))
 			->addClass('sidebar-nav')
 			->addClass('scrollable')
+			// Do not allow focusing scrollable container.
+			->setAttribute('tabindex', '-1')
 	)
 	->show();

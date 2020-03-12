@@ -359,7 +359,6 @@ footer {
     position: fixed;
     top: 0;
     bottom: 0;
-    z-index: 10001;
     box-shadow: 2px 0 6px rgba(0, 0, 0, 0.5); }
   .sidebar.is-compact + .wrapper {
     margin-left: 48px; }
@@ -388,11 +387,9 @@ footer {
     .sidebar.is-compact:not(.is-opened) .form-search {
       position: relative; }
       .sidebar.is-compact:not(.is-opened) .form-search .search {
-        padding: 0 12px;
         opacity: 0; }
       .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
-        top: 0;
-        right: 0;
+        opacity: 1;
         transform: scale(1); }
     .sidebar.is-compact:not(.is-opened) nav a {
       color: transparent; }
@@ -441,13 +438,21 @@ footer {
     left: 0;
     width: 100%;
     height: 24px;
-    padding-right: 20px;
-    color: #ffffff;
-    background: #000000;
+    padding-right: 22px;
+    color: #000000;
+    background: #ffffff;
     border: 1px solid #000000;
     border-radius: 3px; }
-    .form-search .search:focus ~ .search-icon, .form-search .search:hover ~ .search-icon {
-      opacity: 1; }
+    .form-search .search:focus {
+      color: #ffffff;
+      background: #000000;
+      border-color: #000000; }
+      .form-search .search:focus ~ .search-icon {
+        background-position: -570px -616px;
+        opacity: 1; }
+        .form-search .search:focus ~ .search-icon:hover:not(:disabled) {
+          background-position: -570px -616px;
+          opacity: 1; }
   .form-search .search-icon {
     position: absolute;
     top: 0;
@@ -455,17 +460,17 @@ footer {
     width: 24px;
     height: 24px;
     padding: 0;
-    background: url(../img/icon-sprite.svg) no-repeat -570px -616px;
+    background-color: transparent !important;
+    background: url(../img/icon-sprite.svg) no-repeat -600px -616px;
     border: 0;
-    opacity: 0.75;
+    opacity: 1;
     transform: scale(0.8);
-    cursor: pointer;
-    transition: opacity 3s; }
+    transition: opacity 0.3s ease-out; }
     .form-search .search-icon:focus {
-      opacity: 1;
-      background-position: -570px -616px; }
-    .form-search .search-icon:hover {
-      background-position: -570px -616px; }
+      box-shadow: 0 0 0 2px #000000; }
+    .form-search .search-icon:focus, .form-search .search-icon:hover:not(:disabled) {
+      background-position: -600px -616px;
+      opacity: 1; }
 
 .search-suggest {
   position: absolute;
@@ -5250,12 +5255,6 @@ table.preprocessing-test-results .rel-container {
 .host-avail-widget .host-avail-total {
   background: transparent; }
 
-.form-search .search:focus {
-  background: #ffffff;
-  color: #000000; }
-  .form-search .search:focus ~ .search-icon {
-    background-position-x: -600px; }
-
 .sidebar .button-hide {
   background-position: -600px -568px; }
 .sidebar .button-show {
@@ -5264,9 +5263,6 @@ table.preprocessing-test-results .rel-container {
   background-position: -570px -544px; }
 .sidebar .button-expand {
   background-position: -570px -520px; }
-.sidebar.is-compact:not(.is-opened) .form-search .search-icon {
-  background-position-x: -570px;
-  opacity: 1; }
 .sidebar.is-compact:not(.is-opened) .menu-main > li.is-selected > a {
   background: #0c0c0c;
   border-left-color: transparent; }
