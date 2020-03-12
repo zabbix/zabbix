@@ -131,25 +131,33 @@ class CLegacyWebTest extends CWebTest {
 		}
 	}
 
-	public function zbxTestTextVisibleOnPage($strings) {
+	public function zbxTestTextVisible($strings, $context = null) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
+		}
+
+		if ($context === null) {
+			$context = $this;
 		}
 
 		foreach ($strings as $string) {
 			if (!empty($string)) {
-				$this->assertTrue($this->query('xpath://*[contains(text(),"'.$string.'")]')->count() !== 0, '"'.$string.'" must exist.');
+				$this->assertTrue($context->query('xpath://*[contains(text(),"'.$string.'")]')->count() !== 0, '"'.$string.'" must exist.');
 			}
 		}
 	}
 
-	public function zbxTestTextNotVisibleOnPage($strings) {
+	public function zbxTestTextNotVisible($strings, $context = null) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
 		}
 
+		if ($context === null) {
+			$context = $this;
+		}
+
 		foreach ($strings as $string) {
-			$elements = $this->query('xpath://*[contains(text(),"'.$string.'")]')->all();
+			$elements = $context->query('xpath:.//*[contains(text(),"'.$string.'")]')->all();
 			foreach ($elements as $element) {
 				$this->assertFalse($element->isDisplayed());
 			}

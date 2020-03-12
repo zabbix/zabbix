@@ -809,7 +809,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					}
 					break;
 				default:
-					$this->zbxTestTextNotVisibleOnPage(['Host interface', 'No interface found']);
+					$this->zbxTestTextNotVisible(['Host interface', 'No interface found']);
 					$this->zbxTestAssertNotVisibleId('interfaceid');
 					break;
 			}
@@ -846,7 +846,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertElementValue('params_ap', '');
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('SQL query');
+			$this->zbxTestTextNotVisible('SQL query');
 			$this->zbxTestAssertNotVisibleId('params_ap');
 		}
 
@@ -856,7 +856,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//textarea[@id='params_es']", 'rows', 7);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Executed script');
+			$this->zbxTestTextNotVisible('Executed script');
 			$this->zbxTestAssertNotVisibleId('params_es');
 		}
 
@@ -866,7 +866,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//textarea[@id='params_f']", 'rows', 7);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Formula');
+			$this->zbxTestTextNotVisible('Formula');
 			$this->zbxTestAssertNotVisibleId('params_f');
 		}
 
@@ -877,7 +877,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='ipmi_sensor']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('IPMI sensor');
+			$this->zbxTestTextNotVisible('IPMI sensor');
 			$this->zbxTestAssertNotVisibleId('ipmi_sensor');
 		}
 
@@ -887,7 +887,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestDropdownHasOptions('authtype', ['Password', 'Public key']);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Authentication method');
+			$this->zbxTestTextNotVisible('Authentication method');
 			$this->zbxTestAssertNotVisibleId('authtype');
 		}
 
@@ -909,7 +909,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='password']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage(['User name', 'Password', 'Key passphrase']);
+			$this->zbxTestTextNotVisible(['User name', 'Password', 'Key passphrase']);
 			$this->zbxTestAssertNotVisibleId('username');
 			$this->zbxTestAssertNotVisibleId('password');
 		}
@@ -926,10 +926,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='privatekey']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Public key file');
+			$this->zbxTestTextNotVisible('Public key file');
 			$this->zbxTestAssertNotVisibleId('publickey');
 
-			$this->zbxTestTextNotVisibleOnPage('Private key file');
+			$this->zbxTestTextNotVisible('Private key file');
 			$this->zbxTestAssertNotVisibleId('publickey');
 		}
 
@@ -948,10 +948,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='port']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('SNMP OID');
+			$this->zbxTestTextNotVisible('SNMP OID');
 			$this->zbxTestAssertNotVisibleId('snmp_oid');
 
-			$this->zbxTestTextNotVisibleOnPage('Port');
+			$this->zbxTestTextNotVisible('Port');
 			$this->zbxTestAssertNotVisibleId('port');
 		}
 
@@ -965,7 +965,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('SNMP community');
+			$this->zbxTestTextNotVisible('SNMP community');
 			$this->zbxTestAssertNotVisibleId('snmp_community');
 		}
 
@@ -980,10 +980,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestDropdownHasOptions('snmpv3_securitylevel', ['noAuthNoPriv', 'authNoPriv', 'authPriv']);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Security name');
+			$this->zbxTestTextNotVisible('Security name');
 			$this->zbxTestAssertNotVisibleId('snmpv3_securityname');
 
-			$this->zbxTestTextNotVisibleOnPage('Security level');
+			$this->zbxTestTextNotVisible('Security level');
 			$this->zbxTestAssertNotVisibleId('snmpv3_securitylevel');
 		}
 
@@ -999,12 +999,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='snmpv3_authpassphrase']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Authentication protocol');
+			$this->zbxTestTextNotVisible('Authentication protocol');
 			$this->zbxTestAssertNotVisibleId('row_snmpv3_authprotocol');
 			$this->zbxTestAssertNotVisibleXpath("//label[text()='MD5']");
 			$this->zbxTestAssertNotVisibleXpath("//label[text()='SHA']");
 
-			$this->zbxTestTextNotVisibleOnPage('Authentication passphrase');
+			$this->zbxTestTextNotVisible('Authentication passphrase');
 			$this->zbxTestAssertNotVisibleId('snmpv3_authpassphrase');
 		}
 
@@ -1020,12 +1020,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='snmpv3_privpassphrase']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Privacy protocol');
+			$this->zbxTestTextNotVisible('Privacy protocol');
 			$this->zbxTestAssertNotVisibleId('row_snmpv3_privprotocol');
 			$this->zbxTestAssertNotVisibleXpath("//label[text()='DES']");
 			$this->zbxTestAssertNotVisibleXpath("//label[text()='AES']");
 
-			$this->zbxTestTextNotVisibleOnPage('Privacy passphrase');
+			$this->zbxTestTextNotVisible('Privacy passphrase');
 			$this->zbxTestAssertNotVisibleId('snmpv3_privpassphrase');
 		}
 
@@ -1054,7 +1054,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				}
 				break;
 			default:
-				$this->zbxTestTextNotVisibleOnPage('Update interval');
+				$this->zbxTestTextNotVisible('Update interval');
 				$this->zbxTestAssertNotVisibleId('delay');
 		}
 
@@ -1097,16 +1097,16 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Units');
+			$this->zbxTestTextNotVisible('Units');
 			$this->zbxTestAssertNotVisibleId('units');
 		}
 
 		// Custom intervals isn't visible for type 'SNMP trap' and 'Zabbix trapper'
 		if ($type === 'SNMP trap' || $type === 'Zabbix trapper') {
-			$this->zbxTestTextNotVisibleOnPage(['Custom intervals', 'Interval', 'Period']);
+			$this->zbxTestTextNotVisible(['Custom intervals', 'Interval', 'Period']);
 			$this->zbxTestAssertNotVisibleId('delayFlexTable');
 
-			$this->zbxTestTextNotVisibleOnPage(['Flexible', 'Scheduling']);
+			$this->zbxTestTextNotVisible(['Flexible', 'Scheduling']);
 			$this->zbxTestAssertNotVisibleId('delay_flex_0_delay');
 			$this->zbxTestAssertNotVisibleId('delay_flex_0_period');
 			$this->zbxTestAssertNotVisibleId('interval_add');
@@ -1147,7 +1147,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='trends']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Trend storage period');
+			$this->zbxTestTextNotVisible('Trend storage period');
 			$this->zbxTestAssertNotVisibleId('trends');
 		}
 
@@ -1182,7 +1182,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='trapper_hosts']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Allowed hosts');
+			$this->zbxTestTextNotVisible('Allowed hosts');
 			$this->zbxTestAssertNotVisibleId('trapper_hosts');
 		}
 
@@ -1193,7 +1193,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='logtimefmt']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Log time format');
+			$this->zbxTestTextNotVisible('Log time format');
 			$this->zbxTestAssertNotVisibleId('logtimefmt');
 		}
 
