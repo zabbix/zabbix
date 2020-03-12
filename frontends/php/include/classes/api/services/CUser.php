@@ -473,7 +473,7 @@ class CUser extends CApiService {
 
 		if ($db_users) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('User with alias "%s" already exists.', $db_users[0]['alias'])
+				_s('User with alias "%1$s" already exists.', $db_users[0]['alias'])
 			);
 		}
 	}
