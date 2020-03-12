@@ -352,13 +352,7 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function hover() {
-		$rect = $this->getRect();
-
-		CElementQuery::getDriver()->getMouse()->mouseMove($this->getCoordinates(), floor($rect['width'] / 2),
-				floor($rect['height'] / 2)
-		);
-
-		return $this;
+		return $this->fireEvent('mouseover');
 	}
 
 	/**

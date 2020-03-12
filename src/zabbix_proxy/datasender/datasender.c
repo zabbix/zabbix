@@ -52,7 +52,7 @@ extern int		server_num, process_num;
  *                                                                            *
  * Function: proxy_data_sender                                                *
  *                                                                            *
- * Purpose: collects host availability, history, discovery, auto registration *
+ * Purpose: collects host availability, history, discovery, autoregistration  *
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
@@ -222,7 +222,9 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));

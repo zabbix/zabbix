@@ -94,7 +94,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		$this->zbxTestTextPresent(
 				[
 					$today,
-					$type['name'],
+					CTestArrayHelper::get($type, 'name'),
 					$status,
 					$retries,
 					$auditactions['sendto'],

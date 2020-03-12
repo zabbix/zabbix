@@ -207,12 +207,12 @@ class CXmlConstantName {
 	const AUTHPRIV = 'AUTHPRIV';
 
 	const ZABBIX_PASSIVE = 'ZABBIX_PASSIVE';
-	const SNMPV1 = 'SNMPV1';
+	const SNMPV1 = 'SNMPV1'; // Used by item type in 4.4 and as interface SNMP version in 5.0.
 	const TRAP = 'TRAP';
 	// const SIMPLE = 'SIMPLE'; // Duplicate.
-	const SNMPV2 = 'SNMPV2';
+	const SNMPV2 = 'SNMPV2'; // Used by item type in 4.4 and as interface SNMP version in 5.0.
 	const INTERNAL = 'INTERNAL';
-	const SNMPV3 = 'SNMPV3';
+	const SNMPV3 = 'SNMPV3'; // Used by item type in 4.4 and as interface SNMP version in 5.0.
 	const ZABBIX_ACTIVE = 'ZABBIX_ACTIVE';
 	const AGGREGATE = 'AGGREGATE';
 	const EXTERNAL = 'EXTERNAL';
@@ -225,6 +225,7 @@ class CXmlConstantName {
 	const SNMP_TRAP = 'SNMP_TRAP';
 	const DEPENDENT = 'DEPENDENT';
 	const HTTP_AGENT = 'HTTP_AGENT';
+	const SNMP_AGENT = 'SNMP_AGENT';
 
 	const FLOAT = 'FLOAT';
 	const CHAR = 'CHAR';
@@ -284,4 +285,16 @@ class CXmlConstantName {
 
 	const CONTENT_TYPE_TEXT = 'TEXT'; // Duplicate.
 	const CONTENT_TYPE_HTML = 'HTML';
+
+	const TRIGGERS = 'TRIGGERS';
+	const DISCOVERY = 'DISCOVERY';
+	const AUTOREGISTRATION = 'AUTOREGISTRATION';
+	// const INTERNAL = 'INTERNAL'; // Duplicate.
+
+	const PROBLEM = 'PROBLEM';
+	const RECOVERY = 'RECOVERY';
+	const UPDATE = 'UPDATE';
+
+	const MACRO_TYPE_TEXT = 'TEXT';
+	const MACRO_TYPE_SECRET = 'SECRET_TEXT';
 }

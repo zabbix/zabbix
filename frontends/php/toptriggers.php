@@ -30,16 +30,16 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR					TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupids' =>	[T_ZBX_INT,			O_OPT,	P_SYS,	DB_ID,	null],
-	'hostids' =>	[T_ZBX_INT,			O_OPT,	P_SYS,	DB_ID,	null],
-	'severities' =>	[T_ZBX_INT,			O_OPT,	P_SYS,	null,	null],
-	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,	null,	null],
-	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,	null,	null],
-	'filter_rst' =>	[T_ZBX_STR,			O_OPT,	P_SYS,	null,	null],
-	'filter_set' =>	[T_ZBX_STR,			O_OPT,	P_SYS,	null,	null]
+	'groupids' =>		[T_ZBX_INT,			O_OPT,	P_SYS,	DB_ID,	null],
+	'hostids' =>		[T_ZBX_INT,			O_OPT,	P_SYS,	DB_ID,	null],
+	'severities' =>		[T_ZBX_INT,			O_OPT,	P_SYS,	null,	null],
+	'filter_from' =>	[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,	null,	null],
+	'filter_to' =>		[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,	null,	null],
+	'filter_rst' =>		[T_ZBX_STR,			O_OPT,	P_SYS,	null,	null],
+	'filter_set' =>		[T_ZBX_STR,			O_OPT,	P_SYS,	null,	null]
 ];
 check_fields($fields);
-validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
+validateTimeSelectorPeriod(getRequest('filter_from'), getRequest('filter_to'));
 
 $data['config'] = select_config();
 
@@ -65,22 +65,15 @@ elseif (hasRequest('filter_rst')) {
 $timeselector_options = [
 	'profileIdx' => 'web.toptriggers.filter',
 	'profileIdx2' => 0,
-	'from' => getRequest('from'),
-	'to' => getRequest('to')
+	'from' => getRequest('filter_from'),
+	'to' => getRequest('filter_to')
 ];
 updateTimeSelectorPeriod($timeselector_options);
 
-if (!hasRequest('filter_set')) {
-	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$defaultSeverities[$severity] = $severity;
-	}
-}
-else {
-	$defaultSeverities = [];
-}
-
 $data['filter'] = [
-	'severities' => CProfile::getArray('web.toptriggers.filter.severities', $defaultSeverities),
+	'severities' => CProfile::getArray('web.toptriggers.filter.severities',
+		hasRequest('filter_set') ? [] : range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+	),
 	'timeline' => getTimeSelectorPeriod($timeselector_options),
 	'active_tab' => CProfile::get('web.toptriggers.filter.active', 1)
 ];
@@ -199,8 +192,6 @@ $data['hosts'] = API::Host()->get([
 ]);
 
 // render view
-$historyView = new CView('reports.toptriggers', $data);
-$historyView->render();
-$historyView->show();
+echo (new CView('reports.toptriggers', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

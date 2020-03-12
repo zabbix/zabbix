@@ -279,7 +279,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'auditlogs.php',
+				'url' => 'zabbix.php?action=auditlog.list',
 				'title' =>	'Audit log',
 				'users' => [
 					'guest' => false,
@@ -480,7 +480,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=2',
 				'title' =>	'Configuration of actions',
-				'header' => 'Auto registration actions',
+				'header' => 'Autoregistration actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

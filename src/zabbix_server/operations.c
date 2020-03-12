@@ -240,7 +240,10 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		{
 			result = DBselect(
 					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,"
-						"dc.host_source,dc.name_source,dr.druleid"
+						"dc.host_source,dc.name_source,dr.druleid,"
+						"dc.snmp_community,dc.snmpv3_securityname,dc.snmpv3_securitylevel,"
+						"dc.snmpv3_authpassphrase,dc.snmpv3_privpassphrase,"
+						"dc.snmpv3_authprotocol,dc.snmpv3_privprotocol,dc.snmpv3_contextname"
 					" from drules dr,dchecks dc,dservices ds"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
@@ -252,7 +255,10 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		{
 			result = DBselect(
 					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,"
-						"dc.host_source,dc.name_source,dr.druleid"
+						"dc.host_source,dc.name_source,dr.druleid,"
+						"dc.snmp_community,dc.snmpv3_securityname,dc.snmpv3_securitylevel,"
+						"dc.snmpv3_authpassphrase,dc.snmpv3_privpassphrase,"
+						"dc.snmpv3_authprotocol,dc.snmpv3_privprotocol,dc.snmpv3_contextname"
 					" from drules dr,dchecks dc,dservices ds,dservices ds1"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
@@ -264,6 +270,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			zbx_uint64_t	interfaceid;
+
 			ZBX_STR2UINT64(dhostid, row[0]);
 			ZBX_STR2UINT64(druleid, row[8]);
 			ZBX_DBROW2UINT64(proxy_hostid, row[1]);
@@ -428,7 +436,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				if (HOST_INVENTORY_DISABLED != cfg.default_inventory_mode)
 					DBadd_host_inventory(hostid, cfg.default_inventory_mode);
 
-				DBadd_interface(hostid, interface_type, 1, row[2], row[3], port, ZBX_CONN_DEFAULT);
+				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
+						ZBX_CONN_DEFAULT);
 
 				zbx_free(host_unique);
 				zbx_free(host_visible_unique);
@@ -436,7 +445,25 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				add_discovered_host_groups(hostid, &groupids);
 			}
 			else
-				DBadd_interface(hostid, interface_type, 1, row[2], row[3], port, ZBX_CONN_DEFAULT);
+				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
+						ZBX_CONN_DEFAULT);
+
+			if (INTERFACE_TYPE_SNMP == interface_type)
+			{
+				unsigned char securitylevel, authprotocol, privprotocol, version = ZBX_IF_SNMP_VERSION_2;
+
+				ZBX_STR2UCHAR(securitylevel, row[11]);
+				ZBX_STR2UCHAR(authprotocol, row[14]);
+				ZBX_STR2UCHAR(privprotocol, row[15]);
+
+				if (SVC_SNMPv1 == svc_type)
+					version = ZBX_IF_SNMP_VERSION_1;
+				else if (SVC_SNMPv3 == svc_type)
+					version = ZBX_IF_SNMP_VERSION_3;
+
+				DBadd_interface_snmp(interfaceid, version, SNMP_BULK_ENABLED, row[9], row[10],
+						securitylevel, row[12], row[13], authprotocol, privprotocol, row[16]);
+			}
 		}
 		DBfree_result(result);
 	}
@@ -578,15 +605,15 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: is_discovery_or_auto_registration                                *
+ * Function: is_discovery_or_autoregistration                                 *
  *                                                                            *
- * Purpose: checks if the event is discovery or auto registration event       *
+ * Purpose: checks if the event is discovery or autoregistration event        *
  *                                                                            *
- * Return value: SUCCEED - it's discovery or auto registration event          *
+ * Return value: SUCCEED - it's discovery or autoregistration event           *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	is_discovery_or_auto_registration(const DB_EVENT *event)
+static int	is_discovery_or_autoregistration(const DB_EVENT *event)
 {
 	if (event->source == EVENT_SOURCE_DISCOVERY && (event->object == EVENT_OBJECT_DHOST ||
 			event->object == EVENT_OBJECT_DSERVICE))
@@ -594,7 +621,7 @@ static int	is_discovery_or_auto_registration(const DB_EVENT *event)
 		return SUCCEED;
 	}
 
-	if (event->source == EVENT_SOURCE_AUTO_REGISTRATION && event->object == EVENT_OBJECT_ZABBIX_ACTIVE)
+	if (event->source == EVENT_SOURCE_AUTOREGISTRATION && event->object == EVENT_OBJECT_ZABBIX_ACTIVE)
 		return SUCCEED;
 
 	return FAIL;
@@ -616,7 +643,7 @@ void	op_host_add(const DB_EVENT *event)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		return;
 
 	add_discovered_host(event);
@@ -640,7 +667,7 @@ void	op_host_del(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		return;
 
 	if (0 == (hostid = select_discovered_host(event)))
@@ -672,7 +699,7 @@ void	op_host_enable(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -703,7 +730,7 @@ void	op_host_disable(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -739,7 +766,7 @@ void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -768,7 +795,7 @@ void	op_groups_add(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -800,7 +827,7 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		return;
 
 	if (0 == (hostid = select_discovered_host(event)))
@@ -862,7 +889,7 @@ void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -896,7 +923,7 @@ void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		return;
 
 	if (0 == (hostid = select_discovered_host(event)))

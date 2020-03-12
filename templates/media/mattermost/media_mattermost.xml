@@ -597,6 +597,7 @@ try {&#13;
     throw 'Mattermost notification failed: ' + error;&#13;
 }</script>
             <process_tags>YES</process_tags>
+            <show_event_menu>YES</show_event_menu>
             <event_menu_url>{EVENT.TAGS.__mattermost_message_link}</event_menu_url>
             <event_menu_name>Open in Mattermost: {EVENT.TAGS.__mattermost_channel_name}</event_menu_name>
         </media_type>

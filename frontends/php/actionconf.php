@@ -37,7 +37,7 @@ $fields = [
 										],
 	'eventsource' =>					[T_ZBX_INT, O_OPT, null,
 											IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-												EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL
+												EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL
 											]),
 											null
 										],
@@ -52,12 +52,6 @@ $fields = [
 	'status' =>							[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 											null
 										],
-	'def_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'def_longdata' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'r_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'r_longdata' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'ack_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'ack_longdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'g_actionid' =>						[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'conditions' =>						[null,		O_OPT,	null,	null,		null],
 	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
@@ -132,12 +126,6 @@ if (hasRequest('add') || hasRequest('update')) {
 		'name' => getRequest('name'),
 		'status' => getRequest('status', ACTION_STATUS_DISABLED),
 		'esc_period' => getRequest('esc_period', DB::getDefault('actions', 'esc_period')),
-		'def_shortdata' => getRequest('def_shortdata', ''),
-		'def_longdata' => getRequest('def_longdata', ''),
-		'r_shortdata' => getRequest('r_shortdata', ''),
-		'r_longdata' => getRequest('r_longdata', ''),
-		'ack_shortdata' => getRequest('ack_shortdata', ''),
-		'ack_longdata' => getRequest('ack_longdata', ''),
 		'operations' => getRequest('operations', []),
 		'recovery_operations' => getRequest('recovery_operations', []),
 		'acknowledge_operations' => getRequest('ack_operations', [])
@@ -147,7 +135,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		foreach ($action[$operation_key] as &$operation) {
 			if (array_key_exists('opmessage', $operation)
 					&& !array_key_exists('default_msg', $operation['opmessage'])) {
-				$operation['opmessage']['default_msg'] = 0;
+				$operation['opmessage']['default_msg'] = 1;
 			}
 		}
 		unset($operation);
@@ -316,7 +304,7 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 
 			if ($uniqOperations[$new_operation['operationtype']] > 1) {
 				$result = false;
-				error(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
+				error(_s('Operation "%1$s" already exists.', operation_type2str($new_operation['operationtype'])));
 				show_messages();
 			}
 		}
@@ -509,46 +497,31 @@ if (hasRequest('form')) {
 		$data['action']['filter']['conditions'] = getRequest('conditions', []);
 
 		if ($data['actionid'] && hasRequest('form_refresh')) {
-			$data['action']['def_shortdata'] = getRequest('def_shortdata', '');
-			$data['action']['def_longdata'] = getRequest('def_longdata', '');
-			$data['action']['r_shortdata'] = getRequest('r_shortdata', '');
-			$data['action']['r_longdata'] = getRequest('r_longdata', '');
-			$data['action']['ack_shortdata'] = getRequest('ack_shortdata', '');
-			$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
-
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				$data['action']['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 			}
 		}
 		else {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				$data['action']['def_shortdata'] = getRequest('def_shortdata', ACTION_DEFAULT_SUBJ_PROBLEM);
-				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_PROBLEM);
-				$data['action']['r_shortdata'] = getRequest('r_shortdata', ACTION_DEFAULT_SUBJ_RECOVERY);
-				$data['action']['r_longdata'] = getRequest('r_longdata', ACTION_DEFAULT_MSG_RECOVERY);
-				$data['action']['ack_shortdata'] = getRequest('ack_shortdata', ACTION_DEFAULT_SUBJ_ACKNOWLEDGE);
-				$data['action']['ack_longdata'] = getRequest('ack_longdata', ACTION_DEFAULT_MSG_ACKNOWLEDGE);
 				$data['action']['pause_suppressed'] = getRequest('pause_suppressed',
 					hasRequest('form_refresh') ? ACTION_PAUSE_SUPPRESSED_FALSE : ACTION_PAUSE_SUPPRESSED_TRUE
 				);
 			}
-			elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
-				$data['action']['def_shortdata'] = getRequest('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
-				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
-			}
-			elseif ($data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
-				$data['action']['def_shortdata'] = getRequest('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
-				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
-			}
-			else {
-				$data['action']['def_shortdata'] = getRequest('def_shortdata', '');
-				$data['action']['def_longdata'] = getRequest('def_longdata', '');
-				$data['action']['r_shortdata'] = getRequest('r_shortdata', '');
-				$data['action']['r_longdata'] = getRequest('r_longdata', '');
-				$data['action']['ack_shortdata'] = getRequest('ack_shortdata', '');
-				$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
+		}
+	}
+
+	foreach (['operations', 'recovery_operations', 'ack_operations'] as $operations) {
+		foreach ($data['action'][$operations] as &$operation) {
+			if (($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+					|| $operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE
+					|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE)
+					&& !array_key_exists('default_msg', $operation['opmessage'])) {
+				$operation['opmessage']['default_msg'] = 1;
+				$operation['opmessage']['subject'] = '';
+				$operation['opmessage']['message'] = '';
 			}
 		}
+		unset($operation);
 	}
 
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
@@ -588,26 +561,20 @@ if (hasRequest('form')) {
 	}
 
 	if ($data['new_ack_operation'] && !is_array($data['new_ack_operation'])) {
-		$data['new_ack_operation'] = [
-			'operationtype' => OPERATION_TYPE_MESSAGE,
-			'ack_short' => ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-			'ack_long' => ACTION_DEFAULT_MSG_ACKNOWLEDGE,
-		];
+		$data['new_ack_operation'] = ['operationtype' => OPERATION_TYPE_MESSAGE];
 	}
 	if ($data['new_ack_operation'] && !array_key_exists('opmessage', $data['new_ack_operation'])
 			&& $data['new_ack_operation']['operationtype'] != OPERATION_TYPE_COMMAND) {
 		$data['new_ack_operation']['opmessage'] = [
-			'default_msg'	=> 1,
-			'mediatypeid'	=> 0,
-			'subject'	=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-			'message'	=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+			'default_msg' => 1,
+			'mediatypeid' => 0,
+			'subject' => '',
+			'message' => ''
 		];
 	}
 
 	// Render view.
-	$actionView = new CView('configuration.action.edit', $data);
-	$actionView->render();
-	$actionView->show();
+	echo (new CView('configuration.action.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -673,9 +640,7 @@ else {
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sortOrder, new CUrl('actionconf.php'));
 
 	// render view
-	$actionView = new CView('configuration.action.list', $data);
-	$actionView->render();
-	$actionView->show();
+	echo (new CView('configuration.action.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

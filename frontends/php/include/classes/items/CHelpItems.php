@@ -383,11 +383,11 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
-					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>]',
+					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
 					'description' => _('Log file monitoring. Returns log')
 				],
 				[
-					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
+					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>]',
 					'description' => _('Count of matched lines in log file monitoring. Returns integer')
 				],
 				[
@@ -1093,6 +1093,12 @@ class CHelpItems {
 				[
 					'key' => 'jmx.get[<discovery mode>,<object name>]',
 					'description' => _('Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD.')
+				]
+			],
+			ITEM_TYPE_IPMI => [
+				[
+					'key' => 'ipmi.get',
+					'description' => _('IPMI sensor IDs and other sensor-related parameters. Returns JSON.')
 				]
 			]
 		];

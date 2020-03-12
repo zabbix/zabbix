@@ -89,10 +89,6 @@ class CImportDataAdapter {
 
 				if (array_key_exists('interfaces', $host)) {
 					foreach ($host['interfaces'] as $inum => $interface) {
-						if ($interface['type'] != INTERFACE_TYPE_SNMP) {
-							unset($interface['bulk']);
-						}
-
 						$host['interfaces'][$inum] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
 					}
 				}
@@ -442,7 +438,19 @@ class CImportDataAdapter {
 				'attempts' => 'maxattempts'
 			];
 
+			$message_template_keys = [
+				'event_source' => 'eventsource',
+				'operation_mode' => 'recovery'
+			];
+
 			foreach ($this->data['media_types'] as $media_type) {
+				if (array_key_exists('message_templates', $media_type)) {
+					foreach ($media_type['message_templates'] as &$message_template) {
+						$message_template = CArrayHelper::renameKeys($message_template, $message_template_keys);
+					}
+					unset($message_template);
+				}
+
 				$media_types[] = CArrayHelper::renameKeys($media_type,
 					$keys + (($media_type['type'] == MEDIA_TYPE_EXEC) ? ['parameters' => 'exec_params'] : [])
 				);

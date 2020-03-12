@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())->setTitle(_('Items'));
 
 if ($data['hostid'] != 0) {
@@ -139,7 +143,7 @@ else {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [CJs::encodeJson($headers_data)];
+$headers->items = [json_encode($headers_data)];
 
 $item_form_list
 	->addRow(
@@ -176,86 +180,6 @@ $item_form_list
 			->setId('headers_pairs')
 			->setAttribute('data-sortable-pairs-table', '1')
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	)
-	// Append SNMP community to item form list.
-	->addRow(
-		(new CVisibilityBox('visible[snmp_community]', 'snmp_community', _('Original')))
-			->setLabel(_('SNMP community'))
-			->setChecked(isset($data['visible']['snmp_community'])),
-		(new CTextBox('snmp_community', $data['snmp_community']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	// Append SNMPv3 contextname to item form list.
-	->addRow(
-		(new CVisibilityBox('visible[snmpv3_contextname]', 'snmpv3_contextname', _('Original')))
-			->setLabel(_('Context name'))
-			->setChecked(isset($data['visible']['snmpv3_contextname'])),
-		(new CTextBox('snmpv3_contextname', $data['snmpv3_contextname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	// Append SNMPv3 securityname to item form list.
-	->addRow(
-		(new CVisibilityBox('visible[snmpv3_securityname]', 'snmpv3_securityname', _('Original')))
-			->setLabel(_('Security name'))
-			->setChecked(isset($data['visible']['snmpv3_securityname'])),
-		(new CTextBox('snmpv3_securityname', $data['snmpv3_securityname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	// Append SNMPv3 securitylevel to item form list.
-	->addRow(
-		(new CVisibilityBox('visible[snmpv3_securitylevel]', 'snmpv3_securitylevel', _('Original')))
-			->setLabel(_('Security level'))
-			->setChecked(isset($data['visible']['snmpv3_securitylevel'])),
-		new CComboBox('snmpv3_securitylevel', $data['snmpv3_securitylevel'], null, [
-			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-		])
-	)
-	// Append SNMPv3 authprotocol to item form list.
-	->addRow(
-		(new CVisibilityBox('visible[snmpv3_authprotocol]', 'authprotocol_div', _('Original')))
-			->setLabel(_('Authentication protocol'))
-			->setChecked(isset($data['visible']['snmpv3_authprotocol'])),
-		(new CDiv(
-			(new CRadioButtonList('snmpv3_authprotocol', (int) $data['snmpv3_authprotocol']))
-				->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
-				->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
-				->setModern(true)
-		))->setId('authprotocol_div')
-	)
-	// Append SNMPv3 authpassphrase to item form list.
-	->addRow(
-		(new CVisibilityBox('visible[snmpv3_authpassphrase]', 'snmpv3_authpassphrase', _('Original')))
-			->setLabel(_('Authentication passphrase'))
-			->setChecked(isset($data['visible']['snmpv3_authpassphrase'])),
-		(new CTextBox('snmpv3_authpassphrase', $data['snmpv3_authpassphrase']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	// Append SNMPv3 privprotocol to item form list.
-	->addRow(
-		(new CVisibilityBox('visible[snmpv3_privprotocol]', 'privprotocol_div', _('Original')))
-			->setLabel(_('Privacy protocol'))
-			->setChecked(isset($data['visible']['snmpv3_privprotocol'])),
-		(new CDiv(
-			(new CRadioButtonList('snmpv3_privprotocol', (int) $data['snmpv3_privprotocol']))
-				->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
-				->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
-				->setModern(true)
-		))
-			->setId('privprotocol_div')
-	)
-	// Append SNMPv3 privpassphrase to item form list.
-	->addRow(
-		(new CVisibilityBox('visible[snmpv3_privpassphrase]', 'snmpv3_privpassphrase', _('Original')))
-			->setLabel(_('Privacy passphrase'))
-			->setChecked(isset($data['visible']['snmpv3_privpassphrase'])),
-		(new CTextBox('snmpv3_privpassphrase', $data['snmpv3_privpassphrase']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	// Append port to item form list.
-	->addRow(
-		(new CVisibilityBox('visible[port]', 'port', _('Original')))
-			->setLabel(_('Port'))
-			->setChecked(isset($data['visible']['port'])),
-		(new CTextBox('port', $data['port']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	// Append value type to item form list.
 	->addRow(
@@ -618,4 +542,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';
 
-return $widget;
+$widget->show();

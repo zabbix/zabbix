@@ -106,7 +106,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 	DC_ITEM		item;
 	int             (*function)(DC_ITEM *, AGENT_RESULT *);
 
-#ifdef HAVE_SSH2
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
 #else
 	assert(ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -146,7 +146,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 			break;
 	}
 
-#ifdef HAVE_SSH2
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	if (ZBX_SCRIPT_TYPE_SSH == script->type)
 	{
 		item.key = zbx_dsprintf(item.key, "ssh.run[,,%s]", script->port);
@@ -157,7 +157,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 #endif
 		item.key = zbx_dsprintf(item.key, "telnet.run[,,%s]", script->port);
 		function = get_value_telnet;
-#ifdef HAVE_SSH2
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	}
 #endif
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
@@ -207,6 +207,7 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 		ZBX_STR2UCHAR(script->type, row[0]);
 		ZBX_STR2UCHAR(script->execute_on, row[1]);
 		script->command = zbx_strdup(script->command, row[2]);
+		script->command_orig = zbx_strdup(script->command_orig, row[2]);
 		ZBX_DBROW2UINT64(*groupid, row[3]);
 		ZBX_STR2UCHAR(script->host_access, row[4]);
 		ret = SUCCEED;
@@ -306,6 +307,7 @@ void	zbx_script_clean(zbx_script_t *script)
 	zbx_free(script->privatekey);
 	zbx_free(script->password);
 	zbx_free(script->command);
+	zbx_free(script->command_orig);
 }
 
 /******************************************************************************
@@ -358,9 +360,9 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					&script->username, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					&script->password, MACRO_TYPE_COMMON, NULL, 0);
 			break;
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
@@ -383,10 +385,18 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
 					NULL, &script->command, MACRO_TYPE_SCRIPT, error, max_error_len))
 			{
 				goto out;
+			}
+			/* expand macros in command_orig used for non-secure logging */
+			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+					NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error, max_error_len))
+			{
+				/* script command_orig is a copy of script command - if the script command  */
+				/* macro substitution succeeded, then it will succeed also for command_orig */
+				THIS_SHOULD_NEVER_HAPPEN;
 			}
 
 			/* DBget_script_by_scriptid() may overwrite script type with anything but global script... */
@@ -465,7 +475,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 #endif
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
-#ifndef HAVE_SSH2
+#if !defined(HAVE_SSH2) && !defined(HAVE_SSH)
 			zbx_strlcpy(error, "Support for SSH script was not compiled in.", max_error_len);
 			break;
 #endif

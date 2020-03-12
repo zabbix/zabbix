@@ -32,6 +32,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/alias.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/threads.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/iprange.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/md5.o
@@ -41,9 +42,11 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/algodefs.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/logfiles.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_system.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dns.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/eventlog.o
 #cgo openssl LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/tls_version.o
-#cgo LDFLAGS: -lpcre -lDbghelp -lpsapi -lws2_32 -lWevtapi
+#cgo LDFLAGS: -lpcre -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
 #cgo openssl LDFLAGS: -lssl -lcrypto
 #cgo LDFLAGS: -Wl,--end-group
 
@@ -61,6 +64,7 @@ const char	*usage_message[] = {};
 const char	*help_message[] = {};
 
 ZBX_METRIC	parameters_common[] = {NULL};
+ZBX_METRIC	parameters_common_local[] = {NULL};
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
@@ -72,7 +76,7 @@ char	*strerror_from_system(unsigned long error)
 
 	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX] ", error);
 
-	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error,
+	if (0 == FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, ZBX_MESSAGE_BUF_SIZE, NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,

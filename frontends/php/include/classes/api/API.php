@@ -123,6 +123,13 @@ class API {
 	}
 
 	/**
+	 * @return CAuditLog
+	 */
+	public static function AuditLog() {
+		return self::getApi('auditlog');
+	}
+
+	/**
 	 * @return CAutoregistration
 	 */
 	public static function Autoregistration() {
@@ -281,6 +288,13 @@ class API {
 	 */
 	public static function Maintenance() {
 		return self::getApi('maintenance');
+	}
+
+	/**
+	 * @return CModule
+	 */
+	public static function Module() {
+		return self::getApi('module');
 	}
 
 	/**

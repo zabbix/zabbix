@@ -51,8 +51,9 @@ class testPageMaps extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allMaps
-	*/
+	 * @dataProvider allMaps
+	 * @browsers chrome
+	 */
 	public function testPageMaps_SimpleUpdateConstructor($map) {
 		$name = $map['name'];
 		$sysmapid = $map['sysmapid'];

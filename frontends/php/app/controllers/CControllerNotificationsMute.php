@@ -29,7 +29,7 @@ class CControllerNotificationsMute extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$data = CJs::encodeJson(['error' => true]);
+			$data = json_encode(['error' => true]);
 			$this->setResponse(new CControllerResponseData(['main_block' => $data]));
 		}
 
@@ -46,7 +46,7 @@ class CControllerNotificationsMute extends CController {
 
 		updateMessageSettings($msg_settings);
 
-		$data = CJs::encodeJson(['muted' => (int) $msg_settings['sounds.mute']]);
+		$data = json_encode(['muted' => (int) $msg_settings['sounds.mute']]);
 		$this->setResponse(new CControllerResponseData(['main_block' => $data]));
 	}
 }

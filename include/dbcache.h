@@ -89,6 +89,7 @@ typedef struct
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	bulk;
+	unsigned char	snmp_version;
 	unsigned char	useip;
 	char		ip_orig[INTERFACE_IP_LEN_MAX];
 	char		dns_orig[INTERFACE_DNS_LEN_MAX];
@@ -125,7 +126,7 @@ typedef struct
 	unsigned char	status;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
 	char		tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
 	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
@@ -146,6 +147,7 @@ typedef struct
 	zbx_uint64_t		lastlogsize;
 	zbx_uint64_t		valuemapid;
 	unsigned char		type;
+	unsigned char		snmp_version;
 	unsigned char		value_type;
 	unsigned char		state;
 	unsigned char		snmpv3_securitylevel;
@@ -290,7 +292,7 @@ typedef struct
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
 	char		tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
 	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
@@ -720,11 +722,19 @@ int	DCconfig_get_proxypoller_nextcheck(void);
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err);
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);
 #endif
 void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
 		unsigned char *psk_buf, size_t psk_buf_len);
+
+#define ZBX_MACRO_ENV_SECURE	0
+#define ZBX_MACRO_ENV_NONSECURE	1
+
+#define ZBX_MACRO_VALUE_TEXT	0
+#define ZBX_MACRO_VALUE_SECRET	1
+
+#define ZBX_MACRO_SECRET_MASK	"******"
 
 void	DCget_user_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 char	*DCexpression_expand_user_macros(const char *expression);
@@ -760,6 +770,8 @@ int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
+
+unsigned int	DCget_internal_action_count(void);
 
 /* global configuration support */
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
@@ -949,5 +961,7 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
 
 void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags);
+
+unsigned char	zbx_dc_set_macro_env(unsigned char env);
 
 #endif

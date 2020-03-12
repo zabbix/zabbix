@@ -266,7 +266,7 @@ class CFormElement extends CElement {
 	 * @return CMessageElement
 	 */
 	public function getOverlayMessage() {
-		return $this->parents('class:overlay-dialogue-body')->one()
+		return $this->parents('class:overlay-dialogue-body')->waitUntilVisible()->one()
 				->query('tag:output')->asMessage()->waitUntilVisible()->one();
 	}
 

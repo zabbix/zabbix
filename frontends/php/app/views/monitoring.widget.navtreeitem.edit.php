@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm('post'))
 	->cleanItems()
 	->setId('widget_dialogue_form')
@@ -44,7 +48,7 @@ $form_list = (new CFormList())
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+				json_encode([
 					'srctbl' => 'sysmaps',
 					'srcfld1' => 'sysmapid',
 					'srcfld2' => 'name',
@@ -80,4 +84,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

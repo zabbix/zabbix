@@ -19,6 +19,9 @@
 **/
 
 
+use Core\CModule,
+	CController as CAction;
+
 require_once dirname(__FILE__).'/CAutoloader.php';
 
 class ZBase {
@@ -27,9 +30,9 @@ class ZBase {
 	const EXEC_MODE_API = 'api';
 
 	/**
-	 * An instance of the current Z object.
+	 * An instance of the current APP object.
 	 *
-	 * @var Z
+	 * @var APP
 	 */
 	protected static $instance;
 
@@ -46,18 +49,51 @@ class ZBase {
 	protected $config = [];
 
 	/**
-	 * Returns the current instance of Z.
+	 * @var CAutoloader
+	 */
+	protected $autoloader;
+
+	/**
+	 * @var CComponentRegistry
+	 */
+	private $component_registry;
+
+	/**
+	 * @var CModuleManager
+	 */
+	private $module_manager;
+
+	/**
+	 * Returns the current instance of APP.
 	 *
 	 * @static
 	 *
-	 * @return Z
+	 * @return APP
 	 */
 	public static function getInstance() {
 		if (self::$instance === null) {
-			self::$instance = new Z();
+			self::$instance = new static;
 		}
 
 		return self::$instance;
+	}
+
+	/**
+	 * Get component registry.
+	 *
+	 * @return CComponentRegistry
+	 */
+	public static function Component() {
+		return self::getInstance()->component_registry;
+	}
+
+	/**
+	 * Get module manager.
+	 *
+	 * @return CModuleManager
+	 */
+	public static function ModuleManager() {
+		return self::getInstance()->module_manager;
 	}
 
 	/**
@@ -65,7 +101,8 @@ class ZBase {
 	 */
 	protected function init() {
 		$this->rootDir = $this->findRootDir();
-		$this->registerAutoloader();
+		$this->initAutoloader();
+		$this->component_registry = new CComponentRegistry;
 
 		// initialize API classes
 		$apiServiceFactory = new CApiServiceFactory();
@@ -78,48 +115,54 @@ class ZBase {
 		API::setApiServiceFactory($apiServiceFactory);
 
 		// system includes
-		require_once $this->getRootDir().'/include/debug.inc.php';
-		require_once $this->getRootDir().'/include/gettextwrapper.inc.php';
-		require_once $this->getRootDir().'/include/defines.inc.php';
-		require_once $this->getRootDir().'/include/func.inc.php';
-		require_once $this->getRootDir().'/include/html.inc.php';
-		require_once $this->getRootDir().'/include/perm.inc.php';
-		require_once $this->getRootDir().'/include/audit.inc.php';
-		require_once $this->getRootDir().'/include/js.inc.php';
-		require_once $this->getRootDir().'/include/users.inc.php';
-		require_once $this->getRootDir().'/include/validate.inc.php';
-		require_once $this->getRootDir().'/include/profiles.inc.php';
-		require_once $this->getRootDir().'/include/locales.inc.php';
-		require_once $this->getRootDir().'/include/db.inc.php';
+		require_once 'include/debug.inc.php';
+		require_once 'include/gettextwrapper.inc.php';
+		require_once 'include/defines.inc.php';
+		require_once 'include/func.inc.php';
+		require_once 'include/html.inc.php';
+		require_once 'include/perm.inc.php';
+		require_once 'include/audit.inc.php';
+		require_once 'include/js.inc.php';
+		require_once 'include/users.inc.php';
+		require_once 'include/validate.inc.php';
+		require_once 'include/profiles.inc.php';
+		require_once 'include/locales.inc.php';
+		require_once 'include/db.inc.php';
 
 		// page specific includes
-		require_once $this->getRootDir().'/include/actions.inc.php';
-		require_once $this->getRootDir().'/include/discovery.inc.php';
-		require_once $this->getRootDir().'/include/draw.inc.php';
-		require_once $this->getRootDir().'/include/events.inc.php';
-		require_once $this->getRootDir().'/include/graphs.inc.php';
-		require_once $this->getRootDir().'/include/hostgroups.inc.php';
-		require_once $this->getRootDir().'/include/hosts.inc.php';
-		require_once $this->getRootDir().'/include/httptest.inc.php';
-		require_once $this->getRootDir().'/include/ident.inc.php';
-		require_once $this->getRootDir().'/include/images.inc.php';
-		require_once $this->getRootDir().'/include/items.inc.php';
-		require_once $this->getRootDir().'/include/maintenances.inc.php';
-		require_once $this->getRootDir().'/include/maps.inc.php';
-		require_once $this->getRootDir().'/include/media.inc.php';
-		require_once $this->getRootDir().'/include/services.inc.php';
-		require_once $this->getRootDir().'/include/sounds.inc.php';
-		require_once $this->getRootDir().'/include/triggers.inc.php';
-		require_once $this->getRootDir().'/include/valuemap.inc.php';
+		require_once 'include/actions.inc.php';
+		require_once 'include/discovery.inc.php';
+		require_once 'include/draw.inc.php';
+		require_once 'include/events.inc.php';
+		require_once 'include/graphs.inc.php';
+		require_once 'include/hostgroups.inc.php';
+		require_once 'include/hosts.inc.php';
+		require_once 'include/httptest.inc.php';
+		require_once 'include/ident.inc.php';
+		require_once 'include/images.inc.php';
+		require_once 'include/items.inc.php';
+		require_once 'include/maintenances.inc.php';
+		require_once 'include/maps.inc.php';
+		require_once 'include/media.inc.php';
+		require_once 'include/services.inc.php';
+		require_once 'include/sounds.inc.php';
+		require_once 'include/triggers.inc.php';
+		require_once 'include/valuemap.inc.php';
 	}
 
 	/**
 	 * Initializes the application.
+	 *
+	 * @param string $mode  Application initialization mode.
+	 *
+	 * @throws DBException
 	 */
 	public function run($mode) {
 		$this->init();
 
 		$this->setMaintenanceMode();
+
+		ini_set('display_errors', 'Off');
 		set_error_handler('zbx_err_handler');
 
 		switch ($mode) {
@@ -129,6 +172,22 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
+				$this->initMainMenu();
+				$this->initModuleManager();
+
+				$file = basename($_SERVER['SCRIPT_NAME']);
+				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
+
+				$router = new CRouter();
+				$router->addActions($this->module_manager->getActions());
+				$router->setAction($action_name);
+
+				$this->component_registry->get('menu.main')->setSelected($action_name);
+
+				CProfiler::getInstance()->start();
+
+				$this->processRequest($router);
+
 				break;
 
 			case self::EXEC_MODE_API:
@@ -147,17 +206,6 @@ class ZBase {
 				}
 				catch (ConfigFileException $e) {}
 				break;
-		}
-
-		// new MVC processing, otherwise we continue execution old style
-		if (hasRequest('action')) {
-			$router = new CRouter(getRequest('action'));
-
-			if ($router->getController() !== null) {
-				CProfiler::getInstance()->start();
-				$this->processRequest($router);
-				exit;
-			}
 		}
 	}
 
@@ -180,28 +228,20 @@ class ZBase {
 	}
 
 	/**
-	 * Register autoloader.
-	 */
-	private function registerAutoloader() {
-		$autoloader = new CAutoloader($this->getIncludePaths());
-		$autoloader->register();
-	}
-
-	/**
 	 * An array of directories to add to the autoloader include paths.
 	 *
 	 * @return array
 	 */
 	private function getIncludePaths() {
 		return [
-			$this->rootDir.'/include/classes/core',
-			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/api/services',
 			$this->rootDir.'/include/classes/api/helpers',
 			$this->rootDir.'/include/classes/api/managers',
 			$this->rootDir.'/include/classes/api/clients',
 			$this->rootDir.'/include/classes/api/wrappers',
+			$this->rootDir.'/include/classes/core',
+			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',
 			$this->rootDir.'/include/classes/validators',
@@ -277,7 +317,7 @@ class ZBase {
 	 * @throws Exception
 	 */
 	protected function setMaintenanceMode() {
-		require_once $this->getRootDir().'/conf/maintenance.inc.php';
+		require_once 'conf/maintenance.inc.php';
 
 		if (defined('ZBX_DENY_GUI_ACCESS')) {
 			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
@@ -296,6 +336,19 @@ class ZBase {
 		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($configFile);
 		$this->config = $config->load();
+	}
+
+	/**
+	 * Initialize classes autoloader.
+	 */
+	protected function initAutoloader() {
+		// Register base directory path for 'include' and 'require' functions.
+		set_include_path(get_include_path().PATH_SEPARATOR.$this->rootDir);
+		$autoloader = new CAutoloader;
+		$autoloader->addNamespace('', $this->getIncludePaths());
+		$autoloader->addNamespace('Core', [$this->rootDir.'/include/classes/core']);
+		$autoloader->register();
+		$this->autoloader = $autoloader;
 	}
 
 	/**
@@ -340,12 +393,6 @@ class ZBase {
 				}
 			}
 
-			// reset the LC_CTYPE locale so that case transformation functions would work correctly
-			// it is also required for PHP to work with the Turkish locale (https://bugs.php.net/bug.php?id=18556)
-			// WARNING: this must be done before executing any other code, otherwise code execution could fail!
-			// this will be unnecessary in PHP 5.5
-			setlocale(LC_CTYPE, $defaultLocales);
-
 			if (!$locale_found && $user_data['lang'] != 'en_GB' && $user_data['lang'] != 'en_gb') {
 				error('Locale for language "'.$user_data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
@@ -358,7 +405,7 @@ class ZBase {
 		setlocale(LC_NUMERIC, $defaultLocales);
 
 		// should be after locale initialization
-		require_once $this->getRootDir().'/include/translateDefines.inc.php';
+		require_once 'include/translateDefines.inc.php';
 	}
 
 	/**
@@ -379,40 +426,70 @@ class ZBase {
 	}
 
 	/**
-	 * Process request and generate response. Main entry for all processing.
+	 * Process request and generate response.
 	 *
-	 * @param CRouter $rourer
+	 * @param CRouter $router  CRouter class instance.
 	 */
 	private function processRequest(CRouter $router) {
-		$controller = $router->getController();
+		$action_name = $router->getAction();
+		$action_class = $router->getController();
 
-		/** @var \CController $controller */
-		$controller = new $controller();
-		$controller->setAction($router->getAction());
-		$response = $controller->run();
-
-		// Controller returned data
-		if ($response instanceof CControllerResponseData) {
-			// if no view defined we pass data directly to layout
-			if ($router->getView() === null || !$response->isViewEnabled()) {
-				$layout = new CView($router->getLayout(), $response->getData());
-				echo $layout->getOutput();
+		try {
+			if (!class_exists($action_class, true)) {
+				throw new Exception(_s('Class %1$s not found for action %2$s.', $action_class, $action_name));
 			}
-			else {
-				$view = new CView($router->getView(), $response->getData());
-				$data['page']['title'] = $response->getTitle();
-				$data['page']['file'] = $response->getFileName();
-				$data['controller']['action'] = $router->getAction();
-				$data['main_block'] = $view->getOutput();
-				$data['javascript']['files'] = $view->getAddedJS();
-				$data['javascript']['pre'] = $view->getIncludedJS();
-				$data['javascript']['post'] = $view->getPostJS();
-				$layout = new CView($router->getLayout(), $data);
-				echo $layout->getOutput();
+
+			$action = new $action_class();
+
+			if (!is_subclass_of($action, CAction::class)) {
+				throw new Exception(_s('Action class %1$s must extend %2$s class.', $action_class, CAction::class));
+			}
+
+			$action->setAction($action_name);
+
+			$modules = $this->module_manager->getModules();
+
+			$action_module = $this->module_manager->getModuleByActionName($action_name);
+
+			if ($action_module) {
+				$modules = array_replace([$action_module->getId() => $action_module], $modules);
+			}
+
+			foreach (array_reverse($modules) as $module) {
+				if (is_subclass_of($module, CModule::class)) {
+					CView::registerDirectory($module->getDir().'/views');
+					CPartial::registerDirectory($module->getDir().'/partials');
+				}
+			}
+
+			register_shutdown_function(function() use ($action) {
+				$this->module_manager->publishEvent($action, 'onTerminate');
+			});
+
+			$this->module_manager->publishEvent($action, 'onBeforeAction');
+
+			$action->run();
+
+			if (!($action instanceof CLegacyAction)) {
+				$this->processResponseFinal($router, $action);
 			}
 		}
-		// Controller returned redirect to another page
-		else if ($response instanceof CControllerResponseRedirect) {
+		catch (Exception $e) {
+			echo (new CView('general.warning', [
+				'header' => $e->getMessage(),
+				'messages' => [],
+				'theme' => ZBX_DEFAULT_THEME
+			]))->getOutput();
+
+			exit;
+		}
+	}
+
+	private function processResponseFinal(CRouter $router, CAction $action) {
+		$response = $action->getResponse();
+
+		// Controller returned redirect to another page?
+		if ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
 			if ($response->getMessageOk() !== null) {
 				CSession::setValue('messageOk', $response->getMessageOk());
@@ -430,8 +507,8 @@ class ZBase {
 
 			redirect($response->getLocation());
 		}
-		// Controller returned fatal error
-		else if ($response instanceof CControllerResponseFatal) {
+		// Controller returned fatal error?
+		elseif ($response instanceof CControllerResponseFatal) {
 			header('Content-Type: text/html; charset=UTF-8');
 
 			global $ZBX_MESSAGES;
@@ -443,8 +520,7 @@ class ZBase {
 			$response->addMessage('Controller: '.$router->getAction());
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {
-				// do not output SID
-				if ($key != 'sid') {
+				if ($key !== 'sid') {
 					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
@@ -452,6 +528,46 @@ class ZBase {
 
 			redirect('zabbix.php?action=system.warning');
 		}
+		// Action has layout?
+		if ($router->getLayout() !== null) {
+			if (!($response instanceof CControllerResponseData)) {
+				throw new Exception(_s('Unexpected response for action %1$s.', $router->getAction()));
+			}
+
+			$layout_data_defaults = [
+				'page' => [
+					'title' => $response->getTitle(),
+					'file' => $response->getFileName()
+				],
+				'controller' => [
+					'action' => $router->getAction()
+				],
+				'main_block' => '',
+				'javascript' => [
+					'files' => []
+				],
+				'web_layout_mode' => ZBX_LAYOUT_NORMAL
+			];
+
+			if ($router->getView() !== null && $response->isViewEnabled()) {
+				$view = new CView($router->getView(), $response->getData());
+
+				$layout_data = array_replace($layout_data_defaults, [
+					'main_block' => $view->getOutput(),
+					'javascript' => [
+						'files' => $view->getJsFiles()
+					],
+					'web_layout_mode' => $view->getLayoutMode()
+				]);
+			}
+			else {
+				$layout_data = array_replace_recursive($layout_data_defaults, $response->getData());
+			}
+
+			echo (new CView($router->getLayout(), $layout_data))->getOutput();
+		}
+
+		exit;
 	}
 
 	/**
@@ -459,13 +575,61 @@ class ZBase {
 	 */
 	private function setLayoutModeByUrl() {
 		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
-			CView::setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
+			CViewHelper::saveLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 		}
 		elseif (array_key_exists('fullscreen', $_GET)) {
-			CView::setLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
+			CViewHelper::saveLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
 		}
 
 		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
 		unset($_GET['fullscreen'], $_GET['kiosk']);
+	}
+
+	/**
+	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
+	 */
+	private function initMainMenu() {
+		$menu = new CMenu('menu.main', []);
+		$this->component_registry->register('menu.main', $menu);
+		include 'include/menu.inc.php';
+	}
+
+	/**
+	 * Initialize module manager and load all enabled modules.
+	 */
+	private function initModuleManager() {
+		$this->module_manager = new CModuleManager($this->rootDir.'/modules');
+
+		$db_modules = API::getApiService('module')->get([
+			'output' => ['id', 'relative_path', 'config'],
+			'filter' => ['status' => MODULE_STATUS_ENABLED],
+			'sortfield' => 'relative_path'
+		], false);
+
+		$modules_missing = [];
+
+		foreach ($db_modules as $db_module) {
+			$manifest = $this->module_manager->addModule($db_module['relative_path'], $db_module['id'],
+				$db_module['config']
+			);
+
+			if (!$manifest) {
+				$modules_missing[] = $db_module['relative_path'];
+			}
+		}
+
+		if ($modules_missing) {
+			error(_n('Cannot load module at: %1$s.', 'Cannot load modules at: %1$s.', implode(', ', $modules_missing),
+				count($modules_missing)
+			));
+		}
+
+		foreach ($this->module_manager->getNamespaces() as $namespace => $paths) {
+			$this->autoloader->addNamespace($namespace, $paths);
+		}
+
+		$this->module_manager->initModules();
+
+		array_map('error', $this->module_manager->getErrors());
 	}
 }

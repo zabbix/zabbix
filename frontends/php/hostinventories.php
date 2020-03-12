@@ -30,8 +30,7 @@ $page['scripts'] = ['layout.mode.js'];
 $hostId = getRequest('hostid', 0);
 
 if ($hostId > 0) {
-	CView::$has_web_layout_mode = true;
-	$page['web_layout_mode'] = CView::getLayoutMode();
+	$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -131,9 +130,7 @@ if ($hostId > 0) {
 	}
 
 	// view generation
-	$hostinventoriesView = new CView('inventory.host.view', $data);
-	$hostinventoriesView->render();
-	$hostinventoriesView->show();
+	echo (new CView('inventory.host.view', $data))->getOutput();
 }
 else {
 	$data = [
@@ -190,7 +187,7 @@ else {
 		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
 		if ($data['filterField'] !== '' && $data['filterFieldValue'] !== ''
 				&& !isset($possibleInventoryFields[$data['filterField']])) {
-			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filterField']));
+			error(_s('Impossible to filter by inventory field "%1$s", which does not exist.', $data['filterField']));
 		}
 		else {
 			// if we are filtering by field, this field is also required
@@ -276,9 +273,7 @@ else {
 		(new CUrl('hostinventories.php'))->setArgument('groupid', $data['pageFilter']->groupid)
 	);
 
-	$hostinventoriesView = new CView('inventory.host.list', $data);
-	$hostinventoriesView->render();
-	$hostinventoriesView->show();
+	echo (new CView('inventory.host.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -33,6 +33,9 @@ void	zbx_free_ipmi_handler(void);
 int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
 		unsigned char privilege, const char *username, const char *password, const char *sensor, char **value);
 
+int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
+		unsigned char privilege, const char *username, const char *password, char **value);
+
 int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len);
 
 int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned short port, signed char authtype,

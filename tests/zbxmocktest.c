@@ -137,7 +137,7 @@ char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /* the following TLS parameters are not used in server, they are defined for linking with tls.c */
 char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL;

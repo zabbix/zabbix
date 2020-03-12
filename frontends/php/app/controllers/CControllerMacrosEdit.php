@@ -51,13 +51,13 @@ class CControllerMacrosEdit extends CController {
 		}
 		else {
 			$data['macros'] = array_values(order_macros(API::UserMacro()->get([
-				'output' => ['globalmacroid', 'macro', 'value', 'description'],
+				'output' => ['globalmacroid', 'macro', 'value', 'type', 'description'],
 				'globalmacro' => true
 			]), 'macro'));
 		}
 
 		if (!$data['macros']) {
-			$data['macros'][] = ['macro' => '', 'value' => '', 'description' => ''];
+			$data['macros'][] = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
 		}
 
 		$response = new CControllerResponseData($data);

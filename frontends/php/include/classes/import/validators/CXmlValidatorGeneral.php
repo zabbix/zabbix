@@ -100,7 +100,6 @@ class CXmlValidatorGeneral {
 						));
 					}
 				}
-				unset($value);
 			}
 
 			// validation of the values type

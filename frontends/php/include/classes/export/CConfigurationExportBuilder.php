@@ -86,6 +86,11 @@ class CConfigurationExportBuilder {
 					continue;
 				}
 
+				if (array_key_exists('export', $val)) {
+					$store[$tag] = call_user_func($val['export'], $row);
+					continue;
+				}
+
 				if (($is_indexed_array || $is_array) && $has_data) {
 					$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
 					if ($is_required || $temp_store) {
@@ -94,22 +99,17 @@ class CConfigurationExportBuilder {
 					continue;
 				}
 
-				if (array_key_exists('export', $val)) {
-					$store[$tag] = call_user_func($val['export'], $row);
+				if (array_key_exists('in', $val)) {
+					if (!array_key_exists($value, $val['in'])) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
+							_s('unexpected constant value "%1$s"', $value)
+						));
+					}
+
+					$store[$tag] = $val['in'][$value];
 				}
 				else {
-					if (array_key_exists('in', $val)) {
-						if (!array_key_exists($value, $val['in'])) {
-							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
-								_s('unexpected constant value "%1$s"', $value)
-							));
-						}
-
-						$store[$tag] = $val['in'][$value];
-					}
-					else {
-						$store[$tag] = $value;
-					}
+					$store[$tag] = $value;
 				}
 			}
 
@@ -418,6 +418,17 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($media_types, ['name']);
 
 		foreach ($media_types as $media_type) {
+			$message_templates = [];
+
+			foreach ($media_type['message_templates'] as $message_template) {
+				$message_templates[] = [
+					'event_source' => $message_template['eventsource'],
+					'operation_mode' => $message_template['recovery'],
+					'subject' => $message_template['subject'],
+					'message' => $message_template['message']
+				];
+			}
+
 			$result[] = [
 				'name' => $media_type['name'],
 				'type' => $media_type['type'],
@@ -447,7 +458,8 @@ class CConfigurationExportBuilder {
 				'show_event_menu' => $media_type['show_event_menu'],
 				'event_menu_url' => $media_type['event_menu_url'],
 				'event_menu_name' => $media_type['event_menu_name'],
-				'description' => $media_type['description']
+				'description' => $media_type['description'],
+				'message_templates' => $message_templates
 			];
 		}
 
@@ -546,19 +558,11 @@ class CConfigurationExportBuilder {
 			$data = [
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
-				'snmp_community' => $discoveryRule['snmp_community'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
 				'key' => $discoveryRule['key_'],
 				'delay' => $discoveryRule['delay'],
 				'status' => $discoveryRule['status'],
 				'allowed_hosts' => $discoveryRule['trapper_hosts'],
-				'snmpv3_contextname' => $discoveryRule['snmpv3_contextname'],
-				'snmpv3_securityname' => $discoveryRule['snmpv3_securityname'],
-				'snmpv3_securitylevel' => $discoveryRule['snmpv3_securitylevel'],
-				'snmpv3_authprotocol' => $discoveryRule['snmpv3_authprotocol'],
-				'snmpv3_authpassphrase' => $discoveryRule['snmpv3_authpassphrase'],
-				'snmpv3_privprotocol' => $discoveryRule['snmpv3_privprotocol'],
-				'snmpv3_privpassphrase' => $discoveryRule['snmpv3_privpassphrase'],
 				'params' => $discoveryRule['params'],
 				'ipmi_sensor' => $discoveryRule['ipmi_sensor'],
 				'authtype' => $discoveryRule['authtype'],
@@ -566,7 +570,6 @@ class CConfigurationExportBuilder {
 				'password' => $discoveryRule['password'],
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
-				'port' => $discoveryRule['port'],
 				'filter' => $discoveryRule['filter'],
 				'lifetime' => $discoveryRule['lifetime'],
 				'description' => $discoveryRule['description'],
@@ -897,7 +900,7 @@ class CConfigurationExportBuilder {
 				'ip' => $interface['ip'],
 				'dns' => $interface['dns'],
 				'port' => $interface['port'],
-				'bulk' => $interface['bulk'],
+				'details' => $interface['details'],
 				'interface_ref' => $interface['interface_ref']
 			];
 		}
@@ -944,7 +947,6 @@ class CConfigurationExportBuilder {
 			$data = [
 				'name' => $item['name'],
 				'type' => $item['type'],
-				'snmp_community' => $item['snmp_community'],
 				'snmp_oid' => $item['snmp_oid'],
 				'key' => $item['key_'],
 				'delay' => $item['delay'],
@@ -954,13 +956,6 @@ class CConfigurationExportBuilder {
 				'value_type' => $item['value_type'],
 				'allowed_hosts' => $item['trapper_hosts'],
 				'units' => $item['units'],
-				'snmpv3_contextname' => $item['snmpv3_contextname'],
-				'snmpv3_securityname' => $item['snmpv3_securityname'],
-				'snmpv3_securitylevel' => $item['snmpv3_securitylevel'],
-				'snmpv3_authprotocol' => $item['snmpv3_authprotocol'],
-				'snmpv3_authpassphrase' => $item['snmpv3_authpassphrase'],
-				'snmpv3_privprotocol' => $item['snmpv3_privprotocol'],
-				'snmpv3_privpassphrase' => $item['snmpv3_privpassphrase'],
 				'params' => $item['params'],
 				'ipmi_sensor' => $item['ipmi_sensor'],
 				'authtype' => $item['authtype'],
@@ -968,7 +963,6 @@ class CConfigurationExportBuilder {
 				'password' => $item['password'],
 				'publickey' => $item['publickey'],
 				'privatekey' => $item['privatekey'],
-				'port' => $item['port'],
 				'description' => $item['description'],
 				'inventory_link' => $item['inventory_link'],
 				'applications' => $this->formatApplications($item['applications']),
@@ -1111,7 +1105,8 @@ class CConfigurationExportBuilder {
 		foreach ($macros as $macro) {
 			$result[] = [
 				'macro' => $macro['macro'],
-				'value' => $macro['value'],
+				'type' => $macro['type'],
+				'value' => array_key_exists('value', $macro) ? $macro['value'] : '',
 				'description' => $macro['description']
 			];
 		}

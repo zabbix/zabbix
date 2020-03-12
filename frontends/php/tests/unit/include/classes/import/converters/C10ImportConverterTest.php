@@ -564,7 +564,6 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_SNMPV1,
-							'interface_ref' => 'if0',
 							'description' => 'item1',
 							'name' => 'item1',
 							'valuemap' => [],
@@ -576,7 +575,6 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item2',
 							'type' => ITEM_TYPE_SNMPV2C,
-							'interface_ref' => 'if1',
 							'description' => 'item2',
 							'name' => 'item2',
 							'valuemap' => [],
@@ -588,7 +586,6 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item3',
 							'type' => ITEM_TYPE_SNMPV3,
-							'interface_ref' => 'if2',
 							'description' => 'item3',
 							'name' => 'item3',
 							'valuemap' => [],
@@ -600,7 +597,6 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item4',
 							'type' => ITEM_TYPE_SNMPV1,
-							'interface_ref' => 'if0',
 							'description' => 'item4',
 							'name' => 'item4',
 							'valuemap' => [],

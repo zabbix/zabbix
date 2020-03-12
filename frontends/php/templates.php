@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/include/ident.inc.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of templates');
 $page['file'] = 'templates.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js', 'macrovalue.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -52,6 +52,14 @@ $fields = [
 							],
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'mass_update_macros' => [T_ZBX_INT, O_OPT, null,
+								IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+								null
+							],
+	'macros_add'		=> [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros_update'		=> [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros_remove'		=> [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros_remove_all' => [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'visible'			=> [T_ZBX_STR, O_OPT, null,			null,	null],
 	'mass_action_tpls'	=> [T_ZBX_INT, O_OPT, null, IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]), null ],
 	'mass_clear_tpls'	=> [T_ZBX_STR, O_OPT, null,			null,	null],
@@ -130,12 +138,11 @@ foreach ($tags as $key => $tag) {
 $macros = cleanInheritedMacros(getRequest('macros', []));
 
 // Remove empty new macro lines.
-foreach ($macros as $idx => $macro) {
-	if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
-			&& $macro['description'] === '') {
-		unset($macros[$idx]);
-	}
-}
+$macros = array_filter($macros, function($macro) {
+	$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+
+	return (bool) array_filter(array_intersect_key($macro, $keys));
+});
 
 /*
  * Actions
@@ -185,6 +192,23 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		$_REQUEST['groups'] = $groups;
 	}
 
+	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
+		// Reset macro type and value.
+		$macros = array_map(function($value) {
+			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
+				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
+				: $value;
+		}, $macros);
+
+		$msg = [
+			'type' => 'error',
+			'message' => _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
+			'src' => ''
+		];
+
+		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
+	}
+
 	if (hasRequest('clone')) {
 		unset($_REQUEST['templateid']);
 	}
@@ -224,6 +248,15 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 			}
 
 			$tags = array_values($unique_tags);
+		}
+
+		if (array_key_exists('macros', $visible)) {
+			$mass_update_macros = getRequest('mass_update_macros', ZBX_ACTION_ADD);
+
+			if ($mass_update_macros == ZBX_ACTION_ADD || $mass_update_macros == ZBX_ACTION_REPLACE
+					|| $mass_update_macros == ZBX_ACTION_REMOVE) {
+				$options['selectMacros'] = ['hostmacroid', 'macro'];
+			}
 		}
 
 		$templates = API::Template()->get($options);
@@ -269,6 +302,9 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 			$new_values['description'] = getRequest('description');
 		}
 
+		$template_macros_add = [];
+		$template_macros_update = [];
+		$template_macros_remove = [];
 		foreach ($templates as &$template) {
 			if (array_key_exists('groups', $visible)) {
 				if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
@@ -348,6 +384,81 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 				}
 			}
 
+			if (array_key_exists('macros', $visible)) {
+				switch ($mass_update_macros) {
+					case ZBX_ACTION_ADD:
+						if ($macros) {
+							$update_existing = getRequest('macros_add', 0);
+
+							foreach ($macros as $macro) {
+								foreach ($template['macros'] as $template_macro) {
+									if ($macro['macro'] === $template_macro['macro']) {
+										if ($update_existing) {
+											$macro['hostmacroid'] = $template_macro['hostmacroid'];
+											$template_macros_update[] = $macro;
+										}
+
+										continue 2;
+									}
+								}
+
+								$macro['hostid'] = $template['templateid'];
+								$template_macros_add[] = $macro;
+							}
+						}
+						break;
+
+					case ZBX_ACTION_REPLACE: // In Macros its update.
+						if ($macros) {
+							$add_missing = getRequest('macros_update', 0);
+
+							foreach ($macros as $macro) {
+								foreach ($template['macros'] as $template_macro) {
+									if ($macro['macro'] === $template_macro['macro']) {
+										$macro['hostmacroid'] = $template_macro['hostmacroid'];
+										$template_macros_update[] = $macro;
+
+										continue 2;
+									}
+								}
+
+								if ($add_missing) {
+									$macro['hostid'] = $template['templateid'];
+									$template_macros_add[] = $macro;
+								}
+							}
+						}
+						break;
+
+					case ZBX_ACTION_REMOVE:
+						if ($macros) {
+							$except_selected = getRequest('macros_remove', 0);
+
+							$macro_names = array_column($macros, 'macro');
+
+							foreach ($template['macros'] as $template_macro) {
+								if ((!$except_selected && in_array($template_macro['macro'], $macro_names))
+										|| ($except_selected && !in_array($template_macro['macro'], $macro_names))) {
+									$template_macros_remove[] = $template_macro['hostmacroid'];
+								}
+							}
+						}
+						break;
+
+					case ZBX_ACTION_REMOVE_ALL:
+						if (!getRequest('macros_remove_all', 0)) {
+							throw new Exception();
+						}
+
+						$template['macros'] = [];
+						break;
+				}
+
+				if ($mass_update_macros != ZBX_ACTION_REMOVE_ALL) {
+					unset($template['macros']);
+				}
+			}
+
 			unset($template['parentTemplates']);
 
 			$template = $new_values + $template;
@@ -356,6 +467,28 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 
 		if (!API::Template()->update($templates)) {
 			throw new Exception();
+		}
+
+		/**
+		 * Macros must be updated separately, since calling API::UserMacro->replaceMacros() inside
+		 * API::Template->update() results in loss of secret macro values.
+		 */
+		if ($template_macros_remove) {
+			if (!API::UserMacro()->delete($template_macros_remove)) {
+				throw new Exception();
+			}
+		}
+
+		if ($template_macros_add) {
+			if (!API::UserMacro()->create($template_macros_add)) {
+				throw new Exception();
+			}
+		}
+
+		if ($template_macros_update) {
+			if (!API::UserMacro()->update($template_macros_update)) {
+				throw new Exception();
+			}
 		}
 
 		DBend(true);
@@ -648,6 +781,14 @@ if (hasRequest('templates') && (getRequest('action') === 'template.massupdatefor
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
 		'tags' => $tags,
+		'macros' => $macros,
+		'macros_checkbox' => [
+			ZBX_ACTION_ADD => getRequest('macros_add', '0'),
+			ZBX_ACTION_REPLACE => getRequest('macros_update', '0'),
+			ZBX_ACTION_REMOVE => getRequest('macros_remove', '0'),
+			ZBX_ACTION_REMOVE_ALL => getRequest('macros_remove_all', '0')
+		],
+		'macros_visible' => getRequest('mass_update_macros', ZBX_ACTION_ADD),
 		'description' => getRequest('description'),
 		'linked_templates' => getRequest('linked_templates', [])
 	];
@@ -666,6 +807,18 @@ if (hasRequest('templates') && (getRequest('action') === 'template.massupdatefor
 			'templateids' => $data['linked_templates']
 		]), ['templateid' => 'id'])
 		: [];
+
+	$data['groups'] = $data['groups']
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $data['groups'],
+			'editable' => true
+		]), ['groupid' => 'id'])
+		: [];
+
+	if (!$data['macros']) {
+		$data['macros'] = [['macro' => '', 'type' => ZBX_MACRO_TYPE_TEXT, 'value' => '', 'description' => '']];
+	}
 
 	$view = new CView('configuration.template.massupdate', $data);
 }
@@ -756,10 +909,12 @@ elseif (hasRequest('form')) {
 
 	// The empty inputs will not be shown if there are inherited macros, for example.
 	if (!$data['macros']) {
-		$macro = ['macro' => '', 'value' => '', 'description' => ''];
+		$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
+
 		if ($data['show_inherited_macros']) {
-			$macro['type'] = ZBX_PROPERTY_OWN;
+			$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 		}
+
 		$data['macros'][] = $macro;
 	}
 
@@ -1013,7 +1168,6 @@ else {
 	$view = new CView('configuration.template.list', $data);
 }
 
-$view->render();
-$view->show();
+echo $view->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

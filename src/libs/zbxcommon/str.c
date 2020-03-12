@@ -56,7 +56,7 @@ void	version(void)
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	printf("\n");
 	zbx_tls_version();
 #endif
@@ -1312,9 +1312,7 @@ const char	*zbx_agent_type_string(zbx_item_type_t item_type)
 	{
 		case ITEM_TYPE_ZABBIX:
 			return "Zabbix agent";
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
+		case ITEM_TYPE_SNMP:
 			return "SNMP agent";
 		case ITEM_TYPE_IPMI:
 			return "IPMI agent";

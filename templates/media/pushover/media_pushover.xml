@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2019-12-10T08:23:13Z</date>
+    <date>2020-02-20T14:29:11Z</date>
     <media_types>
         <media_type>
             <name>Pushover</name>
             <type>WEBHOOK</type>
             <parameters>
+                <parameter>
+                    <name>endpoint</name>
+                    <value>https://api.pushover.net/1/messages.json</value>
+                </parameter>
                 <parameter>
                     <name>token</name>
                     <value>&lt;PUSHOVER TOKEN HERE&gt;</value>
@@ -43,48 +47,95 @@
                     <name>triggerid</name>
                     <value>{TRIGGER.ID}</value>
                 </parameter>
+                <parameter>
+                    <name>retry</name>
+                    <value>60</value>
+                </parameter>
+                <parameter>
+                    <name>expire</name>
+                    <value>1200</value>
+                </parameter>
             </parameters>
             <max_sessions>0</max_sessions>
             <script>try {&#13;
-//	Zabbix.Log(127, 'Pushover webhook script value='+value);&#13;
+    var params = JSON.parse(value),&#13;
+        request = new CurlHttpRequest(),&#13;
+        data,&#13;
+        response;&#13;
 &#13;
-	params = JSON.parse(value),&#13;
-	req = new CurlHttpRequest(),&#13;
-	fields = {};&#13;
+    if (isNaN(params.priority) || params.priority &lt; -2 || params.priority &gt; 2) {&#13;
+        throw 'field &quot;priority&quot; should be -2..2';&#13;
+    }&#13;
 &#13;
-	req.AddHeader('Content-Type: application/json');&#13;
+    if (isNaN(params.triggerid)) {&#13;
+        throw 'field &quot;triggerid&quot; is not a number';&#13;
+    }&#13;
 &#13;
-	fields.token= params.token;&#13;
-	fields.user = params.user;&#13;
+    if (isNaN(params.eventid)) {&#13;
+        throw 'field &quot;eventid&quot; is not a number';&#13;
+    }&#13;
 &#13;
+    if (typeof params.message !== 'string' || params.message.trim() === '') {&#13;
+        throw 'field &quot;message&quot; cannot be empty';&#13;
+    }&#13;
 &#13;
-       /*&#13;
-       If a device name is not specified for a user, or the specified device name is no longer enabled/valid,&#13;
-       notifications will be sent to all active devices for that user to avoid losing messages.&#13;
-       Messages may be addressed to multiple specific devices by joining them with a comma (such as device=iphone,nexus5).&#13;
-       fields.device = params.device;&#13;
-       */&#13;
-	fields.title =  params.title;&#13;
-	fields.message =  params.message;&#13;
-        fields.url = params.url+&quot;/tr_events.php?triggerid=&quot;+params.triggerid+&quot;&amp;eventid=&quot;+params.eventid;&#13;
-        fields.url_title = params.url_title;&#13;
-        fields.priority = params.priority;&#13;
-	var resp = req.Post('https://api.pushover.net/1/messages.json',&#13;
-		JSON.stringify(fields)&#13;
-	);&#13;
+    data = {&#13;
+        token: params.token,&#13;
+        user: params.user,&#13;
+        title: params.title,&#13;
+        message: params.message,&#13;
+        url: params.url + '/tr_events.php?triggerid=' + params.triggerid + '&amp;eventid=' + params.eventid,&#13;
+        url_title: params.url_title,&#13;
+        priority: params.priority&#13;
+    };&#13;
 &#13;
-	if (req.Status() != 200) {&#13;
-		throw JSON.parse(resp).errors[0];&#13;
-	}&#13;
+    if (params.priority == 2) {&#13;
+        if (isNaN(params.retry) || params.retry &lt; 30) {&#13;
+            throw 'field &quot;retry&quot; should be a number with value of at least 30 if &quot;priority&quot; is set to 2';&#13;
+        }&#13;
 &#13;
-	resp = JSON.parse(resp);&#13;
-        return &quot;OK&quot;;&#13;
+        if (isNaN(params.expire) || params.expire &gt; 10800) {&#13;
+            throw 'field &quot;expire&quot; should be a number with value of at most 10800 if &quot;priority&quot; is set to 2';&#13;
+        }&#13;
 &#13;
-} catch (error) {&#13;
-	Zabbix.Log(127, 'Pushover notification failed : '+error);&#13;
-        throw 'Pushover notification failed : '+error;&#13;
+        data.retry = params.retry;&#13;
+        data.expire = params.expire;&#13;
+    }&#13;
+&#13;
+    data = JSON.stringify(data);&#13;
+    Zabbix.Log(4, '[ Pushover Webhook ] Sending request: ' + params.endpoint + '\n' + data);&#13;
+&#13;
+    request.AddHeader('Content-Type: application/json');&#13;
+    response = request.Post(params.endpoint, data);&#13;
+&#13;
+    Zabbix.Log(4, '[ Pushover Webhook ] Received response with status code ' + request.Status() + '\n' + response);&#13;
+&#13;
+    if (response !== null) {&#13;
+        try {&#13;
+            response = JSON.parse(response);&#13;
+        }&#13;
+        catch (error) {&#13;
+            Zabbix.Log(4, '[ Pushover Webhook ] Failed to parse response received from Pushover');&#13;
+            response = null;&#13;
+        }&#13;
+    }&#13;
+&#13;
+    if (request.Status() != 200 || response === null || typeof response !== 'object' || response.status !== 1) {&#13;
+        if (response !== null &amp;&amp; typeof response === 'object' &amp;&amp; typeof response.errors === 'object'&#13;
+                &amp;&amp; typeof response.errors[0] === 'string') {&#13;
+            throw response.errors[0];&#13;
+        }&#13;
+        else {&#13;
+            throw 'Unknown error. Check debug log for more information.';&#13;
+        }&#13;
+    }&#13;
+&#13;
+    return 'OK';&#13;
+}&#13;
+catch (error) {&#13;
+    Zabbix.Log(4, '[ Pushover Webhook ] Pushover notification failed: ' + error);&#13;
+    throw 'Pushover notification failed: ' + error;&#13;
 }</script>
-            <show_event_menu>NO</show_event_menu>
             <description>Please refer to setup guide here: https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/pushover&#13;
 &#13;
 Set token parameter with to your Pushover application key.&#13;

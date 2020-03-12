@@ -45,7 +45,7 @@ class CAction extends CApiService {
 			CONDITION_TYPE_DUPTIME, CONDITION_TYPE_DVALUE, CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK,
 			CONDITION_TYPE_PROXY, CONDITION_TYPE_DOBJECT
 		],
-		EVENT_SOURCE_AUTO_REGISTRATION => [
+		EVENT_SOURCE_AUTOREGISTRATION => [
 			CONDITION_TYPE_PROXY, CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_HOST_METADATA
 		],
 		EVENT_SOURCE_INTERNAL => [
@@ -598,12 +598,6 @@ class CAction extends CApiService {
 			if (isset($action['filter'])) {
 				$action['evaltype'] = $action['filter']['evaltype'];
 			}
-			$action += [
-				'r_shortdata' => ACTION_DEFAULT_SUBJ_RECOVERY,
-				'r_longdata' => ACTION_DEFAULT_MSG_RECOVERY,
-				'ack_shortdata' => ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-				'ack_longdata' => ACTION_DEFAULT_MSG_ACKNOWLEDGE
-			];
 
 			// Set default values for recovery operations and their messages.
 			if (array_key_exists('recovery_operations', $action)) {
@@ -614,16 +608,11 @@ class CAction extends CApiService {
 							? $operation['opmessage']
 							: [];
 
-						if (array_key_exists('default_msg', $message) && $message['default_msg'] == 1) {
-							$message['subject'] = $action['r_shortdata'];
-							$message['message'] = $action['r_longdata'];
-						}
-
 						$operation['opmessage'] = $message + [
-							'default_msg' => 0,
+							'default_msg' => 1,
 							'mediatypeid' => 0,
-							'subject' => ACTION_DEFAULT_SUBJ_RECOVERY,
-							'message' => ACTION_DEFAULT_MSG_RECOVERY
+							'subject' => '',
+							'message' => ''
 						];
 					}
 				}
@@ -639,16 +628,11 @@ class CAction extends CApiService {
 							? $operation['opmessage']
 							: [];
 
-						if (array_key_exists('default_msg', $message) && $message['default_msg'] == 1) {
-							$message['subject'] = $action['ack_shortdata'];
-							$message['message'] = $action['ack_longdata'];
-						}
-
 						$operation['opmessage'] = $message + [
-							'default_msg'	=> 0,
-							'mediatypeid'	=> 0,
-							'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-							'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+							'default_msg' => 1,
+							'mediatypeid' => 0,
+							'subject' => '',
+							'message' => ''
 						];
 					}
 				}
@@ -890,23 +874,12 @@ class CAction extends CApiService {
 					if (!array_key_exists('operationid', $ack_operation)) {
 						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$opmessage += [
-								'default_msg'	=> 0,
-								'mediatypeid'	=> 0,
-								'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-								'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+							$ack_operation['opmessage'] += [
+								'default_msg' => 1,
+								'mediatypeid' => 0,
+								'subject' => '',
+								'message' => ''
 							];
-
-							if ($opmessage['default_msg'] == 1) {
-								$opmessage['subject'] = array_key_exists('ack_shortdata', $action)
-									? $action['ack_shortdata']
-									: $db_action['ack_shortdata'];
-								$opmessage['message'] = array_key_exists('ack_longdata', $action)
-									? $action['ack_longdata']
-									: $db_action['ack_longdata'];
-							}
-
-							$ack_operation['opmessage'] = $opmessage;
 						}
 
 						$operations_to_create[] = $ack_operation;
@@ -917,22 +890,18 @@ class CAction extends CApiService {
 							$db_opmessage = array_key_exists('opmessage', $db_ack_operations[$ack_operation['operationid']])
 								? $db_ack_operations[$ack_operation['operationid']]['opmessage']
 								: [
-									'default_msg'	=> 0,
-									'mediatypeid'	=> 0,
-									'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
-									'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+									'default_msg' => 1,
+									'mediatypeid' => 0,
+									'subject' => '',
+									'message' => ''
 								];
 							$default_msg = array_key_exists('default_msg', $opmessage)
 								? $opmessage['default_msg']
 								: $db_opmessage['default_msg'];
 
 							if ($default_msg == 1) {
-								$opmessage['subject'] = array_key_exists('ack_shortdata', $action)
-									? $action['ack_shortdata']
-									: $db_action['ack_shortdata'];
-								$opmessage['message'] = array_key_exists('ack_longdata', $action)
-									? $action['ack_longdata']
-									: $db_action['ack_longdata'];
+								$opmessage['subject'] = '';
+								$opmessage['message'] = '';
 								$ack_operation['opmessage'] = $opmessage;
 							}
 						}
@@ -1684,7 +1653,7 @@ class CAction extends CApiService {
 					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
 					OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY
 				],
-				EVENT_SOURCE_AUTO_REGISTRATION => [
+				EVENT_SOURCE_AUTOREGISTRATION => [
 					OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_GROUP_ADD,
 					OPERATION_TYPE_GROUP_REMOVE, OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE,
 					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
@@ -1805,7 +1774,7 @@ class CAction extends CApiService {
 						case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 							if (!isset($operation['opcommand']['execute_on'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No execution target specified for action operation command "%s".',
+									_s('No execution target specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
 									)
 								);
@@ -1815,7 +1784,7 @@ class CAction extends CApiService {
 							if (!isset($operation['opcommand']['authtype'])
 									|| zbx_empty($operation['opcommand']['authtype'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication type specified for action operation command "%s".',
+									_s('No authentication type specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
 									)
 								);
@@ -1825,7 +1794,7 @@ class CAction extends CApiService {
 									|| !is_string($operation['opcommand']['username'])
 									|| $operation['opcommand']['username'] == '') {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication user name specified for action operation command "%s".',
+									_s('No authentication user name specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
 									)
 								);
@@ -1835,7 +1804,7 @@ class CAction extends CApiService {
 								if (!isset($operation['opcommand']['publickey'])
 										|| zbx_empty($operation['opcommand']['publickey'])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('No public key file specified for action operation command "%s".',
+										_s('No public key file specified for action operation command "%1$s".',
 											$operation['opcommand']['command']
 										)
 									);
@@ -1843,7 +1812,7 @@ class CAction extends CApiService {
 								if (!isset($operation['opcommand']['privatekey'])
 										|| zbx_empty($operation['opcommand']['privatekey'])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('No private key file specified for action operation command "%s".',
+										_s('No private key file specified for action operation command "%1$s".',
 											$operation['opcommand']['command']
 										)
 									);
@@ -1860,7 +1829,7 @@ class CAction extends CApiService {
 									|| !is_string($operation['opcommand']['username'])
 									|| $operation['opcommand']['username'] == '') {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication user name specified for action operation command "%s".',
+									_s('No authentication user name specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
 									)
 								);
@@ -1892,7 +1861,7 @@ class CAction extends CApiService {
 						if (zbx_ctype_digit($operation['opcommand']['port'])) {
 							if ($operation['opcommand']['port'] > 65535 || $operation['opcommand']['port'] < 1) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect action operation port "%s".', $operation['opcommand']['port'])
+									_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
 								);
 							}
 						}
@@ -1901,7 +1870,7 @@ class CAction extends CApiService {
 
 							if ($user_macro_parser->parse($operation['opcommand']['port']) != CParser::PARSE_SUCCESS) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect action operation port "%s".', $operation['opcommand']['port'])
+									_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
 								);
 							}
 						}
@@ -1934,15 +1903,17 @@ class CAction extends CApiService {
 					if (!$groupids && !$hostids && $withoutCurrent) {
 						if ($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('You did not specify targets for action operation global script "%s".',
+								_s('You did not specify targets for action operation global script "%1$s".',
 									$scripts[$operation['opcommand']['scriptid']]['name']
-							));
+								)
+							);
 						}
 						else {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('You did not specify targets for action operation command "%s".',
+								_s('You did not specify targets for action operation command "%1$s".',
 									$operation['opcommand']['command']
-							));
+								)
+							);
 						}
 					}
 

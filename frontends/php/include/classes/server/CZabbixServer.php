@@ -171,6 +171,28 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Request server to test item.
+	 *
+	 * @param array  $data    Array of item properties to test.
+	 * @param string $sid     User session ID.
+	 *
+	 * @return array
+	 */
+	public function testItem(array $data, $sid) {
+		/*
+		 * Timeout for 'item.test' request is increased because since message can be forwarded from server to proxy and
+		 * later to agent, it might take more time due network latency.
+		 */
+		$this->timeout = 60;
+
+		return $this->request([
+			'request' => 'item.test',
+			'data' => $data,
+			'sid' => $sid
+		]);
+	}
+
+	/**
 	 * Retrieve item queue information.
 	 *
 	 * Possible $type values:
@@ -346,7 +368,7 @@ class CZabbixServer {
 		stream_set_timeout($this->socket, $this->timeout);
 
 		// Send the command.
-		$json = CJs::encodeJson($params);
+		$json = json_encode($params);
 		if (fwrite($this->socket, ZBX_TCP_HEADER.pack('V', strlen($json))."\x00\x00\x00\x00".$json) === false) {
 			$this->error = _s('Cannot send command, check connection with Zabbix server "%1$s".', $this->host);
 			return false;
@@ -419,7 +441,7 @@ class CZabbixServer {
 			return false;
 		}
 
-		$response = CJs::decodeJson(substr($response, ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN));
+		$response = json_decode(substr($response, ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN), true);
 
 		if (!$response || !$this->normalizeResponse($response)) {
 			$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
@@ -434,12 +456,11 @@ class CZabbixServer {
 
 			return array_key_exists('data', $response) ? $response['data'] : true;
 		}
-		// An error on the server side occurred.
-		else {
-			$this->error = $response['info'];
 
-			return false;
-		}
+		// An error on the server side occurred.
+		$this->error = $response['info'];
+
+		return false;
 	}
 
 	/**
@@ -457,19 +478,19 @@ class CZabbixServer {
 			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, $this->timeout)) {
 				switch ($errorMsg) {
 					case 'Connection refused':
-						$dErrorMsg = _s("Connection to Zabbix server \"%s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
 						break;
 
 					case 'No route to host':
-						$dErrorMsg = _s("Zabbix server \"%s\" can not be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $this->host);
+						$dErrorMsg = _s("Zabbix server \"%1\$s\" can not be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $this->host);
 						break;
 
 					case 'Connection timed out':
-						$dErrorMsg = _s("Connection to Zabbix server \"%s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $this->host);
 						break;
 
 					default:
-						$dErrorMsg = _s("Connection to Zabbix server \"%s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
 				}
 
 				$this->error = $dErrorMsg.$errorMsg;

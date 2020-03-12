@@ -19,7 +19,11 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
+
 <script type="text/x-jquery-tmpl" id="groupPrototypeRow">
 	<tr class="form_row">
 		<td>
@@ -58,7 +62,7 @@
 			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
 		<?php endif ?>
 		<?php foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype): ?>
-			addGroupPrototypeRow(<?= CJs::encodeJson([
+			addGroupPrototypeRow(<?= json_encode([
 				'name' => $groupPrototype['name'],
 				'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
 			]) ?>);

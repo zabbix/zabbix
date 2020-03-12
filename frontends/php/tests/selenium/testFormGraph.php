@@ -921,7 +921,8 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']//select[@name='hostid']"));
+			COverlayDialogElement::find()->one()->waitUntilReady();
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]//select[@name='hostid']"));
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
@@ -936,7 +937,8 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']//select[@name='hostid']"));
+			COverlayDialogElement::find()->one()->waitUntilReady();
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]//select[@name='hostid']"));
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
 			$this->zbxTestClickLinkTextWait($this->itemSimple);

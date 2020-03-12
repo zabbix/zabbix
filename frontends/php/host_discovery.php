@@ -62,11 +62,10 @@ $fields = [
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null],
 	'type' =>					[T_ZBX_INT, O_OPT, null,
-									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-										ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3,
+									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
 									]),
 									'isset({add}) || isset({update})'
 								],
@@ -95,49 +94,12 @@ $fields = [
 									),
 									getParamFieldLabelByType(getRequest('type', 0))
 								],
-	'snmp_community' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-									'(isset({add}) || isset({update})) && isset({type})'.
-										' && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C, 'type'),
-									_('SNMP community')
-								],
 	'snmp_oid' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 									'(isset({add}) || isset({update})) && isset({type})'.
-										' && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3, 'type'),
+										' && {type} == '.ITEM_TYPE_SNMP,
 									_('SNMP OID')
 								],
-	'port' =>					[T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535),
-									'(isset({add}) || isset({update})) && isset({type})'.
-										' && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3, 'type'),
-									_('Port')
-								],
-	'snmpv3_contextname' =>		[T_ZBX_STR, O_OPT, null,	null,
-									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3
-								],
-	'snmpv3_securitylevel' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
-									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3
-								],
-	'snmpv3_securityname' =>	[T_ZBX_STR, O_OPT, null,	null,
-									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3
-								],
-	'snmpv3_authprotocol' =>	[T_ZBX_INT, O_OPT, null, IN(ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA),
-									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.
-										' && ({snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
-										' || {snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.')'
-								],
-	'snmpv3_authpassphrase' =>	[T_ZBX_STR, O_OPT, null, null,
-									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.
-										' && ({snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
-										' || {snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.')'
-								],
-	'snmpv3_privprotocol' =>	[T_ZBX_INT, O_OPT, null, IN(ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES),
-									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.
-										' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
-								],
-	'snmpv3_privpassphrase' =>	[T_ZBX_STR, O_OPT, null, null,
-									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.
-										' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
-								],
-	'ipmi_sensor' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,
+	'ipmi_sensor' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM, null,
 									'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_IPMI,
 									_('IPMI sensor')
 								],
@@ -415,17 +377,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'delay' => $delay,
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
 			'type' => getRequest('type'),
-			'snmp_community' => getRequest('snmp_community'),
 			'snmp_oid' => getRequest('snmp_oid'),
 			'trapper_hosts' => getRequest('trapper_hosts'),
-			'port' => getRequest('port'),
-			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
-			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
-			'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
-			'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
-			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
-			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
-			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
 			'authtype' => getRequest('authtype'),
 			'username' => getRequest('username'),
 			'password' => getRequest('password'),
@@ -515,15 +468,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if (hasRequest('update')) {
 			DBstart();
-
-			// unset snmpv3 fields
-			if ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-				$newItem['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
-				$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-			}
-			elseif ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-				$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-			}
 
 			// unset unchanged values
 			$newItem = CArrayHelper::unsetEqualValues($newItem, $item, ['itemid']);
@@ -691,7 +635,7 @@ if (hasRequest('form')) {
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['host'] = $host;
-	$data['preprocessing_test_type'] = CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_LLD;
+	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
 
 	if (!hasRequest('form_refresh')) {
@@ -731,9 +675,7 @@ if (hasRequest('form')) {
 
 	// render view
 	if (!$has_errors) {
-		$itemView = new CView('configuration.host.discovery.edit', $data);
-		$itemView->render();
-		$itemView->show();
+		echo (new CView('configuration.host.discovery.edit', $data))->getOutput();
 	}
 }
 else {
@@ -803,9 +745,7 @@ else {
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 
 	// render view
-	$discoveryView = new CView('configuration.host.discovery.list', $data);
-	$discoveryView->render();
-	$discoveryView->show();
+	echo (new CView('configuration.host.discovery.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

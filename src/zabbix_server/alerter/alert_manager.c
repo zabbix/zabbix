@@ -1408,8 +1408,8 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, pstart, pend - pstart);
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, &db_alert, NULL, &param,
-					MACRO_TYPE_ALERT, NULL, 0);
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, &db_alert, NULL,
+					&param, MACRO_TYPE_ALERT, NULL, 0);
 
 			param_esc = zbx_dyn_escape_shell_single_quote(param);
 			zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
@@ -1963,6 +1963,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 	if (FAIL == am_init(&manager, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize alert manager: %s", error);
@@ -1976,8 +1978,6 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	time_stat = zbx_time();
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
-
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	while (ZBX_IS_RUNNING())
 	{

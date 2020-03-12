@@ -201,6 +201,7 @@ zbx_key_access_rule_type_t;
 
 void	init_metrics(void);
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
+int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	free_metrics(void);
 
 void	init_key_access_rules(void);
@@ -318,13 +319,20 @@ MODE_FUNCTION;
 
 typedef struct
 {
-	char		fsname[MAX_STRING_LEN];
-	char		fstype[MAX_STRING_LEN];
 	zbx_uint64_t	total;
 	zbx_uint64_t	not_used;
 	zbx_uint64_t	used;
 	double		pfree;
 	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
 }
 zbx_mpoint_t;
 
@@ -335,6 +343,8 @@ zbx_mpoint_t;
 #define ZBX_SYSINFO_TAG_FSNAME			"fsname"
 #define ZBX_SYSINFO_TAG_FSTYPE			"fstype"
 #define ZBX_SYSINFO_TAG_FSDRIVETYPE		"fsdrivetype"
+#define ZBX_SYSINFO_TAG_BYTES			"bytes"
+#define ZBX_SYSINFO_TAG_INODES			"inodes"
 #define ZBX_SYSINFO_TAG_TOTAL			"total"
 #define ZBX_SYSINFO_TAG_FREE			"free"
 #define ZBX_SYSINFO_TAG_USED			"used"

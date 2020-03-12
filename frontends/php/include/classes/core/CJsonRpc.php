@@ -23,8 +23,6 @@ class CJsonRpc {
 
 	const VERSION = '2.0';
 
-	public $json;
-
 	/**
 	 * API client to use for making requests.
 	 *
@@ -47,12 +45,11 @@ class CJsonRpc {
 	public function __construct(CApiClient $apiClient, $data) {
 		$this->apiClient = $apiClient;
 
-		$this->json = new CJson();
 		$this->initErrors();
 
 		$this->_error = false;
 		$this->_response = [];
-		$this->_jsonDecoded = $this->json->decode($data, true);
+		$this->_jsonDecoded = json_decode($data, true);
 	}
 
 	/**
@@ -61,14 +58,14 @@ class CJsonRpc {
 	 * @return string JSON encoded value
 	 */
 	public function execute() {
-		if ($this->json->hasError()) {
+		if (json_last_error()) {
 			$this->jsonError(null, '-32700', null, null, true);
-			return $this->json->encode($this->_response[0], [], false, false);
+			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
 		}
 
-		if (!is_array($this->_jsonDecoded) || $this->_jsonDecoded == []) {
+		if (!is_array($this->_jsonDecoded) || $this->_jsonDecoded === []) {
 			$this->jsonError(null, '-32600', null, null, true);
-			return $this->json->encode($this->_response[0], [], false, false);
+			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
 		}
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
@@ -94,30 +91,36 @@ class CJsonRpc {
 		if (is_array($this->_jsonDecoded)
 				&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)) {
 			// Return response as encoded batch if $this->_jsonDecoded is associative array.
-			return $this->json->encode($this->_response, [], false, false);
+			return json_encode($this->_response, JSON_UNESCAPED_SLASHES);
 		}
 
-		return $this->json->encode($this->_response[0], [], false, false);
+		return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
 	}
 
 	public function validate($call) {
 		if (!isset($call['jsonrpc'])) {
 			$this->jsonError($call['id'], '-32600', _('JSON-rpc version is not specified.'), null, true);
+
 			return false;
 		}
 
 		if ($call['jsonrpc'] != self::VERSION) {
-			$this->jsonError($call['id'], '-32600', _s('Expecting JSON-rpc version 2.0, "%s" is given.', $call['jsonrpc']), null, true);
+			$this->jsonError($call['id'], '-32600',
+				_s('Expecting JSON-rpc version 2.0, "%1$s" is given.', $call['jsonrpc']), null, true
+			);
+
 			return false;
 		}
 
 		if (!isset($call['method'])) {
 			$this->jsonError($call['id'], '-32600', _('JSON-rpc method is not defined.'));
+
 			return false;
 		}
 
 		if (isset($call['params']) && !is_array($call['params'])) {
 			$this->jsonError($call['id'], '-32602', _('JSON-rpc params is not an Array.'));
+
 			return false;
 		}
 
@@ -155,7 +158,7 @@ class CJsonRpc {
 		$this->_error = true;
 
 		if (!isset($this->_error_list[$errno])) {
-			$data = _s('JSON-rpc error generation failed. No such error "%s".', $errno);
+			$data = _s('JSON-rpc error generation failed. No such error "%1$s".', $errno);
 			$errno = '-32400';
 		}
 

@@ -1,3 +1,29 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
 <script type="text/x-jquery-tmpl" id="delayFlexRow">
 	<tr class="form_row">
 		<td>
@@ -57,12 +83,8 @@ if (!empty($this->data['interfaces'])) {
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_ZABBIX, 'interfaceid');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'interface_row');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'interfaceid');
+	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMP, 'interface_row');
+	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMP, 'interfaceid');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_EXTERNAL, 'interface_row');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_EXTERNAL, 'interfaceid');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_IPMI, 'interface_row');
@@ -82,28 +104,8 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'row_username
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'row_password');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'snmp_oid');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'snmp_oid');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmp_oid');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'row_snmp_oid');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'row_snmp_oid');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'row_snmp_oid');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'snmp_community');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'snmp_community');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'row_snmp_community');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'row_snmp_community');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmpv3_contextname');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'row_snmpv3_contextname');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmpv3_securityname');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmpv3_securitylevel');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'row_snmpv3_securitylevel');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'port');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'port');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'port');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'row_port');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'row_port');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'row_port');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMP, 'snmp_oid');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMP, 'row_snmp_oid');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_IPMI, 'ipmi_sensor');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_IPMI, 'row_ipmi_sensor');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'authtype');
@@ -198,20 +200,6 @@ foreach ([ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE] as $type) {
 	zbx_subarray_push($this->data['typeDisable'], $type, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT], 'value_type');
 }
 
-$this->data['securityLevelVisibility'] = [];
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'snmpv3_authprotocol');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'row_snmpv3_authprotocol');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'snmpv3_authpassphrase');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'row_snmpv3_authpassphrase');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_authprotocol');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_authprotocol');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_authpassphrase');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_authpassphrase');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_privprotocol');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_privprotocol');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_privpassphrase');
-zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_privpassphrase');
-
 $this->data['authTypeVisibility'] = [];
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
@@ -221,12 +209,25 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 ?>
 <script type="text/javascript">
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == <?php echo CJs::encodeJson(ITEM_AUTHTYPE_PUBLICKEY); ?>
-				&& jQuery('#type').val() == <?php echo CJs::encodeJson(ITEM_TYPE_SSH); ?>) {
-			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Key passphrase')); ?>);
+		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
+				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
+			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
 		}
 		else {
-			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Password')); ?>);
+			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
+		}
+	}
+
+	function updateItemTestBtn() {
+		var testable_item_types = <?= json_encode(CControllerPopupItemTest::getTestableItemTypes($this->data['hostid'])) ?>,
+			type = parseInt(jQuery('#type').val()),
+			key = jQuery('#key').val();
+
+		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
+			jQuery('#test_item').prop('disabled', true);
+		}
+		else {
+			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
 		}
 	}
 
@@ -248,11 +249,6 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				HTTPTEST_AUTH_KERBEROS => ['http_username_row', 'http_password_row']
 			], true) ?>);
 		}
-		<?php
-		if (!empty($this->data['securityLevelVisibility'])) { ?>
-			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
-				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
-		<?php } ?>
 
 		if ($('#allow_traps').length) {
 			new CViewSwitcher('allow_traps', 'change', <?= zbx_jsvalue([
@@ -260,21 +256,35 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			], true) ?>);
 		}
 
+		$("#key").on('keyup change', updateItemTestBtn);
+
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
+				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
+
+				updateItemTestBtn();
 				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())]);
 
 				setAuthTypeLabel();
 			})
 			.trigger('change');
 
+		$('#test_item').on('click', function() {
+			var step_nums = [];
+			$('select[name^="preprocessing"][name$="[type]"]', $('#preprocessing')).each(function() {
+				var str = $(this).attr('name');
+				step_nums.push(str.substr(14, str.length - 21));
+			});
+
+			openItemTestDialog(step_nums, true, true, this, -2);
+		});
+
 		$('#authtype').bind('change', function() {
 			setAuthTypeLabel();
 		});
 
-		$('[data-action="parse_url"]').click(function() {
+		$('[data-action="parse_url"]').click(function(e) {
 			var url_node = $(this).siblings('[name="url"]'),
 				table = $('#query_fields_pairs').data('editableTable'),
 				url = parseUrlString(url_node.val())
@@ -297,19 +307,19 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			}
 			else {
 				overlayDialogue({
-					'title': <?= CJs::encodeJson(_('Error')); ?>,
+					'title': <?= json_encode(_('Error')); ?>,
 					'content': $('<span>').html(<?=
-						CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
+						json_encode(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
 					?>),
 					'buttons': [
 						{
-							title: <?= CJs::encodeJson(_('Ok')); ?>,
+							title: <?= json_encode(_('Ok')); ?>,
 							class: 'btn-alt',
 							focused: true,
 							action: function() {}
 						}
 					]
-				});
+				}, e.target);
 			}
 		});
 
