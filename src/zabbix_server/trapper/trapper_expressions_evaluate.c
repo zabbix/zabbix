@@ -30,13 +30,15 @@
 
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions, char **error)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSIONS_PARSE FUNC 333x");
+	
 	char			buffer[MAX_STRING_LEN], *step_params = NULL, *error_handler_params = NULL;
 	const char		*ptr;
 	zbx_user_t		user;
 	int			ret = FAIL;
-	struct zbx_json_parse	jp_data, jp_history, jp_steps, jp_step;
+	struct zbx_json_parse	jp_data, jp_expressions, jp_expression;
 	size_t			size;
-	zbx_timespec_t		ts_now;
+	//zbx_timespec_t		ts_now;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, buffer, sizeof(buffer), NULL) ||
 			SUCCEED != DBget_user_by_active_session(buffer, &user) || USER_TYPE_ZABBIX_ADMIN > user.type)
@@ -45,6 +47,9 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 		goto out;
 	}
 
+	//	zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSION ALL: ->%s<-",jp);
+
+	
 	if (FAIL == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		*error = zbx_strdup(NULL, "Missing data field.");
@@ -52,38 +57,73 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 	}
 
 	
-	zbx_timespec(&ts_now);
+	//zbx_timespec(&ts_now);
 
 	
 	size = 0;
 
-	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_EXPRESSIONS, &jp_steps))
+	/* if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_EXPRESSIONS, &jp_steps)) */
+	/* { */
+	/* 	*error = zbx_strdup(NULL, "Missing expressions field."); */
+	/* 	goto out; */
+	/* } */
+
+	char *expression;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSIONS: ->%s<-",jp_data);
+	zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSIONS TAG: ->%s<-",ZBX_PROTO_TAG_EXPRESSIONS);
+
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_EXPRESSIONS, &jp_expressions))
 	{
-		*error = zbx_strdup(NULL, "Missing preprocessing steps field.");
+		*error = zbx_strdup(NULL, "Missing expressions field.");
 		goto out;
 	}
-	
-	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_steps, ptr));)
+
+
+
+	for (ptr = NULL; NULL != (ptr = zbx_json_next_value(&jp_expressions, ptr, buffer, sizeof(buffer), NULL));)
 	{
+
+
+	  
+	  zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSIONS_PARSE NEXT 444: ->%s<-",buffer);
+	  zbx_vector_ptr_append(expressions, zbx_strdup(NULL,buffer));
+
+	/* 	zbx_free(expression); */
+
+
+	}
+
+
+	  
+	/* if (FAIL == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_EXPRESSIONS, buffer, sizeof(buffer), NULL)) */
+	/* { */
+	/* 	*error = zbx_strdup(NULL, "Missing expressions field."); */
+	/* 	goto out; */
+	/* } */
+
+
+	/* expression = zbx_strdup(NULL, buffer); */
+
+	/* zabbix_log(LOG_LEVEL_INFORMATION, "buffer ->%s<-", buffer); */
+	/* zabbix_log(LOG_LEVEL_INFORMATION, "expression ->%s<-", expression); */
+
+
+	
+	/* for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_steps, ptr));) */
+	/* { */
+
+	/*   zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSIONS_PARSE NEXT 444: ->%s<-",ptr); */
+
+	  
 	  //zbx_preproc_op_t	*step;
-	  char *expression;
 	  //unsigned char		step_type, error_handler;
 
-		if (FAIL == zbx_json_brackets_open(ptr, &jp_step))
-		{
-			*error = zbx_strdup(NULL, "Cannot parse preprocessing step.");
-			goto out;
-		}
 
-		if (FAIL == zbx_json_value_by_name(&jp_step, ZBX_PROTO_TAG_EXPRESSION, buffer, sizeof(buffer), NULL))
-		{
-			*error = zbx_strdup(NULL, "Missing preprocessing step type field.");
-			goto out;
-		}
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "buffer ->%s<-",buffer);
-		expression = zbx_strdup(NULL,buffer);
-		zabbix_log(LOG_LEVEL_INFORMATION, "expression ->%s<-",expression);
+	  
+
 		
 		/* if (FAIL == zbx_json_value_by_name(&jp_step, ZBX_PROTO_TAG_TYPE, buffer, sizeof(buffer), NULL)) */
 		/* { */
@@ -119,14 +159,20 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 		/* step->params = step_params; */
 		/* step->error_handler = error_handler; */
 		/* step->error_handler_params = error_handler_params; */
-		zbx_vector_ptr_append(expressions, expression);
 
-		zbx_free(expression);
+
+
+
+
+
+	/* zbx_vector_ptr_append(expressions, expression); */
+
+	/* 	zbx_free(expression); */
 		
 		
-		step_params = NULL;
-		error_handler_params = NULL;
-	}
+	/* 	step_params = NULL; */
+	/* 	error_handler_params = NULL; */
+	/* } */
 
 	ret = SUCCEED;
 	zbx_free(step_params);
@@ -146,6 +192,8 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 
 static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSIONS_EVALUATE RUN FUNC 222");
+
 	char			*evaluate_error = NULL;
 	int			ret = FAIL, i;
 	unsigned char		value_type;
@@ -187,6 +235,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 			double expr_result;
 			char			err[MAX_STRING_LEN];
 			zbx_vector_ptr_t	unknown_msgs;
+			zabbix_log(LOG_LEVEL_INFORMATION, "2222222222222, EXPR: ->%s<-",expressions.values[ii]);
 			if (SUCCEED != evaluate(&expr_result, expressions.values[ii], err, sizeof(err), &unknown_msgs))
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER");
@@ -288,6 +337,7 @@ out:
 
 int	zbx_trapper_expressions_evaluate(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSIONS_EVALUATE FUNC 111");
 	char		*error = NULL;
 	int		ret;
 	struct zbx_json	json;
