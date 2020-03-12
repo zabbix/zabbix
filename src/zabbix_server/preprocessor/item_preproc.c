@@ -491,19 +491,26 @@ static int	item_preproc_delta_speed(unsigned char value_type, zbx_variant_t *val
 
 /******************************************************************************
  *                                                                            *
- * Function: unescape                                                         *
+ * Function: unescapen                                                        *
  *                                                                            *
- * Purpose: unescapes string                                                  *
+ * Purpose: copy first n chars of null terminated string from in to out       *
+ *          unescape escaped characters during copying                        *
  *                                                                            *
  * Parameters: in  - [IN] the string to unescape                              *
  *             out - [OUT] the unescaped string                               *
  *                                                                            *
  ******************************************************************************/
-static void	unescape(const char *in, char *out)
+static void	unescapen(const char *in, char *out, int len)
 {
+	const char *first;
+
+	first = in;
+
 	for (; '\0' != *in; in++, out++)
 	{
-		if ('\\' == *in)
+		if (in > first + len - 1)
+			break;
+		if ('\\' == *in && in < first + len - 1)
 		{
 			switch (*(++in))
 			{
@@ -555,7 +562,7 @@ static int item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	unescape(params, params_raw);
+	unescapen(params, params_raw, strlen(params));
 
 	if (ZBX_PREPROC_LTRIM == op_type || ZBX_PREPROC_TRIM == op_type)
 		zbx_ltrim(value->data.str, params_raw);
@@ -2094,29 +2101,42 @@ out:
  ******************************************************************************/
 static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char	*new_string;
-	char	param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = "";
-	char	param2[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = "";
-	char	search_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = "";
-	char	replace_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = "";
+	int		param_1_len, param_2_len;
+	char		*new_string, *n_ptr;
+	char		search_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		replace_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-	if (0 == zbx_strlcpy(param1, params, strchr(params, '\n') - params + 1))
+	n_ptr = strchr(params, '\n');
+
+	if (NULL == n_ptr)
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "first parameter is mandatory");
+		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
+		return FAIL;
+	}
+	else if (NULL != strchr(n_ptr + 1, '\n'))
+	{
+		*errmsg = zbx_strdup(*errmsg, "more than two parameters provided");
 		return FAIL;
 	}
 
-	zbx_strlcpy(param2, strchr(params, '\n') + 1, strchr(params, '\0') - strchr(params, '\n'));
+	param_1_len = n_ptr - params;
+	if (0 == param_1_len)
+	{
+		*errmsg = zbx_strdup(*errmsg, "first parameter cannot be empty");
+		return FAIL;
+	}
 
-	unescape(param1, search_str);
-	unescape(param2, replace_str);
+	param_2_len = strchr(params, '\0') - n_ptr - 1;
+
+	unescapen(params, search_str, param_1_len);
+	unescapen(n_ptr + 1, replace_str, param_2_len);
 
 	if (SUCCEED != item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
 	new_string = string_replace(value->data.str, search_str, replace_str);
-	free(value->data.str);
-	value->data.str = new_string;
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, new_string);
 
 	return SUCCEED;
 }
