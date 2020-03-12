@@ -59,6 +59,10 @@
 							<a target="_blank" href="http://www.mozilla.org/firefox">Mozilla Firefox</a>
 						</li>
 						<li>
+							<a target="_blank" href="https://www.microsoft.com/en-us/edge"><div class="<?= ZBX_STYLE_BROWSER_LOGO_ED ?>"></div></a>
+							<a target="_blank" href="https://www.microsoft.com/en-us/edge">Microsoft Edge</a>
+						</li>
+						<li>
 							<a target="_blank" href="http://www.opera.com/download"><div class="<?= ZBX_STYLE_BROWSER_LOGO_OPERA ?>"></div></a>
 							<a target="_blank" href="http://www.opera.com/download">Opera browser</a>
 						</li>
@@ -72,11 +76,8 @@
 					</div>
 				</div>
 			</main>
-		</div>
 
-		<?php
-			$footer = makePageFooter(false);
-			echo $footer->toString();
-		?>
+			<?= makePageFooter(false); ?>
+		</div>
 	</body>
 </html>

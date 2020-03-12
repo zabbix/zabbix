@@ -4383,19 +4383,19 @@ span.is-loading {
   margin-bottom: 5px; }
 
 .browser-logo-chrome {
-  background-position: url(../img/browser-sprite.png) no-repeat 0 0; }
+  background-position: 0 0; }
 
 .browser-logo-ff {
-  background-position: url(../img/browser-sprite.png) no-repeat -66px 0; }
+  background-position: -66px 0; }
 
 .browser-logo-ed {
-  background-position: url(../img/browser-sprite.png) no-repeat 0 -66px; }
+  background-position: 0 -66px; }
 
 .browser-logo-opera {
-  background-position: url(../img/browser-sprite.png) no-repeat -66px -66px; }
+  background-position: -66px -66px; }
 
 .browser-logo-safari {
-  background-position: url(../img/browser-sprite.png) no-repeat 0 -132px; }
+  background-position: 0 -132px; }
 
 .browser-warning-container {
   margin-top: 5%;

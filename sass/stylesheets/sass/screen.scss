@@ -5656,11 +5656,11 @@ span {
 }
 
 $browser-logos: (
-	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
-	ff: url(../img/browser-sprite.png) no-repeat -66px 0,
-	ed: url(../img/browser-sprite.png) no-repeat 0 -66px,
-	opera: url(../img/browser-sprite.png) no-repeat -66px -66px,
-	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
+	chrome: 0 0,
+	ff: -66px 0,
+	ed: 0 -66px,
+	opera: -66px -66px,
+	safari: 0 -132px
 );
 
 %browser-logo-style {

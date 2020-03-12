@@ -41,8 +41,8 @@ $search = (new CForm('get', 'zabbix.php'))
 	->addItem([
 		(new CVar('action', 'search'))->removeId(),
 		(new CTextBox('search', getRequest('search', ''), false, 255))
-			->setAttribute('autocomplete', 'off')
 			->addClass(ZBX_STYLE_SEARCH)
+			->setAttribute('autocomplete', 'off')
 			->setAttribute('aria-label', _('type here to search')),
 		$search_icon
 	]);
