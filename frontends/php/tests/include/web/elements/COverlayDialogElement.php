@@ -58,16 +58,15 @@ class COverlayDialogElement extends CElement {
 			return $this;
 		}
 
-		$query = $this->query('xpath:./div[@class="overlay-dialogue-controls"]//select')->asDropdown()->waitUntilPresent();
+		$form = $this->query('xpath:./div[@class="overlay-dialogue-controls"]/form')->asForm()->waitUntilPresent()->one();
+		$fields = $form->getFields();
 
 		if (!is_array($context)) {
-			$query->one()->select($context);
+			$fields->first()->fill($context);
 			$this->waitUntilReady();
 
 			return $this;
 		}
-
-		$controls = $query->all()->indexByAttribute('name');
 
 		foreach ($context as $name => $value) {
 			if (is_array($value) && array_key_exists('name', $value) && array_key_exists('value', $value)) {
@@ -75,8 +74,8 @@ class COverlayDialogElement extends CElement {
 				$value = $value['value'];
 			}
 
-			if ($controls->exists($name)) {
-				$controls->get($name)->select($value);
+			if ($fields->exists($name)) {
+				$fields->get($name)->fill($value);
 				$this->waitUntilReady();
 			}
 			else {
