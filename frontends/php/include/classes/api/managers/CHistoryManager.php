@@ -1046,24 +1046,48 @@ class CHistoryManager {
 	private function deleteHistoryFromSql(array $items) {
 		global $DB;
 		$config = select_config();
-		$value_types = [];
 
-		foreach ($items as $itemid => $value_type) {
-			$value_types[$value_type][] = $itemid;
+		$value_count = array_count_values($items);
+		$value_trends = $value_count;
+		$tables = array_map('self::getTableName', array_keys($value_count));
+
+		if (array_key_exists(ITEM_VALUE_TYPE_UINT64, $value_count)) {
+			$tables[] = 'trends_uint' ;
+			unset($value_trends[ITEM_VALUE_TYPE_UINT64]);
+		}
+		if ($value_trends) {
+			$tables[] = 'trends' ;
 		}
 
-		foreach ($value_types as $value_type => $itemids) {
-			$trend_table = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
-			$history_table = self::getTableName($value_type);
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
+				&&	PostgresqlDbBackend::isCompressed($tables)) {
+			error(_('Some of the history for this item may be compressed, deletion is not available'));
+			return false;
+		}
 
-			if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
-					&&	PostgresqlDbBackend::isCompressed([$history_table, $trend_table])) {
-				error(_('Some of the history for this item may be compressed, deletion is not available'));
+		$tables = array_flip($tables);
+
+		if (array_key_exists('trends_uint', $tables)) {
+			If (!DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid',
+					array_keys(array_intersect($items, [ITEM_VALUE_TYPE_UINT64]))))) {
 				return false;
 			}
+			unset($tables['trends_uint']);
+		}
 
-			if (!DBexecute('DELETE FROM '.$trend_table.' WHERE '.dbConditionInt('itemid', $itemids))
-					|| !DBexecute('DELETE FROM '.$history_table.' WHERE '.dbConditionInt('itemid', $itemids))) {
+		if (array_key_exists('trends', $tables)) {
+			If (!DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid',
+					array_keys(array_intersect($items, array_keys($value_trends)))))) {
+				return false;
+			}
+			unset($tables['trends']);
+		}
+
+		$table_names = array_flip(self::getTableName());
+
+		foreach ($tables as $table => $i) {
+			If (!DBexecute('DELETE FROM '.$table.' WHERE '.dbConditionInt('itemid',
+					array_keys(array_intersect($items, [$table_names[$table]]))))) {
 				return false;
 			}
 		}
@@ -1223,7 +1247,7 @@ class CHistoryManager {
 	 *
 	 * @return string    table name
 	 */
-	public static function getTableName($value_type) {
+	public static function getTableName($value_type = null) {
 		$tables = [
 			ITEM_VALUE_TYPE_LOG => 'history_log',
 			ITEM_VALUE_TYPE_TEXT => 'history_text',
@@ -1232,7 +1256,7 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_UINT64 => 'history_uint'
 		];
 
-		return $tables[$value_type];
+		return ($value_type === null) ? $tables : $tables[$value_type];
 	}
 
 	/**
