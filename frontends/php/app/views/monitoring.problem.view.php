@@ -74,7 +74,7 @@ switch ($data['filter']['show']) {
 
 $screen = CScreenBuilder::getScreen($options);
 
-if ($data['action'] == 'problem.view') {
+if ($data['action'] === 'problem.view') {
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 		$this->addJsFile('class.calendar.js');
 	}

@@ -692,15 +692,16 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
-		var url = new Curl('zabbix.php', false);
-
-		url.setArgument('action', 'acknowledge.edit');
-		url.setArgument('eventids[]', options.eventid);
-		url.setArgument('backurl', options.acknowledge.backurl);
-
 		items[items.length] = {
 			label: t('Acknowledge'),
-			url: url.getUrl()
+			clickCallback: function() {
+				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
+
+				return PopUp('popup.acknowledge.edit', {
+					eventids: [options.eventid],
+					backurl: options.acknowledge.backurl
+				}, null, trigger_elmnt);
+			}
 		};
 	}
 

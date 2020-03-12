@@ -160,7 +160,7 @@ class CScreenHostTriggers extends CScreenBase {
 	 * @param array   $filter['hostids']       Host ids.
 	 * @param string  $filter['sortfield']     Sort field name.
 	 * @param string  $filter['sortorder']     Sort order.
-	 * @param string  $back_url                URL used by acknowledgment page.
+	 * @param string  $back_url                URL to return to.
 	 */
 	protected function getProblemsListTable($filter, $back_url) {
 		$config = select_config();
@@ -259,6 +259,18 @@ class CScreenHostTriggers extends CScreenBase {
 					->setArgument('filter_set', '1')
 			);
 
+			// Create acknowledge link.
+			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
+			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
+				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->onClick('return PopUp("popup.acknowledge.edit",'.
+					json_encode([
+						'eventids' => [$problem['eventid']],
+						'backurl' => $back_url
+					]).', null, this);'
+				);
+
 			$table->addRow([
 				$host_name,
 				(new CCol([
@@ -270,15 +282,7 @@ class CScreenHostTriggers extends CScreenBase {
 				$clock,
 				zbx_date2age($problem['clock']),
 				makeInformationList($info_icons),
-				(new CLink($problem['acknowledged'] ? _('Yes') : _('No'),
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'acknowledge.edit')
-						->setArgument('eventids', [$problem['eventid']])
-						->setArgument('backurl', $back_url)
-						->getUrl())
-					)
-					->addClass($problem['acknowledged'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-					->addClass(ZBX_STYLE_LINK_ALT),
+				$problem_update_link,
 				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'],
 					$config
 				)

@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerAcknowledgeEdit extends CController {
+class CControllerPopupAcknowledgeEdit extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -60,7 +60,15 @@ class CControllerAcknowledgeEdit extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$output = [];
+
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -177,9 +185,14 @@ class CControllerAcknowledgeEdit extends CController {
 			'objectids' => $triggerids
 		]);
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Update problem'));
-		$this->setResponse($response);
+		$output = [
+			'title' => _('Update problem'),
+			'errors' => hasErrorMesssages() ? getMessages() : null,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		] + $data;
+
+		$this->setResponse(new CControllerResponseData($output));
 	}
 }
-

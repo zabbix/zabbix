@@ -109,7 +109,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 	$cell_clock = new CCol(new CLink($cell_clock, $url_details));
 
-	$is_acknowledged = $problem['acknowledged'] == EVENT_ACKNOWLEDGED;
+	$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	if ($show_recovery_data) {
 		if ($problem['r_eventid'] != 0) {
@@ -246,12 +246,16 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		];
 	}
 
-	// Create acknowledge url.
-	$problem_update_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'acknowledge.edit')
-		->setArgument('eventids', [$problem['eventid']])
-		->setArgument('backurl', $backurl)
-		->getUrl();
+	// Create acknowledge link.
+	$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
+		->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+		->addClass(ZBX_STYLE_LINK_ALT)
+		->onClick('return PopUp("popup.acknowledge.edit",'.
+			json_encode([
+				'eventids' => [$problem['eventid']],
+				'backurl' => $backurl
+			]).', null, this);'
+		);
 
 	$table->addRow(array_merge($row, [
 		$show_recovery_data ? $cell_r_clock : null,
@@ -262,9 +266,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata : null,
 		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
-		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
-			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-			->addClass(ZBX_STYLE_LINK_ALT),
+		$problem_update_link,
 		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
 			$data['data']['users'], $data['config']
 		),

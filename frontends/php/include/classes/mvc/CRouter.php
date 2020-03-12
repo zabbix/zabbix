@@ -55,8 +55,6 @@ class CRouter {
 	 */
 	private $routes = [
 		// action						controller											layout					view
-		'acknowledge.create'			=> ['CControllerAcknowledgeCreate',					null,					null],
-		'acknowledge.edit'				=> ['CControllerAcknowledgeEdit',					'layout.htmlpage',		'monitoring.acknowledge.edit'],
 		'auditlog.list'					=> ['CControllerAuditLogList',						'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'			=> ['CControllerAuthenticationEdit',				'layout.htmlpage',		'administration.authentication.edit'],
 		'authentication.update'			=> ['CControllerAuthenticationUpdate',				null,					null],
@@ -124,6 +122,8 @@ class CRouter {
 		'notifications.get'				=> ['CControllerNotificationsGet',					'layout.json',			null],
 		'notifications.mute'			=> ['CControllerNotificationsMute',					'layout.json',			null],
 		'notifications.read'			=> ['CControllerNotificationsRead',					'layout.json',			null],
+		'popup.acknowledge.edit'		=> ['CControllerPopupAcknowledgeEdit',				'layout.json',			'popup.acknowledge.edit'],
+		'popup.acknowledge.create'		=> ['CControllerPopupAcknowledgeCreate',			'layout.json',			null],
 		'popup.action.acknowledge'		=> ['CControllerPopupActionAcknowledge',			'layout.json',			'popup.operation.common'],
 		'popup.action.operation'		=> ['CControllerPopupActionOperation',				'layout.json',			'popup.operation.common'],
 		'popup.action.recovery'			=> ['CControllerPopupActionRecovery',				'layout.json',			'popup.operation.common'],

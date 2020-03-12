@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerAcknowledgeCreate extends CController {
+class CControllerPopupAcknowledgeCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
@@ -39,18 +39,15 @@ class CControllerAcknowledgeCreate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			switch ($this->GetValidationError()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=acknowledge.edit');
-					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update event'));
-					$this->setResponse($response);
-					break;
+			$output = [];
 
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
 			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -120,19 +117,24 @@ class CControllerAcknowledgeCreate extends CController {
 			}
 		}
 
+		$output = [];
+
 		if ($result) {
-			$response = new CControllerResponseRedirect($this->getInput('backurl', 'zabbix.php?action=problem.view'));
-			$response->setMessageOk(_n('Event updated', 'Events updated', $updated_events_count));
+			CSession::setValue('messageOk', _n('Event updated', 'Events updated', $updated_events_count));
+			$output['redirect'] = $this->getInput('backurl', 'zabbix.php?action=problem.view');
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=acknowledge.edit');
-			$response->setFormData($this->getInputAll());
-			$response->setMessageError(($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE)
+			error(($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE)
 				? _('At least one update operation is mandatory')
 				: _n('Cannot update event', 'Cannot update events', $updated_events_count)
 			);
+
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
 		}
-		$this->setResponse($response);
+
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 
 	/**

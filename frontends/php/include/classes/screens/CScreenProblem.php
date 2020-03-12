@@ -834,6 +834,7 @@ class CScreenProblem extends CScreenBase {
 				->getUrl();
 
 			$form = (new CForm('post', 'zabbix.php'))
+				->setId('problem_form')
 				->setName('problem')
 				->cleanItems()
 				->addVar('backurl', $backurl);
@@ -959,11 +960,6 @@ class CScreenProblem extends CScreenBase {
 				$dependencies = getTriggerDependencies($data['triggers']);
 			}
 
-			// Create link to Problem update page.
-			$problem_update_url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'acknowledge.edit')
-				->setArgument('backurl', $backurl);
-
 			// Add problems to table.
 			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
@@ -1013,12 +1009,11 @@ class CScreenProblem extends CScreenBase {
 					$value_clock = $in_closing ? time() : $problem['clock'];
 				}
 
+				$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 				$cell_status = new CSpan($value_str);
 
 				// Add colors and blinking to span depending on configuration and trigger parameters.
-				addTriggerValueStyle($cell_status, $value, $value_clock,
-					$problem['acknowledged'] == EVENT_ACKNOWLEDGED
-				);
+				addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 
 				// Info.
 				$info_icons = [];
@@ -1131,11 +1126,15 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				// Create acknowledge link.
-				$problem_update_url->setArgument('eventids', [$problem['eventid']]);
-				$acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
-				$problem_update_link = (new CLink($acknowledged ? _('Yes') : _('No'), $problem_update_url->getUrl()))
-					->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-					->addClass(ZBX_STYLE_LINK_ALT);
+				$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
+					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->onClick('return PopUp("popup.acknowledge.edit",'.
+						json_encode([
+							'eventids' => [$problem['eventid']],
+							'backurl' => $backurl
+						]).', null, this);'
+					);
 
 				// Add table row.
 				$table->addRow(array_merge($row, [
@@ -1166,7 +1165,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$footer = new CActionButtonList('action', 'eventids', [
-				'acknowledge.edit' => ['name' => _('Mass update')]
+				'popup.acknowledge.edit' => ['name' => _('Mass update')]
 			], 'problem');
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
