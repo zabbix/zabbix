@@ -5046,13 +5046,8 @@ table.preprocessing-test-results .rel-container {
   .host-avail-widget td {
     height: 100%; } }
 .interface-container {
-  border-top: 1px solid #666666;
   margin-bottom: 5px;
-  padding: 0;
-  padding-top: 5px;
-  width: 752px; }
-  .interface-container:nth-of-type(2) {
-    border-top: 0; }
+  padding: 0; }
   .interface-container.interface-container-header {
     margin: 0;
     border: 0; }
@@ -5065,7 +5060,8 @@ table.preprocessing-test-results .rel-container {
     justify-content: start;
     align-items: stretch;
     margin-bottom: 5px;
-    width: 752px; }
+    width: fit-content;
+    width: -moz-fit-content; }
     .interface-container .interface-row.interface-row-header {
       margin: 0; }
     .interface-container .interface-row[data-type] .interface-cell-details {
@@ -5094,6 +5090,8 @@ table.preprocessing-test-results .rel-container {
       .interface-container .interface-row .interface-cell .table-forms-td-left,
       .interface-container .interface-row .interface-cell .table-forms-td-right {
         padding-bottom: 0; }
+  .interface-container.list-vertical-accordion {
+    margin-bottom: 0; }
 
 .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .list-accordion-item-body {
   display: none; }
@@ -5101,6 +5099,10 @@ table.preprocessing-test-results .rel-container {
   display: block; }
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
+
+.interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) .interface-row:nth-child(1) {
+  border-top: 1px solid #666666;
+  padding-top: 5px; }
 
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,

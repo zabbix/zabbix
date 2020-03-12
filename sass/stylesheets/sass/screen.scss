@@ -7656,16 +7656,8 @@ table.preprocessing-test-results {
 // HOST INTERFACES
 
 .interface-container {
-	border-top: 1px solid $form-border-color;
 	margin-bottom: 5px;
 	padding: 0;
-	padding-top: 5px;
-	width: 752px;
-
-	// Hide first border.
-	&:nth-of-type(2) {
-		border-top: 0;
-	}
 
 	&.interface-container-header {
 		margin: 0;
@@ -7683,7 +7675,8 @@ table.preprocessing-test-results {
 		justify-content: start;
 		align-items: stretch;
 		margin-bottom: 5px;
-		width: 752px;
+		width: fit-content;
+		width: -moz-fit-content;
 
 		&.interface-row-header {
 			margin: 0;
@@ -7733,6 +7726,10 @@ table.preprocessing-test-results {
 			}
 		}
 	}
+
+	&.list-vertical-accordion {
+		margin-bottom: 0;
+	}
 }
 
 // Host interface accordion for SNMP specific styles.
@@ -7761,4 +7758,9 @@ table.preprocessing-test-results {
 		display: inline-block;
 		@extend %btn-widget;
 	}
+}
+
+.interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) .interface-row:nth-child(1) {
+	border-top: 1px solid $form-border-color;
+	padding-top: 5px;
 }
