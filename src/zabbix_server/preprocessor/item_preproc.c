@@ -491,15 +491,15 @@ static int	item_preproc_delta_speed(unsigned char value_type, zbx_variant_t *val
 
 /******************************************************************************
  *                                                                            *
- * Function: unescape_trim_params                                             *
+ * Function: unescape                                                         *
  *                                                                            *
- * Purpose: unescapes string used for trim operation parameter                *
+ * Purpose: unescapes string                                                  *
  *                                                                            *
  * Parameters: in  - [IN] the string to unescape                              *
  *             out - [OUT] the unescaped string                               *
  *                                                                            *
  ******************************************************************************/
-static void	unescape_trim_params(const char *in, char *out)
+static void	unescape(const char *in, char *out)
 {
 	for (; '\0' != *in; in++, out++)
 	{
@@ -518,6 +518,9 @@ static void	unescape_trim_params(const char *in, char *out)
 					break;
 				case 't':
 					*out = '\t';
+					break;
+				case '\\':
+					*out = '\\';
 					break;
 				default:
 					*out = *(--in);
@@ -552,7 +555,7 @@ static int item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	unescape_trim_params(params, params_raw);
+	unescape(params, params_raw);
 
 	if (ZBX_PREPROC_LTRIM == op_type || ZBX_PREPROC_TRIM == op_type)
 		zbx_ltrim(value->data.str, params_raw);
@@ -2077,6 +2080,49 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_str_replace                                         *
+ *                                                                            *
+ * Purpose: replace substrings in string                                      *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char	*new_string;
+	char	param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = "";
+	char	param2[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = "";
+	char	search_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = "";
+	char	replace_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = "";
+
+	if (0 == zbx_strlcpy(param1, params, strchr(params, '\n') - params + 1))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "first parameter is mandatory");
+		return FAIL;
+	}
+
+	zbx_strlcpy(param2, strchr(params, '\n') + 1, strchr(params, '\0') - strchr(params, '\n'));
+
+	unescape(param1, search_str);
+	unescape(param2, replace_str);
+
+	if (SUCCEED != item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	new_string = string_replace(value->data.str, search_str, replace_str);
+	free(value->data.str);
+	value->data.str = new_string;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
@@ -2176,6 +2222,9 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			break;
 		case ZBX_PREPROC_CSV_TO_JSON:
 			ret = item_preproc_csv_to_json(value, op->params, error);
+			break;
+		case ZBX_PREPROC_STR_REPLACE:
+			ret = item_preproc_str_replace(value, op->params, error);
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "unknown preprocessing operation");
