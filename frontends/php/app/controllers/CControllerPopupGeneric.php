@@ -496,7 +496,11 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($host_options) {
-			$hosts = API::Host()->get(['output' => [], 'preservekeys' => true] + $host_options);
+			$hosts = API::Host()->get([
+				'output' => [],
+				'templated_hosts' => true,
+				'preservekeys' => true
+			] + $host_options);
 
 			if (!$hosts) {
 				return false;
@@ -835,7 +839,8 @@ class CControllerPopupGeneric extends CController {
 		// Construct API request.
 		$options = [
 			'editable' => $this->hasInput('writeonly'),
-			'preservekeys' => true
+			'preservekeys' => true,
+			'limit' => 100
 		];
 
 		$popups_support_templated_entries = ['applications', 'triggers', 'trigger_prototypes', 'graphs',
