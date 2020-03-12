@@ -79,7 +79,7 @@ type ContainerNetwork struct {
 
 // Container represents each container in the list returned by ListContainers.
 type Container struct {
-	ID         string
+	ID         string `json:"Id"`
 	Image      string
 	Command    string
 	Created    int64
@@ -111,7 +111,7 @@ type ContainerState struct {
 // Info contains response of Engine API:
 // GET "/info"
 type Info struct {
-	ID                 string
+	ID                 string `json:"Id"`
 	Containers         int
 	ContainersRunning  int
 	ContainersPaused   int
