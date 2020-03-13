@@ -153,13 +153,13 @@ int	zbx_double_compare(double a, double b);
 typedef enum
 {
 	ITEM_TYPE_ZABBIX = 0,
-	ITEM_TYPE_SNMPv1,
-	ITEM_TYPE_TRAPPER,
+/*	ITEM_TYPE_SNMPv1,*/
+	ITEM_TYPE_TRAPPER = 2,
 	ITEM_TYPE_SIMPLE,
-	ITEM_TYPE_SNMPv2c,
-	ITEM_TYPE_INTERNAL,
-	ITEM_TYPE_SNMPv3,
-	ITEM_TYPE_ZABBIX_ACTIVE,
+/*	ITEM_TYPE_SNMPv2c,*/
+	ITEM_TYPE_INTERNAL = 5,
+/*	ITEM_TYPE_SNMPv3,*/
+	ITEM_TYPE_ZABBIX_ACTIVE = 7,
 	ITEM_TYPE_AGGREGATE,
 	ITEM_TYPE_HTTPTEST,
 	ITEM_TYPE_EXTERNAL,
@@ -171,7 +171,8 @@ typedef enum
 	ITEM_TYPE_JMX,
 	ITEM_TYPE_SNMPTRAP,
 	ITEM_TYPE_DEPENDENT,
-	ITEM_TYPE_HTTPAGENT	/* 19 */
+	ITEM_TYPE_HTTPAGENT,
+	ITEM_TYPE_SNMP		/* 20 */
 }
 zbx_item_type_t;
 const char	*zbx_agent_type_string(zbx_item_type_t item_type);
@@ -193,6 +194,10 @@ extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
+
+#define ZBX_IF_SNMP_VERSION_1	1
+#define ZBX_IF_SNMP_VERSION_2	2
+#define ZBX_IF_SNMP_VERSION_3	3
 
 #define ZBX_FLAG_DISCOVERY_NORMAL	0x00
 #define ZBX_FLAG_DISCOVERY_RULE		0x01
@@ -786,6 +791,7 @@ typedef struct
 	char		*publickey;
 	char		*privatekey;
 	char		*command;
+	char		*command_orig;
 	zbx_uint64_t	scriptid;
 	unsigned char	host_access;
 }

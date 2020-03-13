@@ -308,7 +308,7 @@ class CIconMap extends CApiService {
 		]);
 
 		if ($db_iconmaps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%s" already exists.', $db_iconmaps[0]['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%1$s" already exists.', $db_iconmaps[0]['name']));
 		}
 	}
 

@@ -86,9 +86,7 @@ function item_type2str($type = null) {
 		ITEM_TYPE_ZABBIX => _('Zabbix agent'),
 		ITEM_TYPE_ZABBIX_ACTIVE => _('Zabbix agent (active)'),
 		ITEM_TYPE_SIMPLE => _('Simple check'),
-		ITEM_TYPE_SNMPV1 => _('SNMPv1 agent'),
-		ITEM_TYPE_SNMPV2C => _('SNMPv2 agent'),
-		ITEM_TYPE_SNMPV3 => _('SNMPv3 agent'),
+		ITEM_TYPE_SNMP => _('SNMP agent'),
 		ITEM_TYPE_SNMPTRAP => _('SNMP trap'),
 		ITEM_TYPE_INTERNAL => _('Zabbix internal'),
 		ITEM_TYPE_TRAPPER => _('Zabbix trapper'),
@@ -355,9 +353,7 @@ function interfaceType2str($type) {
 
 function itemTypeInterface($type = null) {
 	$types = [
-		ITEM_TYPE_SNMPV1 => INTERFACE_TYPE_SNMP,
-		ITEM_TYPE_SNMPV2C => INTERFACE_TYPE_SNMP,
-		ITEM_TYPE_SNMPV3 => INTERFACE_TYPE_SNMP,
+		ITEM_TYPE_SNMP =>  INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_SNMPTRAP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_IPMI => INTERFACE_TYPE_IPMI,
 		ITEM_TYPE_ZABBIX => INTERFACE_TYPE_AGENT,
@@ -389,14 +385,12 @@ function itemTypeInterface($type = null) {
  */
 function copyItemsToHosts($src_itemids, $dst_hostids) {
 	$items = API::Item()->get([
-		'output' => ['type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
-			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
-			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint', 'master_itemid', 'timeout',
-			'url', 'query_fields', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
-			'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-			'verify_peer', 'verify_host', 'allow_traps'
+		'output' => ['type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
+			'trapper_hosts', 'units', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
+			'password', 'publickey', 'privatekey', 'flags', 'description', 'inventory_link', 'jmx_endpoint',
+			'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes', 'follow_redirects',
+			'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file',
+			'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -560,14 +554,13 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 
 function copyItems($srcHostId, $dstHostId) {
 	$srcItems = API::Item()->get([
-		'output' => ['type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
-			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
-			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'port', 'description', 'inventory_link', 'jmx_endpoint', 'master_itemid',
-			'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type',
-			'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file',
-			'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
+		'output' => ['type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
+			'trapper_hosts', 'units', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
+			'password', 'publickey', 'privatekey', 'flags', 'description', 'inventory_link', 'jmx_endpoint',
+			'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
+			'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
+			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
+			'allow_traps'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -1957,11 +1950,8 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 function checkNowAllowedTypes() {
 	return [
 		ITEM_TYPE_ZABBIX,
-		ITEM_TYPE_SNMPV1,
 		ITEM_TYPE_SIMPLE,
-		ITEM_TYPE_SNMPV2C,
 		ITEM_TYPE_INTERNAL,
-		ITEM_TYPE_SNMPV3,
 		ITEM_TYPE_AGGREGATE,
 		ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR,
@@ -1970,6 +1960,7 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_TELNET,
 		ITEM_TYPE_CALCULATED,
 		ITEM_TYPE_JMX,
-		ITEM_TYPE_HTTPAGENT
+		ITEM_TYPE_HTTPAGENT,
+		ITEM_TYPE_SNMP
 	];
 }

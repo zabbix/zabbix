@@ -24,8 +24,14 @@
 #include "md5.h"
 #include "../metrics.h"
 
-#define ZBX_LOG_ROTATION_LOGRT	0	/* pure rotation model */
-#define ZBX_LOG_ROTATION_LOGCPT	1	/* copy-truncate rotation model */
+typedef enum
+{
+	ZBX_LOG_ROTATION_LOGRT = 0,	/* pure rotation model */
+	ZBX_LOG_ROTATION_LOGCPT,	/* copy-truncate rotation model */
+	ZBX_LOG_ROTATION_REREAD,	/* reread if modification time changes but size does not */
+	ZBX_LOG_ROTATION_NO_REREAD	/* don't reread if modification time changes but size does not */
+}
+zbx_log_rotation_options_t;
 
 struct	st_logfile
 {
@@ -60,7 +66,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
 		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
-		int rotation_type);
+		zbx_log_rotation_options_t rotation_type);
 
 int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,

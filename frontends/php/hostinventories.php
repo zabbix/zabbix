@@ -188,7 +188,7 @@ else {
 	// Checking if correct inventory field is specified for filter.
 	if ($data['filter']['fieldValue'] !== ''
 			&& !array_key_exists($data['filter']['field'], $data['host_inventories'])) {
-		error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filter']['field']));
+		error(_s('Impossible to filter by inventory field "%1$s", which does not exist.', $data['filter']['field']));
 		$filter_set = false;
 	}
 	else {

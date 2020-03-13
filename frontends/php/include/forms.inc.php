@@ -84,10 +84,7 @@ function getItemFilterForm(&$items) {
 	$filter_name				= $_REQUEST['filter_name'];
 	$filter_type				= $_REQUEST['filter_type'];
 	$filter_key					= $_REQUEST['filter_key'];
-	$filter_snmp_community		= $_REQUEST['filter_snmp_community'];
-	$filter_snmpv3_securityname	= $_REQUEST['filter_snmpv3_securityname'];
 	$filter_snmp_oid			= $_REQUEST['filter_snmp_oid'];
-	$filter_port				= $_REQUEST['filter_port'];
 	$filter_value_type			= $_REQUEST['filter_value_type'];
 	$filter_delay				= $_REQUEST['filter_delay'];
 	$filter_history				= $_REQUEST['filter_history'];
@@ -145,20 +142,8 @@ function getItemFilterForm(&$items) {
 		if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP) {
 			zbx_subarray_push($fTypeVisibility, $type, 'filter_delay_row');
 		}
-
-		switch ($type) {
-			case ITEM_TYPE_SNMPV1:
-			case ITEM_TYPE_SNMPV2C:
-				zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_community_row');
-				zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_oid_row');
-				zbx_subarray_push($fTypeVisibility, $type, 'filter_port_row');
-				break;
-
-			case ITEM_TYPE_SNMPV3:
-				zbx_subarray_push($fTypeVisibility, $type, 'filter_snmpv3_securityname_row');
-				zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_oid_row');
-				zbx_subarray_push($fTypeVisibility, $type, 'filter_port_row');
-				break;
+		if ($type == ITEM_TYPE_SNMP) {
+			zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_oid_row');
 		}
 	}
 
@@ -270,15 +255,6 @@ function getItemFilterForm(&$items) {
 				)
 		]
 	);
-	$filterColumn2->addRow(_('SNMP community'),
-		(new CTextBox('filter_snmp_community', $filter_snmp_community))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		'filter_snmp_community_row'
-	);
-	$filterColumn2->addRow(_('Security name'),
-		(new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		'filter_snmpv3_securityname_row'
-	);
 
 	$filterColumn3->addRow(_('History'),
 		(new CTextBox('filter_history', $filter_history))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -313,10 +289,6 @@ function getItemFilterForm(&$items) {
 	// row 5
 	$filterColumn1->addRow(_('Key'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-	);
-	$filterColumn2->addRow(_('Port'),
-		(new CNumericBox('filter_port', $filter_port, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-		'filter_port_row'
 	);
 	$filterColumn4->addRow(_('Discovery'),
 		new CComboBox('filter_discovery', $filter_discovery, null, [
@@ -810,9 +782,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
 		'type' => getRequest('type', 0),
-		'snmp_community' => getRequest('snmp_community', 'public'),
 		'snmp_oid' => getRequest('snmp_oid', ''),
-		'port' => getRequest('port', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
 		'units' => getRequest('units', ''),
@@ -822,13 +792,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'new_application' => getRequest('new_application', ''),
 		'applications' => getRequest('applications', []),
 		'delay_flex' => array_values(getRequest('delay_flex', [])),
-		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
-		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
-		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', 0),
-		'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
-		'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase', ''),
-		'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
-		'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase', ''),
 		'ipmi_sensor' => getRequest('ipmi_sensor', ''),
 		'authtype' => getRequest('authtype', 0),
 		'username' => getRequest('username', ''),
@@ -987,24 +950,13 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['key'] = $data['item']['key_'];
 		$data['interfaceid'] = $data['item']['interfaceid'];
 		$data['type'] = $data['item']['type'];
-		if ($data['item']['snmp_community'] !== '') {
-			$data['snmp_community'] = $data['item']['snmp_community'];
-		}
 		$data['snmp_oid'] = $data['item']['snmp_oid'];
-		$data['port'] = $data['item']['port'];
 		$data['value_type'] = $data['item']['value_type'];
 		$data['trapper_hosts'] = $data['item']['trapper_hosts'];
 		$data['units'] = $data['item']['units'];
 		$data['valuemapid'] = $data['item']['valuemapid'];
 		$data['hostid'] = $data['item']['hostid'];
 		$data['params'] = $data['item']['params'];
-		$data['snmpv3_contextname'] = $data['item']['snmpv3_contextname'];
-		$data['snmpv3_securityname'] = $data['item']['snmpv3_securityname'];
-		$data['snmpv3_securitylevel'] = $data['item']['snmpv3_securitylevel'];
-		$data['snmpv3_authprotocol'] = $data['item']['snmpv3_authprotocol'];
-		$data['snmpv3_authpassphrase'] = $data['item']['snmpv3_authpassphrase'];
-		$data['snmpv3_privprotocol'] = $data['item']['snmpv3_privprotocol'];
-		$data['snmpv3_privpassphrase'] = $data['item']['snmpv3_privpassphrase'];
 		$data['ipmi_sensor'] = $data['item']['ipmi_sensor'];
 		$data['authtype'] = $data['item']['authtype'];
 		$data['username'] = $data['item']['username'];
@@ -1193,17 +1145,6 @@ function getItemFormData(array $item = [], array $options = []) {
 			'nopermissions' => true
 		]);
 		$data['alreadyPopulated'] = zbx_toHash($data['alreadyPopulated'], 'inventory_link');
-	}
-
-	// unset snmpv3 fields
-	if ($data['type'] != ITEM_TYPE_SNMPV3) {
-		$data['snmpv3_contextname'] = '';
-		$data['snmpv3_securityname'] = '';
-		$data['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
-		$data['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
-		$data['snmpv3_authpassphrase'] = '';
-		$data['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-		$data['snmpv3_privpassphrase'] = '';
 	}
 
 	// unset ssh auth fields

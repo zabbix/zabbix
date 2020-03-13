@@ -11,6 +11,8 @@ libcommonsysinfo_a_SOURCES = \
 	cpu.h \
 	dir.c \
 	dir.h \
+	dns.c \
+	dns.h \
 	file.c \
 	file.h \
 	http.c \
