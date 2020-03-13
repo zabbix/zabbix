@@ -2125,4 +2125,17 @@ in:
 out:
   return: SUCCEED
   value: "OK"
+---
+test case: replace 2 characters '\t' to OK
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\\t"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\\\t\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
 ...
