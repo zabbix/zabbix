@@ -27,16 +27,13 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'eventids' =>					'required|array_db acknowledges.eventid',
-			'message' =>					'db acknowledges.message',
-			'scope' =>						'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
-			'change_severity' =>			'db acknowledges.action|in '.
-												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
-			'severity' =>					'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
-			'acknowledge_problem' =>		'db acknowledges.action|in '.
-												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
-			'close_problem' =>				'db acknowledges.action|in '.
-												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
+			'eventids' =>				'required|array_db acknowledges.eventid',
+			'message' =>				'db acknowledges.message|flags '.P_CRLF,
+			'scope' =>					'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
+			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
+			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
+			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
 		$ret = $this->validateInput($fields);
@@ -83,7 +80,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'problem_severity_can_be_changed' => false
 		];
 
-		// Select events:
+		// Select events.
 		$events = API::Event()->get([
 			'output' => ['eventid', 'objectid', 'acknowledged', 'value', 'r_eventid'],
 			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
@@ -113,7 +110,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			]);
 		}
 
-		$triggerids = array_keys(array_flip(zbx_objectValues($events, 'objectid')));
+		$triggerids = array_column($events, 'objectid', 'objectid');
 
 		$editable_triggers = API::Trigger()->get([
 			'output' => ['manual_close'],

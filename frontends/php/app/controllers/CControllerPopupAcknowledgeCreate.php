@@ -21,18 +21,40 @@
 
 class CControllerPopupAcknowledgeCreate extends CController {
 
+	/**
+	 * @var bool
+	 */
+	private $close_problems;
+
+	/**
+	 * @var bool
+	 */
+	private $change_severity;
+
+	/**
+	 * @var bool
+	 */
+	private $acknowledge;
+
+	/**
+	 * @var string
+	 */
+	private $new_severity;
+
+	/**
+	 * @var string
+	 */
+	private $message;
+
 	protected function checkInput() {
 		$fields = [
 			'eventids' =>				'required|array_db acknowledges.eventid',
-			'message' =>				'db acknowledges.message |flags '.P_CRLF,
+			'message' =>				'db acknowledges.message|flags '.P_CRLF,
 			'scope' =>					'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
-			'change_severity' =>		'db acknowledges.action|in '.
-											ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
+			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
 			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
-			'acknowledge_problem' =>	'db acknowledges.action|in '.
-												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
-			'close_problem' =>			'db acknowledges.action|in '.
-											ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
+			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
 		$ret = $this->validateInput($fields);
@@ -82,7 +104,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		}
 
 		// Select data about all affected events and triggers involved.
-		list($events, $editable_triggers) = $this->getEventDetails(array_keys($eventids));
+		[$events, $editable_triggers] = $this->getEventDetails(array_keys($eventids));
 		unset($eventids);
 
 		// Group events by actions user is allowed to perform.
@@ -96,7 +118,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			 * for any of selected events. This can happen, when you will perform one action on multiple problems,
 			 * where only some of these problems can perform this action (ex. close problem).
 			 */
-			if ($data['action'] === ZBX_PROBLEM_UPDATE_NONE) {
+			if ($data['action'] == ZBX_PROBLEM_UPDATE_NONE) {
 				break;
 			}
 
@@ -152,8 +174,8 @@ class CControllerPopupAcknowledgeCreate extends CController {
 
 		if ($events) {
 			$related_problems = API::Problem()->get([
-				'output' => [],
-				'objectids' => array_keys(array_flip(zbx_objectValues($events, 'objectid'))),
+				'output' => ['eventid'],
+				'objectids' => array_column($events, 'objectid', 'objectid'),
 				'preservekeys' => true
 			]);
 
@@ -187,7 +209,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$editable_triggers = ($events && ($this->change_severity || $this->close_problems))
 			? API::Trigger()->get([
 				'output' => ['manual_close'],
-				'triggerids' => zbx_objectValues($events, 'objectid'),
+				'triggerids' => array_column($events, 'objectid'),
 				'editable' => true,
 				'preservekeys' => true
 			])
@@ -259,11 +281,10 @@ class CControllerPopupAcknowledgeCreate extends CController {
 				|| bccomp($event['r_eventid'], '0') > 0) {
 			return false;
 		}
-		else {
-			foreach ($event['acknowledges'] as $acknowledge) {
-				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-					return false;
-				}
+
+		foreach ($event['acknowledges'] as $acknowledge) {
+			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+				return false;
 			}
 		}
 
@@ -295,7 +316,6 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		}
 
 		if ($this->change_severity && $eventid_groups['editable']) {
-
 			if (!$data['eventids']) {
 				$data['eventids'] = $eventid_groups['editable'];
 			}
@@ -306,7 +326,6 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		}
 
 		if ($this->acknowledge && $eventid_groups['acknowledgeable']) {
-
 			if (!$data['eventids']) {
 				$data['eventids'] = $eventid_groups['acknowledgeable'];
 			}
@@ -316,7 +335,6 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		}
 
 		if ($this->message !== '' && $eventid_groups['readable']) {
-
 			if (!$data['eventids']) {
 				$data['eventids'] = $eventid_groups['readable'];
 			}

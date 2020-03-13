@@ -149,7 +149,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  */
 function make_event_details(array $event) {
 	$config = select_config();
-	$acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
+	$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	$table = (new CTableInfo())
 		->addRow([
@@ -170,8 +170,8 @@ function make_event_details(array $event) {
 		])
 		->addRow([
 			_('Acknowledged'),
-			(new CLink($acknowledged ? _('Yes') : _('No')))
-				->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			(new CLink($is_acknowledged ? _('Yes') : _('No')))
+				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->onClick('return PopUp("popup.acknowledge.edit",'.
 					json_encode([
