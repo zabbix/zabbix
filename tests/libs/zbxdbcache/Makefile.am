@@ -25,6 +25,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 CACHE_LIBS = \
@@ -73,7 +74,6 @@ COMMON_WRAP_FUNCS = \
 
 zbx_vc_get_values_SOURCES = \
 	zbx_vc_get_values.c \
-	valuecache_mock.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
@@ -90,7 +90,6 @@ zbx_vc_get_values_CFLAGS = \
 
 zbx_vc_add_values_SOURCES = \
 	zbx_vc_add_values.c \
-	valuecache_mock.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
@@ -107,7 +106,6 @@ zbx_vc_add_values_CFLAGS = \
 
 zbx_vc_get_value_SOURCES = \
 	zbx_vc_get_value.c \
-	valuecache_mock.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h

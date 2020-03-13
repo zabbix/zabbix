@@ -33,7 +33,6 @@
 #include "zbxmockassert.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
-#include "valuecache_test.h"
 #include "valuecache_mock.h"
 
 /*
@@ -56,6 +55,8 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
 int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 time_t	__wrap_time(time_t *ptr);
+
+void	zbx_vc_set_mode(int mode);
 
 /* comparison function to sort history record vector by timestamps in ascending order */
 static int	history_compare(const void *d1, const void *d2)
@@ -318,6 +319,21 @@ void	zbx_vcmock_ds_dump(void)
 		printf("itemid:" ZBX_FS_UI64 ", value_type:%d\n", item->itemid, item->value_type);
 		zbx_vcmock_history_dump(item->value_type, &item->data);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_ds_first_item                                         *
+ *                                                                            *
+ * Purpose: returns first item in value cache mock data source                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_vcmock_ds_item_t	*zbx_vcmock_ds_first_item()
+{
+	zbx_hashset_iter_t	iter;
+
+	zbx_hashset_iter_reset((zbx_hashset_t *)&vc_ds.items, &iter);
+	return (zbx_vcmock_ds_item_t *)zbx_hashset_iter_next(&iter);
 }
 
 /******************************************************************************

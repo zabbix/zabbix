@@ -167,6 +167,9 @@ tests/zabbix_server/preprocessor/item_preproc_csv_to_json
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
+tests/libs/zbxcommon/zbx_truncate_itemkey
+tests/libs/zbxcommon/zbx_truncate_value
+tests/libs/zbxserver/evaluate_function
 /zabbix-*.tar.gz
 .vscode
 sbin/zabbix_agentd

@@ -1,6 +1,7 @@
 if SERVER
 SERVER_tests = \
-	expression
+	expression \
+	evaluate_function
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -30,13 +31,11 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/odbc/libzbxodbc.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
-	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
@@ -77,8 +76,7 @@ COMMON_LIB_FILES = \
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 
 expression_SOURCES = \
-	expression.c \
-	$(COMMON_SRC_FILES)
+	expression.c
 
 expression_LDADD = \
 	$(COMMON_LIB_FILES)
@@ -89,4 +87,38 @@ expression_LDFLAGS = @SERVER_LDFLAGS@
 
 expression_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+
+evaluate_function_SOURCES = \
+	evaluate_function.c \
+	$(COMMON_SRC_FILES)
+
+evaluate_function_LDADD = \
+	@SERVER_LIBS@ \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+evaluate_function_LDADD += $(COMMON_LIB_FILES)
+
+evaluate_function_LDFLAGS = @SERVER_LDFLAGS@
+
+VALUECACHE_WRAP_FUNCS = \
+	-Wl,--wrap=zbx_mutex_create \
+	-Wl,--wrap=zbx_mutex_destroy \
+	-Wl,--wrap=zbx_mem_create \
+	-Wl,--wrap=__zbx_mem_malloc \
+	-Wl,--wrap=__zbx_mem_realloc \
+	-Wl,--wrap=__zbx_mem_free \
+	-Wl,--wrap=zbx_mem_dump_stats \
+	-Wl,--wrap=zbx_history_get_values \
+	-Wl,--wrap=zbx_history_add_values \
+	-Wl,--wrap=zbx_history_sql_init \
+	-Wl,--wrap=zbx_history_elastic_init \
+	-Wl,--wrap=time \
+	-Wl,--wrap=substitute_simple_macros
+
+evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxhistory \
+	$(VALUECACHE_WRAP_FUNCS)
+	
 endif
