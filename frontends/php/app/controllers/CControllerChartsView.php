@@ -108,6 +108,7 @@ class CControllerChartsView extends CControllerCharts {
 			'filter_graphids' => $filter_graphids,
 			'filter_graph_patterns' => $filter_graph_patterns,
 			'must_specify_host' => true,
+			'error' => '',
 			'page' => $this->getInput('page', 1)
 		];
 
@@ -124,6 +125,14 @@ class CControllerChartsView extends CControllerCharts {
 				'graphids' => $filter_graphids
 			]), ['graphid' => 'id']);
 
+			// Cuntinue with readable graphs only.
+			if (count($filter_graphids) != count($data['ms_graphs'])) {
+				$filter_graphids = array_column($data['ms_graphs'], 'id');
+				if ($this->hasInput('filter_set')) {
+					$data['error'] = _('No permissions to referred object or it does not exist!');
+				}
+			}
+
 			// Prefix graphs by hostnames.
 			foreach ($data['ms_graphs'] as &$graph) {
 				$graph['prefix'] = $graph['hosts'][0]['name'].NAME_DELIMITER;
@@ -137,6 +146,14 @@ class CControllerChartsView extends CControllerCharts {
 				'output' => ['name', 'hostid'],
 				'hostids' => $filter_hostids
 			]), ['hostid' => 'id']);
+
+			// Cuntinue with readable hosts only.
+			if (count($filter_hostids) != count($data['ms_hosts'])) {
+				$filter_hostids = array_column($data['ms_hosts'], 'id');
+				if ($this->hasInput('filter_set')) {
+					$data['error'] = _('No permissions to referred object or it does not exist!');
+				}
+			}
 		}
 
 		// Host must be specified if pattern select is used or if strict select is used without any selected graphs.
