@@ -271,6 +271,14 @@ char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
+char	*CONFIG_TLS_CIPHER_CERT13	= NULL;
+char	*CONFIG_TLS_CIPHER_CERT		= NULL;
+char	*CONFIG_TLS_CIPHER_PSK13	= NULL;
+char	*CONFIG_TLS_CIPHER_PSK		= NULL;
+char	*CONFIG_TLS_CIPHER_ALL13	= NULL;
+char	*CONFIG_TLS_CIPHER_ALL		= NULL;
+char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/* not used in proxy, defined for linking with tls.c */
+char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* not used in proxy, defined for linking with tls.c */
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
@@ -589,6 +597,16 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", CONFIG_TLS_PSK_IDENTITY, "TLS support"));
 	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", CONFIG_TLS_PSK_FILE, "TLS support"));
 #endif
+#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", CONFIG_TLS_CIPHER_CERT, "GnuTLS or OpenSSL"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", CONFIG_TLS_CIPHER_PSK, "GnuTLS or OpenSSL"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", CONFIG_TLS_CIPHER_ALL, "GnuTLS or OpenSSL"));
+#endif
+#if !defined(HAVE_OPENSSL)
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", CONFIG_TLS_CIPHER_CERT13, "OpenSSL 1.1.1 or newer"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", CONFIG_TLS_CIPHER_PSK13, "OpenSSL 1.1.1 or newer"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", CONFIG_TLS_CIPHER_ALL13, "OpenSSL 1.1.1 or newer"));
+#endif
 
 #if !defined(HAVE_OPENIPMI)
 	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
@@ -764,6 +782,18 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"TLSPSKIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCipherCert13",		&CONFIG_TLS_CIPHER_CERT13,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCipherCert",		&CONFIG_TLS_CIPHER_CERT,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCipherPSK13",		&CONFIG_TLS_CIPHER_PSK13,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCipherPSK",		&CONFIG_TLS_CIPHER_PSK,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCipherAll13",		&CONFIG_TLS_CIPHER_ALL13,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCipherAll",		&CONFIG_TLS_CIPHER_ALL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
