@@ -2021,4 +2021,108 @@ in:
 out:
   return: FAIL
   error: custom error
+---
+test case: replace a to b
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: a
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\nb"
+out:
+  return: SUCCEED
+  value: b
+---
+test case: replace a to a
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: a
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\na"
+out:
+  return: SUCCEED
+  value: a
+---
+test case: replace a to nothing
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: a
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\n"
+out:
+  return: SUCCEED
+  value: ""
+---
+test case: replace non printable characters
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\n\r	 "
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\n\\r\\t\\s\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: replace non printable characters mixed
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\n1\r2	3 4"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\n1\\r2\\t3\\s4\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: replace non printable characters 2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\n\r	 "
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\n\\r	 \nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: replace non printable characters in both search and replace
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\n\r	 "
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\n\\r\\t\\s\n\\n\\r\\tOK\\s"
+out:
+  return: SUCCEED
+  value: "\n\r\tOK "
+---
+test case: replace \
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\\"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
 ...
