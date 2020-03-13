@@ -2036,9 +2036,10 @@ out:
  ******************************************************************************/
 static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	int	len;
-	char	*new_string, *ptr, search_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
-		replace_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	int		len;
+	const char	*ptr;
+	char		*new_string, search_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
+			replace_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	if (NULL == (ptr = strchr(params, '\n')))
 	{
