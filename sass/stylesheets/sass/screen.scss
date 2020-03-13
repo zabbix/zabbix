@@ -4842,8 +4842,9 @@ $form-icon-btn: (
 	overflow: hidden;
 	resize: none;
 	word-break: break-all;
-	white-space: normal;
 	height: 24px;
+	line-height: 14px;
+	white-space: break-spaces;
 }
 
 // Map widget back to parent button.
@@ -4906,11 +4907,6 @@ $form-icon-btn: (
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
-
-	// for IE11
-	textarea {
-		white-space: pre-wrap;
-	}
 
 	.debug-output {
 		margin: 10px 0 0;
@@ -7654,5 +7650,105 @@ table.preprocessing-test-results {
 		td {
 			height: 100%;
 		}
+	}
+}
+
+.interface-container {
+	border-bottom: 1px solid #cecece;
+	margin-bottom: 5px;
+	padding: 0;
+	width: 751px;
+
+	&.interface-container-header {
+		margin: 0;
+		border: 0;
+	}
+
+	&:empty {
+		display: none;
+	}
+
+	.interface-row {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: start;
+		align-items: stretch;
+		margin-bottom: 5px;
+		width: 751px;
+
+		&.interface-row-header {
+			margin: 0;
+		}
+
+		&[data-type] .interface-cell-details {
+			display: none;
+		}
+
+		.interface-cell {
+			margin: 5px 5px 5px 0;
+			flex: 0 1 auto;
+			align-self: center;
+
+			.interface-btn-toggle {
+				@extend .btn-link;
+			}
+
+			&.interface-cell-header {
+				color: #768d99;
+				text-align: left;
+			}
+
+			&.interface-cell-icon {
+				width: 26px;
+			}
+			&.interface-cell-type {
+				width: 36px;
+			}
+			&.interface-cell-ip {
+				width: 225px;
+			}
+			&.interface-cell-useip {
+				width: 83px;
+			}
+			&.interface-cell-dns {
+				width: 175px;
+			}
+			&.interface-cell-port {
+				width: 100px;
+			}
+
+			.table-forms-td-left,
+			.table-forms-td-right {
+				padding-bottom: 0;
+			}
+		}
+	}
+}
+
+// Host interface accordion for SNMP specific styles.
+.interface-row.list-accordion-item[data-type="2"] {
+	&.list-accordion-item-closed {
+		.interface-btn-toggle {
+			@extend .btn-widget-expand;
+		}
+
+		.list-accordion-item-body {
+			display: none;
+		}
+	}
+
+	&.list-accordion-item-opened {
+		.interface-btn-toggle {
+			@extend .btn-widget-collapse;
+		}
+
+		.list-accordion-item-body {
+			display: block;
+		}
+	}
+
+	.interface-btn-toggle {
+		@extend %btn-widget;
 	}
 }

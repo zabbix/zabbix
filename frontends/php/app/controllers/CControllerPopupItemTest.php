@@ -35,9 +35,9 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @var array
 	 */
-	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C,
-		ITEM_TYPE_SNMPV3, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-		ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED
+	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
+		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
+		ITEM_TYPE_CALCULATED
 	];
 
 	/**
@@ -50,18 +50,16 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @var array
 	 */
-	protected $items_require_interface = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3,
-		ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE
-	];
+	protected $items_require_interface = [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP];
 
 	/**
 	 * Item types with proxy support.
 	 *
 	 * @var array
 	 */
-	protected $items_support_proxy = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C,
-		ITEM_TYPE_SNMPV3, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT,
-		ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX
+	protected $items_support_proxy = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
+		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
+		ITEM_TYPE_SNMP
 	];
 
 	/**
@@ -157,26 +155,6 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
-		'snmp_community' => [
-			'support_user_macros' => true,
-			'support_lld_macros' => false
-		],
-		'snmpv3_contextname' => [
-			'support_user_macros' => true,
-			'support_lld_macros' => false
-		],
-		'snmpv3_securityname' => [
-			'support_user_macros' => true,
-			'support_lld_macros' => false
-		],
-		'snmpv3_authpassphrase' => [
-			'support_user_macros' => true,
-			'support_lld_macros' => false
-		],
-		'snmpv3_privpassphrase' => [
-			'support_user_macros' => true,
-			'support_lld_macros' => false
-		],
 		'ipmi_sensor' => [
 			'support_user_macros' => false,
 			'support_lld_macros' => true
@@ -197,7 +175,7 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Tested item's host.
 	 *
-	 * @var int
+	 * @var array
 	 */
 	protected $host;
 
@@ -233,21 +211,22 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @return array
 	 */
 	public static function getTestableItemTypes(int $hostid = 0): array {
-		if ($hostid != 0 && self::isIpmiTestSupported($hostid)) {
+		if ($hostid != 0 && self::isItemTypeTestable($hostid)) {
 			self::$testable_item_types[] = ITEM_TYPE_IPMI;
+			self::$testable_item_types[] = ITEM_TYPE_SNMP;
 		}
 
 		return self::$testable_item_types;
 	}
 
 	/**
-	 * Function checks if IPMI item can be tested depending on what type of host it belongs to.
+	 * Function checks if item type can be tested depending on what type of host it belongs to.
 	 *
 	 * @param int $hostid
 	 *
 	 * @return bool
 	 */
-	protected static function isIpmiTestSupported(int $hostid): bool {
+	protected static function isItemTypeTestable(int $hostid): bool {
 		$ret = (bool) API::Template()->get([
 			'countOutput' => true,
 			'templateids' => [$hostid]
@@ -370,14 +349,8 @@ abstract class CControllerPopupItemTest extends CController {
 		if (array_key_exists('interface', $input) && array_key_exists('useip', $input['interface'])) {
 			$interface_input['useip'] = $input['interface']['useip'];
 		}
-		elseif (array_key_exists('useip', $input)) {
-			$interface_input['useip'] = $input['useip'];
-		}
 
-		if (array_key_exists('custom_port', $input) && $input['custom_port'] !== '') {
-			$interface_input['port'] = $input['custom_port'];
-		}
-		elseif (array_key_exists('data', $input) && array_key_exists('port', $input['data'])) {
+		if (array_key_exists('data', $input) && array_key_exists('port', $input['data'])) {
 			$interface_input['port'] = $input['data']['port'];
 		}
 		elseif (array_key_exists('interface', $input) && array_key_exists('port', $input['interface'])) {
@@ -432,9 +405,7 @@ abstract class CControllerPopupItemTest extends CController {
 				);
 				break;
 
-			case ITEM_TYPE_SNMPV1:
-			case ITEM_TYPE_SNMPV2C:
-			case ITEM_TYPE_SNMPV3:
+			case ITEM_TYPE_SNMP:
 				if (!array_key_exists('flags', $input)) {
 					$items = (array_key_exists('itemid', $input))
 						? API::Item()->get([
@@ -468,7 +439,6 @@ abstract class CControllerPopupItemTest extends CController {
 
 				$data += [
 					'snmp_oid' => array_key_exists('snmp_oid', $input) ? $input['snmp_oid'] : null,
-					'snmp_community' => array_key_exists('snmp_community', $input) ? $input['snmp_community'] : null,
 					'flags' => $item_flag,
 					'host' => [
 						'host' => $this->host['host']
@@ -477,47 +447,6 @@ abstract class CControllerPopupItemTest extends CController {
 				];
 
 				unset($data['interface']['ip'], $data['interface']['dns']);
-
-				if ($this->item_type == ITEM_TYPE_SNMPV3) {
-					$data += [
-						'snmpv3_securityname' => array_key_exists('snmpv3_securityname', $input)
-							? $input['snmpv3_securityname']
-							: null,
-						'snmpv3_contextname' => array_key_exists('snmpv3_contextname', $input)
-							? $input['snmpv3_contextname']
-							: null,
-						'snmpv3_securitylevel' => array_key_exists('snmpv3_securitylevel', $input)
-							? $input['snmpv3_securitylevel']
-							: ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV
-					];
-
-					if ($data['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-						$data += [
-							'snmpv3_authprotocol' => array_key_exists('snmpv3_authprotocol', $input)
-								? $input['snmpv3_authprotocol']
-								: null,
-							'snmpv3_authpassphrase' => array_key_exists('snmpv3_authpassphrase', $input)
-								? $input['snmpv3_authpassphrase']
-								: null,
-							'snmpv3_privprotocol' => array_key_exists('snmpv3_privprotocol', $input)
-								? $input['snmpv3_privprotocol']
-								: null,
-							'snmpv3_privpassphrase' => array_key_exists('snmpv3_privpassphrase', $input)
-								? $input['snmpv3_privpassphrase']
-								: null
-						];
-					}
-					elseif ($data['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-						$data += [
-							'snmpv3_authprotocol' => array_key_exists('snmpv3_authprotocol', $input)
-								? $input['snmpv3_authprotocol']
-								: null,
-							'snmpv3_authpassphrase' => array_key_exists('snmpv3_authpassphrase', $input)
-								? $input['snmpv3_authpassphrase']
-								: null
-						];
-					}
-				}
 				break;
 
 			case ITEM_TYPE_INTERNAL:
@@ -708,20 +637,13 @@ abstract class CControllerPopupItemTest extends CController {
 				&& array_key_exists('interfaceid', $inputs)) {
 			$interfaces = array_key_exists('interfaceid', $inputs)
 				? API::HostInterface()->get([
-					'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip'],
+					'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip', 'details'],
 					'interfaceids' => $inputs['interfaceid'],
 					'hostids' => $this->host['hostid']
 				])
 				: [];
 
 			if (count($interfaces) > 0) {
-				// SNMP items has it's own port field.
-				if (in_array($this->item_type, [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])
-						&& array_key_exists('port', $inputs) && $inputs['port'] !== '') {
-					$interfaces[0]['port'] = $inputs['port'];
-					unset($inputs['port']);
-				}
-
 				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
 
 				$interface_data = [
@@ -732,7 +654,8 @@ abstract class CControllerPopupItemTest extends CController {
 					'useip' => $interfaces[0]['useip'],
 					'ip' => $interfaces[0]['ip'],
 					'dns' => $interfaces[0]['dns'],
-					'interfaceid' => $interfaces[0]['interfaceid']
+					'interfaceid' => $interfaces[0]['interfaceid'],
+					'details' => $interfaces[0]['details']
 				];
 			}
 		}
