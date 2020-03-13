@@ -2050,7 +2050,7 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 	if (0 == (len = ptr - params))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		*errmsg = zbx_strdup(*errmsg, "first parameter cannot be empty");
+		*errmsg = zbx_strdup(*errmsg, "first parameter is expected");
 		return FAIL;
 	}
 
