@@ -22,7 +22,7 @@ const SIDEBAR_VIEW_MODE_FULL       = 0;
 const SIDEBAR_VIEW_MODE_COMPACT    = 1;
 const SIDEBAR_VIEW_MODE_HIDDEN     = 2;
 
-const SIDEBAR_MIN_WIDTH            = 200;
+const SIDEBAR_MIN_WIDTH            = 170;
 const SIDEBAR_HOVER_DELAY          = 1000;
 
 const SIDEBAR_EVENT_BLUR           = 'blur';

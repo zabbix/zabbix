@@ -3204,7 +3204,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .menu-popup {
   position: absolute;
-  z-index: 1000;
+  z-index: 1001;
   padding: 5px 15px 5px 25px;
   min-width: 166px;
   max-width: 250px;
