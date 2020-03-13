@@ -2055,8 +2055,8 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 		return FAIL;
 	}
 
-	unescape_param(params, search_str, len);
-	unescape_param(ptr + 1, replace_str, strlen(ptr + 1));
+	unescape_param(params, search_str, MIN(len, sizeof(search_str) - 1));
+	unescape_param(ptr + 1, replace_str, MIN(strlen(ptr + 1), sizeof(replace_str) - 1));
 
 	if (SUCCEED != item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 	{
