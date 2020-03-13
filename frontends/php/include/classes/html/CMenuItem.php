@@ -62,12 +62,12 @@ class CMenuItem extends CTag {
 	private $url;
 
 	/**
-	 * @var bool;
+	 * @var bool
 	 */
 	private $is_selected = false;
 
 	/**
-	 * Create menu item class instance.
+	 * Create menu item.
 	 *
 	 * @param string $label  Menu item visual label.
 	 */
@@ -78,7 +78,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Getter for action name property.
+	 * Get action name.
 	 *
 	 * @return string|null
 	 */
@@ -87,7 +87,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Set action name property and create CUrl object for the menu item link.
+	 * Set action name and derive a corresponding URL for menu item link.
 	 *
 	 * @param string  Action name.
 	 *
@@ -98,7 +98,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Getter for aliases property.
+	 * Get action name aliases.
 	 *
 	 * @return array
 	 */
@@ -107,7 +107,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Register action aliases for the this menu item link.
+	 * Set action name aliases.
 	 *
 	 * @param array $aliases
 	 *
@@ -120,7 +120,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Set icon CSS class for the this menu item link.
+	 * Set icon CSS class for menu item link.
 	 *
 	 * @param string $icon_class
 	 *
@@ -133,7 +133,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Getter for visual label property.
+	 * Get visual label of menu item.
 	 *
 	 * @return string
 	 */
@@ -142,7 +142,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Return TRUE if menu item marked as selected.
+	 * Check if menu item is marked as selected.
 	 *
 	 * @return bool
 	 */
@@ -151,41 +151,38 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Set selected property.
-	 *
-	 * @param bool $is_selected
+	 * Mark menu item as selected.
 	 *
 	 * @return CMenuItem
 	 */
-	public function setSelected(bool $is_selected): self {
-		$this->is_selected = $is_selected;
-
-		if ($is_selected) {
-			$this->addClass('is-selected');
-		}
+	public function setSelected(): self {
+		$this->is_selected = true;
+		$this->addClass('is-selected');
 
 		return $this;
 	}
 
 	/**
-	 * Set selected property if this item according passed action name.
+	 * Deep find menu item (including this one) by action name and mark the whole chain as selected.
 	 *
-	 * @param string $action_name  Action name to be selected.
-	 * @param bool $expand         Add class 'is-expanded' for the opening submenu if is selected.
+	 * @param string $action_name  Action name to search for.
+	 * @param bool $expand         Add 'is-expanded' class for selected submenus.
 	 *
-	 * @return bool  Returns true, if menu item selected
+	 * @return bool  True, if menu item was selected.
 	 */
 	public function setSelectedByAction(string $action_name, bool $expand = true): bool {
-		$is_selected = (($this->sub_menu !== null && $this->sub_menu->setSelectedByAction($action_name, $expand))
-			|| $this->action === $action_name || in_array($action_name, $this->aliases));
+		if ($this->action === $action_name || in_array($action_name, $this->aliases)
+				|| ($this->sub_menu !== null && $this->sub_menu->setSelectedByAction($action_name, $expand))) {
+			$this->setSelected();
 
-		$this->setSelected($is_selected);
+			return true;
+		}
 
-		return $is_selected;
+		return false;
 	}
 
 	/**
-	 * Get submenu object or create new, if not exists.
+	 * Get submenu of menu item or create new one, if not exists.
 	 *
 	 * @return CMenu
 	 */
@@ -198,7 +195,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Set submenu object.
+	 * Set submenu for menu item.
 	 *
 	 * @param CMenu $sub_menu
 	 *
@@ -212,7 +209,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Check, if item has submenu.
+	 * Check if menu item has submenu.
 	 *
 	 * @return bool
 	 */
@@ -221,7 +218,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Set attribute target for the menu item link.
+	 * Set target attribute for the menu item link.
 	 *
 	 * @param string $target
 	 *
@@ -234,7 +231,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Set attribute title for the menu item link.
+	 * Set title attribute for the menu item link.
 	 *
 	 * @param string $title
 	 *
@@ -247,7 +244,7 @@ class CMenuItem extends CTag {
 	}
 
 	/**
-	 * Getter for url property.
+	 * Get url of the menu item link.
 	 *
 	 * @return CUrl|null
 	 */
@@ -259,7 +256,7 @@ class CMenuItem extends CTag {
 	 * Set url for the menu item link.
 	 *
 	 * @param CUrl $url
-	 * @param string|null $action_name  Action name to be matched by setSelected method.
+	 * @param string|null $action_name  Associate action name to be matched by setSelected method.
 	 *
 	 * @return CMenuItem
 	 */
@@ -274,7 +271,7 @@ class CMenuItem extends CTag {
 	{
 		if ($this->url !== null || $this->sub_menu !== null) {
 			$this->addItem([
-				(new CLink($this->label, $this->sub_menu !== null ? '#' : $this->url))
+				(new CLink($this->label, $this->sub_menu !== null ? '#' : $this->url->getUrl()))
 					->addClass($this->icon_class)
 					->setTitle($this->title)
 					->setTarget($this->target),

@@ -27,7 +27,7 @@ class CMenu extends CTag {
 	private $menu_items = [];
 
 	/**
-	 * Create menu class instance.
+	 * Create menu.
 	 *
 	 * @param CMenuItem[] $menu_items  Array of menu items.
 	 */
@@ -61,7 +61,7 @@ class CMenu extends CTag {
 	 */
 	public function find(string $label): ?CMenuItem {
 		foreach ($this->menu_items as $item) {
-			if ($item->getLabel() == $label) {
+			if ($item->getLabel() === $label) {
 				return $item;
 			}
 		}
@@ -70,7 +70,7 @@ class CMenu extends CTag {
 	}
 
 	/**
-	 * Find menu item by label or add new, if not exists.
+	 * Find menu item by label or add new one, if not exists.
 	 *
 	 * @param string $label  Visual label.
 	 *
@@ -87,6 +87,11 @@ class CMenu extends CTag {
 		return $item;
 	}
 
+	/**
+	 * Find selected menu item.
+	 *
+	 * @return CMenuItem|null
+	 */
 	public function findSelected(): ?CMenuItem {
 		foreach ($this->menu_items as $item) {
 			if ($item->isSelected()) {
@@ -98,7 +103,7 @@ class CMenu extends CTag {
 	}
 
 	/**
-	 * Add new menu item after specified item with $label visual label or add to list end, if not found.
+	 * Insert new menu item after the one with specified label, or insert as the last item, if not found.
 	 *
 	 * @param string $label         Visual label to insert item after.
 	 * @param CMenuItem $menu_item  Menu item object.
@@ -110,7 +115,7 @@ class CMenu extends CTag {
 	}
 
 	/**
-	 * Add new menu item before specified item with $label visual label or add to list begin, if not found.
+	 * Insert new menu item before the one with specified label, or insert as the first item, if not found.
 	 *
 	 * @param string $label         Visual label to insert item before.
 	 * @param CMenuItem $menu_item  Menu item object.
@@ -130,8 +135,8 @@ class CMenu extends CTag {
 	 */
 	public function remove(string $label): self {
 		foreach ($this->menu_items as $index => $item) {
-			if ($item->getLabel() == $label) {
-				unset($this->menu_items[$index]);
+			if ($item->getLabel() === $label) {
+				array_splice($this->menu_items, $index, 1);
 				break;
 			}
 		}
@@ -140,17 +145,17 @@ class CMenu extends CTag {
 	}
 
 	/**
-	 * Find item by action name and set selected property to true if found.
+	 * Deep find menu item by action name and mark the whole chain as selected.
 	 *
-	 * @param string $action_name  Visual label.
-	 * @param bool $expand         Add class 'is-expanded' for the opening submenu if is selected.
+	 * @param string $action_name  Action name to search for.
+	 * @param bool $expand         Add 'is-expanded' class for selected submenus.
 	 *
-	 * @return bool  Returns true, if of the menu items is selected
+	 * @return bool  True, if menu item was selected.
 	 */
 	public function setSelectedByAction(string $action_name, bool $expand = true): bool {
 		foreach ($this->menu_items as $item) {
 			if ($item->setSelectedByAction($action_name, $expand)) {
-				if ($item->hasSubMenu() && $expand) {
+				if ($expand && $item->hasSubMenu()) {
 					$item->addClass('is-expanded');
 				}
 				return true;
@@ -171,12 +176,12 @@ class CMenu extends CTag {
 		$count = count($this->menu_items);
 
 		for ($i = 0; $i < $count; $i++) {
-			if ($this->menu_items[$i]->getLabel() == $label) {
+			if ($this->menu_items[$i]->getLabel() === $label) {
 				break;
 			}
 		}
 
-		$position = ($count == $i && !$after) ? 0 : $i + ($after ? 1 : 0);
+		$position = ($count == $i && !$after) ? 0 : $i + (($i < $count && $after) ? 1 : 0);
 		array_splice($this->menu_items, $position, 0, [$menu_item]);
 
 		return $this;
