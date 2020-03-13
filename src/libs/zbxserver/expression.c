@@ -223,6 +223,8 @@ static char	*get_expanded_expression(const char *expression)
 {
 	char	*expression_ex;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "EXPAND_USER_MACROS, get_expanded_expression 444444");
+	
 	if (NULL != (expression_ex = DCexpression_expand_user_macros(expression)))
 		zbx_remove_whitespace(expression_ex);
 
@@ -247,9 +249,9 @@ static char	*get_expanded_expression(const char *expression)
 void	get_trigger_expression_constant(const char *expression, const zbx_token_reference_t *reference,
 		char **constant, size_t *length)
 {
-	size_t		pos;
+	size_t		pos, ii, i;
 	zbx_strloc_t	number;
-	int		index, ii, i;
+	int		index;
 	const char	*tmp = NULL;
 
 	for (pos = 0, index = 1; SUCCEED == zbx_number_or_string_find(expression, pos, &number);
