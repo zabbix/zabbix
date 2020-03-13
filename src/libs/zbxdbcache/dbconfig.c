@@ -9560,16 +9560,15 @@ out:
  ******************************************************************************/
 static int	dc_expression_user_macro_validator(const char *value)
 {
-  zabbix_log(LOG_LEVEL_INFORMATION, "BADGER VALIDATOR ->%s<-",value);
-  
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER VALIDATOR ->%s<-",value);
 	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
-	  {
-	      zabbix_log(LOG_LEVEL_INFORMATION, "BADGER VALIDATOR RETURN SUCCEED");
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER VALIDATOR RETURN SUCCEED");
 
 		return SUCCEED;
-	  }
+	}
 
-	      zabbix_log(LOG_LEVEL_INFORMATION, "BADGER VALIDATOR RETURN FAIL");
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER VALIDATOR RETURN FAIL");
 	return FAIL;
 }
 
@@ -9667,7 +9666,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
  ******************************************************************************/
 static char	*dc_expression_expand_user_macros(const char *expression)
 {
-  zabbix_log(LOG_LEVEL_INFORMATION, "DC_EXPRESSION_EXPAND_USER_MACROS START");
+	zabbix_log(LOG_LEVEL_INFORMATION, "DC_EXPRESSION_EXPAND_USER_MACROS START");
 	zbx_vector_uint64_t	functionids, hostids;
 	char			*out;
 

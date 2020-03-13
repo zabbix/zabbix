@@ -28,10 +28,6 @@
 #include "dbcache.h"
 #include "zbxembed.h"
 #include "log.h"
-/* #include "preproc.h" */
-/* #include "../../../src/zabbix_server/preprocessor/item_preproc.h" */
-/* #include "../../../src/zabbix_server/preprocessor/preproc_history.h" */
-//#include "trapper_preproc_test_run.h"
 #include "trapper_expressions_evaluate_run.h"
 
 zbx_es_t	es_engine;

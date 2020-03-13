@@ -1734,7 +1734,7 @@ static char	**dbsync_item_preproc_row(char **row)
 	/* expand user macros */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER PREPROC ROW, EXPAND!!");
-	
+
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_DELAY))
 		row[14] = zbx_dc_expand_user_macros(row[14], &hostid, 1, NULL);
 

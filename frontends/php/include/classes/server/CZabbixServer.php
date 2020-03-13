@@ -475,27 +475,21 @@ class CZabbixServer {
 			return false;
 		}
 
-        // if (!$response)
-        // {
-		// 	$this->error = _s(' badger2');
-        //     return false;
-        // }
-        // else
-        // {
-		// 	$this->error = _s(' %1$s',substr($response, ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN));
-        //     return false;
-        // }
+// if (!$response)
+// {
+// 	$this->error = _s(' badger2');
+//     return false;
+// }
+// else
+// {
+// 	$this->error = _s(' %1$s',substr($response, ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN));
+//     return false;
+// }
 
 		$response = json_decode(substr($response, ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN), true);
 
-        if (!$response)
-        {
-			$this->error = _s(' badger.');
-            return false;
-        }
-        
 		if (!$response || !$this->normalizeResponse($response)) {
- 			$this->error = _s('333 ->%2$s<- ->%3$s<- Incorrect response received from Zabbix server "%1$s".', $this->host, $response, $response_len);
+			$this->error = _s('333 ->%2$s<- ->%3$s<- Incorrect response received from Zabbix server "%1$s".', $this->host, $response, $response_len);
 
 			return false;
 		}

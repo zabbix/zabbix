@@ -224,7 +224,7 @@ static char	*get_expanded_expression(const char *expression)
 	char	*expression_ex;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "EXPAND_USER_MACROS, get_expanded_expression 444444");
-	
+
 	if (NULL != (expression_ex = DCexpression_expand_user_macros(expression)))
 		zbx_remove_whitespace(expression_ex);
 
