@@ -39,67 +39,6 @@ extern zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
- * Function: str_printable_dyn                                                *
- *                                                                            *
- * Purpose: converts text to printable string by converting special           *
- *          characters to escape sequences                                    *
- *                                                                            *
- * Parameters: text - [IN] the text to convert                                *
- *                                                                            *
- * Return value: The text converted in printable format                       *
- *                                                                            *
- ******************************************************************************/
-static char	*str_printable_dyn(const char *text)
-{
-	size_t		out_alloc = 0;
-	const char	*pin;
-	char		*out, *pout;
-
-	for (pin = text; '\0' != *pin; pin++)
-	{
-		switch (*pin)
-		{
-			case '\n':
-			case '\t':
-			case '\r':
-				out_alloc += 2;
-				break;
-			default:
-				out_alloc++;
-				break;
-		}
-	}
-
-	out = zbx_malloc(NULL, ++out_alloc);
-
-	for (pin = text, pout = out; '\0' != *pin; pin++)
-	{
-		switch (*pin)
-		{
-			case '\n':
-				*pout++ = '\\';
-				*pout++ = 'n';
-				break;
-			case '\t':
-				*pout++ = '\\';
-				*pout++ = 't';
-				break;
-			case '\r':
-				*pout++ = '\\';
-				*pout++ = 'r';
-				break;
-			default:
-				*pout++ = *pin;
-				break;
-		}
-	}
-	*pout = '\0';
-
-	return out;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: item_preproc_numeric_type_hint                                   *
  *                                                                            *
  * Purpose: returns numeric type hint based on item value type                *
@@ -590,7 +529,7 @@ static int item_preproc_rtrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_RTRIM, params, &err))
 		return SUCCEED;
 
-	characters = str_printable_dyn(params);
+	characters = zbx_str_printable_dyn(params);
 	*errmsg = zbx_dsprintf(*errmsg, "cannot perform right trim of \"%s\" for value of type \"%s\": %s",
 			characters, zbx_variant_type_desc(value), err);
 
@@ -621,7 +560,7 @@ static int item_preproc_ltrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_LTRIM, params, &err))
 		return SUCCEED;
 
-	characters = str_printable_dyn(params);
+	characters = zbx_str_printable_dyn(params);
 	*errmsg = zbx_dsprintf(*errmsg, "cannot perform left trim of \"%s\" for value of type \"%s\": %s",
 			characters, zbx_variant_type_desc(value), err);
 
@@ -652,7 +591,7 @@ static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_TRIM, params, &err))
 		return SUCCEED;
 
-	characters = str_printable_dyn(params);
+	characters = zbx_str_printable_dyn(params);
 	*errmsg = zbx_dsprintf(*errmsg, "cannot perform trim of \"%s\" for value of type \"%s\": %s",
 			characters, zbx_variant_type_desc(value), err);
 

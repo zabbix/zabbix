@@ -2570,6 +2570,11 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
 			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_JSONPATH;
 			params_num = 1;
 			break;
+		case ZBX_PREPROC_STR_REPLACE:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_STR_REPLACE;
+			flags2 = ZBX_MACRO_ANY | ZBX_TOKEN_STR_REPLACE;
+			params_num = 2;
+			break;
 		default:
 			flags1 = ZBX_MACRO_ANY;
 			params_num = 1;
