@@ -3446,7 +3446,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 
 		key = (unsigned int) atoi(value);
 
-		if (0 == key && FAIL == is_int_prefix(value))
+		if (0 == key && 0 == isdigit(value[('-' == *value || '+' == *value) ? 1 : 0 ]))
 		{
 			zabbix_log(LOG_LEVEL_TRACE, "skipping eventlog key '%s', not a number", value);
 			zbx_free(value);
@@ -3646,7 +3646,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 
 	xml_event.id = (unsigned int) atoi(value);
 
-	if (0 == xml_event.id && FAIL == is_int_prefix(value))
+	if (0 == xml_event.id && 0 == isdigit(value[('-' == *value || '+' == *value) ? 1 : 0 ]))
 	{
 		*error = zbx_dsprintf(*error, "Cannot convert eventlog key from %s", value);
 		zbx_free(value);
