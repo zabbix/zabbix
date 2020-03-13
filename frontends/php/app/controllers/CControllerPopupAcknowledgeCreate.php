@@ -123,7 +123,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		}
 		else {
 			error(($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE)
-				? _('At least one update operation is mandatory')
+				? _('At least one update operation or message is mandatory')
 				: _n('Cannot update event', 'Cannot update events', $updated_events_count)
 			);
 
