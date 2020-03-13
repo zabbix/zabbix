@@ -427,7 +427,7 @@ class CZabbixServer {
 
 				if ($expect == self::ZBX_TCP_EXPECT_HEADER) {
 					if (strncmp($response, ZBX_TCP_HEADER, min($response_len, ZBX_TCP_HEADER_LEN)) != 0) {
-						$this->error = _s('111 Incorrect response received from Zabbix server "%1$s".', $this->host);
+						$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 						return false;
 					}
 
@@ -469,25 +469,14 @@ class CZabbixServer {
 		fclose($this->socket);
 
 		if ($expected_len > $response_len || $response_len > $expected_len) {
-			$this->error = _s('222 Incorrect response received from Zabbix server "%1$s".', $this->host);
+			$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 			return false;
 		}
-
-// if (!$response)
-// {
-// 	$this->error = _s(' badger2');
-//     return false;
-// }
-// else
-// {
-// 	$this->error = _s(' %1$s',substr($response, ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN));
-//     return false;
-// }
 
 		$response = json_decode(substr($response, ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN), true);
 
 		if (!$response || !$this->normalizeResponse($response)) {
-			$this->error = _s('333 ->%2$s<- ->%3$s<- Incorrect response received from Zabbix server "%1$s".', $this->host, $response, $response_len);
+			$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 
 			return false;
 		}
