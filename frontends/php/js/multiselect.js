@@ -420,6 +420,7 @@ jQuery(function($) {
 				'id': $label.length ? $label.attr('for') : null,
 				'class': 'input',
 				'type': 'text',
+				'autocomplete': 'off',
 				'placeholder': ms.options.placeholder,
 				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.placeholder,
 				'aria-required': ms.options.required_str
