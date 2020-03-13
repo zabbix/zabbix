@@ -1047,47 +1047,30 @@ class CHistoryManager {
 		global $DB;
 		$config = select_config();
 
-		$value_count = array_count_values($items);
-		$value_trends = $value_count;
-		$tables = array_map('self::getTableName', array_keys($value_count));
+		$item_tables = array_map('self::getTableName', array_unique($items));
+		$table_names = array_flip(self::getTableName());
 
-		if (array_key_exists(ITEM_VALUE_TYPE_UINT64, $value_count)) {
-			$tables[] = 'trends_uint' ;
-			unset($value_trends[ITEM_VALUE_TYPE_UINT64]);
+		if (in_array(ITEM_VALUE_TYPE_UINT64, $items)) {
+			$item_tables[] = 'trends_uint';
+			$table_names['trends_uint'] = ITEM_VALUE_TYPE_UINT64;
 		}
-		if ($value_trends) {
-			$tables[] = 'trends' ;
+
+		if (in_array(ITEM_VALUE_TYPE_FLOAT, $items)) {
+			$item_tables[] = 'trends';
+			$table_names['trends'] = ITEM_VALUE_TYPE_FLOAT;
 		}
 
 		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
-				&&	PostgresqlDbBackend::isCompressed($tables)) {
+				&& PostgresqlDbBackend::isCompressed($item_tables)) {
 			error(_('Some of the history for this item may be compressed, deletion is not available'));
+
 			return false;
-		}
+		};
 
-		$tables = array_flip($tables);
+		foreach ($item_tables as $table_name) {
+			$itemids = array_keys(array_intersect($items, [(string) $table_names[$table_name]]));
 
-		if (array_key_exists('trends_uint', $tables)) {
-			If (!DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid',
-					array_keys(array_intersect($items, [ITEM_VALUE_TYPE_UINT64]))))) {
-				return false;
-			}
-			unset($tables['trends_uint']);
-		}
-
-		if (array_key_exists('trends', $tables)) {
-			If (!DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid',
-					array_keys(array_intersect($items, array_keys($value_trends)))))) {
-				return false;
-			}
-			unset($tables['trends']);
-		}
-
-		$table_names = array_flip(self::getTableName());
-
-		foreach ($tables as $table => $i) {
-			If (!DBexecute('DELETE FROM '.$table.' WHERE '.dbConditionInt('itemid',
-					array_keys(array_intersect($items, [$table_names[$table]]))))) {
+			if (!DBexecute('DELETE FROM '.$table_name.' WHERE '.dbConditionInt('itemid', $itemids))) {
 				return false;
 			}
 		}
@@ -1245,7 +1228,7 @@ class CHistoryManager {
 	 *
 	 * @param int $value_type    value type
 	 *
-	 * @return string    table name
+	 * @return string|array    table name| all tables
 	 */
 	public static function getTableName($value_type = null) {
 		$tables = [
