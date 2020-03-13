@@ -574,7 +574,7 @@ class CControllerPopupGeneric extends CController {
 			$host_options['templated_hosts'] = 1;
 			$group_options['templated_hosts'] = 1;
 		}
-		else {
+		elseif ($this->source_table !== 'templates') {
 			$group_options['with_hosts_and_templates'] = 1;
 		}
 
