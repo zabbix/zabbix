@@ -1505,7 +1505,6 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			}
 			break;
 		case ZBX_PREPROC_STR_REPLACE:
-			zabbix_log(LOG_LEVEL_INFORMATION, "pp->params '%s", pp->params);
 			if ('\n' == *pp->params)
 			{
 				zbx_snprintf(err, sizeof(err), "first parameter is expected");
