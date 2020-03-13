@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-02-25T08:11:58Z</date>
+    <date>2020-03-13T14:05:18Z</date>
     <groups>
         <group>
             <name>Templates/Databases</name>
@@ -1051,7 +1051,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                 </item>
                 <item>
                     <name>PostgreSQL: locks</name>
-                    <key>pgsql.locks</key>
+                    <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <description>Collect all metrics from pg_locks per database&#13;
@@ -1605,6 +1605,186 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             </preprocessing>
                             <master_item>
                                 <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>DB {#DBNAME}: Num of accessexclusive locks</name>
+                            <type>DEPENDENT</type>
+                            <key>pgsql.locks.accessexclusive[&quot;{#DBNAME}&quot;]</key>
+                            <delay>0</delay>
+                            <description>Number of accessexclusive locks for each database</description>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['{#DBNAME}'].accessexclusive</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>DB {#DBNAME}: Num of accessshare locks</name>
+                            <type>DEPENDENT</type>
+                            <key>pgsql.locks.accessshare[&quot;{#DBNAME}&quot;]</key>
+                            <delay>0</delay>
+                            <description>Number of accessshare locks for each database</description>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['{#DBNAME}'].accessshare</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>DB {#DBNAME}: Num of exclusive locks</name>
+                            <type>DEPENDENT</type>
+                            <key>pgsql.locks.exclusive[&quot;{#DBNAME}&quot;]</key>
+                            <delay>0</delay>
+                            <description>Number of exclusive locks for each database</description>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['{#DBNAME}'].exclusive</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>DB {#DBNAME}: Num of rowexclusive locks</name>
+                            <type>DEPENDENT</type>
+                            <key>pgsql.locks.rowexclusive[&quot;{#DBNAME}&quot;]</key>
+                            <delay>0</delay>
+                            <description>Number of rowexclusive locks for each database</description>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['{#DBNAME}'].rowexclusive</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>DB {#DBNAME}: Num of rowshare locks</name>
+                            <type>DEPENDENT</type>
+                            <key>pgsql.locks.rowshare[&quot;{#DBNAME}&quot;]</key>
+                            <delay>0</delay>
+                            <description>Number of rowshare locks for each database</description>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['{#DBNAME}'].rowshare</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>DB {#DBNAME}: Num of sharerowexclusive locks</name>
+                            <type>DEPENDENT</type>
+                            <key>pgsql.locks.sharerowexclusive[&quot;{#DBNAME}&quot;]</key>
+                            <delay>0</delay>
+                            <description>Number of total sharerowexclusive for each database</description>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['{#DBNAME}'].sharerowexclusive</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>DB {#DBNAME}: Num of shareupdateexclusive locks</name>
+                            <type>DEPENDENT</type>
+                            <key>pgsql.locks.shareupdateexclusive[&quot;{#DBNAME}&quot;]</key>
+                            <delay>0</delay>
+                            <description>Number of shareupdateexclusive locks for each database</description>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['{#DBNAME}'].shareupdateexclusive</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>DB {#DBNAME}: Num of share locks</name>
+                            <type>DEPENDENT</type>
+                            <key>pgsql.locks.share[&quot;{#DBNAME}&quot;]</key>
+                            <delay>0</delay>
+                            <description>Number of share locks for each database</description>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['{#DBNAME}'].share</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>DB {#DBNAME}: Num of total locks</name>
+                            <type>DEPENDENT</type>
+                            <key>pgsql.locks.total[&quot;{#DBNAME}&quot;]</key>
+                            <delay>0</delay>
+                            <description>Number of total locks for each database</description>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['{#DBNAME}'].total</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
                             </master_item>
                         </item_prototype>
                     </item_prototypes>
