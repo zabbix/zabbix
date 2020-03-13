@@ -351,7 +351,7 @@ class CZabbixServer {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'expressions' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
 				'expression' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'value' =>			['type' => API_BOOLEAN],
+				'value' =>			['type' => API_INT32, 'in' => '0,1'],
 				'error' =>			['type' => API_STRING_UTF8]
 			]]
 		]];
