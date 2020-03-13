@@ -1174,7 +1174,6 @@ New features:
 ....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 
 Bug fixes:
-..F....... [ZBX-17075] fixed "Problems" page validation to ignore invalid date format in filter (vasilijs)
 ..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
 ..F....... [ZBX-17185] fixed non-disappearing messages of failed login attempts (Ivo)
 ........S. [ZBX-17322] fixed deadlock between server and frontend when updating multiple hosts (vso)
