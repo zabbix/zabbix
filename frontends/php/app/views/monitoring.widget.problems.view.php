@@ -26,10 +26,6 @@
 // indicator of sort field
 $sort_div = (new CSpan())->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
-$backurl = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->getUrl();
-
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
 	->setArgument('eventid', '');
@@ -190,9 +186,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		(new CLinkAction($problem['name']))
 			->setHint(
 				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-					'triggerid' => $trigger['triggerid']], $eventid, $backurl, $show_timeline,
-					$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
-					$data['fields']['tag_priority']
+					'triggerid' => $trigger['triggerid']], $eventid, $show_timeline, $data['fields']['show_tags'],
+					$data['fields']['tags'], $data['fields']['tag_name_format'], $data['fields']['tag_priority']
 				)
 			)
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
@@ -252,8 +247,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		->addClass(ZBX_STYLE_LINK_ALT)
 		->onClick('return PopUp("popup.acknowledge.edit",'.
 			json_encode([
-				'eventids' => [$problem['eventid']],
-				'backurl' => $backurl
+				'eventids' => [$problem['eventid']]
 			]).', null, this);'
 		);
 

@@ -118,8 +118,7 @@
 				}).get();
 
 			return PopUp('popup.acknowledge.edit', {
-				eventids: eventids,
-				backurl: $('#backurl').val()
+				eventids: eventids
 			}, null, this);
 		});
 	});

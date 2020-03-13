@@ -36,28 +36,10 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'acknowledge_problem' =>		'db acknowledges.action|in '.
 												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
 			'close_problem' =>				'db acknowledges.action|in '.
-												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
-			'backurl' =>					'string'
+												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			$backurl = $this->getInput('backurl', 'zabbix.php?action=problem.view');
-
-			switch (parse_url($backurl, PHP_URL_PATH)) {
-				case 'overview.php':
-				case 'screenedit.php':
-				case 'screens.php':
-				case 'slides.php':
-				case 'tr_events.php':
-				case 'zabbix.php':
-					break;
-
-				default:
-					$ret = false;
-			}
-		}
 
 		if (!$ret) {
 			$output = [];
@@ -91,7 +73,6 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'eventids' => $this->getInput('eventids'),
 			'message' => $this->getInput('message', ''),
 			'scope' => (int) $this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED),
-			'backurl' => $this->getInput('backurl', 'zabbix.php?action=problem.view'),
 			'change_severity' => $this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE),
 			'severity' => $this->hasInput('severity') ? (int) $this->getInput('severity') : null,
 			'acknowledge_problem' => $this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),

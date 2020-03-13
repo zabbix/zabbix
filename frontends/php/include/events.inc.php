@@ -144,11 +144,10 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param string $event['acknowledged']   State of acknowledgement.
  * @param CCOl   $event['opdata']         Operational data with expanded macros.
  * @param string $event['comments']       Trigger description with expanded macros.
- * @param string $backurl                 A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
  */
-function make_event_details($event, $backurl) {
+function make_event_details(array $event) {
 	$config = select_config();
 	$acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
@@ -176,8 +175,7 @@ function make_event_details($event, $backurl) {
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->onClick('return PopUp("popup.acknowledge.edit",'.
 					json_encode([
-						'eventids' => [$event['eventid']],
-						'backurl' => $backurl
+						'eventids' => [$event['eventid']]
 					]).', null, this);'
 				)
 		]);
@@ -243,7 +241,7 @@ function make_event_details($event, $backurl) {
 	return $table;
 }
 
-function make_small_eventlist($startEvent, $backurl) {
+function make_small_eventlist(array $startEvent) {
 	$config = select_config();
 
 	$table = (new CTableInfo())
@@ -367,8 +365,7 @@ function make_small_eventlist($startEvent, $backurl) {
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->onClick('return PopUp("popup.acknowledge.edit",'.
 				json_encode([
-					'eventids' => [$event['eventid']],
-					'backurl' => $backurl
+					'eventids' => [$event['eventid']]
 				]).', null, this);'
 			);
 
@@ -400,7 +397,6 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $trigger['comments']        Trigger description.
  * @param string $trigger['url']             Trigger URL.
  * @param string $eventid_till
- * @param string $backurl                    URL to return to.
  * @param bool   $show_timeline              Show time line flag.
  * @param int    $show_tags                  Show tags flag. Possible values:
  *                                             - PROBLEMS_SHOW_TAGS_NONE;
@@ -419,9 +415,8 @@ function make_small_eventlist($startEvent, $backurl) {
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline = true,
-		$show_tags = PROBLEMS_SHOW_TAGS_3, array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL,
-		$tag_priority = '') {
+function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $show_tags = PROBLEMS_SHOW_TAGS_3,
+		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '') {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -606,8 +601,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline 
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->onClick('return PopUp("popup.acknowledge.edit",'.
 					json_encode([
-						'eventids' => [$problem['eventid']],
-						'backurl' => $backurl
+						'eventids' => [$problem['eventid']]
 					]).', null, this);'
 				);
 

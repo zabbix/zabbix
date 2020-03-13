@@ -49,11 +49,17 @@ function submitAcknowledge(overlay) {
 	}).done(function(response) {
 		overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-		if ('redirect' in response) {
-			redirect(response.redirect);
-		}
-		else if ('errors' in response) {
+		if ('errors' in response) {
 			jQuery(response.errors).insertBefore($form);
+		}
+		else {
+			// Clear all selected checkboxes in Monitoring->Problems.
+			if (chkbxRange.prefix === 'problem') {
+				chkbxRange.clearSelectedOnFilterChange();
+			}
+
+			// Reload the page.
+			location.href = location.href;
 		}
 	});
 }

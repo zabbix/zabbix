@@ -32,8 +32,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			'acknowledge_problem' =>	'db acknowledges.action|in '.
 												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
 			'close_problem' =>			'db acknowledges.action|in '.
-											ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
-			'backurl' =>				'string'
+											ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
 		$ret = $this->validateInput($fields);
@@ -121,7 +120,6 @@ class CControllerPopupAcknowledgeCreate extends CController {
 
 		if ($result) {
 			CSession::setValue('messageOk', _n('Event updated', 'Events updated', $updated_events_count));
-			$output['redirect'] = $this->getInput('backurl', 'zabbix.php?action=problem.view');
 		}
 		else {
 			error(($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE)

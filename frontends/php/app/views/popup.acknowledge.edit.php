@@ -27,8 +27,7 @@ $form = (new CForm())
 	->cleanItems()
 	->setId('acknowledge_form')
 	->addVar('action', 'popup.acknowledge.create')
-	->addVar('eventids', $data['eventids'])
-	->addVar('backurl', $data['backurl']);
+	->addVar('eventids', $data['eventids']);
 
 $form_list = (new CFormList())
 	->addRow(

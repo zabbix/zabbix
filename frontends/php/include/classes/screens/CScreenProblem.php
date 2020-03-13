@@ -827,17 +827,10 @@ class CScreenProblem extends CScreenBase {
 			: $this->data['filter']['show_opdata'];
 
 		if ($this->data['action'] === 'problem.view') {
-			$backurl = clone $url;
-			$backurl = $backurl
-				->setArgument('page', $this->page)
-				->setArgument('uncheck', '1')
-				->getUrl();
-
 			$form = (new CForm('post', 'zabbix.php'))
 				->setId('problem_form')
 				->setName('problem')
-				->cleanItems()
-				->addVar('backurl', $backurl);
+				->cleanItems();
 
 			$header_check_box = (new CColHeader(
 				(new CCheckBox('all_eventids'))
@@ -1131,8 +1124,7 @@ class CScreenProblem extends CScreenBase {
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->onClick('return PopUp("popup.acknowledge.edit",'.
 						json_encode([
-							'eventids' => [$problem['eventid']],
-							'backurl' => $backurl
+							'eventids' => [$problem['eventid']]
 						]).', null, this);'
 					);
 
