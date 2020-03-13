@@ -7658,6 +7658,8 @@ table.preprocessing-test-results {
 .interface-container {
 	margin-bottom: 5px;
 	padding: 0;
+	width: fit-content;
+	width: -moz-fit-content;
 
 	&.interface-container-header {
 		margin: 0;
@@ -7669,14 +7671,11 @@ table.preprocessing-test-results {
 	}
 
 	.interface-row {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		justify-content: start;
-		align-items: stretch;
-		margin-bottom: 5px;
-		width: fit-content;
-		width: -moz-fit-content;
+		display: grid;
+		grid-template-columns: 26px 36px 225px 175px 85px 100px 20px 1fr;
+		grid-template-rows: 25px 1fr;
+		gap: 5px;
+		padding-top: 10px;
 
 		&.interface-row-header {
 			margin: 0;
@@ -7687,8 +7686,6 @@ table.preprocessing-test-results {
 		}
 
 		.interface-cell {
-			margin: 5px 5px 5px 0;
-			flex: 0 1 auto;
 			align-self: center;
 
 			.interface-btn-toggle {
@@ -7701,34 +7698,11 @@ table.preprocessing-test-results {
 				text-align: left;
 			}
 
-			&.interface-cell-icon {
-				width: 26px;
-			}
-			&.interface-cell-type {
-				width: 36px;
-			}
-			&.interface-cell-ip {
-				width: 225px;
-			}
-			&.interface-cell-useip {
-				width: 83px;
-			}
-			&.interface-cell-dns {
-				width: 175px;
-			}
-			&.interface-cell-port {
-				width: 100px;
-			}
-
 			.table-forms-td-left,
 			.table-forms-td-right {
 				padding-bottom: 0;
 			}
 		}
-	}
-
-	&.list-vertical-accordion {
-		margin-bottom: 0;
 	}
 }
 
@@ -7762,5 +7736,4 @@ table.preprocessing-test-results {
 
 .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) .interface-row:nth-child(1) {
 	border-top: 1px solid $form-border-color;
-	padding-top: 5px;
 }
