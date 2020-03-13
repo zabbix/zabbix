@@ -375,6 +375,9 @@ jQuery(function($) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
 					}
+				})
+				.on('remove', function() {
+					cleanSearch($obj);
 				});
 
 			if (empty(ms.options.data)) {
@@ -987,10 +990,6 @@ jQuery(function($) {
 		}
 
 		$available.appendTo(document.body);
-
-		$obj.on('remove', function() {
-			cleanSearch($obj);
-		});
 	}
 
 	function hideAvailable($obj) {
