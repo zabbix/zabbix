@@ -43,19 +43,13 @@ typedef struct
 	char			*logtimefmt;
 	char			*params;
 	char			*ipmi_sensor;
-	char			*snmp_community;
 	char			*snmp_oid;
-	char			*snmpv3_securityname;
-	char			*snmpv3_authpassphrase;
-	char			*snmpv3_privpassphrase;
-	char			*snmpv3_contextname;
 	char			*username;
 	char			*password;
 	char			*publickey;
 	char			*privatekey;
 	char			*description;
 	char			*lifetime;
-	char			*port;
 	char			*jmx_endpoint;
 	char			*timeout;
 	char			*url;
@@ -77,9 +71,6 @@ typedef struct
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		status;
-	unsigned char		snmpv3_securitylevel;
-	unsigned char		snmpv3_authprotocol;
-	unsigned char		snmpv3_privprotocol;
 	unsigned char		authtype;
 	unsigned char		flags;
 	unsigned char		inventory_link;
@@ -173,11 +164,9 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select ti.itemid,ti.name,ti.key_,ti.type,ti.value_type,ti.delay,"
 				"ti.history,ti.trends,ti.status,ti.trapper_hosts,ti.units,"
-				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_community,"
-				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authprotocol,"
-				"ti.snmpv3_authpassphrase,ti.snmpv3_privprotocol,ti.snmpv3_privpassphrase,ti.authtype,"
+				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_oid,ti.authtype,"
 				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.description,"
-				"ti.inventory_link,ti.lifetime,ti.snmpv3_contextname,hi.itemid,ti.evaltype,ti.port,"
+				"ti.inventory_link,ti.lifetime,hi.itemid,ti.evaltype,"
 				"ti.jmx_endpoint,ti.master_itemid,ti.timeout,ti.url,ti.query_fields,ti.posts,"
 				"ti.status_codes,ti.follow_redirects,ti.post_type,ti.http_proxy,ti.headers,"
 				"ti.retrieve_mode,ti.request_method,ti.output_format,ti.ssl_cert_file,ti.ssl_key_file,"
@@ -200,13 +189,10 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->value_type, row[4]);
 		ZBX_STR2UCHAR(item->status, row[8]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[13]);
-		ZBX_STR2UCHAR(item->snmpv3_securitylevel, row[19]);
-		ZBX_STR2UCHAR(item->snmpv3_authprotocol, row[20]);
-		ZBX_STR2UCHAR(item->snmpv3_privprotocol, row[22]);
-		ZBX_STR2UCHAR(item->authtype, row[24]);
-		ZBX_STR2UCHAR(item->flags, row[29]);
-		ZBX_STR2UCHAR(item->inventory_link, row[31]);
-		ZBX_STR2UCHAR(item->evaltype, row[35]);
+		ZBX_STR2UCHAR(item->authtype, row[17]);
+		ZBX_STR2UCHAR(item->flags, row[22]);
+		ZBX_STR2UCHAR(item->inventory_link, row[24]);
+		ZBX_STR2UCHAR(item->evaltype, row[27]);
 
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
@@ -235,26 +221,20 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->logtimefmt = zbx_strdup(NULL, row[12]);
 		item->params = zbx_strdup(NULL, row[14]);
 		item->ipmi_sensor = zbx_strdup(NULL, row[15]);
-		item->snmp_community = zbx_strdup(NULL, row[16]);
-		item->snmp_oid = zbx_strdup(NULL, row[17]);
-		item->snmpv3_securityname = zbx_strdup(NULL, row[18]);
-		item->snmpv3_authpassphrase = zbx_strdup(NULL, row[21]);
-		item->snmpv3_privpassphrase = zbx_strdup(NULL, row[23]);
-		item->username = zbx_strdup(NULL, row[25]);
-		item->password = zbx_strdup(NULL, row[26]);
-		item->publickey = zbx_strdup(NULL, row[27]);
-		item->privatekey = zbx_strdup(NULL, row[28]);
-		item->description = zbx_strdup(NULL, row[30]);
-		item->lifetime = zbx_strdup(NULL, row[32]);
-		item->snmpv3_contextname = zbx_strdup(NULL, row[33]);
-		item->port = zbx_strdup(NULL, row[36]);
-		item->jmx_endpoint = zbx_strdup(NULL, row[37]);
-		ZBX_DBROW2UINT64(item->master_itemid, row[38]);
+		item->snmp_oid = zbx_strdup(NULL, row[16]);
+		item->username = zbx_strdup(NULL, row[18]);
+		item->password = zbx_strdup(NULL, row[19]);
+		item->publickey = zbx_strdup(NULL, row[20]);
+		item->privatekey = zbx_strdup(NULL, row[21]);
+		item->description = zbx_strdup(NULL, row[23]);
+		item->lifetime = zbx_strdup(NULL, row[25]);
+		item->jmx_endpoint = zbx_strdup(NULL, row[28]);
+		ZBX_DBROW2UINT64(item->master_itemid, row[29]);
 
-		if (SUCCEED != DBis_null(row[34]))
+		if (SUCCEED != DBis_null(row[26]))
 		{
 			item->key = NULL;
-			ZBX_STR2UINT64(item->itemid, row[34]);
+			ZBX_STR2UINT64(item->itemid, row[26]);
 		}
 		else
 		{
@@ -262,24 +242,24 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 			item->itemid = 0;
 		}
 
-		item->timeout = zbx_strdup(NULL, row[39]);
-		item->url = zbx_strdup(NULL, row[40]);
-		item->query_fields = zbx_strdup(NULL, row[41]);
-		item->posts = zbx_strdup(NULL, row[42]);
-		item->status_codes = zbx_strdup(NULL, row[43]);
-		ZBX_STR2UCHAR(item->follow_redirects, row[44]);
-		ZBX_STR2UCHAR(item->post_type, row[45]);
-		item->http_proxy = zbx_strdup(NULL, row[46]);
-		item->headers = zbx_strdup(NULL, row[47]);
-		ZBX_STR2UCHAR(item->retrieve_mode, row[48]);
-		ZBX_STR2UCHAR(item->request_method, row[49]);
-		ZBX_STR2UCHAR(item->output_format, row[50]);
-		item->ssl_cert_file = zbx_strdup(NULL, row[51]);
-		item->ssl_key_file = zbx_strdup(NULL, row[52]);
-		item->ssl_key_password = zbx_strdup(NULL, row[53]);
-		ZBX_STR2UCHAR(item->verify_peer, row[54]);
-		ZBX_STR2UCHAR(item->verify_host, row[55]);
-		ZBX_STR2UCHAR(item->allow_traps, row[56]);
+		item->timeout = zbx_strdup(NULL, row[30]);
+		item->url = zbx_strdup(NULL, row[31]);
+		item->query_fields = zbx_strdup(NULL, row[31]);
+		item->posts = zbx_strdup(NULL, row[33]);
+		item->status_codes = zbx_strdup(NULL, row[34]);
+		ZBX_STR2UCHAR(item->follow_redirects, row[35]);
+		ZBX_STR2UCHAR(item->post_type, row[36]);
+		item->http_proxy = zbx_strdup(NULL, row[37]);
+		item->headers = zbx_strdup(NULL, row[38]);
+		ZBX_STR2UCHAR(item->retrieve_mode, row[39]);
+		ZBX_STR2UCHAR(item->request_method, row[40]);
+		ZBX_STR2UCHAR(item->output_format, row[41]);
+		item->ssl_cert_file = zbx_strdup(NULL, row[42]);
+		item->ssl_key_file = zbx_strdup(NULL, row[43]);
+		item->ssl_key_password = zbx_strdup(NULL, row[44]);
+		ZBX_STR2UCHAR(item->verify_peer, row[45]);
+		ZBX_STR2UCHAR(item->verify_host, row[46]);
+		ZBX_STR2UCHAR(item->allow_traps, row[47]);
 		zbx_vector_ptr_create(&item->dependent_items);
 		zbx_vector_ptr_append(items, item);
 	}
@@ -546,10 +526,9 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 	if (NULL == item->key) /* existing item */
 	{
 		char	*name_esc, *delay_esc, *history_esc, *trends_esc, *trapper_hosts_esc, *units_esc, *formula_esc,
-			*logtimefmt_esc, *params_esc, *ipmi_sensor_esc, *snmp_community_esc, *snmp_oid_esc,
-			*snmpv3_securityname_esc, *snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc, *username_esc,
+			*logtimefmt_esc, *params_esc, *ipmi_sensor_esc, *snmp_oid_esc, *username_esc,
 			*password_esc, *publickey_esc, *privatekey_esc, *description_esc, *lifetime_esc,
-			*snmpv3_contextname_esc, *port_esc, *jmx_endpoint_esc, *timeout_esc, *url_esc,
+			*jmx_endpoint_esc, *timeout_esc, *url_esc,
 			*query_fields_esc, *posts_esc, *status_codes_esc, *http_proxy_esc, *headers_esc,
 			*ssl_cert_file_esc, *ssl_key_file_esc, *ssl_key_password_esc;
 
@@ -563,19 +542,13 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		logtimefmt_esc = DBdyn_escape_string(item->logtimefmt);
 		params_esc = DBdyn_escape_string(item->params);
 		ipmi_sensor_esc = DBdyn_escape_string(item->ipmi_sensor);
-		snmp_community_esc = DBdyn_escape_string(item->snmp_community);
 		snmp_oid_esc = DBdyn_escape_string(item->snmp_oid);
-		snmpv3_securityname_esc = DBdyn_escape_string(item->snmpv3_securityname);
-		snmpv3_authpassphrase_esc = DBdyn_escape_string(item->snmpv3_authpassphrase);
-		snmpv3_privpassphrase_esc = DBdyn_escape_string(item->snmpv3_privpassphrase);
 		username_esc = DBdyn_escape_string(item->username);
 		password_esc = DBdyn_escape_string(item->password);
 		publickey_esc = DBdyn_escape_string(item->publickey);
 		privatekey_esc = DBdyn_escape_string(item->privatekey);
 		description_esc = DBdyn_escape_string(item->description);
 		lifetime_esc = DBdyn_escape_string(item->lifetime);
-		snmpv3_contextname_esc = DBdyn_escape_string(item->snmpv3_contextname);
-		port_esc = DBdyn_escape_string(item->port);
 		jmx_endpoint_esc = DBdyn_escape_string(item->jmx_endpoint);
 		timeout_esc = DBdyn_escape_string(item->timeout);
 		url_esc = DBdyn_escape_string(item->url);
@@ -604,15 +577,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					"valuemapid=%s,"
 					"params='%s',"
 					"ipmi_sensor='%s',"
-					"snmp_community='%s',"
 					"snmp_oid='%s',"
-					"snmpv3_securityname='%s',"
-					"snmpv3_securitylevel=%d,"
-					"snmpv3_authprotocol=%d,"
-					"snmpv3_authpassphrase='%s',"
-					"snmpv3_privprotocol=%d,"
-					"snmpv3_privpassphrase='%s',"
-					"snmpv3_contextname='%s',"
 					"authtype=%d,"
 					"username='%s',"
 					"password='%s',"
@@ -625,7 +590,6 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					"interfaceid=%s,"
 					"lifetime='%s',"
 					"evaltype=%d,"
-					"port='%s',"
 					"jmx_endpoint='%s',"
 					"master_itemid=%s,"
 					"timeout='%s',"
@@ -650,13 +614,10 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				name_esc, (int)item->type, (int)item->value_type, delay_esc,
 				history_esc, trends_esc, (int)item->status, trapper_hosts_esc, units_esc,
 				formula_esc, logtimefmt_esc, DBsql_id_ins(item->valuemapid), params_esc,
-				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc, snmpv3_securityname_esc,
-				(int)item->snmpv3_securitylevel, (int)item->snmpv3_authprotocol,
-				snmpv3_authpassphrase_esc, (int)item->snmpv3_privprotocol, snmpv3_privpassphrase_esc,
-				snmpv3_contextname_esc, (int)item->authtype, username_esc, password_esc, publickey_esc,
-				privatekey_esc, item->templateid, (int)item->flags, description_esc,
+				ipmi_sensor_esc, snmp_oid_esc,(int)item->authtype, username_esc, password_esc,
+				publickey_esc, privatekey_esc, item->templateid, (int)item->flags, description_esc,
 				(int)item->inventory_link, DBsql_id_ins(item->interfaceid), lifetime_esc,
-				(int)item->evaltype, port_esc, jmx_endpoint_esc, DBsql_id_ins(item->master_itemid),
+				(int)item->evaltype, jmx_endpoint_esc, DBsql_id_ins(item->master_itemid),
 				timeout_esc, url_esc, query_fields_esc, posts_esc, status_codes_esc,
 				item->follow_redirects, item->post_type, http_proxy_esc, headers_esc,
 				item->retrieve_mode, item->request_method, item->output_format, ssl_cert_file_esc,
@@ -664,19 +625,13 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->allow_traps, item->itemid);
 
 		zbx_free(jmx_endpoint_esc);
-		zbx_free(port_esc);
-		zbx_free(snmpv3_contextname_esc);
 		zbx_free(lifetime_esc);
 		zbx_free(description_esc);
 		zbx_free(privatekey_esc);
 		zbx_free(publickey_esc);
 		zbx_free(password_esc);
 		zbx_free(username_esc);
-		zbx_free(snmpv3_privpassphrase_esc);
-		zbx_free(snmpv3_authpassphrase_esc);
-		zbx_free(snmpv3_securityname_esc);
 		zbx_free(snmp_oid_esc);
-		zbx_free(snmp_community_esc);
 		zbx_free(ipmi_sensor_esc);
 		zbx_free(params_esc);
 		zbx_free(logtimefmt_esc);
@@ -703,13 +658,10 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key, hostid, (int)item->type,
 				(int)item->value_type, item->delay, item->history, item->trends,
 				(int)item->status, item->trapper_hosts, item->units, item->formula, item->logtimefmt,
-				item->valuemapid, item->params, item->ipmi_sensor, item->snmp_community, item->snmp_oid,
-				item->snmpv3_securityname, (int)item->snmpv3_securitylevel,
-				(int)item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
-				(int)item->snmpv3_privprotocol, item->snmpv3_privpassphrase, (int)item->authtype,
+				item->valuemapid, item->params, item->ipmi_sensor, item->snmp_oid, (int)item->authtype,
 				item->username, item->password, item->publickey, item->privatekey, item->templateid,
 				(int)item->flags, item->description, (int)item->inventory_link, item->interfaceid,
-				item->lifetime, item->snmpv3_contextname, (int)item->evaltype, item->port,
+				item->lifetime, (int)item->evaltype,
 				item->jmx_endpoint, item->master_itemid, item->timeout, item->url, item->query_fields,
 				item->posts, item->status_codes, item->follow_redirects, item->post_type,
 				item->http_proxy, item->headers, item->retrieve_mode, item->request_method,
@@ -769,11 +721,9 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 		zbx_db_insert_prepare(&db_insert_items, "items", "itemid", "name", "key_", "hostid", "type", "value_type",
 				"delay", "history", "trends", "status", "trapper_hosts", "units",
 				"formula", "logtimefmt", "valuemapid", "params", "ipmi_sensor",
-				"snmp_community", "snmp_oid", "snmpv3_securityname", "snmpv3_securitylevel",
-				"snmpv3_authprotocol", "snmpv3_authpassphrase", "snmpv3_privprotocol",
-				"snmpv3_privpassphrase", "authtype", "username", "password", "publickey", "privatekey",
+				"snmp_oid", "authtype", "username", "password", "publickey", "privatekey",
 				"templateid", "flags", "description", "inventory_link", "interfaceid", "lifetime",
-				"snmpv3_contextname", "evaltype", "port", "jmx_endpoint", "master_itemid",
+				"evaltype","jmx_endpoint", "master_itemid",
 				"timeout", "url", "query_fields", "posts", "status_codes", "follow_redirects",
 				"post_type", "http_proxy", "headers", "retrieve_mode", "request_method",
 				"output_format", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "verify_peer",
@@ -1164,19 +1114,13 @@ static void	free_template_item(zbx_template_item_t *item)
 	zbx_free(item->ssl_key_file);
 	zbx_free(item->ssl_key_password);
 	zbx_free(item->jmx_endpoint);
-	zbx_free(item->port);
-	zbx_free(item->snmpv3_contextname);
 	zbx_free(item->lifetime);
 	zbx_free(item->description);
 	zbx_free(item->privatekey);
 	zbx_free(item->publickey);
 	zbx_free(item->password);
 	zbx_free(item->username);
-	zbx_free(item->snmpv3_privpassphrase);
-	zbx_free(item->snmpv3_authpassphrase);
-	zbx_free(item->snmpv3_securityname);
 	zbx_free(item->snmp_oid);
-	zbx_free(item->snmp_community);
 	zbx_free(item->ipmi_sensor);
 	zbx_free(item->params);
 	zbx_free(item->logtimefmt);

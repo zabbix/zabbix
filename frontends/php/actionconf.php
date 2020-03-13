@@ -304,7 +304,7 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 
 			if ($uniqOperations[$new_operation['operationtype']] > 1) {
 				$result = false;
-				error(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
+				error(_s('Operation "%1$s" already exists.', operation_type2str($new_operation['operationtype'])));
 				show_messages();
 			}
 		}

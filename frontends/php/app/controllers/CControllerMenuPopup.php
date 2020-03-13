@@ -128,18 +128,28 @@ class CControllerMenuPopup extends CController {
 
 		$db_hosts = $has_goto
 			? API::Host()->get([
-				'output' => ['status'],
+				'output' => ['hostid', 'status'],
 				'selectGraphs' => API_OUTPUT_COUNT,
 				'selectScreens' => API_OUTPUT_COUNT,
+				'selectHttpTests' => API_OUTPUT_COUNT,
 				'hostids' => $data['hostid']
 			])
 			: API::Host()->get([
-				'output' => [],
+				'output' => ['hostid'],
 				'hostids' => $data['hostid']
 			]);
 
 		if ($db_hosts) {
 			$db_host = $db_hosts[0];
+			$rw_hosts = false;
+
+			if ($has_goto && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
+				$rw_hosts = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => $db_host['hostid'],
+					'editable' => true
+				]);
+			}
 
 			$scripts = API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']];
 
@@ -159,6 +169,9 @@ class CControllerMenuPopup extends CController {
 			if ($has_goto) {
 				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
 				$menu_data['showScreens'] = (bool) $db_host['screens'];
+				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
+				$menu_data['showConfig'] = (CWebUser::getType() > USER_TYPE_ZABBIX_USER);
+				$menu_data['isWriteable'] = $rw_hosts;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
 					$menu_data['severity_min'] = $data['severity_min'];

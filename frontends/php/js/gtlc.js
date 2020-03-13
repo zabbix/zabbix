@@ -26,6 +26,8 @@ jQuery(function ($){
 		element = {
 			from: container.find('[name=from]'),
 			to: container.find('[name=to]'),
+			filter_from: container.find('[name=filter_from]'),
+			filter_to: container.find('[name=filter_to]'),
 			from_clndr: container.find('[name=from_calendar]'),
 			to_clndr: container.find('[name=to_calendar]'),
 			apply: container.find('[name=apply]'),
@@ -120,6 +122,8 @@ jQuery(function ($){
 		if ('error' in data === false) {
 			element.from.val(data.from);
 			element.to.val(data.to);
+			element.filter_from.val(data.from);
+			element.filter_to.val(data.to);
 			element.label.text(data.label);
 		}
 
@@ -264,20 +268,20 @@ jQuery(function ($){
 	/**
 	 * Update from/to URL arguments and remove page URL argument from browser history.
 	 *
-	 * @param {string} from  Value for 'from' argument.
-	 * @param {string} to    Value for 'to' argument.
+	 * @param {string} from  Value for 'filter_from' argument.
+	 * @param {string} to    Value for 'filter_to' argument.
 	 */
 	function updateUrlArguments(from, to) {
 		var url = new Curl(),
 			args = url.getArguments();
 
-		if (('from' in args) || ('to' in args) || ('page' in args)) {
-			if ('from' in args) {
-				url.setArgument('from', from);
+		if (('filter_from' in args) || ('filter_to' in args) || ('page' in args)) {
+			if ('filter_from' in args) {
+				url.setArgument('filter_from', from);
 			}
 
-			if ('to' in args) {
-				url.setArgument('to', to);
+			if ('filter_to' in args) {
+				url.setArgument('filter_to', to);
 			}
 
 			if ('page' in args) {

@@ -71,7 +71,7 @@ class CScreenDataOverview extends CScreenBase {
 		}
 
 		$footer = (new CList())
-			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addItem(_s('Updated: %1$s', zbx_date2str(TIME_FORMAT_SECONDS)))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
 		return $this->getOutput(new CUiWidget(uniqid(), [$header, $table, $footer]));

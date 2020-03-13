@@ -3489,21 +3489,6 @@ int	is_time_function(const char *func)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_snmp_type                                                     *
- *                                                                            *
- * Return value:  SUCCEED  - the given type is one of regular SNMP types      *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
-int	is_snmp_type(unsigned char type)
-{
-	return ITEM_TYPE_SNMPv1 == type || ITEM_TYPE_SNMPv2c == type || ITEM_TYPE_SNMPv3 == type ? SUCCEED : FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: make_hostname                                                    *
  *                                                                            *
  * Purpose: replace all not-allowed hostname characters in the string         *
@@ -3549,9 +3534,7 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 	{
 		case ITEM_TYPE_ZABBIX:
 			return INTERFACE_TYPE_AGENT;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
+		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_SNMPTRAP:
 			return INTERFACE_TYPE_SNMP;
 		case ITEM_TYPE_IPMI:

@@ -1,0 +1,1 @@
+.......PS. [ZBX-17330] fixed error reading vmware events with keys over 2^31 (MVekslers)

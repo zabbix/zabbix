@@ -48,7 +48,6 @@ abstract class CItemGeneral extends CApiService {
 		// host - value should be null for template items
 		$this->fieldRules = [
 			'type'					=> ['template' => 1],
-			'snmp_community'		=> [],
 			'snmp_oid'				=> ['template' => 1],
 			'hostid'				=> [],
 			'name'					=> ['template' => 1],
@@ -62,13 +61,6 @@ abstract class CItemGeneral extends CApiService {
 			'value_type'			=> ['template' => 1],
 			'trapper_hosts'			=> [],
 			'units'					=> ['template' => 1],
-			'snmpv3_contextname'	=> [],
-			'snmpv3_securityname'	=> [],
-			'snmpv3_securitylevel'	=> [],
-			'snmpv3_authprotocol'	=> [],
-			'snmpv3_authpassphrase'	=> [],
-			'snmpv3_privprotocol'	=> [],
-			'snmpv3_privpassphrase'	=> [],
 			'formula'				=> ['template' => 1],
 			'error'					=> ['system' => 1],
 			'lastlogsize'			=> ['system' => 1],
@@ -86,7 +78,6 @@ abstract class CItemGeneral extends CApiService {
 			'flags'					=> [],
 			'filter'				=> [],
 			'interfaceid'			=> ['host' => 1],
-			'port'					=> [],
 			'inventory_link'		=> [],
 			'lifetime'				=> [],
 			'preprocessing'			=> ['template' => 1],
@@ -533,15 +524,15 @@ abstract class CItemGeneral extends CApiService {
 
 			// ssh, telnet
 			if ($fullItem['type'] == ITEM_TYPE_SSH || $fullItem['type'] == ITEM_TYPE_TELNET) {
-				if (zbx_empty($fullItem['username'])) {
+				if ($fullItem['username'] === '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No authentication user name specified.'));
 				}
 
 				if ($fullItem['type'] == ITEM_TYPE_SSH && $fullItem['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
-					if (zbx_empty($fullItem['publickey'])) {
+					if ($fullItem['publickey'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No public key file specified.'));
 					}
-					if (zbx_empty($fullItem['privatekey'])) {
+					if ($fullItem['privatekey'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No private key file specified.'));
 					}
 				}
@@ -562,41 +553,9 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// snmp oid
-			if ((in_array($fullItem['type'], [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3]))
-					&& zbx_empty($fullItem['snmp_oid'])) {
+			if ($fullItem['type'] == ITEM_TYPE_SNMP
+					&& (!array_key_exists('snmp_oid', $fullItem) || $fullItem['snmp_oid'] === '')) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP OID specified.'));
-			}
-
-			// snmp community
-			if (in_array($fullItem['type'], [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C])
-					&& zbx_empty($fullItem['snmp_community'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP community specified.'));
-			}
-
-			// snmp port
-			if (isset($fullItem['port']) && !zbx_empty($fullItem['port']) && !validatePortNumberOrMacro($fullItem['port'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Item "%1$s:%2$s" has invalid port: "%3$s".', $fullItem['name'], $fullItem['key_'], $fullItem['port']));
-			}
-
-			if (isset($fullItem['snmpv3_securitylevel']) && $fullItem['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-				// snmpv3 authprotocol
-				if (str_in_array($fullItem['snmpv3_securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])) {
-					if (isset($fullItem['snmpv3_authprotocol']) && (zbx_empty($fullItem['snmpv3_authprotocol'])
-							|| !str_in_array($fullItem['snmpv3_authprotocol'],
-								[ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA]))) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect authentication protocol for item "%1$s".', $fullItem['name']));
-					}
-				}
-
-				// snmpv3 privprotocol
-				if ($fullItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-					if (isset($fullItem['snmpv3_privprotocol']) && (zbx_empty($fullItem['snmpv3_privprotocol'])
-							|| !str_in_array($fullItem['snmpv3_privprotocol'],
-								[ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES]))) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect privacy protocol for item "%1$s".', $fullItem['name']));
-					}
-				}
 			}
 
 			if (isset($item['applications']) && $item['applications']) {

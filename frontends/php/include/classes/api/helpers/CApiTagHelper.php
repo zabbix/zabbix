@@ -87,4 +87,39 @@ class CApiTagHelper {
 
 		return (count($values_by_tag) > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
 	}
+
+	/**
+	 * Checks, if host tag matches filter tag.
+	 *
+	 * @param array  $filter_tag
+	 * @param string $filter_tag['tag']
+	 * @param int    $filter_tag['operator']
+	 * @param string $filter_tag['value']
+	 * @param array  $host_tag
+	 * @param string $host_tag['tag']
+	 * @param string $host_tag['value']
+	 *
+	 * @return boolean
+	 */
+	public static function checkTag(array $filter_tag, array $host_tag) {
+		switch ($filter_tag['operator']) {
+			case TAG_OPERATOR_EQUAL:
+				if ($filter_tag['tag'] === $host_tag['tag']
+						&& $filter_tag['value'] === $host_tag['value']) {
+					return true;
+				}
+
+				break;
+			case TAG_OPERATOR_LIKE:
+				if ($filter_tag['tag'] === $host_tag['tag']
+						&& ($filter_tag['value'] === ''
+							|| mb_strpos($host_tag['value'], $filter_tag['value']) !== false)) {
+					return true;
+				}
+
+				break;
+		}
+
+		return false;
+	}
 }

@@ -275,10 +275,7 @@ foreach ($data['hosts'] as $host) {
 		->addSID();
 
 	if ($maintenance_icon) {
-		$status = [$maintenance_icon, $status];
-	}
-	elseif (count($data['maintenances'])) {
-		$status->addClass(ZBX_STYLE_ICON_NONE);
+		$description[] = $maintenance_icon;
 	}
 
 	order_result($host['parentTemplates'], 'name');
@@ -392,7 +389,9 @@ foreach ($data['hosts'] as $host) {
 			$out_encryption[] = (new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
-		$encryption = (new CDiv([$in_encryption, ' ', $out_encryption]))->addClass(ZBX_STYLE_STATUS_CONTAINER);
+		$encryption = (new CDiv([new CSpan($in_encryption), ' ', new CSpan($out_encryption)]))
+			->addClass(ZBX_STYLE_STATUS_CONTAINER)
+			->addClass(ZBX_STYLE_NOWRAP);
 	}
 
 	$table->addRow([
