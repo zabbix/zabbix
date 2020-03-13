@@ -131,13 +131,10 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 			continue;
 		}
 		result->value = expr_result;
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "RES EXPRESSION: %s", result->expression);
-		zabbix_log(LOG_LEVEL_INFORMATION, "RES expr_result: %f",expr_result);
-		zabbix_log(LOG_LEVEL_INFORMATION, "RES result_value: %f",result->value);
 	}
 
-	zbx_json_addarray(json, ZBX_PROTO_TAG_EXPRESSIONS);
+	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
+	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
 
 
 	for (i = 0; i < results.values_num; i++)

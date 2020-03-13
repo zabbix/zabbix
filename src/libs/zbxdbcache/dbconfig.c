@@ -9602,16 +9602,28 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 	if ('\0' == *text)
 		return zbx_strdup(NULL, text);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "TEXT: ->%s<-",text);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "11111111111111111111111111111111111");
 	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
+	zabbix_log(LOG_LEVEL_INFORMATION, "222222222222222222222");
+
 		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "33333333333333333");
 
 		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
 			continue;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "4444444444444444444444");
+
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 		dc_get_user_macro(hostids, hostids_num, name, context, &value);
+
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "5555555555555: ->%d<-",(NULL==value));
 
 		if (NULL != value && NULL != validator_func && FAIL == validator_func(value))
 			zbx_free(value);
@@ -9688,6 +9700,7 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_uint64_destroy(&functionids);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "DC_EXPRESSION_EXPAND_USER_MACROS END\n\n\n");
 	return out;
 }
 
