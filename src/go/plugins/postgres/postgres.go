@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"zabbix.com/pkg/plugin"
@@ -89,7 +90,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		handler    requestHandler
 		session    *Session
 	)
-
 	if len(params) > 0 && len(params[0]) > 0 {
 		var ok bool
 		if session, ok = p.options.Sessions[params[0]]; !ok {
@@ -97,29 +97,39 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			if err != nil {
 				return nil, fmt.Errorf("Invalid connection URI: %s", err)
 			}
+			if u.Host == "" {
+				u.Host = p.options.Host
+			}
+			session = &Session{
+				Host:     u.Host,
+				Database: u.Path,
+			}
 			var port uint64
 			if u.Port() != "" {
 				if port, err = strconv.ParseUint(u.Port(), 10, 16); err != nil {
 					return nil, fmt.Errorf("Invalid connection port: %s", err)
 				}
-			}
-			session = &Session{
-				Host:     u.Host,
-				Port:     uint16(port),
-				Database: u.Path,
+				session.Port = uint16(port)
+			} else {
+				session.Port = p.options.Port
 			}
 			if len(params) > 1 {
 				session.User = params[1]
+			} else {
+				session.User = p.options.User
 			}
 			if len(params) > 2 {
 				session.Password = params[2]
+			} else {
+				session.Password = p.options.Password
 			}
+
 		}
 	} else {
-		if len(params) > 1 && params[1] != "" {
+		if len(params) > 1 && params[1] == "" {
 			return nil, errors.New("Invalid second parameter.")
 		}
-		if len(params) > 2 && params[1] != "" {
+		if len(params) > 2 && params[2] == "" {
 			return nil, errors.New("Invalid third parameter.")
 		}
 		session = &Session{
@@ -210,6 +220,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	conn, err := p.connMgr.GetPostgresConnection(connString)
 	if err != nil {
+		fmt.Println("cannot connect to PG ")
 		// Here is another logic of processing connection errors if postgres.ping is requested
 		if key == keyPostgresPing {
 			return postgresPingFailed, nil
@@ -220,8 +231,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	var handlerParams []string
-	if len(params) >= 3 {
-		handlerParams = params[3:]
+	if len(params) > 0 {
+		path := strings.TrimLeft(u.Path, "/")
+		handlerParams = []string{path}
 	} else {
 		handlerParams = make([]string, 0)
 	}
