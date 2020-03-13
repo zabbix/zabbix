@@ -348,12 +348,10 @@ class CZabbixServer {
 			return false;
 		}
 
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'expressions' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
-				'expression' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'value' =>			['type' => API_INT32, 'in' => '0,1'],
-				'error' =>			['type' => API_STRING_UTF8]
-			]]
+		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
+			'expression' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'value' =>		['type' => API_INT32, 'in' => '0,1'],
+			'error' =>		['type' => API_STRING_UTF8]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $response, '/', $this->error)) {

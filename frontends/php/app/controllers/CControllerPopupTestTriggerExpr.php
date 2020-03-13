@@ -162,7 +162,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 				$message_title = _('Cannot evaluate expression');
 			}
 			else {
-				foreach ($response['expressions'] as $expression) {
+				foreach ($response as $expression) {
 					foreach ($mapping[$expression['expression']] as $original_expression) {
 						unset($expression['expression']);
 						$results[$original_expression] = $expression;
