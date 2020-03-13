@@ -2696,7 +2696,7 @@ ZABBIX.apps.map = (function($) {
 			// hosts
 			$('#elementNameHost').multiSelectHelper({
 				id: 'elementNameHost',
-				objectName: 'hosts',
+				object_name: 'hosts',
 				name: 'elementValue',
 				selectedLimit: 1,
 				popup: {
@@ -2712,7 +2712,7 @@ ZABBIX.apps.map = (function($) {
 			// triggers
 			$('#elementNameTriggers').multiSelectHelper({
 				id: 'elementNameTriggers',
-				objectName: 'triggers',
+				object_name: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
 					real_hosts: true
@@ -2734,7 +2734,7 @@ ZABBIX.apps.map = (function($) {
 			// host group
 			$('#elementNameHostGroup').multiSelectHelper({
 				id: 'elementNameHostGroup',
-				objectName: 'hostGroup',
+				object_name: 'hostGroup',
 				name: 'elementValue',
 				selectedLimit: 1,
 				popup: {
