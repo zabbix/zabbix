@@ -617,6 +617,14 @@ class CControllerPopupGeneric extends CController {
 		// Host dropdown.
 		if (in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER)
 				&& ($this->source_table !== 'item_prototypes' || !$this->page_options['parent_discoveryid'])) {
+
+			$src_name = 'hosts';
+			if (!array_key_exists('monitored_hosts', $host_options)
+					&& !array_key_exists('real_hosts', $host_options)
+					&& !array_key_exists('templated_hosts', $host_options)) {
+				$src_name = 'host_templates';
+			}
+
 			$hosts = $this->hostids
 				? API::Host()->get([
 					'output' => ['name', 'hostid'],
@@ -642,13 +650,13 @@ class CControllerPopupGeneric extends CController {
 			$filter['hosts'] = [
 				'multiple' => false,
 				'name' => 'popup_host',
-				'object_name' => 'hosts',
+				'object_name' => $src_name,
 				'data' => array_values($hosts),
 				'selectedLimit' => 1,
 				'disabled' => $this->hasInput('only_hostid'),
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'hosts',
+						'srctbl' => $src_name,
 						'srcfld1' => 'hostid',
 						'dstfld1' => 'popup_host'
 					] + $host_options
