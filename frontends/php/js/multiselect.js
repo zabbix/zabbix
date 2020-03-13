@@ -986,6 +986,10 @@ jQuery(function($) {
 		}
 
 		$available.appendTo(document.body);
+
+		$obj.on('remove', function() {
+			cleanSearch($obj);
+		});
 	}
 
 	function hideAvailable($obj) {
