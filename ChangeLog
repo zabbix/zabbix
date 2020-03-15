@@ -1,6 +1,14 @@
 Changes for 5.0.0beta1
 
 New features:
+...G...PS. [ZBXNEXT-3604] added support of user configurable ciphers for communication between Zabbix components (Andris)
+.......PS. [ZBXNEXT-5649] added name referencing support ('~' suffix) to jsonpath (wiper)
+.....J.... [ZBXNEXT-2727] added support of JMX TabularData (viktors)
+A.F....... [ZBXNEXT-5694] implemented new page Monitoring->Hosts and added "Configuration" to Host context menu (Ivo, vmurzins)
+A.F.....S. [ZBXNEXT-2957] added ability to mask macros (rlataria, wiper)
+..F....... [ZBXNEXT-617] added mass update of macros on host / template (rlataria)
+A.F....PS. [ZBXNEXT-2613] moved SNMP connection-related attributes to host interface level (MVekslers, rlataria)
+.........T [ZBX-17409] fixed item mysql.dbsize in Template DB MySQL (mchudinov)
 ..F....... [ZBXNEXT-5449] added support of svg graph as image download (gcalenko)
 ...GI..PS. [ZBXNEXT-5716] removed mbedTLS support (Andris)
 ....I..... [ZBX-17173] improved windows agent build scripts (yurii)
@@ -13,6 +21,15 @@ A.F.I..... [ZBXNEXT-4584] implemented auditlog API (gcalenko, Sasha)
 ..F....... [ZBXNEXT-5725] added ability to select specific severities in Monitoring->Problems (vasilijs)
 
 Bug fixes:
+..F....... [ZBX-17344] fixed PHP 7.4 errors in Latest data->History page for text and log items having an empty filter (Ivo)
+..F....... [ZBX-17288] fixed undefined indexes in Administration->Regular expressions->Test tab (averza, Ivo)
+.......PS. [ZBX-17330] fixed error reading vmware events with keys over 2^31 (MVekslers)
+A.F....... [ZBX-17272] changed translation strings to yield order number in argument (Ivo)
+...G...... [ZBX-17426] fixed agen2 build with go 1.14 (wiper)
+..FG...... [ZBX-16802] added mtime-reread/mtime-noreread options parameter to log* keys (atumilovics)
+..F....... [ZBX-17350] fixed displaying of multiple value types in Latest data->History page (Ivo)
+........S. [ZBX-17284] fixed macro {EVENT.VALUE} is not substituted properly in webhooks (akozlovs)
+..F....... [ZBX-17027] fixed broken layout in usergroup page (rlataria)
 ..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
 ..F....... [ZBX-17205] fixed inability to add more than one space in auto-expandable fields like macros and tags (agriscenko)
 ..F....... [ZBX-17347] fixed order of setting the Severity in the columns in the filters to vertical (vasilijs)
