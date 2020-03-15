@@ -639,6 +639,7 @@ if ($data['multiselect'] && $form !== null) {
 	];
 }
 
+// Types require results returned as array.
 $types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
 	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes'
 ];
