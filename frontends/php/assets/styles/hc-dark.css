@@ -5047,15 +5047,12 @@ table.preprocessing-test-results .rel-container {
     height: 100%; } }
 .interface-container {
   width: fit-content;
-  width: -moz-fit-content;
-  padding: 10px 0 0;
-  margin-bottom: 5px;
-  border-top: 1px solid #666666; }
-  .interface-container.interface-container-header {
-    margin: 0; }
-  .interface-container.interface-container-header, .interface-container.interface-container-header + .interface-container, .interface-container:empty + .interface-container {
-    padding: 0;
-    border: 0; }
+  width: -moz-fit-content; }
+  .interface-container:not(.interface-container-header) {
+    padding: 0 0 5px; }
+    .interface-container:not(.interface-container-header):not(:last-of-type) {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #666666; }
   .interface-container:empty {
     display: none; }
   .interface-container .interface-row {

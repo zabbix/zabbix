@@ -7658,19 +7658,14 @@ table.preprocessing-test-results {
 .interface-container {
 	width: fit-content;
 	width: -moz-fit-content;
-	padding: 10px 0 0;
-	margin-bottom: 5px;
-	border-top: 1px solid $form-border-color;
 
-	&.interface-container-header {
-		margin: 0;
-	}
+	&:not(.interface-container-header) {
+		padding: 0 0 5px;
 
-	&.interface-container-header,
-	&.interface-container-header + .interface-container,
-	&:empty + .interface-container {
-		padding: 0;
-		border: 0;
+		&:not(:last-of-type) {
+			margin-bottom: 10px;
+			border-bottom: 1px solid $form-border-color;
+		}
 	}
 
 	&:empty {
