@@ -1686,8 +1686,8 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
  ******************************************************************************/
 static int	macro_str_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_hostmacro_t * hostmacro1 = (const zbx_lld_hostmacro_t *)d1;
-	const zbx_lld_hostmacro_t * hostmacro2 = (const zbx_lld_hostmacro_t *)d2;
+	const zbx_lld_hostmacro_t *hostmacro1 = *(const zbx_lld_hostmacro_t **)d1;
+	const zbx_lld_hostmacro_t *hostmacro2 = *(const zbx_lld_hostmacro_t **)d2;
 
 	return strcmp(hostmacro1->macro, hostmacro2->macro);
 }
