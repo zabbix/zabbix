@@ -482,10 +482,10 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 				$tests[] = [$func, $params, $valueType, $options, false];
 
 				$params[$no] = '1.';
-				$tests[] = [$func, $params, $valueType, $options, false];
+				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
 
 				$params[$no] = '.1';
-				$tests[] = [$func, $params, $valueType, $options, false];
+				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
 
 				$params[$no] = '.';
 				$tests[] = [$func, $params, $valueType, $options, false];
