@@ -1345,7 +1345,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->assertEquals('Send message', $operation_details->getField('Operation type')->getValue());
 		// Make sure that Custom message is unchecked and that message related fields are not visible.
 		$this->assertFalse($operation_details->getField('Custom message')->getValue());
-		$this->zbxTestTextNotVisible('Subject','Message');
+		$this->zbxTestTextNotVisible(['Subject','Message']);
 		// Set the Custom message option and check Subject and Message fields.
 		$operation_details->getField('Custom message')->set(true);
 		$this->assertEquals(255, $operation_details->getField('Subject')->waitUntilVisible()->getAttribute('maxlength'));
