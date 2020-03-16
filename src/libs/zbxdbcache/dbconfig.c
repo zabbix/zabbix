@@ -11765,7 +11765,13 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 		{
 			ZBX_DC_SNMPINTERFACE *snmp;
 
-			snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &dst->interfaceid);
+			if (NULL == (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
+					&dst->interfaceid)))
+			{
+				zbx_free(*interfaces);
+				goto unlock;
+			}
+
 			dst->bulk = snmp->bulk;
 			dst->snmp_version= snmp->version;
 		}
