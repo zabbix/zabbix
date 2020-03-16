@@ -5080,11 +5080,12 @@ table.preprocessing-test-results .rel-container {
   .interface-container .interface-row {
     display: grid;
     grid-template-columns: 26px 36px 225px 175px 85px 100px 20px 1fr;
-    grid-template-rows: 25px 1fr;
-    gap: 5px;
-    padding-top: 10px; }
+    grid-template-rows: 24px 1fr;
+    gap: 5px; }
     .interface-container .interface-row.interface-row-header {
       margin: 0; }
+    .interface-container .interface-row:not(.interface-row-header) {
+      padding-top: 10px; }
     .interface-container .interface-row[data-type] .interface-cell-details {
       display: none; }
     .interface-container .interface-row .interface-cell {
