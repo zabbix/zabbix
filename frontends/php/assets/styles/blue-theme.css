@@ -5069,12 +5069,13 @@ table.preprocessing-test-results .rel-container {
     height: 100%; } }
 .interface-container {
   width: fit-content;
-  width: -moz-fit-content; }
-  .interface-container:not(.interface-container-header) {
-    padding: 0 0 5px; }
-    .interface-container:not(.interface-container-header):not(:last-of-type) {
-      margin-bottom: 10px;
-      border-bottom: 1px solid #acbbc2; }
+  width: -moz-fit-content;
+  padding-left: 0; }
+  .interface-container:not(.interface-container-header):not(:empty) {
+    margin-bottom: 5px; }
+    .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) {
+      border-top: 1px solid #acbbc2;
+      padding-top: 10px; }
   .interface-container:empty {
     display: none; }
   .interface-container .interface-row {
