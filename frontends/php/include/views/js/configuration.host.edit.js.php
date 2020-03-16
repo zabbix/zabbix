@@ -31,7 +31,7 @@
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
 	<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
 
-	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_ICON ?>">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
 		<button type="button" class="<?= ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE ?>"></button>
 	</div>
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_TYPE ?>">
