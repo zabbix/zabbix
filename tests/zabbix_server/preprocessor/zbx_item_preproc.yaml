@@ -2048,6 +2048,19 @@ out:
   return: SUCCEED
   value: b
 ---
+test case: replace a to bbb
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: a1a2a3a
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\nbbb"
+out:
+  return: SUCCEED
+  value: bbb1bbb2bbb3bbb
+---
 test case: replace a to a
 in:
   value:
@@ -2073,6 +2086,19 @@ in:
 out:
   return: SUCCEED
   value: ""
+---
+test case: replace a to nothing in between
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abac
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\n"
+out:
+  return: SUCCEED
+  value: "bc"
 ---
 test case: replace non printable characters
 in:
