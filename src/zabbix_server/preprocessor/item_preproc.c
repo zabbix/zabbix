@@ -2042,7 +2042,7 @@ out:
  ******************************************************************************/
 static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	unsigned int	len;
+	unsigned int	len_search, len_replace;
 	const char	*ptr;
 	char		*new_string, search_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
 			replace_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
@@ -2054,15 +2054,17 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 		return FAIL;
 	}
 
-	if (0 == (len = ptr - params))
+	if (0 == (len_search = ptr - params))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		*errmsg = zbx_strdup(*errmsg, "first parameter is expected");
 		return FAIL;
 	}
 
-	unescape_param(ZBX_PREPROC_STR_REPLACE, params, MIN(len, sizeof(search_str) - 1), search_str);
-	unescape_param(ZBX_PREPROC_STR_REPLACE, ptr + 1, MIN(strlen(ptr + 1), sizeof(replace_str) - 1), replace_str);
+	unescape_param(ZBX_PREPROC_STR_REPLACE, params, MIN(len_search, sizeof(search_str) - 1), search_str);
+
+	len_replace = strlen(ptr + 1);
+	unescape_param(ZBX_PREPROC_STR_REPLACE, ptr + 1, MIN(len_replace, sizeof(replace_str) - 1), replace_str);
 
 	if (SUCCEED != item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 	{
