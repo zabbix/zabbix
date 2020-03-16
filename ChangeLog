@@ -21,7 +21,6 @@ A.F.I..... [ZBXNEXT-4584] implemented auditlog API (gcalenko, Sasha)
 ..F....... [ZBXNEXT-5725] added ability to select specific severities in Monitoring->Problems (vasilijs)
 
 Bug fixes:
-A......... [ZBX-17425] fixed template.massupdate API macros update (rlataria)
 ..F....... [ZBX-17344] fixed PHP 7.4 errors in Latest data->History page for text and log items having an empty filter (Ivo)
 ..F....... [ZBX-17288] fixed undefined indexes in Administration->Regular expressions->Test tab (averza, Ivo)
 .......PS. [ZBX-17330] fixed error reading vmware events with keys over 2^31 (MVekslers)
