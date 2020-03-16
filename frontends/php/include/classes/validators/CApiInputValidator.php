@@ -1237,6 +1237,9 @@ class CApiInputValidator {
 		// Remove leading zeros.
 		$data = preg_replace('/^(-)?(0+)?(\d.*)$/', '${1}${3}', $data);
 
+		// Add leading zero.
+		$data = preg_replace('/^(-)?(\..*)$/', '${1}0${2}', $data);
+
 		return true;
 	}
 

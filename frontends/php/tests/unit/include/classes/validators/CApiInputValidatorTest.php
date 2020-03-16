@@ -816,7 +816,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_FLOAT],
 				'.23E11',
 				'/1/float',
-				'Invalid parameter "/1/float": a floating point value is expected.',
+				0.23E11,
 			],
 			[
 				['type' => API_FLOATS],
@@ -1845,7 +1845,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'.124',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is expected.'
+				'0.124',
+			],
+			[
+				['type' => API_NUMERIC],
+				'-.124',
+				'/1/numeric',
+				'-0.124',
 			],
 			[
 				['type' => API_NUMERIC],

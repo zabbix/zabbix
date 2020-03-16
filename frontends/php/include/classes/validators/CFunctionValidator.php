@@ -530,7 +530,7 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validatePercent($param) {
-		return (preg_match('/^\d+(\.\d{1,4})?$/', $param) && $param <= 100);
+		return (preg_match('/^\d*(\.\d{0,4})?$/', $param) && $param !== '.' && $param <= 100);
 	}
 
 	/**

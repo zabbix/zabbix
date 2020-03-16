@@ -1158,7 +1158,7 @@ define('ZBX_PREG_PRINT', '^\x00-\x1F');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_MACRO_NAME_LLD', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
-define('ZBX_PREG_NUMBER', '(?<number>-?\d+(\.\d+)?([Ee][+-]?\d+)?)');
+define('ZBX_PREG_NUMBER', '(?<number>-?(\d+(\.\d*)?|\.\d+)([Ee][+-]?\d+)?)');
 define('ZBX_PREG_INT', '(?<int>-?\d+)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
