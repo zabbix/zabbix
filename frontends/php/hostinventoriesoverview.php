@@ -67,14 +67,12 @@ $filter = [
 	'groupby' => CProfile::get('web.hostinventoriesoverview.filter_groupby', '')
 ];
 
-$filter['groups'] = $filter['groups']
-	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groups'],
-		'real_hosts' => true,
-		'preservekeys' => true
-	]), ['groupid' => 'id'])
-	: [];
+$ms_groups = [];
+$filter_groupids = $filter['groups'] ? getSubGroups($filter['groups'], $ms_groups, ['real_hosts' => true]) : null;
+
+if (count($ms_groups) != count($filter['groups'])) {
+	show_error_message(_('No permissions to referred object or it does not exist!'));
+}
 
 $inventories = [];
 foreach (getHostInventories() as $inventory) {
@@ -91,11 +89,6 @@ $table = (new CTableInfo())->setHeader([
 	make_sorting_header($grouping_column, 'inventory_field', $sortField, $sortOrder),
 	make_sorting_header(_('Host count'), 'host_count', $sortField, $sortOrder),
 ]);
-
-$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
-if ($filter_groupids) {
-	$filter_groupids = getSubGroups($filter_groupids);
-}
 
 // To show a report, we will need a host group and a field to aggregate.
 if ($filter['groupby'] !== '') {
@@ -136,7 +129,7 @@ if ($filter['groupby'] !== '') {
 				(new CUrl('hostinventories.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_exact', '1')
-					->setArgument('filter_groups', array_keys($filter['groups']))
+					->setArgument('filter_groups', array_keys($ms_groups))
 					->setArgument('filter_field', $filter['groupby'])
 					->setArgument('filter_field_value', $rep['inventory_field'])
 			)
@@ -159,7 +152,7 @@ $grouping_options = array_merge(['' => _('not selected')], $inventories);
 						(new CMultiSelect([
 							'name' => 'filter_groups[]',
 							'object_name' => 'hostGroup',
-							'data' => $filter['groups'],
+							'data' => $ms_groups,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'host_groups',

@@ -192,17 +192,18 @@ function inheritTagFilters($groupid, $name) {
  * Get sub-groups of selected host groups.
  *
  * @param array $groupids
- * @param array $ms_groups  [OUT] the list of groups for multiselect
+ * @param array $ms_groups  [OUT] the list of groups for multiselect.
+ * @param array $options    additional API options to select host groups.
  *
  * @return array
  */
-function getSubGroups(array $groupids, array &$ms_groups = null) {
+function getSubGroups(array $groupids, array &$ms_groups = null, array $options = []) {
 	$db_groups = $groupids
 		? API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $groupids,
 			'preservekeys' => true
-		])
+		] + $options)
 		: [];
 
 	if ($ms_groups !== null) {
@@ -222,7 +223,7 @@ function getSubGroups(array $groupids, array &$ms_groups = null) {
 			'searchByAny' => true,
 			'startSearch' => true,
 			'preservekeys' => true
-		]);
+		] + $options);
 	}
 
 	return array_keys($db_groups);
