@@ -20,8 +20,8 @@
 
 class CBaseComponent {
 
-	constructor(node) {
-		this._node = node;
+	constructor(target) {
+		this._target = target;
 	}
 
 	/**
@@ -29,28 +29,28 @@ class CBaseComponent {
 	 */
 
 	addClass(class_name) {
-		this._node.classList.add(class_name);
+		this._target.classList.add(class_name);
 		return this;
 	}
 
 	removeClass(class_name) {
-		this._node.classList.remove(class_name);
+		this._target.classList.remove(class_name);
 		return this;
 	}
 
 	toggleClass(class_name, force) {
-		return this._node.classList.toggle(class_name, force);
+		return this._target.classList.toggle(class_name, force);
 	}
 
 	hasClass(class_name) {
-		return this._node.classList.contains(class_name);
+		return this._target.classList.contains(class_name);
 	}
 
 	/**
 	 * Events.
 	 */
 	on(types, listener, options = false) {
-		types.split(' ').forEach((t) => this._node.addEventListener(t, listener, options));
+		types.split(' ').forEach((t) => this._target.addEventListener(t, listener, options));
 		return this;
 	}
 
@@ -59,12 +59,12 @@ class CBaseComponent {
 	}
 
 	off(types, listener, options = false) {
-		types.split(' ').forEach((t) => this._node.removeEventListener(t, listener, options));
+		types.split(' ').forEach((t) => this._target.removeEventListener(t, listener, options));
 		return this;
 	}
 
-	trigger(type, options = {}) {
-		this._node.dispatchEvent(new CustomEvent(type, {detail: Object.assign({targetObj: this}, options)}));
+	fire(type, options = {}) {
+		this._target.dispatchEvent(new CustomEvent(type, {detail: Object.assign({target: this}, options)}));
 		return this;
 	}
-};
+}

@@ -26,8 +26,8 @@ const MENU_EVENT_FOCUS           = 'focus';
 
 class CMenu extends CBaseComponent {
 
-	constructor(node) {
-		super(node);
+	constructor(target) {
+		super(target);
 
 		this.init();
 		this.registerEvents();
@@ -35,12 +35,12 @@ class CMenu extends CBaseComponent {
 
 	init() {
 		this._items = [];
-		for (const el of this._node.childNodes) {
+		for (const el of this._target.childNodes) {
 			this._items.push(new CMenuItem(el));
 		}
 
 		if (this.hasClass('submenu')) {
-			this._node.style.maxHeight = this._node.scrollHeight + 'px';
+			this._target.style.maxHeight = this._target.scrollHeight + 'px';
 		}
 	}
 
@@ -89,14 +89,14 @@ class CMenu extends CBaseComponent {
 		this._events = {
 
 			focus: (e) => {
-				if (!this._node.contains(e.relatedTarget)) {
-					this.trigger((e.type === 'focusin') ? MENU_EVENT_FOCUS : MENU_EVENT_BLUR);
+				if (!this._target.contains(e.relatedTarget)) {
+					this.fire((e.type === 'focusin') ? MENU_EVENT_FOCUS : MENU_EVENT_BLUR);
 				}
 			},
 
 			expand: (e) => {
-				this.collapseAll(e.detail.targetObj);
-				this.trigger(MENU_EVENT_EXPAND, {menu_item: e.detail.targetObj});
+				this.collapseAll(e.detail.target);
+				this.fire(MENU_EVENT_EXPAND, {menu_item: e.detail.target});
 			}
 		};
 

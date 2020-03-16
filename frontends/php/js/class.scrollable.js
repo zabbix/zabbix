@@ -20,7 +20,7 @@
 
 class CScrollable {
 
-	constructor(node) {
-		this._node = node;
+	constructor(target) {
+		this._target = target;
 	}
 }

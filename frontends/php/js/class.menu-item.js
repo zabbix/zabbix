@@ -24,18 +24,18 @@ const MENUITEM_EVENT_FOCUS    = 'focus';
 
 class CMenuItem extends CBaseComponent {
 
-	constructor(node) {
-		super(node);
+	constructor(target) {
+		super(target);
 
 		this.init();
 		this.registerEvents();
 	}
 
 	init() {
-		this._toggle = this._node.querySelector('a');
+		this._toggle = this._target.querySelector('a');
 
 		if (this.hasClass('has-submenu')) {
-			this._submenu = new CMenu(this._node.querySelector('.submenu'));
+			this._submenu = new CMenu(this._target.querySelector('.submenu'));
 		}
 
 		this._is_expanded = this.hasClass('is-expanded');
@@ -65,7 +65,7 @@ class CMenuItem extends CBaseComponent {
 	expandSubmenu() {
 		if (!this._is_expanded && this.toggleClass('is-expanded', this.hasSubmenu())) {
 			this._is_expanded = true;
-			this.trigger(MENUITEM_EVENT_EXPAND);
+			this.fire(MENUITEM_EVENT_EXPAND);
 		}
 
 		return this;
@@ -77,7 +77,7 @@ class CMenuItem extends CBaseComponent {
 
 		if (this._is_expanded) {
 			this._is_expanded = false;
-			this.trigger(MENUITEM_EVENT_COLLAPSE);
+			this.fire(MENUITEM_EVENT_COLLAPSE);
 		}
 
 		return this;
@@ -100,7 +100,7 @@ class CMenuItem extends CBaseComponent {
 				if (this.hasSubmenu() && !this._is_expanded) {
 					this.expandSubmenu();
 				}
-				this.trigger(MENUITEM_EVENT_FOCUS);
+				this.fire(MENUITEM_EVENT_FOCUS);
 			}
 		};
 

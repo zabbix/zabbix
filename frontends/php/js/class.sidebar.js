@@ -33,8 +33,8 @@ const SIDEBAR_EVENT_VIEWMODECHANGE = 'viewmodechange';
 
 class CSidebar extends CBaseComponent {
 
-	constructor(node) {
-		super(node);
+	constructor(target) {
+		super(target);
 
 		this.init();
 		this.registerEvents();
@@ -47,17 +47,17 @@ class CSidebar extends CBaseComponent {
 		this._is_opened = false;
 
 		let max_width = 0;
-		for (const menu of this._node.querySelectorAll('nav > ul')) {
+		for (const menu of this._target.querySelectorAll('nav > ul')) {
 			const position = window.getComputedStyle(menu).position;
 			menu.style.position = 'absolute';
 			max_width = Math.max(max_width, menu.clientWidth);
 			menu.style.position = position;
 		}
-		this._node.style.maxWidth = Math.max(max_width, SIDEBAR_MIN_WIDTH) + 'px';
+		this._target.style.maxWidth = Math.max(max_width, SIDEBAR_MIN_WIDTH) + 'px';
 
-		let server_name = this._node.querySelector('.sidebar-header .server-name');
+		let server_name = this._target.querySelector('.sidebar-header .server-name');
 		if (server_name) {
-			this._node.querySelector('.sidebar-header').style.maxWidth = max_width + 'px';
+			this._target.querySelector('.sidebar-header').style.maxWidth = max_width + 'px';
 			server_name.style.width = 'auto';
 		}
 
@@ -90,7 +90,7 @@ class CSidebar extends CBaseComponent {
 			}
 
 			setTimeout(() => this.addClass('is-opened'), 0);
-			this.trigger(SIDEBAR_EVENT_OPEN);
+			this.fire(SIDEBAR_EVENT_OPEN);
 		}
 
 		return this;
@@ -118,7 +118,7 @@ class CSidebar extends CBaseComponent {
 			}
 
 			this.removeClass('is-opened');
-			this.trigger(SIDEBAR_EVENT_CLOSE);
+			this.fire(SIDEBAR_EVENT_CLOSE);
 		}
 
 		return this;
@@ -137,7 +137,7 @@ class CSidebar extends CBaseComponent {
 
 		if (this._view_mode !== view_mode) {
 			this._view_mode = view_mode;
-			this.trigger(SIDEBAR_EVENT_VIEWMODECHANGE, {view_mode: this._view_mode});
+			this.fire(SIDEBAR_EVENT_VIEWMODECHANGE, {view_mode: this._view_mode});
 		}
 
 		return this;
@@ -161,7 +161,7 @@ class CSidebar extends CBaseComponent {
 			},
 
 			focus: (e) => {
-				if (!this._node.contains(e.relatedTarget)) {
+				if (!this._target.contains(e.relatedTarget)) {
 					this._is_focused = (e.type === 'focusin');
 
 					if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
@@ -172,7 +172,7 @@ class CSidebar extends CBaseComponent {
 							this.close();
 						}
 
-						this.trigger(this._is_focused ? SIDEBAR_EVENT_FOCUS : SIDEBAR_EVENT_BLUR);
+						this.fire(this._is_focused ? SIDEBAR_EVENT_FOCUS : SIDEBAR_EVENT_BLUR);
 					}
 				}
 			},
@@ -268,7 +268,7 @@ class CSidebar extends CBaseComponent {
 
 		this.on('focusin focusout', this._events.focus);
 
-		for (const el of this._node.querySelectorAll('.js-sidebar-mode')) {
+		for (const el of this._target.querySelectorAll('.js-sidebar-mode')) {
 			el.addEventListener('click', this._events.viewmodechange);
 		}
 
