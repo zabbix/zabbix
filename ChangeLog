@@ -115,11 +115,11 @@ Changes for 4.4.7rc1
 New features:
 ...G...PS. [ZBXNEXT-3604] added support of user configurable ciphers for communication between Zabbix components (Andris)
 .......PS. [ZBXNEXT-5649] added name referencing support ('~' suffix) to jsonpath (wiper)
-.........T [ZBX-17409] fixed item mysql.dbsize in Template DB MySQL (mchudinov)
-....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 ...G...... [ZBXNEXT-5781] improved agent2 metric testing (-t) and printing (-p) by adding full plugin interface support and verbose testing option (wiper)
 
 Bug fixes:
+.........T [ZBX-17409] fixed item mysql.dbsize in Template DB MySQL (mchudinov)
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 A......... [ZBX-17425] fixed template.massupdate API macros update (rlataria)
 ..F....... [ZBX-17344] fixed PHP 7.4 errors in Latest data->History page for text and log items having an empty filter (Ivo)
 .......PS. [ZBX-17330] fixed error reading vmware events with keys over 2^31 (MVekslers)
@@ -1203,9 +1203,9 @@ Changes for 4.0.19rc1
 New features:
 .......PS. [ZBXNEXT-5649] added name referencing support ('~' suffix) to jsonpath (wiper)
 ...G...PS. [ZBXNEXT-3604] added support of user configurable ciphers for communication between Zabbix components (Andris)
-....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 
 Bug fixes:
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 A......... [ZBX-17425] fixed template.massupdate API macros update (rlataria)
 ..F....... [ZBX-17344] fixed PHP 7.4 errors in Latest data->History page for text and log items having an empty filter (Ivo)
 .......PS. [ZBX-17330] fixed error reading vmware events with keys over 2^31 (MVekslers)
