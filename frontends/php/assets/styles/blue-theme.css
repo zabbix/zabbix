@@ -194,7 +194,12 @@ aside,
   .wrapper > header + [class^="msg-"], .wrapper > [class^="msg-"] + [class^="msg-"] {
     margin-top: 0; }
   .wrapper.layout-kioskmode main {
-    padding: 10px; }
+    padding: 10px;
+    transition: margin-top .3s; }
+  .wrapper.layout-kioskmode.kiosk-slide-lines-1 main {
+    margin-top: 2rem; }
+  .wrapper.layout-kioskmode.kiosk-slide-lines-2 main {
+    margin-top: 4rem; }
   .wrapper > .debug-output {
     flex-shrink: 0; }
 
@@ -2614,13 +2619,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: relative;
   margin: -4px;
   z-index: 3; }
-
-.layout-kioskmode {
-  transition: margin-top .3s; }
-  .layout-kioskmode.kiosk-slide-lines-1 {
-    margin-top: 2rem; }
-  .layout-kioskmode.kiosk-slide-lines-2 {
-    margin-top: 4rem; }
 
 .dashbrd-grid-new-widget-placeholder {
   box-sizing: border-box;
