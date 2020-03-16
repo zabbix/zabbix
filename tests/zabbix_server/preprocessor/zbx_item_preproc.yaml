@@ -2203,4 +2203,17 @@ in:
 out:
   return: SUCCEED
   value: "\\"
+---
+test case: No match
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "O K"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "OK\ntest"
+out:
+  return: SUCCEED
+  value: "O K"
 ...
