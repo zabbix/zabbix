@@ -1717,9 +1717,8 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 
 	result = DBselect(
 			"select hm.macro,hm.value,hm.description,hm.type"
-			" from hostmacro hm,items i"
-			" where hm.hostid=i.hostid"
-				" and i.itemid=" ZBX_FS_UI64,
+			" from hostmacro hm"
+			" where hm.hostid=" ZBX_FS_UI64,
 			parent_hostid);
 
 	while (NULL != (row = DBfetch(result)))
