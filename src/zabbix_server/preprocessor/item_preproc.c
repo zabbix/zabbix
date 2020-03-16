@@ -432,14 +432,16 @@ static int	item_preproc_delta_speed(unsigned char value_type, zbx_variant_t *val
  *                                                                            *
  * Function: unescape_param                                                   *
  *                                                                            *
- * Purpose: copy first n chars of null terminated string from in to out       *
- *          unescape escaped characters during copying                        *
+ * Purpose: copy first n chars from in to out, unescape escaped characters    *
+ *          during copying                                                    *
  *                                                                            *
- * Parameters: in  - [IN] the string to unescape                              *
- *             out - [OUT] the unescaped string                               *
+ * Parameters: op_type - [IN] the operation type                              *
+ *             in      - [IN] the value to unescape                           *
+ *             len     - [IN] the length of the value to be unescaped         *
+ *             out     - [OUT] the value to process                           *
  *                                                                            *
  ******************************************************************************/
-static void	unescape_param(const char *in, char *out, int len)
+static void	unescape_param(int op_type, const char *in, int len, char *out)
 {
 	const char	*end = in + len;
 
@@ -462,8 +464,12 @@ static void	unescape_param(const char *in, char *out, int len)
 					*out = '\t';
 					break;
 				case '\\':
-					*out = '\\';
-					break;
+					if (ZBX_PREPROC_STR_REPLACE == op_type)
+					{
+						*out = '\\';
+						break;
+					}
+					ZBX_FALLTHROUGH;
 				default:
 					*out = *(--in);
 			}
@@ -497,7 +503,7 @@ static int item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	unescape_param(params, params_raw, strlen(params));
+	unescape_param(op_type, params, strlen(params), params_raw);
 
 	if (ZBX_PREPROC_LTRIM == op_type || ZBX_PREPROC_TRIM == op_type)
 		zbx_ltrim(value->data.str, params_raw);
@@ -2055,8 +2061,8 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 		return FAIL;
 	}
 
-	unescape_param(params, search_str, MIN(len, sizeof(search_str) - 1));
-	unescape_param(ptr + 1, replace_str, MIN(strlen(ptr + 1), sizeof(replace_str) - 1));
+	unescape_param(ZBX_PREPROC_STR_REPLACE, params, MIN(len, sizeof(search_str) - 1), search_str);
+	unescape_param(ZBX_PREPROC_STR_REPLACE, ptr + 1, MIN(strlen(ptr + 1), sizeof(replace_str) - 1), replace_str);
 
 	if (SUCCEED != item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 	{

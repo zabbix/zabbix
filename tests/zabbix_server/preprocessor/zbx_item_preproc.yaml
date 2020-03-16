@@ -179,6 +179,19 @@ out:
   return: SUCCEED
   value: 01abc01
 ---
+test case: trim(\\s, abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\\ abc \\"
+  step:
+    type: ZBX_PREPROC_TRIM
+    params: "\\\\s"
+out:
+  return: SUCCEED
+  value: "abc"
+---
 test case: regsub("test 123 number", "([0-9]+", 1)
 in:
   value:
@@ -2126,7 +2139,7 @@ out:
   return: SUCCEED
   value: "OK"
 ---
-test case: replace 2 characters '\t' to OK
+test case: replace 2 characters "\t" to OK
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
