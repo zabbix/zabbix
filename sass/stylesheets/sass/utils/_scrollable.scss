@@ -1,8 +1,8 @@
-.scrollable {
-	$size: 4px;
-	$size-hover: 8px;
-	$size-outline: 2px;
+$scrollbar-track-size: 4px;
+$scrollbar-track-size-hover: 8px;
+$scrollbar-track-size-outline: 2px;
 
+.scrollable {
 	overflow-y: auto;
 	overflow-x: hidden;
 	position: relative;
@@ -16,7 +16,7 @@
 
 	.scrollbar-track {
 		background: $scrollbar-track-color;
-		width: $size;
+		width: $scrollbar-track-size;
 		border-radius: 2px;
 		height: 100%;
 		position: absolute;
@@ -29,9 +29,9 @@
 			content: '';
 			position: absolute;
 			top: 0;
-			right: -$size-outline;
+			right: -$scrollbar-track-size-outline;
 			bottom: 0;
-			left: -$size-hover + $size - $size-outline;
+			left: -$scrollbar-track-size-hover + $scrollbar-track-size - $scrollbar-track-size-outline;
 		}
 
 		&.is-active {
@@ -39,10 +39,10 @@
 		}
 
 		&:hover {
-			width: $size-hover;
+			width: $scrollbar-track-size-hover;
 
 			.scrollbar-thumb {
-				width: $size-hover;
+				width: $scrollbar-track-size-hover;
 			}
 		}
 	}
@@ -50,19 +50,21 @@
 	.scrollbar-thumb {
 		background: $scrollbar-thumb-color;
 		border-radius: 2px;
-		width: $size;
+		width: $scrollbar-track-size;
 		position: absolute;
 		height: 0;
 		right: 0;
 		opacity: .5;
 
 		&:hover {
-			width: $size-hover;
+			width: $scrollbar-track-size-hover;
 			opacity: 1;
 		}
 	}
 
 	@if $ui-transitions {
+		scroll-behavior: smooth;
+
 		.scrollbar-track {
 			transition: opacity $ui-transition-duration ease-out 2s,
 			width $ui-transition-duration ease-out 2s;

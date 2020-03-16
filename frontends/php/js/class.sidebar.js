@@ -196,6 +196,11 @@ class CSidebar extends CBaseComponent {
 
 			expandSelected: () => {
 				this._expand_timer = setTimeout(() => {
+					const scrollable = this._target.querySelector('.scrollable');
+					if (scrollable) {
+						scrollable.scrollTop = 0;
+					}
+
 					ZABBIX.MenuMain
 						.expandSelected()
 						.focusSelected();

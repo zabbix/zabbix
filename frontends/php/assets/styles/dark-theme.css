@@ -138,7 +138,8 @@ svg a {
   overflow-x: hidden;
   position: relative;
   scrollbar-width: none;
-  -ms-overflow-style: none; }
+  -ms-overflow-style: none;
+  scroll-behavior: smooth; }
   .scrollable::-webkit-scrollbar {
     width: 0; }
   .scrollable .scrollbar-track {
