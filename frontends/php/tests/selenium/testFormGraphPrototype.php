@@ -592,9 +592,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			if (isset($data['host'])) {
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-				$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
+				$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
 				$this->zbxTestClickLinkText($this->itemSimple);
 			}
 
@@ -1084,8 +1082,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestClick('add_item');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
-			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-			$this->zbxTestDropdownSelectWait('hostid', $this->host);
+			$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
 			$this->zbxTestClickLinkText($this->itemSimple);
 
 			if (isset($data['removeItem'])) {
@@ -1097,8 +1094,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 
 				$this->zbxTestClick('add_item');
 				$this->zbxTestLaunchOverlayDialog('Items');
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-				$this->zbxTestDropdownSelectWait('hostid', $this->host);
+				$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
 				$this->zbxTestClickLinkText($this->itemSimple);
 
 				$this->zbxTestClick('add_protoitem');

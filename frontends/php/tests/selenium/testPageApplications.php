@@ -29,27 +29,36 @@ class testPageApplications extends CLegacyWebTest {
 		return [
 			[
 				[
-					'host' => 'Test host',
-					'group' => 'all',
-					'visible_name' => 'ЗАББИКС Сервер'
+					'filter' => [
+						'Hosts' => 'ЗАББИКС Сервер'
+					],
+					'Host name' => 'Test host'
 				]
 			],
 			[
 				[
-					'host' => 'Template App Apache Tomcat JMX',
-					'group' => 'all'
+					'filter' => [
+						'Hosts' => 'Template App Apache Tomcat JMX'
+					]
 				]
 			],
 			[
 				[
-					'host' => 'all',
-					'group' => 'Templates/Applications'
+					'filter' => [
+						'Hosts' => ['ЗАББИКС Сервер', 'Empty host']
+					]
 				]
 			],
 			[
 				[
-					'host' => 'all',
-					'group' => 'all'
+					'filter' => [
+						'Host groups' => 'Templates/Applications'
+					]
+				]
+			],
+			[
+				[
+					'filter' => []
 				]
 			]
 		];
@@ -71,21 +80,17 @@ class testPageApplications extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Applications');
 
 		// Check selected host and group.
-		$this->zbxTestDropdownAssertSelected('hostid', 'ЗАББИКС Сервер');
-		$this->zbxTestDropdownAssertSelected('groupid', 'all');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$this->assertEquals(['ЗАББИКС Сервер'], array_values($filter->getField('Hosts')->getSelected()));
+		$this->assertEquals([], $filter->getField('Host groups')->getSelected());
 
-		// Select host and/or host group
-		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestDropdownSelectWait('hostid', $data['visible_name']);
-		}
-		else {
-			$this->zbxTestDropdownSelectWait('hostid', $data['host']);
-		}
-		$this->zbxTestDropdownSelectWait('groupid', $data['group']);
+		$filter->fill($data['filter']);
+		$filter->submit();
+		$this->page->waitUntilReady();
 
-		if ($data['host'] != 'all') {
+		if (CTestArrayHelper::get($data, 'Host name', false)) {
 			// Get host id
-			$sql_host_id = DBfetch(DBselect("SELECT hostid FROM hosts WHERE host='".$data['host']."'"));
+			$sql_host_id = DBfetch(DBselect("SELECT hostid FROM hosts WHERE host='".$data['Host name']."'"));
 			$host_id= $sql_host_id['hostid'];
 
 			// Check the application names in frontend
@@ -112,17 +117,22 @@ class testPageApplications extends CLegacyWebTest {
 				}
 			}
 		}
-		else {
+		elseif (is_array(CTestArrayHelper::get($data, 'filter.Hosts', false))) {
 			// Check disabled creation button of application
 			$this->zbxTestAssertElementText("//button[@id='form']", 'Create application (select host first)');
 			$this->zbxTestAssertAttribute("//button[@id='form']",'disabled','true');
 			$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'object-group')]");
 		}
 
-		if ($data['group'] != 'all') {
+		if (CTestArrayHelper::get($data['filter'], 'Host groups', false)) {
+			if (CTestArrayHelper::get($data['filter'], 'Host groups', false)) {
+				$filter = $this->query('name:zbx_filter')->asForm()->one();
+				$filter->getField('Hosts')->clear();
+				$filter->submit();
+			}
 			$group_app= [];
 			$sql_all_applications = "SELECT a.name FROM hosts_groups hg LEFT JOIN applications a ON hg.hostid=a.hostid"
-					. " WHERE hg.groupid=(SELECT groupid FROM hstgrp WHERE name='".$data['group']."')";
+					. " WHERE hg.groupid=(SELECT groupid FROM hstgrp WHERE name='".$data['filter']['Host groups']."')";
 			$result = DBselect($sql_all_applications);
 			while ($row = DBfetch($result)) {
 				$group_app[] = $row['name'];
@@ -134,7 +144,11 @@ class testPageApplications extends CLegacyWebTest {
 	public function selectApplications($app_names, $host) {
 		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestDropdownSelectWait('hostid', $host);
+		// Filter applications by host
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Hosts')->select($host);
+		$filter->submit();
+
 		$result = [];
 		$hosts = DBfetch(DBselect('SELECT hostid FROM hosts WHERE name=' . zbx_dbstr($host)));
 		$this->assertFalse(empty($hosts));

@@ -110,8 +110,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'charts.php',
-				'title' =>	'Custom graphs [refreshed every 30 sec.]',
+				'url' => 'zabbix.php?action=charts.view',
+				'title' =>	'Custom graphs',
 				'header' =>	'Graphs',
 				'users' => [
 					'guest' => true,
@@ -120,8 +120,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'charts.php?fullscreen=0&groupid=0&hostid=0&graphid=523',
-				'title' =>	'Custom graphs [refreshed every 30 sec.]',
+				'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_search_type=0&filter_graphids%5B%5D=523&filter_set=1',
+				'title' =>	'Custom graphs',
 				'no_permissions_to_object' => true,
 				'users' => [
 					'guest' => true,

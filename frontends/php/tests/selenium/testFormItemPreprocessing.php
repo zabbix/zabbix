@@ -116,9 +116,10 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 		$this->query('button:Copy')->one()->click();
 		$form = $this->query('name:elements_form')->waitUntilPresent()->asForm()->one();
 
+//		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$form->fill([
 			'Target type'	=> 'Hosts',
-			'Target' => ['values' => [$target_hostname], 'context' => 'Zabbix servers']
+			'Target' => ['values' => $target_hostname, 'context' => 'Zabbix servers']
 		]);
 		$form->submit();
 

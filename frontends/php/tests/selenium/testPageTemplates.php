@@ -37,7 +37,9 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Host groups')->select('Templates');
+		$filter->submit();
 		$this->zbxTestTextPresent($this->templateName);
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Applications')]");
@@ -79,7 +81,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
 		$this->zbxTestLogin('templates.php?page=1');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestTextPresent($name);
 		// Check if template name present on page, if not, check on second page.
@@ -104,22 +106,23 @@ class testPageTemplates extends CLegacyWebTest {
 
 	public function testPageTemplates_FilterTemplateByName() {
 		$this->zbxTestLogin('templates.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestInputTypeOverwrite('filter_name', $this->templateName);
-		$this->zbxTestClickButtonText('Apply');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Host groups')->select('Templates');
+		$filter->getField('Name')->fill($this->templateName);
+		$filter->submit();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
 		$this->zbxTestLogin('templates.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestClickButtonMultiselect('filter_templates_');
-		$this->zbxTestLaunchOverlayDialog('Templates');
-		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//select/option[text()="Templates"]');
-		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//a[text()="Template Module ICMP Ping"]');
-		$this->zbxTestClickButtonText('Apply');
+		$this->query('button:Reset')->one()->click();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->fill([
+			'Host groups'	=> 'Templates',
+			'Linked templates' => ['values' => 'Template Module ICMP Ping', 'context' => 'Templates']
+		]);
+		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMPv1']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMPv2']");
@@ -128,9 +131,12 @@ class testPageTemplates extends CLegacyWebTest {
 
 	public function testPageTemplates_FilterNone() {
 		$this->zbxTestLogin('templates.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestInputTypeOverwrite('filter_name', '123template!@#$%^&*()_"=');
-		$this->zbxTestClickButtonText('Apply');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->fill([
+			'Host groups'	=> 'Templates',
+			'Name' => '123template!@#$%^&*()_"='
+		]);
+		$filter->submit();
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
@@ -139,13 +145,11 @@ class testPageTemplates extends CLegacyWebTest {
 
 	public function testPageTemplates_FilterReset() {
 		$this->zbxTestLogin('templates.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestClickButtonText('Apply');
+		$this->query('button:Reset')->one()->click();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
-public static function getFilterByTagsData() {
+	public static function getFilterByTagsData() {
 		return [
 			// "And" and "And/Or" checks.
 			[

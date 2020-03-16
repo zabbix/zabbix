@@ -210,10 +210,13 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 			if (array_key_exists('host', $filter)) {
 				$this->zbxTestClickButtonMultiselect('hostids_');
 				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->zbxTestDropdownHasOptions('groupid', ['Host group for tag permissions', 'Zabbix servers',
-					'ZBX6648 All Triggers', 'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers']
-				);
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
+				$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->edit();
+				$host_groups = $this->query('name:hostGroupsform')->asForm()->one();
+				foreach (['Host group for tag permissions', 'Zabbix servers', 'ZBX6648 All Triggers',
+						'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers'] as $group ) {
+					$this->assertEquals(1, $host_groups->query('xpath://a[text()="'.$group.'"]')->all()->count());
+				}
+				$host_groups->query('xpath://a[text()="Zabbix servers"]')->one()->click();
 				$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//a[text()="'.
 						$filter['host'].'"]');
 				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));

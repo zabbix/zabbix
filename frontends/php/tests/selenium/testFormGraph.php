@@ -446,9 +446,7 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			if (isset($data['host'])) {
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-				$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
+				$this->query('id:generic-popup-form')->asForm()->one()->getField('Host')->select($this->host);
 				$this->zbxTestClickLinkText($this->itemSimple);
 			}
 
@@ -851,10 +849,7 @@ class testFormGraph extends CLegacyWebTest {
 				$this->zbxTestClick('add_item');
 				$this->zbxTestLaunchOverlayDialog('Items');
 				$link = $item['itemName'];
-
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-				$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
+				$this->query('id:generic-popup-form')->asForm()->one()->getField('Host')->select($this->host);
 				$this->zbxTestClickLinkTextWait($link);
 
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('items_0_name'));
@@ -919,12 +914,8 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['ymin_name'])) {
 			$this->zbxTestClick('yaxis_min');
 			$this->zbxTestLaunchOverlayDialog('Items');
-
-			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
+			$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
 			COverlayDialogElement::find()->one()->waitUntilReady();
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]//select[@name='hostid']"));
-			$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymin_name = $data['ymin_name'];
@@ -936,11 +927,8 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestClick('yaxis_max');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
-			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
+			$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
 			COverlayDialogElement::find()->one()->waitUntilReady();
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]//select[@name='hostid']"));
-			$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymax_name = $data['ymax_name'];
@@ -978,6 +966,10 @@ class testFormGraph extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
+			$filter = $this->query('name:zbx_filter')->asForm()->one();
+			$filter->getField('Hosts')->select('Simple form test host');
+			$filter->submit();
+
 			$this->zbxTestClickLinkTextWait($name);
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestDropdownAssertSelected('graphtype', $graphtype);

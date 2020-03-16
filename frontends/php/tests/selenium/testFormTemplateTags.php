@@ -285,6 +285,9 @@ class testFormTemplateTags extends CWebTest {
 		$data['fields']['Template name'] = $this->update_template;
 
 		$this->page->login()->open('templates.php');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->submit();
 		$this->query('link:'.$this->update_template)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 
@@ -331,6 +334,9 @@ class testFormTemplateTags extends CWebTest {
 		$new_name = 'Template with tags for cloning - '.$action;
 
 		$this->page->login()->open('templates.php?groupid=4');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->submit();
 		$this->query('link:'.$this->clone_template)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 		$form->getField('Template name')->fill($new_name);

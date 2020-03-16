@@ -168,7 +168,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Templates');
 
 		foreach ($data['templates'] as $template) {
-			$this->zbxTestDropdownSelectWait('groupid', $template['group']);
+			$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select($template['group']);
 			$this->zbxTestClickLinkTextWait($template['name']);
 			$this->zbxTestWaitForPageToLoad();
 		}
@@ -335,7 +335,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			foreach ($data['templates'] as $template) {
 				$this->zbxTestClickButtonMultiselect('add_templates_');
 				$this->zbxTestLaunchOverlayDialog('Templates');
-				$this->zbxTestDropdownSelectWait('groupid', $template['group']);
+				$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select('Templates');
 				$this->zbxTestClickLinkTextWait($template['name']);
 				$this->zbxTestWaitForPageToLoad();
 			}
@@ -455,7 +455,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+			$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 
