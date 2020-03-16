@@ -2177,4 +2177,30 @@ in:
 out:
   return: FAIL
   value: "a"
+---
+test case: Single slash in search
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\\"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: Single slash in replace
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "OK"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "OK\n\\"
+out:
+  return: SUCCEED
+  value: "\\"
 ...
