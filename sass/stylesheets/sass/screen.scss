@@ -7664,12 +7664,13 @@ table.preprocessing-test-results {
 
 	&.interface-container-header {
 		margin: 0;
+	}
 
-		&,
-		& + .interface-container {
-			padding: 0;
-			border: 0;
-		}
+	&.interface-container-header,
+	&.interface-container-header + .interface-container,
+	&:empty + .interface-container {
+		padding: 0;
+		border: 0;
 	}
 
 	&:empty {
