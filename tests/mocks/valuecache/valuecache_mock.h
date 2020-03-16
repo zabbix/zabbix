@@ -39,7 +39,7 @@ unsigned char	zbx_mock_str_to_value_type(const char *value_type);
 void	zbx_vcmock_ds_init(void);
 void	zbx_vcmock_ds_destroy(void);
 void	zbx_vcmock_ds_dump(void);
-zbx_vcmock_ds_item_t	*zbx_vcmock_ds_first_item();
+zbx_vcmock_ds_item_t	*zbx_vcmock_ds_first_item(void);
 
 int	zbx_vcmock_str_to_cache_mode(const char *mode);
 int	zbx_vcmock_str_to_item_status(const char *str);

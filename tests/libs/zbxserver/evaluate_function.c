@@ -54,7 +54,7 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *even
 void	zbx_mock_test_entry(void **state)
 {
 	int			err, expected_ret, returned_ret;
-	char			*error = NULL, *value = NULL;
+	char			*error = NULL, *returned_value = NULL;
 	const char		*function, *params;
 	DC_ITEM			item;
 	zbx_vcmock_ds_item_t	*ds_item;
@@ -79,9 +79,9 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.time"), &ts))
 		fail_msg("Invalid timestamp");
 
-	value = zbx_malloc(NULL, MAX_STRING_LEN);
+	returned_value = zbx_malloc(NULL, MAX_BUFFER_LEN);
 
-	if (SUCCEED != (returned_ret = evaluate_function(&value, &item, function, params, &ts, &error)))
+	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &item, function, params, &ts, &error)))
 		printf("evaluate_function returned error: %s\n", error);
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
@@ -89,9 +89,16 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == expected_ret)
 	{
-		zbx_mock_assert_str_eq("function result", zbx_mock_get_parameter_string("out.value"), value);
+		zbx_mock_handle_t	handle;
+		const char		*expected_value;
+
+		handle = zbx_mock_get_parameter_handle("out.value");
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string_ex(handle, &expected_value)))
+			fail_msg("Cannot read output value: %s", zbx_mock_error_string(err));
+
+		zbx_mock_assert_str_eq("function result", expected_value, returned_value);
 	}
-	zbx_free(value);
+	zbx_free(returned_value);
 
 	ZBX_UNUSED(state);
 }

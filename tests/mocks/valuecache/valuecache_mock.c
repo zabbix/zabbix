@@ -85,8 +85,11 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 {
 	const char		*data;
 	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
 
-	data = zbx_mock_get_object_member_string(hvalue, "value");
+	handle = zbx_mock_get_object_member_handle(hvalue, "value");
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string_ex(handle, &data)))
+		fail_msg("Cannot read history value: %s", zbx_mock_error_string(err));
 
 	if (ITEM_VALUE_TYPE_LOG != value_type)
 	{
@@ -328,7 +331,7 @@ void	zbx_vcmock_ds_dump(void)
  * Purpose: returns first item in value cache mock data source                *
  *                                                                            *
  ******************************************************************************/
-zbx_vcmock_ds_item_t	*zbx_vcmock_ds_first_item()
+zbx_vcmock_ds_item_t	*zbx_vcmock_ds_first_item(void)
 {
 	zbx_hashset_iter_t	iter;
 

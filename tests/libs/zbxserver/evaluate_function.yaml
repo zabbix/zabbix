@@ -1,5 +1,5 @@
 ---
-test case: Evaluate last()
+test case: Evaluate last() (float)
 in:
   history:
   - itemid: 1
@@ -16,7 +16,7 @@ out:
   return: SUCCEED
   value: 0.2
 ---
-test case: Evaluate last(#2)
+test case: Evaluate last(#2) (float)
 in:
   history:
   - itemid: 1
@@ -32,4 +32,41 @@ in:
 out:
   return: SUCCEED
   value: 0.1
+---
+test case: Evaluate last() (string)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: xyz
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: last
+  params: ""
+out:
+  return: SUCCEED
+  value: '"xyz"'
+---
+test case: Evaluate last() (string)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value:    
+        page: 😓
+        pages: 20000
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: last
+  params: ""
+out:
+  return: SUCCEED
+  value: 
+     header: '"'
+     page: 😓
+     pages: 20000
+     footer: '"'
 ...
+
