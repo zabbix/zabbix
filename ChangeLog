@@ -1204,6 +1204,7 @@ New features:
 ....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 
 Bug fixes:
+A......... [ZBX-17425] fixed template.massupdate API macros update (rlataria)
 ..F....... [ZBX-17344] fixed PHP 7.4 errors in Latest data->History page for text and log items having an empty filter (Ivo)
 .......PS. [ZBX-17330] fixed error reading vmware events with keys over 2^31 (MVekslers)
 ..F....... [ZBX-17288] fixed undefined indexes in Administration->Regular expressions->Test tab (averza, Ivo)
