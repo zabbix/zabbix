@@ -1297,14 +1297,15 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
  *                                                                            *
  * Purpose: parse jsonpath name reference ~                                   *
  *                                                                            *
- * Parameters: jsonpath  - [IN/OUT] the jsonpath                              *
+ * Parameters: start     - [IN] the segment start                             *
+ *             jsonpath  - [IN/OUT] the jsonpath                              *
  *             next      - [OUT] a pointer to the next character after parsed *
  *                               segment                                      *
  *                                                                            *
  * Return value: SUCCEED - the name reference was parsed                      *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_parse_name_reference(zbx_jsonpath_t *jsonpath, const char **next)
+static int	jsonpath_parse_name_reference(const char *start, zbx_jsonpath_t *jsonpath, const char **next)
 {
 	zbx_jsonpath_segment_t	*segment;
 
@@ -1312,7 +1313,7 @@ static int	jsonpath_parse_name_reference(zbx_jsonpath_t *jsonpath, const char **
 	jsonpath->segments_num++;
 	segment->type = ZBX_JSONPATH_SEGMENT_FUNCTION;
 	segment->data.function.type = ZBX_JSONPATH_FUNCTION_NAME;
-	(*next)++;
+	*next = start + 1;
 	return SUCCEED;
 }
 
@@ -2532,7 +2533,7 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 				ret = jsonpath_parse_bracket_segment(ptr + 1, &jpquery, &next);
 				break;
 			case '~':
-				ret = jsonpath_parse_name_reference(&jpquery, &next);
+				ret = jsonpath_parse_name_reference(ptr, &jpquery, &next);
 				break;
 			default:
 				ret = zbx_jsonpath_error(ptr);
