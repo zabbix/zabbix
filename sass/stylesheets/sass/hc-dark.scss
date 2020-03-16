@@ -70,10 +70,10 @@ $menu-main-arrow-bg-position: -606px -434px;
 
 $menu-user-color: #131619;
 $menu-user-hover-color: #000000;
-$menu-user-disabled-color: $disabled-item-color;
+$menu-user-disabled-color: #787878;
 
 // Sidebar
-$sidebar-server-name-color: $menu-user-color;
+$sidebar-server-name-color: #787878;
 
 $menu-main-icons: (
 		dashboard: -600px -664px,
@@ -89,7 +89,7 @@ $menu-user-icons: (
 		support: -247px -84px,
 		share: -168px -84px,
 		help: -168px -84px,
-		guest: -247px -156px,
+		guest: -247px -192px,
 		profile: -168px -120px,
 		signout: -168px -156px
 ) !default;

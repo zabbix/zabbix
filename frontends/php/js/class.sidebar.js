@@ -46,18 +46,21 @@ class CSidebar extends CBaseComponent {
 		this._is_focused = false;
 		this._is_opened = false;
 
-		let max_width = 0;
+		let max_width = SIDEBAR_MIN_WIDTH;
 		for (const menu of this._target.querySelectorAll('nav > ul')) {
 			const position = window.getComputedStyle(menu).position;
 			menu.style.position = 'absolute';
 			max_width = Math.max(max_width, menu.clientWidth);
 			menu.style.position = position;
 		}
-		this._target.style.maxWidth = Math.max(max_width, SIDEBAR_MIN_WIDTH) + 'px';
+		this._target.style.maxWidth = max_width + 'px';
 
-		let server_name = this._target.querySelector('.sidebar-header .server-name');
+		const sidebar_header = this._target.querySelector('.sidebar-header');
+		sidebar_header.style.minWidth = SIDEBAR_MIN_WIDTH + 'px';
+
+		const server_name = this._target.querySelector('.sidebar-header .server-name');
 		if (server_name) {
-			this._target.querySelector('.sidebar-header').style.maxWidth = max_width + 'px';
+			sidebar_header.style.maxWidth = max_width + 'px';
 			server_name.style.width = 'auto';
 		}
 

@@ -7,6 +7,11 @@ $scrollbar-track-size-outline: 2px;
 	overflow-x: hidden;
 	position: relative;
 
+	&:focus {
+		outline: 0;
+	}
+
+
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 

@@ -127,6 +127,8 @@ svg a {
   scrollbar-width: none;
   -ms-overflow-style: none;
   scroll-behavior: smooth; }
+  .scrollable:focus {
+    outline: 0; }
   .scrollable::-webkit-scrollbar {
     width: 0; }
   .scrollable .scrollbar-track {
