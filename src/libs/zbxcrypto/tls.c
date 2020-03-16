@@ -102,8 +102,6 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 	SSL_load_error_strings();
 	ERR_load_BIO_strings();
 	SSL_library_init();
-#elif defined(LIBRESSL_VERSION_NUMBER)
-	OPENSSL_init_ssl(opts, settings);
 #endif
 #ifdef _WINDOWS
 	ZBX_UNUSED(opts);
@@ -2233,12 +2231,13 @@ static void	zbx_tls_library_init(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library (version %s) initialized", gnutls_check_version(NULL));
 #elif defined(HAVE_OPENSSL)
+#if !defined(LIBRESSL_VERSION_NUMBER)	/* LibreSSL does not require initialization */
 	if (1 != zbx_openssl_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize OpenSSL library");
 		exit(EXIT_FAILURE);
 	}
-
+#endif
 	init_done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", OpenSSL_version(OPENSSL_VERSION));
@@ -2895,7 +2894,7 @@ void	zbx_tls_init_child(void)
 		/* override TLS 1.3 certificate ciphersuites with user-defined settings */
 		if (NULL != CONFIG_TLS_CIPHER_CERT13 || NULL != CONFIG_TLS_CIPHER_CMD13)
 		{
-#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL && !defined(LIBRESSL_VERSION_NUMBER)	/* only OpenSSL 1.1.1 or newer */
 			const char	*override_ciphers = CONFIG_TLS_CIPHER_CERT13;	/* can be NULL */
 
 			if (NULL != CONFIG_TLS_CIPHER_CMD13 && ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
@@ -2910,8 +2909,9 @@ void	zbx_tls_init_child(void)
 			}
 #else
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
-					" certificate ciphersuites: compiled with OpenSSL version older than 1.1.1."
-					" Consider not using parameters \"TLSCipherCert13\" or \"--tls-cipher13\"");
+					" certificate ciphersuites: compiled with OpenSSL version older than 1.1.1 or"
+					" with LibreSSL. Consider not using parameters \"TLSCipherCert13\" or"
+					" \"--tls-cipher13\"");
 			goto out1;
 #endif
 		}
@@ -3078,7 +3078,6 @@ void	zbx_tls_init_child(void)
 
 		zbx_log_ciphersuites(__func__, "certificate and PSK", ctx_all);
 	}
-#endif /* defined(HAVE_OPENSSL_WITH_PSK) */
 
 	if (NULL == ctx_psk)
 	{
@@ -3088,19 +3087,17 @@ void	zbx_tls_init_child(void)
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK13\" cannot"
 					" be applied: the list of PSK ciphersuites is not used");
-			goto out1;
 #else
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK13\" cannot"
-					" be applied: compiled with OpenSSL version older than 1.1.1, or is compiled"
-					" without PSK support, and the list of PSK ciphersuites is not used");
-			goto out1;
+					" be applied: compiled with OpenSSL version older than 1.1.1");
 #endif
+			goto out1;
 		}
 
 		/* cannot override TLS 1.2 PSK ciphersuites */
 		if (NULL != CONFIG_TLS_CIPHER_PSK)
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK\" cannot be"
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK\" cannot"
 					" be applied: the list of PSK ciphersuites is not used");
 			goto out1;
 		}
@@ -3116,26 +3113,36 @@ void	zbx_tls_init_child(void)
 					" be applied: the combined list of certificate and PSK ciphersuites is"
 					" not used. Most likely parameters \"TLSCipherCert13\" and/or \"TLSCipherPSK13\""
 					" are sufficient");
-			goto out1;
 #else
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll13\" cannot"
-					" be applied: compiled with OpenSSL version older than 1.1.1, or is compiled"
-					" without PSK support, and the combined list of certificate and PSK"
-					" ciphersuites is not used");
-			goto out1;
+					" be applied: compiled with OpenSSL version older than 1.1.1");
 #endif
+			goto out1;
 		}
 
 		/* cannot override TLS 1.2 ciphersuites */
 		if (NULL != CONFIG_TLS_CIPHER_ALL)
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll\" cannot be"
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll\" cannot"
 					" be applied: the combined list of certificate and PSK ciphersuites is"
 					" not used. Most likely parameters \"TLSCipherCert\" and/or \"TLSCipherPSK\""
 					" are sufficient");
 			goto out1;
 		}
 	}
+#else	/* HAVE_OPENSSL_WITH_PSK is not defined */
+	/* cannot use TLSCipherPSK13, TLSCipherPSK, TLSCipherAll13 and TLSCipherAll13 parameters */
+	/* if PSK is not supported by crypto library */
+	if (NULL != CONFIG_TLS_CIPHER_PSK13 || NULL != CONFIG_TLS_CIPHER_PSK ||
+			NULL != CONFIG_TLS_CIPHER_ALL13 || NULL != CONFIG_TLS_CIPHER_ALL)
+	{
+		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "at least one of parameters TLSCipherPSK13,"
+				" TLSCipherPSK, TLSCipherAll13 or TLSCipherAll is defined. These parameters must not"
+				" be defined because the program is compiled with OpenSSL without PSK support or"
+				" LibreSSL");
+		goto out1;
+	}
+#endif /* defined(HAVE_OPENSSL_WITH_PSK) */
 #ifndef _WINDOWS
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 #endif
