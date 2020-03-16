@@ -11749,7 +11749,7 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 			{
 				zbx_free(*interfaces);
 				goto unlock;
-			};
+			}
 
 			dst->bulk = snmp->bulk;
 			dst->snmp_version= snmp->version;

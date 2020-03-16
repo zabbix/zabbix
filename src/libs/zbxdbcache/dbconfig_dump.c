@@ -398,15 +398,10 @@ static void	DCdump_interfaces(void)
 				interface->interfaceid, interface->hostid, interface->ip, interface->dns,
 				interface->port, interface->type, interface->main, interface->useip);
 
-		while (INTERFACE_TYPE_SNMP == interface->type)
+		if (INTERFACE_TYPE_SNMP == interface->type &&
+				NULL != (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
+				&interface->interfaceid)))
 		{
-			if (NULL == (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
-					&interface->interfaceid)))
-			{
-				zbx_snprintf_alloc(&if_msg, &alloc, &offset, "snmp:[NULL]");
-				break;
-			};
-
 			zbx_snprintf_alloc(&if_msg, &alloc, &offset, "snmp:[bulk:%u snmp_type:%u community:'%s']",
 					snmp->bulk, snmp->version, snmp->community);
 
@@ -417,8 +412,6 @@ static void	DCdump_interfaces(void)
 					" contextname:'%s']", snmp->securityname, snmp->securitylevel,
 					snmp->authprotocol, snmp->privprotocol, snmp->contextname);
 			}
-
-			break;
 		}
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s", if_msg);
