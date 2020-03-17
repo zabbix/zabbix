@@ -41,7 +41,6 @@ zbx_hash_t	zbx_hash_splittable64(const void *data);
 typedef zbx_hash_t (*zbx_hash_func_t)(const void *data);
 
 zbx_hash_t	zbx_default_ptr_hash_func(const void *data);
-zbx_hash_t	zbx_default_uint64_hash_func(const void *data);
 zbx_hash_t	zbx_default_string_hash_func(const void *data);
 zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 
