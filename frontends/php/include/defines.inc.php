@@ -566,6 +566,7 @@ define('ZBX_PREPROC_SCRIPT',				21);
 define('ZBX_PREPROC_PROMETHEUS_PATTERN',	22);
 define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	23);
 define('ZBX_PREPROC_CSV_TO_JSON',			24);
+define('ZBX_PREPROC_STR_REPLACE',			25);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
