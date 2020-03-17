@@ -89,6 +89,7 @@ class CSidebar extends CBaseComponent {
 			}
 
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
+				this._target.style.zIndex = '10001';
 				document.addEventListener('keyup', this._events.escape);
 			}
 
@@ -107,15 +108,18 @@ class CSidebar extends CBaseComponent {
 				ZABBIX.MenuMain.collapseAll();
 			}
 
-			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
-				this._opened_timer = setTimeout(() => this.addClass('focus-off'), UI_TRANSITION_DURATION);
-			}
-
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
 				const active_element = document.activeElement;
 				if (active_element.parentElement.classList.contains('has-submenu')) {
 					active_element.blur();
 				}
+
+				this._opened_timer = setTimeout(() => {
+					if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+						this.addClass('focus-off');
+					}
+					this._target.style.zIndex = null;
+				}, UI_TRANSITION_DURATION);
 
 				document.removeEventListener('keyup', this._events.escape);
 			}
