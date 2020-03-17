@@ -93,10 +93,11 @@ evaluate_function_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 evaluate_function_LDADD = \
-	@SERVER_LIBS@ \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
 evaluate_function_LDADD += $(COMMON_LIB_FILES)
+
+evaluate_function_LDADD += @SERVER_LIBS@
 
 evaluate_function_LDFLAGS = @SERVER_LDFLAGS@
 
@@ -122,5 +123,4 @@ evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	$(VALUECACHE_WRAP_FUNCS)
-	
 endif
