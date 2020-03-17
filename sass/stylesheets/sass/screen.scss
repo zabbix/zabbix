@@ -6776,6 +6776,12 @@ svg {
 .checkbox-list {
 	li {
 		margin-top: 4px;
+		overflow-x: hidden;
+		text-overflow: ellipsis;
+
+		label {
+			vertical-align: middle;
+		}
 	}
 }
 
