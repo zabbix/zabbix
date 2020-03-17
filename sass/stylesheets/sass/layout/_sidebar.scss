@@ -123,6 +123,10 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		top: 0;
 		bottom: 0;
 		box-shadow: 2px 0 6px $action-shadow-color;
+
+		&.is-opened {
+			z-index: 10001;
+		}
 	}
 
 	&.is-compact {

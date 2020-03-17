@@ -368,6 +368,8 @@ footer {
     top: 0;
     bottom: 0;
     box-shadow: 2px 0 6px rgba(0, 0, 0, 0.5); }
+    .sidebar.is-compact.is-opened, .sidebar.is-hidden.is-opened {
+      z-index: 10001; }
   .sidebar.is-compact + .wrapper {
     margin-left: 48px; }
   .sidebar.is-compact .button-compact,
