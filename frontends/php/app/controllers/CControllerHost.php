@@ -146,11 +146,11 @@ abstract class CControllerHost extends CController {
 
 		// Select triggers and problems to calculate number of problems for each host.
 		$triggers = API::Trigger()->get([
-			'output' => ['description', 'status'],
+			'output' => [],
 			'selectHosts' => ['hostid'],
 			'hostids' => array_keys($hosts),
 			'skipDependent' => true,
-			'filter' => ['status' => TRIGGER_STATUS_ENABLED],
+			'monitored' => true,
 			'preservekeys' => true
 		]);
 
