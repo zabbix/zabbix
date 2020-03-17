@@ -648,4 +648,28 @@ class CFrontendSetup {
 			)
 		];
 	}
+
+	/**
+	 * Checks for the SSL parameters point to files that are open for writing.
+	 *
+	 * @return array
+	 */
+	public function checkSslFiles() {
+		global $DB;
+		$writeable = [];
+
+		foreach (['KEY_FILE', 'CERT_FILE', 'CA_FILE'] as $key) {
+			if ($DB[$key] !== '' && is_writable($DB[$key])) {
+				$writeable[] = $key;
+			}
+		}
+
+		return [
+			'name' => _('TLS certificate file'),
+			'current' => implode(', ', $writeable),
+			'required' => null,
+			'result' => $writeable ? self::CHECK_FATAL : self::CHECK_OK,
+			'error' => _s('TLS certificate files must be read-only')
+		];
+	}
 }
