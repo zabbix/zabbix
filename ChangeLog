@@ -1,4 +1,4 @@
-Changes for 5.0.0beta1
+Changes for 5.0.0alpha3
 
 New features:
 ...G...PS. [ZBXNEXT-3604] added support of user configurable ciphers for communication between Zabbix components (Andris)
@@ -8,10 +8,8 @@ A.F....... [ZBXNEXT-5694] implemented new page Monitoring->Hosts and added "Conf
 A.F.....S. [ZBXNEXT-2957] added ability to mask macros (rlataria, wiper)
 ..F....... [ZBXNEXT-617] added mass update of macros on host / template (rlataria)
 A.F....PS. [ZBXNEXT-2613] moved SNMP connection-related attributes to host interface level (MVekslers, rlataria)
-.........T [ZBX-17409] fixed item mysql.dbsize in Template DB MySQL (mchudinov)
 ..F....... [ZBXNEXT-5449] added support of svg graph as image download (gcalenko)
 ...GI..PS. [ZBXNEXT-5716] removed mbedTLS support (Andris)
-....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 ...G...... [ZBXNEXT-5781] improved agent2 metric testing (-t) and printing (-p) by adding full plugin interface support and verbose testing option (wiper)
 .......PS. [ZBXNEXT-3940] added functionality to flush SNMP connections cache (arimdjonoks)
 .D.G...... [ZBXNEXT-1561] added nanoseconds option for zabbix_sender; thanks to Vladimir for the patch (asestakovs)
@@ -21,6 +19,8 @@ A.F.I..... [ZBXNEXT-4584] implemented auditlog API (gcalenko, Sasha)
 ..F....... [ZBXNEXT-5725] added ability to select specific severities in Monitoring->Problems (vasilijs)
 
 Bug fixes:
+.........T [ZBX-17409] fixed item mysql.dbsize in Template DB MySQL (mchudinov)
+....I..... [ZBX-17173] improved windows agent build scripts (yurii)
 ..F....... [ZBX-17344] fixed PHP 7.4 errors in Latest data->History page for text and log items having an empty filter (Ivo)
 ..F....... [ZBX-17288] fixed undefined indexes in Administration->Regular expressions->Test tab (averza, Ivo)
 .......PS. [ZBX-17330] fixed error reading vmware events with keys over 2^31 (MVekslers)
