@@ -283,9 +283,9 @@ static int	evaluate_LOGEVENTID(char **value, DC_ITEM *item, const char *paramete
 		else
 		{
 			if (ZBX_REGEXP_MATCH == regexp_ret)
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 			else if (ZBX_REGEXP_NO_MATCH == regexp_ret)
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 
 			ret = SUCCEED;
 		}
@@ -367,11 +367,11 @@ static int	evaluate_LOGSOURCE(char **value, DC_ITEM *item, const char *parameter
 		switch (regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
 		{
 			case ZBX_REGEXP_MATCH:
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 				ret = SUCCEED;
 				break;
 			case ZBX_REGEXP_NO_MATCH:
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 				ret = SUCCEED;
 				break;
 			case FAIL:
@@ -423,7 +423,9 @@ static int	evaluate_LOGSEVERITY(char **value, DC_ITEM *item, const zbx_timespec_
 
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
-		zbx_snprintf(*value, MAX_BUFFER_LEN, "%d", vc_value.value.log->severity);
+		size_t	value_alloc = 0, value_offset = 0;
+
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, "%d", vc_value.value.log->severity);
 		zbx_history_record_clear(&vc_value, item->value_type);
 
 		ret = SUCCEED;
@@ -583,6 +585,7 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts_end = *ts;
+	size_t				value_alloc = 0, value_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -833,7 +836,7 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 	else
 		count = values.values_num;
 
-	zbx_snprintf(*value, MAX_BUFFER_LEN, "%d", count);
+	zbx_snprintf_alloc(value, &value_alloc, &value_offset, "%d", count);
 
 	ret = SUCCEED;
 out:
@@ -956,7 +959,7 @@ static int	evaluate_SUM(char **value, DC_ITEM *item, const char *parameters, con
 			result.ui64 += values.values[i].value.ui64;
 	}
 
-	zbx_history_value2str(*value, MAX_BUFFER_LEN, &result, item->value_type);
+	*value = zbx_history_value2str_dyn(&result, item->value_type);
 	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
@@ -1046,6 +1049,7 @@ static int	evaluate_AVG(char **value, DC_ITEM *item, const char *parameters, con
 	if (0 < values.values_num)
 	{
 		double	sum = 0;
+		size_t	value_alloc = 0, value_offset = 0;
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
@@ -1058,7 +1062,7 @@ static int	evaluate_AVG(char **value, DC_ITEM *item, const char *parameters, con
 				sum += values.values[i].value.ui64;
 		}
 
-		zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_DBL, sum / values.values_num);
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, sum / values.values_num);
 
 		ret = SUCCEED;
 	}
@@ -1131,32 +1135,28 @@ static int	evaluate_LAST(char **value, DC_ITEM *item, const char *parameters, co
 	{
 		if (arg1 <= values.values_num)
 		{
-			zbx_history_value2str(*value, MAX_BUFFER_LEN, &values.values[arg1 - 1].value, item->value_type);
+			char	*tmp;
+
+			tmp = zbx_history_value2str_dyn(&values.values[arg1 - 1].value, item->value_type);
 
 			if (ITEM_VALUE_TYPE_STR == item->value_type ||
 					ITEM_VALUE_TYPE_TEXT == item->value_type ||
 					ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
-				int	escape_quote_escaped_value_len;
-				char	*escape_escaped_value = NULL, *escape_quote_escaped_value = NULL;
+				size_t	len;
+				char	*ptr;
 
-				escape_escaped_value = zbx_dyn_escape_string(*value, "\\");
-				zbx_free(*value);
-
-				escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value, "\"");
-				zbx_free(escape_escaped_value);
-
-				escape_quote_escaped_value_len = strlen(escape_quote_escaped_value);
-
-				*value = zbx_malloc(NULL, escape_quote_escaped_value_len + 3);
-				(*value)[0] = '"';
-				zbx_strlcpy((*value) + 1, escape_quote_escaped_value,
-						escape_quote_escaped_value_len + 1);
-
-				(*value)[escape_quote_escaped_value_len + 1] = '"';
-				(*value)[escape_quote_escaped_value_len + 2] = '\0';
-				zbx_free(escape_quote_escaped_value);
+				len = zbx_get_escape_string_len(tmp, "\"\\");
+				ptr = *value = zbx_malloc(NULL, len + 3);
+				*ptr++ = '"';
+				zbx_escape_string(ptr, len + 1, tmp, "\"\\");
+				ptr += len;
+				*ptr++ = '"';
+				*ptr = '\0';
+				zbx_free(tmp);
 			}
+			else
+				*value = tmp;
 
 			ret = SUCCEED;
 		}
@@ -1276,8 +1276,7 @@ static int	evaluate_MIN(char **value, DC_ITEM *item, const char *parameters, con
 			}
 		}
 
-		zbx_history_value2str(*value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
-
+		*value = zbx_history_value2str_dyn(&values.values[index].value, item->value_type);
 		ret = SUCCEED;
 	}
 	else
@@ -1391,7 +1390,7 @@ static int	evaluate_MAX(char **value, DC_ITEM *item, const char *parameters, con
 			}
 		}
 
-		zbx_history_value2str(*value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
+		*value = zbx_history_value2str_dyn(&values.values[index].value, item->value_type);
 
 		ret = SUCCEED;
 	}
@@ -1517,7 +1516,7 @@ static int	evaluate_PERCENTILE(char **value, DC_ITEM *item, const char *paramete
 		else
 			index = (int)ceil(values.values_num * (percentage / 100));
 
-		zbx_history_value2str(*value, MAX_BUFFER_LEN, &values.values[index - 1].value, item->value_type);
+		*value = zbx_history_value2str_dyn(&values.values[index - 1].value, item->value_type);
 
 		ret = SUCCEED;
 	}
@@ -1644,7 +1643,7 @@ static int	evaluate_DELTA(char **value, DC_ITEM *item, const char *parameters, c
 			result.dbl = values.values[index_max].value.dbl - values.values[index_min].value.dbl;
 		}
 
-		zbx_history_value2str(*value, MAX_BUFFER_LEN, &result, item->value_type);
+		*value = zbx_history_value2str_dyn(&result, item->value_type);
 
 		ret = SUCCEED;
 	}
@@ -1703,7 +1702,7 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, arg1, 1, &ts) &&
 			1 == values.values_num)
 	{
-		zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+		*value = zbx_strdup(*value, "0");
 	}
 	else
 	{
@@ -1722,7 +1721,7 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 			goto out;
 		}
 
-		zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+		*value = zbx_strdup(*value, "1");
 	}
 
 	ret = SUCCEED;
@@ -1750,6 +1749,7 @@ out:
 static int	evaluate_ABSCHANGE(char **value, DC_ITEM *item, const zbx_timespec_t *ts, char **error)
 {
 	int				ret = FAIL;
+	size_t				value_alloc = 0, value_offset = 0;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1766,35 +1766,35 @@ static int	evaluate_ABSCHANGE(char **value, DC_ITEM *item, const zbx_timespec_t 
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_DBL,
+			zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL,
 					fabs(values.values[0].value.dbl - values.values[1].value.dbl));
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			/* to avoid overflow */
 			if (values.values[0].value.ui64 >= values.values[1].value.ui64)
 			{
-				zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_UI64,
+				zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_UI64,
 						values.values[0].value.ui64 - values.values[1].value.ui64);
 			}
 			else
 			{
-				zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_UI64,
+				zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_UI64,
 						values.values[1].value.ui64 - values.values[0].value.ui64);
 			}
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (0 == strcmp(values.values[0].value.log->value, values.values[1].value.log->value))
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 			else
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 			break;
 
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			if (0 == strcmp(values.values[0].value.str, values.values[1].value.str))
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 			else
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 			break;
 		default:
 			*error = zbx_strdup(*error, "invalid value type");
@@ -1825,6 +1825,7 @@ out:
 static int	evaluate_CHANGE(char **value, DC_ITEM *item, const zbx_timespec_t *ts, char **error)
 {
 	int				ret = FAIL;
+	size_t				value_alloc = 0, value_offset = 0;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1841,31 +1842,31 @@ static int	evaluate_CHANGE(char **value, DC_ITEM *item, const zbx_timespec_t *ts
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_DBL,
+			zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL,
 					values.values[0].value.dbl - values.values[1].value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			/* to avoid overflow */
 			if (values.values[0].value.ui64 >= values.values[1].value.ui64)
-				zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_UI64,
+				zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_UI64,
 						values.values[0].value.ui64 - values.values[1].value.ui64);
 			else
-				zbx_snprintf(*value, MAX_BUFFER_LEN, "-" ZBX_FS_UI64,
+				zbx_snprintf_alloc(value, &value_alloc, &value_offset, "-" ZBX_FS_UI64,
 						values.values[1].value.ui64 - values.values[0].value.ui64);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (0 == strcmp(values.values[0].value.log->value, values.values[1].value.log->value))
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 			else
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 			break;
 
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			if (0 == strcmp(values.values[0].value.str, values.values[1].value.str))
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 			else
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 			break;
 		default:
 			*error = zbx_strdup(*error, "invalid value type");
@@ -1913,28 +1914,28 @@ static int	evaluate_DIFF(char **value, DC_ITEM *item, const zbx_timespec_t *ts, 
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			if (SUCCEED == zbx_double_compare(values.values[0].value.dbl, values.values[1].value.dbl))
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 			else
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (values.values[0].value.ui64 == values.values[1].value.ui64)
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 			else
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (0 == strcmp(values.values[0].value.log->value, values.values[1].value.log->value))
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 			else
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			if (0 == strcmp(values.values[0].value.str, values.values[1].value.str))
-				zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "0");
 			else
-				zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+				*value = zbx_strdup(*value, "1");
 			break;
 		default:
 			*error = zbx_strdup(*error, "invalid value type");
@@ -2009,6 +2010,7 @@ static int	evaluate_STR(char **value, DC_ITEM *item, const char *function, const
 	zbx_value_type_t		arg2_type = ZBX_VALUE_NVALUES;
 	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
+	size_t				value_alloc = 0, value_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2123,7 +2125,7 @@ static int	evaluate_STR(char **value, DC_ITEM *item, const char *function, const
 		}
 	}
 
-	zbx_snprintf(*value, MAX_BUFFER_LEN, "%d", found);
+	zbx_snprintf_alloc(value, &value_alloc, &value_offset, "%d", found);
 	ret = SUCCEED;
 out:
 	zbx_regexp_clean_expressions(&regexps);
@@ -2159,27 +2161,75 @@ out:
 static int	evaluate_STRLEN(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
-	int	ret = FAIL;
+	int				arg1 = 1, ret = FAIL;
+	zbx_value_type_t		arg1_type = ZBX_VALUE_NVALUES;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			ts_end = *ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
 			ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
 		*error = zbx_strdup(*error, "invalid value type");
-		goto clean;
+		goto out;
 	}
 
-	if (SUCCEED == evaluate_LAST(value, item, parameters, ts, error))
+	if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 1, ZBX_PARAM_OPTIONAL, &arg1,
+			&arg1_type))
 	{
-		/* *value after evaluate_LAST() can be of any size, even bigger than MAX_BUFFER_LEN */
-		zbx_fs_size_t x = zbx_strlen_utf8(*value);
-		zbx_free(*value);
-		*value = zbx_malloc(*value, MAX_BUFFER_LEN);
-		zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_SIZE_T, x);
-		ret = SUCCEED;
+		*error = zbx_strdup(*error, "invalid first parameter");
+		goto out;
 	}
-clean:
+
+	if (ZBX_VALUE_NVALUES != arg1_type)
+		arg1 = 1;	/* non-# first parameter is ignored to support older syntax "strlen(0)" */
+
+	if (2 == num_param(parameters))
+	{
+		int			time_shift = 0;
+		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
+
+		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
+		{
+			*error = zbx_strdup(*error, "invalid second parameter");
+			goto out;
+		}
+
+		ts_end.sec -= time_shift;
+	}
+
+	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, 0, arg1, &ts_end))
+	{
+		if (arg1 <= values.values_num)
+		{
+			size_t	sz, value_alloc = 0, value_offset = 0;
+
+			if (ITEM_VALUE_TYPE_LOG == item->value_type)
+				sz = zbx_strlen_utf8(values.values[0].value.log->value);
+			else
+				sz = zbx_strlen_utf8(values.values[0].value.str);
+
+			zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_SIZE_T, sz);
+			ret = SUCCEED;
+		}
+		else
+		{
+			*error = zbx_strdup(*error, "not enough data");
+			goto out;
+		}
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+	}
+
+	zbx_history_record_vector_destroy(&values, item->value_type);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -2245,16 +2295,16 @@ static int	evaluate_FUZZYTIME(char **value, DC_ITEM *item, const char *parameter
 	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 	{
 		if (vc_value.value.ui64 >= fuzlow && vc_value.value.ui64 <= fuzhig)
-			zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+			*value = zbx_strdup(*value, "1");
 		else
-			zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+			*value = zbx_strdup(*value, "0");
 	}
 	else
 	{
 		if (vc_value.value.dbl >= fuzlow && vc_value.value.dbl <= fuzhig)
-			zbx_strlcpy(*value, "1", MAX_BUFFER_LEN);
+			*value = zbx_strdup(*value, "1");
 		else
-			zbx_strlcpy(*value, "0", MAX_BUFFER_LEN);
+			*value = zbx_strdup(*value, "0");
 	}
 
 	zbx_history_record_clear(&vc_value, item->value_type);
@@ -2320,9 +2370,10 @@ static int	evaluate_BAND(char **value, DC_ITEM *item, const char *parameters, co
 
 	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, error))
 	{
-		/* value after evaluate_LAST() can be of any size, even bigger than MAX_BUFFER_LEN */
 		ZBX_STR2UINT64(last_uint64, *value);
-		zbx_snprintf(*value, sizeof(value), ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
+		/* 'and' bit operation cannot be larger than the source value, */
+		/* so the result can just be copied in value buffer            */
+		zbx_snprintf(*value, strlen(*value) + 1, ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
 		ret = SUCCEED;
 	}
 
@@ -2359,6 +2410,7 @@ static int	evaluate_FORECAST(char **value, DC_ITEM *item, const char *parameters
 	zbx_fit_t			fit;
 	zbx_mode_t			mode;
 	zbx_timespec_t			ts_end = *ts;
+	size_t				value_alloc = 0, value_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2472,13 +2524,13 @@ static int	evaluate_FORECAST(char **value, DC_ITEM *item, const char *parameters
 			}
 		}
 
-		zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_forecast(t, x, values.values_num,
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, zbx_forecast(t, x, values.values_num,
 				ts->sec - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), time, fit, k, mode));
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-		zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_DBL, ZBX_MATH_ERROR);
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, ZBX_MATH_ERROR);
 	}
 
 	ret = SUCCEED;
@@ -2521,6 +2573,7 @@ static int	evaluate_TIMELEFT(char **value, DC_ITEM *item, const char *parameters
 	zbx_timespec_t			zero_time;
 	zbx_fit_t			fit;
 	zbx_timespec_t			ts_end = *ts;
+	size_t				value_alloc = 0, value_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2626,13 +2679,13 @@ static int	evaluate_TIMELEFT(char **value, DC_ITEM *item, const char *parameters
 			}
 		}
 
-		zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_timeleft(t, x, values.values_num,
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, zbx_timeleft(t, x, values.values_num,
 				ts->sec - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), threshold, fit, k));
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-		zbx_snprintf(*value, MAX_BUFFER_LEN, ZBX_FS_DBL, ZBX_MATH_ERROR);
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, ZBX_MATH_ERROR);
 	}
 
 	ret = SUCCEED;
@@ -2714,34 +2767,40 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 	}
 	else if (0 == strcmp(function, "date"))
 	{
+		size_t	value_alloc = 0, value_offset = 0;
 		time_t	now = ts->sec;
 
 		tm = localtime(&now);
-		zbx_snprintf(*value, MAX_BUFFER_LEN, "%.4d%.2d%.2d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, "%.4d%.2d%.2d",
+				tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "dayofweek"))
 	{
+		size_t	value_alloc = 0, value_offset = 0;
 		time_t	now = ts->sec;
 
 		tm = localtime(&now);
-		zbx_snprintf(*value, MAX_BUFFER_LEN, "%d", 0 == tm->tm_wday ? 7 : tm->tm_wday);
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, "%d", 0 == tm->tm_wday ? 7 : tm->tm_wday);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "dayofmonth"))
 	{
+		size_t	value_alloc = 0, value_offset = 0;
 		time_t	now = ts->sec;
 
 		tm = localtime(&now);
-		zbx_snprintf(*value, MAX_BUFFER_LEN, "%d", tm->tm_mday);
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, "%d", tm->tm_mday);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "time"))
 	{
+		size_t	value_alloc = 0, value_offset = 0;
 		time_t	now = ts->sec;
 
 		tm = localtime(&now);
-		zbx_snprintf(*value, MAX_BUFFER_LEN, "%.2d%.2d%.2d", tm->tm_hour, tm->tm_min, tm->tm_sec);
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, "%.2d%.2d%.2d", tm->tm_hour, tm->tm_min,
+				tm->tm_sec);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "abschange"))
@@ -2766,7 +2825,9 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 	}
 	else if (0 == strcmp(function, "now"))
 	{
-		zbx_snprintf(*value, MAX_BUFFER_LEN, "%d", ts->sec);
+		size_t	value_alloc = 0, value_offset = 0;
+
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, "%d", ts->sec);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "fuzzytime"))
@@ -3242,8 +3303,6 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __func__, host, key, function, parameter);
-
-	value = zbx_malloc(value, MAX_BUFFER_LEN);
 
 	DCconfig_get_items_by_keys(&item, &host_key, &errcode, 1);
 

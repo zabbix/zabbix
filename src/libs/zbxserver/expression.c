@@ -4970,7 +4970,7 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *unknown_msgs)
 {
 	DC_ITEM			*items = NULL;
-	char			*value = NULL, *error = NULL;
+	char			*error = NULL;
 	int			i;
 	zbx_func_t		*func;
 	zbx_vector_uint64_t	itemids;
@@ -4978,9 +4978,6 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 	zbx_hashset_iter_t	iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() funcs_num:%d", __func__, funcs->num_data);
-
-	/* evaluate_LAST() may need more than MAX_BUFFER_LEN, so it would reallocate more on its own */
-	value = zbx_malloc(NULL, MAX_BUFFER_LEN);
 
 	zbx_vector_uint64_create(&itemids);
 	zbx_vector_uint64_reserve(&itemids, funcs->num_data);
@@ -5048,10 +5045,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			ret_unknown = 1;
 		}
 
-		zbx_free(value);
-		value = zbx_malloc(value, MAX_BUFFER_LEN);
-
-		if (0 == ret_unknown && SUCCEED != evaluate_function(&value, &items[i], func->function,
+		if (0 == ret_unknown && SUCCEED != evaluate_function(&func->value, &items[i], func->function,
 				func->parameter, &func->timespec, &error))
 		{
 			/* compose and store error message for future use */
@@ -5079,16 +5073,13 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			ret_unknown = 1;
 		}
 
-		if (0 == ret_unknown)
+		if (0 != ret_unknown)
 		{
-			func->value = zbx_strdup(func->value, value);
-		}
-		else
-		{
+			char	buffer[MAX_ID_LEN + 1];
 			/* write a special token of unknown value with 'unknown' message number, like */
 			/* ZBX_UNKNOWN0, ZBX_UNKNOWN1 etc. not wrapped in () */
-			func->value = zbx_dsprintf(func->value, ZBX_UNKNOWN_STR "%d",
-					unknown_msgs->values_num - 1);
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_UNKNOWN_STR "%d", unknown_msgs->values_num - 1);
+			func->value = zbx_strdup(func->value, buffer);
 		}
 	}
 
@@ -5097,7 +5088,6 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 
 	zbx_free(errcodes);
 	zbx_free(items);
-	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

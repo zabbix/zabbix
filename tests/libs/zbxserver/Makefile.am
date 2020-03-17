@@ -113,7 +113,9 @@ VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_history_sql_init \
 	-Wl,--wrap=zbx_history_elastic_init \
 	-Wl,--wrap=time \
-	-Wl,--wrap=substitute_simple_macros
+	-Wl,--wrap=substitute_simple_macros \
+	-Wl,--wrap=DCget_data_expected_from \
+	-Wl,--wrap=zbx_timespec
 
 evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \

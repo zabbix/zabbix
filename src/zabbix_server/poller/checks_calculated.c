@@ -251,8 +251,6 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 			ret_unknown = 1;
 		}
 
-		f->value = (char *)zbx_malloc(f->value, MAX_BUFFER_LEN);
-
 		if (0 == ret_unknown &&
 				SUCCEED != evaluate_function(&(f->value), &items[i], f->func, f->params, &ts, &errstr))
 		{

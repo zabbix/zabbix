@@ -39,7 +39,7 @@
  * data source
  */
 static zbx_vcmock_ds_t	vc_ds;
-static time_t	vcmock_time;
+static zbx_timespec_t	vcmock_ts;
 
 int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
 void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex);
@@ -788,13 +788,20 @@ void	zbx_vcmock_set_mode(zbx_mock_handle_t hitem, const char *key)
 /*
  * time() emulation
  */
-
 time_t	__wrap_time(time_t *ptr)
 {
 	if (NULL != ptr)
-		*ptr = vcmock_time;
+		*ptr = vcmock_ts.sec;
 
-	return vcmock_time;
+	return vcmock_ts.sec;
+}
+
+/*
+ * zbx_timespec() emulation
+ */
+void	__wrap_zbx_timespec(zbx_timespec_t *ts)
+{
+	*ts = vcmock_ts;
 }
 
 /******************************************************************************
@@ -809,12 +816,21 @@ void	zbx_vcmock_set_time(zbx_mock_handle_t hitem, const char *key)
 {
 	zbx_mock_error_t	err;
 	const char		*data;
-	zbx_timespec_t		ts;
 
 	data = zbx_mock_get_object_member_string(hitem, key);
 
-	if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(data, &ts)))
+	if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(data, &vcmock_ts)))
 		fail_msg("Cannot read \"%s\" parameter", key);
+}
 
-	vcmock_time = ts.sec;
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_get_time                                              *
+ *                                                                            *
+ * Purpose: returns the mocked current time                                   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_timespec_t	zbx_vcmock_get_ts()
+{
+	return vcmock_ts;
 }

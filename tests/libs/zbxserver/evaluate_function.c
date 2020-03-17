@@ -51,6 +51,13 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *even
 	return SUCCEED;
 }
 
+int __wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
+{
+	ZBX_UNUSED(itemid);
+	*seconds = zbx_vcmock_get_ts().sec - 600;
+	return SUCCEED;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	int			err, expected_ret, returned_ret;
@@ -59,6 +66,7 @@ void	zbx_mock_test_entry(void **state)
 	DC_ITEM			item;
 	zbx_vcmock_ds_item_t	*ds_item;
 	zbx_timespec_t		ts;
+	zbx_mock_handle_t	handle;
 
 	err = zbx_vc_init(&error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
@@ -76,10 +84,9 @@ void	zbx_mock_test_entry(void **state)
 	function = zbx_mock_get_parameter_string("in.function");
 	params = zbx_mock_get_parameter_string("in.params");
 
-	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.time"), &ts))
-		fail_msg("Invalid timestamp");
-
-	returned_value = zbx_malloc(NULL, MAX_BUFFER_LEN);
+	handle = zbx_mock_get_parameter_handle("in");
+	zbx_vcmock_set_time(handle, "time");
+	ts = zbx_vcmock_get_ts();
 
 	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &item, function, params, &ts, &error)))
 		printf("evaluate_function returned error: %s\n", error);
