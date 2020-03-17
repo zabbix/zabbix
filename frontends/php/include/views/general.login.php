@@ -40,10 +40,10 @@ if ($data['error']) {
 $guest = $data['guest_login_url']
 	? (new CListItem(['or ', new CLink('sign in as guest', $data['guest_login_url'])]))->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
+
 $http_login_link = $data['http_login_url']
 	? (new CListItem(new CLink(_('Sign in with HTTP'), $data['http_login_url'])))->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
-
 
 global $ZBX_SERVER_NAME;
 
@@ -53,7 +53,7 @@ global $ZBX_SERVER_NAME;
 			? (new CDiv($ZBX_SERVER_NAME))->addClass(ZBX_STYLE_SERVER_NAME)
 			: null,
 		(new CDiv([
-			(new CDiv(CBrandHelper::getLogo()))->addClass(ZBX_STYLE_SIGNIN_LOGO),
+			(new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass(ZBX_STYLE_SIGNIN_LOGO),
 			(new CForm())
 				->cleanItems()
 				->setAttribute('aria-label', _('Sign in'))

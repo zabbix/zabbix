@@ -87,14 +87,23 @@ class CBrandHelper {
 	}
 
 	/**
-	 * Get logo.
+	 * Get logo of the specified type.
 	 *
-	 * @return CImg|CDiv
+	 * @return string
 	 */
-	public static function getLogo() {
-		$logo = self::getValue('BRAND_LOGO', null);
+	public static function getLogo(int $type): ?string {
+		switch ($type) {
+			case LOGO_TYPE_NORMAL:
+				return self::getValue('BRAND_LOGO', null);
 
-		return ($logo !== null) ? new CImg($logo) : new CDiv();
+			case LOGO_TYPE_SIDEBAR:
+				return self::getValue('BRAND_LOGO_SIDEBAR', null);
+
+			case LOGO_TYPE_SIDEBAR_COMPACT:
+				return self::getValue('BRAND_LOGO_SIDEBAR_COMPACT', null);
+		}
+
+		return null;
 	}
 
 	/**

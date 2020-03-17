@@ -351,6 +351,11 @@ define('HOST_AVAILABLE_UNKNOWN',	0);
 define('HOST_AVAILABLE_TRUE',		1);
 define('HOST_AVAILABLE_FALSE',		2);
 
+// Logo.
+define('LOGO_TYPE_NORMAL',			0);
+define('LOGO_TYPE_SIDEBAR',			1);
+define('LOGO_TYPE_SIDEBAR_COMPACT',	2);
+
 define('MAINTENANCE_TAG_EVAL_TYPE_AND_OR',	0);
 define('MAINTENANCE_TAG_EVAL_TYPE_OR',		2);
 define('MAINTENANCE_TAG_OPERATOR_EQUAL',	0);
@@ -1756,6 +1761,9 @@ define('ZBX_STYLE_WIDGET_URL', 'widget-url');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
+define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
+define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO', 'zabbix-sidebar-logo');
+define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT', 'zabbix-sidebar-logo-compact');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');

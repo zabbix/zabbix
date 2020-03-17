@@ -322,6 +322,24 @@ footer {
     background: rgba(135, 209, 255, 0.55); }
   .sidebar .scrollable .scrollbar-thumb {
     background: rgba(135, 209, 255, 0.85); }
+  .sidebar .logo {
+    position: relative;
+    display: block;
+    overflow: hidden; }
+    .sidebar .logo:active, .sidebar .logo:hover, .sidebar .logo:link, .sidebar .logo:visited {
+      border: 0; }
+    .sidebar .logo:focus {
+      box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35); }
+    .sidebar .logo .sidebar-logo {
+      margin-right: 60px; }
+    .sidebar .logo .sidebar-logo-compact {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0; }
+  .sidebar .button-compact,
+  .sidebar .button-expand {
+    margin-left: 12px; }
   .sidebar .button-hide,
   .sidebar .button-show,
   .sidebar .button-compact,
@@ -360,8 +378,6 @@ footer {
     margin-top: 5px;
     color: rgba(206, 218, 225, 0.5);
     transition: opacity 0.3s ease-out; }
-  .sidebar .logo {
-    transition: width 0.3s; }
   .sidebar .form-search .search {
     transition: opacity 0.3s; }
   .sidebar .form-search .search-icon {
@@ -383,11 +399,12 @@ footer {
     max-width: 48px !important; }
     .sidebar.is-compact:not(.is-opened) .scrollable .scrollbar-track {
       display: none; }
-    .sidebar.is-compact:not(.is-opened) .logo {
-      width: 24px; }
-      .sidebar.is-compact:not(.is-opened) .logo div {
-        background-position: -540px -400px;
-        transition: background 0s 0.21s; }
+    .sidebar.is-compact:not(.is-opened) .logo .sidebar-logo {
+      opacity: 0;
+      transition: opacity 0s 0.3s; }
+    .sidebar.is-compact:not(.is-opened) .logo .sidebar-logo-compact {
+      opacity: 1;
+      transition: opacity 0s 0.21s; }
     .sidebar.is-compact:not(.is-opened) .button-compact,
     .sidebar.is-compact:not(.is-opened) .button-expand,
     .sidebar.is-compact:not(.is-opened) .button-hide,
@@ -937,23 +954,20 @@ pre, pre a, pre td, pre span {
   font-size: 0;
   line-height: 0; }
 
-.logo {
-  display: block;
+.zabbix-logo {
+  width: 114px;
+  height: 30px;
+  background: url(../img/icon-sprite.svg) no-repeat 0 -864px; }
+
+.zabbix-sidebar-logo {
   width: 91px;
-  height: 24px; }
-  .logo div {
-    height: 100%;
-    background: url(../img/icon-sprite.svg) no-repeat -570px -400px; }
-  .logo img {
-    display: inline-block;
-    max-width: 100%;
-    max-height: 100%; }
-  .logo:active, .logo:hover, .logo:link, .logo:visited {
-    border: 0; }
-  .logo:focus div,
-  .logo:focus img {
-    box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35);
-    transition: box-shadow 0.3s ease-out; }
+  height: 24px;
+  background: url(../img/icon-sprite.svg) no-repeat -570px -400px; }
+
+.zabbix-sidebar-logo-compact {
+  width: 24px;
+  height: 24px;
+  background: url(../img/icon-sprite.svg) no-repeat -540px -400px; }
 
 .object-group {
   min-height: 24px;
@@ -2541,12 +2555,14 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border: 0;
     margin: 3px 0 11px;
     padding: 0; }
-  .setup-container .signin-logo {
-    margin: 0 0 37px; }
+  .setup-container .setup-logo {
+    display: flex;
+    margin-bottom: 40px;
+    justify-content: flex-start; }
 
 .setup-left {
   float: left;
-  width: 198px;
+  width: 200px;
   padding-right: 10px; }
   .setup-left ul {
     margin: -4px 0 0 -42px; }
@@ -2559,7 +2575,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .setup-right {
   width: auto;
-  margin-left: 198px; }
+  margin-left: 200px; }
 
 .setup-right-body {
   padding-right: 5px;
@@ -2626,11 +2642,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     width: 100%; }
 
 .signin-logo {
-  margin: 0 auto;
+  display: flex;
   margin-bottom: 21px;
-  width: 114px;
-  height: 30px;
-  background: url(../img/icon-sprite.svg) no-repeat 0 -864px; }
+  justify-content: center; }
 
 .signin-links {
   width: 100%;

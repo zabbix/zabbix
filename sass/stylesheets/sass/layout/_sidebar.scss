@@ -17,6 +17,7 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 	.sidebar-header {
 		padding: $sidebar-padding;
 		box-sizing: border-box;
+
 	}
 
 	.sidebar-nav {
@@ -38,6 +39,39 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		.scrollbar-thumb {
 			background: $sidebar-scrollbar-thumb-color;
 		}
+	}
+
+	.logo {
+		position: relative;
+		display: block;
+		overflow: hidden;
+
+		&:active,
+		&:hover,
+		&:link,
+		&:visited {
+			border: 0;
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 2px rgba($blue, .35);
+		}
+
+		.sidebar-logo {
+			margin-right: 48px + $sidebar-padding;
+		}
+
+		.sidebar-logo-compact {
+			position: absolute;
+			top: 0;
+			left: 0;
+			opacity: 0;
+		}
+	}
+
+	.button-compact,
+	.button-expand {
+		margin-left: $sidebar-padding;
 	}
 
 	.button-hide,
@@ -102,10 +136,6 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		will-change: max-width;
 		transform: translate3d(0, 0, 0);
 
-		.logo {
-			transition: width $ui-transition-duration;
-		}
-
 		.form-search {
 			.search {
 				transition: opacity $ui-transition-duration;
@@ -150,13 +180,19 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 			}
 
 			.logo {
-				width: $sidebar-compact-width - $sidebar-padding * 2;
-
-				div {
-					background-position: -540px -400px;
+				.sidebar-logo {
+					opacity: 0;
 
 					@if $ui-transitions {
-						transition: background 0s $ui-transition-duration * .7;
+						transition: opacity 0s $ui-transition-duration;
+					}
+				}
+
+				.sidebar-logo-compact {
+					opacity: 1;
+
+					@if $ui-transitions {
+						transition: opacity 0s $ui-transition-duration * .7;
 					}
 				}
 			}

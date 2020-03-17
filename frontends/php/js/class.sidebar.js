@@ -22,7 +22,6 @@ const SIDEBAR_VIEW_MODE_FULL       = 0;
 const SIDEBAR_VIEW_MODE_COMPACT    = 1;
 const SIDEBAR_VIEW_MODE_HIDDEN     = 2;
 
-const SIDEBAR_MIN_WIDTH            = 170;
 const SIDEBAR_HOVER_DELAY          = 1000;
 
 const SIDEBAR_EVENT_BLUR           = 'blur';
@@ -46,17 +45,14 @@ class CSidebar extends CBaseComponent {
 		this._is_focused = false;
 		this._is_opened = false;
 
-		let max_width = SIDEBAR_MIN_WIDTH;
-		for (const menu of this._target.querySelectorAll('nav > ul')) {
-			const position = window.getComputedStyle(menu).position;
-			menu.style.position = 'absolute';
-			max_width = Math.max(max_width, menu.clientWidth);
-			menu.style.position = position;
+		let max_width = 0;
+		for (const child of this._target.querySelectorAll('.sidebar-header, nav > ul')) {
+			const position = window.getComputedStyle(child).position;
+			child.style.position = 'absolute';
+			max_width = Math.max(max_width, child.clientWidth);
+			child.style.position = position;
 		}
 		this._target.style.maxWidth = max_width + 'px';
-
-		const sidebar_header = this._target.querySelector('.sidebar-header');
-		sidebar_header.style.minWidth = SIDEBAR_MIN_WIDTH + 'px';
 
 		const server_name = this._target.querySelector('.sidebar-header .server-name');
 		if (server_name) {

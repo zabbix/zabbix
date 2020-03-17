@@ -156,36 +156,22 @@ $ui-transition-duration: .3s !default;
 	line-height: 0;
 }
 
-.logo {
-	display: block;
+.zabbix-logo {
+	width: 114px;
+	height: 30px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
+}
+
+.zabbix-sidebar-logo {
 	width: 91px;
 	height: 24px;
+	background: url(../img/icon-sprite.svg) no-repeat -570px -400px;
+}
 
-	div {
-		height: 100%;
-		background: url(../img/icon-sprite.svg) no-repeat -570px -400px;
-	}
-
-	img {
-		display: inline-block;
-		max-width: 100%;
-		max-height: 100%;
-	}
-
-	&:active,
-	&:hover,
-	&:link,
-	&:visited {
-		border: 0;
-	}
-
-	&:focus {
-		div,
-		img {
-			box-shadow: 0 0 0 2px rgba($blue, .35);
-			transition: box-shadow $ui-transition-duration ease-out;
-		}
-	}
+.zabbix-sidebar-logo-compact {
+	width: 24px;
+	height: 24px;
+	background: url(../img/icon-sprite.svg) no-repeat -540px -400px;
 }
 
 .object-group {
@@ -2787,7 +2773,7 @@ $form-icon-btn: (
 	}
 }
 
-// Sign in, Installation.
+// Installation.
 .setup-container {
 	background-color: $ui-bg-color;
 	width: 766px;
@@ -2805,14 +2791,16 @@ $form-icon-btn: (
 		padding: 0;
 	}
 
-	.signin-logo {
-		margin: 0 0 37px;
+	.setup-logo {
+		display: flex;
+		margin-bottom: 40px;
+		justify-content: flex-start;
 	}
 }
 
 .setup-left {
 	float: left;
-	width: 198px;
+	width: 200px;
 	padding-right: 10px;
 
 	ul {
@@ -2832,7 +2820,7 @@ $form-icon-btn: (
 
 .setup-right {
 	width: auto;
-	margin-left: 198px;
+	margin-left: 200px;
 }
 
 .setup-right-body {
@@ -2943,11 +2931,9 @@ $form-icon-btn: (
 }
 
 .signin-logo {
-	margin: 0 auto;
+	display: flex;
 	margin-bottom: 21px;
-	width: 114px;
-	height: 30px;
-	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
+	justify-content: center;
 }
 
 .signin-links {

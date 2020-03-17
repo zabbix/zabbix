@@ -738,6 +738,30 @@ function makeServerStatusOutput() {
 }
 
 /**
+* Make logo of the specified type.
+*
+* @param int $type  LOGO_TYPE_NORMAL | LOGO_TYPE_SIDEBAR | LOGO_TYPE_SIDEBAR_COMPACT.
+*
+* @return CTag
+*/
+function makeLogo(int $type): ?CTag {
+	static $zabbix_logo_classes = [
+		LOGO_TYPE_NORMAL => ZBX_STYLE_ZABBIX_LOGO,
+		LOGO_TYPE_SIDEBAR => ZBX_STYLE_ZABBIX_SIDEBAR_LOGO,
+		LOGO_TYPE_SIDEBAR_COMPACT => ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT
+	];
+
+	$brand_logo = CBrandHelper::getLogo($type);
+
+	if ($brand_logo !== null) {
+		return (new CImg($brand_logo));
+	}
+	else {
+		return (new CDiv())->addClass($zabbix_logo_classes[$type]);
+	}
+}
+
+/**
  * Renders a page footer.
  *
  * @param bool $with_version

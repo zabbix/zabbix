@@ -19,12 +19,19 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 $logo = (new CLink(
-	CBrandHelper::getLogo(),
+	[
+		makeLogo(LOGO_TYPE_SIDEBAR)->addClass('sidebar-logo'),
+		makeLogo(LOGO_TYPE_SIDEBAR_COMPACT)->addClass('sidebar-logo-compact')
+	],
 	(new CUrl('zabbix.php'))
 		->setArgument('action', 'dashboard.view')
 		->getUrl()
-	))->addClass(ZBX_STYLE_LOGO);
+))->addClass(ZBX_STYLE_LOGO);
 
 $search_icon = (new CSubmitButton(null))
 	->addClass('search-icon')
