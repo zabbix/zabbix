@@ -1843,6 +1843,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 					((zbx_lld_hostmacro_t *)hostmacros->values[j])->description);
 			hostmacro->flags = 0x00;
 			substitute_lld_macros(&hostmacro->value, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&hostmacro->description, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
 
 			zbx_vector_ptr_append(&host->new_hostmacros, hostmacro);
 		}
