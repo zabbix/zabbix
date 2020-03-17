@@ -680,7 +680,7 @@ footer {
     .menu-user span::before {
       position: absolute;
       top: 13px;
-      left: 20px;
+      left: 18px;
       opacity: .75;
       transition: opacity 0.3s ease-out; }
   .menu-user a {
