@@ -5,6 +5,8 @@ $sidebar-padding: 12px;
 
 $sidebar-toggle-bg-position: -540px -592px !default;
 
+
+$ui-transition-duration: 1s;
 .sidebar {
 	position: relative;
 	z-index: 998;
@@ -92,7 +94,7 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		}
 
 		@if $ui-transitions {
-			transition: opacity $ui-transition-duration;
+			transition: opacity $ui-transition-duration * .5 $ui-transition-duration * .5;
 		}
 	}
 
@@ -201,6 +203,10 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 			.button-hide,
 			.button-show {
 				opacity: 0;
+
+				@if $ui-transitions {
+					transition: opacity $ui-transition-duration * .5;
+				}
 			}
 
 			.server-name {
