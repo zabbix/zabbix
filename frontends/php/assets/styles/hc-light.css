@@ -5262,10 +5262,18 @@ table.preprocessing-test-results .rel-container {
   .sidebar.is-compact:not(.is-opened) .menu-main > li.is-selected > a::before {
     background-position-x: -600px; }
 
-.menu-main > li.is-expanded > a:hover::before {
-  background-position-x: -570px; }
+.menu-main > li.is-expanded > a:hover, .menu-main > li.is-expanded > a:focus {
+  background: #000000;
+  border-left-color: #ffffff;
+  color: #ffffff; }
+  .menu-main > li.is-expanded > a:hover::before, .menu-main > li.is-expanded > a:focus::before {
+    background-position-x: -570px; }
 .menu-main > li.is-expanded > a::before {
   background-position-x: -600px; }
+.menu-main > li.has-submenu.is-expanded > a::after {
+  background-position-x: -579px; }
+.menu-main > li.has-submenu.is-expanded > a:hover::after, .menu-main > li.has-submenu.is-expanded > a:focus::after {
+  background-position-x: -606px; }
 
 .menu-user a {
   padding-left: 45px;
