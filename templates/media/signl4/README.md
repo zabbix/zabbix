@@ -10,16 +10,6 @@ Pairing Zabbix with SIGNL4 can enhance your daily operations by letting you effi
 
 ![SIGNL4](images/signl4-zabbix.png?raw=true)
 
-## Setup
-
-There are two options to integrate SIGNL4 with Zabbix.
-
-1. Webhook  
-If you use Zabbix 4.4 or higher, webhook is the recommended option.
-
-2. Script  
-If you are using a Zabbix version lower than 4.4, consider the script integration. You can find more details regarding script integration in signl4 [GitHub](https://github.com/signl4/signl4-integration-zabbix)
-
 ## Webhook Integraion
 
 This section describes the setup and configuration of the SIGNL4 webhook for Zabbix:
@@ -35,7 +25,8 @@ In Zabbix you can now import a new Media Type under Administration -> Media type
 
 ![Zabbix Media Type](images/zabbix-webhook-media-type.png?raw=true)
 
-The parameter teamsecret is filled from the user's Sent to field. The other parameters are flexible and you can add, remove or adapt them as needed.
+The parameter "teamsecret" is filled from the user's "Sent to" field by default. **Please note that "Send to" field is exposed in list of problems. If there are multiple Zabbix users with access to problem list it is recomended to set value of the "teamsecret" parameter directly in the mediatype configuration to avoid exposure of "teamsecret".**
+The other parameters are flexible and you can add, remove or adapt them as needed.
 
 4. Add Media Type to a User  
 Under Administration -> Users, create a dedicated user and add the media type we have created above.
