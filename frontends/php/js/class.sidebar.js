@@ -90,6 +90,8 @@ class CSidebar extends CBaseComponent {
 			}
 
 			setTimeout(() => this.addClass('is-opened'), 0);
+
+			clearTimeout(this._opened_timer);
 			this.fire(SIDEBAR_EVENT_OPEN);
 		}
 
@@ -121,6 +123,8 @@ class CSidebar extends CBaseComponent {
 			}
 
 			this.removeClass('is-opened');
+
+			clearTimeout(this._opened_timer);
 			this.fire(SIDEBAR_EVENT_CLOSE);
 		}
 
@@ -153,7 +157,6 @@ class CSidebar extends CBaseComponent {
 		this._events = {
 
 			mouseenter: () => {
-				clearTimeout(this._opened_timer);
 				this.open();
 			},
 
