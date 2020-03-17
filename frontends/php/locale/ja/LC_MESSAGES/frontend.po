@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 17:15+0200\n"
-"PO-Revision-Date: 2020-02-18 04:35+0300\n"
+"POT-Creation-Date: 2020-03-17 10:25+0200\n"
+"PO-Revision-Date: 2020-03-17 02:39+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1581993359.000000\n"
+"X-POOTLE-MTIME: 1584405564.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:67
 #: include/classes/db/OracleDbBackend.php:87
@@ -45,7 +45,7 @@ msgstr "\"%1$s\" で指定してください"
 #: maintenance.php:136 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%1$s\"は1970.01.01から2038.01.18の間で設定してください。"
 
 #: include/classes/api/services/CItemGeneral.php:1384
 #, c-format
@@ -97,7 +97,7 @@ msgstr "%1$s (%2$s年)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - %2$sにあるモジュールで発生しました。"
 
 #: app/partials/monitoring.latest.view.html.php:304
 #: app/partials/monitoring.latest.view.html.php:465
@@ -475,7 +475,7 @@ msgstr "アクションを追加しました"
 #: include/classes/core/ZBase.php:445
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "アクションクラス%1$sは%2$sクラスを拡張してください。"
 
 #: actionconf.php:204
 msgid "Action deleted"
@@ -711,7 +711,7 @@ msgstr "ホストを追加"
 
 #: app/partials/massupdate.macros.tab.php:93
 msgid "Add missing"
-msgstr ""
+msgstr "未設定時に追加"
 
 #: jsLoader.php:325
 msgid "Add multiple maps"
@@ -723,7 +723,7 @@ msgstr "新しいデータセットの追加"
 
 #: include/views/configuration.host.edit.php:147
 msgid "Add new interface"
-msgstr ""
+msgstr "新しいインターフェースの追加"
 
 #: include/classes/widgets/CWidgetHelper.php:693
 msgid "Add new override"
@@ -786,7 +786,7 @@ msgstr "表示期間"
 #: include/views/monitoring.overview.triggers.php:71
 #, c-format
 msgid "Age less than %1$s"
-msgstr ""
+msgstr "表示期間 %1$s"
 
 #: app/views/administration.script.list.php:87 app/views/popup.generic.php:603
 #: include/hosts.inc.php:1431 include/items.inc.php:345
@@ -1689,7 +1689,7 @@ msgstr "メディアタイプを追加できません"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
+msgstr[0] "モジュールを追加できません: %1$s。"
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -2026,7 +2026,7 @@ msgstr[0] "メディアタイプを削除できません"
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
+msgstr[0] "モジュールを削除できません: %1$s。"
 
 #: sysmaps.php:259
 msgid "Cannot delete network map"
@@ -2189,7 +2189,7 @@ msgstr[0] "メディアタイプを無効にできません"
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
-msgstr[0] ""
+msgstr[0] "モジュールを無効にできません: %1$s。"
 
 #: triggers.php:553
 msgid "Cannot disable trigger"
@@ -2244,7 +2244,7 @@ msgstr[0] "メディアタイプを有効にできません"
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
-msgstr[0] ""
+msgstr[0] "モジュールを有効にできません: %1$s。"
 
 #: triggers.php:552
 msgid "Cannot enable trigger"
@@ -2419,7 +2419,7 @@ msgstr "テンプレートをリンクできません。"
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
-msgstr[0] ""
+msgstr[0] "%1$sにあるモジュールをロードできません。"
 
 #: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
@@ -2444,7 +2444,7 @@ msgstr "テンプレートの表示名を一括更新できません。"
 #: include/classes/api/services/CHostBase.php:61
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
-msgstr ""
+msgstr "テンプレートIDの重複のためリンク%1$sを作成できません。"
 
 #: include/classes/db/DB.php:827
 #, c-format
@@ -2612,7 +2612,7 @@ msgstr "テンプレートのリンクを削除できません。"
 #: include/classes/api/services/CHostGeneral.php:268
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "トリガー\"%1$s\"のリンクを削除できません。ホストにリンクされたテンプレートのアイテムを使用しています。"
 
 #: include/classes/api/services/CAction.php:2974
 #: include/classes/api/services/CAction.php:2979
@@ -3011,7 +3011,7 @@ msgstr "深刻度の変更"
 
 #: include/classes/html/CMacroValue.php:143
 msgid "Change type"
-msgstr ""
+msgstr "形式の変更"
 
 #: include/forms.inc.php:184 include/items.inc.php:127
 #: include/views/configuration.item.edit.php:582
@@ -3159,7 +3159,7 @@ msgstr "テンプレートの循環リンクは行えません。"
 #: include/classes/core/ZBase.php:439
 #, c-format
 msgid "Class %1$s not found for action %2$s."
-msgstr ""
+msgstr "アクション%2$sのためのクラス%1$sが見つかりません。"
 
 #: jsLoader.php:220
 msgid "Clear"
@@ -3318,12 +3318,12 @@ msgstr "いくつかのトリガーを\"and\"で比較することはできま�
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
 msgid "Component %1$s already registered."
-msgstr ""
+msgstr "コンポーネント%1$sは既に登録されています。"
 
 #: include/classes/core/CComponentRegistry.php:37
 #, c-format
 msgid "Component %1$s is not registered."
-msgstr ""
+msgstr "コンポーネント%1$sは登録されていません。"
 
 #: app/views/administration.proxy.list.php:75
 msgid "Compression"
@@ -3574,7 +3574,7 @@ msgstr "確認テキスト"
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "おめでとうございます！Webインターフェースのインストールが終了しました。"
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1465
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1463
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:715
 msgid "Connect to"
@@ -3603,6 +3603,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"への接続に失敗しました。以下の原因が考えられます：\n"
+"1. \"zabbix.conf.php\"に設定されたサーバーのIP/DNSが正しくない。\n"
+"2. DNSサーバーの設定が正しくない。\n"
 
 #: include/classes/server/CZabbixServer.php:481
 #, c-format
@@ -3613,6 +3616,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"への接続が拒否されました。以下の原因が考えられます：\n"
+"1. \"zabbix.conf.php\"に設定されたサーバーのIP/DNSが正しくない。\n"
+"2. SELinuxなどのセキュリティ関連の設定で接続がブロックされている。\n"
+"3. Zabbixサーバーのプロセスが起動していない。\n"
+"4. FirewallによってTCPでの接続がブロックされている。\n"
 
 #: include/classes/server/CZabbixServer.php:489
 #, c-format
@@ -3621,6 +3629,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"への接続でタイムアウトが発生しました。以下の原因が考えられます：\n"
+"1. \"zabbix.conf.php\"に設定されたIP/DNSが正しくない。\n"
+"2. FirewallによってTCPでの接続がブロックされている。\n"
 
 #: include/views/configuration.host.massupdate.php:294
 msgid "Connections"
@@ -4131,7 +4142,7 @@ msgstr "無効"
 msgid "DNS"
 msgstr "DNS"
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1460
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1458
 #: include/views/configuration.discovery.edit.php:106
 #: include/views/configuration.discovery.edit.php:119
 #: include/views/inventory.host.view.php:79
@@ -4338,7 +4349,7 @@ msgstr "12月"
 
 #: app/views/administration.iconmap.edit.php:106
 #: include/classes/widgets/forms/CWidgetForm.php:49 include/hosts.inc.php:31
-#: include/hosts.inc.php:1475 include/views/configuration.action.edit.php:226
+#: include/hosts.inc.php:1473 include/views/configuration.action.edit.php:226
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:142
 #: include/views/js/monitoring.sysmaps.js.php:243
@@ -5208,7 +5219,7 @@ msgstr "Down"
 
 #: jsLoader.php:306
 msgid "Download image"
-msgstr ""
+msgstr "イメージのダウンロード"
 
 #: include/classes/setup/CSetupWizard.php:372
 msgid "Download the configuration file"
@@ -5292,18 +5303,18 @@ msgstr "トリガープロトタイプ\"%1$s\"の依存関係が重複してい�
 #: include/classes/api/services/CHost.php:2201
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
-msgstr ""
+msgstr "ホストが重複しています。同じホスト名\"%1$s\"を持つホスト設定がすでに存在しています。"
 
 #: include/classes/api/services/CHost.php:1968
 #: include/classes/api/services/CHost.php:2221
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
-msgstr ""
+msgstr "ホストが重複しています。同じホストの表示名\"%1$s\"を持つホストがすでに存在しています。"
 
 #: include/profiles.inc.php:176
 #, c-format
 msgid "Duplicate severity name \"%1$s\"."
-msgstr ""
+msgstr "重要度名\"%1$s\"が重複しています。"
 
 #: include/classes/api/services/CTriggerGeneral.php:504
 #, c-format
@@ -5854,7 +5865,7 @@ msgstr "繰返し間隔(週)"
 
 #: app/partials/massupdate.macros.tab.php:101
 msgid "Except selected"
-msgstr ""
+msgstr "選択したものを除く"
 
 #: app/views/popup.triggerwizard.php:54 app/views/popup.triggerwizard.php:105
 msgid "Exclude"
@@ -5932,7 +5943,7 @@ msgstr "障害が1件のときにトリガー名を表示"
 #: include/classes/core/CJsonRpc.php:109
 #, c-format
 msgid "Expecting JSON-rpc version 2.0, \"%1$s\" is given."
-msgstr ""
+msgstr "JSON-rpcバージョン2.0で指定してください。\"%1$s\"が指定されました。"
 
 #: include/views/configuration.maintenance.list.php:60
 #: include/views/configuration.maintenance.list.php:90
@@ -6408,7 +6419,7 @@ msgstr "一般設定"
 #: chart4.php:172 chart5.php:203
 #, c-format
 msgid "Generated in %1$s sec"
-msgstr ""
+msgstr "Generated in %1$s sec"
 
 #: include/locales.inc.php:56
 msgid "Georgian (ka_GE)"
@@ -7442,7 +7453,7 @@ msgstr "ハンガリー語 (hu_HU)"
 
 #: app/partials/massupdate.macros.tab.php:109
 msgid "I confirm to remove all macros"
-msgstr ""
+msgstr "すべてのマクロを削除することを確認"
 
 #: include/discovery.inc.php:60
 msgid "ICMP ping"
@@ -7465,7 +7476,7 @@ msgstr "IMAP"
 msgid "IP"
 msgstr "IPアドレス"
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1455
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1453
 #: include/maps.inc.php:46 include/views/configuration.discovery.edit.php:95
 #: include/views/configuration.discovery.edit.php:107
 #: include/views/configuration.discovery.edit.php:120
@@ -7558,7 +7569,7 @@ msgstr "アイコンのマッピング"
 #: include/classes/api/services/CIconMap.php:311
 #, c-format
 msgid "Icon map \"%1$s\" already exists."
-msgstr ""
+msgstr "アイコンのマッピング\"%1$s\"はすでに存在します。"
 
 #: include/classes/api/services/CIconMap.php:533
 #, c-format
@@ -7595,17 +7606,17 @@ msgstr "アイコン"
 #: include/classes/core/CModuleManager.php:155
 #, c-format
 msgid "Identical ID (%1$s) is used by modules located at %2$s."
-msgstr ""
+msgstr "同一のID(%1$s)は%2$sにあるモジュールで使用されています。"
 
 #: include/classes/core/CModuleManager.php:173
 #, c-format
 msgid "Identical actions are used by modules located at %1$s."
-msgstr ""
+msgstr "同一のアクションは%1$sにあるモジュールで使用されています。"
 
 #: include/classes/core/CModuleManager.php:162
 #, c-format
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
-msgstr ""
+msgstr "同一のネームスペース(%1$s)は%2$sにあるモジュールで使用されています。"
 
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:571
@@ -7654,7 +7665,7 @@ msgstr "[%2$s]内の[%1$s]のイメージの読み込みエラー。"
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
-msgstr ""
+msgstr "イメージのサイズは%1$s未満にしてください。"
 
 #: app/controllers/CControllerImageUpdate.php:137
 msgid "Image updated"
@@ -7700,7 +7711,7 @@ msgstr "インポートに成功しました"
 #: hostinventories.php:190
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
-msgstr ""
+msgstr "インベントリフィールド\"%1$s\"が存在しないためフィルタリングが行えません。"
 
 #: include/html.inc.php:324
 msgid "In maintenance"
@@ -7968,7 +7979,7 @@ msgstr "実行するアクションのホストの値が正しくありません
 #: include/classes/api/services/CAction.php:1873
 #, c-format
 msgid "Incorrect action operation port \"%1$s\"."
-msgstr ""
+msgstr "実行するアクションのポート\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CAction.php:1978
 msgid "Incorrect action operation template. Template does not exist or you have no access to this template."
@@ -8091,7 +8102,7 @@ msgstr "サービス\"%1$s\"のSLAの値の計算が正しくありません。"
 #: include/classes/api/services/CHost.php:2195
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
-msgstr ""
+msgstr "ホスト名\"%1$s\"に不正な文字列が使用されています。"
 
 #: include/classes/api/services/CProxy.php:624
 #: include/classes/api/services/CProxy.php:740
@@ -8268,18 +8279,18 @@ msgstr "入力されたパラメータが正しくありません。"
 #: include/classes/api/services/CHostInterface.php:782
 #, c-format
 msgid "Incorrect interface DNS parameter \"%1$s\" provided."
-msgstr ""
+msgstr "インターフェースのDNSパラメータ\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CHostInterface.php:827
 #, c-format
 msgid "Incorrect interface port \"%1$s\" provided."
-msgstr ""
+msgstr "インターフェースのポート\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CHost.php:2031
 #: include/classes/api/services/CHost.php:2177
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
-msgstr ""
+msgstr "インベントリのフィールド\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CAction.php:1962
 msgid "Incorrect inventory mode in action operation."
@@ -9019,7 +9030,7 @@ msgstr "IPアドレス\"%1$s\"が設定されたインターフェースにDNS�
 #: include/views/configuration.host.edit.php:186
 #: include/views/configuration.host.prototype.edit.php:108
 msgid "Interfaces"
-msgstr ""
+msgstr "インターフェース"
 
 #: app/views/administration.authentication.edit.php:33
 msgctxt "authentication"
@@ -9422,7 +9433,7 @@ msgstr "トリガーデータの保存期間が正しくありません：%1$s�
 #: include/classes/api/services/CUserMacro.php:750
 #, c-format
 msgid "Invalid type for macro \"%1$s\"."
-msgstr ""
+msgstr "マクロ\"%1$s\"のタイプが正しくありません。"
 
 #: include/profiles.inc.php:115
 #, c-format
@@ -9774,7 +9785,7 @@ msgstr "JSON文字列で指定してください"
 #: include/classes/core/CJsonRpc.php:161
 #, c-format
 msgid "JSON-rpc error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "JSON-rpcのエラー生成が失敗しました。そのようなエラー\"%1$s\"はありません。"
 
 #: include/classes/core/CJsonRpc.php:116
 msgid "JSON-rpc method is not defined."
@@ -10439,7 +10450,7 @@ msgstr "メンテナンス\"%1$s\"はすでに存在します。"
 #: include/classes/api/services/CMaintenance.php:366
 #, c-format
 msgid "Maintenance \"%1$s\" value cannot be bigger than \"%2$s\"."
-msgstr ""
+msgstr "メンテナンス期間\"%1$s\"の値は\"%2$s\"よりも大きい値を指定できません。"
 
 #: include/classes/api/services/CMaintenance.php:619
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
@@ -10783,7 +10794,7 @@ msgstr "メディアタイプ"
 #: include/classes/api/services/CMediatype.php:1142
 #, c-format
 msgid "Media types used by action \"%1$s\"."
-msgstr ""
+msgstr "メディアタイプはアクション\"%1$s\"に利用されています。"
 
 #: app/views/administration.usergroup.list.php:74
 #: include/views/configuration.hostgroups.list.php:66
@@ -10880,12 +10891,12 @@ msgstr "最小値"
 #: include/classes/setup/CFrontendSetup.php:124
 #, c-format
 msgid "Minimum required PHP memory limit is %1$s (configuration option \"memory_limit\")."
-msgstr ""
+msgstr "PHPメモリ上限の最小値は%1$sです (\"memory_limit\"設定オプション)。"
 
 #: include/classes/setup/CFrontendSetup.php:162
 #, c-format
 msgid "Minimum required PHP upload filesize is %1$s (configuration option \"upload_max_filesize\")."
-msgstr ""
+msgstr "PHPアップロードファイルサイズの最小値は%1$sです (\"upload_max_filesize\"設定オプション)。"
 
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
@@ -10895,17 +10906,17 @@ msgstr "最低限必要なPHPのバージョンは%1$sです。"
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
-msgstr ""
+msgstr "PHPスクリプトの実行時間の最小値は%1$sです (\"max_execution_time\"設定オプション)。"
 
 #: include/classes/setup/CFrontendSetup.php:216
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %1$s (configuration option \"max_input_time\")."
-msgstr ""
+msgstr "PHPスクリプトの入力パース時間の最小値は%1$sです(\"max_input_time\"設定オプション)。"
 
 #: include/classes/setup/CFrontendSetup.php:143
 #, c-format
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
-msgstr ""
+msgstr "PHPのpostサイズの最小値は%1$sです(\"post_max_size\"設定オプション)。"
 
 #: app/partials/common.filter.trigger.php:47
 #: app/views/monitoring.map.view.php:46
@@ -10990,30 +11001,30 @@ msgstr "モジュール"
 #, c-format
 msgid "Module added: %1$s."
 msgid_plural "Modules added: %1$s."
-msgstr[0] ""
+msgstr[0] "モジュールを追加しました: %1$s。"
 
 #: app/controllers/CControllerModuleScan.php:117
 #, c-format
 msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
-msgstr[0] ""
+msgstr[0] "モジュールを削除しました: %1$s。"
 
 #: app/controllers/CControllerModuleUpdate.php:147
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
-msgstr[0] ""
+msgstr[0] "モジュールを無効にしました: %1$s。"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
-msgstr[0] ""
+msgstr[0] "モジュールを有効にしました: %1$s。"
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
 msgid "Module.php class must extend %1$s for module located at %2$s."
-msgstr ""
+msgstr "%2$sにあるモジュールのためのModule.phpクラスは%1$sを拡張してください。"
 
 #: app/controllers/CControllerModuleEdit.php:98
 #: app/controllers/CControllerModuleList.php:123
@@ -11490,13 +11501,13 @@ msgstr "アプリケーションがありません。"
 #: include/classes/api/services/CAction.php:1787
 #, c-format
 msgid "No authentication type specified for action operation command \"%1$s\"."
-msgstr ""
+msgstr "実行するアクションのコマンド\"%1$s\"に認証のタイプが設定されていません。"
 
 #: include/classes/api/services/CAction.php:1797
 #: include/classes/api/services/CAction.php:1832
 #, c-format
 msgid "No authentication user name specified for action operation command \"%1$s\"."
-msgstr ""
+msgstr "実行するアクションのコマンド\"%1$s\"に認証ユーザー名が設定されていません。"
 
 #: include/classes/api/services/CItemGeneral.php:528
 msgid "No authentication user name specified."
@@ -11568,7 +11579,7 @@ msgstr "暗号なし"
 #: include/classes/api/services/CAction.php:1777
 #, c-format
 msgid "No execution target specified for action operation command \"%1$s\"."
-msgstr ""
+msgstr "実行するアクションのコマンド\"%1$s\"に実行する対象が設定されていません。"
 
 #: include/classes/helpers/CUploadFile.php:159
 msgid "No file was uploaded."
@@ -11581,7 +11592,7 @@ msgstr "スクリーンの要素にグラフIDが設定されていません。"
 #: include/graphs.inc.php:171
 #, c-format
 msgid "No graph item with graphid \"%1$s\"."
-msgstr ""
+msgstr "グラフID\"%1$s\"のグラフアイテムがありません。"
 
 #: include/classes/api/services/CScreenItem.php:491
 msgid "No graph prototype ID provided for screen element."
@@ -11607,7 +11618,7 @@ msgstr "スクリーンの要素にホストグループIDが設定されてい�
 #: include/hosts.inc.php:487
 #, c-format
 msgid "No host groups with groupid \"%1$s\"."
-msgstr ""
+msgstr "グループID\"%1$s\"を持つホストグループが設定されていません。"
 
 #: app/controllers/CControllerWidgetUrlView.php:41
 #: include/classes/screens/CScreenUrl.php:44
@@ -11617,12 +11628,12 @@ msgstr "ホストが選択されていません。"
 #: include/hosts.inc.php:530
 #, c-format
 msgid "No host with hostid \"%1$s\"."
-msgstr ""
+msgstr "ホストID\"%1$s\"を持つホストが設定されていません。"
 
 #: include/classes/api/services/CMapElement.php:176
 #, c-format
 msgid "No icon for map element \"\"%1$s\"."
-msgstr ""
+msgstr "マップの要素\"%1$s\"にアイコンが存在しません。"
 
 #: include/views/monitoring.sysmap.edit.php:112
 msgid "No image"
@@ -11645,13 +11656,13 @@ msgstr "インターフェースが見つかりません。"
 #: include/classes/api/services/CProxy.php:835
 #, c-format
 msgid "No interface provided for proxy \"%1$s\"."
-msgstr ""
+msgstr "プロキシ\"%1$s\"にインターフェースが設定されていません。"
 
 #: include/classes/api/services/CHost.php:2010
 #: include/classes/api/services/CHost.php:2188
 #, c-format
 msgid "No interfaces for host \"%1$s\"."
-msgstr ""
+msgstr "ホスト\"%1$s\"にインターフェースが設定されていません。"
 
 #: include/classes/api/services/CAction.php:1957
 msgid "No inventory mode specified for action operation."
@@ -11869,7 +11880,7 @@ msgstr "対象が存在しないか、アクセス権がありません！"
 #: include/classes/api/services/CAction.php:1815
 #, c-format
 msgid "No private key file specified for action operation command \"%1$s\"."
-msgstr ""
+msgstr "実行するアクションのコマンド\"%1$s\"に秘密鍵ファイルが設定されていません。"
 
 #: include/classes/api/services/CItemGeneral.php:536
 msgid "No private key file specified."
@@ -11882,7 +11893,7 @@ msgstr "プロキシなし"
 #: include/classes/api/services/CAction.php:1807
 #, c-format
 msgid "No public key file specified for action operation command \"%1$s\"."
-msgstr ""
+msgstr "実行するアクションのコマンド\"%1$s\"に公開鍵ファイルが設定されていません。"
 
 #: include/classes/api/services/CItemGeneral.php:533
 msgid "No public key file specified."
@@ -11989,7 +12000,7 @@ msgstr "未確認"
 #: include/classes/api/services/CTriggerPrototype.php:870
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
-msgstr ""
+msgstr "すべてのテンプレートは\"%1$s\"にリンクされていません。"
 
 #: include/classes/api/services/CUser.php:442
 msgid "Not allowed to set password for user \"guest\"."
@@ -12469,7 +12480,7 @@ msgstr "OS情報。文字列値を返す。"
 #: actionconf.php:307
 #, c-format
 msgid "Operation \"%1$s\" already exists."
-msgstr ""
+msgstr "実行するアクション\"%1$s\"はすでに存在しています。"
 
 #: include/validate.inc.php:281
 msgid "Operation cannot be performed due to unauthorized request."
@@ -13140,7 +13151,7 @@ msgstr "設定値を確認してください。正しければ\"%1$s\"ボタン�
 
 #: app/partials/js/massupdate.macros.tab.js.php:145
 msgid "Please confirm that you want to remove all macros."
-msgstr ""
+msgstr "すべてのマクロを削除してよいか確認してください。"
 
 #: include/classes/setup/CSetupWizard.php:264
 #, c-format
@@ -13192,7 +13203,7 @@ msgstr "ホストインベントリフィールドの自動設定"
 #: app/views/monitoring.host.view.php:130
 #: app/views/popup.itemtestedit.view.php:97
 #: app/views/popup.operation.common.php:516
-#: include/classes/setup/CSetupWizard.php:279 include/hosts.inc.php:1470
+#: include/classes/setup/CSetupWizard.php:279 include/hosts.inc.php:1468
 #: include/views/configuration.host.list.php:134
 #: include/views/inventory.host.view.php:79 setup.php:50
 msgid "Port"
@@ -13504,7 +13515,7 @@ msgstr "プロキシ"
 #: include/classes/api/services/CProxy.php:767
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
-msgstr ""
+msgstr "プロキシ\"%1$s\"はすでに存在しています。"
 
 #: include/classes/import/importers/CHostImporter.php:226
 #, c-format
@@ -13769,7 +13780,7 @@ msgstr "正規表現"
 #: include/regexp.inc.php:58 include/regexp.inc.php:99
 #, c-format
 msgid "Regular expression \"%1$s\" already exists."
-msgstr ""
+msgstr "正規表現\"%1$s\"はすでに存在しています。"
 
 #: app/controllers/CControllerRegExCreate.php:85
 msgid "Regular expression added"
@@ -13946,7 +13957,7 @@ msgstr "削除"
 
 #: app/partials/massupdate.macros.tab.php:125
 msgid "Remove all"
-msgstr ""
+msgstr "すべて削除"
 
 #: app/views/administration.authentication.edit.php:52
 msgid "Remove domain name"
@@ -14252,7 +14263,7 @@ msgstr "ICMP pingパケットのロスト率を返す。"
 
 #: include/classes/html/CMacroValue.php:84
 msgid "Revert changes"
-msgstr ""
+msgstr "変更を戻す"
 
 #: include/classes/widgets/CWidgetHelper.php:725
 #: include/classes/widgets/CWidgetHelper.php:800
@@ -14421,7 +14432,7 @@ msgstr "SNMP OID"
 
 #: include/items.inc.php:89
 msgid "SNMP agent"
-msgstr ""
+msgstr "SNMPエージェント"
 
 #: app/views/popup.discovery.check.php:56
 #: include/views/js/configuration.host.edit.js.php:81
@@ -14442,11 +14453,11 @@ msgstr "SNMPトラップのキーが正しくありません。"
 
 #: include/views/js/configuration.host.edit.js.php:77
 msgid "SNMP version"
-msgstr ""
+msgstr "SNMPバージョン"
 
 #: include/views/js/configuration.host.edit.js.php:78
 msgid "SNMPv1"
-msgstr ""
+msgstr "SNMPv1"
 
 #: include/discovery.inc.php:57
 msgid "SNMPv1 agent"
@@ -14454,7 +14465,7 @@ msgstr "SNMPv1エージェント"
 
 #: include/views/js/configuration.host.edit.js.php:78
 msgid "SNMPv2"
-msgstr ""
+msgstr "SNMPv2"
 
 #: include/discovery.inc.php:58
 msgid "SNMPv2 agent"
@@ -14462,7 +14473,7 @@ msgstr "SNMPv2エージェント"
 
 #: include/views/js/configuration.host.edit.js.php:78
 msgid "SNMPv3"
-msgstr ""
+msgstr "SNMPv3"
 
 #: include/discovery.inc.php:59
 msgid "SNMPv3 agent"
@@ -14800,7 +14811,7 @@ msgstr "セカンダリPOCスクリーン名"
 
 #: include/classes/html/CMacroValue.php:139
 msgid "Secret text"
-msgstr ""
+msgstr "隠しテキスト"
 
 #: app/views/popup.discovery.check.php:80
 #: include/views/js/configuration.host.edit.js.php:97
@@ -15090,7 +15101,7 @@ msgstr "インベントリモードの設定"
 
 #: include/classes/html/CInputSecret.php:81 jsLoader.php:338
 msgid "Set new value"
-msgstr ""
+msgstr "新しい値を設定"
 
 #: app/views/js/popup.itemtestedit.view.js.php:357 include/forms.inc.php:1363
 #: include/views/js/item.preprocessing.js.php:64
@@ -16237,11 +16248,11 @@ msgstr "ディスカバリされたアプリケーションが見つかりませ
 
 #: hosts.php:351
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
-msgstr ""
+msgstr "クローンしたホストは\"隠しテキスト\"タイプのユーザー定義マクロを含んでいます。それらのマクロの値とタイプはリセットされました。"
 
 #: templates.php:205
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
-msgstr ""
+msgstr "クローンしたテンプレートは\"隠しテキスト\"タイプのユーザー定義マクロを含んでいます。それらのマクロの値とタイプはリセットされました。"
 
 #: include/classes/db/MysqlDbBackend.php:35
 #: include/classes/db/OracleDbBackend.php:36
@@ -16321,7 +16332,7 @@ msgstr "先週の今日"
 #: include/views/configuration.host.edit.php:677
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
-msgstr ""
+msgstr "このフィールドはアイテム\"%1$s\"によって自動的に設定されます。"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:80
 msgid "This is the test message from Zabbix"
@@ -16846,7 +16857,7 @@ msgstr "前後文字列削除"
 #: include/classes/pagefilter/CPageFilter.php:181
 #, c-format
 msgid "Try to read inaccessible property \"%1$s\"."
-msgstr ""
+msgstr "アクセスできないプロパティ\"%1$s\"を参照しようとしています。"
 
 #: include/func.inc.php:217
 msgid "Tue"
@@ -16890,7 +16901,7 @@ msgstr "2つのマップ要素を選択する必要があります"
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
 #: include/forms.inc.php:178 include/hosts.inc.php:99
-#: include/hosts.inc.php:1450
+#: include/hosts.inc.php:1448
 #: include/views/administration.auditacts.list.php:63
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/configuration.graph.edit.php:341
@@ -17084,7 +17095,7 @@ msgstr "選択したユーザーのブロックを解除しますか？"
 #: include/classes/core/ZBase.php:534
 #, c-format
 msgid "Unexpected response for action %1$s."
-msgstr ""
+msgstr "アクション%1$sから想定外の応答を受信しました。"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:231
@@ -17372,7 +17383,7 @@ msgstr "ホスト\"%1$s\"のステータスを更新しました。"
 #: include/classes/screens/CScreenTriggersOverview.php:47
 #, c-format
 msgid "Updated: %1$s"
-msgstr ""
+msgstr "更新時刻: %1$s"
 
 #: app/views/administration.image.edit.php:52
 msgid "Upload"
@@ -17653,7 +17664,7 @@ msgstr "ID \"%1$s\"のユーザーは使用できません。"
 #: include/classes/api/services/CUser.php:476
 #, c-format
 msgid "User with alias \"%1$s\" already exists."
-msgstr ""
+msgstr "アカウント名\"%1$s\"を持つユーザーがすでに存在します。"
 
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
 msgid "User/Recipient"
@@ -18346,7 +18357,7 @@ msgstr "表示/設定"
 #: include/classes/core/CModuleManager.php:203
 #, c-format
 msgid "Wrong Module.php class name for module located at %1$s."
-msgstr ""
+msgstr "%1$sにあるモジュールのModule.phpのクラス名が間違っています。"
 
 #: include/classes/api/services/CService.php:386
 #, c-format
@@ -18569,12 +18580,12 @@ msgstr "現在選択しているホストに切り替えることができませ
 #: include/classes/api/services/CAction.php:1913
 #, c-format
 msgid "You did not specify targets for action operation command \"%1$s\"."
-msgstr ""
+msgstr "アクションのコマンド実行\"%1$s\"のターゲットが指定されていません。"
 
 #: include/classes/api/services/CAction.php:1906
 #, c-format
 msgid "You did not specify targets for action operation global script \"%1$s\"."
-msgstr ""
+msgstr "アクションのグローバルスクリプト\"%1$s\"のターゲットが指定されていません。"
 
 #: include/classes/api/services/CAuditLog.php:75
 #: include/classes/api/services/CCorrelation.php:474
@@ -18701,6 +18712,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"に到達できません。以下の原因が考えられます：\n"
+"1. \"zabbix.conf.php\"内のIP/DNSが正しくない。\n"
+"2. ネットワークの設定が正しくない。\n"
 
 #: app/views/administration.script.edit.php:56
 #: app/views/popup.operation.common.php:473 include/actions.inc.php:875
@@ -18744,12 +18758,12 @@ msgstr "ズームアウト"
 #: include/func.inc.php:148
 #, c-format
 msgid "[Wrong value for day: \"%1$s\" ]"
-msgstr ""
+msgstr "[日の値が正しくありません: \"%1$s\"]"
 
 #: include/func.inc.php:133
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
-msgstr ""
+msgstr "[月の値が正しくありません: \"%1$s\"]"
 
 #: include/classes/validators/CApiInputValidator.php:788
 msgid "a boolean is expected"

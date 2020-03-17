@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 17:15+0200\n"
+"POT-Creation-Date: 2020-03-17 10:25+0200\n"
 "PO-Revision-Date: 2019-10-10 13:52+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -3702,7 +3702,7 @@ msgstr "Текст підтвердження"
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Вітаємо! Ви успішно встановили веб-інтерфейс Zabbix."
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1465
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1463
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:715
 msgid "Connect to"
@@ -4263,7 +4263,7 @@ msgstr "ДЕЗАКТИВОВАНО"
 msgid "DNS"
 msgstr "DNS"
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1460
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1458
 #: include/views/configuration.discovery.edit.php:106
 #: include/views/configuration.discovery.edit.php:119
 #: include/views/inventory.host.view.php:79
@@ -4472,7 +4472,7 @@ msgstr "Грудень"
 
 #: app/views/administration.iconmap.edit.php:106
 #: include/classes/widgets/forms/CWidgetForm.php:49 include/hosts.inc.php:31
-#: include/hosts.inc.php:1475 include/views/configuration.action.edit.php:226
+#: include/hosts.inc.php:1473 include/views/configuration.action.edit.php:226
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:142
 #: include/views/js/monitoring.sysmaps.js.php:243
@@ -7619,7 +7619,7 @@ msgstr "IMAP"
 msgid "IP"
 msgstr "IP"
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1455
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1453
 #: include/maps.inc.php:46 include/views/configuration.discovery.edit.php:95
 #: include/views/configuration.discovery.edit.php:107
 #: include/views/configuration.discovery.edit.php:120
@@ -13386,7 +13386,7 @@ msgstr "Заповнює поле інвентарних даних вузла �
 #: app/views/monitoring.host.view.php:130
 #: app/views/popup.itemtestedit.view.php:97
 #: app/views/popup.operation.common.php:516
-#: include/classes/setup/CSetupWizard.php:279 include/hosts.inc.php:1470
+#: include/classes/setup/CSetupWizard.php:279 include/hosts.inc.php:1468
 #: include/views/configuration.host.list.php:134
 #: include/views/inventory.host.view.php:79 setup.php:50
 msgid "Port"
@@ -17102,7 +17102,7 @@ msgstr "Необхідно вибрати два елемента карти м�
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
 #: include/forms.inc.php:178 include/hosts.inc.php:99
-#: include/hosts.inc.php:1450
+#: include/hosts.inc.php:1448
 #: include/views/administration.auditacts.list.php:63
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/configuration.graph.edit.php:341
