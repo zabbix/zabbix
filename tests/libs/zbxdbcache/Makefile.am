@@ -64,6 +64,7 @@ COMMON_WRAP_FUNCS = \
 	-Wl,--wrap=__zbx_mem_malloc \
 	-Wl,--wrap=__zbx_mem_realloc \
 	-Wl,--wrap=__zbx_mem_free \
+	-Wl,--wrap=zbx_mem_dump_stats \
 	-Wl,--wrap=zbx_history_get_values \
 	-Wl,--wrap=zbx_history_add_values \
 	-Wl,--wrap=zbx_history_sql_init \

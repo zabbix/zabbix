@@ -40,18 +40,29 @@
 			return false;
 		}
 
+		/**
+		 * Simulate input behaviour by replacing newlines with space character.
+		 * NB! WebKit based browsers add a newline character to textarea when translating content to the next line.
+		 */
 		var old_value = $textarea.val(),
-			new_value = old_value.replace(/\r?\n/gi, ''),
+			new_value = old_value
+				.replace(/\r?\n+$/g, '')
+				.replace(/\r?\n/g, ' '),
 			scroll_pos = $(window).scrollTop();
 
-		if (old_value.length !== new_value.length) {
+		if (old_value !== new_value) {
+			var pos = $textarea[0].selectionStart;
+
 			$textarea.val(new_value);
+			$textarea[0].setSelectionRange(pos, pos);
 		}
 
-		if (new_value !== '') {
-			$textarea.height(0).innerHeight($textarea[0].scrollHeight);
-			$(window).scrollTop(scroll_pos);
-		}
+		// Resize textarea.
+		$textarea
+			.height(0)
+			.innerHeight($textarea[0].scrollHeight);
+
+		$(window).scrollTop(scroll_pos);
 	}
 
 	var methods = {

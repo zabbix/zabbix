@@ -26,6 +26,7 @@
 #include "dir.h"
 #include "http.h"
 #include "net.h"
+#include "dns.h"
 #include "system.h"
 #include "zabbix_stats.h"
 #include "zbxexec.h"
@@ -44,6 +45,14 @@ extern int	CONFIG_TIMEOUT;
 
 static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	SYSTEM_RUN_LOCAL(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+ZBX_METRIC	parameters_common_local[] =
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
+{
+	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN_LOCAL, 	"echo test"},
+	{NULL}
+};
 
 ZBX_METRIC	parameters_common[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
@@ -170,7 +179,7 @@ int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result, int level)
 {
 	char	*command, *flag;
 
@@ -189,10 +198,7 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (1 == CONFIG_LOG_REMOTE_COMMANDS)
-		zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", command);
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
+	zabbix_log(level, "Executing command '%s'", command);
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 	{
@@ -216,3 +222,21 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 }
+
+static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	level;
+
+	level = LOG_LEVEL_DEBUG;
+
+	if (0 != CONFIG_LOG_REMOTE_COMMANDS)
+		level = LOG_LEVEL_WARNING;
+
+	return system_run(request, result, level);
+}
+
+static int	SYSTEM_RUN_LOCAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return system_run(request, result, LOG_LEVEL_DEBUG);
+}
+

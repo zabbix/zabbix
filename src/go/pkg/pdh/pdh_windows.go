@@ -22,6 +22,7 @@ package pdh
 import (
 	"fmt"
 	"strconv"
+	"syscall"
 	"unsafe"
 
 	"zabbix.com/pkg/log"
@@ -37,8 +38,8 @@ type sysCounter struct {
 
 const (
 	ObjectSystem = iota
-	CounterProcessor
-	CounterProcessorInfo
+	ObjectProcessor
+	ObjectProcessorInfo
 	CounterProcessorTime
 	CounterProcessorQueue
 	CounterSystemUptime
@@ -58,6 +59,15 @@ var sysCounters []sysCounter = []sysCounter{
 }
 
 const HKEY_PERFORMANCE_TEXT = 0x80000050
+
+type CounterPathElements struct {
+	MachineName    string
+	ObjectName     string
+	InstanceName   string
+	ParentInstance string
+	InstanceIndex  int
+	CounterName    string
+}
 
 func nextField(buf []uint16) (field []uint16, left []uint16) {
 	start := -1
@@ -117,6 +127,10 @@ func CounterIndex(id int) (index string) {
 	return sysCounters[id].index
 }
 
+func CounterName(id int) (name string) {
+	return sysCounters[id].name
+}
+
 func CounterPath(object int, counter int) (path string) {
 	return fmt.Sprintf(`\%s\%s`, sysCounters[object].index, sysCounters[counter].index)
 }
@@ -165,8 +179,8 @@ func ConvertPath(path string) (outPath string, err error) {
 		return
 	}
 
-	bufObject := (*[1 << 16]uint16)(unsafe.Pointer(elements.ObjectName))[:win32.PDH_MAX_COUNTER_NAME:win32.PDH_MAX_COUNTER_NAME]
-	bufCounter := (*[1 << 16]uint16)(unsafe.Pointer(elements.CounterName))[:win32.PDH_MAX_COUNTER_NAME:win32.PDH_MAX_COUNTER_NAME]
+	bufObject := (*win32.RGWSTR)(unsafe.Pointer(elements.ObjectName))[:win32.PDH_MAX_COUNTER_NAME:win32.PDH_MAX_COUNTER_NAME]
+	bufCounter := (*win32.RGWSTR)(unsafe.Pointer(elements.CounterName))[:win32.PDH_MAX_COUNTER_NAME:win32.PDH_MAX_COUNTER_NAME]
 	objectName := windows.UTF16ToString(bufObject)
 	counterName := windows.UTF16ToString(bufCounter)
 	objectIndex, objectErr := strconv.ParseInt(objectName, 10, 32)
@@ -191,6 +205,35 @@ func ConvertPath(path string) (outPath string, err error) {
 	}
 
 	return win32.PdhMakeCounterPath(elements)
+}
+
+func uft16PtrFromStringZ(s string) (ptr uintptr, err error) {
+	if s == "" {
+		return 0, nil
+	}
+	p, err := syscall.UTF16PtrFromString(s)
+	return uintptr(unsafe.Pointer(p)), err
+}
+
+func MakePath(elements *CounterPathElements) (path string, err error) {
+	var cpe win32.PDH_COUNTER_PATH_ELEMENTS
+	if cpe.MachineName, err = uft16PtrFromStringZ(elements.MachineName); err != nil {
+		return
+	}
+	if cpe.ObjectName, err = uft16PtrFromStringZ(elements.ObjectName); err != nil {
+		return
+	}
+	if cpe.InstanceName, err = uft16PtrFromStringZ(elements.InstanceName); err != nil {
+		return
+	}
+	if cpe.ParentInstance, err = uft16PtrFromStringZ(elements.ParentInstance); err != nil {
+		return
+	}
+	if cpe.CounterName, err = uft16PtrFromStringZ(elements.CounterName); err != nil {
+		return
+	}
+	cpe.InstanceIndex = uint32(elements.InstanceIndex)
+	return win32.PdhMakeCounterPath(&cpe)
 }
 
 func init() {

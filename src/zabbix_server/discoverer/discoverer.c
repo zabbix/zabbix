@@ -37,6 +37,10 @@ extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
+#ifdef HAVE_NETSNMP
+static volatile sig_atomic_t	snmp_cache_reload_requested;
+#endif
+
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
 /******************************************************************************
@@ -210,13 +214,16 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 				switch (dcheck->type)
 				{
 					case SVC_SNMPv1:
-						item.type = ITEM_TYPE_SNMPv1;
+						item.snmp_version = ZBX_IF_SNMP_VERSION_1;
+						item.type = ITEM_TYPE_SNMP;
 						break;
 					case SVC_SNMPv2c:
-						item.type = ITEM_TYPE_SNMPv2c;
+						item.snmp_version = ZBX_IF_SNMP_VERSION_2;
+						item.type = ITEM_TYPE_SNMP;
 						break;
 					case SVC_SNMPv3:
-						item.type = ITEM_TYPE_SNMPv3;
+						item.snmp_version = ZBX_IF_SNMP_VERSION_3;
+						item.type = ITEM_TYPE_SNMP;
 						break;
 					default:
 						item.type = ITEM_TYPE_ZABBIX;
@@ -241,12 +248,12 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 					item.snmp_community = strdup(dcheck->snmp_community);
 					item.snmp_oid = strdup(dcheck->key_);
 
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-							&item.snmp_community, MACRO_TYPE_COMMON, NULL, 0);
+					substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, &item.snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 					substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL, NULL,
 							MACRO_TYPE_SNMP_OID, NULL, 0);
 
-					if (ITEM_TYPE_SNMPv3 == item.type)
+					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
 						item.snmpv3_securityname =
 								zbx_strdup(NULL, dcheck->snmpv3_securityname);
@@ -259,18 +266,18 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
 						item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
 
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, &item.snmpv3_securityname, MACRO_TYPE_COMMON,
-								NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, &item.snmpv3_authpassphrase, MACRO_TYPE_COMMON,
-								NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, &item.snmpv3_privpassphrase, MACRO_TYPE_COMMON,
-								NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, &item.snmpv3_contextname, MACRO_TYPE_COMMON,
-								NULL, 0);
+						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+								NULL, NULL, NULL, &item.snmpv3_securityname,
+								MACRO_TYPE_COMMON, NULL, 0);
+						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+								NULL, NULL, NULL, &item.snmpv3_authpassphrase,
+								MACRO_TYPE_COMMON, NULL, 0);
+						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+								NULL, NULL, NULL, &item.snmpv3_privpassphrase,
+								MACRO_TYPE_COMMON, NULL, 0);
+						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+								NULL, NULL, NULL, &item.snmpv3_contextname,
+								MACRO_TYPE_COMMON, NULL, 0);
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result) &&
@@ -284,7 +291,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 					zbx_free(item.snmp_community);
 					zbx_free(item.snmp_oid);
 
-					if (ITEM_TYPE_SNMPv3 == item.type)
+					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
 						zbx_free(item.snmpv3_securityname);
 						zbx_free(item.snmpv3_authpassphrase);
@@ -855,6 +862,16 @@ static int	get_minnextcheck(void)
 	return res;
 }
 
+static void	zbx_discoverer_sigusr_handler(int flags)
+{
+#ifdef HAVE_NETSNMP
+	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+		snmp_cache_reload_requested = 1;
+#else
+	ZBX_UNUSED(flags);
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: discoverer_thread                                                *
@@ -875,6 +892,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 #ifdef HAVE_NETSNMP
 	zbx_init_snmp();
 #endif
@@ -882,7 +901,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
@@ -890,10 +909,20 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	zbx_set_sigusr_handler(zbx_discoverer_sigusr_handler);
+
 	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
+
+#ifdef HAVE_NETSNMP
+		if (1 == snmp_cache_reload_requested)
+		{
+			zbx_clear_cache_snmp();
+			snmp_cache_reload_requested = 0;
+		}
+#endif
 
 		if (0 != sleeptime)
 		{

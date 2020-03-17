@@ -30,7 +30,7 @@
 
 extern unsigned int	configured_tls_connect_mode;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern char	*CONFIG_TLS_SERVER_CERT_ISSUER;
 extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
 extern char	*CONFIG_TLS_PSK_IDENTITY;
@@ -50,7 +50,7 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 			tls_arg1 = NULL;
 			tls_arg2 = NULL;
 			break;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		case ZBX_TCP_SEC_TLS_CERT:
 			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
 			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;

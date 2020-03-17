@@ -19,56 +19,9 @@
 **/
 
 
-function audit_resource2str($resource_type = null) {
-	$resources = [
-		AUDIT_RESOURCE_USER => _('User'),
-		AUDIT_RESOURCE_ZABBIX_CONFIG => _('Configuration of Zabbix'),
-		AUDIT_RESOURCE_MEDIA_TYPE => _('Media type'),
-		AUDIT_RESOURCE_HOST => _('Host'),
-		AUDIT_RESOURCE_HOST_PROTOTYPE => _('Host prototype'),
-		AUDIT_RESOURCE_ACTION => _('Action'),
-		AUDIT_RESOURCE_GRAPH => _('Graph'),
-		AUDIT_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
-		AUDIT_RESOURCE_GRAPH_ELEMENT => _('Graph element'),
-		AUDIT_RESOURCE_USER_GROUP => _('User group'),
-		AUDIT_RESOURCE_APPLICATION => _('Application'),
-		AUDIT_RESOURCE_TRIGGER => _('Trigger'),
-		AUDIT_RESOURCE_TRIGGER_PROTOTYPE => _('Trigger prototype'),
-		AUDIT_RESOURCE_HOST_GROUP => _('Host group'),
-		AUDIT_RESOURCE_ITEM => _('Item'),
-		AUDIT_RESOURCE_ITEM_PROTOTYPE => _('Item prototype'),
-		AUDIT_RESOURCE_IMAGE => _('Image'),
-		AUDIT_RESOURCE_VALUE_MAP => _('Value map'),
-		AUDIT_RESOURCE_IT_SERVICE => _('Service'),
-		AUDIT_RESOURCE_MAP => _('Map'),
-		AUDIT_RESOURCE_SCREEN => _('Screen'),
-		AUDIT_RESOURCE_SCENARIO => _('Web scenario'),
-		AUDIT_RESOURCE_DISCOVERY_RULE => _('Discovery rule'),
-		AUDIT_RESOURCE_SLIDESHOW => _('Slide show'),
-		AUDIT_RESOURCE_PROXY => _('Proxy'),
-		AUDIT_RESOURCE_REGEXP => _('Regular expression'),
-		AUDIT_RESOURCE_MAINTENANCE => _('Maintenance'),
-		AUDIT_RESOURCE_SCRIPT => _('Script'),
-		AUDIT_RESOURCE_MACRO => _('Macro'),
-		AUDIT_RESOURCE_TEMPLATE => _('Template'),
-		AUDIT_RESOURCE_ICON_MAP => _('Icon mapping'),
-		AUDIT_RESOURCE_CORRELATION => _('Event correlation'),
-		AUDIT_RESOURCE_DASHBOARD => _('Dashboard'),
-		AUDIT_RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
-		AUDIT_RESOURCE_MODULE => _('Module')
-	];
-
-	if (is_null($resource_type)) {
-		natsort($resources);
-		return $resources;
-	}
-
-	return isset($resources[$resource_type]) ? $resources[$resource_type] : _('Unknown resource');
-}
-
-function add_audit($action, $resourcetype, $details) {
-	if (mb_strlen($details) > 128) {
-		$details = mb_substr($details, 0, 125).'...';
+function add_audit($action, $resourcetype, $note) {
+	if (mb_strlen($note) > 128) {
+		$note = mb_substr($note, 0, 125).'...';
 	}
 
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
@@ -79,7 +32,7 @@ function add_audit($action, $resourcetype, $details) {
 		'ip' => substr($ip, 0, 39),
 		'action' => $action,
 		'resourcetype' => $resourcetype,
-		'details' => $details
+		'note' => $note
 	];
 
 	try {
@@ -157,7 +110,7 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 	}
 }
 
-function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $details = null, $userId = null) {
+function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $note = null, $userId = null) {
 	if ($userId === null) {
 		$userId = CWebUser::$data['userid'];
 	}
@@ -176,7 +129,7 @@ function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $
 		'resourcetype' => $resourcetype,
 		'resourceid' => $resourceid,
 		'resourcename' => $resourcename,
-		'details' => $details
+		'note' => $note
 	];
 	try {
 		DB::insert('auditlog', [$values]);

@@ -264,9 +264,10 @@ abstract class CHostGeneral extends CHostBase {
 			')'.
 			' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
 		if ($dbTrigger = DBfetch(DBSelect($sql, 1))) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_s('Cannot unlink trigger "%s", it has items from template that is left linked to host.', $dbTrigger['description'])
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot unlink trigger "%1$s", it has items from template that is left linked to host.',
+					$dbTrigger['description']
+				)
 			);
 		}
 

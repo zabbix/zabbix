@@ -867,7 +867,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 							foreach ($depTemplateIds as $depTemplateId) {
 								if (!isset($templates[$depTemplateId])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('Not all templates are linked to "%s".', reset($templates))
+										_s('Not all templates are linked to "%1$s".', reset($templates))
 									);
 								}
 							}

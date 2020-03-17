@@ -78,8 +78,9 @@ function getMenuPopupHistory(options) {
  * @param {string} options[]['name']             Script name.
  * @param {string} options[]['scriptid']         Script ID.
  * @param {string} options[]['confirmation']     Confirmation text.
- * @param {bool}   options['showGraphs']         Link to host graphs page.
- * @param {bool}   options['showScreens']        Link to host screen page.
+ * @param {bool}   options['showGraphs']         Link to Monitoring->Hosts->Graphs page.
+ * @param {bool}   options['showScreens']        Link to Monitoring->Screen page.
+ * @param {bool}   options['showWeb']		     Link to Monitoring->Hosts->Web page.
  * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
  * @param {bool}   options['hasGoTo']            "Go to" block in popup.
  * @param {int}    options['severity_min']       (optional)
@@ -95,35 +96,25 @@ function getMenuPopupHistory(options) {
 function getMenuPopupHost(options, trigger_elmnt) {
 	var sections = [];
 
-	// scripts
-	if (typeof options.scripts !== 'undefined') {
-		sections.push({
-			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
-		});
-	}
-
 	// go to section
 	if (options.hasGoTo) {
-		// inventory
 		var	host_inventory = {
-				label: t('Host inventory')
+				label: t('Inventory')
 			},
-			// latest
 			latest_data = {
 				label: t('Latest data')
 			},
-			// problems
 			problems = {
 				label: t('Problems')
 			},
-			// graphs
 			graphs = {
 				label: t('Graphs')
 			},
-			// screens
 			screens = {
-				label: t('Host screens')
+				label: t('Screens')
+			},
+			web = {
+				label: t('Web')
 			};
 
 		// inventory link
@@ -181,15 +172,47 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			screens.url = screens_url.getUrl();
 		}
 
+		if (!options.showWeb) {
+			web.disabled = true;
+		}
+		else {
+			var web_url = new Curl('zabbix.php', false);
+			web_url.setArgument('action', 'web.view');
+			web_url.setArgument('hostid', options.hostid);
+
+			web.url = web_url.getUrl();
+		}
+
+		var items = [
+			host_inventory,
+			latest_data,
+			problems,
+			graphs,
+			screens,
+			web
+		];
+
+		if (options.showConfig) {
+			var config = {
+				label: t('Configuration')
+			};
+
+			if (options.isWriteable) {
+				var config_url = new Curl('hosts.php', false);
+				config_url.setArgument('form', 'update');
+				config_url.setArgument('hostid', options.hostid);
+				config.url = config_url.getUrl();
+			}
+			else {
+				config.disabled = true;
+			}
+
+			items.push(config);
+		}
+
 		sections.push({
-			label: t('Go to'),
-			items: [
-				host_inventory,
-				latest_data,
-				problems,
-				graphs,
-				screens
-			]
+			label: t('Host'),
+			items: items
 		});
 	}
 
@@ -198,6 +221,14 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		sections.push({
 			label: t('URLs'),
 			items: options.urls
+		});
+	}
+
+	// scripts
+	if (typeof options.scripts !== 'undefined') {
+		sections.push({
+			label: t('Scripts'),
+			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
 		});
 	}
 
@@ -503,6 +534,58 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 }
 
 /**
+ * Get menu popup widget actions data.
+ *
+ * @param {string}   options['widgetName']   Widget name.
+ * @param {string}   options['currentRate']  Current rate value.
+ * @param {bool}     options['multiplier']   Multiplier or time mode.
+ * @param {callback} options['callback']     Callback function on success (optional).
+ * @param {object}   trigger_elmnt           UI element which triggered opening of overlay dialogue.
+ *
+ * @return array
+ */
+function getMenuPopupWidgetActions(options, trigger_elmnt) {
+	var menu = getMenuPopupRefresh(options, trigger_elmnt),
+		widget_actions = [],
+		widget = jQuery('.dashbrd-grid-container').dashboardGrid('getWidgetsBy', 'widgetid', options.widgetName).pop(),
+		widgetid = widget.widgetid,
+		loading = !widget['ready'] || widget['content_body'].find('.is-loading').length > 0;
+
+	if ('download' in options) {
+		widget_actions.push({
+			label: t('Download image'),
+			disabled: loading || !options.download,
+			clickCallback: function() {
+				var svg = widget['content_body'].find('svg').first();
+
+				if (svg.length) {
+					downloadSvgImage(svg, 'graph.png');
+				}
+				else {
+					downloadPngImage(widget['content_body'].find('img').first(), 'graph.png');
+				}
+
+				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
+			},
+			refreshCallback: function(widget) {
+				if (widget['widgetid'] == widgetid && options.download) {
+					this.disabled = !widget['ready'];
+				}
+			}
+		});
+	}
+
+	if (widget_actions.length) {
+		menu.unshift({
+			label: t('Actions'),
+			items: widget_actions
+		});
+	}
+
+	return menu;
+}
+
+/**
  * Get menu popup trigger section data.
  *
  * @param {string} options['dashboardid']
@@ -790,6 +873,39 @@ function getMenuPopupItemPrototype(options) {
 }
 
 /**
+ * Get dropdown section data.
+ *
+ * @param {array}  options
+ * @param {object} trigger_elem  UI element that was clicked to open overlay dialogue.
+ *
+ * @returns array
+ */
+function getMenuPopupDropdown(options, trigger_elem) {
+	var items = [];
+
+	jQuery.each(options.items, function(i, item) {
+		items.push({
+			label: item.label,
+			url: item.url || 'javascript:void(0);',
+			class: item.class,
+			clickCallback: () => {
+				jQuery(trigger_elem)
+					.removeClass()
+					.addClass(['btn-alt', 'btn-dropdown-toggle', item.class].join(' '));
+
+				jQuery('input[type=hidden]', jQuery(trigger_elem).parent())
+					.val(item.value)
+					.trigger('change');
+			}
+		});
+	});
+
+	return [{
+		items: items
+	}];
+}
+
+/**
  * Get menu popup submenu section data.
  *
  * @param object options['submenu']                                    List of menu sections.
@@ -976,6 +1092,48 @@ jQuery(function($) {
 		}
 	};
 
+	/**
+	 * Created popup menu item nodes and append to $menu_popup.
+	 *
+	 * @param {object} $menu_popup    jQuery node of popup menu.
+	 * @param {array} sections        Array of menu popup sections.
+	 */
+	function addMenuPopupItems($menu_popup, sections) {
+		// Create menu sections.
+		$.each(sections, function(i, section) {
+			// Add a separator between menu item sections.
+			if (i > 0) {
+				$menu_popup.append($('<li>').append($('<div>')));
+			}
+
+			var section_label = null;
+
+			if (typeof section.label === 'string' && section.label.length) {
+				section_label = section.label;
+			}
+
+			// Add menu item section label, if provided.
+			if (section_label !== null) {
+				$menu_popup.append($('<li>').append($('<h3>').text(section_label)));
+			}
+
+			// Add individual menu items of the section.
+			$.each(section.items, function(i, item) {
+				item = $.extend({}, item);
+				if (sections.length > 1 && section_label !== null) {
+					item.ariaLabel = section_label + ', ' + item['label'];
+				}
+				$menu_popup.append(createMenuItem(item));
+			});
+		});
+
+		if (sections.length == 1) {
+			if (typeof sections[0].label === 'string' && sections[0].label.length) {
+				$menu_popup.attr({'aria-label': sections[0].label});
+			}
+		}
+	}
+
 	var methods = {
 		init: function(sections, event, options) {
 			// Don't display empty menu.
@@ -1000,7 +1158,7 @@ jQuery(function($) {
 			// Close other action menus and prevent focus jumping before opening a new popup.
 			$('.menu-popup-top').menuPopup('close', null, false);
 
-			$opener.attr('data-expanded', 'true');
+			$opener.attr('aria-expanded', 'true');
 
 			var $menu_popup = $('<ul>', {
 					'role': 'menu',
@@ -1013,39 +1171,11 @@ jQuery(function($) {
 				$menu_popup.addClass(options.class);
 			}
 
-			// Create menu sections.
-			$.each(sections, function(i, section) {
-				// Add a separator between menu item sections.
-				if (i > 0) {
-					$menu_popup.append($('<li>').append($('<div>')));
-				}
-
-				var section_label = null;
-
-				if (typeof section.label === 'string' && section.label.length) {
-					section_label = section.label;
-				}
-
-				// Add menu item section label, if provided.
-				if (section_label !== null) {
-					$menu_popup.append($('<li>').append($('<h3>').text(section_label)));
-				}
-
-				// Add individual menu items of the section.
-				$.each(section.items, function(i, item) {
-					item = $.extend({}, item);
-					if (sections.length > 1 && section_label !== null) {
-						item.ariaLabel = section_label + ', ' + item['label'];
-					}
-					$menu_popup.append(createMenuItem(item));
-				});
+			$opener.data({
+				sections: sections,
+				menu_popup: $menu_popup
 			});
-
-			if (sections.length == 1) {
-				if (typeof sections[0].label === 'string' && sections[0].label.length) {
-					$menu_popup.attr({'aria-label': sections[0].label});
-				}
-			}
+			addMenuPopupItems($menu_popup, sections);
 
 			$('body').append($menu_popup);
 
@@ -1064,11 +1194,11 @@ jQuery(function($) {
 			$menu_popup.focus();
 		},
 
-		close: function(trigger_elmnt, return_focus) {
+		close: function(trigger_elem, return_focus) {
 			var menu_popup = $(this);
 
-			if (!menu_popup.is(trigger_elmnt) && menu_popup.has(trigger_elmnt).length === 0) {
-				$(trigger_elmnt).removeAttr('data-expanded');
+			if (!menu_popup.is(trigger_elem) && menu_popup.has(trigger_elem).length === 0) {
+				$('[aria-expanded="true"]', trigger_elem).attr({'aria-expanded': 'false'});
 				menu_popup.fadeOut(0);
 
 				$('.highlighted', menu_popup).removeClass('highlighted');
@@ -1082,11 +1212,27 @@ jQuery(function($) {
 
 				if (overlay && typeof overlay['element'] !== undefined) {
 					// Remove expanded attribute of the original opener.
-					$(overlay['element']).removeAttr('data-expanded');
+					$(overlay['element']).attr({'aria-expanded': 'false'});
 				}
 
 				menu_popup.remove();
 			}
+		},
+
+		/**
+		 * Refresh popup menu, call refreshCallback for every item if defined. Refresh recreate item dom nodes.
+		 */
+		refresh: function(widget) {
+			var $opener = $(this),
+				sections = $opener.data('sections'),
+				$menu_popup = $opener.data('menu_popup');
+
+			$menu_popup.empty();
+			sections.forEach(
+				section => section.items && section.items.forEach(
+					item => item.refreshCallback && item.refreshCallback.call(item, widget)
+			));
+			addMenuPopupItems($menu_popup, sections);
 		}
 	};
 
@@ -1270,7 +1416,8 @@ jQuery(function($) {
 		options = $.extend({
 			ariaLabel: options.label,
 			selected: false,
-			disabled: false
+			disabled: false,
+			class: false
 		}, options);
 
 		var item = $('<li>'),
@@ -1316,6 +1463,10 @@ jQuery(function($) {
 
 		if (options.selected) {
 			link.addClass('selected');
+		}
+
+		if (options.class) {
+			link.addClass(options.class);
 		}
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {

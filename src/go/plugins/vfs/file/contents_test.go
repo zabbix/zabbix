@@ -47,6 +47,25 @@ func TestFileContentsEncoding(t *testing.T) {
 	}
 }
 
+func TestFileContentsBom(t *testing.T) {
+	stdOs = std.NewMockOs()
+
+	impl.options.Timeout = 3
+
+	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xfe, 0xff, 0x04, 0x30, 0x04, 0x32, 0x04, 0x33, 0x04, 0x43, 0x04, 0x41, 0x04, 0x42, 0x04, 0x30, 0x00, 0x0d, 0x00, 0x0a})
+	if result, err := impl.Export("vfs.file.contents", []string{"text.txt"}, nil); err != nil {
+		t.Errorf("vfs.file.contents returned error %s", err.Error())
+	} else {
+		if contents, ok := result.(string); !ok {
+			t.Errorf("vfs.file.contents returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if contents != "августа" {
+				t.Errorf("vfs.file.contents returned invalid result")
+			}
+		}
+	}
+}
+
 func TestFileContents(t *testing.T) {
 	stdOs = std.NewMockOs()
 

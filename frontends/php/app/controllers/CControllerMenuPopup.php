@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in dashboard,history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro',
+			'type' => 'required|in dashboard,history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
 			'data' => 'array'
 		];
 
@@ -128,18 +128,28 @@ class CControllerMenuPopup extends CController {
 
 		$db_hosts = $has_goto
 			? API::Host()->get([
-				'output' => ['status'],
+				'output' => ['hostid', 'status'],
 				'selectGraphs' => API_OUTPUT_COUNT,
 				'selectScreens' => API_OUTPUT_COUNT,
+				'selectHttpTests' => API_OUTPUT_COUNT,
 				'hostids' => $data['hostid']
 			])
 			: API::Host()->get([
-				'output' => [],
+				'output' => ['hostid'],
 				'hostids' => $data['hostid']
 			]);
 
 		if ($db_hosts) {
 			$db_host = $db_hosts[0];
+			$rw_hosts = false;
+
+			if ($has_goto && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
+				$rw_hosts = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => $db_host['hostid'],
+					'editable' => true
+				]);
+			}
 
 			$scripts = API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']];
 
@@ -159,6 +169,9 @@ class CControllerMenuPopup extends CController {
 			if ($has_goto) {
 				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
 				$menu_data['showScreens'] = (bool) $db_host['screens'];
+				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
+				$menu_data['showConfig'] = (CWebUser::getType() > USER_TYPE_ZABBIX_USER);
+				$menu_data['isWriteable'] = $rw_hosts;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
 					$menu_data['severity_min'] = $data['severity_min'];
@@ -622,6 +635,49 @@ class CControllerMenuPopup extends CController {
 		return ['type' => 'trigger_macro'];
 	}
 
+	/**
+	 * Prepare data for widget actions menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['widgetName']   Widget index in array of widgets on dashboard.
+	 * @param string $data['currentRate']  Refresh rate for widget.
+	 * @param bool   $data['multiplier']   Multiplier or time mode.
+	 *
+	 * @return mixed
+	 */
+	private static function getMenuDataWidgetActions(array $data) {
+		$menu_data = [
+			'type' => 'widget_actions',
+			'widgetName' => $data['widgetName'],
+			'currentRate' => $data['currentRate'],
+			'multiplier' => (bool) $data['multiplier']
+		];
+
+		if ($data['widgetType'] == WIDGET_SVG_GRAPH) {
+			$menu_data['download'] = true;
+		}
+
+		if (array_key_exists('params', $data)) {
+			$menu_data['params'] = $data['params'];
+		}
+
+		if ($data['widgetType'] == WIDGET_GRAPH && array_key_exists('graphid', $data) && $data['graphid']) {
+			$menu_data['download'] = (bool) API::Graph()->get([
+				'output' => ['graphid'],
+				'graphids' => $data['graphid']
+			]);
+		}
+		elseif ($data['widgetType'] == WIDGET_GRAPH && array_key_exists('itemid', $data) && $data['itemid']) {
+			$menu_data['download'] = (bool) API::Item()->get([
+				'output' => ['itemid'],
+				'itemids' => $data['itemid'],
+				'webitems' => true
+			]);
+		}
+
+		return $menu_data;
+	}
+
 	protected function doAction() {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
@@ -660,6 +716,10 @@ class CControllerMenuPopup extends CController {
 
 			case 'trigger_macro':
 				$menu_data = self::getMenuDataTriggerMacro();
+				break;
+
+			case 'widget_actions':
+				$menu_data = self::getMenuDataWidgetActions($data);
 				break;
 		}
 
