@@ -180,6 +180,12 @@ class CSidebar extends CBaseComponent {
 				}
 			},
 
+			click: (e) => {
+				if (this._is_opened && !this._target.contains(e.target)) {
+					this.close();
+				}
+			},
+
 			escape: (e) => {
 				if (e.key === 'Escape') {
 					this.close();
@@ -248,10 +254,12 @@ class CSidebar extends CBaseComponent {
 				if (view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 					this.on('mouseenter', this._events.mouseenter);
 					this.on('mouseleave', this._events.mouseleave);
+					document.addEventListener('click', this._events.click);
 				}
 				else {
 					this.off('mouseenter', this._events.mouseenter);
 					this.off('mouseleave', this._events.mouseleave);
+					document.removeEventListener('click', this._events.click);
 				}
 
 				if (this._sidebar_toggle !== null) {
