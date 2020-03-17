@@ -56,7 +56,7 @@ class CSidebar extends CBaseComponent {
 
 		const server_name = this._target.querySelector('.sidebar-header .server-name');
 		if (server_name) {
-			sidebar_header.style.maxWidth = max_width + 'px';
+			this._target.querySelector('.sidebar-header').style.maxWidth = max_width + 'px';
 			server_name.style.width = 'auto';
 		}
 
