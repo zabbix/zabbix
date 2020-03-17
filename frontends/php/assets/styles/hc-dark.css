@@ -302,7 +302,7 @@ footer {
   width: max-content;
   max-width: 480px;
   background: #ffffff;
-  transition: max-width 1s, transform 1s ease-out;
+  transition: max-width 0.3s, transform 0.3s ease-out;
   will-change: max-width;
   transform: translate3d(0, 0, 0); }
   .sidebar .sidebar-header {
@@ -350,7 +350,7 @@ footer {
     border-radius: 0;
     text-indent: -9999px;
     opacity: .75;
-    transition: opacity 0.5s 0.5s; }
+    transition: opacity 0.15s 0.15s; }
     .sidebar .button-hide:hover,
     .sidebar .button-show:hover,
     .sidebar .button-compact:hover,
@@ -374,11 +374,11 @@ footer {
     width: 0;
     margin-top: 5px;
     color: #787878;
-    transition: opacity 1s ease-out; }
+    transition: opacity 0.3s ease-out; }
   .sidebar .form-search .search {
-    transition: opacity 1s; }
+    transition: opacity 0.3s; }
   .sidebar .form-search .search-icon {
-    transition: transform 1s; }
+    transition: transform 0.3s; }
   .sidebar.is-compact, .sidebar.is-hidden {
     position: fixed;
     top: 0;
@@ -398,16 +398,16 @@ footer {
       display: none; }
     .sidebar.is-compact:not(.is-opened) .logo .sidebar-logo {
       opacity: 0;
-      transition: opacity 0s 1s; }
+      transition: opacity 0s 0.3s; }
     .sidebar.is-compact:not(.is-opened) .logo .sidebar-logo-compact {
       opacity: 1;
-      transition: opacity 0s 0.7s; }
+      transition: opacity 0s 0.21s; }
     .sidebar.is-compact:not(.is-opened) .button-compact,
     .sidebar.is-compact:not(.is-opened) .button-expand,
     .sidebar.is-compact:not(.is-opened) .button-hide,
     .sidebar.is-compact:not(.is-opened) .button-show {
       opacity: 0;
-      transition: opacity 0.5s; }
+      transition: opacity 0.15s; }
     .sidebar.is-compact:not(.is-opened) .server-name {
       opacity: 0; }
     .sidebar.is-compact:not(.is-opened) .form-search {
@@ -448,7 +448,7 @@ footer {
     border-radius: 0;
     text-indent: -9999px;
     opacity: .75;
-    transition: opacity 1s ease-out; }
+    transition: opacity 0.3s ease-out; }
     .sidebar-nav-toggle .button-toggle:hover {
       opacity: 1; }
   .sidebar-nav-toggle + div {
@@ -491,7 +491,7 @@ footer {
     border: 0;
     opacity: 1;
     transform: scale(0.8);
-    transition: opacity 1s ease-out; }
+    transition: opacity 0.3s ease-out; }
     .form-search .search-icon:focus {
       box-shadow: 0 0 0 2px #000000; }
     .form-search .search-icon:focus, .form-search .search-icon:hover:not(:disabled) {
@@ -584,7 +584,7 @@ footer {
     height: 4px;
     background: url(../img/icon-sprite.svg) no-repeat -579px -434px;
     transform: rotate(0deg);
-    transition: transform 1s, opacity 1s; }
+    transition: transform 0.3s, opacity 0.3s; }
   .menu-main > li.has-submenu > a:hover::after, .menu-main > li.has-submenu > a:focus::after {
     background-position: -579px -434px; }
   .menu-main > li.has-submenu.is-expanded > a::after {
@@ -598,7 +598,7 @@ footer {
   line-height: inherit;
   white-space: nowrap;
   border-left: 3px solid transparent;
-  transition: color 1s, border-color 1s, background-color 1s; }
+  transition: color 0.3s, border-color 0.3s, background-color 0.3s; }
   .menu-main a:active, .menu-main a:hover, .menu-main a:link, .menu-main a:visited {
     border-bottom: 0; }
 .menu-main .submenu {
@@ -606,7 +606,7 @@ footer {
   padding-left: 24px;
   overflow: hidden;
   background: #f3f3f3;
-  transition: max-height 1s ease;
+  transition: max-height 0.3s ease;
   will-change: max-height;
   transform: translate3d(0, 0, 0); }
   .menu-main .submenu li {
@@ -676,14 +676,14 @@ footer {
     padding: 12px 12px 12px 48px;
     font-size: 12px;
     white-space: nowrap;
-    transition: color 1s ease-out; }
+    transition: color 0.3s ease-out; }
     .menu-user a::before,
     .menu-user span::before {
       position: absolute;
       top: 13px;
       left: 18px;
       opacity: .75;
-      transition: opacity 1s ease-out; }
+      transition: opacity 0.3s ease-out; }
   .menu-user a {
     color: #131619; }
     .menu-user a:hover, .menu-user a:focus {
