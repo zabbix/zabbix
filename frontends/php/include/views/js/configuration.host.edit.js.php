@@ -31,7 +31,7 @@
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
 	<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
 
-	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_ICON ?>">
+	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?>">
 		<button type="button" class="<?= ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE ?>"></button>
 	</div>
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_TYPE ?>">
@@ -138,38 +138,37 @@
 	'use strict';
 
 	class HostInterfaceManager {
-
-		// Constants.
-		TEMPLATE = new Template(document.getElementById('host-interface-row-tmpl').innerHTML);
-		DEFAULT_PORTS = {
-			agent: 10050,
-			snmp: 161,
-			jmx: 12345,
-			ipmi: 623
-		};
-		CONTAINER_IDS = {
-			<?= INTERFACE_TYPE_AGENT ?>: '#agentInterfaces',
-			<?= INTERFACE_TYPE_SNMP ?>: '#SNMPInterfaces',
-			<?= INTERFACE_TYPE_JMX ?>: '#JMXInterfaces',
-			<?= INTERFACE_TYPE_IPMI ?>: '#IPMIInterfaces'
-		};
-		INTERFACE_TYPES = {
-			'agent': '<?= INTERFACE_TYPE_AGENT ?>',
-			'snmp': '<?= INTERFACE_TYPE_SNMP ?>',
-			'jmx': '<?= INTERFACE_TYPE_JMX ?>',
-			'ipmi': '<?= INTERFACE_TYPE_IPMI ?>'
-		};
-		INTERFACE_NAMES = {
-			<?= INTERFACE_TYPE_AGENT ?>: '<?= _('Agent') ?>',
-			<?= INTERFACE_TYPE_SNMP ?>: '<?= _('SNMP') ?>',
-			<?= INTERFACE_TYPE_JMX ?>: '<?= _('JMX') ?>',
-			<?= INTERFACE_TYPE_IPMI ?>: '<?= _('IPMI') ?>'
-		};
-
-		// Variables.
-		interfaces = {};
-
 		constructor(data) {
+			// Constants.
+			this.TEMPLATE = new Template(document.getElementById('host-interface-row-tmpl').innerHTML);
+			this.DEFAULT_PORTS = {
+				agent: 10050,
+				snmp: 161,
+				jmx: 12345,
+				ipmi: 623
+			};
+			this.CONTAINER_IDS = {
+				<?= INTERFACE_TYPE_AGENT ?>: '#agentInterfaces',
+				<?= INTERFACE_TYPE_SNMP ?>: '#SNMPInterfaces',
+				<?= INTERFACE_TYPE_JMX ?>: '#JMXInterfaces',
+				<?= INTERFACE_TYPE_IPMI ?>: '#IPMIInterfaces'
+			};
+			this.INTERFACE_TYPES = {
+				'agent': '<?= INTERFACE_TYPE_AGENT ?>',
+				'snmp': '<?= INTERFACE_TYPE_SNMP ?>',
+				'jmx': '<?= INTERFACE_TYPE_JMX ?>',
+				'ipmi': '<?= INTERFACE_TYPE_IPMI ?>'
+			};
+			this.INTERFACE_NAMES = {
+				<?= INTERFACE_TYPE_AGENT ?>: '<?= _('Agent') ?>',
+				<?= INTERFACE_TYPE_SNMP ?>: '<?= _('SNMP') ?>',
+				<?= INTERFACE_TYPE_JMX ?>: '<?= _('JMX') ?>',
+				<?= INTERFACE_TYPE_IPMI ?>: '<?= _('IPMI') ?>'
+			};
+
+			// Variables.
+			this.interfaces = {};
+
 			this.data = data;
 		}
 

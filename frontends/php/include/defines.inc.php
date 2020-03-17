@@ -1823,7 +1823,6 @@ define('ZBX_STYLE_HOST_INTERFACE_ROW_HEADER', 'interface-row-header');
 define('ZBX_STYLE_HOST_INTERFACE_CELL', 'interface-cell');
 define('ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS', 'interface-cell-details');
 define('ZBX_STYLE_HOST_INTERFACE_CELL_HEADER', 'interface-cell-header');
-define('ZBX_STYLE_HOST_INTERFACE_CELL_ICON', 'interface-cell-icon');
 define('ZBX_STYLE_HOST_INTERFACE_CELL_TYPE', 'interface-cell-type');
 define('ZBX_STYLE_HOST_INTERFACE_CELL_IP', 'interface-cell-ip');
 define('ZBX_STYLE_HOST_INTERFACE_CELL_DNS', 'interface-cell-dns');
