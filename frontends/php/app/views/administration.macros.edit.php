@@ -19,8 +19,15 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
+$this->addJsFile('inputsecret.js');
 $this->addJsFile('textareaflexible.js');
-$this->includeJSfile('app/views/administration.macros.edit.js.php');
+$this->addJsFile('macrovalue.js');
+
+$this->includeJsFile('administration.macros.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Macros'))
@@ -29,7 +36,7 @@ $widget = (new CWidget())
 $table = (new CTable())
 	->setId('tbl_macros')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->setHeader([_('Macro'), '', _('Value'), _('Description'), '']);
+	->setHeader([_('Macro'), _('Value'), _('Description'), '']);
 
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
@@ -41,9 +48,18 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 
-	$value_input = (new CTextAreaFlexible('macros['.$i.'][value]', $macro['value']))
-		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-		->setAttribute('placeholder', _('value'));
+	$macro_value = new CMacroValue($macro['type'], 'macros['.$i.']');
+
+	if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+		$macro_value->addRevertButton();
+		$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
+			&& array_key_exists('globalmacroid', $macro)
+		);
+	}
+
+	if (array_key_exists('value', $macro)) {
+		$macro_value->setAttribute('value', $macro['value']);
+	}
 
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -61,8 +77,7 @@ foreach ($data['macros'] as $i => $macro) {
 
 	$table->addRow([
 		(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		'&rArr;',
-		(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
@@ -84,8 +99,11 @@ $tab_view->setFooter(makeFormFooter($save_button));
 
 $form = (new CForm())
 	->setName('macrosForm')
+	->disablePasswordAutofill()
 	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'macros.update')->getUrl())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem($tab_view);
 
-$widget->addItem($form)->show();
+$widget
+	->addItem($form)
+	->show();

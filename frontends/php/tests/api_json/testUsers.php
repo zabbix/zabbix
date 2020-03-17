@@ -970,12 +970,12 @@ class testUsers extends CAPITest {
 					],
 					'user_medias' => [
 						[
-							'mediatypeid' => '10',
+							'mediatypeid' => '1234',
 							'sendto' => 'api@zabbix.com'
 						]
 					],
 				],
-				'expected_error' => 'Media type with ID "10" is not available.'
+				'expected_error' => 'Media type with ID "1234" is not available.'
 			],
 			// Check user media, sendto.
 			[

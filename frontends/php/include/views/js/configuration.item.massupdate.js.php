@@ -1,6 +1,31 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+
 include dirname(__FILE__).'/item.preprocessing.js.php';
 include dirname(__FILE__).'/editabletable.js.php';
+include dirname(__FILE__).'/itemtest.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="custom_intervals_row">
 	<tr class="form_row">
@@ -32,8 +57,8 @@ include dirname(__FILE__).'/editabletable.js.php';
 		$('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!$('#visible_type').is(':checked')) {
-				var itemInterfaceTypes = <?= CJs::encodeJson(itemTypeInterface()) ?>;
-				organizeInterfaces(itemInterfaceTypes[<?= CJs::encodeJson($data['initial_item_type']) ?>]);
+				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
+				organizeInterfaces(itemInterfaceTypes[<?= json_encode($data['initial_item_type']) ?>]);
 			}
 			else {
 				$('#type').trigger('change');
@@ -43,7 +68,7 @@ include dirname(__FILE__).'/editabletable.js.php';
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?= CJs::encodeJson(itemTypeInterface()) ?>;
+				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
 				organizeInterfaces(itemInterfaceTypes[parseInt(jQuery(this).val())]);
 			})
 			.trigger('change');

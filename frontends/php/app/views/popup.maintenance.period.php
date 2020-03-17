@@ -18,6 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CView $this
+ */
+
 $form = (new CForm())
 	->cleanItems()
 	->setId('maintenance_period_form')
@@ -85,6 +90,7 @@ $form_list
 		(new CCheckBoxList('days'))
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setOptions($days_weekly),
 		'row_timeperiod_dayofweek'
 	)
@@ -92,6 +98,7 @@ $form_list
 		(new CCheckBoxList('months'))
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setOptions($months),
 		'row_timeperiod_months'
 	)
@@ -116,6 +123,7 @@ $form_list
 		(new CCheckBoxList('monthly_days'))
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setOptions($days_monthly),
 		'row_timeperiod_week_days'
 	)
@@ -169,7 +177,7 @@ $output = [
 		]
 	],
 	'params' => $data['params'],
-	'script_inline' => require 'app/views/popup.maintenance.period.js.php'
+	'script_inline' => $this->readJsFile('popup.maintenance.period.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
@@ -177,4 +185,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

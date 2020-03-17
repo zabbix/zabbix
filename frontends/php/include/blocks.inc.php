@@ -47,6 +47,8 @@ function getSystemStatusData(array $filter) {
 	$filter_ext_ack = array_key_exists('ext_ack', $filter)
 		? $filter['ext_ack']
 		: EXTACK_OPTION_ALL;
+	$filter_evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
+	$filter_tags = array_key_exists('tags', $filter) ? $filter['tags'] : [];
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 		if ($filter_hostids === null) {
@@ -113,6 +115,8 @@ function getSystemStatusData(array $filter) {
 		'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged', 'severity'],
 		'groupids' => array_keys($data['groups']),
 		'hostids' => $filter_hostids,
+		'evaltype' => $filter_evaltype,
+		'tags' => $filter_tags,
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'suppressed' => false,

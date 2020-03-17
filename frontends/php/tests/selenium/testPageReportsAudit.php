@@ -68,7 +68,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	];
 
 	public function testPageReportsAudit_CheckLayout() {
-		$this->zbxTestLogin('auditlogs.php');
+		$this->zbxTestLogin('zabbix.php?action=auditlog.list');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
 
@@ -77,9 +77,9 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestExpandFilterTab();
 		$this->zbxTestAssertElementPresentId('alias');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
-		$this->zbxTestAssertElementPresentId('btn1');
+		$this->zbxTestAssertElementPresentId('select_user');
 
-		$this->zbxTestDropdownHasOptions('action', $this->actions);
+		$this->zbxTestDropdownHasOptions('auditlog_action', $this->actions);
 		$this->zbxTestDropdownHasOptions('resourcetype', $this->resourcetypes);
 	}
 
@@ -167,16 +167,16 @@ class testPageReportsAudit extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider auditActions
-	*/
+	 * @dataProvider auditActions
+	 */
 	public function testPageReportsAudit_Filter($action, $resourcetype) {
-		$this->zbxTestLogin('auditlogs.php');
+		$this->zbxTestLogin('zabbix.php?action=auditlog.list');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
 
 		$this->zbxTestExpandFilterTab();
 		$this->zbxTestInputType('alias', '');
-		$this->zbxTestDropdownSelect('action', $this->actions[$action]);
+		$this->zbxTestDropdownSelect('auditlog_action', $this->actions[$action]);
 		$this->zbxTestDropdownSelect('resourcetype', $this->resourcetypes[$resourcetype]);
 
 		$this->zbxTestClickXpathWait("//form[@name='zbx_filter']//button[@name='filter_set']");
@@ -184,8 +184,8 @@ class testPageReportsAudit extends CLegacyWebTest {
 	}
 
 	/**
-	* @backup-once globalmacro
-	*/
+	 * @backup-once globalmacro
+	 */
 	public function testPageReportsAudit_UpdateMacroDescription() {
 		// Update Macro description.
 		$this->page->login()->open('zabbix.php?action=macros.edit');
@@ -206,7 +206,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->assertEquals('Macros updated', $message->getTitle());
 
 		// Check Audit record about global macro update.
-		$this->page->open('auditlogs.php');
+		$this->page->open('zabbix.php?action=auditlog.list');
 		$this->query('button:Reset')->waitUntilVisible()->one()->click();
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
 		// Get first row data.
@@ -215,7 +215,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$audit = [
 			'User' => 'Admin',
 			'Resource' => 'Macro',
-			'Action' => 'Updated',
+			'Action' => 'Update',
 			'ID' => 11,
 			'Details' => "globalmacro.description: Test description 1 => New Updated Description"
 		];

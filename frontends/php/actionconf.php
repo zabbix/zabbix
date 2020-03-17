@@ -304,7 +304,7 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 
 			if ($uniqOperations[$new_operation['operationtype']] > 1) {
 				$result = false;
-				error(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
+				error(_s('Operation "%1$s" already exists.', operation_type2str($new_operation['operationtype'])));
 				show_messages();
 			}
 		}
@@ -574,9 +574,7 @@ if (hasRequest('form')) {
 	}
 
 	// Render view.
-	$actionView = new CView('configuration.action.edit', $data);
-	$actionView->render();
-	$actionView->show();
+	echo (new CView('configuration.action.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -642,9 +640,7 @@ else {
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sortOrder, new CUrl('actionconf.php'));
 
 	// render view
-	$actionView = new CView('configuration.action.list', $data);
-	$actionView->render();
-	$actionView->show();
+	echo (new CView('configuration.action.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

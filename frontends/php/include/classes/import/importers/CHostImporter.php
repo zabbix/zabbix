@@ -146,8 +146,8 @@ class CHostImporter extends CImporter {
 
 		// create interfaces cache interface_ref->interfaceid
 		$dbInterfaces = API::HostInterface()->get([
-			'hostids' => $this->processedHostIds,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'hostids' => $this->processedHostIds
 		]);
 
 		foreach ($hosts as $host) {
@@ -161,13 +161,25 @@ class CHostImporter extends CImporter {
 
 					foreach ($dbInterfaces as $dbInterface) {
 						if ($hostId == $dbInterface['hostid']
-								&& $dbInterface['ip'] == $interface['ip']
-								&& $dbInterface['dns'] == $interface['dns']
+								&& $dbInterface['ip'] === $interface['ip']
+								&& $dbInterface['dns'] === $interface['dns']
 								&& $dbInterface['useip'] == $interface['useip']
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
-								&& $dbInterface['main'] == $interface['main']
-								&& (!isset($interface['bulk']) || $dbInterface['bulk'] == $interface['bulk'])) {
+								&& $dbInterface['main'] == $interface['main']) {
+
+							// Check SNMP additional fields.
+							if ($dbInterface['type'] == INTERFACE_TYPE_SNMP) {
+								// Get fields that we can compare.
+								$array_diff = array_intersect_key($dbInterface['details'], $interface['details']);
+								foreach (array_keys($array_diff) as $key) {
+									// Check field equality.
+									if ($dbInterface['details'][$key] != $interface['details'][$key]) {
+										continue 2;
+									}
+								}
+							}
+
 							$refName = $interface['interface_ref'];
 							$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
 						}
@@ -306,9 +318,7 @@ class CHostImporter extends CImporter {
 							&& $dbHostInterface['dns'] == $xmlHostInterface['dns']
 							&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
 							&& $dbHostInterface['port'] == $xmlHostInterface['port']
-							&& $dbHostInterface['type'] == $xmlHostInterface['type']
-							&& (!isset($xmlHostInterface['bulk'])
-								|| $dbHostInterface['bulk'] == $xmlHostInterface['bulk'])) {
+							&& $dbHostInterface['type'] == $xmlHostInterface['type']) {
 						$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
 						$reusedInterfaceIds[$dbHostInterfaceId] = true;
 						break;

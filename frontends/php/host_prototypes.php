@@ -26,7 +26,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
-$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multiselect.js', 'textareaflexible.js'];
+$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multiselect.js', 'textareaflexible.js',
+	'class.cverticalaccordion.js', 'inputsecret.js', 'macrovalue.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -312,7 +314,7 @@ if (hasRequest('form')) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectGroups' => ['groupid', 'name'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
-		'selectMacros' => ['macro', 'value', 'description'],
+		'selectMacros' => ['macro', 'value', 'description', 'type'],
 		'hostids' => $discoveryRule['hostid'],
 		'templated_hosts' => true
 	]);
@@ -400,10 +402,8 @@ if (hasRequest('form')) {
 		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))
 	];
 
-	// render view
-	$itemView = new CView('configuration.host.prototype.edit', $data);
-	$itemView->render();
-	$itemView->show();
+	// Render view.
+	echo (new CView('configuration.host.prototype.edit', $data))->getOutput();
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -484,9 +484,7 @@ else {
 	}
 
 	// render view
-	$itemView = new CView('configuration.host.prototype.list', $data);
-	$itemView->render();
-	$itemView->show();
+	echo (new CView('configuration.host.prototype.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

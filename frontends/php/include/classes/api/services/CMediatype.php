@@ -1139,7 +1139,7 @@ class CMediatype extends CApiService {
 		]);
 		if (!empty($actions)) {
 			$action = reset($actions);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media types used by action "%s".', $action['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media types used by action "%1$s".', $action['name']));
 		}
 
 		$db_mediatypes = DB::select('media_type', [

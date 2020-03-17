@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';
-	private $macroClass = 'textarea-flexible macro initialized-field';
+	private $macroClass = 'textarea-flexible macro';
 
 	private $valueMaxLength = 255;
 	private $valuePlaceholder = 'value';

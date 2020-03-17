@@ -176,9 +176,9 @@ static void	__snmpidx_mapping_clean(void *data)
 
 static char	*get_item_community_context(const DC_ITEM *item)
 {
-	if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type)
+	if (ZBX_IF_SNMP_VERSION_1 == item->snmp_version || ZBX_IF_SNMP_VERSION_2 == item->snmp_version)
 		return item->snmp_community;
-	else if (ITEM_TYPE_SNMPv3 == item->type)
+	else if (ZBX_IF_SNMP_VERSION_3 == item->snmp_version)
 		return item->snmpv3_contextname;
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -187,7 +187,7 @@ static char	*get_item_community_context(const DC_ITEM *item)
 
 static char	*get_item_security_name(const DC_ITEM *item)
 {
-	if (ITEM_TYPE_SNMPv3 == item->type)
+	if (ZBX_IF_SNMP_VERSION_3 == item->snmp_version)
 		return item->snmpv3_securityname;
 
 	return "";
@@ -433,15 +433,15 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set \"DontCheckRange\" option for Net-SNMP");
 	}
 
-	switch (item->type)
+	switch (item->snmp_version)
 	{
-		case ITEM_TYPE_SNMPv1:
+		case ZBX_IF_SNMP_VERSION_1:
 			session.version = SNMP_VERSION_1;
 			break;
-		case ITEM_TYPE_SNMPv2c:
+		case ZBX_IF_SNMP_VERSION_2:
 			session.version = SNMP_VERSION_2c;
 			break;
-		case ITEM_TYPE_SNMPv3:
+		case ZBX_IF_SNMP_VERSION_3:
 			session.version = SNMP_VERSION_3;
 			break;
 		default:
@@ -1013,7 +1013,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d OID:'%s' bulk:%d", __func__, (int)item->type, snmp_oid, bulk);
 
-	if (ITEM_TYPE_SNMPv1 == item->type)	/* GetBulkRequest-PDU available since SNMPv2 */
+	if (ZBX_IF_SNMP_VERSION_1 == item->snmp_version)	/* GetBulkRequest-PDU available since SNMPv2 */
 		bulk = SNMP_BULK_DISABLED;
 
 	/* create OID from string */
@@ -2127,6 +2127,29 @@ void	zbx_init_snmp(void)
 	init_snmp(progname);
 
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+}
+
+static void	zbx_shutdown_snmp(void)
+{
+	sigset_t	mask, orig_mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+
+	snmp_shutdown(progname);
+
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+}
+
+void	zbx_clear_cache_snmp(void)
+{
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
+	zbx_shutdown_snmp();
+	zbx_init_snmp();
 }
 
 #endif	/* HAVE_NETSNMP */

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
 
 $hostWidget = (new CWidget())->setTitle(_('Hosts'));
@@ -29,7 +33,8 @@ $hostView = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'host.massupdate')
 	->addVar('tls_accept', $data['tls_accept'])
-	->setId('hostForm');
+	->setId('hostForm')
+	->disablePasswordAutofill();
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }
@@ -300,6 +305,13 @@ $hostTab = (new CTabView())
 	->addTab('templatesTab', _('Templates'), $templatesFormList)
 	->addTab('ipmiTab', _('IPMI'), $ipmiFormList)
 	->addTab('tagsTab', _('Tags'), $tags_form_list)
+	->addTab('macros_tab', _('Macros'), new CPartial('massupdate.macros.tab', [
+		'visible' => $data['visible'],
+		'macros' => $data['macros'],
+		'macros_checkbox' => $data['macros_checkbox'],
+		'macros_visible' => $data['macros_visible']
+	]))
+
 	->addTab('inventoryTab', _('Inventory'), $inventoryFormList)
 	->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
@@ -318,4 +330,4 @@ $hostView->addItem($hostTab);
 
 $hostWidget->addItem($hostView);
 
-return $hostWidget;
+$hostWidget->show();

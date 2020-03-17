@@ -56,8 +56,6 @@ check_fields($fields);
  * Ajax
  */
 if (isset($_REQUEST['favobj'])) {
-	$json = new CJson();
-
 	if (getRequest('favobj') === 'sysmap' && hasRequest('action')) {
 		if (getRequest('action') === 'update') {
 			$sysmapid = getRequest('sysmapid', 0);
@@ -78,7 +76,7 @@ if (isset($_REQUEST['favobj'])) {
 					throw new Exception(_('Access denied!'));
 				}
 
-				$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
+				$sysmapUpdate = json_decode($_REQUEST['sysmap'], true);
 				$sysmapUpdate['sysmapid'] = $sysmapid;
 				$sysmapUpdate['lines'] = [];
 
@@ -104,7 +102,7 @@ if (isset($_REQUEST['favobj'])) {
 						->getUrl();
 
 					echo
-						'if (confirm('.CJs::encodeJson(_('Map is updated! Return to map list?')).')) {'.
+						'if (confirm('.json_encode(_('Map is updated! Return to map list?')).')) {'.
 							'location.href = "'.$url.'";'.
 						'}';
 				}
@@ -166,7 +164,7 @@ if (isset($_REQUEST['favobj'])) {
 
 			ksort($return);
 
-			echo CJs::encodeJson($return);
+			echo json_encode($return);
 			exit;
 		}
 	}
@@ -310,8 +308,6 @@ if ($data['iconList']) {
 $data['theme'] = getUserGraphTheme();
 
 // render view
-$sysmapView = new CView('monitoring.sysmap.constructor', $data);
-$sysmapView->render();
-$sysmapView->show();
+echo (new CView('monitoring.sysmap.constructor', $data))->getOutput();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

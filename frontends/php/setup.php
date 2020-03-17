@@ -27,11 +27,11 @@ try {
 	APP::getInstance()->run(APP::EXEC_MODE_SETUP);
 }
 catch (Exception $e) {
-	(new CView('general.warning', [
+	echo (new CView('general.warning', [
 		'header' => $e->getMessage(),
 		'messages' => [],
 		'theme' => ZBX_DEFAULT_THEME
-	]))->render();
+	]))->getOutput();
 
 	exit;
 }

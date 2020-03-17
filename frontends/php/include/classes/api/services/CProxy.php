@@ -635,7 +635,7 @@ class CProxy extends CApiService {
 		]);
 
 		if ($proxy_exists) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%s" already exists.', $proxy_exists[0]['host']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%1$s" already exists.', $proxy_exists[0]['host']));
 		}
 
 		$hostids = [];
@@ -651,7 +651,9 @@ class CProxy extends CApiService {
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE
 					&& (!array_key_exists('interface', $proxy)
 						|| !is_array($proxy['interface']) || !$proxy['interface'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%s".', $proxy['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('No interface provided for proxy "%1$s".', $proxy['host'])
+				);
 			}
 
 			if (array_key_exists('proxy_address', $proxy)) {
@@ -761,7 +763,9 @@ class CProxy extends CApiService {
 				if (array_key_exists('host', $proxy) && $proxy['host'] !== $db_proxies[$proxy['proxyid']]['host']) {
 					foreach ($proxies_exists as $proxy_exists) {
 						if (bccomp($proxy_exists['proxyid'], $proxy['proxyid']) != 0) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%s" already exists.', $proxy['host']));
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Proxy "%1$s" already exists.', $proxy['host'])
+							);
 						}
 					}
 				}
@@ -828,9 +832,7 @@ class CProxy extends CApiService {
 		// interface
 		if ($status == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)
 				&& (!is_array($proxy['interface']) || !$proxy['interface'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('No interface provided for proxy "%s".', $proxy['host'])
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%1$s".', $proxy['host']));
 		}
 
 		$proxies = $this->extendFromObjects(zbx_toHash($proxies, 'proxyid'), $db_proxies, [

@@ -24,7 +24,7 @@
 
 #include "checks_agent.h"
 
-#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
 #endif
 
@@ -48,10 +48,10 @@ extern unsigned char	program_type;
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_agent(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
-	char		*tls_arg1, *tls_arg2;
+	const char	*tls_arg1, *tls_arg2;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
@@ -64,7 +64,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			tls_arg1 = NULL;
 			tls_arg2 = NULL;
 			break;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		case ZBX_TCP_SEC_TLS_CERT:
 			tls_arg1 = item->host.tls_issuer;
 			tls_arg2 = item->host.tls_subject;

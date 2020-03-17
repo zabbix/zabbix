@@ -31,6 +31,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 );
 
 $scripts = [];
+$jq_templates = [];
 
 // Host groups.
 $field_groupids = CWidgetHelper::getGroup($fields['groupids'],
@@ -62,8 +63,16 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['problem']), CWidgetHelper::g
 // Severity.
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['severities']),
-	CWidgetHelper::getSeverities($fields['severities'], $data['config'])
+	CWidgetHelper::getSeverities($fields['severities'])
 );
+
+// Tags.
+$form_list->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']));
+
+// Tags filter list.
+$form_list->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
+$scripts[] = $fields['tags']->getJavascript();
+$jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Show suppressed problems.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
@@ -83,5 +92,6 @@ $form->addItem($form_list);
 
 return [
 	'form' => $form,
-	'scripts' => $scripts
+	'scripts' => $scripts,
+	'jq_templates' => $jq_templates
 ];

@@ -127,13 +127,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if (!validateDateInterval($active_since_date->format('Y'), $active_since_date->format('m'),
 			$active_since_date->format('d'))) {
-		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
+		info(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
 		$result = false;
 	}
 
 	if (!validateDateInterval($active_till_date->format('Y'), $active_till_date->format('m'),
 			$active_till_date->format('d'))) {
-		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
+		info(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
 		$result = false;
 	}
 
@@ -308,9 +308,7 @@ if (!empty($data['form'])) {
 	CArrayHelper::sort($data['groups_ms'], ['name']);
 
 	// render view
-	$maintenanceView = new CView('configuration.maintenance.edit', $data);
-	$maintenanceView->render();
-	$maintenanceView->show();
+	echo (new CView('configuration.maintenance.edit', $data))->getOutput();
 }
 else {
 	// get maintenances
@@ -409,9 +407,7 @@ else {
 	$data['pageFilter'] = $pageFilter;
 
 	// render view
-	$maintenanceView = new CView('configuration.maintenance.list', $data);
-	$maintenanceView->render();
-	$maintenanceView->show();
+	echo (new CView('configuration.maintenance.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

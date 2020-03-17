@@ -140,8 +140,6 @@ class CControllerReportServices extends CController {
 		]);
 		$data['sla'] = reset($sla);
 
-		CView::$has_web_layout_mode = true;
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Service availability report'));
 		$this->setResponse($response);
