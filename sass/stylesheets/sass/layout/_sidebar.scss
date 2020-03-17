@@ -43,6 +43,8 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 	.logo {
 		position: relative;
 		display: block;
+		padding: 2px;
+		margin: -2px;
 		overflow: hidden;
 
 		&:active,
@@ -53,7 +55,9 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		}
 
 		&:focus {
-			box-shadow: 0 0 0 2px rgba($blue, .35);
+			.sidebar-logo {
+				box-shadow: 0 0 0 2px rgba($blue, .35);
+			}
 		}
 
 		.sidebar-logo {
@@ -62,8 +66,8 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 
 		.sidebar-logo-compact {
 			position: absolute;
-			top: 0;
-			left: 0;
+			top: 2px;
+			left: 2px;
 			opacity: 0;
 		}
 	}

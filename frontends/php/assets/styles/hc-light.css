@@ -322,17 +322,19 @@ footer {
   .sidebar .logo {
     position: relative;
     display: block;
+    padding: 2px;
+    margin: -2px;
     overflow: hidden; }
     .sidebar .logo:active, .sidebar .logo:hover, .sidebar .logo:link, .sidebar .logo:visited {
       border: 0; }
-    .sidebar .logo:focus {
+    .sidebar .logo:focus .sidebar-logo {
       box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35); }
     .sidebar .logo .sidebar-logo {
       margin-right: 60px; }
     .sidebar .logo .sidebar-logo-compact {
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 2px;
+      left: 2px;
       opacity: 0; }
   .sidebar .button-compact,
   .sidebar .button-expand {
