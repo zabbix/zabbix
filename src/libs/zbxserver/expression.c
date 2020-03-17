@@ -2374,7 +2374,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 		if (NULL == r_event)
 			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - event->clock));
 		else
-			*replace_to = zbx_strdup(*replace_to, zbx_date2str(r_event->clock - event->clock));
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(r_event->clock - event->clock));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_ID))
 	{
