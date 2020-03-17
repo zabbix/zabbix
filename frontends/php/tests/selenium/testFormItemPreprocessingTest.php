@@ -417,12 +417,8 @@ class testFormItemPreprocessingTest extends CWebTest {
 	private function openPreprocessing($data) {
 		$this->page->login()->open('items.php?form=create&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		if (CTestArrayHelper::get($data, 'Key')) {
-			$form->fill(['Key' => $data['Key']]);
-		}
-		else {
-			$form->fill(['Key' => 'test.key']);
-		}
+		$key = CTestArrayHelper::get($data, 'Key', false) ? $data['Key'] : 'test.key';
+		$form->fill(['Key' => $key]);
 		$form->selectTab('Preprocessing');
 	}
 
@@ -477,7 +473,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'actual' => []
 				];
 
-				if ($macros['expected']){
+				if ($macros['expected']) {
 					foreach ($form->getField('Macros')->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
@@ -516,7 +512,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 		}
 	}
 
-	private function chooseDialogActions($data){
+	private function chooseDialogActions($data) {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
 		switch ($data['action']) {
