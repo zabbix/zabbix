@@ -1767,6 +1767,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_ACK_STATUS		MVAR_EVENT "ACK.STATUS}"
 #define MVAR_EVENT_AGE			MVAR_EVENT "AGE}"
 #define MVAR_EVENT_DATE			MVAR_EVENT "DATE}"
+#define MVAR_EVENT_DURATION		MVAR_EVENT "DURATION}"
 #define MVAR_EVENT_ID			MVAR_EVENT "ID}"
 #define MVAR_EVENT_NAME			MVAR_EVENT "NAME}"
 #define MVAR_EVENT_STATUS		MVAR_EVENT "STATUS}"
@@ -2358,7 +2359,7 @@ static void	get_current_event_value(const char *macro, const DB_EVENT *event, ch
  *                                                                            *
  ******************************************************************************/
 static void	get_event_value(const char *macro, const DB_EVENT *event, char **replace_to,
-			const zbx_uint64_t *recipient_userid)
+			const zbx_uint64_t *recipient_userid, const DB_EVENT *r_event)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_AGE))
 	{
@@ -2367,6 +2368,13 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	else if (0 == strcmp(macro, MVAR_EVENT_DATE))
 	{
 		*replace_to = zbx_strdup(*replace_to, zbx_date2str(event->clock));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_DURATION))
+	{
+		if (NULL == r_event)
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - event->clock));
+		else
+			*replace_to = zbx_strdup(*replace_to, zbx_date2str(r_event->clock - event->clock));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_ID))
 	{
@@ -2964,7 +2972,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid);
+					get_event_value(m, event, &replace_to, userid, r_event);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -3264,7 +3272,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid);
+					get_event_value(m, event, &replace_to, userid, r_event);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -3454,7 +3462,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid);
+					get_event_value(m, event, &replace_to, userid, r_event);
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
 				{
@@ -3593,7 +3601,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid);
+					get_event_value(m, event, &replace_to, userid, r_event);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_METADATA))
 				{
@@ -3706,7 +3714,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid);
+					get_event_value(m, event, &replace_to, userid, r_event);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -3838,7 +3846,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid);
+					get_event_value(m, event, &replace_to, userid, r_event);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -4091,7 +4099,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 				{
-					get_event_value(m, event, &replace_to, userid);
+					get_event_value(m, event, &replace_to, userid, r_event);
 				}
 			}
 		}
