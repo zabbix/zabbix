@@ -91,12 +91,9 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		text-indent: -9999px;
 		opacity: .75;
 
+		&:focus,
 		&:hover {
 			opacity: 1;
-		}
-
-		@if $ui-transitions {
-			transition: opacity $ui-transition-duration * .5 $ui-transition-duration * .5;
 		}
 	}
 

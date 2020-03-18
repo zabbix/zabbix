@@ -341,11 +341,13 @@ footer {
     border: none;
     border-radius: 0;
     text-indent: -9999px;
-    opacity: .75;
-    transition: opacity 0.15s 0.15s; }
-    .sidebar .button-hide:hover,
+    opacity: .75; }
+    .sidebar .button-hide:focus, .sidebar .button-hide:hover,
+    .sidebar .button-show:focus,
     .sidebar .button-show:hover,
+    .sidebar .button-compact:focus,
     .sidebar .button-compact:hover,
+    .sidebar .button-expand:focus,
     .sidebar .button-expand:hover {
       opacity: 1; }
   .sidebar .button-hide {
@@ -5448,6 +5450,10 @@ table.preprocessing-test-results .rel-container {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
+.sidebar .logo:focus .sidebar-logo {
+  box-shadow: 0 0 0 2px #000000; }
+.sidebar button:focus {
+  box-shadow: 0 0 0 2px #000000; }
 .sidebar .button-hide {
   background-position: -600px -568px; }
 .sidebar .button-show {

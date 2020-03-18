@@ -192,6 +192,20 @@ $multiselect-selected-bg-color: #777777;
 
 // layout/sidebar
 .sidebar {
+	.logo {
+		&:focus {
+			.sidebar-logo {
+				box-shadow: 0 0 0 2px #ffffff;
+			}
+		}
+	}
+
+	button {
+		&:focus {
+			box-shadow: 0 0 0 2px #ffffff;
+		}
+	}
+
 	&.is-compact:not(.is-opened) {
 		.menu-main {
 			& > li {
@@ -267,15 +281,6 @@ $multiselect-selected-bg-color: #777777;
 		&:hover,
 		&:focus {
 			border-color: #ffffff;
-		}
-	}
-}
-
-.logo {
-	&:focus {
-		div,
-		img {
-			box-shadow: 0 0 0 2px $blue;
 		}
 	}
 }

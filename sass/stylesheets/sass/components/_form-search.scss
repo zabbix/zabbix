@@ -4,15 +4,22 @@ $form-search-border-color: #010a0f !default;
 $form-search-focused-color: $form-search-color !default;
 $form-search-focused-bg-color: $form-search-bg-color !default;
 $form-search-focused-border-color: lighten($sidebar-bg-color, 20%) !default;
+
+// Standard search-icon style.
 $form-search-icon-bg-position: -540px -616px !default;
 $form-search-icon-opacity: .75 !default;
+
+// Search-icon style on focused search-input.
 $form-search-focused-icon-bg-position: $form-search-icon-bg-position !default;
 $form-search-focused-icon-opacity: $form-search-icon-opacity !default;
+
+// Focused search-icon style.
 $form-search-icon-focused-bg-position: -570px -616px !default;
 $form-search-icon-focused-opacity: 1 !default;
+
+// Hovered search-icon style on focused search-input.
 $form-search-focused-icon-hover-bg-position: $form-search-icon-focused-bg-position !default;
 $form-search-focused-icon-hover-opacity: $form-search-icon-focused-opacity !default;
-
 
 .form-search {
 	position: relative;

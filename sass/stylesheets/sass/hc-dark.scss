@@ -218,6 +218,20 @@ $multiselect-selected-bg-color: #222222;
 
 // layout/sidebar
 .sidebar {
+	.logo {
+		&:focus {
+			.sidebar-logo {
+				box-shadow: 0 0 0 2px #000000;
+			}
+		}
+	}
+
+	button {
+		&:focus {
+			box-shadow: 0 0 0 2px #000000;
+		}
+	}
+
 	.button-hide {
 		background-position: -600px -568px;
 	}
