@@ -124,6 +124,7 @@
 									'data': widget_actions
 								}),
 								'attr': {
+									'aria-expanded': false,
 									'aria-haspopup': true
 								}
 							})

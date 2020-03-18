@@ -78,8 +78,9 @@ function getMenuPopupHistory(options) {
  * @param {string} options[]['name']             Script name.
  * @param {string} options[]['scriptid']         Script ID.
  * @param {string} options[]['confirmation']     Confirmation text.
- * @param {bool}   options['showGraphs']         Link to host graphs page.
- * @param {bool}   options['showScreens']        Link to host screen page.
+ * @param {bool}   options['showGraphs']         Link to Monitoring->Hosts->Graphs page.
+ * @param {bool}   options['showScreens']        Link to Monitoring->Screen page.
+ * @param {bool}   options['showWeb']		     Link to Monitoring->Hosts->Web page.
  * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
  * @param {bool}   options['hasGoTo']            "Go to" block in popup.
  * @param {array}  options['severities']         (optional)
@@ -95,35 +96,25 @@ function getMenuPopupHistory(options) {
 function getMenuPopupHost(options, trigger_elmnt) {
 	var sections = [];
 
-	// scripts
-	if (typeof options.scripts !== 'undefined') {
-		sections.push({
-			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
-		});
-	}
-
 	// go to section
 	if (options.hasGoTo) {
-		// inventory
 		var	host_inventory = {
-				label: t('Host inventory')
+				label: t('Inventory')
 			},
-			// latest
 			latest_data = {
 				label: t('Latest data')
 			},
-			// problems
 			problems = {
 				label: t('Problems')
 			},
-			// graphs
 			graphs = {
 				label: t('Graphs')
 			},
-			// screens
 			screens = {
-				label: t('Host screens')
+				label: t('Screens')
+			},
+			web = {
+				label: t('Web')
 			};
 
 		// inventory link
@@ -181,15 +172,47 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			screens.url = screens_url.getUrl();
 		}
 
+		if (!options.showWeb) {
+			web.disabled = true;
+		}
+		else {
+			var web_url = new Curl('zabbix.php', false);
+			web_url.setArgument('action', 'web.view');
+			web_url.setArgument('hostid', options.hostid);
+
+			web.url = web_url.getUrl();
+		}
+
+		var items = [
+			host_inventory,
+			latest_data,
+			problems,
+			graphs,
+			screens,
+			web
+		];
+
+		if (options.showConfig) {
+			var config = {
+				label: t('Configuration')
+			};
+
+			if (options.isWriteable) {
+				var config_url = new Curl('hosts.php', false);
+				config_url.setArgument('form', 'update');
+				config_url.setArgument('hostid', options.hostid);
+				config.url = config_url.getUrl();
+			}
+			else {
+				config.disabled = true;
+			}
+
+			items.push(config);
+		}
+
 		sections.push({
-			label: t('Go to'),
-			items: [
-				host_inventory,
-				latest_data,
-				problems,
-				graphs,
-				screens
-			]
+			label: t('Host'),
+			items: items
 		});
 	}
 
@@ -198,6 +221,14 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		sections.push({
 			label: t('URLs'),
 			items: options.urls
+		});
+	}
+
+	// scripts
+	if (typeof options.scripts !== 'undefined') {
+		sections.push({
+			label: t('Scripts'),
+			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
 		});
 	}
 
@@ -627,8 +658,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
  * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
- * @param {object} options['acknowledge']             Link to acknowledge page (optional).
- * @param {string} options['acknowledge']['backurl']  Return URL.
+ * @param {bool}   options['acknowledge']             (optional) Whether to show Acknowledge section.
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
@@ -660,16 +690,16 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	items[items.length] = events;
 
 	// acknowledge
-	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
-		var url = new Curl('zabbix.php', false);
-
-		url.setArgument('action', 'acknowledge.edit');
-		url.setArgument('eventids[]', options.eventid);
-		url.setArgument('backurl', options.acknowledge.backurl);
-
+	if (typeof options.acknowledge !== 'undefined' && options.acknowledge) {
 		items[items.length] = {
 			label: t('Acknowledge'),
-			url: url.getUrl()
+			clickCallback: function() {
+				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
+
+				return PopUp('popup.acknowledge.edit', {
+					eventids: [options.eventid]
+				}, null, trigger_elmnt);
+			}
 		};
 	}
 
@@ -838,6 +868,39 @@ function getMenuPopupItemPrototype(options) {
 			label: t('Create dependent item'),
 			url: url.getUrl()
 		}]
+	}];
+}
+
+/**
+ * Get dropdown section data.
+ *
+ * @param {array}  options
+ * @param {object} trigger_elem  UI element that was clicked to open overlay dialogue.
+ *
+ * @returns array
+ */
+function getMenuPopupDropdown(options, trigger_elem) {
+	var items = [];
+
+	jQuery.each(options.items, function(i, item) {
+		items.push({
+			label: item.label,
+			url: item.url || 'javascript:void(0);',
+			class: item.class,
+			clickCallback: () => {
+				jQuery(trigger_elem)
+					.removeClass()
+					.addClass(['btn-alt', 'btn-dropdown-toggle', item.class].join(' '));
+
+				jQuery('input[type=hidden]', jQuery(trigger_elem).parent())
+					.val(item.value)
+					.trigger('change');
+			}
+		});
+	});
+
+	return [{
+		items: items
 	}];
 }
 
@@ -1094,7 +1157,7 @@ jQuery(function($) {
 			// Close other action menus and prevent focus jumping before opening a new popup.
 			$('.menu-popup-top').menuPopup('close', null, false);
 
-			$opener.attr('data-expanded', 'true');
+			$opener.attr('aria-expanded', 'true');
 
 			var $menu_popup = $('<ul>', {
 					'role': 'menu',
@@ -1130,11 +1193,11 @@ jQuery(function($) {
 			$menu_popup.focus();
 		},
 
-		close: function(trigger_elmnt, return_focus) {
+		close: function(trigger_elem, return_focus) {
 			var menu_popup = $(this);
 
-			if (!menu_popup.is(trigger_elmnt) && menu_popup.has(trigger_elmnt).length === 0) {
-				$(trigger_elmnt).removeAttr('data-expanded');
+			if (!menu_popup.is(trigger_elem) && menu_popup.has(trigger_elem).length === 0) {
+				$('[aria-expanded="true"]', trigger_elem).attr({'aria-expanded': 'false'});
 				menu_popup.fadeOut(0);
 
 				$('.highlighted', menu_popup).removeClass('highlighted');
@@ -1148,7 +1211,7 @@ jQuery(function($) {
 
 				if (overlay && typeof overlay['element'] !== undefined) {
 					// Remove expanded attribute of the original opener.
-					$(overlay['element']).removeAttr('data-expanded');
+					$(overlay['element']).attr({'aria-expanded': 'false'});
 				}
 
 				menu_popup.remove();
@@ -1352,7 +1415,8 @@ jQuery(function($) {
 		options = $.extend({
 			ariaLabel: options.label,
 			selected: false,
-			disabled: false
+			disabled: false,
+			class: false
 		}, options);
 
 		var item = $('<li>'),
@@ -1398,6 +1462,10 @@ jQuery(function($) {
 
 		if (options.selected) {
 			link.addClass('selected');
+		}
+
+		if (options.class) {
+			link.addClass(options.class);
 		}
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {

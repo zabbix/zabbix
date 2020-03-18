@@ -68,7 +68,7 @@ if ($blink_period > 0) {
 			);
 	}
 	$indic_container->addItem(
-		(new CTag('p', true, _s('Age less than %s', convertUnitsS($blink_period))))->addClass(ZBX_STYLE_GREY)
+		(new CTag('p', true, _s('Age less than %1$s', convertUnitsS($blink_period))))->addClass(ZBX_STYLE_GREY)
 	);
 
 	$help_hint->addItem($indic_container);
@@ -150,9 +150,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
-	global $page;
-
-	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style']);
+	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $data['view_style']);
 }
 else {
 	$dataTable = new CTableInfo();

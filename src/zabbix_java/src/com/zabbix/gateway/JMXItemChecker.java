@@ -31,6 +31,7 @@ import javax.management.ObjectName;
 import javax.management.MalformedObjectNameException;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularDataSupport;
+import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
 
@@ -180,9 +181,17 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("attributeName:'{}'", realAttributeName);
 			logger.trace("fieldNames:'{}'", fieldNames);
 
+			Object dataObject = mbsc.getAttribute(objectName, realAttributeName);
+
+			if (dataObject instanceof TabularData)
+			{
+				logger.trace("'{}' contains tabular data", attributeName);
+				return getTabularData((TabularData)dataObject).toString();
+			}
+
 			try
 			{
-				return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
+				return getPrimitiveAttributeValue(dataObject, fieldNames);
 			}
 			catch (InstanceNotFoundException e)
 			{
@@ -292,6 +301,53 @@ class JMXItemChecker extends ItemChecker
 			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
 	}
 
+	private JSONArray getTabularData(TabularData data) throws JSONException
+	{
+		JSONArray values = new JSONArray();
+
+		for (Object value : data.values())
+		{
+			JSONObject tmp = getCompositeDataValues((CompositeData)value);
+
+			if (tmp.length() > 0)
+				values.put(tmp);
+		}
+
+		return values;
+	}
+
+	private JSONObject getCompositeDataValues(CompositeData compData) throws JSONException
+	{
+		JSONObject value = new JSONObject();
+
+		for (String key : compData.getCompositeType().keySet())
+		{
+			Object data = compData.get(key);
+
+			if (data == null)
+			{
+				value.put(key, JSONObject.NULL);
+			}
+			else if (data.getClass().isArray())
+			{
+				logger.trace("found attribute of a known, unsupported type: {}", data.getClass());
+				continue;
+			}
+			else if (data instanceof TabularData)
+			{
+				value.put(key, getTabularData((TabularData)data));
+			}
+			else if (data instanceof CompositeData)
+			{
+				value.put(key, getCompositeDataValues((CompositeData)data));
+			}
+			else
+				value.put(key, data);
+		}
+
+		return value;
+	}
+
 	private void discoverAttributes(JSONArray counters, ObjectName filter, boolean propertiesAsMacros) throws Exception
 	{
 		for (ObjectName name : mbsc.queryNames(filter, null))
@@ -347,7 +403,9 @@ class JMXItemChecker extends ItemChecker
 			{
 				logger.trace("discovered attribute '{}'", attrInfo.getName());
 
-				if (null == values.get(attrInfo.getName()))
+				Object attribute;
+
+				if (null == (attribute = values.get(attrInfo.getName())))
 				{
 					logger.trace("cannot retrieve attribute value, skipping");
 					continue;
@@ -355,10 +413,20 @@ class JMXItemChecker extends ItemChecker
 
 				try
 				{
-					logger.trace("looking for attributes of primitive types");
 					String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
-					getAttributeFields(counters, name, descr, attrInfo.getName(), values.get(attrInfo.getName()),
-						propertiesAsMacros);
+
+					if (attribute instanceof TabularData)
+					{
+						logger.trace("looking for attributes of tabular types");
+
+						formatPrimitiveTypeResult(counters, name, descr, attrInfo.getName(), attribute,
+							propertiesAsMacros, getTabularData((TabularData)attribute).toString());
+					}
+					else
+					{
+						logger.trace("looking for attributes of primitive types");
+						getAttributeFields(counters, name, descr, attrInfo.getName(), attribute, propertiesAsMacros);
+					}
 				}
 				catch (Exception e)
 				{
@@ -480,27 +548,7 @@ class JMXItemChecker extends ItemChecker
 		if (isPrimitiveAttributeType(attribute))
 		{
 			logger.trace("found attribute of a primitive type: {}", attribute.getClass());
-
-			JSONObject counter = new JSONObject();
-
-			if (propertiesAsMacros)
-			{
-				counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
-				counter.put("{#JMXOBJ}", name);
-				counter.put("{#JMXATTR}", attrPath);
-				counter.put("{#JMXTYPE}", attribute.getClass().getName());
-				counter.put("{#JMXVALUE}", attribute.toString());
-			}
-			else
-			{
-				counter.put("name", attrPath);
-				counter.put("object", name);
-				counter.put("description", null == descr ? name + "," + attrPath : descr);
-				counter.put("type", attribute.getClass().getName());
-				counter.put("value", attribute.toString());
-			}
-
-			counters.put(counter);
+			formatPrimitiveTypeResult(counters, name, descr, attrPath, attribute, propertiesAsMacros, attribute.toString());
 		}
 		else if (attribute instanceof CompositeData)
 		{
@@ -515,12 +563,37 @@ class JMXItemChecker extends ItemChecker
 						attrPath + "." + key, comp.get(key), propertiesAsMacros);
 			}
 		}
-		else if (attribute instanceof TabularDataSupport || attribute.getClass().isArray())
+		else if (attribute.getClass().isArray())
 		{
 			logger.trace("found attribute of a known, unsupported type: {}", attribute.getClass());
 		}
 		else
 			logger.trace("found attribute of an unknown, unsupported type: {}", attribute.getClass());
+	}
+
+	private void formatPrimitiveTypeResult(JSONArray counters, ObjectName name, String descr, String attrPath,
+			Object attribute, boolean propertiesAsMacros, String value) throws JSONException
+	{
+		JSONObject counter = new JSONObject();
+
+		if (propertiesAsMacros)
+		{
+			counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
+			counter.put("{#JMXOBJ}", name);
+			counter.put("{#JMXATTR}", attrPath);
+			counter.put("{#JMXTYPE}", attribute.getClass().getName());
+			counter.put("{#JMXVALUE}", value);
+		}
+		else
+		{
+			counter.put("name", attrPath);
+			counter.put("object", name);
+			counter.put("description", null == descr ? name + "," + attrPath : descr);
+			counter.put("type", attribute.getClass().getName());
+			counter.put("value", value);
+		}
+
+		counters.put(counter);
 	}
 
 	private boolean isPrimitiveAttributeType(Object obj) throws NoSuchMethodException

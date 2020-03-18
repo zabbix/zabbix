@@ -48,7 +48,9 @@ typedef enum
 	ZBX_JSONPATH_FUNCTION_AVG,
 	ZBX_JSONPATH_FUNCTION_LENGTH,
 	ZBX_JSONPATH_FUNCTION_FIRST,
-	ZBX_JSONPATH_FUNCTION_SUM
+	ZBX_JSONPATH_FUNCTION_SUM,
+	/* the element name suffix '~' internally is treated as a function */
+	ZBX_JSONPATH_FUNCTION_NAME
 }
 zbx_jsonpath_function_type_t;
 

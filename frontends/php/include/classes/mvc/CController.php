@@ -199,14 +199,14 @@ abstract class CController {
 
 		if ($period < ZBX_MIN_PERIOD) {
 			info(_n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
+				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
 			));
 
 			return false;
 		}
 		elseif ($period > ZBX_MAX_PERIOD) {
 			info(_n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
+				'Maximum time period to display is %1$s days.', (int) (ZBX_MAX_PERIOD / SEC_PER_DAY)
 			));
 
 			return false;

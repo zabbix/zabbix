@@ -383,11 +383,11 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
-					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>]',
+					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
 					'description' => _('Log file monitoring. Returns log')
 				],
 				[
-					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
+					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>]',
 					'description' => _('Count of matched lines in log file monitoring. Returns integer')
 				],
 				[
@@ -1069,15 +1069,15 @@ class CHelpItems {
 			],
 			ITEM_TYPE_DB_MONITOR => [
 				[
-					'key' => 'db.odbc.select[<unique short description>,dsn]',
+					'key' => 'db.odbc.select[<unique short description>,<dsn>,<connection string>]',
 					'description' => _('Return first column of the first row of the SQL query result.')
 				],
 				[
-					'key' => 'db.odbc.discovery[<unique short description>,dsn]',
+					'key' => 'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',
 					'description' => _('Transform SQL query result into a JSON array for low-level discovery.')
 				],
 				[
-					'key' => 'db.odbc.get[<unique short description>,dsn]',
+					'key' => 'db.odbc.get[<unique short description>,<dsn>,<connection string>]',
 					'description' => _('Transform SQL query result into a JSON array.')
 				]
 			],
