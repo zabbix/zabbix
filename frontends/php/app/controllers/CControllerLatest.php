@@ -72,7 +72,7 @@ abstract class CControllerLatest extends CController {
 
 		if ($child_groups) {
 			$filter_groups += API::HostGroup()->get([
-				'output' => ['groupid'],
+				'output' => [],
 				'search' => ['name' => $child_groups],
 				'startSearch' => true,
 				'searchByAny' => true,
@@ -87,6 +87,7 @@ abstract class CControllerLatest extends CController {
 			'hostids' => $filter['hostids'],
 			'groupids' => $groupids,
 			'with_monitored_items' => true,
+			'sortfield' => 'host',
 			'limit' => $config['search_limit'] + 1,
 			'preservekeys' => true
 		]);
