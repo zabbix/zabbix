@@ -262,6 +262,7 @@ class CXmlConstantName {
 	const PROMETHEUS_PATTERN = 'PROMETHEUS_PATTERN';
 	const PROMETHEUS_TO_JSON = 'PROMETHEUS_TO_JSON';
 	const CSV_TO_JSON = 'CSV_TO_JSON';
+	const STR_REPLACE = 'STR_REPLACE';
 
 	const AND_OR = 'AND_OR';
 	const XML_AND = 'AND';

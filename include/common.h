@@ -988,6 +988,7 @@ void	zbx_lrtrim(char *str, const char *charlist);
 void	zbx_trim_integer(char *str);
 void	zbx_trim_float(char *str);
 void	zbx_remove_chars(char *str, const char *charlist);
+char	*zbx_str_printable_dyn(const char *text);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	del_zeros(char *s);
@@ -1365,6 +1366,7 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_REGEXP_OUTPUT	0x100000
 #define ZBX_TOKEN_PROMETHEUS	0x200000
 #define ZBX_TOKEN_JSONPATH	0x400000
+#define ZBX_TOKEN_STR_REPLACE	0x800000
 
 /* location of a substring */
 typedef struct
@@ -1492,6 +1494,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_PROMETHEUS_PATTERN		22
 #define ZBX_PREPROC_PROMETHEUS_TO_JSON		23
 #define ZBX_PREPROC_CSV_TO_JSON			24
+#define ZBX_PREPROC_STR_REPLACE			25
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
