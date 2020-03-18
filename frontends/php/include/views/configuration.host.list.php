@@ -129,9 +129,7 @@ $filter
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(_('Name'),
-				(new CTextBox('filter_host', $data['filter']['host']))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
+				(new CTextBox('filter_host', $data['filter']['host']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(_('DNS'),
 				(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)

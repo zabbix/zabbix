@@ -112,9 +112,7 @@ $filter
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
+				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			),
 		(new CFormList())->addRow(_('Tags'), $filter_tags_table)
 	]);

@@ -129,8 +129,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 				)
 				->addRow(_('Application'), [
 					(new CTextBox('application', $data['filter']['application']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-						->setAttribute('autofocus', 'autofocus'),
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('application_name', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)

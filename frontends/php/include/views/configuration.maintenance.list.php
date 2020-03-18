@@ -56,9 +56,7 @@ $widget = (new CWidget())
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				)
 				->addRow(_('Name'),
-					(new CTextBox('filter_name', $data['filter']['name']))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAttribute('autofocus', 'autofocus')
+					(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				),
 			(new CFormList())->addRow(_('State'),
 				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))

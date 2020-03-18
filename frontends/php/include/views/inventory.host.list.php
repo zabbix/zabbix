@@ -26,8 +26,7 @@
 $widget = (new CWidget())->setTitle(_('Host inventory'));
 
 // Make an inventory field dropdown.
-$inventoryFieldsComboBox = (new CComboBox('filter_field', $data['filter']['field']))
-	->setAttribute('autofocus', 'autofocus');
+$inventoryFieldsComboBox = new CComboBox('filter_field', $data['filter']['field']);
 foreach ($data['host_inventories'] as $inventoryField) {
 	$inventoryFieldsComboBox->addItem($inventoryField['db_field'], $inventoryField['title']);
 }
