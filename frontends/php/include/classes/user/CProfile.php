@@ -27,7 +27,7 @@ class CProfile {
 	private static $insert = [];
 	private static $stringProfileMaxLength;
 
-	public static function init() {
+	private static function init() {
 		self::$userDetails = CWebUser::$data;
 		self::$profiles = [];
 
