@@ -142,7 +142,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 				new CLink(_('Web'),
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'web.view')
-						->setArgument('hostid', $host['hostid'])
+						->setArgument('filter_set', '1')
+						->setArgument('filter_hostids', (array) $host['hostid'])
 				),
 				CViewHelper::showNum($host['httpTests'])
 			]
