@@ -40,11 +40,11 @@ $fields = [
 	'filter_hostids' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
 	'filter_rst'=>		[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
 	'filter_set' =>		[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
-	'filter_from' =>	[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
-	'filter_to' =>		[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
+	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
+	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
 ];
 check_fields($fields);
-validateTimeSelectorPeriod(getRequest('filter_from'), getRequest('filter_to'));
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $report_mode = getRequest('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
 CProfile::update('web.avail_report.mode', $report_mode, PROFILE_TYPE_INT);
@@ -138,8 +138,8 @@ $data['filter'] = ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE)
 $timeselector_options = [
 	'profileIdx' => 'web.avail_report.filter',
 	'profileIdx2' => 0,
-	'from' => getRequest('filter_from'),
-	'to' => getRequest('filter_to')
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
 ];
 updateTimeSelectorPeriod($timeselector_options);
 

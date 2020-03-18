@@ -31,6 +31,12 @@ extern char	*CONFIG_DBSCHEMA;
 extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 extern char	*CONFIG_DBSOCKET;
+extern char	*CONFIG_DB_TLS_CONNECT;
+extern char	*CONFIG_DB_TLS_CERT_FILE;
+extern char	*CONFIG_DB_TLS_KEY_FILE;
+extern char	*CONFIG_DB_TLS_CA_FILE;
+extern char	*CONFIG_DB_TLS_CIPHER;
+extern char	*CONFIG_DB_TLS_CIPHER_13;
 extern int	CONFIG_DBPORT;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
@@ -475,6 +481,11 @@ void	DBdeinit(void);
 
 int	DBconnect(int flag);
 void	DBclose(void);
+
+int	zbx_db_validate_config_features(void);
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+void	zbx_db_validate_config(void);
+#endif
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);

@@ -38,9 +38,23 @@ const char	*usage_message[] = {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "--tls-connect cert", "--tls-ca-file CA-file",
 	"[--tls-crl-file CRL-file]", "[--tls-agent-cert-issuer cert-issuer]", "[--tls-agent-cert-subject cert-subject]",
-	"--tls-cert-file cert-file", "--tls-key-file key-file", "-k item-key", NULL,
+	"--tls-cert-file cert-file", "--tls-key-file key-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13 cipher-string]",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"-k item-key", NULL,
 	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "-k item-key", NULL,
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13 cipher-string]",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"-k item-key", NULL,
 #endif
 	"-h", NULL,
 	"-V", NULL,
@@ -94,6 +108,20 @@ const char	*help_message[] = {
 	"",
 	"  --tls-psk-file PSK-file    Full pathname of a file containing the pre-shared",
 	"                             key",
+#if defined(HAVE_OPENSSL)
+	"",
+	"  --tls-cipher13             Cipher string for OpenSSL 1.1.1 or newer for",
+	"                             TLS 1.3. Override the default ciphersuite",
+	"                             selection criteria. This option is not available",
+	"                             if OpenSSL version is less than 1.1.1",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"",
+	"  --tls-cipher               GnuTLS priority string (for TLS 1.2 and up) or",
+	"                             OpenSSL cipher string (only for TLS 1.2).",
+	"                             Override the default ciphersuite selection",
+	"                             criteria",
+#endif
 #else
 	"  Not available. This 'zabbix_get' was compiled without TLS support",
 #endif
@@ -133,6 +161,15 @@ char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 
+char	*CONFIG_TLS_CIPHER_CERT13	= NULL;	/* not used in zabbix_get, just for linking with tls.c */
+char	*CONFIG_TLS_CIPHER_CERT		= NULL;	/* not used in zabbix_get, just for linking with tls.c */
+char	*CONFIG_TLS_CIPHER_PSK13	= NULL;	/* not used in zabbix_get, just for linking with tls.c */
+char	*CONFIG_TLS_CIPHER_PSK		= NULL;	/* not used in zabbix_get, just for linking with tls.c */
+char	*CONFIG_TLS_CIPHER_ALL13	= NULL;	/* not used in zabbix_get, just for linking with tls.c */
+char	*CONFIG_TLS_CIPHER_ALL		= NULL;	/* not used in zabbix_get, just for linking with tls.c */
+char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/* parameter '--tls-cipher13' from zabbix_get command line */
+char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* parameter '--tls-cipher' from zabbix_get command line */
+
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */
 
@@ -156,6 +193,8 @@ struct zbx_option	longopts[] =
 	{"tls-key-file",		1,	NULL,	'7'},
 	{"tls-psk-identity",		1,	NULL,	'8'},
 	{"tls-psk-file",		1,	NULL,	'9'},
+	{"tls-cipher13",		1,	NULL,	'A'},
+	{"tls-cipher",			1,	NULL,	'B'},
 	{NULL}
 };
 
@@ -364,6 +403,28 @@ int	main(int argc, char **argv)
 			case '9':
 				CONFIG_TLS_PSK_FILE = zbx_strdup(CONFIG_TLS_PSK_FILE, zbx_optarg);
 				break;
+			case 'A':
+#if defined(HAVE_OPENSSL)
+				CONFIG_TLS_CIPHER_CMD13 = zbx_strdup(CONFIG_TLS_CIPHER_CMD13, zbx_optarg);
+#elif defined(HAVE_GNUTLS)
+				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
+						" zabbix_get was compiled with GnuTLS");
+				exit(EXIT_FAILURE);
+#elif defined(HAVE_POLARSSL)
+				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
+						" zabbix_get was compiled with mbedTLS (PolarSSL)");
+				exit(EXIT_FAILURE);
+#endif
+				break;
+			case 'B':
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				CONFIG_TLS_CIPHER_CMD = zbx_strdup(CONFIG_TLS_CIPHER_CMD, zbx_optarg);
+#elif defined(HAVE_POLARSSL)
+				zbx_error("parameter \"--tls-cipher\" requires GnuTLS or OpenSSL."
+						" zabbix_get was compiled with mbedTLS (PolarSSL)");
+				exit(EXIT_FAILURE);
+#endif
+				break;
 #else
 			case '1':
 			case '2':
@@ -374,6 +435,8 @@ int	main(int argc, char **argv)
 			case '7':
 			case '8':
 			case '9':
+			case 'A':
+			case 'B':
 				zbx_error("TLS parameters cannot be used: 'zabbix_get' was compiled without TLS"
 						" support");
 				exit(EXIT_FAILURE);
@@ -440,7 +503,8 @@ int	main(int argc, char **argv)
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
 			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
-			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
+			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE ||
+			NULL != CONFIG_TLS_CIPHER_CMD13 || NULL != CONFIG_TLS_CIPHER_CMD)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config();

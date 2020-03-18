@@ -588,6 +588,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				case ZBX_PREPROC_REGSUB:
 				case ZBX_PREPROC_ERROR_FIELD_REGEX:
+				case ZBX_PREPROC_STR_REPLACE:
 					$step['params'] = implode("\n", $step['params']);
 					break;
 
@@ -1090,6 +1091,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 							case ZBX_PREPROC_REGSUB:
 							case ZBX_PREPROC_ERROR_FIELD_REGEX:
+							case ZBX_PREPROC_STR_REPLACE:
 								$step['params'] = implode("\n", $step['params']);
 								break;
 

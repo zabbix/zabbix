@@ -164,6 +164,8 @@ tests/libs/zbxsysinfo/process
 tests/libs/zbxsysinfo/check_key_access_rules
 tests/libs/zbxdbcache/is_item_processed_by_server
 tests/zabbix_server/preprocessor/item_preproc_csv_to_json
+tests/libs/zbxcommon/convert_to_utf8
+tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run

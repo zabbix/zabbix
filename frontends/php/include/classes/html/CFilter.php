@@ -224,7 +224,7 @@ class CFilter extends CDiv {
 
 		return $this->addTab(
 			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_FILTER_TRIGGER),
-			(new CDiv($this->form->addItem($body)))
+			(new CDiv($body))
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)
 				->setId($anchor)
 		);
@@ -304,9 +304,6 @@ class CFilter extends CDiv {
 					->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
 					->setId($anchor)
 			);
-			$this->form
-				->addItem(new CVar('filter_from', $from))
-				->addItem(new CVar('filter_to', $to));
 		}
 		else {
 			$this
@@ -384,7 +381,9 @@ class CFilter extends CDiv {
 			}
 		}
 
-		$this->addStyle('display:none');
+		$this
+			->addStyle('display:none')
+			->form->addItem($this->tabs);
 
 		if ($headers_cnt) {
 			$this
@@ -392,7 +391,7 @@ class CFilter extends CDiv {
 				->setAttribute('aria-label', _('Filter'));
 		}
 
-		$this->addItem($this->tabs);
+		$this->addItem($this->form);
 
 		return parent::toString($destroy).($headers_cnt ? get_js($this->getJS()) : '');
 	}
