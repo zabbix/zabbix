@@ -25,7 +25,6 @@
 #include "zbxmockutil.h"
 
 #include "valuecache.h"
-#include "dbcache.h"
 #include "zbxserver.h"
 
 #include "mocks/valuecache/valuecache_mock.h"

@@ -825,8 +825,6 @@ extern zbx_rwlock_t	config_lock;
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2
 
-/* validator function optionally used to validate macro values when expanding user macros */
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_macro_value_validate_and_transform_func_t                    *
@@ -843,6 +841,7 @@ extern zbx_rwlock_t	config_lock;
  ******************************************************************************/
 typedef char* (*zbx_macro_value_validate_and_transform_func_t)(char *in, char **please_free_me);
 
+/* function optionally used to escape macro values when expanding user macros */
 char    *zbx_macro_value_transform(char *in, char **out);
 
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,

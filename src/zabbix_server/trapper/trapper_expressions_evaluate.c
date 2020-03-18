@@ -18,10 +18,7 @@
 **/
 
 #include "common.h"
-#include "log.h"
-#include "zbxjson.h"
-#include "zbxalgo.h"
-#include "dbcache.h"
+#include "zbxserver.h"
 
 typedef struct
 {
@@ -76,15 +73,13 @@ out:
 	return ret;
 }
 
-
-
 static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
-	char			*evaluate_error = NULL;
-	int			ret = FAIL, i;
-	unsigned char		value_type;
-	zbx_vector_ptr_t	expressions, results, history;
-	zbx_timespec_t		ts[2];
+	char					*evaluate_error = NULL;
+	int					ret = FAIL, i;
+	unsigned char				value_type;
+	zbx_vector_ptr_t			expressions, results, history;
+	zbx_timespec_t				ts[2];
 	zbx_expressions_evaluate_result_t	*result;
 
 	zbx_vector_ptr_create(&expressions);
@@ -105,7 +100,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 		zbx_vector_ptr_append(&results, result);
 
 		result->expression = zbx_strdup(NULL, expressions.values[ii]);
-		(result->error)[0]='\0';
+		(result->error)[0] = '\0';
 		expressions.values[ii] = get_expanded_expression(expressions.values[ii]);
 
 		if (SUCCEED != evaluate(&expr_result, expressions.values[ii], result->error, sizeof(result->error),
@@ -117,7 +112,6 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
-
 
 	for (i = 0; i < results.values_num; i++)
 	{
@@ -153,7 +147,6 @@ out:
 
 	return ret;
 }
-
 
 int	zbx_trapper_expressions_evaluate(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {

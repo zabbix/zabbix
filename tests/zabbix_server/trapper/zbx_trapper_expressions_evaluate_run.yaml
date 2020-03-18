@@ -219,7 +219,7 @@ in:
         "value_type": 0,
         "value": "1",
         "history": {
-            "timestamp": "now-1m" 
+            "timestamp": "now-1m"
         }
       },
       "request": "preprocessing.test",
@@ -228,7 +228,7 @@ in:
 out:
   return: FAIL
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to data: 4$' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to data: 4$'
 in:
   request: |
     {
@@ -280,7 +280,7 @@ out:
       }
     }
 ---
-test case: 'Apply mult(2) + trim($) + regsub("data: *(.*)", \1) to data: 4$' 
+test case: 'Apply mult(2) + trim($) + regsub("data: *(.*)", \1) to data: 4$'
 in:
   request: |
     {
@@ -326,7 +326,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + mult(2) + regsub("data: *(.*)", \1) to data: 4$' 
+test case: 'Apply trim($) + mult(2) + regsub("data: *(.*)", \1) to data: 4$'
 in:
   request: |
     {
@@ -375,7 +375,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to data: x$' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to data: x$'
 in:
   request: |
     {
@@ -427,7 +427,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to 4$ with discard on fail' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to 4$ with discard on fail'
 in:
   request: |
     {
@@ -478,7 +478,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to 4$ with set value to 5 on fail' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to 4$ with set value to 5 on fail'
 in:
   request: |
     {
@@ -532,7 +532,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to 4$ with set error to Validation error on fail' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to 4$ with set error to Validation error on fail'
 in:
   request: |
     {
@@ -583,7 +583,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) to data: x$ for uint value' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) to data: x$ for uint value'
 in:
   request: |
     {
@@ -626,7 +626,7 @@ out:
       }
     }
 ---
-test case: 'Apply regsub("data: *(.*)", \1) to data: x for uint value testing single step' 
+test case: 'Apply regsub("data: *(.*)", \1) to data: x for uint value testing single step'
 in:
   request: |
     {
@@ -661,7 +661,7 @@ out:
       }
     }
 ---
-test case: 'Apply delta() to 100, 700' 
+test case: 'Apply delta() to 100, 700'
 in:
   request: |
     {
@@ -699,7 +699,7 @@ out:
       }
     }
 ---
-test case: 'Apply delta_per_second() to 100, 700' 
+test case: 'Apply delta_per_second() to 100, 700'
 in:
   request: |
     {
@@ -737,7 +737,7 @@ out:
       }
     }
 ---
-test case: 'Apply mult(2) + trim($) + regsub("data: *(.*)", \1) to history data: 4$' 
+test case: 'Apply mult(2) + trim($) + regsub("data: *(.*)", \1) to history data: 4$'
 in:
   request: |
     {
@@ -788,7 +788,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + mult(2) + regsub("data: *(.*)", \1) to history data: 4$' 
+test case: 'Apply trim($) + mult(2) + regsub("data: *(.*)", \1) to history data: 4$'
 in:
   request: |
     {
@@ -842,7 +842,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history data: x$' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history data: x$'
 in:
   request: |
     {
@@ -899,7 +899,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history 4$ with discard on fail' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history 4$ with discard on fail'
 in:
   request: |
     {
@@ -955,7 +955,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history 4$ with set value to 5 on fail' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history 4$ with set value to 5 on fail'
 in:
   request: |
     {
@@ -1011,7 +1011,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history 4$ with set error to Validation error on fail' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) + mult(2) to history 4$ with set error to Validation error on fail'
 in:
   request: |
     {
@@ -1067,7 +1067,7 @@ out:
       }
     }
 ---
-test case: 'Apply trim($) + regsub("data: *(.*)", \1) to history data: x$ for uint value' 
+test case: 'Apply trim($) + regsub("data: *(.*)", \1) to history data: x$ for uint value'
 in:
   request: |
     {
@@ -1115,7 +1115,7 @@ out:
       }
     }
 ---
-test case: 'Apply regsub("data: *(.*)", \1) to history data: x for uint value testing single step' 
+test case: 'Apply regsub("data: *(.*)", \1) to history data: x for uint value testing single step'
 in:
   request: |
     {
@@ -1154,7 +1154,7 @@ out:
       }
     }
 ---
-test case: 'Apply regsub("data: *(.*)", \1) + delta() to data: 9, data:10' 
+test case: 'Apply regsub("data: *(.*)", \1) + delta() to data: 9, data:10'
 in:
   request: |
     {
@@ -1201,7 +1201,7 @@ out:
       }
     }
 ---
-test case: 'Apply regsub("data: *(.*)", \1) + delta() to data: 9, data:10' 
+test case: 'Apply regsub("data: *(.*)", \1) + delta() to data: 9, data:10'
 in:
   request: |
     {

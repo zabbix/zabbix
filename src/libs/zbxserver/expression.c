@@ -5262,7 +5262,7 @@ empty:
  *                                                                            *
  * Purpose: evaluate trigger expressions                                      *
  *                                                                            *
- * Parameters: triggers - [IN] vector of DC_TRIGGGER pointers, sorted by      *
+ * Parameters: triggers - [IN] vector of DC_TRIGGER pointers, sorted by       *
  *                             triggerids                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *

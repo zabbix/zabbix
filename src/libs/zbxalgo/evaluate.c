@@ -112,7 +112,7 @@ static void	evaluate_string(zbx_variant_t *res)
 		ptr++;
 	}
 
-	str_len = ptr-p0;
+	str_len = ptr - p0;
 	res_temp = zbx_malloc(NULL, str_len + 1);
 
 	for (i = 0; i < str_len; i++)
@@ -122,7 +122,6 @@ static void	evaluate_string(zbx_variant_t *res)
 
 	zbx_variant_set_str(res, res_temp);
 }
-
 
 /******************************************************************************
  *                                                                            *

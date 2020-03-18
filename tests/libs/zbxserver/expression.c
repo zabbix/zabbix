@@ -18,11 +18,8 @@
 **/
 
 #include "common.h"
-#include "db.h"
-#include "log.h"
-#include "sysinfo.h"
-#include "zbxserver.h"
 
+#include "zbxserver.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
