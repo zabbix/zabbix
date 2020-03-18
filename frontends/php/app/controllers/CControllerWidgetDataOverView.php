@@ -34,15 +34,16 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
-		$groupids = $fields['groupids'] ? $fields['groupids'] : null;
+		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
+		$hostids = $fields['hostids'] ? $fields['hostids'] : null;
 
 		if ($fields['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop($groupids, null,
+			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop($groupids, $hostids,
 				$fields['application']
 			);
 		}
 		else {
-			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewLeft($groupids, null,
+			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewLeft($groupids, $hostids,
 				$fields['application']
 			);
 		}
