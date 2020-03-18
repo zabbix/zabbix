@@ -189,6 +189,12 @@ switch ($data['method']) {
 					$options['templated_hosts'] = true;
 				}
 
+				if (array_key_exists('with_monitored_triggers', $data)) {
+					$options += [
+						'with_monitored_triggers' => true
+					];
+				}
+
 				if (array_key_exists('with_monitored_items', $data)) {
 					$options += [
 						'with_monitored_items' => true,

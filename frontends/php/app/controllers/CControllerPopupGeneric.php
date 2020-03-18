@@ -907,6 +907,12 @@ class CControllerPopupGeneric extends CController {
 					'templated_hosts' => $this->hasInput('with_hosts_and_templates') ? true : null
 				];
 
+				if ($this->hasInput('with_monitored_triggers')) {
+					$options += [
+						'with_monitored_triggers' => true
+					];
+				}
+
 				if ($this->hasInput('with_monitored_items')) {
 					$options += [
 						'with_monitored_items' => true,
