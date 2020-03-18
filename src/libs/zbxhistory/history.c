@@ -325,7 +325,6 @@ char	*zbx_history_value2str_dyn(const history_value_t *value, int value_type)
 	return str;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_history_record_vector_clean                                  *

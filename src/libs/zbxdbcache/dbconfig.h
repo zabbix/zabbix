@@ -829,20 +829,24 @@ extern zbx_rwlock_t	config_lock;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_macro_value_validator_func_t                                 *
+ * Function: zbx_macro_value_validate_and_transform_func_t                    *
  *                                                                            *
- * Purpose: validate macro value when expanding user macros                   *
+ * Purpose: validate and/or transform macro value when expanding user macros  *
  *                                                                            *
  * Parameters: value   - [IN] the macro value                                 *
+ *                     - [PLEASE_FREE_ME] optimisation buffer that must be    *
+ *                                        cleared by the calling function     *
  *                                                                            *
- * Return value: SUCCEED - the value is valid                                 *
- *               FAIL    - otherwise                                          *
+ * Return value: NOT NULL text value - transformed and validated value        *
+ *               NULL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-typedef int (*zbx_macro_value_validator_func_t)(const char *value);
+typedef char* (*zbx_macro_value_validate_and_transform_func_t)(char *in, char **please_free_me);
+
+char    *zbx_macro_value_transform(char *in, char **out);
 
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_value_validator_func_t validator_func);
+		zbx_macro_value_validate_and_transform_func_t validate_and_transform_func);
 
 void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids);

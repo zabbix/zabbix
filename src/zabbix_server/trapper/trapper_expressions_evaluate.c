@@ -61,7 +61,6 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 
 	for (ptr = NULL; NULL != (ptr = zbx_json_next_value(&jp_expressions, ptr, buffer, sizeof(buffer), NULL));)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSIONS_PARSE NEXT 444: ->%s<-",buffer);
 		zbx_vector_ptr_append(expressions, zbx_strdup(NULL, buffer));
 	}
 
@@ -81,8 +80,6 @@ out:
 
 static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "EXPRESSIONS_EVALUATE RUN FUNC 222");
-
 	char			*evaluate_error = NULL;
 	int			ret = FAIL, i;
 	unsigned char		value_type;
@@ -100,7 +97,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 	for (int ii = 0; ii < expressions.values_num; ii++)
 	{
-		double expr_result;
+		double			expr_result;
 		zbx_vector_ptr_t	unknown_msgs;
 
 		result = (zbx_expressions_evaluate_result_t *)zbx_malloc(NULL,
@@ -109,12 +106,12 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 		result->expression = zbx_strdup(NULL, expressions.values[ii]);
 		(result->error)[0]='\0';
+		expressions.values[ii] = get_expanded_expression(expressions.values[ii]);
+
 		if (SUCCEED != evaluate(&expr_result, expressions.values[ii], result->error, sizeof(result->error),
 				&unknown_msgs))
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "BADGER");
 			continue;
-		}
+
 		result->value = expr_result;
 	}
 
@@ -147,7 +144,6 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 	ret = SUCCEED;
 out:
-
 	zbx_free(evaluate_error);
 
 	zbx_vector_ptr_clear_ext(&expressions, (zbx_clean_func_t)zbx_ptr_free);

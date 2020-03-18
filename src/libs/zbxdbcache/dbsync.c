@@ -1733,8 +1733,6 @@ static char	**dbsync_item_preproc_row(char **row)
 
 	/* expand user macros */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER PREPROC ROW, EXPAND!!");
-
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_DELAY))
 		row[14] = zbx_dc_expand_user_macros(row[14], &hostid, 1, NULL);
 
@@ -2096,11 +2094,13 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
-		row[2] = zbx_dc_expand_user_macros(row[2], hostids.values, hostids.values_num, NULL);
+		row[2] = zbx_dc_expand_user_macros(row[2], hostids.values, hostids.values_num,
+				zbx_macro_value_transform);
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))
 	{
-		row[11] = zbx_dc_expand_user_macros(row[11], hostids.values, hostids.values_num, NULL);
+		row[11] = zbx_dc_expand_user_macros(row[11], hostids.values, hostids.values_num,
+				zbx_macro_value_transform);
 	}
 
 	zbx_vector_uint64_destroy(&functionids);

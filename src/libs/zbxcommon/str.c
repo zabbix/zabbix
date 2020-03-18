@@ -1070,7 +1070,7 @@ char	*zbx_dyn_escape_string(const char *src, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dyn_escape_string                                            *
+ * Function: zbx_escape_string                                                *
  *                                                                            *
  * Purpose: escape characters in the source string to fixed output buffer     *
  *                                                                            *

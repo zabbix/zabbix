@@ -1085,7 +1085,7 @@ out:
  *                                                                            *
  * Purpose: evaluate functions 'last' and 'prev' for the item                 *
  *                                                                            *
- * Parameters: value - dynamic buffer, currently of size MAX_BUFFER_LEN       *
+ * Parameters: value - dynamic buffer                                         *
  *             item - item (performance metric)                               *
  *             parameters - Nth last value and time shift (optional)          *
  *                                                                            *
@@ -2150,7 +2150,7 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'strlen' for the item                           *
  *                                                                            *
- * Parameters: value - dynamic buffer, currently of size MAX_BUFFER_LEN       *
+ * Parameters: value - dynamic buffer                                         *
  *             item - item (performance metric)                               *
  *             parameters - Nth last value and time shift (optional)          *
  *                                                                            *
@@ -2322,7 +2322,7 @@ out:
  *                                                                            *
  * Purpose: evaluate logical bitwise function 'and' for the item              *
  *                                                                            *
- * Parameters: value - dynamic buffer, currently of size MAX_BUFFER_LEN       *
+ * Parameters: value - dynamic buffer                                         *
  *             item - item (performance metric)                               *
  *             parameters - up to 3 comma-separated fields:                   *
  *                            (1) same as the 1st parameter for function      *

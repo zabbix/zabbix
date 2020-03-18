@@ -9548,28 +9548,37 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_expression_user_macro_validator                               *
+ * Function: zbx_macro_value_transform                                        *
  *                                                                            *
- * Purpose: validate user macro values in trigger expressions                 *
+ * Purpose: escape user macro values in trigger expressions                   *
  *                                                                            *
  * Parameters: value   - [IN] the macro value                                 *
+ *                     - [PLEASE_FREE_ME] optimisation buffer that must be    *
+ *                                        cleared by the calling function     *
  *                                                                            *
- * Return value: SUCCEED - the macro value can be used in expression          *
- *               FAIL    - otherwise                                          *
+ * Return value: NOT NULL text value - transformed and validated value        *
+ *               NULL - otherwise                                             *
  *                                                                            *
- ******************************************************************************/
-static int	dc_expression_user_macro_validator(const char *value)
+ *******************************************************************************/
+char*	zbx_macro_value_transform(char *in, char **please_free_me)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER VALIDATOR ->%s<-",value);
-	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER VALIDATOR RETURN SUCCEED");
+	size_t	len;
+	char	*tmp;
 
-		return SUCCEED;
+	len = zbx_get_escape_string_len(in, "\"\\");
+
+	if (len == strlen(in))
+	{
+		please_free_me = &in;
+		return in;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER VALIDATOR RETURN FAIL");
-	return FAIL;
+	tmp = zbx_malloc(NULL, len + 1);
+	zbx_escape_string(tmp, len + 1, in, "\"\\");
+	tmp[len] = '\0';
+	please_free_me = &in;
+
+	return tmp;
 }
 
 /******************************************************************************
@@ -9581,7 +9590,7 @@ static int	dc_expression_user_macro_validator(const char *value)
  * Parameters: text           - [IN] the text value to expand                 *
  *             hostids        - [IN] an array of related hostids              *
  *             hostids_num    - [IN] the number of hostids                    *
- *             validator_func - [IN] an optional validator function           *
+ *    validate_transform_func - [IN] an optional validate/transform function  *
  *                                                                            *
  * Return value: The text value with expanded user macros. Unknown or invalid *
  *               macros will be left unresolved.                              *
@@ -9591,22 +9600,19 @@ static int	dc_expression_user_macro_validator(const char *value)
  *                                                                            *
  ******************************************************************************/
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_value_validator_func_t validator_func)
+		zbx_macro_value_validate_and_transform_func_t validate_transform_func)
 {
 	zbx_token_t	token;
 	int		pos = 0, len, last_pos = 0, escape_quote_escaped_value_len;
 	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL, *escape_escaped_value = NULL,
-			*escape_quote_escaped_value = NULL;
+			*escape_quote_escaped_value = NULL,  *please_free_me = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
 
 	if ('\0' == *text)
 		return zbx_strdup(NULL, text);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "TEXT: ->%s<-",text);
-
 	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
-
 		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
 
@@ -9616,21 +9622,11 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 		dc_get_user_macro(hostids, hostids_num, name, context, &value);
 
-		if (NULL != value && NULL != validator_func && FAIL == validator_func(value))
-			zbx_free(value);
+		if (NULL != value && NULL != validate_transform_func)
+			value = validate_transform_func(value, &please_free_me);
 
 		if (NULL != value)
 		{
-			escape_escaped_value = zbx_dyn_escape_string(value, "\\");
-			zbx_free(value);
-			escape_quote_escaped_value = zbx_dyn_escape_string(escape_escaped_value, "\"");
-			zbx_free(escape_escaped_value);
-			escape_quote_escaped_value_len = strlen(escape_quote_escaped_value);
-
-			value = zbx_malloc(NULL, escape_quote_escaped_value_len + 1);
-			zbx_strlcpy(value, escape_quote_escaped_value, escape_quote_escaped_value_len + 1);
-			zbx_free(escape_quote_escaped_value);
-
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
 			zbx_free(value);
 		}
@@ -9648,6 +9644,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 	}
 
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
+	zbx_free(please_free_me);
 
 	return str;
 }
@@ -9669,7 +9666,6 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
  ******************************************************************************/
 static char	*dc_expression_expand_user_macros(const char *expression)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "DC_EXPRESSION_EXPAND_USER_MACROS START");
 	zbx_vector_uint64_t	functionids, hostids;
 	char			*out;
 
@@ -9680,7 +9676,7 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
 	out = zbx_dc_expand_user_macros(expression, hostids.values, hostids.values_num,
-					dc_expression_user_macro_validator);
+					zbx_macro_value_transform);
 
 	if (NULL != strstr(out, "{$"))
 	{
@@ -9691,7 +9687,6 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_uint64_destroy(&functionids);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "DC_EXPRESSION_EXPAND_USER_MACROS END\n\n\n");
 	return out;
 }
 
