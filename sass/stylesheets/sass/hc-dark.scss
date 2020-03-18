@@ -335,15 +335,6 @@ $multiselect-selected-bg-color: #222222;
 	}
 }
 
-.logo {
-	&:focus {
-		div,
-		img {
-			box-shadow: 0 0 0 2px $blue;
-		}
-	}
-}
-
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.

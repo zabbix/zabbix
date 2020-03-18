@@ -5493,10 +5493,6 @@ table.preprocessing-test-results .rel-container {
   .menu-user a:hover, .menu-user a:focus {
     border-color: #000000; }
 
-.logo:focus div,
-.logo:focus img {
-  box-shadow: 0 0 0 2px #ffffff; }
-
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
