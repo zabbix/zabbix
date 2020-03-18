@@ -483,6 +483,7 @@ footer {
     background-color: transparent !important;
     background: url(../img/icon-sprite.svg) no-repeat -540px -616px;
     image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
     border: 0;
     opacity: 0.75;
     transform: scale(0.8);

@@ -69,6 +69,7 @@ $form-search-focused-icon-hover-opacity: $form-search-icon-focused-opacity !defa
 
 		background: url(../img/icon-sprite.svg) no-repeat $form-search-icon-bg-position;
 		image-rendering: pixelated;
+		image-rendering: -moz-crisp-edges;
 		border: 0;
 		opacity: $form-search-icon-opacity;
 		transform: scale(.8);
