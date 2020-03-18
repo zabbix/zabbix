@@ -3462,7 +3462,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event);
+					get_event_value(m, event, &replace_to, userid, event);
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
 				{
@@ -3601,7 +3601,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event);
+					get_event_value(m, event, &replace_to, userid, event);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_METADATA))
 				{
@@ -4099,7 +4099,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event);
+					get_event_value(m, event, &replace_to, userid, NULL);
 				}
 			}
 		}
