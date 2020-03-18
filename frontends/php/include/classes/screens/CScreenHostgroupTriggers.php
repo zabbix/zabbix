@@ -137,11 +137,7 @@ class CScreenHostgroupTriggers extends CScreenHostTriggers {
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 		}
 
-		list($table, $info) = $this->getProblemsListTable($params,
-			(new CUrl($this->pageFile))
-				->setArgument('screenid', $this->screenid)
-				->getUrl()
-		);
+		[$table, $info] = $this->getProblemsListTable($params);
 
 		$footer = (new CList())
 			->addItem($info)

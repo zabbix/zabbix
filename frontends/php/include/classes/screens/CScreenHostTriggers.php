@@ -137,11 +137,7 @@ class CScreenHostTriggers extends CScreenBase {
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 		}
 
-		list($table, $info) = $this->getProblemsListTable($params,
-			(new CUrl($this->pageFile))
-				->setArgument('screenid', $this->screenid)
-				->getUrl()
-		);
+		[$table, $info] = $this->getProblemsListTable($params);
 
 		$footer = (new CList())
 			->addItem($info)
@@ -154,15 +150,14 @@ class CScreenHostTriggers extends CScreenBase {
 	/**
 	 * Render table with host or host group problems.
 	 *
-	 * @param array   $filter                  Array of filter options.
-	 * @param int     $filter['limit']         Table rows count.
-	 * @param array   $filter['groupids']      Host group ids.
-	 * @param array   $filter['hostids']       Host ids.
-	 * @param string  $filter['sortfield']     Sort field name.
-	 * @param string  $filter['sortorder']     Sort order.
-	 * @param string  $back_url                URL used by acknowledgment page.
+	 * @param array   $filter               Array of filter options.
+	 * @param int     $filter['limit']      Table rows count.
+	 * @param array   $filter['groupids']   Host group ids.
+	 * @param array   $filter['hostids']    Host ids.
+	 * @param string  $filter['sortfield']  Sort field name.
+	 * @param string  $filter['sortorder']  Sort order.
 	 */
-	protected function getProblemsListTable($filter, $back_url) {
+	protected function getProblemsListTable(array $filter) {
 		$config = select_config();
 
 		// If no hostids and groupids defined show recent problems.
@@ -259,26 +254,29 @@ class CScreenHostTriggers extends CScreenBase {
 					->setArgument('filter_set', '1')
 			);
 
+			// Create acknowledge link.
+			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
+			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
+				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->onClick('return PopUp("popup.acknowledge.edit",'.
+					json_encode([
+						'eventids' => [$problem['eventid']]
+					]).', null, this);'
+				);
+
 			$table->addRow([
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
 						->setHint(make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-							'triggerid' => $trigger['triggerid']], $problem['eventid'], $back_url
+							'triggerid' => $trigger['triggerid']], $problem['eventid']
 						))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,
 				zbx_date2age($problem['clock']),
 				makeInformationList($info_icons),
-				(new CLink($problem['acknowledged'] ? _('Yes') : _('No'),
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'acknowledge.edit')
-						->setArgument('eventids', [$problem['eventid']])
-						->setArgument('backurl', $back_url)
-						->getUrl())
-					)
-					->addClass($problem['acknowledged'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-					->addClass(ZBX_STYLE_LINK_ALT),
+				$problem_update_link,
 				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'],
 					$config
 				)
