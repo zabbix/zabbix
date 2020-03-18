@@ -1005,10 +1005,7 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
 	$visible_items = [];
 	foreach ($items_by_name as $hostid_to_itemids) {
 		foreach ($hostid_to_itemids as $itemid) {
-			$visible_items[$itemid] = [
-				'value_type' => $db_items[$itemid]['value_type'],
-				'itemid' => $db_items[$itemid]['itemid']
-			];
+			$visible_items[$itemid] = $db_items[$itemid];
 		}
 	}
 
