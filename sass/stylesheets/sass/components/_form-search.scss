@@ -94,7 +94,6 @@ $form-search-focused-icon-hover-opacity: $form-search-icon-focused-opacity !defa
 	right: 0;
 	z-index: 1000;
 	min-width: 16px;
-	padding: 0 10px;
 	color: $font-alt-color;
 	background-color: $form-bg-color;
 	border: 1px solid $action-border-color;
@@ -104,8 +103,8 @@ $form-search-focused-icon-hover-opacity: $form-search-icon-focused-opacity !defa
 	li {
 		display: block;
 		height: inherit;
-		padding: .4em 0;
-		margin: 0 -5px;
+		padding: .4em 5px;
+		margin: 0;
 		overflow: hidden;
 		color: $font-color;
 		line-height: normal;

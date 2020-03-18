@@ -498,7 +498,6 @@ footer {
   right: 0;
   z-index: 1000;
   min-width: 16px;
-  padding: 0 10px;
   color: #333333;
   background-color: #ffffff;
   border: 1px solid #383838;
@@ -507,8 +506,8 @@ footer {
   .search-suggest li {
     display: block;
     height: inherit;
-    padding: .4em 0;
-    margin: 0 -5px;
+    padding: .4em 5px;
+    margin: 0;
     overflow: hidden;
     color: #000000;
     line-height: normal;
