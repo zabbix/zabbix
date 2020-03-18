@@ -79,7 +79,7 @@ class CMacrosResolverGeneral {
 			$i = (int) $reference[1] - 1;
 			$macro_values[$reference] = array_key_exists($i, $values[0]) ? $values[0][$i] : '';
 
-			if ($macro_values[$reference][0] === '"') {
+			if ($macro_values[$reference] !== '' && $macro_values[$reference][0] === '"') {
 				$macro_values[$reference] = CTriggerExpression::unquoteString($macro_values[$reference]);
 			}
 		}
