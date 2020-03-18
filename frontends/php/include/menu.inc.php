@@ -30,25 +30,25 @@ function getMainMenu(): CMenu {
 			->setSubMenu(new Cmenu([
 				(new CMenuItem(_('Dashboard')))
 					->setAction('dashboard.view')
-					->setAliases(['dashboard.list', 'dashboard.view']),
+					->setAliases(['dashboard.list']),
 				(new CMenuItem(_('Problems')))
 					->setAction('problem.view')
-					->setAliases(['problem.view', 'acknowledge.edit', 'tr_events.php']),
+					->setAliases(['acknowledge.edit', 'tr_events.php']),
+				(new CMenuItem(_('Hosts')))
+					->setAction('host.view')
+					->setAliases(['web.view', 'charts.php', 'chart2.php', 'chart3.php', 'chart6.php', 'chart7.php',
+						'httpdetails.php'
+					]),
 				(new CMenuItem(_('Overview')))
 					->setUrl(new CUrl('overview.php'), 'overview.php'),
-				(new CMenuItem(_('Web')))
-					->setAction('web.view')
-					->setAliases(['httpdetails.php']),
 				(new CMenuItem(_('Latest data')))
 					->setAction('latest.view')
 					->setAliases(['history.php', 'chart.php']),
-				(new CMenuItem(_('Graphs')))
-					->setUrl(new CUrl('charts.php'), 'charts.php')
-					->setAliases(['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php']),
 				(new CMenuItem(_('Screens')))
 					->setUrl(new CUrl('screens.php'), 'screens.php')
-					->setAliases(['host_screen.php', 'screenconf.php', 'screenedit.php', 'screen.import.php',
-						'slides.php', 'slideconf.php']),
+					->setAliases(['screenconf.php', 'screenedit.php', 'screen.import.php', 'slides.php',
+						'slideconf.php'
+					]),
 				(new CMenuItem(_('Maps')))
 					->setAction('map.view')
 					->setAliases(['image.php', 'sysmaps.php', 'sysmap.php', 'map.php', 'map.import.php']),
@@ -89,9 +89,8 @@ function getMainMenu(): CMenu {
 		$menu
 			->find(_('Reports'))
 			->getSubMenu()
-				->insertAfter(_('Maps'),
-					(new CMenuItem(_('Notifications')))
-						->setUrl(new CUrl('report4.php'), 'report4.php')
+				->add((new CMenuItem(_('Notifications')))
+					->setUrl(new CUrl('report4.php'), 'report4.php')
 				);
 
 		$menu->add(
@@ -153,17 +152,17 @@ function getMainMenu(): CMenu {
 				->setSubMenu(new CMenu([
 					(new CMenuItem(_('General')))
 						->setAction('gui.edit')
-						->setAliases(['gui.edit', 'autoreg.edit', 'housekeeping.edit', 'image.list', 'image.edit',
+						->setAliases(['autoreg.edit', 'housekeeping.edit', 'image.list', 'image.edit',
 							'iconmap.list', 'iconmap.edit', 'regex.list', 'regex.edit', 'macros.edit', 'valuemap.list',
 							'valuemap.edit', 'workingtime.edit', 'trigseverity.edit', 'trigdisplay.edit',
 							'miscconfig.edit', 'module.list', 'module.edit', 'module.scan'
 						]),
 					(new CMenuItem(_('Proxies')))
 						->setAction('proxy.list')
-						->setAliases(['proxy.edit', 'proxy.list']),
+						->setAliases(['proxy.edit']),
 					(new CMenuItem(_('Authentication')))
 						->setAction('authentication.edit')
-						->setAliases(['authentication.edit', 'authentication.update']),
+						->setAliases(['authentication.update']),
 					(new CMenuItem(_('User groups')))
 						->setAction('usergroup.list')
 						->setAliases(['usergroup.edit']),

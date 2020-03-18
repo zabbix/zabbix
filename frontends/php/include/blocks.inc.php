@@ -671,7 +671,11 @@ function make_status_of_zbx() {
 
 	// check requirements
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		foreach ((new CFrontendSetup())->checkRequirements() as $req) {
+		$setup = new CFrontendSetup();
+		$reqs = $setup->checkRequirements();
+		$reqs[] = $setup->checkSslFiles();
+
+		foreach ($reqs as $req) {
 			if ($req['result'] == CFrontendSetup::CHECK_FATAL) {
 				$table->addRow(
 					(new CRow([$req['name'], $req['current'], $req['error']]))->addClass(ZBX_STYLE_RED)

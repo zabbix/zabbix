@@ -66,12 +66,11 @@ $fields = [
 									],
 	'status' =>						[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
 	'type' =>						[T_ZBX_INT, O_OPT, null,
-										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-											ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3,
-											ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
-											ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-											ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
-											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT
+										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+											ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
+											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
 										]),
 										'isset({add}) || isset({update})'
 									],
@@ -117,60 +116,10 @@ $fields = [
 	'inventory_link' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
 										'(isset({add}) || isset({update})) && {value_type} != '.ITEM_VALUE_TYPE_LOG
 									],
-	'snmp_community' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-										'(isset({add}) || isset({update})) && isset({type})'.
-											' && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C, 'type'),
-										_('SNMP community')
-									],
 	'snmp_oid' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
-											' && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,
-												'type'
-											),
+											' && {type} == '.ITEM_TYPE_SNMP,
 										_('SNMP OID')
-									],
-	'port' =>						[T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535),
-										'(isset({add}) || isset({update})) && isset({type})'.
-											' && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,
-												'type'
-											),
-										_('Port')
-									],
-	'snmpv3_securitylevel' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
-										'(isset({add}) || isset({update})) && isset({type})'.
-											' && {type} == '.ITEM_TYPE_SNMPV3
-									],
-	'snmpv3_contextname' =>			[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && isset({type})'.
-											' && {type} == '.ITEM_TYPE_SNMPV3
-									],
-	'snmpv3_securityname' =>		[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && isset({type})'.
-											' && {type} == '.ITEM_TYPE_SNMPV3
-									],
-	'snmpv3_authprotocol' =>		[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA),
-										'(isset({add}) || isset({update})) && isset({type})'.
-											' && {type} == '.ITEM_TYPE_SNMPV3.
-											' && ({snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
-												' || {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.
-											')'
-									],
-	'snmpv3_authpassphrase' =>		[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && isset({type})'.
-											' && {type} == '.ITEM_TYPE_SNMPV3.
-											' && ({snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
-												' || {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.
-											')'
-									],
-	'snmpv3_privprotocol' =>		[T_ZBX_INT, O_OPT, null,	IN(ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES),
-										'(isset({add}) || isset({update})) && isset({type})'.
-											' && {type} == '.ITEM_TYPE_SNMPV3.
-											' &&  {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
-									],
-	'snmpv3_privpassphrase' =>		[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && isset({type})'.
-											' && {type} == '.ITEM_TYPE_SNMPV3.
-											' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
 									],
 	'ipmi_sensor' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM, null,
 										'(isset({add}) || isset({update})) && isset({type})'.
@@ -293,20 +242,16 @@ $fields = [
 	'filter_application' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
-										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-											ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3,
-											ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
-											ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-											ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
-											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT
+										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+											ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
+											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
 										]),
 										null
 									],
 	'filter_key' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_snmp_community' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_snmpv3_securityname' => [T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_snmp_oid' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_port' =>				[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Port')],
 	'filter_value_type' =>			[T_ZBX_INT, O_OPT, null,	IN('-1,0,1,2,3,4'), null],
 	'filter_delay' =>				[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
 	'filter_history' =>				[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('History')],
@@ -404,12 +349,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.items.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_snmp_community', getRequest('filter_snmp_community', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_snmpv3_securityname', getRequest('filter_snmpv3_securityname', ''),
-		PROFILE_TYPE_STR
-	);
 	CProfile::update('web.items.filter_snmp_oid', getRequest('filter_snmp_oid', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_port', getRequest('filter_port', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_value_type', getRequest('filter_value_type', -1), PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_history', getRequest('filter_history', ''), PROFILE_TYPE_STR);
@@ -437,10 +377,7 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::deleteIdx('web.items.filter_name');
 	CProfile::deleteIdx('web.items.filter_type');
 	CProfile::deleteIdx('web.items.filter_key');
-	CProfile::deleteIdx('web.items.filter_snmp_community');
-	CProfile::deleteIdx('web.items.filter_snmpv3_securityname');
 	CProfile::deleteIdx('web.items.filter_snmp_oid');
-	CProfile::deleteIdx('web.items.filter_port');
 	CProfile::deleteIdx('web.items.filter_value_type');
 	CProfile::deleteIdx('web.items.filter_delay');
 	CProfile::deleteIdx('web.items.filter_history');
@@ -460,10 +397,7 @@ $_REQUEST['filter_application'] = CProfile::get('web.items.filter_application', 
 $_REQUEST['filter_name'] = CProfile::get('web.items.filter_name', '');
 $_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
 $_REQUEST['filter_key'] = CProfile::get('web.items.filter_key', '');
-$_REQUEST['filter_snmp_community'] = CProfile::get('web.items.filter_snmp_community', '');
-$_REQUEST['filter_snmpv3_securityname'] = CProfile::get('web.items.filter_snmpv3_securityname', '');
 $_REQUEST['filter_snmp_oid'] = CProfile::get('web.items.filter_snmp_oid', '');
-$_REQUEST['filter_port'] = CProfile::get('web.items.filter_port', '');
 $_REQUEST['filter_value_type'] = CProfile::get('web.items.filter_value_type', -1);
 $_REQUEST['filter_delay'] = CProfile::get('web.items.filter_delay', '');
 $_REQUEST['filter_history'] = CProfile::get('web.items.filter_history', '');
@@ -654,6 +588,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				case ZBX_PREPROC_REGSUB:
 				case ZBX_PREPROC_ERROR_FIELD_REGEX:
+				case ZBX_PREPROC_STR_REPLACE:
 					$step['params'] = implode("\n", $step['params']);
 					break;
 
@@ -684,15 +619,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'key_' => getRequest('key', ''),
 				'interfaceid' => getRequest('interfaceid', 0),
 				'snmp_oid' => getRequest('snmp_oid', ''),
-				'snmp_community' => getRequest('snmp_community', ''),
-				'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
-				'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
-				'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV),
-				'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
-				'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase', ''),
-				'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
-				'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase', ''),
-				'port' => getRequest('port', ''),
 				'authtype' => getRequest('authtype', ITEM_AUTHTYPE_PASSWORD),
 				'username' => getRequest('username', ''),
 				'password' => getRequest('password', ''),
@@ -761,9 +687,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 		else {
 			$db_items = API::Item()->get([
-				'output' => ['name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'snmp_community', 'snmpv3_contextname',
-					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase',
-					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
+				'output' => ['name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'authtype', 'username', 'password',
 					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'history',
 					'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description', 'status',
 					'templateid', 'flags', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
@@ -812,40 +736,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
 					$item['interfaceid'] = getRequest('interfaceid', 0);
-				}
-				if ($db_item['snmp_community'] !== getRequest('snmp_community', '')) {
-					$item['snmp_community'] = getRequest('snmp_community', '');
-				}
-				if ($db_item['snmpv3_contextname'] !== getRequest('snmpv3_contextname', '')) {
-					$item['snmpv3_contextname'] = getRequest('snmpv3_contextname', '');
-				}
-				if ($db_item['snmpv3_securityname'] !== getRequest('snmpv3_securityname', '')) {
-					$item['snmpv3_securityname'] = getRequest('snmpv3_securityname', '');
-				}
-				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
-				if ($db_item['snmpv3_securitylevel'] != $snmpv3_securitylevel) {
-					$item['snmpv3_securitylevel'] = $snmpv3_securitylevel;
-				}
-				$snmpv3_authprotocol = ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
-					? ITEM_AUTHPROTOCOL_MD5
-					: getRequest('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5);
-				if ($db_item['snmpv3_authprotocol'] != $snmpv3_authprotocol) {
-					$item['snmpv3_authprotocol'] = $snmpv3_authprotocol;
-				}
-				if ($db_item['snmpv3_authpassphrase'] !== getRequest('snmpv3_authpassphrase', '')) {
-					$item['snmpv3_authpassphrase'] = getRequest('snmpv3_authpassphrase', '');
-				}
-				$snmpv3_privprotocol = ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV)
-					? getRequest('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES)
-					: ITEM_AUTHPROTOCOL_MD5;
-				if ($db_item['snmpv3_privprotocol'] != $snmpv3_privprotocol) {
-					$item['snmpv3_privprotocol'] = $snmpv3_privprotocol;
-				}
-				if ($db_item['snmpv3_privpassphrase'] !== getRequest('snmpv3_privpassphrase', '')) {
-					$item['snmpv3_privpassphrase'] = getRequest('snmpv3_privpassphrase', '');
-				}
-				if ($db_item['port'] !== getRequest('port', '')) {
-					$item['port'] = getRequest('port', '');
 				}
 				if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
 					$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
@@ -1121,19 +1011,10 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 						? ITEM_NO_STORAGE_VALUE
 						: getRequest('history'),
 					'type' => getRequest('type'),
-					'snmp_community' => getRequest('snmp_community'),
 					'snmp_oid' => getRequest('snmp_oid'),
 					'value_type' => getRequest('value_type'),
 					'trapper_hosts' => getRequest('trapper_hosts'),
-					'port' => getRequest('port'),
 					'units' => getRequest('units'),
-					'snmpv3_contextname' => getRequest('snmpv3_contextname'),
-					'snmpv3_securityname' => getRequest('snmpv3_securityname'),
-					'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
-					'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
-					'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
-					'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
-					'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
 					'trends' => (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
 						? ITEM_NO_STORAGE_VALUE
 						: getRequest('trends'),
@@ -1210,6 +1091,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 							case ZBX_PREPROC_REGSUB:
 							case ZBX_PREPROC_ERROR_FIELD_REGEX:
+							case ZBX_PREPROC_STR_REPLACE:
 								$step['params'] = implode("\n", $step['params']);
 								break;
 
@@ -1465,15 +1347,13 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 
 	if (hasRequest('itemid')) {
 		$items = API::Item()->get([
-			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
-				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
+			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
-				'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
-				'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
-				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'verify_peer', 'verify_host', 'allow_traps'
+				'flags', 'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint',
+				'master_itemid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects',
+				'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectHosts' => ['status', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
@@ -1597,8 +1477,6 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'status' => getRequest('status', 0),
 		'type' => getRequest('type', 0),
 		'interfaceid' => getRequest('interfaceid', 0),
-		'snmp_community' => getRequest('snmp_community', 'public'),
-		'port' => getRequest('port', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
 		'units' => getRequest('units', ''),
@@ -1611,13 +1489,6 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'valuemapid' => getRequest('valuemapid', 0),
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'applications' => getRequest('applications', []),
-		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
-		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
-		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', 0),
-		'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
-		'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase', ''),
-		'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
-		'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase', ''),
 		'logtimefmt' => getRequest('logtimefmt', ''),
 		'preprocessing' => getRequest('preprocessing', []),
 		'initial_item_type' => null,
@@ -1866,17 +1737,8 @@ else {
 	if (isset($_REQUEST['filter_key']) && !zbx_empty($_REQUEST['filter_key'])) {
 		$options['search']['key_'] = $_REQUEST['filter_key'];
 	}
-	if (isset($_REQUEST['filter_snmp_community']) && !zbx_empty($_REQUEST['filter_snmp_community'])) {
-		$options['filter']['snmp_community'] = $_REQUEST['filter_snmp_community'];
-	}
-	if (isset($_REQUEST['filter_snmpv3_securityname']) && !zbx_empty($_REQUEST['filter_snmpv3_securityname'])) {
-		$options['filter']['snmpv3_securityname'] = $_REQUEST['filter_snmpv3_securityname'];
-	}
 	if (isset($_REQUEST['filter_snmp_oid']) && !zbx_empty($_REQUEST['filter_snmp_oid'])) {
 		$options['filter']['snmp_oid'] = $_REQUEST['filter_snmp_oid'];
-	}
-	if (isset($_REQUEST['filter_port']) && !zbx_empty($_REQUEST['filter_port'])) {
-		$options['filter']['port'] = $_REQUEST['filter_port'];
 	}
 	if (isset($_REQUEST['filter_value_type']) && !zbx_empty($_REQUEST['filter_value_type'])
 			&& $_REQUEST['filter_value_type'] != -1) {
@@ -1895,10 +1757,9 @@ else {
 
 		if ($filter_delay !== '') {
 			if ($filter_type == -1 && $filter_delay == 0) {
-				$options['filter']['type'] = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_SIMPLE,
-					ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
-					ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX
+				$options['filter']['type'] = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,  ITEM_TYPE_INTERNAL,
+					ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+					ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX
 				];
 
 				$options['filter']['delay'] = $filter_delay;

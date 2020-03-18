@@ -69,6 +69,14 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
 	case "system.localtime":
 		cfunc = unsafe.Pointer(C.SYSTEM_LOCALTIME)
+	case "net.dns":
+		cfunc = unsafe.Pointer(C.NET_DNS)
+	case "net.dns.record":
+		cfunc = unsafe.Pointer(C.NET_DNS_RECORD)
+	case "vfs.dir.count":
+		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
+	case "vfs.dir.size":
+		cfunc = unsafe.Pointer(C.VFS_DIR_SIZE)
 	}
 	return
 }

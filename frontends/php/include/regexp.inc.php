@@ -55,7 +55,7 @@ function addRegexp(array $regexp, array $expressions) {
 				' WHERE re.name='.zbx_dbstr($regexp['name']);
 
 		if (DBfetch(DBselect($sql))) {
-			throw new Exception(_s('Regular expression "%s" already exists.', $regexp['name']));
+			throw new Exception(_s('Regular expression "%1$s" already exists.', $regexp['name']));
 		}
 
 		$regexpIds = DB::insert('regexps', [$regexp]);
@@ -96,7 +96,7 @@ function updateRegexp(array $regexp, array $expressions) {
 			' WHERE re.name='.zbx_dbstr($regexp['name'])
 		));
 		if ($dbRegexp && bccomp($regexpId, $dbRegexp['regexpid']) != 0) {
-			throw new Exception(_s('Regular expression "%s" already exists.', $regexp['name']));
+			throw new Exception(_s('Regular expression "%1$s" already exists.', $regexp['name']));
 		}
 
 		rewriteRegexpExpressions($regexpId, $expressions);

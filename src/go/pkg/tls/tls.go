@@ -55,7 +55,7 @@ typedef struct {
 	int ready;
 	char *psk_identity;
 	char *psk_key;
-} tls_t, *tls_lp_t;
+} tls_t;
 
 static int tls_init(void)
 {
@@ -864,7 +864,7 @@ type tlsConn struct {
 func (c *tlsConn) Error() (err error) {
 	var cBuf *C.char
 	var errmsg string
-	if c.tls != nil && 0 != C.tls_error(C.tls_lp_t(c.tls), &cBuf) {
+	if c.tls != nil && 0 != C.tls_error((*C.tls_t)(c.tls), &cBuf) {
 		errmsg = C.GoString(cBuf)
 		C.free(unsafe.Pointer(cBuf))
 	} else {
@@ -874,15 +874,13 @@ func (c *tlsConn) Error() (err error) {
 }
 
 func (c *tlsConn) ready() bool {
-	return C.tls_ready(C.tls_lp_t(c.tls)) == 1
+	return C.tls_ready((*C.tls_t)(c.tls)) == 1
 }
 
 // Note, don't use flushTLS() and recvTLS() concurrently
 func (c *tlsConn) flushTLS() (err error) {
 	for {
-		if cn := C.tls_recv(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(len(c.buf))); cn > 0 {
-			// TODO: remove
-			//fmt.Println("->server", cn, c.buf[:5])
+		if cn := C.tls_recv((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(len(c.buf))); cn > 0 {
 			if _, err = c.conn.Write(c.buf[:cn]); err != nil {
 				return
 			}
@@ -902,9 +900,7 @@ func (c *tlsConn) recvTLS() (err error) {
 	if n, err = c.conn.Read(c.buf); err != nil {
 		return
 	}
-	// TODO: remove
-	//fmt.Println("->openssl", n, c.buf[:5])
-	C.tls_send(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(n))
+	C.tls_send((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(n))
 	return
 }
 
@@ -929,7 +925,7 @@ func (c *tlsConn) SetWriteDeadline(t time.Time) error {
 }
 
 func (c *tlsConn) Close() (err error) {
-	cr := C.tls_close(C.tls_lp_t(c.tls))
+	cr := C.tls_close((*C.tls_t)(c.tls))
 	c.conn.Close()
 	if cr < 0 {
 		return c.Error()
@@ -948,7 +944,7 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 			cSubject = C.CString(cfg.ServerCertSubject)
 			defer C.free(unsafe.Pointer(cSubject))
 		}
-		if 0 != C.tls_validate_issuer_and_subject(C.tls_lp_t(c.tls), cIssuer, cSubject) {
+		if 0 != C.tls_validate_issuer_and_subject((*C.tls_t)(c.tls), cIssuer, cSubject) {
 			return c.Error()
 		}
 	}
@@ -957,7 +953,7 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 
 func (c *tlsConn) String() (desc string) {
 	var cDesc *C.char
-	C.tls_description(C.tls_lp_t(c.tls), &cDesc)
+	C.tls_description((*C.tls_t)(c.tls), &cDesc)
 	desc = C.GoString(cDesc)
 	C.free(unsafe.Pointer(cDesc))
 	return
@@ -969,11 +965,11 @@ type Client struct {
 }
 
 func (c *Client) checkConnection() (err error) {
-	if C.tls_connected(C.tls_lp_t(c.tls)) == C.int(1) {
+	if C.tls_connected((*C.tls_t)(c.tls)) == C.int(1) {
 		return
 	}
-	for C.tls_connected(C.tls_lp_t(c.tls)) != C.int(1) {
-		cRet := C.tls_handshake(C.tls_lp_t(c.tls))
+	for C.tls_connected((*C.tls_t)(c.tls)) != C.int(1) {
+		cRet := C.tls_handshake((*C.tls_t)(c.tls))
 		if cRet == 0 {
 			break
 		}
@@ -995,7 +991,7 @@ func (c *Client) Write(b []byte) (n int, err error) {
 	if err = c.checkConnection(); err != nil {
 		return
 	}
-	cRet := C.tls_write(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
+	cRet := C.tls_write((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 	if cRet <= 0 {
 		return 0, c.Error()
 	}
@@ -1010,7 +1006,7 @@ func (c *Client) Read(b []byte) (n int, err error) {
 		if err = c.checkConnection(); err != nil {
 			return
 		}
-		cRet := C.tls_read(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
+		cRet := C.tls_read((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 		if cRet > 0 {
 			return int(cRet), nil
 		}
@@ -1070,7 +1066,7 @@ func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 			timeout: timeout,
 		},
 	}
-	runtime.SetFinalizer(c, func(c *Client) { C.tls_free(C.tls_lp_t(c.tls)) })
+	runtime.SetFinalizer(c, func(c *Client) { C.tls_free((*C.tls_t)(c.tls)) })
 
 	if !c.ready() {
 		return nil, c.Error()
@@ -1095,11 +1091,11 @@ type Server struct {
 }
 
 func (s *Server) checkConnection() (err error) {
-	if C.tls_connected(C.tls_lp_t(s.tls)) == C.int(1) {
+	if C.tls_connected((*C.tls_t)(s.tls)) == C.int(1) {
 		return
 	}
 	for {
-		cRet := C.tls_accept(C.tls_lp_t(s.tls))
+		cRet := C.tls_accept((*C.tls_t)(s.tls))
 		if cRet == 0 {
 			break
 		}
@@ -1121,7 +1117,7 @@ func (s *Server) Write(b []byte) (n int, err error) {
 	if err = s.checkConnection(); err != nil {
 		return
 	}
-	cRet := C.tls_write(C.tls_lp_t(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
+	cRet := C.tls_write((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 	if cRet <= 0 {
 		return 0, s.Error()
 	}
@@ -1133,7 +1129,7 @@ func (s *Server) Read(b []byte) (n int, err error) {
 		if err = s.checkConnection(); err != nil {
 			return
 		}
-		cRet := C.tls_read(C.tls_lp_t(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
+		cRet := C.tls_read((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 		if cRet > 0 {
 			return int(cRet), nil
 		}
@@ -1193,7 +1189,7 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 			timeout: timeout,
 		},
 	}
-	runtime.SetFinalizer(s, func(s *Server) { C.tls_free(C.tls_lp_t(s.tls)) })
+	runtime.SetFinalizer(s, func(s *Server) { C.tls_free((*C.tls_t)(s.tls)) })
 
 	if !s.ready() {
 		return nil, s.Error()
@@ -1203,7 +1199,7 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		if b, ok := args[1].([]byte); !ok {
 			return nil, fmt.Errorf("invalid pending buffer parameter of type %T", args)
 		} else {
-			C.tls_send(C.tls_lp_t(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
+			C.tls_send((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 		}
 	}
 

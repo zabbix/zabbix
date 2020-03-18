@@ -34,14 +34,19 @@ $header = [
 		->addVar('itemids', getRequest('itemids'))
 ];
 $header_row = [];
-$first_item = reset($data['items']);
-$host_name = $first_item['hosts'][0]['name'];
+
 $same_host = true;
 $items_numeric = true;
+$host_name = '';
 
-foreach ($data['items'] as $item) {
-	$same_host = ($same_host && $host_name === $item['hosts'][0]['name']);
-	$items_numeric = ($items_numeric && array_key_exists($item['value_type'], $data['iv_numeric']));
+if ($data['items']) {
+	$first_item = reset($data['items']);
+	$host_name = $first_item['hosts'][0]['name'];
+
+	foreach ($data['items'] as $item) {
+		$same_host = ($same_host && $host_name === $item['hosts'][0]['name']);
+		$items_numeric = ($items_numeric && array_key_exists($item['value_type'], $data['iv_numeric']));
+	}
 }
 
 if ((count($data['items']) == 1 || $same_host) && $data['itemids']) {

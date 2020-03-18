@@ -35,12 +35,6 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
 }
 
-if (CProfile::isModified()) {
-	DBstart();
-	$result = CProfile::flush();
-	DBend($result);
-}
-
 // end transactions if they have not been closed already
 if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
 	error(_('Transaction has not been closed. Aborting...'));

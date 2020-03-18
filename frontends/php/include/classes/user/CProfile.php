@@ -33,6 +33,13 @@ class CProfile {
 
 		$profilesTableSchema = DB::getSchema('profiles');
 		self::$stringProfileMaxLength = $profilesTableSchema['fields']['value_str']['length'];
+		DBselect('SELECT NULL FROM users u WHERE '.dbConditionId('u.userid', (array) self::$userDetails['userid']).
+			' FOR UPDATE;'
+		);
+
+		register_shutdown_function(function() {
+			self::flush();
+		});
 	}
 
 	/**
@@ -63,6 +70,8 @@ class CProfile {
 					$result &= self::updateDB($idx, $data['value'], $data['type'], $idx2);
 				}
 			}
+
+			self::clear();
 		}
 
 		return $result;
@@ -86,7 +95,7 @@ class CProfile {
 			return null;
 		}
 
-		if (is_null(self::$profiles)) {
+		if (self::$profiles === null) {
 			self::init();
 		}
 
@@ -196,7 +205,7 @@ class CProfile {
 	 * @param int|array  	$idx2	second identifier, which can be list of identifiers as well
 	 */
 	public static function delete($idx, $idx2 = 0) {
-		if (is_null(self::$profiles)) {
+		if (self::$profiles === null) {
 			self::init();
 		}
 
@@ -244,7 +253,7 @@ class CProfile {
 	 * @param int		$idx2
 	 */
 	public static function update($idx, $value, $type, $idx2 = 0) {
-		if (is_null(self::$profiles)) {
+		if (self::$profiles === null) {
 			self::init();
 		}
 

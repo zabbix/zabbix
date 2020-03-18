@@ -523,10 +523,9 @@ jQuery(function($) {
 					$('[data-problems' + sev + ']', $obj).each(function() {
 						var obj = $(this);
 
-						$('>.tree-row>.problems', this).append($('<span/>', {
-								'style': 'background: #' + conf['color'],
-								'class': 'problems-per-item',
-								'title': conf['name']
+						$('>.tree-row>.problem-icon-list', this).append($('<span/>', {
+								'class': 'problem-icon-list-item ' + conf.style_class,
+								'title': conf.name
 							})
 							.html(obj.attr('data-problems' + sev))
 						);
@@ -827,7 +826,7 @@ jQuery(function($) {
 				}
 				else {
 					var problems = document.createElement('DIV');
-					problems.setAttribute('class', 'problems');
+					problems.setAttribute('class', 'problem-icon-list');
 					tree_row.appendChild(problems);
 				}
 

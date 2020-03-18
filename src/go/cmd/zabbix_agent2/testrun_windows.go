@@ -19,7 +19,9 @@
 
 package main
 
-func checkMetrics() {
+import "zabbix.com/internal/agent/scheduler"
+
+func checkMetrics(s scheduler.Scheduler) {
 	metrics := []string{
 		`agent.hostname`,
 		`agent.ping`,
@@ -87,6 +89,6 @@ func checkMetrics() {
 	}
 
 	for _, metric := range metrics {
-		checkMetric(metric)
+		checkMetric(s, metric)
 	}
 }

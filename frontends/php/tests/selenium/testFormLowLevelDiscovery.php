@@ -70,34 +70,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				['type' => 'Simple check', 'host' => 'Simple form test host']
 			],
 			[
-				['type' => 'SNMPv1 agent', 'host' => 'Simple form test host']
-			],
-			[
-				['type' => 'SNMPv2 agent', 'host' => 'Simple form test host']
-			],
-			[
-				['type' => 'SNMPv3 agent', 'host' => 'Simple form test host']
-			],
-			[
-				[
-					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authNoPriv',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authPriv',
-					'host' => 'Simple form test host'
-				]
+				['type' => 'SNMP agent', 'host' => 'Simple form test host']
 			],
 			[
 				['type' => 'Zabbix internal', 'host' => 'Simple form test host']
@@ -150,34 +123,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				['type' => 'Simple check', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'SNMPv1 agent', 'template' => 'Inheritance test template']
-			],
-			[
-				['type' => 'SNMPv2 agent', 'template' => 'Inheritance test template']
-			],
-			[
-				['type' => 'SNMPv3 agent', 'template' => 'Inheritance test template']
-			],
-			[
-				[
-					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authNoPriv',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authPriv',
-					'template' => 'Inheritance test template'
-				]
+				['type' => 'SNMP agent', 'template' => 'Inheritance test template']
 			],
 			[
 				['type' => 'Zabbix internal', 'template' => 'Inheritance test template']
@@ -277,9 +223,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				'Zabbix agent',
 				'Zabbix agent (active)',
 				'Simple check',
-				'SNMPv1 agent',
-				'SNMPv2 agent',
-				'SNMPv3 agent',
+				'SNMP agent',
 				'Zabbix internal',
 				'Zabbix trapper',
 				'External check',
@@ -371,16 +315,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					break;
 			}
 		}
-		if ($type == 'SNMPv3 agent') {
-			if (isset($data['snmpv3_securitylevel'])) {
-				$this->zbxTestDropdownSelect('snmpv3_securitylevel', $data['snmpv3_securitylevel']);
-				$snmpv3_securitylevel = $data['snmpv3_securitylevel'];
-			}
-			else {
-				$snmpv3_securitylevel = $this->zbxTestGetSelectedLabel('snmpv3_securitylevel');
-			}
-		}
-
 		$this->zbxTestTextNotPresent('Additional parameters');
 		$this->zbxTestAssertNotVisibleId('params_ap');
 
@@ -456,105 +390,23 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestAssertNotVisibleId('publickey');
 		}
 
-		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent' || $type == 'SNMPv3 agent') {
+		if	($type === 'SNMP agent') {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
-
-			$this->zbxTestTextPresent('Port');
-			$this->zbxTestAssertVisibleId('port');
-			$this->zbxTestAssertAttribute("//input[@id='port']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='port']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('SNMP OID');
 			$this->zbxTestAssertNotVisibleId('snmp_oid');
-
-			$this->zbxTestTextNotVisible('Port');
-			$this->zbxTestAssertNotVisibleId('port');
-		}
-
-		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent') {
-			$this->zbxTestTextPresent('SNMP community');
-			$this->zbxTestAssertVisibleId('snmp_community');
-			$this->zbxTestAssertAttribute("//input[@id='snmp_community']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='snmp_community']", 'size', 20);
-			$this->zbxTestAssertElementValue('snmp_community', 'public');
-		}
-		else {
-			$this->zbxTestTextNotVisible('SNMP community');
-			$this->zbxTestAssertNotVisibleId('snmp_community');
-		}
-
-		if	($type == 'SNMPv3 agent') {
-			$this->zbxTestTextPresent('Security name');
-			$this->zbxTestAssertVisibleId('snmpv3_securityname');
-			$this->zbxTestAssertAttribute("//input[@id='snmpv3_securityname']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='snmpv3_securityname']", 'size', 20);
-
-			$this->zbxTestTextPresent('Security level');
-			$this->zbxTestAssertVisibleId('snmpv3_securitylevel');
-			$this->zbxTestDropdownHasOptions('snmpv3_securitylevel', ['noAuthNoPriv', 'authNoPriv', 'authPriv']);
-		}
-		else {
-			$this->zbxTestTextNotVisible('Security name');
-			$this->zbxTestAssertNotVisibleId('snmpv3_securityname');
-
-			$this->zbxTestTextNotVisible('Security level');
-			$this->zbxTestAssertNotVisibleId('snmpv3_securitylevel');
-		}
-
-		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel != 'noAuthNoPriv') {
-			$this->zbxTestTextPresent('Authentication protocol');
-			$this->zbxTestAssertVisibleId('row_snmpv3_authprotocol');
-			$this->zbxTestAssertVisibleXpath("//label[text()='MD5']");
-			$this->zbxTestAssertVisibleXpath("//label[text()='SHA']");
-
-			$this->zbxTestTextPresent('Authentication passphrase');
-			$this->zbxTestAssertVisibleId('snmpv3_authpassphrase');
-			$this->zbxTestAssertAttribute("//input[@id='snmpv3_authpassphrase']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='snmpv3_authpassphrase']", 'size', 20);
-		}
-		else {
-			$this->zbxTestTextNotVisible('Authentication protocol');
-			$this->zbxTestAssertNotVisibleId('row_snmpv3_authprotocol');
-			$this->zbxTestAssertNotVisibleXpath("//label[text()='MD5']");
-			$this->zbxTestAssertNotVisibleXpath("//label[text()='SHA']");
-
-			$this->zbxTestTextNotVisible('Authentication passphrase');
-			$this->zbxTestAssertNotVisibleId('snmpv3_authpassphrase');
-		}
-
-		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel == 'authPriv') {
-			$this->zbxTestTextPresent('Privacy protocol');
-			$this->zbxTestAssertVisibleId('row_snmpv3_privprotocol');
-			$this->zbxTestAssertVisibleXpath("//label[text()='DES']");
-			$this->zbxTestAssertVisibleXpath("//label[text()='AES']");
-
-			$this->zbxTestTextPresent('Privacy passphrase');
-			$this->zbxTestAssertVisibleId('snmpv3_privpassphrase');
-			$this->zbxTestAssertAttribute("//input[@id='snmpv3_privpassphrase']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='snmpv3_privpassphrase']", 'size', 20);
-		}
-		else {
-			$this->zbxTestTextNotVisible('Privacy protocol');
-			$this->zbxTestAssertNotVisibleId('row_snmpv3_privprotocol');
-			$this->zbxTestAssertNotVisibleXpath("//label[text()='DES']");
-			$this->zbxTestAssertNotVisibleXpath("//label[text()='AES']");
-
-			$this->zbxTestTextNotVisible('Privacy passphrase');
-			$this->zbxTestAssertNotVisibleId('snmpv3_privpassphrase');
 		}
 
 		switch ($type) {
 			case 'Zabbix agent':
 			case 'Zabbix agent (active)':
 			case 'Simple check':
-			case 'SNMPv1 agent':
-			case 'SNMPv2 agent':
-			case 'SNMPv3 agent':
+			case 'SNMP agent':
 			case 'Zabbix internal':
 			case 'External check':
 			case 'IPMI agent':
@@ -1368,31 +1220,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'type' => 'SNMPv1 agent',
-					'name' => 'SNMPv1 agent',
-					'key' => 'discovery-snmpv1-agent',
-					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'SNMPv2 agent',
-					'name' => 'SNMPv2 agent',
-					'key' => 'discovery-snmpv2-agent',
-					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'SNMPv3 agent',
-					'name' => 'SNMPv3 agent',
-					'key' => 'discovery-snmpv3-agent',
+					'type' => 'SNMP agent',
+					'name' => 'SNMP agent',
+					'key' => 'discovery-snmp-agent',
 					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
@@ -1401,8 +1231,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'SNMPv1 agent',
-					'name' => 'SNMPv1 agent',
+					'type' => 'SNMP agent',
+					'name' => 'SNMP agent',
 					'key' => 'test-item-snmp_oid',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
@@ -1413,8 +1243,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'SNMPv1 agent',
-					'name' => 'SNMPv1 agent',
+					'type' => 'SNMP agent',
+					'name' => 'SNMP agent',
 					'key' => 'test-item-reuse',
 					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
@@ -1426,8 +1256,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'SNMPv1 agent',
-					'name' => 'SNMPv1 agent',
+					'type' => 'SNMP agent',
+					'name' => 'SNMP agent',
 					'key' => 'test-item-form1',
 					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
@@ -1645,9 +1475,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		switch ($type) {
 			case 'Zabbix agent':
 			case 'Simple check':
-			case 'SNMPv1 agent':
-			case 'SNMPv2 agent':
-			case 'SNMPv3 agent':
+			case 'SNMP agent':
 			case 'SNMP trap':
 			case 'External check':
 			case 'IPMI agent':
@@ -1765,9 +1593,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			switch ($type) {
 				case 'Zabbix agent':
 				case 'Simple check':
-				case 'SNMPv1 agent':
-				case 'SNMPv2 agent':
-				case 'SNMPv3 agent':
+				case 'SNMP agent':
 				case 'SNMP trap':
 				case 'External check':
 				case 'IPMI agent':
@@ -1781,8 +1607,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			}
 
 			// "Check now" button availability
-			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMPv1 agent', 'SNMPv2 agent', 'SNMPv3 agent',
-					'Zabbix internal', 'External check', 'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent',
+			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMP agent', 'Zabbix internal', 'External check',
+					'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent',
 					'JMX agent'])) {
 				$this->zbxTestClick('check_now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
