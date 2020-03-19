@@ -165,6 +165,7 @@ static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
 static int	hc_queue_get_size(void);
+static int	hc_get_history_compression_age(void);
 
 /******************************************************************************
  *                                                                            *
@@ -827,17 +828,19 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
  *                                                                            *
  * Purpose: update trends cache and get list of trends to flush into database *
  *                                                                            *
- * Parameters: history     - array of history data                            *
- *             history_num - number of history structures                     *
- *             trends      - list of trends to flush into database            *
- *             trends_num  - number of trends                                 *
+ * Parameters: history         - [IN]  array of history data                  *
+ *             history_num     - [IN]  number of history structures           *
+ *             trends          - [OUT] list of trends to flush into database  *
+ *             trends_num      - [OUT] number of trends                       *
+ *             compression_age - [IN]  history compression age                *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num, ZBX_DC_TREND **trends,
-		int *trends_num)
+		int *trends_num, int compression_age)
 {
+	static int	last_trend_discard = 0;
 	zbx_timespec_t	ts;
 	int		trends_alloc = 0, i, hour, seconds;
 
@@ -871,7 +874,17 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 			if (trend->clock == hour)
 				continue;
 
-			if (SUCCEED == zbx_history_requires_trends(trend->value_type))
+			/* discard trend items that are older than compression age */
+			if (0 != compression_age && trend->clock < compression_age)
+			{
+				if (SEC_PER_HOUR < (ts.sec - last_trend_discard)) /* log once per hour */
+				{
+					zabbix_log(LOG_LEVEL_TRACE, "discarding trends that are pointing to"
+							" compressed history period");
+					last_trend_discard = ts.sec;
+				}
+			}
+			else if (SUCCEED == zbx_history_requires_trends(trend->value_type))
 				DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
 			zbx_hashset_iter_remove(&iter);
@@ -1464,9 +1477,11 @@ static void	DCsync_trends(void)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_TREND		*trends = NULL, *trend;
-	int			trends_alloc = 0, trends_num = 0;
+	int			trends_alloc = 0, trends_num = 0, compression_age;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __func__, cache->trends_num);
+
+	compression_age = hc_get_history_compression_age();
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing trend data...");
 
@@ -1476,7 +1491,7 @@ static void	DCsync_trends(void)
 
 	while (NULL != (trend = (ZBX_DC_TREND *)zbx_hashset_iter_next(&iter)))
 	{
-		if (SUCCEED == zbx_history_requires_trends(trend->value_type))
+		if (SUCCEED == zbx_history_requires_trends(trend->value_type) && trend->clock >= compression_age)
 			DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
 	}
 
@@ -2428,15 +2443,20 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  *             history_num      - [IN] number of history structures           *
  *             item_diff        - [OUT] the changes in item data              *
  *             inventory_values - [OUT] the inventory values to add           *
+ *             compression_age  - [IN] history compression age                *
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
 		const DC_ITEM *items, const int *errcodes, int history_num, zbx_vector_ptr_t *item_diff,
-		zbx_vector_ptr_t *inventory_values)
+		zbx_vector_ptr_t *inventory_values, int compression_age)
 {
-	int	i;
+	static time_t	last_history_discard = 0;
+	time_t		now;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, history_num);
+
+	now = time(NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2444,6 +2464,20 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 		const DC_ITEM	*item;
 		zbx_item_diff_t	*diff;
 		int		index;
+
+		/* discard history items that are older than compression age */
+		if (0 != compression_age && h->ts.sec < compression_age)
+		{
+			if (SEC_PER_HOUR < (now - last_history_discard)) /* log once per hour */
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "discarding history that is pointing to"
+							" compressed history period");
+				last_history_discard = now;
+			}
+
+			h->flags |= ZBX_DC_FLAG_UNDEF;
+			continue;
+		}
 
 		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
@@ -2768,7 +2802,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
-					history_text_num, history_log_num, txn_error;
+					history_text_num, history_log_num, txn_error, compression_age;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids, timer_triggerids;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
@@ -2804,6 +2838,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		history_log = (ZBX_HISTORY_LOG *)zbx_malloc(history_log,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 	}
+
+	compression_age = hc_get_history_compression_age();
 
 	zbx_vector_ptr_create(&inventory_values);
 	zbx_vector_ptr_create(&item_diff);
@@ -2865,12 +2901,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num);
 
 			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
-					&inventory_values);
+					&inventory_values, compression_age);
 
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
 				DCconfig_items_apply_changes(&item_diff);
-				DCmass_update_trends(history, history_num, &trends, &trends_num);
+				DCmass_update_trends(history, history_num, &trends, &trends_num, compression_age);
 
 				do
 				{
@@ -4099,6 +4135,25 @@ void	hc_push_items(zbx_vector_ptr_t *history_items)
 int	hc_queue_get_size(void)
 {
 	return cache->history_queue.elems_num;
+}
+
+int	hc_get_history_compression_age(void)
+{
+	zbx_config_t	cfg;
+	int		compression_age = 0;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_EXTENSION);
+
+	if (ON == cfg.db.history_compression_availability &&
+			ON == cfg.db.history_compression_status &&
+			0 != cfg.db.history_compress_older)
+	{
+		compression_age = (int)time(NULL) - cfg.db.history_compress_older;
+	}
+
+	zbx_config_clean(&cfg);
+
+	return compression_age;
 }
 
 /******************************************************************************

@@ -885,11 +885,13 @@ if ($data['itemid'] != 0) {
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 
 	if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
-		$buttons[] = new CButtonQMessage(
-			'del_history',
-			_('Clear history and trends'),
-			_('History clearing can take a long time. Continue?')
-		);
+		$buttons[] = ($data['config']['compression_status'])
+			? new CSubmit('del_history', _('Clear history and trends'))
+			: new CButtonQMessage(
+				'del_history',
+				_('Clear history and trends'),
+				_('History clearing can take a long time. Continue?')
+			);
 	}
 
 	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid'])))

@@ -63,6 +63,10 @@ $schema = DB::getSchema('config');
 			jQuery('#hk_trends').prop('disabled', !this.checked);
 		});
 
+		jQuery('#compression_status').change(function() {
+			jQuery('#compress_older').prop('disabled', !this.checked);
+		});
+
 		jQuery("#resetDefaults").click(function() {
 			overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
@@ -138,6 +142,14 @@ $schema = DB::getSchema('config');
 								)
 								.change();
 							jQuery('#hk_trends').val("<?= $schema['fields']['hk_trends']['default'] ?>");
+
+							// history and trends compression
+							jQuery('#compression_status')
+								.prop('checked',
+									<?= ($schema['fields']['compression_status']['default'] == 1) ? 'true' : 'false' ?>
+								)
+								.change();
+							jQuery('#compress_older').val("<?= $schema['fields']['compress_older']['default'] ?>");
 						}
 					}
 				]

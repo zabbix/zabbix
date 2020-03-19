@@ -2389,3 +2389,25 @@ int	zbx_db_strlen_n(const char *text, size_t maxlen)
 {
 	return zbx_strlen_utf8_nchars(text, maxlen);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbms_get_version                                             *
+ *                                                                            *
+ * Purpose: returns DBMS version as integer: MMmmuu                           *
+ *          M = major version part                                            *
+ *          m = minor version part                                            *
+ *          u = micro version part                                            *
+ *                                                                            *
+ * Example: 1.2.34 version will be returned as 10234                          *
+ *                                                                            *
+ * Return value: DBMS version or 0 if unknown                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbms_get_version(void)
+{
+#ifdef HAVE_POSTGRESQL
+	return ZBX_PG_SVERSION;
+#endif
+	return 0;
+}
