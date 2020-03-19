@@ -101,7 +101,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 		result->expression = zbx_strdup(NULL, expressions.values[ii]);
 		(result->error)[0] = '\0';
-		expressions.values[ii] = get_expanded_expression(expressions.values[ii]);
+		expressions.values[ii] = DCexpression_expand_user_macros(expressions.values[ii]);
 
 		if (SUCCEED != evaluate(&expr_result, expressions.values[ii], result->error, sizeof(result->error),
 				&unknown_msgs))

@@ -219,7 +219,7 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
  * Comments: removes ' ', '\r', '\n' and '\t' for easier number search        *
  *                                                                            *
  ******************************************************************************/
-char	*get_expanded_expression(const char *expression)
+static char	*get_expanded_expression(const char *expression)
 {
 	char	*expression_ex;
 
