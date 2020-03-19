@@ -210,6 +210,55 @@ out:
   value: 2621440
   return: 'SUCCEED'
 ---
+test case: 'string castable with suffix str comparison 1'
+in:
+  expression: '"2.5M"="2621440"'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'string castable with suffix str comparison 2'
+in:
+  expression: '"2.5M"<>"2621440"'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'string castable with suffix str comparison 3'
+in:
+  expression: '"2.5M"="2.5M"'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'string castable with suffix int comparison 1'
+in:
+  expression: '"2.5M"=2621440'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'string castable with suffix int comparison 2'
+in:
+  expression: '"2.5M"<>2621440'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'string castable with suffix, suffix comparison 1'
+in:
+  expression: '"2.5M"=2.5M'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'string castable with suffix, suffix comparison 2'
+in:
+  expression: '-1K="-1K"'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
 test case: 'unicode 1'
 in:
   expression: '"//etc//пельмень_номер_1"="//etc//пельмень_номер_1"'
@@ -453,7 +502,7 @@ in:
 out:
   error: 'Cannot evaluate expression: expected numeric token at "".'
   return: 'FAIL'
-  
+
 # '+' and '-' operator tests
 ---
 test case: 'term 5 + str and str'
@@ -866,7 +915,7 @@ in:
 out:
   error: 'Cannot evaluate expression: expected numeric token at "&&&&&&&&&&".'
   return: 'FAIL'
-  
+
 # 'and' operator tests
 ---
 test case: 'term 2 and str and str 1'
@@ -1076,7 +1125,7 @@ out:
   value: -1
   return: 'SUCCEED'
 ---
-test case: 'Valid expression "1<2"' 
+test case: 'Valid expression "1<2"'
 in:
   expression: '1<2'
 out:
