@@ -88,7 +88,9 @@ $action_list = (new CList())
 	->addItem([
 		new CLabel(_('View as')),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CComboBox('action', $data['action'], 'submit()', $actions))->setEnabled((bool) $data['items']),
+		(new CComboBox('action', $data['action'], 'submit()', $actions))
+			->setEnabled((bool) $data['items'])
+			->removeId(),
 	]);
 
 if ($data['action'] !== HISTORY_GRAPH && $data['action'] !== HISTORY_BATCH_GRAPH) {

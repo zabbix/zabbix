@@ -82,17 +82,24 @@ foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFA
 
 		foreach ($interfaces[$type] as $interface) {
 			$ifTab->addRow([
-				(new CTextBox('ip', $interface['ip'], true, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
-				(new CTextBox('dns', $interface['dns'], true, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
+				(new CTextBox('ip', $interface['ip'], true, 64))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
+					->removeId(),
+				(new CTextBox('dns', $interface['dns'], true, 64))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
+					->removeId(),
 				(new CRadioButtonList('useip['.$interface['interfaceid'].']', (int) $interface['useip']))
 					->addValue(_('IP'), INTERFACE_USE_IP)
 					->addValue(_('DNS'), INTERFACE_USE_DNS)
 					->setModern(true)
 					->setEnabled(false),
-				(new CTextBox('port', $interface['port'], true, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH),
-				(new CRadioButtonList('main['.$interface['type'].']', (int) $interface['main']))
+				(new CTextBox('port', $interface['port'], true, 64))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+					->removeId(),
+				(new CRadioButtonList('main['.$interface['interfaceid'].']', (int) $interface['main']))
 					->addValue(null, INTERFACE_PRIMARY)
 					->setEnabled(false)
+					->removeId()
 			]);
 		}
 
