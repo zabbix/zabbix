@@ -48,28 +48,80 @@ const char	*usage_message[] = {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect cert", "--tls-ca-file CA-file",
 	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
-	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "-k key",
-	"-o value", NULL,
+	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13 cipher-string]",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"-k key", "-o value", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert", "--tls-ca-file CA-file",
 	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
-	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "[-T]",
-	"[-N]", "[-r]", "-i input-file", NULL,
+	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13] cipher-string",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
 	"[-v]", "-c config-file [-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
 	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
-	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "-k key",
-	"-o value", NULL,
+	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13 cipher-string]",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"-k key", "-o value", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
 	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
-	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "[-T]",
-	"[-N]", "[-r]", "-i input-file", NULL,
+	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13 cipher-string]",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "-k key", "-o value", NULL,
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13 cipher-string]",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"-k key", "-o value", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "[-T]", "[-N]", "[-r]", "-i input-file", NULL,
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13 cipher-string]",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "-k key", "-o value", NULL,
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13 cipher-string]",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"-k key", "-o value", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "[-T]", "[-N]", "[-r]", "-i input-file", NULL,
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
+#if defined(HAVE_OPENSSL)
+	"[--tls-cipher13 cipher-string]",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[--tls-cipher cipher-string]",
+#endif
+	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
 #endif
 	"-h", NULL,
 	"-V", NULL,
@@ -163,6 +215,20 @@ const char	*help_message[] = {
 	"",
 	"  --tls-psk-file PSK-file    Full pathname of a file containing the pre-shared",
 	"                             key",
+#if defined(HAVE_OPENSSL)
+	"",
+	"  --tls-cipher13             Cipher string for OpenSSL 1.1.1 or newer for",
+	"                             TLS 1.3. Override the default ciphersuite",
+	"                             selection criteria. This option is not available",
+	"                             if OpenSSL version is less than 1.1.1",
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"",
+	"  --tls-cipher               GnuTLS priority string (for TLS 1.2 and up) or",
+	"                             OpenSSL cipher string (only for TLS 1.2).",
+	"                             Override the default ciphersuite selection",
+	"                             criteria",
+#endif
 #else
 	"  Not available. This Zabbix sender was compiled without TLS support",
 #endif
@@ -202,6 +268,15 @@ char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 
+char	*CONFIG_TLS_CIPHER_CERT13	= NULL;	/* parameter 'TLSCipherCert13' from agent config file */
+char	*CONFIG_TLS_CIPHER_CERT		= NULL;	/* parameter 'TLSCipherCert' from agent config file */
+char	*CONFIG_TLS_CIPHER_PSK13	= NULL;	/* parameter 'TLSCipherPSK13' from agent config file */
+char	*CONFIG_TLS_CIPHER_PSK		= NULL;	/* parameter 'TLSCipherPSK' from agent config file */
+char	*CONFIG_TLS_CIPHER_ALL13	= NULL;	/* not used in zabbix_sender, just for linking with tls.c */
+char	*CONFIG_TLS_CIPHER_ALL		= NULL;	/* not used in zabbix_sender, just for linking with tls.c */
+char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/* parameter '--tls-cipher13' from sender command line */
+char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* parameter '--tls-cipher' from sender command line */
+
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
 
@@ -233,6 +308,8 @@ static struct zbx_option	longopts[] =
 	{"tls-key-file",		1,	NULL,	'7'},
 	{"tls-psk-identity",		1,	NULL,	'8'},
 	{"tls-psk-file",		1,	NULL,	'9'},
+	{"tls-cipher13",		1,	NULL,	'A'},
+	{"tls-cipher",			1,	NULL,	'B'},
 	{NULL}
 };
 
@@ -718,7 +795,9 @@ static void	zbx_load_config(const char *config_file)
 	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *cfg_tls_connect = NULL,
 		*cfg_tls_ca_file = NULL, *cfg_tls_crl_file = NULL, *cfg_tls_server_cert_issuer = NULL,
 		*cfg_tls_server_cert_subject = NULL, *cfg_tls_cert_file = NULL, *cfg_tls_key_file = NULL,
-		*cfg_tls_psk_file = NULL, *cfg_tls_psk_identity = NULL;
+		*cfg_tls_psk_file = NULL, *cfg_tls_psk_identity = NULL,
+		*cfg_tls_cipher_cert13 = NULL, *cfg_tls_cipher_cert = NULL,
+		*cfg_tls_cipher_psk13 = NULL, *cfg_tls_cipher_psk = NULL;
 
 	struct cfg_line	cfg[] =
 	{
@@ -748,6 +827,14 @@ static void	zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"TLSPSKFile",			&cfg_tls_psk_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"TLSCipherCert13",		&cfg_tls_cipher_cert13,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCipherCert",		&cfg_tls_cipher_cert,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCipherPSK13",		&cfg_tls_cipher_psk13,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCipherPSK",		&cfg_tls_cipher_psk,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -774,6 +861,11 @@ static void	zbx_load_config(const char *config_file)
 	zbx_fill_from_config_file(&CONFIG_TLS_KEY_FILE, cfg_tls_key_file);
 	zbx_fill_from_config_file(&CONFIG_TLS_PSK_IDENTITY, cfg_tls_psk_identity);
 	zbx_fill_from_config_file(&CONFIG_TLS_PSK_FILE, cfg_tls_psk_file);
+
+	zbx_fill_from_config_file(&CONFIG_TLS_CIPHER_CERT13, cfg_tls_cipher_cert13);
+	zbx_fill_from_config_file(&CONFIG_TLS_CIPHER_CERT, cfg_tls_cipher_cert);
+	zbx_fill_from_config_file(&CONFIG_TLS_CIPHER_PSK13, cfg_tls_cipher_psk13);
+	zbx_fill_from_config_file(&CONFIG_TLS_CIPHER_PSK, cfg_tls_cipher_psk);
 }
 
 static void	parse_commandline(int argc, char **argv)
@@ -878,6 +970,28 @@ static void	parse_commandline(int argc, char **argv)
 			case '9':
 				CONFIG_TLS_PSK_FILE = zbx_strdup(CONFIG_TLS_PSK_FILE, zbx_optarg);
 				break;
+			case 'A':
+#if defined(HAVE_OPENSSL)
+				CONFIG_TLS_CIPHER_CMD13 = zbx_strdup(CONFIG_TLS_CIPHER_CMD13, zbx_optarg);
+#elif defined(HAVE_GNUTLS)
+				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
+						" Zabbix sender was compiled with GnuTLS");
+				exit(EXIT_FAILURE);
+#elif defined(HAVE_POLARSSL)
+				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
+						" Zabbix sender was compiled with mbedTLS (PolarSSL)");
+				exit(EXIT_FAILURE);
+#endif
+				break;
+			case 'B':
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				CONFIG_TLS_CIPHER_CMD = zbx_strdup(CONFIG_TLS_CIPHER_CMD, zbx_optarg);
+#elif defined(HAVE_POLARSSL)
+				zbx_error("parameter \"--tls-cipher\" requires GnuTLS or OpenSSL."
+						" Zabbix sender was compiled with mbedTLS (PolarSSL)");
+				exit(EXIT_FAILURE);
+#endif
+				break;
 #else
 			case '1':
 			case '2':
@@ -888,6 +1002,8 @@ static void	parse_commandline(int argc, char **argv)
 			case '7':
 			case '8':
 			case '9':
+			case 'A':
+			case 'B':
 				zbx_error("TLS parameters cannot be used: Zabbix sender was compiled without TLS"
 						" support");
 				exit(EXIT_FAILURE);
@@ -1292,7 +1408,10 @@ int	main(int argc, char **argv)
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
 			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
-			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
+			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE ||
+			NULL != CONFIG_TLS_CIPHER_CERT13 || NULL != CONFIG_TLS_CIPHER_CERT ||
+			NULL != CONFIG_TLS_CIPHER_PSK13 || NULL != CONFIG_TLS_CIPHER_PSK ||
+			NULL != CONFIG_TLS_CIPHER_CMD13 || NULL != CONFIG_TLS_CIPHER_CMD)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config();

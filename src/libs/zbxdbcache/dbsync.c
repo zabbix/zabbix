@@ -452,7 +452,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	DB_RESULT	result;
 
-#define SELECTED_CONFIG_FIELD_COUNT	29	/* number of columns in the following DBselect() */
+#define SELECTED_CONFIG_FIELD_COUNT	32	/* number of columns in the following DBselect() */
 
 	if (NULL == (result = DBselect("select refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
@@ -461,7 +461,8 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"hk_events_discovery,hk_events_autoreg,hk_services_mode,"
 				"hk_services,hk_audit_mode,hk_audit,hk_sessions_mode,hk_sessions,"
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
-				"hk_trends_global,hk_trends,default_inventory_mode,db_extension,autoreg_tls_accept"
+				"hk_trends_global,hk_trends,default_inventory_mode,db_extension,autoreg_tls_accept,"
+				"compression_status,compression_availability,compress_older"
 			" from config"
 			" order by configid")))	/* if you change number of columns in DBselect(), */
 						/* adjust SELECTED_CONFIG_FIELD_COUNT */
@@ -989,6 +990,9 @@ static int	dbsync_compare_global_macro(const ZBX_DC_GMACRO *gmacro, const DB_ROW
 	char	*macro = NULL, *context = NULL;
 	int	ret = FAIL;
 
+	if (FAIL == dbsync_compare_uchar(dbrow[3], gmacro->type))
+		return FAIL;
+
 	if (FAIL == dbsync_compare_str(dbrow[2], gmacro->value))
 		return FAIL;
 
@@ -1041,13 +1045,13 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 	ZBX_DC_GMACRO		*macro;
 
 	if (NULL == (result = DBselect(
-			"select globalmacroid,macro,value"
+			"select globalmacroid,macro,value,type"
 			" from globalmacro")))
 	{
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 3, NULL);
+	dbsync_prepare(sync, 4, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -1105,6 +1109,9 @@ static int	dbsync_compare_host_macro(const ZBX_DC_HMACRO *hmacro, const DB_ROW d
 	char	*macro = NULL, *context = NULL;
 	int	ret = FAIL;
 
+	if (FAIL == dbsync_compare_uchar(dbrow[4], hmacro->type))
+		return FAIL;
+
 	if (FAIL == dbsync_compare_str(dbrow[3], hmacro->value))
 		return FAIL;
 
@@ -1160,13 +1167,13 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	ZBX_DC_HMACRO		*macro;
 
 	if (NULL == (result = DBselect(
-			"select hostmacroid,hostid,macro,value"
+			"select hostmacroid,hostid,macro,value,type"
 			" from hostmacro")))
 	{
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 4, NULL);
+	dbsync_prepare(sync, 5, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

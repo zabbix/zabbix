@@ -203,6 +203,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'texts_support_lld_macros' => $texts_support_lld_macros,
 			'texts_support_user_macros' => $texts_support_user_macros,
 			'supported_macros' => $supported_macros,
+			'support_lldmacros' => $support_lldmacros,
 			'macros_values' => $this->getSupportedMacros($inputs + ['interfaceid' => $this->getInput('interfaceid', 0)])
 		]);
 

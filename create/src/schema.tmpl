@@ -617,6 +617,9 @@ FIELD		|ldap_configured		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|db_extension	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|autoreg_tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|compression_status	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|compression_availability	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|compress_older	|t_varchar(32)	|'7d'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -720,6 +723,7 @@ FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|macro
 
 TABLE|hostmacro|hostmacroid|ZBX_TEMPLATE
@@ -728,6 +732,7 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|hostid,macro
 
 TABLE|hosts_groups|hostgroupid|ZBX_TEMPLATE
@@ -1732,4 +1737,4 @@ FIELD		|contextname	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4050057	|4050057
+ROW		|4050063	|4050063

@@ -95,6 +95,9 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_maintenance_precache_nested_groups(void);
 
+/* by default the macro environment is non-secure and all secret macros are masked with ****** */
+static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
+
 /******************************************************************************
  *                                                                            *
  * Function: dc_strdup                                                        *
@@ -844,7 +847,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_services_mode", "hk_services", "hk_audit_mode", "hk_audit",
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
-					"default_inventory_mode", "db_extension", "autoreg_tls_accept"};	/* sync with zbx_dbsync_compare_config() */
+					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
+					"compression_status", "compression_availability", "compress_older"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
@@ -906,10 +910,18 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	else
 		config->config->discovery_groupid = ZBX_DISCOVERY_GROUPID_UNDEFINED;
 
-	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
+	ZBX_STR2UCHAR(config->config->snmptrap_logging, row[2]);
 	config->config->default_inventory_mode = atoi(row[26]);
-	DCstrpool_replace(found, &config->config->db_extension, row[27]);
-	config->config->autoreg_tls_accept = (unsigned char)atoi(row[28]);
+	DCstrpool_replace(found, (const char **)&config->config->db.extension, row[27]);
+	ZBX_STR2UCHAR(config->config->autoreg_tls_accept, row[28]);
+	ZBX_STR2UCHAR(config->config->db.history_compression_status, row[29]);
+	ZBX_STR2UCHAR(config->config->db.history_compression_availability, row[30]);
+
+	if (SUCCEED != is_time_suffix(row[31], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid history compression age: %s", row[31]);
+		config->config->db.history_compress_older = 0;
+	}
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
 		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
@@ -968,7 +980,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #ifdef HAVE_POSTGRESQL
 	if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode &&
 			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
-			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 	{
 		config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
 	}
@@ -987,7 +999,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #ifdef HAVE_POSTGRESQL
 	if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode &&
 			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
-			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 	{
 		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
 	}
@@ -1775,6 +1787,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		}
 
 		/* store new information in macro structure */
+		ZBX_STR2UCHAR(gmacro->type, row[3]);
 		DCstrpool_replace(found, &gmacro->macro, macro);
 		DCstrpool_replace(found, &gmacro->value, row[2]);
 
@@ -1867,6 +1880,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 
 		/* store new information in macro structure */
 		hmacro->hostid = hostid;
+		ZBX_STR2UCHAR(hmacro->type, row[4]);
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);
 
@@ -9427,6 +9441,14 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	dc_get_host_macro_value(const ZBX_DC_HMACRO *macro, char **value)
+{
+	if (ZBX_MACRO_ENV_NONSECURE == macro_env && ZBX_MACRO_VALUE_SECRET == macro->type)
+		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+	else
+		*value = zbx_strdup(*value, macro->value);
+}
+
 static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
 		char **value, char **value_default)
 {
@@ -9455,13 +9477,13 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 				{
 					if (0 == zbx_strcmp_null(hmacro->context, context))
 					{
-						*value = zbx_strdup(*value, hmacro->value);
+						dc_get_host_macro_value(hmacro, value);
 						return;
 					}
 
 					/* check for the default (without parameters) macro value */
 					if (NULL == *value_default && NULL != context && NULL == hmacro->context)
-						*value_default = zbx_strdup(*value_default, hmacro->value);
+						dc_get_host_macro_value(hmacro, value_default);
 				}
 			}
 		}
@@ -9488,6 +9510,14 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 	zbx_vector_uint64_destroy(&templateids);
 }
 
+static void	dc_get_global_macro_value(const ZBX_DC_GMACRO *macro, char **value)
+{
+	if (ZBX_MACRO_ENV_NONSECURE == macro_env && ZBX_MACRO_VALUE_SECRET == macro->type)
+		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+	else
+		*value = zbx_strdup(*value, macro->value);
+}
+
 static void	dc_get_global_macro(const char *macro, const char *context, char **value, char **value_default)
 {
 	int			i;
@@ -9506,13 +9536,13 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 			{
 				if (0 == zbx_strcmp_null(gmacro->context, context))
 				{
-					*value = zbx_strdup(*value, gmacro->value);
+					dc_get_global_macro_value(gmacro, value);
 					break;
 				}
 
 				/* check for the default (without parameters) macro value */
 				if (NULL == *value_default && NULL != context && NULL == gmacro->context)
-					*value_default = zbx_strdup(*value_default, gmacro->value);
+					dc_get_global_macro_value(gmacro, value_default);
 			}
 		}
 	}
@@ -10621,7 +10651,12 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 		cfg->hk = config->config->hk;
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
-		cfg->db_extension = zbx_strdup(NULL, config->config->db_extension);
+	{
+		cfg->db.extension = zbx_strdup(NULL, config->config->db.extension);
+		cfg->db.history_compression_status = config->config->db.history_compression_status;
+		cfg->db.history_compression_availability = config->config->db.history_compression_availability;
+		cfg->db.history_compress_older = config->config->db.history_compress_older;
+	}
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT))
 		cfg->autoreg_tls_accept = config->config->autoreg_tls_accept;
@@ -10654,7 +10689,7 @@ void	zbx_config_clean(zbx_config_t *cfg)
 	}
 
 	if (0 != (cfg->flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
-		zbx_free(cfg->db_extension);
+		zbx_free(cfg->db.extension);
 }
 
 /******************************************************************************
@@ -11744,7 +11779,13 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 		{
 			ZBX_DC_SNMPINTERFACE *snmp;
 
-			snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &dst->interfaceid);
+			if (NULL == (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
+					&dst->interfaceid)))
+			{
+				zbx_free(*interfaces);
+				goto unlock;
+			}
+
 			dst->bulk = snmp->bulk;
 			dst->snmp_version= snmp->version;
 		}
@@ -12318,6 +12359,25 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 	}
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_set_macro_env                                             *
+ *                                                                            *
+ * Purpose: sts user macro environment security level                         *
+ *                                                                            *
+ * Parameter: env - [IN] the security level (see ZBX_MACRO_ENV_* defines)     *
+ *                                                                            *
+ * Comments: The security level affects how the secret macros are resolved -  *
+ *           as they values or '******'.                                      *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	zbx_dc_set_macro_env(unsigned char env)
+{
+	unsigned char	old_env = macro_env;
+	macro_env = env;
+	return old_env;
 }
 
 #ifdef HAVE_TESTS

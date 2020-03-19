@@ -154,6 +154,32 @@ $house_keeper_tab = (new CFormList())
 			->setAriaRequired()
 	);
 
+	if ($data['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB) {
+		$house_keeper_tab
+			->addRow(null)
+			->addRow(new CTag('h4', true, _('History and trends compression')))
+			->addRow(
+				new CLabel(_('Enable compression'), 'compression_status'),
+				(new CCheckBox('compression_status'))
+					->setChecked($data['compression_status'] == 1)
+					->setEnabled($data['compression_availability'] == 1)
+			)
+			->addRow(
+				(new CLabel(_('Compress records older than'), 'compress_older'))
+					->setAsteriskMark(),
+				(new CTextBox('compress_older', $data['compress_older']))
+					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+					->setEnabled($data['compression_availability'] == 1 && $data['compression_status'] == 1)
+					->setAriaRequired()
+			);
+
+		if ($data['compression_availability'] == 0) {
+			$house_keeper_tab->addRow('',
+				(new CSpan(_('Compression is not available due to incompatible DB version')))->addClass(ZBX_STYLE_RED)
+			);
+		}
+	}
+
 $house_keeper_view = (new CTabView())
 	->addTab('houseKeeper', _('Housekeeping'), $house_keeper_tab)
 	->setFooter(makeFormFooter(

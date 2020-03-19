@@ -25,6 +25,7 @@
 #include "zbxserver.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
+#include "cfg.h"
 
 #if defined(HAVE_MYSQL) || defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL)
 #define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
@@ -53,11 +54,100 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
 
 static int	connection_failure;
+extern unsigned char	program_type;
 
 void	DBclose(void)
 {
 	zbx_db_close();
 }
+
+int	zbx_db_validate_config_features(void)
+{
+	int	err = 0;
+
+#if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))
+	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT, "PostgreSQL or MySQL library"
+			" version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCAFile", CONFIG_DB_TLS_CA_FILE,"PostgreSQL or MySQL library"
+			" version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCertFile", CONFIG_DB_TLS_CERT_FILE, "PostgreSQL or MySQL library"
+			" version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSKeyFile", CONFIG_DB_TLS_KEY_FILE, "PostgreSQL or MySQL library"
+			" version that support TLS"));
+#endif
+
+#if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_POSTGRESQL))
+	if (NULL != CONFIG_DB_TLS_CONNECT && 0 == strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+	{
+		zbx_error("\"DBTLSConnect\" configuration parameter value '%s' cannot be used: Zabbix %s was compiled"
+			" without PostgreSQL or MySQL library version that support this value",
+			ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, get_program_type_string(program_type));
+		err |= 1;
+	}
+#endif
+
+#if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS))
+	err |= (FAIL == check_cfg_feature_str("DBTLSCipher", CONFIG_DB_TLS_CIPHER, "MySQL library version that support"
+			" configuration of cipher"));
+#endif
+
+#if !defined(HAVE_MYSQL_TLS_CIPHERSUITES)
+	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13, "MySQL library version that"
+			" support configuration of TLSv1.3 ciphersuites"));
+#endif
+
+	return 0 != err ? FAIL : SUCCEED;
+}
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+static void	check_cfg_empty_str(const char *parameter, const char *value)
+{
+	if (NULL != value && 0 == strlen(value))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"%s\" is defined but empty", parameter);
+		exit(EXIT_FAILURE);
+	}
+}
+
+void	zbx_db_validate_config(void)
+{
+	check_cfg_empty_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT);
+	check_cfg_empty_str("DBTLSCertFile", CONFIG_DB_TLS_CERT_FILE);
+	check_cfg_empty_str("DBTLSKeyFile", CONFIG_DB_TLS_KEY_FILE);
+	check_cfg_empty_str("DBTLSCAFile", CONFIG_DB_TLS_CA_FILE);
+	check_cfg_empty_str("DBTLSCipher", CONFIG_DB_TLS_CIPHER);
+	check_cfg_empty_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13);
+
+	if (NULL != CONFIG_DB_TLS_CONNECT &&
+			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_REQUIRED_TXT) &&
+			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT) &&
+			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DBTLSConnect\" configuration parameter: '%s'",
+				CONFIG_DB_TLS_CONNECT);
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL != CONFIG_DB_TLS_CONNECT &&
+			(0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, CONFIG_DB_TLS_CONNECT) ||
+			0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT, CONFIG_DB_TLS_CONNECT)) &&
+			NULL == CONFIG_DB_TLS_CA_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSConnect\" value \"%s\" requires \"DBTLSCAFile\", but it"
+				" is not defined", CONFIG_DB_TLS_CONNECT);
+		exit(EXIT_FAILURE);
+	}
+
+	if ((NULL != CONFIG_DB_TLS_CERT_FILE || NULL != CONFIG_DB_TLS_KEY_FILE) &&
+			(NULL == CONFIG_DB_TLS_CERT_FILE || NULL == CONFIG_DB_TLS_KEY_FILE ||
+			NULL == CONFIG_DB_TLS_CA_FILE))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSKeyFile\" or \"DBTLSCertFile\" is defined, but"
+				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
+		exit(EXIT_FAILURE);
+	}
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -79,7 +169,9 @@ int	DBconnect(int flag)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __func__, flag);
 
 	while (ZBX_DB_OK != (err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
-			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)))
+			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT, CONFIG_DB_TLS_CONNECT,
+			CONFIG_DB_TLS_CERT_FILE, CONFIG_DB_TLS_KEY_FILE, CONFIG_DB_TLS_CA_FILE, CONFIG_DB_TLS_CIPHER,
+			CONFIG_DB_TLS_CIPHER_13)))
 	{
 		if (ZBX_DB_CONNECT_ONCE == flag)
 			break;
@@ -723,6 +815,52 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcheck_capabilities                                             *
+ *                                                                            *
+ * Purpose: checks DBMS for optional features and adjusting configuration     *
+ *                                                                            *
+ ******************************************************************************/
+void	DBcheck_capabilities(void)
+{
+#ifdef HAVE_POSTGRESQL
+	int	compression_available = OFF;
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
+	if (100002 <= zbx_dbms_get_version())
+	{
+		DB_RESULT	result;
+		DB_ROW		row;
+		int		major, minor, patch, version;
+
+		if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")))
+			goto out;
+
+		if (NULL == (row = DBfetch(result)))
+			goto clean;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
+
+		sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch);
+		version = major * 10000;
+		version += minor * 100;
+		version += patch;
+
+		if (10500 <= version)
+			compression_available = ON;
+clean:
+		DBfree_result(result);
+	}
+out:
+	DBexecute("update config set compression_availability=%d", compression_available);
+
+	DBclose();
+#endif
 }
 
 #define MAX_EXPRESSIONS	950

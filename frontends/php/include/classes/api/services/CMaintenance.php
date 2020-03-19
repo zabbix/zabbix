@@ -348,17 +348,23 @@ class CMaintenance extends CApiService {
 		foreach ($maintenances as $mnum => $maintenance) {
 			// validate maintenance active since
 			if (!validateUnixTime($maintenance['active_since'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'active_since')
+				);
 			}
 
 			// validate maintenance active till
 			if (!validateUnixTime($maintenance['active_till'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'active_till')
+				);
 			}
 
 			// validate maintenance active interval
 			if ($maintenance['active_since'] > $maintenance['active_till']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance "Active since" value cannot be bigger than "Active till".'));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Maintenance "%1$s" value cannot be bigger than "%2$s".', 'active_since', 'active_till')
+				);
 			}
 
 			// validate timeperiods
@@ -384,17 +390,16 @@ class CMaintenance extends CApiService {
 
 				if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for unsigned int field "%2$s".',
-							$timeperiod['every'], 'every')
-						);
+						_s('Incorrect value "%1$s" for unsigned int field "%2$s".', $timeperiod['every'], 'every')
+					);
 				}
 
 				if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
 					$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
 				}
 				else if (!validateUnixTime($timeperiod['start_date'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.',
-						_('Date'))
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'start_date')
 					);
 				}
 				else {
@@ -582,7 +587,7 @@ class CMaintenance extends CApiService {
 
 				if (!validateUnixTime($active_since)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since'))
+						_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'active_since')
 					);
 				}
 
@@ -598,7 +603,7 @@ class CMaintenance extends CApiService {
 
 				if (!validateUnixTime($active_till)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till'))
+						_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'active_till')
 					);
 				}
 
@@ -651,9 +656,8 @@ class CMaintenance extends CApiService {
 
 					if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value "%1$s" for unsigned int field "%2$s".',
-								$timeperiod['every'], 'every')
-							);
+							_s('Incorrect value "%1$s" for unsigned int field "%2$s".', $timeperiod['every'], 'every')
+						);
 					}
 
 					// Without "timeperiod_type" it resolves to default TIMEPERIOD_TYPE_ONETIME. But will it be forever?
@@ -668,7 +672,7 @@ class CMaintenance extends CApiService {
 					else if (array_key_exists('start_date', $timeperiod)
 							&& !validateUnixTime($timeperiod['start_date'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Date'))
+							_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'start_date')
 						);
 					}
 					else {

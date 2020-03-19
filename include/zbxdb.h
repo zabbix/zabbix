@@ -43,6 +43,10 @@
 #error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
 #endif
 
+#define ZBX_DB_TLS_CONNECT_REQUIRED_TXT		"required"
+#define ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT	"verify_ca"
+#define ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT	"verify_full"
+
 typedef char	**DB_ROW;
 typedef struct zbx_db_result	*DB_RESULT;
 
@@ -78,7 +82,8 @@ zbx_db_value_t;
 int	zbx_db_init(const char *dbname, const char *const db_schema, char **error);
 void	zbx_db_deinit(void);
 
-int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
+int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
+			char *tlsmode, char *cert, char *key, char *ca, char *cipher, char *cipher_13);
 void	zbx_db_close(void);
 
 int	zbx_db_begin(void);
@@ -88,6 +93,8 @@ int	zbx_db_txn_level(void);
 int	zbx_db_txn_error(void);
 int	zbx_db_txn_end_error(void);
 const char	*zbx_db_last_strerr(void);
+
+int	zbx_dbms_get_version(void);
 
 #ifdef HAVE_ORACLE
 

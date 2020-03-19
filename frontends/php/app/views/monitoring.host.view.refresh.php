@@ -19,15 +19,12 @@
 **/
 
 
-/**
- * @var CView $this
- */
-?>
+$output = [
+	'body' => (new CPartial('monitoring.host.view.html', $data))->getOutput()
+];
 
-<script type="text/javascript">
-	jQuery(document).ready(function($) {
-		$('#acknowledge_form').submit(function() {
-			$(this).trimValues(['#message']);
-		});
-	});
-</script>
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
+}
+
+echo json_encode($output);

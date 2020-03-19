@@ -475,8 +475,8 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields, unsigned
 		data = zbx_strdup(data, value);
 		if (MACRO_EXPAND_YES == expand_macros)
 		{
-			substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
-					MACRO_TYPE_HTTP_RAW, NULL, 0);
+			substitute_simple_macros_unmasked(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL,
+					&data, MACRO_TYPE_HTTP_RAW, NULL, 0);
 		}
 
 		zbx_http_url_encode(data, &data);
@@ -500,7 +500,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 		errcodes[i] = SUCCEED;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		if (MACRO_EXPAND_YES == expand_macros && SUCCEED != substitute_key_macros(&items[i].key, NULL,
+		if (MACRO_EXPAND_YES == expand_macros && SUCCEED != substitute_key_macros_unmasked(&items[i].key, NULL,
 				&items[i], NULL, NULL, MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
@@ -542,16 +542,16 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 
 					if (MACRO_EXPAND_YES == expand_macros)
 					{
-						substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
+						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 								NULL, NULL, NULL, NULL, &items[i].snmpv3_securityname,
 								MACRO_TYPE_COMMON, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
+						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 								NULL, NULL, NULL, NULL, &items[i].snmpv3_authpassphrase,
 								MACRO_TYPE_COMMON, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
+						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 								NULL, NULL, NULL, NULL, &items[i].snmpv3_privpassphrase,
 								MACRO_TYPE_COMMON, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
+						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 								NULL, NULL, NULL, NULL, &items[i].snmpv3_contextname,
 								MACRO_TYPE_COMMON, NULL, 0);
 					}
@@ -563,7 +563,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 				if (MACRO_EXPAND_NO == expand_macros)
 					break;
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid,
 						NULL, NULL, NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
@@ -591,7 +591,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 			case ITEM_TYPE_DB_MONITOR:
 				if (MACRO_EXPAND_YES == expand_macros)
 				{
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
+					substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 							NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				}
 				ZBX_FALLTHROUGH;
@@ -602,9 +602,9 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 				if (MACRO_EXPAND_NO == expand_macros)
 					break;
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				break;
 			case ITEM_TYPE_JMX:
@@ -615,9 +615,9 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 				if (MACRO_EXPAND_NO == expand_macros)
 					break;
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, &items[i].jmx_endpoint, MACRO_TYPE_JMX_ENDPOINT, NULL, 0);
@@ -638,8 +638,9 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 					substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 							NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL,
 							0);
-					substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i],
-							NULL, NULL, &items[i].url, MACRO_TYPE_HTTP_RAW, NULL, 0);
+					substitute_simple_macros_unmasked(NULL, NULL, NULL,NULL, NULL, &items[i].host,
+							&items[i], NULL, NULL, &items[i].url, MACRO_TYPE_HTTP_RAW, NULL,
+							0);
 				}
 
 				if (SUCCEED != zbx_http_punycode_encode_url(&items[i].url))
@@ -662,8 +663,8 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 				switch (items[i].post_type)
 				{
 					case ZBX_POSTTYPE_XML:
-						if (SUCCEED != substitute_macros_xml(&items[i].posts, &items[i], NULL,
-								NULL, error, sizeof(error)))
+						if (SUCCEED != substitute_macros_xml_unmasked(&items[i].posts, &items[i],
+								NULL, NULL, error, sizeof(error)))
 						{
 							SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
 							errcodes[i] = CONFIG_ERROR;
@@ -671,19 +672,19 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 						}
 						break;
 					case ZBX_POSTTYPE_JSON:
-						substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host,
-								&items[i], NULL, NULL, &items[i].posts,
+						substitute_simple_macros_unmasked(NULL, NULL, NULL,NULL, NULL,
+								&items[i].host, &items[i], NULL, NULL, &items[i].posts,
 								MACRO_TYPE_HTTP_JSON, NULL, 0);
 						break;
 					default:
-						substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host,
-								&items[i], NULL, NULL, &items[i].posts,
+						substitute_simple_macros_unmasked(NULL, NULL, NULL,NULL, NULL,
+								&items[i].host, &items[i], NULL, NULL, &items[i].posts,
 								MACRO_TYPE_HTTP_RAW, NULL, 0);
 						break;
 				}
 
-				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].headers, MACRO_TYPE_HTTP_RAW, NULL, 0);
+				substitute_simple_macros_unmasked(NULL, NULL, NULL,NULL, NULL, &items[i].host,
+						&items[i], NULL, NULL, &items[i].headers, MACRO_TYPE_HTTP_RAW, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].status_codes, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
@@ -692,11 +693,12 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 						NULL, &items[i].ssl_cert_file, MACRO_TYPE_HTTP_RAW, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
 						NULL, &items[i].ssl_key_file, MACRO_TYPE_HTTP_RAW, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, &items[i].ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+						NULL, NULL, NULL, &items[i].ssl_key_password, MACRO_TYPE_COMMON, NULL,
+						0);
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				break;
 		}

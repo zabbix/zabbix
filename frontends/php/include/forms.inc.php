@@ -1330,6 +1330,13 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						->setReadonly($readonly)
 				];
 				break;
+
+			case ZBX_PREPROC_STR_REPLACE:
+				$params = [
+					$step_param_0->setAttribute('placeholder', _('search string')),
+					$step_param_1->setAttribute('placeholder', _('replacement'))
+				];
+				break;
 		}
 
 		// Create checkbox "Custom on fail" and enable or disable depending on preprocessing type.
@@ -1342,6 +1349,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			case ZBX_PREPROC_THROTTLE_VALUE:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			case ZBX_PREPROC_SCRIPT:
+			case ZBX_PREPROC_STR_REPLACE:
 				$on_fail->setEnabled(false);
 				break;
 

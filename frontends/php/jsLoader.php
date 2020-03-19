@@ -64,6 +64,8 @@ $availableJScripts = [
 	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
+	'inputsecret.js' => '',
+	'macrovalue.js' => '',
 	// vendors
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
@@ -276,8 +278,9 @@ $tranStrings = [
 		'Go to' => _('Go to'),
 		'Graphs' => _('Graphs'),
 		'History' => _('History'),
-		'Host inventory' => _('Host inventory'),
-		'Host screens' => _('Host screens'),
+		'Host' => _('Host'),
+		'Inventory' => _('Inventory'),
+		'Screens' => _('Screens'),
 		'Latest data' => _('Latest data'),
 		'Latest values' => _('Latest values'),
 		'Last hour graph' => _('Last hour graph'),
@@ -291,6 +294,7 @@ $tranStrings = [
 		'S_TRIGGER' => _('Trigger'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
+		'Web' => _('Web'),
 		'No refresh' => _('No refresh'),
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
@@ -329,6 +333,9 @@ $tranStrings = [
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel')
+	],
+	'macrovalue.js' => [
+		'Set new value' => _('Set new value')
 	]
 ];
 

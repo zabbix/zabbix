@@ -29,11 +29,14 @@ typedef struct
 	char		*macro;
 	char		*value;
 	char		*description;
+	unsigned char	type;
 #define ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE		__UINT64_C(0x00000001)
 #define ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION	__UINT64_C(0x00000002)
+#define ZBX_FLAG_LLD_HOSTMACRO_UPDATE_TYPE		__UINT64_C(0x00000004)
 #define ZBX_FLAG_LLD_HOSTMACRO_UPDATE									\
-		(ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE | ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION)
-#define ZBX_FLAG_LLD_HOSTMACRO_REMOVE			__UINT64_C(0x00000004)
+		(ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE | ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION |	\
+		ZBX_FLAG_LLD_HOSTMACRO_UPDATE_TYPE)
+#define ZBX_FLAG_LLD_HOSTMACRO_REMOVE			__UINT64_C(0x00000008)
 	zbx_uint64_t	flags;
 }
 zbx_lld_hostmacro_t;
@@ -1645,7 +1648,7 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
-			"select hm.macro,hm.value,hm.description"
+			"select hm.macro,hm.value,hm.description,hm.type"
 			" from hostmacro hm,items i"
 			" where hm.hostid=i.hostid"
 				" and i.itemid=" ZBX_FS_UI64,
@@ -1658,6 +1661,7 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
 		hostmacro->macro = zbx_strdup(NULL, row[0]);
 		hostmacro->value = zbx_strdup(NULL, row[1]);
 		hostmacro->description = zbx_strdup(NULL, row[2]);
+		ZBX_STR2UCHAR(hostmacro->type, row[3]);
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
@@ -1672,7 +1676,7 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
  *                                                                            *
  ******************************************************************************/
 static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostmacroid, const char *macro,
-		const char *value, const char *description)
+		const char *value, const char *description, unsigned char type)
 {
 	zbx_lld_hostmacro_t	*hostmacro;
 	int			i;
@@ -1689,6 +1693,8 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 				hostmacro->flags |= ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE;
 			if (0 != strcmp(hostmacro->description, description))
 				hostmacro->flags |= ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION;
+			if (hostmacro->type != type)
+				hostmacro->flags |= ZBX_FLAG_LLD_HOSTMACRO_UPDATE_TYPE;
 			return;
 		}
 	}
@@ -1746,6 +1752,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 			hostmacro->hostmacroid = 0;
 			hostmacro->macro = zbx_strdup(NULL, ((zbx_lld_hostmacro_t *)hostmacros->values[j])->macro);
 			hostmacro->value = zbx_strdup(NULL, ((zbx_lld_hostmacro_t *)hostmacros->values[j])->value);
+			hostmacro->type = ((zbx_lld_hostmacro_t *)hostmacros->values[j])->type;
 			hostmacro->description = zbx_strdup(NULL,
 					((zbx_lld_hostmacro_t *)hostmacros->values[j])->description);
 			hostmacro->flags = 0x00;
@@ -1763,7 +1770,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 		size_t	sql_alloc = 0, sql_offset = 0;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hostmacroid,hostid,macro,value,description"
+				"select hostmacroid,hostid,macro,value,description,type"
 				" from hostmacro"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
@@ -1774,6 +1781,8 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			unsigned char	type;
+
 			ZBX_STR2UINT64(hostid, row[1]);
 
 			if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -1785,8 +1794,9 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 			host = (zbx_lld_host_t *)hosts->values[i];
 
 			ZBX_STR2UINT64(hostmacroid, row[0]);
+			ZBX_STR2UCHAR(type, row[5]);
 
-			lld_hostmacro_make(&host->new_hostmacros, hostmacroid, row[2], row[3], row[4]);
+			lld_hostmacro_make(&host->new_hostmacros, hostmacroid, row[2], row[3], row[4], type);
 		}
 		DBfree_result(result);
 	}
@@ -2178,7 +2188,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
 		zbx_db_insert_prepare(&db_insert_hmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value",
-				"description", NULL);
+				"description", "type", NULL);
 	}
 
 	if (0 != new_interfaces)
@@ -2456,7 +2466,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			if (0 == hostmacro->hostmacroid)
 			{
 				zbx_db_insert_add_values(&db_insert_hmacro, hostmacroid++, host->hostid,
-						hostmacro->macro, hostmacro->value, hostmacro->description);
+						hostmacro->macro, hostmacro->value, hostmacro->description,
+						(int)hostmacro->type);
 			}
 			else if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HOSTMACRO_UPDATE))
 			{
@@ -2476,6 +2487,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdescription='%s'",
 							d, value_esc);
 					zbx_free(value_esc);
+					d = ",";
+				}
+				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HOSTMACRO_UPDATE_TYPE))
+				{
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%stype=%d",
+							d, hostmacro->type);
 				}
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where hostmacroid=" ZBX_FS_UI64 ";\n", hostmacro->hostmacroid);
