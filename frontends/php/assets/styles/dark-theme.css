@@ -138,8 +138,7 @@ svg a {
   overflow-x: hidden;
   position: relative;
   scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-behavior: smooth; }
+  -ms-overflow-style: none; }
   .scrollable:focus {
     outline: 0; }
   .scrollable::-webkit-scrollbar {

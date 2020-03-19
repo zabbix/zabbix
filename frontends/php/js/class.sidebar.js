@@ -41,6 +41,7 @@ class CSidebar extends CBaseComponent {
 
 	init() {
 		this._sidebar_toggle = document.getElementById('sidebar-button-toggle');
+		this._sidebar_scrollable = this._target.querySelector('.scrollable');
 
 		this._is_focused = false;
 		this._is_opened = false;
@@ -211,11 +212,6 @@ class CSidebar extends CBaseComponent {
 
 			expandSelected: () => {
 				this._expand_timer = setTimeout(() => {
-					const scrollable = this._target.querySelector('.scrollable');
-					if (scrollable) {
-						scrollable.scrollTop = 0;
-					}
-
 					ZABBIX.MenuMain
 						.expandSelected()
 						.focusSelected();
@@ -226,9 +222,15 @@ class CSidebar extends CBaseComponent {
 				clearTimeout(this._expand_timer);
 			},
 
-			expand: () => {
-				this.on('mouseleave', this._events.expandSelected);
-				this.on('mouseenter', this._events.cancelExpandSelected);
+			expand: (e) => {
+				if (this._sidebar_scrollable.scrollHeight > this._sidebar_scrollable.clientHeight) {
+					setTimeout(() => {
+						e.detail.menu_item._target.scrollIntoView({
+							behavior: 'smooth',
+							block: 'nearest'
+						});
+					}, UI_TRANSITION_DURATION);
+				}
 			},
 
 			viewmodechange: (e) => {
@@ -279,6 +281,8 @@ class CSidebar extends CBaseComponent {
 
 				if ([SIDEBAR_VIEW_MODE_FULL, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
 					ZABBIX.MenuMain.on('expand', this._events.expand);
+					this.on('mouseleave', this._events.expandSelected);
+					this.on('mouseenter', this._events.cancelExpandSelected);
 				}
 				else {
 					ZABBIX.MenuMain.off('expand', this._events.expand);

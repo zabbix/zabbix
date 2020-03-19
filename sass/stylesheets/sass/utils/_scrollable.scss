@@ -68,8 +68,6 @@ $scrollbar-track-size-outline: 2px;
 	}
 
 	@if $ui-transitions {
-		scroll-behavior: smooth;
-
 		.scrollbar-track {
 			transition: opacity $ui-transition-duration ease-out 2s,
 			width $ui-transition-duration ease-out 2s;
