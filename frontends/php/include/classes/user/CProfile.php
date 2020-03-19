@@ -26,8 +26,9 @@ class CProfile {
 	private static $update = [];
 	private static $insert = [];
 	private static $stringProfileMaxLength;
+	private static $is_initialized = false;
 
-	private static function init() {
+	public static function init() {
 		self::$userDetails = CWebUser::$data;
 		self::$profiles = [];
 
@@ -37,9 +38,15 @@ class CProfile {
 			' FOR UPDATE;'
 		);
 
-		register_shutdown_function(function() {
-			self::flush();
-		});
+		if (!self::$is_initialized) {
+			register_shutdown_function(function() {
+				DBstart();
+				$result = self::flush();
+				DBend($result);
+			});
+		}
+
+		self::$is_initialized = true;
 	}
 
 	/**
