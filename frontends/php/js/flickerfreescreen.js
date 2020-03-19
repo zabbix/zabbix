@@ -276,9 +276,9 @@
 							screen.timestamp = request_start;
 							screen.isRefreshing = false;
 
-							$('main .msg-bad').remove();
+							$('.wrapper .msg-bad').remove();
 							$('#flickerfreescreen_' + id).replaceWith(html);
-							$('main .msg-bad').insertBefore('main > :first-child');
+							$('.wrapper .msg-bad').prependTo('.wrapper');
 
 							window.flickerfreeScreen.setElementProgressState(id, false);
 						}
