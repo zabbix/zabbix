@@ -19,6 +19,8 @@
 
 
 // Global constants.
+
+// Sync with SASS variable: $ui-transition-duration.
 const UI_TRANSITION_DURATION = 300;
 
 // Array indexOf method for javascript<1.6 compatibility

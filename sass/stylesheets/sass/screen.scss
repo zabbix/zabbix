@@ -1,6 +1,8 @@
 $theme-name: 'blue' !default;
 
 $ui-transitions: true !default;
+
+// Sync with JavaScript variable: UI_TRANSITION_DURATION.
 $ui-transition-duration: .3s !default;
 
 @import "utils/mixins";
