@@ -108,6 +108,10 @@ class CSidebar extends CBaseComponent {
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 				ZABBIX.MenuMain.collapseAll();
+				ZABBIX.MenuMain.getSelected()._target.scrollIntoView({
+					behavior: 'smooth',
+					block: 'nearest'
+				});
 			}
 
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
@@ -280,12 +284,10 @@ class CSidebar extends CBaseComponent {
 				}
 
 				if ([SIDEBAR_VIEW_MODE_FULL, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
-					ZABBIX.MenuMain.on('expand', this._events.expand);
 					this.on('mouseleave', this._events.expandSelected);
 					this.on('mouseenter', this._events.cancelExpandSelected);
 				}
 				else {
-					ZABBIX.MenuMain.off('expand', this._events.expand);
 					this.off('mouseleave', this._events.expandSelected);
 					this.off('mouseenter', this._events.cancelExpandSelected);
 				}
@@ -297,6 +299,8 @@ class CSidebar extends CBaseComponent {
 		for (const el of this._target.querySelectorAll('.js-sidebar-mode')) {
 			el.addEventListener('click', this._events.viewmodechange);
 		}
+
+		ZABBIX.MenuMain.on('expand', this._events.expand);
 
 		this._events._update(this._view_mode);
 	}

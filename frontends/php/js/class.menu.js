@@ -82,6 +82,16 @@ class CMenu extends CBaseComponent {
 		return this;
 	}
 
+	getSelected() {
+		for (const item of this._items) {
+			if (item.hasSubmenu() && item.isSelected()) {
+				return item;
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * Register all DOM events.
 	 */
