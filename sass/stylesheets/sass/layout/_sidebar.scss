@@ -90,10 +90,15 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		border-radius: 0;
 		text-indent: -9999px;
 		opacity: .75;
+		z-index: 0;
 
 		&:focus,
 		&:hover {
 			opacity: 1;
+		}
+
+		@if $ui-transitions {
+			transition: right $ui-transition-duration, z-index 0s $ui-transition-duration;
 		}
 	}
 
@@ -201,10 +206,11 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 			.button-expand,
 			.button-hide,
 			.button-show {
-				opacity: 0;
+				right: $sidebar-padding;
+				z-index: -1;
 
 				@if $ui-transitions {
-					transition: opacity $ui-transition-duration * .5;
+					transition: right $ui-transition-duration;
 				}
 			}
 

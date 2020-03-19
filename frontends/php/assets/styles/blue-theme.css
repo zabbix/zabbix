@@ -341,7 +341,9 @@ footer {
     border: none;
     border-radius: 0;
     text-indent: -9999px;
-    opacity: .75; }
+    opacity: .75;
+    z-index: 0;
+    transition: right 0.3s, z-index 0s 0.3s; }
     .sidebar .button-hide:focus, .sidebar .button-hide:hover,
     .sidebar .button-show:focus,
     .sidebar .button-show:hover,
@@ -400,8 +402,9 @@ footer {
     .sidebar.is-compact:not(.is-opened) .button-expand,
     .sidebar.is-compact:not(.is-opened) .button-hide,
     .sidebar.is-compact:not(.is-opened) .button-show {
-      opacity: 0;
-      transition: opacity 0.15s; }
+      right: 12px;
+      z-index: -1;
+      transition: right 0.3s; }
     .sidebar.is-compact:not(.is-opened) .server-name {
       opacity: 0; }
     .sidebar.is-compact:not(.is-opened) .form-search {
