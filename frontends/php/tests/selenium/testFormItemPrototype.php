@@ -20,6 +20,8 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/api/services/CItemGeneral.php';
+require_once dirname(__FILE__).'/../../include/classes/api/services/CItemPrototype.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -625,7 +627,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if ($type == 'Database monitor' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'db.odbc.select[<unique short description>,dsn]');
+			$this->zbxTestAssertElementValue('key', 'db.odbc.select[<unique short description>,<dsn>,<connection string>]');
 		}
 
 		if ($type == 'SSH agent' && !isset($itemid)) {

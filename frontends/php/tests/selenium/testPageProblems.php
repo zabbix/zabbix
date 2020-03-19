@@ -156,7 +156,9 @@ class testPageProblems extends CLegacyWebTest {
 		// Select host
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
-		$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select('Zabbix servers');
+		COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+		$this->zbxTestLaunchOverlayDialog('Host groups');
+		$this->query('xpath://a[text()="Zabbix servers"]')->one()->waitUntilClickable()->click();
 		$this->zbxTestClickWait('spanid10084');
 
 		// Type application
@@ -165,8 +167,6 @@ class testPageProblems extends CLegacyWebTest {
 		// Select trigger
 		$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
-		$this->query('id:generic-popup-form')->asForm()->one()->getField('Host')->select('ЗАББИКС Сервер');
-		COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->zbxTestCheckboxSelect("item_'99250'");
 		$this->zbxTestCheckboxSelect("item_'99251'");
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
@@ -389,7 +389,9 @@ class testPageProblems extends CLegacyWebTest {
 
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
-		$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select('Host group for suppression');
+		COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+		$this->zbxTestLaunchOverlayDialog('Host groups');
+		$this->query('xpath://a[text()="Host group for suppression"]')->one()->waitUntilClickable()->click();
 		$this->zbxTestClickLinkTextWait('Host for suppression');
 		$this->zbxTestClickButtonText('Apply');
 

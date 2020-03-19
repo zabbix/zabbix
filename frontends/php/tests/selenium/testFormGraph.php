@@ -446,7 +446,10 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			if (isset($data['host'])) {
-				$this->query('id:generic-popup-form')->asForm()->one()->getField('Host')->select($this->host);
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
+						->one()->click();
 				$this->zbxTestClickLinkText($this->itemSimple);
 			}
 
@@ -849,7 +852,10 @@ class testFormGraph extends CLegacyWebTest {
 				$this->zbxTestClick('add_item');
 				$this->zbxTestLaunchOverlayDialog('Items');
 				$link = $item['itemName'];
-				$this->query('id:generic-popup-form')->asForm()->one()->getField('Host')->select($this->host);
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
+						->one()->click();
 				$this->zbxTestClickLinkTextWait($link);
 
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('items_0_name'));
@@ -914,8 +920,10 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['ymin_name'])) {
 			$this->zbxTestClick('yaxis_min');
 			$this->zbxTestLaunchOverlayDialog('Items');
-			$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
-			COverlayDialogElement::find()->one()->waitUntilReady();
+			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+			$this->zbxTestLaunchOverlayDialog('Hosts');
+			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
+						->one()->click();
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymin_name = $data['ymin_name'];
@@ -927,8 +935,10 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestClick('yaxis_max');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
-			$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
-			COverlayDialogElement::find()->one()->waitUntilReady();
+			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+			$this->zbxTestLaunchOverlayDialog('Hosts');
+			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
+						->one()->click();
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymax_name = $data['ymax_name'];

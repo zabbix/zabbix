@@ -1772,7 +1772,9 @@ class testFormAction extends CLegacyWebTest {
 // add target host Zabbix server
 		$this->zbxTestClickButtonMultiselect('operation_opcommand_hst_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
-		$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select('Zabbix servers');
+		$this->query('xpath://div[@class="overlay-dialogue-controls"]//button[text()="Select"]')->one()->click();
+		$this->zbxTestLaunchOverlayDialog('Host groups');
+		$this->query('xpath://a[text()="Zabbix servers"]')->one()->waitUntilClickable()->click();
 		$this->zbxTestClickLinkTextWait('Simple form test host');
 // add target group Zabbix servers
 		$this->zbxTestClickButtonMultiselect('operation_opcommand_grp_');

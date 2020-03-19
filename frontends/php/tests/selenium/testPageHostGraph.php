@@ -442,7 +442,11 @@ class testPageHostGraph extends CLegacyWebTest {
 			// Select hosts or templates.
 			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
 				// Select host group.
-				$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select($data['group']);
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Host groups');
+				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$data['group'].'"]')
+						->one()->waitUntilClickable()->click();
+				$this->query('id:overlay-bg')->waitUntilNotVisible();
 
 				foreach ($data['targets'] as $target) {
 					$result = DBselect('SELECT hostid FROM hosts WHERE host='. zbx_dbstr($target));

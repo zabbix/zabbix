@@ -28,28 +28,25 @@ class testZBX6648 extends CLegacyWebTest {
 		return [
 			[
 				[
-					'hostgroup' => 'ZBX6648 All Triggers',
 					'host' => 'ZBX6648 All Triggers Host',
 					'triggers' => 'both'
 				]
 			],
 			[
 				[
-					'hostgroup' => 'ZBX6648 Enabled Triggers',
 					'host' => 'ZBX6648 Enabled Triggers Host',
 					'triggers' => 'enabled'
 				]
 			],
 			[
 				[
-					'hostgroup' => 'ZBX6648 Disabled Triggers',
 					'host' => 'ZBX6648 Disabled Triggers Host',
 					'triggers' => 'disabled'
 				]
 			],
 			[
 				[
-					'hostgroup' => 'ZBX6648 Group No Hosts',
+					'host' => 'Host 1 from first group',
 					'triggers' => 'no triggers'
 				]
 			]
@@ -68,22 +65,18 @@ class testZBX6648 extends CLegacyWebTest {
 		switch ($zbx_data['triggers']) {
 			case 'both' :
 			case 'enabled' :
-				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
-				COverlayDialogElement::find()->one()->waitUntilReady();
-				$this->zbxTestLaunchOverlayDialog('Triggers');
-				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				$this->query('xpath://a[text()="'.$zbx_data['host'].'"]')->one()->waitUntilClickable()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->zbxTestLaunchOverlayDialog('Triggers');
 				break;
 			case 'disabled' :
-				$hostgroup = $zbx_data['hostgroup'];
-				$host = $zbx_data['host'];
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='groupid']/option[text()='$hostgroup']");
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='hostid']/option[text()='$host']");
-				break;
 			case 'no triggers' :
-				$hostgroup = $zbx_data['hostgroup'];
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='groupid']/option[text()='$hostgroup']");
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				COverlayDialogElement::find()->one()->waitUntilReady();
+				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['host'].'"]');
 				break;
 		}
 	}

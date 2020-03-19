@@ -592,7 +592,10 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			if (isset($data['host'])) {
-				$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
+						->one()->waitUntilClickable()->click();
 				$this->zbxTestClickLinkText($this->itemSimple);
 			}
 
@@ -1082,7 +1085,10 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestClick('add_item');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
-			$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
+			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+			$this->zbxTestLaunchOverlayDialog('Hosts');
+			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
+					->one()->waitUntilClickable()->click();
 			$this->zbxTestClickLinkText($this->itemSimple);
 
 			if (isset($data['removeItem'])) {
@@ -1094,7 +1100,10 @@ class testFormGraphPrototype extends CLegacyWebTest {
 
 				$this->zbxTestClick('add_item');
 				$this->zbxTestLaunchOverlayDialog('Items');
-				$this->query('id:generic-popup-form')->asForm()->waitUntilVisible()->one()->getField('Host')->select($this->host);
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
+						->one()->waitUntilClickable()->click();
 				$this->zbxTestClickLinkText($this->itemSimple);
 
 				$this->zbxTestClick('add_protoitem');

@@ -168,7 +168,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Templates');
 
 		foreach ($data['templates'] as $template) {
-			$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select($template['group']);
+			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+			$this->zbxTestLaunchOverlayDialog('Host groups');
+			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$template['group'].'"]')
+					->one()->waitUntilClickable()->click();
 			$this->zbxTestClickLinkTextWait($template['name']);
 			$this->zbxTestWaitForPageToLoad();
 		}
@@ -335,7 +338,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			foreach ($data['templates'] as $template) {
 				$this->zbxTestClickButtonMultiselect('add_templates_');
 				$this->zbxTestLaunchOverlayDialog('Templates');
-				$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select('Templates');
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Host groups');
+				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="Templates"]')
+						->one()->waitUntilClickable()->click();
 				$this->zbxTestClickLinkTextWait($template['name']);
 				$this->zbxTestWaitForPageToLoad();
 			}
@@ -455,7 +461,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select('Templates');
+			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+			$this->zbxTestLaunchOverlayDialog('Host groups');
+			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="Templates"]')
+					->one()->waitUntilClickable()->click();
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 

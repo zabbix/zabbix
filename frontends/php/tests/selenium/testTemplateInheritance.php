@@ -55,7 +55,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
-		$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->select('Templates');
+		COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+		$this->zbxTestLaunchOverlayDialog('Host groups');
+		$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="Templates"]')
+				->one()->waitUntilClickable()->click();
 		$this->zbxTestClickLinkTextWait('Template Module Zabbix agent');
 
 		$this->zbxTestTextPresent('Template Module Zabbix agent');

@@ -210,7 +210,8 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 			if (array_key_exists('host', $filter)) {
 				$this->zbxTestClickButtonMultiselect('hostids_');
 				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->query('id:generic-popup-form')->asForm()->one()->getField('Host group')->edit();
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Host groups');
 				$host_groups = $this->query('name:hostGroupsform')->asForm()->one();
 				foreach (['Host group for tag permissions', 'Zabbix servers', 'ZBX6648 All Triggers',
 						'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers'] as $group ) {
