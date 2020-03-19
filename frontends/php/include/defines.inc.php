@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.0.0beta1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050059);
+define('ZABBIX_DB_VERSION',		4050062);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -127,6 +127,8 @@ define('ZBX_AUTH_CASE_SENSITIVE',	1);
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
+
+define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 

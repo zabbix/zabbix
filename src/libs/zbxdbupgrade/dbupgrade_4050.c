@@ -1494,6 +1494,27 @@ static int	DBpatch_4050059(void)
 	return DBadd_field("hostmacro", &field);
 }
 
+static int	DBpatch_4050060(void)
+{
+	const ZBX_FIELD	field = {"compression_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050061(void)
+{
+	const ZBX_FIELD	field = {"compression_availability", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050062(void)
+{
+	const ZBX_FIELD	field = {"compress_older", "7d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1554,5 +1575,8 @@ DBPATCH_ADD(4050056, 0, 1)
 DBPATCH_ADD(4050057, 0, 1)
 DBPATCH_ADD(4050058, 0, 1)
 DBPATCH_ADD(4050059, 0, 1)
+DBPATCH_ADD(4050060, 0, 1)
+DBPATCH_ADD(4050061, 0, 1)
+DBPATCH_ADD(4050062, 0, 1)
 
 DBPATCH_END()
