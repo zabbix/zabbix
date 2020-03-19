@@ -179,7 +179,7 @@
 					jQuery('.wrapper').find('> .msg-bad, > .msg-good').remove();
 
 					if (messages.length) {
-						jQuery('.wrapper').prepend(messages);
+						jQuery('.wrapper main').before(messages);
 					}
 					overlayDialogueDestroy(overlay.dialogueid);
 				}

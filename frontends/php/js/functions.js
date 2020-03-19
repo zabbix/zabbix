@@ -263,7 +263,7 @@ function objectSize(obj) {
 function addMessage(html) {
 	var $message_div = jQuery('<div>').attr('id', 'messages');
 	$message_div.append(html);
-	jQuery('.wrapper').prepend($message_div);
+	jQuery('.wrapper main').before($message_div);
 }
 
 function removeMessages() {

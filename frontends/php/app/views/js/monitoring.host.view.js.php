@@ -65,7 +65,7 @@
 				return $('form[name=host_view]');
 			},
 			addMessages: function(messages) {
-				$('.wrapper').prepend(messages);
+				$('.wrapper main').before(messages);
 			},
 			removeMessages: function() {
 				$('.wrapper .msg-bad').remove();

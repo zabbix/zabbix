@@ -278,7 +278,7 @@
 
 							$('.wrapper .msg-bad').remove();
 							$('#flickerfreescreen_' + id).replaceWith(html);
-							$('.wrapper .msg-bad').prependTo('.wrapper');
+							$('.wrapper .msg-bad').insertBefore('.wrapper main');
 
 							window.flickerfreeScreen.setElementProgressState(id, false);
 						}
