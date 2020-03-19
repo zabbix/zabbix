@@ -173,9 +173,9 @@ abstract class CMapElement extends CApiService {
 			}
 
 			if (isset($selement['iconid_off']) && $selement['iconid_off'] == 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('No icon for map element "%s".', array_key_exists('label', $selement) ? $selement['label'] : '')
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No icon for map element ""%1$s".',
+					array_key_exists('label', $selement) ? $selement['label'] : ''
+				));
 			}
 
 			if ($create) {
@@ -186,9 +186,7 @@ abstract class CMapElement extends CApiService {
 
 		// check permissions to used objects
 		if (!CMapHelper::checkSelementPermissions($selements)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-			);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		return $update ? $db_selements : true;

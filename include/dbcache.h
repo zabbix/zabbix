@@ -89,6 +89,7 @@ typedef struct
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	bulk;
+	unsigned char	snmp_version;
 	unsigned char	useip;
 	char		ip_orig[INTERFACE_IP_LEN_MAX];
 	char		dns_orig[INTERFACE_DNS_LEN_MAX];
@@ -146,6 +147,7 @@ typedef struct
 	zbx_uint64_t		lastlogsize;
 	zbx_uint64_t		valuemapid;
 	unsigned char		type;
+	unsigned char		snmp_version;
 	unsigned char		value_type;
 	unsigned char		state;
 	unsigned char		snmpv3_securitylevel;
@@ -737,6 +739,14 @@ size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *p
 void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
 		unsigned char *psk_buf, size_t psk_buf_len);
 
+#define ZBX_MACRO_ENV_SECURE	0
+#define ZBX_MACRO_ENV_NONSECURE	1
+
+#define ZBX_MACRO_VALUE_TEXT	0
+#define ZBX_MACRO_VALUE_SECRET	1
+
+#define ZBX_MACRO_SECRET_MASK	"******"
+
 void	DCget_user_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 char	*DCexpression_expand_user_macros(const char *expression);
 
@@ -962,5 +972,7 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
 
 void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags);
+
+unsigned char	zbx_dc_set_macro_env(unsigned char env);
 
 #endif

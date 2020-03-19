@@ -187,7 +187,7 @@ else {
 		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
 		if ($data['filterField'] !== '' && $data['filterFieldValue'] !== ''
 				&& !isset($possibleInventoryFields[$data['filterField']])) {
-			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filterField']));
+			error(_s('Impossible to filter by inventory field "%1$s", which does not exist.', $data['filterField']));
 		}
 		else {
 			// if we are filtering by field, this field is also required

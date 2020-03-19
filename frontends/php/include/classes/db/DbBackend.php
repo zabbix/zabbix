@@ -26,7 +26,72 @@ abstract class DbBackend {
 
 	protected $warning;
 
+	/**
+	 * Error message.
+	 *
+	 * @var string
+	 */
 	protected $error;
+
+	/**
+	 * TLS encryption on/off.
+	 *
+	 * @var bool
+	 */
+	protected $tls_encryption = false;
+
+	/**
+	 * Path to TLS key file.
+	 *
+	 * @var string
+	 */
+	protected $tls_key_file = '';
+
+	/**
+	 * Path to TLS cert file.
+	 *
+	 * @var string
+	 */
+	protected $tls_cert_file = '';
+
+	/**
+	 * Path to TLS ca file.
+	 *
+	 * @var string
+	 */
+	protected $tls_ca_file = '';
+
+	/**
+	 * True - need host verification..
+	 *
+	 * @var bool
+	 */
+	protected $tls_verify_host = true;
+
+	/**
+	 * Connection required cipher pattern.
+	 *
+	 * @var string
+	 */
+	protected $tls_cipher_list = '';
+
+	/**
+	 * Set TLS specific options for db conection.
+	 *
+	 * @param string $key_file       Path to TLS key file.
+	 * @param string $cert_file      Path to TLS cert file.
+	 * @param string $ca_file        Path to TLS ca file.
+	 * @param bool   $verify_host    True - need host verification.
+	 * @param string $cipher_list    Connection required cipher pattern.
+	 */
+	public function setConnectionSecurity($key_file, $cert_file, $ca_file, $verify_host, $cipher_list) {
+		$this->tls_encryption = true;
+		$this->tls_key_file = $key_file;
+		$this->tls_cert_file = $cert_file;
+		$this->tls_ca_file = $ca_file;
+		$this->tls_verify_host = $verify_host;
+		$this->tls_cipher_list = $cipher_list;
+	}
 
 	/**
 	 * Check if 'dbversion' table exists.
@@ -34,6 +99,20 @@ abstract class DbBackend {
 	 * @return boolean
 	 */
 	abstract protected function checkDbVersionTable();
+
+	/**
+	 * Create connection to database server.
+	 *
+	 * @param string $host         Host name.
+	 * @param string $port         Port.
+	 * @param string $user         User name.
+	 * @param string $password     Password.
+	 * @param string $dbname       Database name.
+	 * @param string $schema       DB schema.
+	 *
+	 * @return resource|null
+	 */
+	abstract public function connect($host, $port, $user, $password, $dbname, $schema);
 
 	/**
 	 * Check if connected database version matches with frontend version.

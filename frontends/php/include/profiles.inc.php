@@ -184,7 +184,7 @@ function update_config($config) {
 			}
 
 			if (isset($names[$config[$varName]])) {
-				error(_s('Duplicate severity name "%s".', $config[$varName]));
+				error(_s('Duplicate severity name "%1$s".', $config[$varName]));
 				return false;
 			}
 			else {

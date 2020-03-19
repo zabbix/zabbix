@@ -40,9 +40,8 @@ class testFormItemTest extends CWebTest {
 		return [
 				['Type' => 'Zabbix agent (active)'],
 				['Type' => 'Simple check'],
-				['Type' => 'SNMPv1 agent','SNMP OID' => '[IF-MIB::]ifInOctets.1'],
-				['Type' => 'SNMPv2 agent'],
-				['Type' => 'SNMPv3 agent'],
+				['Type' => 'SNMP agent','SNMP OID' => '[IF-MIB::]ifInOctets.1'],
+				['Type' => 'SNMP agent'],
 				['Type' => 'Zabbix internal'],
 				['Type' => 'Zabbix trapper'],
 				['Type' => 'External check'],
@@ -104,7 +103,7 @@ class testFormItemTest extends CWebTest {
 
 			for ($i = 0; $i < 2; $i++) {
 
-				if ($type === 'IPMI agent' && $is_host === false) {
+				if (($type === 'IPMI agent' || $type === 'SNMP agent') && $is_host === false) {
 					$enabled = false;
 				}
 				else {
@@ -152,6 +151,64 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Zabbix agent',
+						'Key' => 'key.macro.in.preproc.steps'
+					],
+					'macros' => [
+						[
+							'macro' => '{$1}',
+							'value' => 'Numeric macro'
+						],
+						[
+							'macro' => '{$A}',
+							'value' => 'Some text'
+						],
+						[
+							'macro' => '{$_}',
+							'value' => 'Underscore'
+						]
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
+						'Key' => 'macro.in.key.and.preproc.steps[{$DEFAULT_DELAY}]'
+					],
+					'macros' => [
+						[
+							'macro' => '{$1}',
+							'value' => 'Numeric macro'
+						],
+						[
+							'macro' => '{$A}',
+							'value' => 'Some text'
+						],
+						[
+							'macro' => '{$_}',
+							'value' => 'Underscore'
+						],
+						[
+							'macro' => '{$DEFAULT_DELAY}',
+							'value' => '30'
+						]
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
 						'Key' => 'test.item.key'
 					]
 
@@ -170,7 +227,7 @@ class testFormItemTest extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'SNMPv1 agent',
+						'Type' => 'SNMP agent',
 						'Key' => 'test.item.no.host.value'
 					],
 					'host_value' => false
@@ -180,17 +237,8 @@ class testFormItemTest extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'SNMPv2 agent',
-						'Key' => 'test.snmpv2'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'SNMPv3 agent',
-						'Key' => 'test.snmpv3'
+						'Type' => 'SNMP agent',
+						'Key' => 'test.snmp'
 					]
 				]
 			],
@@ -503,7 +551,7 @@ class testFormItemTest extends CWebTest {
 	 * @param boolean	$is_host		true if host, false if template
 	 */
 	public function checkTestItem($create_link, $data, $is_host) {
-		if (!$is_host && $data['fields']['Type'] === 'IPMI agent') {
+		if (!$is_host && ($data['fields']['Type'] === 'IPMI agent' || $data['fields']['Type'] === 'SNMP agent')) {
 			return;
 		}
 
@@ -550,9 +598,7 @@ class testFormItemTest extends CWebTest {
 				// Check interface and proxy fields.
 				switch ($data['fields']['Type']) {
 					case 'Zabbix agent':
-					case 'SNMPv1 agent':
-					case 'SNMPv2 agent':
-					case 'SNMPv3 agent':
+					case 'SNMP agent':
 					case 'IPMI agent':
 						$fields_value = [
 							'address' => $is_host ? $host_interface[0] : '',
@@ -619,9 +665,7 @@ class testFormItemTest extends CWebTest {
 				$this->checkServerMessage(['Connection to Zabbix server "localhost" refused. Possible reasons:']);
 
 				// Check empty interface fields.
-				if (in_array($data['fields']['Type'], ['Zabbix agent', 'SNMPv1 agent', 'SNMPv2 agent',
-					'SNMPv3 agent', 'IPMI agent'
-				])){
+				if (in_array($data['fields']['Type'], ['Zabbix agent', 'SNMP agent', 'IPMI agent'])) {
 					$elements['address']->clear();
 					$elements['port']->clear();
 					$button->click();

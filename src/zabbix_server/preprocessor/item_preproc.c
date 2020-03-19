@@ -39,67 +39,6 @@ extern zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
- * Function: str_printable_dyn                                                *
- *                                                                            *
- * Purpose: converts text to printable string by converting special           *
- *          characters to escape sequences                                    *
- *                                                                            *
- * Parameters: text - [IN] the text to convert                                *
- *                                                                            *
- * Return value: The text converted in printable format                       *
- *                                                                            *
- ******************************************************************************/
-static char	*str_printable_dyn(const char *text)
-{
-	size_t		out_alloc = 0;
-	const char	*pin;
-	char		*out, *pout;
-
-	for (pin = text; '\0' != *pin; pin++)
-	{
-		switch (*pin)
-		{
-			case '\n':
-			case '\t':
-			case '\r':
-				out_alloc += 2;
-				break;
-			default:
-				out_alloc++;
-				break;
-		}
-	}
-
-	out = zbx_malloc(NULL, ++out_alloc);
-
-	for (pin = text, pout = out; '\0' != *pin; pin++)
-	{
-		switch (*pin)
-		{
-			case '\n':
-				*pout++ = '\\';
-				*pout++ = 'n';
-				break;
-			case '\t':
-				*pout++ = '\\';
-				*pout++ = 't';
-				break;
-			case '\r':
-				*pout++ = '\\';
-				*pout++ = 'r';
-				break;
-			default:
-				*pout++ = *pin;
-				break;
-		}
-	}
-	*pout = '\0';
-
-	return out;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: item_preproc_numeric_type_hint                                   *
  *                                                                            *
  * Purpose: returns numeric type hint based on item value type                *
@@ -491,17 +430,22 @@ static int	item_preproc_delta_speed(unsigned char value_type, zbx_variant_t *val
 
 /******************************************************************************
  *                                                                            *
- * Function: unescape_trim_params                                             *
+ * Function: unescape_param                                                   *
  *                                                                            *
- * Purpose: unescapes string used for trim operation parameter                *
+ * Purpose: copy first n chars from in to out, unescape escaped characters    *
+ *          during copying                                                    *
  *                                                                            *
- * Parameters: in  - [IN] the string to unescape                              *
- *             out - [OUT] the unescaped string                               *
+ * Parameters: op_type - [IN] the operation type                              *
+ *             in      - [IN] the value to unescape                           *
+ *             len     - [IN] the length of the value to be unescaped         *
+ *             out     - [OUT] the value to process                           *
  *                                                                            *
  ******************************************************************************/
-static void	unescape_trim_params(const char *in, char *out)
+static void	unescape_param(int op_type, const char *in, int len, char *out)
 {
-	for (; '\0' != *in; in++, out++)
+	const char	*end = in + len;
+
+	for (;in < end; in++, out++)
 	{
 		if ('\\' == *in)
 		{
@@ -519,6 +463,13 @@ static void	unescape_trim_params(const char *in, char *out)
 				case 't':
 					*out = '\t';
 					break;
+				case '\\':
+					if (ZBX_PREPROC_STR_REPLACE == op_type)
+					{
+						*out = '\\';
+						break;
+					}
+					ZBX_FALLTHROUGH;
 				default:
 					*out = *(--in);
 			}
@@ -552,7 +503,7 @@ static int item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	unescape_trim_params(params, params_raw);
+	unescape_param(op_type, params, strlen(params), params_raw);
 
 	if (ZBX_PREPROC_LTRIM == op_type || ZBX_PREPROC_TRIM == op_type)
 		zbx_ltrim(value->data.str, params_raw);
@@ -584,7 +535,7 @@ static int item_preproc_rtrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_RTRIM, params, &err))
 		return SUCCEED;
 
-	characters = str_printable_dyn(params);
+	characters = zbx_str_printable_dyn(params);
 	*errmsg = zbx_dsprintf(*errmsg, "cannot perform right trim of \"%s\" for value of type \"%s\": %s",
 			characters, zbx_variant_type_desc(value), err);
 
@@ -615,7 +566,7 @@ static int item_preproc_ltrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_LTRIM, params, &err))
 		return SUCCEED;
 
-	characters = str_printable_dyn(params);
+	characters = zbx_str_printable_dyn(params);
 	*errmsg = zbx_dsprintf(*errmsg, "cannot perform left trim of \"%s\" for value of type \"%s\": %s",
 			characters, zbx_variant_type_desc(value), err);
 
@@ -646,7 +597,7 @@ static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_TRIM, params, &err))
 		return SUCCEED;
 
-	characters = str_printable_dyn(params);
+	characters = zbx_str_printable_dyn(params);
 	*errmsg = zbx_dsprintf(*errmsg, "cannot perform trim of \"%s\" for value of type \"%s\": %s",
 			characters, zbx_variant_type_desc(value), err);
 
@@ -2077,6 +2028,58 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_str_replace                                         *
+ *                                                                            *
+ * Purpose: replace substrings in string                                      *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	unsigned int	len_search, len_replace;
+	const char	*ptr;
+	char		*new_string, search_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
+			replace_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+	if (NULL == (ptr = strchr(params, '\n')))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
+		return FAIL;
+	}
+
+	if (0 == (len_search = ptr - params))
+	{
+		*errmsg = zbx_strdup(*errmsg, "first parameter is expected");
+		return FAIL;
+	}
+
+	unescape_param(ZBX_PREPROC_STR_REPLACE, params, MIN(len_search, sizeof(search_str) - 1), search_str);
+
+	len_replace = strlen(ptr + 1);
+	unescape_param(ZBX_PREPROC_STR_REPLACE, ptr + 1, MIN(len_replace, sizeof(replace_str) - 1), replace_str);
+
+	if (SUCCEED != item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	new_string = string_replace(value->data.str, search_str, replace_str);
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, new_string);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
@@ -2176,6 +2179,9 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			break;
 		case ZBX_PREPROC_CSV_TO_JSON:
 			ret = item_preproc_csv_to_json(value, op->params, error);
+			break;
+		case ZBX_PREPROC_STR_REPLACE:
+			ret = item_preproc_str_replace(value, op->params, error);
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "unknown preprocessing operation");
