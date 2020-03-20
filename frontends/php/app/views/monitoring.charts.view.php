@@ -111,6 +111,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					'object_name' => 'graphs',
 					'data' => $data['ms_graphs'],
 					'popup' => [
+						'filter_preselect_field' => 'filter_hostids_',
 						'parameters' => [
 							'srctbl' => 'graphs',
 							'srcfld1' => 'graphid',
@@ -131,6 +132,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					'object_name' => 'graphs',
 					'data' => $data['ms_graph_patterns'],
 					'popup' => [
+						'filter_preselect_field' => 'filter_hostids_',
 						'parameters' => [
 							'srctbl' => 'graphs',
 							'srcfld1' => 'graphid',

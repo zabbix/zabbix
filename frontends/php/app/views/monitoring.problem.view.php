@@ -155,6 +155,7 @@ if ($data['action'] == 'problem.view') {
 				'object_name' => 'triggers',
 				'data' => $data['filter']['triggers'],
 				'popup' => [
+					'filter_preselect_field' => 'filter_hostids_',
 					'parameters' => [
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',
