@@ -122,7 +122,8 @@ if ($config == QUEUE_OVERVIEW) {
 		foreach ($itemTypes as $type) {
 			if (isset($queueData[$type])) {
 				$itemTypeData = $queueData[$type];
-			} else {
+			}
+			else {
 				$itemTypeData = [
 					'delay5' => 0,
 					'delay10' => 0,
@@ -160,7 +161,6 @@ if ($config == QUEUE_OVERVIEW) {
 
 // overview by proxy
 elseif ($config == QUEUE_OVERVIEW_BY_PROXY) {
-
 	$table->setHeader([
 		_('Proxy'),
 		_('5 seconds'),
@@ -184,7 +184,8 @@ elseif ($config == QUEUE_OVERVIEW_BY_PROXY) {
 		foreach ($proxies as $proxyId => $proxy) {
 			if (isset($queueData[$proxyId])) {
 				$proxyData = $queueData[$proxyId];
-			} else {
+			}
+			else {
 				$proxyData = [
 					'delay5' => 0,
 					'delay10' => 0,
@@ -214,7 +215,6 @@ elseif ($config == QUEUE_OVERVIEW_BY_PROXY) {
 
 // details
 elseif ($config == QUEUE_DETAILS) {
-
 	$table->setHeader([
 		_('Scheduled check'),
 		_('Delayed by'),
