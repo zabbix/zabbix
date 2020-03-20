@@ -112,7 +112,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &error)))
+	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, NULL, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
@@ -187,7 +187,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	struct zbx_json		j;
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
 	char			*error = NULL;
-	int			availability_ts, more_history, more_discovery, more_areg;
+	int			availability_ts, more_history, more_discovery, more_areg, proxy_delay;
 	zbx_vector_ptr_t	tasks;
 	struct zbx_json_parse	jp, jp_tasks;
 
@@ -223,6 +223,9 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
+
+	if (ZBX_PROXY_DATA_MORE == more_history && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
+		zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 	if (SUCCEED == send_data_to_server(sock, j.buffer, &error))
 	{

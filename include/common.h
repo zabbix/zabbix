@@ -922,6 +922,14 @@ typedef struct
 }
 ZBX_TASK_EX;
 
+typedef struct
+{
+	int	values_num;
+	int	period_start;
+	int	period_end;
+}
+zbx_proxy_commdelay_t;
+
 #define ZBX_RTC_MSG_SHIFT	0
 #define ZBX_RTC_SCOPE_SHIFT	8
 #define ZBX_RTC_DATA_SHIFT	16

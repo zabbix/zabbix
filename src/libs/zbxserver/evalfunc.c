@@ -1648,16 +1648,17 @@ out:
  ******************************************************************************/
 static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, char **error)
 {
-	int				arg1, ret = FAIL;
+	int				arg1, num, period, lazy = 1, ret = FAIL;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts;
+	char				*arg2 = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_history_record_vector_create(&values);
 
-	if (1 < num_param(parameters))
+	if (2 < (num = num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1670,9 +1671,50 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 		goto out;
 	}
 
+	if (1 < num && (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 2, &arg2) ||
+			('\0' != *arg2 && 0 != (lazy = strcmp("strict", arg2)))))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
 	zbx_timespec(&ts);
 
-	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, arg1, 1, &ts) &&
+	if (0 != item->host.proxy_hostid && 0 != lazy)
+	{
+		zbx_proxy_commdelay_t	commdelay;
+
+		if (SUCCEED != DCget_proxy_commdelay(item->host.proxy_hostid, &commdelay))
+		{
+			*error = zbx_strdup(*error, "cannot retrieve proxy commdelay");
+			goto out;
+		}
+
+		if (0 == commdelay.values_num)
+		{
+			int	lastaccess, proxy_delay;
+
+			if (SUCCEED != DCget_proxy_lastaccess(item->host.proxy_hostid, &lastaccess))
+			{
+				*error = zbx_strdup(*error, "cannot retrieve proxy lastaccess");
+				goto out;
+			}
+
+			if (SUCCEED != DCget_proxy_delay(item->host.proxy_hostid, &proxy_delay))
+			{
+				*error = zbx_strdup(*error, "cannot retrieve proxy delay");
+				goto out;
+			}
+
+			period = arg1 + proxy_delay + (ts.sec - lastaccess);
+		}
+		else
+			period = commdelay.period_end - commdelay.period_start + arg1;
+	}
+	else
+		period = arg1;
+
+	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
 			1 == values.values_num)
 	{
 		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -1700,6 +1742,7 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
+	zbx_free(arg2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

@@ -132,6 +132,7 @@ static char	*dc_strdup(const char *source)
  *           | Zabbix internal  | zabbix[host,discovery,interfaces]    |      *
  *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
  *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
+ *           | Zabbix internal  | zabbix[proxy,<proxyname>,delay]      |      *
  *           | Zabbix aggregate | *                                    |      *
  *           | Calculated       | *                                    |      *
  *           '------------------+--------------------------------------'      *
@@ -176,7 +177,8 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
 						ret = SUCCEED;
 				}
-				else if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg3, "lastaccess"))
+				else if (0 == strcmp(arg1, "proxy") &&
+						(0 == strcmp(arg3, "lastaccess") || 0 == strcmp(arg3, "delay")))
 					ret = SUCCEED;
 clean:
 				free_request(&request);
@@ -1440,6 +1442,11 @@ done:
 				proxy->version = 0;
 				proxy->lastaccess = atoi(row[24]);
 				proxy->last_cfg_error_time = 0;
+				proxy->proxy_delay = 0;
+				proxy->more_data = 0;
+				proxy->commdelay.values_num = 0;
+				proxy->commdelay.period_start = 0;
+				proxy->commdelay.period_end = 0;
 			}
 
 			proxy->auto_compress = atoi(row[32 + ZBX_HOST_TLS_OFFSET]);
@@ -12017,7 +12024,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 	WRLOCK_CACHE;
 
-	if (diff->lastaccess < config->proxy_lastaccess_ts)
+	if (0 == (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VALNUM) && diff->lastaccess < config->proxy_lastaccess_ts)
 		diff->lastaccess = config->proxy_lastaccess_ts;
 
 	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &diff->hostid)))
@@ -12052,6 +12059,48 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			if (proxy-> last_version_error_time != diff->last_version_error_time)
 				proxy->last_version_error_time = diff->last_version_error_time;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR);
+		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY))
+		{
+			if (proxy->proxy_delay != diff->proxy_delay)
+				proxy->proxy_delay = diff->proxy_delay;
+
+			if (proxy->more_data != diff->more_data)
+				proxy->more_data = diff->more_data;
+		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMMDELAY))
+		{
+			zbx_proxy_commdelay_t	*proxy_commdelay = &proxy->commdelay;
+
+			if (0 == proxy_commdelay->values_num)
+			{
+				proxy_commdelay->period_start = diff->commdelay.period_start;
+				proxy_commdelay->period_end = diff->commdelay.period_end;
+				proxy_commdelay->values_num = diff->commdelay.values_num;
+			}
+			else
+			{
+				proxy_commdelay->values_num += diff->commdelay.values_num;
+
+				if (0 != proxy->more_data)
+				{
+					if (diff->commdelay.period_start < proxy_commdelay->period_start)
+						proxy_commdelay->period_start = diff->commdelay.period_start;
+
+					if (diff->commdelay.period_end > proxy_commdelay->period_end)
+						proxy_commdelay->period_end = diff->commdelay.period_end;
+				}
+			}
+		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VALNUM))
+		{
+			if (proxy->commdelay.values_num > 0)
+				proxy->commdelay.values_num--;
+			else
+				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_VALNUM);
 		}
 	}
 
@@ -12284,6 +12333,121 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 	}
 
 	UNLOCK_CACHE;
+}
+
+int	DCget_proxy_commdelay(zbx_uint64_t hostid, zbx_proxy_commdelay_t *commdelay)
+{
+	const ZBX_DC_PROXY	*dc_proxy;
+	int			ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
+	{
+		const zbx_proxy_commdelay_t	*proxy_commdelay = &dc_proxy->commdelay;
+
+		commdelay->period_start = proxy_commdelay->period_start;
+		commdelay->period_end = proxy_commdelay->period_end;
+		commdelay->values_num = proxy_commdelay->values_num;
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+int	DCget_proxy_lastaccess(zbx_uint64_t hostid, int *lastaccess)
+{
+	const ZBX_DC_PROXY	*dc_proxy;
+	int			ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
+	{
+		*lastaccess = dc_proxy->lastaccess;
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_proxy_delay                                                *
+ *                                                                            *
+ * Purpose: retrieves proxy delay from the cache                              *
+ *                                                                            *
+ * Parameters: hostid - [IN] proxy host id                                    *
+ *             delay  - [OUT] proxy delay                                     *
+ *                                                                            *
+ * Return value: SUCCEED - the delay is retrieved                             *
+ *               FAIL    - the delay cannot be retrieved, proxy not found in  *
+ *                         configuration cache                                *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_proxy_delay(zbx_uint64_t hostid, int *delay)
+{
+	const ZBX_DC_PROXY	*dc_proxy;
+	int			ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
+	{
+		*delay = dc_proxy->proxy_delay;
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_proxy_delay_by_name                                        *
+ *                                                                            *
+ * Purpose: retrieves proxy delay from the cache                              *
+ *                                                                            *
+ * Parameters: name  - [IN] proxy host name                                   *
+ *             delay - [OUT] proxy delay                                      *
+ *             error - [OUT] error                                            *
+ *                                                                            *
+ * Return value: SUCCEED - proxy delay is retrieved                           *
+ *               FAIL    - proxy delay cannot be retrieved                    *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error)
+{
+	const ZBX_DC_HOST	*dc_host;
+
+	RDLOCK_CACHE;
+	dc_host = DCfind_proxy(name);
+	UNLOCK_CACHE;
+
+	if (NULL == dc_host)
+	{
+		*error = zbx_dsprintf(*error, "proxy \"%s\" not found", name);
+		return FAIL;
+	}
+
+	if (SUCCEED != DCget_proxy_delay(dc_host->hostid, delay))
+	{
+		*error = zbx_dsprintf(*error, "proxy \"%s\" not found in configuration cache", name);
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 #ifdef HAVE_TESTS

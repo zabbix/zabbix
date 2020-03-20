@@ -1274,7 +1274,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			av.state = ITEM_STATE_NOTSUPPORTED;
 
 		DCconfig_get_items_by_keys(&item, &hk, &errcode, 1);
-		process_history_data(&item, &av, &errcode, 1);
+		process_history_data(&item, &av, &errcode, 1, NULL);
 		DCconfig_clean_items(&item, &errcode, 1);
 
 		zbx_alarm_on(CONFIG_TIMEOUT);

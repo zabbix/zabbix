@@ -760,20 +760,26 @@ void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	unsigned char	compress;
-	int		version;
-	int		lastaccess;
-	int		last_version_error_time;
+	zbx_uint64_t		hostid;
+	unsigned char		compress;
+	int			version;
+	int			lastaccess;
+	int			last_version_error_time;
+	int			proxy_delay;
+	int			more_data;
+	zbx_proxy_commdelay_t	commdelay;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			__UINT64_C(0x0002)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			__UINT64_C(0x0004)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY			__UINT64_C(0x0010)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMMDELAY			__UINT64_C(0x0020)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_VALNUM			__UINT64_C(0x0040)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
-		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION | 	\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
 	zbx_uint64_t	flags;
 }
