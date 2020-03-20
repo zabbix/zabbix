@@ -93,8 +93,7 @@ $popup_options = [
 	'dstfld1' => $data['expression_field_name'],
 	'parent_discoveryid' => $data['parent_discoveryid']
 ];
-if ($data['groupid'] && $data['hostid']) {
-	$popup_options['groupid'] = $data['groupid'];
+if ($data['hostid']) {
 	$popup_options['hostid'] = $data['hostid'];
 }
 $add_expression_button = (new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
@@ -592,8 +591,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'with_triggers' => '1',
 						'normal_only' => '1',
 						'noempty' => '1',
-						'hostid' => $data['hostid'],
-						'groupid' => $data['groupid']
+						'hostid' => $data['hostid']
 					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
