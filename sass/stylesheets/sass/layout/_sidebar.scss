@@ -44,7 +44,7 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 	}
 
 	.form-search {
-		margin: 12px $sidebar-padding $sidebar-padding;
+		margin: $sidebar-padding $sidebar-padding $sidebar-padding;
 	}
 
 	.sidebar-nav {
@@ -92,7 +92,6 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 			opacity: 0;
 		}
 	}
-
 
 	.button-hide,
 	.button-show,
