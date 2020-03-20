@@ -295,8 +295,26 @@ footer {
   will-change: max-width;
   transform: translate3d(0, 0, 0); }
   .sidebar .sidebar-header {
-    padding: 12px;
-    box-sizing: border-box; }
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    margin: 10px 10px 0;
+    padding: 2px;
+    overflow: hidden;
+    justify-content: space-between; }
+  .sidebar .sidebar-header-buttons {
+    display: flex;
+    width: 48px;
+    justify-content: flex-end; }
+  .sidebar .server-name {
+    box-sizing: border-box;
+    width: 0;
+    margin-top: 5px;
+    padding: 0 12px;
+    color: #9f9f9f;
+    transition: opacity 0.3s ease-out; }
+  .sidebar .form-search {
+    margin: 12px 12px 12px; }
   .sidebar .sidebar-nav {
     display: flex;
     flex-direction: column;
@@ -310,39 +328,27 @@ footer {
     background: rgba(135, 209, 255, 0.85); }
   .sidebar .logo {
     position: relative;
-    display: block;
-    padding: 2px;
-    margin: -2px;
-    overflow: hidden; }
+    margin-right: 12px; }
     .sidebar .logo:active, .sidebar .logo:hover, .sidebar .logo:link, .sidebar .logo:visited {
       border: 0; }
     .sidebar .logo:focus .sidebar-logo {
       box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35); }
-    .sidebar .logo .sidebar-logo {
-      margin-right: 60px; }
     .sidebar .logo .sidebar-logo-compact {
       position: absolute;
-      top: 2px;
-      left: 2px;
+      top: 0;
+      left: 0;
       opacity: 0; }
-  .sidebar .button-compact,
-  .sidebar .button-expand {
-    margin-left: 12px; }
   .sidebar .button-hide,
   .sidebar .button-show,
   .sidebar .button-compact,
   .sidebar .button-expand {
-    position: absolute;
-    top: 12px;
     width: 24px;
     height: 24px;
     background: url(../img/icon-sprite.svg) no-repeat;
     border: none;
     border-radius: 0;
     text-indent: -9999px;
-    opacity: .75;
-    z-index: 0;
-    transition: right 0.3s, z-index 0s 0.3s; }
+    opacity: .75; }
     .sidebar .button-hide:focus, .sidebar .button-hide:hover,
     .sidebar .button-show:focus,
     .sidebar .button-show:hover,
@@ -352,24 +358,15 @@ footer {
     .sidebar .button-expand:hover {
       opacity: 1; }
   .sidebar .button-hide {
-    right: 12px;
     background-position: -540px -568px; }
   .sidebar .button-show {
     display: none;
-    right: 12px;
     background-position: -570px -568px; }
   .sidebar .button-compact {
-    right: 36px;
     background-position: -540px -544px; }
   .sidebar .button-expand {
     display: none;
-    right: 36px;
     background-position: -540px -520px; }
-  .sidebar .server-name {
-    width: 0;
-    margin-top: 5px;
-    color: #9f9f9f;
-    transition: opacity 0.3s ease-out; }
   .sidebar .form-search .search {
     transition: opacity 0.3s; }
   .sidebar .form-search .search-icon {
@@ -396,14 +393,7 @@ footer {
       transition: opacity 0s 0.3s; }
     .sidebar.is-compact:not(.is-opened) .logo .sidebar-logo-compact {
       opacity: 1;
-      transition: opacity 0s 0.21s; }
-    .sidebar.is-compact:not(.is-opened) .button-compact,
-    .sidebar.is-compact:not(.is-opened) .button-expand,
-    .sidebar.is-compact:not(.is-opened) .button-hide,
-    .sidebar.is-compact:not(.is-opened) .button-show {
-      right: 12px;
-      z-index: -1;
-      transition: right 0.3s; }
+      transition: opacity 0s 0.3s; }
     .sidebar.is-compact:not(.is-opened) .server-name {
       opacity: 0; }
     .sidebar.is-compact:not(.is-opened) .form-search {
@@ -452,7 +442,6 @@ footer {
 
 .form-search {
   position: relative;
-  margin-top: 12px;
   height: 24px; }
   .form-search .search {
     position: absolute;

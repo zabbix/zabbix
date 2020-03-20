@@ -46,8 +46,18 @@ class CSidebar extends CBaseComponent {
 		this._is_focused = false;
 		this._is_opened = false;
 
-		let max_width = 0;
-		for (const child of this._target.querySelectorAll('.sidebar-header, nav > ul')) {
+		const sidebar_header = this._target.querySelector('.sidebar-header'),
+			sidebar_header_style = window.getComputedStyle(sidebar_header),
+			sidebar_header_style_position = sidebar_header_style.position;
+
+		sidebar_header.style.position = 'absolute';
+
+		let max_width = sidebar_header.clientWidth + parseInt(sidebar_header_style.getPropertyValue('margin-left'))
+			+ parseInt(sidebar_header_style.getPropertyValue('margin-right'));
+
+		sidebar_header.style.position = sidebar_header_style_position;
+
+		for (const child of this._target.querySelectorAll('nav > ul')) {
 			const position = window.getComputedStyle(child).position;
 			child.style.position = 'absolute';
 			max_width = Math.max(max_width, child.clientWidth);
@@ -55,10 +65,10 @@ class CSidebar extends CBaseComponent {
 		}
 		this._target.style.maxWidth = max_width + 'px';
 
-		const server_name = this._target.querySelector('.sidebar-header .server-name');
+		const server_name = this._target.querySelector('.server-name');
 		if (server_name) {
-			this._target.querySelector('.sidebar-header').style.maxWidth = max_width + 'px';
 			server_name.style.width = 'auto';
+			server_name.style.maxWidth = max_width + 'px';
 		}
 
 		this._view_mode = SIDEBAR_VIEW_MODE_FULL;

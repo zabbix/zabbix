@@ -23,15 +23,39 @@
  * @var CPartial $this
  */
 
-$logo = (new CLink(
-	[
-		makeLogo(LOGO_TYPE_SIDEBAR)->addClass('sidebar-logo'),
-		makeLogo(LOGO_TYPE_SIDEBAR_COMPACT)->addClass('sidebar-logo-compact')
-	],
-	(new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->getUrl()
-))->addClass(ZBX_STYLE_LOGO);
+$header = (new CDiv())
+	->addClass('sidebar-header')
+	->addItem(
+		(new CLink(
+			[
+				makeLogo(LOGO_TYPE_SIDEBAR)->addClass('sidebar-logo'),
+				makeLogo(LOGO_TYPE_SIDEBAR_COMPACT)->addClass('sidebar-logo-compact')
+			],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.view')
+				->getUrl()
+		))->addClass(ZBX_STYLE_LOGO)
+	)
+	->addItem(
+		(new CDiv([
+			(new CButton(null, _('Collapse sidebar')))
+				->addClass('button-compact js-sidebar-mode')
+				->setAttribute('title', _('Collapse sidebar')),
+			(new CButton(null, _('Expand sidebar')))
+				->addClass('button-expand js-sidebar-mode')
+				->setAttribute('title', _('Expand sidebar')),
+			(new CButton(null, _('Hide sidebar')))
+				->addClass('button-hide js-sidebar-mode')
+				->setAttribute('title', _('Hide sidebar')),
+			(new CButton(null, _('Show sidebar')))
+				->addClass('button-show js-sidebar-mode')
+				->setAttribute('title', _('Show sidebar'))
+		]))->addClass('sidebar-header-buttons')
+	);
+
+$server_name = ($data['server_name'] !== '')
+	? (new CDiv($data['server_name']))->addClass(ZBX_STYLE_SERVER_NAME)
+	: null;
 
 $search_icon = (new CSubmitButton(null))
 	->addClass('search-icon')
@@ -54,33 +78,12 @@ $search = (new CForm('get', 'zabbix.php'))
 		$search_icon
 	]);
 
-$server_name = ($data['server_name'] !== '')
-	? (new CDiv($data['server_name']))->addClass(ZBX_STYLE_SERVER_NAME)
-	: null;
-
 (new CTag('aside', true))
 	->addClass('sidebar')
 	->addClass(CViewHelper::loadSidebarMode() == ZBX_SIDEBAR_VIEW_MODE_COMPACT ? 'is-compact' : null)
 	->addClass(CViewHelper::loadSidebarMode() == ZBX_SIDEBAR_VIEW_MODE_HIDDEN ? 'is-hidden' : null)
-	->addItem(
-		(new CDiv([
-			$logo,
-			(new CButton(null, _('Collapse sidebar')))
-				->addClass('button-compact js-sidebar-mode')
-				->setAttribute('title', _('Collapse sidebar')),
-			(new CButton(null, _('Expand sidebar')))
-				->addClass('button-expand js-sidebar-mode')
-				->setAttribute('title', _('Expand sidebar')),
-			(new CButton(null, _('Hide sidebar')))
-				->addClass('button-hide js-sidebar-mode')
-				->setAttribute('title', _('Hide sidebar')),
-			(new CButton(null, _('Show sidebar')))
-				->addClass('button-show js-sidebar-mode')
-				->setAttribute('title', _('Show sidebar')),
-			$server_name,
-			$search
-		]))->addClass('sidebar-header')
-	)
+
+	->addItem([$header, $server_name, $search])
 	->addItem(
 		(new CDiv([
 			(new CTag('nav', true, APP::Component()->get('menu.main')->addClass('menu-main')))

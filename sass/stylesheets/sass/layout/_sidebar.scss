@@ -15,8 +15,36 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 	background: $sidebar-bg-color;
 
 	.sidebar-header {
-		padding: $sidebar-padding;
+		position: relative;
 		box-sizing: border-box;
+		display: flex;
+		margin: $sidebar-padding - 2px $sidebar-padding - 2px 0;
+		padding: 2px;
+		overflow: hidden;
+		justify-content: space-between;
+	}
+
+	.sidebar-header-buttons {
+		display: flex;
+		width: 48px;
+		justify-content: flex-end;
+	}
+
+	.server-name {
+		@extend %overflow-ellipsis;
+		box-sizing: border-box;
+		width: 0;
+		margin-top: 5px;
+		padding: 0 $sidebar-padding;
+		color: $sidebar-server-name-color;
+
+		@if $ui-transitions {
+			transition: opacity $ui-transition-duration ease-out;
+		}
+	}
+
+	.form-search {
+		margin: 12px $sidebar-padding $sidebar-padding;
 	}
 
 	.sidebar-nav {
@@ -42,10 +70,7 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 
 	.logo {
 		position: relative;
-		display: block;
-		padding: 2px;
-		margin: -2px;
-		overflow: hidden;
+		margin-right: $sidebar-padding;
 
 		&:active,
 		&:hover,
@@ -60,29 +85,19 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 			}
 		}
 
-		.sidebar-logo {
-			margin-right: 48px + $sidebar-padding;
-		}
-
 		.sidebar-logo-compact {
 			position: absolute;
-			top: 2px;
-			left: 2px;
+			top: 0;
+			left: 0;
 			opacity: 0;
 		}
 	}
 
-	.button-compact,
-	.button-expand {
-		margin-left: $sidebar-padding;
-	}
 
 	.button-hide,
 	.button-show,
 	.button-compact,
 	.button-expand {
-		position: absolute;
-		top: $sidebar-padding;
 		width: 24px;
 		height: 24px;
 		background: url(../img/icon-sprite.svg) no-repeat;
@@ -90,49 +105,29 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		border-radius: 0;
 		text-indent: -9999px;
 		opacity: .75;
-		z-index: 0;
 
 		&:focus,
 		&:hover {
 			opacity: 1;
 		}
-
-		@if $ui-transitions {
-			transition: right $ui-transition-duration, z-index 0s $ui-transition-duration;
-		}
 	}
 
 	.button-hide {
-		right: $sidebar-padding;
 		background-position: -540px -568px;
 	}
 
 	.button-show {
 		display: none;
-		right: $sidebar-padding;
 		background-position: -570px -568px;
 	}
 
 	.button-compact {
-		right: 24px + $sidebar-padding;
 		background-position: -540px -544px;
 	}
 
 	.button-expand {
 		display: none;
-		right: 24px + $sidebar-padding;
 		background-position: -540px -520px;
-	}
-
-	.server-name {
-		@extend %overflow-ellipsis;
-		width: 0;
-		margin-top: 5px;
-		color: $sidebar-server-name-color;
-
-		@if $ui-transitions {
-			transition: opacity $ui-transition-duration ease-out;
-		}
 	}
 
 	@if $ui-transitions {
@@ -197,20 +192,8 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 					opacity: 1;
 
 					@if $ui-transitions {
-						transition: opacity 0s $ui-transition-duration * .7;
+						transition: opacity 0s $ui-transition-duration;
 					}
-				}
-			}
-
-			.button-compact,
-			.button-expand,
-			.button-hide,
-			.button-show {
-				right: $sidebar-padding;
-				z-index: -1;
-
-				@if $ui-transitions {
-					transition: right $ui-transition-duration;
 				}
 			}
 
