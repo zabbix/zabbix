@@ -1400,7 +1400,6 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 		}
 
 		$number = sprintf('%.'.($precision - 1).'E', $number);
-
 		$digits = ($precision == 1) ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
 	}
 
