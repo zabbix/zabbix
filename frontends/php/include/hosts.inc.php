@@ -983,6 +983,11 @@ function isTemplate($hostId) {
  *   array(
  *       '{$MACRO}' => array(
  *           'macro' => '{$MACRO}',
+ *           'parent_host' => array(                <- optional
+ *               'value' => 'parent host level value',
+ *               'type' => 0,
+ *               'description' => ''
+ *           ),
  *           'template' => array(                   <- optional
  *               'value' => 'template-level value'
  *               'templateid' => 10001,
@@ -994,11 +999,12 @@ function isTemplate($hostId) {
  *       )
  *   )
  *
- * @param array $hostids
+ * @param array     $hostids        Hots or template ids.
+ * @param int|null  $parent_hostid  Parent host id of host prototype.
  *
  * @return array
  */
-function getInheritedMacros(array $hostids) {
+function getInheritedMacros(array $hostids, ?int $parent_hostid = null) {
 	$user_macro_parser = new CUserMacroParser();
 
 	$all_macros = [];
@@ -1119,15 +1125,34 @@ function getInheritedMacros(array $hostids) {
 		}
 	} while ($templateids);
 
-	$all_macros = array_keys($all_macros);
 	$all_templates = [];
 	$inherited_macros = [];
+	$parent_host_macros = [];
+
+	if ($parent_hostid !== null) {
+		[$parent_host] = API::Host()->get([
+			'output' => [],
+			'hostids' => [$parent_hostid],
+			'selectMacros' => ['macro', 'type', 'value', 'description']
+		]);
+		$parent_host_macros = array_column($parent_host['macros'], null, 'macro');
+		$all_macros += array_fill_keys(array_keys($parent_host_macros), true);
+	}
+
+	$all_macros = array_keys($all_macros);
 
 	// resolving
 	foreach ($all_macros as $macro) {
 		$inherited_macro = ['macro' => $macro];
 
-		if (array_key_exists($macro, $global_macros)) {
+		if (array_key_exists($macro, $parent_host_macros)) {
+			$inherited_macro['parent_host'] = [
+				'value' => CMacrosResolverGeneral::getMacroValue($parent_host_macros[$macro]),
+				'description' => $parent_host_macros[$macro]['description'],
+				'type' => $parent_host_macros[$macro]['type']
+			];
+		}
+		else if (array_key_exists($macro, $global_macros)) {
 			$inherited_macro['global'] = [
 				'value' => $global_macros[$macro]['value'],
 				'description' => $global_macros[$macro]['description'],
@@ -1206,6 +1231,11 @@ function getInheritedMacros(array $hostids) {
  *           'inherited_type' => 0x03,              <- ZBX_PROPERTY_INHERITED, ZBX_PROPERTY_OWN or ZBX_PROPERTY_BOTH
  *           'value' => 'effective value',
  *           'hostmacroid' => 7532,                 <- optional
+ *           'parent_host' => array(                <- optional
+ *               'value' => 'parent host value',
+ *               'type' => 0,
+ *               'description' => ''
+ *           ),
  *           'template' => array(                   <- optional
  *               'value' => 'template-level value'
  *               'templateid' => 10001,
@@ -1224,19 +1254,15 @@ function getInheritedMacros(array $hostids) {
  */
 function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 	$user_macro_parser = new CUserMacroParser();
+	$inherit_order = ['parent_host', 'template', 'global'];
 
 	foreach ($inherited_macros as &$inherited_macro) {
+		[$inherited_level] = array_values(array_intersect($inherit_order, array_keys($inherited_macro)));
 		$inherited_macro['inherited_type'] = ZBX_PROPERTY_INHERITED;
-		if (array_key_exists('template', $inherited_macro)) {
-			$inherited_macro['value'] = $inherited_macro['template']['value'];
-			$inherited_macro['description'] = $inherited_macro['template']['description'];
-			$inherited_macro['type'] = $inherited_macro['template']['type'];
-		}
-		else {
-			$inherited_macro['value'] = $inherited_macro['global']['value'];
-			$inherited_macro['description'] = $inherited_macro['global']['description'];
-			$inherited_macro['type'] = $inherited_macro['global']['type'];
-		}
+		$inherited_macro['inherited_level'] = $inherited_level;
+		$inherited_macro['value'] = $inherited_macro[$inherited_level]['value'];
+		$inherited_macro['type'] = $inherited_macro[$inherited_level]['type'];
+		$inherited_macro['description'] = $inherited_macro[$inherited_level]['description'];
 
 		// Secret macro value cannot be inherited.
 		if ($inherited_macro['type'] == ZBX_MACRO_TYPE_SECRET) {

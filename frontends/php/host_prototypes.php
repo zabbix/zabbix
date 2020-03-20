@@ -47,6 +47,7 @@ $fields = [
 	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
 	'group_hostid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"hostprototype.massdelete","hostprototype.massdisable",'.
@@ -88,6 +89,7 @@ if (getRequest('parent_discoveryid')) {
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid', 'name'],
 			'selectParentHost' => ['hostid'],
+			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'editable' => true
 		]);
 		$hostPrototype = reset($hostPrototype);
@@ -128,6 +130,14 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 		}
 		unset($groupPrototype);
 	}
+
+	if (hasRequest('macros')) {
+		foreach ($_REQUEST['macros'] as &$macro) {
+			$macro['type'] = ZBX_MACRO_TYPE_TEXT;
+			unset($macro['hostmacroid']);
+		}
+	}
+
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
@@ -141,6 +151,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'groupPrototypes' => [],
 		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', []))
 	];
+
+	if (hasRequest('macros')) {
+		// Remove empty new macro lines.
+		$newHostPrototype['macros'] = array_filter(cleanInheritedMacros(getRequest('macros', [])), function($macro) {
+			$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+
+			return (bool) array_filter(array_intersect_key($macro, $keys));
+		});
+	}
 
 	if (hasRequest('inventory_mode')) {
 		$newHostPrototype['inventory_mode'] = getRequest('inventory_mode');
@@ -277,10 +296,11 @@ if (hasRequest('form')) {
 			'templates' => [],
 			'add_templates' => [],
 			'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
-			'groupPrototypes' => getRequest('group_prototypes', [])
+			'groupPrototypes' => getRequest('group_prototypes', []),
+			'macros' => getRequest('macros', [])
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
-		'readonly' => true,
+		'readonly' => false,
 		'groups' => [],
 		// Parent discovery rules.
 		'templates' => []
@@ -314,12 +334,12 @@ if (hasRequest('form')) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectGroups' => ['groupid', 'name'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
-		'selectMacros' => ['macro', 'value', 'description', 'type'],
 		'hostids' => $discoveryRule['hostid'],
 		'templated_hosts' => true
 	]);
 	$parentHost = reset($parentHost);
 	$data['parent_host'] = $parentHost;
+	$data['parent_hostid'] = $parentHost['hostid'];
 
 	if (getRequest('group_links')) {
 		$data['groups'] = API::HostGroup()->get([
@@ -387,14 +407,19 @@ if (hasRequest('form')) {
 		]);
 	}
 
-	// Add inherited macros to host macros.
-	$data['macros'] = $data['parent_host']['macros'];
+	$macros = $data['host_prototype']['macros'];
+
 	if ($data['show_inherited_macros']) {
-		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(array_keys($templates)));
+		$macros = mergeInheritedMacros($macros, getInheritedMacros(array_keys($templates), $data['parent_hostid']));
 	}
 
 	// Sort only after inherited macros are added. Otherwise the list will look chaotic.
-	$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
+	$data['macros'] = array_values(order_macros($macros, 'macro')) + [[
+		'macro' => '',
+		'value' => '',
+		'type' => ZBX_MACRO_TYPE_TEXT,
+		'description' => ''
+	]];
 
 	// This data is used in common.template.edit.js.php.
 	$data['macros_tab'] = [
