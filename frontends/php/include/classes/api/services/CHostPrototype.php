@@ -1425,20 +1425,19 @@ class CHostPrototype extends CHostBase {
 			foreach ($macros as $macro) {
 				if (array_key_exists('hostmacroid', $macro) && array_key_exists($macro['hostmacroid'], $db_macros)) {
 					$diff = array_diff($macro, $db_macros[$macro['hostmacroid']]);
+					unset($diff['hostid']);
 
 					if ($diff) {
 						$update[] = ['hostmacroid' => $macro['hostmacroid']] + $diff;
-						unset($db_macros[$macro['hostmacroid']]);
 					}
+
+					unset($db_macros[$macro['hostmacroid']]);
 				}
 				else {
 					$create[] = ['hostid' => $hostid] + $macro;
 				}
 			}
 		}
-
-		// Remove empty arrays.
-		$update = array_filter($update);
 
 		if ($create) {
 			API::UserMacro()->create($create);
