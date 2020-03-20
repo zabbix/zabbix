@@ -314,7 +314,7 @@ footer {
     color: rgba(206, 218, 225, 0.5);
     transition: opacity 0.3s ease-out; }
   .sidebar .form-search {
-    margin: 12px 12px 12px; }
+    margin: 12px; }
   .sidebar .sidebar-nav {
     display: flex;
     flex-direction: column;
