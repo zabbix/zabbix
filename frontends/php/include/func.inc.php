@@ -1400,6 +1400,7 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 		}
 
 		$number = sprintf('%.'.($precision - 1).'E', $number);
+
 		$digits = ($precision == 1) ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
 	}
 
@@ -1417,7 +1418,8 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 			return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 		}
 	}
-	elseif ($exponent >= $precision && ($number != $number_original || $exponent - $precision > 2)) {
+	elseif ($exponent >= PHP_FLOAT_DIG
+		|| ($exponent >= $precision && ($number != $number_original || $exponent - $precision > 2))) {
 		return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 	}
 	else {
