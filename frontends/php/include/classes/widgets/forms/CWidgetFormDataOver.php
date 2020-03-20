@@ -46,6 +46,7 @@ class CWidgetFormDataOver extends CWidgetForm {
 
 		// Application field.
 		$field_application = new CWidgetFieldApplication('application', _('Application'));
+		$field_application->filter_preselect_field = 'hostids_';
 
 		if (array_key_exists('application', $this->data)) {
 			$field_application->setValue($this->data['application']);

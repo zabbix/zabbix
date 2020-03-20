@@ -137,7 +137,7 @@ if ($data['action'] == 'problem.view') {
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('filter_application_select', _('Select')))
-				->onClick('return PopUp("popup.generic",'.
+				->onClick('return PopUp("popup.generic", jQuery.extend('.
 					json_encode([
 						'srctbl' => 'applications',
 						'srcfld1' => 'name',
@@ -145,7 +145,7 @@ if ($data['action'] == 'problem.view') {
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1',
 						'real_hosts' => '1'
-					]).', null, this);'
+					]).', getFirstMultiselectValue("filter_hostids_")), null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])

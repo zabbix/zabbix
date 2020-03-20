@@ -908,3 +908,18 @@ Function.prototype.bindAsEventListener = function (context) {
 		return method.apply(context, [event || window.event].concat(args));
 	};
 };
+
+/**
+ * Get first selected host from multiselect field.
+ *
+ * @param {string} id
+ *
+ * @return {Object}
+ */
+function getFirstMultiselectValue(id) {
+	var values = jQuery('#'+id).multiSelect('getData');
+
+	return (values.length != 0)
+		? {hostid: values[0].id}
+		: {};
+}

@@ -133,7 +133,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('application_name', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
-						->onClick('return PopUp("popup.generic",'.
+						->onClick('return PopUp("popup.generic", jQuery.extend('.
 							json_encode([
 								'srctbl' => 'applications',
 								'srcfld1' => 'name',
@@ -141,7 +141,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 								'dstfld1' => 'application',
 								'real_hosts' => '1',
 								'with_applications' => '1'
-							]).', null, this);'
+							]).', getFirstMultiselectValue("filter_hostids_")), null, this);'
 						)
 				])
 				->addRow(_('Show suppressed problems'),

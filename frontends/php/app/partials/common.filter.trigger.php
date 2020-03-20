@@ -91,7 +91,7 @@ $column1
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
+			->onClick('return PopUp("popup.generic", jQuery.extend('.
 				json_encode([
 					'srctbl' => 'applications',
 					'srcfld1' => 'name',
@@ -99,7 +99,7 @@ $column1
 					'dstfld1' => 'application',
 					'real_hosts' => '1',
 					'with_applications' => '1'
-				]).', null, this);'
+				]).', getFirstMultiselectValue("filter_hostids_")), null, this);'
 			)
 	])
 	->addRow(_('Name'),

@@ -847,8 +847,7 @@ ZABBIX.apps.map = (function($) {
 
 				// application selection pop up
 				$('#application-select').click(function(event) {
-					var data = $('#elementNameHost').multiSelect('getData'),
-						popup_options = {
+					var popup_options = {
 							srctbl: 'applications',
 							srcfld1: 'name',
 							dstfrm: 'selementForm',
@@ -857,8 +856,8 @@ ZABBIX.apps.map = (function($) {
 							with_applications: '1'
 						};
 
-					if (data.length > 0 && $('#elementType').val() == '4') {
-						popup_options['hostid'] = data[0].id;
+					if ($('#elementType').val() == '0') {
+						popup_options = jQuery.extend(popup_options, getFirstMultiselectValue('elementNameHost'));
 					}
 
 					PopUp('popup.generic', popup_options, null, event.target);
