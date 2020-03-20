@@ -119,7 +119,6 @@ static void	evaluate_string(zbx_variant_t *res)
 		*(res_temp + i) = *(p0 + i);
 
 	*(res_temp + str_len) = '\0';
-
 	zbx_variant_set_str(res, res_temp);
 }
 
@@ -170,37 +169,49 @@ static double	evaluate_number(int *unknown_idx)
 	return result;
 }
 
-static void var_to_double(zbx_variant_t *result, int *unknown_idx)
+static void	var_to_double(zbx_variant_t *result)
 {
 	if (ZBX_VARIANT_STR == result->type)
 	{
-		int	negate = 0;
-		int	len;
-		double	result_double_value;
-
-		if (strlen(result->data.str) > 1 && result->data.str[0] == '-')
-		{
-			memmove(result->data.str, result->data.str+1, strlen(result->data.str));
-			negate = 1;
-		}
-
-		if (SUCCEED == zbx_suffixed_number_parse(result->data.str, &len) && '\0' == *(result->data.str + len))
-		{
-			result_double_value = atof(result->data.str) * suffix2factor(*(result->data.str + len - 1));
-
-			if (negate)
-				result_double_value = -result_double_value;
-		}
-		else
+		double	result_double_value = evaluate_string_to_double(result->data.str);
+		if (ZBX_INFINITY == result_double_value)
 		{
 			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
 					" expected numeric token at \"%s\".", result->data.str);
-			result_double_value = ZBX_INFINITY;
 		}
-
 		zbx_variant_clear(result);
 		zbx_variant_set_dbl(result, result_double_value);
 	}
+}
+
+static void	expand_suffixes_if_operands_are_castable(zbx_variant_t *result, zbx_variant_t *operand)
+{
+	zbx_variant_t	tmp_res, tmp_operand;
+	zbx_variant_copy(&tmp_res, result);
+	zbx_variant_copy(&tmp_operand, operand);
+
+	if (ZBX_VARIANT_STR == tmp_res.type)
+	{
+		double	result_double_value = evaluate_string_to_double(tmp_res.data.str);
+		zbx_variant_clear(&tmp_res);
+		zbx_variant_set_dbl(&tmp_res, result_double_value);
+	}
+
+	if (ZBX_VARIANT_STR == tmp_operand.type)
+	{
+		double	result_double_value = evaluate_string_to_double(tmp_operand.data.str);
+		zbx_variant_clear(&tmp_operand);
+		zbx_variant_set_dbl(&tmp_operand, result_double_value);
+	}
+
+	if (ZBX_INFINITY != tmp_res.data.dbl && ZBX_INFINITY != tmp_operand.data.dbl)
+	{
+		var_to_double(result);
+		var_to_double(operand);
+	}
+
+	zbx_variant_clear(&tmp_res);
+	zbx_variant_clear(&tmp_operand);
 }
 
 static zbx_variant_t	evaluate_term1(int *unknown_idx);
@@ -317,7 +328,7 @@ static zbx_variant_t	evaluate_term8(int *unknown_idx)
 		zbx_variant_t	res;
 		ptr++;
 		res = evaluate_term9(unknown_idx);
-		var_to_double(&res, unknown_idx);
+		var_to_double(&res);
 
 		if (ZBX_UNKNOWN == res.data.dbl || ZBX_INFINITY == res.data.dbl)
 			return res;
@@ -348,7 +359,7 @@ static zbx_variant_t	evaluate_term7(int *unknown_idx)
 		zbx_variant_t	res;
 		ptr += 3;
 		res = evaluate_term8(unknown_idx);
-		var_to_double(&res, unknown_idx);
+		var_to_double(&res);
 
 		if (ZBX_UNKNOWN == res.data.dbl || ZBX_INFINITY == res.data.dbl)
 			return res;
@@ -399,14 +410,18 @@ static zbx_variant_t	evaluate_term6(int *unknown_idx)
 	{
 		zbx_variant_t	operand;
 
-		var_to_double(&res, unknown_idx);
+		var_to_double(&res);
+
+		if (ZBX_INFINITY == res.data.dbl)
+			return res;
+
 		op = *ptr++;
 
 		/* 'ZBX_UNKNOWN' in multiplication and division produces 'ZBX_UNKNOWN'. */
 		/* Even if 1st operand is Unknown we evaluate 2nd operand too to catch fatal errors in it. */
 
 		operand = evaluate_term7(&oper_idx);
-		var_to_double(&operand, unknown_idx);
+		var_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -491,13 +506,17 @@ static zbx_variant_t	evaluate_term5(int *unknown_idx)
 
 	while ('+' == *ptr || '-' == *ptr)
 	{
-		var_to_double(&res, unknown_idx);
+		var_to_double(&res);
+
+		if (ZBX_INFINITY == res.data.dbl)
+			return res;
+
 		op = *ptr++;
 
 		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurs */
 
 		operand = evaluate_term6(&oper_idx);
-		var_to_double(&operand, unknown_idx);
+		var_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -578,7 +597,7 @@ static zbx_variant_t	evaluate_term4(int *unknown_idx)
 		else
 			break;
 
-		var_to_double(&res, unknown_idx);
+		var_to_double(&res);
 
 		if (ZBX_INFINITY == res.data.dbl)
 			return res;
@@ -587,7 +606,7 @@ static zbx_variant_t	evaluate_term4(int *unknown_idx)
 
 		operand = evaluate_term5(&oper_idx);
 
-		var_to_double(&operand, unknown_idx);
+		var_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -649,7 +668,7 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 	{
 		if (ZBX_INFINITY == res.data.dbl)
 		{
-			var_to_double(&res, unknown_idx);
+			var_to_double(&res);
 			res.data.dbl = ZBX_INFINITY;
 			return res;
 		}
@@ -678,6 +697,8 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 
 		operand = evaluate_term4(&oper_idx);
 
+		expand_suffixes_if_operands_are_castable(&res, &operand);
+
 		if (ZBX_VARIANT_STR == res.type && ZBX_VARIANT_STR == operand.type)
 		{
 			int res_temp = strcmp(res.data.str, operand.data.str);
@@ -692,7 +713,7 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 		}
 		else
 		{
-			var_to_double(&operand, unknown_idx);
+			var_to_double(&operand);
 
 			if (ZBX_INFINITY == operand.data.dbl)
 			{
@@ -702,7 +723,7 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 				return res;
 			}
 
-			var_to_double(&res, unknown_idx);
+			var_to_double(&res);
 
 			if (ZBX_INFINITY == res.data.dbl)
 			{
@@ -768,13 +789,13 @@ static zbx_variant_t	evaluate_term2(int *unknown_idx)
 	while ('a' == ptr[0] && 'n' == ptr[1] && 'd' == ptr[2] && SUCCEED == is_operator_delimiter(ptr[3]))
 	{
 		ptr += 3;
-		var_to_double(&res, unknown_idx);
+		var_to_double(&res);
 
 		if (ZBX_INFINITY == res.data.dbl)
 			return res;
 
 		operand = evaluate_term3(&oper_idx);
-		var_to_double(&operand, unknown_idx);
+		var_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -865,14 +886,14 @@ static zbx_variant_t	evaluate_term1(int *unknown_idx)
 	while ('o' == ptr[0] && 'r' == ptr[1] && SUCCEED == is_operator_delimiter(ptr[2]))
 	{
 		ptr += 2;
-		var_to_double(&res, unknown_idx);
+		var_to_double(&res);
 
 		if (ZBX_INFINITY == res.data.dbl)
 			return res;
 
 		operand = evaluate_term2(&oper_idx);
 
-		var_to_double(&operand, unknown_idx);
+		var_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -937,6 +958,8 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, expression);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "evaluate expression ->%s<-",expression);
+
 	ptr = expression;
 	level = 0;
 	buffer = error;
@@ -954,7 +977,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 		}
 		else
 		{
-			var_to_double(&res, &unknown_idx);
+			var_to_double(&res);
 		}
 	}
 
@@ -1044,7 +1067,7 @@ int	evaluate_unknown(const char *expression, double *value, char *error, size_t 
 	buffer = error;
 	max_buffer_len = max_error_len;
 	res = evaluate_term1(&unknown_idx);
-	var_to_double(&res, &unknown_idx);
+	var_to_double(&res);
 	*value = res.data.dbl;
 	zbx_variant_clear(&res);
 
@@ -1063,4 +1086,30 @@ int	evaluate_unknown(const char *expression, double *value, char *error, size_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:" ZBX_FS_DBL, __function_name, *value);
 
 	return SUCCEED;
+}
+
+double	evaluate_string_to_double(char *in)
+{
+	int	negate = 0, len;
+	double	result_double_value;
+
+	if (1 < strlen(in) && '-' == in[0])
+	{
+		memmove(in, in + 1, strlen(in));
+		negate = 1;
+	}
+
+	if (SUCCEED == zbx_suffixed_number_parse(in, &len) && '\0' == *(in + len))
+	{
+		result_double_value = atof(in) * suffix2factor(*(in + len - 1));
+
+		if (negate)
+			result_double_value = -(result_double_value);
+	}
+	else
+	{
+		result_double_value = ZBX_INFINITY;
+	}
+
+	return result_double_value;
 }

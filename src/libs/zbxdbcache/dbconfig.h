@@ -839,10 +839,10 @@ extern zbx_rwlock_t	config_lock;
  *               NULL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-typedef char* (*zbx_macro_value_validate_and_transform_func_t)(char *in, char **please_free_me);
+typedef char* (*zbx_macro_value_validate_and_transform_func_t)(char *in, char **please_free_me, int inside_quote);
 
-/* function optionally used to escape macro values when expanding user macros */
-char    *zbx_macro_value_transform(char *in, char **out);
+/* function optionally used to escape and autoquote macro values when expanding user macros */
+char    *zbx_macro_value_transform(char *in, char **please_free_me, int inside_quote);
 
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
 		zbx_macro_value_validate_and_transform_func_t validate_and_transform_func);

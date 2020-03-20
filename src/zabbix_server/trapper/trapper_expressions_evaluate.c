@@ -76,7 +76,7 @@ out:
 static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
 	char					*evaluate_error = NULL;
-	int					ret = FAIL, i, ii;
+	int					ret = FAIL, i;
 	unsigned char				value_type;
 	zbx_vector_ptr_t			expressions, results, history;
 	zbx_timespec_t				ts[2];
@@ -90,7 +90,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_ptr_free);
 
-	for (ii = 0; ii < expressions.values_num; ii++)
+	for (i = 0; i < expressions.values_num; i++)
 	{
 		double			expr_result;
 		zbx_vector_ptr_t	unknown_msgs;
@@ -99,11 +99,11 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 				sizeof(zbx_expressions_evaluate_result_t));
 		zbx_vector_ptr_append(&results, result);
 
-		result->expression = zbx_strdup(NULL, expressions.values[ii]);
+		result->expression = zbx_strdup(NULL, expressions.values[i]);
 		(result->error)[0] = '\0';
-		expressions.values[ii] = DCexpression_expand_user_macros(expressions.values[ii]);
+		expressions.values[i] = DCexpression_expand_user_macros(expressions.values[i]);
 
-		if (SUCCEED != evaluate(&expr_result, expressions.values[ii], result->error, sizeof(result->error),
+		if (SUCCEED != evaluate(&expr_result, expressions.values[i], result->error, sizeof(result->error),
 				&unknown_msgs))
 			continue;
 

@@ -9555,28 +9555,45 @@ out:
  * Parameters: value   - [IN] the macro value                                 *
  *                     - [PLEASE_FREE_ME] optimisation buffer that must be    *
  *                                        cleared by the calling function     *
+ *                     - [INSIDE_QUOTE] autoquoting gets applied if macro is  *
+ *                                      not already inside a quote and is not *
+ *                                      castable to a double                  *
  *                                                                            *
  * Return value: NOT NULL text value - transformed and validated value        *
  *               NULL - otherwise                                             *
  *                                                                            *
  *******************************************************************************/
-char*	zbx_macro_value_transform(char *in, char **please_free_me)
+char*	zbx_macro_value_transform(char *in, char **please_free_me, int inside_quote)
 {
 	size_t	len;
 	char	*tmp;
 
 	len = zbx_get_escape_string_len(in, "\"\\");
 
-	if (len == strlen(in))
+	if (!inside_quote && ZBX_INFINITY == evaluate_string_to_double(in))
 	{
-		please_free_me = &in;
-		return in;
-	}
+		/* autoquote */
+		tmp = zbx_malloc(NULL, len + 3);
+		tmp[0] = '\"';
+		zbx_escape_string(tmp+1, len + 1, in, "\"\\");
 
-	tmp = zbx_malloc(NULL, len + 1);
-	zbx_escape_string(tmp, len + 1, in, "\"\\");
-	tmp[len] = '\0';
-	please_free_me = &in;
+		tmp[len + 1] = '\"';
+		tmp[len + 2] = '\0';
+		please_free_me = &in;
+	}
+	else
+	{
+		if (len == strlen(in))
+		{
+			please_free_me = &in;
+			return in;
+		}
+
+		tmp = zbx_malloc(NULL, len + 1);
+		zbx_escape_string(tmp, len + 1, in, "\"\\");
+		tmp[len] = '\0';
+		please_free_me = &in;
+	}
 
 	return tmp;
 }
@@ -9603,9 +9620,9 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		zbx_macro_value_validate_and_transform_func_t validate_transform_func)
 {
 	zbx_token_t	token;
-	int		pos = 0, len, last_pos = 0, escape_quote_escaped_value_len;
+	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len, i;
 	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL, *escape_escaped_value = NULL,
-			*escape_quote_escaped_value = NULL,  *please_free_me = NULL;
+			*please_free_me = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
 
 	if ('\0' == *text)
@@ -9613,17 +9630,40 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
+		for (i = prev_token_loc_r + 1; i < token.loc.l; ++i)
+		{
+			if ('\"' == text[i] && (0 == i || (0 < i && '\\' != text[i - 1]) || 1 == i ||
+					(1 < i && '\\' == text[i - 2])))
+			{
+				if (!cur_token_inside_quote)
+				{
+					cur_token_inside_quote = 1;
+					break;
+				}
+				else
+				{
+					cur_token_inside_quote = 0;
+				}
+			}
+		}
+
 		if (ZBX_TOKEN_USER_MACRO != token.type)
+		{
+			prev_token_loc_r = token.loc.r;
 			continue;
+		}
 
 		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
+		{
+			prev_token_loc_r = token.loc.r;
 			continue;
+		}
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 		dc_get_user_macro(hostids, hostids_num, name, context, &value);
 
 		if (NULL != value && NULL != validate_transform_func)
-			value = validate_transform_func(value, &please_free_me);
+			value = validate_transform_func(value, &please_free_me, cur_token_inside_quote);
 
 		if (NULL != value)
 		{
@@ -9641,9 +9681,11 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 		pos = token.loc.r;
 		last_pos = pos + 1;
+		prev_token_loc_r = token.loc.r;
 	}
 
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
+
 	zbx_free(please_free_me);
 
 	return str;

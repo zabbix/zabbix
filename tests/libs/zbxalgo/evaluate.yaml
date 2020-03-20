@@ -21,6 +21,13 @@ out:
   value: 0
   return: 'SUCCEED'
 ---
+test case: 'strings comparison, castable to ints'
+in:
+  expression: '" 2"="2"'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
 test case: 'strings comparison, single bracket'
 in:
   expression: '"ccc"=("ccc"'
@@ -214,14 +221,14 @@ test case: 'string castable with suffix str comparison 1'
 in:
   expression: '"2.5M"="2621440"'
 out:
-  value: 0
+  value: 1
   return: 'SUCCEED'
 ---
 test case: 'string castable with suffix str comparison 2'
 in:
   expression: '"2.5M"<>"2621440"'
 out:
-  value: 1
+  value: 0
   return: 'SUCCEED'
 ---
 test case: 'string castable with suffix str comparison 3'
@@ -430,7 +437,7 @@ test case: 'term 6 / not_castable_str and not_castable_str'
 in:
   expression: '"-"/"-y"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "y".'
+  error: 'Cannot evaluate expression: expected numeric token at "-".'
   return: 'FAIL'
 ---
 test case: 'term 6 / castable_str and not_castable_str'
@@ -444,14 +451,14 @@ test case: 'term 6 / not_castable_str and zero int'
 in:
   expression: '"-z"/0'
 out:
-  error: 'Cannot evaluate expression: division by zero.'
+  error: 'Cannot evaluate expression: expected numeric token at "z".'
   return: 'FAIL'
 ---
 test case: 'term 6 / not_castable_str and zero str'
 in:
   expression: '"-z"/"0"'
 out:
-  error: 'Cannot evaluate expression: division by zero.'
+  error: 'Cannot evaluate expression: expected numeric token at "z".'
   return: 'FAIL'
 ---
 test case: 'term 6 / str and zero str'
@@ -500,7 +507,7 @@ test case: 'term 6 * not_castable_str and not_castable_str'
 in:
   expression: '"bb"*""'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "".'
+  error: 'Cannot evaluate expression: expected numeric token at "bb".'
   return: 'FAIL'
 
 # '+' and '-' operator tests
