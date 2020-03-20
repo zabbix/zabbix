@@ -1965,6 +1965,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
 			'selectTemplates' => ['templateid'],
+			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'preservekeys' => true
 		]);
 
@@ -1983,6 +1984,12 @@ class CDiscoveryRule extends CItemGeneral {
 					unset($groupPrototype['group_prototypeid']);
 				}
 				unset($groupPrototype);
+
+				foreach ($prototype['macros'] as &$macro) {
+					$macro['type'] = ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_MACRO_TYPE_TEXT : $macro['type'];
+					$macro += ['value' => ''];
+				}
+				unset($macro);
 			}
 			unset($prototype);
 
