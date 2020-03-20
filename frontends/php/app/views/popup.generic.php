@@ -152,6 +152,10 @@ if ($data['multiselect'] && $form !== null) {
 
 $table = (new CTableInfo())->setHeader(array_merge($table_columns, $data['table_columns']));
 
+if ($data['preselect_required']) {
+	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
+}
+
 $js_action_onclick = ' jQuery(this).removeAttr("onclick");'.
 	' overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));'.
 	' return false;';

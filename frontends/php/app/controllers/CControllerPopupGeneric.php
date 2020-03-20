@@ -94,6 +94,20 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected $hostids = [];
 
+	/**
+	 * Either Host filter need to be filled to load results.
+	 *
+	 * @var bool
+	 */
+	protected $host_preselect_required;
+
+	/**
+	 * Either Host group filter need to be filled to load results.
+	 *
+	 * @var bool
+	 */
+	protected $group_preselect_required;
+
 	protected function init() {
 		$this->disableSIDvalidation();
 
@@ -719,6 +733,9 @@ class CControllerPopupGeneric extends CController {
 	protected function doAction() {
 		$popup = $this->popup_properties[$this->source_table];
 
+		// Set popup options.
+		$this->host_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER);
+		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER);
 		$this->page_options = $this->getPageOptions();
 
 		// Make control filters. Must be called bedore extending groupids.
@@ -742,6 +759,8 @@ class CControllerPopupGeneric extends CController {
 			'multiselect' => $this->getInput('multiselect', 0),
 			'table_columns' => $popup['table_columns'],
 			'table_records' => $records,
+			'preselect_required' => (($this->host_preselect_required && !$this->hostids)
+				|| ($this->group_preselect_required && !$this->groupids)),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -890,7 +909,9 @@ class CControllerPopupGeneric extends CController {
 					'groupids' => $this->groupids ? $this->groupids : null
 				];
 
-				$records = API::Template()->get($options);
+				$records = (!$this->group_preselect_required || $this->groupids)
+					? API::Template()->get($options)
+					: [];
 
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['templateid' => 'id']);
@@ -920,7 +941,10 @@ class CControllerPopupGeneric extends CController {
 					];
 				}
 
-				$records = API::Host()->get($options);
+				$records = (!$this->group_preselect_required || $this->groupids)
+					? API::Host()->get($options)
+					: [];
+
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['hostid' => 'id']);
 				break;
@@ -932,7 +956,10 @@ class CControllerPopupGeneric extends CController {
 					'templated_hosts' => true
 				];
 
-				$records = API::Host()->get($options);
+				$records = (!$this->group_preselect_required || $this->groupids)
+					? API::Host()->get($options)
+					: [];
+
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['hostid' => 'id']);
 				break;
@@ -1008,7 +1035,13 @@ class CControllerPopupGeneric extends CController {
 					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 				}
 
-				$records = API::Trigger()->get($options);
+				if ((!$this->group_preselect_required || $this->groupids)
+						|| (!$this->host_preselect_required || $this->hostids)) {
+					$records = API::Trigger()->get($options);
+				}
+				else {
+					$records = [];
+				}
 
 				CArrayHelper::sort($records, ['description']);
 				break;
@@ -1065,7 +1098,9 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				if ($this->source_table === 'item_prototypes') {
-					$records = API::ItemPrototype()->get($options);
+					$records = (!$this->host_preselect_required || $this->hostids)
+						? API::ItemPrototype()->get($options)
+						: [];
 				}
 				else {
 					if ($this->hasInput('with_webitems')) {
@@ -1076,7 +1111,9 @@ class CControllerPopupGeneric extends CController {
 						$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 					}
 
-					$records = API::Item()->get($options);
+					$records = (!$this->host_preselect_required || $this->hostids)
+						? API::Item()->get($options)
+						: [];
 				}
 
 				// Resolve item names by default.
@@ -1096,7 +1133,14 @@ class CControllerPopupGeneric extends CController {
 						: null
 				];
 
-				$records = API::Application()->get($options);
+				if ((!$this->group_preselect_required || $this->groupids)
+						|| (!$this->host_preselect_required || $this->hostids)) {
+					$records = API::Application()->get($options);
+				}
+				else {
+					$records = [];
+				}
+
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['applicationid' => 'id']);
 				break;
@@ -1137,10 +1181,14 @@ class CControllerPopupGeneric extends CController {
 				];
 
 				if ($this->source_table === 'graph_prototypes') {
-					$records = API::GraphPrototype()->get($options);
+					$records = (!$this->host_preselect_required || $this->hostids)
+						? API::GraphPrototype()->get($options)
+						: [];
 				}
 				else {
-					$records = API::Graph()->get($options);
+					$records = (!$this->host_preselect_required || $this->hostids)
+						? API::Graph()->get($options)
+						: [];
 				}
 
 				CArrayHelper::sort($records, ['name']);
@@ -1200,7 +1248,14 @@ class CControllerPopupGeneric extends CController {
 					'groupids' => (!$this->hostids && $this->groupids) ? $this->groupids : null
 				];
 
-				$records = API::Script()->get($options);
+				if ((!$this->host_preselect_required && $this->hostids)
+						|| (!$this->group_preselect_required || $this->groupids)) {
+					$records = API::Script()->get($options);
+				}
+				else {
+					$records = [];
+				}
+
 				CArrayHelper::sort($records, ['name']);
 				break;
 		}

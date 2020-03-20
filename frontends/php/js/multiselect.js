@@ -268,6 +268,7 @@ jQuery(function($) {
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
 	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
+	 * @param string options['popup']['filter_preselect_field']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
 	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
@@ -405,15 +406,37 @@ jQuery(function($) {
 				}
 
 				popup_button.on('click', function(event) {
+					var popup_options = ms.options.popup.parameters;
+
+					if (ms.options.popup.filter_preselect_field != null) {
+						popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj));
+					}
+
 					// Click used instead focus because in patternselect listen only click.
 					$('input[type="text"]', $obj).click();
-					return PopUp('popup.generic', ms.options.popup.parameters, null, event.target);
+					return PopUp('popup.generic', popup_options, null, event.target);
 				});
 
 				$obj.after($('<div>', {'class': 'multiselect-button'}).append(popup_button));
 			}
 		});
 	};
+
+	/**
+	 * Get current value from preselect filter field.
+	 *
+	 * @param {jQuery} $obj
+	 *
+	 * @return {Object}
+	 */
+	function getFilterPreselectField($obj) {
+		var ms = $obj.data('multiSelect'),
+			values = $('#'+ms.options.popup.filter_preselect_field).multiSelect('getData');
+
+		return (values.length != 0)
+			? {hostid: values[0].id}
+			: {};
+	}
 
 	function makeMultiSelectInput($obj) {
 		var ms = $obj.data('multiSelect'),

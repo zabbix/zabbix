@@ -91,6 +91,10 @@ class CMultiSelect extends CTag {
 		}
 
 		if (array_key_exists('popup', $options)) {
+			if (array_key_exists('filter_preselect_field', $options['popup'])) {
+				$params['popup']['filter_preselect_field'] = $options['popup']['filter_preselect_field'];
+			}
+
 			if (array_key_exists('parameters', $options['popup'])) {
 				$params['popup']['parameters'] = $options['popup']['parameters'];
 
@@ -170,11 +174,21 @@ class CMultiSelect extends CTag {
 		$popup_parameters = [];
 
 		if (array_key_exists('popup', $options)) {
-			$valid_fields = ['parameters'];
+			$valid_fields = ['parameters', 'filter_preselect_field'];
 
 			foreach ($options['popup'] as $field => $value) {
 				if (!in_array($field, $valid_fields)) {
 					error('unsupported option: $options[\'popup\'][\''.$field.'\']');
+				}
+			}
+
+			if (array_key_exists('filter_preselect_field', $options['popup'])) {
+				if (is_string($options['popup']['filter_preselect_field'])
+						&& $options['popup']['filter_preselect_field'] !== '') {
+					$mapped_options['popup']['filter_preselect_field'] = $options['popup']['filter_preselect_field'];
+				}
+				else {
+					error('invalid property: $options[\'popup\'][\'filter_preselect_field\']');
 				}
 			}
 
