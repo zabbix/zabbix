@@ -1347,6 +1347,8 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  * @param int|null $decimals   Max number of first non-zero decimals decimals to display. Default: 0.
  * @param bool     $exact      Display exaclty this number of decimals instead of first non-zeros.
  *
+ * Note: $decimals must be less than $precision.
+ *
  * @return string
  */
 function formatFloat(float $number, int $precision = null, int $decimals = null, bool $exact = false): string {
@@ -1391,7 +1393,8 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 	}
 	else {
 		if ($exponent >= $precision) {
-			if (round($number, $precision - $exponent - 1) != $number) {
+			if ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
+					|| round($number, $precision - $exponent - 1) != $number) {
 				$number = round($number, $decimals - $exponent);
 			}
 		}
@@ -1417,8 +1420,8 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 			return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 		}
 	}
-	elseif ($exponent >= PHP_FLOAT_DIG
-		|| ($exponent >= $precision && ($number != $number_original || $exponent - $precision > 2))) {
+	elseif ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
+			|| ($exponent >= $precision && $number != $number_original)) {
 		return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 	}
 	else {
