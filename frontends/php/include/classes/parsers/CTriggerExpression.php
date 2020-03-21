@@ -57,14 +57,17 @@ class CTriggerExpression {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'lldmacros' => true        Enable low-level discovery macros usage in trigger expression.
-	 *   'allow_func_only' => true  Allow trigger expression without host:key pair, i.e. {func(param)}.
+	 *   'lldmacros' => true             Enable low-level discovery macros usage in trigger expression.
+	 *   'allow_func_only' => true       Allow trigger expression without host:key pair, i.e. {func(param)}.
+	 *   'collapsed_expression' => true  Short trigger expression.
+	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
 	 *
 	 * @var array
 	 */
 	public $options = [
 		'lldmacros' => true,
-		'allow_func_only' => false
+		'allow_func_only' => false,
+		'collapsed_expression' => false
 	];
 
 	/**
@@ -124,6 +127,13 @@ class CTriggerExpression {
 	protected $function_macro_parser;
 
 	/**
+	 * Parser for function id macros.
+	 *
+	 * @var CFunctionIdParser
+	 */
+	protected $functionid_parser;
+
+	/**
 	 * Parser for trigger functions.
 	 *
 	 * @var CFunctionParser
@@ -162,6 +172,7 @@ class CTriggerExpression {
 	 * @param array $options
 	 * @param bool  $options['lldmacros']
 	 * @param bool  $options['allow_func_only']
+	 * @param bool  $options['collapsed_expression']
 	 */
 	public function __construct(array $options = []) {
 		$this->options = array_merge($this->options, $options);
@@ -170,7 +181,12 @@ class CTriggerExpression {
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
 		$this->notOperatorParser = new CSetParser(['not']);
 		$this->macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
-		$this->function_macro_parser = new CFunctionMacroParser();
+		if ($this->options['collapsed_expression']) {
+			$this->functionid_parser = new CFunctionIdParser();
+		}
+		else {
+			$this->function_macro_parser = new CFunctionMacroParser();
+		}
 		$this->function_parser = new CFunctionParser();
 		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->lld_macro_function_parser = new CLLDMacroFunctionParser;
@@ -213,6 +229,11 @@ class CTriggerExpression {
 
 		$this->pos = 0;
 		$this->expression = $expression;
+
+		if ($this->options['collapsed_expression'] && $this->options['allow_func_only']) {
+			$this->isValid = false;
+			$this->error = 'Incompatible options.';
+		}
 
 		$state = self::STATE_AFTER_OPEN_BRACE;
 		$afterSpace = false;
@@ -609,6 +630,21 @@ class CTriggerExpression {
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseFunctionMacro() {
+		if ($this->options['collapsed_expression']) {
+			return $this->parseUsing($this->functionid_parser, CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO);
+		}
+		else {
+			return $this->parseSimpleMacro();
+		}
+	}
+
+	/**
+	 * Parses a simple macro constant {host:key.func()} in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseSimpleMacro() {
 		$startPos = $this->pos;
 
 		if ($this->function_macro_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {

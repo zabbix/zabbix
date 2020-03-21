@@ -3202,6 +3202,14 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			["{last(#5)}={#LLDMACRO}", null, false, ['lldmacros' => false]],
 			["{last(#5)}={#LLDMACRO}", null, true, ['allow_func_only' => true]],
 
+			// collapsed trigger expressions
+			['{host:key.func()}', null, false, ['collapsed_expression' => true]],
+			['{func()}', null, false, ['collapsed_expression' => true]],
+			['{123}', null, true, ['collapsed_expression' => true]],
+			['{123} = {$MACRO}', null, true, ['collapsed_expression' => true]],
+			['{123} = {#MACRO}', null, true, ['collapsed_expression' => true]],
+			['{123} = {#MACRO}', null, false, ['collapsed_expression' => true, 'lldmacros' => false]],
+
 			// Compare strings.
 			['{host:key.last()}=""', null, true],
 			['{host:key.last()}=" "', null, true],
