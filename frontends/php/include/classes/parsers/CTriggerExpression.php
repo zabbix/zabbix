@@ -782,27 +782,30 @@ class CTriggerExpression {
 	 *
 	 * @param string $value
 	 * @param bool   $allow_macros
+	 * @param bool   $force
 	 *
 	 * @return string
 	 */
-	public static function quoteString(string $value, bool $allow_macros = true): string {
-		$number_parser = new CNumberParser(['with_suffix' => true]);
+	public static function quoteString(string $value, bool $allow_macros = true, bool $force = false): string {
+		if (!$force) {
+			$number_parser = new CNumberParser(['with_suffix' => true]);
 
-		if ($number_parser->parse($value) == CParser::PARSE_SUCCESS) {
-			return $value;
-		}
-
-		if ($allow_macros) {
-			$user_macro_parser = new CUserMacroParser();
-			$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
-			$lld_macro_parser = new CLLDMacroParser();
-			$lld_macro_function_parser = new CLLDMacroFunctionParser;
-
-			if ($user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
-					|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
-					|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
-					|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			if ($number_parser->parse($value) == CParser::PARSE_SUCCESS) {
 				return $value;
+			}
+
+			if ($allow_macros) {
+				$user_macro_parser = new CUserMacroParser();
+				$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+				$lld_macro_parser = new CLLDMacroParser();
+				$lld_macro_function_parser = new CLLDMacroFunctionParser;
+
+				if ($user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+						|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
+						|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+						|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+					return $value;
+				}
 			}
 		}
 
