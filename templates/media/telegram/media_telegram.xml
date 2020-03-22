@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-03-22T19:32:42Z</date>
+    <date>2020-03-22T21:51:03Z</date>
     <media_types>
         <media_type>
             <name>Telegram Webhook</name>
@@ -87,7 +87,7 @@ try {&#13;
 &#13;
     tg.token = parameters.telegramToken;&#13;
 &#13;
-    if (parameters.telegramParseMode !== null &amp;&amp; (parameters.telegramParseMode === &quot;Markdown&quot; || parameters.telegramParseMode === &quot;HTML&quot;)) {&#13;
+    if (parameters.telegramParseMode !== null &amp;&amp; (parameters.telegramParseMode === &quot;Markdown&quot; || parameters.telegramParseMode === &quot;HTML&quot; || parameters.telegramParseMode === &quot;MarkdownV2&quot;)) {&#13;
         tg.parseMode = parameters.telegramParseMode;&#13;
     }&#13;
 &#13;
@@ -107,8 +107,8 @@ try {&#13;
             <timeout>10s</timeout>
             <process_tags>YES</process_tags>
             <show_event_menu>NO</show_event_menu>
-            <description>1. Register bot: send &quot;/newbot&quot; to @BotFather&#13;
-2. Copy and paste obtained token in the &quot;telegram_token&quot; field above&#13;
+            <description>1. Register bot: send &quot;/newbot&quot; to @BotFather and follow instructions&#13;
+2. Copy and paste obtained token into the &quot;telegramToken&quot; field above&#13;
 3. If you want to send personal notifications, you need to get chat id of the user you want to send messages to:&#13;
     3.1. Send &quot;/getid&quot; to &quot;@myidbot&quot; in Telegram messenger&#13;
     3.2. Copy returned chat id and save it in the &quot;Telegram Webhook&quot; media for the user&#13;
