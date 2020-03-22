@@ -1378,7 +1378,17 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 
 	if ($exponent < 0) {
 		for ($i = 1; $i >= 0; $i--) {
-			$test = round($number, $decimals - $exponent - $i);
+			$round_precision = $decimals - $exponent - $i;
+
+			// PHP rounding bug when precision is set more than 294.
+			if ($round_precision > 294) {
+				$decimal_shift = pow(10, $round_precision - 294);
+				$test = round($number * $decimal_shift, 294) / $decimal_shift;
+			}
+			else {
+				$test = round($number, $round_precision);
+			}
+
 			$test_number = sprintf('%.'.($precision - 1).'E', $test);
 			$test_digits = ($precision == 1)
 				? 1

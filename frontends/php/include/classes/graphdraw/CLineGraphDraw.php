@@ -352,7 +352,7 @@ class CLineGraphDraw extends CGraphDraw {
 						}
 
 						$dy = $data[$var_name][$ci] - $data[$var_name][$first_idx];
-						$data[$var_name][$ci - ($dx - $cj)] = $data[$var_name][$first_idx] + $cj * $dy / $dx;
+						$data[$var_name][$ci - ($dx - $cj)] = $data[$var_name][$first_idx] + $cj / $dx * $dy;
 					}
 				}
 			}

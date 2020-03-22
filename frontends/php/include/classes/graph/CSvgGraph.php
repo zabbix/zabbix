@@ -801,8 +801,8 @@ class CSvgGraph extends CSvg {
 				$in_range = ($max_value >= $point && $min_value <= $point);
 				if ($in_range || $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
 					$x = $this->canvas_x + $this->canvas_width
-						- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
-					$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
+						- $this->canvas_width / $time_range * ($this->time_till - $clock + $timeshift);
+					$y = $this->canvas_y + $this->canvas_height / $value_diff * ($max_value - $point);
 
 					if (!$in_range) {
 						$y = ($point > $max_value) ? max($y_min, $y) : min($y_max, $y);
