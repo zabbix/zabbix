@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-03-22T19:32:42Z</date>
+    <media_types>
+        <media_type>
+            <name>Telegram Webhook</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>To</name>
+                    <value>{ALERT.TO}</value>
+                </parameter>
+                <parameter>
+                    <name>Subject</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>Message</name>
+                    <value>{ALERT.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>telegramToken</name>
+                    <value>xxx</value>
+                </parameter>
+                <parameter>
+                    <name>telegramParseMode</name>
+                    <value>null</value>
+                </parameter>
+            </parameters>
+            <script>var Telegram = {&#13;
+&#13;
+    token: null,&#13;
+    to: null,&#13;
+    message: null,&#13;
+&#13;
+    tgUrlBotGeneral: &quot;https://api.telegram.org/bot&quot;,&#13;
+    disableWebPagePreview: true,&#13;
+    disableNotification: false,&#13;
+    parseMode: null,&#13;
+&#13;
+    req: new CurlHttpRequest(),&#13;
+&#13;
+    printToken: function () {&#13;
+        return(this.token);&#13;
+    },&#13;
+&#13;
+    action: function(method) {&#13;
+        this.req.AddHeader('Content-Type: application/json');&#13;
+        var params = {sendMessage: {chat_id: this.to,&#13;
+                      text: this.message,&#13;
+                      disable_web_page_preview: this.disableWebPagePreview,&#13;
+                      disable_notification: this.disableNotification&#13;
+                    },&#13;
+                    getMe: {},&#13;
+                    getUpdates: {}&#13;
+        };&#13;
+&#13;
+        if (this.parseMode !== null) {&#13;
+            params[&quot;sendMessage&quot;][&quot;parse_mode&quot;] = this.parseMode;&#13;
+        }&#13;
+&#13;
+        Zabbix.Log(3, &quot;params: &quot; + JSON.stringify(params[method]));&#13;
+        var url = this.tgUrlBotGeneral + this.token + &quot;/&quot; + method;&#13;
+        Zabbix.Log(3, &quot;URL: &quot; + url.replace(this.token, &quot;XXX&quot;));&#13;
+        //Zabbix.Log(3, &quot;URL: &quot; + url);  // uncomment this if you want to see the exposed token in the log file&#13;
+        //var resp = this.req.Post(url, params=JSON.stringify(params[method]));&#13;
+        var resp = this.req.Post(url, JSON.stringify(params[method]));&#13;
+        resp = JSON.parse(JSON.stringify(resp))&#13;
+        Zabbix.Log(3, &quot;HTTP code: &quot; + this.req.Status());&#13;
+        if (this.req.Status() != 200) {&#13;
+            throw resp;&#13;
+        }&#13;
+&#13;
+        return resp;&#13;
+&#13;
+    }&#13;
+}&#13;
+&#13;
+try {&#13;
+&#13;
+    var tg = Telegram;&#13;
+&#13;
+    parameters = JSON.parse(value);&#13;
+&#13;
+    Zabbix.Log(3, &quot;Telegram webhook script value= &quot; + value);&#13;
+&#13;
+    tg.token = parameters.telegramToken;&#13;
+&#13;
+    if (parameters.telegramParseMode !== null &amp;&amp; (parameters.telegramParseMode === &quot;Markdown&quot; || parameters.telegramParseMode === &quot;HTML&quot;)) {&#13;
+        tg.parseMode = parameters.telegramParseMode;&#13;
+    }&#13;
+&#13;
+    // Zabbix.Log(3, tg.action(&quot;getMe&quot;));&#13;
+&#13;
+    tg.to = parameters.To;&#13;
+    tg.message = parameters.Subject + &quot; &quot; + parameters.Message;&#13;
+    var sendMessageResult = tg.action(&quot;sendMessage&quot;);&#13;
+&#13;
+    return sendMessageResult;&#13;
+&#13;
+} catch (error) {&#13;
+    Zabbix.Log(4, &quot;Telegram webhook notification failed: &quot; + error);&#13;
+    throw &quot;Telegram webhook notification failed: &quot; + error;&#13;
+}&#13;
+</script>
+            <timeout>10s</timeout>
+            <process_tags>YES</process_tags>
+            <show_event_menu>NO</show_event_menu>
+            <description>1. Register bot: send &quot;/newbot&quot; to @BotFather&#13;
+2. Copy and paste obtained token in the &quot;telegram_token&quot; field above&#13;
+3. If you want to send personal notifications, you need to get chat id of the user you want to send messages to:&#13;
+    3.1. Send &quot;/getid&quot; to &quot;@myidbot&quot; in Telegram messenger&#13;
+    3.2. Copy returned chat id and save it in the &quot;Telegram Webhook&quot; media for the user&#13;
+    3.3. Ask the user to send &quot;/start&quot; to your bot (Telegram bot won't send anything to the user without it)&#13;
+4. If you want to send group notifications, you need to get group id of the group you want to send messages to:&#13;
+    4.1. Add &quot;@myidbot&quot; to your group&#13;
+    4.2. Send &quot;/getgroupid@myidbot&quot; in your group&#13;
+    4.3. Copy returned group id save it in the &quot;Telegram Webhook&quot; media for the user you created for  group notifications&#13;
+    4.4. Send &quot;/start@your_bot_name_here&quot; in your group (Telegram bot won't send anything to the group without it)</description>
+        </media_type>
+    </media_types>
+</zabbix_export>
