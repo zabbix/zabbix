@@ -721,9 +721,6 @@ class CControllerPopupGeneric extends CController {
 			}
 		}
 
-		$page_options['show_item_hostname'] = (!$this->hasInput('only_hostid') && !$this->hasInput('hostid')
-			&& ($this->source_table === 'items' || $this->source_table === 'item_prototypes'));
-
 		return $page_options;
 	}
 
