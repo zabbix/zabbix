@@ -27,8 +27,6 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	param_handle;
-
-	char			actual_error[256];
 	zbx_uint64_t		index = 0;
 	const char		*expected_result = NULL, *expression = NULL;
 	char			*actual_result = NULL, *out = NULL;
@@ -70,6 +68,11 @@ void	zbx_mock_test_entry(void **state)
 
 		actual_result[res_len] = '\0';
 		zbx_free(out);
+	}
+	else
+	{
+		actual_result = zbx_malloc(NULL, 1);
+		actual_result[0] = '\0';
 	}
 
 	if (0 != strcmp(expected_result, actual_result))

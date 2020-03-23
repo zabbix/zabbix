@@ -439,7 +439,7 @@ static zbx_variant_t	evaluate_term6(int *unknown_idx)
 				res_idx = oper_idx;
 				res.data.dbl = ZBX_UNKNOWN;
 			}
-			else if (ZBX_UNKNOWN == operand.data.dbl)		/* Unknown * known */
+			else if (ZBX_UNKNOWN == res.data.dbl)		/* Unknown * known */
 				*unknown_idx = res_idx;
 			else
 				res.data.dbl *= operand.data.dbl;
