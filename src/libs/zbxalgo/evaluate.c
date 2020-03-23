@@ -667,11 +667,7 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 	if (ZBX_VARIANT_DBL == res.type)
 	{
 		if (ZBX_INFINITY == res.data.dbl)
-		{
-			var_to_double(&res);
-			res.data.dbl = ZBX_INFINITY;
 			return res;
-		}
 
 		if (ZBX_UNKNOWN == res.data.dbl)
 			*unknown_idx = res_idx;
