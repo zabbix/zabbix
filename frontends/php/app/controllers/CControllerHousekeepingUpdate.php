@@ -23,23 +23,25 @@ class CControllerHousekeepingUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'hk_trends'           => 'db config.hk_trends',
-			'hk_trends_global'    => 'db config.hk_trends_global | in 1',
-			'hk_trends_mode'      => 'db config.hk_trends_mode',
-			'hk_history'          => 'db config.hk_history',
-			'hk_history_global'   => 'db config.hk_history_global | in 1',
-			'hk_history_mode'     => 'db config.hk_history_mode',
-			'hk_sessions'         => 'db config.hk_sessions',
-			'hk_sessions_mode'    => 'db config.hk_sessions_mode | in 1',
-			'hk_audit'            => 'db config.hk_audit',
-			'hk_audit_mode'       => 'db config.hk_audit_mode | in 1',
-			'hk_services'         => 'db config.hk_services',
-			'hk_services_mode'    => 'db config.hk_services_mode | in 1',
-			'hk_events_autoreg'   => 'db config.hk_events_autoreg',
-			'hk_events_discovery' => 'db config.hk_events_discovery',
-			'hk_events_internal'  => 'db config.hk_events_internal',
-			'hk_events_trigger'   => 'db config.hk_events_trigger',
-			'hk_events_mode'      => 'db config.hk_events_mode | in 1'
+			'hk_trends'				=> 'db config.hk_trends',
+			'hk_trends_global'		=> 'db config.hk_trends_global | in 1',
+			'hk_trends_mode'		=> 'db config.hk_trends_mode',
+			'hk_history'			=> 'db config.hk_history',
+			'hk_history_global'		=> 'db config.hk_history_global | in 1',
+			'hk_history_mode'		=> 'db config.hk_history_mode',
+			'hk_sessions'			=> 'db config.hk_sessions',
+			'hk_sessions_mode'		=> 'db config.hk_sessions_mode | in 1',
+			'hk_audit'				=> 'db config.hk_audit',
+			'hk_audit_mode'			=> 'db config.hk_audit_mode | in 1',
+			'hk_services'			=> 'db config.hk_services',
+			'hk_services_mode'		=> 'db config.hk_services_mode | in 1',
+			'hk_events_autoreg'		=> 'db config.hk_events_autoreg',
+			'hk_events_discovery'	=> 'db config.hk_events_discovery',
+			'hk_events_internal'	=> 'db config.hk_events_internal',
+			'hk_events_trigger'		=> 'db config.hk_events_trigger',
+			'hk_events_mode'		=> 'db config.hk_events_mode | in 1',
+			'compression_status'	=> 'db config.compression_status | in 1',
+			'compress_older'		=> 'db config.compress_older'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -70,21 +72,22 @@ class CControllerHousekeepingUpdate extends CController {
 
 	protected function doAction() {
 		$config = [
-			'hk_events_mode'    => $this->getInput('hk_events_mode',    0),
-			'hk_services_mode'  => $this->getInput('hk_services_mode',  0),
-			'hk_audit_mode'     => $this->getInput('hk_audit_mode',     0),
-			'hk_sessions_mode'  => $this->getInput('hk_sessions_mode',  0),
-			'hk_history_mode'   => $this->getInput('hk_history_mode',   0),
-			'hk_history_global' => $this->getInput('hk_history_global', 0),
-			'hk_trends_mode'    => $this->getInput('hk_trends_mode',    0),
-			'hk_trends_global'  => $this->getInput('hk_trends_global',  0)
+			'hk_events_mode'		=> $this->getInput('hk_events_mode', 0),
+			'hk_services_mode'		=> $this->getInput('hk_services_mode', 0),
+			'hk_audit_mode'			=> $this->getInput('hk_audit_mode', 0),
+			'hk_sessions_mode'		=> $this->getInput('hk_sessions_mode', 0),
+			'hk_history_mode'		=> $this->getInput('hk_history_mode', 0),
+			'hk_history_global'		=> $this->getInput('hk_history_global', 0),
+			'hk_trends_mode'		=> $this->getInput('hk_trends_mode', 0),
+			'hk_trends_global'		=> $this->getInput('hk_trends_global', 0),
+			'compression_status'	=> $this->getInput('compression_status', 0),
+			'compress_older'		=> $this->getInput('compress_older', DB::getDefault('config', 'compress_older'))
 		];
 
 		if ($config['hk_events_mode'] == 1) {
-			$config['hk_events_trigger']   = $this->getInput('hk_events_trigger');
-			$config['hk_events_internal']  = $this->getInput('hk_events_internal');
-			$config['hk_events_discovery'] = $this->getInput('hk_events_discovery');
-			$config['hk_events_autoreg']   = $this->getInput('hk_events_autoreg');
+			$this->getInputs($config,
+				['hk_events_trigger', 'hk_events_internal', 'hk_events_discovery', 'hk_events_autoreg']
+			);
 		}
 
 		if ($config['hk_services_mode'] == 1) {

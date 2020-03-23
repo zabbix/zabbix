@@ -1401,7 +1401,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	fi
 
 	dnl Checking for PostgreSQL support
-	AX_LIB_POSTGRESQL("8.1")
+	AX_LIB_POSTGRESQL("9.2")
 	if test "x$want_postgresql" = "xyes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
@@ -1669,30 +1669,11 @@ if test "x$have_ipcservice" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
 fi
 
-dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
-LIBMBEDTLS_CHECK_CONFIG([no])
-if test "x$want_mbedtls" = "xyes"; then
-	if test "x$have_tls" != "xno"; then
-		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
-	fi
-
-	if test "x$found_mbedtls" != "xyes"; then
-		AC_MSG_ERROR([mbed TLS (PolarSSL) library libpolarssl not found])
-	elif test "x$accept_mbedtls_version" != "xyes"; then
-		AC_MSG_ERROR([mbed TLS (PolarSSL) library version requirement not met (>= 1.3.9)])
-	else
-		have_tls="mbed TLS"
-	fi
-	TLS_CFLAGS="$MBEDTLS_CFLAGS"
-	TLS_LDFLAGS="$MBEDTLS_LDFLAGS"
-	TLS_LIBS="$MBEDTLS_LIBS"
-fi
-
 dnl Check for GnuTLS libgnutls [by default - skip]
 LIBGNUTLS_CHECK_CONFIG([no])
 if test "x$want_gnutls" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
-		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-gnutls or --with-openssl).])
 	fi
 
 	if test "x$found_gnutls" != "xyes"; then
@@ -1711,7 +1692,7 @@ dnl Check for OpenSSL libssl and libcrypto [by default - skip]
 LIBOPENSSL_CHECK_CONFIG([no])
 if test "x$want_openssl" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
-		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-gnutls or --with-openssl).])
 	fi
 
 	if test "x$found_openssl" != "xOpenSSL" -a "x$found_openssl" != "xOpenSSL (PSK not supported)"; then

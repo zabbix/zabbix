@@ -143,14 +143,6 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	const char	*snmp_oid;
-	const char	*snmp_community;
-	const char	*snmpv3_securityname;
-	const char	*snmpv3_authpassphrase;
-	const char	*snmpv3_privpassphrase;
-	const char	*snmpv3_contextname;
-	unsigned char	snmpv3_securitylevel;
-	unsigned char	snmpv3_authprotocol;
-	unsigned char	snmpv3_privprotocol;
 	unsigned char	snmp_oid_type;
 }
 ZBX_DC_SNMPITEM;
@@ -282,7 +274,7 @@ typedef struct
 }
 ZBX_DC_HTTPITEM;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
 {
 	const char	*tls_psk_identity;	/* pre-shared key identity           */
@@ -343,7 +335,7 @@ typedef struct
 	/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*tls_issuer;
 	const char	*tls_subject;
 	ZBX_DC_PSK	*tls_dc_psk;
@@ -420,6 +412,7 @@ typedef struct
 	const char	*macro;
 	const char	*context;
 	const char	*value;
+	unsigned char	type;
 }
 ZBX_DC_GMACRO;
 
@@ -437,6 +430,7 @@ typedef struct
 	const char	*macro;
 	const char	*context;
 	const char	*value;
+	unsigned char	type;
 }
 ZBX_DC_HMACRO;
 
@@ -458,11 +452,26 @@ typedef struct
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	useip;
-	unsigned char	bulk;
-	unsigned char	max_snmp_succeed;
-	unsigned char	min_snmp_fail;
 }
 ZBX_DC_INTERFACE;
+
+typedef struct
+{
+	zbx_uint64_t	interfaceid;
+	const char	*community;
+	const char	*securityname;
+	const char	*authpassphrase;
+	const char	*privpassphrase;
+	const char	*contextname;
+	unsigned char	securitylevel;
+	unsigned char	authprotocol;
+	unsigned char	privprotocol;
+	unsigned char	version;
+	unsigned char	bulk;
+	unsigned char	max_succeed;
+	unsigned char	min_fail;
+}
+ZBX_DC_SNMPINTERFACE;
 
 typedef struct
 {
@@ -512,7 +521,10 @@ typedef struct
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
-	const char	*db_extension;
+
+	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
+	zbx_config_db_t	db;
+
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
 }
@@ -782,6 +794,7 @@ typedef struct
 	zbx_hashset_t		hmacros;
 	zbx_hashset_t		hmacros_hm;		/* hostid, macro */
 	zbx_hashset_t		interfaces;
+	zbx_hashset_t		interfaces_snmp;
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */
 	zbx_hashset_t		interface_snmpaddrs;	/* addr, interfaceids for SNMP interfaces */
 	zbx_hashset_t		interface_snmpitems;	/* interfaceid, itemids for SNMP trap items */
@@ -801,7 +814,7 @@ typedef struct
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
 #endif

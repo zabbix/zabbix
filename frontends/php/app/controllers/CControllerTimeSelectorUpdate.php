@@ -234,12 +234,12 @@ class CControllerTimeSelectorUpdate extends CController {
 
 		if ($period < ZBX_MIN_PERIOD) {
 			$this->data['error']['from'] = _n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
+				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
 			);
 		}
 		elseif ($period > ZBX_MAX_PERIOD) {
 			$this->data['error']['from'] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
+				'Maximum time period to display is %1$s days.', (int) (ZBX_MAX_PERIOD / SEC_PER_DAY)
 			);
 		}
 

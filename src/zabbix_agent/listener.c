@@ -101,7 +101,7 @@ static void	process_listener(zbx_socket_t *s)
 
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char		*msg = NULL;
 #endif
 	int		ret;
@@ -121,7 +121,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 	zbx_free(args);
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
 	while (ZBX_IS_RUNNING())
@@ -137,7 +137,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			if ('\0' != *CONFIG_HOSTS_ALLOWED &&
 					SUCCEED == (ret = zbx_tcp_check_allowed_peers(&s, CONFIG_HOSTS_ALLOWED)))
 			{
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				if (ZBX_TCP_SEC_TLS_CERT != s.connection_type ||
 						SUCCEED == (ret = zbx_check_server_issuer_subject(&s, &msg)))
 #endif
@@ -152,7 +152,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
 			continue;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (NULL != msg)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s", msg);

@@ -723,5 +723,40 @@ in:
 out:
   return: SUCCEED
   values: '[2]'
+---
+test case: Query $.*~
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.*~
+out:
+  return: SUCCEED
+  value: '["books","services","filters","closed message","tags"]'
+---
+test case: Query $.*~.first()
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.*~.first()
+out:
+  return: SUCCEED
+  value: 'books'
+---
+test case: Query $.services[?(@.servicegroup=="1002")]~
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.services[?(@.servicegroup=="1002")]~
+out:
+  return: SUCCEED
+  value: '["restoration"]'
+---
+test case: Query $.books[?(@.category=="fiction")]~
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.books[?(@.category=="fiction")]~
+out:
+  return: SUCCEED
+  value: '["1","2","3"]'
 ...
-

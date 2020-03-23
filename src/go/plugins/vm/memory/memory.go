@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,16 +17,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+package memory
 
-/**
- * @var CView $this
- */
-?>
+import (
+	"errors"
 
-<script type="text/javascript">
-	jQuery(document).ready(function($) {
-		$('#acknowledge_form').submit(function() {
-			$(this).trimValues(['#message']);
-		});
-	});
-</script>
+	"zabbix.com/pkg/plugin"
+)
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+var impl Plugin
+
+// Export -
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if len(params) > 1 {
+		return nil, errors.New("Too many parameters.")
+	}
+
+	switch key {
+	case "vm.memory.size":
+		return p.exportVmMemorySize(params)
+	default:
+		return nil, plugin.UnsupportedMetricError
+	}
+
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, "Memory",
+		"vm.memory.size", "Returns memory size in bytes or in percentage from total.",
+	)
+}

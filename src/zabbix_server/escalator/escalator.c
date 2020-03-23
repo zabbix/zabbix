@@ -808,7 +808,7 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk");
 #endif
@@ -892,7 +892,7 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 		strscpy(host->ipmi_username, row[6]);
 		strscpy(host->ipmi_password, row[7]);
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		strscpy(host->tls_issuer, row[4 + ZBX_IPMI_FIELDS_NUM]);
 		strscpy(host->tls_subject, row[5 + ZBX_IPMI_FIELDS_NUM]);
 		strscpy(host->tls_psk_identity, row[6 + ZBX_IPMI_FIELDS_NUM]);
@@ -978,7 +978,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
 #endif
 				);
@@ -1006,7 +1006,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 #ifdef HAVE_OPENIPMI
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
 #endif
 			);
@@ -1025,7 +1025,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				",0,2,null,null");
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				",null,null,null,null");
 #endif
@@ -1059,8 +1059,11 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[12]);
-			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
+			script.command_orig = zbx_strdup(script.command_orig, row[12]);
+			substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
 					NULL, NULL, NULL, ack, &script.command, macro_type, NULL, 0);
+			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
+					NULL, NULL, NULL, ack, &script.command_orig, macro_type, NULL, 0);
 		}
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
@@ -1088,7 +1091,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				strscpy(host.ipmi_username, row[16]);
 				strscpy(host.ipmi_password, row[17]);
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				strscpy(host.tls_issuer, row[14 + ZBX_IPMI_FIELDS_NUM]);
 				strscpy(host.tls_subject, row[15 + ZBX_IPMI_FIELDS_NUM]);
 				strscpy(host.tls_psk_identity, row[16 + ZBX_IPMI_FIELDS_NUM]);
@@ -1150,7 +1153,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			status = ALERT_STATUS_FAILED;
 
 		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
-				script.command, status, error);
+				script.command_orig, status, error);
 skip:
 		zbx_script_clean(&script);
 	}
@@ -1194,7 +1197,7 @@ static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event,
 
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
 				ack, &name, message_type, NULL, 0);
-		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
+		substitute_simple_macros_unmasked(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
 				ack, &value, message_type, NULL, 0);
 
 		zbx_json_addstring(&json, name, value, ZBX_JSON_TYPE_STRING);
@@ -1695,7 +1698,7 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 	}
 	DBfree_result(result);
 
-	flush_user_msg(&user_msg, 1, event, NULL, action->actionid, ack);
+	flush_user_msg(&user_msg, 1, event, r_event, action->actionid, ack);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2647,10 +2650,12 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);

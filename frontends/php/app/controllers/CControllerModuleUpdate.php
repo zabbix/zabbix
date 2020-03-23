@@ -139,24 +139,24 @@ class CControllerModuleUpdate extends CController {
 
 		if ($result) {
 			if ($set_status == MODULE_STATUS_ENABLED) {
-				$response->setMessageOk(_n('Module enabled: %s.', 'Modules enabled: %s.',
+				$response->setMessageOk(_n('Module enabled: %1$s.', 'Modules enabled: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}
 			else {
-				$response->setMessageOk(_n('Module disabled: %s.', 'Modules disabled: %s.',
+				$response->setMessageOk(_n('Module disabled: %1$s.', 'Modules disabled: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}
 		}
 		else {
 			if ($set_status == MODULE_STATUS_ENABLED) {
-				$response->setMessageError(_n('Cannot enable module: %s.', 'Cannot enable modules: %s.',
+				$response->setMessageError(_n('Cannot enable module: %1$s.', 'Cannot enable modules: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}
 			else {
-				$response->setMessageError(_n('Cannot disable module: %s.', 'Cannot disable modules: %s.',
+				$response->setMessageError(_n('Cannot disable module: %1$s.', 'Cannot disable modules: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}

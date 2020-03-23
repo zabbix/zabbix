@@ -26,6 +26,7 @@
 #include "dir.h"
 #include "http.h"
 #include "net.h"
+#include "dns.h"
 #include "system.h"
 #include "zabbix_stats.h"
 #include "zbxexec.h"

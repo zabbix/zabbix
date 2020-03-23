@@ -38,7 +38,15 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "discovery_groupid:" ZBX_FS_UI64, config->config->discovery_groupid);
 	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%hhu", config->config->snmptrap_logging);
 	zabbix_log(LOG_LEVEL_TRACE, "default_inventory_mode:%d", config->config->default_inventory_mode);
-	zabbix_log(LOG_LEVEL_TRACE, "db_extension: %s", config->config->db_extension);
+
+	zabbix_log(LOG_LEVEL_TRACE, "db:");
+	zabbix_log(LOG_LEVEL_TRACE, "  extension: %s", config->config->db.extension);
+	zabbix_log(LOG_LEVEL_TRACE, "  history_compression_availability: %d",
+			config->config->db.history_compression_availability);
+	zabbix_log(LOG_LEVEL_TRACE, "  history_compression_status: %d",
+			config->config->db.history_compression_status);
+	zabbix_log(LOG_LEVEL_TRACE, "  history_compress_older: %d", config->config->db.history_compress_older);
+
 	zabbix_log(LOG_LEVEL_TRACE, "autoreg_tls_accept:%hhu", config->config->autoreg_tls_accept);
 
 	zabbix_log(LOG_LEVEL_TRACE, "severity names:");
@@ -121,7 +129,7 @@ static void	DCdump_hosts(void)
 
 		/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 		zabbix_log(LOG_LEVEL_TRACE, "  tls:[connect:%u accept:%u]", host->tls_connect, host->tls_accept);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zabbix_log(LOG_LEVEL_TRACE, "  tls:[issuer:'%s' subject:'%s']", host->tls_issuer, host->tls_subject);
 
 		if (NULL != host->tls_dc_psk)
@@ -329,9 +337,9 @@ static void	DCdump_gmacros(void)
 	for (i = 0; i < index.values_num; i++)
 	{
 		gmacro = (ZBX_DC_GMACRO *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "globalmacroid:" ZBX_FS_UI64 " macro:'%s' value:'%s' context:'%s'",
+		zabbix_log(LOG_LEVEL_TRACE, "globalmacroid:" ZBX_FS_UI64 " macro:'%s' value:'%s' context:'%s' type:%d",
 				gmacro->globalmacroid, gmacro->macro,
-				gmacro->value, ZBX_NULL2EMPTY_STR(gmacro->context));
+				gmacro->value, ZBX_NULL2EMPTY_STR(gmacro->context), gmacro->type);
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -360,8 +368,8 @@ static void	DCdump_hmacros(void)
 	{
 		hmacro = (ZBX_DC_HMACRO *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "hostmacroid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " macro:'%s' value:'%s'"
-				" context '%s'", hmacro->hostmacroid, hmacro->hostid, hmacro->macro, hmacro->value,
-				ZBX_NULL2EMPTY_STR(hmacro->context));
+				" context '%s' type:%d", hmacro->hostmacroid, hmacro->hostid, hmacro->macro,
+				hmacro->value, ZBX_NULL2EMPTY_STR(hmacro->context), hmacro->type);
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -372,8 +380,11 @@ static void	DCdump_hmacros(void)
 static void	DCdump_interfaces(void)
 {
 	ZBX_DC_INTERFACE	*interface;
+	ZBX_DC_SNMPINTERFACE	*snmp;
 	zbx_hashset_iter_t	iter;
 	zbx_vector_ptr_t	index;
+	char			*if_msg = NULL;
+	size_t			alloc, offset;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
@@ -389,12 +400,32 @@ static void	DCdump_interfaces(void)
 	for (i = 0; i < index.values_num; i++)
 	{
 		interface = (ZBX_DC_INTERFACE *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "interfaceid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " ip:'%s' dns:'%s'"
-				" port:'%s' type:%u main:%u useip:%u bulk:%u",
+
+		zbx_snprintf_alloc(&if_msg, &alloc, &offset, "interfaceid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64
+				" ip:'%s' dns:'%s' port:'%s' type:%u main:%u useip:%u",
 				interface->interfaceid, interface->hostid, interface->ip, interface->dns,
-				interface->port, interface->type, interface->main, interface->useip, interface->bulk);
+				interface->port, interface->type, interface->main, interface->useip);
+
+		if (INTERFACE_TYPE_SNMP == interface->type &&
+				NULL != (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
+				&interface->interfaceid)))
+		{
+			zbx_snprintf_alloc(&if_msg, &alloc, &offset, "snmp:[bulk:%u snmp_type:%u community:'%s']",
+					snmp->bulk, snmp->version, snmp->community);
+
+			if (ZBX_IF_SNMP_VERSION_3 == snmp->version)
+			{
+				zbx_snprintf_alloc(&if_msg, &alloc, &offset," snmpv3:["
+					"securityname:'%s' securitylevel:%u authprotocol:%u privprotocol:%u"
+					" contextname:'%s']", snmp->securityname, snmp->securitylevel,
+					snmp->authprotocol, snmp->privprotocol, snmp->contextname);
+			}
+		}
+
+		zabbix_log(LOG_LEVEL_TRACE, "%s", if_msg);
 	}
 
+	zbx_free(if_msg);
 	zbx_vector_ptr_destroy(&index);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
@@ -407,16 +438,7 @@ static void	DCdump_numitem(const ZBX_DC_NUMITEM *numitem)
 
 static void	DCdump_snmpitem(const ZBX_DC_SNMPITEM *snmpitem)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "  snmp:[oid:'%s' community:'%s' oid_type:%u]", snmpitem->snmp_oid,
-			snmpitem->snmp_community, snmpitem->snmp_oid_type);
-
-	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3:[securityname:'%s' authpassphrase:'%s' privpassphrase:'%s']",
-			snmpitem->snmpv3_securityname, snmpitem->snmpv3_authpassphrase,
-			snmpitem->snmpv3_privpassphrase);
-
-	zabbix_log(LOG_LEVEL_TRACE, "  snmpv3:[contextname:'%s' securitylevel:%u authprotocol:%u privprotocol:%u]",
-			snmpitem->snmpv3_contextname, snmpitem->snmpv3_securitylevel, snmpitem->snmpv3_authprotocol,
-			snmpitem->snmpv3_privprotocol);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmp:[oid:'%s' oid_type:%u]", snmpitem->snmp_oid, snmpitem->snmp_oid_type);
 }
 
 static void	DCdump_ipmiitem(const ZBX_DC_IPMIITEM *ipmiitem)
@@ -572,7 +594,7 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " key:'%s'",
 				item->itemid, item->hostid, item->key);
 		zabbix_log(LOG_LEVEL_TRACE, "  type:%u value_type:%u", item->type, item->value_type);
-		zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64 " port:'%s'", item->interfaceid, item->port);
+		zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, item->interfaceid);
 		zabbix_log(LOG_LEVEL_TRACE, "  state:%u error:'%s'", item->state, item->error);
 		zabbix_log(LOG_LEVEL_TRACE, "  flags:%u status:%u", item->flags, item->status);
 		zabbix_log(LOG_LEVEL_TRACE, "  valuemapid:" ZBX_FS_UI64, item->valuemapid);

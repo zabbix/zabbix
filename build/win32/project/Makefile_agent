@@ -70,6 +70,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\common\file.o \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
+	..\..\..\src\libs\zbxsysinfo\common\dns.o \
 	..\..\..\src\libs\zbxsysinfo\common\system.o \
 	..\..\..\src\libs\zbxsysinfo\common\zabbix_stats.o \
 	..\..\..\src\libs\zbxsysinfo\simple\ntp.o \
@@ -105,7 +106,7 @@ OBJS = \
 	..\..\..\src\libs\zbxwin32\fatal.o \
 	..\..\..\src\libs\zbxwin32\disk.o
 
-LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib $(LIBS)
 
 !INCLUDE Makefile_pcre.inc
 !INCLUDE Makefile_tls.inc

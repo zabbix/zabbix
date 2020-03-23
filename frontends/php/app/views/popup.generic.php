@@ -632,8 +632,7 @@ if ($data['multiselect'] && $form !== null) {
 			'class' => '',
 			'isSubmit' => true,
 			'action' => 'return addSelectedValues('.zbx_jsvalue($form->getId()).', '.
-						zbx_jsvalue($options['reference']).', '.$options['parentid'].'); '.
-						'overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));'
+				zbx_jsvalue($options['reference']).', '.$options['parentid'].');'
 		]
 	];
 }

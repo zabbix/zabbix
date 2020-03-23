@@ -395,34 +395,26 @@ class CWidgetHelper {
 
 	/**
 	 * @param CWidgetFieldSeverities $field
-	 * @param array $config
 	 *
-	 * @return CList
+	 * @return CSeverityCheckBoxList
 	 */
-	public static function getSeverities($field, $config) {
-		$severities = [];
-
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severities[$severity] = getSeverityName($severity, $config);
-		}
-
-		return self::getCheckBoxList($field, $severities)->addClass(ZBX_STYLE_COLUMNS.' '.ZBX_STYLE_COLUMNS_3);
+	public static function getSeverities($field) {
+		return (new CSeverityCheckBoxList($field->getName()))
+			->setChecked($field->getValue())
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	/**
 	 * @param CWidgetFieldCheckBoxList $field
-	 * @param array $config
+	 * @param array                    $list  Option list array.
 	 *
 	 * @return CList
 	 */
-	public static function getCheckBoxList($field, array $config) {
+	public static function getCheckBoxList($field, array $list) {
 		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
-		if ($field->getOrientation() == CWidgetFieldCheckBoxList::ORIENTATION_HORIZONTAL) {
-			$checkbox_list->addClass(ZBX_STYLE_HOR_LIST);
-		}
-
-		foreach ($config as $key => $label) {
+		foreach ($list as $key => $label) {
 			$checkbox_list->addItem(
 				(new CCheckBox($field->getName().'[]', $key))
 					->setLabel($label)

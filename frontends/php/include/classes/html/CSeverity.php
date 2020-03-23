@@ -73,27 +73,10 @@ class CSeverity extends CRadioButtonList {
 			$this->addValue(_('all'), -1);
 		}
 
-		foreach (self::getSeverities() as $severity) {
+		foreach (getSeverities() as $severity) {
 			$this->addValue($severity['name'], $severity['value'], $severity['style']);
 		}
 
 		return parent::toString($destroy);
-	}
-
-	/**
-	 * Generate array with severities options.
-	 */
-	public static function getSeverities() {
-		$config = select_config();
-		$severities = [];
-		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-			$severities[] = [
-				'name' => getSeverityName($severity, $config),
-				'value' => $severity,
-				'style' => getSeverityStyle($severity)
-			];
-		}
-
-		return $severities;
 	}
 }
