@@ -62,7 +62,7 @@ function DBconnect(&$error) {
 
 	$db = new $db_types[$DB['TYPE']];
 
-	if (array_key_exists('ENCRYPTION', $DB) && $DB['ENCRYPTION']) {
+	if ($DB['ENCRYPTION']) {
 		$db->setConnectionSecurity($DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE'], $DB['VERIFY_HOST'],
 			$DB['CIPHER_LIST']
 		);
@@ -74,8 +74,8 @@ function DBconnect(&$error) {
 		$db->init();
 	}
 
-	if ($db->getError() || (array_key_exists('ENCRYPTION', $DB) && $DB['ENCRYPTION'] && !$db->isConnectionSecure())
-			|| !$db->checkDbVersion() || !$db->checkConfig()) {
+	if ($db->getError() || ($DB['ENCRYPTION'] && !$db->isConnectionSecure()) || !$db->checkDbVersion()
+			|| !$db->checkConfig()) {
 		$error = $db->getError();
 		return false;
 	}
