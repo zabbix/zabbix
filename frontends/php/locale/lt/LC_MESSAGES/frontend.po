@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-22 01:45+0200\n"
+"POT-Creation-Date: 2020-03-23 10:38+0200\n"
 "PO-Revision-Date: 2013-10-10 08:29+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -102,8 +102,8 @@ msgstr "%1$s (metai %2$s)"
 msgid "%1$s - thrown by module located at %2$s."
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:304
-#: app/partials/monitoring.latest.view.html.php:465
+#: app/partials/monitoring.latest.view.html.php:301
+#: app/partials/monitoring.latest.view.html.php:462
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -3097,8 +3097,8 @@ msgstr ""
 msgid "Certificate"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:64
-#: app/partials/monitoring.latest.view.html.php:80 include/items.inc.php:1728
+#: app/partials/monitoring.latest.view.html.php:61
+#: app/partials/monitoring.latest.view.html.php:77 include/items.inc.php:1728
 #: include/items.inc.php:1732
 msgctxt "noun"
 msgid "Change"
@@ -5281,7 +5281,7 @@ msgstr ""
 msgid "Display OK triggers for"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:481
+#: app/partials/monitoring.latest.view.html.php:478
 msgid "Display graph"
 msgstr ""
 
@@ -5289,7 +5289,7 @@ msgstr ""
 msgid "Display problems"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:480
+#: app/partials/monitoring.latest.view.html.php:477
 msgid "Display stacked graph"
 msgstr ""
 
@@ -6660,8 +6660,8 @@ msgid "Gradient line"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:189
-#: app/partials/monitoring.latest.view.html.php:203
-#: app/partials/monitoring.latest.view.html.php:374 charts.php:99
+#: app/partials/monitoring.latest.view.html.php:200
+#: app/partials/monitoring.latest.view.html.php:371 charts.php:99
 #: include/classes/macros/CMacrosResolverGeneral.php:848
 #: include/classes/screens/CScreenProblem.php:1311
 #: include/classes/widgets/CWidgetConfig.php:49
@@ -7117,9 +7117,9 @@ msgstr ""
 msgid "Highlight whole row"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:58
-#: app/partials/monitoring.latest.view.html.php:208
-#: app/partials/monitoring.latest.view.html.php:379
+#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:205
+#: app/partials/monitoring.latest.view.html.php:376
 #: app/views/administration.housekeeping.edit.php:121
 #: app/views/monitoring.problem.view.php:100
 #: app/views/popup.acknowledge.edit.php:41 history.php:27
@@ -7189,8 +7189,8 @@ msgid "Horizontal align"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:186
-#: app/partials/monitoring.latest.view.html.php:53
-#: app/partials/monitoring.latest.view.html.php:73
+#: app/partials/monitoring.latest.view.html.php:50
+#: app/partials/monitoring.latest.view.html.php:70
 #: app/views/monitoring.dashboard.view.php:67
 #: app/views/monitoring.web.view.php:48
 #: app/views/monitoring.widget.problems.view.php:56
@@ -9079,7 +9079,7 @@ msgstr ""
 msgid "Indonesian (id_ID)"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:66
+#: app/partials/monitoring.latest.view.html.php:63
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:55
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
@@ -9250,7 +9250,7 @@ msgstr ""
 msgid "Internet Explorer"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:57 include/forms.inc.php:700
+#: app/partials/monitoring.latest.view.html.php:54 include/forms.inc.php:700
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.edit.php:492
 #: include/views/configuration.host.discovery.list.php:61
@@ -10192,8 +10192,8 @@ msgstr ""
 msgid "Last change (descending)"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:61
-#: app/partials/monitoring.latest.view.html.php:77
+#: app/partials/monitoring.latest.view.html.php:58
+#: app/partials/monitoring.latest.view.html.php:74
 #: include/classes/screens/CScreenHttpTest.php:119
 msgid "Last check"
 msgstr ""
@@ -10221,8 +10221,8 @@ msgstr ""
 msgid "Last seen (age)"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:63
-#: app/partials/monitoring.latest.view.html.php:79
+#: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:76
 msgid "Last value"
 msgstr ""
 
@@ -11355,8 +11355,8 @@ msgstr ""
 #: app/partials/common.filter.trigger.php:67
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/monitoring.host.view.html.php:33
-#: app/partials/monitoring.latest.view.html.php:55
-#: app/partials/monitoring.latest.view.html.php:75
+#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:72
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
 #: app/views/administration.image.edit.php:45
@@ -15772,7 +15772,6 @@ msgstr ""
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:33
 #: include/views/monitoring.history.php:280
 msgid "Specify some filter condition to see the values."
 msgstr ""
@@ -16842,7 +16841,7 @@ msgstr ""
 msgid "Trend storage period"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:59
+#: app/partials/monitoring.latest.view.html.php:56
 #: app/views/administration.housekeeping.edit.php:139
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:279 include/forms.inc.php:695
@@ -17141,7 +17140,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:212
 #: app/controllers/CControllerPopupGeneric.php:275
-#: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:57
 #: app/views/administration.image.list.php:36
 #: app/views/administration.mediatype.edit.php:55
 #: app/views/administration.mediatype.list.php:74

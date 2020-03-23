@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-22 01:45+0200\n"
+"POT-Creation-Date: 2020-03-23 10:38+0200\n"
 "PO-Revision-Date: 2020-03-17 02:39+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -99,8 +99,8 @@ msgstr "%1$s (%2$s年)"
 msgid "%1$s - thrown by module located at %2$s."
 msgstr "%1$s - %2$sにあるモジュールで発生しました。"
 
-#: app/partials/monitoring.latest.view.html.php:304
-#: app/partials/monitoring.latest.view.html.php:465
+#: app/partials/monitoring.latest.view.html.php:301
+#: app/partials/monitoring.latest.view.html.php:462
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -2972,8 +2972,8 @@ msgstr "中央"
 msgid "Certificate"
 msgstr "証明書"
 
-#: app/partials/monitoring.latest.view.html.php:64
-#: app/partials/monitoring.latest.view.html.php:80 include/items.inc.php:1728
+#: app/partials/monitoring.latest.view.html.php:61
+#: app/partials/monitoring.latest.view.html.php:77 include/items.inc.php:1728
 #: include/items.inc.php:1732
 msgctxt "noun"
 msgid "Change"
@@ -5155,7 +5155,7 @@ msgstr "ディスク書き込み統計。typeがsectors、operations、bytesの�
 msgid "Display OK triggers for"
 msgstr "正常イベントの表示期間"
 
-#: app/partials/monitoring.latest.view.html.php:481
+#: app/partials/monitoring.latest.view.html.php:478
 msgid "Display graph"
 msgstr "グラフ表示"
 
@@ -5163,7 +5163,7 @@ msgstr "グラフ表示"
 msgid "Display problems"
 msgstr "障害数の表示"
 
-#: app/partials/monitoring.latest.view.html.php:480
+#: app/partials/monitoring.latest.view.html.php:477
 msgid "Display stacked graph"
 msgstr "積算グラフ表示"
 
@@ -6532,8 +6532,8 @@ msgid "Gradient line"
 msgstr "グラデーションライン"
 
 #: app/controllers/CControllerAuditLogList.php:189
-#: app/partials/monitoring.latest.view.html.php:203
-#: app/partials/monitoring.latest.view.html.php:374 charts.php:99
+#: app/partials/monitoring.latest.view.html.php:200
+#: app/partials/monitoring.latest.view.html.php:371 charts.php:99
 #: include/classes/macros/CMacrosResolverGeneral.php:848
 #: include/classes/screens/CScreenProblem.php:1311
 #: include/classes/widgets/CWidgetConfig.php:49
@@ -6985,9 +6985,9 @@ msgstr "High-contrast light"
 msgid "Highlight whole row"
 msgstr "行を強調表示"
 
-#: app/partials/monitoring.latest.view.html.php:58
-#: app/partials/monitoring.latest.view.html.php:208
-#: app/partials/monitoring.latest.view.html.php:379
+#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:205
+#: app/partials/monitoring.latest.view.html.php:376
 #: app/views/administration.housekeeping.edit.php:121
 #: app/views/monitoring.problem.view.php:100
 #: app/views/popup.acknowledge.edit.php:41 history.php:27
@@ -7057,8 +7057,8 @@ msgid "Horizontal align"
 msgstr "横位置"
 
 #: app/controllers/CControllerAuditLogList.php:186
-#: app/partials/monitoring.latest.view.html.php:53
-#: app/partials/monitoring.latest.view.html.php:73
+#: app/partials/monitoring.latest.view.html.php:50
+#: app/partials/monitoring.latest.view.html.php:70
 #: app/views/monitoring.dashboard.view.php:67
 #: app/views/monitoring.web.view.php:48
 #: app/views/monitoring.widget.problems.view.php:56
@@ -8939,7 +8939,7 @@ msgstr "プロキシのステータス\"%1$s\"に使用されている値が正�
 msgid "Indonesian (id_ID)"
 msgstr "インドネシア語 (id_ID)"
 
-#: app/partials/monitoring.latest.view.html.php:66
+#: app/partials/monitoring.latest.view.html.php:63
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:55
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
@@ -9110,7 +9110,7 @@ msgstr "内部イベント復旧"
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: app/partials/monitoring.latest.view.html.php:57 include/forms.inc.php:700
+#: app/partials/monitoring.latest.view.html.php:54 include/forms.inc.php:700
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.edit.php:492
 #: include/views/configuration.host.discovery.list.php:61
@@ -10032,8 +10032,8 @@ msgstr "最新の変更"
 msgid "Last change (descending)"
 msgstr "最新の変更 (降順)"
 
-#: app/partials/monitoring.latest.view.html.php:61
-#: app/partials/monitoring.latest.view.html.php:77
+#: app/partials/monitoring.latest.view.html.php:58
+#: app/partials/monitoring.latest.view.html.php:74
 #: include/classes/screens/CScreenHttpTest.php:119
 msgid "Last check"
 msgstr "最新のチェック時刻"
@@ -10061,8 +10061,8 @@ msgstr "最新の"
 msgid "Last seen (age)"
 msgstr "最新データ受信時刻 (経過時間)"
 
-#: app/partials/monitoring.latest.view.html.php:63
-#: app/partials/monitoring.latest.view.html.php:79
+#: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:76
 msgid "Last value"
 msgstr "最新の値"
 
@@ -11177,8 +11177,8 @@ msgstr "NTLM"
 #: app/partials/common.filter.trigger.php:67
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/monitoring.host.view.html.php:33
-#: app/partials/monitoring.latest.view.html.php:55
-#: app/partials/monitoring.latest.view.html.php:75
+#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:72
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
 #: app/views/administration.image.edit.php:45
@@ -15586,7 +15586,6 @@ msgstr "スペイン語(es_ES)"
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "実行するアクションのコマンドで指定されたスクリプトが存在しないか、権限がありません。"
 
-#: app/partials/monitoring.latest.view.html.php:33
 #: include/views/monitoring.history.php:280
 msgid "Specify some filter condition to see the values."
 msgstr "値を表示するにはいくつかのフィルター条件を指定してください。"
@@ -16652,7 +16651,7 @@ msgstr "トレンドデータ保存期間 \"%1$s\"。"
 msgid "Trend storage period"
 msgstr "トレンドの保存期間"
 
-#: app/partials/monitoring.latest.view.html.php:59
+#: app/partials/monitoring.latest.view.html.php:56
 #: app/views/administration.housekeeping.edit.php:139
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:279 include/forms.inc.php:695
@@ -16943,7 +16942,7 @@ msgstr "2つのマップ要素を選択する必要があります"
 
 #: app/controllers/CControllerPopupGeneric.php:212
 #: app/controllers/CControllerPopupGeneric.php:275
-#: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:57
 #: app/views/administration.image.list.php:36
 #: app/views/administration.mediatype.edit.php:55
 #: app/views/administration.mediatype.list.php:74

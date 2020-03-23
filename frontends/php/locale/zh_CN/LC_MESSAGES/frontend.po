@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-22 01:45+0200\n"
+"POT-Creation-Date: 2020-03-23 10:38+0200\n"
 "PO-Revision-Date: 2017-10-11 11:47+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -103,8 +103,8 @@ msgstr "%1$s (年 %2$s)"
 msgid "%1$s - thrown by module located at %2$s."
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:304
-#: app/partials/monitoring.latest.view.html.php:465
+#: app/partials/monitoring.latest.view.html.php:301
+#: app/partials/monitoring.latest.view.html.php:462
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -2978,8 +2978,8 @@ msgstr "居中"
 msgid "Certificate"
 msgstr "证书"
 
-#: app/partials/monitoring.latest.view.html.php:64
-#: app/partials/monitoring.latest.view.html.php:80 include/items.inc.php:1728
+#: app/partials/monitoring.latest.view.html.php:61
+#: app/partials/monitoring.latest.view.html.php:77 include/items.inc.php:1728
 #: include/items.inc.php:1732
 msgctxt "noun"
 msgid "Change"
@@ -5150,7 +5150,7 @@ msgstr "磁盘写入数据。类型是sectors, operations, bytes;返回整数，
 msgid "Display OK triggers for"
 msgstr "显示OK触发器予"
 
-#: app/partials/monitoring.latest.view.html.php:481
+#: app/partials/monitoring.latest.view.html.php:478
 msgid "Display graph"
 msgstr "显示数据图"
 
@@ -5158,7 +5158,7 @@ msgstr "显示数据图"
 msgid "Display problems"
 msgstr "显示问题"
 
-#: app/partials/monitoring.latest.view.html.php:480
+#: app/partials/monitoring.latest.view.html.php:477
 msgid "Display stacked graph"
 msgstr "显示堆叠数据图"
 
@@ -6528,8 +6528,8 @@ msgid "Gradient line"
 msgstr "梯度线"
 
 #: app/controllers/CControllerAuditLogList.php:189
-#: app/partials/monitoring.latest.view.html.php:203
-#: app/partials/monitoring.latest.view.html.php:374 charts.php:99
+#: app/partials/monitoring.latest.view.html.php:200
+#: app/partials/monitoring.latest.view.html.php:371 charts.php:99
 #: include/classes/macros/CMacrosResolverGeneral.php:848
 #: include/classes/screens/CScreenProblem.php:1311
 #: include/classes/widgets/CWidgetConfig.php:49
@@ -6983,9 +6983,9 @@ msgstr "高对比度亮色"
 msgid "Highlight whole row"
 msgstr "高亮整行"
 
-#: app/partials/monitoring.latest.view.html.php:58
-#: app/partials/monitoring.latest.view.html.php:208
-#: app/partials/monitoring.latest.view.html.php:379
+#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:205
+#: app/partials/monitoring.latest.view.html.php:376
 #: app/views/administration.housekeeping.edit.php:121
 #: app/views/monitoring.problem.view.php:100
 #: app/views/popup.acknowledge.edit.php:41 history.php:27
@@ -7055,8 +7055,8 @@ msgid "Horizontal align"
 msgstr "横向对齐"
 
 #: app/controllers/CControllerAuditLogList.php:186
-#: app/partials/monitoring.latest.view.html.php:53
-#: app/partials/monitoring.latest.view.html.php:73
+#: app/partials/monitoring.latest.view.html.php:50
+#: app/partials/monitoring.latest.view.html.php:70
 #: app/views/monitoring.dashboard.view.php:67
 #: app/views/monitoring.web.view.php:48
 #: app/views/monitoring.widget.problems.view.php:56
@@ -8937,7 +8937,7 @@ msgstr "错误的值用于代理服务器状态 \"%1$s\"."
 msgid "Indonesian (id_ID)"
 msgstr "印度尼西亚 (id_ID)"
 
-#: app/partials/monitoring.latest.view.html.php:66
+#: app/partials/monitoring.latest.view.html.php:63
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:55
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
@@ -9108,7 +9108,7 @@ msgstr ""
 msgid "Internet Explorer"
 msgstr "IE浏览器"
 
-#: app/partials/monitoring.latest.view.html.php:57 include/forms.inc.php:700
+#: app/partials/monitoring.latest.view.html.php:54 include/forms.inc.php:700
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.edit.php:492
 #: include/views/configuration.host.discovery.list.php:61
@@ -10030,8 +10030,8 @@ msgstr "触发时间"
 msgid "Last change (descending)"
 msgstr "最后改变(降序)"
 
-#: app/partials/monitoring.latest.view.html.php:61
-#: app/partials/monitoring.latest.view.html.php:77
+#: app/partials/monitoring.latest.view.html.php:58
+#: app/partials/monitoring.latest.view.html.php:74
 #: include/classes/screens/CScreenHttpTest.php:119
 msgid "Last check"
 msgstr "最近检查记录"
@@ -10059,8 +10059,8 @@ msgstr "最后一个"
 msgid "Last seen (age)"
 msgstr "最近出现(持续)"
 
-#: app/partials/monitoring.latest.view.html.php:63
-#: app/partials/monitoring.latest.view.html.php:79
+#: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:76
 msgid "Last value"
 msgstr "最新数据"
 
@@ -11176,8 +11176,8 @@ msgstr "NTLM"
 #: app/partials/common.filter.trigger.php:67
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/monitoring.host.view.html.php:33
-#: app/partials/monitoring.latest.view.html.php:55
-#: app/partials/monitoring.latest.view.html.php:75
+#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:72
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
 #: app/views/administration.image.edit.php:45
@@ -15589,7 +15589,6 @@ msgstr "西班牙语 (es_ES)"
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "指定的脚本不存在或您没有对操作命令的权限."
 
-#: app/partials/monitoring.latest.view.html.php:33
 #: include/views/monitoring.history.php:280
 msgid "Specify some filter condition to see the values."
 msgstr "指定过滤器条件以用于查看值"
@@ -16656,7 +16655,7 @@ msgstr "趋势数据存储期 \"%1$s\"。"
 msgid "Trend storage period"
 msgstr "趋势存储时间"
 
-#: app/partials/monitoring.latest.view.html.php:59
+#: app/partials/monitoring.latest.view.html.php:56
 #: app/views/administration.housekeeping.edit.php:139
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:279 include/forms.inc.php:695
@@ -16947,7 +16946,7 @@ msgstr "应选择两个拓扑元素"
 
 #: app/controllers/CControllerPopupGeneric.php:212
 #: app/controllers/CControllerPopupGeneric.php:275
-#: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:57
 #: app/views/administration.image.list.php:36
 #: app/views/administration.mediatype.edit.php:55
 #: app/views/administration.mediatype.list.php:74
