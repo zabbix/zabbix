@@ -1166,8 +1166,14 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	ZBX_DC_HMACRO		*macro;
 
 	if (NULL == (result = DBselect(
-			"select hostmacroid,hostid,macro,value,type"
-			" from hostmacro")))
+			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type"
+			" from hostmacro m"
+			" inner join hosts h on m.hostid=h.hostid"
+#ifdef HAVE_ORACLE
+			" where 0=BITAND(h.flags,2)")))
+#else
+			" where 0=h.flags&2")))
+#endif
 	{
 		return FAIL;
 	}
