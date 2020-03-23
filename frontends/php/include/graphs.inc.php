@@ -784,14 +784,15 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 		}
 	}
 
-	$power = (int) min(8, max(0, floor(log(abs($scale_max), $is_binary ? ZBX_KIBIBYTE : 1000))));
+	$power = (int) min(8, max(0, floor(log(max(abs($scale_min), abs($scale_max)), $is_binary ? ZBX_KIBIBYTE : 1000))));
 
 	$best_result_value = null;
 	$best_result = [
 		'min' => $scale_min,
 		'max' => $scale_max,
 		'interval' => $scale_max - $scale_min,
-		'rows' => 1
+		'rows' => 1,
+		'power' => $power
 	];
 
 	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
