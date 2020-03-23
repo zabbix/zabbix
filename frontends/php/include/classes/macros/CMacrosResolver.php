@@ -1005,10 +1005,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			unset($usermacros_data);
 
 			// Get user macros values.
-			foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
-				$usermacro_values[$key] = array_key_exists($key, $macro_values)
-					? array_merge($macro_values[$key], $usermacros_data['macros'])
-					: $usermacros_data['macros'];
+			foreach ($this->getUserMacros($usermacros, true) as $key => $usermacros_data) {
+				$usermacro_values[$key] = $usermacros_data['macros'];
 			}
 		}
 
@@ -1045,9 +1043,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							break;
 
 						case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-							$expression[] = array_key_exists($token['value'], $usermacro_values[$key])
-								? CTriggerExpression::quoteString($usermacro_values[$key][$token['value']], false)
-								: $token['value'];
+							if (array_key_exists($token['value'], $usermacro_values[$key])) {
+								$expression[] =
+									CTriggerExpression::quoteString($usermacro_values[$key][$token['value']], false);
+							}
+							else {
+								$expression[] = ($options['resolve_usermacros'] && $options['html'])
+									? (new CSpan('*ERROR*'))->addClass(ZBX_STYLE_RED)
+									: $token['value'];
+							}
 							break;
 
 						case CTriggerExprParserResult::TOKEN_TYPE_STRING:

@@ -955,12 +955,13 @@ class CMacrosResolverGeneral {
 	 * Get macros with values.
 	 *
 	 * @param array $data
-	 * @param array $data[n]['hostids']  the list of host ids; [<hostid1>, ...]
-	 * @param array $data[n]['macros']   the list of user macros to resolve, ['<usermacro1>' => null, ...]
+	 * @param array $data[n]['hostids']  The list of host ids; [<hostid1>, ...].
+	 * @param array $data[n]['macros']   The list of user macros to resolve, ['<usermacro1>' => null, ...].
+	 * @param bool  $unset_undefined     Unset undefined macros.
 	 *
 	 * @return array
 	 */
-	protected function getUserMacros(array $data) {
+	protected function getUserMacros(array $data, bool $unset_undefined = false) {
 		if (!$data) {
 			return $data;
 		}
@@ -1137,22 +1138,23 @@ class CMacrosResolverGeneral {
 			unset($element);
 		}
 
-		foreach ($data as &$element) {
-			foreach ($element['macros'] as $usermacro => &$value) {
+		foreach ($data as $key => $element) {
+			foreach ($element['macros'] as $usermacro => $value) {
 				if ($value['value'] !== null) {
-					$value = $value['value'];
+					$data[$key]['macros'][$usermacro] = $value['value'];
 				}
 				elseif ($value['value_default'] !== null) {
-					$value = $value['value_default'];
+					$data[$key]['macros'][$usermacro] = $value['value_default'];
+				}
+				// Unresolved macro.
+				elseif ($unset_undefined) {
+					unset($data[$key]['macros'][$usermacro]);
 				}
 				else {
-					// Unresolved macro.
-					$value = $usermacro;
+					$data[$key]['macros'][$usermacro] = $usermacro;
 				}
 			}
-			unset($value);
 		}
-		unset($element);
 
 		return $data;
 	}
