@@ -24,7 +24,7 @@ GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_m
 
 For more information please read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
 
-2. Set in the {$MYSQL.DSN} macro the system data source name of the MySQL instance like <protocol(host:port or /path/to/socket)/>.
+2. Set in the {$MYSQL.DSN} macro the system data source name of the MySQL instance such as <protocol(host:port or /path/to/socket)/>.
 3. Set the user name and password in host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.
 
 ## Zabbix configuration
@@ -36,8 +36,8 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MYSQL.ABORTED_CONN.MAX.WARN}|<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p>|`3`|
-|{$MYSQL.BUFF_UTIL.MIN.WARN}|<p>The minimum buffer pool utilization in percent for trigger expression.</p>|`50`|
-|{$MYSQL.DSN}|<p>System data source name like <protocol(host:port or /path/to/socket)/>.</p>|`<Put your DSN>`|
+|{$MYSQL.BUFF_UTIL.MIN.WARN}|<p>The minimum buffer pool utilization percentage for trigger expression.</p>|`50`|
+|{$MYSQL.DSN}|<p>System data source name such as <protocol(host:port or /path/to/socket)/>.</p>|`<Put your DSN>`|
 |{$MYSQL.PASSWORD}|<p>MySQL user password.</p>|``|
 |{$MYSQL.REPL_LAG.MAX.WARN}|<p>The lag of slave from master for trigger expression.</p>|`30m`|
 |{$MYSQL.SLOW_QUERIES.MAX.WARN}|<p>The number of slow queries for trigger expression.</p>|`3`|
