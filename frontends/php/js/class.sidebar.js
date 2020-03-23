@@ -127,9 +127,9 @@ class CSidebar extends CBaseComponent {
 			}
 
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
-				const active_element = document.activeElement;
-				if (active_element.parentElement.classList.contains('has-submenu')) {
-					active_element.blur();
+				const active_parent = document.activeElement.parentElement;
+				if (active_parent !== null && active_parent.classList.contains('has-submenu')) {
+					active_parent.blur();
 				}
 
 				this._opened_timer = setTimeout(() => {
