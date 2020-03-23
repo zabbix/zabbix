@@ -1202,7 +1202,8 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                  21 - ZBX_PREPROC_SCRIPT;
 	 *                                                                  22 - ZBX_PREPROC_PROMETHEUS_PATTERN;
 	 *                                                                  23 - ZBX_PREPROC_PROMETHEUS_TO_JSON;
-	 *                                                                  24 - ZBX_PREPROC_CSV_TO_JSON.
+	 *                                                                  24 - ZBX_PREPROC_CSV_TO_JSON;
+	 *                                                                  25 - ZBX_PREPROC_STR_REPLACE.
 	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
 	 *                                                                 option. Multiple parameters are separated by LF
 	 *                                                                 (\n) character.
@@ -1318,6 +1319,7 @@ abstract class CItemGeneral extends CApiService {
 
 					case ZBX_PREPROC_REGSUB:
 					case ZBX_PREPROC_ERROR_FIELD_REGEX:
+					case ZBX_PREPROC_STR_REPLACE:
 						// Check if 'params' are not empty and if second parameter contains (after \n) is not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1337,7 +1339,9 @@ abstract class CItemGeneral extends CApiService {
 							));
 						}
 
-						if (!array_key_exists(1, $params) || $params[1] === '') {
+						if (($preprocessing['type'] == ZBX_PREPROC_REGSUB
+								|| $preprocessing['type'] == ZBX_PREPROC_ERROR_FIELD_REGEX)
+								&& (!array_key_exists(1, $params) || $params[1] === '')) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'params', _('second parameter is expected')
 							));
@@ -1572,6 +1576,7 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_THROTTLE_VALUE:
 					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 					case ZBX_PREPROC_SCRIPT:
+					case ZBX_PREPROC_STR_REPLACE:
 						if (is_array($preprocessing['error_handler'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 						}

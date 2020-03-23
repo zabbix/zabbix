@@ -311,13 +311,14 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		// Checkbox: Selected items only.
 		$field_show_problems = (new CWidgetFieldCheckBox('show_problems', _('Show problems')))
 			->setAction(
-				'var on = jQuery(this).is(":checked");'.
+				'var on = jQuery(this).is(":checked"),'.
+					'widget = jQuery(this).closest(".ui-widget");'.
 				'jQuery("#graph_item_problems, #problem_name, #problemhosts_select")'.
 					'.prop("disabled", !on);'.
 				'jQuery("#problemhosts_").multiSelect(on ? "enable" : "disable");'.
-				'jQuery("[name=\"severities[]\"]").prop("disabled", !on);'.
-				'jQuery("[name=\"evaltype\"]").prop("disabled", !on);'.
-				'jQuery("input, button", jQuery("#tags_table_tags")).prop("disabled", !on);'
+				'jQuery("[name^=\"severities[\"]", widget).prop("disabled", !on);'.
+				'jQuery("[name=\"evaltype\"]", widget).prop("disabled", !on);'.
+				'jQuery("input, button", jQuery("#tags_table_tags", widget)).prop("disabled", !on);'
 			);
 
 		if (array_key_exists('show_problems', $this->data)) {

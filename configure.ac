@@ -1401,7 +1401,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	fi
 
 	dnl Checking for PostgreSQL support
-	AX_LIB_POSTGRESQL("8.1")
+	AX_LIB_POSTGRESQL("9.2")
 	if test "x$want_postgresql" = "xyes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])

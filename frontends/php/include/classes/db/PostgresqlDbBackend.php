@@ -23,6 +23,26 @@
  * Database backend class for PostgreSQL.
  */
 class PostgresqlDbBackend extends DbBackend {
+	/**
+	 * Database name.
+	 *
+	 * @var string
+	 */
+	protected $dbname = '';
+
+	/**
+	 * DB schema.
+	 *
+	 * @var string
+	 */
+	protected $schema = '';
+
+	/**
+	 * User name.
+	 *
+	 * @var string
+	 */
+	protected $user = '';
 
 	/**
 	 * Check if 'dbversion' table exists.
@@ -30,14 +50,10 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDbVersionTable() {
-		global $DB;
-
-		$schema = zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public');
-
 		$tableExists = DBfetch(DBselect('SELECT 1 FROM information_schema.tables'.
-			' WHERE table_catalog='.zbx_dbstr($DB['DATABASE']).
-				' AND table_schema='.$schema.
-				" AND table_name='dbversion'"
+			' WHERE table_catalog='.zbx_dbstr($this->dbname).
+				' AND table_schema='.zbx_dbstr($this->schema).
+				' AND table_name='.zbx_dbstr('dbversion')
 		));
 
 		if (!$tableExists) {
@@ -116,5 +132,108 @@ class PostgresqlDbBackend extends DbBackend {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check is current connection contain requested cipher list.
+	 *
+	 * @return bool
+	 */
+	public function isConnectionSecure() {
+		$row = DBfetch(DBselect('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl'.
+			' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
+				' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
+
+		if (!$row ) {
+			$this->setError('Error connecting to database. Empty cipher.');
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Create connection to database server.
+	 *
+	 * @param string $host         Host name.
+	 * @param string $port         Port.
+	 * @param string $user         User name.
+	 * @param string $password     Password.
+	 * @param string $dbname       Database name.
+	 * @param string $schema       DB schema.
+	 *
+	 * @param
+	 * @return resource|null
+	 */
+	public function connect($host, $port, $user, $password, $dbname, $schema) {
+		$this->user = $user;
+		$this->dbname = $dbname;
+		$this->schema = ($schema) ? $schema : 'public';
+		$params = compact(['host', 'port', 'user', 'password', 'dbname']);
+
+		if ($this->tls_encryption && (bool) $this->tls_ca_file) {
+			$params += [
+				'sslmode' => $this->tls_verify_host ? 'verify-full' : 'verify-ca',
+				'sslkey' => $this->tls_key_file,
+				'sslcert' => $this->tls_cert_file,
+				'sslrootcert' => $this->tls_ca_file
+			];
+		}
+
+		$conn_string = '';
+
+		foreach ($params as $key => $param) {
+			$conn_string .= ((bool) $param) ? $key.'=\''.pg_connect_escape($param).'\' ' : '';
+		}
+
+		$resource = pg_connect($conn_string);
+
+		if (!$resource) {
+			$this->setError('Error connecting to database.');
+			return null;
+		}
+
+		return $resource;
+	}
+
+	/**
+	 * Initialize database connection.
+	 *
+	 * @return bool
+	 */
+	public function init() {
+		$schema_set = DBexecute('SET search_path='.zbx_dbstr($this->schema), true);
+
+		if(!$schema_set) {
+			$this->setError(pg_last_error());
+			return false;
+		}
+
+		$pgsql_version = pg_parameter_status('server_version');
+
+		if ($pgsql_version !== false && (int) $pgsql_version >= 9) {
+			// change the output format for values of type bytea from hex (the default) to escape
+			DBexecute('SET bytea_output=escape');
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if tables have compressed data.
+	 *
+	 * @static
+	 *
+	 * @param array $tables  Tables list.
+	 *
+	 * @return bool
+	 */
+	public static function isCompressed(array $tables) :bool {
+		$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
+			' FROM timescaledb_information.compressed_hypertable_stats'.
+			' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
+		));
+
+		return (bool) $result['chunks'];
 	}
 }

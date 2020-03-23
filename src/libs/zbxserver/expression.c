@@ -5555,6 +5555,15 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 		zbx_free(replace_to);
 		replace_to = replace_to_esc;
 	}
+	else if (0 != (flags & ZBX_TOKEN_STR_REPLACE))
+	{
+		char	*replace_to_esc;
+
+		replace_to_esc = zbx_str_printable_dyn(replace_to);
+
+		zbx_free(replace_to);
+		replace_to = replace_to_esc;
+	}
 
 	if (NULL != replace_to)
 	{

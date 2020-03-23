@@ -1306,7 +1306,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN], *errmsg = NULL;
 	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
-	const char*	regexp_err = NULL;
+	const char	*regexp_err = NULL;
 	zbx_uint64_t	value_ui64;
 	zbx_jsonpath_t	jsonpath;
 
@@ -1450,6 +1450,14 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 				ret = FAIL;
 				break;
 			}
+			break;
+		case ZBX_PREPROC_STR_REPLACE:
+			if ('\n' == *pp->params)
+			{
+				zbx_snprintf(err, sizeof(err), "first parameter is expected");
+				ret = FAIL;
+			}
+			break;
 	}
 
 	if (SUCCEED != ret)
@@ -2507,6 +2515,11 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
 		case ZBX_PREPROC_JSONPATH:
 			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_JSONPATH;
 			params_num = 1;
+			break;
+		case ZBX_PREPROC_STR_REPLACE:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_STR_REPLACE;
+			flags2 = ZBX_MACRO_ANY | ZBX_TOKEN_STR_REPLACE;
+			params_num = 2;
 			break;
 		default:
 			flags1 = ZBX_MACRO_ANY;

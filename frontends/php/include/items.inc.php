@@ -1692,6 +1692,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 			'group' => _('Text'),
 			'name' => _('Regular expression')
 		],
+		ZBX_PREPROC_STR_REPLACE => [
+			'group' => _('Text'),
+			'name' => _('Replace')
+		],
 		ZBX_PREPROC_TRIM => [
 			'group' => _('Text'),
 			'name' => _('Trim')

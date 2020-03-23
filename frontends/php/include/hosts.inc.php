@@ -1444,9 +1444,7 @@ function renderInterfaceHeaders() {
 			(new CDiv())
 				->addClass(implode(' ', [ZBX_STYLE_HOST_INTERFACE_ROW, ZBX_STYLE_HOST_INTERFACE_ROW_HEADER]))
 				->addItem([
-					(new CDiv())->addClass(
-						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_ICON])
-					),
+					(new CDiv())->addClass(ZBX_STYLE_HOST_INTERFACE_CELL),
 					(new CDiv(_('Type')))->addClass(
 						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
 							ZBX_STYLE_HOST_INTERFACE_CELL_TYPE

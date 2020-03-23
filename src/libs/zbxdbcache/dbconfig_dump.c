@@ -38,7 +38,15 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "discovery_groupid:" ZBX_FS_UI64, config->config->discovery_groupid);
 	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%hhu", config->config->snmptrap_logging);
 	zabbix_log(LOG_LEVEL_TRACE, "default_inventory_mode:%d", config->config->default_inventory_mode);
-	zabbix_log(LOG_LEVEL_TRACE, "db_extension: %s", config->config->db_extension);
+
+	zabbix_log(LOG_LEVEL_TRACE, "db:");
+	zabbix_log(LOG_LEVEL_TRACE, "  extension: %s", config->config->db.extension);
+	zabbix_log(LOG_LEVEL_TRACE, "  history_compression_availability: %d",
+			config->config->db.history_compression_availability);
+	zabbix_log(LOG_LEVEL_TRACE, "  history_compression_status: %d",
+			config->config->db.history_compression_status);
+	zabbix_log(LOG_LEVEL_TRACE, "  history_compress_older: %d", config->config->db.history_compress_older);
+
 	zabbix_log(LOG_LEVEL_TRACE, "autoreg_tls_accept:%hhu", config->config->autoreg_tls_accept);
 
 	zabbix_log(LOG_LEVEL_TRACE, "severity names:");
@@ -398,11 +406,10 @@ static void	DCdump_interfaces(void)
 				interface->interfaceid, interface->hostid, interface->ip, interface->dns,
 				interface->port, interface->type, interface->main, interface->useip);
 
-		if (INTERFACE_TYPE_SNMP == interface->type)
+		if (INTERFACE_TYPE_SNMP == interface->type &&
+				NULL != (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
+				&interface->interfaceid)))
 		{
-			snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
-					&interface->interfaceid);
-
 			zbx_snprintf_alloc(&if_msg, &alloc, &offset, "snmp:[bulk:%u snmp_type:%u community:'%s']",
 					snmp->bulk, snmp->version, snmp->community);
 

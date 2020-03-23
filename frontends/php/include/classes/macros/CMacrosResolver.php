@@ -2617,6 +2617,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $data['steps'][]['error_handler_params]     Preprocessing steps error handle parameters.
 	 * @param string $data['delay']                              Update interval value.
 	 * @param array  $data['supported_macros']                   Supported macros.
+	 * @param bool   $data['support_lldmacros']                  Either LLD macros need to be extracted.
 	 * @param array  $data['texts_support_macros']               List of texts potentially could contain macros.
 	 * @param array  $data['texts_support_user_macros']          List of texts potentially could contain user macros.
 	 * @param array  $data['texts_support_lld_macros']           List of texts potentially could contain LLD macros.
@@ -2648,8 +2649,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
+		// Extract macros.
 		if ($data['supported_macros']) {
-			$matched_macros = $this->extractMacros(array_merge($texts, $data['texts_support_macros']),
+			$matched_macros = $this->extractMacros($data['texts_support_macros'],
 				['macros' => $data['supported_macros']]
 			);
 
@@ -2660,10 +2662,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
+		// Extract user macros.
+		$data['texts_support_user_macros'] = array_merge($texts, $data['texts_support_user_macros']);
 		if ($data['texts_support_user_macros']) {
-			$matched_macros = $this->extractMacros(array_merge($texts, $data['texts_support_user_macros']),
-				['usermacros' => true]
-			);
+			$matched_macros = $this->extractMacros($data['texts_support_user_macros'], ['usermacros' => true]);
 
 			$usermacros = [[
 				'macros' => $matched_macros['usermacros'],
@@ -2676,10 +2678,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
+		// Extract LLD macros.
+		$data['texts_support_lld_macros'] = $data['support_lldmacros']
+			? array_merge($texts, $data['texts_support_lld_macros'])
+			: [];
 		if ($data['texts_support_lld_macros']) {
-			$matched_macros = $this->extractMacros(array_merge($texts, $data['texts_support_lld_macros']),
-				['lldmacros' => true]
-			);
+			$matched_macros = $this->extractMacros($data['texts_support_lld_macros'], ['lldmacros' => true]);
 
 			foreach (array_keys($matched_macros['lldmacros']) as $lldmacro) {
 				$macros[$lldmacro] = $lldmacro;
