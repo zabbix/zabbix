@@ -181,7 +181,8 @@ class CSidebar extends CBaseComponent {
 			},
 
 			mouseleave: () => {
-				if (!this._is_focused || document.activeElement.parentElement.classList.contains('has-submenu')) {
+				if (!this._is_focused || document.activeElement.parentElement === null
+						|| document.activeElement.parentElement.classList.contains('has-submenu')) {
 					clearTimeout(this._opened_timer);
 					this._opened_timer = setTimeout(() => this.close(), SIDEBAR_HOVER_DELAY);
 				}
