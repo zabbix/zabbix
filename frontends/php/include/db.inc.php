@@ -42,109 +42,45 @@ function DBconnect(&$error) {
 	$DB['TRANSACTION_NO_FAILED_SQLS'] = true; // true - if no statements failed in transaction, false - there are failed statements
 	$DB['SELECT_COUNT'] = 0; // stats
 	$DB['EXECUTE_COUNT'] = 0;
+	$DB['DB'] = null;
 
 	if (!isset($DB['TYPE'])) {
 		$error = 'Unknown database type.';
-		$result = false;
-	}
-	else {
-		switch ($DB['TYPE']) {
-			case ZBX_DB_MYSQL:
-				$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
-				if (!$DB['DB']) {
-					$error = 'Error connecting to database: '.trim(mysqli_connect_error());
-					$result = false;
-				}
-				elseif (mysqli_autocommit($DB['DB'], true) === false) {
-					$error = 'Error setting auto commit.';
-					$result = false;
-				}
-				else {
-					DBexecute('SET NAMES utf8');
-				}
-
-				if ($result) {
-					$dbBackend = new MysqlDbBackend();
-				}
-				break;
-			case ZBX_DB_POSTGRESQL:
-				$pg_connection_string =
-					(!empty($DB['SERVER']) ? 'host=\''.pg_connect_escape($DB['SERVER']).'\' ' : '').
-					'dbname=\''.pg_connect_escape($DB['DATABASE']).'\' '.
-					(!empty($DB['USER']) ? 'user=\''.pg_connect_escape($DB['USER']).'\' ' : '').
-					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
-					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
-
-				$DB['DB']= @pg_connect($pg_connection_string);
-				if (!$DB['DB']) {
-					$error = 'Error connecting to database.';
-					$result = false;
-				}
-				else {
-					$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public'), true);
-
-					if(!$schemaSet) {
-						clear_messages();
-						$error = pg_last_error();
-						$result = false;
-					}
-					else {
-						if (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
-							if ((int) $pgsql_version >= 9) {
-								// change the output format for values of type bytea from hex (the default) to escape
-								DBexecute('SET bytea_output = escape');
-							}
-						}
-					}
-				}
-
-				if ($result) {
-					$dbBackend = new PostgresqlDbBackend();
-				}
-				break;
-			case ZBX_DB_ORACLE:
-				$connect = '';
-				if (!empty($DB['SERVER'])) {
-					$connect = '//'.$DB['SERVER'];
-
-					if ($DB['PORT'] != '0') {
-						$connect .= ':'.$DB['PORT'];
-					}
-					if ($DB['DATABASE']) {
-						$connect .= '/'.$DB['DATABASE'];
-					}
-				}
-
-				$DB['DB'] = @oci_connect($DB['USER'], $DB['PASSWORD'], $connect, 'UTF8');
-				if ($DB['DB']) {
-					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
-				}
-				else {
-					$ociError = oci_error();
-					$error = 'Error connecting to database: '.$ociError['message'];
-					$result = false;
-				}
-
-				if ($result) {
-					$dbBackend = new OracleDbBackend();
-				}
-				break;
-			default:
-				$error = 'Unsupported database';
-				$result = false;
-		}
+		return false;
 	}
 
-	if ($result && (!$dbBackend->checkDbVersion() || !$dbBackend->checkConfig())) {
-		$error = $dbBackend->getError();
-		$result = false;
+	$db_types = [
+		ZBX_DB_MYSQL => MysqlDbBackend::class,
+		ZBX_DB_POSTGRESQL => PostgresqlDbBackend::class,
+		ZBX_DB_ORACLE => OracleDbBackend::class
+	];
+
+	if (!array_key_exists($DB['TYPE'], $db_types)) {
+		$error = 'Unsupported database';
+		return false;
 	}
 
-	if (false == $result) {
-		$DB['DB'] = null;
+	$db = new $db_types[$DB['TYPE']];
+
+	if ($DB['ENCRYPTION']) {
+		$db->setConnectionSecurity($DB['KEY_FILE'], $DB['CERT_FILE'], $DB['CA_FILE'], $DB['VERIFY_HOST'],
+			$DB['CIPHER_LIST']
+		);
 	}
 
-	return $result;
+	$DB['DB'] = $db->connect($DB['SERVER'], $DB['PORT'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['SCHEMA']);
+
+	if ($DB['DB']) {
+		$db->init();
+	}
+
+	if ($db->getError() || ($DB['ENCRYPTION'] && !$db->isConnectionSecure()) || !$db->checkDbVersion()
+			|| !$db->checkConfig()) {
+		$error = $db->getError();
+		return false;
+	}
+
+	return true;
 }
 
 function DBclose() {

@@ -32,6 +32,11 @@ class CCheckBoxList extends CList {
 	protected $name;
 
 	/**
+	 * @var bool $enabled
+	 */
+	protected $enabled = true;
+
+	/**
 	 * @param string $name
 	 */
 	public function __construct($name) {
@@ -88,6 +93,17 @@ class CCheckBoxList extends CList {
 		return $this;
 	}
 
+	/**
+	 * Set checkboxes enabled state.
+	 *
+	 * @param bool $enabled  State of checkboxes.
+	 */
+	public function setEnabled($enabled) {
+		$this->enabled = $enabled;
+
+		return $this;
+	}
+
 	/*
 	 * @param bool $destroy
 	 *
@@ -99,6 +115,7 @@ class CCheckBoxList extends CList {
 				(new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
 					->setLabel($value['name'])
 					->setChecked($value['checked'])
+					->setEnabled($this->enabled)
 			);
 		}
 

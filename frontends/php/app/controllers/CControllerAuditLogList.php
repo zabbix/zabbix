@@ -29,8 +29,8 @@ class CControllerAuditLogList extends CController {
 			'filter_rst' =>			'in 1',
 			'filter_set' =>			'in 1',
 			'alias' =>				'string',
-			'filter_from' =>		'range_time',
-			'filter_to' =>			'range_time'
+			'from' =>				'range_time',
+			'to' =>					'range_time'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -63,9 +63,10 @@ class CControllerAuditLogList extends CController {
 		$timeselector_options = [
 			'profileIdx' => 'web.auditlog.filter',
 			'profileIdx2' => 0,
-			'from' => $this->hasInput('filter_from') ? $this->getInput('filter_from') : null,
-			'to' => $this->hasInput('filter_to') ? $this->getInput('filter_to') : null
+			'from' => null,
+			'to' => null
 		];
+		$this->getInputs($timeselector_options, ['from', 'to']);
 		updateTimeSelectorPeriod($timeselector_options);
 
 		$data = [

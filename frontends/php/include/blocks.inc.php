@@ -327,11 +327,10 @@ function getSystemStatusData(array $filter) {
  * @param array  $data['triggers'][<triggerid>]['opdata']
  * @param array  $config
  * @param string $config['severity_name_*']
- * @param string $backurl
  *
  * @return CDiv
  */
-function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
+function makeSystemStatus(array $filter, array $data, array $config) {
 	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
 		? $filter['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
@@ -386,16 +385,16 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
 			$allTriggersNum = $stat['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = (new CLinkAction($allTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $backurl, $data['actions'],
-						$config, $filter
+					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $data['actions'], $config,
+						$filter
 					));
 			}
 
 			$unackTriggersNum = $stat['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = (new CLinkAction($unackTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $backurl, $data['actions'],
-						$config, $filter
+					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $data['actions'], $config,
+						$filter
 					));
 			}
 
@@ -546,7 +545,6 @@ function makeSeverityTotals(array $data) {
  * @param array   $data['filter']
  * @param array   $data['filter']['ext_ack']
  * @param array   $data['severity_names']
- * @param array   $data['backurl']
  * @param array   $stat
  * @param int     $stats['count']
  * @param array   $stats['problems']
@@ -567,16 +565,16 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 	$allTriggersNum = $stat['count'];
 	if ($allTriggersNum) {
 		$allTriggersNum = (new CLinkAction($allTriggersNum))
-			->setHint(makeProblemsPopup($stat['problems'], $data['data']['triggers'], $data['backurl'],
-				$data['data']['actions'], $data['severity_names'], $data['filter']
+			->setHint(makeProblemsPopup($stat['problems'], $data['data']['triggers'], $data['data']['actions'],
+				$data['severity_names'], $data['filter']
 			));
 	}
 
 	$unackTriggersNum = $stat['count_unack'];
 	if ($unackTriggersNum) {
 		$unackTriggersNum = (new CLinkAction($unackTriggersNum))
-			->setHint(makeProblemsPopup($stat['problems_unack'], $data['data']['triggers'], $data['backurl'],
-				$data['data']['actions'], $data['severity_names'], $data['filter']
+			->setHint(makeProblemsPopup($stat['problems_unack'], $data['data']['triggers'], $data['data']['actions'],
+				$data['severity_names'], $data['filter']
 			));
 	}
 
@@ -671,7 +669,11 @@ function make_status_of_zbx() {
 
 	// Check requirements.
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		foreach ((new CFrontendSetup())->checkRequirements() as $req) {
+		$setup = new CFrontendSetup();
+		$reqs = $setup->checkRequirements();
+		$reqs[] = $setup->checkSslFiles();
+
+		foreach ($reqs as $req) {
 			if ($req['result'] == CFrontendSetup::CHECK_FATAL) {
 				$table->addRow(
 					(new CRow([$req['name'], $req['current'], $req['error']]))->addClass(ZBX_STYLE_RED)
@@ -723,7 +725,6 @@ function make_status_of_zbx() {
  * @param array  $triggers[<triggerid>]['hosts']
  * @param string $triggers[<triggerid>]['hosts'][]['name']
  * @param string $triggers[<triggerid>]['opdata']
- * @param string $backurl
  * @param array  $actions
  * @param array  $config
  * @param array  $filter
@@ -733,7 +734,7 @@ function make_status_of_zbx() {
  *
  * @return CTableInfo
  */
-function makeProblemsPopup(array $problems, array $triggers, $backurl, array $actions, array $config, array $filter) {
+function makeProblemsPopup(array $problems, array $triggers, array $actions, array $config, array $filter) {
 	$url_details = (new CUrl('tr_events.php'))
 		->setArgument('triggerid', '')
 		->setArgument('eventid', '');
@@ -860,16 +861,16 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			}
 		}
 
-		// ack
-		$problem_update_url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'acknowledge.edit')
-			->setArgument('eventids', [$problem['eventid']])
-			->setArgument('backurl', $backurl)
-			->getUrl();
-
-		$ack = (new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
-			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-			->addClass(ZBX_STYLE_LINK_ALT);
+		// Create acknowledge link.
+		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
+		$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
+			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->onClick('return PopUp("popup.acknowledge.edit",'.
+				json_encode([
+					'eventids' => [$problem['eventid']]
+				]).', null, this);'
+			);
 
 		$table->addRow(array_merge($row, [
 			makeInformationList($info_icons),
@@ -882,7 +883,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			),
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 			zbx_date2age($problem['clock']),
-			$ack,
+			$problem_update_link,
 			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['mediatypes'],
 				$actions['users'], $config
 			),

@@ -584,6 +584,67 @@ void	zbx_remove_chars(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_str_printable_dyn                                            *
+ *                                                                            *
+ * Purpose: converts text to printable string by converting special           *
+ *          characters to escape sequences                                    *
+ *                                                                            *
+ * Parameters: text - [IN] the text to convert                                *
+ *                                                                            *
+ * Return value: The text converted in printable format                       *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_str_printable_dyn(const char *text)
+{
+	size_t		out_alloc = 0;
+	const char	*pin;
+	char		*out, *pout;
+
+	for (pin = text; '\0' != *pin; pin++)
+	{
+		switch (*pin)
+		{
+			case '\n':
+			case '\t':
+			case '\r':
+				out_alloc += 2;
+				break;
+			default:
+				out_alloc++;
+				break;
+		}
+	}
+
+	out = zbx_malloc(NULL, ++out_alloc);
+
+	for (pin = text, pout = out; '\0' != *pin; pin++)
+	{
+		switch (*pin)
+		{
+			case '\n':
+				*pout++ = '\\';
+				*pout++ = 'n';
+				break;
+			case '\t':
+				*pout++ = '\\';
+				*pout++ = 't';
+				break;
+			case '\r':
+				*pout++ = '\\';
+				*pout++ = 'r';
+				break;
+			default:
+				*pout++ = *pin;
+				break;
+		}
+	}
+	*pout = '\0';
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_strlcpy                                                      *
  *                                                                            *
  * Purpose: Copy src to string dst of size siz. At most siz - 1 characters    *

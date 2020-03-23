@@ -151,6 +151,64 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Zabbix agent',
+						'Key' => 'key.macro.in.preproc.steps'
+					],
+					'macros' => [
+						[
+							'macro' => '{$1}',
+							'value' => 'Numeric macro'
+						],
+						[
+							'macro' => '{$A}',
+							'value' => 'Some text'
+						],
+						[
+							'macro' => '{$_}',
+							'value' => 'Underscore'
+						]
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
+						'Key' => 'macro.in.key.and.preproc.steps[{$DEFAULT_DELAY}]'
+					],
+					'macros' => [
+						[
+							'macro' => '{$1}',
+							'value' => 'Numeric macro'
+						],
+						[
+							'macro' => '{$A}',
+							'value' => 'Some text'
+						],
+						[
+							'macro' => '{$_}',
+							'value' => 'Underscore'
+						],
+						[
+							'macro' => '{$DEFAULT_DELAY}',
+							'value' => '30'
+						]
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
 						'Key' => 'test.item.key'
 					]
 

@@ -225,7 +225,7 @@ final class CModuleManager {
 				}
 			}
 			catch (Exception $e) {
-				$this->errors[] = _s('%1$s - thrown by module located at %1$s.', $e->getMessage(), $relative_path);
+				$this->errors[] = _s('%1$s - thrown by module located at %2$s.', $e->getMessage(), $relative_path);
 			}
 		}
 

@@ -996,12 +996,12 @@ class CHistoryManager {
 	/**
 	 * Clear item history and trends by provided item IDs. History is deleted from both SQL and Elasticsearch.
 	 *
-	 * @param array $itemids    item ids to delete history for
+	 * @param array $items  Key - itemid, value - value_type.
 	 *
 	 * @return bool
 	 */
-	public function deleteHistory(array $itemids) {
-		return $this->deleteHistoryFromSql($itemids) && $this->deleteHistoryFromElasticsearch($itemids);
+	public function deleteHistory(array $items) {
+		return $this->deleteHistoryFromSql($items) && $this->deleteHistoryFromElasticsearch(array_keys($items));
 	}
 
 	/**
@@ -1043,14 +1043,39 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-	private function deleteHistoryFromSql(array $itemids) {
-		return DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemids))
-				&& DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemids));
+	private function deleteHistoryFromSql(array $items) {
+		global $DB;
+		$config = select_config();
+
+		$item_tables = array_map('self::getTableName', array_unique($items));
+		$table_names = array_flip(self::getTableName());
+
+		if (in_array(ITEM_VALUE_TYPE_UINT64, $items)) {
+			$item_tables[] = 'trends_uint';
+			$table_names['trends_uint'] = ITEM_VALUE_TYPE_UINT64;
+		}
+
+		if (in_array(ITEM_VALUE_TYPE_FLOAT, $items)) {
+			$item_tables[] = 'trends';
+			$table_names['trends'] = ITEM_VALUE_TYPE_FLOAT;
+		}
+
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
+				&& PostgresqlDbBackend::isCompressed($item_tables)) {
+			error(_('Some of the history for this item may be compressed, deletion is not available.'));
+
+			return false;
+		};
+
+		foreach ($item_tables as $table_name) {
+			$itemids = array_keys(array_intersect($items, [(string) $table_names[$table_name]]));
+
+			if (!DBexecute('DELETE FROM '.$table_name.' WHERE '.dbConditionInt('itemid', $itemids))) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -1203,9 +1228,9 @@ class CHistoryManager {
 	 *
 	 * @param int $value_type    value type
 	 *
-	 * @return string    table name
+	 * @return string|array    table name| all tables
 	 */
-	public static function getTableName($value_type) {
+	public static function getTableName($value_type = null) {
 		$tables = [
 			ITEM_VALUE_TYPE_LOG => 'history_log',
 			ITEM_VALUE_TYPE_TEXT => 'history_text',
@@ -1214,7 +1239,7 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_UINT64 => 'history_uint'
 		];
 
-		return $tables[$value_type];
+		return ($value_type === null) ? $tables : $tables[$value_type];
 	}
 
 	/**

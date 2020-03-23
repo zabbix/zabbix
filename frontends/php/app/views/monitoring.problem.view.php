@@ -39,7 +39,7 @@ $options = [
 			'application' => $data['filter']['application'],
 			'triggerids' => $data['filter']['triggerids'],
 			'name' => $data['filter']['name'],
-			'severity' => $data['filter']['severity'],
+			'severities' => $data['filter']['severities'],
 			'inventory' => $data['filter']['inventory'],
 			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags'],
@@ -74,7 +74,7 @@ switch ($data['filter']['show']) {
 
 $screen = CScreenBuilder::getScreen($options);
 
-if ($data['action'] == 'problem.view') {
+if ($data['action'] === 'problem.view') {
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 		$this->addJsFile('class.calendar.js');
 	}
@@ -171,7 +171,7 @@ if ($data['action'] == 'problem.view') {
 			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 		->addRow(_('Severity'),
-			(new CSeverityCheckBoxList('filter_severity'))->setChecked($data['filter']['severity'])
+			(new CSeverityCheckBoxList('filter_severities'))->setChecked($data['filter']['severities'])
 		);
 
 	$filter_age = (new CNumericBox('filter_age', $data['filter']['age'], 3, false, false, false))

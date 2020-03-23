@@ -518,7 +518,10 @@ typedef struct
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
-	const char	*db_extension;
+
+	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
+	zbx_config_db_t	db;
+
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
 }
