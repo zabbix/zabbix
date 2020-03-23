@@ -914,7 +914,7 @@ Function.prototype.bindAsEventListener = function (context) {
  *
  * @param {string} id
  *
- * @return {Object}
+ * @return {object}
  */
 function getFirstMultiselectValue(id) {
 	var values = jQuery('#'+id).multiSelect('getData');

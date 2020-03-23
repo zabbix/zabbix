@@ -26,10 +26,9 @@ class CWidgetFieldApplication extends CWidgetField {
 
 	/**
 	 * ID for Host Multiselect element used to prefill Application PoPup Host filter.
-	 *
 	 * Analog for multiselect filter_preselect_field property.
 	 *
-	 * @var string (nullable) ID for Multiselect element.
+	 * @var string  (nullable) ID for Multiselect element.
 	 */
 	public $filter_preselect_field;
 

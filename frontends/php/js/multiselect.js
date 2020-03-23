@@ -427,11 +427,11 @@ jQuery(function($) {
 	 *
 	 * @param {jQuery} $obj
 	 *
-	 * @return {Object}
+	 * @return {object}
 	 */
 	function getFilterPreselectField($obj) {
 		var ms = $obj.data('multiSelect'),
-			values = $('#'+ms.options.popup.filter_preselect_field).multiSelect('getData');
+			values = $('#' + ms.options.popup.filter_preselect_field).multiSelect('getData');
 
 		return (values.length != 0)
 			? {hostid: values[0].id}
