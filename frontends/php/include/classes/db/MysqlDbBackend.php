@@ -134,7 +134,7 @@ class MysqlDbBackend extends DbBackend {
 		}
 
 		$sql =
-			'SELECT COUNT(*) "cnt" FROM information_schema.columns'.
+			'SELECT COUNT(*) cnt FROM information_schema.columns'.
 				' WHERE table_schema LIKE '.zbx_dbstr($DB['DATABASE']).
 				' AND column_type LIKE "double"'.
 				' AND ('.implode(' OR ', $conditions_or).')';

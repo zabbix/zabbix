@@ -166,7 +166,7 @@ class PostgresqlDbBackend extends DbBackend {
 		}
 
 		$sql =
-			'SELECT COUNT(*) "cnt" FROM information_schema.columns'.
+			'SELECT COUNT(*) cnt FROM information_schema.columns'.
 				' WHERE data_type LIKE '.zbx_dbstr($DB['DATABASE']).
 				' AND column_type LIKE "double precision"'.
 				' AND ('.implode(' OR ', $conditions_or).')';

@@ -175,7 +175,7 @@ class OracleDbBackend extends DbBackend {
 		}
 
 		$sql =
-			'SELECT COUNT(*) "cnt" FROM user_tab_columns'.
+			'SELECT COUNT(*) cnt FROM user_tab_columns'.
 				' WHERE data_type LIKE '.zbx_dbstr($DB['DATABASE']).
 				' AND column_type LIKE "BINARY_DOUBLE"'.
 				' AND ('.implode(' OR ', $conditions_or).')';
