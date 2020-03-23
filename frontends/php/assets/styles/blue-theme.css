@@ -230,6 +230,8 @@ header {
   padding: 0 10px;
   background: #ffffff;
   border-bottom: 1px solid #dfe4e7; }
+  header > div {
+    overflow: hidden; }
   header h1 {
     position: relative;
     padding-top: 1px;

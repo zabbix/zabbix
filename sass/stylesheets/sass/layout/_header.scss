@@ -6,6 +6,10 @@ header {
 	background: $header-bg-color;
 	border-bottom: 1px solid $ui-border-color;
 
+	> div {
+		overflow: hidden;
+	}
+
 	h1 {
 		position: relative;
 		padding-top: 1px;
