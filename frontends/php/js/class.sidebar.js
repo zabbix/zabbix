@@ -119,11 +119,12 @@ class CSidebar extends CBaseComponent {
 			this._is_opened = false;
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
-				ZABBIX.MenuMain.collapseAll();
-				ZABBIX.MenuMain.getSelected()._target.scrollIntoView({
-					behavior: 'smooth',
-					block: 'nearest'
-				});
+				ZABBIX.MenuMain
+					.collapseAll()
+					._target.scrollIntoView({
+						behavior: 'smooth',
+						block: 'start'
+					});
 			}
 
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
