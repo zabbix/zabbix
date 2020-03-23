@@ -53,38 +53,30 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected function resolveTriggerReferences($expression, $references) {
-		$matched_macros = $this->getMacroPositions($expression, ['usermacros' => true]);
+		$values = [];
+		$expression_data = new CTriggerExpression(['collapsed_expression' => true]);
 
-		// Replace user macros with string 'macro' to make values search easier.
-		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-			$expression = substr_replace($expression, 'macro', $pos, strlen($macro));
-		}
+		if (($result = $expression_data->parse($expression)) !== false) {
+			foreach ($result->getTokens() as $token) {
+				switch ($token['type']) {
+					case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
+					case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
+						$values[] = $token['value'];
+						break;
 
-		// Replace functionids with string 'function' to make values search easier.
-		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
-
-		// Replace whitespace with emptyness to make value search easier.
-		$expression = str_replace(" \r\n\t", '', $expression);
-
-		// Search for numeric values and quoted strings in expression.
-		preg_match_all('/((?<![\)\.0-9]|[\.0-9]['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']|function)\-?'.
-				'([.][0-9]+|[0-9]+[.]?[0-9]*)['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?|"([^\\\\"]|\\\\["\\\\])*")/',
-			$expression,
-			$values
-		);
-
-		$macro_values = [];
-
-		foreach (array_keys($references) as $reference) {
-			$i = (int) $reference[1] - 1;
-			$macro_values[$reference] = array_key_exists($i, $values[0]) ? $values[0][$i] : '';
-
-			if ($macro_values[$reference] !== '' && $macro_values[$reference][0] === '"') {
-				$macro_values[$reference] = CTriggerExpression::unquoteString($macro_values[$reference]);
+					case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+						$values[] = $token['data']['string'];
+						break;
+				}
 			}
 		}
 
-		return $macro_values;
+		foreach ($references as $macro => $value) {
+			$i = (int) $macro[1] - 1;
+			$references[$macro] = array_key_exists($i, $values) ? $values[$i] : '';
+		}
+
+		return $references;
 	}
 
 	/**
