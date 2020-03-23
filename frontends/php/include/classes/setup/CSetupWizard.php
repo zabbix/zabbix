@@ -421,7 +421,8 @@ class CSetupWizard extends CForm {
 				'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
 				'CA_FILE' => $this->getConfig('DB_CA_FILE'),
 				'VERIFY_HOST' => $this->getConfig('DB_VERIFY_HOST'),
-				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
+				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
+				'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
 			],
 			'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 			'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
@@ -470,7 +471,7 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function checkConnection() {
+	function dbConnect() {
 		global $DB;
 
 		if (!$this->getConfig('check_fields_result')) {
@@ -498,32 +499,46 @@ class CSetupWizard extends CForm {
 		$error = '';
 
 		// During setup set debug to false to avoid displaying unwanted PHP errors in messages.
-		if (!$result = DBconnect($error)) {
-			error($error);
+		if (DBconnect($error)) {
+			return true;
 		}
 		else {
-			$result = true;
-			if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-				$db_schema = DBselect('SELECT schema_name FROM information_schema.schemata WHERE schema_name = \''.pg_escape_string($DB['SCHEMA']).'\';');
-				$result = DBfetch($db_schema);
-			}
-
-			if ($result) {
-				$result = DBexecute('CREATE TABLE zabbix_installation_test (test_row INTEGER)');
-				$result &= DBexecute('DROP TABLE zabbix_installation_test');
-			}
-
-			$db = DB::getDbBackend();
-
-			if (!$db->checkEncoding()) {
-				error($db->getWarning());
-				return false;
-			}
+			return $error;
 		}
+	}
+
+	function dbClose() {
+		global $DB;
 
 		DBclose();
 
-		$DB = null;
+		unset($DB);
+	}
+
+	function checkConnection() {
+		global $DB;
+
+		$result = true;
+
+		if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+			$db_schema = DBselect('SELECT schema_name FROM information_schema.schemata WHERE schema_name = \''.
+				pg_escape_string($DB['SCHEMA']).'\';'
+			);
+			$result = DBfetch($db_schema);
+		}
+
+		if ($result) {
+			$result = DBexecute('CREATE TABLE zabbix_installation_test (test_row INTEGER)');
+			$result &= DBexecute('DROP TABLE zabbix_installation_test');
+		}
+
+		$db = DB::getDbBackend();
+
+		if (!$db->checkEncoding()) {
+			error($db->getWarning());
+			return false;
+		}
+
 		return $result;
 	}
 
@@ -570,7 +585,24 @@ class CSetupWizard extends CForm {
 			$this->setConfig('DB_CIPHER_LIST', getRequest('cipher_list', $this->getConfig('DB_CIPHER_LIST', '')));
 
 			if (hasRequest('next') && array_key_exists(2, getRequest('next'))) {
-				if ($this->checkConnection()) {
+				$db_connected = $this->dbConnect();
+				if ($db_connected === true) {
+					$db_connection_checked = $this->checkConnection();
+				}
+				else {
+					error($db_connected);
+					$db_connection_checked = false;
+				}
+
+				if ($db_connection_checked) {
+					$this->setConfig('DB_DOUBLE_IEEE754', DB::getDbBackend()->isDoubleIEEE754());
+				}
+
+				if ($db_connected === true) {
+					$this->dbClose();
+				}
+
+				if ($db_connection_checked) {
 					$this->doNext();
 				}
 				else {
@@ -613,7 +645,8 @@ class CSetupWizard extends CForm {
 						'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
 						'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
 						'CA_FILE' => $this->getConfig('DB_CA_FILE'),
-						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
+						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
+						'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
 					],
 					'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 					'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),

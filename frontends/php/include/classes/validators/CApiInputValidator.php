@@ -1182,7 +1182,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateNumeric($rule, &$data, $path, &$error) {
-		global $DB_HISTORY_FLOAT_IEEE754;
+		global $DB;
 
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
@@ -1214,7 +1214,7 @@ class CApiInputValidator {
 
 		$value = $number_parser->calcValue();
 
-		if ($DB_HISTORY_FLOAT_IEEE754 === true) {
+		if ($DB['DOUBLE_IEEE754']) {
 			if (abs($value) > ZBX_FLOAT_MAX) {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 

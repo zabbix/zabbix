@@ -1,6 +1,5 @@
 <?php
 // Zabbix GUI configuration file.
-global $DB, $HISTORY, $DB_HISTORY_FLOAT_IEEE754;
 
 $DB['TYPE']				= 'MYSQL';
 $DB['SERVER']			= 'localhost';
@@ -8,16 +7,22 @@ $DB['PORT']				= '0';
 $DB['DATABASE']			= 'zabbix';
 $DB['USER']				= 'zabbix';
 $DB['PASSWORD']			= '';
+
 // Schema name. Used for PostgreSQL.
 $DB['SCHEMA']			= '';
 
 // Used for TLS connection.
-$DB['ENCRYPTION']  = false;
-$DB['KEY_FILE']    = '';
-$DB['CERT_FILE']   = '';
-$DB['CA_FILE']     = '';
-$DB['VERIFY_HOST']  = false;
-$DB['CIPHER_LIST'] = '';
+$DB['ENCRYPTION']		= false;
+$DB['KEY_FILE']			= '';
+$DB['CERT_FILE']		= '';
+$DB['CA_FILE']			= '';
+$DB['VERIFY_HOST']		= false;
+$DB['CIPHER_LIST']		= '';
+
+// Use IEEE754 compatible value range for Numeric (float) history values.
+// This option is enabled by default for new Zabbix installations.
+// For upgraded installations, please read database upgrade notes before enabling this option.
+$DB['DOUBLE_IEEE754']	= true;
 
 $ZBX_SERVER				= 'localhost';
 $ZBX_SERVER_PORT		= '10051';
@@ -25,17 +30,11 @@ $ZBX_SERVER_NAME		= '';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 
-// Use IEEE754 compatible value range for Numeric (float) history values.
-// This option is enabled by default for new Zabbix installations.
-// For upgraded installations, please read database upgrade notes before enabling this option:
-// https://www.zabbix.com/
-$DB_HISTORY_FLOAT_IEEE754	= true;
-
 // Uncomment this block only if you are using Elasticsearch.
 // Elasticsearch url (can be string if same url is used for all types).
-//$HISTORY['url']   = [
-//		'uint' => 'http://localhost:9200',
-//		'text' => 'http://localhost:9200'
+//$HISTORY['url'] = [
+//	'uint' => 'http://localhost:9200',
+//	'text' => 'http://localhost:9200'
 //];
 // Value types stored in Elasticsearch.
 //$HISTORY['types'] = ['uint', 'text'];

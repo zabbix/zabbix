@@ -142,7 +142,7 @@ function unset_all() {
 }
 
 function check_type(&$field, $flags, &$var, $type, $caption = null) {
-	global $DB_HISTORY_FLOAT_IEEE754;
+	global $DB;
 
 	if ($caption === null) {
 		$caption = $field;
@@ -177,7 +177,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 		$value = $number_parser->calcValue();
 
-		if ($DB_HISTORY_FLOAT_IEEE754 === true) {
+		if ($DB['DOUBLE_IEEE754']) {
 			if (abs($value) > ZBX_FLOAT_MAX) {
 				$error = true;
 				$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too large'));

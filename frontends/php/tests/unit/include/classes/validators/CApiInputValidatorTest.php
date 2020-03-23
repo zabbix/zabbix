@@ -3015,9 +3015,9 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 	 * @param bool   $float_ieee754
 	 */
 	public function testApiInputValidator(array $rule, $data, $path, $expected, $float_ieee754 = true) {
-		global $DB_HISTORY_FLOAT_IEEE754;
+		global $DB;
 
-		$DB_HISTORY_FLOAT_IEEE754 = $float_ieee754;
+		$DB['DOUBLE_IEEE754'] = $float_ieee754;
 
 		$rc = CApiInputValidator::validate($rule, $data, $path, $error);
 
