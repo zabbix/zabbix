@@ -6,21 +6,19 @@ header {
 	background: $header-bg-color;
 	border-bottom: 1px solid $ui-border-color;
 
-	> div {
-		overflow: hidden;
-
-		&:last-child:not(:first-of-type) {
-			flex-shrink: 0;
-			margin-left: auto;
-		}
-	}
-
 	h1 {
 		position: relative;
 		padding-top: 1px;
 		overflow: hidden;
 		line-height: 24px;
 		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.header-controls {
+		flex-shrink: 0;
+		margin: 0 -2px 0 auto;
+		padding: 2px;
 		white-space: nowrap;
 	}
 

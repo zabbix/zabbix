@@ -230,17 +230,17 @@ header {
   padding: 0 10px;
   background: #ffffff;
   border-bottom: 1px solid #dfe4e7; }
-  header > div {
-    overflow: hidden; }
-    header > div:last-child:not(:first-of-type) {
-      flex-shrink: 0;
-      margin-left: auto; }
   header h1 {
     position: relative;
     padding-top: 1px;
     overflow: hidden;
     line-height: 24px;
     text-overflow: ellipsis;
+    white-space: nowrap; }
+  header .header-controls {
+    flex-shrink: 0;
+    margin: 0 -2px 0 auto;
+    padding: 2px;
     white-space: nowrap; }
   header a.link-action {
     box-sizing: border-box;

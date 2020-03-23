@@ -150,7 +150,7 @@ class CWidget {
 		}
 
 		if ($this->controls !== null) {
-			$divs[] = (new CDiv($this->controls))->addClass(ZBX_STYLE_NOWRAP);
+			$divs[] = (new CDiv($this->controls))->addClass(ZBX_STYLE_HEADER_CONTROLS);
 		}
 
 		return (new CTag('header', true, $divs))->addClass(ZBX_STYLE_HEADER_TITLE);
