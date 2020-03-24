@@ -622,25 +622,21 @@ class CSvgGraph extends CSvg {
 		// Calculate vertical zero position.
 
 		if ($this->left_y_max - $this->left_y_min == INF) {
-			$this->left_y_zero = $this->canvas_y + zbx_mulDiv(
-				[$this->canvas_height, $this->left_y_max / 10],
-				[$this->left_y_max / 10 - $this->left_y_min / 10]
-			);
+			$this->left_y_zero = $this->canvas_y + $this->canvas_height
+				* max(0, min(1, $this->left_y_max / 10 / ($this->left_y_max / 10 - $this->left_y_min / 10)));
 		}
 		else {
-			$this->left_y_zero = $this->canvas_y
-				+ zbx_mulDiv([$this->canvas_height, $this->left_y_max], [$this->left_y_max - $this->left_y_min]);
+			$this->left_y_zero = $this->canvas_y + $this->canvas_height
+				* max(0, min(1, $this->left_y_max / ($this->left_y_max - $this->left_y_min)));
 		}
 
 		if ($this->right_y_max - $this->right_y_min == INF) {
-			$this->right_y_zero = $this->canvas_y + zbx_mulDiv(
-				[$this->canvas_height, $this->right_y_max / 10],
-				[$this->right_y_max / 10 - $this->right_y_min / 10]
-			);
+			$this->right_y_zero = $this->canvas_y + $this->canvas_height
+				* max(0, min(1, $this->right_y_max / 10 / ($this->right_y_max / 10 - $this->right_y_min / 10)));
 		}
 		else {
-			$this->right_y_zero = $this->canvas_y
-				+ zbx_mulDiv([$this->canvas_height, $this->right_y_max], [$this->right_y_max - $this->right_y_min]);
+			$this->right_y_zero = $this->canvas_y + $this->canvas_height
+				* max(0, min(1, $this->right_y_max / ($this->right_y_max - $this->right_y_min)));
 		}
 	}
 
