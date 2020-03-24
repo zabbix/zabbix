@@ -29,24 +29,27 @@ class testZBX6648 extends CLegacyWebTest {
 			[
 				[
 					'host' => 'ZBX6648 All Triggers Host',
+					'hostgroup' => 'ZBX6648 All Triggers',
 					'triggers' => 'both'
 				]
 			],
 			[
 				[
 					'host' => 'ZBX6648 Enabled Triggers Host',
+					'hostgroup' => 'ZBX6648 Enabled Triggers',
 					'triggers' => 'enabled'
 				]
 			],
 			[
 				[
-					'host' => 'ZBX6648 Disabled Triggers Host',
+					'hostgroup' => 'ZBX6648 Disabled Triggers',
 					'triggers' => 'disabled'
 				]
 			],
 			[
 				[
-					'host' => 'Host 1 from first group',
+					'host' => 'Test item host',
+					'hostgroup' => 'Zabbix servers',
 					'triggers' => 'no triggers'
 				]
 			]
@@ -65,17 +68,25 @@ class testZBX6648 extends CLegacyWebTest {
 		switch ($zbx_data['triggers']) {
 			case 'both' :
 			case 'enabled' :
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->query('xpath://a[text()="'.$zbx_data['host'].'"]')->one()->waitUntilClickable()->click();
-				COverlayDialogElement::find()->one()->waitUntilReady();
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill([
+					'values' => $zbx_data['host'],
+					'context' => $zbx_data['hostgroup']
+				]);
 				$this->zbxTestLaunchOverlayDialog('Triggers');
 				break;
 			case 'disabled' :
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//div[@class="multiselect-control"]'.
+						'//button')->one()->click();
+				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['hostgroup'].'"]');
+				break;
 			case 'no triggers' :
 				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
 				$this->zbxTestLaunchOverlayDialog('Hosts');
-				COverlayDialogElement::find()->one()->waitUntilReady();
+				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//div[@class="multiselect-control"]')
+						->asMultiselect()->one()->select($zbx_data['hostgroup']);
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['host'].'"]');
 				break;
 		}

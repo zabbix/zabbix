@@ -34,6 +34,13 @@ class testFormGraph extends CLegacyWebTest {
 	protected $host = 'Simple form test host';
 
 	/**
+	 * The name of the host group that the above host belongs to.
+	 *
+	 * @var string
+	 */
+	protected $hostGroup = 'Zabbix servers';
+
+	/**
 	 * The name of the host item for the testing of the layout of the graphs created in the test data set.
 	 *
 	 * @var string
@@ -187,12 +194,14 @@ class testFormGraph extends CLegacyWebTest {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
+			$this->query('button:Reset')->one()->click();
 			$this->zbxTestClickLinkTextWait($data['template']);
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin('hosts.php');
+			$this->query('button:Reset')->one()->click();
 			$this->zbxTestClickLinkTextWait($data['host']);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
@@ -446,10 +455,12 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			if (isset($data['host'])) {
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
-						->one()->click();
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill([
+					'values' => $this->host,
+					'context' => $this->hostGroup
+				]);
+				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->zbxTestClickLinkText($this->itemSimple);
 			}
 
@@ -852,10 +863,11 @@ class testFormGraph extends CLegacyWebTest {
 				$this->zbxTestClick('add_item');
 				$this->zbxTestLaunchOverlayDialog('Items');
 				$link = $item['itemName'];
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
-						->one()->click();
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+					$host->fill([
+						'values' => $this->host,
+						'context' => $this->hostGroup
+					]);
 				$this->zbxTestClickLinkTextWait($link);
 
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('items_0_name'));
@@ -920,10 +932,11 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['ymin_name'])) {
 			$this->zbxTestClick('yaxis_min');
 			$this->zbxTestLaunchOverlayDialog('Items');
-			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-			$this->zbxTestLaunchOverlayDialog('Hosts');
-			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
-						->one()->click();
+			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+			$host->fill([
+				'values' => $this->host,
+				'context' => $this->hostGroup
+			]);
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymin_name = $data['ymin_name'];
@@ -934,11 +947,11 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['ymax_name'])) {
 			$this->zbxTestClick('yaxis_max');
 			$this->zbxTestLaunchOverlayDialog('Items');
-
-			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-			$this->zbxTestLaunchOverlayDialog('Hosts');
-			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
-						->one()->click();
+			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+			$host->fill([
+				'values' => $this->host,
+				'context' => $this->hostGroup
+			]);
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymax_name = $data['ymax_name'];
@@ -977,7 +990,10 @@ class testFormGraph extends CLegacyWebTest {
 
 		if (isset($data['formCheck'])) {
 			$filter = $this->query('name:zbx_filter')->asForm()->one();
-			$filter->getField('Hosts')->select('Simple form test host');
+			$filter->getField('Hosts')->fill([
+				'values' => $this->host,
+				'context' => $this->hostGroup
+			]);
 			$filter->submit();
 
 			$this->zbxTestClickLinkTextWait($name);

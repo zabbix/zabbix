@@ -27,6 +27,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 
 	private $template = 'Inheritance test template';
 	private $host = 'Template inheritance test host';
+	private $hostgroup = 'Templates';
 
 	/**
 	 * Select a single value from DB.
@@ -42,16 +43,19 @@ class testInheritanceApplication extends CLegacyWebTest {
 	/**
 	 * Select host or template to open applications page.
 	 */
-	private function openApplicationsPage($host) {
+	private function openApplicationsPage($host, $hostgroup) {
 		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
 		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$filter->getField('Hosts')->clear()->select($host);
+		$filter->getField('Hosts')->clear()->fill([
+			'values' => $host,
+			'context' => $hostgroup
+		]);
 		$filter->submit();
 		$this->zbxTestCheckHeader('Applications');
 	}
 
 	public function testInheritanceApplication_CheckLayout() {
-		$this->openApplicationsPage($this->host);
+		$this->openApplicationsPage($this->host, $this->hostgroup);
 
 		// Get application names linked to host.
 		$applications = 'SELECT name FROM applications WHERE hostid IN ('.
@@ -74,6 +78,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
+					'hostgroup' => 'Templates',
 					'host' => 'Template inheritance test host',
 					'application' => 'NEW inheritance application'
 				]
@@ -82,6 +87,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
+					'hostgroup' => 'Templates',
 					'host' => 'Template inheritance test host',
 					'application' => 'Application on host'
 				]
@@ -90,6 +96,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			[
 				[
 					'host' => 'Template inheritance test host',
+					'hostgroup' => 'Zabbix servers',
 					'application' => 'Inheritance application',
 					'error' => 'Cannot add application',
 					'error_datails' => 'Application "Inheritance application" already exists.'
@@ -103,7 +110,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 	 */
 	public function testInheritanceApplication_Create($data) {
 		// Add application.
-		$this->openApplicationsPage(CTestArrayHelper::get($data, 'template', $data['host']));
+		$this->openApplicationsPage(CTestArrayHelper::get($data, 'template', $data['host']), $data['hostgroup']);
 		$this->zbxTestContentControlButtonClickText('Create application');
 		$this->zbxTestInputTypeWait('appname', $data['application']);
 		$this->zbxTestClick('add');
@@ -113,7 +120,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 
 			// Check created application on host.
 			$filter = $this->query('name:zbx_filter')->asForm()->one();
-			$filter->getField('Hosts')->select($data['host']);
+			$filter->getField('Hosts')->fill($data['host']);
 			$filter->submit();
 			$get_text = $this->zbxTestGetText('//table//td[text()=": '.$data['application'].'"]');
 			$this->assertEquals($get_text, $data['template'].': '.$data['application']);
@@ -156,7 +163,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 					'SELECT templateid FROM application_template'.
 				')';
 
-		$this->openApplicationsPage($this->template);
+		$this->openApplicationsPage($this->template, 'Templates');
 
 		foreach (CDBHelper::getAll($applications) as $application) {
 			// Update application on template.
@@ -177,7 +184,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 				')');
 
 		// Open template page and update application name.
-		$this->openApplicationsPage($this->template);
+		$this->openApplicationsPage($this->template, 'Templates');
 		$this->zbxTestClickLinkTextWait($application);
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('appname'));
 		$this->zbxTestInputType('appname', $new_name);
@@ -190,7 +197,10 @@ class testInheritanceApplication extends CLegacyWebTest {
 
 		// Check updated application name on host.
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Hosts')->clear()->select($this->host);
+		$filter->getField('Hosts')->clear()->fill([
+			'values' => $this->host,
+			'context' => $this->hostgroup
+		]);
 		$filter->submit();
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//table//td[text()=": '.$new_name.'"]'));
 		$get_host_application = $this->zbxTestGetText('//table//td[text()=": '.$new_name.'"]');
@@ -216,6 +226,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
+					'hostgroup' => 'Templates',
 					'host' => 'Template inheritance test host',
 					'application' => 'Inheritance application for delete without items'
 				]
@@ -224,6 +235,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
+					'hostgroup' => 'Templates',
 					'host' => 'Template inheritance test host',
 					'application' => 'Inheritance application for delete with items',
 					'items' => true
@@ -233,6 +245,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			[
 				[
 					'host' => 'Template inheritance test host',
+					'hostgroup' => 'Zabbix servers',
 					'application' => 'Inheritance application',
 					'error' => 'Cannot delete application',
 					'error_datails' => 'Cannot delete templated application.'
@@ -245,7 +258,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testInheritanceApplication_Delete($data) {
-		$this->openApplicationsPage(CTestArrayHelper::get($data, 'template', $data['host']));
+		$this->openApplicationsPage(CTestArrayHelper::get($data, 'template', $data['host']), $data['hostgroup']);
 
 		if (array_key_exists('template', $data)) {
 			// Delete application.
@@ -256,7 +269,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 
 			// Check application on host.
 			$filter = $this->query('name:zbx_filter')->asForm()->one();
-			$filter->getField('Hosts')->clear()->select($data['host']);
+			$filter->getField('Hosts')->clear()->fill($data['host']);
 			$filter->submit();
 
 			// Check the results in DB.

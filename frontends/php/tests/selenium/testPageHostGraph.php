@@ -714,7 +714,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				$filter->getField('Hosts')->clear();
 			}
 			else {
-				$filter->getField('Hosts')->select($data['host']);
+				$filter->getField('Hosts')->fill($data['host']);
 			}
 			if (array_key_exists('change_group', $data)) {
 				$filter->getField('Host groups')->clear();

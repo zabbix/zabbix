@@ -42,6 +42,13 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	protected $host = 'Simple form test host';
 
 	/**
+	 * The name of the host group that the above host belongs to.
+	 *
+	 * @var string
+	 */
+	protected $hostGroup = 'Zabbix servers';
+
+	/**
 	 * The name of the test discovery rule created in the test data set.
 	 *
 	 * @var string
@@ -592,11 +599,12 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			if (isset($data['host'])) {
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
-						->one()->waitUntilClickable()->click();
-				$this->zbxTestClickLinkText($this->itemSimple);
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill([
+					'values' => $this->host,
+					'context' => $this->hostGroup
+				]);
+				$this->query('link:'.$this->itemSimple)->waitUntilClickable()->one()->click();
 			}
 
 			if (isset($data['template'])) {
@@ -1085,10 +1093,11 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestClick('add_item');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
-			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-			$this->zbxTestLaunchOverlayDialog('Hosts');
-			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
-					->one()->waitUntilClickable()->click();
+			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill([
+					'values' => $this->host,
+					'context' => $this->hostGroup
+				]);
 			$this->zbxTestClickLinkText($this->itemSimple);
 
 			if (isset($data['removeItem'])) {
@@ -1100,10 +1109,11 @@ class testFormGraphPrototype extends CLegacyWebTest {
 
 				$this->zbxTestClick('add_item');
 				$this->zbxTestLaunchOverlayDialog('Items');
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$this->host.'"]')
-						->one()->waitUntilClickable()->click();
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill([
+					'values' => $this->host,
+					'context' => $this->hostGroup
+				]);
 				$this->zbxTestClickLinkText($this->itemSimple);
 
 				$this->zbxTestClick('add_protoitem');

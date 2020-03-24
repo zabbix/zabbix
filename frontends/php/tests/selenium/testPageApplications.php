@@ -141,12 +141,15 @@ class testPageApplications extends CLegacyWebTest {
 		}
 	}
 
-	public function selectApplications($app_names, $host) {
+	public function selectApplications($app_names, $host, $hostgroup) {
 		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
 		$this->zbxTestWaitForPageToLoad();
 		// Filter applications by host
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Hosts')->select($host);
+		$filter->getField('Hosts')->fill([
+			'values' => $host,
+			'context' => $hostgroup
+		]);
 		$filter->submit();
 
 		$result = [];
@@ -182,7 +185,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test deactivation of selected applications.
 	 */
 	public function testPageApplications_DisableSelected() {
-		$result = $this->selectApplications(['General','OS'], 'ЗАББИКС Сервер');
+		$result = $this->selectApplications(['General','OS'], 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
@@ -201,7 +204,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test deactivation of all applications in host.
 	 */
 	public function testPageApplications_DisableAll() {
-		$result = $this->selectApplications('all', 'ЗАББИКС Сервер');
+		$result = $this->selectApplications('all', 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
@@ -219,7 +222,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test activation of selected applications.
 	 */
 	public function testPageApplications_EnableSelected() {
-		$result = $this->selectApplications(['General','OS'], 'ЗАББИКС Сервер');
+		$result = $this->selectApplications(['General','OS'], 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
@@ -238,7 +241,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test activation of all applications in host.
 	 */
 	public function testPageApplications_EnableAll() {
-		$result = $this->selectApplications('all', 'ЗАББИКС Сервер');
+		$result = $this->selectApplications('all', 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
@@ -256,7 +259,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test deleting of application.
 	 */
 	public function testPageApplications_DeleteSelected() {
-		$result = $this->selectApplications(['Selenium test application'], 'ЗАББИКС Сервер');
+		$result = $this->selectApplications(['Selenium test application'], 'ЗАББИКС Сервер', 'Zabbix servers');
 		$items = CDBHelper::getCount('SELECT NULL FROM items');
 
 		$this->zbxTestClickButtonText('Delete');
@@ -278,7 +281,7 @@ class testPageApplications extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM applications ORDER BY applicationid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$result = $this->selectApplications('all', 'ЗАББИКС Сервер');
+		$result = $this->selectApplications('all', 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();

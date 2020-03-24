@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageDashboard extends CLegacyWebTest {
 
 	public $graphCpu = 'CPU usage';
+	public $hostGroup = 'Zabbix servers';
+	public $hostName = 'ЗАББИКС Сервер';
 	public $graphCpuId = 910;
 	public $graphMemory = 'Memory usage';
 	public $graphMemoryId = 919;
@@ -86,7 +88,13 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=charts.view');
 		$this->zbxTestCheckHeader('Graphs');
 		$this->query('xpath://a[text()="Filter"]')->one()->click();
-		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one()->highlight();
+		$filter->fill([
+			'Host' => [
+				'values' => $this->hostName,
+				'context' => $this->hostGroup
+			]
+		]);
 		$filter->getField('Graphs')->select($this->graphCpu);
 		$filter->submit();
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));

@@ -241,7 +241,11 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
-		$filter->getField('Templates')->select('Form test template');
+		$filter->fill([
+			'Templates' => [
+				'values' =>'Form test template',
+				'context' => 'Templates']
+		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Simple form test host']");
