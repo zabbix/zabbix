@@ -7,8 +7,7 @@ A.F....PS. [ZBXNEXT-4712] added new preprocessing type "Replace" for items, item
 A.F.....S. [ZBXNEXT-5676] added support for TimescaleDB compression (atumilovics, vasilijs)
 .......PS. [ZBXNEXT-5829] replaced uint64 hash function with faster one (wiper)
 ..F....... [ZBXNEXT-1169] replaced problem acknowledge page with a modal popup window (agriscenko)
-.......PS. [ZBXNEXT-2753] added TLS for server and proxy connection to database (mabele)
-..F....... [ZBXNEXT-5641] added support for using SSL when connecting to database (vasilijs)
+..F....PS. [ZBXNEXT-2753,ZBXNEXT-5641] added TLS for server, proxy and UI connection to database (mabele, vasilijs)
 ........S. [ZBXNEXT-1961] added support for connection string to db.odbc.* items (atumilovics)
 
 Bug fixes:
