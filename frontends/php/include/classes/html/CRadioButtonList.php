@@ -116,7 +116,9 @@ class CRadioButtonList extends CList {
 
 		if ($this->readonly) {
 			$this->addItem(
-				((new CVar($this->name, $this->value))->removeId())->setEnabled($this->enabled)
+				(new CVar($this->name, $this->value))
+					->setEnabled($this->enabled)
+					->removeId()
 			);
 		}
 
