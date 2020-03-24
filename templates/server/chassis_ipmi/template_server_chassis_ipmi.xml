@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-03-24T06:13:30Z</date>
+   <date>2020-03-24T13:00:11Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -41,7 +41,7 @@ Template tooling version used: 0.35</description>
                <name>Get IPMI sensors</name>
                <type>IPMI</type>
                <key>ipmi.get</key>
-               <history>1h</history>
+               <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
                <description>The master item that receives all sensors with values for LLD and dependent elements from BMC.</description>
