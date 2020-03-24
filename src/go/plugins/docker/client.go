@@ -17,25 +17,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package docker
 
 import (
-	_ "zabbix.com/plugins/docker"
-	_ "zabbix.com/plugins/kernel"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/mysql"
-	_ "zabbix.com/plugins/net/netif"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/proc"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/system/cpu"
-	_ "zabbix.com/plugins/system/uname"
-	_ "zabbix.com/plugins/system/uptime"
-	_ "zabbix.com/plugins/systemd"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/vfs/dev"
-	_ "zabbix.com/plugins/vfs/file"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"context"
+	"net"
+	"net/http"
+	"time"
 )
+
+type client struct {
+	client http.Client
+}
+
+func newClient(socketPath string, timeout int) *client {
+	transport := &http.Transport{
+		DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+			return net.Dial("unix", socketPath)
+		},
+	}
+
+	client := client{}
+	client.client = http.Client{
+		Transport: transport,
+		Timeout:   time.Duration(timeout) * time.Second,
+	}
+
+	return &client
+}
