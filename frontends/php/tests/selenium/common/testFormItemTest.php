@@ -678,6 +678,8 @@ class testFormItemTest extends CWebTest {
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.']);
 				}
 
+				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				$value_test_button = $overlay->query('button:Get value and test')->waitUntilVisible()->one();
 				// Uncheck "Get value from host" checkbox.
 				if (CTestArrayHelper::get($data, 'host_value', true) === false) {
 					$get_host_value->uncheck();
@@ -686,6 +688,9 @@ class testFormItemTest extends CWebTest {
 						$elements[$field]->waitUntilNotVisible();
 					}
 					$button->waitUntilNotVisible();
+					// Check that Test button changed its name.
+					$this->assertFalse($overlay->query('button:Get value and test')->one(false)->isValid());
+					$overlay->query('button:Test')->waitUntilVisible()->one();
 
 					/*
 					 * Check that value fields still present after "Get value
