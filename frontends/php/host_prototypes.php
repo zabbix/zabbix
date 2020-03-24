@@ -300,7 +300,7 @@ if (hasRequest('form')) {
 			'macros' => getRequest('macros', [])
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
-		'readonly' => false,
+		'readonly' => (bool) $hostPrototype['templateid'],
 		'groups' => [],
 		// Parent discovery rules.
 		'templates' => []
