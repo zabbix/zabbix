@@ -512,7 +512,7 @@ class CSetupWizard extends CForm {
 
 		DBclose();
 
-		unset($DB);
+		$DB = null;
 	}
 
 	function checkConnection() {
