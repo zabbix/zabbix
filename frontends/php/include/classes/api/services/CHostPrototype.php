@@ -80,7 +80,7 @@ class CHostPrototype extends CHostBase {
 			'sortorder' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
-			'inherited'	=>				['type' => API_FLAG, 'default' => false],
+			'inherited'	=>				['type' => API_FLAG],
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
 			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false]	// TODO: This property and frontend usage SHOULD BE removed.
@@ -90,6 +90,11 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		/**
+		 * CApiInputValidator rule ['default' => null] will convert API_FLAG to boolean and this will cause error
+		 * in results because field API_FLAG equal any value is interpreted as true.
+		 */
+		$options += ['inherited' => null];
 
 		// build and execute query
 		$sql = $this->createSelectQuery($this->tableName(), $options);
@@ -530,13 +535,7 @@ class CHostPrototype extends CHostBase {
 		$macros = array_column($host_prototypes, 'macros', 'hostid');
 
 		if ($macros) {
-			$db_macros = API::UserMacro()->get([
-				'output' => ['hostmacroid', 'macro', 'type', 'value', 'description'],
-				'hostids' => array_keys($macros),
-				'preservekeys' => true
-			]);
-
-			$this->updateMacros($macros, $db_macros);
+			$this->updateMacros($macros);
 		}
 
 		$host_prototypes = $this->updateReal($host_prototypes);
@@ -680,10 +679,16 @@ class CHostPrototype extends CHostBase {
 		// save the new host prototypes
 		if (!zbx_empty($insertHostPrototypes)) {
 			$insertHostPrototypes = $this->createReal($insertHostPrototypes);
+			$this->createMacros(array_column($insertHostPrototypes, 'macros', 'hostid'));
 		}
 
 		if (!zbx_empty($updateHostPrototypes)) {
 			$updateHostPrototypes = $this->updateReal($updateHostPrototypes);
+			$macros = array_column($updateHostPrototypes, 'macros', 'hostid');
+
+			if ($macros) {
+				$this->updateMacros($macros);
+			}
 		}
 
 		$host_prototypes = array_merge($updateHostPrototypes, $insertHostPrototypes);
@@ -915,6 +920,7 @@ class CHostPrototype extends CHostBase {
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
+			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
 		]);
@@ -1415,23 +1421,33 @@ class CHostPrototype extends CHostBase {
 	 * Update host prototype macros, key is host prototype id and value is array of arrays with macro objects.
 	 *
 	 * @param array $macros     Array with macros objects.
-	 * @param array $db_macros  Array with database macro, key is hostmacroid value is macro object.
 	 */
-	protected function updateMacros(array $update_macros, array $db_macros) {
+	protected function updateMacros(array $update_macros) {
 		$create = [];
 		$update = [];
+		$db_macros = API::UserMacro()->get([
+			'output' => ['hostid', 'macro', 'type', 'value', 'description'],
+			'hostids' => array_keys($update_macros),
+			'preservekeys' => true
+		]);
+		$host_macros = array_fill_keys(array_column($db_macros, 'hostid'), []);
+
+		foreach ($db_macros as $hostmacroid => $db_macro) {
+			$host_macros[$db_macro['hostid']][$db_macro['macro']] = $hostmacroid;
+		}
 
 		foreach ($update_macros as $hostid => $macros) {
 			foreach ($macros as $macro) {
-				if (array_key_exists('hostmacroid', $macro) && array_key_exists($macro['hostmacroid'], $db_macros)) {
-					$diff = array_diff($macro, $db_macros[$macro['hostmacroid']]);
-					unset($diff['hostid']);
+				if (array_key_exists($macro['macro'], $host_macros[$hostid])) {
+					$hostmacroid = $host_macros[$hostid][$macro['macro']];
+					$diff = array_diff($macro, $db_macros[$hostmacroid]);
+					unset($diff['hostid'], $diff['hostmacroid']);
 
 					if ($diff) {
-						$update[] = ['hostmacroid' => $macro['hostmacroid']] + $diff;
+						$update[] = ['hostmacroid' => $hostmacroid] + $diff;
 					}
 
-					unset($db_macros[$macro['hostmacroid']]);
+					unset($db_macros[$hostmacroid], $host_macros[$hostid][$macro['macro']]);
 				}
 				else {
 					$create[] = ['hostid' => $hostid] + $macro;
