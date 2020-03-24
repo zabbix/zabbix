@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-03-23T13:03:58Z</date>
+   <date>2020-03-24T07:10:16Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -16,7 +16,7 @@
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '&lt;password&gt;';&#13;
 GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';&#13;
 For more information read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please. &#13;
-2. Set in the {$MYSQL.DSN} macro the system data source name of the MySQL instance like &lt;protocol(host:port or /path/to/socket)/&gt;.&#13;
+2. Set in the {$MYSQL.DSN} macro the system data source name of the MySQL instance such as &lt;protocol(host:port or /path/to/socket)/&gt;.&#13;
 3. Set the user name and password in host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.&#13;
 &#13;
 &#13;
@@ -1354,12 +1354,12 @@ As with the I/O thread, this should normally be Yes.</description>
             <macro>
                <macro>{$MYSQL.BUFF_UTIL.MIN.WARN}</macro>
                <value>50</value>
-               <description>The minimum buffer pool utilization in percent for trigger expression.</description>
+               <description>The minimum buffer pool utilization percentage for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MYSQL.DSN}</macro>
                <value>&lt;Put your DSN&gt;</value>
-               <description>System data source name like &lt;protocol(host:port or /path/to/socket)/&gt;.</description>
+               <description>System data source name such as &lt;protocol(host:port or /path/to/socket)/&gt;.</description>
             </macro>
             <macro>
                <macro>{$MYSQL.PASSWORD}</macro>
