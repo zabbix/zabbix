@@ -716,7 +716,8 @@ function find_period_end($periods, $time, $max_time) {
 function yieldGraphScaleInterval(float $min, float $max, bool $is_binary, int $power, int $rows): iterable {
 	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
 
-	$interval = truncateFloat(($max - $min) / $rows / pow($unit_base, $power));
+	// Expression optimized to avoid overflow.
+	$interval = truncateFloat(($max / $rows - $min / $rows) / pow($unit_base, $power));
 
 	while (true) {
 		if ($is_binary && $interval >= 1) {
@@ -726,7 +727,7 @@ function yieldGraphScaleInterval(float $min, float $max, bool $is_binary, int $p
 			$exponent = floor(log10($interval));
 
 			foreach ([2, 5, 10] as $multiply) {
-				$candidate =  truncateFloat(pow(10, $exponent) * $multiply);
+				$candidate = truncateFloat(pow(10, $exponent) * $multiply);
 				if ($candidate >= $interval) {
 					$result = $candidate;
 
@@ -790,8 +791,9 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 	$best_result = [
 		'min' => $scale_min,
 		'max' => $scale_max,
-		'interval' => $scale_max - $scale_min,
-		'rows' => 1,
+		// Expression optimized to avoid overflow.
+		'interval' => $scale_max / 2 - $scale_min / 2,
+		'rows' => 2,
 		'power' => $power
 	];
 
@@ -941,7 +943,9 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 
 	foreach ($rows as $value) {
 		$scale_values[] = [
-			'relative_pos' => ($value - $min) / ($max - $min),
+			'relative_pos' => (abs($max - $min) == INF)
+				? ($value / 10 - $min / 10) / ($max / 10 - $min / 10)
+				: ($value - $min) / ($max - $min),
 			'value' => convertUnits([
 				'value' => $value,
 			] + $options_calculated)

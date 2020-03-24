@@ -621,11 +621,27 @@ class CSvgGraph extends CSvg {
 
 		// Calculate vertical zero position.
 
-		$this->left_y_zero = $this->canvas_y
-			+ $this->canvas_height * max(0, min(1, $this->left_y_max / ($this->left_y_max - $this->left_y_min)));
+		if ($this->left_y_max - $this->left_y_min == INF) {
+			$this->left_y_zero = $this->canvas_y + zbx_mulDiv(
+				[$this->canvas_height, $this->left_y_max / 10],
+				[$this->left_y_max / 10 - $this->left_y_min / 10]
+			);
+		}
+		else {
+			$this->left_y_zero = $this->canvas_y
+				+ zbx_mulDiv([$this->canvas_height, $this->left_y_max], [$this->left_y_max - $this->left_y_min]);
+		}
 
-		$this->right_y_zero = $this->canvas_y
-			+ $this->canvas_height * max(0, min(1, $this->right_y_max / ($this->right_y_max - $this->right_y_min)));
+		if ($this->right_y_max - $this->right_y_min == INF) {
+			$this->right_y_zero = $this->canvas_y + zbx_mulDiv(
+				[$this->canvas_height, $this->right_y_max / 10],
+				[$this->right_y_max / 10 - $this->right_y_min / 10]
+			);
+		}
+		else {
+			$this->right_y_zero = $this->canvas_y
+				+ zbx_mulDiv([$this->canvas_height, $this->right_y_max], [$this->right_y_max - $this->right_y_min]);
+		}
 	}
 
 	/**
@@ -765,7 +781,7 @@ class CSvgGraph extends CSvg {
 	protected function calculatePaths() {
 		// Metric having very big values of y outside visible area will fail to render.
 		$y_max = pow(2, 16);
-		$y_min = $y_max * -1;
+		$y_min = -$y_max;
 
 		foreach ($this->metrics as $index => $metric) {
 			if (!array_key_exists($index, $this->points)) {
@@ -782,7 +798,6 @@ class CSvgGraph extends CSvg {
 			}
 
 			$time_range = ($this->time_till - $this->time_from) ? : 1;
-			$value_diff = ($max_value - $min_value) ? : 1;
 			$timeshift = $metric['options']['timeshift'];
 			$paths = [];
 
@@ -803,8 +818,18 @@ class CSvgGraph extends CSvg {
 					$x = $this->canvas_x + $this->canvas_width
 						- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 
-					// Braces needed to protect from overflowing to INF.
-					$y = $this->canvas_y + $this->canvas_height * (($max_value - $point) / $value_diff);
+					if ($max_value - $min_value == INF) {
+						$y = $this->canvas_y + zbx_mulDiv(
+							[$this->canvas_height, $max_value / 10 - $point / 10],
+							[$max_value / 10 - $min_value / 10]
+						);
+					}
+					else {
+						$y = $this->canvas_y + zbx_mulDiv(
+							[$this->canvas_height, $max_value - $point],
+							[$max_value - $min_value]
+						);
+					}
 
 					if (!$in_range) {
 						$y = ($point > $max_value) ? max($y_min, $y) : min($y_max, $y);

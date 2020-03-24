@@ -351,8 +351,12 @@ class CLineGraphDraw extends CGraphDraw {
 							continue;
 						}
 
-						$dy = $data[$var_name][$ci] - $data[$var_name][$first_idx];
-						$data[$var_name][$ci - ($dx - $cj)] = $data[$var_name][$first_idx] + $cj / $dx * $dy;
+						// Expression optimized to avoid overflow.
+						$data[$var_name][$ci - ($dx - $cj)] = zbx_add([
+							$data[$var_name][$first_idx],
+							zbx_mulDiv([$data[$var_name][$ci], $cj], [$dx]),
+							-zbx_mulDiv([$data[$var_name][$first_idx], $cj], [$dx])
+						]);
 					}
 				}
 			}
@@ -673,7 +677,9 @@ class CLineGraphDraw extends CGraphDraw {
 
 	protected function calcZero() {
 		foreach ($this->getVerticalScalesInUse() as $side) {
-			$this->unit2px[$side] = ($this->m_maxY[$side] - $this->m_minY[$side]) / $this->sizeY;
+			// Expression optimized to avoid overflow.
+			$this->unit2px[$side] = $this->m_maxY[$side] / $this->sizeY - $this->m_minY[$side] / $this->sizeY;
+
 			if ($this->unit2px[$side] == 0) {
 				$this->unit2px[$side] = 1;
 			}
@@ -1292,7 +1298,15 @@ class CLineGraphDraw extends CGraphDraw {
 					? $this->graphtheme['leftpercentilecolor']
 					: $this->graphtheme['rightpercentilecolor'];
 
-				$y = $this->sizeY - (($percentile['value'] - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY;
+				if ($maxY - $minY == INF) {
+					$y = $this->sizeY + $this->shiftY
+						- zbx_mulDiv([$percentile['value'] / 10 - $minY / 10, $this->sizeY], [$maxY / 10 - $minY / 10]);
+				}
+				else {
+					$y = $this->sizeY + $this->shiftY
+						- zbx_mulDiv([$percentile['value'] - $minY, $this->sizeY], [$maxY - $minY]);
+				}
+
 				zbx_imageline(
 					$this->im,
 					$this->shiftXleft,
@@ -1320,7 +1334,15 @@ class CLineGraphDraw extends CGraphDraw {
 				continue;
 			}
 
-			$y = $this->sizeY - (($trigger['val'] - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY;
+			if ($maxY - $minY == INF) {
+				$y = $this->sizeY + $this->shiftY
+					- zbx_mulDiv([$trigger['val'] / 10 - $minY / 10, $this->sizeY], [$maxY / 10 - $minY / 10]);
+			}
+			else {
+				$y = $this->sizeY + $this->shiftY
+					- zbx_mulDiv([$trigger['val'] - $minY, $this->sizeY], [$maxY - $minY]);
+			}
+
 			$triggerColor = $this->getColor($trigger['color']);
 			$lineStyle = [$triggerColor, $triggerColor, $triggerColor, $triggerColor, $triggerColor, $oppColor, $oppColor, $oppColor];
 

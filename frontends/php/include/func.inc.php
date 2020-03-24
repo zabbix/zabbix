@@ -1477,7 +1477,76 @@ function zbx_avg(array $values) {
 
 	$count = 1;
 	foreach ($values as $value) {
-		$result += ($value - $result) / $count++;
+		// Expression optimized to avoid overflow.
+		$result += $value / $count - $result / $count;
+		$count++;
+	}
+
+	return $result;
+}
+
+/**
+* Calculate sum of addenda (avoiding overflow).
+*
+* @param array $addenda
+*
+* @return float
+*/
+function zbx_add(array $addenda): float {
+	sort($addenda, SORT_NUMERIC);
+
+	$result = $addenda[0];
+
+	$head = 1;
+	$tail = count($addenda) - 1;
+
+	while ($head <= $tail) {
+		$result_candidate = $result + $addenda[$head];
+		if (abs($result_candidate) != INF) {
+			$result = $result_candidate;
+			$head++;
+		}
+		else {
+			$result += $addenda[$tail];
+			$tail--;
+		}
+	}
+
+	return $result;
+}
+
+/**
+* Calculate multiplication of multipliers divided by multiplication of divisors safely (avoiding overflow).
+*
+* @param array $multipliers
+* @param array $divisors
+*
+* @return float
+*/
+function zbx_mulDiv(array $multipliers, array $divisors): float {
+	foreach ($divisors as $divisor) {
+		$multipliers[] = 1 / $divisor;
+	}
+
+	usort($multipliers, function(float $a, float $b): int {
+		return abs($b) <=> abs($a);
+	});
+
+	$result = $multipliers[0];
+
+	$head = 1;
+	$tail = count($multipliers) - 1;
+
+	while ($head <= $tail) {
+		$result_candidate = $result * $multipliers[$head];
+		if (abs($result_candidate) != INF) {
+			$result = $result_candidate;
+			$head++;
+		}
+		else {
+			$result *= $multipliers[$tail];
+			$tail--;
+		}
 	}
 
 	return $result;
