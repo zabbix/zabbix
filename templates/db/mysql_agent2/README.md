@@ -120,7 +120,6 @@ There are no template links in this template.
 |MySQL: The slave I/O thread is not running|<p>Whether the I/O thread for reading the master's binary log is running.</p>|`{TEMPLATE_NAME:mysql.replication.slave_io_running["{#MASTER_HOST}"].count(#1,"No",eq)}=1`|AVERAGE||
 |MySQL: The slave I/O thread is not connected to a replication master|<p>-</p>|`{TEMPLATE_NAME:mysql.replication.slave_io_running["{#MASTER_HOST}"].count(#1,"Yes",ne)}=1`|WARNING|<p>**Depends on**:</p><p>- MySQL: The slave I/O thread is not running</p>|
 |MySQL: The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`{TEMPLATE_NAME:mysql.replication.slave_sql_running["{#MASTER_HOST}"].count(#1,"No",eq)}=1`|WARNING|<p>**Depends on**:</p><p>- MySQL: The slave I/O thread is not running</p>|
-|MySQL: Failed to get items (no data for 30m)|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"].nodata(30m)}=1`|WARNING|<p>**Depends on**:</p><p>- MySQL: Service is down</p>|
 
 ## Feedback
 
