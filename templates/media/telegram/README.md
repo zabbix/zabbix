@@ -1,6 +1,6 @@
 # Zabbix Telegram webhook intergration
 
-![](images/images/telegram_logo.png?raw=true)
+![](images/telegram_logo.png?raw=true)
 
 This guide describes how to send Zabbix notifications with Telegram messenger Bot API using the Zabbix webhook feature.
 
