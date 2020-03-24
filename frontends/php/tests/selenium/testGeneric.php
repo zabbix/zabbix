@@ -84,7 +84,7 @@ class testGeneric extends CLegacyWebTest {
 			['services.php',					'Configuration of services'],
 
 			// Administration
-			['zabbix.php?action=gui.edit&ddreset=1',	'Configuration of GUI'],
+			['zabbix.php?action=gui.edit',	'Configuration of GUI'],
 			['zabbix.php?action=housekeeping.edit',		'Configuration of housekeeping'],
 			['zabbix.php?action=image.list',	'Configuration of images'],
 			['zabbix.php?action=iconmap.list',	'Configuration of icon mapping'],

@@ -2077,7 +2077,7 @@ class testFormItem extends CLegacyWebTest {
 	}
 
 	public function testFormItem_HousekeeperUpdate() {
-		$this->zbxTestLogin('zabbix.php?action=gui.edit&ddreset=1');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
@@ -2093,7 +2093,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
 		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
 
-		$this->zbxTestOpen('zabbix.php?action=gui.edit&ddreset=1');
+		$this->zbxTestOpen('zabbix.php?action=gui.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global');
@@ -2114,7 +2114,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickWait('trends_mode_hint');
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
 
-		$this->zbxTestOpen('zabbix.php?action=gui.edit&ddreset=1');
+		$this->zbxTestOpen('zabbix.php?action=gui.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestInputType('hk_history', 90);

@@ -538,7 +538,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// Administration
 			[[
-				'url' => 'zabbix.php?action=gui.edit&ddreset=1',
+				'url' => 'zabbix.php?action=gui.edit',
 				'title' =>	'Configuration of GUI',
 				'users' => [
 					'guest' => false,
