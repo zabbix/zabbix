@@ -20,13 +20,15 @@
 package plugins
 
 import (
+	_ "zabbix.com/plugins/docker"
 	_ "zabbix.com/plugins/kernel"
 	_ "zabbix.com/plugins/log"
+	_ "zabbix.com/plugins/mysql"
 	_ "zabbix.com/plugins/net/netif"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/proc"
 	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/system/cpucollector"
+	_ "zabbix.com/plugins/system/cpu"
 	_ "zabbix.com/plugins/system/uname"
 	_ "zabbix.com/plugins/system/uptime"
 	_ "zabbix.com/plugins/systemd"

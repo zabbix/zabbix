@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXCRYPTO_H
 #define ZABBIX_ZBXCRYPTO_H
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #if defined(_WINDOWS)
 
@@ -39,6 +39,6 @@ void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);
 void	zbx_tls_version(void);
 
-#endif	/* #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
+#endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 
 #endif /* ZABBIX_DISK_H */

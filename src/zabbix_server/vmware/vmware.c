@@ -3444,7 +3444,9 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 			continue;
 		}
 
-		if (SUCCEED != is_uint64(value, &key))
+		key = (unsigned int) atoi(value);
+
+		if (0 == key && 0 == isdigit(value[('-' == *value || '+' == *value) ? 1 : 0 ]))
 		{
 			zabbix_log(LOG_LEVEL_TRACE, "skipping eventlog key '%s', not a number", value);
 			zbx_free(value);
@@ -3642,7 +3644,9 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 		goto clean;
 	}
 
-	if (SUCCEED != is_uint64(value, &xml_event.id))
+	xml_event.id = (unsigned int) atoi(value);
+
+	if (0 == xml_event.id && 0 == isdigit(value[('-' == *value || '+' == *value) ? 1 : 0 ]))
 	{
 		*error = zbx_dsprintf(*error, "Cannot convert eventlog key from %s", value);
 		zbx_free(value);
@@ -5268,6 +5272,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

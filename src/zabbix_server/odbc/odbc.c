@@ -205,15 +205,43 @@ static void	zbx_log_odbc_connection_info(const char *function, SQLHDBC hdbc)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_odbc_connection_string_append                                *
+ *                                                                            *
+ * Purpose: Appends a new argument to ODBC connection string.                 *
+ *          Connection string is reallocated to fit new value.                *
+ *                                                                            *
+ * Parameters: connection_str - [IN/OUT] connection string                    *
+ *             attribute      - [IN] attribute name                           *
+ *             value          - [IN] attribute value                          *
+ *                                                                            *
+ ******************************************************************************/
+static void zbx_odbc_connection_string_append(char **connection_str, const char *attribute, const char *value)
+{
+	size_t	len;
+	char	last = '\0';
+
+	if (NULL == value)
+		return;
+
+	if (0 < (len = strlen(*connection_str)))
+		last = (*connection_str)[len-1];
+
+	*connection_str = zbx_dsprintf(*connection_str, "%s%s%s=%s", *connection_str, ';' == last ? "" : ";",
+			attribute, value);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_odbc_connect                                                 *
  *                                                                            *
  * Purpose: connect to ODBC data source                                       *
  *                                                                            *
- * Parameters: dsn     - [IN] data source name                                *
- *             user    - [IN] user name                                       *
- *             pass    - [IN] password                                        *
- *             timeout - [IN] timeout                                         *
- *             error   - [OUT] error message                                  *
+ * Parameters: dsn        - [IN] data source name                             *
+ *             connection - [IN] connection string                            *
+ *             user       - [IN] user name                                    *
+ *             pass       - [IN] password                                     *
+ *             timeout    - [IN] timeout                                      *
+ *             error      - [OUT] error message                               *
  *                                                                            *
  * Return value: pointer to opaque data source data structure or NULL in case *
  *               of failure, allocated error message is returned in error     *
@@ -221,7 +249,8 @@ static void	zbx_log_odbc_connection_info(const char *function, SQLHDBC hdbc)
  * Comments: It is caller's responsibility to free error buffer!              *
  *                                                                            *
  ******************************************************************************/
-zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, const char *pass, int timeout, char **error)
+zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *connection, const char *user, const char *pass,
+		int timeout, char **error)
 {
 	char			*diag = NULL;
 	zbx_odbc_data_source_t	*data_source = NULL;
@@ -254,8 +283,31 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 					if ('\0' == *pass)
 						pass = NULL;
 
-					rc = SQLConnect(data_source->hdbc, (SQLCHAR *)dsn, SQL_NTS, (SQLCHAR *)user,
-							SQL_NTS, (SQLCHAR *)pass, SQL_NTS);
+					if (NULL != connection && '\0' != *connection)
+					{
+						char	*connection_str;
+
+						connection_str = NULL;
+
+						if (NULL != user || NULL != pass)
+						{
+							connection_str = zbx_strdup(NULL, connection);
+							zbx_odbc_connection_string_append(&connection_str, "UID", user);
+							zbx_odbc_connection_string_append(&connection_str, "PWD", pass);
+							connection = connection_str;
+						}
+
+						rc = SQLDriverConnect(data_source->hdbc, NULL,
+								(SQLCHAR *)connection, SQL_NTS, NULL, 0, NULL,
+								SQL_DRIVER_NOPROMPT);
+
+						zbx_free(connection_str);
+					}
+					else
+					{
+						rc = SQLConnect(data_source->hdbc, (SQLCHAR *)dsn, SQL_NTS,
+								(SQLCHAR *)user, SQL_NTS, (SQLCHAR *)pass, SQL_NTS);
+					}
 
 					if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 					{

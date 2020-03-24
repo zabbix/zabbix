@@ -130,7 +130,7 @@ function getMonthCaption($num) {
 		case 12: return _('December');
 	}
 
-	return _s('[Wrong value for month: "%s" ]', $num);
+	return _s('[Wrong value for month: "%1$s" ]', $num);
 }
 
 function getDayOfWeekCaption($num) {
@@ -145,7 +145,7 @@ function getDayOfWeekCaption($num) {
 		case 7: return _('Sunday');
 	}
 
-	return _s('[Wrong value for day: "%s" ]', $num);
+	return _s('[Wrong value for day: "%1$s" ]', $num);
 }
 
 // Convert seconds (0..SEC_PER_WEEK) to string representation. For example, 212400 -> 'Tuesday 11:00'

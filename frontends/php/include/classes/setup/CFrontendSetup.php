@@ -31,8 +31,8 @@ class CFrontendSetup {
 	const MIN_PHP_UPLOAD_MAX_FILESIZE = '2097152'; // 2 * ZBX_MEBIBYTE;
 	const MIN_PHP_MAX_EXECUTION_TIME = 300;
 	const MIN_PHP_MAX_INPUT_TIME = 300;
-	const MIN_PHP_GD_VERSION = '2.2';
-	const MIN_PHP_LIBXML_VERSION = '2.9';
+	const MIN_PHP_GD_VERSION = '2.0';
+	const MIN_PHP_LIBXML_VERSION = '2.6.15';
 	const REQUIRED_PHP_ARG_SEPARATOR_OUTPUT = '&';
 
 	/**
@@ -121,8 +121,9 @@ class CFrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_MEMORY_LIMIT),
 			'result' => $check ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required PHP memory limit is %s (configuration option "memory_limit").',
-				mem2str(self::MIN_PHP_MEMORY_LIMIT))
+			'error' => _s('Minimum required PHP memory limit is %1$s (configuration option "memory_limit").',
+				mem2str(self::MIN_PHP_MEMORY_LIMIT)
+			)
 		];
 	}
 
@@ -139,8 +140,9 @@ class CFrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_POST_MAX_SIZE),
 			'result' => (str2mem($current) >= self::MIN_PHP_POST_MAX_SIZE) ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required size of PHP post is %s (configuration option "post_max_size").',
-				mem2str(self::MIN_PHP_POST_MAX_SIZE))
+			'error' => _s('Minimum required size of PHP post is %1$s (configuration option "post_max_size").',
+				mem2str(self::MIN_PHP_POST_MAX_SIZE)
+			)
 		];
 	}
 
@@ -157,8 +159,9 @@ class CFrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE),
 			'result' => (str2mem($current) >= self::MIN_PHP_UPLOAD_MAX_FILESIZE) ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required PHP upload filesize is %s (configuration option "upload_max_filesize").',
-				mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE))
+			'error' => _s('Minimum required PHP upload filesize is %1$s (configuration option "upload_max_filesize").',
+				mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE)
+			)
 		];
 	}
 
@@ -187,7 +190,9 @@ class CFrontendSetup {
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_EXECUTION_TIME,
 			'result' => $currentIsValid ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required limit on execution time of PHP scripts is %s (configuration option "max_execution_time").', self::MIN_PHP_MAX_EXECUTION_TIME)
+			'error' => _s('Minimum required limit on execution time of PHP scripts is %1$s (configuration option "max_execution_time").',
+				self::MIN_PHP_MAX_EXECUTION_TIME
+			)
 		];
 	}
 
@@ -208,7 +213,9 @@ class CFrontendSetup {
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_INPUT_TIME,
 			'result' => $currentIsValid ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required limit on input parse time for PHP scripts is %s (configuration option "max_input_time").', self::MIN_PHP_MAX_INPUT_TIME)
+			'error' => _s('Minimum required limit on input parse time for PHP scripts is %1$s (configuration option "max_input_time").',
+				self::MIN_PHP_MAX_INPUT_TIME
+			)
 		];
 	}
 
@@ -639,6 +646,30 @@ class CFrontendSetup {
 			'error' => _s('PHP option "%1$s" must be set to "%2$s"', 'arg_separator.output',
 				self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT
 			)
+		];
+	}
+
+	/**
+	 * Checks for the SSL parameters point to files that are open for writing.
+	 *
+	 * @return array
+	 */
+	public function checkSslFiles() {
+		global $DB;
+		$writeable = [];
+
+		foreach (['KEY_FILE', 'CERT_FILE', 'CA_FILE'] as $key) {
+			if ($DB[$key] !== '' && is_writable($DB[$key])) {
+				$writeable[] = $key;
+			}
+		}
+
+		return [
+			'name' => _('TLS certificate file'),
+			'current' => implode(', ', $writeable),
+			'required' => null,
+			'result' => $writeable ? self::CHECK_FATAL : self::CHECK_OK,
+			'error' => _s('TLS certificate files must be read-only')
 		];
 	}
 }

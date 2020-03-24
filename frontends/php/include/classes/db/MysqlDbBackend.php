@@ -101,4 +101,73 @@ class MysqlDbBackend extends DbBackend {
 
 		return true;
 	}
+
+	/**
+	 * Check is current connection contain requested cipher list.
+	 *
+	 * @return bool
+	 */
+	public function isConnectionSecure() {
+		$row = DBfetch(DBselect("SHOW STATUS LIKE 'ssl_cipher'"));
+
+		if (!$row || !$row['Value']) {
+			$this->setError('Error connecting to database. Empty cipher.');
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Create connection to database server.
+	 *
+	 * @param string $host         Host name.
+	 * @param string $port         Port.
+	 * @param string $user         User name.
+	 * @param string $password     Password.
+	 * @param string $dbname       Database name.
+	 * @param string $schema       DB schema.
+	 *
+	 * @param
+	 * @return resource|null
+	 */
+	public function connect($host, $port, $user, $password, $dbname, $schema) {
+		$resource = mysqli_init();
+		$tls_mode = null;
+
+		if ($this->tls_encryption) {
+			$cipher_suit = ($this->tls_cipher_list === '') ? null : $this->tls_cipher_list;
+			$resource->ssl_set($this->tls_key_file, $this->tls_cert_file, $this->tls_ca_file, null, $cipher_suit);
+
+			$tls_mode = MYSQLI_CLIENT_SSL;
+		}
+
+		$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
+
+		if ($resource->error) {
+			$this->setError($resource->error);
+			return null;
+		}
+
+		if ($resource->errno) {
+			$this->setError('Database error code '.$resource->errno);
+			return null;
+		}
+
+		if ($resource->autocommit(true) === false) {
+			$this->setError('Error setting auto commit.');
+			return null;
+		}
+
+		return $resource;
+	}
+
+	/**
+	 * Initialize connection.
+	 *
+	 * @return bool
+	 */
+	public function init() {
+		DBexecute('SET NAMES utf8');
+	}
 }

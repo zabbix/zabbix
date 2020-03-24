@@ -40,38 +40,43 @@ class CControllerMacrosUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$db_macros = API::UserMacro()->get([
-			'output' => ['globalmacroid', 'macro', 'value', 'description'],
-			'globalmacro' => true,
-			'preservekeys' => true
-		]);
-
 		/** @var array $macros */
 		$macros = $this->getInput('macros', []);
 		foreach ($macros as &$macro) {
 			$macro['macro'] = trim($macro['macro']);
-			$macro['value'] = trim($macro['value']);
+
+			if (array_key_exists('value', $macro)) {
+				$macro['value'] = trim($macro['value']);
+			}
+
 			$macro['description'] = trim($macro['description']);
 		}
 		unset($macro);
 
 		foreach ($macros as $idx => $macro) {
-			if (!array_key_exists('globalmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
-					&& $macro['description'] === '') {
+			if (!array_key_exists('globalmacroid', $macro) && $macro['macro'] === ''
+					&& (!array_key_exists('value', $macro) || $macro['value'] === '') && $macro['description'] === '') {
 				unset($macros[$idx]);
 			}
 		}
+
+		$db_macros = API::UserMacro()->get([
+			'output' => ['globalmacroid', 'macro', 'value', 'type', 'description'],
+			'globalmacro' => true,
+			'preservekeys' => true
+		]);
 
 		$macros_to_update = [];
 		foreach ($macros as $idx => $macro) {
 			if (array_key_exists('globalmacroid', $macro) && array_key_exists($macro['globalmacroid'], $db_macros)) {
 				$dbMacro = $db_macros[$macro['globalmacroid']];
 
-				// remove item from new macros array
+				// Remove item from new macros array.
 				unset($macros[$idx], $db_macros[$macro['globalmacroid']]);
 
-				// if the macro is unchanged - skip it
-				if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['value'] === $macro['value']
+				// If the macro is unchanged - skip it.
+				if ($dbMacro['macro'] === $macro['macro'] && (array_key_exists('value', $dbMacro)
+							&& $dbMacro['value'] === $macro['value']) && $dbMacro['type'] === $macro['type']
 						&& $dbMacro['description'] === $macro['description']) {
 					continue;
 				}

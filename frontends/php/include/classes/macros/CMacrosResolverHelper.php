@@ -525,7 +525,7 @@ class CMacrosResolverHelper {
 	 *
 	 * @return string
 	 */
-	public static function resolveMapLabelMacros($label, $replaceHosts = null) {
+	public static function resolveMapLabelMacros($label, array $replaceHosts = []) {
 		self::init();
 
 		return self::$macrosResolver->resolveMapLabelMacros($label, $replaceHosts);
@@ -625,6 +625,7 @@ class CMacrosResolverHelper {
 	 * @param string $data['steps'][]['error_handler_params]     Preprocessing steps error handle parameters.
 	 * @param string $data['delay']                              Update interval value.
 	 * @param array  $data['supported_macros']                   Supported macros.
+	 * @param bool   $data['support_lldmacros']                  Either LLD macros need to be extracted.
 	 * @param array  $data['texts_support_macros']               List of texts potentially could contain macros.
 	 * @param array  $data['texts_support_user_macros']          List of texts potentially could contain user macros.
 	 * @param array  $data['texts_support_lld_macros']           List of texts potentially could contain LLD macros.

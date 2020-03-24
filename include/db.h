@@ -31,6 +31,12 @@ extern char	*CONFIG_DBSCHEMA;
 extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 extern char	*CONFIG_DBSOCKET;
+extern char	*CONFIG_DB_TLS_CONNECT;
+extern char	*CONFIG_DB_TLS_CERT_FILE;
+extern char	*CONFIG_DB_TLS_KEY_FILE;
+extern char	*CONFIG_DB_TLS_CA_FILE;
+extern char	*CONFIG_DB_TLS_CIPHER;
+extern char	*CONFIG_DB_TLS_CIPHER_13;
 extern int	CONFIG_DBPORT;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
@@ -476,6 +482,11 @@ void	DBdeinit(void);
 int	DBconnect(int flag);
 void	DBclose(void);
 
+int	zbx_db_validate_config_features(void);
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+void	zbx_db_validate_config(void);
+#endif
+
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
 #endif
@@ -495,6 +506,8 @@ const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
+
+void	DBcheck_capabilities(void);
 
 /******************************************************************************
  *                                                                            *
@@ -620,6 +633,10 @@ zbx_conn_flags_t;
 
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
 		const char *dns, unsigned short port, zbx_conn_flags_t flags);
+void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char type, const unsigned char bulk,
+		const char *community, const char *securityname, const unsigned char securitylevel,
+		const char *authpassphrase, const char *privpassphrase, const unsigned char authprotocol,
+		const unsigned char privprotocol, const char *contextname);
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 

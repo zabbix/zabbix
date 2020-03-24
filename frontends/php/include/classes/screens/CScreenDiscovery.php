@@ -78,7 +78,7 @@ class CScreenDiscovery extends CScreenBase {
 
 		// user macros
 		$macros = API::UserMacro()->get([
-			'output' => ['macro', 'value'],
+			'output' => ['macro', 'value', 'type'],
 			'globalmacro' => true
 		]);
 		$macros = zbx_toHash($macros, 'macro');
@@ -95,7 +95,7 @@ class CScreenDiscovery extends CScreenBase {
 			$key_ = $dchecks[$dservice['dcheckid']]['key_'];
 			if ($key_ !== '') {
 				if (array_key_exists($key_, $macros)) {
-					$key_ = $macros[$key_]['value'];
+					$key_ = CMacrosResolverGeneral::getMacroValue($macros[$key_]);
 				}
 				$key_ = ': '.$key_;
 			}
@@ -193,7 +193,7 @@ class CScreenDiscovery extends CScreenBase {
 					$key_ = $dchecks[$dservice['dcheckid']]['key_'];
 					if ($key_ !== '') {
 						if (array_key_exists($key_, $macros)) {
-							$key_ = $macros[$key_]['value'];
+							$key_ = CMacrosResolverGeneral::getMacroValue($macros[$key_]);
 						}
 						$key_ = NAME_DELIMITER.$key_;
 					}
