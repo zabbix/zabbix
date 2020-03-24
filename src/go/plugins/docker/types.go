@@ -226,7 +226,7 @@ type ContainerInfo struct {
 	SizeRootFs      int64
 }
 
-// HostConfig structure yeah
+// HostConfig the non-portable Config structure of a container
 type HostConfig struct {
 	Binds           []string
 	ContainerIDFile string
@@ -287,7 +287,7 @@ type ThrottlingData struct {
 	ThrottledTime    uint64 `json:"throttled_time"`
 }
 
-// CPUUsage stores All CPU stats aggregated since container inception.
+// CPUUsage stores all CPU stats aggregated since container inception.
 type CPUUsage struct {
 	TotalUsage        uint64   `json:"total_usage"`
 	PercpuUsage       []uint64 `json:"percpu_usage"`
@@ -329,14 +329,14 @@ type NetworkStats struct {
 	InstanceID string `json:"instance_id"`
 }
 
-// Stats is Ultimate struct aggregating all types of stats of one container
+// Stats is struct aggregating all types of stats of one container
 type Stats struct {
 	CPUStats    CPUStats    `json:"cpu_stats"`
 	PreCPUStats CPUStats    `json:"precpu_stats"`
 	MemoryStats MemoryStats `json:"memory_stats"`
 }
 
-// ContainerStats
+// ContainerStats struct
 type ContainerStats struct {
 	Stats
 	Name     string                  `json:"name"`
