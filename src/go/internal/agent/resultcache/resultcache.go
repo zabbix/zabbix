@@ -41,9 +41,12 @@ package resultcache
 
 import (
 	"crypto/md5"
+	"database/sql"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"sync/atomic"
 	"time"
 
@@ -57,6 +60,7 @@ import (
 
 const (
 	UploadRetryInterval = time.Second
+	DbVariableNotSet    = -1
 )
 
 type ResultCache struct {
@@ -72,6 +76,13 @@ type ResultCache struct {
 	persistValueNum int32
 	retry           *time.Timer
 	timeout         int
+	EnablePersist   int
+	PersistPeriod   int
+	DbName          string
+	database        *sql.DB
+	OldestLog       uint64
+	OldestData      uint64
+	LastSentLogSize uint64
 }
 
 type AgentData struct {
@@ -104,7 +115,7 @@ type Uploader interface {
 	CanRetry() (enabled bool)
 }
 
-func (c *ResultCache) upload(u Uploader) (err error) {
+func (c *ResultCache) uploadMemory(u Uploader) (err error) {
 	if len(c.results) == 0 {
 		return
 	}
@@ -153,6 +164,114 @@ func (c *ResultCache) upload(u Uploader) (err error) {
 	c.totalValueNum = 0
 	c.persistValueNum = 0
 	return
+}
+
+func (c *ResultCache) resultFetch(rows *sql.Rows) AgentData {
+	var tmp uint64
+	var data AgentData
+	var LastLogSize int64
+	var Mtime, State, EventID, EventSeverity, EventTimestamp int
+	var Value, EventSource string
+
+	rows.Scan(&data.Id, &data.Itemid, &LastLogSize, &Mtime, &State, &Value, &EventSource, &EventID,
+		&EventSeverity, &EventTimestamp, &data.Clock, &data.Ns)
+	if LastLogSize != DbVariableNotSet {
+		tmp = uint64(LastLogSize)
+		data.LastLogsize = &tmp
+		if tmp > c.LastSentLogSize {
+			c.LastSentLogSize = tmp
+		}
+	}
+	if Mtime != DbVariableNotSet {
+		data.Mtime = &Mtime
+	}
+	if State != DbVariableNotSet {
+		data.State = &State
+	}
+	if Value != "" {
+		data.Value = &Value
+	}
+	if EventSource != "" {
+		data.EventSource = &EventSource
+	}
+	if EventID != DbVariableNotSet {
+		data.EventID = &EventID
+	}
+	if EventSeverity != DbVariableNotSet {
+		data.EventSeverity = &EventSeverity
+	}
+	if EventTimestamp != DbVariableNotSet {
+		data.EventTimestamp = &EventTimestamp
+	}
+	return data
+}
+
+func (c *ResultCache) uploadPersist(u Uploader) (err error) {
+
+	var results []*AgentData
+
+	rows, _ := c.database.Query("SELECT * FROM data")
+	for rows.Next() {
+		result := c.resultFetch(rows)
+		result.persistent = false
+		results = append(results, &result)
+
+	}
+	rows, _ = c.database.Query("SELECT * FROM log")
+	for rows.Next() {
+		result := c.resultFetch(rows)
+		result.persistent = true
+		results = append(results, &result)
+	}
+	if len(results) == 0 {
+		return
+	}
+
+	request := AgentDataRequest{
+		Request: "agent data",
+		Data:    results,
+		Session: c.token,
+		Host:    agent.Options.Hostname,
+		Version: version.Short(),
+	}
+
+	var data []byte
+
+	if data, err = json.Marshal(&request); err != nil {
+		log.Errf("[%d] cannot convert cached history to json: %s", c.clientID, err.Error())
+		return
+	}
+
+	timeout := len(results) * c.timeout
+	if timeout > 60 {
+		timeout = 60
+	}
+	if err = u.Write(data, time.Duration(timeout)*time.Second); err != nil {
+		if c.lastError == nil || err.Error() != c.lastError.Error() {
+			log.Warningf("[%d] history upload to [%s] started to fail: %s", c.clientID, u.Addr(), err)
+			c.lastError = err
+		}
+		return
+	}
+
+	if c.lastError != nil {
+		log.Warningf("[%d] history upload to [%s] is working again", c.clientID, u.Addr())
+		c.lastError = nil
+	}
+	c.database.Exec("DELETE FROM data")
+	c.database.Exec("DELETE FROM log")
+	c.OldestData = 0
+	c.OldestLog = 0
+
+	return
+}
+
+func (c *ResultCache) upload(u Uploader) (err error) {
+	if c.EnablePersist == 0 {
+		return c.uploadMemory(u)
+	} else {
+		return c.uploadPersist(u)
+	}
 }
 
 func (c *ResultCache) flushOutput(u Uploader) {
@@ -217,7 +336,7 @@ func (c *ResultCache) insertResult(result *AgentData) {
 	c.results[len(c.results)-1] = result
 }
 
-func (c *ResultCache) write(r *plugin.Result) {
+func (c *ResultCache) writeMemory(r *plugin.Result) {
 	c.lastDataID++
 	var value *string
 	var state *int
@@ -259,9 +378,100 @@ func (c *ResultCache) write(r *plugin.Result) {
 	}
 }
 
+func (c *ResultCache) writePersist(r *plugin.Result) {
+	c.lastDataID++
+
+	var LastLogsize int64 = DbVariableNotSet
+	if r.LastLogsize != nil {
+		LastLogsize = int64(*r.LastLogsize)
+		/*if int64(c.LastSentLogSize) >= LastLogsize {
+			return
+		}*/
+	}
+
+	var Value string
+	var State int = DbVariableNotSet
+	if r.Error != nil {
+		Value = r.Error.Error()
+		State = itemutil.StateNotSupported
+	} else if r.Value != nil {
+		Value = *r.Value
+	}
+
+	var ns int
+	var clock uint64
+	if !r.Ts.IsZero() {
+		clock = uint64(r.Ts.Unix())
+		ns = r.Ts.Nanosecond()
+	}
+
+	var Mtime int = DbVariableNotSet
+	if r.Mtime != nil {
+		Mtime = *r.Mtime
+	}
+
+	var EventSource string
+	if r.EventSource != nil {
+		EventSource = *r.EventSource
+	}
+
+	var EventID int = DbVariableNotSet
+	if r.EventID != nil {
+		EventID = *r.EventID
+	}
+
+	var EventSeverity int = DbVariableNotSet
+	if r.EventSeverity != nil {
+		EventSeverity = *r.EventSeverity
+	}
+
+	var EventTimestamp int = DbVariableNotSet
+	if r.EventTimestamp != nil {
+		EventTimestamp = *r.EventTimestamp
+	}
+
+	var stmt *sql.Stmt
+	var err error
+
+	if r.Persistent == true {
+		if c.OldestLog == 0 {
+			c.OldestLog = clock
+		}
+		if (clock - c.OldestLog) <= uint64(c.PersistPeriod) {
+			stmt, err = c.database.Prepare(c.InsertResultTable("log"))
+		}
+	} else {
+		if c.OldestData == 0 {
+			c.OldestData = clock
+		}
+		if (clock - c.OldestData) > uint64(c.PersistPeriod) {
+			query := fmt.Sprintf("DELETE FROM data WHERE clock = %d", c.OldestData)
+			c.database.Exec(query)
+			rows, _ := c.database.Query("SELECT MIN(Clock) FROM data")
+			for rows.Next() {
+				rows.Scan(&c.OldestData)
+			}
+		}
+		stmt, err = c.database.Prepare(c.InsertResultTable("data"))
+	}
+	if stmt != nil {
+		stmt.Exec(c.lastDataID, r.Itemid, LastLogsize, Mtime, State, Value,
+			EventSource, EventID, EventSeverity, EventTimestamp, clock, ns)
+	}
+
+}
+
+func (c *ResultCache) write(r *plugin.Result) {
+	if c.EnablePersist == 0 {
+		c.writeMemory(r)
+	} else {
+		c.writePersist(r)
+	}
+}
+
 func (c *ResultCache) run() {
 	defer log.PanicHook()
-	log.Debugf("[%d] starting result cache", c.clientID)
+	log.Debugf("[%d] starting memory cache", c.clientID)
 
 	for {
 		u := <-c.input
@@ -277,7 +487,10 @@ func (c *ResultCache) run() {
 			c.updateOptions(v)
 		}
 	}
-	log.Debugf("[%d] result cache has been stopped", c.clientID)
+	log.Debugf("[%d] memory cache has been stopped", c.clientID)
+	if c.database != nil {
+		c.database.Close()
+	}
 	monitor.Unregister(monitor.Output)
 }
 
@@ -288,14 +501,71 @@ func newToken() string {
 }
 
 func (c *ResultCache) updateOptions(options *agent.AgentOptions) {
-	c.maxBufferSize = int32(options.BufferSize)
-	c.timeout = options.Timeout
+	if c.EnablePersist == 0 {
+		c.maxBufferSize = int32(options.BufferSize)
+		c.timeout = options.Timeout
+	} else {
+		c.PersistPeriod = options.PersistentBufferPeriod
+		c.DbName = options.PersistentBufferFile
+	}
+}
+
+func (c *ResultCache) InsertResultTable(table string) string {
+	return fmt.Sprintf(`
+		INSERT INTO %s
+		(Id, Itemid, LastLogsize, Mtime, State, Value, EventSource, EventID, EventSeverity, EventTimestamp, Clock, Ns)
+		VALUES
+		(?,?,?,?,?,?,?,?,?,?,?,?)	
+	`, table)
+}
+
+func (c *ResultCache) CreateTable(table string) string {
+	return fmt.Sprintf(`
+		CREATE TABLE IF NOT EXISTS %s
+		(Id INTEGER,
+		Itemid INTEGER,
+		LastLogsize INTEGER,
+		Mtime INTEGER,
+		State INTEGER,
+		Value TEXT,
+		EventSource TEXT,
+		EventID INTEGER,
+		EventSeverity INTEGER,
+		EventTimestamp INTEGER,
+		Clock INTEGER,
+		Ns INTEGER
+		)
+	`, table)
 }
 
 func (c *ResultCache) init() {
 	c.updateOptions(&agent.Options)
 	c.input = make(chan interface{}, 100)
-	c.results = make([]*AgentData, 0, c.maxBufferSize)
+	if c.EnablePersist == 0 {
+		c.results = make([]*AgentData, 0, c.maxBufferSize)
+	} else {
+		var err error
+
+		c.database, err = sql.Open("sqlite3", c.DbName)
+		if err == nil {
+			var lastDataID uint64
+			stmt, _ := c.database.Prepare(c.CreateTable("data"))
+			stmt.Exec()
+			stmt, _ = c.database.Prepare(c.CreateTable("log"))
+			stmt.Exec()
+			rows, _ := c.database.Query("SELECT MIN(Clock), MAX(Id) FROM data")
+			for rows.Next() {
+				rows.Scan(&c.OldestData, &lastDataID)
+			}
+			rows, _ = c.database.Query("SELECT MIN(Clock), MAX(Id) FROM log")
+			for rows.Next() {
+				rows.Scan(&c.OldestLog, &c.lastDataID)
+			}
+			if lastDataID > c.lastDataID {
+				c.lastDataID = lastDataID
+			}
+		}
+	}
 }
 
 func (c *ResultCache) Start() {
@@ -309,8 +579,9 @@ func (c *ResultCache) Stop() {
 }
 
 func NewActive(clientid uint64, output Uploader) *ResultCache {
-	cache := &ResultCache{clientID: clientid, output: output, token: newToken()}
+	cache := &ResultCache{clientID: clientid, output: output, token: newToken(), EnablePersist: agent.Options.EnablePersistentBuffer}
 	cache.init()
+
 	return cache
 }
 
@@ -340,17 +611,38 @@ func (c *ResultCache) UpdateOptions(options *agent.AgentOptions) {
 }
 
 func (c *ResultCache) SlotsAvailable() int {
+	if c.EnablePersist != 0 {
+		return int(^uint(0) >> 1) //Max int
+	}
 	slots := atomic.LoadInt32(&c.maxBufferSize) - atomic.LoadInt32(&c.totalValueNum)
+	if slots < 0 {
+		slots = 0
+	}
+
+	return int(slots)
+}
+
+func (c *ResultCache) PersistSlotsAvailable() int {
+	if c.EnablePersist != 0 {
+		return int(^uint(0) >> 1) //Max int
+	}
+	slots := atomic.LoadInt32(&c.maxBufferSize)/2 - atomic.LoadInt32(&c.persistValueNum)
 	if slots < 0 {
 		slots = 0
 	}
 	return int(slots)
 }
 
-func (c *ResultCache) PersistSlotsAvailable() int {
-	slots := atomic.LoadInt32(&c.maxBufferSize)/2 - atomic.LoadInt32(&c.persistValueNum)
-	if slots < 0 {
-		slots = 0
+func CheckCacheConfiguration(options *agent.AgentOptions) (err error) {
+	/*if options.EnablePersistentBuffer == 1 && options.BufferSize != 0 {
+		return errors.New("\"BufferSize\" parameter is set")
+	}*/
+	if options.EnablePersistentBuffer == 1 && options.PersistentBufferFile == "" {
+		return errors.New("\"PersistentBufferFile\" parameter is not set")
 	}
-	return int(slots)
+	if options.EnablePersistentBuffer == 0 && options.PersistentBufferFile != "" {
+		log.Warningf("\"PersistentBufferFile\" parameter is not empty but \"EnablePersistentBuffer\" is not set")
+	}
+	return err
+
 }

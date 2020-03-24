@@ -107,18 +107,18 @@ func TestToken(t *testing.T) {
 	}
 }
 
-func checkBuffer(t *testing.T, rc *ResultCache, input []*plugin.Result, expected []*AgentData) {
+func checkBuffer(t *testing.T, c *ResultCache, input []*plugin.Result, expected []*AgentData) {
 	for _, r := range input {
-		rc.write(r)
+		c.write(r)
 	}
 
-	if !reflect.DeepEqual(rc.results, expected) {
+	if !reflect.DeepEqual(c.results, expected) {
 		t.Errorf("Expected:")
 		for _, d := range expected {
 			t.Errorf("    %+v", *d)
 		}
 		t.Errorf("While got:")
-		for _, d := range rc.results {
+		for _, d := range c.results {
 			t.Errorf("    %+v", *d)
 		}
 	}

@@ -6,6 +6,8 @@ require (
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/godbus/dbus v4.1.0+incompatible
+	github.com/gwenn/gosqlite v0.0.0-20200112083630-60b142bbd287
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mediocregopher/radix/v3 v3.4.2
 	github.com/natefinch/npipe v0.0.0-20160621034901-c1b8fa8bdcce
 	github.com/stretchr/objx v0.2.0 // indirect
