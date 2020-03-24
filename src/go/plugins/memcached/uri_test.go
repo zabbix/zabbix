@@ -294,14 +294,8 @@ func Test_parseURI(t *testing.T) {
 			true,
 		},
 		{
-			"Should fail if port is less than 1",
-			args{"tcp://localhost:0"},
-			nil,
-			true,
-		},
-		{
 			"Should fail if port is greater than 65535",
-			args{"tcp://localhost:99999"},
+			args{"tcp://localhost:65536"},
 			nil,
 			true,
 		},

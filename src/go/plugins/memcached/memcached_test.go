@@ -116,7 +116,7 @@ func TestPlugin_Export(t *testing.T) {
 			p:          &p,
 			args:       args{keyPing, []string{"tcp://127.0.0.1", "", "", "excess_param"}, nil},
 			wantResult: nil,
-			wantErr:    errorInvalidParams,
+			wantErr:    errorTooManyParameters,
 		},
 		{
 			name:       "Should fail if unknown session given",

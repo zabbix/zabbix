@@ -35,6 +35,8 @@ const (
 	keyPing  = "memcached.ping"
 )
 
+const commonParamsNum = 3
+
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
@@ -100,8 +102,8 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 	}
 
 	// Extract handler related params
-	if len(params) > 3 {
-		handlerParams = params[3:]
+	if len(params) > commonParamsNum {
+		handlerParams = params[commonParamsNum:]
 	}
 
 	switch key {

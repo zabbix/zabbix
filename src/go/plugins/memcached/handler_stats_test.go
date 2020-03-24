@@ -70,7 +70,7 @@ func TestPlugin_statsHandler(t *testing.T) {
 				params: []string{"wrong_type"},
 			},
 			want:    nil,
-			wantErr: errorInvalidParams,
+			wantErr: zabbixError{"unknown stats type"},
 		},
 		{
 			name: "Should return error if cannot fetch data",

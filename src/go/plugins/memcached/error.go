@@ -19,19 +19,27 @@
 
 package memcached
 
+import "strings"
+
 type zabbixError struct {
 	err string
 }
 
 func (e zabbixError) Error() string {
-	return e.err
+	errText := e.err
+	if errText[len(errText)-1:] != "." {
+		errText += "."
+	}
+
+	return strings.Title(errText)
 }
 
 var (
-	errorInvalidParams     = zabbixError{"Invalid parameters."}
-	errorCannotFetchData   = zabbixError{"Cannot fetch data."}
-	errorCannotMarshalJSON = zabbixError{"Cannot marshal JSON."}
-	errorUnsupportedMetric = zabbixError{"Unsupported metric."}
-	errorEmptyResult       = zabbixError{"Empty result."}
-	errorUnknownSession    = zabbixError{"Unknown session."}
+	errorInvalidParams     = zabbixError{"invalid parameters"}
+	errorTooManyParameters = zabbixError{"too many parameters"}
+	errorCannotFetchData   = zabbixError{"cannot fetch data"}
+	errorCannotMarshalJSON = zabbixError{"cannot marshal JSON"}
+	errorUnsupportedMetric = zabbixError{"unsupported metric"}
+	errorEmptyResult       = zabbixError{"empty result"}
+	errorUnknownSession    = zabbixError{"unknown session"}
 )

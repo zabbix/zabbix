@@ -29,7 +29,7 @@ const pingMaxParams = 0
 // pingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
 func pingHandler(conn MCClient, params []string) (interface{}, error) {
 	if len(params) > pingMaxParams {
-		return nil, errorInvalidParams
+		return nil, errorTooManyParameters
 	}
 
 	if err := conn.NoOp(); err != nil {

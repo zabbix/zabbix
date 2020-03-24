@@ -32,7 +32,7 @@ func Test_zabbixError_Error(t *testing.T) {
 		{
 			"ZabbixError stringify",
 			zabbixError{"foobar"},
-			"foobar",
+			"Foobar.",
 		},
 	}
 	for _, tt := range tests {

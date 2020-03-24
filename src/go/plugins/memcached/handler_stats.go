@@ -40,7 +40,7 @@ func statsHandler(conn MCClient, params []string) (interface{}, error) {
 	statsType := statsTypeGeneral
 
 	if len(params) > statsMaxParams {
-		return nil, errorInvalidParams
+		return nil, errorTooManyParameters
 	}
 
 	if len(params) > 0 {
@@ -57,18 +57,18 @@ func statsHandler(conn MCClient, params []string) (interface{}, error) {
 			statsType = strings.ToLower(params[0])
 
 		default:
-			return nil, errorInvalidParams
+			return nil, zabbixError{"unknown stats type"}
 		}
 	}
 
 	stats, err := conn.Stats(statsType)
 	if err != nil {
-		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotFetchData)
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}
 
 	jsonRes, err := json.Marshal(stats)
 	if err != nil {
-		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotMarshalJSON)
+		return nil, fmt.Errorf("%w (%s)", errorCannotMarshalJSON, err.Error())
 	}
 
 	return string(jsonRes), nil

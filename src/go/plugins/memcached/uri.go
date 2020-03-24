@@ -93,14 +93,12 @@ func parseURI(uri string) (res *URI, err error) {
 
 			port := u.Port()
 
-			if portInt, err := strconv.Atoi(port); err == nil {
-				if portInt < 1 || portInt > 65535 {
-					return nil, errors.New("port must be integer and must be between 1 and 65535")
-				}
-			}
-
 			if len(port) == 0 {
 				port = DefaultPort
+			} else {
+				if _, err := strconv.ParseUint(port, 10, 16); err != nil {
+					return nil, errors.New("port must be integer and must be between 0 and 65535")
+				}
 			}
 
 			res.port = port
