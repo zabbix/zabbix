@@ -584,7 +584,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'value' => $value,
 			'params' => $params,
 			'paramtype' => $param_type,
-			'description' => $description,
+			'item_description' => $description,
 			'functions' => $this->functions,
 			'function' => $function,
 			'operator' => $operator,
@@ -625,7 +625,7 @@ class CControllerPopupTriggerExpr extends CController {
 		// Create and validate trigger expression before inserting it into textarea field.
 		if ($this->getInput('add', false)) {
 			try {
-				if ($data['description']) {
+				if ($data['item_description']) {
 					if ($data['paramtype'] == PARAM_TYPE_COUNTS
 							&& array_key_exists('last', $data['params'])
 							&& $data['params']['last'] !== '') {
