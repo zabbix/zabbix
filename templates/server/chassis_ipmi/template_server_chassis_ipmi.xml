@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-03-23T12:35:19Z</date>
+   <date>2020-03-24T06:13:30Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -80,7 +80,7 @@ Template tooling version used: 0.35</description>
                      </condition>
                   </conditions>
                </filter>
-               <description>Discovery the discrete IPMI sensors.</description>
+               <description>Discovery of the discrete IPMI sensors.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>IPMI: {#SENSOR_ID}</name>
@@ -168,7 +168,7 @@ Template tooling version used: 0.35</description>
                      </condition>
                   </conditions>
                </filter>
-               <description>Discovery the threshold IPMI sensors.</description>
+               <description>Discovery of the threshold IPMI sensors.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>IPMI: {#SENSOR_ID}, {#SENSOR_UNIT}</name>
@@ -235,7 +235,7 @@ Template tooling version used: 0.35</description>
                            <expression>{min(5m)}&gt;{#SENSOR_HI_WARN}</expression>
                            <name>IPMI: {#SENSOR_ID} value is above non-critical high (greater than {#SENSOR_HI_WARN} for 5m)</name>
                            <priority>WARNING</priority>
-                           <description>The trigger is informing that a value more than the upper non-critical threshold has been reached.</description>
+                           <description>The trigger is informing that a value higher than the upper non-critical threshold has been reached.</description>
                            <dependencies>
                               <dependency>
                                  <name>IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)</name>
@@ -251,7 +251,7 @@ Template tooling version used: 0.35</description>
                            <expression>{min(5m)}&gt;{#SENSOR_HI_CRIT}</expression>
                            <name>IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)</name>
                            <priority>HIGH</priority>
-                           <description>The trigger is informing that a value more than the upper critical threshold has been reached.</description>
+                           <description>The trigger is informing that a value higher than the upper critical threshold has been reached.</description>
                            <dependencies>
                               <dependency>
                                  <name>IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</name>
@@ -263,7 +263,7 @@ Template tooling version used: 0.35</description>
                            <expression>{min(5m)}&gt;{#SENSOR_HI_DISAST}</expression>
                            <name>IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</name>
                            <priority>DISASTER</priority>
-                           <description>The trigger is informing that a value more than the upper non-recoverable threshold has been reached.</description>
+                           <description>The trigger is informing that a value higher than the upper non-recoverable threshold has been reached.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
