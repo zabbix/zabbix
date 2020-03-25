@@ -9632,8 +9632,7 @@ char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hos
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len;
-	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL, *escape_escaped_value = NULL,
-			*please_free_me = NULL;
+	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL;
 	size_t		str_alloc = 0, str_offset = 0, i;
 
 	if ('\0' == *text)
@@ -9723,8 +9722,6 @@ char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hos
 	}
 
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
-
-	zbx_free(please_free_me);
 
 	return str;
 }

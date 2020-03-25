@@ -77,9 +77,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 {
 	char					*evaluate_error = NULL;
 	int					ret = FAIL, i;
-	unsigned char				value_type;
-	zbx_vector_ptr_t			expressions, results, history;
-	zbx_timespec_t				ts[2];
+	zbx_vector_ptr_t			expressions, results;
 	zbx_expressions_evaluate_result_t	*result;
 
 	zbx_vector_ptr_create(&expressions);
