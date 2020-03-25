@@ -1095,9 +1095,7 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				if ($this->source_table === 'item_prototypes') {
-					$records = (!$this->host_preselect_required || $this->hostids)
-						? API::ItemPrototype()->get($options)
-						: [];
+					$records = API::ItemPrototype()->get($options);
 				}
 				else {
 					if ($this->hasInput('with_webitems')) {
