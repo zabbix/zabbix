@@ -309,7 +309,7 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 
-			$data['avg_orig'] = $data['avg'] ? zbx_avg($data['avg']) : null;
+			$data['avg_orig'] = $data['avg'] ? CMathHelper::safeAvg($data['avg']) : null;
 
 			/*
 				first_idx - last existing point
@@ -351,11 +351,10 @@ class CLineGraphDraw extends CGraphDraw {
 							continue;
 						}
 
-						// Expression optimized to avoid overflow.
-						$data[$var_name][$ci - ($dx - $cj)] = zbx_add([
+						$data[$var_name][$ci - ($dx - $cj)] = CMathHelper::safeSum([
 							$data[$var_name][$first_idx],
-							zbx_mulDiv([$data[$var_name][$ci], $cj], [$dx]),
-							-zbx_mulDiv([$data[$var_name][$first_idx], $cj], [$dx])
+							CMathHelper::safeMul([$cj, 1 / $dx, $data[$var_name][$ci]]),
+							CMathHelper::safeMul([$cj, 1 / $dx, -$data[$var_name][$first_idx]])
 						]);
 					}
 				}
@@ -1299,12 +1298,14 @@ class CLineGraphDraw extends CGraphDraw {
 					: $this->graphtheme['rightpercentilecolor'];
 
 				if ($maxY - $minY == INF) {
-					$y = $this->sizeY + $this->shiftY
-						- zbx_mulDiv([$percentile['value'] / 10 - $minY / 10, $this->sizeY], [$maxY / 10 - $minY / 10]);
+					$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
+						$percentile['value'] / 10 - $minY / 10, 1 / ($maxY / 10 - $minY / 10)]
+					);
 				}
 				else {
-					$y = $this->sizeY + $this->shiftY
-						- zbx_mulDiv([$percentile['value'] - $minY, $this->sizeY], [$maxY - $minY]);
+					$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
+						$percentile['value'] - $minY, 1 / ($maxY - $minY)]
+					);
 				}
 
 				zbx_imageline(
@@ -1335,12 +1336,14 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			if ($maxY - $minY == INF) {
-				$y = $this->sizeY + $this->shiftY
-					- zbx_mulDiv([$trigger['val'] / 10 - $minY / 10, $this->sizeY], [$maxY / 10 - $minY / 10]);
+				$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
+					$trigger['val'] / 10 - $minY / 10, 1 / ($maxY / 10 - $minY / 10)
+				]);
 			}
 			else {
-				$y = $this->sizeY + $this->shiftY
-					- zbx_mulDiv([$trigger['val'] - $minY, $this->sizeY], [$maxY - $minY]);
+				$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
+					$trigger['val'] - $minY, 1 / ($maxY - $minY)
+				]);
 			}
 
 			$triggerColor = $this->getColor($trigger['color']);

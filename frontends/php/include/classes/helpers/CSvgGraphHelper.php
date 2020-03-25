@@ -223,7 +223,7 @@ class CSvgGraphHelper {
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = [
 								'clock' => $tick,
-								'value' => zbx_avg($point['value'])
+								'value' => CMathHelper::safeAvg($point['value'])
 							];
 						}
 						break;

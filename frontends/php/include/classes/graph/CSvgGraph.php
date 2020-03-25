@@ -815,16 +815,14 @@ class CSvgGraph extends CSvg {
 						- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 
 					if ($max_value - $min_value == INF) {
-						$y = $this->canvas_y + zbx_mulDiv(
-							[$this->canvas_height, $max_value / 10 - $point / 10],
-							[$max_value / 10 - $min_value / 10]
-						);
+						$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+							$max_value / 10 - $point / 10, 1 / ($max_value / 10 - $min_value / 10)
+						]);
 					}
 					else {
-						$y = $this->canvas_y + zbx_mulDiv(
-							[$this->canvas_height, $max_value - $point],
-							[$max_value - $min_value]
-						);
+						$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+							$max_value - $point, 1 / ($max_value - $min_value)
+						]);
 					}
 
 					if (!$in_range) {
