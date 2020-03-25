@@ -625,6 +625,8 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				$trigger['status'] = TRIGGER_STATUS_DISABLED;
 			}
 
+			$trigger['source'][SYSMAP_ELEMENT_TYPE_TRIGGER] = true;
+
 			if (array_key_exists($triggerid, $all_triggerid_to_selementids)) {
 				foreach ($all_triggerid_to_selementids[$triggerid] as $selementid) {
 					$selements[$selementid]['triggers'][$triggerid] = $trigger;
@@ -656,11 +658,20 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			'preservekeys' => true
 		]);
 
-		foreach ($triggers as $trigger) {
+		foreach ($triggers as $triggerid => $trigger) {
+			$trigger['source'][SYSMAP_ELEMENT_TYPE_HOST] = true;
+
 			foreach ($trigger['hosts'] as $host) {
 				if (array_key_exists($host['hostid'], $hostIdToSelementIds)) {
-					foreach ($hostIdToSelementIds[$host['hostid']] as $belongs_to_sel) {
-						$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
+					foreach ($hostIdToSelementIds[$host['hostid']] as $selementid) {
+						if (!array_key_exists($triggerid, $selements[$selementid]['triggers'])) {
+							$selements[$selementid]['triggers'][$triggerid] = $trigger;
+						}
+						else {
+							$selements[$selementid]['triggers'][$triggerid]['status'] = $trigger['status'];
+							$selements[$selementid]['triggers'][$triggerid]['source'] += $trigger['source'];
+							$selements[$selementid]['triggers'][$triggerid]['items'] = $trigger['items'];
+						}
 					}
 				}
 			}
@@ -725,15 +736,21 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			continue;
 		}
 
-		$trigger_hosts = [];
-		foreach ($selement['triggers'] as $trigger) {
-			foreach ($trigger['hosts'] as $host) {
-				if (!array_key_exists($host['hostid'], $trigger_hosts)
-						&& !array_key_exists($host['hostid'], $selement['hosts'])) {
-					$trigger_hosts[$host['hostid']] = true;
+		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
+				|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+			$trigger_hosts = [];
+			foreach ($selement['triggers'] as $trigger) {
+				foreach ($trigger['hosts'] as $host) {
+					if (!array_key_exists($host['hostid'], $trigger_hosts)
+							&& !array_key_exists($host['hostid'], $selement['hosts'])) {
+						$trigger_hosts[$host['hostid']] = true;
 
-					if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-						$i['maintenance']++;
+						if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
+								&& ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
+								|| ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
+									&& array_key_exists(SYSMAP_ELEMENT_TYPE_TRIGGER, $trigger['source'])))) {
+							$i['maintenance']++;
+						}
 					}
 				}
 			}
