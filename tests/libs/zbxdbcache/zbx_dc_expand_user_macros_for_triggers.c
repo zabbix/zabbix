@@ -153,8 +153,7 @@ void	zbx_mock_test_entry(void **state)
 
 	/* the macro expansion relies on wrapped zbx_hashset_search which returns mocked */
 	/* macros when used with global macro index hashset                              */
-	returned_expression = zbx_dc_expand_user_macros(expression, NULL, 0, zbx_macro_value_transform);
-
+	returned_expression = zbx_dc_expand_user_macros_for_triggers(expression, NULL, 0);
 	zbx_mock_assert_str_eq("Expanded expression", expected_expression, returned_expression);
 
 	zbx_free(returned_expression);

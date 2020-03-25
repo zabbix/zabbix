@@ -6,8 +6,7 @@ SERVER_tests = \
 	dc_maintenance_match_tags \
 	is_item_processed_by_server \
 	dc_item_poller_type_update \
-	zbx_dc_expand_user_macros
-	
+	zbx_dc_expand_user_macros_for_triggers
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -140,12 +139,12 @@ dc_item_poller_type_update_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
 dc_item_poller_type_update_LDFLAGS = @SERVER_LDFLAGS@
 dc_item_poller_type_update_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/libs/zbxdbcache
 
-zbx_dc_expand_user_macros_CFLAGS = \
+zbx_dc_expand_user_macros_for_triggers_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-Wl,--wrap=zbx_hashset_search
-zbx_dc_expand_user_macros_SOURCES = zbx_dc_expand_user_macros.c
-zbx_dc_expand_user_macros_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
-zbx_dc_expand_user_macros_LDFLAGS = @SERVER_LDFLAGS@
+zbx_dc_expand_user_macros_for_triggers_SOURCES = zbx_dc_expand_user_macros_for_triggers.c
+zbx_dc_expand_user_macros_for_triggers_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
+zbx_dc_expand_user_macros_for_triggers_LDFLAGS = @SERVER_LDFLAGS@
 
 endif

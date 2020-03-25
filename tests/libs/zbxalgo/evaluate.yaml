@@ -307,7 +307,7 @@ test case: 'term 8, not_castable_str negative 2'
 in:
   expression: '"-a"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "a".'
+  error: 'Cannot evaluate expression: expected numeric token at "-a".'
   return: 'FAIL'
 ---
 test case: 'term 8, not_castable_str quotes'
@@ -430,7 +430,7 @@ test case: 'term 6 / int and not_castable_string negative'
 in:
   expression: '2/"-y"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "y".'
+  error: 'Cannot evaluate expression: expected numeric token at "-y".'
   return: 'FAIL'
 ---
 test case: 'term 6 / not_castable_str and not_castable_str'
@@ -444,21 +444,21 @@ test case: 'term 6 / castable_str and not_castable_str'
 in:
   expression: '"9"/"-y"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "y".'
+  error: 'Cannot evaluate expression: expected numeric token at "-y".'
   return: 'FAIL'
 ---
 test case: 'term 6 / not_castable_str and zero int'
 in:
   expression: '"-z"/0'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "z".'
+  error: 'Cannot evaluate expression: expected numeric token at "-z".'
   return: 'FAIL'
 ---
 test case: 'term 6 / not_castable_str and zero str'
 in:
   expression: '"-z"/"0"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "z".'
+  error: 'Cannot evaluate expression: expected numeric token at "-z".'
   return: 'FAIL'
 ---
 test case: 'term 6 / str and zero str'
@@ -1837,7 +1837,7 @@ test case: 'Invalid expression "--1" string 3'
 in:
   expression: '"--1"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "-1".'
+  error: 'Cannot evaluate expression: expected numeric token at "--1".'
   return: 'FAIL'
 ---
 test case: 'Invalid expression "not1"'

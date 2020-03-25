@@ -9548,66 +9548,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_macro_value_transform                                        *
- *                                                                            *
- * Purpose: escape user macro values in trigger expressions                   *
- *                                                                            *
- * Parameters: value   - [IN] the macro value                                 *
- *                     - [PLEASE_FREE_ME] optimisation buffer that must be    *
- *                                        cleared by the calling function     *
- *                     - [INSIDE_QUOTE] autoquoting gets applied if macro is  *
- *                                      not already inside a quote and is not *
- *                                      castable to a double                  *
- *                                                                            *
- * Return value: NOT NULL text value - transformed and validated value        *
- *               NULL - otherwise                                             *
- *                                                                            *
- *******************************************************************************/
-char*	zbx_macro_value_transform(char *in, char **please_free_me, int inside_quote)
-{
-	size_t	len;
-	char	*tmp;
-
-	len = zbx_get_escape_string_len(in, "\"\\");
-
-	if (!inside_quote && ZBX_INFINITY == evaluate_string_to_double(in))
-	{
-		/* autoquote */
-		tmp = zbx_malloc(NULL, len + 3);
-		tmp[0] = '\"';
-		zbx_escape_string(tmp+1, len + 1, in, "\"\\");
-
-		tmp[len + 1] = '\"';
-		tmp[len + 2] = '\0';
-		please_free_me = &in;
-	}
-	else
-	{
-		if (len == strlen(in))
-		{
-			please_free_me = &in;
-			return in;
-		}
-
-		tmp = zbx_malloc(NULL, len + 1);
-		zbx_escape_string(tmp, len + 1, in, "\"\\");
-		tmp[len] = '\0';
-		please_free_me = &in;
-	}
-
-	return tmp;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dc_expand_user_macros                                        *
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
+ * WARNING - DO NOT USE FOR TRIGGERS, for triggers use the dedicated function *
  *                                                                            *
  * Parameters: text           - [IN] the text value to expand                 *
  *             hostids        - [IN] an array of related hostids              *
  *             hostids_num    - [IN] the number of hostids                    *
- *    validate_transform_func - [IN] an optional validate/transform function  *
  *                                                                            *
  * Return value: The text value with expanded user macros. Unknown or invalid *
  *               macros will be left unresolved.                              *
@@ -9616,8 +9564,71 @@ char*	zbx_macro_value_transform(char *in, char **please_free_me, int inside_quot
  *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_value_validate_and_transform_func_t validate_transform_func)
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num)
+{
+	zbx_token_t	token;
+	int		pos = 0, len, last_pos = 0;
+	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL;
+	size_t		str_alloc = 0, str_offset = 0;
+
+	if ('\0' == *text)
+		return zbx_strdup(NULL, text);
+
+	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
+	{
+		if (ZBX_TOKEN_USER_MACRO != token.type)
+			continue;
+
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
+			continue;
+
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
+		dc_get_user_macro(hostids, hostids_num, name, context, &value);
+
+		if (NULL != value)
+		{
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
+			zbx_free(value);
+
+		}
+		else
+		{
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
+		}
+
+		zbx_free(name);
+		zbx_free(context);
+
+		pos = token.loc.r;
+		last_pos = pos + 1;
+	}
+
+	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
+
+	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_expand_user_macros_for_triggers                           *
+ *                                                                            *
+ * Purpose: expand user macros for triggers in the specified text value       *
+ *          autoquote macros that are not already quoted that cannot be       *
+ *          casted to a double                                                *
+ *                                                                            *
+ * Parameters: text           - [IN] the text value to expand                 *
+ *             hostids        - [IN] an array of related hostids              *
+ *             hostids_num    - [IN] the number of hostids                    *
+ *                                                                            *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
+ *               macros will be left unresolved.                              *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *           This function must be used only by configuration syncer          *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len, i;
@@ -9635,10 +9646,9 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 			if ('\"' == text[i] && (0 == i || (0 < i && '\\' != text[i - 1]) || 1 == i ||
 					(1 < i && '\\' == text[i - 2])))
 			{
-				if (!cur_token_inside_quote)
+				if (0 == cur_token_inside_quote)
 				{
 					cur_token_inside_quote = 1;
-					break;
 				}
 				else
 				{
@@ -9662,8 +9672,36 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 		dc_get_user_macro(hostids, hostids_num, name, context, &value);
 
-		if (NULL != value && NULL != validate_transform_func)
-			value = validate_transform_func(value, &please_free_me, cur_token_inside_quote);
+		if (NULL != value)
+		{
+			size_t	len;
+			char	*tmp;
+
+			len = zbx_get_escape_string_len(value, "\"\\");
+
+			if (0 == cur_token_inside_quote && ZBX_INFINITY == evaluate_string_to_double(value))
+			{
+				/* autoquote */
+				tmp = zbx_malloc(NULL, len + 3);
+				tmp[0] = '\"';
+				zbx_escape_string(tmp+1, len + 1, value, "\"\\");
+				tmp[len + 1] = '\"';
+				tmp[len + 2] = '\0';
+				zbx_free(value);
+				value = tmp;
+			}
+			else
+			{
+				if (len != strlen(value))
+				{
+					tmp = zbx_malloc(NULL, len + 1);
+					zbx_escape_string(tmp, len + 1, value, "\"\\");
+					tmp[len] = '\0';
+					zbx_free(value);
+					value = tmp;
+				}
+			}
+		}
 
 		if (NULL != value)
 		{
@@ -9717,8 +9755,7 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	get_functionids(&functionids, expression);
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	out = zbx_dc_expand_user_macros(expression, hostids.values, hostids.values_num,
-					zbx_macro_value_transform);
+	out = zbx_dc_expand_user_macros_for_triggers(expression, hostids.values, hostids.values_num);
 
 	if (NULL != strstr(out, "{$"))
 	{

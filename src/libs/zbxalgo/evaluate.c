@@ -954,8 +954,6 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, expression);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "evaluate expression ->%s<-",expression);
-
 	ptr = expression;
 	level = 0;
 	buffer = error;
@@ -1084,22 +1082,21 @@ int	evaluate_unknown(const char *expression, double *value, char *error, size_t 
 	return SUCCEED;
 }
 
-double	evaluate_string_to_double(char *in)
+double	evaluate_string_to_double(const char *in)
 {
-	int	negate = 0, len;
-	double	result_double_value;
+	int		len;
+	double		result_double_value;
+	const char	*ptr = in;
 
 	if (1 < strlen(in) && '-' == in[0])
-	{
-		memmove(in, in + 1, strlen(in));
-		negate = 1;
-	}
+		ptr++;
 
-	if (SUCCEED == zbx_suffixed_number_parse(in, &len) && '\0' == *(in + len))
+	if (SUCCEED == zbx_suffixed_number_parse(ptr, &len) && '\0' == *(ptr + len))
 	{
-		result_double_value = atof(in) * suffix2factor(*(in + len - 1));
+		result_double_value = atof(ptr) * suffix2factor(*(ptr + len - 1));
 
-		if (negate)
+		/* negative sign detected */
+		if (ptr != in)
 			result_double_value = -(result_double_value);
 	}
 	else

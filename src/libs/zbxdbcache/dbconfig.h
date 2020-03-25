@@ -827,25 +827,13 @@ extern zbx_rwlock_t	config_lock;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_macro_value_validate_and_transform_func_t                    *
- *                                                                            *
- * Purpose: validate and/or transform macro value when expanding user macros  *
- *                                                                            *
- * Parameters: value   - [IN] the macro value                                 *
- *                     - [PLEASE_FREE_ME] optimisation buffer that must be    *
- *                                        cleared by the calling function     *
- *                                                                            *
- * Return value: NOT NULL text value - transformed and validated value        *
- *               NULL - otherwise                                             *
+ * zbx_dc_expand_user_macros - has no autoquoting                             *
+ * zbx_dc_expand_user_macros_for_triggers - autoquotes macros that are not    *
+ * already quoted and cannot be casted to a double                            *
  *                                                                            *
  ******************************************************************************/
-typedef char* (*zbx_macro_value_validate_and_transform_func_t)(char *in, char **please_free_me, int inside_quote);
-
-/* function optionally used to escape and autoquote macro values when expanding user macros */
-char    *zbx_macro_value_transform(char *in, char **please_free_me, int inside_quote);
-
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_value_validate_and_transform_func_t validate_and_transform_func);
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
+char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num);
 
 void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids);
