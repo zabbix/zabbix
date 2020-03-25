@@ -216,11 +216,6 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function onBeforeTestCase() {
 		global $DB;
-
-		if (!array_key_exists('ENCRYPTION', $DB)) {
-			$DB['ENCRYPTION'] = false;
-		}
-
 		static $suite = null;
 		$class_name = get_class($this);
 		$case_name = $this->getName(false);
