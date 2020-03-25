@@ -35,6 +35,7 @@ import (
 	_ "zabbix.com/plugins/systemrun"
 	_ "zabbix.com/plugins/vfs/dev"
 	_ "zabbix.com/plugins/vfs/file"
+	_ "zabbix.com/plugins/web"
 	_ "zabbix.com/plugins/zabbix/async"
 	_ "zabbix.com/plugins/zabbix/stats"
 	_ "zabbix.com/plugins/zabbix/sync"
