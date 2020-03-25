@@ -5599,7 +5599,7 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
  ******************************************************************************/
 const char	*zbx_print_double(char *buffer, size_t size, double val)
 {
-	zbx_snprintf(buffer, size, "%.15g", val);
+	zbx_snprintf(buffer, size, "%.15G", val);
 
 	if (atof(buffer) != val)
 		zbx_snprintf(buffer, size, ZBX_FS_DBL64, val);

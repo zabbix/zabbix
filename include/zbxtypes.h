@@ -161,7 +161,7 @@ typedef off_t	zbx_offset_t;
 
 #define ZBX_FS_DBL		"%lf"
 #define ZBX_FS_DBL_EXT(p)	"%." #p "lf"
-#define ZBX_FS_DBL64		"%.17g"
+#define ZBX_FS_DBL64		"%.17G"
 
 #ifdef HAVE_ORACLE
 #	define ZBX_FS_DBL64_SQL	ZBX_FS_DBL64 "d"
