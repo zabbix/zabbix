@@ -144,9 +144,8 @@ class PostgresqlDbBackend extends DbBackend {
 
 		if (version_compare($row['server_version'], '9.5', '<')) {
 			$row = DBfetch(DBselect('SHOW ssl'));
-			if ($row['ssl'] == 'off') {
-				$this->setError('Error connecting to database. Connection is not secure.');
-				return false;
+			if ($row['ssl'] == 'on') {
+				return true;
 			}
 		}
 		else {
@@ -154,13 +153,14 @@ class PostgresqlDbBackend extends DbBackend {
 				' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
 					' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
 
-			if (!$row ) {
-				$this->setError('Error connecting to database. Empty cipher.');
-				return false;
+			if ($row ) {
+				return true;
 			}
 		}
 
-		return true;
+		$this->setError('Error connecting to database. Connection is not secure.');
+
+		return false;
 	}
 
 	/**
