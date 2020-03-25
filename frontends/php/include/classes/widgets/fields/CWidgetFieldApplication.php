@@ -26,11 +26,11 @@ class CWidgetFieldApplication extends CWidgetField {
 
 	/**
 	 * ID for Host Multiselect element used to prefill Application PoPup Host filter.
-	 * Analog for multiselect filter_preselect_field property.
+	 * Analog for multiselect filter_preselect_fields['hosts'] property.
 	 *
 	 * @var string  (nullable) ID for Multiselect element.
 	 */
-	public $filter_preselect_field;
+	public $filter_preselect_host_field;
 
 	private $filter_parameters = [
 		'srctbl' => 'applications',

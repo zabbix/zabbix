@@ -731,7 +731,8 @@ class CControllerPopupGeneric extends CController {
 		$popup = $this->popup_properties[$this->source_table];
 
 		// Set popup options.
-		$this->host_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER);
+		$this->host_preselect_required = (in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER)
+			&& $this->source_table !== 'applications');
 		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER);
 		$this->page_options = $this->getPageOptions();
 
@@ -1122,14 +1123,10 @@ class CControllerPopupGeneric extends CController {
 			case 'applications':
 				$options += [
 					'output' => ['applicationid', 'name'],
-					'hostids' => $this->hostids ? $this->hostids : null,
-					'groupids' => $this->groupids
-						? ($this->hostids ? null : $this->groupids)
-						: null
+					'hostids' => $this->hostids ? $this->hostids : null
 				];
 
-				if ((!$this->group_preselect_required || $this->groupids)
-						|| (!$this->host_preselect_required || $this->hostids)) {
+				if (!$this->host_preselect_required || $this->hostids) {
 					$records = API::Application()->get($options);
 				}
 				else {

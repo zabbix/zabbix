@@ -210,6 +210,9 @@ function getItemFilterForm(&$items) {
 			'object_name' => 'host_templates',
 			'data' => $host_filter,
 			'popup' => [
+				'filter_preselect_fields' => [
+					'hostgroups' => 'filter_groupids_'
+				],
 				'parameters' => [
 					'srctbl' => 'host_templates',
 					'srcfld1' => 'hostid',
@@ -248,10 +251,7 @@ function getItemFilterForm(&$items) {
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1'
 					]).
-					',(jQuery("input[name=\'filter_hostids\']").length > 0)'.
-						' ? {hostid: jQuery("input[name=\'filter_hostids\']").val()}'.
-						' : {}'.
-					'), null, this);'
+					', getFirstMultiselectValue("filter_hostids_")), null, this);'
 				)
 		]
 	);

@@ -268,7 +268,7 @@ jQuery(function($) {
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
 	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
-	 * @param string options['popup']['filter_preselect_field']
+	 * @param string options['popup']['filter_preselect_fields']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
 	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
@@ -408,7 +408,7 @@ jQuery(function($) {
 				popup_button.on('click', function(event) {
 					var popup_options = ms.options.popup.parameters;
 
-					if (ms.options.popup.filter_preselect_field != null) {
+					if (ms.options.popup.filter_preselect_fields != null) {
 						popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj));
 					}
 
@@ -431,11 +431,23 @@ jQuery(function($) {
 	 */
 	function getFilterPreselectField($obj) {
 		var ms = $obj.data('multiSelect'),
-			values = $('#' + ms.options.popup.filter_preselect_field).multiSelect('getData');
+			ret = {};
 
-		return (values.length != 0)
-			? {hostid: values[0].id}
-			: {};
+		if (typeof ms.options.popup.filter_preselect_fields.hosts !== 'undefined') {
+			var hosts = $('#' + ms.options.popup.filter_preselect_fields.hosts).multiSelect('getData');
+			if (hosts.length != 0) {
+				ret.hostid = hosts[0].id;
+			}
+		}
+
+		if (typeof ms.options.popup.filter_preselect_fields.hostgroups !== 'undefined') {
+			var host_groups = $('#' + ms.options.popup.filter_preselect_fields.hostgroups).multiSelect('getData');
+			if (host_groups.length != 0) {
+				ret.groupid = host_groups[0].id;
+			}
+		}
+
+		return ret;
 	}
 
 	function makeMultiSelectInput($obj) {

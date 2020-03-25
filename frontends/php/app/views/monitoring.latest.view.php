@@ -69,6 +69,9 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 						'object_name' => 'hosts',
 						'data' => $data['multiselect_host_data'],
 						'popup' => [
+							'filter_preselect_fields' => [
+								'hostgroups' => 'filter_groupids_'
+							],
 							'parameters' => [
 								'srctbl' => 'hosts',
 								'srcfld1' => 'hostid',

@@ -53,6 +53,9 @@ $filter = (new CFilter(new CUrl('httpconf.php')))
 					'object_name' => 'host_templates',
 					'data' => $data['filter']['hosts'],
 					'popup' => [
+						'filter_preselect_fields' => [
+							'hostgroups' => 'filter_groups_'
+						],
 						'parameters' => [
 							'srctbl' => 'host_templates',
 							'srcfld1' => 'hostid',

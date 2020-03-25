@@ -211,8 +211,7 @@ class CWidgetHelper {
 	 */
 	private static function getMultiselectField($field, $captions, $form_name, $object_name, $popup_options) {
 		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
-
-		return (new CMultiSelect([
+		$options = [
 			'name' => $field_name,
 			'object_name' => $object_name,
 			'multiple' => $field->isMultiple(),
@@ -224,7 +223,13 @@ class CWidgetHelper {
 				] + $popup_options
 			],
 			'add_post_js' => false
-		]))
+		];
+
+		if ($field instanceof CWidgetFieldMsHost && $field->filter_preselect_host_group_field) {
+			$options['popup']['filter_preselect_fields']['hostgroups'] = $field->filter_preselect_host_group_field;
+		}
+
+		return (new CMultiSelect($options))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
 	}
@@ -532,9 +537,9 @@ class CWidgetHelper {
 	public static function getApplicationSelector($field) {
 		$popup_options = json_encode($field->getFilterParameters());
 
-		if ($field->filter_preselect_field) {
+		if ($field->filter_preselect_host_field) {
 			$popup_options = 'jQuery.extend('.
-				$popup_options.', getFirstMultiselectValue("'.$field->filter_preselect_field.'"))';
+				$popup_options.', getFirstMultiselectValue("'.$field->filter_preselect_host_field.'"))';
 		}
 
 		return [

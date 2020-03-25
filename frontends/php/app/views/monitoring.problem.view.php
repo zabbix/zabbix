@@ -123,6 +123,9 @@ if ($data['action'] == 'problem.view') {
 				'object_name' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
+					'filter_preselect_fields' => [
+						'hostgroups' => 'filter_groupids_'
+					],
 					'parameters' => [
 						'srctbl' => 'hosts',
 						'srcfld1' => 'hostid',
@@ -155,7 +158,9 @@ if ($data['action'] == 'problem.view') {
 				'object_name' => 'triggers',
 				'data' => $data['filter']['triggers'],
 				'popup' => [
-					'filter_preselect_field' => 'filter_hostids_',
+					'filter_preselect_fields' => [
+						'hosts' => 'filter_hostids_'
+					],
 					'parameters' => [
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',

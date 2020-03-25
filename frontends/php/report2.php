@@ -442,6 +442,9 @@ else {
 					'object_name' => 'hosts',
 					'data' => $data['filter']['hostids'],
 					'popup' => [
+						'filter_preselect_fields' => [
+							'hostgroups' => 'filter_groups_'
+						],
 						'parameters' => [
 							'srctbl' => 'hosts',
 							'srcfld1' => 'hostid',

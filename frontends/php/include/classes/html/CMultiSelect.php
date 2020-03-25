@@ -31,6 +31,13 @@ class CMultiSelect extends CTag {
 	const SEARCH_METHOD = 'multiselect.get';
 
 	/**
+	 * Supported preselect types.
+	 *
+	 * @param array
+	 */
+	protected $preselect_fields = ['hosts', 'hostgroups'];
+
+	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
 	 * @param bool  $options['multiple']       Allows multiple selections.
 	 * @param bool  $options['add_post_js']
@@ -91,8 +98,8 @@ class CMultiSelect extends CTag {
 		}
 
 		if (array_key_exists('popup', $options)) {
-			if (array_key_exists('filter_preselect_field', $options['popup'])) {
-				$params['popup']['filter_preselect_field'] = $options['popup']['filter_preselect_field'];
+			if (array_key_exists('filter_preselect_fields', $options['popup'])) {
+				$params['popup']['filter_preselect_fields'] = $options['popup']['filter_preselect_fields'];
 			}
 
 			if (array_key_exists('parameters', $options['popup'])) {
@@ -174,7 +181,7 @@ class CMultiSelect extends CTag {
 		$popup_parameters = [];
 
 		if (array_key_exists('popup', $options)) {
-			$valid_fields = ['parameters', 'filter_preselect_field'];
+			$valid_fields = ['parameters', 'filter_preselect_fields'];
 
 			foreach ($options['popup'] as $field => $value) {
 				if (!in_array($field, $valid_fields)) {
@@ -182,13 +189,19 @@ class CMultiSelect extends CTag {
 				}
 			}
 
-			if (array_key_exists('filter_preselect_field', $options['popup'])) {
-				if (is_string($options['popup']['filter_preselect_field'])
-						&& $options['popup']['filter_preselect_field'] !== '') {
-					$mapped_options['popup']['filter_preselect_field'] = $options['popup']['filter_preselect_field'];
+			if (array_key_exists('filter_preselect_fields', $options['popup'])) {
+				if (is_array($options['popup']['filter_preselect_fields'])) {
+					foreach ($options['popup']['filter_preselect_fields'] as $field => $value) {
+						if (in_array($field, $this->preselect_fields) && is_string($value) && $value !== '') {
+							$mapped_options['popup']['filter_preselect_fields'][$field] = $value;
+						}
+						else {
+							error('invalid property: $options[\'popup\'][\'filter_preselect_fields\'][\''.$field.'\']');
+						}
+					}
 				}
 				else {
-					error('invalid property: $options[\'popup\'][\'filter_preselect_field\']');
+					error('invalid property: $options[\'popup\'][\'filter_preselect_fields\']');
 				}
 			}
 
