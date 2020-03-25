@@ -171,6 +171,7 @@ tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
 tests/libs/zbxcommon/zbx_truncate_itemkey
 tests/libs/zbxcommon/zbx_truncate_value
 tests/libs/zbxserver/evaluate_function
+tests/libs/zbxserver/get_trigger_expression_constant
 /zabbix-*.tar.gz
 .vscode
 sbin/zabbix_agentd

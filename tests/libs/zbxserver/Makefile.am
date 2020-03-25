@@ -1,6 +1,6 @@
 if SERVER
 SERVER_tests = \
-	expression \
+	get_trigger_expression_constant \
 	evaluate_function
 endif
 
@@ -75,17 +75,17 @@ COMMON_LIB_FILES = \
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 
-expression_SOURCES = \
-	expression.c
+get_trigger_expression_constant_SOURCES = \
+	get_trigger_expression_constant.c
 
-expression_LDADD = \
+get_trigger_expression_constant_LDADD = \
 	$(COMMON_LIB_FILES)
 
-expression_LDADD += @SERVER_LIBS@
+get_trigger_expression_constant_LDADD += @SERVER_LIBS@
 
-expression_LDFLAGS = @SERVER_LDFLAGS@
+get_trigger_expression_constant_LDFLAGS = @SERVER_LDFLAGS@
 
-expression_CFLAGS = $(COMMON_COMPILER_FLAGS)
+get_trigger_expression_constant_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
 evaluate_function_SOURCES = \

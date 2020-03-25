@@ -238,16 +238,14 @@ static char	*get_expanded_expression(const char *expression)
  *                                                                            *
  * Parameters: expression - [IN] trigger expression, source of constants      *
  *             reference  - [IN] reference from a trigger name ($1, $2, ...)  *
- *             constant   - [OUT] pointer to the constant's location in       *
- *                            trigger expression or empty string if there is  *
- *                            no corresponding constant                       *
- *             length     - [OUT] length of constant                          *
+ *             constant   - [OUT] the extracted constant or empty string,     *
+ *                                must be freed by caller                     *
  *                                                                            *
  ******************************************************************************/
 void	get_trigger_expression_constant(const char *expression, const zbx_token_reference_t *reference,
-		char **constant, size_t *length)
+		char **constant)
 {
-	size_t		pos, ii, i;
+	size_t		pos, j, i;
 	zbx_strloc_t	number;
 	int		index;
 	const char	*tmp = NULL;
@@ -255,6 +253,8 @@ void	get_trigger_expression_constant(const char *expression, const zbx_token_ref
 	for (pos = 0, index = 1; SUCCEED == zbx_number_or_string_find(expression, pos, &number);
 			pos = number.r + 1, index++)
 	{
+		size_t	length;
+
 		if (index < reference->index)
 		{
 			if ('\"' == expression[number.r + 1])
@@ -262,38 +262,36 @@ void	get_trigger_expression_constant(const char *expression, const zbx_token_ref
 
 			continue;
 		}
-		*length = number.r - number.l + 1;
-		*constant = zbx_malloc(NULL, *length + 1);
+		length = number.r - number.l + 1;
+		*constant = zbx_malloc(*constant, length + 1);
 		tmp = expression + number.l;
 
 		// unescape
-		ii = 0;
-		for (i = 0; i < *length; ++i)
+		j = 0;
+		for (i = 0; i < length; i++)
 		{
-			if ('\\' == *(tmp + i))
+			if ('\\' == tmp[i])
 			{
-				if('\\' != *(tmp + i + 1) && '\"' != *(tmp + i + 1))
+				if('\\' != tmp[i + 1] && '\"' != tmp[i + 1])
 				{
-					// every slash and quote symbol must be escaped at this stage
+					/* every slash and quote symbol must be escaped at this stage */
 					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
 				}
 
 				i++;
 			}
 
-			(*constant)[ii] = tmp[i];
-			ii++;
+			(*constant)[j] = tmp[i];
+			j++;
 		}
 
-		(*constant)[ii] = '\0';
-		*length = ii;
+		(*constant)[j] = '\0';
 
 		return;
 	}
 
-	*length = 0;
-	*constant = zbx_malloc(NULL, 1);
-	(*constant)[0] = '\0';
+	*constant = zbx_strdup(*constant, "");
 }
 
 static void	DCexpand_trigger_expression(char **expression)
@@ -2797,12 +2795,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
-	char			c, *replace_to = NULL, *replace = NULL, sql[64];
+	char			c, *replace_to = NULL, sql[64];
 	const char		*m;
 	int			N_functionid, indexed_macro, require_numeric, require_address, ret, res = SUCCEED,
 				pos = 0, found,
 				raw_value;
-	size_t			data_alloc, data_len, replace_len;
+	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
 	zbx_token_t		token;
@@ -3984,8 +3982,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 						continue;
 					}
 
-					get_trigger_expression_constant(expression, &token.data.reference, &replace,
-							&replace_len);
+					get_trigger_expression_constant(expression, &token.data.reference, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
@@ -4575,20 +4572,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					token.loc.r - token.loc.l + 1, replace_to, strlen(replace_to));
 			zbx_free(replace_to);
 		}
-		else if (NULL != replace)
-		{
-			pos = token.loc.r;
-
-			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, token.loc.l,
-					token.loc.r - token.loc.l + 1, replace, replace_len);
-
-			replace = NULL;
-		}
 
 		pos++;
 	}
 
-	zbx_free(replace);
 	zbx_free(expression);
 	zbx_vector_uint64_destroy(&hostids);
 

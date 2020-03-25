@@ -22,6 +22,7 @@
 #include "zbxserver.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockassert.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -29,9 +30,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	param_handle;
 	zbx_uint64_t		index = 0;
 	const char		*expected_result = NULL, *expression = NULL;
-	char			*actual_result = NULL, *out = NULL;
-	size_t			res_len, i;
-	zbx_token_reference_t	*token = NULL;
+	char			*actual_result = NULL;
+	zbx_token_reference_t	token;
 
 	ZBX_UNUSED(state);
 
@@ -54,32 +54,10 @@ void	zbx_mock_test_entry(void **state)
 				zbx_mock_error_string(error));
 	}
 
-	token = zbx_malloc(NULL, sizeof(zbx_token_reference_t));
-	*token = (zbx_token_reference_t){.index = index};
-	get_trigger_expression_constant(expression, token, &out, &res_len);
+	token.index = index;
+	get_trigger_expression_constant(expression, &token, &actual_result);
 
-	if (NULL != out)
-	{
-		actual_result = zbx_malloc(NULL, res_len + 1);
-
-		for (i = 0; i < res_len; ++i)
-			actual_result[i] = out[i];
-
-		actual_result[res_len] = '\0';
-		zbx_free(out);
-	}
-	else
-	{
-		actual_result = zbx_malloc(NULL, 1);
-		actual_result[0] = '\0';
-	}
-
-	if (0 != strcmp(expected_result, actual_result))
-	{
-		fail_msg("Got ->%s<- instead of ->%s<- as a result.", actual_result,
-				expected_result);
-	}
+	zbx_mock_assert_str_eq("Invalid result", expected_result, actual_result);
 
 	zbx_free(actual_result);
-	zbx_free(token);
 }
