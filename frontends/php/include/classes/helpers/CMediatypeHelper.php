@@ -62,11 +62,11 @@ class CMediatypeHelper {
 				'template' => [
 					'subject' => 'Resolved: {EVENT.NAME}',
 					'html' => '<b>Problem has been resolved</b> at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}<br>'.
-						'<b>Problem name:</b> {EVENT.NAME}<br><b>Host:</b> {HOST.NAME}<br>'.
+						'<b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> {EVENT.DURATION}<br><b>Host:</b> {HOST.NAME}<br>'.
 						'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}',
 					'sms' => "RESOLVED: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' => "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-						"Problem name: {EVENT.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
+						"Problem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
 						"Original problem ID: {EVENT.ID}\n{TRIGGER.URL}"
 				]
 			],
