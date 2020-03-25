@@ -27,7 +27,7 @@ class CMathHelper {
 	/**
 	* Calculate sum of values (overflow safe).
 	*
-	* @param array $addenda
+	* @param array $values
 	*
 	* @return float
 	*/
@@ -57,7 +57,7 @@ class CMathHelper {
 	/**
 	* Calculate multiplication of values (overflow safe).
 	*
-	* @param array $multipliers
+	* @param array $values
 	*
 	* @return float
 	*/
@@ -87,7 +87,7 @@ class CMathHelper {
 	}
 
 	/**
-	 * Calculate average value (with overflow protection).
+	 * Calculate average of values (overflow safe).
 	 *
 	 * @param array $values  A non-empty array of values.
 	 *
