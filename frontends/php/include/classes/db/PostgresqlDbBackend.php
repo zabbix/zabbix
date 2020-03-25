@@ -145,7 +145,7 @@ class PostgresqlDbBackend extends DbBackend {
 		if (version_compare($row['server_version'], '9.5', '<')) {
 			$row = DBfetch(DBselect('SHOW ssl'));
 			if ($row['ssl'] == 'off') {
-				$this->setError('Error connecting to database. SSL off.');
+				$this->setError('Error connecting to database. Connection is not secure.');
 				return false;
 			}
 		}
