@@ -115,6 +115,7 @@ class CSidebar extends CBaseComponent {
 
 	close() {
 		clearTimeout(this._opened_timer);
+
 		if (this._is_opened) {
 			this._is_opened = false;
 
@@ -297,13 +298,18 @@ class CSidebar extends CBaseComponent {
 					}
 				}
 
-				if ([SIDEBAR_VIEW_MODE_FULL, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
+				if ([SIDEBAR_VIEW_MODE_FULL, SIDEBAR_VIEW_MODE_HIDDEN].includes(view_mode)) {
 					this.on('mouseleave', this._events.expandSelected);
 					this.on('mouseenter', this._events.cancelExpandSelected);
 				}
 				else {
 					this.off('mouseleave', this._events.expandSelected);
 					this.off('mouseenter', this._events.cancelExpandSelected);
+				}
+
+				if (view_mode === SIDEBAR_VIEW_MODE_FULL && this._is_opened) {
+					document.removeEventListener('keyup', this._events.escape);
+					document.removeEventListener('click', this._events.click);
 				}
 			}
 		};
