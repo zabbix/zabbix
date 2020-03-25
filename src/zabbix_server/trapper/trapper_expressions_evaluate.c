@@ -120,7 +120,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 		zbx_json_addobject(json, NULL);
 		zbx_json_addstring(json, ZBX_PROTO_TAG_EXPRESSION, result->expression, ZBX_JSON_TYPE_STRING);
 
-		if (NULL != result->error && 0 != strlen(result->error))
+		if (0 != strlen(result->error))
 		{
 			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->error, ZBX_JSON_TYPE_STRING);
 		}

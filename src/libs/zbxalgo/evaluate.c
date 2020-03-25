@@ -1086,17 +1086,17 @@ double	evaluate_string_to_double(const char *in)
 {
 	int		len;
 	double		result_double_value;
-	const char	*ptr = in;
+	const char	*tmp_ptr = in;
 
 	if (1 < strlen(in) && '-' == in[0])
-		ptr++;
+		tmp_ptr++;
 
-	if (SUCCEED == zbx_suffixed_number_parse(ptr, &len) && '\0' == *(ptr + len))
+	if (SUCCEED == zbx_suffixed_number_parse(tmp_ptr, &len) && '\0' == *(tmp_ptr + len))
 	{
-		result_double_value = atof(ptr) * suffix2factor(*(ptr + len - 1));
+		result_double_value = atof(tmp_ptr) * suffix2factor(*(tmp_ptr + len - 1));
 
 		/* negative sign detected */
-		if (ptr != in)
+		if (tmp_ptr != in)
 			result_double_value = -(result_double_value);
 	}
 	else

@@ -9631,10 +9631,10 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
-	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len, i;
+	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len;
 	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL, *escape_escaped_value = NULL,
 			*please_free_me = NULL;
-	size_t		str_alloc = 0, str_offset = 0;
+	size_t		str_alloc = 0, str_offset = 0, i;
 
 	if ('\0' == *text)
 		return zbx_strdup(NULL, text);

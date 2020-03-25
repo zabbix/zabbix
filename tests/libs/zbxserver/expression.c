@@ -30,8 +30,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_uint64_t		index = 0;
 	const char		*expected_result = NULL, *expression = NULL;
 	char			*actual_result = NULL, *out = NULL;
-	size_t			res_len;
-	int			i;
+	size_t			res_len, i;
 	zbx_token_reference_t	*token = NULL;
 
 	ZBX_UNUSED(state);
