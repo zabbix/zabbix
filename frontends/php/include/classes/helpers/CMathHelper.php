@@ -40,14 +40,14 @@ class CMathHelper {
 		$tail = count($values) - 1;
 
 		while ($head <= $tail) {
-			$result_candidate = $result + $values[$head];
+			$result_candidate = $result + $values[$tail];
 			if ($result_candidate != INF) {
 				$result = $result_candidate;
-				$head++;
+				$tail--;
 			}
 			else {
-				$result += $values[$tail];
-				$tail--;
+				$result += $values[$head];
+				$head++;
 			}
 		}
 
