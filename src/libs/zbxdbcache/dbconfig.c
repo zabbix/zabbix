@@ -9673,29 +9673,29 @@ char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hos
 
 		if (NULL != value)
 		{
-			size_t	len;
+			size_t	sz;
 			char	*tmp;
 
-			len = zbx_get_escape_string_len(value, "\"\\");
+			sz = zbx_get_escape_string_len(value, "\"\\");
 
 			if (0 == cur_token_inside_quote && ZBX_INFINITY == evaluate_string_to_double(value))
 			{
 				/* autoquote */
-				tmp = zbx_malloc(NULL, len + 3);
+				tmp = zbx_malloc(NULL, sz + 3);
 				tmp[0] = '\"';
-				zbx_escape_string(tmp+1, len + 1, value, "\"\\");
-				tmp[len + 1] = '\"';
-				tmp[len + 2] = '\0';
+				zbx_escape_string(tmp+1, sz + 1, value, "\"\\");
+				tmp[sz + 1] = '\"';
+				tmp[sz + 2] = '\0';
 				zbx_free(value);
 				value = tmp;
 			}
 			else
 			{
-				if (len != strlen(value))
+				if (sz != strlen(value))
 				{
-					tmp = zbx_malloc(NULL, len + 1);
-					zbx_escape_string(tmp, len + 1, value, "\"\\");
-					tmp[len] = '\0';
+					tmp = zbx_malloc(NULL, sz + 1);
+					zbx_escape_string(tmp, sz + 1, value, "\"\\");
+					tmp[sz] = '\0';
 					zbx_free(value);
 					value = tmp;
 				}
