@@ -40,15 +40,7 @@ class CMathHelper {
 		$tail = count($values) - 1;
 
 		while ($head <= $tail) {
-			$result_candidate = $result + $values[$tail];
-			if ($result_candidate != INF) {
-				$result = $result_candidate;
-				$tail--;
-			}
-			else {
-				$result += $values[$head];
-				$head++;
-			}
+			$result += $values[$result > 0 ? $head++ : $tail--];
 		}
 
 		return $result;
@@ -63,7 +55,7 @@ class CMathHelper {
 	*/
 	public static function safeMul(array $values): float {
 		usort($values, function(float $a, float $b): int {
-			return abs($b) <=> abs($a);
+			return abs($a) <=> abs($b);
 		});
 
 		$result = $values[0];
@@ -72,15 +64,7 @@ class CMathHelper {
 		$tail = count($values) - 1;
 
 		while ($head <= $tail) {
-			$result_candidate = $result * $values[$head];
-			if (abs($result_candidate) != INF) {
-				$result = $result_candidate;
-				$head++;
-			}
-			else {
-				$result *= $values[$tail];
-				$tail--;
-			}
+			$result *= $values[abs($result) > 1 ? $head++ : $tail--];
 		}
 
 		return $result;
@@ -94,12 +78,20 @@ class CMathHelper {
 	 * @return float
 	 */
 	public static function safeAvg(array $values): float {
+		sort($values, SORT_NUMERIC);
+
 		$result = 0;
 
 		$count = 1;
-		foreach ($values as $value) {
+		$head = 0;
+		$tail = count($values) - 1;
+
+		while ($head <= $tail) {
+			$value = $values[$result > 0 ? $head++ : $tail--];
+
 			// Expression optimized to avoid overflow.
 			$result += $value / $count - $result / $count;
+
 			$count++;
 		}
 
