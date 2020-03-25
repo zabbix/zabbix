@@ -10,7 +10,6 @@ $DB['USER']				= '{DBUSER}';
 $DB['PASSWORD']			= '{DBPASSWORD}';
 // Schema name. Used for PostgreSQL.
 $DB['SCHEMA']			= '';
-$DB['ENCRYPTION']		= false;
 
 $ZBX_SERVER				= 'localhost';
 $ZBX_SERVER_PORT		= '10051';
