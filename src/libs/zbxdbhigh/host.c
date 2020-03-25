@@ -3493,7 +3493,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 
 	zbx_vector_uint64_create(&hostids);
 
-	/* select list of groups which should be linked to host prototypes */
+	/* select list of macros prototypes which should be linked to host prototypes */
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -3510,18 +3510,23 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
 
 	result = DBselect("%s", sql);
+	host_prototype = NULL;
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 
-		if (FAIL == (i = zbx_vector_ptr_bsearch(host_prototypes, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (NULL == host_prototype || host_prototype->templateid != hostid)
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
+			if (FAIL == (i = zbx_vector_ptr_bsearch(host_prototypes, &hostid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
 
-		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+			host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+		}
 
 		hostmacro = (zbx_macros_prototype_t *)zbx_malloc(NULL, sizeof(zbx_macros_prototype_t));
 		hostmacro->hostmacroid = 0;
@@ -3534,7 +3539,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 	}
 	DBfree_result(result);
 
-	/* select list of group prototypes which already linked to host prototypes */
+	/* select list of macros prototypes which already linked to host prototypes */
 
 	zbx_vector_uint64_clear(&hostids);
 
