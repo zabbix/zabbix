@@ -557,9 +557,9 @@ footer {
       top: 7px;
       left: 9px; }
     .menu-main > li > a:hover, .menu-main > li > a:focus {
-      background: #ffffff;
-      border-left-color: #0c0c0c;
-      color: #000000; }
+      background: #1a1a1a;
+      border-left-color: transparent;
+      color: #ffffff; }
       .menu-main > li > a:hover::before, .menu-main > li > a:focus::before {
         background-position-x: -570px; }
   .menu-main > li.has-submenu > a::after {
@@ -603,8 +603,8 @@ footer {
       border-left-color: #787878;
       color: #ffffff; }
       .menu-main .submenu li.is-selected a:hover, .menu-main .submenu li.is-selected a:focus {
-        background: #ffffff;
-        color: #000000; }
+        background: #1a1a1a;
+        color: #ffffff; }
     .menu-main .submenu li:not(:last-child) {
       border-bottom: 1px solid #f3f3f3; }
   .menu-main .submenu a {
@@ -613,9 +613,9 @@ footer {
     background: #cccccc;
     color: #0c0c0c; }
     .menu-main .submenu a:hover, .menu-main .submenu a:focus {
-      background: #ffffff;
-      border-left-color: #000000;
-      color: #000000; }
+      background: #1a1a1a;
+      border-left-color: transparent;
+      color: #ffffff; }
   .menu-main .submenu::before, .menu-main .submenu::after {
     content: '';
     position: absolute;
@@ -5461,20 +5461,10 @@ table.preprocessing-test-results .rel-container {
   .sidebar.is-compact:not(.is-opened) .menu-main > li.is-selected > a::before {
     background-position-x: -570px; }
 
-.menu-main > li > a:hover::before {
-  background-position-x: -600px; }
-.menu-main > li.is-expanded > a:hover, .menu-main > li.is-expanded > a:focus {
-  background: #ffffff;
-  border-left-color: #0c0c0c;
-  color: #000000; }
-  .menu-main > li.is-expanded > a:hover::before, .menu-main > li.is-expanded > a:focus::before {
-    background-position-x: -600px; }
-.menu-main > li.is-expanded > a::before {
+.menu-main > li.has-submenu.is-expanded > a::before, .menu-main > li.has-submenu > a:hover::before, .menu-main > li.has-submenu > a:focus::before {
   background-position-x: -570px; }
-.menu-main > li.has-submenu.is-expanded > a::after {
+.menu-main > li.has-submenu.is-expanded > a::after, .menu-main > li.has-submenu > a:hover::after, .menu-main > li.has-submenu > a:focus::after {
   background-position-x: -606px; }
-.menu-main > li.has-submenu.is-expanded > a:hover::after, .menu-main > li.has-submenu.is-expanded > a:focus::after {
-  background-position-x: -579px; }
 
 .menu-user a {
   padding-left: 45px;

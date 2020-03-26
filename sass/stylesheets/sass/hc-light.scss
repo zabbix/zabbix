@@ -43,7 +43,9 @@ $overlay-bg-color: #000000;
 
 // Main menu
 $menu-main-color: #ffffff;
-$menu-main-hover-bg-color: #000000;
+$menu-main-hover-color: #000000;
+$menu-main-hover-bg-color: #e6e6e6;
+$menu-main-hover-border-color: transparent;
 $menu-main-selected-bg-color: #000000;
 $menu-main-selected-border-color: #f3f3f3;
 $menu-main-expanded-color: #000000;
@@ -52,8 +54,9 @@ $menu-main-expanded-bg-color: #f3f3f3;
 $menu-main-submenu-color: #f4f4f4;
 $menu-main-submenu-bg-color: #333333;
 $menu-main-submenu-border-color: #0d0d0d;
-$menu-main-submenu-hover-color: #ffffff;
-$menu-main-submenu-hover-bg-color: #000000;
+$menu-main-submenu-hover-color: #000000;
+$menu-main-submenu-hover-bg-color: #e6e6e6;
+$menu-main-submenu-hover-border-color: transparent;
 $menu-main-submenu-selected-color: #000000;
 $menu-main-submenu-selected-bg-color: #f3f3f3;
 $menu-main-submenu-selected-border-color: #949494;
@@ -223,38 +226,16 @@ $multiselect-selected-bg-color: #777777;
 
 // components/menu-main
 .menu-main {
-	& > li {
-		&.is-expanded {
-			& > a {
-				&:hover,
-				&:focus {
-					background: $menu-main-hover-bg-color;
-					border-left-color: $menu-main-hover-border-color;
-					color: $menu-main-hover-color;
-
-					&::before {
-						background-position-x: -570px;
-					}
-				}
-
-				&::before {
-					background-position-x: -600px;
-				}
+	& > li.has-submenu {
+		&.is-expanded > a,
+		& > a:hover,
+		& > a:focus {
+			&::before {
+				background-position-x: -600px;
 			}
-		}
 
-		&.has-submenu.is-expanded {
-			& > a {
-				&::after {
-					background-position-x: -579px;
-				}
-
-				&:hover,
-				&:focus {
-					&::after {
-						background-position-x: -606px;
-					}
-				}
+			&::after {
+				background-position-x: -579px;
 			}
 		}
 	}
