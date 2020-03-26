@@ -30,8 +30,8 @@ For more information please read the MYSQL documentation https://dev.mysql.com/d
 
 ```text
 [client]
-user=zbx_monitor
-password=<password>
+user='zbx_monitor'
+password='<password>'
 ```
 NOTE: Use systemd to start the Zabbix agent on Linux OS. 
 For example in Centos use "systemctl edit zabbix-agent.service" to set the required user to start the Zabbix agent. 
