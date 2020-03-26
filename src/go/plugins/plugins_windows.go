@@ -23,6 +23,7 @@ import (
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/net/netif"
 	_ "zabbix.com/plugins/net/tcp"
+	_ "zabbix.com/plugins/net/udp"
 	_ "zabbix.com/plugins/proc"
 	_ "zabbix.com/plugins/system/cpu"
 	_ "zabbix.com/plugins/system/swap"
@@ -37,6 +38,6 @@ import (
 	_ "zabbix.com/plugins/windows/perfmon"
 	_ "zabbix.com/plugins/windows/services"
 	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/sync"
 	_ "zabbix.com/plugins/zabbix/stats"
+	_ "zabbix.com/plugins/zabbix/sync"
 )
