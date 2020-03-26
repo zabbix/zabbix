@@ -140,16 +140,24 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function isConnectionSecure() {
-		$row = DBfetch(DBselect('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl'.
-			' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
-				' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
+		$row = DBfetch(DBselect('SHOW server_version'));
+		$is_secure = false;
 
-		if (!$row ) {
-			$this->setError('Error connecting to database. Empty cipher.');
-			return false;
+		if (version_compare($row['server_version'], '9.5', '<')) {
+			$row = DBfetch(DBselect('SHOW ssl'));
+			$is_secure = ($row && $row['ssl'] === 'on');
+		}
+		else {
+			$is_secure = (bool) DBfetch(DBselect('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl'.
+				' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
+					' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
 		}
 
-		return true;
+		if (!$is_secure) {
+			$this->setError('Error connecting to database. Connection is not secure.');
+		}
+
+		return $is_secure;
 	}
 
 	/**
