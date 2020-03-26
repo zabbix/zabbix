@@ -26,6 +26,7 @@
 #include "dbconfig.h"
 
 #include "dbsync.h"
+#include "zbxserver.h"
 
 extern int		CONFIG_TIMER_FORKS;
 
@@ -1519,6 +1520,21 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 		query = (zbx_event_suppress_query_t *)event_queries->values[i];
 
 		/* find hostids of items used in event trigger expressions */
+
+		/* Some processes do not have trigger data at hand and create event queries */
+		/* without filling query functionids. Do it here if necessary.              */
+		if (0 == query->functionids.values_num)
+		{
+			ZBX_DC_TRIGGER	*trigger;
+
+			if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
+					&query->triggerid)))
+			{
+				continue;
+			}
+			get_functionids(&query->functionids, trigger->expression);
+			get_functionids(&query->functionids, trigger->recovery_expression);
+		}
 
 		for (j = 0; j < query->functionids.values_num; j++)
 		{
