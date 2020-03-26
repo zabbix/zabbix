@@ -79,13 +79,11 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 		evaluate_error[0] = '\0';
 
-		evaluate(&expr_result, expressions.values[i], evaluate_error, sizeof(evaluate_error),
-			&unknown_msgs);
-
 		zbx_json_addobject(json, NULL);
 		zbx_json_addstring(json, ZBX_PROTO_TAG_EXPRESSION, expressions.values[i], ZBX_JSON_TYPE_STRING);
 
-		if (0 != strlen(evaluate_error))
+		if (SUCCEED != evaluate(&expr_result, expressions.values[i], evaluate_error, sizeof(evaluate_error),
+			&unknown_msgs))
 		{
 			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, evaluate_error, ZBX_JSON_TYPE_STRING);
 		}
