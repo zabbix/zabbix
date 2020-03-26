@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-25T00:00:00Z</date>
+    <date>2020-03-26T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Redmine</name>
@@ -52,8 +52,8 @@
                     <value>{EVENT.TAGS.__zbx_redmine_issue_id}</value>
                 </parameter>
                 <parameter>
-                    <name>redmine_project_name</name>
-                    <value>&lt;PUT YOUR PROJECT NAME&gt;</value>
+                    <name>redmine_project</name>
+                    <value>&lt;PUT YOUR PROJECT NAME OR ID&gt;</value>
                 </parameter>
                 <parameter>
                     <name>redmine_tracker_id</name>
@@ -104,30 +104,34 @@
                         var field_value;&#13;
 &#13;
                         for (var idx in schema.custom_fields) {&#13;
-                            if (schema.custom_fields[idx].id == field) {&#13;
+                            if (schema.custom_fields[idx].id != field) {&#13;
+                                continue;&#13;
+                            }&#13;
 &#13;
-                                switch (schema.custom_fields[idx].field_format) {&#13;
-                                    case 'string':&#13;
-                                        field_value = fields[field];&#13;
-                                        break;&#13;
+                            switch (schema.custom_fields[idx].field_format) {&#13;
+                                case 'string':&#13;
+                                    field_value = fields[field];&#13;
+                                    break;&#13;
 &#13;
-                                    case 'int':&#13;
-                                        field_value = parseInt(fields[field]);&#13;
-                                        break;&#13;
+                                case 'int':&#13;
+                                    field_value = parseInt(fields[field]);&#13;
+                                    break;&#13;
 &#13;
-                                    case 'float':&#13;
-                                        field_value = parseFloat(fields[field]);&#13;
-                                        break;&#13;
+                                case 'float':&#13;
+                                    field_value = parseFloat(fields[field]);&#13;
+                                    break;&#13;
 &#13;
-                                    case 'date':&#13;
-                                        if (fields[field].match(/^\d{4}[.-]\d{2}[.-]\d{2}$/)) {&#13;
-                                            field_value = fields[field].replace(/\./g, '-');&#13;
-                                        }&#13;
-                                }&#13;
+                                case 'date':&#13;
+                                    if (fields[field].match(/^\d{4}[.-]\d{2}[.-]\d{2}$/)) {&#13;
+                                        field_value = fields[field].replace(/\./g, '-');&#13;
+                                    }&#13;
+                                    break;&#13;
+                                default:&#13;
+                                    field_value = undefined;&#13;
+                            }&#13;
 &#13;
-                                if (field_value) {&#13;
-                                    data.issue.custom_fields.push({id: field, value: field_value});&#13;
-                                }&#13;
+                            if (field_value) {&#13;
+                                data.issue.custom_fields.push({id: field, value: field_value});&#13;
                             }&#13;
                         }&#13;
                     });&#13;
@@ -144,7 +148,7 @@
         ['url', 'access_key'].forEach(function (field) {&#13;
             if (typeof Redmine.params !== 'object' || typeof Redmine.params[field] === 'undefined'&#13;
                 || Redmine.params[field] === '' ) {&#13;
-                throw new Error('Required Redmine param is not set: &quot;' + field + '&quot;.');&#13;
+                throw 'Required param is not set: &quot;' + field + '&quot;.';&#13;
             }&#13;
         });&#13;
 &#13;
@@ -176,7 +180,7 @@
                 break;&#13;
 &#13;
             default:&#13;
-                throw new Error('Unsupported HTTP request method: ' + method);&#13;
+                throw 'Unsupported HTTP request method: ' + method;&#13;
         }&#13;
 &#13;
         Zabbix.Log(4, '[ Redmine Webhook ] Received response with status code ' + request.Status() + '\n' + response);&#13;
@@ -203,7 +207,7 @@
                 message += ': ' + JSON.stringify(response.errorMessages);&#13;
             }&#13;
 &#13;
-            throw new Error(message + ' Check debug log for more information.');&#13;
+            throw message + ' Check debug log for more information.';&#13;
         }&#13;
 &#13;
         return {&#13;
@@ -217,7 +221,7 @@
             project_id;&#13;
 &#13;
         if (result.response) {&#13;
-            var projects = result.response.projects;&#13;
+            var projects = result.response.projects || [];&#13;
 &#13;
             for (var i in projects) {&#13;
                 if (projects[i].name === name) {&#13;
@@ -230,6 +234,10 @@
             Zabbix.Log(4, '[ Redmine Webhook ] Failed to retrieve project data.');&#13;
         }&#13;
 &#13;
+        if (typeof project_id === 'undefined') {&#13;
+            throw 'Cannot find project with name: ' + name;&#13;
+        }&#13;
+&#13;
         return project_id;&#13;
     },&#13;
 &#13;
@@ -240,23 +248,23 @@
     },&#13;
 &#13;
     createIssue: function(subject, description, fields) {&#13;
-        var project_id = Redmine.getProjectID(Redmine.params.project_name);&#13;
-&#13;
-        var data = {&#13;
-            issue: {&#13;
-                project_id: project_id,&#13;
-                tracker_id: Redmine.params.tracker_id,&#13;
-                subject: subject,&#13;
-                description: description,&#13;
-            }&#13;
-        };&#13;
-&#13;
-        var result = Redmine.request('post', 'issues.json', Redmine.addCustomFields(data, fields));&#13;
+        var project_id = /^\d+$/.test(Redmine.params.project)&#13;
+                ? Redmine.params.project&#13;
+                : Redmine.getProjectID(Redmine.params.project),&#13;
+            data = {&#13;
+                issue: {&#13;
+                    project_id: project_id,&#13;
+                    tracker_id: Redmine.params.tracker_id,&#13;
+                    subject: subject,&#13;
+                    description: description&#13;
+                }&#13;
+            },&#13;
+            result = Redmine.request('post', 'issues.json', Redmine.addCustomFields(data, fields));&#13;
 &#13;
         if (typeof result.response !== 'object'&#13;
             || typeof result.response.issue.id === 'undefined'&#13;
             || result.status != 201) {&#13;
-            throw new Error('Cannot create Redmine issue. Check debug log for more information.');&#13;
+            throw 'Cannot create Redmine issue. Check debug log for more information.';&#13;
         }&#13;
 &#13;
         return result.response.issue.id;&#13;
@@ -280,7 +288,7 @@ try {&#13;
         params_update = {},&#13;
         result = {tags: {}},&#13;
         required_params = [&#13;
-            'alert_subject', 'tracker_id', 'project_name',&#13;
+            'alert_subject', 'tracker_id', 'project',&#13;
             'event_recovery_value', 'event_source', 'event_value',  'event_name',&#13;
         ];&#13;
 &#13;
