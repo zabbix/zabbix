@@ -1831,25 +1831,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_NUMERIC],
-				'-9223372036854775809',
+				'-1.23E+500',
 				'/1/numeric',
 				'Invalid parameter "/1/numeric": a number is too large.'
 			],
 			[
 				['type' => API_NUMERIC],
-				'9223372036854775808',
-				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
-			],
-			[
-				['type' => API_NUMERIC],
-				'-9223372036854775808.000001',
-				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
-			],
-			[
-				['type' => API_NUMERIC],
-				'9223372036854775807.000001',
+				'1.23E+500',
 				'/1/numeric',
 				'Invalid parameter "/1/numeric": a number is too large.'
 			],
@@ -1857,7 +1845,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'.124',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is expected.'
+				'0.124',
+			],
+			[
+				['type' => API_NUMERIC],
+				'-.124',
+				'/1/numeric',
+				'-0.124',
 			],
 			[
 				['type' => API_NUMERIC],
@@ -1947,7 +1941,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'8388608T',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
+				'8388608T'
 			],
 			[
 				['type' => API_SCRIPT_NAME, 'length' => 23],
@@ -2958,6 +2952,59 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 		];
 	}
 
+	public function dataProviderInputLegacy() {
+		return [
+			[
+				['type' => API_NUMERIC],
+				'9.99999999999999E+15',
+				'/1/numeric',
+				'9.99999999999999E+15',
+			],
+			[
+				['type' => API_NUMERIC],
+				'1E+16',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-9.99999999999999E+15',
+				'/1/numeric',
+				'-9.99999999999999E+15',
+			],
+			[
+				['type' => API_NUMERIC],
+				'-1E+16',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'10000000000.0001',
+				'/1/numeric',
+				'10000000000.0001',
+			],
+			[
+				['type' => API_NUMERIC],
+				'1.00001',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number has too many fractional digits.',
+			],
+			[
+				['type' => API_NUMERIC],
+				'1E-4',
+				'/1/numeric',
+				'1E-4',
+			],
+			[
+				['type' => API_NUMERIC],
+				'1E-5',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number has too many fractional digits.',
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider dataProviderInput
 	 *
@@ -2965,8 +3012,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param mixed  $exprected
+	 * @param bool   $float_ieee754
 	 */
-	public function testApiInputValidator(array $rule, $data, $path, $expected) {
+	public function testApiInputValidator(array $rule, $data, $path, $expected, $float_ieee754 = true) {
+		global $DB;
+
+		$DB['DOUBLE_IEEE754'] = $float_ieee754;
+
 		$rc = CApiInputValidator::validate($rule, $data, $path, $error);
 
 		$this->assertTrue(is_bool($rc));
@@ -2981,6 +3033,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			$this->assertSame(gettype($expected), gettype($error));
 			$this->assertSame($expected, $error);
 		}
+	}
+
+	/**
+	 * @dataProvider dataProviderInputLegacy
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param mixed  $exprected
+	 */
+	public function testApiInputLegacyValidator(array $rule, $data, $path, $expected) {
+		$this->testApiInputValidator($rule, $data, $path, $expected, false);
 	}
 
 	public function dataProviderUniqueness() {

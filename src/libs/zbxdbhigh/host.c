@@ -3844,16 +3844,16 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 				" set name='%s',"
 					"width=%d,"
 					"height=%d,"
-					"yaxismin=" ZBX_FS_DBL ","
-					"yaxismax=" ZBX_FS_DBL ","
+					"yaxismin=" ZBX_FS_DBL64_SQL ","
+					"yaxismax=" ZBX_FS_DBL64_SQL ","
 					"templateid=" ZBX_FS_UI64 ","
 					"show_work_period=%d,"
 					"show_triggers=%d,"
 					"graphtype=%d,"
 					"show_legend=%d,"
 					"show_3d=%d,"
-					"percent_left=" ZBX_FS_DBL ","
-					"percent_right=" ZBX_FS_DBL ","
+					"percent_left=" ZBX_FS_DBL64_SQL ","
+					"percent_right=" ZBX_FS_DBL64_SQL ","
 					"ymin_type=%d,"
 					"ymax_type=%d,"
 					"ymin_itemid=%s,"
@@ -3901,9 +3901,9 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 				"show_work_period,show_triggers,graphtype,show_legend,"
 				"show_3d,percent_left,percent_right,ymin_type,ymax_type,"
 				"ymin_itemid,ymax_itemid,flags)"
-				" values (" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL ","
-				ZBX_FS_DBL "," ZBX_FS_UI64 ",%d,%d,%d,%d,%d," ZBX_FS_DBL ","
-				ZBX_FS_DBL ",%d,%d,%s,%s,%d);\n",
+				" values (" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL64_SQL ","
+				ZBX_FS_DBL64_SQL "," ZBX_FS_UI64 ",%d,%d,%d,%d,%d," ZBX_FS_DBL64_SQL ","
+				ZBX_FS_DBL64_SQL ",%d,%d,%s,%s,%d);\n",
 				hst_graphid, name_esc, width, height, yaxismin, yaxismax,
 				graphid, (int)show_work_period, (int)show_triggers,
 				(int)graphtype, (int)show_legend, (int)show_3d,
