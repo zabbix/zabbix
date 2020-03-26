@@ -801,7 +801,8 @@ class CUserMacro extends CApiService {
 
 			$count += API::HostPrototype()->get([
 				'countOutput' => true,
-				'hostids' => $hostids
+				'hostids' => $hostids,
+				'editable' => true
 			]);
 
 			if ($count != count($hostids)) {
