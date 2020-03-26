@@ -2304,14 +2304,8 @@ static void	get_event_tags(const DB_EVENT *event, char **replace_to)
  ******************************************************************************/
 static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
 {
-	struct zbx_json		json;
-	int			i;
-
-	if (0 == event->tags.values_num)
-	{
-		*replace_to = zbx_strdup(*replace_to, "[]");
-		return;
-	}
+	struct zbx_json	json;
+	int		i;
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -2326,7 +2320,7 @@ static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
 	}
 
 	zbx_json_close(&json);
-	*replace_to = zbx_strdup(NULL, json.buffer);
+	*replace_to = zbx_strdup(*replace_to, json.buffer);
 	zbx_json_free(&json);
 }
 
