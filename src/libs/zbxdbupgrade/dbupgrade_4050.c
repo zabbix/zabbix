@@ -1613,6 +1613,7 @@ static int	DBpatch_4050069(void)
 
 	return DBadd_field("config", &field);
 }
+
 static int	DBpatch_4050070(void)
 {
 	const ZBX_FIELD	field = {"saml_nameid_format", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -1626,7 +1627,6 @@ static int	DBpatch_4050071(void)
 
 	return DBadd_field("config", &field);
 }
-
 
 static int	DBpatch_4050072(void)
 {
