@@ -20,18 +20,10 @@
 #include "common.h"
 #include "zbxserver.h"
 
-typedef struct
-{
-	char	*expression;
-	double	value;
-	char	error[MAX_STRING_LEN];
-}
-zbx_expressions_evaluate_result_t;
-
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions,
 				char **error)
 {
-	char			buffer[MAX_STRING_LEN], *step_params = NULL, *error_handler_params = NULL;
+	char			buffer[MAX_STRING_LEN];
 	const char		*ptr;
 	zbx_user_t		user;
 	int			ret = FAIL;
@@ -62,70 +54,45 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 	}
 
 	ret = SUCCEED;
-	zbx_free(step_params);
 out:
-	if (FAIL == ret)
-		zbx_vector_ptr_clear_ext(expressions, (zbx_clean_func_t)zbx_ptr_free);
-
-	zbx_free(step_params);
-	zbx_free(error_handler_params);
-
 	return ret;
 }
 
 static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
-	char					*evaluate_error = NULL;
 	int					ret = FAIL, i;
-	zbx_vector_ptr_t			expressions, results;
-	zbx_expressions_evaluate_result_t	*result;
+	zbx_vector_ptr_t			expressions;
 
 	zbx_vector_ptr_create(&expressions);
-	zbx_vector_ptr_create(&results);
 
 	if (FAIL == trapper_parse_expressions_evaluate(jp,  &expressions, error))
 		goto out;
 
-	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_ptr_free);
+	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
+	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
 
 	for (i = 0; i < expressions.values_num; i++)
 	{
 		double			expr_result;
 		zbx_vector_ptr_t	unknown_msgs;
+		char			evaluate_error[MAX_STRING_LEN];
 
-		result = (zbx_expressions_evaluate_result_t *)zbx_malloc(NULL,
-				sizeof(zbx_expressions_evaluate_result_t));
-		zbx_vector_ptr_append(&results, result);
+		evaluate_error[0] = '\0';
 
-		result->expression = zbx_strdup(NULL, expressions.values[i]);
-		(result->error)[0] = '\0';
-		expressions.values[i] = DCexpression_expand_user_macros(expressions.values[i]);
-
-		if (SUCCEED != evaluate(&expr_result, expressions.values[i], result->error, sizeof(result->error),
-				&unknown_msgs))
-			continue;
-
-		result->value = expr_result;
-	}
-
-	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
-
-	for (i = 0; i < results.values_num; i++)
-	{
-		result = (zbx_expressions_evaluate_result_t *)results.values[i];
+		evaluate(&expr_result, expressions.values[i], evaluate_error, sizeof(evaluate_error),
+			&unknown_msgs);
 
 		zbx_json_addobject(json, NULL);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_EXPRESSION, result->expression, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_EXPRESSION, expressions.values[i], ZBX_JSON_TYPE_STRING);
 
-		if (0 != strlen(result->error))
+		if (0 != strlen(evaluate_error))
 		{
-			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->error, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, evaluate_error, ZBX_JSON_TYPE_STRING);
 		}
 		else
 		{
-			zbx_uint64_t res = (ZBX_INFINITY == result->value ||
-					SUCCEED == zbx_double_compare(result->value, 0.0)) ? 0 : 1;
+			zbx_uint64_t res = (ZBX_INFINITY == expr_result ||
+					SUCCEED == zbx_double_compare(expr_result, 0.0)) ? 0 : 1;
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_VALUE, res);
 
 		}
@@ -136,12 +103,8 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 	ret = SUCCEED;
 out:
-	zbx_free(evaluate_error);
-
 	zbx_vector_ptr_clear_ext(&expressions, (zbx_clean_func_t)zbx_ptr_free);
 	zbx_vector_ptr_destroy(&expressions);
-	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_destroy(&results);
 
 	return ret;
 }
