@@ -408,7 +408,7 @@ jQuery(function($) {
 				popup_button.on('click', function(event) {
 					var popup_options = ms.options.popup.parameters;
 
-					if (ms.options.popup.filter_preselect_fields != null) {
+					if (ms.options.popup.filter_preselect_fields) {
 						popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj));
 					}
 
