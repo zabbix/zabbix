@@ -19,9 +19,11 @@
 **/
 
 
-$back_url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
+/**
+ * @var CView $this
+ */
 
-$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style']);
+$table = getTriggersOverview($data['hosts'], $data['triggers'], $data['style']);
 
 $output = [
 	'header' => $data['name'],
@@ -37,4 +39,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

@@ -19,12 +19,12 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 // indicator of sort field
 $sort_div = (new CSpan())->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
-
-$backurl = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->getUrl();
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
@@ -105,7 +105,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 	$cell_clock = new CCol(new CLink($cell_clock, $url_details));
 
-	$is_acknowledged = $problem['acknowledged'] == EVENT_ACKNOWLEDGED;
+	$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	if ($show_recovery_data) {
 		if ($problem['r_eventid'] != 0) {
@@ -186,9 +186,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		(new CLinkAction($problem['name']))
 			->setHint(
 				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-					'triggerid' => $trigger['triggerid']], $eventid, $backurl, $show_timeline,
-					$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
-					$data['fields']['tag_priority']
+					'triggerid' => $trigger['triggerid']], $eventid, $show_timeline, $data['fields']['show_tags'],
+					$data['fields']['tags'], $data['fields']['tag_name_format'], $data['fields']['tag_priority']
 				)
 			)
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
@@ -242,12 +241,15 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		];
 	}
 
-	// Create acknowledge url.
-	$problem_update_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'acknowledge.edit')
-		->setArgument('eventids', [$problem['eventid']])
-		->setArgument('backurl', $backurl)
-		->getUrl();
+	// Create acknowledge link.
+	$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
+		->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+		->addClass(ZBX_STYLE_LINK_ALT)
+		->onClick('return PopUp("popup.acknowledge.edit",'.
+			json_encode([
+				'eventids' => [$problem['eventid']]
+			]).', null, this);'
+		);
 
 	$table->addRow(array_merge($row, [
 		$show_recovery_data ? $cell_r_clock : null,
@@ -258,9 +260,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata : null,
 		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
-		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
-			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-			->addClass(ZBX_STYLE_LINK_ALT),
+		$problem_update_link,
 		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
 			$data['data']['users'], $data['config']
 		),
@@ -291,4 +291,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

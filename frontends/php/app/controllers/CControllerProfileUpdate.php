@@ -34,18 +34,21 @@ class CControllerProfileUpdate extends CController {
 			switch ($this->getInput('idx')) {
 				case 'web.actionconf.filter.active':
 				case 'web.auditacts.filter.active':
-				case 'web.auditlogs.filter.active':
+				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
-				case 'web.graphs.filter.active':
 				case 'web.correlation.filter.active':
+				case 'web.dashbrd.filter.active':
+				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
+				case 'web.graphs.filter.active':
 				case 'web.groups.filter.active':
 				case 'web.hostinventories.filter.active':
+				case 'web.hosts.filter.active':
+				case 'web.hostsmon.filter.active':
 				case 'web.httpconf.filter.active':
 				case 'web.httpdetails.filter.active':
-				case 'web.hosts.filter.active':
-				case 'web.items.filter.active':
 				case 'web.item.graph.filter.active':
+				case 'web.items.filter.active':
 				case 'web.latest.filter.active':
 				case 'web.layout.mode':
 				case 'web.maintenance.filter.active':
@@ -54,31 +57,29 @@ class CControllerProfileUpdate extends CController {
 				case 'web.overview.filter.active':
 				case 'web.problem.filter.active':
 				case 'web.proxies.filter.active':
-				case 'web.scripts.filter.active':
-				case 'web.templates.filter.active':
-				case 'web.toptriggers.filter.active':
-				case 'web.triggers.filter.active':
-				case 'web.screens.filter.active':
 				case 'web.screenconf.filter.active':
-				case 'web.slides.filter.active':
-				case 'web.slideconf.filter.active':
-				case 'web.sysmapconf.filter.active':
-				case 'web.user.filter.active':
-				case 'web.usergroup.filter.active':
-				case 'web.dashbrd.filter.active':
+				case 'web.screens.filter.active':
+				case 'web.scripts.filter.active':
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
+				case 'web.slideconf.filter.active':
+				case 'web.slides.filter.active':
+				case 'web.sysmapconf.filter.active':
+				case 'web.templates.filter.active':
+				case 'web.toptriggers.filter.active':
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state':
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
-				case 'web.discovery.filter.active':
+				case 'web.triggers.filter.active':
+				case 'web.user.filter.active':
+				case 'web.usergroup.filter.active':
 					$ret = true;
 					break;
 
+				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
+				case 'web.dashbrd.navtree.item.selected':
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
-				case 'web.dashbrd.navtree.item.selected':
-				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 					$ret = $this->hasInput('idx2');
 					break;
 
@@ -124,7 +125,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case 'web.layout.mode':
-				CView::setLayoutMode($value_int);
+				CViewHelper::saveLayoutMode($value_int);
 				break;
 
 			default:

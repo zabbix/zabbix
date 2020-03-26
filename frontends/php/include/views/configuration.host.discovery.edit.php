@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
 	->addItem(get_header_host_table('discoveries', $data['hostid'],
@@ -98,7 +102,7 @@ elseif (!$data['limited']) {
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
-$query_fields->items = [CJs::encodeJson($query_fields_data)];
+$query_fields->items = [json_encode($query_fields_data)];
 
 $form_list
 	->addRow(
@@ -190,7 +194,7 @@ elseif (!$data['limited']) {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [CJs::encodeJson($headers_data)];
+$headers->items = [json_encode($headers_data)];
 
 $form_list
 	->addRow(
@@ -415,61 +419,9 @@ $form_list
 			->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
 			->setAriaRequired(),
 		'row_snmp_oid'
-	)
-	->addRow(_('Context name'),
-		(new CTextBox('snmpv3_contextname', $data['snmpv3_contextname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_contextname'
-	)
-	->addRow(
-		(new CLabel(_('SNMP community'), 'snmp_community'))->setAsteriskMark(),
-		(new CTextBox('snmp_community', $data['snmp_community'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		'row_snmp_community'
-	)
-	->addRow(_('Security name'),
-		(new CTextBox('snmpv3_securityname', $data['snmpv3_securityname'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_securityname'
 	);
 
-// Append SNMPv3 security level to form list.
 $form_list
-	->addRow(_('Security level'),
-		new CComboBox('snmpv3_securitylevel', $data['snmpv3_securitylevel'], null, [
-			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-		]),
-		'row_snmpv3_securitylevel'
-	)
-	->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol')),
-		(new CRadioButtonList('snmpv3_authprotocol', (int) $data['snmpv3_authprotocol']))
-			->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
-			->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
-			->setModern(true),
-		'row_snmpv3_authprotocol'
-	)
-	->addRow(_('Authentication passphrase'),
-		(new CTextBox('snmpv3_authpassphrase', $data['snmpv3_authpassphrase'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_authpassphrase'
-	)
-	->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol')),
-		(new CRadioButtonList('snmpv3_privprotocol', (int) $data['snmpv3_privprotocol']))
-			->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
-			->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
-			->setModern(true),
-		'row_snmpv3_privprotocol'
-	)
-	->addRow(_('Privacy passphrase'),
-		(new CTextBox('snmpv3_privpassphrase', $data['snmpv3_privpassphrase'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_privpassphrase'
-	)
-	->addRow(_('Port'),
-		(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_port'
-	)
 	->addRow(_('IPMI sensor'),
 		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $data['limited'], 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
@@ -798,12 +750,14 @@ if (!empty($data['itemid'])) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Check now')))
+		$buttons[] = (new CSubmit('check_now', _('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
 			);
 	}
+
+	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 
 	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid'])))
 		->setEnabled(!$data['limited']);
@@ -814,7 +768,7 @@ if (!empty($data['itemid'])) {
 else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('hostid'))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('hostid'))]
 	));
 }
 
@@ -823,4 +777,4 @@ $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';
 
-return $widget;
+$widget->show();

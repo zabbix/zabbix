@@ -20,7 +20,7 @@
 #ifndef ZABBIX_DISK_H
 #define ZABBIX_DISK_H
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 #	error "This module is only available for Windows OS"
 #endif
 

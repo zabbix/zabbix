@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $filterForm = new CFilter(new CUrl('toptriggers.php'));
 
 $severities = [];
@@ -62,13 +66,7 @@ $filter_column = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Severity'),
-		(new CCheckBoxList('severities'))
-			->setOptions($severities)
-			->setChecked($data['filter']['severities'])
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass(ZBX_STYLE_COLUMNS_3)
-	);
+	->addRow(_('Severity'), (new CSeverityCheckBoxList('severities'))->setChecked($data['filter']['severities']));
 
 $filterForm
 	->setProfile($data['filter']['timeline']['profileIdx'])
@@ -88,7 +86,7 @@ foreach ($data['triggers'] as $trigger) {
 	}
 
 	$triggerDescription = (new CLinkAction($trigger['description']))
-		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], 0, [], false));
+		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], 0));
 
 	$table->addRow([
 		$hostName,
@@ -109,7 +107,8 @@ $obj_data = [
 zbx_add_post_js('timeControl.addObject("toptriggers", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');');
 zbx_add_post_js('timeControl.processObjects();');
 
-return (new CWidget())
+(new CWidget())
 	->setTitle(_('100 busiest triggers'))
 	->addItem($filterForm)
-	->addItem($table);
+	->addItem($table)
+	->show();

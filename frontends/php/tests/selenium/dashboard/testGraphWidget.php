@@ -49,7 +49,7 @@ class testGraphWidget extends CWebTest {
 	public function setDefaultWidgetType() {
 		DBexecute('DELETE FROM profiles WHERE idx=\'web.dashbrd.last_widget_type\' AND userid=\'1\'');
 		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, type)'.
-				' VALUES (999,1,\'web.dashbrd.last_widget_type\',\'svggraph\',3)');
+				' VALUES (99999,1,\'web.dashbrd.last_widget_type\',\'svggraph\',3)');
 	}
 
 	/**
@@ -1901,7 +1901,6 @@ class testGraphWidget extends CWebTest {
 			switch ($tab) {
 				case 'Problems':
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
-
 					if (array_key_exists('tags', $data['Problems'])) {
 						$this->setFilterSelector('id:tags_table_tags');
 						$this->setTags($data['Problems']['tags']);

@@ -158,7 +158,7 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'fullscreen':
-			switch (CView::getLayoutMode()) {
+			switch ($params['mode']) {
 				case ZBX_LAYOUT_KIOSKMODE:
 					$icon = (new CButton(null, '&nbsp;'))
 						->setTitle(_('Normal view'))
@@ -1002,24 +1002,6 @@ function makeWarningIcon($error) {
 }
 
 /**
- * Renders a debug button
- *
- * @return CButton
- */
-function makeDebugButton() {
-	return (new CDiv(
-		(new CLink(_('Debug'), '#debug'))
-			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
-				"this.state = (this.state == 'none' ? 'block' : 'none');".
-				"jQuery(this)".
-					".text(this.state == 'none' ? ".CJs::encodeJson(_('Debug'))." : ".CJs::encodeJson(_('Hide debug')).")".
-					".blur();".
-				"showHideByName('zbx_debug_info', this.state);"
-			)
-	))->addClass(ZBX_STYLE_BTN_DEBUG);
-}
-
-/**
  * Returns css for trigger severity backgrounds.
  *
  * @param array $config
@@ -1046,7 +1028,7 @@ function getTriggerSeverityCss($config) {
 
 	foreach ($severities as $class => $color) {
 		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before, .flh-'.$class.
-			', .status-'.$class.' { background-color: #'.$color.' }'."\n";
+			', .status-'.$class.', .status-'.$class.':before { background-color: #'.$color.' }'."\n";
 	}
 
 	return $css;

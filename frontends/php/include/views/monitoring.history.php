@@ -19,7 +19,11 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
+/**
+ * @var CView $this
+ */
+
+$web_layout_mode = CViewHelper::loadLayoutMode();
 
 $historyWidget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
@@ -30,14 +34,19 @@ $header = [
 		->addVar('itemids', getRequest('itemids'))
 ];
 $header_row = [];
-$first_item = reset($data['items']);
-$host_name = $first_item['hosts'][0]['name'];
+
 $same_host = true;
 $items_numeric = true;
+$host_name = '';
 
-foreach ($data['items'] as $item) {
-	$same_host = ($same_host && $host_name === $item['hosts'][0]['name']);
-	$items_numeric = ($items_numeric && array_key_exists($item['value_type'], $data['iv_numeric']));
+if ($data['items']) {
+	$first_item = reset($data['items']);
+	$host_name = $first_item['hosts'][0]['name'];
+
+	foreach ($data['items'] as $item) {
+		$same_host = ($same_host && $host_name === $item['hosts'][0]['name']);
+		$items_numeric = ($items_numeric && array_key_exists($item['value_type'], $data['iv_numeric']));
+	}
 }
 
 if ((count($data['items']) == 1 || $same_host) && $data['itemids']) {
@@ -79,7 +88,7 @@ $action_list = (new CList())
 	->addItem([
 		new CLabel(_('View as')),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CComboBox('action', $data['action'], 'submit()', $actions))->setEnabled((bool) $data['items']),
+		(new CComboBox('action', $data['action'], 'submit()', $actions))->setEnabled((bool) $data['items'])
 	]);
 
 if ($data['action'] !== HISTORY_GRAPH && $data['action'] !== HISTORY_BATCH_GRAPH) {
@@ -94,7 +103,7 @@ if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	]));
 }
 
-$action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_icon('fullscreen')]);
+$action_list->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
 
 $header['right']->addItem($action_list);
 
@@ -271,4 +280,4 @@ else {
 	}
 }
 
-return $historyWidget;
+$historyWidget->show();

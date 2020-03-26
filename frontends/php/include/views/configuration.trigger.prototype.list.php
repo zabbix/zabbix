@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $widget = (new CWidget())
 	->setTitle(_('Trigger prototypes'))
 	->setControls(
@@ -173,4 +177,4 @@ $triggersForm->addItem([
 // append form to widget
 $widget->addItem($triggersForm);
 
-return $widget;
+$widget->show();

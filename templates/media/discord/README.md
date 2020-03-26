@@ -13,14 +13,14 @@ This guide describes how to integrate your Zabbix 4.4 installation with Discord 
 
 
 3\. Setup your Discord webhook and press **Save**.
-<br>You can copy Discord webhook URL now or do it later with **Edit** button.
+<br>You can copy Discord webhook URL now or view it later by clicking on **Edit** button.
 
 [![](images/thumb.3.png?raw=true)](images/3.png)
 
 
 ## Setting up Zabbix Webhook
 1\. Before setting up Discord Webhook, you need to setup the global macro "{$ZABBIX.URL}", which must contain the URL to the Zabbix frontend.
-<br>The URL should be either an IP address, a fully qualified domain name or localhost. Protocol is is mandatory, port is optional. 
+<br>The URL should be either an IP address, a fully qualified domain name or localhost. Specifying a protocol is mandatory, whereas port is optional.
 Good examples:<br>
 http://zabbix.com<br>
 https://zabbix.lan/<br>
@@ -35,11 +35,12 @@ http://zabbix/<br>
 
 2\. In the "Administration > Media types" section, import the [media_discord.xml](media_discord.xml)
 
-3\. You can also choose between two notification format. Open added **Discord** media and set _"use_default_message"_ parameter:
+3\. If you want to change values of default parameters, open the newly added **Discord** media type.<br>
+You can also choose between two notification modes by modifying _"use_default_message"_ parameter value:
 - **false** (default)
-	- use preformatted Embed Object with predefined set of fields
+    - receive problem notifications with predefined set of fields (problem, host name, event severity, event type, etc.)
 - **true**
-	- use default message from Zabbix Action
+    - receive default message defined in the Zabbix Action that triggered notification
 
 [![](images/thumb.5.png?raw=true)](images/5.png)
 
@@ -49,7 +50,7 @@ The "Send to" field must contain Discord webhook URL created before.
 
 [![](images/thumb.6.png?raw=true)](images/6.png)
 
-5\. Got Alerts! You are awesome!
+5\. Start getting alerts! You have made it!
 
 [![](images/thumb.7.png?raw=true)](images/7.png)
 

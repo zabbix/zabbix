@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 $inline_js = '';
 
 $form = (new CForm())
@@ -386,7 +390,7 @@ switch ($data['type']) {
 					(new CButton('btn1', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->onClick('return PopUp("popup.generic",'.
-							CJs::encodeJson([
+							json_encode([
 								'srctbl' => 'dchecks',
 								'srcfld1' => 'dcheckid',
 								'srcfld2' => 'name',
@@ -674,4 +678,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

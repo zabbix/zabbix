@@ -80,31 +80,25 @@ class CConfigurationExport {
 		];
 
 		$this->dataFields = [
-			'item' => ['hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
-				'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
-				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
-				'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
+			'item' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
+				'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link', 'flags',
 				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps'
 			],
-			'drule' => ['itemid', 'hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
-				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
-				'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'filter', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
-				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
+			'drule' => ['itemid', 'hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
+				'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link',
+				'flags', 'filter', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields',
+				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps'
 			],
-			'item_prototype' => ['hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
-				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
-				'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
+			'item_prototype' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
+				'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link', 'flags',
 				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
@@ -325,7 +319,7 @@ class CConfigurationExport {
 				'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
 				'tls_psk', 'inventory_mode'
 			],
-			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'bulk'],
+			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectInventory' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => ['groupid', 'name'],
@@ -1120,6 +1114,13 @@ class CConfigurationExport {
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);
+
+		foreach ($this->data['mediaTypes'] as &$media_type) {
+			if ($media_type['type'] == MEDIA_TYPE_WEBHOOK) {
+				CArrayHelper::sort($media_type['parameters'], ['name']);
+			}
+		}
+		unset($media_type);
 	}
 
 	/**

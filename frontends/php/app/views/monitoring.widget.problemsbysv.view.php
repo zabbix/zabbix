@@ -19,9 +19,9 @@
 **/
 
 
-$data['backurl'] = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->getUrl();
+/**
+ * @var CView $this
+ */
 
 if ($data['filter']['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
 	$table = makeSeverityTotals($data)
@@ -82,4 +82,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo (new CJson())->encode($output);
+echo json_encode($output);

@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
+
 require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Maintenance periods'));
@@ -270,4 +274,4 @@ $maintenanceForm->addItem($maintenanceTab);
 
 $widget->addItem($maintenanceForm);
 
-return $widget;
+$widget->show();

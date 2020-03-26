@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/regexp.inc.php';
+
 class CControllerRegExTest extends CController {
 
 	protected function checkInput() {
@@ -49,23 +51,18 @@ class CControllerRegExTest extends CController {
 			'final' => true
 		];
 
-		$validator = new CRegexValidator([
-			'messageInvalid' => _('Regular expression must be a string'),
-			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
-		]);
-
-		foreach ($data['expressions'] as $id => $expression) {
-			if (!in_array($expression['expression_type'], [EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE])
-					|| $validator->validate($expression['expression'])) {
-				$match = CGlobalRegexp::matchExpression($expression, $data['testString']);
-				$result['expressions'][$id] = $match;
+		if (array_key_exists('expressions', $data)) {
+			foreach ($data['expressions'] as $id => $expression) {
+				try {
+					validateRegexp([$expression]);
+					$result['expressions'][$id] = CGlobalRegexp::matchExpression($expression, $data['testString']);
+					$result['final'] = $result['final'] && $result['expressions'][$id];
+				}
+				catch (Exception $e) {
+					$result['errors'][$id] = $e->getMessage();
+					$result['final'] = false;
+				}
 			}
-			else {
-				$match = false;
-				$result['errors'][$id] = $validator->getError();
-			}
-
-			$result['final'] = ($result['final'] && $match);
 		}
 
 		$response->success($result);

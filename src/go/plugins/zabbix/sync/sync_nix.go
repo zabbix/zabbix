@@ -27,9 +27,6 @@ func getMetrics() []string {
 		"net.dns.record", "Performs DNS query.",
 		"proc.mem", "Memory used by process in bytes.",
 		"proc.num", "The number of processes.",
-		"web.page.get", "Get content of web page.",
-		"web.page.perf", "Loading time of full web page (in seconds).",
-		"web.page.regexp", "Find string on a web page.",
 		"system.hw.chassis", "Chassis information.",
 		"system.hw.devices", "Listing of PCI or USB devices.",
 		"system.sw.packages", "Listing of installed packages.",
@@ -43,6 +40,7 @@ func getMetrics() []string {
 		"vfs.dir.size", "Directory size (in bytes).",
 		"vfs.fs.inode", "Number or percentage of inodes.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
+		"vfs.fs.get", "List of mounted filesystems with statistics.",
 		"vm.memory.size", "Memory size in bytes or in percentage from total.",
 	}
 }

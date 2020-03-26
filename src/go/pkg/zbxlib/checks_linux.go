@@ -34,9 +34,6 @@ int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -57,11 +54,10 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 */
 import "C"
@@ -84,12 +80,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.PROC_NUM)
 	case "system.boottime":
 		cfunc = unsafe.Pointer(C.SYSTEM_BOOTTIME)
-	case "web.page.get":
-		cfunc = unsafe.Pointer(C.WEB_PAGE_GET)
-	case "web.page.perf":
-		cfunc = unsafe.Pointer(C.WEB_PAGE_PERF)
-	case "web.page.regexp":
-		cfunc = unsafe.Pointer(C.WEB_PAGE_REGEXP)
 	case "net.tcp.listen":
 		cfunc = unsafe.Pointer(C.NET_TCP_LISTEN)
 	case "net.tcp.service", "net.udp.service":
@@ -130,16 +120,14 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
 	case "vfs.dir.size":
 		cfunc = unsafe.Pointer(C.VFS_DIR_SIZE)
-	case "vfs.file.md5sum":
-		cfunc = unsafe.Pointer(C.VFS_FILE_MD5SUM)
-	case "vfs.file.regmatch":
-		cfunc = unsafe.Pointer(C.VFS_FILE_REGMATCH)
 	case "vfs.fs.discovery":
 		cfunc = unsafe.Pointer(C.VFS_FS_DISCOVERY)
 	case "vfs.fs.inode":
 		cfunc = unsafe.Pointer(C.VFS_FS_INODE)
 	case "vfs.fs.size":
 		cfunc = unsafe.Pointer(C.VFS_FS_SIZE)
+	case "vfs.fs.get":
+		cfunc = unsafe.Pointer(C.VFS_FS_GET)
 	case "vm.memory.size":
 		cfunc = unsafe.Pointer(C.VM_MEMORY_SIZE)
 	}

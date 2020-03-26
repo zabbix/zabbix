@@ -226,4 +226,22 @@ class PostgresqlDbBackend extends DbBackend {
 
 		return true;
 	}
+
+	/**
+	 * Check if tables have compressed data.
+	 *
+	 * @static
+	 *
+	 * @param array $tables  Tables list.
+	 *
+	 * @return bool
+	 */
+	public static function isCompressed(array $tables) :bool {
+		$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
+			' FROM timescaledb_information.compressed_hypertable_stats'.
+			' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
+		));
+
+		return (bool) $result['chunks'];
+	}
 }

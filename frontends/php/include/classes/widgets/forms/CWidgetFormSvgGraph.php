@@ -311,13 +311,14 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		// Checkbox: Selected items only.
 		$field_show_problems = (new CWidgetFieldCheckBox('show_problems', _('Show problems')))
 			->setAction(
-				'var on = jQuery(this).is(":checked");'.
+				'var on = jQuery(this).is(":checked"),'.
+					'widget = jQuery(this).closest(".ui-widget");'.
 				'jQuery("#graph_item_problems, #problem_name, #problemhosts_select")'.
 					'.prop("disabled", !on);'.
 				'jQuery("#problemhosts_").multiSelect(on ? "enable" : "disable");'.
-				'jQuery("[name=\"severities[]\"]").prop("disabled", !on);'.
-				'jQuery("[name=\"evaltype\"]").prop("disabled", !on);'.
-				'jQuery("input, button", jQuery("#tags_table_tags")).prop("disabled", !on);'
+				'jQuery("[name^=\"severities[\"]", widget).prop("disabled", !on);'.
+				'jQuery("[name=\"evaltype\"]", widget).prop("disabled", !on);'.
+				'jQuery("input, button", jQuery("#tags_table_tags", widget)).prop("disabled", !on);'
 			);
 
 		if (array_key_exists('show_problems', $this->data)) {
@@ -353,8 +354,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_problemhosts->getName()] = $field_problemhosts;
 
 		// Severity checkboxes list.
-		$field_severities = (new CWidgetFieldSeverities('severities', _('Severity')))
-			->setOrientation(CWidgetFieldSeverities::ORIENTATION_HORIZONTAL);
+		$field_severities = new CWidgetFieldSeverities('severities', _('Severity'));
 
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
 			$field_severities->setFlags(CWidgetField::FLAG_DISABLED);
@@ -378,7 +378,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		$this->fields[$field_problem_name->getName()] = $field_problem_name;
 
-		// Problem tag evalype (And/Or).
+		// Problem tag evaltype (And/Or).
 		$field_evaltype = (new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
 			TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 			TAG_EVAL_TYPE_OR => _('Or')
@@ -443,12 +443,12 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		if ($period < ZBX_MIN_PERIOD) {
 			$errors[] = _n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
+				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
 			);
 		}
 		elseif ($period > ZBX_MAX_PERIOD) {
 			$errors[] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
+				'Maximum time period to display is %1$s days.', (int) (ZBX_MAX_PERIOD / SEC_PER_DAY)
 			);
 		}
 

@@ -201,6 +201,7 @@ zbx_key_access_rule_type_t;
 
 void	init_metrics(void);
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
+int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	free_metrics(void);
 
 void	init_key_access_rules(void);

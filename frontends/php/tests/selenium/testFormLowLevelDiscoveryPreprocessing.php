@@ -85,6 +85,7 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 						'Key' => 'item.spaces.preprocessing'
 					],
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => '   test text  ', 'parameter_2' => '   replacement 1  '],
 						['type' => 'Regular expression', 'parameter_1' => '       expression       ', 'parameter_2' => '   \1     '],
 						['type' => 'JSONPath', 'parameter_1' => '    $.data.test      '],
 						['type' => 'JavaScript', 'parameter_1' => "  Test line 1\n   Test line   2\n   Test line 3   "],
@@ -101,6 +102,7 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 						'Key' => 'lld-all-preprocessing-steps'
 					],
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => 'test', 'parameter_2' => 'replacement'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => '\1'],
 						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test'],
@@ -119,6 +121,8 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 						'Key' => 'lld-double-preprocessing-steps'
 					],
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => '123', 'parameter_2' => '345'],
+						['type' => 'Replace', 'parameter_1' => '123', 'parameter_2' => '345'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression1', 'parameter_2' => '\1'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression2', 'parameter_2' => '\2'],
 						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],

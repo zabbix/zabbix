@@ -115,7 +115,8 @@ static void	jsonpath_token_print(char **data, size_t *data_alloc, size_t *data_o
 
 static char	*segment_data_to_str(const zbx_jsonpath_segment_t *segment)
 {
-	const char			*functions[] = {"unknown", "min()", "max()", "avg()", "length()", "first()"};
+	const char			*functions[] = {"unknown", "min()", "max()", "avg()", "length()", "first()",
+							"sum()", "~"};
 	char				*data = NULL;
 	size_t				data_alloc = 0, data_offset = 0;
 	int				i;

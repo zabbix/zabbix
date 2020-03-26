@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"time"
 
+	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxcmd"
@@ -66,7 +67,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Invalid first parameter.")
 	}
 
-	if p.options.LogRemoteCommands == 1 {
+	if p.options.LogRemoteCommands == 1 && ctx.ClientID() != agent.LocalChecksClientID {
 		p.Warningf("Executing command:'%s'", params[0])
 	} else {
 		p.Debugf("Executing command:'%s'", params[0])

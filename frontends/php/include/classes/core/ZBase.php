@@ -393,12 +393,6 @@ class ZBase {
 				}
 			}
 
-			// reset the LC_CTYPE locale so that case transformation functions would work correctly
-			// it is also required for PHP to work with the Turkish locale (https://bugs.php.net/bug.php?id=18556)
-			// WARNING: this must be done before executing any other code, otherwise code execution could fail!
-			// this will be unnecessary in PHP 5.5
-			setlocale(LC_CTYPE, $defaultLocales);
-
 			if (!$locale_found && $user_data['lang'] != 'en_GB' && $user_data['lang'] != 'en_gb') {
 				error('Locale for language "'.$user_data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
@@ -442,13 +436,13 @@ class ZBase {
 
 		try {
 			if (!class_exists($action_class, true)) {
-				throw new Exception(_s('Class %s not found for action %s.', $action_class, $action_name));
+				throw new Exception(_s('Class %1$s not found for action %2$s.', $action_class, $action_name));
 			}
 
 			$action = new $action_class();
 
 			if (!is_subclass_of($action, CAction::class)) {
-				throw new Exception(_s('Action class %s must extend %s class.', $action_class, CAction::class));
+				throw new Exception(_s('Action class %1$s must extend %2$s class.', $action_class, CAction::class));
 			}
 
 			$action->setAction($action_name);
@@ -463,7 +457,8 @@ class ZBase {
 
 			foreach (array_reverse($modules) as $module) {
 				if (is_subclass_of($module, CModule::class)) {
-					array_unshift(CView::$viewsDir, $module->getDir().'/views');
+					CView::registerDirectory($module->getDir().'/views');
+					CPartial::registerDirectory($module->getDir().'/partials');
 				}
 			}
 
@@ -536,7 +531,7 @@ class ZBase {
 		// Action has layout?
 		if ($router->getLayout() !== null) {
 			if (!($response instanceof CControllerResponseData)) {
-				throw new Exception(_s('Unexpected response for action %s.', $router->getAction()));
+				throw new Exception(_s('Unexpected response for action %1$s.', $router->getAction()));
 			}
 
 			$layout_data_defaults = [
@@ -549,10 +544,9 @@ class ZBase {
 				],
 				'main_block' => '',
 				'javascript' => [
-					'files' => [],
-					'pre' => '',
-					'post' => ''
-				]
+					'files' => []
+				],
+				'web_layout_mode' => ZBX_LAYOUT_NORMAL
 			];
 
 			if ($router->getView() !== null && $response->isViewEnabled()) {
@@ -561,10 +555,9 @@ class ZBase {
 				$layout_data = array_replace($layout_data_defaults, [
 					'main_block' => $view->getOutput(),
 					'javascript' => [
-						'files' => $view->getAddedJS(),
-						'pre' => $view->getIncludedJS(),
-						'post' => $view->getPostJS()
-					]
+						'files' => $view->getJsFiles()
+					],
+					'web_layout_mode' => $view->getLayoutMode()
 				]);
 			}
 			else {
@@ -582,10 +575,10 @@ class ZBase {
 	 */
 	private function setLayoutModeByUrl() {
 		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
-			CView::setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
+			CViewHelper::saveLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 		}
 		elseif (array_key_exists('fullscreen', $_GET)) {
-			CView::setLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
+			CViewHelper::saveLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
 		}
 
 		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
@@ -626,7 +619,7 @@ class ZBase {
 		}
 
 		if ($modules_missing) {
-			error(_n('Cannot load module at: %s.', 'Cannot load modules at: %s.', implode(', ', $modules_missing),
+			error(_n('Cannot load module at: %1$s.', 'Cannot load modules at: %1$s.', implode(', ', $modules_missing),
 				count($modules_missing)
 			));
 		}

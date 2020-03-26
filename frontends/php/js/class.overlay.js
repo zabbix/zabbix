@@ -47,29 +47,31 @@ function Overlay(type, dialogueid) {
 	});
 
 	var $close_btn = jQuery('<button>', {
-		class: 'overlay-close-btn',
-		title: t('S_CLOSE')
-	})
-	.click(function(e) {
-		overlayDialogueDestroy(this.dialogueid);
-		e.preventDefault();
-	}.bind(this));
+			class: 'overlay-close-btn',
+			title: t('S_CLOSE')
+		})
+		.click(function(e) {
+			overlayDialogueDestroy(this.dialogueid);
+			e.preventDefault();
+		}.bind(this));
 
 	this.$dialogue.append($close_btn);
 
 	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
-	this.$dialogue.$script = jQuery('<script>');
-	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output', name: 'zbx_debug_info'});
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
 	this.$dialogue.$body = jQuery('<div>', {class: 'overlay-dialogue-body'});
+	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output'});
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
+	this.$dialogue.$script = jQuery('<script>');
 
 	this.$dialogue.append(jQuery('<div>', {class: 'dashbrd-widget-head'}).append(this.$dialogue.$header));
 	this.$dialogue.append(this.$dialogue.$body);
 	this.$dialogue.append(this.$dialogue.$footer);
 
+	this.center_dialog_function = this.centerDialog.bind(this);
+
 	var body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver;
-	this.body_mutation_observer = new body_mutation_observer(this.centerDialog.bind(this));
+	this.body_mutation_observer = new body_mutation_observer(this.center_dialog_function);
 
 	jQuery(window).resize(function() {
 		this.$dialogue.is(':visible') && this.centerDialog();
@@ -95,12 +97,30 @@ Overlay.prototype.centerDialog = function() {
 	// A fix for IE and Edge to stop popup width flickering when having vertical scrollbar.
 	this.$dialogue.$body.css('overflow-y', body_scroll_height > body_height ? 'scroll' : 'hidden');
 
+	// Allow full width to determine actual width taken by the contents.
 	this.$dialogue.css({
-		'left': Math.round((jQuery(window).width() - this.$dialogue.outerWidth()) / 2) + 'px',
+		'left': 0,
+		'top': 0
+	});
+
+	this.$dialogue.css({
+		'left': Math.max(0, parseInt((jQuery(window).width() - this.$dialogue.outerWidth(true)) / 2)) + 'px',
 		'top': this.$dialogue.hasClass('sticked-to-top')
 			? ''
-			: Math.round((jQuery(window).height() - this.$dialogue.outerHeight()) / 2) + 'px'
+			: Math.max(0, parseInt((jQuery(window).height() - this.$dialogue.outerHeight(true)) / 2)) + 'px'
 	});
+
+	var size = {
+			width: this.$dialogue.$body[0].scrollWidth,
+			height: this.$dialogue.$body[0].scrollHeight
+		},
+		size_saved = this.$dialogue.data('size') || size;
+
+	if (JSON.stringify(size) !== JSON.stringify(size_saved)) {
+		this.$dialogue.trigger('overlay-dialogue-resize', [size, size_saved]);
+	}
+
+	this.$dialogue.data('size', size);
 };
 
 /**
@@ -216,6 +236,8 @@ Overlay.prototype.load = function(action, options) {
 Overlay.prototype.unmount = function() {
 	this.cancel_action && this.cancel_action();
 
+	jQuery.unsubscribe('debug.click', this.center_dialog_function);
+
 	this.$backdrop.remove();
 	this.$dialogue.remove();
 
@@ -241,6 +263,8 @@ Overlay.prototype.mount = function() {
 
 	this.body_mutation_observer.observe(this.$dialogue[0], {childList: true, subtree: true});
 	this.centerDialog();
+
+	jQuery.subscribe('debug.click', this.center_dialog_function);
 };
 
 /**
@@ -250,9 +274,9 @@ Overlay.prototype.mount = function() {
  */
 Overlay.prototype.makeButton = function(obj) {
 	var $button = jQuery('<button>', {
-		type: 'button',
-		text: obj.title
-	});
+			type: 'button',
+			text: obj.title
+		});
 
 	$button.on('click', function(e) {
 		if (obj.isSubmit && this.$btn_submit) {
@@ -332,6 +356,9 @@ Overlay.prototype.unsetProperty = function(key) {
 
 		case 'content':
 			this.$dialogue.$body.html('');
+			if (this.$dialogue.$debug.html().length) {
+				this.$dialogue.$body.append(this.$dialogue.$debug);
+			}
 			break;
 
 		case 'controls':
@@ -376,6 +403,9 @@ Overlay.prototype.setProperties = function(obj) {
 
 			case 'content':
 				this.$dialogue.$body.html(obj[key]);
+				if (this.$dialogue.$debug.html().length) {
+					this.$dialogue.$body.append(this.$dialogue.$debug);
+				}
 				break;
 
 			case 'controls':
@@ -385,7 +415,7 @@ Overlay.prototype.setProperties = function(obj) {
 
 			case 'debug':
 				this.$dialogue.$debug.html(jQuery(obj[key]).html());
-				this.$dialogue.$footer.after(this.$dialogue.$debug);
+				this.$dialogue.$body.append(this.$dialogue.$debug);
 				break;
 
 			case 'script_inline':
