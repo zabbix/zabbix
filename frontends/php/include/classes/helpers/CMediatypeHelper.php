@@ -79,12 +79,12 @@ class CMediatypeHelper {
 					'html' =>
 						'<b>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem</b> at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br>'.
 						'{EVENT.UPDATE.MESSAGE}<br><br><b>Current problem status:</b> {EVENT.STATUS}<br>'.
-						'<b>Acknowledged:</b> {EVENT.ACK.STATUS}.',
+						'<b>Age:</b> {EVENT.AGE}<br><b>Acknowledged:</b> {EVENT.ACK.STATUS}.',
 					'sms' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}',
 					'text' =>
 						"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
 						"{EVENT.UPDATE.MESSAGE}\n\n".
-						"Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}."
+						"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
 				]
 			],
 			self::MSG_TYPE_DISCOVERY => [
