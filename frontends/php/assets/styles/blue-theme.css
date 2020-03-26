@@ -515,28 +515,36 @@ footer {
   content: '';
   width: 24px;
   height: 24px;
-  background: url(../img/icon-sprite.svg) no-repeat; }
+  background: url(../img/icon-sprite.svg) no-repeat;
+  opacity: 0.75; }
 
 .icon-dashboard::before {
-  background-position: -540px -664px; }
+  background-position: -540px -664px;
+  transition: opacity 0.3s; }
 
 .icon-problems::before {
-  background-position: -540px -688px; }
+  background-position: -540px -688px;
+  transition: opacity 0.3s; }
 
 .icon-monitoring::before {
-  background-position: -540px -712px; }
+  background-position: -540px -712px;
+  transition: opacity 0.3s; }
 
 .icon-inventory::before {
-  background-position: -540px -736px; }
+  background-position: -540px -736px;
+  transition: opacity 0.3s; }
 
 .icon-reports::before {
-  background-position: -540px -760px; }
+  background-position: -540px -760px;
+  transition: opacity 0.3s; }
 
 .icon-configuration::before {
-  background-position: -540px -784px; }
+  background-position: -540px -784px;
+  transition: opacity 0.3s; }
 
 .icon-administration::before {
-  background-position: -540px -808px; }
+  background-position: -540px -808px;
+  transition: opacity 0.3s; }
 
 .menu-main > li {
   line-height: 16px; }
@@ -561,7 +569,8 @@ footer {
       border-left-color: #ffffff;
       color: #ffffff; }
       .menu-main > li > a:hover::before, .menu-main > li > a:focus::before {
-        background-position-x: -570px; }
+        background-position-x: -570px;
+        opacity: 1; }
   .menu-main > li.has-submenu > a::after {
     content: '';
     position: absolute;
@@ -569,14 +578,18 @@ footer {
     right: 14px;
     width: 6px;
     height: 4px;
-    background: url(../img/icon-sprite.svg) no-repeat -549px -434px;
+    background: url(../img/icon-sprite.svg) no-repeat -606px -434px;
     transform: rotate(0deg);
+    opacity: 0.75;
     transition: transform 0.3s, opacity 0.3s; }
   .menu-main > li.has-submenu > a:hover::after, .menu-main > li.has-submenu > a:focus::after {
-    background-position: -606px -434px; }
+    background-position: -606px -434px;
+    opacity: 1; }
   .menu-main > li.has-submenu.is-expanded > a::after {
     background-position: -606px -434px;
     transform: rotate(-180deg); }
+  .menu-main > li.has-submenu.is-expanded > a::before, .menu-main > li.has-submenu.is-expanded > a::after {
+    opacity: 1; }
 .menu-main a {
   position: relative;
   display: block;

@@ -157,6 +157,10 @@ class CSidebar extends CBaseComponent {
 	 * @returns {CSidebar}
 	 */
 	setViewMode(view_mode) {
+		if (view_mode === SIDEBAR_VIEW_MODE_FULL) {
+			this._is_opened = false;
+			this.removeClass('is-opened');
+		}
 		this.toggleClass('is-compact', view_mode === SIDEBAR_VIEW_MODE_COMPACT);
 		this.toggleClass('is-hidden', view_mode === SIDEBAR_VIEW_MODE_HIDDEN);
 
@@ -307,7 +311,7 @@ class CSidebar extends CBaseComponent {
 					this.off('mouseenter', this._events.cancelExpandSelected);
 				}
 
-				if (view_mode === SIDEBAR_VIEW_MODE_FULL && this._is_opened) {
+				if (view_mode === SIDEBAR_VIEW_MODE_FULL) {
 					document.removeEventListener('keyup', this._events.escape);
 					document.removeEventListener('click', this._events.click);
 				}
