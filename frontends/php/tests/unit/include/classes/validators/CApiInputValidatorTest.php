@@ -816,7 +816,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_FLOAT],
 				'.23E11',
 				'/1/float',
-				0.23E11,
+				0.23E+11,
 			],
 			[
 				['type' => API_FLOATS],
