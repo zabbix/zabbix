@@ -159,7 +159,6 @@ class CScreenProblem extends CScreenBase {
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
 	 * @param int    $filter['age']                   (optional) usable together with 'age_state' and only for
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
-	 * @param int    $filter['severity']              (optional)
 	 * @param array  $filter['severities']            (optional)
 	 * @param int    $filter['unacknowledged']        (optional)
 	 * @param array  $filter['tags']                  (optional)
@@ -277,13 +276,6 @@ class CScreenProblem extends CScreenBase {
 						&& $filter['age_state'] == 1) {
 					$options['time_from'] = time() - $filter['age'] * SEC_PER_DAY + 1;
 				}
-			}
-			if (array_key_exists('severity', $filter) && $filter['severity']) {
-				$options['severities'] = $filter['severity'];
-			}
-			else {
-				$filter['severity'] = null;
-				$options['severities'] = range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
 			}
 			if (array_key_exists('severities', $filter)) {
 				$filter_severities = implode(',', $filter['severities']);
@@ -827,16 +819,10 @@ class CScreenProblem extends CScreenBase {
 			: $this->data['filter']['show_opdata'];
 
 		if ($this->data['action'] === 'problem.view') {
-			$backurl = clone $url;
-			$backurl = $backurl
-				->setArgument('page', $this->page)
-				->setArgument('uncheck', '1')
-				->getUrl();
-
 			$form = (new CForm('post', 'zabbix.php'))
+				->setId('problem_form')
 				->setName('problem')
-				->cleanItems()
-				->addVar('backurl', $backurl);
+				->cleanItems();
 
 			$header_check_box = (new CColHeader(
 				(new CCheckBox('all_eventids'))
@@ -959,11 +945,6 @@ class CScreenProblem extends CScreenBase {
 				$dependencies = getTriggerDependencies($data['triggers']);
 			}
 
-			// Create link to Problem update page.
-			$problem_update_url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'acknowledge.edit')
-				->setArgument('backurl', $backurl);
-
 			// Add problems to table.
 			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
@@ -1013,12 +994,11 @@ class CScreenProblem extends CScreenBase {
 					$value_clock = $in_closing ? time() : $problem['clock'];
 				}
 
+				$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 				$cell_status = new CSpan($value_str);
 
 				// Add colors and blinking to span depending on configuration and trigger parameters.
-				addTriggerValueStyle($cell_status, $value, $value_clock,
-					$problem['acknowledged'] == EVENT_ACKNOWLEDGED
-				);
+				addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 
 				// Info.
 				$info_icons = [];
@@ -1131,11 +1111,14 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				// Create acknowledge link.
-				$problem_update_url->setArgument('eventids', [$problem['eventid']]);
-				$acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
-				$problem_update_link = (new CLink($acknowledged ? _('Yes') : _('No'), $problem_update_url->getUrl()))
-					->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-					->addClass(ZBX_STYLE_LINK_ALT);
+				$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
+					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->onClick('return PopUp("popup.acknowledge.edit",'.
+						json_encode([
+							'eventids' => [$problem['eventid']]
+						]).', null, this);'
+					);
 
 				// Add table row.
 				$table->addRow(array_merge($row, [
@@ -1166,7 +1149,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$footer = new CActionButtonList('action', 'eventids', [
-				'acknowledge.edit' => ['name' => _('Mass update')]
+				'popup.acknowledge.edit' => ['name' => _('Mass update')]
 			], 'problem');
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);

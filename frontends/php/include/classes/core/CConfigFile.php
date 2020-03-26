@@ -112,6 +112,30 @@ class CConfigFile {
 			$this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
 		}
 
+		if (isset($DB['ENCRYPTION'])) {
+			$this->config['DB']['ENCRYPTION'] = $DB['ENCRYPTION'];
+		}
+
+		if (isset($DB['VERIFY_HOST'])) {
+			$this->config['DB']['VERIFY_HOST'] = $DB['VERIFY_HOST'];
+		}
+
+		if (isset($DB['KEY_FILE'])) {
+			$this->config['DB']['KEY_FILE'] = $DB['KEY_FILE'];
+		}
+
+		if (isset($DB['CERT_FILE'])) {
+			$this->config['DB']['CERT_FILE'] = $DB['CERT_FILE'];
+		}
+
+		if (isset($DB['CA_FILE'])) {
+			$this->config['DB']['CA_FILE'] = $DB['CA_FILE'];
+		}
+
+		if (isset($DB['CIPHER_LIST'])) {
+			$this->config['DB']['CIPHER_LIST'] = $DB['CIPHER_LIST'];
+		}
+
 		if (isset($ZBX_SERVER)) {
 			$this->config['ZBX_SERVER'] = $ZBX_SERVER;
 		}
@@ -179,6 +203,14 @@ $DB[\'PASSWORD\'] = \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 // Schema name. Used for PostgreSQL.
 $DB[\'SCHEMA\'] = \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
 
+// Used for TLS connection.
+$DB[\'ENCRYPTION\']  = '.($this->config['DB']['ENCRYPTION'] ? 'true' : 'false').';
+$DB[\'KEY_FILE\']    = \''.addcslashes($this->config['DB']['KEY_FILE'], "'\\").'\';
+$DB[\'CERT_FILE\']   = \''.addcslashes($this->config['DB']['CERT_FILE'], "'\\").'\';
+$DB[\'CA_FILE\']     = \''.addcslashes($this->config['DB']['CA_FILE'], "'\\").'\';
+$DB[\'VERIFY_HOST\']  = '.($this->config['DB']['VERIFY_HOST'] ? 'true' : 'false').';
+$DB[\'CIPHER_LIST\'] = \''.addcslashes($this->config['DB']['CIPHER_LIST'], "'\\").'\';
+
 $ZBX_SERVER      = \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';
 $ZBX_SERVER_PORT = \''.addcslashes($this->config['ZBX_SERVER_PORT'], "'\\").'\';
 $ZBX_SERVER_NAME = \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
@@ -195,7 +227,13 @@ $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
 			'DATABASE' => null,
 			'USER' => '',
 			'PASSWORD' => '',
-			'SCHEMA' => ''
+			'SCHEMA' => '',
+			'ENCRYPTION' => false,
+			'KEY_FILE' => '',
+			'CERT_FILE' => '',
+			'CA_FILE' => '',
+			'VERIFY_HOST' => true,
+			'CIPHER_LIST' => ''
 		];
 		$this->config['ZBX_SERVER'] = 'localhost';
 		$this->config['ZBX_SERVER_PORT'] = '10051';

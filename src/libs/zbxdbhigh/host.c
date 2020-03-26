@@ -5199,6 +5199,133 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBadd_interface_snmp                                             *
+ *                                                                            *
+ * Purpose: add new or update interface options to specified interface        *
+ *                                                                            *
+ * Parameters: interfaceid    - [IN] interface id from database               *
+ *             version        - [IN] snmp version                             *
+ *             bulk           - [IN] snmp bulk options                        *
+ *             community      - [IN] snmp community name                      *
+ *             securityname   - [IN] snmp v3 security name                    *
+ *             securitylevel  - [IN] snmp v3 security level                   *
+ *             authpassphrase - [IN] snmp v3 authentication passphrase        *
+ *             privpassphrase - [IN] snmp v3 private passphrase               *
+ *             authprotocol   - [IN] snmp v3 authentication protocol          *
+ *             privprotocol   - [IN] snmp v3 private protocol                 *
+ *             contextname    - [IN] snmp v3 context name                     *
+ *                                                                            *
+ ******************************************************************************/
+void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version, const unsigned char bulk,
+		const char *community, const char *securityname, const unsigned char securitylevel,
+		const char *authpassphrase, const char *privpassphrase, const unsigned char authprotocol,
+		const unsigned char privprotocol, const char *contextname)
+{
+	char		*community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc, *contextname_esc;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect(
+			"select version,bulk,community,securityname,securitylevel,authpassphrase,privpassphrase,"
+			"authprotocol,privprotocol,contextname"
+			" from interface_snmp"
+			" where interfaceid=" ZBX_FS_UI64,
+			interfaceid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		unsigned char	db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
+
+		ZBX_STR2UCHAR(db_version, row[0]);
+
+		if (version != db_version)
+			break;
+
+		ZBX_STR2UCHAR(db_bulk, row[1]);
+
+		if (bulk != db_bulk)
+			break;
+
+		if (0 != strcmp(community, row[2]))
+			break;
+
+		if (0 != strcmp(securityname, row[3]))
+			break;
+
+		ZBX_STR2UCHAR(db_securitylevel, row[4]);
+
+		if (securitylevel != db_securitylevel)
+			break;
+
+		if (0 != strcmp(authpassphrase, row[5]))
+			break;
+
+		if (0 != strcmp(privpassphrase, row[6]))
+			break;
+
+		ZBX_STR2UCHAR(db_authprotocol, row[7]);
+
+		if (authprotocol != db_authprotocol)
+			break;
+
+		ZBX_STR2UCHAR(db_privprotocol, row[8]);
+
+		if (privprotocol != db_privprotocol)
+			break;
+
+		if (0 != strcmp(contextname, row[9]))
+			break;
+
+		goto out;
+	}
+
+	community_esc = DBdyn_escape_field("interface_snmp", "community", community);
+	securityname_esc = DBdyn_escape_field("interface_snmp", "securityname", securityname);
+	authpassphrase_esc = DBdyn_escape_field("interface_snmp", "authpassphrase", authpassphrase);
+	privpassphrase_esc = DBdyn_escape_field("interface_snmp", "privpassphrase", privpassphrase);
+	contextname_esc = DBdyn_escape_field("interface_snmp", "contextname", contextname);
+
+	if (NULL == row)
+	{
+		DBexecute("insert into interface_snmp"
+				" (interfaceid,version,bulk,community,securityname,securitylevel,authpassphrase,"
+				" privpassphrase,authprotocol,privprotocol,contextname)"
+			" values"
+				" (" ZBX_FS_UI64 ",%d,%d,'%s','%s',%d,'%s','%s',%d,%d,'%s')",
+			interfaceid, (int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
+			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc);
+	}
+	else
+	{
+		DBexecute(
+			"update interface_snmp"
+			" set version=%d"
+				",bulk=%d"
+				",community='%s'"
+				",securityname='%s'"
+				",securitylevel=%d"
+				",authpassphrase='%s'"
+				",privpassphrase='%s'"
+				",authprotocol=%d"
+				",privprotocol=%d"
+				",contextname='%s'"
+			" where interfaceid=" ZBX_FS_UI64,
+			(int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
+			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
+			interfaceid);
+	}
+
+	zbx_free(community_esc);
+	zbx_free(securityname_esc);
+	zbx_free(authpassphrase_esc);
+	zbx_free(privpassphrase_esc);
+	zbx_free(contextname_esc);
+out:
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBdelete_groups_validate                                         *
  *                                                                            *
  * Purpose: removes the groupids from the list which cannot be deleted        *

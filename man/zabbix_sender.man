@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SENDER 1 "2020\-02\-11" Zabbix
+.TH ZABBIX_SENDER 1 "2020\-02\-29" Zabbix
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility
@@ -128,6 +128,10 @@ zabbix_sender \- Zabbix sender utility
 .I cert\-file
 .B \-\-tls\-key\-file
 .I key\-file
+.RB [ \-\-tls\-cipher13
+.IR cipher\-string ]
+.RB [ \-\-tls\-cipher
+.IR cipher\-string ]
 .B \-k
 .I key
 .B \-o
@@ -157,6 +161,10 @@ zabbix_sender \- Zabbix sender utility
 .I cert\-file
 .B \-\-tls\-key\-file
 .I key\-file
+.RB [ \-\-tls\-cipher13
+.IR cipher\-string ]
+.RB [ \-\-tls\-cipher
+.IR cipher\-string ]
 .RB [ \-T ]
 .RB [ \-N ]
 .RB [ \-r ]
@@ -189,6 +197,10 @@ zabbix_sender \- Zabbix sender utility
 .I cert\-file
 .B \-\-tls\-key\-file
 .I key\-file
+.RB [ \-\-tls\-cipher13
+.IR cipher\-string ]
+.RB [ \-\-tls\-cipher
+.IR cipher\-string ]
 .B \-k
 .I key
 .B \-o
@@ -220,6 +232,10 @@ zabbix_sender \- Zabbix sender utility
 .I cert\-file
 .B \-\-tls\-key\-file
 .I key\-file
+.RB [ \-\-tls\-cipher13
+.IR cipher\-string ]
+.RB [ \-\-tls\-cipher
+.IR cipher\-string ]
 .RB [ \-T ]
 .RB [ \-N ]
 .RB [ \-r ]
@@ -242,6 +258,10 @@ zabbix_sender \- Zabbix sender utility
 .I PSK\-identity
 .B \-\-tls\-psk\-file
 .I PSK\-file
+.RB [ \-\-tls\-cipher13
+.IR cipher\-string ]
+.RB [ \-\-tls\-cipher
+.IR cipher\-string ]
 .B \-k
 .I key
 .B \-o
@@ -263,6 +283,10 @@ zabbix_sender \- Zabbix sender utility
 .I PSK\-identity
 .B \-\-tls\-psk\-file
 .I PSK\-file
+.RB [ \-\-tls\-cipher13
+.IR cipher\-string ]
+.RB [ \-\-tls\-cipher
+.IR cipher\-string ]
 .RB [ \-T ]
 .RB [ \-N ]
 .RB [ \-r ]
@@ -287,6 +311,10 @@ zabbix_sender \- Zabbix sender utility
 .I PSK\-identity
 .B \-\-tls\-psk\-file
 .I PSK\-file
+.RB [ \-\-tls\-cipher13
+.IR cipher\-string ]
+.RB [ \-\-tls\-cipher
+.IR cipher\-string ]
 .B \-k
 .I key
 .B \-o
@@ -310,6 +338,10 @@ zabbix_sender \- Zabbix sender utility
 .I PSK\-identity
 .B \-\-tls\-psk\-file
 .I PSK\-file
+.RB [ \-\-tls\-cipher13
+.IR cipher\-string ]
+.RB [ \-\-tls\-cipher
+.IR cipher\-string ]
 .RB [ \-T ]
 .RB [ \-N ]
 .RB [ \-r ]
@@ -456,6 +488,10 @@ Full pathname of a file containing the private key.
 PSK\-identity string.
 .IP "\fB\-\-tls\-psk\-file\fR \fIPSK\-file\fR"
 Full pathname of a file containing the pre-shared key.
+.IP "\fB\-\-tls\-cipher13\fR \fIcipher\-string\fR"
+Cipher string for OpenSSL 1.1.1 or newer for TLS 1.3. Override the default ciphersuite selection criteria. This option is not available if OpenSSL version is less than 1.1.1.
+.IP "\fB\-\-tls\-cipher\fR \fIcipher\-string\fR"
+GnuTLS priority string (for TLS 1.2 and up) or OpenSSL cipher string (only for TLS 1.2). Override the default ciphersuite selection criteria.
 .IP "\fB\-v\fR, \fB\-\-verbose\fR"
 Verbose mode, \fB\-vv\fR for more details.
 .IP "\fB\-h\fR, \fB\-\-help\fR"

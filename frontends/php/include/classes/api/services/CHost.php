@@ -29,36 +29,63 @@ class CHost extends CHostGeneral {
 	/**
 	 * Get host data.
 	 *
-	 * @param array			$options
-	 * @param array			$options['groupids']					HostGroup IDs
-	 * @param array			$options['hostids']						Host IDs
-	 * @param bool			$options['monitored_hosts']				only monitored Hosts
-	 * @param bool			$options['templated_hosts']				include templates in result
-	 * @param bool			$options['with_items']					only with items
-	 * @param bool			$options['with_item_prototypes']		only with item prototypes
-	 * @param bool			$options['with_simple_graph_items']		only with items suitable for graphs
-	 * @param bool			$options['with_simple_graph_item_prototypes']	only with item prototypes suitable for graphs
-	 * @param bool			$options['with_monitored_items']		only with monitored items
-	 * @param bool			$options['with_triggers']				only with triggers
-	 * @param bool			$options['with_monitored_triggers']		only with monitored triggers
-	 * @param bool			$options['with_httptests']				only with http tests
-	 * @param bool			$options['with_monitored_httptests']	only with monitored http tests
-	 * @param bool			$options['with_graphs']					only with graphs
-	 * @param bool			$options['with_graph_prototypes']		only with graph prototypes
-	 * @param bool			$options['editable']					only with read-write permission. Ignored for SuperAdmins
-	 * @param bool			$options['selectGroups']				select HostGroups
-	 * @param bool			$options['selectItems']					select Items
-	 * @param bool			$options['selectTriggers']				select Triggers
-	 * @param bool			$options['selectGraphs']				select Graphs
-	 * @param bool			$options['selectApplications']			select Applications
-	 * @param bool			$options['selectMacros']				select Macros
-	 * @param bool|array	$options['selectInventory']				select Inventory
-	 * @param int			$options['count']						count Hosts, returned column name is rowscount
-	 * @param string		$options['pattern']						search hosts by pattern in Host name
-	 * @param string		$options['extendPattern']				search hosts by pattern in Host name, ip and DNS
-	 * @param int			$options['limit']						limit selection
-	 * @param string		$options['sortfield']					field to sort by
-	 * @param string		$options['sortorder']					sort order
+	 * @param array         $options
+	 * @param array         $options['groupids']                           Select hosts by group IDs.
+	 * @param array         $options['hostids']                            Select hosts by host IDs.
+	 * @param array         $options['templateids']                        Select hosts by template IDs.
+	 * @param array         $options['interfaceids']                       Select hosts by interface IDs.
+	 * @param array         $options['itemids']                            Select hosts by item IDs.
+	 * @param array         $options['triggerids']                         Select hosts by trigger IDs.
+	 * @param array         $options['maintenanceids']                     Select hosts by maintenance IDs.
+	 * @param array         $options['graphids']                           Select hosts by graph IDs.
+	 * @param array         $options['applicationids']                     Select hosts by application IDs.
+	 * @param array         $options['dserviceids']                        Select hosts by discovery service IDs.
+	 * @param array         $options['httptestids']                        Select hosts by web scenario IDs.
+	 * @param bool          $options['monitored_hosts']                    Return only monitored hosts.
+	 * @param bool          $options['templated_hosts']                    Include templates in result.
+	 * @param bool          $options['proxy_hosts']                        Include proxies in result.
+	 * @param bool          $options['with_items']                         Select hosts only with items.
+	 * @param bool          $options['with_item_prototypes']               Select hosts only with item prototypes.
+	 * @param bool          $options['with_simple_graph_items']            Select hosts only with items suitable for graphs.
+	 * @param bool          $options['with_simple_graph_item_prototypes']  Select hosts only with item prototypes suitable for graphs.
+	 * @param bool          $options['with_monitored_items']               Select hosts only with monitored items.
+	 * @param bool          $options['with_triggers']                      Select hosts only with triggers.
+	 * @param bool          $options['with_monitored_triggers']            Select hosts only with monitored triggers.
+	 * @param bool          $options['with_httptests']                     Select hosts only with http tests.
+	 * @param bool          $options['with_monitored_httptests']           Select hosts only with monitored http tests.
+	 * @param bool          $options['with_graphs']                        Select hosts only with graphs.
+	 * @param bool          $options['with_graph_prototypes']              Select hosts only with graph prototypes.
+	 * @param bool          $options['with_applications']                  Select hosts with applications.
+	 * @param bool          $options['withProblemsSuppressed']             Select hosts that have suppressed problems. (null - all, true - only suppressed, false - unsuppressed)
+	 * @param bool          $options['editable']                           Select hosts only with read-write permission. Ignored for Super admins.
+	 * @param bool          $options['nopermissions']                      Select hosts by ignoring all permissions. Only available inside API calls.
+	 * @param bool          $options['evaltype']                           Operator for tag filter 0 - AND/OR; 2 - OR.
+	 * @param bool          $options['tags']                               Select hosts by given tags.
+	 * @param bool          $options['severities']                         Select hosts that have only problems with given severities.
+	 * @param bool          $options['inheritedTags']                      Select hosts that have given tags also in their linked templates.
+	 * @param string|array  $options['selectGroups']                       Return a "groups" property with host groups data that the host belongs to.
+	 * @param string|array  $options['selectParentTemplates']              Return a "parentTemplates" property with templates that the host is linked to.
+	 * @param string|array  $options['selectItems']                        Return an "items" property with host items.
+	 * @param string|array  $options['selectDiscoveries']                  Return a "discoveries" property with host low-level discovery rules.
+	 * @param string|array  $options['selectTriggers']                     Return a "triggers" property with host triggers.
+	 * @param string|array  $options['selectGraphs']                       Return a "graphs" property with host graphs.
+	 * @param string|array  $options['selectApplications']                 Return an "applications" property with host applications.
+	 * @param string|array  $options['selectMacros']                       Return a "macros" property with host macros.
+	 * @param string|array  $options['selectScreens']                      Return a "screens" property with host screens.
+	 * @param string|array  $options['selectInterfaces']                   Return an "interfaces" property with host interfaces.
+	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
+	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
+	 * @param string|array  $options['selectDiscoveryRule']                Return a "discoveryRule" property with the low-level discovery rule that created the host (from host prototype in VMware monitoring).
+	 * @param string|array  $options['selectHostDiscovery']                Return a "hostDiscovery" property with host discovery object data.
+	 * @param string|array  $options['selectTags']                         Return a "tags" property with host tags.
+	 * @param string|array  $options['selectInheritedTags']                Return an "inheritedTags" property with tags that are on templates which are linked to host.
+	 * @param bool          $options['countOutput']                        Return host count as output.
+	 * @param bool          $options['groupCount']                         Group the host count.
+	 * @param bool          $options['preservekeys']                       Return host IDs as array keys.
+	 * @param string        $options['sortfield']                          Field to sort by.
+	 * @param string        $options['sortorder']                          Sort order.
+	 * @param int           $options['limit']                              Limit selection.
+	 * @param int           $options['limitSelects']                       Limits the number of records returned by subselects.
 	 *
 	 * @return array|boolean Host data as array or false if error
 	 */
@@ -102,11 +129,14 @@ class CHost extends CHostGeneral {
 			'with_graphs'						=> null,
 			'with_graph_prototypes'				=> null,
 			'with_applications'					=> null,
+			'withProblemsSuppressed'			=> null,
 			'editable'							=> false,
 			'nopermissions'						=> null,
 			// filter
 			'evaltype'							=> TAG_EVAL_TYPE_AND_OR,
 			'tags'								=> null,
+			'severities'						=> null,
+			'inheritedTags'						=> false,
 			'filter'							=> null,
 			'search'							=> null,
 			'searchInventory'					=> null,
@@ -131,6 +161,7 @@ class CHost extends CHostGeneral {
 			'selectDiscoveryRule'				=> null,
 			'selectHostDiscovery'				=> null,
 			'selectTags'						=> null,
+			'selectInheritedTags'				=> null,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
 			'preservekeys'						=> false,
@@ -140,6 +171,8 @@ class CHost extends CHostGeneral {
 			'limitSelects'						=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+
+		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -415,13 +448,6 @@ class CHost extends CHostGeneral {
 			$sqlParts['where'][] = 'a.hostid=h.hostid';
 		}
 
-		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-				'host_tag', 'hostid'
-			);
-		}
-
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('hosts h', $options, $sqlParts);
@@ -459,17 +485,98 @@ class CHost extends CHostGeneral {
 			}
 		}
 
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			if ($options['inheritedTags']) {
+				$tags = [];
+
+				$db_template_tags = DBfetchArray(DBselect(
+					'SELECT h.hostid,ht.tag,ht.value'.
+					' FROM hosts h,host_tag ht'.
+					' WHERE '.CApiTagHelper::addWhereCondition($options['tags'], TAG_EVAL_TYPE_OR, 'h','host_tag',
+							'hostid').
+						' AND ht.hostid=h.hostid'.
+						' AND h.status='.HOST_STATUS_TEMPLATE
+				));
+
+				foreach ($options['tags'] as $tag) {
+					$templateids = [];
+					foreach ($db_template_tags as $template_tag) {
+						if (CApiTagHelper::checkTag($tag, $template_tag)) {
+							$templateids[$template_tag['hostid']] = true;
+						}
+					}
+
+					if (!array_key_exists($tag['tag'], $tags)) {
+						$tags[$tag['tag']] = [
+							'templateids' => [],
+							'pairs' => []
+						];
+					}
+
+					$tags[$tag['tag']]['pairs'][] = [
+						'value' => $tag['value'],
+						'operator' => $tag['operator']
+					];
+
+					while ($templateids) {
+						$tags[$tag['tag']]['templateids'] += $templateids;
+
+						$templateids = API::Template()->get([
+							'output' => [],
+							'parentTemplateids' => array_keys($templateids),
+							'preservekeys' => true,
+							'nopermissions' => true
+						]);
+					}
+				}
+
+				$where = [];
+				foreach ($tags as $tag => $_tag) {
+					$_tags = [];
+					foreach ($_tag['pairs'] as $pair) {
+						$_tags[] = [
+							'tag' => $tag,
+							'value' => $pair['value'],
+							'operator' => $pair['operator']
+						];
+					}
+
+					$where[] = '('.
+						CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid').
+						' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids'])).
+					')';
+				}
+
+				$sqlParts['left_join']['hosts_templates'] = [
+					'from' => 'hosts_templates ht2',
+					'on' => 'h.hostid=ht2.hostid'
+				];
+				$sqlParts['left_table'] = $this->tableName();
+
+				$operator = ($options['evaltype'] == TAG_EVAL_TYPE_AND_OR) ? ' AND ' : ' OR ';
+				$sqlParts['where'][] = '('.implode($operator, $where).')';
+			}
+			else {
+				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
+					'host_tag', 'hostid'
+				);
+			}
+		}
+
 		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
+		if (!zbx_ctype_digit($options['limit']) || !$options['limit']) {
+			$options['limit'] = null;
 		}
 
 		$sqlParts = $this->applyQueryFilterOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($host = DBfetch($res)) {
-			if ($options['countOutput']) {
+
+		// Return count or grouped counts via direct SQL count.
+		if ($options['countOutput'] && !$this->requiresPostSqlFiltering($options)) {
+			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $options['limit']);
+			while ($host = DBfetch($res)) {
 				if ($options['groupCount']) {
 					$result[] = $host;
 				}
@@ -477,13 +584,15 @@ class CHost extends CHostGeneral {
 					$result = $host['rowscount'];
 				}
 			}
-			else {
-				$result[$host['hostid']] = $host;
-			}
+
+			return $result;
 		}
 
+		$result = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'hostid');
+
+		// Return count for post SQL filtered result sets.
 		if ($options['countOutput']) {
-			return $result;
+			return (string) count($result);
 		}
 
 		if ($result) {
@@ -560,7 +669,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['port']         Interface port (optional).
 	 * @param int    $hosts[]['interfaces']['useip']        Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']          Interface should use DNS (optional).
-	 * @param int    $hosts[]['interfaces']['bulk']         Use bulk requests for interface (optional).
+	 * @param int    $hosts[]['interfaces']['details']      Interface additional fields (optional).
 	 * @param int    $hosts[]['proxy_hostid']               ID of the proxy that is used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']              IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']             IPMI privilege (optional).
@@ -682,7 +791,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['port']               Interface port (optional).
 	 * @param int    $hosts[]['interfaces']['useip']              Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']                Interface should use DNS (optional).
-	 * @param int    $hosts[]['interfaces']['bulk']               Use bulk requests for interface (optional).
+	 * @param int    $hosts[]['interfaces']['details']            Interface additional fields (optional).
 	 * @param int    $hosts[]['proxy_hostid']                     ID of the proxy that is used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']                    IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']                   IPMI privilege (optional).
@@ -836,7 +945,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts['fields']['useip']			Use IP. OPTIONAL
 	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
 	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
-	 * @param int    $hosts['fields']['bulk']			bulk. OPTIONAL
+	 * @param int    $hosts['fields']['details']		Details. OPTIONAL
 	 * @param int    $hosts['fields']['proxy_hostid']	Proxy Host ID. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
@@ -933,7 +1042,7 @@ class CHost extends CHostGeneral {
 
 			if ($host_name_parser->parse($data['host']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect characters used for host name "%s".', $data['host'])
+					_s('Incorrect characters used for host name "%1$s".', $data['host'])
 				);
 			}
 
@@ -1500,7 +1609,9 @@ class CHost extends CHostGeneral {
 
 				$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
 
-				$interfaces = $this->unsetExtraFields($interfaces, ['hostid', 'interfaceid'], $options['selectInterfaces']);
+				$interfaces = $this->unsetExtraFields($interfaces, ['hostid', 'interfaceid'],
+					$options['selectInterfaces']
+				);
 				$result = $relationMap->mapMany($result, $interfaces, 'interfaces', $options['limitSelects']);
 			}
 			else {
@@ -1548,12 +1659,15 @@ class CHost extends CHostGeneral {
 					'countOutput' => true,
 					'groupCount' => true
 				]);
-				$screens = zbx_toHash($screens, 'hostid');
 
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['screens'] = array_key_exists($hostid, $screens)
-						? $screens[$hostid]['rowscount']
-						: '0';
+					$result[$hostid]['screens'] = 0;
+
+					foreach ($screens as $screen) {
+						if (bccomp($screen['hostid'], $hostid) == 0) {
+							$result[$hostid]['screens'] += $screen['rowscount'];
+						}
+					}
 				}
 			}
 		}
@@ -1592,7 +1706,65 @@ class CHost extends CHostGeneral {
 			$result = $relationMap->mapOne($result, $hostDiscoveries, 'hostDiscovery');
 		}
 
+		if ($options['selectInheritedTags'] !== null && $options['selectInheritedTags'] != API_OUTPUT_COUNT) {
+			$hosts_templates = [];
+			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
+
+			$templates = API::Template()->get([
+				'output' => [],
+				'selectTags' => ['tag', 'value'],
+				'templateids' => $templateids,
+				'preservekeys' => true,
+				'nopermissions' => true
+			]);
+
+			// Set "inheritedTags" for each host.
+			foreach ($result as &$host) {
+				$tags = [];
+
+				// Get IDs and template tag values from previously stored variables.
+				foreach ($hosts_templates[$host['hostid']] as $templateid) {
+					foreach ($templates[$templateid]['tags'] as $tag) {
+						foreach ($tags as $_tag) {
+							// Skip tags with same name and value.
+							if ($_tag['tag'] === $tag['tag'] && $_tag['value'] === $tag['value']) {
+								continue 2;
+							}
+						}
+						$tags[] = $tag;
+					}
+				}
+
+				$host['inheritedTags'] = $this->unsetExtraFields($tags, ['tag', 'value'],
+					$options['selectInheritedTags']
+				);
+			}
+		}
+
 		return $result;
+	}
+
+	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options) {
+		// Validate input parameters.
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'inheritedTags' => ['type' => API_BOOLEAN, 'default' => false],
+			'selectInheritedTags' => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+			'severities' =>	[
+				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true
+			],
+			'withProblemsSuppressed' =>  ['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL]
+		]];
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -1757,7 +1929,7 @@ class CHost extends CHostGeneral {
 			// Validate "host" field.
 			if ($host_name_parser->parse($host['host']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect characters used for host name "%s".', $host['host'])
+					_s('Incorrect characters used for host name "%1$s".', $host['host'])
 				);
 			}
 
@@ -1786,14 +1958,14 @@ class CHost extends CHostGeneral {
 		$duplicate = CArrayHelper::findDuplicate($hosts, 'host');
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate host. Host with the same host name "%s" already exists in data.', $duplicate['host'])
+				_s('Duplicate host. Host with the same host name "%1$s" already exists in data.', $duplicate['host'])
 			);
 		}
 
 		$duplicate = CArrayHelper::findDuplicate($hosts, 'name');
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate host. Host with the same visible name "%s" already exists in data.', $duplicate['name'])
+				_s('Duplicate host. Host with the same visible name "%1$s" already exists in data.', $duplicate['name'])
 			);
 		}
 
@@ -1835,7 +2007,7 @@ class CHost extends CHostGeneral {
 
 		foreach ($hosts as $host) {
 			if (!array_key_exists('interfaces', $host) || !is_array($host['interfaces']) || !$host['interfaces']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
 			}
 
 			if (array_key_exists('status', $host)) {
@@ -1856,7 +2028,7 @@ class CHost extends CHostGeneral {
 				$fields = array_keys($host['inventory']);
 				foreach ($fields as $field) {
 					if (!in_array($field, $inventory_fields)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect inventory field "%s".', $field));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect inventory field "%1$s".', $field));
 					}
 				}
 			}
@@ -1881,13 +2053,13 @@ class CHost extends CHostGeneral {
 		foreach ($hosts_exists as $host_exists) {
 			if (array_key_exists($host_exists['host'], $host_names['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host with the same name "%s" already exists.', $host_exists['host'])
+					_s('Host with the same name "%1$s" already exists.', $host_exists['host'])
 				);
 			}
 
 			if (array_key_exists($host_exists['name'], $host_names['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host with the same visible name "%s" already exists.', $host_exists['name'])
+					_s('Host with the same visible name "%1$s" already exists.', $host_exists['name'])
 				);
 			}
 		}
@@ -1902,13 +2074,13 @@ class CHost extends CHostGeneral {
 		foreach ($templates_exists as $template_exists) {
 			if (array_key_exists($template_exists['host'], $host_names['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template with the same name "%s" already exists.', $template_exists['host'])
+					_s('Template with the same name "%1$s" already exists.', $template_exists['host'])
 				);
 			}
 
 			if (array_key_exists($template_exists['name'], $host_names['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template with the same visible name "%s" already exists.', $template_exists['name'])
+					_s('Template with the same visible name "%1$s" already exists.', $template_exists['name'])
 				);
 			}
 		}
@@ -2002,7 +2174,7 @@ class CHost extends CHostGeneral {
 				$fields = array_keys($host['inventory']);
 				foreach ($fields as $field) {
 					if (!in_array($field, $inventory_fields)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect inventory field "%s".', $field));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect inventory field "%1$s".', $field));
 					}
 				}
 			}
@@ -2013,20 +2185,20 @@ class CHost extends CHostGeneral {
 
 			if (array_key_exists('interfaces', $host)) {
 				if (!is_array($host['interfaces']) || !$host['interfaces']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
 				}
 			}
 
 			if (array_key_exists('host', $host)) {
 				if ($host_name_parser->parse($host['host']) != CParser::PARSE_SUCCESS) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect characters used for host name "%s".', $host['host'])
+						_s('Incorrect characters used for host name "%1$s".', $host['host'])
 					);
 				}
 
 				if (array_key_exists('host', $host_names) && array_key_exists($host['host'], $host_names['host'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Duplicate host. Host with the same host name "%s" already exists in data.', $host['host'])
+						_s('Duplicate host. Host with the same host name "%1$s" already exists in data.', $host['host'])
 					);
 				}
 
@@ -2046,7 +2218,7 @@ class CHost extends CHostGeneral {
 
 				if (array_key_exists('name', $host_names) && array_key_exists($host['name'], $host_names['name'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Duplicate host. Host with the same visible name "%s" already exists in data.', $host['name'])
+						'Duplicate host. Host with the same visible name "%1$s" already exists in data.', $host['name'])
 					);
 				}
 				$host_names['name'][$host['name']] = $host['hostid'];
@@ -2107,14 +2279,14 @@ class CHost extends CHostGeneral {
 				if (array_key_exists('host', $host_names) && array_key_exists($host_exists['host'], $host_names['host'])
 						&& bccomp($host_exists['hostid'], $host_names['host'][$host_exists['host']]) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Host with the same name "%s" already exists.', $host_exists['host'])
+						_s('Host with the same name "%1$s" already exists.', $host_exists['host'])
 					);
 				}
 
 				if (array_key_exists('name', $host_names) && array_key_exists($host_exists['name'], $host_names['name'])
 						&& bccomp($host_exists['hostid'], $host_names['name'][$host_exists['name']]) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Host with the same visible name "%s" already exists.', $host_exists['name'])
+						_s('Host with the same visible name "%1$s" already exists.', $host_exists['name'])
 					);
 				}
 			}
@@ -2132,7 +2304,7 @@ class CHost extends CHostGeneral {
 						&& array_key_exists($template_exists['host'], $host_names['host'])
 						&& bccomp($template_exists['templateid'], $host_names['host'][$template_exists['host']]) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Template with the same name "%s" already exists.', $template_exists['host'])
+						_s('Template with the same name "%1$s" already exists.', $template_exists['host'])
 					);
 				}
 
@@ -2140,13 +2312,75 @@ class CHost extends CHostGeneral {
 						&& array_key_exists($template_exists['name'], $host_names['name'])
 						&& bccomp($template_exists['templateid'], $host_names['name'][$template_exists['name']]) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Template with the same visible name "%s" already exists.', $template_exists['name'])
+						_s('Template with the same visible name "%1$s" already exists.', $template_exists['name'])
 					);
 				}
 			}
 		}
 
 		$this->validateEncryption($hosts, $db_hosts);
+
+		return $hosts;
+	}
+
+	protected function requiresPostSqlFiltering(array $options) {
+		return ($options['severities'] !== null || $options['withProblemsSuppressed'] !== null);
+	}
+
+	protected function applyPostSqlFiltering(array $hosts, array $options) {
+		$hosts = zbx_toHash($hosts, 'hostid');
+
+		if ($options['severities'] !== null || $options['withProblemsSuppressed'] !== null) {
+			$triggers = API::Trigger()->get([
+				'output' => [],
+				'selectHosts' => ['hostid'],
+				'hostids' => zbx_objectValues($hosts, 'hostid'),
+				'skipDependent' => true,
+				'status' => TRIGGER_STATUS_ENABLED,
+				'preservekeys' => true
+			]);
+
+			$problems = API::Problem()->get([
+				'output' => ['objectid'],
+				'objectids' => array_keys($triggers),
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => $options['withProblemsSuppressed'],
+				'severities' => $options['severities']
+			]);
+
+			if (!$problems) {
+				return [];
+			}
+
+			// Keys are the trigger ids, that have problems.
+			$problem_triggers = array_flip(array_column($problems, 'objectid'));
+
+			// Hostids, with triggerids on them.
+			$host_triggers = [];
+			foreach ($triggers as $triggerid => $trigger) {
+				foreach ($trigger['hosts'] as $trigger_host) {
+					$host_triggers[$trigger_host['hostid']][$triggerid] = true;
+				}
+			}
+
+			foreach ($hosts as $key => $host) {
+				$problems_found = false;
+
+				if (array_key_exists($host['hostid'], $host_triggers)) {
+					foreach (array_keys($host_triggers[$host['hostid']]) as $host_trigger) {
+						if (array_key_exists($host_trigger, $problem_triggers)) {
+							$problems_found = true;
+							break;
+						}
+					}
+				}
+
+				if (!$problems_found) {
+					unset($hosts[$key]);
+				}
+			}
+		}
 
 		return $hosts;
 	}

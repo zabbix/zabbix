@@ -44,6 +44,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => 'текст', 'parameter_2' => 'замена'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
@@ -76,6 +77,70 @@ class testFormItemPreprocessingTest extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$1}', 'parameter_2' => '{$A}'],
+						['type' => 'Right trim', 'parameter_1' => '{$DEFAULT_LINUX_IF}'],
+						['type' => 'XML XPath', 'parameter_1' => '{$SNMP_COMMUNITY}'],
+						['type' => 'JSONPath', 'parameter_1' => '{$WORKING_HOURS}'],
+						['type' => 'Custom multiplier', 'parameter_1' => '{$DEFAULT_DELAY}'],
+						['type' => 'JavaScript', 'parameter_1' => '{$LOCALIP}'],
+						['type' => 'Does not match regular expression', 'parameter_1' => '{$_}'],
+					],
+					'macros' => [
+						[
+							[
+								'macro' => '{$1}',
+								'value' => 'Numeric macro'
+							],
+							[
+								'macro' => '{$A}',
+								'value' => 'Some text'
+							]
+						],
+						[
+							[
+								'macro' => '{$DEFAULT_LINUX_IF}',
+								'value' => 'eth0'
+							]
+						],
+						[
+							[
+								'macro' => '{$SNMP_COMMUNITY}',
+								'value' => 'public'
+							]
+						],
+						[
+							[
+								'macro' => '{$WORKING_HOURS}',
+								'value' => '1-5,09:00-18:00'
+							]
+						],
+						[
+							[
+								'macro' => '{$DEFAULT_DELAY}',
+								'value' => '30'
+							]
+						],
+						[
+							[
+								'macro' => '{$LOCALIP}',
+								'value' => '127.0.0.1'
+							]
+						],
+						[
+							[
+								'macro' => '{$_}',
+								'value' => 'Underscore'
+							]
+						]
+					],
+					'action' => 'Test'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => 'test', 'parameter_2' => ''],
 						['type' => 'In range', 'parameter_1' => '1', 'parameter_2' => ''],
 						['type' => 'In range', 'parameter_1' => '', 'parameter_2' => '2'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu', 'parameter_2' => '']
@@ -122,6 +187,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => '', 'parameter_2' => 'test'],
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '1'],
 						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'label']
 					],
@@ -145,6 +211,59 @@ class testFormItemPreprocessingTest extends CWebTest {
 
 	public static function getTestAllStepsData() {
 		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macros' => [
+						[
+							'macro' => '{$1}',
+							'value' => 'Numeric macro'
+						],
+						[
+							'macro' => '{$A}',
+							'value' => 'Some text'
+						],
+						[
+							'macro' => '{$_}',
+							'value' => 'Underscore'
+						]
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					],
+					'action' => 'Cancel'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'Key' => 'macro.in.key.and.preproc.steps[{$DEFAULT_DELAY}]',
+					'macros' => [
+						[
+							'macro' => '{$1}',
+							'value' => 'Numeric macro'
+						],
+						[
+							'macro' => '{$A}',
+							'value' => 'Some text'
+						],
+						[
+							'macro' => '{$_}',
+							'value' => 'Underscore'
+						],
+						[
+							'macro' => '{$DEFAULT_DELAY}',
+							'value' => '30'
+						]
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					],
+					'action' => 'Close'
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -301,7 +420,8 @@ class testFormItemPreprocessingTest extends CWebTest {
 	private function openPreprocessing($data) {
 		$this->page->login()->open('items.php?form=create&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$form->fill(['Key' => 'test.key']);
+		$key = CTestArrayHelper::get($data, 'Key', false) ? $data['Key'] : 'test.key';
+		$form->fill(['Key' => $key]);
 		$form->selectTab('Preprocessing');
 	}
 
@@ -349,6 +469,36 @@ class testFormItemPreprocessingTest extends CWebTest {
 				$radio = $form->getField('End of line sequence');
 				$this->assertTrue($radio->isEnabled());
 
+				$macros = [
+					'expected' => ($id === null)
+							? CTestArrayHelper::get($data, 'macros')
+							: CTestArrayHelper::get($data, 'macros.'.$id),
+					'actual' => []
+				];
+
+				if ($macros['expected']) {
+					foreach ($form->getField('Macros')->getRows() as $row) {
+						$columns = $row->getColumns()->asArray();
+						/*
+						 * Macro columns are represented in following way:
+						 * (0)macro (1)=> (2)value
+						 */
+						$macros['actual'][] = [
+							'macro' => $columns[0]->getText(),
+							'value' => $columns[2]->getText()
+						];
+					}
+
+					foreach ($macros as &$array) {
+						usort($array, function ($a, $b) {
+							return strcmp($a['macro'], $b['macro']);
+						});
+					}
+					unset ($array);
+
+					$this->assertEquals($macros['expected'], $macros['actual']);
+				}
+
 				$table = $form->getField('Preprocessing steps')->asTable();
 
 				if ($id === null) {
@@ -365,7 +515,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 		}
 	}
 
-	private function chooseDialogActions($data){
+	private function chooseDialogActions($data) {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
 		switch ($data['action']) {

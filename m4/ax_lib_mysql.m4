@@ -46,6 +46,77 @@
 #   modification, are permitted in any medium without royalty provided
 #   the copyright notice and this notice are preserved.
 
+AC_DEFUN([LIBMYSQL_TLS_TRY_LINK],
+[
+	AC_MSG_CHECKING([for TLS support in MySQL library])
+	AC_TRY_LINK(
+[
+#include <mysql.h>
+],
+[
+	unsigned int	mysql_tls_mode;
+	MYSQL		*mysql;
+
+	mysql_tls_mode = SSL_MODE_REQUIRED;
+	mysql_options(mysql, MYSQL_OPT_SSL_MODE, &mysql_tls_mode);
+
+	mysql_tls_mode = SSL_MODE_VERIFY_CA;
+	mysql_options(mysql, MYSQL_OPT_SSL_MODE, &mysql_tls_mode);
+
+	mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
+	mysql_options(mysql, MYSQL_OPT_SSL_MODE, &mysql_tls_mode);
+
+	mysql_options(mysql, MYSQL_OPT_SSL_CA, "");
+	mysql_options(mysql, MYSQL_OPT_SSL_KEY, "");
+	mysql_options(mysql, MYSQL_OPT_SSL_CERT, "");
+	mysql_options(mysql, MYSQL_OPT_SSL_CIPHER, "");
+],
+	AC_DEFINE([HAVE_MYSQL_TLS], [1], [Define to 1 if TLS is supported in MySQL library])
+	found_mysql_tls="yes"
+	AC_MSG_RESULT(yes),
+	AC_MSG_RESULT(no))
+])
+
+AC_DEFUN([LIBMYSQL_TLS_CIPHERS_TRY_LINK],
+[
+	AC_MSG_CHECKING([for TLS ciphersuites in MySQL library])
+	AC_TRY_LINK(
+[
+#include <mysql.h>
+],
+[
+	MYSQL	*mysql;
+
+	mysql_options(mysql, MYSQL_OPT_TLS_CIPHERSUITES, "");
+],
+	AC_DEFINE([HAVE_MYSQL_TLS_CIPHERSUITES], [1], [Define to 1 if TLS ciphersuites are supported in MySQL library])
+	AC_MSG_RESULT(yes),
+	AC_MSG_RESULT(no))
+])
+
+AC_DEFUN([LIBMARIADB_TLS_TRY_LINK],
+[
+	AC_MSG_CHECKING([for TLS support in MariaDB library])
+	AC_TRY_LINK(
+[
+#include <mysql.h>
+],
+[
+	MYSQL	*mysql;
+
+	mysql_optionsv(mysql, MYSQL_OPT_SSL_ENFORCE, (void *)"");
+	mysql_optionsv(mysql, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, (void *)"");
+	mysql_optionsv(mysql, MYSQL_OPT_SSL_CA, (void *)"");
+	mysql_optionsv(mysql, MYSQL_OPT_SSL_KEY, (void *)"");
+	mysql_optionsv(mysql, MYSQL_OPT_SSL_CERT, (void *)"");
+	mysql_optionsv(mysql, MYSQL_OPT_SSL_CIPHER, (void *)"");
+],
+	AC_DEFINE([HAVE_MARIADB_TLS], [1], [Define to 1 if TLS is supported in MariaDB library])
+	found_mariadb_tls="yes"
+	AC_MSG_RESULT(yes),
+	AC_MSG_RESULT(no))
+])
+
 AC_DEFUN([AX_LIB_MYSQL],
 [
     MYSQL_CONFIG="no"
@@ -84,8 +155,9 @@ AC_DEFUN([AX_LIB_MYSQL],
             MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"
             _full_libmysql_libs="`$MYSQL_CONFIG --libs`"
 
-             _save_mysql_ldflags="${LDFLAGS}"
+            _save_mysql_ldflags="${LDFLAGS}"
             _save_mysql_cflags="${CFLAGS}"
+            _save_mysql_libs="${LIBS}"
             LDFLAGS="${LDFLAGS} ${_full_libmysql_libs}"
             CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
 
@@ -119,14 +191,26 @@ AC_DEFUN([AX_LIB_MYSQL],
                 ;;
                 esac
             done
-    
             LDFLAGS="${_save_mysql_ldflags}"
             CFLAGS="${_save_mysql_cflags}"
+
+            CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
+            LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS}"
+            LIBS="${LIBS} ${MYSQL_LIBS}"
+            LIBMYSQL_TLS_TRY_LINK([no])
+            if test "$found_mysql_tls" == "yes"; then
+                LIBMYSQL_TLS_CIPHERS_TRY_LINK([no])
+            else
+                LIBMARIADB_TLS_TRY_LINK([no])
+            fi
+
+            LDFLAGS="${_save_mysql_ldflags}"
+            CFLAGS="${_save_mysql_cflags}"
+            LIBS="${_save_mysql_libs}"
             unset _save_mysql_ldflags
             unset _save_mysql_cflags
-    
             MYSQL_VERSION=`$MYSQL_CONFIG --version`
-    
+
             AC_DEFINE([HAVE_MYSQL], [1],
                 [Define to 1 if MySQL libraries are available])
 

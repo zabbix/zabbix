@@ -110,15 +110,12 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 }
 
 $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data, array_flip([
-	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set',
-	'paging'
+	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'paging'
 ]))));
 
 $widget->show();
 
-// Initialize page refresh only if the filter is sufficient for data selection.
-if ($data['filter_set']) {
-	(new CScriptTag('latest_page.start();'))
-		->setOnDocumentReady()
-		->show();
-}
+// Initialize page refresh.
+(new CScriptTag('latest_page.start();'))
+	->setOnDocumentReady()
+	->show();

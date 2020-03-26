@@ -1710,9 +1710,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * @return string
 	 */
-	public function resolveMapLabelMacros($label, $replaceHosts = null) {
+	public function resolveMapLabelMacros($label, array $replaceHosts = []) {
 		$pattern = '/(?P<macros>{'.
-				'('.ZBX_PREG_HOST_FORMAT.(($replaceHosts !== null)
+				'('.ZBX_PREG_HOST_FORMAT.($replaceHosts
 						? '|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'})' : '').'):'.
 				ZBX_PREG_ITEM_KEY_FORMAT.'\.'.
 				'(last|max|min|avg)\('.
@@ -1721,7 +1721,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		if (preg_match_all($pattern, $label, $matches) !== false && array_key_exists('macros', $matches)) {
 			// $replaceHosts with key '0' is used for macros without reference.
-			if ($replaceHosts !== null && array_key_exists(0, $replaceHosts)) {
+			if (array_key_exists(0, $replaceHosts)) {
 				$replaceHosts[''] = $replaceHosts[0];
 				unset($replaceHosts[0]);
 			}
@@ -1730,20 +1730,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			foreach ($matches['macros'] as $expr) {
 				$macro = $expr;
 
-				if ($replaceHosts !== null) {
-					// Search for macros with all possible indices.
-					foreach ($replaceHosts as $i => $host) {
-						$macroTmp = $macro;
+				// Search for macros with all possible indexes.
+				foreach ($replaceHosts as $i => $host) {
+					$macroTmp = $macro;
 
-						// Replace only macro in first position.
-						$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U',
-								'{'.$host['host'].':$2}', $macro
-						);
+					// Replace only macro in first position.
+					$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U',
+							'{'.$host['host'].':$2}', $macro
+					);
 
-						// Only one simple macro possible inside functional macro.
-						if ($macro !== $macroTmp) {
-							break;
-						}
+					// Only one simple macro possible inside functional macro.
+					if ($macro !== $macroTmp) {
+						break;
 					}
 				}
 
@@ -2185,7 +2183,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			$matched_macros = $macros_by_selementid[$selid];
-			$hosts_by_nr = null;
+			$hosts_by_nr = [];
 			$trigger = null;
 			$host = null;
 			$map = null;
@@ -2201,9 +2199,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
 					if (array_key_exists($elementid, $triggers)) {
 						$trigger = $triggers[$elementid];
-
-						// Must be here for correct counting.
-						$hosts_by_nr = [0 => null];
 
 						/**
 						 * Get all function ids from expression and link host data against position in expression.
@@ -2228,7 +2223,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							$hostid = $hosts_by_itemids[$itemid];
 
 							if (array_key_exists($hostid, $hosts)) {
-								$hosts_by_nr[count($hosts_by_nr)] = $hosts[$hostid];
+								$hosts_by_nr[count($hosts_by_nr) + 1] = $hosts[$hostid];
 							}
 						}
 
@@ -2626,6 +2621,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $data['steps'][]['error_handler_params]     Preprocessing steps error handle parameters.
 	 * @param string $data['delay']                              Update interval value.
 	 * @param array  $data['supported_macros']                   Supported macros.
+	 * @param bool   $data['support_lldmacros']                  Either LLD macros need to be extracted.
 	 * @param array  $data['texts_support_macros']               List of texts potentially could contain macros.
 	 * @param array  $data['texts_support_user_macros']          List of texts potentially could contain user macros.
 	 * @param array  $data['texts_support_lld_macros']           List of texts potentially could contain LLD macros.
@@ -2657,8 +2653,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
+		// Extract macros.
 		if ($data['supported_macros']) {
-			$matched_macros = $this->extractMacros(array_merge($texts, $data['texts_support_macros']),
+			$matched_macros = $this->extractMacros($data['texts_support_macros'],
 				['macros' => $data['supported_macros']]
 			);
 
@@ -2669,10 +2666,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
+		// Extract user macros.
+		$data['texts_support_user_macros'] = array_merge($texts, $data['texts_support_user_macros']);
 		if ($data['texts_support_user_macros']) {
-			$matched_macros = $this->extractMacros(array_merge($texts, $data['texts_support_user_macros']),
-				['usermacros' => true]
-			);
+			$matched_macros = $this->extractMacros($data['texts_support_user_macros'], ['usermacros' => true]);
 
 			$usermacros = [[
 				'macros' => $matched_macros['usermacros'],
@@ -2685,10 +2682,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
+		// Extract LLD macros.
+		$data['texts_support_lld_macros'] = $data['support_lldmacros']
+			? array_merge($texts, $data['texts_support_lld_macros'])
+			: [];
 		if ($data['texts_support_lld_macros']) {
-			$matched_macros = $this->extractMacros(array_merge($texts, $data['texts_support_lld_macros']),
-				['lldmacros' => true]
-			);
+			$matched_macros = $this->extractMacros($data['texts_support_lld_macros'], ['lldmacros' => true]);
 
 			foreach (array_keys($matched_macros['lldmacros']) as $lldmacro) {
 				$macros[$lldmacro] = $lldmacro;

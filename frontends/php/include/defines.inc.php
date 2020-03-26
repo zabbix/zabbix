@@ -21,7 +21,8 @@
 define('ZABBIX_VERSION',		'5.0.0beta1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050042);
+define('ZABBIX_DB_VERSION',		4050063);
+
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
 
@@ -38,7 +39,8 @@ define('ZBX_MEBIBYTE',	'1048576');
 define('ZBX_GIBIBYTE',	'1073741824');
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
-define('ZBX_MAX_PERIOD',		63158400); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400
+// the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 3600 + 1
+define('ZBX_MAX_PERIOD',		63162001);
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MIN_INT64',			'-9223372036854775808');
@@ -126,6 +128,8 @@ define('ZBX_AUTH_CASE_SENSITIVE',	1);
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
+
+define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
@@ -452,12 +456,12 @@ define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
 
 define('ITEM_TYPE_ZABBIX',			0);
-define('ITEM_TYPE_SNMPV1',			1);
+define('ITEM_TYPE_SNMPV1',			1); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_TRAPPER',			2);
 define('ITEM_TYPE_SIMPLE',			3);
-define('ITEM_TYPE_SNMPV2C',			4);
+define('ITEM_TYPE_SNMPV2C',			4); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_INTERNAL',		5);
-define('ITEM_TYPE_SNMPV3',			6);
+define('ITEM_TYPE_SNMPV3',			6); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
 define('ITEM_TYPE_AGGREGATE',		8);
 define('ITEM_TYPE_HTTPTEST',		9);
@@ -471,6 +475,11 @@ define('ITEM_TYPE_JMX',				16);
 define('ITEM_TYPE_SNMPTRAP',		17);
 define('ITEM_TYPE_DEPENDENT',		18);
 define('ITEM_TYPE_HTTPAGENT',		19);
+define('ITEM_TYPE_SNMP',			20);
+
+define('SNMP_V1', 1);
+define('SNMP_V2C', 2);
+define('SNMP_V3', 3);
 
 define('ZBX_DEPENDENT_ITEM_MAX_LEVELS',	3);
 define('ZBX_DEPENDENT_ITEM_MAX_COUNT',	29999);
@@ -486,8 +495,8 @@ define('ITEM_DATA_TYPE_OCTAL',			1);
 define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
 define('ITEM_DATA_TYPE_BOOLEAN',		3);
 
-define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,dsn]');
-define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,dsn]');
+define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,<dsn>,<connection string>]');
+define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]');
 define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 
@@ -560,6 +569,7 @@ define('ZBX_PREPROC_SCRIPT',				21);
 define('ZBX_PREPROC_PROMETHEUS_PATTERN',	22);
 define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	23);
 define('ZBX_PREPROC_CSV_TO_JSON',			24);
+define('ZBX_PREPROC_STR_REPLACE',			25);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
@@ -1303,6 +1313,10 @@ define('DAY_IN_YEAR', 365);
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
+define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
+define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
+define('ZBX_MACRO_SECRET_MASK', '******'); // Placeholder for masked macro value.
+
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
 define('ZBX_LAYOUT_FULLSCREEN', 1);
@@ -1343,6 +1357,7 @@ define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 define('ZBX_ACTION_ADD',		0);
 define('ZBX_ACTION_REPLACE',	1);
 define('ZBX_ACTION_REMOVE',		2);
+define('ZBX_ACTION_REMOVE_ALL', 3);
 
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
@@ -1608,7 +1623,6 @@ define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
-define('ZBX_STYLE_ICON_NONE', 'icon-none');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
 define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
@@ -1764,6 +1778,8 @@ define('ZBX_STYLE_WIDGET_URL', 'widget-url');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
+define('ZBX_STYLE_PROBLEM_ICON_LIST' , 'problem-icon-list');
+define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
@@ -1796,6 +1812,32 @@ define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 
 // Widget "Problems by severity" styles.
 define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
+
+define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
+
+// Icons.
+define('ZBX_STYLE_ICON_TEXT', 'icon-text');
+define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
+
+// Host interface styles.
+define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');
+define('ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER', 'interface-container-header');
+define('ZBX_STYLE_HOST_INTERFACE_ROW', 'interface-row');
+define('ZBX_STYLE_HOST_INTERFACE_ROW_HEADER', 'interface-row-header');
+define('ZBX_STYLE_HOST_INTERFACE_CELL', 'interface-cell');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS', 'interface-cell-details');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_HEADER', 'interface-cell-header');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_TYPE', 'interface-cell-type');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_IP', 'interface-cell-ip');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_DNS', 'interface-cell-dns');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_USEIP', 'interface-cell-useip');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_PORT', 'interface-cell-port');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_DEFAULT', 'interface-cell-default');
+define('ZBX_STYLE_HOST_INTERFACE_CELL_ACTION', 'interface-cell-action');
+define('ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE', 'interface-btn-toggle');
+define('ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE', 'interface-btn-remove');
+define('ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE', 'interface-btn-main-interface');
+define('ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND', 'interface-input-expand');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
