@@ -4,6 +4,7 @@ SERVER_tests = \
 	zbx_vc_add_values \
 	zbx_vc_get_value \
 	dc_maintenance_match_tags \
+	dc_check_maintenance_period \
 	is_item_processed_by_server \
 	dc_item_poller_type_update
 endif
@@ -126,9 +127,17 @@ dc_maintenance_match_tags_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/tests
 
+dc_check_maintenance_period_CFLAGS = \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/tests
+
 dc_maintenance_match_tags_SOURCES = dc_maintenance_match_tags.c
 dc_maintenance_match_tags_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
 dc_maintenance_match_tags_LDFLAGS = @SERVER_LDFLAGS@
+
+dc_check_maintenance_period_SOURCES = dc_check_maintenance_period.c
+dc_check_maintenance_period_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
+dc_check_maintenance_period_LDFLAGS = @SERVER_LDFLAGS@
 
 is_item_processed_by_server_SOURCES = is_item_processed_by_server.c
 is_item_processed_by_server_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
