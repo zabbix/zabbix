@@ -160,4 +160,22 @@ in:
   expression: '{1} < "{$A}"'
 out:
   expression: '{1} < ""'
+---
+test case: Expand '{1} = {$A:"x:\"1\""} or {2} = {$A:"y"}' with {$A:"x:\"1\""}=ax, {$A}=a
+in:
+  macros:
+    - name: '{$A:"x:\"1\""}'
+      value: ax
+    - name: '{$A}'
+      value: a
+  expression: '{1} = {$A:"x:\"1\""} or {2} = {$A:"y"}'
+out:
+  expression: '{1} = "ax" or {2} = "a"'
+---
+test case: Expand '{1} < {$A:"x:\"1\""}'
+in:
+  macros: []
+  expression: '{1} < {$A:"x:\"1\""}'
+out:
+  expression: '{1} < {$A:"x:\"1\""}'
 ...
