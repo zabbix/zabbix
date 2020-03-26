@@ -1771,7 +1771,7 @@ FIELD	|override_operationid	|t_id		|	|NOT NULL	|0	|1|override_operation
 FIELD	|delay			|t_varchar(1024)|'0'	|NOT NULL	|0
 
 TABLE|override_ophistory|override_operationid|ZBX_TEMPLATE
-FIELD	|override_operationid	|t_id	|	|NOT NULL	|0	|1|override_operation
+FIELD	|override_operationid	|t_id		|	|NOT NULL	|0	|1|override_operation
 FIELD	|history		|t_varchar(255)	|'90d'	|NOT NULL	|0
 
 TABLE|override_optrends|override_operationid|ZBX_TEMPLATE
@@ -1793,14 +1793,14 @@ TABLE|override_opgroup_prototype|override_opgroup_prototypeid|ZBX_TEMPLATE
 FIELD	|override_opgroup_prototypeid	|t_id		|	|NOT NULL	|0
 FIELD	|override_operationid		|t_id		|	|NOT NULL	|0	|1|override_operation
 FIELD	|name				|t_varchar(255)	|''	|NOT NULL	|0
-FIELD	|groupid			|t_id		|	|NULL	|0	|2|hstgrp	|	|RESTRICT
+FIELD	|groupid			|t_id		|	|NULL		|0	|2|hstgrp|	|RESTRICT
 INDEX	|1				|override_operationid
 INDEX	|2				|groupid
 
 TABLE|override_optemplate|override_optemplateid|ZBX_TEMPLATE
-FIELD	|override_optemplateid	|t_id	|	|NOT NULL	|0
-FIELD	|override_operationid	|t_id	|	|NOT NULL	|0	|1|override_operation
-FIELD	|templateid		|t_id	|	|NOT NULL	|0	|2|hosts	|hostid	|RESTRICT
+FIELD	|override_optemplateid	|t_id		|	|NOT NULL	|0
+FIELD	|override_operationid	|t_id		|	|NOT NULL	|0	|1|override_operation
+FIELD	|templateid		|t_id		|	|NOT NULL	|0	|2|hosts	|hostid	|RESTRICT
 UNIQUE	|1			|override_operationid,templateid
 INDEX	|2			|templateid
 
