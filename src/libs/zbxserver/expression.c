@@ -253,49 +253,17 @@ static char	*get_expanded_expression(const char *expression)
 void	get_trigger_expression_constant(const char *expression, const zbx_token_reference_t *reference,
 		char **constant)
 {
-	size_t		pos, j, i;
-	zbx_strloc_t	number;
+	size_t		pos;
+	zbx_strloc_t	loc;
 	int		index;
-	const char	*tmp = NULL;
 
-	for (pos = 0, index = 1; SUCCEED == zbx_number_or_string_find(expression, pos, &number);
-			pos = number.r + 1, index++)
+	for (pos = 0, index = 1; SUCCEED == zbx_expression_next_constant(expression, pos, &loc);
+			pos = loc.r + 1, index++)
 	{
-		size_t	length;
-
 		if (index < reference->index)
-		{
-			if ('\"' == expression[number.r + 1])
-				number.r = number.r + 1;
-
 			continue;
-		}
-		length = number.r - number.l + 1;
-		*constant = zbx_malloc(*constant, length + 1);
-		tmp = expression + number.l;
 
-		// unescape
-		j = 0;
-		for (i = 0; i < length; i++)
-		{
-			if ('\\' == tmp[i])
-			{
-				if('\\' != tmp[i + 1] && '\"' != tmp[i + 1])
-				{
-					/* every slash and quote symbol must be escaped at this stage */
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-				}
-
-				i++;
-			}
-
-			(*constant)[j] = tmp[i];
-			j++;
-		}
-
-		(*constant)[j] = '\0';
-
+		*constant = zbx_expression_extract_constant(expression, &loc);
 		return;
 	}
 

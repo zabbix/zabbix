@@ -1464,8 +1464,10 @@ typedef enum
 zbx_token_search_t;
 
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
-int	zbx_number_or_string_find(const char *str, size_t pos, zbx_strloc_t *number_loc);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
+
+int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc);
+char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
 #define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)

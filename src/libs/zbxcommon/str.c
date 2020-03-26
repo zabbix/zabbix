@@ -4328,104 +4328,152 @@ int	zbx_suffixed_number_parse(const char *number, int *len)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_number_find                                                  *
+ * Function: zbx_expression_next_constant                                     *
  *                                                                            *
- * Purpose: finds number or a quoted string inside expression starting at     *
- * specified position                                                         *
+ * Purpose: gets next constant (numeric/string value or unresolved user       *
+ *          macro) from trigger expression.                                   *
  *                                                                            *
- * Parameters: str        - [IN] the expression                               *
- *             pos        - [IN] the starting position                        *
- *             number_loc - [OUT] the number location                         *
+ * Parameters: src - [IN] the expression                                      *
+ *             pos - [IN] the starting position                               *
+ *             loc - [IN] the substring location                              *
  *                                                                            *
- * Return value: SUCCEED - the number was parsed successfully                 *
- *               FAIL    - expression does not contain number                 *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *           The token field locations are specified as offsets from the      *
- *           beginning of the expression.                                     *
+ * Return value: SUCCEED - the next constant was located.                     *
+ *               FAIL    - otherwise.                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_number_or_string_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
+int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc)
 {
-	const char	*s = NULL, *e = NULL;
-	int		parsing_str = 0, i = 0, len;
+	const char	*s;
+	zbx_token_t	token;
+	int		offset = 0, len;
 
-	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
+	for (s = str + pos; '\0' != *s; s++)
 	{
-		i++;
-
-		if ('\"' == *s)
+		switch (*s)
 		{
-			if (!parsing_str)
-			{
-				s++;
-				number_loc->l = s - str;
-				parsing_str = 1;
+			case '"':
+				loc->l = s - str;
 
-				if (parsing_str && '\\' == *s)
-					s++;
-
-				continue;
-			}
-			else
-			{
-				number_loc->r = s - str - 1;
-
-				return SUCCEED;
-			}
-		}
-
-		if (parsing_str && '\\' == (*s))
-			s++;
-
-		if (!parsing_str)
-		{
-			if (0 == isdigit(*s) && ('.' != *s || 0 == isdigit(s[1])) && '\"' != *s)
-				continue;
-
-			if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
-			{
-				/* skip functions '{65432}' */
-				s = e;
-				continue;
-			}
-
-			if (SUCCEED != zbx_suffixed_number_parse(s, &len))
-				continue;
-
-			/* number found */
-
-			number_loc->r = s + len - str - 1;
-
-			/* check for minus before number */
-			if (s > str + pos && '-' == *(s - 1))
-			{
-				/* and make sure it's unary */
-				if (s - 1 > str)
+				for (++s;'\0' != *s; s++)
 				{
-					e = s - 2;
-
-					if (e > str && NULL != strchr(ZBX_UNIT_SYMBOLS, *e))
-						e--;
-
-					/* check that minus is not preceded by function, parentheses or */
-					/* (suffixed) number */
-					if ('}' != *e && ')' != *e && '.' != *e && 0 == isdigit(*e))
-						s--;
+					if ('"' == *s)
+					{
+						loc->r = s - str;
+						return SUCCEED;
+					}
+					if ('\\' == *s)
+					{
+						if ('\\' != s[1] && '"' != s[1])
+							return FAIL;
+						s++;
+					}
 				}
-				else	/* nothing before minus, it's definitely unary */
-					s--;
-			}
+				return FAIL;
+			case '{':
+				if (SUCCEED == zbx_token_find(str, s - str, &token, ZBX_TOKEN_SEARCH_BASIC))
+				{
+					if (ZBX_TOKEN_USER_MACRO == token.type)
+					{
+						*loc = token.loc;
+						return SUCCEED;
+					}
+					if (ZBX_TOKEN_OBJECTID != token.type)
+						return FAIL;
 
-			number_loc->l = s - str;
+					s = str + token.loc.r;
+				}
+				continue;
+			case '-':
+				offset = 1;
+				continue;
+			case '0':
+				ZBX_FALLTHROUGH;
+			case '1':
+				ZBX_FALLTHROUGH;
+			case '2':
+				ZBX_FALLTHROUGH;
+			case '3':
+				ZBX_FALLTHROUGH;
+			case '4':
+				ZBX_FALLTHROUGH;
+			case '5':
+				ZBX_FALLTHROUGH;
+			case '6':
+				ZBX_FALLTHROUGH;
+			case '7':
+				ZBX_FALLTHROUGH;
+			case '8':
+				ZBX_FALLTHROUGH;
+			case '9':
+				ZBX_FALLTHROUGH;
+			case '.':
+				if (SUCCEED != zbx_suffixed_number_parse(s, &len))
+					return FAIL;
 
-			return SUCCEED;
+				loc->l = s - str - offset;
+				loc->r = s - str + len - 1;
+				return SUCCEED;
+			default:
+				offset = 0;
 		}
 	}
-
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_expression_extract_constant                                  *
+ *                                                                            *
+ * Purpose: extracts constant from trigger expression unquoting/escaping if   *
+ *          necessary                                                         *
+ *                                                                            *
+ * Parameters: src - [IN] the source string                                   *
+ *             loc - [IN] the substring location                              *
+ *                                                                            *
+ * Return value: The constant.                                                *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc)
+{
+	char		*str, *pout;
+	const char	*pin;
+	size_t		len;
+
+	len = loc->r - loc->l + 1;
+	str = zbx_malloc(NULL, len + 1);
+
+	if ('"' == src[loc->l])
+	{
+		for (pout = str, pin = src + loc->l + 1; pin <= src + loc->r - 1; pin++)
+		{
+			if ('\\' == *pin)
+			{
+				pin++;
+				switch (*pin)
+				{
+					case '\\':
+						*pout++ = '\\';
+						break;
+					case '"':
+						*pout++ = '"';
+						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+						*pout++ = '?';
+				}
+			}
+			else
+				*pout++ = *pin;
+		}
+		*pout++  ='\0';
+	}
+	else
+	{
+		memcpy(str, src + loc->l, len);
+		str[len] = '\0';
+	}
+
+	return str;
 }
 
 /******************************************************************************

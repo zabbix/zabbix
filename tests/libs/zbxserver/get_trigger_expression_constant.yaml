@@ -103,5 +103,61 @@ in:
   index: 1
 out:
   return: '"""'
+---
+test case: 'user macro'
+in:
+  expression: '{19928}<>{$MACRO}'
+  index: 1
+out:
+  return: '{$MACRO}'
+---
+test case: 'negative constant'
+in:
+  expression: '{19928}=-1'
+  index: 1
+out:
+  return: '-1'
+---
+test case: 'user macro with context'
+in:
+  expression: '{19928}<>{$MACRO:"x:\"1\""}'
+  index: 1
+out:
+  return: '{$MACRO:"x:\"1\""}'
+---
+test case: 'broken user macro with context'
+in:
+  expression: '{19928}<>{$MACRO:"x:\"1} and 1'
+  index: 1
+out:
+  return: ''
+---
+test case: 'unsupported macro'
+in:
+  expression: '{19928}<>{HOST.HOST} and 1'
+  index: 1
+out:
+  return: ''
+---
+test case: 'fraction'
+in:
+  expression: '{19928}<>.5'
+  index: 1
+out:
+  return: '.5'
+---
+test case: 'negative fraction'
+in:
+  expression: '{19928}<>-.5'
+  index: 1
+out:
+  return: '-.5'
+---
+test case: 'invalid number .5.5.5'
+in:
+  expression: '{19928}<>.5.5.5'
+  index: 1
+out:
+  return: ''
 ...
 
