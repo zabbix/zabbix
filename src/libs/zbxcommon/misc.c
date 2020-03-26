@@ -361,32 +361,60 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 #endif
 	if (NULL != tz)
 	{
-#ifdef HAVE_TM_TM_GMTOFF
-#	define ZBX_UTC_OFF	tm->tm_gmtoff
+		long	offset;
+#ifdef _WINDOWS
+		offset = zbx_get_timezone_offset(current_time.time, tm);
 #else
-#	define ZBX_UTC_OFF	offset
-		long		offset;
-		struct tm	tm_utc;
-#if defined(_WINDOWS) || defined(__MINGW32__)
-		tm_utc = *gmtime(&current_time.time);	/* gmtime() cannot return NULL if called with valid parameter */
-#else
-		gmtime_r(&current_time.tv_sec, &tm_utc);
+		offset = zbx_get_timezone_offset(current_time.tv_sec, tm);
 #endif
-		offset = (tm->tm_yday - tm_utc.tm_yday) * SEC_PER_DAY + (tm->tm_hour - tm_utc.tm_hour) * SEC_PER_HOUR +
-				(tm->tm_min - tm_utc.tm_min) * SEC_PER_MIN;	/* assuming seconds are equal */
-
-		while (tm->tm_year > tm_utc.tm_year)
-			offset += (SUCCEED == is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
-
-		while (tm->tm_year < tm_utc.tm_year)
-			offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
-#endif
-		tz->tz_sign = (0 <= ZBX_UTC_OFF ? '+' : '-');
-		tz->tz_hour = labs(ZBX_UTC_OFF) / SEC_PER_HOUR;
-		tz->tz_min = (labs(ZBX_UTC_OFF) - tz->tz_hour * SEC_PER_HOUR) / SEC_PER_MIN;
+		tz->tz_sign = (0 <= offset ? '+' : '-');
+		tz->tz_hour = labs(offset) / SEC_PER_HOUR;
+		tz->tz_min = (labs(offset) - tz->tz_hour * SEC_PER_HOUR) / SEC_PER_MIN;
 		/* assuming no remaining seconds like in historic Asia/Riyadh87, Asia/Riyadh88 and Asia/Riyadh89 */
-#undef ZBX_UTC_OFF
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_timezone_offset                                          *
+ *                                                                            *
+ * Purpose: get time offset from UTC                                          *
+ *                                                                            *
+ * Parameters: t  - [IN] input time to calculate offset with                  *
+ *             tm - [OUT] broken-down representation of the current time      *
+ *                                                                            *
+ * Return value: Time offset from UTC in seconds                              *
+ *                                                                            *
+ ******************************************************************************/
+long	zbx_get_timezone_offset(time_t t, struct tm *tm)
+{
+	long		offset;
+#ifndef HAVE_TM_TM_GMTOFF
+	struct tm	tm_utc;
+#endif
+
+	*tm = *localtime(&t);
+
+#ifdef HAVE_TM_TM_GMTOFF
+	offset = tm->tm_gmtoff;
+#else
+#ifdef _WINDOWS
+	tm_utc = *gmtime(&t);
+#else
+	gmtime_r(&t, &tm_utc);
+#endif
+	offset = (tm->tm_yday - tm_utc.tm_yday) * SEC_PER_DAY +
+			(tm->tm_hour - tm_utc.tm_hour) * SEC_PER_HOUR +
+			(tm->tm_min - tm_utc.tm_min) * SEC_PER_MIN;	/* assuming seconds are equal */
+
+	while (tm->tm_year > tm_utc.tm_year)
+		offset += (SUCCEED == is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+
+	while (tm->tm_year < tm_utc.tm_year)
+		offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+#endif
+
+	return offset;
 }
 
 /******************************************************************************
