@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-03-22T21:51:03Z</date>
+    <date>2020-03-26T22:54:02Z</date>
     <media_types>
         <media_type>
-            <name>Telegram Webhook</name>
+            <name>Telegram</name>
             <type>WEBHOOK</type>
             <parameters>
                 <parameter>
@@ -21,7 +21,7 @@
                 </parameter>
                 <parameter>
                     <name>telegramToken</name>
-                    <value>xxx</value>
+                    <value>&lt;TELEGRAM TOKEN HERE&gt;</value>
                 </parameter>
                 <parameter>
                     <name>telegramParseMode</name>
@@ -34,76 +34,76 @@
     to: null,&#13;
     message: null,&#13;
 &#13;
-    tgUrlBotGeneral: &quot;https://api.telegram.org/bot&quot;,&#13;
-    disableWebPagePreview: true,&#13;
-    disableNotification: false,&#13;
-    parseMode: null,&#13;
+    tg_url_bot_general: 'https://api.telegram.org/bot',&#13;
+    disable_web_page_preview: true,&#13;
+    disable_notification: false,&#13;
+    parse_mode: null,&#13;
 &#13;
-    req: new CurlHttpRequest(),&#13;
+    telegram_request: new CurlHttpRequest(),&#13;
 &#13;
-    printToken: function () {&#13;
+    getToken: function () {&#13;
         return(this.token);&#13;
     },&#13;
 &#13;
-    action: function(method) {&#13;
-        this.req.AddHeader('Content-Type: application/json');&#13;
-        var params = {sendMessage: {chat_id: this.to,&#13;
-                      text: this.message,&#13;
-                      disable_web_page_preview: this.disableWebPagePreview,&#13;
-                      disable_notification: this.disableNotification&#13;
-                    },&#13;
-                    getMe: {},&#13;
-                    getUpdates: {}&#13;
-        };&#13;
+    doAction: function(method) {&#13;
 &#13;
-        if (this.parseMode !== null) {&#13;
-            params[&quot;sendMessage&quot;][&quot;parse_mode&quot;] = this.parseMode;&#13;
+        var params = {&#13;
+                        sendMessage: {&#13;
+                            chat_id: this.to,&#13;
+                            text: this.message,&#13;
+                            disable_web_page_preview: this.disable_web_page_preview,&#13;
+                            disable_notification: this.disable_notification&#13;
+                        },&#13;
+                        getMe: {},&#13;
+                        getUpdates: {}&#13;
+                    };&#13;
+&#13;
+        var url = this.tg_url_bot_general + this.token + '/' + method;&#13;
+&#13;
+        if (this.parse_mode !== null) {&#13;
+            params['sendMessage']['parse_mode'] = this.parse_mode;&#13;
         }&#13;
 &#13;
-        Zabbix.Log(3, &quot;params: &quot; + JSON.stringify(params[method]));&#13;
-        var url = this.tgUrlBotGeneral + this.token + &quot;/&quot; + method;&#13;
-        Zabbix.Log(3, &quot;URL: &quot; + url.replace(this.token, &quot;XXX&quot;));&#13;
-        //Zabbix.Log(3, &quot;URL: &quot; + url);  // uncomment this if you want to see the exposed token in the log file&#13;
-        //var resp = this.req.Post(url, params=JSON.stringify(params[method]));&#13;
-        var resp = this.req.Post(url, JSON.stringify(params[method]));&#13;
-        resp = JSON.parse(JSON.stringify(resp))&#13;
-        Zabbix.Log(3, &quot;HTTP code: &quot; + this.req.Status());&#13;
-        if (this.req.Status() != 200) {&#13;
-            throw resp;&#13;
+        this.telegram_request.AddHeader('Content-Type: application/json');&#13;
+&#13;
+        Zabbix.Log(3, '[Telegram Webhook] params: ' + JSON.stringify(params[method]));&#13;
+        Zabbix.Log(3, '[Telegram Webhook] URL: ' + url.replace(this.token, 'XXX'));&#13;
+        //Zabbix.Log(3, '[Telegram Webhook] URL: ' + url);  // uncomment this if you want to see the exposed token in the log file&#13;
+        var telegram_response = this.telegram_request.Post(url, JSON.stringify(params[method]));&#13;
+        Zabbix.Log(3, '[Telegram Webhook] HTTP code: ' + this.telegram_request.Status());&#13;
+        if (this.telegram_request.Status() != 200) {&#13;
+            throw telegram_response;&#13;
         }&#13;
 &#13;
-        return resp;&#13;
+        return telegram_response;&#13;
 &#13;
     }&#13;
 }&#13;
 &#13;
 try {&#13;
 &#13;
-    var tg = Telegram;&#13;
-&#13;
     parameters = JSON.parse(value);&#13;
 &#13;
-    Zabbix.Log(3, &quot;Telegram webhook script value= &quot; + value);&#13;
+    Zabbix.Log(3, '[Telegram Webhook] script value= ' + value);&#13;
 &#13;
-    tg.token = parameters.telegramToken;&#13;
+    Telegram.token = parameters.telegramToken;&#13;
 &#13;
-    if (parameters.telegramParseMode !== null &amp;&amp; (parameters.telegramParseMode === &quot;Markdown&quot; || parameters.telegramParseMode === &quot;HTML&quot; || parameters.telegramParseMode === &quot;MarkdownV2&quot;)) {&#13;
-        tg.parseMode = parameters.telegramParseMode;&#13;
+    if (['Markdown', 'HTML', 'MarkdownV2'].indexOf(parameters.telegramParseMode) !== -1) {&#13;
+        Telegram.parse_mode = parameters.telegramParseMode;&#13;
     }&#13;
 &#13;
-    // Zabbix.Log(3, tg.action(&quot;getMe&quot;));&#13;
+    // Zabbix.Log(3, Telegram.doAction('getMe'));&#13;
 &#13;
-    tg.to = parameters.To;&#13;
-    tg.message = parameters.Subject + &quot; &quot; + parameters.Message;&#13;
-    var sendMessageResult = tg.action(&quot;sendMessage&quot;);&#13;
+    Telegram.to = parameters.To;&#13;
+    Telegram.message = parameters.Subject + ' ' + parameters.Message;&#13;
+    var send_message_result = Telegram.doAction('sendMessage');&#13;
 &#13;
-    return sendMessageResult;&#13;
+    return send_message_result;&#13;
 &#13;
 } catch (error) {&#13;
-    Zabbix.Log(4, &quot;Telegram webhook notification failed: &quot; + error);&#13;
-    throw &quot;Telegram webhook notification failed: &quot; + error;&#13;
-}&#13;
-</script>
+    Zabbix.Log(4, '[Telegram Webhook] notification failed: ' + error);&#13;
+    throw '[Telegram Webhook] notification failed: ' + error;&#13;
+}</script>
             <timeout>10s</timeout>
             <process_tags>YES</process_tags>
             <show_event_menu>NO</show_event_menu>
