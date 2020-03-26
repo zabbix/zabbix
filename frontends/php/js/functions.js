@@ -482,8 +482,8 @@ function overlayDialogueDestroy(dialogueid) {
 		jQuery.publish('overlay.close', {dialogueid: dialogueid});
 
 		if (!jQuery('[data-dialogueid]').length) {
-			jQuery('body').css('overflow', jQuery('body').data('overflow'));
-			jQuery('body').removeData('overflow');
+			jQuery('.wrapper').css('overflow', jQuery('.wrapper').data('overflow'));
+			jQuery('.wrapper').removeData('overflow');
 		}
 	}
 }
