@@ -2079,7 +2079,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 		}
 		else
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot update item, error in key parameters: %s.\n", err);
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->delay);
@@ -2143,7 +2143,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 			}
 		}
 		else
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot update item, error in formula: %s.\n", err);
 	}
 	else
 	{
@@ -2250,7 +2250,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
 
 	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, lld_macro_paths, err, sizeof(err)))
-		*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+		*error = zbx_strdcatf(*error, "Cannot update item, error in json: %s.\n", err);
 
 	if (0 != strcmp(item->query_fields, buffer))
 	{
@@ -2271,7 +2271,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		if (FAIL == substitute_macros_xml(&buffer, NULL, jp_row, lld_macro_paths, err, sizeof(err)))
 		{
 			zbx_lrtrim(err, ZBX_WHITESPACE);
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot update item, error in XML: %s.\n", err);
 		}
 	}
 	else
