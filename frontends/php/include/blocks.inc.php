@@ -667,7 +667,7 @@ function make_status_of_zbx() {
 		]);
 	}
 
-	// check requirements
+	// Check requirements.
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$setup = new CFrontendSetup();
 		$reqs = $setup->checkRequirements();
@@ -688,6 +688,17 @@ function make_status_of_zbx() {
 				(new CRow((new CCol($db->getWarning()))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
 			);
 		}
+	}
+
+	// Warn if database history tables have not been upgraded.
+	global $DB;
+
+	if (!$DB['DOUBLE_IEEE754']) {
+		$table->addRow([
+			_('Database history tables upgraded'),
+			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
+			''
+		]);
 	}
 
 	return $table;

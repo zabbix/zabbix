@@ -32,8 +32,6 @@ func getMetrics() []string {
 		"system.sw.packages", "Listing of installed packages.",
 		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
 		"net.tcp.service.perf", "Checks performance of TCP service.",
-		"net.udp.service", "Checks if service is running and responding to UDP requests.",
-		"net.udp.service.perf", "Checks performance of UDP service.",
 		"system.users.num", "Number of users logged in.",
 		"system.swap.size", "Swap space size in bytes or in percentage from total.",
 		"vfs.dir.count", "Directory entry count.",

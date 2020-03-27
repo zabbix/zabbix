@@ -4271,7 +4271,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
  ******************************************************************************/
 int	zbx_number_parse(const char *number, int *len)
 {
-	int	digits = 0, dots = 0;
+	int	digits = 0, dots = 0, exp = 0;
 
 	*len = 0;
 
@@ -4291,7 +4291,23 @@ int	zbx_number_parse(const char *number, int *len)
 			continue;
 		}
 
-		if (1 > digits || 1 < dots)
+		if ('e' == number[*len] || 'E' == number[*len])
+		{
+			(*len)++;
+
+			if ('-' == number[*len] || '+' == number[*len])
+				(*len)++;
+
+			if (0 == isdigit(number[*len]))
+				return FAIL;
+
+			while (0 != isdigit(number[++(*len)]));
+
+			exp++;
+			continue;
+		}
+
+		if (1 > digits || 1 < dots || 1 < exp)
 			return FAIL;
 
 		return SUCCEED;
@@ -5680,4 +5696,28 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
 	return buf;
 
 #	undef ZBX_SUFFIX
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_print_double                                                 *
+ *                                                                            *
+ * Purpose: converts double value to string and truncates insignificant       *
+ *          precision                                                         *
+ *                                                                            *
+ * Parameters: buffer - [OUT] the output buffer                               *
+ *             size   - [IN] the output buffer size                           *
+ *             val    - [IN] double value to be converted                     *
+ *                                                                            *
+ * Return value: the oputput buffer with printed value                        *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_print_double(char *buffer, size_t size, double val)
+{
+	zbx_snprintf(buffer, size, "%.15G", val);
+
+	if (atof(buffer) != val)
+		zbx_snprintf(buffer, size, ZBX_FS_DBL64, val);
+
+	return buffer;
 }

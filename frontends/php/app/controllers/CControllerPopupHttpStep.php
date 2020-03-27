@@ -96,7 +96,7 @@ class CControllerPopupHttpStep extends CController {
 			elseif ($page_options['timeout'][0] !== '{') {
 				$seconds = timeUnitToSeconds($page_options['timeout']);
 
-				if ($seconds < 1 || bccomp($seconds, SEC_PER_HOUR) > 0) {
+				if ($seconds < 1 || $seconds > SEC_PER_HOUR) {
 					error(_s('Invalid parameter "%1$s": %2$s.', 'timeout',
 						_s('value must be one of %1$s', '1-'.SEC_PER_HOUR)
 					));

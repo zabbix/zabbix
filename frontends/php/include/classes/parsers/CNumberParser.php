@@ -19,6 +19,7 @@
 **/
 
 
+<<<<<<< HEAD
 define('_ZBX_TEBIBYTE',	'1099511627776');
 
 // Time suffixes and multipliers.
@@ -45,6 +46,8 @@ define('_ZBX_BYTE_SUFFIX_MULTIPLIERS', [
 
 define('_ZBX_PREG_NUMBER', '(?<number>-?\d+(\.\d+)?([Ee][+-]?\d+)?)');
 
+=======
+>>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 /**
  * A parser for numbers with optional time or byte suffix.
  */
@@ -79,14 +82,22 @@ class CNumberParser extends CParser {
 	 *
 	 * @var string
 	 */
+<<<<<<< HEAD
 	private static $suffixes = _ZBX_TIME_SUFFIXES._ZBX_BYTE_SUFFIXES;
+=======
+	private static $suffixes = ZBX_TIME_SUFFIXES.ZBX_BYTE_SUFFIXES;
+>>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 
 	/**
 	 * Suffix multiplier table for value calculation.
 	 *
 	 * @var array
 	 */
+<<<<<<< HEAD
 	private static $suffix_multipliers = _ZBX_BYTE_SUFFIX_MULTIPLIERS + _ZBX_TIME_SUFFIX_MULTIPLIERS;
+=======
+	private static $suffix_multipliers = ZBX_BYTE_SUFFIX_MULTIPLIERS + ZBX_TIME_SUFFIX_MULTIPLIERS;
+>>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 
 	public function __construct(array $options = []) {
 		$this->options = array_replace($this->options, array_intersect_key($options, $this->options));
@@ -111,8 +122,13 @@ class CNumberParser extends CParser {
 		$fragment = substr($source, $pos);
 
 		$pattern = $this->options['with_suffix']
+<<<<<<< HEAD
 			? '/^'._ZBX_PREG_NUMBER.'(?<suffix>['.self::$suffixes.'])?/'
 			: '/^'._ZBX_PREG_NUMBER.'/';
+=======
+			? '/^'.ZBX_PREG_NUMBER.'(?<suffix>['.self::$suffixes.'])?/'
+			: '/^'.ZBX_PREG_NUMBER.'/';
+>>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 
 		if (!preg_match($pattern, $fragment, $matches)) {
 			return self::PARSE_FAIL;

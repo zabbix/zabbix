@@ -71,9 +71,28 @@ class CMacrosResolverGeneral {
 			}
 		}
 
+<<<<<<< HEAD
 		foreach ($references as $macro => $value) {
 			$i = (int) $macro[1] - 1;
 			$references[$macro] = array_key_exists($i, $values) ? $values[$i] : '';
+=======
+		// Replace functionids with string 'function' to make values search easier.
+		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
+
+		// Replace whitespace with emptyness to make value search easier.
+		$expression = str_replace(" \r\n\t", '', $expression);
+
+		// Search for numeric values in expression.
+		preg_match_all('/(?<![\w\)])('.ZBX_PREG_NUMBER.'['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)/', $expression,
+			$values
+		);
+
+		$macro_values = [];
+
+		foreach (array_keys($references) as $reference) {
+			$i = (int) $reference[1] - 1;
+			$macro_values[$reference] = array_key_exists($i, $values[0]) ? $values[0][$i] : '';
+>>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 		}
 
 		return $references;

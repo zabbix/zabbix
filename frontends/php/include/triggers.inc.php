@@ -1907,11 +1907,18 @@ function makeExpression(array $expressionTree, $level = 0, $operator = null) {
 }
 
 function get_item_function_info($expr) {
+<<<<<<< HEAD
 	$rule_float = ['value_type' => _('Numeric (float)'), 'values' => null];
 	$rule_int = ['value_type' => _('Numeric (integer)'), 'values' => null];
 	$rule_str = ['value_type' => _('String'), 'values' => null];
 	$rule_any = ['value_type' => _('Any'), 'values' => null];
 	$rule_0or1 = ['value_type' => _('0 or 1'), 'values' => [0 => 0, 1 => 1]];
+=======
+	$suffix = '['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?';
+	$rule_float = [_('Numeric (float)'), 'preg_match("/^'.ZBX_PREG_NUMBER.$suffix.'$/", {})'];
+	$rule_int = [_('Numeric (integer)'), 'preg_match("/^'.ZBX_PREG_INT.$suffix.'$/", {})'];
+	$rule_0or1 = [_('0 or 1'), IN('0,1')];
+>>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 	$rules = [
 		// Every nested array should have two elements: label, values.
 		'integer' => [
@@ -2083,6 +2090,7 @@ function get_item_function_info($expr) {
 }
 
 /**
+<<<<<<< HEAD
  * Converts a string representation of various time and byte measures into corresponding SI unit value.
  *
  * @param string $value  String value with byte or time suffix.
@@ -2123,9 +2131,67 @@ function convert($value) {
 		case 'w':
 			$value *= 60 * 60 * 24 * 7;
 			break;
+=======
+ * Substitute macros in the expression with the given values and evaluate its result.
+ *
+ * @param string $expression               a trigger expression
+ * @param array  $replace_function_macros  an array of macro - value pairs
+ *
+ * @return bool  the calculated value of the expression
+ */
+function evalExpressionData($expression, $replace_function_macros) {
+	// Sort by longest array key which in this case contains macros.
+	uksort($replace_function_macros, function($key1, $key2) {
+		$s1 = strlen($key1);
+		$s2 = strlen($key2);
+
+		if ($s1 == $s2) {
+			return 0;
+		}
+
+		return ($s1 > $s2) ? -1 : 1;
+	});
+
+	// Replace function macros with their values.
+	$expression = str_replace(
+		array_keys($replace_function_macros), array_values($replace_function_macros), $expression
+	);
+
+	$parser = new CTriggerExpression(['calc_constant_values' => true]);
+	$parse_result = $parser->parse($expression);
+
+	// The $replaceFunctionMacros array may contain string values which after substitution
+	// will result in an invalid expression. In such cases we should just return false.
+	if (!$parse_result) {
+		return false;
 	}
 
-	return $value;
+	// Turn the expression into valid PHP code.
+	$eval_expression = '';
+	$replace_operators = ['not' => '!', '=' => '=='];
+	foreach ($parse_result->getTokens() as $token) {
+		$value = $token['value'];
+
+		switch ($token['type']) {
+			case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
+				// Replace specific operators with their PHP analogues.
+				if (array_key_exists($token['value'], $replace_operators)) {
+					$value = $replace_operators[$token['value']];
+				}
+				break;
+
+			case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
+				// Use calculated (unsuffixed) number value.
+				$value = $token['data']['calc_value'];
+				break;
+		}
+
+		$eval_expression .= ' '.$value;
+>>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
+	}
+
+	// Execute expression.
+	return eval('return ('.$eval_expression.');');
 }
 
 /**

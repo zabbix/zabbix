@@ -276,7 +276,7 @@ void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *val
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(buffer, size, ZBX_FS_DBL, value->dbl);
+			zbx_snprintf(buffer, size, ZBX_FS_DBL64, value->dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_snprintf(buffer, size, ZBX_FS_UI64, value->ui64);
@@ -292,6 +292,7 @@ void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *val
 
 /******************************************************************************
  *                                                                            *
+<<<<<<< HEAD
  * Function: zbx_history_value2str_dyn                                        *
  *                                                                            *
  * Purpose: converts history value to string format (with dynamic buffer)     *
@@ -323,6 +324,25 @@ char	*zbx_history_value2str_dyn(const history_value_t *value, int value_type)
 			str = zbx_strdup(NULL, value->log->value);
 	}
 	return str;
+=======
+ * Function: zbx_history_value_print                                          *
+ *                                                                            *
+ * Purpose: converts history value to string format (double type printed in   *
+ *          human friendly format)                                            *
+ *                                                                            *
+ * Parameters: buffer     - [OUT] the output buffer                           *
+ *             size       - [IN] the output buffer size                       *
+ *             value      - [IN] the value to convert                         *
+ *             value_type - [IN] the history value type                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_history_value_print(char *buffer, size_t size, const history_value_t *value, int value_type)
+{
+	if (ITEM_VALUE_TYPE_FLOAT == value_type)
+		zbx_print_double(buffer, size, value->dbl);
+	else
+		zbx_history_value2str(buffer, size, value, value_type);
+>>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 }
 
 /******************************************************************************
