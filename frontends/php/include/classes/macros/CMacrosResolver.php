@@ -125,7 +125,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$interface_hostids = [];
 
 		foreach ($data as $hostid => $texts) {
-			$matched_macros = $this->extractMacros($texts, $types);
+			$matched_macros = self::extractMacros($texts, $types);
 
 			if (array_key_exists('macros', $matched_macros)) {
 				if (array_key_exists('host', $matched_macros['macros']) && $matched_macros['macros']['host']) {
@@ -348,7 +348,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Find macros.
 		foreach ($triggers as $triggerid => $trigger) {
-			$matched_macros = $this->extractMacros([$trigger['description']], $types);
+			$matched_macros = self::extractMacros([$trigger['description']], $types);
 
 			if (!$options['references_only']) {
 				$functionids = $this->findFunctions($trigger['expression']);
@@ -502,7 +502,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$texts[] = $trigger[$source];
 			}
 
-			$matched_macros = $this->extractMacros($texts, $types);
+			$matched_macros = self::extractMacros($texts, $types);
 
 			foreach ($matched_macros['macros_n']['host'] as $token => $data) {
 				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
@@ -657,7 +657,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Find macros.
 		$functionids = $this->findFunctions($trigger['expression']);
-		$matched_macros = $this->extractMacros([$trigger['url']], $types);
+		$matched_macros = self::extractMacros([$trigger['url']], $types);
 
 		foreach ($matched_macros['macros']['trigger'] as $macro) {
 			$macro_values[$triggerid][$macro] = $triggerid;
@@ -813,7 +813,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			$matched_macros = $this->extractMacros($texts, $types);
+			$matched_macros = self::extractMacros($texts, $types);
 
 			$macro_values[$key] = $functionid_macros;
 			$usermacro_values[$key] = [];
@@ -1343,7 +1343,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 
 		foreach ($items as $key => $item) {
-			$matched_macros = $this->extractMacros([$item['name_expanded']], $types);
+			$matched_macros = self::extractMacros([$item['name_expanded']], $types);
 
 			if ($matched_macros['usermacros']) {
 				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
@@ -1620,7 +1620,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$texts[] = $value[$source];
 			}
 
-			$matched_macros = $this->extractMacros($texts, $types);
+			$matched_macros = self::extractMacros($texts, $types);
 
 			if ($matched_macros['usermacros']) {
 				$usermacros[$key] = [
@@ -2009,7 +2009,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			// Extract macros from collected strings.
-			$matched_macros = $this->extractMacros($texts, $types_by_selement_type[$selement_type]);
+			$matched_macros = self::extractMacros($texts, $types_by_selement_type[$selement_type]);
 
 			// Map extracted macros to map elements.
 			if (array_key_exists('macros', $matched_macros)) {
@@ -2209,7 +2209,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						 * For example, having a trigger like: '{host:item.change()}=1 or {$MACRO: "{1234} ..."}' gives
 						 * incorrect result of 'functionids' without requesting to parse macros and user macros as well.
 						 */
-						$matched_functionids = $this->extractMacros([$trigger['expression']], [
+						$matched_functionids = self::extractMacros([$trigger['expression']], [
 							'macros' => [
 								'trigger' => ['{TRIGGER.VALUE}']
 							],
@@ -2566,7 +2566,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			$num = 0;
-			$matched_macros = $this->extractMacros([$trigger['expression'].$trigger['recovery_expression']], $types);
+			$matched_macros = self::extractMacros([$trigger['expression'].$trigger['recovery_expression']], $types);
 
 			foreach (array_keys($matched_macros['functionids']) as $macro) {
 				$functionid = substr($macro, 1, -1); // strip curly braces
@@ -2655,7 +2655,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Extract macros.
 		if ($data['supported_macros']) {
-			$matched_macros = $this->extractMacros($data['texts_support_macros'],
+			$matched_macros = self::extractMacros($data['texts_support_macros'],
 				['macros' => $data['supported_macros']]
 			);
 
@@ -2669,7 +2669,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Extract user macros.
 		$data['texts_support_user_macros'] = array_merge($texts, $data['texts_support_user_macros']);
 		if ($data['texts_support_user_macros']) {
-			$matched_macros = $this->extractMacros($data['texts_support_user_macros'], ['usermacros' => true]);
+			$matched_macros = self::extractMacros($data['texts_support_user_macros'], ['usermacros' => true]);
 
 			$usermacros = [[
 				'macros' => $matched_macros['usermacros'],
@@ -2687,7 +2687,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			? array_merge($texts, $data['texts_support_lld_macros'])
 			: [];
 		if ($data['texts_support_lld_macros']) {
-			$matched_macros = $this->extractMacros($data['texts_support_lld_macros'], ['lldmacros' => true]);
+			$matched_macros = self::extractMacros($data['texts_support_lld_macros'], ['lldmacros' => true]);
 
 			foreach (array_keys($matched_macros['lldmacros']) as $lldmacro) {
 				$macros[$lldmacro] = $lldmacro;
@@ -2735,7 +2735,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$url_macros = [];
 
 		foreach ($urls as $index => $url) {
-			$matched_macros = $this->extractMacros([$url['url'], $url['name']], $types);
+			$matched_macros = self::extractMacros([$url['url'], $url['name']], $types);
 			$url_macros[$index] = [];
 
 			foreach ($matched_macros['macros_an']['event'] as $token => $data) {

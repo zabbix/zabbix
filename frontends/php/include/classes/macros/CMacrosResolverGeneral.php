@@ -250,7 +250,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	public function extractMacros(array $texts, array $types) {
+	public static function extractMacros(array $texts, array $types) {
 		$macros = [];
 		$extract_usermacros = array_key_exists('usermacros', $types);
 		$extract_macros = array_key_exists('macros', $types);
@@ -486,7 +486,7 @@ class CMacrosResolverGeneral {
 			$item_key_parameters = $this->getItemKeyParameters($item_key_parser->getParamsRaw());
 		}
 
-		return $this->extractMacros($item_key_parameters, $types);
+		return self::extractMacros($item_key_parameters, $types);
 	}
 
 	/**
@@ -515,7 +515,7 @@ class CMacrosResolverGeneral {
 			}
 		}
 
-		return $this->extractMacros($function_parameters, $types);
+		return self::extractMacros($function_parameters, $types);
 	}
 
 	/**
