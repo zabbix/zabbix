@@ -1,24 +1,4 @@
 <?php
-/*
-** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-**/
-
-
 return [
 	'users' => [
 		'key' => 'userid',
@@ -3120,11 +3100,13 @@ return [
 			'yaxismin' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
+				'length' => 16,
 				'default' => '0',
 			],
 			'yaxismax' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
+				'length' => 16,
 				'default' => '100',
 			],
 			'templateid' => [
@@ -3167,11 +3149,13 @@ return [
 			'percent_left' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
+				'length' => 16,
 				'default' => '0',
 			],
 			'percent_right' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
+				'length' => 16,
 				'default' => '0',
 			],
 			'ymin_type' => [
@@ -3644,6 +3628,7 @@ return [
 			'goodsla' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
+				'length' => 16,
 				'default' => '99.9',
 			],
 			'sortorder' => [
@@ -4656,6 +4641,7 @@ return [
 			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
+				'length' => 16,
 				'default' => '0.0000',
 			],
 			'ns' => [
@@ -5039,16 +5025,19 @@ return [
 			'value_min' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
+				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_avg' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
+				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_max' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
+				'length' => 16,
 				'default' => '0.0000',
 			],
 		],
@@ -7937,6 +7926,319 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			],
+		],
+	],
+	'override' => [
+		'key' => 'overrideid',
+		'fields' => [
+			'overrideid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'step' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'evaltype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'formula' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'stop' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'override_condition' => [
+		'key' => 'override_conditionid',
+		'fields' => [
+			'override_conditionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'overrideid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override',
+				'ref_field' => 'overrideid',
+			],
+			'operator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '8',
+			],
+			'macro' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'override_operation' => [
+		'key' => 'override_operationid',
+		'fields' => [
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'overrideid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override',
+				'ref_field' => 'overrideid',
+			],
+			'operationtype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'evaltype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'override_opcondition' => [
+		'key' => 'override_opconditionid',
+		'fields' => [
+			'override_opconditionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override_operation',
+				'ref_field' => 'override_operationid',
+			],
+			'operator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'override_opperiod' => [
+		'key' => 'override_operationid',
+		'fields' => [
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override_operation',
+				'ref_field' => 'override_operationid',
+			],
+			'delay' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => '0',
+			],
+		],
+	],
+	'override_ophistory' => [
+		'key' => 'override_operationid',
+		'fields' => [
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override_operation',
+				'ref_field' => 'override_operationid',
+			],
+			'history' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '90d',
+			],
+		],
+	],
+	'override_optrends' => [
+		'key' => 'override_operationid',
+		'fields' => [
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override_operation',
+				'ref_field' => 'override_operationid',
+			],
+			'trends' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '365d',
+			],
+		],
+	],
+	'override_opseverity' => [
+		'key' => 'override_operationid',
+		'fields' => [
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override_operation',
+				'ref_field' => 'override_operationid',
+			],
+			'severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'override_optag' => [
+		'key' => 'override_optagid',
+		'fields' => [
+			'override_optagid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override_operation',
+				'ref_field' => 'override_operationid',
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'override_opgroup_prototype' => [
+		'key' => 'override_opgroup_prototypeid',
+		'fields' => [
+			'override_opgroup_prototypeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override_operation',
+				'ref_field' => 'override_operationid',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'groupid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hstgrp',
+				'ref_field' => 'groupid',
+			],
+		],
+	],
+	'override_optemplate' => [
+		'key' => 'override_optemplateid',
+		'fields' => [
+			'override_optemplateid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override_operation',
+				'ref_field' => 'override_operationid',
+			],
+			'templateid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			],
+		],
+	],
+	'override_opinventory' => [
+		'key' => 'override_operationid',
+		'fields' => [
+			'override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'override_operation',
+				'ref_field' => 'override_operationid',
+			],
+			'inventory_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
