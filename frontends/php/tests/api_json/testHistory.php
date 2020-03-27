@@ -97,15 +97,15 @@ class testHistory extends CAPITest {
 				],
 				'expected_result' => [
 					[
-						'value' => '-1.5000',
+						'value' => '-1.5',
 						'clock' => '1549350962'
 					],
 					[
-						'value' => '-1.0000',
+						'value' => '-1',
 						'clock' => '1549350961'
 					],
 					[
-						'value' => '1.5000',
+						'value' => '1.5',
 						'clock' => '1549350960'
 					],
 					[
@@ -113,7 +113,7 @@ class testHistory extends CAPITest {
 						'clock' => '1549350959'
 					],
 					[
-						'value' => '1.5000',
+						'value' => '1.5',
 						'clock' => '1549350958'
 					]
 				],
@@ -196,7 +196,7 @@ class testHistory extends CAPITest {
 				],
 				'expected_result' => [
 					[
-						'value' => '1.5000',
+						'value' => '1.5',
 						'clock' => '1549350958'
 					],
 					[
@@ -204,15 +204,15 @@ class testHistory extends CAPITest {
 						'clock' => '1549350959'
 					],
 					[
-						'value' => '1.5000',
+						'value' => '1.5',
 						'clock' => '1549350960'
 					],
 					[
-						'value' => '-1.0000',
+						'value' => '-1',
 						'clock' => '1549350961'
 					],
 					[
-						'value' => '-1.5000',
+						'value' => '-1.5',
 						'clock' => '1549350962'
 					]
 				],
