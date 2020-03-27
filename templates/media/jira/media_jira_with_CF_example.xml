@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-27T12:28:36Z</date>
+    <date>2020-03-27T13:09:06Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -126,6 +126,10 @@
         }&#13;
     },&#13;
 &#13;
+    setProxy: function (HTTPProxy) {&#13;
+        Jira.HTTPProxy = HTTPProxy;&#13;
+    },&#13;
+&#13;
     escapeMarkup: function (str) {&#13;
         var length = str.length,&#13;
             result = '',&#13;
@@ -200,6 +204,10 @@
 &#13;
         request.AddHeader('Content-Type: application/json');&#13;
         request.AddHeader('Authorization: Basic ' + btoa(Jira.params.user + ':' + Jira.params.password));&#13;
+&#13;
+        if (typeof Jira.HTTPProxy !== 'undefined' &amp;&amp; Jira.HTTPProxy !== '') {&#13;
+            request.SetProxy(Jira.HTTPProxy);&#13;
+        }&#13;
 &#13;
         if (typeof data !== 'undefined') {&#13;
             data = JSON.stringify(data);&#13;
@@ -361,6 +369,7 @@ try {&#13;
     }&#13;
 &#13;
     Jira.setParams(jira);&#13;
+    Jira.setProxy(params.HTTPProxy);&#13;
 &#13;
     // Create issue for non trigger-based events.&#13;
     if (params.event_source !== '0' &amp;&amp; params.event_recovery_value !== '0') {&#13;
