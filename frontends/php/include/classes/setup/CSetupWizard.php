@@ -521,21 +521,19 @@ class CSetupWizard extends CForm {
 		$result = true;
 
 		if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-			$db_schema = DBselect('SELECT schema_name FROM information_schema.schemata WHERE schema_name = \''.
-				pg_escape_string($DB['SCHEMA']).'\';'
+			$db_schema = DBselect(
+				"SELECT schema_name".
+				" FROM information_schema.schemata".
+				" WHERE schema_name='".pg_escape_string($DB['SCHEMA'])."'"
 			);
 			$result = DBfetch($db_schema);
-		}
-
-		if ($result) {
-			$result = DBexecute('CREATE TABLE zabbix_installation_test (test_row INTEGER)');
-			$result &= DBexecute('DROP TABLE zabbix_installation_test');
 		}
 
 		$db = DB::getDbBackend();
 
 		if (!$db->checkEncoding()) {
 			error($db->getWarning());
+
 			return false;
 		}
 
