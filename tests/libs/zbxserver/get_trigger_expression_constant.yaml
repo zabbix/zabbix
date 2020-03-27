@@ -132,13 +132,6 @@ in:
 out:
   return: ''
 ---
-test case: 'unsupported macro'
-in:
-  expression: '{19928}<>{HOST.HOST} and 1'
-  index: 1
-out:
-  return: ''
----
 test case: 'fraction'
 in:
   expression: '{19928}<>.5'
@@ -159,5 +152,12 @@ in:
   index: 1
 out:
   return: ''
+---
+test case: 'constant after macro'
+in:
+  expression: '{TRIGGER.VALUE}=1 and {19928}<>10'
+  index: 2
+out:
+  return: '10'
 ...
 

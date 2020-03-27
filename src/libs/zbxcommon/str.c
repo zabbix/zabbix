@@ -4377,9 +4377,7 @@ int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc)
 						*loc = token.loc;
 						return SUCCEED;
 					}
-					if (ZBX_TOKEN_OBJECTID != token.type)
-						return FAIL;
-
+					/* Skip all other tokens. Currently it can be only {TRIGGER.VALUE} macro. */
 					s = str + token.loc.r;
 				}
 				continue;
