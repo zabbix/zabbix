@@ -731,8 +731,7 @@ class CControllerPopupGeneric extends CController {
 		$popup = $this->popup_properties[$this->source_table];
 
 		// Set popup options.
-		$this->host_preselect_required = (in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER)
-			&& $this->source_table !== 'applications');
+		$this->host_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER);
 		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER);
 		$this->page_options = $this->getPageOptions();
 
