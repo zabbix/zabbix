@@ -1048,12 +1048,8 @@ static int	evaluate_AVG(char **value, DC_ITEM *item, const char *parameters, con
 
 	if (0 < values.values_num)
 	{
-<<<<<<< HEAD
-		double	sum = 0;
-		size_t	value_alloc = 0, value_offset = 0;
-=======
 		double	avg = 0;
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
+		size_t	value_alloc = 0, value_offset = 0;
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
@@ -1067,12 +1063,7 @@ static int	evaluate_AVG(char **value, DC_ITEM *item, const char *parameters, con
 
 			avg = avg / values.values_num;
 		}
-<<<<<<< HEAD
-
-		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, sum / values.values_num);
-=======
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL64, avg);
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL64, avg);
 
 		ret = SUCCEED;
 	}
@@ -1776,11 +1767,7 @@ static int	evaluate_ABSCHANGE(char **value, DC_ITEM *item, const zbx_timespec_t 
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-<<<<<<< HEAD
-			zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL,
-=======
-			zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL64,
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
+			zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL64,
 					fabs(values.values[0].value.dbl - values.values[1].value.dbl));
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
@@ -1856,11 +1843,7 @@ static int	evaluate_CHANGE(char **value, DC_ITEM *item, const zbx_timespec_t *ts
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-<<<<<<< HEAD
-			zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL,
-=======
-			zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL64,
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
+			zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL64,
 					values.values[0].value.dbl - values.values[1].value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
@@ -2542,21 +2525,14 @@ static int	evaluate_FORECAST(char **value, DC_ITEM *item, const char *parameters
 			}
 		}
 
-<<<<<<< HEAD
-		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, zbx_forecast(t, x, values.values_num,
-=======
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL64, zbx_forecast(t, x, values.values_num,
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
-				ts->sec - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), time, fit, k, mode));
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL64, zbx_forecast(t, x,
+				values.values_num, ts->sec - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), time, fit, k,
+				mode));
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-<<<<<<< HEAD
-		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, ZBX_MATH_ERROR);
-=======
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL64, ZBX_MATH_ERROR);
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL64, ZBX_MATH_ERROR);
 	}
 
 	ret = SUCCEED;
@@ -2705,21 +2681,14 @@ static int	evaluate_TIMELEFT(char **value, DC_ITEM *item, const char *parameters
 			}
 		}
 
-<<<<<<< HEAD
-		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, zbx_timeleft(t, x, values.values_num,
-=======
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL64, zbx_timeleft(t, x, values.values_num,
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
-				ts->sec - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), threshold, fit, k));
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL64, zbx_timeleft(t, x,
+				values.values_num, ts->sec - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), threshold,
+				fit, k));
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-<<<<<<< HEAD
-		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL, ZBX_MATH_ERROR);
-=======
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL64, ZBX_MATH_ERROR);
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
+		zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_DBL64, ZBX_MATH_ERROR);
 	}
 
 	ret = SUCCEED;

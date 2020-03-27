@@ -292,7 +292,6 @@ void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *val
 
 /******************************************************************************
  *                                                                            *
-<<<<<<< HEAD
  * Function: zbx_history_value2str_dyn                                        *
  *                                                                            *
  * Purpose: converts history value to string format (with dynamic buffer)     *
@@ -324,7 +323,10 @@ char	*zbx_history_value2str_dyn(const history_value_t *value, int value_type)
 			str = zbx_strdup(NULL, value->log->value);
 	}
 	return str;
-=======
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_history_value_print                                          *
  *                                                                            *
  * Purpose: converts history value to string format (double type printed in   *
@@ -342,7 +344,6 @@ void	zbx_history_value_print(char *buffer, size_t size, const history_value_t *v
 		zbx_print_double(buffer, size, value->dbl);
 	else
 		zbx_history_value2str(buffer, size, value, value_type);
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 }
 
 /******************************************************************************
