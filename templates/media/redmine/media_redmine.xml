@@ -156,6 +156,10 @@
             url = Redmine.params.url + query,&#13;
             request = new CurlHttpRequest();&#13;
 &#13;
+        if (typeof Redmine.params.HTTPProxy !== 'undefined' &amp;&amp; Redmine.params.HTTPProxy.trim() !== '') {&#13;
+            request.SetProxy(Redmine.params.HTTPProxy);&#13;
+        }&#13;
+&#13;
         request.AddHeader('Content-Type: application/json');&#13;
         request.AddHeader('X-Redmine-API-Key: ' + Redmine.params.access_key);&#13;
 &#13;
