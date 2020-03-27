@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-27T13:09:06Z</date>
+    <date>2020-03-27T15:18:08Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -54,6 +54,10 @@
                 <parameter>
                     <name>event_source</name>
                     <value>{EVENT.SOURCE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_tags_json</name>
+                    <value>{EVENT.TAGSJSON}</value>
                 </parameter>
                 <parameter>
                     <name>event_update_action</name>
@@ -128,6 +132,30 @@
 &#13;
     setProxy: function (HTTPProxy) {&#13;
         Jira.HTTPProxy = HTTPProxy;&#13;
+    },&#13;
+&#13;
+    setTags: function(event_tags_json) {&#13;
+        if (typeof event_tags_json !== 'undefined' &amp;&amp; event_tags_json !== ''&#13;
+            &amp;&amp; event_tags_json !== '{EVENT.TAGSJSON}') {&#13;
+            try {&#13;
+                var tags = JSON.parse(event_tags_json),&#13;
+                    label;&#13;
+&#13;
+                Jira.labels = [];&#13;
+&#13;
+                tags.forEach(function (tag) {&#13;
+                    if (typeof tag.tag !== 'undefined' &amp;&amp; typeof tag.value !== 'undefined' ) {&#13;
+                        label = (tag.tag + (tag.value ? (':' + tag.value) : '')).replace(/\s/g, '_');&#13;
+                        if (label.length &lt; 255) {&#13;
+                            Jira.labels.push(label);&#13;
+                        }&#13;
+                    }&#13;
+                });&#13;
+            }&#13;
+            catch (error) {&#13;
+                // Code is not missing here.&#13;
+            }&#13;
+        }&#13;
     },&#13;
 &#13;
     escapeMarkup: function (str) {&#13;
@@ -286,6 +314,9 @@
             }&#13;
         };&#13;
 &#13;
+        if (Jira.labels &amp;&amp; Jira.labels.length &gt; 0) {&#13;
+            data.fields.labels = Jira.labels;&#13;
+        }&#13;
         var result = Jira.request('post', 'issue', Jira.addCustomFields(data, fields));&#13;
 &#13;
         if (typeof result.response !== 'object' || typeof result.response.key === 'undefined') {&#13;
@@ -370,6 +401,7 @@ try {&#13;
 &#13;
     Jira.setParams(jira);&#13;
     Jira.setProxy(params.HTTPProxy);&#13;
+    Jira.setTags(params.event_tags_json);&#13;
 &#13;
     // Create issue for non trigger-based events.&#13;
     if (params.event_source !== '0' &amp;&amp; params.event_recovery_value !== '0') {&#13;
