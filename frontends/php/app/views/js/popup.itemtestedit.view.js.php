@@ -456,7 +456,7 @@ jQuery(document).ready(function($) {
 		$('#get_value').on('change', function() {
 			$rows = $('#host_address_row, #proxy_hostid_row, #get_value_row'),
 			$form = $('#preprocessing-test-form'),
-			$submit_btn = $('.submit-test-btn');
+			$submit_btn = overlays_stack.getById('item-test').$btn_submit;
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
