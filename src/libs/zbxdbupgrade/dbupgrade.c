@@ -273,6 +273,8 @@ static void	DBdrop_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#elif defined(HAVE_ORACLE)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s default null", field->name);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s drop default", field->name);
 #endif
