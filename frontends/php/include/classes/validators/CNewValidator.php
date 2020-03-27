@@ -331,30 +331,27 @@ class CNewValidator {
 	}
 
 	private function is_id($value) {
-		if (1 != preg_match('/^[0-9]+$/', $value)) {
+		if (!preg_match('/^'.ZBX_PREG_INT.'$/', $value)) {
 			return false;
 		}
 
-		// between 0 and _I64_MAX
 		return (bccomp($value, '0') >= 0 && bccomp($value, ZBX_DB_MAX_ID) <= 0);
 	}
 
 	public static function is_int32($value) {
-		if (1 != preg_match('/^\-?[0-9]+$/', $value)) {
+		if (!preg_match('/^'.ZBX_PREG_INT.'$/', $value)) {
 			return false;
 		}
 
-		// between INT_MIN and INT_MAX
-		return (bccomp($value, ZBX_MIN_INT32) >= 0 && bccomp($value, ZBX_MAX_INT32) <= 0);
+		return ($value >= ZBX_MIN_INT32 && $value <= ZBX_MAX_INT32);
 	}
 
 	public static function is_uint64($value) {
-		if (1 != preg_match('/^[0-9]+$/', $value)) {
+		if (!preg_match('/^'.ZBX_PREG_INT.'$/', $value)) {
 			return false;
 		}
 
-		// between 0 and _UI64_MAX
-		return (bccomp($value, '0') >= 0 && bccomp($value, '18446744073709551615') <= 0);
+		return ($value >= 0 && bccomp($value, ZBX_MAX_UINT64) <= 0);
 	}
 
 	/**

@@ -1779,7 +1779,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 				else {
 					$value = getItemFunctionalValue($item, $function,
-							$expressionData->expressions[0]['functionParamList'][0]
+						$expressionData->expressions[0]['functionParamList'][0]
 					);
 				}
 

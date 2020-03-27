@@ -1459,7 +1459,7 @@ static int	DBitem_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
-			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_value_print(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
 			if (0 == raw)
@@ -1772,6 +1772,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_NAME			MVAR_EVENT "NAME}"
 #define MVAR_EVENT_STATUS		MVAR_EVENT "STATUS}"
 #define MVAR_EVENT_TAGS			MVAR_EVENT "TAGS}"
+#define MVAR_EVENT_TAGSJSON		MVAR_EVENT "TAGSJSON}"
 #define MVAR_EVENT_TAGS_PREFIX		MVAR_EVENT "TAGS."
 #define MVAR_EVENT_TIME			MVAR_EVENT "TIME}"
 #define MVAR_EVENT_VALUE		MVAR_EVENT "VALUE}"
@@ -1785,6 +1786,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_RECOVERY_ID		MVAR_EVENT_RECOVERY "ID}"
 #define MVAR_EVENT_RECOVERY_STATUS	MVAR_EVENT_RECOVERY "STATUS}"	/* deprecated */
 #define MVAR_EVENT_RECOVERY_TAGS	MVAR_EVENT_RECOVERY "TAGS}"
+#define MVAR_EVENT_RECOVERY_TAGSJSON	MVAR_EVENT_RECOVERY "TAGSJSON}"
 #define MVAR_EVENT_RECOVERY_TIME	MVAR_EVENT_RECOVERY "TIME}"
 #define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"	/* deprecated */
 #define MVAR_EVENT_RECOVERY_NAME	MVAR_EVENT_RECOVERY "NAME}"
@@ -2293,6 +2295,38 @@ static void	get_event_tags(const DB_EVENT *event, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_event_tags_json                                              *
+ *                                                                            *
+ * Purpose: format event tags string in JSON format                           *
+ *                                                                            *
+ * Parameters: event        [IN] the event                                    *
+ *             replace_to - [OUT] replacement string                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
+{
+	struct zbx_json	json;
+	int		i;
+
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < event->tags.values_num; i++)
+	{
+		const zbx_tag_t	*tag = (const zbx_tag_t *)event->tags.values[i];
+
+		zbx_json_addobject(&json, NULL);
+		zbx_json_addstring(&json, "tag", tag->tag, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "value", tag->value, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
+	}
+
+	zbx_json_close(&json);
+	*replace_to = zbx_strdup(*replace_to, json.buffer);
+	zbx_json_free(&json);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_recovery_event_value                                         *
  *                                                                            *
  * Purpose: request recovery event value by macro                             *
@@ -2321,13 +2355,16 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%d", r_event->value);
 	}
-	else if (EVENT_SOURCE_TRIGGERS == r_event->source && 0 == strcmp(macro, MVAR_EVENT_RECOVERY_TAGS))
-	{
-		get_event_tags(r_event, replace_to);
-	}
 	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_NAME))
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%s", r_event->name);
+	}
+	else if (EVENT_SOURCE_TRIGGERS == r_event->source)
+	{
+		if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TAGS))
+			get_event_tags(r_event, replace_to);
+		else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TAGSJSON))
+			get_event_tags_json(r_event, replace_to);
 	}
 }
 
@@ -2405,6 +2442,10 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
 		{
 			get_event_tags(event, replace_to);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGSJSON))
+		{
+			get_event_tags_json(event, replace_to);
 		}
 		else if (0 == strcmp(macro, MVAR_EVENT_NSEVERITY))
 		{

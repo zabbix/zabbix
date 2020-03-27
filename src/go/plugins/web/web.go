@@ -175,7 +175,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		for scanner.Scan() {
 			if out, ok := zbxregexp.ExecuteRegex(scanner.Bytes(), rx, []byte(output)); ok {
 				if length != nil {
-					out, _ = agent.CutAfterN(out, *length)
+					out = agent.CutAfterN(out, *length)
 				}
 				return out, nil
 			}
