@@ -1032,8 +1032,7 @@ class CControllerPopupGeneric extends CController {
 					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 				}
 
-				if ((!$this->group_preselect_required || $this->groupids)
-						|| (!$this->host_preselect_required || $this->hostids)) {
+				if (!$this->host_preselect_required || $this->hostids || $this->groupids) {
 					$records = API::Trigger()->get($options);
 				}
 				else {
