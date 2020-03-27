@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-11T08:04:47Z</date>
+    <date>2020-03-27T12:27:06Z</date>
     <media_types>
         <media_type>
             <name>Jira</name>
@@ -161,7 +161,7 @@ var Jira = {&#13;
         ['url', 'user', 'password', 'project_key', 'issue_type'].forEach(function (field) {&#13;
             if (typeof Jira.params !== 'object' || typeof Jira.params[field] === 'undefined'&#13;
                 || Jira.params[field] === '' ) {&#13;
-                throw new Error('Required Jira param is not set: &quot;' + field + '&quot;.');&#13;
+                throw 'Required Jira param is not set: &quot;' + field + '&quot;.';&#13;
             }&#13;
         });&#13;
 &#13;
@@ -192,7 +192,7 @@ var Jira = {&#13;
                 break;&#13;
 &#13;
             default:&#13;
-                throw new Error('Unsupported HTTP request method: ' + method);&#13;
+                throw 'Unsupported HTTP request method: ' + method;&#13;
         }&#13;
 &#13;
         Zabbix.Log(4, '[ Jira Webhook ] Received response with status code ' + request.Status() + '\n' + response);&#13;
@@ -219,7 +219,7 @@ var Jira = {&#13;
                 message += ': ' + JSON.stringify(response.errorMessages);&#13;
             }&#13;
 &#13;
-            throw new Error(message + ' Check debug log for more information.');&#13;
+            throw message + ' Check debug log for more information.';&#13;
         }&#13;
 &#13;
         return {&#13;
@@ -252,7 +252,7 @@ var Jira = {&#13;
         var result = Jira.request('post', 'issue', Jira.addCustomFields(data, fields));&#13;
 &#13;
         if (typeof result.response !== 'object' || typeof result.response.key === 'undefined') {&#13;
-            throw new Error('Cannot create Jira issue. Check debug log for more information.');&#13;
+            throw 'Cannot create Jira issue. Check debug log for more information.';&#13;
         }&#13;
 &#13;
         return result.response.key;&#13;
@@ -350,7 +350,7 @@ try {&#13;
     // Update created issue for trigger-based event.&#13;
     else {&#13;
         if (!jira.issue_key.startsWith(jira.project_key)) {&#13;
-            throw new Error('Incorrect Issue key given: ' + jira.issue_key);&#13;
+            throw 'Incorrect Issue key given: ' + jira.issue_key;&#13;
         }&#13;
         Jira.updateIssue(params.summary, fields,&#13;
             ((params.event_value === '0' &amp;&amp; !Object.keys(fields).length)&#13;
