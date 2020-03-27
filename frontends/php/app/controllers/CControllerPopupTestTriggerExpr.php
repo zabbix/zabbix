@@ -32,7 +32,8 @@ class CControllerPopupTestTriggerExpr extends CController {
 		CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO => 1,
 		CTriggerExprParserResult::TOKEN_TYPE_MACRO => 1,
 		CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO => 1,
-		CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO => 1
+		CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO => 1,
+		CTriggerExprParserResult::TOKEN_TYPE_STRING => 1
 	];
 
 	protected function init() {
@@ -63,44 +64,66 @@ class CControllerPopupTestTriggerExpr extends CController {
 			$this->macros_data = [];
 
 			foreach ($result->getTokens() as $token) {
-				if (!array_key_exists($token['type'], $this->supported_token_types)
-						|| array_key_exists($token['value'], $this->macros_data)) {
+				if (!array_key_exists($token['type'], $this->supported_token_types)) {
 					continue;
 				}
 
-				$row = (new CRow())->addItem(
-					(new CCol($token['value']))
-						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-						->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-				);
-				$fname = 'test_data_'.md5($token['value']);
-				$this->macros_data[$token['value']] = array_key_exists($fname, $_REQUEST) ? $_REQUEST[$fname] : '';
-				$info = get_item_function_info($token['value']);
+				if ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
+					$matched_macros = CMacrosResolverGeneral::extractMacros([$token['data']['string']], [
+						'macros' => [
+							'trigger' => ['{TRIGGER.VALUE}']
+						],
+						'lldmacros' => true,
+						'usermacros' => true
+					]);
 
-				if (!is_array($info) && array_key_exists($info, $this->defined_error_phrases)) {
-					$this->allowed_testing = false;
-					$row->addItem(
-						(new CCol($this->defined_error_phrases[$info]))
-							->addClass(ZBX_STYLE_RED)
-							->setColspan(2)
+					$macros = array_merge(array_keys($matched_macros['usermacros'] + $matched_macros['lldmacros']),
+						$matched_macros['macros']['trigger']
 					);
 				}
 				else {
-					if ($info['values'] !== null) {
-						$control = new CComboBox($fname, $this->macros_data[$token['value']], null, $info['values']);
-					}
-					else {
-						$control = (new CTextBox($fname, $this->macros_data[$token['value']]))
-							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-					}
-
-					$this->fields[$fname] = 'string';
-
-					$row->addItem($info['value_type']);
-					$row->addItem($control);
+					$macros = [$token['value']];
 				}
 
-				$this->data_table_rows[] = $row;
+				foreach ($macros as $macro) {
+					if (array_key_exists($macro, $this->macros_data)) {
+						continue;
+					}
+
+					$row = (new CRow())->addItem(
+						(new CCol($macro))
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+							->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+					);
+					$fname = 'test_data_'.md5($macro);
+					$this->macros_data[$macro] = array_key_exists($fname, $_REQUEST) ? $_REQUEST[$fname] : '';
+					$info = get_item_function_info($macro);
+
+					if (!is_array($info) && array_key_exists($info, $this->defined_error_phrases)) {
+						$this->allowed_testing = false;
+						$row->addItem(
+							(new CCol($this->defined_error_phrases[$info]))
+								->addClass(ZBX_STYLE_RED)
+								->setColspan(2)
+						);
+					}
+					else {
+						if ($info['values'] !== null) {
+							$control = new CComboBox($fname, $this->macros_data[$macro], null, $info['values']);
+						}
+						else {
+							$control = (new CTextBox($fname, $this->macros_data[$macro]))
+								->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+						}
+
+						$this->fields[$fname] = 'string';
+
+						$row->addItem($info['value_type']);
+						$row->addItem($control);
+					}
+
+					$this->data_table_rows[] = $row;
+				}
 			}
 		}
 	}
@@ -133,21 +156,45 @@ class CControllerPopupTestTriggerExpr extends CController {
 		$results = [];
 
 		if ($this->allowed_testing && $this->hasInput('test_expression')) {
-			// Quoting non-numeric values.
-			foreach ($this->macros_data as &$value) {
-				$value = CTriggerExpression::quoteString($value, false);
-			}
-			unset($value);
-
 			$mapping = [];
 			$expressions = [];
 
+			$expression_data = new CTriggerExpression();
+
 			foreach ($expression_html_tree as $e) {
 				$original_expression = $e['expression']['value'];
-				$expression = strtr($original_expression, $this->macros_data);
 
-				$mapping[$expression][] = $original_expression;
-				$expressions[] = $expression;
+				$result = $expression_data->parse($original_expression);
+
+				if ($result) {
+					$expression = [];
+					$pos_left = 0;
+
+					foreach ($result->getTokens() as $token) {
+						if (!array_key_exists($token['type'], $this->supported_token_types)) {
+							continue;
+						}
+
+						if ($pos_left != $token['pos']) {
+							$expression[] = substr($original_expression, $pos_left, $token['pos'] - $pos_left);
+						}
+						$pos_left = $token['pos'] + $token['length'];
+
+						if ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
+							$value = strtr($token['data']['string'], $this->macros_data);
+							$expression[] = CTriggerExpression::quoteString($value, false, true);
+						}
+						else {
+							$value = strtr($token['value'], $this->macros_data);
+							$expression[] = CTriggerExpression::quoteString($value, false);
+						}
+					}
+
+					$expression = implode('', $expression);
+
+					$mapping[$expression][] = $original_expression;
+					$expressions[] = $expression;
+				}
 			}
 
 			$data = ['expressions' => array_values(array_unique($expressions))];
@@ -176,8 +223,6 @@ class CControllerPopupTestTriggerExpr extends CController {
 			'expression' => $this->expression,
 			'allowed_testing' => $this->allowed_testing,
 			'data_table_rows' => $this->data_table_rows,
-			'supported_token_types' => $this->supported_token_types,
-			'defined_error_phrases' => $this->defined_error_phrases,
 			'eHTMLTree' => $expression_html_tree,
 			'results' => $results,
 			'outline' => $outline,
