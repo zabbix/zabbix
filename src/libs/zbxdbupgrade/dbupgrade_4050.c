@@ -1574,16 +1574,16 @@ static int	DBpatch_4050063(void)
 
 static int	DBpatch_4050064(void)
 {
-	const ZBX_TABLE table =
-		{"override",	"overrideid",	0,
+	const ZBX_TABLE	table =
+		{"override", "overrideid", 0,
 			{
-				{"overrideid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"itemid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"name",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-				{"step",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-				{"evaltype",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-				{"formula",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-				{"stop",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
+				{"overrideid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"step", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"stop", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1606,14 +1606,14 @@ static int	DBpatch_4050066(void)
 
 static int	DBpatch_4050067(void)
 {
-	const ZBX_TABLE table =
-		{"override_condition",	"override_conditionid",	0,
+	const ZBX_TABLE	table =
+		{"override_condition", "override_conditionid", 0,
 			{
-				{"override_conditionid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"overrideid",	NULL,	"override",	"overrideid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE},
-				{"operator",	"8",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-				{"macro",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-				{"value",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+				{"override_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"overrideid", NULL, "override", "overrideid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
+				{"operator", "8", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"macro", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1624,7 +1624,7 @@ static int	DBpatch_4050067(void)
 
 static int	DBpatch_4050068(void)
 {
-	const ZBX_FIELD	field = {"overrideid",	NULL,	"override",	"overrideid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"overrideid", NULL, "override", "overrideid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_condition", 1, &field);
 }
@@ -1636,13 +1636,13 @@ static int	DBpatch_4050069(void)
 
 static int	DBpatch_4050070(void)
 {
-	const ZBX_TABLE table =
-		{"override_operation",	"override_operationid",	0,
-				{
-				{"override_operationid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"overrideid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"operationtype",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-				{"evaltype",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
+	const ZBX_TABLE	table =
+		{"override_operation", "override_operationid", 0,
+			{
+				{"override_operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"overrideid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"operationtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1653,7 +1653,7 @@ static int	DBpatch_4050070(void)
 
 static int	DBpatch_4050071(void)
 {
-	const ZBX_FIELD	field = {"overrideid",	NULL,	"override",	"overrideid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"overrideid", NULL, "override", "overrideid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_operation", 1, &field);
 }
@@ -1665,13 +1665,13 @@ static int	DBpatch_4050072(void)
 
 static int	DBpatch_4050073(void)
 {
-	const ZBX_TABLE table =
-		{"override_opcondition",	"override_opconditionid",	0,
+	const ZBX_TABLE	table =
+		{"override_opcondition", "override_opconditionid", 0,
 			{
-				{"override_opconditionid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE},
-				{"operator",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-				{"value",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+				{"override_opconditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
+				{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1682,7 +1682,7 @@ static int	DBpatch_4050073(void)
 
 static int	DBpatch_4050074(void)
 {
-	const ZBX_FIELD	field = {"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_opcondition", 1, &field);
 }
@@ -1694,11 +1694,11 @@ static int	DBpatch_4050075(void)
 
 static int	DBpatch_4050076(void)
 {
-	const ZBX_TABLE table =
-		{"override_opperiod",	"override_operationid",	0,
+	const ZBX_TABLE	table =
+		{"override_opperiod", "override_operationid", 0,
 			{
-				{"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"delay",	"0",	NULL,	NULL,	1024,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+				{"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"delay", "0", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1709,18 +1709,18 @@ static int	DBpatch_4050076(void)
 
 static int	DBpatch_4050077(void)
 {
-	const ZBX_FIELD	field = {"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_opperiod", 1, &field);
 }
 
 static int	DBpatch_4050078(void)
 {
-	const ZBX_TABLE table =
-		{"override_ophistory",	"override_operationid",	0,
+	const ZBX_TABLE	table =
+		{"override_ophistory", "override_operationid", 0,
 			{
-				{"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"history",	"90d",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+				{"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"history", "90d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1731,18 +1731,18 @@ static int	DBpatch_4050078(void)
 
 static int	DBpatch_4050079(void)
 {
-	const ZBX_FIELD	field = {"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_ophistory", 1, &field);
 }
 
 static int	DBpatch_4050080(void)
 {
-	const ZBX_TABLE table =
-		{"override_optrends",	"override_operationid",	0,
+	const ZBX_TABLE	table =
+		{"override_optrends", "override_operationid", 0,
 			{
-				{"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"trends",	"365d",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+				{"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"trends", "365d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1753,18 +1753,18 @@ static int	DBpatch_4050080(void)
 
 static int	DBpatch_4050081(void)
 {
-	const ZBX_FIELD	field = {"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_optrends", 1, &field);
 }
 
 static int	DBpatch_4050082(void)
 {
-	const ZBX_TABLE table =
-		{"override_opseverity",	"override_operationid",	0,
+	const ZBX_TABLE	table =
+		{"override_opseverity", "override_operationid", 0,
 			{
-				{"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"severity",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
+				{"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1775,20 +1775,20 @@ static int	DBpatch_4050082(void)
 
 static int	DBpatch_4050083(void)
 {
-	const ZBX_FIELD	field = {"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_opseverity", 1, &field);
 }
 
 static int	DBpatch_4050084(void)
 {
-	const ZBX_TABLE table =
-		{"override_optag",	"override_optagid",	0,
+	const ZBX_TABLE	table =
+		{"override_optag", "override_optagid", 0,
 			{
-				{"override_optagid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"tag",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-				{"value",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+				{"override_optagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1799,7 +1799,7 @@ static int	DBpatch_4050084(void)
 
 static int	DBpatch_4050085(void)
 {
-	const ZBX_FIELD	field = {"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_optag", 1, &field);
 }
@@ -1811,13 +1811,13 @@ static int	DBpatch_4050086(void)
 
 static int	DBpatch_4050087(void)
 {
-	const ZBX_TABLE table =
-		{"override_opgroup_prototype",	"override_opgroup_prototypeid",	0,
+	const ZBX_TABLE	table =
+		{"override_opgroup_prototype", "override_opgroup_prototypeid", 0,
 			{
-				{"override_opgroup_prototypeid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"name",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-				{"groupid",	NULL,	"hstgrp",	"groupid",	0,	ZBX_TYPE_ID,	0,	0},
+				{"override_opgroup_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"groupid", NULL, "hstgrp", "groupid", 0, ZBX_TYPE_ID, 0, 0},
 				{0}
 			},
 			NULL
@@ -1828,7 +1828,7 @@ static int	DBpatch_4050087(void)
 
 static int	DBpatch_4050088(void)
 {
-	const ZBX_FIELD	field = {"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_opgroup_prototype", 1, &field);
 }
@@ -1840,7 +1840,7 @@ static int	DBpatch_4050089(void)
 
 static int	DBpatch_4050090(void)
 {
-	const ZBX_FIELD	field = {"groupid",	NULL,	"hstgrp",	"groupid",	0,	ZBX_TYPE_ID,	0,	0};
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("override_opgroup_prototype", 2, &field);
 }
@@ -1853,11 +1853,11 @@ static int	DBpatch_4050091(void)
 static int	DBpatch_4050092(void)
 {
 	const ZBX_TABLE table =
-		{"override_optemplate",	"override_optemplateid",	0,
+		{"override_optemplate", "override_optemplateid", 0,
 			{
-				{"override_optemplateid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"override_operationid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"templateid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
+				{"override_optemplateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"override_operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1868,7 +1868,7 @@ static int	DBpatch_4050092(void)
 
 static int	DBpatch_4050093(void)
 {
-	const ZBX_FIELD	field = {"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_optemplate", 1, &field);
 }
@@ -1880,7 +1880,7 @@ static int	DBpatch_4050094(void)
 
 static int	DBpatch_4050095(void)
 {
-	const ZBX_FIELD	field = {"templateid",	NULL,	"hosts",	"hostid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0};
+	const ZBX_FIELD	field = {"templateid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBadd_foreign_key("override_optemplate", 2, &field);
 }
@@ -1892,11 +1892,11 @@ static int	DBpatch_4050096(void)
 
 static int	DBpatch_4050097(void)
 {
-	const ZBX_TABLE table =
-		{"override_opinventory",	"override_operationid",	0,
+	const ZBX_TABLE	table =
+		{"override_opinventory", "override_operationid", 0,
 			{
-				{"override_operationid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-				{"inventory_mode",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
+				{"override_operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"inventory_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1907,7 +1907,7 @@ static int	DBpatch_4050097(void)
 
 static int	DBpatch_4050098(void)
 {
-	const ZBX_FIELD	field = {"override_operationid",	NULL,	"override_operation",	"override_operationid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"override_operationid", NULL, "override_operation", "override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("override_opinventory", 1, &field);
 }
