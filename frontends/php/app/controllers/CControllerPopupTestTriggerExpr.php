@@ -190,6 +190,10 @@ class CControllerPopupTestTriggerExpr extends CController {
 						}
 					}
 
+					if ($pos_left != strlen($original_expression)) {
+						$expression[] = substr($original_expression, $pos_left);
+					}
+
 					$expression = implode('', $expression);
 
 					$mapping[$expression][] = $original_expression;
