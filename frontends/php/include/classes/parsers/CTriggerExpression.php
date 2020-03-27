@@ -57,27 +57,17 @@ class CTriggerExpression {
 	 * An options array.
 	 *
 	 * Supported options:
-<<<<<<< HEAD
 	 *   'lldmacros' => true             Enable low-level discovery macros usage in trigger expression.
 	 *   'allow_func_only' => true       Allow trigger expression without host:key pair, i.e. {func(param)}.
 	 *   'collapsed_expression' => true  Short trigger expression.
 	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
-=======
-	 *   'lldmacros' => true              Enable low-level discovery macros usage in trigger expression.
-	 *   'allow_func_only' => false       Allow trigger expression without host:key pair, i.e. {func(param)}.
-	 *   'calc_constant_values' => false  Include calculated constant values in the result (i.e., "10K" => 10240).
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 	 *
 	 * @var array
 	 */
 	public $options = [
 		'lldmacros' => true,
 		'allow_func_only' => false,
-<<<<<<< HEAD
 		'collapsed_expression' => false
-=======
-		'calc_constant_values' => false
->>>>>>> 07266a2eb54eeb012cfecea7d25371b42ffcd32d
 	];
 
 	/**
@@ -728,10 +718,6 @@ class CTriggerExpression {
 		$token_data = [
 			'suffix' => $this->number_parser->getSuffix()
 		];
-
-		if ($this->options['calc_constant_values']) {
-			$token_data['calc_value'] = $value;
-		}
 
 		$this->result->addToken(
 			CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
