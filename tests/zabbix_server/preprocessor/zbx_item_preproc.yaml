@@ -179,6 +179,19 @@ out:
   return: SUCCEED
   value: 01abc01
 ---
+test case: trim(\\s, abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\\ abc \\"
+  step:
+    type: ZBX_PREPROC_TRIM
+    params: "\\\\s"
+out:
+  return: SUCCEED
+  value: "abc"
+---
 test case: regsub("test 123 number", "([0-9]+", 1)
 in:
   value:
@@ -2021,4 +2034,212 @@ in:
 out:
   return: FAIL
   error: custom error
+---
+test case: replace a to b
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: a
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\nb"
+out:
+  return: SUCCEED
+  value: b
+---
+test case: replace a to bbb
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: a1a2a3a
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\nbbb"
+out:
+  return: SUCCEED
+  value: bbb1bbb2bbb3bbb
+---
+test case: replace a to a
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: a
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\na"
+out:
+  return: SUCCEED
+  value: a
+---
+test case: replace a to nothing
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: a
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\n"
+out:
+  return: SUCCEED
+  value: ""
+---
+test case: replace a to nothing in between
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abac
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\n"
+out:
+  return: SUCCEED
+  value: "bc"
+---
+test case: replace non printable characters
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\n\r	 "
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\n\\r\\t\\s\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: replace non printable characters mixed
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\n1\r2	3 4"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\n1\\r2\\t3\\s4\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: replace non printable characters 2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\n\r	 "
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\n\\r	 \nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: replace non printable characters in both search and replace
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\n\r	 "
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\n\\r\\t\\s\n\\n\\r\\tOK\\s"
+out:
+  return: SUCCEED
+  value: "\n\r\tOK "
+---
+test case: replace \
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\\"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: replace 2 characters "\t" to OK
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\\t"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\\\t\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: Missing second parameter
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "OK"
+out:
+  return: FAIL
+  value: "a"
+---
+test case: Missing first parameter
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\nOK"
+out:
+  return: FAIL
+  value: "a"
+---
+test case: Single slash in search
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "\\"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "\\\nOK"
+out:
+  return: SUCCEED
+  value: "OK"
+---
+test case: Single slash in replace
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "OK"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "OK\n\\"
+out:
+  return: SUCCEED
+  value: "\\"
+---
+test case: No match
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "O K"
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "OK\ntest"
+out:
+  return: SUCCEED
+  value: "O K"
 ...

@@ -101,4 +101,116 @@ class MysqlDbBackend extends DbBackend {
 
 		return true;
 	}
+
+	/**
+	* Check if database is using IEEE754 compatible double precision columns.
+	*
+	* @return bool
+	*/
+	public function isDoubleIEEE754() {
+		global $DB;
+
+		$table_columns = [];
+		$table_columns_cnt = 0;
+
+		foreach (DB::getSchema() as $table_name => $table_spec) {
+			foreach ($table_spec['fields'] as $field_name => $field_spec) {
+				if ($field_spec['type'] === DB::FIELD_TYPE_FLOAT) {
+					$table_columns[$table_name][] = zbx_dbstr($field_name);
+					$table_columns_cnt++;
+				}
+			}
+		}
+
+		if (!$table_columns) {
+			return true;
+		}
+
+		$conditions_or = [];
+
+		foreach ($table_columns as $table_name => $fields) {
+			$conditions_or[] = '(LOWER(table_name) LIKE '.zbx_dbstr($table_name).
+				' AND LOWER(column_name) IN ('.implode(', ', $fields).'))';
+		}
+
+		$sql =
+			'SELECT COUNT(*) cnt FROM information_schema.columns'.
+				' WHERE table_schema LIKE '.zbx_dbstr($DB['DATABASE']).
+				' AND column_type LIKE "double"'.
+				' AND ('.implode(' OR ', $conditions_or).')';
+
+
+		$result = DBfetch(DBselect($sql));
+
+		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == $table_columns_cnt);
+	}
+
+	/**
+	 * Check is current connection contain requested cipher list.
+	 *
+	 * @return bool
+	 */
+	public function isConnectionSecure() {
+		$row = DBfetch(DBselect("SHOW STATUS LIKE 'ssl_cipher'"));
+
+		if (!$row || !$row['Value']) {
+			$this->setError('Error connecting to database. Empty cipher.');
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Create connection to database server.
+	 *
+	 * @param string $host         Host name.
+	 * @param string $port         Port.
+	 * @param string $user         User name.
+	 * @param string $password     Password.
+	 * @param string $dbname       Database name.
+	 * @param string $schema       DB schema.
+	 *
+	 * @param
+	 * @return resource|null
+	 */
+	public function connect($host, $port, $user, $password, $dbname, $schema) {
+		$resource = mysqli_init();
+		$tls_mode = null;
+
+		if ($this->tls_encryption) {
+			$cipher_suit = ($this->tls_cipher_list === '') ? null : $this->tls_cipher_list;
+			$resource->ssl_set($this->tls_key_file, $this->tls_cert_file, $this->tls_ca_file, null, $cipher_suit);
+
+			$tls_mode = MYSQLI_CLIENT_SSL;
+		}
+
+		$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
+
+		if ($resource->error) {
+			$this->setError($resource->error);
+			return null;
+		}
+
+		if ($resource->errno) {
+			$this->setError('Database error code '.$resource->errno);
+			return null;
+		}
+
+		if ($resource->autocommit(true) === false) {
+			$this->setError('Error setting auto commit.');
+			return null;
+		}
+
+		return $resource;
+	}
+
+	/**
+	 * Initialize connection.
+	 *
+	 * @return bool
+	 */
+	public function init() {
+		DBexecute('SET NAMES utf8');
+	}
 }

@@ -669,6 +669,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'item.all.preprocessing'
 					],
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Left trim', 'parameter_1' => 'def'],
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
@@ -694,6 +695,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'item.symbols.preprocessing'
 					],
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '1a!@#$%^&*()-='],
 						['type' => 'Right trim', 'parameter_1' => '1a!@#$%^&*()-='],
 						['type' => 'Left trim', 'parameter_1' => '2b!@#$%^&*()-='],
 						['type' => 'Trim', 'parameter_1' => '3c!@#$%^&*()-='],
@@ -718,6 +720,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'item.theSamePpreprocessing'
 					],
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => 'текст', 'parameter_2' => 'замена'],
+						['type' => 'Replace', 'parameter_1' => 'текст', 'parameter_2' => 'замена'],
 						['type' => 'Change per second'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
@@ -766,6 +770,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'item-user-macro'
 					],
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => '{$TEST1}', 'parameter_2' => '{$MACRO2}'],
 						['type' => 'Regular expression', 'parameter_1' => '{$DELIM}(.*)', 'parameter_2' => '\1'],
 						['type' => 'Trim', 'parameter_1' => '{$DELIM}'],
 						['type' => 'Right trim', 'parameter_1' => '{$MACRO}'],
@@ -793,6 +798,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'item-spaces-preprocessing'
 					],
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => '   test text  ', 'parameter_2' => '   replacement 1  '],
 						['type' => 'Regular expression', 'parameter_1' => '  pattern    ', 'parameter_2' => '   \1   '],
 						['type' => 'Right trim', 'parameter_1' => '    22   '],
 						['type' => 'Left trim', 'parameter_1' => '   33  '],

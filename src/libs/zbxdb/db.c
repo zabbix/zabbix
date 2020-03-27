@@ -308,6 +308,9 @@ static int	is_recoverable_mysql_error(void)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
+#ifdef CR_SSL_CONNECTION_ERROR
+		case CR_SSL_CONNECTION_ERROR:
+#endif
 #ifdef ER_CONNECTION_KILLED
 		case ER_CONNECTION_KILLED:
 #endif
@@ -340,7 +343,8 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
  *               ZBX_DB_FAIL - failed to connect                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
+int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
+			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
@@ -354,10 +358,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	sword		err = OCI_SUCCESS;
 	static ub2	csid = 0;
 #elif defined(HAVE_POSTGRESQL)
+#	define ZBX_DB_MAX_PARAMS	9
+
 	int		rc;
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
+	const char	*keywords[ZBX_DB_MAX_PARAMS + 1];
+	const char	*values[ZBX_DB_MAX_PARAMS + 1];
+	unsigned int	i = 0;
 #elif defined(HAVE_SQLITE3)
 	char		*p, *path = NULL;
 #endif
@@ -383,8 +392,118 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
 		exit(EXIT_FAILURE);
 	}
+#if defined(HAVE_MYSQL_TLS)
+	if (NULL != tls_connect)
+	{
+		unsigned int	mysql_tls_mode;
 
-	if (NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
+		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+			mysql_tls_mode = SSL_MODE_REQUIRED;
+		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+			mysql_tls_mode = SSL_MODE_VERIFY_CA;
+		else
+			mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
+
+		if (0 != mysql_options(conn, MYSQL_OPT_SSL_MODE, &mysql_tls_mode))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_MODE option.");
+			ret = ZBX_DB_FAIL;
+		}
+	}
+
+	if (ZBX_DB_OK == ret && NULL != ca && 0 != mysql_options(conn, MYSQL_OPT_SSL_CA, ca))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CA option.");
+		ret = ZBX_DB_FAIL;
+	}
+
+	if (ZBX_DB_OK == ret && NULL != key && 0 != mysql_options(conn, MYSQL_OPT_SSL_KEY, key))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_KEY option.");
+		ret = ZBX_DB_FAIL;
+	}
+
+	if (ZBX_DB_OK == ret && NULL != cert && 0 != mysql_options(conn, MYSQL_OPT_SSL_CERT, cert))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CERT option.");
+		ret = ZBX_DB_FAIL;
+	}
+
+	if (ZBX_DB_OK == ret && NULL != cipher && 0 != mysql_options(conn, MYSQL_OPT_SSL_CIPHER, cipher))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
+		ret = ZBX_DB_FAIL;
+	}
+#if defined(HAVE_MYSQL_TLS_CIPHERSUITES)
+	if (ZBX_DB_OK == ret && NULL != cipher_13 && 0 != mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_TLS_CIPHERSUITES option.");
+		ret = ZBX_DB_FAIL;
+	}
+#else
+	ZBX_UNUSED(cipher_13);
+#endif
+#elif defined(HAVE_MARIADB_TLS)
+	ZBX_UNUSED(cipher_13);
+
+	if (NULL != tls_connect)
+	{
+		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		{
+			my_bool	enforce_tls = 1;
+
+			if (0 != mysql_optionsv(conn, MYSQL_OPT_SSL_ENFORCE, (void *)&enforce_tls))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_ENFORCE option.");
+				ret = ZBX_DB_FAIL;
+			}
+		}
+		else
+		{
+			my_bool	verify = 1;
+
+			if (0 != mysql_optionsv(conn, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, (void *)&verify))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_VERIFY_SERVER_CERT option.");
+				ret = ZBX_DB_FAIL;
+			}
+		}
+	}
+
+	if (ZBX_DB_OK == ret && NULL != ca && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CA, ca))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CA option.");
+		ret = ZBX_DB_FAIL;
+	}
+
+	if (ZBX_DB_OK == ret && NULL != key && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_KEY, key))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_KEY option.");
+		ret = ZBX_DB_FAIL;
+	}
+
+	if (ZBX_DB_OK == ret && NULL != cert && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CERT, cert))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CERT option.");
+		ret = ZBX_DB_FAIL;
+	}
+
+	if (ZBX_DB_OK == ret && NULL != cipher && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CIPHER, cipher))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
+		ret = ZBX_DB_FAIL;
+	}
+#else
+	ZBX_UNUSED(tls_connect);
+	ZBX_UNUSED(cert);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(ca);
+	ZBX_UNUSED(cipher);
+	ZBX_UNUSED(cipher_13);
+#endif
+	if (ZBX_DB_OK == ret &&
+			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
+				CLIENT_MULTI_STATEMENTS))
 	{
 		zbx_db_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
@@ -417,9 +536,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error())
 		ret = ZBX_DB_DOWN;
-
 #elif defined(HAVE_ORACLE)
 	ZBX_UNUSED(dbschema);
+	ZBX_UNUSED(tls_connect);
+	ZBX_UNUSED(cert);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(ca);
+	ZBX_UNUSED(cipher);
+	ZBX_UNUSED(cipher_13);
 
 	memset(&oracle, 0, sizeof(oracle));
 
@@ -485,6 +609,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			case OCI_SUCCESS_WITH_INFO:
 				zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_oci_error(err, NULL));
 				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			case OCI_SUCCESS:
 				err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp,
 						(ub4 *)0, OCI_ATTR_SERVER, oracle.errhp);
@@ -518,10 +643,73 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	zbx_free(connect);
 #elif defined(HAVE_POSTGRESQL)
-	if (0 != port)
-		cport = zbx_dsprintf(cport, "%d", port);
+	ZBX_UNUSED(cipher);
+	ZBX_UNUSED(cipher_13);
 
-	conn = PQsetdbLogin(host, cport, NULL, NULL, dbname, user, password);
+	if (NULL != tls_connect)
+	{
+		keywords[i] = "sslmode";
+
+		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+			values[i++] = "require";
+		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+			values[i++] = "verify-ca";
+		else
+			values[i++] = "verify-full";
+	}
+
+	if (NULL != cert)
+	{
+		keywords[i] = "sslcert";
+		values[i++] = cert;
+	}
+
+	if (NULL != key)
+	{
+		keywords[i] = "sslkey";
+		values[i++] = key;
+	}
+
+	if (NULL != ca)
+	{
+		keywords[i] = "sslrootcert";
+		values[i++] = ca;
+	}
+
+	if (NULL != host)
+	{
+		keywords[i] = "host";
+		values[i++] = host;
+	}
+
+	if (NULL != dbname)
+	{
+		keywords[i] = "dbname";
+		values[i++] = dbname;
+	}
+
+	if (NULL != user)
+	{
+		keywords[i] = "user";
+		values[i++] = user;
+	}
+
+	if (NULL != password)
+	{
+		keywords[i] = "password";
+		values[i++] = password;
+	}
+
+	if (0 != port)
+	{
+		keywords[i] = "port";
+		values[i++] = cport = zbx_dsprintf(cport, "%d", port);
+	}
+
+	keywords[i] = NULL;
+	values[i] = NULL;
+
+	conn = PQconnectdbParams(keywords, values, 0);
 
 	zbx_free(cport);
 
@@ -568,6 +756,13 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK != ret)
 		goto out;
 
+	/* increase float precision */
+	if (0 < (ret = zbx_db_execute("set extra_float_digits to 3")))
+		ret = ZBX_DB_OK;
+
+	if (ZBX_DB_OK != ret)
+		goto out;
+
 	result = zbx_db_select("show standard_conforming_strings");
 
 	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
@@ -593,6 +788,12 @@ out:
 	ZBX_UNUSED(password);
 	ZBX_UNUSED(dbschema);
 	ZBX_UNUSED(port);
+	ZBX_UNUSED(tls_connect);
+	ZBX_UNUSED(cert);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(ca);
+	ZBX_UNUSED(cipher);
+	ZBX_UNUSED(cipher_13);
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
@@ -976,7 +1177,7 @@ static sb4 db_bind_dynamic_cb(dvoid *ctxp, OCIBind *bindp, ub4 iter, ub4 index, 
 				*alenp = 0;
 				break;
 			}
-			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ZBX_TYPE_UINT:
 			*bufpp = &((OCINumber *)context->data)[iter];
 			*alenp = sizeof(OCINumber);
@@ -1063,7 +1264,7 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 			break;
 		case ZBX_TYPE_FLOAT:
 			context->size_max = sizeof(double);
-			data_type = SQLT_FLT;
+			data_type = SQLT_BDOUBLE;
 			break;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
@@ -1476,33 +1677,38 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 		}
 		else
 		{
-			if (OCI_SUCCESS == err)
+			if (SQLT_IBDOUBLE != data_type && SQLT_BDOUBLE != data_type)
 			{
-				/* retrieve the length semantics for the column */
-				char_semantics = 0;
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics,
-						(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
-			}
-
-			if (OCI_SUCCESS == err)
-			{
-				if (0 != char_semantics)
+				if (OCI_SUCCESS == err)
 				{
-					/* retrieve the column width in characters */
-					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
-							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+					/* retrieve the length semantics for the column */
+					char_semantics = 0;
+					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics,
+							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
+				}
 
-					/* adjust for UTF-8 */
-					col_width *= 4;
-				}
-				else
+				if (OCI_SUCCESS == err)
 				{
-					/* retrieve the column width in bytes */
-					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
-							(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+					if (0 != char_semantics)
+					{
+						/* retrieve the column width in characters */
+						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
+								(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+
+						/* adjust for UTF-8 */
+						col_width *= 4;
+					}
+					else
+					{
+						/* retrieve the column width in bytes */
+						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
+								(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+					}
 				}
+				col_width++;	/* add 1 byte for terminating '\0' */
 			}
-			col_width++;	/* add 1 byte for terminating '\0' */
+			else
+				col_width = ZBX_MAX_DOUBLE_LEN + 1;
 
 			result->values_alloc[counter - 1] = col_width;
 			result->values[counter - 1] = zbx_malloc(NULL, col_width);
@@ -2195,4 +2401,26 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 int	zbx_db_strlen_n(const char *text, size_t maxlen)
 {
 	return zbx_strlen_utf8_nchars(text, maxlen);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbms_get_version                                             *
+ *                                                                            *
+ * Purpose: returns DBMS version as integer: MMmmuu                           *
+ *          M = major version part                                            *
+ *          m = minor version part                                            *
+ *          u = micro version part                                            *
+ *                                                                            *
+ * Example: 1.2.34 version will be returned as 10234                          *
+ *                                                                            *
+ * Return value: DBMS version or 0 if unknown                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbms_get_version(void)
+{
+#ifdef HAVE_POSTGRESQL
+	return ZBX_PG_SVERSION;
+#endif
+	return 0;
 }

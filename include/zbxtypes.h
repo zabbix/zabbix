@@ -159,8 +159,15 @@ typedef off_t	zbx_offset_t;
 
 #endif	/* _WINDOWS */
 
-#define	ZBX_FS_DBL		"%lf"
-#define	ZBX_FS_DBL_EXT(p)	"%." #p "lf"
+#define ZBX_FS_DBL		"%lf"
+#define ZBX_FS_DBL_EXT(p)	"%." #p "lf"
+#define ZBX_FS_DBL64		"%.17G"
+
+#ifdef HAVE_ORACLE
+#	define ZBX_FS_DBL64_SQL	ZBX_FS_DBL64 "d"
+#else
+#	define ZBX_FS_DBL64_SQL	ZBX_FS_DBL64
+#endif
 
 #define ZBX_PTR_SIZE		sizeof(void *)
 #define ZBX_FS_SIZE_T		ZBX_FS_UI64

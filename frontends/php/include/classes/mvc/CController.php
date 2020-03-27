@@ -180,25 +180,22 @@ abstract class CController {
 	/**
 	 * Validate "from" and "to" parameters for allowed period.
 	 *
-	 * @param string $key_from  Start date parameter name.
-	 * @param string $key_to    End date parameter name.
-	 *
 	 * @return bool
 	 */
-	public function validateTimeSelectorPeriod($key_from = 'from', $key_to = 'to') {
-		if (!$this->hasInput($key_from) || !$this->hasInput($key_to)) {
+	public function validateTimeSelectorPeriod() {
+		if (!$this->hasInput('from') || !$this->hasInput('to')) {
 			return true;
 		}
 
 		$ts = [];
 		$range_time_parser = new CRangeTimeParser();
 
-		foreach ([$key_from, $key_to] as $field) {
+		foreach (['from', 'to'] as $field) {
 			$range_time_parser->parse($this->getInput($field));
-			$ts[$field] = $range_time_parser->getDateTime($field === $key_from)->getTimestamp();
+			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
 		}
 
-		$period = $ts[$key_to] - $ts[$key_from] + 1;
+		$period = $ts['to'] - $ts['from'] + 1;
 
 		if ($period < ZBX_MIN_PERIOD) {
 			info(_n('Minimum time period to display is %1$s minute.',

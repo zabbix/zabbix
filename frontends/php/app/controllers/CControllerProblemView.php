@@ -27,40 +27,40 @@ class CControllerProblemView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'action' =>						'string',
-			'sort' =>						'in clock,host,severity,name',
-			'sortorder' =>					'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>					'in 1',
-			'page' =>						'ge 1',
-			'filter_set' =>					'in 1',
-			'filter_rst' =>					'in 1',
-			'filter_show' =>				'in '.TRIGGERS_OPTION_RECENT_PROBLEM.','.TRIGGERS_OPTION_IN_PROBLEM.','.TRIGGERS_OPTION_ALL,
-			'filter_groupids' =>			'array_id',
-			'filter_hostids' =>				'array_id',
-			'filter_application' =>			'string',
-			'filter_triggerids' =>			'array_id',
-			'filter_name' =>				'string',
-			'filter_severity' =>			'array',
-			'filter_age_state' =>			'in 1',
-			'filter_age' =>					'int32',
-			'filter_inventory' =>			'array',
-			'filter_evaltype' =>			'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
-			'filter_tags' =>				'array',
-			'filter_show_tags' =>			'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
-			'filter_show_suppressed' =>		'in 1',
-			'filter_unacknowledged' =>		'in 1',
-			'filter_compact_view' =>		'in 1',
-			'filter_show_timeline' =>		'in 1',
-			'filter_details' =>				'in 1',
-			'filter_highlight_row' =>		'in 1',
-			'filter_show_opdata' =>			'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
-			'filter_tag_name_format' =>		'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
-			'filter_tag_priority' =>		'string',
-			'filter_from' =>				'range_time',
-			'filter_to' =>					'range_time'
+			'action' =>					'string',
+			'sort' =>					'in clock,host,severity,name',
+			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>				'in 1',
+			'page' =>					'ge 1',
+			'filter_set' =>				'in 1',
+			'filter_rst' =>				'in 1',
+			'filter_show' =>			'in '.TRIGGERS_OPTION_RECENT_PROBLEM.','.TRIGGERS_OPTION_IN_PROBLEM.','.TRIGGERS_OPTION_ALL,
+			'filter_groupids' =>		'array_id',
+			'filter_hostids' =>			'array_id',
+			'filter_application' =>		'string',
+			'filter_triggerids' =>		'array_id',
+			'filter_name' =>			'string',
+			'filter_severities' =>		'array',
+			'filter_age_state' =>		'in 1',
+			'filter_age' =>				'int32',
+			'filter_inventory' =>		'array',
+			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_tags' =>			'array',
+			'filter_show_tags' =>		'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
+			'filter_show_suppressed' =>	'in 1',
+			'filter_unacknowledged' =>	'in 1',
+			'filter_compact_view' =>	'in 1',
+			'filter_show_timeline' =>	'in 1',
+			'filter_details' =>			'in 1',
+			'filter_highlight_row' =>	'in 1',
+			'filter_show_opdata' =>		'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
+			'filter_tag_name_format' =>	'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
+			'filter_tag_priority' =>	'string',
+			'from' =>					'range_time',
+			'to' =>						'range_time'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod('filter_from', 'filter_to');
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
 
 		if ($ret && $this->hasInput('filter_inventory')) {
 			foreach ($this->getInput('filter_inventory') as $filter_inventory) {
@@ -129,7 +129,7 @@ class CControllerProblemView extends CController {
 				PROFILE_TYPE_ID
 			);
 			CProfile::update('web.problem.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::updateArray('web.problem.filter.severity', $this->getInput('filter_severity', []),
+			CProfile::updateArray('web.problem.filter.severities', $this->getInput('filter_severities', []),
 				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.problem.filter.age_state', $this->getInput('filter_age_state', 0), PROFILE_TYPE_INT);
@@ -201,7 +201,7 @@ class CControllerProblemView extends CController {
 			CProfile::delete('web.problem.filter.application');
 			CProfile::deleteIdx('web.problem.filter.triggerids');
 			CProfile::delete('web.problem.filter.name');
-			CProfile::deleteIdx('web.problem.filter.severity');
+			CProfile::deleteIdx('web.problem.filter.severities');
 			CProfile::delete('web.problem.filter.age_state');
 			CProfile::delete('web.problem.filter.age');
 			CProfile::deleteIdx('web.problem.filter.inventory.field');
@@ -298,7 +298,7 @@ class CControllerProblemView extends CController {
 				'triggerids' => $filter_triggerids,
 				'triggers' => $filter_triggers,
 				'name' => CProfile::get('web.problem.filter.name', ''),
-				'severity' => CProfile::getArray('web.problem.filter.severity', []),
+				'severities' => CProfile::getArray('web.problem.filter.severities', []),
 				'age_state' => CProfile::get('web.problem.filter.age_state', 0),
 				'age' => CProfile::get('web.problem.filter.age', 14),
 				'inventories' => $inventories,
@@ -323,8 +323,8 @@ class CControllerProblemView extends CController {
 			$timeselector_options = [
 				'profileIdx' => 'web.problem.filter',
 				'profileIdx2' => 0,
-				'from' => $this->hasInput('filter_from') ? $this->getInput('filter_from') : null,
-				'to' => $this->hasInput('filter_to') ? $this->getInput('filter_to') : null
+				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+				'to' => $this->hasInput('to') ? $this->getInput('to') : null
 			];
 			updateTimeSelectorPeriod($timeselector_options);
 

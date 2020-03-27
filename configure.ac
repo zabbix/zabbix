@@ -62,7 +62,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h stddef.h limits.h)
+  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h stddef.h limits.h float.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -1401,7 +1401,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	fi
 
 	dnl Checking for PostgreSQL support
-	AX_LIB_POSTGRESQL("8.1")
+	AX_LIB_POSTGRESQL("9.2")
 	if test "x$want_postgresql" = "xyes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
@@ -1864,7 +1864,7 @@ CGO_LDFLAGS="$AGENT_LDFLAGS $LD_START_GROUP \
 	\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
 	\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
 	\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
-	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
