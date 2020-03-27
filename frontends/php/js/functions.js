@@ -480,11 +480,6 @@ function overlayDialogueDestroy(dialogueid) {
 
 		removeFromOverlaysStack(dialogueid);
 		jQuery.publish('overlay.close', {dialogueid: dialogueid});
-
-		if (!jQuery('[data-dialogueid]').length) {
-			jQuery('.wrapper').css('overflow', jQuery('.wrapper').data('overflow'));
-			jQuery('.wrapper').removeData('overflow');
-		}
 	}
 }
 

@@ -243,9 +243,11 @@ Overlay.prototype.unmount = function() {
 
 	this.body_mutation_observer.disconnect();
 
+	var $wrapper = jQuery('.wrapper');
+
 	if (!jQuery('[data-dialogueid]').length) {
-		jQuery('.wrapper').css('overflow', jQuery('.wrapper').data('overflow'));
-		jQuery('.wrapper').removeData('overflow');
+		$wrapper.css('overflow', $wrapper.data('overflow'));
+		$wrapper.removeData('overflow');
 	}
 };
 
@@ -253,15 +255,15 @@ Overlay.prototype.unmount = function() {
  * Appends associated nodes to document body.
  */
 Overlay.prototype.mount = function() {
-	var wrapper = jQuery('.wrapper');
+	var $wrapper = jQuery('.wrapper');
 
 	if (!jQuery('[data-dialogueid]').length) {
-		wrapper.data('overflow', wrapper.css('overflow'));
-		wrapper.css('overflow', 'hidden');
+		$wrapper.data('overflow', $wrapper.css('overflow'));
+		$wrapper.css('overflow', 'hidden');
 	}
 
-	this.$backdrop.appendTo(wrapper);
-	this.$dialogue.appendTo(wrapper);
+	this.$backdrop.appendTo($wrapper);
+	this.$dialogue.appendTo($wrapper);
 
 	this.body_mutation_observer.observe(this.$dialogue[0], {childList: true, subtree: true});
 	this.centerDialog();
